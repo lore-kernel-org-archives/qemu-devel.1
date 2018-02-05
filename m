@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiaD-00029F-58
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:29 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiaH-0002B3-G2
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiaB-0002Aw-U2
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiaC-0002C6-JP
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:29 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:33 +0100
-Message-Id: <20180205151835.20812-25-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:32 +0100
+Message-Id: <20180205151835.20812-24-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 24/26] block/curl: Harmonize option defaults
+Subject: [Qemu-devel] [PATCH v8 23/26] block: Fix FIXME from "Add
+ BDS.backing_overridden"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,67 +23,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-Both of the defaults we currently have in the curl driver are named
-based on a slightly different schema, let's unify that and call both
-CURL_BLOCK_OPT_${NAME}_DEFAULT.
-
-While at it, we can add a macro for the third option for which a default
-exists, namely "sslverify".
+Said commit introduced a FIXME stating that bdrv_open_backing_file()
+should set bs->backing_overridden to true not only if the file.filename
+option was set, but if the "options" QDict contained any option that is
+significant for any node in the BDS tree emerging from the backing BDS.
+This behavior is implemented by this patch.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/curl.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ block.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 75 insertions(+), 6 deletions(-)
 
-diff --git a/block/curl.c b/block/curl.c
-index 7c5418324f..4790c7dad5 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -72,8 +72,6 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+diff --git a/block.c b/block.c
+index 664f87bad4..640015e1f7 100644
+--- a/block.c
++++ b/block.c
+@@ -73,6 +73,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+                                            const BdrvChildRole *child_role,
+                                            Error **errp);
  
- #define CURL_NUM_STATES 8
- #define CURL_NUM_ACB    8
--#define READ_AHEAD_DEFAULT (256 * 1024)
--#define CURL_TIMEOUT_DEFAULT 5
- #define CURL_TIMEOUT_MAX 10000
- 
- #define CURL_BLOCK_OPT_URL       "url"
-@@ -87,6 +85,10 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
- #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
- #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
- 
-+#define CURL_BLOCK_OPT_READAHEAD_DEFAULT (256 * 1024)
-+#define CURL_BLOCK_OPT_SSLVERIFY_DEFAULT true
-+#define CURL_BLOCK_OPT_TIMEOUT_DEFAULT 5
++static bool has_significant_runtime_options(BlockDriverState *bs,
++                                            const QDict *d);
 +
- struct BDRVCURLState;
+ /* If non-zero, use only whitelisted block drivers */
+ static int use_bdrv_whitelist;
  
- static bool libcurl_initialized;
-@@ -714,7 +716,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+@@ -2249,6 +2252,42 @@ out:
+     bdrv_refresh_limits(bs, NULL);
+ }
+ 
++/**
++ * Checks whether @options contains any significant option for any of the nodes
++ * in the BDS tree emerging from @bs.
++ */
++static bool is_significant_option_tree(BlockDriverState *bs, QDict *options)
++{
++    BdrvChild *child;
++
++    if (!qdict_size(options)) {
++        /* No need to recurse */
++        return false;
++    }
++
++    if (has_significant_runtime_options(bs, options)) {
++        return true;
++    }
++
++    QLIST_FOREACH(child, &bs->children, next) {
++        QDict *child_options;
++        char *option_prefix;
++
++        option_prefix = g_strdup_printf("%s.", child->name);
++        qdict_extract_subqdict(options, &child_options, option_prefix);
++        g_free(option_prefix);
++
++        if (is_significant_option_tree(child->bs, child_options)) {
++            QDECREF(child_options);
++            return true;
++        }
++
++        QDECREF(child_options);
++    }
++
++    return false;
++}
++
+ /*
+  * Opens the backing file for a BlockDriverState if not yet open
+  *
+@@ -2267,7 +2306,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+     const char *reference = NULL;
+     int ret = 0;
+     BlockDriverState *backing_hd;
+-    QDict *options;
++    QDict *options, *cloned_options = NULL;
+     QDict *tmp_parent_options = NULL;
+     Error *local_err = NULL;
+ 
+@@ -2297,11 +2336,6 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+     reference = qdict_get_try_str(parent_options, bdref_key);
+     if (reference || qdict_haskey(options, "file.filename")) {
+         /* keep backing_filename NULL */
+-
+-        /* FIXME: Should also be set to true if @options contains other runtime
+-         *        options which control the data that is read from the backing
+-         *        BDS */
+-        bs->backing_overridden = true;
+     } else if (bs->backing_file[0] == '\0' && qdict_size(options) == 0) {
+         QDECREF(options);
+         goto free_exit;
+@@ -2322,6 +2356,8 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+         goto free_exit;
      }
  
-     s->readahead_size = qemu_opt_get_size(opts, CURL_BLOCK_OPT_READAHEAD,
--                                          READ_AHEAD_DEFAULT);
-+                                          CURL_BLOCK_OPT_READAHEAD_DEFAULT);
-     if ((s->readahead_size & 0x1ff) != 0) {
-         error_setg(errp, "HTTP_READAHEAD_SIZE %zd is not a multiple of 512",
-                    s->readahead_size);
-@@ -722,13 +724,14 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
++    cloned_options = qdict_clone_shallow(options);
++
+     if (!reference &&
+         bs->backing_format[0] != '\0' && !qdict_haskey(options, "driver")) {
+         qdict_put_str(options, "driver", bs->backing_format);
+@@ -2337,6 +2373,10 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
      }
+     bdrv_set_aio_context(backing_hd, bdrv_get_aio_context(bs));
  
-     s->timeout = qemu_opt_get_number(opts, CURL_BLOCK_OPT_TIMEOUT,
--                                     CURL_TIMEOUT_DEFAULT);
-+                                     CURL_BLOCK_OPT_TIMEOUT_DEFAULT);
-     if (s->timeout > CURL_TIMEOUT_MAX) {
-         error_setg(errp, "timeout parameter is too large or negative");
-         goto out_noclean;
-     }
++    if (reference || is_significant_option_tree(backing_hd, cloned_options)) {
++        bs->backing_overridden = true;
++    }
++
+     /* Hook up the backing file link; drop our reference, bs owns the
+      * backing_hd reference now */
+     bdrv_set_backing_hd(bs, backing_hd, &local_err);
+@@ -2352,6 +2392,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+ free_exit:
+     g_free(backing_filename);
+     QDECREF(tmp_parent_options);
++    QDECREF(cloned_options);
+     return ret;
+ }
  
--    s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
-+    s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY,
-+                                     CURL_BLOCK_OPT_SSLVERIFY_DEFAULT);
+@@ -5027,6 +5068,34 @@ static const char *const *significant_options(BlockDriverState *bs,
+     return (curopt && *curopt) ? curopt : NULL;
+ }
  
-     cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
-     cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
++/**
++ * Returns true if @d contains any options the block driver of @bs considers to
++ * be significant runtime options.
++ */
++static bool has_significant_runtime_options(BlockDriverState *bs,
++                                            const QDict *d)
++{
++    const char *const *option_name = NULL;
++
++    while ((option_name = significant_options(bs, option_name))) {
++        assert(strlen(*option_name) > 0);
++        if ((*option_name)[strlen(*option_name) - 1] != '.') {
++            if (qdict_haskey(d, *option_name)) {
++                return true;
++            }
++        } else {
++            const QDictEntry *entry;
++            for (entry = qdict_first(d); entry; entry = qdict_next(d, entry)) {
++                if (strstart(qdict_entry_key(entry), *option_name, NULL)) {
++                    return true;
++                }
++            }
++        }
++    }
++
++    return false;
++}
++
+ /**
+  * Copies all significant runtime options from bs->options to the given QDict.
+  * The set of significant option keys is determined by invoking
 -- 
 2.14.3
