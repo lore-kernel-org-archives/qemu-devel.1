@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eijIK-0007Bv-8n
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:07:01 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eijMF-0002AB-VE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:11:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eijII-0001U1-7A
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:07:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40392)
+	(envelope-from <cohuck@redhat.com>) id 1eijMF-0003Rv-03
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:11:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eijIH-0001RJ-Ub
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:06:58 -0500
-Date: Mon, 5 Feb 2018 16:06:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180205160652.GB2317@work-vm>
-References: <1517511547-10147-1-git-send-email-minyard@acm.org>
-	<1517511547-10147-2-git-send-email-minyard@acm.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eijME-0003Py-R0
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:11:02 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 21210C051694
+	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 16:11:02 +0000 (UTC)
+Date: Mon, 5 Feb 2018 17:10:27 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180205171027.3bdacf54.cohuck@redhat.com>
+In-Reply-To: <20180205152455.12088-2-berrange@redhat.com>
+References: <20180205152455.12088-1-berrange@redhat.com>
+	<20180205152455.12088-2-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1517511547-10147-2-git-send-email-minyard@acm.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] ipmi: Use proper struct reference for
- KCS vmstate
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/9] char: don't silently skip tn3270
+ protocol init when TLS is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org
-Cc: qemu-devel@nongnu.org, Corey Minyard <cminyard@mvista.com>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* minyard@acm.org (minyard@acm.org) wrote:
-> From: Corey Minyard <cminyard@mvista.com>
+On Mon,  5 Feb 2018 15:24:47 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-Hi Corey,
-
-> The vmstate for isa_ipmi_kcs was referencing into the kcs structure,
-> instead create a kcs structure separate and use that.
-> 
-> There was also some issues in the state transfer.  The inlen field
-> was not being transferred, so if a transaction was in process during
-> the transfer it would be messed up.  And the use_irq field was
-> transferred, but that should come from the configuration.  This
-> also fixes those issues and is tested under heavy load.
-> 
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>=20
+> Even if common tn3270 implementations do not support TLS, it is trivial to
+> have them proxied over a proxy like stunnel which adds TLS at the sockets
+> layer. We should thus not silently skip tn3270 protocol initialization
+> when TLS is enabled.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  hw/ipmi/isa_ipmi_kcs.c | 75 ++++++++++++++++++++++++++++++++++++++++----------
->  1 file changed, 60 insertions(+), 15 deletions(-)
-> 
-> diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
-> index 689587b..3c942d6 100644
-> --- a/hw/ipmi/isa_ipmi_kcs.c
-> +++ b/hw/ipmi/isa_ipmi_kcs.c
-> @@ -422,24 +422,69 @@ static void ipmi_isa_realize(DeviceState *dev, Error **errp)
->      isa_register_ioport(isadev, &iik->kcs.io, iik->kcs.io_base);
->  }
->  
-> -const VMStateDescription vmstate_ISAIPMIKCSDevice = {
-> -    .name = TYPE_IPMI_INTERFACE,
-> +static const VMStateDescription vmstate_IPMIKCS = {
-> +    .name = TYPE_IPMI_INTERFACE_PREFIX "kcs",
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .fields      = (VMStateField[]) {
-> -        VMSTATE_BOOL(kcs.obf_irq_set, ISAIPMIKCSDevice),
-> -        VMSTATE_BOOL(kcs.atn_irq_set, ISAIPMIKCSDevice),
-> -        VMSTATE_BOOL(kcs.use_irq, ISAIPMIKCSDevice),
-> -        VMSTATE_BOOL(kcs.irqs_enabled, ISAIPMIKCSDevice),
-> -        VMSTATE_UINT32(kcs.outpos, ISAIPMIKCSDevice),
-> -        VMSTATE_UINT8_ARRAY(kcs.outmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
-> -        VMSTATE_UINT8_ARRAY(kcs.inmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
-> -        VMSTATE_BOOL(kcs.write_end, ISAIPMIKCSDevice),
-> -        VMSTATE_UINT8(kcs.status_reg, ISAIPMIKCSDevice),
-> -        VMSTATE_UINT8(kcs.data_out_reg, ISAIPMIKCSDevice),
-> -        VMSTATE_INT16(kcs.data_in_reg, ISAIPMIKCSDevice),
-> -        VMSTATE_INT16(kcs.cmd_reg, ISAIPMIKCSDevice),
-> -        VMSTATE_UINT8(kcs.waiting_rsp, ISAIPMIKCSDevice),
-> +        VMSTATE_BOOL(obf_irq_set, IPMIKCS),
-> +        VMSTATE_BOOL(atn_irq_set, IPMIKCS),
-> +        VMSTATE_BOOL(use_irq, IPMIKCS),
-> +        VMSTATE_BOOL(irqs_enabled, IPMIKCS),
-> +        VMSTATE_UINT32(outpos, IPMIKCS),
-> +        VMSTATE_UINT8_ARRAY(outmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
-> +        VMSTATE_UINT32(inlen, IPMIKCS),
-> +        VMSTATE_UINT8_ARRAY(inmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
+>  chardev/char-socket.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 77cdf487eb..5c46a89200 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -634,8 +634,7 @@ static void tcp_chr_tls_handshake(QIOTask *task,
+>      if (qio_task_propagate_error(task, NULL)) {
+>          tcp_chr_disconnect(chr);
+>      } else {
+> -        /* tn3270 does not support TLS yet */
+> -        if (s->do_telnetopt && !s->is_tn3270) {
+> +        if (s->do_telnetopt) {
+>              tcp_chr_telnet_init(chr);
+>          } else {
+>              tcp_chr_connect(chr);
 
-There's an easier way to do this, which means that you don't need the
-load_old hook; you can do:
-
-  VMSTATE_UINT32_V(inlen, IPMIKCS, 2);
-
-and that field will only be loaded when loading a v2.
-
-
-Now, the other thing you could do, if it's rare then inlen is none-0,
-is you could add it as a subsection that only gets sent when it's
-none-0; that way migration to an old qemu would work in most cases.
-
-Dave
-
-> +        VMSTATE_BOOL(write_end, IPMIKCS),
-> +        VMSTATE_UINT8(status_reg, IPMIKCS),
-> +        VMSTATE_UINT8(data_out_reg, IPMIKCS),
-> +        VMSTATE_INT16(data_in_reg, IPMIKCS),
-> +        VMSTATE_INT16(cmd_reg, IPMIKCS),
-> +        VMSTATE_UINT8(waiting_rsp, IPMIKCS),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static int isa_ipmi_kcs_load_old(QEMUFile *f, void *opaque, int version_id)
-> +{
-> +    ISAIPMIKCSDevice *iik = opaque;
-> +    IPMIKCS *k = &iik->kcs;
-> +    unsigned int i;
-> +
-> +    if (version_id != 1) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    k->obf_irq_set = qemu_get_byte(f);
-> +    k->atn_irq_set = qemu_get_byte(f);
-> +    qemu_get_byte(f); /* Used to be use_irq, but that's not a good idea. */
-> +    k->irqs_enabled = qemu_get_byte(f);
-> +    k->outpos = qemu_get_be32(f);
-> +    for (i = 0; i < MAX_IPMI_MSG_SIZE; i++) {
-> +        k->outmsg[i] = qemu_get_byte(f);
-> +    }
-> +    k->inlen = 0; /* This was forgotten on version 1, just reset it. */
-> +    for (i = 0; i < MAX_IPMI_MSG_SIZE; i++) {
-> +        k->inmsg[i] = qemu_get_byte(f);
-> +    }
-> +    k->write_end = qemu_get_byte(f);
-> +    k->status_reg = qemu_get_byte(f);
-> +    k->data_out_reg = qemu_get_byte(f);
-> +    k->data_in_reg = qemu_get_be16(f);
-> +    k->cmd_reg = qemu_get_be16(f);
-> +    k->waiting_rsp = qemu_get_byte(f);
-> +
-> +    return 0;
-> +}
-> +
-> +static const VMStateDescription vmstate_ISAIPMIKCSDevice = {
-> +    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-kcs",
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
-> +    .minimum_version_id_old = 1,
-> +    .load_state_old = isa_ipmi_kcs_load_old,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_STRUCT(kcs, ISAIPMIKCSDevice, 1, vmstate_IPMIKCS, IPMIKCS),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> -- 
-> 2.7.4
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Acked-by: Cornelia Huck <cohuck@redhat.com>
