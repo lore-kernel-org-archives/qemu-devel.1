@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eih58-0000XD-2S
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:15 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eih5O-0000mx-SY
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eih53-0002z8-9E
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:14 -0500
-Received: from mail-qt0-f180.google.com ([209.85.216.180]:36123)
+	(envelope-from <richard.henderson@linaro.org>) id 1eih5K-0003MI-D8
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:30 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:41604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eih53-0002yM-4a
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:09 -0500
-Received: by mail-qt0-f180.google.com with SMTP id t25so6001809qtg.3
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 05:45:09 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eih5K-0003LQ-2U
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:26 -0500
+Received: by mail-pl0-x243.google.com with SMTP id k8so9585980pli.8
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 05:45:25 -0800 (PST)
+References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
+	<1517811767-75958-3-git-send-email-mjc@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f880f730-a999-b15d-1196-ce49ae63a266@linaro.org>
+Date: Mon, 5 Feb 2018 05:45:22 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180202130336.24719-12-armbru@redhat.com>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-12-armbru@redhat.com>
-From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Mon, 5 Feb 2018 14:45:08 +0100
-Message-ID: <CAMxuvazcT3xF-qD0ZTN4TvGoF_R2kvCT2kPZ3w5uBjfni=M8YA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 11/21] qapi: Lift error reporting from
- QAPISchema.__init__() to callers
+In-Reply-To: <1517811767-75958-3-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 03/22] RISC-V CPU Core Definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,109 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, marcandre <marcandre.lureau@redhat.com>, "Blake, Eric" <eblake@redhat.com>, mdroth@linux.vnet.ibm.com
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
+On 02/04/2018 10:22 PM, Michael Clark wrote:
+> Add CPU state header, CPU definitions and initialization routines
+> 
+> Signed-off-by: Michael Clark <mjc@sifive.com>
 > ---
->  scripts/qapi-gen.py            |  8 ++++++--
->  scripts/qapi/common.py         | 23 +++++++++--------------
->  tests/qapi-schema/test-qapi.py |  8 +++++++-
->  3 files changed, 22 insertions(+), 17 deletions(-)
->
-> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
-> index 6302fd0d55..ba82ca92cc 100755
-> --- a/scripts/qapi-gen.py
-> +++ b/scripts/qapi-gen.py
-> @@ -7,7 +7,7 @@
->  import getopt
->  import re
->  import sys
-> -from qapi.common import QAPISchema
-> +from qapi.common import QAPIError, QAPISchema
->  from qapi.types import gen_types
->  from qapi.visit import gen_visit
->  from qapi.commands import gen_commands
-> @@ -77,7 +77,11 @@ def main(argv):
->          if o in ('-u', '--unmask-non-abi-names'):
->              opt_unmask =3D True
->
-> -    schema =3D QAPISchema(input_file)
-> +    try:
-> +        schema =3D QAPISchema(input_file)
-> +    except QAPIError as err:
-> +        print >>sys.stderr, err
-> +        exit(1)
->
->      gen_types(schema, output_dir, prefix, opt_builtins)
->      gen_visit(schema, output_dir, prefix, opt_builtins)
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 78e960d07c..d334e1db5a 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -15,7 +15,6 @@ import errno
->  import os
->  import re
->  import string
-> -import sys
->  from ordereddict import OrderedDict
->
->  builtin_types =3D {
-> @@ -1455,19 +1454,15 @@ class QAPISchemaEvent(QAPISchemaEntity):
->
->  class QAPISchema(object):
->      def __init__(self, fname):
-> -        try:
-> -            parser =3D QAPISchemaParser(open(fname, 'r'))
-> -            exprs =3D check_exprs(parser.exprs)
-> -            self.docs =3D parser.docs
-> -            self._entity_dict =3D {}
-> -            self._predefining =3D True
-> -            self._def_predefineds()
-> -            self._predefining =3D False
-> -            self._def_exprs(exprs)
-> -            self.check()
-> -        except QAPIError as err:
-> -            print >>sys.stderr, err
-> -            exit(1)
-> +        parser =3D QAPISchemaParser(open(fname, 'r'))
-> +        exprs =3D check_exprs(parser.exprs)
-> +        self.docs =3D parser.docs
-> +        self._entity_dict =3D {}
-> +        self._predefining =3D True
-> +        self._def_predefineds()
-> +        self._predefining =3D False
-> +        self._def_exprs(exprs)
-> +        self.check()
->
->      def _def_entity(self, ent):
->          # Only the predefined types are allowed to not have info
-> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-> index 7772d09919..d6bb8ec6a4 100644
-> --- a/tests/qapi-schema/test-qapi.py
-> +++ b/tests/qapi-schema/test-qapi.py
-> @@ -53,7 +53,13 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
->              for v in variants.variants:
->                  print '    case %s: %s' % (v.name, v.type.name)
->
-> -schema =3D QAPISchema(sys.argv[1])
-> +
-> +try:
-> +    schema =3D QAPISchema(sys.argv[1])
-> +except QAPIError as err:
-> +    print >>sys.stderr, err
-> +    exit(1)
-> +
->  schema.visit(QAPISchemaTestVisitor())
->
->  for doc in schema.docs:
-> --
-> 2.13.6
->
+>  target/riscv/cpu.c      | 385 ++++++++++++++++++++++++++++++++++++++++++++
+>  target/riscv/cpu.h      | 256 +++++++++++++++++++++++++++++
+>  target/riscv/cpu_bits.h | 417 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 1058 insertions(+)
+>  create mode 100644 target/riscv/cpu.c
+>  create mode 100644 target/riscv/cpu.h
+>  create mode 100644 target/riscv/cpu_bits.h
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+> 
+> +static const RISCVCPUInfo riscv_cpus[] = {
+> +#ifdef CONFIG_USER_ONLY
+> +    { TYPE_RISCV_CPU_ANY,                riscv_any_cpu_init },
+> +#else
+> +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09, riscv_imafdcsu_priv1_9_cpu_init },
+> +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10, riscv_imafdcsu_priv1_10_cpu_init },
+> +    { TYPE_RISCV_CPU_IMACU_PRIV_1_10,    riscv_imacu_priv1_10_cpu_init },
+> +    { TYPE_RISCV_CPU_IMAC_PRIV_1_10,     riscv_imac_priv1_10_cpu_init },
+> +#endif
+> +    { NULL, NULL }
+> +};
+
+I do wonder if there might be value in providing the more restricted cpus for
+CONFIG_USER_ONLY as well.  E.g. toolchain testing, so that you can be sure that
+the compiler doesn't emit an instruction that is invalid for a given MISA.
+
+
+r~
