@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eiktH-0002R8-SS
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 12:49:17 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eil6y-0003xh-T7
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:03:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eiktE-0000a5-Q4
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 12:49:15 -0500
-Resent-Message-Id: <E1eiktE-0000a5-Q4@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21103)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eiktE-0000Ym-HD
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 12:49:12 -0500
-In-Reply-To: <20180205152455.12088-1-berrange@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151785202886.90.5488609646875482619@bdbb90650ae5>
+	(envelope-from <alistair23@gmail.com>) id 1eil6x-0001Th-UE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:03:24 -0500
+Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:47100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eil6x-0001SN-MU
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:03:23 -0500
+Received: by mail-lf0-x235.google.com with SMTP id q194so42988916lfe.13
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 10:03:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 5 Feb 2018 09:33:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] Enable passing pre-opened chardev
- socket FD
+Sender: alistair23@gmail.com
+In-Reply-To: <20180205150426.20542-1-peter.maydell@linaro.org>
+References: <20180205150426.20542-1-peter.maydell@linaro.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 5 Feb 2018 10:02:51 -0800
+Message-ID: <CAKmqyKN0UC+J8o8YnPph-jLAhUO0QjUrtHvhRx_e5M_mVKybbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Allow PC to be set
+ on command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Patch Tracking <patches@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjA1MTUyNDU1LjEyMDg4LTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvOV0gRW5hYmxlIHBhc3NpbmcgcHJlLW9wZW5l
-ZCBjaGFyZGV2IHNvY2tldCBGRAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcg
-dXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAyMDUxNTI0NTUuMTIwODgtMS1iZXJyYW5n
-ZUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAyMDUxNTI0NTUuMTIwODgtMS1iZXJyYW5nZUBy
-ZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjljNDJiNDUwNyBjaGFy
-OiBhbGxvdyBwYXNzaW5nIHByZS1vcGVuZWQgc29ja2V0IGZpbGUgZGVzY3JpcHRvciBhdCBzdGFy
-dHVwCmFlZTEwMzFlZTUgY2hhcjogcmVmYWN0b3IgcGFyc2luZyBvZiBzb2NrZXQgYWRkcmVzcyBp
-bmZvcm1hdGlvbgoyMGVhNWRmMzljIHNvY2tldHM6IGFsbG93IFNvY2tldEFkZHJlc3MgJ2ZkJyB0
-byByZWZlcmVuY2UgbnVtZXJpYyBmaWxlIGRlc2NyaXB0b3JzCjAyN2I1ZjdhMDAgc29ja2V0czog
-Y2hlY2sgdGhhdCB0aGUgbmFtZWQgZmlsZSBkZXNjcmlwdG9yIGlzIGEgc29ja2V0CjA2NDQ3Njdm
-MWUgc29ja2V0czogbW92ZSBmZF9pc19zb2NrZXQoKSBpbnRvIGNvbW1vbiBzb2NrZXRzIGNvZGUK
-NTY3YjZhNDAxMSBzb2NrZXRzOiBzdHJlbmd0aGVuIHRlc3Qgc3VpdGUgSVAgcHJvdG9jb2wgYXZh
-aWxhYmlsaXR5IGNoZWNrcwphNzdiMWYzMjI0IHNvY2tldHM6IHB1bGwgY29kZSBmb3IgdGVzdGlu
-ZyBJUCBhdmFpbGFiaWxpdHkgb3V0IG9mIHNwZWNpZmljIHRlc3QKMTkyYmFiNDFkMSBjdXRpbHM6
-IGFkZCBxZW11X3N0cnRvaSAmIHFlbXVfc3RydG91aSBwYXJzZXJzIGZvciBpbnQvdW5zaWduZWQg
-aW50IHR5cGVzCmZhZWQxZGZkMDEgY2hhcjogZG9uJ3Qgc2lsZW50bHkgc2tpcCB0bjMyNzAgcHJv
-dG9jb2wgaW5pdCB3aGVuIFRMUyBpcyBlbmFibGVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVj
-a2luZyBQQVRDSCAxLzk6IGNoYXI6IGRvbid0IHNpbGVudGx5IHNraXAgdG4zMjcwIHByb3RvY29s
-IGluaXQgd2hlbiBUTFMgaXMgZW5hYmxlZC4uLgpDaGVja2luZyBQQVRDSCAyLzk6IGN1dGlsczog
-YWRkIHFlbXVfc3RydG9pICYgcWVtdV9zdHJ0b3VpIHBhcnNlcnMgZm9yIGludC91bnNpZ25lZCBp
-bnQgdHlwZXMuLi4KRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG9sIGluIHByZWZlcmVu
-Y2UgdG8gc3RydG9sCiM3MzM6IEZJTEU6IHV0aWwvY3V0aWxzLmM6MzM4OgorICAgIGxyZXN1bHQg
-PSBzdHJ0b2wobnB0ciwgJmVwLCBiYXNlKTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0
-cnRvbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAojNzgzOiBGSUxFOiB1dGlsL2N1dGlscy5jOjM4
-ODoKKyAgICBscmVzdWx0ID0gc3RydG9sKG5wdHIsICZlcCwgYmFzZSk7Cgp0b3RhbDogMiBlcnJv
-cnMsIDAgd2FybmluZ3MsIDc4NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzk6IHNvY2tldHM6IHB1bGwgY29kZSBm
-b3IgdGVzdGluZyBJUCBhdmFpbGFiaWxpdHkgb3V0IG9mIHNwZWNpZmljIHRlc3QuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC85OiBzb2NrZXRzOiBzdHJlbmd0aGVuIHRlc3Qgc3VpdGUgSVAgcHJvdG9jb2wg
-YXZhaWxhYmlsaXR5IGNoZWNrcy4uLgpDaGVja2luZyBQQVRDSCA1Lzk6IHNvY2tldHM6IG1vdmUg
-ZmRfaXNfc29ja2V0KCkgaW50byBjb21tb24gc29ja2V0cyBjb2RlLi4uCkNoZWNraW5nIFBBVENI
-IDYvOTogc29ja2V0czogY2hlY2sgdGhhdCB0aGUgbmFtZWQgZmlsZSBkZXNjcmlwdG9yIGlzIGEg
-c29ja2V0Li4uCkNoZWNraW5nIFBBVENIIDcvOTogc29ja2V0czogYWxsb3cgU29ja2V0QWRkcmVz
-cyAnZmQnIHRvIHJlZmVyZW5jZSBudW1lcmljIGZpbGUgZGVzY3JpcHRvcnMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggOC85OiBjaGFyOiByZWZhY3RvciBwYXJzaW5nIG9mIHNvY2tldCBhZGRyZXNzIGluZm9y
-bWF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDkvOTogY2hhcjogYWxsb3cgcGFzc2luZyBwcmUtb3Bl
-bmVkIHNvY2tldCBmaWxlIGRlc2NyaXB0b3IgYXQgc3RhcnR1cC4uLgo9PT0gT1VUUFVUIEVORCA9
-PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Mon, Feb 5, 2018 at 7:04 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> The documentation for the generic loader claims that you can
+> set the PC for a CPU with an option of the form
+>   -device loader,cpu-num=0,addr=0x10000004
+>
+> However if you try this QEMU complains:
+>   cpu_num must be specified when setting a program counter
+>
+> This is because we were testing against 0 rather than CPU_NONE.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+
+> ---
+> I've also noticed that you can't use this to specify that
+> the starting address should be in Thumb mode for Arm CPUs,
+> but I'm not so sure of the right way to fix that...
+
+Should we at least update the documentation to mention this then?
+
+Alistair
+
+>
+>  hw/core/generic-loader.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+> index 46012673c3..cb0e68486d 100644
+> --- a/hw/core/generic-loader.c
+> +++ b/hw/core/generic-loader.c
+> @@ -105,7 +105,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
+>              error_setg(errp, "data can not be specified when setting a "
+>                         "program counter");
+>              return;
+> -        } else if (!s->cpu_num) {
+> +        } else if (s->cpu_num == CPU_NONE) {
+>              error_setg(errp, "cpu_num must be specified when setting a "
+>                         "program counter");
+>              return;
+> --
+> 2.16.1
+>
+>
