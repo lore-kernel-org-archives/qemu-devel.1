@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSd-0004rX-VO
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:53 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSd-00059u-1f
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSc-0004qB-OR
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:51 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35757)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSb-00059S-P8
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:50 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43242)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eimSc-00059e-RH
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:50 -0500
-Received: by mail-wr0-x244.google.com with SMTP id w50so30854520wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:50 -0800 (PST)
+	id 1eimSb-00058s-HL
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:49 -0500
+Received: by mail-wr0-x243.google.com with SMTP id b52so10520999wrd.10
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:49 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  5 Feb 2018 20:28:52 +0100
-Message-Id: <1517858941-5538-39-git-send-email-pbonzini@redhat.com>
+Date: Mon,  5 Feb 2018 20:28:51 +0100
+Message-Id: <1517858941-5538-38-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
 References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 38/47] memfd: add hugetlbsize argument
+Subject: [Qemu-devel] [PULL 37/47] memfd: add hugetlb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,86 +35,79 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Learn to specificy hugetlb size as qemu_memfd_create() argument.
+Linux commit 749df87bd7bee5a79cef073f5d032ddb2b211de8 (v4.14-rc1)
+added a new flag MFD_HUGETLB to memfd_create() that specify the file
+to be created resides in the hugetlbfs filesystem.  This is the
+generic hugetlbfs filesystem not associated with any specific mount
+point.
+
+hugetlbfs does not support sealing operations in v4.14, therefore
+specifying MFD_ALLOW_SEALING with MFD_HUGETLB will result in EINVAL.
+
+However, I added sealing support in "[PATCH v3 0/9] memfd: add sealing
+to hugetlb-backed memory" series, queued in -mm tree for v4.16.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180201132757.23063-4-marcandre.lureau@redhat.com>
+Message-Id: <20180201132757.23063-3-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/memfd.h |  2 +-
- util/memfd.c         | 22 ++++++++++++++++++----
- 2 files changed, 19 insertions(+), 5 deletions(-)
+ include/qemu/memfd.h |  4 ++--
+ util/memfd.c         | 13 ++++++++++---
+ 2 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/include/qemu/memfd.h b/include/qemu/memfd.h
-index 1d3ecc7..de10198 100644
+index b9d0987..1d3ecc7 100644
 --- a/include/qemu/memfd.h
 +++ b/include/qemu/memfd.h
-@@ -17,7 +17,7 @@
+@@ -16,8 +16,8 @@
+ #define F_SEAL_WRITE    0x0008  /* prevent writes */
  #endif
  
- int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
--                      unsigned int seals, Error **errp);
-+                      uint64_t hugetlbsize, unsigned int seals, Error **errp);
+-int qemu_memfd_create(const char *name, size_t size, unsigned int seals,
+-                      Error **errp);
++int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
++                      unsigned int seals, Error **errp);
  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,
                         int *fd, Error **errp);
  void qemu_memfd_free(void *ptr, size_t size, int fd);
 diff --git a/util/memfd.c b/util/memfd.c
-index 7594af7..07d579e 100644
+index 8d27307..7594af7 100644
 --- a/util/memfd.c
 +++ b/util/memfd.c
-@@ -29,6 +29,7 @@
- 
- #include "qapi/error.h"
- #include "qemu/memfd.h"
-+#include "qemu/host-utils.h"
- 
- #if defined CONFIG_LINUX && !defined CONFIG_MEMFD
- #include <sys/syscall.h>
-@@ -56,9 +57,22 @@ static int memfd_create(const char *name, unsigned int flags)
- #define MFD_HUGETLB 0x0004U
+@@ -52,7 +52,11 @@ static int memfd_create(const char *name, unsigned int flags)
+ #define MFD_ALLOW_SEALING 0x0002U
  #endif
  
-+#ifndef MFD_HUGE_SHIFT
-+#define MFD_HUGE_SHIFT 26
+-int qemu_memfd_create(const char *name, size_t size,
++#ifndef MFD_HUGETLB
++#define MFD_HUGETLB 0x0004U
 +#endif
 +
- int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
--                      unsigned int seals, Error **errp)
-+                      uint64_t hugetlbsize, unsigned int seals, Error **errp)
++int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
+                       unsigned int seals, Error **errp)
  {
-+    int htsize = hugetlbsize ? ctz64(hugetlbsize) : 0;
-+
-+    if (htsize && 1 << htsize != hugetlbsize) {
-+        error_setg(errp, "Hugepage size must be a power of 2");
-+        return -1;
-+    }
-+
-+    htsize = htsize << MFD_HUGE_SHIFT;
-+
  #ifdef CONFIG_LINUX
-     int mfd = -1;
-     unsigned int flags = MFD_CLOEXEC;
-@@ -68,8 +82,8 @@ int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
+@@ -62,6 +66,9 @@ int qemu_memfd_create(const char *name, size_t size,
+     if (seals) {
+         flags |= MFD_ALLOW_SEALING;
      }
-     if (hugetlb) {
-         flags |= MFD_HUGETLB;
-+        flags |= htsize;
-     }
--
++    if (hugetlb) {
++        flags |= MFD_HUGETLB;
++    }
+ 
      mfd = memfd_create(name, flags);
      if (mfd < 0) {
-         goto err;
-@@ -104,11 +118,11 @@ void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,
+@@ -97,11 +104,11 @@ void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,
                         int *fd, Error **errp)
  {
      void *ptr;
--    int mfd = qemu_memfd_create(name, size, false, seals, NULL);
-+    int mfd = qemu_memfd_create(name, size, false, 0, seals, NULL);
+-    int mfd = qemu_memfd_create(name, size, seals, NULL);
++    int mfd = qemu_memfd_create(name, size, false, seals, NULL);
  
      /* some systems have memfd without sealing */
      if (mfd == -1) {
--        mfd = qemu_memfd_create(name, size, false, 0, NULL);
-+        mfd = qemu_memfd_create(name, size, false, 0, 0, NULL);
+-        mfd = qemu_memfd_create(name, size, 0, NULL);
++        mfd = qemu_memfd_create(name, size, false, 0, NULL);
      }
  
      if (mfd == -1) {
