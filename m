@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1einDm-0000KN-48
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:18:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1einHl-0004m8-V9
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:22:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1einDh-00047z-Vw
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:18:34 -0500
-Resent-Message-Id: <E1einDh-00047z-Vw@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1einDh-00047X-N5
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:18:29 -0500
-In-Reply-To: <mvmmv0nk6g7.fsf@suse.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151783394795.39.1553009865936585563@bdbb90650ae5>
+	(envelope-from <mreitz@redhat.com>) id 1einHl-0006xk-6u
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:22:41 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 21:22:30 +0100
+Message-Id: <20180205202232.19254-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 5 Feb 2018 04:32:28 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Implement copy_file_range
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/2] block/ssh: Implement
+ .bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +21,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: schwab@suse.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IG12bW12MG5rNmc3LmZzZkBzdXNlLmRlClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0hdIGxpbnV4LXVzZXI6IEltcGxlbWVudCBjb3B5X2ZpbGVfcmFuZ2UKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
-IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
-Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
-aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
-IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
-YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
-ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
-aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCjU3NDFhYmUwOWUgbGludXgtdXNlcjogSW1wbGVtZW50IGNvcHlfZmlsZV9yYW5nZQoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBsaW51eC11c2VyOiBJbXBsZW1l
-bnQgY29weV9maWxlX3JhbmdlLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZp
-bmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxOTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTAz
-NjoKKyNpZiBkZWZpbmVkKFRBUkdFVF9OUl9jb3B5X2ZpbGVfcmFuZ2UpICYmIGRlZmluZWQoX19O
-Ul9jb3B5X2ZpbGVfcmFuZ2UpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
-cyBzaG91bGQgYmUgYXZvaWRlZAojMzI6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjEyNTc4
-OgorI2lmIGRlZmluZWQoVEFSR0VUX05SX2NvcHlfZmlsZV9yYW5nZSkgJiYgZGVmaW5lZChfX05S
-X2NvcHlfZmlsZV9yYW5nZSkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rp
-b24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzUwOiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGwuYzoxMjU5NjoKKyAgICAgICAgICAgIHJldCA9IGdldF9lcnJubyAoc2FmZV9jb3B5X2Zp
-bGVfcmFuZ2UgKGFyZzEsIHBpbm9mZiwgYXJnMywgcG91dG9mZiwKCkVSUk9SOiBzcGFjZSBwcm9o
-aWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzUw
-OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMjU5NjoKKyAgICAgICAgICAgIHJldCA9IGdl
-dF9lcnJubyAoc2FmZV9jb3B5X2ZpbGVfcmFuZ2UgKGFyZzEsIHBpbm9mZiwgYXJnMywgcG91dG9m
-ZiwKCnRvdGFsOiAyIGVycm9ycywgMiB3YXJuaW5ncywgNTEgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+This series implements .bdrv_refresh_filename() for the ssh block
+driver, along with an appropriate .bdrv_dirname() so we don't chop off
+query strings for backing files with relative filenames.
+
+This series depends on my =E2=80=9Cblock: Fix some filename generation is=
+sues=E2=80=9D
+series and on Pino's =E2=80=9Cssh: switch from libssh2 to libssh=E2=80=9D=
+ patch.
+
+Based-on: 20180205151835.20812-1-mreitz@redhat.com
+Based-on: 20180118164439.2120-1-ptoscano@redhat.com
+
+
+Max Reitz (2):
+  block/ssh: Implement .bdrv_refresh_filename()
+  block/ssh: Implement .bdrv_dirname()
+
+ block/ssh.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+------
+ 1 file changed, 65 insertions(+), 7 deletions(-)
+
+--=20
+2.14.3
