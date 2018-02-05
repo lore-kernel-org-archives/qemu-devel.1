@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eimfL-00010F-QF
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:43:00 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eimft-0001UM-4p
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:43:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eimfI-000786-MJ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:42:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49202)
+	(envelope-from <pbonzini@redhat.com>) id 1eimfp-0007v8-VO
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:43:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eimfI-00077Z-En
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:42:56 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71D914B8C
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 19:42:55 +0000 (UTC)
-References: <20180205152455.12088-1-berrange@redhat.com>
-	<20180205152455.12088-8-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d9a1c2af-e5f8-1d46-d5c5-ecb2ce20981a@redhat.com>
-Date: Mon, 5 Feb 2018 13:42:50 -0600
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eimfp-0007uB-OM
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:43:29 -0500
+References: <1517464293-7012-1-git-send-email-changpeng.liu@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <883c5971-b8a6-d554-b19e-755bc8807a24@redhat.com>
+Date: Mon, 5 Feb 2018 20:43:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180205152455.12088-8-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1517464293-7012-1-git-send-email-changpeng.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 7/9] sockets: allow SocketAddress 'fd'
- to reference numeric file descriptors
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: enable multiple vectors when
+ using multiple I/O queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, mst@redhat.com, marcandre.lureau@redhat.com, james.r.harris@intel.com
 
-On 02/05/2018 09:24 AM, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> The SocketAddress 'fd' kind accepts the name of a file descriptor passe=
-d
-> to the monitor with the 'getfd' command. This makes it impossible to us=
-e
-> the 'fd' kind in cases where a monitor is not available. This can apply=
- in
-> handling command line argv at startup, or simply if internal code wants=
- to
-> use SocketAddress and pass a numeric FD it has acquired from elsewhere.
->=20
-> Fortunately the 'getfd' command mandated that the FD names must not sta=
-rt
-> with a leading digit. We can thus safely extend semantics of the
-> SocketAddress 'fd' kind, to allow a purely numeric name to reference an
-> file descriptor that QEMU already has open. There will be restrictions =
-on
-> when each kind can be used.
->=20
-> In codepaths where we are handling a monitor command (ie cur_mon !=3D N=
-ULL),
-> we will only support use of named file descriptors as before. Use of FD
-> numbers is still not permitted for monitor commands.
->=20
-> In codepaths where we are not handling a monitor command (ie cur_mon =3D=
-=3D
-> NULL), we will not support named file descriptors. Instead we can refer=
-ence
-> FD numers explicitly. This allows the app spawning QEMU to intentionall=
-y
-> "leak" a pre-opened socket to QEMU and reference that in a SocketAddres=
-s
-> definition, or for code inside QEMU to pass pre-opened FDs around.
->=20
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On 01/02/2018 06:51, Changpeng Liu wrote:
+> Currently virtio-pci driver hardcoded 2 vectors for virtio-blk device,
+> for multiple I/O queues scenario, all the I/O queues will share one
+> interrupt vector, while here, enable multiple vectors according to
+> the number of I/O queues.
+> 
+> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+
+This is a change in the device's interface to the guest ("guest ABI"),
+so it has to be protected with migration compatibility: just add to
+HW_COMPAT_2_11 in include/hw/compat.h the following:
+
+    {\
+        .driver   = "virtio-blk-pci",\
+        .property = "vectors",\
+        .value    = "2",\
+    },\
+    {\
+        .driver   = "vhost-user-blk-pci",\
+        .property = "vectors",\
+        .value    = "2",\
+    },\
+
+Otherwise, it looks good.
+
+Thanks,
+
+Paolo
+
 > ---
->   qapi/sockets.json         |   7 +++
->   tests/test-util-sockets.c | 112 +++++++++++++++++++++++++++++++++++++=
-++++++---
->   util/qemu-sockets.c       |  16 +++++--
->   3 files changed, 126 insertions(+), 9 deletions(-)
->=20
-> diff --git a/qapi/sockets.json b/qapi/sockets.json
-> index ac022c6ad0..fc81d8d5e8 100644
-> --- a/qapi/sockets.json
-> +++ b/qapi/sockets.json
-> @@ -123,6 +123,13 @@
->   #
->   # @unix:  Unix domain socket
->   #
-> +# @vsock: VMCI address
-> +#
-> +# @fd: decimal is for file descriptor number, otherwise a file descrip=
-tor name.
-> +#      Named file descriptors are permitted in monitor commands, in co=
-mbination
-> +#      with the 'getfd' command. Decimal file descriptors are permitte=
-d at
-> +#      startup or other contexts where no monitor context is active.
-> +#
->   # Since: 2.9
-
-There doesn't seem to be any way to introspect if we support decimal fds=20
-from the command line; is that going to be a problem?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>  hw/virtio/virtio-pci.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 9ae10f0..379b00c 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1932,7 +1932,7 @@ static Property virtio_blk_pci_properties[] = {
+>      DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
+>      DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
+>                      VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
+> -    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
+> +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, DEV_NVECTORS_UNSPECIFIED),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -1941,6 +1941,10 @@ static void virtio_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>      VirtIOBlkPCI *dev = VIRTIO_BLK_PCI(vpci_dev);
+>      DeviceState *vdev = DEVICE(&dev->vdev);
+>  
+> +    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> +        vpci_dev->nvectors = dev->vdev.conf.num_queues + 1;
+> +    }
+> +
+>      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+>      object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+>  }
+> @@ -1983,7 +1987,7 @@ static const TypeInfo virtio_blk_pci_info = {
+>  
+>  static Property vhost_user_blk_pci_properties[] = {
+>      DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
+> -    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
+> +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, DEV_NVECTORS_UNSPECIFIED),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -1992,6 +1996,10 @@ static void vhost_user_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>      VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(vpci_dev);
+>      DeviceState *vdev = DEVICE(&dev->vdev);
+>  
+> +    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> +        vpci_dev->nvectors = dev->vdev.num_queues + 1;
+> +    }
+> +
+>      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+>      object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+>  }
+> 
