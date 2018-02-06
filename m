@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eizsn-0002Cr-2p
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:49:45 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eizyP-0004tp-8K
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eizsg-0002HG-Uw
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:49:45 -0500
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:35246)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eizsg-0002Gt-PL
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:49:38 -0500
-Received: by mail-oi0-x22e.google.com with SMTP id e15so892785oiy.2
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 01:49:38 -0800 (PST)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eizyK-0006Xo-9n
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:55:33 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39782)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eizyK-0006XA-19
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:55:28 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 06 Feb 2018 12:55:26 +0300
+Message-ID: <20180206095526.26436.86301.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA543B64@DGGEMA505-MBX.china.huawei.com>
-References: <1517492876-28428-1-git-send-email-arei.gonglei@huawei.com>
-	<d2f644da-e6c8-da3a-55e4-13ae69c44fc4@redhat.com>
-	<CAFEAcA_6wg6aS_g0mGcNyjC57BVoU+pxdaRU3buM5J6b3XNW-Q@mail.gmail.com>
-	<fa226f5f-77c4-7167-29c6-9baf08737239@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA543B64@DGGEMA505-MBX.china.huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Feb 2018 09:49:17 +0000
-Message-ID: <CAFEAcA_-j5baz-iy16TfzwcUgze1Fs9Fx=uKTkHJKuJ=hpjdqw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] rtc: placing RTC memory region outside BQL
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [ PATCH  ] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
 
-On 6 February 2018 at 08:24, Gonglei (Arei) <arei.gonglei@huawei.com> wrote:
-> So, taking BQL is necessary, and what we can do is trying our best to narrow
-> down the process of locking ? For example, do the following wrapping:
->
-> static void rtc_rasie_irq(RTCState *s)
-> {
->     qemu_mutex_lock_iothread();
->     qemu_irq_raise(s->irq);
->     qemu_mutex_unlock_iothread();
-> }
->
-> static void rtc_lower_irq(RTCState *s)
-> {
->     qemu_mutex_lock_iothread();
->     qemu_irq_lower(s->irq);
->     qemu_mutex_unlock_iothread();
-> }
+This set of patches includex fixes from Alex Benn=C3=A9e for fixing
+BQL and replay locks after inventing the MTTCG. It also includes some
+additional replay patches that makes this set of fixes working.
+It is also fixes some vmstate creation (and loading) issues
+in record/replay modes:
+ - VM start/stop fixes in replay mode
+ - overlay creation for blkreplay filter
+ - fixes for vmstate save/load in record/replay mode
+ - fixes for host clock vmstate
 
-If you do that you'll also need to be careful about not calling
-those functions from contexts where you already hold the iothread
-mutex (eg timer callbacks), since you can't lock a mutex you
-already have locked.
+There is also a set of helper scripts written by Alex Benn=C3=A9e
+for debugging the record/replay code.
 
-thanks
--- PMM
+v5 changes:
+ - removed patch for narrowing BQL-protected code
+ - disabled bdrv_(drain/flush)_all for record/replay mode
+
+v4 changes:
+ - removed upstreamed patches
+ - added patch for saving async queue state in replay
+ - minor fixes
+
+v3 changes:
+ - removed upstreamed patches
+ - fixed bug with recursive checkpoints
+ - fixed bug with icount warp checkpoint
+
+v2 changes:
+ - updated lock/unlock logic (as suggested by Paolo Bonzini)
+ - updated cpu execution loop to avoid races in setting/resetting exit re=
+quest (as suggested by Paolo Bonzini)
+ - minor changes
+
+---
+
+Pavel Dovgalyuk (1):
+      m68k: implement movep instruction
+
+
+ target/m68k/translate.c |   53 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 53 insertions(+)
+
+--=20
+Pavel Dovgalyuk
