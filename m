@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ej1OK-0002Pd-90
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:26:25 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1ej1PG-0003Mr-P7
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ej1OH-0000K1-3E
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:26:24 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2374 helo=huawei.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1ej1PE-0000zM-4W
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:27:22 -0500
+Received: from mga14.intel.com ([192.55.52.115]:57904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ej1OG-0000Fb-Fx
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:26:21 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Tue, 6 Feb 2018 11:26:04 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB80FF5@DGGEMM505-MBS.china.huawei.com>
-References: <1517565055-14588-1-git-send-email-jianjay.zhou@huawei.com>
-	<6228a861-c224-c326-6052-985bca0c8b33@redhat.com>
-In-Reply-To: <6228a861-c224-c326-6052-985bca0c8b33@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] tap: close fd conditionally when error
- occured
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1ej1PD-0000w9-QQ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:27:20 -0500
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Tue,  6 Feb 2018 19:08:18 +0800
+Message-Id: <1517915299-15349-3-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
+References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] migration: use the free page reporting
+ feature from balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +25,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
+Cc: pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-SGkgSmFzb24sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24g
-V2FuZyBbbWFpbHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIEZlYnJ1
-YXJ5IDA2LCAyMDE4IDU6MjkgUE0NCj4gVG86IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VA
-aHVhd2VpLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogbXN0QHJlZGhhdC5jb207
-IGltYW1tZWRvQHJlZGhhdC5jb207IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdA
-aHVhd2VpLmNvbT47IHdhbmd4aW4gKFUpIDx3YW5neGlueGluLndhbmdAaHVhd2VpLmNvbT47IEdv
-bmdsZWkNCj4gKEFyZWkpIDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCB2M10gdGFwOiBjbG9zZSBmZCBjb25kaXRpb25hbGx5IHdoZW4gZXJyb3Igb2NjdXJl
-ZA0KPiANCj4gDQo+IA0KPiBPbiAyMDE45bm0MDLmnIgwMuaXpSAxNzo1MCwgSmF5IFpob3Ugd3Jv
-dGU6DQo+ID4gSWYgbmV0ZGV2X2FkZCB0YXAsaWQ9bmV0MCwuLi4sdmhvc3Q9b24gZmFpbGVkIGlu
-IG5ldF9pbml0X3RhcF9vbmUoKSwNCj4gPiB0aGUgZm9sbG93ZWQgdXAgZGV2aWNlX2FkZCB2aXJ0
-aW8tbmV0LXBjaSxuZXRkZXY9bmV0MCB3aWxsIGZhaWwgdG9vLA0KPiA+IHByaW50czoNCj4gPg0K
-PiA+ICAgICBUVU5TRVRPRkZMT0FEIGlvY3RsKCkgZmFpbGVkOiBCYWQgZmlsZSBkZXNjcmlwdG9y
-IFRVTlNFVE9GRkxPQUQNCj4gPiAgICAgaW9jdGwoKSBmYWlsZWQ6IEJhZCBmaWxlIGRlc2NyaXB0
-b3INCj4gPg0KPiA+IFRoZSByZWFzb24gaXMgdGhhdCB0aGUgZmQgb2YgdGFwIGlzIGNsb3NlZCB3
-aGVuIGVycm9yIG9jY3VyZWQgYWZ0ZXINCj4gPiBjYWxsaW5nIG5ldF9pbml0X3RhcF9vbmUoKS4N
-Cj4gPg0KPiA+IFRoZSBmZCBzaG91bGQgYmUgY2xvc2VkIHdoZW4gY2FsbGluZyBuZXRfaW5pdF90
-YXBfb25lIGZhaWxlZDoNCj4gPiAgICAgLSBpZiB0YXBfc2V0X3NuZGJ1ZigpIGZhaWxlZA0KPiA+
-ICAgICAtIGlmIHRhcF9zZXRfc25kYnVmKCkgc3VjY2VlZGVkIGJ1dCB2aG9zdCBmYWlsZWQgdG8g
-b3BlbiBvcg0KPiA+ICAgICAgIGluaXRpYWxpemUgd2l0aCB2aG9zdGZvcmNlIGZsYWcgb24gVGhl
-IGZkIHNob3VsZCBub3QgYmUgY2xvc2VkDQo+ID4ganVzdCBiZWNhdXNlIHZob3N0IGZhaWxlZCB0
-byBvcGVuIG9yIGluaXRpYWxpemUgYnV0IHdpdGhvdXQgdmhvc3Rmb3JjZQ0KPiA+IGZsYWcuIFNv
-IHRoZSBmb2xsb3dlZCB1cCBkZXZpY2VfYWRkIGNhbiBmYWxsIGJhY2sgdG8gdXNlcnNwYWNlIHZp
-cnRpbw0KPiA+IHN1Y2Nlc3NmdWxseS4NCj4gPg0KPiA+IFN1Z2dlc3RlZC1ieTogTWljaGFlbCBT
-LiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4NCj4gPiBTdWdnZXN0ZWQtYnk6IElnb3IgTWFtbWVk
-b3YgPGltYW1tZWRvQHJlZGhhdC5jb20+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBKYXNvbiBXYW5nIDxq
-YXNvd2FuZ0ByZWRoYXQuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEpheSBaaG91IDxqaWFuamF5
-Lnpob3VAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgIG5ldC90YXAuYyB8IDQ0ICsrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tDQo+ID4gICAxIGZpbGUgY2hhbmdl
-ZCwgMzIgaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0
-IGEvbmV0L3RhcC5jIGIvbmV0L3RhcC5jDQo+ID4gaW5kZXggOTc5ZTYyMi4uYzQ2YWIxNCAxMDA2
-NDQNCj4gPiAtLS0gYS9uZXQvdGFwLmMNCj4gPiArKysgYi9uZXQvdGFwLmMNCj4gPiBAQCAtNjUx
-LDcgKzY1MSw3IEBAIHN0YXRpYyB2b2lkIG5ldF9pbml0X3RhcF9vbmUoY29uc3QgTmV0ZGV2VGFw
-T3B0aW9ucw0KPiAqdGFwLCBOZXRDbGllbnRTdGF0ZSAqcGVlciwNCj4gPiAgICAgICB0YXBfc2V0
-X3NuZGJ1ZihzLT5mZCwgdGFwLCAmZXJyKTsNCj4gPiAgICAgICBpZiAoZXJyKSB7DQo+ID4gICAg
-ICAgICAgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIpOw0KPiA+IC0gICAgICAgIHJldHVybjsN
-Cj4gPiArICAgICAgICBnb3RvIGVycm9yOw0KPiA+ICAgICAgIH0NCj4gPg0KPiA+ICAgICAgIGlm
-ICh0YXAtPmhhc19mZCB8fCB0YXAtPmhhc19mZHMpIHsgQEAgLTY4NiwxNSArNjg2LDI2IEBAIHN0
-YXRpYw0KPiA+IHZvaWQgbmV0X2luaXRfdGFwX29uZShjb25zdCBOZXRkZXZUYXBPcHRpb25zICp0
-YXAsIE5ldENsaWVudFN0YXRlICpwZWVyLA0KPiA+ICAgICAgICAgICBpZiAodmhvc3RmZG5hbWUp
-IHsNCj4gPiAgICAgICAgICAgICAgIHZob3N0ZmQgPSBtb25pdG9yX2ZkX3BhcmFtKGN1cl9tb24s
-IHZob3N0ZmRuYW1lLCAmZXJyKTsNCj4gPiAgICAgICAgICAgICAgIGlmICh2aG9zdGZkID09IC0x
-KSB7DQo+ID4gLSAgICAgICAgICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsNCj4g
-PiAtICAgICAgICAgICAgICAgIHJldHVybjsNCj4gPiArICAgICAgICAgICAgICAgIGlmICh0YXAt
-Pmhhc192aG9zdGZvcmNlICYmIHRhcC0+dmhvc3Rmb3JjZSkgew0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIpOw0KPiA+ICsgICAgICAgICAgICAgICAg
-ICAgIGdvdG8gZXJyb3I7DQo+ID4gKyAgICAgICAgICAgICAgICB9IGVsc2Ugew0KPiA+ICsgICAg
-ICAgICAgICAgICAgICAgIHdhcm5fcmVwb3J0X2VycihlcnIpOw0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgIHJldHVybjsNCj4gPiArICAgICAgICAgICAgICAgIH0NCj4gPiAgICAgICAgICAgICAg
-IH0NCj4gPiAgICAgICAgICAgfSBlbHNlIHsNCj4gPiAgICAgICAgICAgICAgIHZob3N0ZmQgPSBv
-cGVuKCIvZGV2L3Zob3N0LW5ldCIsIE9fUkRXUik7DQo+ID4gICAgICAgICAgICAgICBpZiAodmhv
-c3RmZCA8IDApIHsNCj4gPiAtICAgICAgICAgICAgICAgIGVycm9yX3NldGdfZXJybm8oZXJycCwg
-ZXJybm8sDQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJ0YXA6IG9wZW4g
-dmhvc3QgY2hhciBkZXZpY2UgZmFpbGVkIik7DQo+ID4gLSAgICAgICAgICAgICAgICByZXR1cm47
-DQo+ID4gKyAgICAgICAgICAgICAgICBpZiAodGFwLT5oYXNfdmhvc3Rmb3JjZSAmJiB0YXAtPnZo
-b3N0Zm9yY2UpIHsNCj4gPiArICAgICAgICAgICAgICAgICAgICBlcnJvcl9zZXRnX2Vycm5vKGVy
-cnAsIGVycm5vLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgInRh
-cDogb3BlbiB2aG9zdCBjaGFyIGRldmljZSBmYWlsZWQiKTsNCj4gPiArICAgICAgICAgICAgICAg
-ICAgICBnb3RvIGVycm9yOw0KPiA+ICsgICAgICAgICAgICAgICAgfSBlbHNlIHsNCj4gPiArICAg
-ICAgICAgICAgICAgICAgICB3YXJuX3JlcG9ydCgidGFwOiBvcGVuIHZob3N0IGNoYXIgZGV2aWNl
-IGZhaWxlZDogJXMiLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmVy
-cm9yKGVycm5vKSk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgcmV0dXJuOw0KPiA+ICsgICAg
-ICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAgICAgICAgZmNu
-dGwodmhvc3RmZCwgRl9TRVRGTCwgT19OT05CTE9DSyk7DQo+ID4gICAgICAgICAgIH0NCj4gPiBA
-QCAtNzAyLDEyICs3MTMsMjMgQEAgc3RhdGljIHZvaWQgbmV0X2luaXRfdGFwX29uZShjb25zdA0K
-PiA+IE5ldGRldlRhcE9wdGlvbnMgKnRhcCwgTmV0Q2xpZW50U3RhdGUgKnBlZXIsDQo+ID4NCj4g
-PiAgICAgICAgICAgcy0+dmhvc3RfbmV0ID0gdmhvc3RfbmV0X2luaXQoJm9wdGlvbnMpOw0KPiA+
-ICAgICAgICAgICBpZiAoIXMtPnZob3N0X25ldCkgew0KPiA+IC0gICAgICAgICAgICBlcnJvcl9z
-ZXRnKGVycnAsDQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgInZob3N0LW5ldCByZXF1ZXN0
-ZWQgYnV0IGNvdWxkIG5vdCBiZSBpbml0aWFsaXplZCIpOw0KPiA+IC0gICAgICAgICAgICByZXR1
-cm47DQo+ID4gKyAgICAgICAgICAgIGlmICh0YXAtPmhhc192aG9zdGZvcmNlICYmIHRhcC0+dmhv
-c3Rmb3JjZSkgew0KPiA+ICsgICAgICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLA0KPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAidmhvc3QtbmV0IHJlcXVlc3RlZCBidXQgY291bGQg
-bm90IGJlDQo+IGluaXRpYWxpemVkIik7DQo+ID4gKyAgICAgICAgICAgICAgICBnb3RvIGVycm9y
-Ow0KPiA+ICsgICAgICAgICAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgICAgICAgICAgd2Fybl9y
-ZXBvcnQoInZob3N0LW5ldCByZXF1ZXN0ZWQgYnV0IGNvdWxkIG5vdCBiZQ0KPiBpbml0aWFsaXpl
-ZCIpOw0KPiA+ICsgICAgICAgICAgICAgICAgcmV0dXJuOw0KPiA+ICsgICAgICAgICAgICB9DQo+
-IA0KPiBDYW4gd2UgcmVkdWNlIHRoZSBkdXBsaWNhdGlvbiBieSBkb2luZyBzdWNoIGluIGEgY29t
-bW9uIGVycm9yIGxhYmVsPw0KPiANCg0KWWVhaCwgSSBwbGFuIHRvIGRlZmluZSBpdCBsaWtlIHRo
-aXMgaW4gdmhvc3RfbmV0LmgNCg0KI2RlZmluZSBWSE9TVF9ORVRfSU5JVF9GQUlMRUQgXA0KICAg
-ICJ2aG9zdC1uZXQgcmVxdWVzdGVkIGJ1dCBjb3VsZCBub3QgYmUgaW5pdGlhbGl6ZWQiDQoNCj4g
-PiAgICAgICAgICAgfQ0KPiA+ICAgICAgIH0gZWxzZSBpZiAodmhvc3RmZG5hbWUpIHsNCj4gPiAt
-ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ2aG9zdGZkKHMpPSBpcyBub3QgdmFsaWQgd2l0aG91
-dCB2aG9zdCIpOw0KPiA+ICsgICAgICAgIHdhcm5fcmVwb3J0KCJ2aG9zdGZkKHMpPSBpcyBub3Qg
-dmFsaWQgd2l0aG91dCB2aG9zdCIpOw0KPiA+ICsgICAgICAgIHJldHVybjsNCj4gPiArICAgIH0N
-Cj4gPiArDQo+ID4gK2Vycm9yOg0KPiA+ICsgICAgaWYgKCF0YXAtPmhhc19mZCAmJiAhdGFwLT5o
-YXNfZmRzKSB7DQo+ID4gKyAgICAgICAgY2xvc2UoZmQpOw0KPiANCj4gSSBiZWxpZXZlIHlvdSBj
-YW4gZG8gdGhpcyBpbiB0aGUgY2FsbGVyIGJ5IHNldHRpbmcgZXJycCBhcHByb3ByaWF0ZWx5IChl
-LmcNCj4gZG9uJ3Qgc2V0IGl0IHdoZW4gd2Ugb25seSBuZWVkIGEgd2FybikuDQoNCllvdSdyZSBy
-aWdodCwgdGhhbmtzISA6KQ0KDQpSZWdhcmRzLA0KSmF5DQoNCj4gDQo+IFRoYW5rcw0KPiANCj4g
-PiAgICAgICB9DQo+ID4gICB9DQo+ID4NCj4gPiBAQCAtODc3LDcgKzg5OSw2IEBAIGZyZWVfZmFp
-bDoNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2bmV0X2hkciwgZmQsICZlcnIpOw0K
-PiA+ICAgICAgICAgICBpZiAoZXJyKSB7DQo+ID4gICAgICAgICAgICAgICBlcnJvcl9wcm9wYWdh
-dGUoZXJycCwgZXJyKTsNCj4gPiAtICAgICAgICAgICAgY2xvc2UoZmQpOw0KPiA+ICAgICAgICAg
-ICAgICAgcmV0dXJuIC0xOw0KPiA+ICAgICAgICAgICB9DQo+ID4gICAgICAgfSBlbHNlIHsNCj4g
-PiBAQCAtOTE2LDcgKzkzNyw2IEBAIGZyZWVfZmFpbDoNCj4gPiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgdmhvc3RmZG5hbWUsIHZuZXRfaGRyLCBmZCwgJmVycik7DQo+ID4gICAgICAg
-ICAgICAgICBpZiAoZXJyKSB7DQo+ID4gICAgICAgICAgICAgICAgICAgZXJyb3JfcHJvcGFnYXRl
-KGVycnAsIGVycik7DQo+ID4gLSAgICAgICAgICAgICAgICBjbG9zZShmZCk7DQo+ID4gICAgICAg
-ICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiA+ICAgICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAg
-ICB9DQoNCg==
+Use the free page reporting feature from the balloon device to clear the
+bits corresponding to guest free pages from the dirty bitmap, so that the
+free memory are not sent.
+
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/migration/ram.c b/migration/ram.c
+index d6f462c..4fe16d2 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -49,6 +49,7 @@
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
+ #include "migration/block.h"
++#include "sysemu/balloon.h"
+ 
+ /***********************************************************/
+ /* ram save/restore */
+@@ -206,6 +207,10 @@ struct RAMState {
+     uint32_t last_version;
+     /* We are in the first round */
+     bool ram_bulk_stage;
++    /* The feature, skipping the transfer of free pages, is supported */
++    bool free_page_support;
++    /* Skip the transfer of free pages in the bulk stage */
++    bool free_page_done;
+     /* How many times we have dirty too many pages */
+     int dirty_rate_high_cnt;
+     /* these variables are used for bitmap sync */
+@@ -773,7 +778,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
+     unsigned long *bitmap = rb->bmap;
+     unsigned long next;
+ 
+-    if (rs->ram_bulk_stage && start > 0) {
++    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
+         next = start + 1;
+     } else {
+         next = find_next_bit(bitmap, size, start);
+@@ -1653,6 +1658,8 @@ static void ram_state_reset(RAMState *rs)
+     rs->last_page = 0;
+     rs->last_version = ram_list.version;
+     rs->ram_bulk_stage = true;
++    rs->free_page_support = balloon_free_page_support();
++    rs->free_page_done = false;
+ }
+ 
+ #define MAX_WAIT 50 /* ms, half buffered_file limit */
+@@ -2135,7 +2142,7 @@ static int ram_state_init(RAMState **rsp)
+     return 0;
+ }
+ 
+-static void ram_list_init_bitmaps(void)
++static void ram_list_init_bitmaps(RAMState *rs)
+ {
+     RAMBlock *block;
+     unsigned long pages;
+@@ -2145,7 +2152,11 @@ static void ram_list_init_bitmaps(void)
+         QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+             pages = block->max_length >> TARGET_PAGE_BITS;
+             block->bmap = bitmap_new(pages);
+-            bitmap_set(block->bmap, 0, pages);
++            if (rs->free_page_support) {
++                bitmap_set(block->bmap, 1, pages);
++            } else {
++                bitmap_set(block->bmap, 0, pages);
++            }
+             if (migrate_postcopy_ram()) {
+                 block->unsentmap = bitmap_new(pages);
+                 bitmap_set(block->unsentmap, 0, pages);
+@@ -2161,7 +2172,7 @@ static void ram_init_bitmaps(RAMState *rs)
+     qemu_mutex_lock_ramlist();
+     rcu_read_lock();
+ 
+-    ram_list_init_bitmaps();
++    ram_list_init_bitmaps(rs);
+     memory_global_dirty_log_start();
+     migration_bitmap_sync(rs);
+ 
+@@ -2275,6 +2286,11 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+ 
+     ram_control_before_iterate(f, RAM_CONTROL_ROUND);
+ 
++    if (rs->free_page_support && !rs->free_page_done) {
++        balloon_free_page_poll();
++        rs->free_page_done = true;
++    }
++
+     t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+     i = 0;
+     while ((ret = qemu_file_rate_limit(f)) == 0) {
+-- 
+1.8.3.1
