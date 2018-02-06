@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eithl-0001tj-FA
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 22:14:00 -0500
+	(envelope-from <tiwei.bie@intel.com>) id 1eiv3f-0000sR-MW
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 23:40:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eithk-0004V8-07
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 22:13:57 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:39552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eithj-0004Tb-Lu
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 22:13:55 -0500
-Received: by mail-wr0-x235.google.com with SMTP id f6so406705wra.6
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 19:13:55 -0800 (PST)
+	(envelope-from <tiwei.bie@intel.com>) id 1eiv3a-0001ES-Pq
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 23:40:39 -0500
+Received: from mga07.intel.com ([134.134.136.100]:47058)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1eiv3a-0001CV-FR
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 23:40:34 -0500
+Date: Tue, 6 Feb 2018 12:40:05 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180206044005.louuil5etk6vsy4z@debian-xvivbkq.sh.intel.com>
+References: <20180125040328.22867-1-tiwei.bie@intel.com>
+	<20180125040328.22867-7-tiwei.bie@intel.com>
+	<2e83b7fa-8cec-4c13-003f-f753a13fbfe2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87zi4qf4yi.fsf@dusky.pond.sub.org>
-References: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
-	<1516369485-5374-11-git-send-email-zhangckid@gmail.com>
-	<87zi4qf4yi.fsf@dusky.pond.sub.org>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 6 Feb 2018 03:13:53 +0000
-Message-ID: <CAK3tnvLsUp8CdpThNMSXR62JRSd1D+wGGZowixJF04CQ6e858g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V4 10/16] qmp event: Add COLO_EXIT event to
- notify users while exited COLO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2e83b7fa-8cec-4c13-003f-f753a13fbfe2@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v1 6/6] vhost-user: add VFIO
+ based accelerators support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, alex.williamson@redhat.com, jasowang@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-On Sat, Feb 3, 2018 at 3:49 PM, Markus Armbruster <armbru@redhat.com> wrote:
+On Mon, Feb 05, 2018 at 06:47:51PM +0100, Paolo Bonzini wrote:
+> On 25/01/2018 05:03, Tiwei Bie wrote:
+> > The key difference with PCI passthru is that, in this case only
+> > the data path of the device (e.g. DMA ring, notify region and
+> > queue interrupt) is pass-throughed to the VM, the device control
+> > path (e.g. PCI configuration space and MMIO regions) is still
+> > defined and emulated by QEMU.
+> > 
+> > The benefits of keeping virtio device emulation in QEMU compared
+> > with virtio device PCI passthru include (but not limit to):
+> > 
+> > - consistent device interface for guest OS in the VM;
+> > - max flexibility on the hardware (i.e. the accelerators) design;
+> > - leveraging the existing virtio live-migration framework;
+> > 
+> > The virtual IOMMU isn't supported by the accelerators for now.
+> > Because vhost-user currently lacks of an efficient way to share
+> > the IOMMU table in VM to vhost backend. That's why the software
+> > implementation of virtual IOMMU support in vhost-user backend
+> > can't support dynamic mapping well. Once this problem is solved
+> > in vhost-user, virtual IOMMU can be supported by accelerators
+> > too, and the IOMMU feature bit checking in this patch can be
+> > removed.
+> 
+> I don't understand why this would use vhost-user.  vhost-user is meant
+> for connecting to e.g. a user-space switch that is shared between
+> multiple virtual machines.
 
-> Zhang Chen <zhangckid@gmail.com> writes:
->
-> > From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> >
-> > If some errors happen during VM's COLO FT stage, it's important to
-> > notify the users of this event. Together with 'x-colo-lost-heartbeat',
-> > Users can intervene in COLO's failover work immediately.
-> > If users don't want to get involved in COLO's failover verdict,
-> > it is still necessary to notify users that we exited COLO mode.
-> >
-> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> [...]
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index 70e7b67..6fc95b7 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -869,6 +869,41 @@
-> >    'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
-> >
-> >  ##
-> > +# @COLO_EXIT:
-> > +#
-> > +# Emitted when VM finishes COLO mode due to some errors happening or
-> > +# at the request of users.
-> > +#
-> > +# @mode: which COLO mode the VM was in when it exited.
-> > +#
-> > +# @reason: describes the reason for the COLO exit.
-> > +#
-> > +# Since: 2.12
-> > +#
-> > +# Example:
-> > +#
-> > +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
-> > +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason":
-> "request" } }
-> > +#
-> > +##
-> > +{ 'event': 'COLO_EXIT',
-> > +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
->
-> Standard question when I see a new event: is there a way to poll for the
-> event's information?  If not, why don't we need one?
->
->
-Your means is we'd better print the information to a log file or something
-like that for all qemu events?
-CC  Eric Blake <eblake@redhat.com>
-any idea about this?
+Yeah, you're right!
 
-Thanks
-Zhang Chen
+The commit log you quoted is talking about the benefits
+of vDPA (i.e. only passthru the data path), which is not
+related to vhost-user.
 
+The usage of vhost-user you described is exactly why we
+want to use vhost-user. In our case, the accelerator for
+each VM is a PCI VF device and the PCI card has vswitch
+logic (the VFs are the ports of switch to connect VMs).
+So the card is a vswitch accelerator which will be shared
+between multiple VMs. If we extend vhost-user, QEMU can
+keep using the vhost-user interface to connect to the
+user-space switch which has an optional accelerator.
 
-> Remember, management applications might miss events when they lose the
-> connection and have to reconnect, say because the management application
-> needs to be restarted.
->
-> > +
-> > +##
-> > +# @COLOExitReason:
-> > +#
-> > +# The reason for a COLO exit
-> > +#
-> > +# @request: COLO exit is due to an external request
-> > +#
-> > +# @error: COLO exit is due to an internal error
-> > +#
-> > +# Since: 2.12
-> > +##
-> > +{ 'enum': 'COLOExitReason',
-> > +  'data': [ 'request', 'error' ] }
-> > +
-> > +##
-> >  # @x-colo-lost-heartbeat:
-> >  #
-> >  # Tell qemu that heartbeat is lost, request it to do takeover
-> procedures.
->
+More details can be found in the "Why extend vhost-user
+for vDPA" section of the cover letter:
+
+----- START -----
+
+Why extend vhost-user for vDPA
+==============================
+
+We have already implemented various virtual switches (e.g. OVS-DPDK)
+based on vhost-user for VMs in the Cloud. They are purely software
+running on CPU cores. When we have accelerators for such NFVi applications,
+it's ideal if the applications could keep using the original interface
+(i.e. vhost-user netdev) with QEMU, and infrastructure is able to decide
+when and how to switch between CPU and accelerators within the interface.
+And the switching (i.e. switch between CPU and accelerators) can be done
+flexibly and quickly inside the applications.
+
+----- END -----
+
+I'll try to add these infos into the commit log. Thanks!
+
+Best regards,
+Tiwei Bie
+
+> 
+> In this case, there would be one VFIO device per VM (because different
+> VM must be in different VFIO groups).  So I don't understand the benefit
+> of configuring the control path of the VFIO device outside QEMU.
+> 
+> Paolo
