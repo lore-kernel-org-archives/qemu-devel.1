@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5YM-0004n3-1t
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ej5Z7-0005VU-Bi
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5YL-0006kd-4n
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52226)
+	(envelope-from <dgilbert@redhat.com>) id 1ej5Z1-0008Eu-HD
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5YK-0006k2-Ul
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:01 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5Z1-0008DQ-BV
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:43 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  6 Feb 2018 15:49:32 +0000
-Message-Id: <20180206154936.13565-11-dgilbert@redhat.com>
+Date: Tue,  6 Feb 2018 15:49:33 +0000
+Message-Id: <20180206154936.13565-12-dgilbert@redhat.com>
 In-Reply-To: <20180206154936.13565-1-dgilbert@redhat.com>
 References: <20180206154936.13565-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 10/14] tests: Create migrate-start-postcopy
- command
+Subject: [Qemu-devel] [PULL 11/14] tests: Adjust sleeps for migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +28,84 @@ Cc: peterx@redhat.com, lvivier@redhat.com, groug@kaod.org, ross.lagerwall@citrix
 
 From: Juan Quintela <quintela@redhat.com>
 
-This way, it is like the rest of commands
+Also reorder code to not sleep when event already happened.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/migration-test.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ tests/migration-test.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 2a0b651cd1..26a792c3aa 100644
+index 26a792c3aa..9efad95749 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -416,6 +416,15 @@ static void migrate(QTestState *who, const char *uri)
-     QDECREF(rsp);
+@@ -268,10 +268,9 @@ static uint64_t get_migration_pass(QTestState *who)
+ 
+ static void wait_for_migration_complete(QTestState *who)
+ {
+-    QDict *rsp, *rsp_return;
+-    bool completed;
+-
+-    do {
++    while (true) {
++        QDict *rsp, *rsp_return;
++        bool completed;
+         const char *status;
+ 
+         rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+@@ -280,8 +279,11 @@ static void wait_for_migration_complete(QTestState *who)
+         completed = strcmp(status, "completed") == 0;
+         g_assert_cmpstr(status, !=,  "failed");
+         QDECREF(rsp);
+-        usleep(1000 * 100);
+-    } while (!completed);
++        if (completed) {
++            return;
++        }
++        usleep(1000);
++    }
  }
  
-+static void migrate_start_postcopy(QTestState *who)
-+{
-+    QDict *rsp;
-+
-+    rsp = wait_command(who, "{ 'execute': 'migrate-start-postcopy' }");
-+    g_assert(qdict_haskey(rsp, "return"));
-+    QDECREF(rsp);
-+}
-+
- static void test_migrate_start(QTestState **from, QTestState **to,
-                                const char *uri)
- {
-@@ -549,7 +558,6 @@ static void test_migrate(void)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
--    QDict *rsp;
+ static void wait_for_migration_pass(QTestState *who)
+@@ -290,16 +292,13 @@ static void wait_for_migration_pass(QTestState *who)
+     uint64_t pass;
  
-     test_migrate_start(&from, &to, uri);
+     /* Wait for the 1st sync */
+-    do {
++    while (!got_stop && !initial_pass) {
++        usleep(1000);
+         initial_pass = get_migration_pass(who);
+-        if (got_stop || initial_pass) {
+-            break;
+-        }
+-        usleep(1000 * 100);
+-    } while (true);
++    }
  
-@@ -570,9 +578,7 @@ static void test_migrate(void)
+     do {
+-        usleep(1000 * 100);
++        usleep(1000);
+         pass = get_migration_pass(who);
+     } while (pass == initial_pass && !got_stop);
+ }
+@@ -489,13 +488,13 @@ static void test_migrate_end(QTestState *from, QTestState *to)
+     /* Destination still running, wait for a byte to change */
+     do {
+         qtest_memread(to, start_address, &dest_byte_b, 1);
+-        usleep(10 * 1000);
++        usleep(1000 * 10);
+     } while (dest_byte_a == dest_byte_b);
  
-     wait_for_migration_pass(from);
+     qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
+     /* With it stopped, check nothing changes */
+     qtest_memread(to, start_address, &dest_byte_c, 1);
+-    sleep(1);
++    usleep(1000 * 200);
+     qtest_memread(to, start_address, &dest_byte_d, 1);
+     g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
  
--    rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
--    g_assert(qdict_haskey(rsp, "return"));
--    QDECREF(rsp);
-+    migrate_start_postcopy(from);
- 
-     if (!got_stop) {
-         qtest_qmp_eventwait(from, "STOP");
 -- 
 2.14.3
