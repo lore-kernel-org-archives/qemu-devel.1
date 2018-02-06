@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38997)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1ej1hu-0008L8-So
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:46:40 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41353)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <bounces@canonical.com>) id 1ej1uW-0004hR-Q4
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:59:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1ej1hr-00069Y-PR
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:46:38 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:35800 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ej1hr-00067s-FO
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:46:35 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Tue, 6 Feb 2018 12:46:30 +0100
-References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
-	<20170919143829.GH2107@work-vm>
-	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
-	<20170919144130.GI2107@work-vm>
-	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
-	<20170921123625.GE2717@work-vm>
-	<b7f1d6ec-9511-ef3d-80d1-c52cf8adfc24@kamp.de>
-	<20171212170533.GG2409@work-vm>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <8ed6cb1e-4770-21ec-164e-7142e649eab3@kamp.de>
-Date: Tue, 6 Feb 2018 12:46:31 +0100
+	(envelope-from <bounces@canonical.com>) id 1ej1uT-0000jW-Nn
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:59:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ej1uT-0000hV-Hv
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:59:37 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ej1uS-0004oE-8v
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 11:59:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2E2B82E80C8
+	for <qemu-devel@nongnu.org>; Tue,  6 Feb 2018 11:59:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171212170533.GG2409@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Block Migration and CPU throttling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Feb 2018 11:49:36 -0000
+From: Richard Jones <rjones@redhat.com>
+Reply-To: Bug 1155677 <1155677@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130315161014.18447.2377.malonedeb@gac.canonical.com>
+Message-Id: <151791777668.29609.3474074671339919870.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1155677] Re: snapshot=on fails with non
+ file-based storage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,90 +37,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-Am 12.12.2017 um 18:05 schrieb Dr. David Alan Gilbert:
-> * Peter Lieven (pl@kamp.de) wrote:
->> Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
->>> * Peter Lieven (pl@kamp.de) wrote:
->>>> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
->>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
->>>>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>> I just noticed that CPU throttling and Block Migration don't work together very well.
->>>>>>>> During block migration the throttling heuristic detects that we obviously make no progress
->>>>>>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
->>>>>>>>
->>>>>>>> The result is that any VM is throttled by 99% during block migration.
->>>>>>> Hmm that's unfortunate; do you have a bandwidth set lower than your
->>>>>>> actual network connection? I'm just wondering if it's actually going
->>>>>>> between the block and RAM iterative sections or getting stuck in ne.
->>>>>> It happens also if source and dest are on the same machine and speed is set to 100G.
->>>>> But does it happen if they're not and the speed is set low?
->>>> Yes, it does. I noticed it in our test environment between different nodes with a 10G
->>>> link in between. But its totally clear why it happens. During block migration we transfer
->>>> all dirty memory pages in each round (if there is moderate memory load), but all dirty
->>>> pages are obviously more than 50% of the transferred ram in that round.
->>>> It is more exactly 100%. But the current logic triggers on this condition.
->>>>
->>>> I think I will go forward and send a patch which disables auto converge during
->>>> block migration bulk stage.
->>> Yes, that's fair;  it probably would also make sense to throttle the RAM
->>> migration during the block migration bulk stage, since the chances are
->>> it's not going to get far.  (I think in the nbd setup, the main
->>> migration process isn't started until the end of bulk).
->> Catching up with the idea of delaying ram migration until block bulk has completed.
->> What do you think is the easiest way to achieve this?
-> <excavates inbox, and notices I never replied>
->
-> I think the answer depends whether we think this is a 'special' or we
-> need a new general purpose mechanism.
->
-> If it was really general then we'd probably want to split the iterative
-> stage in two somehow, and only do RAM in the second half.
->
-> But I'm not sure it's worth it; I suspect the easiest way is:
->
->     a) Add a counter in migration/ram.c or in the RAM state somewhere
->     b) Make ram_save_inhibit increment the counter
->     c) Check the counter at the head of ram_save_iterate and just exit
->       if it's none 0
->     d) Call ram_save_inhibit from block_save_setup
->     e) Then release it when you've finished the bulk stage
->
-> Make sure you still count the RAM in the pending totals, otherwise
-> migration might think it's finished a bit early.
+Let's close this.  libguestfs doesn't use snapshot=3Don any longer.
 
-Is there any culprit I don't see or is it as easy as this?
+** Changed in: qemu
+       Status: In Progress =3D> Incomplete
 
-diff --git a/migration/ram.c b/migration/ram.c
-index cb1950f..c67bcf1 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2255,6 +2255,13 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-      int64_t t0;
-      int done = 0;
+-- =
 
-+    if (blk_mig_bulk_active()) {
-+        /* Avoid transferring RAM during bulk phase of block migration as
-+         * the bulk phase will usually take a lot of time and transferring
-+         * RAM updates again and again is pointless. */
-+        goto out;
-+    }
-+
-      rcu_read_lock();
-      if (ram_list.version != rs->last_version) {
-          ram_state_reset(rs);
-@@ -2301,6 +2308,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-       */
-      ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1155677
 
-+out:
-      qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-      ram_counters.transferred += 8;
+Title:
+  snapshot=3Don fails with non file-based storage
 
+Status in QEMU:
+  Incomplete
 
-Peter
+Bug description:
+  The snapshot=3Don option doesn't work with an nbd block device:
+
+  /usr/bin/qemu-system-x86_64 \
+  [...]
+      -device virtio-scsi-pci,id=3Dscsi \
+      -drive file=3Dnbd:localhost:61930,snapshot=3Don,format=3Draw,id=3Dhd0=
+,if=3Dnone \
+      -device scsi-hd,drive=3Dhd0 \
+  [...]
+
+  gives the error:
+
+  qemu-system-x86_64: -drive
+  file=3Dnbd:localhost:61930,snapshot=3Don,format=3Draw,id=3Dhd0,if=3Dnone:=
+ could
+  not open disk image nbd:localhost:61930: No such file or directory
+
+  If you remove the snapshot=3Don flag, it works (although that of course
+  means that the block device is writable which we don't want).
+
+  Previously reported here:
+
+    http://permalink.gmane.org/gmane.comp.emulators.qemu/148390
+
+  and I can confirm this still happens in qemu 1.4.0.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1155677/+subscriptions
