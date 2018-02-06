@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ej8Cz-0003nj-2L
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:43:12 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ej8D7-0003uL-7T
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:43:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ej8Cy-0003E5-0u
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:43:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:6916)
+	(envelope-from <alex.williamson@redhat.com>) id 1ej8D3-0003P7-Mh
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:43:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ej8Cx-0003CW-OM
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:43:07 -0500
+	id 1ej8D3-0003NW-Dc
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:43:13 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F18782D1B5
-	for <qemu-devel@nongnu.org>; Tue,  6 Feb 2018 18:43:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A6B3780B2A
+	for <qemu-devel@nongnu.org>; Tue,  6 Feb 2018 18:43:12 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 06 Feb 2018 11:43:03 -0700
-Message-ID: <20180206184303.14644.13938.stgit@gimli.home>
+Date: Tue, 06 Feb 2018 11:43:12 -0700
+Message-ID: <20180206184312.14644.94922.stgit@gimli.home>
 In-Reply-To: <20180206184101.14644.84734.stgit@gimli.home>
 References: <20180206184101.14644.84734.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 02/11] vfio/spapr: Use iommu memory region's
- get_attr()
+Subject: [Qemu-devel] [PULL 03/11] spapr/iommu: Enable in-kernel TCE
+ acceleration via VFIO KVM device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,71 +39,116 @@ To: qemu-devel@nongnu.org
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 In order to enable TCE operations support in KVM, we have to inform
-the KVM about VFIO groups being attached to specific LIOBNs. The KVM
-already knows about VFIO groups, the only bit missing is which
-in-kernel TCE table (the one with user visible TCEs) should update
-the attached broups. There is an KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE
-attribute of the VFIO KVM device which receives a groupfd/tablefd couple.
+the KVM about VFIO groups being attached to specific LIOBNs;
+the necessary bits are implemented already by IOMMU MR and VFIO.
 
-This uses a new memory_region_iommu_get_attr() helper to get the IOMMU fd
-and calls KVM to establish the link.
+This defines get_attr() for the SPAPR TCE IOMMU MR which makes VFIO
+call the KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE ioctl and establish
+LIOBN-to-IOMMU link.
 
-As get_attr() is not implemented yet, this should cause no behavioural
-change.
+This changes spapr_tce_set_need_vfio() to avoid TCE table reallocation
+if the kernel supports the TCE acceleration.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
+[aw - remove unnecessary sys/ioctl.h include]
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/common.c     |   27 +++++++++++++++++++++++++++
- hw/vfio/trace-events |    1 +
- 2 files changed, 28 insertions(+)
+ hw/ppc/spapr_iommu.c |   18 ++++++++++++++++++
+ target/ppc/kvm.c     |    7 ++++++-
+ target/ppc/kvm_ppc.h |    6 ++++++
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index b77be3a8b36b..ec41f93b7479 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -457,6 +457,33 @@ static void vfio_listener_region_add(MemoryListener *listener,
-         vfio_host_win_add(container, section->offset_within_address_space,
-                           section->offset_within_address_space +
-                           int128_get64(section->size) - 1, pgsize);
-+#ifdef CONFIG_KVM
-+        if (kvm_enabled()) {
-+            VFIOGroup *group;
-+            IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
-+            struct kvm_vfio_spapr_tce param;
-+            struct kvm_device_attr attr = {
-+                .group = KVM_DEV_VFIO_GROUP,
-+                .attr = KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE,
-+                .addr = (uint64_t)(unsigned long)&param,
-+            };
-+
-+            if (!memory_region_iommu_get_attr(iommu_mr, IOMMU_ATTR_SPAPR_TCE_FD,
-+                                              &param.tablefd)) {
-+                QLIST_FOREACH(group, &container->group_list, container_next) {
-+                    param.groupfd = group->fd;
-+                    if (ioctl(vfio_kvm_device_fd, KVM_SET_DEVICE_ATTR, &attr)) {
-+                        error_report("vfio: failed to setup fd %d "
-+                                     "for a group with fd %d: %s",
-+                                     param.tablefd, param.groupfd,
-+                                     strerror(errno));
-+                        return;
-+                    }
-+                    trace_vfio_spapr_group_attach(param.groupfd, param.tablefd);
-+                }
-+            }
-+        }
-+#endif
-     }
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index 5ccd785d5a06..aaa6010d5c97 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -160,6 +160,19 @@ static uint64_t spapr_tce_get_min_page_size(IOMMUMemoryRegion *iommu)
+     return 1ULL << tcet->page_shift;
+ }
  
-     hostwin_found = false;
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index fae096c0724f..3d34fe8a93f1 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -123,3 +123,4 @@ vfio_prereg_register(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0
- vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
- vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=0x%x winsize=0x%"PRIx64" offset=0x%"PRIx64
- vfio_spapr_remove_window(uint64_t off) "offset=0x%"PRIx64
-+vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d to liobn fd %d"
++static int spapr_tce_get_attr(IOMMUMemoryRegion *iommu,
++                              enum IOMMUMemoryRegionAttr attr, void *data)
++{
++    sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
++
++    if (attr == IOMMU_ATTR_SPAPR_TCE_FD && kvmppc_has_cap_spapr_vfio()) {
++        *(int *) data = tcet->fd;
++        return 0;
++    }
++
++    return -EINVAL;
++}
++
+ static void spapr_tce_notify_flag_changed(IOMMUMemoryRegion *iommu,
+                                           IOMMUNotifierFlag old,
+                                           IOMMUNotifierFlag new)
+@@ -284,6 +297,10 @@ void spapr_tce_set_need_vfio(sPAPRTCETable *tcet, bool need_vfio)
+ 
+     tcet->need_vfio = need_vfio;
+ 
++    if (!need_vfio || (tcet->fd != -1 && kvmppc_has_cap_spapr_vfio())) {
++        return;
++    }
++
+     oldtable = tcet->table;
+ 
+     tcet->table = spapr_tce_alloc_table(tcet->liobn,
+@@ -643,6 +660,7 @@ static void spapr_iommu_memory_region_class_init(ObjectClass *klass, void *data)
+     imrc->translate = spapr_tce_translate_iommu;
+     imrc->get_min_page_size = spapr_tce_get_min_page_size;
+     imrc->notify_flag_changed = spapr_tce_notify_flag_changed;
++    imrc->get_attr = spapr_tce_get_attr;
+ }
+ 
+ static const TypeInfo spapr_iommu_memory_region_info = {
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 84284d5957c5..9842b3bb124e 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -137,7 +137,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+     cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+     cap_spapr_multitce = kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE);
+-    cap_spapr_vfio = false;
++    cap_spapr_vfio = kvm_vm_check_extension(s, KVM_CAP_SPAPR_TCE_VFIO);
+     cap_one_reg = kvm_check_extension(s, KVM_CAP_ONE_REG);
+     cap_hior = kvm_check_extension(s, KVM_CAP_PPC_HIOR);
+     cap_epr = kvm_check_extension(s, KVM_CAP_PPC_EPR);
+@@ -2514,6 +2514,11 @@ int kvmppc_get_cap_safe_indirect_branch(void)
+     return cap_ppc_safe_indirect_branch;
+ }
+ 
++bool kvmppc_has_cap_spapr_vfio(void)
++{
++    return cap_spapr_vfio;
++}
++
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
+ {
+     uint32_t host_pvr = mfpvr();
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 39830baa77b9..4d2789eef6ef 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -46,6 +46,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
++bool kvmppc_has_cap_spapr_vfio(void);
+ #endif /* !CONFIG_USER_ONLY */
+ bool kvmppc_has_cap_epr(void);
+ int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function);
+@@ -232,6 +233,11 @@ static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+     return true;
+ }
+ 
++static inline bool kvmppc_has_cap_spapr_vfio(void)
++{
++    return false;
++}
++
+ #endif /* !CONFIG_USER_ONLY */
+ 
+ static inline bool kvmppc_has_cap_epr(void)
