@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ej3uY-0003QO-9i
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:51 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ej40T-0000RA-1M
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:13:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ej3uS-0004Sm-Vl
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:50 -0500
-Received: from [45.249.212.35] (port=33460 helo=huawei.com)
+	(envelope-from <stefanha@redhat.com>) id 1ej40P-0001rk-OV
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:13:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58592)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1ej3uS-0004Ql-BZ
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:44 -0500
-From: Gonglei <arei.gonglei@huawei.com>
-Date: Tue, 6 Feb 2018 22:07:19 +0800
-Message-ID: <1517926039-86416-1-git-send-email-arei.gonglei@huawei.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ej40P-0001rC-Ep
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:13:53 -0500
+Date: Tue, 6 Feb 2018 14:13:34 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180206141334.GA13343@stefanha-x1.localdomain>
+References: <20180124114055.GC17193@stefanha-x1.localdomain>
+	<5A69AF21.5000209@intel.com>
+	<20180126144429.GD17788@stefanha-x1.localdomain>
+	<5A70606F.3030307@intel.com>
+	<20180201190712-mutt-send-email-mst@kernel.org>
+	<5A7462DC.1020904@intel.com>
+	<20180205162549.GH28241@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73942B586@shsmsx102.ccr.corp.intel.com>
+	<20180206093158.GE4942@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73942C099@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] rtc: placing RTC memory region outside BQL
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F73942C099@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,220 +37,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, weidong.huang@huawei.com, peter.maydell@linaro.org, Gonglei <arei.gonglei@huawei.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>
 
-As windows guest use rtc as the clock source device,
-and access rtc frequently. Let's move the rtc memory
-region outside BQL to decrease overhead for windows guests.
-Meanwhile, adding a new lock to avoid different vCPUs
-access the RTC together.
 
-$ cat strace_c.sh
-strace -tt -p $1 -c -o result_$1.log &
-sleep $2
-pid=$(pidof strace)
-kill $pid
-cat result_$1.log
+--mYCpIKhGyMATD0i+
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Before appling this change:
-$ ./strace_c.sh 10528 30
-% time     seconds  usecs/call     calls    errors syscall
------- ----------- ----------- --------- --------- ----------------
- 93.87    0.119070          30      4000           ppoll
-  3.27    0.004148           2      2038           ioctl
-  2.66    0.003370           2      2014           futex
-  0.09    0.000113           1       106           read
-  0.09    0.000109           1       104           io_getevents
-  0.02    0.000029           1        30           poll
-  0.00    0.000000           0         1           write
------- ----------- ----------- --------- --------- ----------------
-100.00    0.126839                  8293           total
+On Tue, Feb 06, 2018 at 12:42:36PM +0000, Wang, Wei W wrote:
+> On Tuesday, February 6, 2018 5:32 PM, Stefan Hajnoczi wrote:
+> > On Tue, Feb 06, 2018 at 01:28:25AM +0000, Wang, Wei W wrote:
+> > > On Tuesday, February 6, 2018 12:26 AM, Stefan Hajnoczi wrote:
+> > > > On Fri, Feb 02, 2018 at 09:08:44PM +0800, Wei Wang wrote:
+> > > > > On 02/02/2018 01:08 AM, Michael S. Tsirkin wrote:
+> > > > > > On Tue, Jan 30, 2018 at 08:09:19PM +0800, Wei Wang wrote:
+> > > > > > > Issues:
+> > > > > > > Suppose we have both the vhost and virtio-net set up, and=20
+> > > > > > > vhost pmd <-> virtio-net pmd communication works well. Now,=
+=20
+> > > > > > > vhost pmd exits (virtio-net pmd is still there). Some time=20
+> > > > > > > later, we re-run vhost pmd, the vhost pmd doesn't know the=20
+> > > > > > > virtqueue addresses of the virtio-net pmd, unless the=20
+> > > > > > > virtio-net pmd reloads to start the 2nd phase of the=20
+> > > > > > > vhost-user protocol. So the second run of the vhost
+> > > > pmd won't work.
+> > > > > > >
+> > > > > > > Any thoughts?
+> > > > > > >
+> > > > > > > Best,
+> > > > > > > Wei
+> > > > > > So vhost in qemu must resend all configuration on reconnect.
+> > > > > > Does this address the issues?
+> > > > > >
+> > > > >
+> > > > > Yes, but the issues are
+> > > > > 1) there is no reconnecting when a pmd exits (the socket=20
+> > > > > connection seems still on at the device layer);
+> > > >
+> > > > This is how real hardware works too.  If the driver suddenly stops=
+=20
+> > > > running then the device remains operational.  When the driver is=20
+> > > > started again it resets the device and initializes it.
+> > > >
+> > > > > 2) If we find a way to break the QEMU layer socket connection=20
+> > > > > when pmd exits and get it reconnect, virtio-net device still=20
+> > > > > won't send all the configure when reconnecting, because socket=20
+> > > > > connecting only triggers phase 1 of vhost-user negotiation (i.e.
+> > > > > vhost_user_init). Phase 2 is triggered after the driver loads=20
+> > > > > (i.e. vhost_net_start). If the virtio-net pmd doesn't reload,=20
+> > > > > there are no phase 2 messages (like virtqueue addresses which=20
+> > > > > are allocated by the pmd). I think we need to think more about=20
+> > > > > this before
+> > moving forward.
+> > > >
+> > > > Marc-Andr=E9: How does vhost-user reconnect work when the master=20
+> > > > goes away and a new master comes online?  Wei found that the QEMU=
+=20
+> > > > slave implementation only does partial vhost-user initialization=20
+> > > > upon reconnect, so the new master doesn't get the virtqueue=20
+> > > > address and
+> > related information.
+> > > > Is this a QEMU bug?
+> > >
+> > > Actually we are discussing the slave (vhost is the slave, right?) goi=
+ng away.
+> > When a slave exits and some moment later a new slave runs, the master
+> > (virtio-net) won't send the virtqueue addresses to the new vhost slave.
+> >=20
+> > Yes, apologies for the typo.  s/QEMU slave/QEMU master/
+> >=20
+> > Yesterday I asked Marc-Andr=E9 for help on IRC and we found the code=20
+> > path where the QEMU master performs phase 2 negotiation upon=20
+> > reconnect.  It's not obvious but the qmp_set_link() calls in net_vhost_=
+user_event() will do it.
+> >=20
+> > I'm going to try to reproduce the issue you're seeing now.  Will let=20
+> > you know what I find.
+> >=20
+>=20
+> OK. Thanks. I observed no messages after re-run virtio-vhost-user pmd, an=
+d found there is no re-connection event happening in the device side.=20
+>=20
+> I also tried to switch the role of client/server - virtio-net to run a se=
+rver socket, and virtio-vhost-user to run the client, and it seems the curr=
+ent code fails to run that way. The reason is the virtio-net side vhost_use=
+r_get_features() doesn't return. On the vhost side, I don't see virtio_vhos=
+t_user_deliver_m2s being invoked to deliver the GET_FEATURES message. I'll =
+come back to continue later.
 
-After appling the change:
-$ ./strace_c.sh 23829 30
-% time     seconds  usecs/call     calls    errors syscall
------- ----------- ----------- --------- --------- ----------------
- 92.86    0.067441          16      4094           ppoll
-  4.85    0.003522           2      2136           ioctl
-  1.17    0.000850           4       189           futex
-  0.54    0.000395           2       202           read
-  0.52    0.000379           2       202           io_getevents
-  0.05    0.000037           1        30           poll
------- ----------- ----------- --------- --------- ----------------
-100.00    0.072624                  6853           total
+This morning I reached the conclusion that reconnection is currently
+broken in the QEMU vhost-user master.  It's a bug in the QEMU vhost-user
+master implementation, not a design or protocol problem.
 
-The futex call number decreases ~90.6% on an idle windows 7 guest.
+On my machine the following QEMU command-line does not launch because
+vhost-user.c gets stuck while trying to connect/negotiate:
 
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
-v2->v1:
- a)Adding a new lock to avoid different vCPUs
-   access the RTC together. [Paolo]
- b)Taking the BQL before raising the outbound IRQ line. [Peter]
- c)Don't hold BQL if it was holden. [Peter]
+  qemu -M accel=3Dkvm -cpu host -m 1G \
+       -object memory-backend-file,id=3Dmem0,mem-path=3D/var/tmp/foo,size=
+=3D1G,share=3Don \
+       -numa node,memdev=3Dmem0 \
+       -drive if=3Dvirtio,file=3Dtest.img,format=3Draw \
+       -chardev socket,id=3Dchardev0,path=3Dvhost-user.sock,reconnect=3D1 \
+       -netdev vhost-user,chardev=3Dchardev0,id=3Dnetdev0 \
+       -device virtio-net-pci,netdev=3Dnetdev0
 
- hw/timer/mc146818rtc.c | 55 ++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 47 insertions(+), 8 deletions(-)
+Commit c89804d674e4e3804bd3ac1fe79650896044b4e8 ("vhost-user: wait until
+backend init is completed") broke reconnect by introducing a call to
+qemu_chr_fe_wait_connected().
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 35a05a6..f0a2a62 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -85,6 +85,7 @@ typedef struct RTCState {
-     uint16_t irq_reinject_on_ack_count;
-     uint32_t irq_coalesced;
-     uint32_t period;
-+    QemuMutex rtc_lock;
-     QEMUTimer *coalesced_timer;
-     Notifier clock_reset_notifier;
-     LostTickPolicy lost_tick_policy;
-@@ -125,6 +126,36 @@ static void rtc_coalesced_timer_update(RTCState *s)
-     }
- }
- 
-+static void rtc_rasie_irq(RTCState *s)
-+{
-+    bool unlocked = !qemu_mutex_iothread_locked();
-+
-+    if (unlocked) {
-+        qemu_mutex_lock_iothread();
-+    }
-+
-+    qemu_irq_raise(s->irq);
-+
-+    if (unlocked) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+}
-+
-+static void rtc_lower_irq(RTCState *s)
-+{
-+    bool unlocked = !qemu_mutex_iothread_locked();
-+
-+    if (unlocked) {
-+        qemu_mutex_lock_iothread();
-+    }
-+
-+    qemu_irq_lower(s->irq);
-+
-+    if (unlocked) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+}
-+
- static QLIST_HEAD(, RTCState) rtc_devices =
-     QLIST_HEAD_INITIALIZER(rtc_devices);
- 
-@@ -141,7 +172,7 @@ void qmp_rtc_reset_reinjection(Error **errp)
- static bool rtc_policy_slew_deliver_irq(RTCState *s)
- {
-     apic_reset_irq_delivered();
--    qemu_irq_raise(s->irq);
-+    rtc_rasie_irq(s);
-     return apic_get_irq_delivered();
- }
- 
-@@ -277,8 +308,9 @@ static void rtc_periodic_timer(void *opaque)
-                 DPRINTF_C("cmos: coalesced irqs increased to %d\n",
-                           s->irq_coalesced);
-             }
--        } else
--            qemu_irq_raise(s->irq);
-+        } else {
-+            rtc_rasie_irq(s);
-+        }
-     }
- }
- 
-@@ -459,7 +491,7 @@ static void rtc_update_timer(void *opaque)
-     s->cmos_data[RTC_REG_C] |= irqs;
-     if ((new_irqs & s->cmos_data[RTC_REG_B]) != 0) {
-         s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
--        qemu_irq_raise(s->irq);
-+        rtc_rasie_irq(s);
-     }
-     check_update_timer(s);
- }
-@@ -471,6 +503,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
-     uint32_t old_period;
-     bool update_periodic_timer;
- 
-+    qemu_mutex_lock(&s->rtc_lock);
-     if ((addr & 1) == 0) {
-         s->cmos_index = data & 0x7f;
-     } else {
-@@ -560,10 +593,10 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
-              * becomes enabled, raise an interrupt immediately.  */
-             if (data & s->cmos_data[RTC_REG_C] & REG_C_MASK) {
-                 s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
--                qemu_irq_raise(s->irq);
-+                rtc_rasie_irq(s);
-             } else {
-                 s->cmos_data[RTC_REG_C] &= ~REG_C_IRQF;
--                qemu_irq_lower(s->irq);
-+                rtc_lower_irq(s);
-             }
-             s->cmos_data[RTC_REG_B] = data;
- 
-@@ -583,6 +616,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
-             break;
-         }
-     }
-+    qemu_mutex_unlock(&s->rtc_lock);
- }
- 
- static inline int rtc_to_bcd(RTCState *s, int a)
-@@ -710,6 +744,7 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
-     if ((addr & 1) == 0) {
-         return 0xff;
-     } else {
-+        qemu_mutex_lock(&s->rtc_lock);
-         switch(s->cmos_index) {
- 	case RTC_IBM_PS2_CENTURY_BYTE:
-             s->cmos_index = RTC_CENTURY;
-@@ -737,7 +772,7 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
-             break;
-         case RTC_REG_C:
-             ret = s->cmos_data[s->cmos_index];
--            qemu_irq_lower(s->irq);
-+            rtc_lower_irq(s);
-             s->cmos_data[RTC_REG_C] = 0x00;
-             if (ret & (REG_C_UF | REG_C_AF)) {
-                 check_update_timer(s);
-@@ -762,6 +797,7 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
-         }
-         CMOS_DPRINTF("cmos: read index=0x%02x val=0x%02x\n",
-                      s->cmos_index, ret);
-+        qemu_mutex_unlock(&s->rtc_lock);
-         return ret;
-     }
- }
-@@ -909,7 +945,7 @@ static void rtc_reset(void *opaque)
-     s->cmos_data[RTC_REG_C] &= ~(REG_C_UF | REG_C_IRQF | REG_C_PF | REG_C_AF);
-     check_update_timer(s);
- 
--    qemu_irq_lower(s->irq);
-+    rtc_lower_irq(s);
- 
-     if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
-         s->irq_coalesced = 0;
-@@ -960,6 +996,8 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
- 
-     rtc_set_date_from_host(isadev);
- 
-+    qemu_mutex_init(&s->rtc_lock);
-+
-     switch (s->lost_tick_policy) {
- #ifdef TARGET_I386
-     case LOST_TICK_POLICY_SLEW:
-@@ -986,6 +1024,7 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
-     qemu_register_suspend_notifier(&s->suspend_notifier);
- 
-     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
-+    memory_region_clear_global_locking(&s->io);
-     isa_register_ioport(isadev, &s->io, base);
- 
-     qdev_set_legacy_instance_id(dev, base, 3);
--- 
-1.8.3.1
+qemu_chr_fe_wait_connected() doesn't work together with -chardev
+=2E..,reconnect=3D1.  This is because reconnect=3D1 connects asynchronously
+and then qemu_chr_fe_wait_connect() connects synchronously (if the async
+connect hasn't completed yet).  This means there will be 2 sockets
+connecting to the vhost-user slave!
+
+The virtio-vhost-user slave accepts the first connection but never
+receives any data because the QEMU master is trying to use the 2nd
+socket instead.
+
+Reconnection probably worked when Marc-Andr=E9 implemented it since QEMU
+wasn't using qemu_chr_fe_wait_connected().
+
+Marc-Andr=E9: How do you think this should be fixed?
+
+Stefan
+
+--mYCpIKhGyMATD0i+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaebgOAAoJEJykq7OBq3PI+K0H/1uSEU8kQdVjG+5MAKWfFGXA
+EOhUrGy9o80Gak9VoYmhtBuPSmuBCCkXIigxQapGmJz37YxlOJ0qHtZpg1GVQiWs
+qBIFGtxD1WReyMPn3foOJ3rkw5xE15A5XEGhYRtvatiBvAezCFDK6yzmPJ00yZ1r
+Hlj+b5q6dntXnqVVW0LZU3rlyP4CtYzgYHAgiSviSjd7FDSpg8VHSEE0jfhXT2qW
+HYpXakQt8juvDC0/SG5Sl9i9hEA+TzGw7VgswG9kuczi7wRlSmQ5T1gR+EiC/z4W
+6zJqa+X1o076SB0bcx/c7oXL/IEaCZN1cWILKofl55P64FTtNhAGhVm3W2W79CY=
+=Psjr
+-----END PGP SIGNATURE-----
+
+--mYCpIKhGyMATD0i+--
