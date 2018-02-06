@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9to-0000jj-3H
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:31 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tr-0000n4-1A
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tk-00035u-OR
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:28 -0500
-Received: from mail-eopbgr00099.outbound.protection.outlook.com
-	([40.107.0.99]:61504
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tn-00037I-Lx
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:31 -0500
+Received: from mail-eopbgr00097.outbound.protection.outlook.com
+	([40.107.0.97]:22064
 	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ej9tk-00035N-DU
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:24 -0500
+	id 1ej9tn-00036m-9T
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:27 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Feb 2018 23:30:23 +0300
-Message-Id: <20180206203048.11096-10-rkagan@virtuozzo.com>
+Date: Tue,  6 Feb 2018 23:30:25 +0300
+Message-Id: <20180206203048.11096-12-rkagan@virtuozzo.com>
 In-Reply-To: <20180206203048.11096-1-rkagan@virtuozzo.com>
 References: <20180206203048.11096-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 09/34] hyperv: block SynIC use in QEMU in
- incompatible configurations
+Subject: [Qemu-devel] [RFC PATCH 11/34] hyperv: add synic message delivery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,237 +31,253 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>, Ben Warren <ben@skyportsystems.com>, si-wei liu <si-wei.liu@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
-Certain configurations do not allow SynIC to be used in QEMU.  In
-particular,
+Add infrastructure to deliver SynIC messages to the guest SynIC message
+page.
 
-- when hyperv_vpindex is off, SINT routes can't be used as they refer to
-  the destination vCPU by vp_index
+Note that KVM also may want to deliver (SynIC timer) messages to the
+same message slot.
 
-- older KVM (which doesn't expose KVM_CAP_HYPERV_SYNIC2) zeroes out
-  SynIC message and event pages on every msr load, breaking migration
+The problem is that the access to a SynIC message slot is controlled by
+the value of its .msg_type field which indicates if the slot is being
+owned by the hypervisor (zero) or by the guest (non-zero).
 
-OTOH in-KVM users of SynIC -- SynIC timers -- do work in those
-configurations, and we shouldn't stop the guest from using them.
+This leaves no room for synchronizing multiple concurrent producers.
 
-To cover both scenarios, introduce a (user-invisible) SynIC property
-that disallows to use the SynIC within QEMU but not in KVM.  The
-property is clear by default but is set via compat logic for older
-machine types.
+The simplest way to deal with this for both KVM and QEMU is to only
+deliver messages in the vcpu thread.  KVM already does this; this patch
+makes it for QEMU, too.
 
-As a result, when hv_synic and a modern machine type are specified, QEMU
-will refuse to run unless vp_index is on and the kernel is recent
-enough.  OTOH with older machine types QEMU will fine run against an
-older kernel and/or without vp_index enabled but will refuse the in-QEMU
-uses of SynIC (e.g. VMBus).
+Specifically,
 
-Also a function is added that allows the devices to query the status of
-SynIC support across vCPUs.
+ - add a function for posting messages, which only copies the message
+   into the staging buffer if its free, and schedules a work on the
+   corresponding vcpu to actually deliver it to the guest slot;
+
+ - instead of a sint ack callback, set up the sint route with a message
+   status callback.  This function is called in a bh whenever there are
+   updates to the message slot status: either the vcpu made definitive
+   progress delivering the message from the staging buffer (succeeded or
+   failed) or the guest issued EOM; the status is passed as an argument
+   to the callback.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- include/hw/i386/pc.h |  5 ++++
- target/i386/hyperv.h |  4 ++-
- target/i386/hyperv.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- target/i386/kvm.c    |  8 +++---
- 4 files changed, 80 insertions(+), 7 deletions(-)
+ target/i386/hyperv.h |   7 +--
+ target/i386/hyperv.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 111 insertions(+), 14 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index bb49165fe0..744f6a20d2 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -352,6 +352,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .property = "extended-tseg-mbytes",\
-         .value    = stringify(0),\
-     },\
-+    {\
-+        .driver   = "hyperv-synic",\
-+        .property = "in-kvm-only",\
-+        .value    = "on",\
-+    },\
- 
- #define PC_COMPAT_2_8 \
-     HW_COMPAT_2_8 \
 diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
-index 20bbd7bb29..249bc15232 100644
+index 249bc15232..df17d9c3b7 100644
 --- a/target/i386/hyperv.h
 +++ b/target/i386/hyperv.h
-@@ -34,8 +34,10 @@ int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route);
- uint32_t hyperv_vp_index(X86CPU *cpu);
- X86CPU *hyperv_find_vcpu(uint32_t vp_index);
+@@ -19,13 +19,12 @@
+ #include "qemu/event_notifier.h"
  
--void hyperv_synic_add(X86CPU *cpu);
-+int hyperv_synic_add(X86CPU *cpu);
- void hyperv_synic_reset(X86CPU *cpu);
- void hyperv_synic_update(X86CPU *cpu);
+ typedef struct HvSintRoute HvSintRoute;
+-typedef void (*HvSintAckClb)(void *data);
++typedef void (*HvSintMsgCb)(void *data, int status);
  
-+bool hyperv_synic_usable(void);
+ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit);
+ 
+ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+-                                   HvSintAckClb sint_ack_clb,
+-                                   void *sint_ack_clb_data);
++                                   HvSintMsgCb cb, void *cb_data);
+ void hyperv_sint_route_ref(HvSintRoute *sint_route);
+ void hyperv_sint_route_unref(HvSintRoute *sint_route);
+ 
+@@ -40,4 +39,6 @@ void hyperv_synic_update(X86CPU *cpu);
+ 
+ bool hyperv_synic_usable(void);
+ 
++int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *msg);
 +
  #endif
 diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index a27d33acb3..933bfe5bcb 100644
+index 514cd27216..918ba26849 100644
 --- a/target/i386/hyperv.c
 +++ b/target/i386/hyperv.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu/main-loop.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include "hw/qdev-properties.h"
- #include "hyperv.h"
- #include "hyperv-proto.h"
-@@ -23,6 +24,8 @@ typedef struct SynICState {
- 
-     X86CPU *cpu;
- 
-+    bool in_kvm_only;
+@@ -47,8 +47,20 @@ struct HvSintRoute {
+     int gsi;
+     EventNotifier sint_set_notifier;
+     EventNotifier sint_ack_notifier;
+-    HvSintAckClb sint_ack_clb;
+-    void *sint_ack_clb_data;
 +
-     bool enabled;
-     hwaddr msg_page_addr;
-     hwaddr evt_page_addr;
-@@ -78,6 +81,10 @@ static void synic_update_evt_page_addr(SynICState *synic)
- 
- static void synic_update(SynICState *synic)
- {
-+    if (synic->in_kvm_only) {
-+        return;
-+    }
++    HvSintMsgCb msg_cb;
++    void *msg_cb_data;
++    struct hyperv_message *msg;
++    /*
++     * the state of the message staged in .msg:
++     * 0        - the staging area is not in use (after init or message
++     *            successfully delivered to guest)
++     * -EBUSY   - the staging area is being used in vcpu thread
++     * -EAGAIN  - delivery attempt failed due to slot being busy, retry
++     * -EXXXX   - error
++     */
++    int msg_status;
 +
-     synic->enabled = synic->cpu->env.msr_hv_synic_control & HV_SYNIC_ENABLE;
-     synic_update_msg_page_addr(synic);
+     unsigned refcount;
+ };
+ 
+@@ -119,6 +131,83 @@ static void synic_update(SynICState *synic)
      synic_update_evt_page_addr(synic);
-@@ -154,6 +161,7 @@ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
-     }
- 
-     synic = get_synic(cpu);
-+    assert(!synic->in_kvm_only);
- 
-     sint_route = g_new0(HvSintRoute, 1);
-     r = event_notifier_init(&sint_route->sint_set_notifier, false);
-@@ -240,17 +248,32 @@ int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route)
-     return event_notifier_set(&sint_route->sint_set_notifier);
  }
  
-+static Property synic_props[] = {
-+    /* user-invisible, only used for compat handling */
-+    DEFINE_PROP_BOOL("in-kvm-only", SynICState, in_kvm_only, false),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
++static void sint_msg_bh(void *opaque)
++{
++    HvSintRoute *sint_route = opaque;
++    int status = sint_route->msg_status;
++    sint_route->msg_status = 0;
++    sint_route->msg_cb(sint_route->msg_cb_data, status);
++    /* drop the reference taken in hyperv_post_msg */
++    hyperv_sint_route_unref(sint_route);
++}
 +
- static void synic_realize(DeviceState *dev, Error **errp)
- {
-     Object *obj = OBJECT(dev);
-     SynICState *synic = SYNIC(dev);
- 
-+    if (synic->in_kvm_only) {
-+        return;
-+    }
-+
-     synic->cpu = X86_CPU(obj->parent);
- }
- 
- static void synic_reset(DeviceState *dev)
- {
-     SynICState *synic = SYNIC(dev);
-+
-+    if (synic->in_kvm_only) {
-+        return;
-+    }
-+
-     synic_update(synic);
- }
- 
-@@ -258,19 +281,45 @@ static void synic_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-+    dc->props = synic_props;
-     dc->realize = synic_realize;
-     dc->reset = synic_reset;
-     dc->user_creatable = false;
- }
- 
--void hyperv_synic_add(X86CPU *cpu)
-+int hyperv_synic_add(X86CPU *cpu)
- {
-     Object *obj;
-+    SynICState *synic;
-+    uint32_t synic_cap;
++/*
++ * Worker to transfer the message from the staging area into the guest-owned
++ * message page in vcpu context, which guarantees serialization with both KVM
++ * vcpu and the guest cpu.
++ */
++static void cpu_post_msg(CPUState *cs, run_on_cpu_data data)
++{
 +    int ret;
- 
-     obj = object_new(TYPE_SYNIC);
-     object_property_add_child(OBJECT(cpu), "synic", obj, &error_abort);
-     object_unref(obj);
++    HvSintRoute *sint_route = data.host_ptr;
++    SynICState *synic = sint_route->synic;
++    struct hyperv_message *dst_msg;
 +
-+    synic = SYNIC(obj);
-+
-+    if (!synic->in_kvm_only) {
-+        synic_cap = KVM_CAP_HYPERV_SYNIC2;
-+        if (!cpu->hyperv_vpindex) {
-+            error_report("Hyper-V SynIC requires VP_INDEX support");
-+            return -ENOSYS;
-+        }
-+    } else {
-+        /* compat mode: only in-KVM SynIC timers supported */
-+        synic_cap = KVM_CAP_HYPERV_SYNIC;
++    if (!synic->enabled || !synic->msg_page_addr) {
++        ret = -ENXIO;
++        goto notify;
 +    }
 +
-+    ret = kvm_vcpu_enable_cap(CPU(cpu), synic_cap, 0);
++    dst_msg = &synic->msg_page->slot[sint_route->sint];
++
++    if (dst_msg->header.message_type != HV_MESSAGE_NONE) {
++        dst_msg->header.message_flags |= HV_MESSAGE_FLAG_PENDING;
++        ret = -EAGAIN;
++    } else {
++        memcpy(dst_msg, sint_route->msg, sizeof(*dst_msg));
++        ret = kvm_hv_sint_route_set_sint(sint_route);
++    }
++
++    memory_region_set_dirty(&synic->msg_page_mr, 0, sizeof(*synic->msg_page));
++
++notify:
++    sint_route->msg_status = ret;
++    /* notify the msg originator of the progress made; if the slot was busy we
++     * set msg_pending flag in it so it will be the guest who will do EOM and
++     * trigger the notification from KVM via sint_ack_notifier */
++    if (ret != -EAGAIN) {
++        aio_bh_schedule_oneshot(qemu_get_aio_context(), sint_msg_bh,
++                                sint_route);
++    }
++}
++
++/*
++ * Post a Hyper-V message to the staging area, for delivery to guest in the
++ * vcpu thread.
++ */
++int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *src_msg)
++{
++    int ret = sint_route->msg_status;
++
++    assert(sint_route->msg_cb);
++
++    if (ret == -EBUSY) {
++        return -EAGAIN;
++    }
 +    if (ret) {
-+        error_report("failed to enable Hyper-V SynIC in KVM: %s",
-+                     strerror(-ret));
 +        return ret;
 +    }
 +
-     object_property_set_bool(obj, true, "realized", &error_abort);
++    sint_route->msg_status = -EBUSY;
++    memcpy(sint_route->msg, src_msg, sizeof(*src_msg));
++
++    /* hold a reference on sint_route until the callback is finished */
++    hyperv_sint_route_ref(sint_route);
++
++    async_run_on_cpu(CPU(sint_route->synic->cpu), cpu_post_msg,
++                     RUN_ON_CPU_HOST_PTR(sint_route));
 +    return 0;
- }
- 
- void hyperv_synic_reset(X86CPU *cpu)
-@@ -283,6 +332,25 @@ void hyperv_synic_update(X86CPU *cpu)
-     synic_update(get_synic(cpu));
- }
- 
-+bool hyperv_synic_usable(void)
-+{
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        X86CPU *cpu = X86_CPU(cs);
-+
-+        if (!cpu->hyperv_synic) {
-+            return false;
-+        }
-+
-+        if (get_synic(cpu)->in_kvm_only) {
-+            return false;
-+        }
-+    }
-+
-+    return true;
 +}
+ 
+ static void async_synic_update(CPUState *cs, run_on_cpu_data data)
+ {
+@@ -176,17 +265,20 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+     }
+ }
+ 
+-static void kvm_hv_sint_ack_handler(EventNotifier *notifier)
++static void sint_ack_handler(EventNotifier *notifier)
+ {
+     HvSintRoute *sint_route = container_of(notifier, HvSintRoute,
+                                            sint_ack_notifier);
+     event_notifier_test_and_clear(notifier);
+-    sint_route->sint_ack_clb(sint_route->sint_ack_clb_data);
 +
- static const TypeInfo synic_type_info = {
-     .name = TYPE_SYNIC,
-     .parent = TYPE_DEVICE,
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 84c5cc2131..663501355b 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -717,12 +717,10 @@ static int hyperv_init_vcpu(X86CPU *cpu)
++    if (sint_route->msg_status == -EAGAIN) {
++        aio_bh_schedule_oneshot(qemu_get_aio_context(), sint_msg_bh,
++                                sint_route);
++    }
+ }
+ 
+ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+-                                   HvSintAckClb sint_ack_clb,
+-                                   void *sint_ack_clb_data)
++                                   HvSintMsgCb cb, void *cb_data)
+ {
+     SynICState *synic;
+     HvSintRoute *sint_route;
+@@ -208,14 +300,16 @@ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+         goto err;
      }
  
-     if (cpu->hyperv_synic) {
--        if (kvm_vcpu_enable_cap(CPU(cpu), KVM_CAP_HYPERV_SYNIC, 0)) {
--            fprintf(stderr, "failed to enable Hyper-V SynIC\n");
--            return -ENOSYS;
-+        int ret = hyperv_synic_add(cpu);
-+        if (ret) {
-+            return ret;
+-    ack_notifier = sint_ack_clb ? &sint_route->sint_ack_notifier : NULL;
++    ack_notifier = cb ? &sint_route->sint_ack_notifier : NULL;
+     if (ack_notifier) {
++        sint_route->msg = g_new(struct hyperv_message, 1);
++
+         r = event_notifier_init(ack_notifier, false);
+         if (r) {
+             goto err_sint_set_notifier;
          }
--
--        hyperv_synic_add(cpu);
+ 
+-        event_notifier_set_handler(ack_notifier, kvm_hv_sint_ack_handler);
++        event_notifier_set_handler(ack_notifier, sint_ack_handler);
      }
  
-     return 0;
+     gsi = kvm_irqchip_add_hv_sint_route(kvm_state, vp_index, sint);
+@@ -230,8 +324,8 @@ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+         goto err_irqfd;
+     }
+     sint_route->gsi = gsi;
+-    sint_route->sint_ack_clb = sint_ack_clb;
+-    sint_route->sint_ack_clb_data = sint_ack_clb_data;
++    sint_route->msg_cb = cb;
++    sint_route->msg_cb_data = cb_data;
+     sint_route->synic = synic;
+     sint_route->sint = sint;
+     sint_route->refcount = 1;
+@@ -244,6 +338,7 @@ err_gsi:
+     if (ack_notifier) {
+         event_notifier_set_handler(ack_notifier, NULL);
+         event_notifier_cleanup(ack_notifier);
++        g_free(sint_route->msg);
+     }
+ err_sint_set_notifier:
+     event_notifier_cleanup(&sint_route->sint_set_notifier);
+@@ -274,9 +369,10 @@ void hyperv_sint_route_unref(HvSintRoute *sint_route)
+                                           &sint_route->sint_set_notifier,
+                                           sint_route->gsi);
+     kvm_irqchip_release_virq(kvm_state, sint_route->gsi);
+-    if (sint_route->sint_ack_clb) {
++    if (sint_route->msg_cb) {
+         event_notifier_set_handler(&sint_route->sint_ack_notifier, NULL);
+         event_notifier_cleanup(&sint_route->sint_ack_notifier);
++        g_free(sint_route->msg);
+     }
+     event_notifier_cleanup(&sint_route->sint_set_notifier);
+     g_free(sint_route);
 -- 
 2.14.3
