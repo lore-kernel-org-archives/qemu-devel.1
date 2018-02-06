@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1ej0u5-0000vk-J1
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:55:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ej0vD-0001lI-QV
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:56:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1ej0u1-0002EC-Mm
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:55:09 -0500
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:19909)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
-	id 1ej0u1-0002Ad-DP
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:55:05 -0500
-Date: Tue, 6 Feb 2018 11:54:51 +0100
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Message-ID: <20180206105451.grddvo3fvk25gz5z@olga.proxmox.com>
-References: <20180202111022.rtnvwmjs4r4jzttq@olga.proxmox.com>
-	<20180205153140.GD28241@stefanha-x1.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1ej0vC-0002xt-Mo
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:56:19 -0500
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:46390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ej0vC-0002xR-Hx
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:56:18 -0500
+Received: by mail-ot0-x22a.google.com with SMTP id f56so1301134otj.13
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 02:56:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180205153140.GD28241@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] rate limiting issues
+In-Reply-To: <20180206091700.GB4942@stefanha-x1.localdomain>
+References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
+	<20180202100843.GD13090@stefanha-x1.localdomain>
+	<CAFEAcA-5PwhJw9epXh+0_oe3E-vsVKkQDX3s1Go-FBzO=FA3zA@mail.gmail.com>
+	<20180205155108.GF28241@stefanha-x1.localdomain>
+	<CAFEAcA-vd3vEJ0i=2LtaR-NQjHoJVYWCNDHOmh3iREPcQsqR4A@mail.gmail.com>
+	<20180206091700.GB4942@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Feb 2018 10:55:57 +0000
+Message-ID: <CAFEAcA-o3b0B1BhzTP5YdsXLyq50_WC7hzZU8vb-EmTOBKjhWA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Qemu Trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +34,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: Nesrine Zouari <nesrine.zouari@enis.tn>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
 
-On Mon, Feb 05, 2018 at 03:31:40PM +0000, Stefan Hajnoczi wrote:
-> On Fri, Feb 02, 2018 at 12:10:22PM +0100, Wolfgang Bumiller wrote:
-(...)
-> > Explanation:
-> > The ratelimiting code in include/qemu/ratelimit.h currently uses slices with
-> > quotas. Finishing up the quota for one slice means it'll wait for the end of
-> > this _and_ the next slice before resetting the accounting and start over.
-> > If that first slice was exceeded by only a tiny bit, we effectively spend every
-> > second slice waiting around. before starting over.
-(...)
-> > typedef struct {
-> >     int64_t last_time;
-> >     uint64_t speed;
-> >     int64_t allowed;
-> > } RateLimit;
-> > 
-> > static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
-> > {
-(... wrong code)
-> > }
-> 
-> This does not implement a rate limit, at least not in the way that users
-> expect:
-> 
-> Imagine there is no activity for 24 hours.  We accumulate a huge number
-> of allowed units and can exceed the rate limit for some time.
+On 6 February 2018 at 09:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> On Mon, Feb 05, 2018 at 03:55:01PM +0000, Peter Maydell wrote:
+>> ...and "online processing of traces" is pretty much exactly
+>> what an instrumentation plugin API is for.
+>
+> There are two cases for online processing:
+>
+> 1. Synchronous - this is what the instrumentation plugins will be able
+>    to do.  It means that QEMU waits until the event has been processed,
+>    and the plugin is therefore able to control QEMU.
+>
+> 2. Asynchronous - this is what LTTng UST does.  It means that the
+>    process analyzing the trace does not hold up QEMU, but it cannot
+>    control QEMU without some delay between trace events firing and
+>    reacting to them.  I think Nesrine's use case is this one.
+>
+> #2 is useful for "real-time" graphs, for example.  That is still
+> "oneline" but it doesn't require instrumentation plugins.
+>
+> Given that the instrumentation plugin API is still in early development,
+> it would delay Nesrine's work and I recommend against depending on it.
 
-Indeed, I forgot that blockjobs can be paused, which affects both
-versions.
-So we need slices, but do they need to be aligned? Changing the current
-code to not try align the waiting period with where a slice would start
-also seems to work better...
+I don't really want us to end up with two separate ways of doing
+basically the same thing that have been implemented entirely
+independently.
 
----8<---
->From e50097e88a04eae0d1d40bed5fb940dc4baa835d Mon Sep 17 00:00:00 2001
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Date: Tue, 6 Feb 2018 11:34:34 +0100
-Subject: [PATCH] ratelimit: don't align wait time with slices
+A lot of the problems you need to solve (like "how do we
+configurably add tracing of things like guest register changes
+into the generated code in a maintainable and efficient way")
+are the same both ways.
 
-It is possible for rate limited writes to keep overshooting a slice's
-quota by a tiny amount causing the slice-aligned waiting period to
-effectively halve the rate.
+>> It would also let you put the logic of "how do we know what a
+>> guest OS task switch is anyway" somewhere other than QEMU,
+>> which is nice because that's very guest-OS specific.
+>
+> How do you envision that instrumentation plugins will monitor guest OS
+> task switches if QEMU does not know about them?
 
-Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
----
- include/qemu/ratelimit.h | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+The plugin can register for information like changes of the
+relevant system registers (and could potentially do cleverer
+things like looking at guest in-memory task data structures).
+QEMU doesn't need to know (and shouldn't know) that x86 CR3 or
+Arm CONTEXTIDR are how you identify a guest OS task switch.
 
-diff --git a/include/qemu/ratelimit.h b/include/qemu/ratelimit.h
-index 8da1232574..01a5d535ec 100644
---- a/include/qemu/ratelimit.h
-+++ b/include/qemu/ratelimit.h
-@@ -35,7 +35,7 @@ typedef struct {
- static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
- {
-     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
--    uint64_t delay_slices;
-+    double delay_slices;
- 
-     assert(limit->slice_quota && limit->slice_ns);
- 
-@@ -54,12 +54,11 @@ static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
-         return 0;
-     }
- 
--    /* Quota exceeded. Calculate the next time slice we may start
--     * sending data again. */
--    delay_slices = (limit->dispatched + limit->slice_quota - 1) /
--        limit->slice_quota;
-+    /* Quota exceeded. Wait based on the excess amount and then start a new
-+     * slice. */
-+    delay_slices = (double)limit->dispatched / limit->slice_quota;
-     limit->slice_end_time = limit->slice_start_time +
--        delay_slices * limit->slice_ns;
-+        (uint64_t)(delay_slices * limit->slice_ns);
-     return limit->slice_end_time - now;
- }
- 
--- 
-2.11.0
+> Without instrumentation plugins I would add a guest_x86_cr3_write trace
+> event, for example.  Then the trace consumer can interpret that event as
+> a task switch if it knows the guest OS always writes to the cr3 register
+> on a task switch.  No instrumentation plugins are necessary in order to
+> do this and it doesn't hardcode knowledge of guest OS task switching
+> into QEMU either.
+
+This only works if you have a trace event for the register change,
+which we don't.
+
+thanks
+-- PMM
