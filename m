@@ -1,42 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ej6mC-000562-RV
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:11:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej6rT-0002H4-7o
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:16:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ej6mB-0005OE-Po
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:11:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33150)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ej6mB-0005NI-IG
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:11:23 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w16HBGEL046656
-	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 12:11:22 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fyff93fkd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 12:11:19 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 6 Feb 2018 12:10:58 -0500
-References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
-	<0c40e592-32e7-315e-fbad-1969c90b9b01@redhat.com>
-	<60be1af6-ab00-5425-1cac-edb722dfcc1a@linux.vnet.ibm.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 6 Feb 2018 12:10:55 -0500
-MIME-Version: 1.0
-In-Reply-To: <60be1af6-ab00-5425-1cac-edb722dfcc1a@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <c2c55487-1896-6b16-0fec-ad68600f74d5@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 05/12] s390-ccw: move
- auxiliary IPL data to separate location
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej6rO-0008UH-7i
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:16:51 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue,  6 Feb 2018 20:16:42 +0300
+Message-Id: <20180206171642.19826-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] iotests: 205: support luks format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,39 +17,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, berrange@redhat.com
 
-On 02/06/2018 05:13 AM, Viktor Mihajlovski wrote:
-> On 06.02.2018 10:23, Thomas Huth wrote:
->> On 05.02.2018 21:57, Collin L. Walling wrote:
->> [...]
->>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->>> index 0d06fc1..3e3c3b8 100644
->>> --- a/hw/s390x/ipl.c
->>> +++ b/hw/s390x/ipl.c
->>> @@ -399,6 +399,20 @@ void s390_reipl_request(void)
->>>       qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->>>   }
->>>   
->>> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
->>> +{
->>> +    S390IPLState *ipl = get_ipl_device();
->>> +    uint8_t *addr;
->>> +    uint64_t len = 4096;
->>> +
->>> +    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
->>> +    if (!addr || len < 204 + sizeof(QemuIplParameters)) {
->>> +        error_report("Cannot set QEMU IPL parameters");
->> I think you should return or exit() here. Otherwise the memcpy below
->> accesses an illegal memory range.Right, I have noticed and fixed that on my private branch, but forgot to
-> update the patch. Collin, could you squash in a
->              return;
+Support default luks options in VM.add_drive and in new library
+function qemu_img_create. Use it in 205 iotests.
 
-Can do.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-[...]
+instead of
+  [PATCH] iotests: 205: support only raw format
 
+let's just support luks. This patch also makes it simple to support
+luks in any other python iotest.
 
+ tests/qemu-iotests/205        |  4 ++--
+ tests/qemu-iotests/iotests.py | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 2 deletions(-)
+
+diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
+index 10388920dc..e7b2eae51d 100644
+--- a/tests/qemu-iotests/205
++++ b/tests/qemu-iotests/205
+@@ -22,7 +22,7 @@ import os
+ import sys
+ import iotests
+ import time
+-from iotests import qemu_img, qemu_io, filter_qemu_io, QemuIoInteractive
++from iotests import qemu_img_create, qemu_io, filter_qemu_io, QemuIoInteractive
+ 
+ nbd_sock = 'nbd_sock'
+ nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
+@@ -31,7 +31,7 @@ disk = os.path.join(iotests.test_dir, 'disk')
+ 
+ class TestNbdServerRemove(iotests.QMPTestCase):
+     def setUp(self):
+-        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
++        qemu_img_create('-f', iotests.imgfmt, disk, '1M')
+ 
+         self.vm = iotests.VM().add_drive(disk)
+         self.vm.launch()
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 5a10b2d534..4b9a4445cd 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -58,6 +58,13 @@ qemu_default_machine = os.environ.get('QEMU_DEFAULT_MACHINE')
+ socket_scm_helper = os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_helper')
+ debug = False
+ 
++luks_default_secret_id = 'luks_secret_default_iotests_id'
++luks_default_secret_data = '12345'
++luks_default_secret_object = 'secret,id=' + luks_default_secret_id + \
++                             ',data=' + luks_default_secret_data
++luks_default_key_secret_opt = 'key-secret=' + luks_default_secret_id
++
++
+ def qemu_img(*args):
+     '''Run qemu-img and return the exit code'''
+     devnull = open('/dev/null', 'r+')
+@@ -66,6 +73,25 @@ def qemu_img(*args):
+         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
+     return exitcode
+ 
++def qemu_img_create(*args):
++    args = list(args)
++
++    # default luks support
++    if '-f' in args and args[args.index('-f') + 1] == 'luks':
++        if '-o' in args:
++            i = args.index('-o')
++            if 'key-secret' not in args[i + 1]:
++                args[i + 1].append(luks_default_key_secret_opt)
++                args.insert(i + 2, '--object')
++                args.insert(i + 3, luks_default_secret_object)
++        else:
++            args = ['-o', luks_default_key_secret_opt,
++                    '--object', luks_default_secret_object] + args
++
++    args.insert(0, 'create')
++
++    return qemu_img(*args)
++
+ def qemu_img_verbose(*args):
+     '''Run qemu-img without suppressing its output and return the exit code'''
+     exitcode = subprocess.call(qemu_img_args + list(args))
+@@ -263,6 +289,13 @@ class VM(qtest.QEMUQtestMachine):
+         if opts:
+             options.append(opts)
+ 
++        if format == 'luks' and 'key-secret' not in opts:
++            # default luks support
++            if luks_default_secret_object not in self._args:
++                self.add_object(luks_default_secret_object)
++
++            options.append(luks_default_key_secret_opt)
++
+         self._args.append('-drive')
+         self._args.append(','.join(options))
+         self._num_drives += 1
 -- 
-- Collin L Walling
+2.11.1
