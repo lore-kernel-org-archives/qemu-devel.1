@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6QD-0000iu-RT
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:45 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Wb-0007BH-EC
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6Q8-0005CE-G6
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:41 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37184)
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6WZ-0001bL-Sk
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:17 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej6Q8-00059Q-5N
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:36 -0500
-Received: by mail-wr0-x242.google.com with SMTP id a43so2654782wrc.4
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:48:35 -0800 (PST)
+	id 1ej6WZ-0001aB-8U
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:15 -0500
+Received: by mail-wr0-x242.google.com with SMTP id b52so2663349wrd.10
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:55:15 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  6 Feb 2018 16:48:13 +0000
-Message-Id: <20180206164815.10084-21-alex.bennee@linaro.org>
+Date: Tue,  6 Feb 2018 16:48:12 +0000
+Message-Id: <20180206164815.10084-20-alex.bennee@linaro.org>
 In-Reply-To: <20180206164815.10084-1-alex.bennee@linaro.org>
 References: <20180206164815.10084-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 20/22] fpu/softfloat: re-factor minmax
+Subject: [Qemu-devel] [PATCH v4 19/22] fpu/softfloat: re-factor scalbn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,285 +32,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Let's do the same re-factor treatment for minmax functions. I still
-use the MACRO trick to expand but now all the checking code is common.
+This is one of the simpler manipulations you could make to a floating
+point number.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
 ---
-v2
-  - minor indentation fix
 v3
-  - fix merge conflicts from dropping MINMAX patch
-  - fix naming of structs
+  - fix renames
 v4
-  - use is_nan/is_snan
-  - pick_nan_parts->pick_nan
-  - minmax_decomposed->minmax_floats
+  - handle NaNs with return_nan
+  - use unlikely(is_nan)
 ---
- fpu/softfloat.c         | 227 +++++++++++++++++++++++++-----------------------
- include/fpu/softfloat.h |   6 ++
- 2 files changed, 126 insertions(+), 107 deletions(-)
+ fpu/softfloat.c         | 106 +++++++++++++++---------------------------------
+ include/fpu/softfloat.h |   1 +
+ 2 files changed, 34 insertions(+), 73 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 558d37ecf9..cb889a7a84 100644
+index 9f9f101d35..558d37ecf9 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1664,6 +1664,126 @@ float64 uint16_to_float64(uint16_t a, float_status *status)
+@@ -1664,6 +1664,39 @@ float64 uint16_to_float64(uint16_t a, float_status *status)
      return uint64_to_float64(a, status);
  }
  
-+/* Float Min/Max */
-+/* min() and max() functions. These can't be implemented as
-+ * 'compare and pick one input' because that would mishandle
-+ * NaNs and +0 vs -0.
-+ *
-+ * minnum() and maxnum() functions. These are similar to the min()
-+ * and max() functions but if one of the arguments is a QNaN and
-+ * the other is numerical then the numerical argument is returned.
-+ * SNaNs will get quietened before being returned.
-+ * minnum() and maxnum correspond to the IEEE 754-2008 minNum()
-+ * and maxNum() operations. min() and max() are the typical min/max
-+ * semantics provided by many CPUs which predate that specification.
-+ *
-+ * minnummag() and maxnummag() functions correspond to minNumMag()
-+ * and minNumMag() from the IEEE-754 2008.
-+ */
-+static FloatParts minmax_floats(FloatParts a, FloatParts b, bool ismin,
-+                                bool ieee, bool ismag, float_status *s)
++/* Multiply A by 2 raised to the power N.  */
++static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
 +{
-+    if (unlikely(is_nan(a.cls) || is_nan(b.cls))) {
-+        if (ieee) {
-+            /* Takes two floating-point values `a' and `b', one of
-+             * which is a NaN, and returns the appropriate NaN
-+             * result. If either `a' or `b' is a signaling NaN,
-+             * the invalid exception is raised.
-+             */
-+            if (is_snan(a.cls) || is_snan(b.cls)) {
-+                return pick_nan(a, b, s);
-+            } else if (is_nan(a.cls) && !is_nan(b.cls)) {
-+                return b;
-+            } else if (is_nan(b.cls) && !is_nan(a.cls)) {
-+                return a;
-+            }
-+        }
-+        return pick_nan(a, b, s);
-+    } else {
-+        int a_exp, b_exp;
-+        bool a_sign, b_sign;
-+
-+        switch (a.cls) {
-+        case float_class_normal:
-+            a_exp = a.exp;
-+            break;
-+        case float_class_inf:
-+            a_exp = INT_MAX;
-+            break;
-+        case float_class_zero:
-+            a_exp = INT_MIN;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+            break;
-+        }
-+        switch (b.cls) {
-+        case float_class_normal:
-+            b_exp = b.exp;
-+            break;
-+        case float_class_inf:
-+            b_exp = INT_MAX;
-+            break;
-+        case float_class_zero:
-+            b_exp = INT_MIN;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+            break;
-+        }
-+
-+        a_sign = a.sign;
-+        b_sign = b.sign;
-+        if (ismag) {
-+            a_sign = b_sign = 0;
-+        }
-+
-+        if (a_sign == b_sign) {
-+            bool a_less = a_exp < b_exp;
-+            if (a_exp == b_exp) {
-+                a_less = a.frac < b.frac;
-+            }
-+            return a_sign ^ a_less ^ ismin ? b : a;
-+        } else {
-+            return a_sign ^ ismin ? b : a;
-+        }
++    if (unlikely(is_nan(a.cls))) {
++        return return_nan(a, s);
 +    }
++    if (a.cls == float_class_normal) {
++        a.exp += n;
++    }
++    return a;
 +}
 +
-+#define MINMAX(sz, name, ismin, isiee, ismag)                           \
-+float ## sz float ## sz ## _ ## name(float ## sz a, float ## sz b,      \
-+                                     float_status *s)                   \
-+{                                                                       \
-+    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
-+    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
-+    FloatParts pr = minmax_floats(pa, pb, ismin, isiee, ismag, s);      \
-+                                                                        \
-+    return float ## sz ## _round_pack_canonical(pr, s);                 \
++float16 float16_scalbn(float16 a, int n, float_status *status)
++{
++    FloatParts pa = float16_unpack_canonical(a, status);
++    FloatParts pr = scalbn_decomposed(pa, n, status);
++    return float16_round_pack_canonical(pr, status);
 +}
 +
-+MINMAX(16, min, true, false, false)
-+MINMAX(16, minnum, true, true, false)
-+MINMAX(16, minnummag, true, true, true)
-+MINMAX(16, max, false, false, false)
-+MINMAX(16, maxnum, false, true, false)
-+MINMAX(16, maxnummag, false, true, true)
++float32 float32_scalbn(float32 a, int n, float_status *status)
++{
++    FloatParts pa = float32_unpack_canonical(a, status);
++    FloatParts pr = scalbn_decomposed(pa, n, status);
++    return float32_round_pack_canonical(pr, status);
++}
 +
-+MINMAX(32, min, true, false, false)
-+MINMAX(32, minnum, true, true, false)
-+MINMAX(32, minnummag, true, true, true)
-+MINMAX(32, max, false, false, false)
-+MINMAX(32, maxnum, false, true, false)
-+MINMAX(32, maxnummag, false, true, true)
++float64 float64_scalbn(float64 a, int n, float_status *status)
++{
++    FloatParts pa = float64_unpack_canonical(a, status);
++    FloatParts pr = scalbn_decomposed(pa, n, status);
++    return float64_round_pack_canonical(pr, status);
++}
 +
-+MINMAX(64, min, true, false, false)
-+MINMAX(64, minnum, true, true, false)
-+MINMAX(64, minnummag, true, true, true)
-+MINMAX(64, max, false, false, false)
-+MINMAX(64, maxnum, false, true, false)
-+MINMAX(64, maxnummag, false, true, true)
-+
-+#undef MINMAX
-+
- /* Multiply A by 2 raised to the power N.  */
- static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
- {
-@@ -6913,113 +7033,6 @@ int float128_compare_quiet(float128 a, float128 b, float_status *status)
-     return float128_compare_internal(a, b, 1, status);
- }
+ /*----------------------------------------------------------------------------
+ | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
+ | and 7, and returns the properly rounded 32-bit integer corresponding to the
+@@ -6987,79 +7020,6 @@ MINMAX(32)
+ MINMAX(64)
  
--/* min() and max() functions. These can't be implemented as
-- * 'compare and pick one input' because that would mishandle
-- * NaNs and +0 vs -0.
-- *
-- * minnum() and maxnum() functions. These are similar to the min()
-- * and max() functions but if one of the arguments is a QNaN and
-- * the other is numerical then the numerical argument is returned.
-- * minnum() and maxnum correspond to the IEEE 754-2008 minNum()
-- * and maxNum() operations. min() and max() are the typical min/max
-- * semantics provided by many CPUs which predate that specification.
-- *
-- * minnummag() and maxnummag() functions correspond to minNumMag()
-- * and minNumMag() from the IEEE-754 2008.
-- */
--#define MINMAX(s)                                                       \
--static inline float ## s float ## s ## _minmax(float ## s a, float ## s b,     \
--                                               int ismin, int isieee,   \
--                                               int ismag,               \
--                                               float_status *status)    \
--{                                                                       \
--    flag aSign, bSign;                                                  \
--    uint ## s ## _t av, bv, aav, abv;                                   \
--    a = float ## s ## _squash_input_denormal(a, status);                \
--    b = float ## s ## _squash_input_denormal(b, status);                \
--    if (float ## s ## _is_any_nan(a) ||                                 \
--        float ## s ## _is_any_nan(b)) {                                 \
--        if (isieee) {                                                   \
--            if (float ## s ## _is_quiet_nan(a, status) &&               \
--                !float ## s ##_is_any_nan(b)) {                         \
--                return b;                                               \
--            } else if (float ## s ## _is_quiet_nan(b, status) &&        \
--                       !float ## s ## _is_any_nan(a)) {                \
--                return a;                                               \
--            }                                                           \
--        }                                                               \
--        return propagateFloat ## s ## NaN(a, b, status);                \
--    }                                                                   \
--    aSign = extractFloat ## s ## Sign(a);                               \
--    bSign = extractFloat ## s ## Sign(b);                               \
--    av = float ## s ## _val(a);                                         \
--    bv = float ## s ## _val(b);                                         \
--    if (ismag) {                                                        \
--        aav = float ## s ## _abs(av);                                   \
--        abv = float ## s ## _abs(bv);                                   \
--        if (aav != abv) {                                               \
--            if (ismin) {                                                \
--                return (aav < abv) ? a : b;                             \
--            } else {                                                    \
--                return (aav < abv) ? b : a;                             \
--            }                                                           \
--        }                                                               \
--    }                                                                   \
--    if (aSign != bSign) {                                               \
--        if (ismin) {                                                    \
--            return aSign ? a : b;                                       \
--        } else {                                                        \
--            return aSign ? b : a;                                       \
--        }                                                               \
--    } else {                                                            \
--        if (ismin) {                                                    \
--            return (aSign ^ (av < bv)) ? a : b;                         \
--        } else {                                                        \
--            return (aSign ^ (av < bv)) ? b : a;                         \
--        }                                                               \
--    }                                                                   \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _min(float ## s a, float ## s b,               \
--                              float_status *status)                     \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 1, 0, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _max(float ## s a, float ## s b,               \
--                              float_status *status)                     \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 0, 0, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _minnum(float ## s a, float ## s b,            \
--                                 float_status *status)                  \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 1, 1, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _maxnum(float ## s a, float ## s b,            \
--                                 float_status *status)                  \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 0, 1, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _minnummag(float ## s a, float ## s b,         \
--                                    float_status *status)               \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 1, 1, 1, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _maxnummag(float ## s a, float ## s b,         \
--                                    float_status *status)               \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 0, 1, 1, status);                \
+ 
+-/* Multiply A by 2 raised to the power N.  */
+-float32 float32_scalbn(float32 a, int n, float_status *status)
+-{
+-    flag aSign;
+-    int16_t aExp;
+-    uint32_t aSig;
+-
+-    a = float32_squash_input_denormal(a, status);
+-    aSig = extractFloat32Frac( a );
+-    aExp = extractFloat32Exp( a );
+-    aSign = extractFloat32Sign( a );
+-
+-    if ( aExp == 0xFF ) {
+-        if ( aSig ) {
+-            return propagateFloat32NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if (aExp != 0) {
+-        aSig |= 0x00800000;
+-    } else if (aSig == 0) {
+-        return a;
+-    } else {
+-        aExp++;
+-    }
+-
+-    if (n > 0x200) {
+-        n = 0x200;
+-    } else if (n < -0x200) {
+-        n = -0x200;
+-    }
+-
+-    aExp += n - 1;
+-    aSig <<= 7;
+-    return normalizeRoundAndPackFloat32(aSign, aExp, aSig, status);
 -}
 -
--MINMAX(32)
--MINMAX(64)
+-float64 float64_scalbn(float64 a, int n, float_status *status)
+-{
+-    flag aSign;
+-    int16_t aExp;
+-    uint64_t aSig;
 -
+-    a = float64_squash_input_denormal(a, status);
+-    aSig = extractFloat64Frac( a );
+-    aExp = extractFloat64Exp( a );
+-    aSign = extractFloat64Sign( a );
+-
+-    if ( aExp == 0x7FF ) {
+-        if ( aSig ) {
+-            return propagateFloat64NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if (aExp != 0) {
+-        aSig |= LIT64( 0x0010000000000000 );
+-    } else if (aSig == 0) {
+-        return a;
+-    } else {
+-        aExp++;
+-    }
+-
+-    if (n > 0x1000) {
+-        n = 0x1000;
+-    } else if (n < -0x1000) {
+-        n = -0x1000;
+-    }
+-
+-    aExp += n - 1;
+-    aSig <<= 10;
+-    return normalizeRoundAndPackFloat64(aSign, aExp, aSig, status);
+-}
 -
  floatx80 floatx80_scalbn(floatx80 a, int n, float_status *status)
  {
      flag aSign;
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 52621e0b79..35df225a55 100644
+index 3e6fdd756a..52621e0b79 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -245,6 +245,12 @@ float16 float16_mul(float16, float16, float_status *status);
+@@ -244,6 +244,7 @@ float16 float16_sub(float16, float16, float_status *status);
+ float16 float16_mul(float16, float16, float_status *status);
  float16 float16_muladd(float16, float16, float16, int, float_status *status);
  float16 float16_div(float16, float16, float_status *status);
- float16 float16_scalbn(float16, int, float_status *status);
-+float16 float16_min(float16, float16, float_status *status);
-+float16 float16_max(float16, float16, float_status *status);
-+float16 float16_minnum(float16, float16, float_status *status);
-+float16 float16_maxnum(float16, float16, float_status *status);
-+float16 float16_minnummag(float16, float16, float_status *status);
-+float16 float16_maxnummag(float16, float16, float_status *status);
++float16 float16_scalbn(float16, int, float_status *status);
  
  int float16_is_quiet_nan(float16, float_status *status);
  int float16_is_signaling_nan(float16, float_status *status);
