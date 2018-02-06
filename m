@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1ej5XQ-00040C-Gi
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ej5Xe-0004DR-Ju
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1ej5XK-0005de-Ok
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:04 -0500
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:39988)
+	(envelope-from <dgilbert@redhat.com>) id 1ej5XY-0005v5-TI
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brogers@suse.com>) id 1ej5XK-0005bD-Er
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:51:58 -0500
-Message-Id: <5A79CF18020000480006831E@prv-mh.provo.novell.com>
-Date: Tue, 06 Feb 2018 08:51:52 -0700
-From: "Bruce Rogers" <brogers@suse.com>
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
-In-Reply-To: <20180129174132.108925-1-brijesh.singh@amd.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH v6 00/23] x86: Secure Encrypted
- Virtualization (AMD)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5XY-0005uU-N0
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:12 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue,  6 Feb 2018 15:49:30 +0000
+Message-Id: <20180206154936.13565-9-dgilbert@redhat.com>
+In-Reply-To: <20180206154936.13565-1-dgilbert@redhat.com>
+References: <20180206154936.13565-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 08/14] tests: Use consistent names for migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: brijesh.singh@amd.com, qemu-devel@nongnu.org
-Cc: Thomas.Lendacky@amd.com, Stefan Hajnoczi <stefanha@gmail.com>, peter.maydell@linaro.org, richard.henderson@linaro.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, edgar.iglesias@xilinx.com
+To: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: peterx@redhat.com, lvivier@redhat.com, groug@kaod.org, ross.lagerwall@citrix.com, wei.w.wang@intel.com, danielhb@linux.vnet.ibm.com
 
->>> On 1/29/2018 at 10:41 AM, <brijesh.singh@amd.com> wrote:
-> This patch series provides support for AMD's new Secure Encrypted=20
-> Virtualization (SEV) feature.
->=20
-> SEV is an extension to the AMD=E2=80=91V architecture which supports =
-running
-> multiple VMs under the control of a hypervisor. The SEV feature allows
-> the memory contents of a virtual machine (VM) to be transparently =
-encrypted
-> with a key unique to the guest VM. The memory controller contains a
-> high performance encryption engine which can be programmed with multiple
-> keys for use by a different VMs in the system. The programming and
-> management of these keys is handled by the AMD Secure Processor firmware
-> which exposes a commands for these tasks.
->=20
-> The KVM SEV patch series introduced a new ioctl (KVM_MEMORY_ENCRYPTION_OP=
-)
-> which is used by qemu to issue the SEV commands to assist performing
-> common hypervisor activities such as a launching, running, snapshooting,
-> migration and debugging guests.
->=20
+From: Juan Quintela <quintela@redhat.com>
 
-As for the reported failure to build on non-x86 hosts, eg:
-...
-  LINK    i386-softmmu/qemu-system-i386
-target/i386/helper.o: In function `get_me_mask':
-/var/tmp/patchew-tester-tmp-hek3vjny/src/target/i386/helper.c:735: =
-undefined reference to `kvm_arch_get_supported_cpuid'
-target/i386/monitor.o: In function `get_me_mask':
-/var/tmp/patchew-tester-tmp-hek3vjny/src/target/i386/monitor.c:71: =
-undefined reference to `kvm_arch_get_supported_cpuid'
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tests/migration-test.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-... I've looked at that a bit and find that in target/i386/kvm-stub.c, if =
-we get rid of
-the #ifndef __OPTIMIZE__ it then builds ok. I'm not sure if the guarding =
-done there
-with the check for  __OPTIMIZE__ is a relic that no longer applies given =
-how qemu
-currently builds, but at least it's something to look at.
-
-Bruce
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 3732682a29..ac4a916169 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -429,12 +429,12 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         init_bootfile_x86(bootpath);
+         cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
+-                                  " -name pcsource,debug-threads=on"
++                                  " -name source,debug-threads=on"
+                                   " -serial file:%s/src_serial"
+                                   " -drive file=%s,format=raw",
+                                   accel, tmpfs, bootpath);
+         cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
+-                                  " -name pcdest,debug-threads=on"
++                                  " -name target,debug-threads=on"
+                                   " -serial file:%s/dest_serial"
+                                   " -drive file=%s,format=raw"
+                                   " -incoming %s",
+@@ -447,12 +447,12 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+         }
+         init_bootfile_ppc(bootpath);
+         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
+-                                  " -name pcsource,debug-threads=on"
++                                  " -name source,debug-threads=on"
+                                   " -serial file:%s/src_serial"
+                                   " -drive file=%s,if=pflash,format=raw",
+                                   accel, tmpfs, bootpath);
+         cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
+-                                  " -name pcdest,debug-threads=on"
++                                  " -name target,debug-threads=on"
+                                   " -serial file:%s/dest_serial"
+                                   " -incoming %s",
+                                   accel, tmpfs, uri);
+-- 
+2.14.3
