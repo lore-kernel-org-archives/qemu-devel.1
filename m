@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej1By-0007lZ-Kx
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:13:40 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej1Cx-0000LU-4c
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:14:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej1Bv-00066W-EI
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:13:38 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:46512)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej1Bv-00066F-84
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:13:35 -0500
-Received: by mail-wr0-x243.google.com with SMTP id 35so1459001wrb.13
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 03:13:35 -0800 (PST)
-References: <20180126045742.5487-1-richard.henderson@linaro.org>
-	<20180126045742.5487-19-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180126045742.5487-19-richard.henderson@linaro.org>
-Date: Tue, 06 Feb 2018 11:13:32 +0000
-Message-ID: <87h8quweub.fsf@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej1Cs-0006mk-Qa
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:14:39 -0500
+Received: from mail-eopbgr20116.outbound.protection.outlook.com
+	([40.107.2.116]:61251
+	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1ej1Cs-0006m1-0g
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:14:34 -0500
+References: <151791154436.32601.15403203498591276038.stgit@bahia.lan>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3766eaba-b437-d152-e7aa-b7dd5dd4e7c6@virtuozzo.com>
+Date: Tue, 6 Feb 2018 14:14:23 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 18/20] target/arm: Use vector
- infrastructure for aa64 orr/bic immediate
+In-Reply-To: <151791154436.32601.15403203498591276038.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2] migration: incoming postcopy advise
+ sanity checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +31,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+06.02.2018 13:05, Greg Kurz wrote:
+> If postcopy-ram was set on the source but not on the destination,
+> migration doesn't occur, the destination prints an error and boots
+> the guest:
+>
+> qemu-system-ppc64: Expected vmdescription section, but got 0
+>
+> We end up with two running instances.
+>
+> This behaviour was introduced in 2.11 by commit 58110f0acb1a "migration:
+> split common postcopy out of ram postcopy" to prepare ground for the
+> upcoming dirty bitmap postcopy support. It adds a new case where the
+> source may send an empty postcopy advise because dirty bitmap doesn't
+> need to check page sizes like RAM postcopy does.
+>
+> If the source has enabled postcopy-ram, then it sends an advise with
+> the page size values. If the destination hasn't enabled postcopy-ram,
+> then loadvm_postcopy_handle_advise() leaves the page size values on
+> the stream and returns. This confuses qemu_loadvm_state() later on
+> and causes the destination to start execution.
+>
+> As discussed several times, postcopy-ram should be enabled both sides
+> to be functional. This patch changes the destination to perform some
+> extra checks on the advise length to ensure this is the case. Otherwise
+> an error is returned and migration is aborted.
+>
+> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  target/arm/translate-a64.c | 28 +++++-----------------------
->  1 file changed, 5 insertions(+), 23 deletions(-)
+> v2: - error out if postcopy-ram is enabled but the source hasn't sent the
+>        expected 16 byte advise
+>      - more descriptive message if postcopy-ram is disabled but the source
+>        has sent a 16 byte advise
+> ---
+>   migration/savevm.c |   21 ++++++++++++++++++---
+>   1 file changed, 18 insertions(+), 3 deletions(-)
 >
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 64a2c2df59..d688a699be 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -6180,7 +6180,6 @@ static void disas_simd_mod_imm(DisasContext *s, uin=
-t32_t insn)
->      bool is_neg =3D extract32(insn, 29, 1);
->      bool is_q =3D extract32(insn, 30, 1);
->      uint64_t imm =3D 0;
-> -    int i;
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index b7908f62be3c..e97671c1f7bd 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1376,7 +1376,8 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+>    * *might* happen - it might be skipped if precopy transferred everything
+>    * quickly.
+>    */
+> -static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+> +static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
+> +                                         uint16_t len)
+>   {
+>       PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
+>       uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
+> @@ -1387,8 +1388,22 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+>           return -1;
+>       }
+>   
+> -    if (!migrate_postcopy_ram()) {
+> +    switch (len) {
+> +    case 0:
+> +        if (migrate_postcopy_ram()) {
+> +            warn_report("RAM postcopy is enabled but have 0 byte advise");
+> +            return -EINVAL;
+
+I think, if we return -EINVAL, it should be error_report, not 
+warn_report. However, I don't insist, so with or without s/warn/error/,
+
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+And thank you for investigating this, it's actually my fault.
+
+> +        }
+>           return 0;
+> +    case 8 + 8:
+> +        if (!migrate_postcopy_ram()) {
+> +            error_report("RAM postcopy is disabled but have 16 byte advise");
+> +            return -EINVAL;
+> +        }
+> +        break;
+> +    default:
+> +        error_report("CMD_POSTCOPY_ADVISE invalid length (%d)", len);
+> +        return -EINVAL;
+>       }
+>   
+>       if (!postcopy_ram_supported_by_host(mis)) {
+> @@ -1807,7 +1822,7 @@ static int loadvm_process_command(QEMUFile *f)
+>           return loadvm_handle_cmd_packaged(mis);
+>   
+>       case MIG_CMD_POSTCOPY_ADVISE:
+> -        return loadvm_postcopy_handle_advise(mis);
+> +        return loadvm_postcopy_handle_advise(mis, len);
+>   
+>       case MIG_CMD_POSTCOPY_LISTEN:
+>           return loadvm_postcopy_handle_listen(mis);
 >
->      if (o2 !=3D 0 || ((cmode =3D=3D 0xf) && is_neg && !is_q)) {
->          unallocated_encoding(s);
-> @@ -6266,29 +6265,12 @@ static void disas_simd_mod_imm(DisasContext *s, u=
-int32_t insn)
->          tcg_gen_gvec_dup64i(vec_full_reg_offset(s, rd), is_q ? 16 : 8,
->                              vec_full_reg_size(s), imm);
->      } else {
-> -        TCGv_i64 tcg_imm =3D tcg_const_i64(imm);
-> -        TCGv_i64 tcg_rd =3D new_tmp_a64(s);
-> -
-> -        for (i =3D 0; i < 2; i++) {
-> -            int foffs =3D vec_reg_offset(s, rd, i, MO_64);
-> -
-> -            if (i =3D=3D 1 && !is_q) {
-> -                /* non-quad ops clear high half of vector */
-> -                tcg_gen_movi_i64(tcg_rd, 0);
-> -            } else {
-> -                tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
-> -                if (is_neg) {
-> -                    /* AND (BIC) */
-> -                    tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
-> -                } else {
-> -                    /* ORR */
-> -                    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
-> -                }
-> -            }
-> -            tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
-> +        /* ORR or BIC, with BIC negation to AND handled above.  */
-> +        if (is_neg) {
-> +            gen_gvec_fn2i(s, is_q, rd, rd, imm, tcg_gen_gvec_andi, MO_64=
-);
-> +        } else {
-> +            gen_gvec_fn2i(s, is_q, rd, rd, imm, tcg_gen_gvec_ori, MO_64);
->          }
-> -
-> -        tcg_temp_free_i64(tcg_imm);
->      }
->  }
 
 
---
-Alex Benn=C3=A9e
+-- 
+Best regards,
+Vladimir
