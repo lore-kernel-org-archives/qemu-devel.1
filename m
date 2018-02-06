@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej6rT-0002H4-7o
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:16:54 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ej6tw-0004xy-Lr
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:19:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej6rO-0008UH-7i
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:16:51 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  6 Feb 2018 20:16:42 +0300
-Message-Id: <20180206171642.19826-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] iotests: 205: support luks format
+	(envelope-from <cohuck@redhat.com>) id 1ej6tr-0001RW-Nv
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:19:24 -0500
+Date: Tue, 6 Feb 2018 18:19:07 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180206181907.577e9b3f.cohuck@redhat.com>
+In-Reply-To: <ee01d23d-5bbc-9b57-d6a5-25ef8d792374@redhat.com>
+References: <20180205102935.14736-1-david@redhat.com>
+	<8c8fc2e6-24b2-5206-9a75-9d5595623d9a@de.ibm.com>
+	<d63f7e05-648a-fb3a-aa9e-0a0dc1925276@redhat.com>
+	<20180205132213.1f06d09c.cohuck@redhat.com>
+	<ee01d23d-5bbc-9b57-d6a5-25ef8d792374@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpumodel: model PTFF subfunctions
+ for Multiple-epoch facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,104 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, berrange@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-Support default luks options in VM.add_drive and in new library
-function qemu_img_create. Use it in 205 iotests.
+On Mon, 5 Feb 2018 13:37:17 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+> On 05.02.2018 13:22, Cornelia Huck wrote:
+> > On Mon, 5 Feb 2018 12:27:33 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 05.02.2018 12:22, Christian Borntraeger wrote:  
+> >>> Looks sane on a z14.
+> >>> Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >>>
+> >>>
+> >>> On 02/05/2018 11:29 AM, David Hildenbrand wrote:    
+> >>>> --- a/target/s390x/kvm.c
+> >>>> +++ b/target/s390x/kvm.c
+> >>>> @@ -2221,6 +2221,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+> >>>>          return;
+> >>>>      }
+> >>>>
+> >>>> +    /* PTFF subfunctions might be indicated although kernel support missing */
+> >>>> +    if (!test_bit(S390_FEAT_MULTIPLE_EPOCH, model->features)) {
+> >>>> +        clear_bit(S390_FEAT_PTFF_QSIE, model->features);
+> >>>> +        clear_bit(S390_FEAT_PTFF_QTOUE, model->features);
+> >>>> +        clear_bit(S390_FEAT_PTFF_STOE, model->features);
+> >>>> +        clear_bit(S390_FEAT_PTFF_STOUE, model->features);
+> >>>> +    }
+> >>>> +
+> >>>>      /* with cpu model support, CMM is only indicated if really available */
+> >>>>      if (kvm_s390_cmma_available()) {
+> >>>>          set_bit(S390_FEAT_CMM, model->features);
+> >>>>    
+> >>>
+> >>> Do you also want to add something to check_consistency ?
+> >>>
+> >>> Right now the following user error 
+> >>> -cpu z14,mepoch=off,mepochptff=on
+> >>> is accepted.
+> >>> On the other hand we also have no consistency checks for other subfunctions.
+> >>>     
+> >>
+> >> Thought about that, but that implies that a CPU model runable now, will
+> >> not run without warnings. Especially if migrating. We could add such
+> >> checks if we would push this into stable.
 
-instead of
-  [PATCH] iotests: 205: support only raw format
+I'm currently wondering whether this change would actually be
+applicable and useful for stable. Given the way stable is usually used,
+probably not.
 
-let's just support luks. This patch also makes it simple to support
-luks in any other python iotest.
+> >>  
+> > 
+> > So, adding this check for the z14 stuff would work iff pushed into
+> > stable - but for the other subfunctions the ship has already sailed?
+> >   
+> 
+> I don't know if we really have problems with other subfunctions. We
+> could also add consistency checks there (the problem here is that we
+> actually have to add missing subfunctions). So it is easier to check for
+> consistency with already existing subfunctions.
 
- tests/qemu-iotests/205        |  4 ++--
- tests/qemu-iotests/iotests.py | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 2 deletions(-)
-
-diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
-index 10388920dc..e7b2eae51d 100644
---- a/tests/qemu-iotests/205
-+++ b/tests/qemu-iotests/205
-@@ -22,7 +22,7 @@ import os
- import sys
- import iotests
- import time
--from iotests import qemu_img, qemu_io, filter_qemu_io, QemuIoInteractive
-+from iotests import qemu_img_create, qemu_io, filter_qemu_io, QemuIoInteractive
- 
- nbd_sock = 'nbd_sock'
- nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
-@@ -31,7 +31,7 @@ disk = os.path.join(iotests.test_dir, 'disk')
- 
- class TestNbdServerRemove(iotests.QMPTestCase):
-     def setUp(self):
--        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
-+        qemu_img_create('-f', iotests.imgfmt, disk, '1M')
- 
-         self.vm = iotests.VM().add_drive(disk)
-         self.vm.launch()
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 5a10b2d534..4b9a4445cd 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -58,6 +58,13 @@ qemu_default_machine = os.environ.get('QEMU_DEFAULT_MACHINE')
- socket_scm_helper = os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_helper')
- debug = False
- 
-+luks_default_secret_id = 'luks_secret_default_iotests_id'
-+luks_default_secret_data = '12345'
-+luks_default_secret_object = 'secret,id=' + luks_default_secret_id + \
-+                             ',data=' + luks_default_secret_data
-+luks_default_key_secret_opt = 'key-secret=' + luks_default_secret_id
-+
-+
- def qemu_img(*args):
-     '''Run qemu-img and return the exit code'''
-     devnull = open('/dev/null', 'r+')
-@@ -66,6 +73,25 @@ def qemu_img(*args):
-         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
-     return exitcode
- 
-+def qemu_img_create(*args):
-+    args = list(args)
-+
-+    # default luks support
-+    if '-f' in args and args[args.index('-f') + 1] == 'luks':
-+        if '-o' in args:
-+            i = args.index('-o')
-+            if 'key-secret' not in args[i + 1]:
-+                args[i + 1].append(luks_default_key_secret_opt)
-+                args.insert(i + 2, '--object')
-+                args.insert(i + 3, luks_default_secret_object)
-+        else:
-+            args = ['-o', luks_default_key_secret_opt,
-+                    '--object', luks_default_secret_object] + args
-+
-+    args.insert(0, 'create')
-+
-+    return qemu_img(*args)
-+
- def qemu_img_verbose(*args):
-     '''Run qemu-img without suppressing its output and return the exit code'''
-     exitcode = subprocess.call(qemu_img_args + list(args))
-@@ -263,6 +289,13 @@ class VM(qtest.QEMUQtestMachine):
-         if opts:
-             options.append(opts)
- 
-+        if format == 'luks' and 'key-secret' not in opts:
-+            # default luks support
-+            if luks_default_secret_object not in self._args:
-+                self.add_object(luks_default_secret_object)
-+
-+            options.append(luks_default_key_secret_opt)
-+
-         self._args.append('-drive')
-         self._args.append(','.join(options))
-         self._num_drives += 1
--- 
-2.11.1
+Hm, so not really worth the hassle, just keep this as-is (and apply
+this patch as-is)?
