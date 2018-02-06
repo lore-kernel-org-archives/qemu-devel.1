@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6Wb-0007BG-Dz
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:18 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Wc-0007DN-Ug
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6WZ-0001ah-3I
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:17 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:41108)
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6WY-0001Z1-5G
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:19 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32773)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej6WY-0001Yl-EL
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:15 -0500
-Received: by mail-wr0-x244.google.com with SMTP id v15so2673786wrb.8
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:55:14 -0800 (PST)
+	id 1ej6WX-0001YK-Lp
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:55:14 -0500
+Received: by mail-wm0-x243.google.com with SMTP id x4-v6so18722029wmc.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:55:13 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  6 Feb 2018 16:48:14 +0000
-Message-Id: <20180206164815.10084-22-alex.bennee@linaro.org>
+Date: Tue,  6 Feb 2018 16:48:04 +0000
+Message-Id: <20180206164815.10084-12-alex.bennee@linaro.org>
 In-Reply-To: <20180206164815.10084-1-alex.bennee@linaro.org>
 References: <20180206164815.10084-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 21/22] fpu/softfloat: re-factor compare
+Subject: [Qemu-devel] [PATCH v4 11/22] fpu/softfloat: define decompose
+ structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,187 +33,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-The compare function was already expanded from a macro. I keep the
-macro expansion but move most of the logic into a compare_decomposed.
+These structures pave the way for generic softfloat helper routines
+that will operate on fully decomposed numbers.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 ---
-v2
-  - minor re-factor for better inf handling
 v3
-  - fix renaming of structs/functions
-v4
-  - use is_nan
+ - comment box style
+ - CamelCase structs
+ - hide DECOMPOSED_BINARY_POINT - frac in macro
+ - more comments
+ - add exp_size, frac_size to FloatFmt
+ - compute exp_bias and exp_max from FLOAT_PARAMS
+ - remove include bitops (in next patch)
 ---
- fpu/softfloat.c         | 134 +++++++++++++++++++++++++++++-------------------
- include/fpu/softfloat.h |   2 +
- 2 files changed, 82 insertions(+), 54 deletions(-)
+ fpu/softfloat.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 85 insertions(+), 1 deletion(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index cb889a7a84..8fc1c2a8d9 100644
+index 297e48f5c9..568d555595 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1784,6 +1784,86 @@ MINMAX(64, maxnummag, false, true, true)
+@@ -83,7 +83,6 @@ this code that are retained.
+  * target-dependent and needs the TARGET_* macros.
+  */
+ #include "qemu/osdep.h"
+-
+ #include "fpu/softfloat.h"
  
- #undef MINMAX
- 
-+/* Floating point compare */
-+static int compare_floats(FloatParts a, FloatParts b, bool is_quiet,
-+                          float_status *s)
-+{
-+    if (is_nan(a.cls) || is_nan(b.cls)) {
-+        if (!is_quiet ||
-+            a.cls == float_class_snan ||
-+            b.cls == float_class_snan) {
-+            s->float_exception_flags |= float_flag_invalid;
-+        }
-+        return float_relation_unordered;
-+    }
-+
-+    if (a.cls == float_class_zero) {
-+        if (b.cls == float_class_zero) {
-+            return float_relation_equal;
-+        }
-+        return b.sign ? float_relation_greater : float_relation_less;
-+    } else if (b.cls == float_class_zero) {
-+        return a.sign ? float_relation_less : float_relation_greater;
-+    }
-+
-+    /* The only really important thing about infinity is its sign. If
-+     * both are infinities the sign marks the smallest of the two.
-+     */
-+    if (a.cls == float_class_inf) {
-+        if ((b.cls == float_class_inf) && (a.sign == b.sign)) {
-+            return float_relation_equal;
-+        }
-+        return a.sign ? float_relation_less : float_relation_greater;
-+    } else if (b.cls == float_class_inf) {
-+        return b.sign ? float_relation_greater : float_relation_less;
-+    }
-+
-+    if (a.sign != b.sign) {
-+        return a.sign ? float_relation_less : float_relation_greater;
-+    }
-+
-+    if (a.exp == b.exp) {
-+        if (a.frac == b.frac) {
-+            return float_relation_equal;
-+        }
-+        if (a.sign) {
-+            return a.frac > b.frac ?
-+                float_relation_less : float_relation_greater;
-+        } else {
-+            return a.frac > b.frac ?
-+                float_relation_greater : float_relation_less;
-+        }
-+    } else {
-+        if (a.sign) {
-+            return a.exp > b.exp ? float_relation_less : float_relation_greater;
-+        } else {
-+            return a.exp > b.exp ? float_relation_greater : float_relation_less;
-+        }
-+    }
-+}
-+
-+#define COMPARE(sz)                                                     \
-+int float ## sz ## _compare(float ## sz a, float ## sz b,               \
-+                            float_status *s)                            \
-+{                                                                       \
-+    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
-+    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
-+    return compare_floats(pa, pb, false, s);                            \
-+}                                                                       \
-+int float ## sz ## _compare_quiet(float ## sz a, float ## sz b,         \
-+                                  float_status *s)                      \
-+{                                                                       \
-+    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
-+    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
-+    return compare_floats(pa, pb, true, s);                             \
-+}
-+
-+COMPARE(16)
-+COMPARE(32)
-+COMPARE(64)
-+
-+#undef COMPARE
-+
- /* Multiply A by 2 raised to the power N.  */
- static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
- {
-@@ -6885,60 +6965,6 @@ int float128_unordered_quiet(float128 a, float128 b, float_status *status)
-     return 0;
+ /* We only need stdlib for abort() */
+@@ -186,6 +185,91 @@ static inline flag extractFloat64Sign(float64 a)
+     return float64_val(a) >> 63;
  }
  
--#define COMPARE(s, nan_exp)                                                  \
--static inline int float ## s ## _compare_internal(float ## s a, float ## s b,\
--                                      int is_quiet, float_status *status)    \
--{                                                                            \
--    flag aSign, bSign;                                                       \
--    uint ## s ## _t av, bv;                                                  \
--    a = float ## s ## _squash_input_denormal(a, status);                     \
--    b = float ## s ## _squash_input_denormal(b, status);                     \
--                                                                             \
--    if (( ( extractFloat ## s ## Exp( a ) == nan_exp ) &&                    \
--         extractFloat ## s ## Frac( a ) ) ||                                 \
--        ( ( extractFloat ## s ## Exp( b ) == nan_exp ) &&                    \
--          extractFloat ## s ## Frac( b ) )) {                                \
--        if (!is_quiet ||                                                     \
--            float ## s ## _is_signaling_nan(a, status) ||                  \
--            float ## s ## _is_signaling_nan(b, status)) {                 \
--            float_raise(float_flag_invalid, status);                         \
--        }                                                                    \
--        return float_relation_unordered;                                     \
--    }                                                                        \
--    aSign = extractFloat ## s ## Sign( a );                                  \
--    bSign = extractFloat ## s ## Sign( b );                                  \
--    av = float ## s ## _val(a);                                              \
--    bv = float ## s ## _val(b);                                              \
--    if ( aSign != bSign ) {                                                  \
--        if ( (uint ## s ## _t) ( ( av | bv )<<1 ) == 0 ) {                   \
--            /* zero case */                                                  \
--            return float_relation_equal;                                     \
--        } else {                                                             \
--            return 1 - (2 * aSign);                                          \
--        }                                                                    \
--    } else {                                                                 \
--        if (av == bv) {                                                      \
--            return float_relation_equal;                                     \
--        } else {                                                             \
--            return 1 - 2 * (aSign ^ ( av < bv ));                            \
--        }                                                                    \
--    }                                                                        \
--}                                                                            \
--                                                                             \
--int float ## s ## _compare(float ## s a, float ## s b, float_status *status) \
--{                                                                            \
--    return float ## s ## _compare_internal(a, b, 0, status);                 \
--}                                                                            \
--                                                                             \
--int float ## s ## _compare_quiet(float ## s a, float ## s b,                 \
--                                 float_status *status)                       \
--{                                                                            \
--    return float ## s ## _compare_internal(a, b, 1, status);                 \
--}
--
--COMPARE(32, 0xff)
--COMPARE(64, 0x7ff)
--
- static inline int floatx80_compare_internal(floatx80 a, floatx80 b,
-                                             int is_quiet, float_status *status)
- {
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 35df225a55..cebe37b716 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -251,6 +251,8 @@ float16 float16_minnum(float16, float16, float_status *status);
- float16 float16_maxnum(float16, float16, float_status *status);
- float16 float16_minnummag(float16, float16, float_status *status);
- float16 float16_maxnummag(float16, float16, float_status *status);
-+int float16_compare(float16, float16, float_status *status);
-+int float16_compare_quiet(float16, float16, float_status *status);
- 
- int float16_is_quiet_nan(float16, float_status *status);
- int float16_is_signaling_nan(float16, float_status *status);
++/*
++ * Classify a floating point number. Everything above float_class_qnan
++ * is a NaN so cls >= float_class_qnan is any NaN.
++ */
++
++typedef enum __attribute__ ((__packed__)) {
++    float_class_unclassified,
++    float_class_zero,
++    float_class_normal,
++    float_class_inf,
++    float_class_qnan,  /* all NaNs from here */
++    float_class_snan,
++    float_class_dnan,
++    float_class_msnan, /* maybe silenced */
++} FloatClass;
++
++/*
++ * Structure holding all of the decomposed parts of a float. The
++ * exponent is unbiased and the fraction is normalized. All
++ * calculations are done with a 64 bit fraction and then rounded as
++ * appropriate for the final format.
++ *
++ * Thanks to the packed FloatClass a decent compiler should be able to
++ * fit the whole structure into registers and avoid using the stack
++ * for parameter passing.
++ */
++
++typedef struct {
++    uint64_t frac;
++    int32_t  exp;
++    FloatClass cls;
++    bool sign;
++} FloatParts;
++
++#define DECOMPOSED_BINARY_POINT    (64 - 2)
++#define DECOMPOSED_IMPLICIT_BIT    (1ull << DECOMPOSED_BINARY_POINT)
++#define DECOMPOSED_OVERFLOW_BIT    (DECOMPOSED_IMPLICIT_BIT << 1)
++
++/* Structure holding all of the relevant parameters for a format.
++ *   exp_size: the size of the exponent field
++ *   exp_bias: the offset applied to the exponent field
++ *   exp_max: the maximum normalised exponent
++ *   frac_size: the size of the fraction field
++ *   frac_shift: shift to normalise the fraction with DECOMPOSED_BINARY_POINT
++ * The following are computed based the size of fraction
++ *   frac_lsb: least significant bit of fraction
++ *   fram_lsbm1: the bit bellow the least significant bit (for rounding)
++ *   round_mask/roundeven_mask: masks used for rounding
++ */
++typedef struct {
++    int exp_size;
++    int exp_bias;
++    int exp_max;
++    int frac_size;
++    int frac_shift;
++    uint64_t frac_lsb;
++    uint64_t frac_lsbm1;
++    uint64_t round_mask;
++    uint64_t roundeven_mask;
++} FloatFmt;
++
++/* Expand fields based on the size of exponent and fraction */
++#define FLOAT_PARAMS(E, F)                                           \
++    .exp_size       = E,                                             \
++    .exp_bias       = ((1 << E) - 1) >> 1,                           \
++    .exp_max        = (1 << E) - 1,                                  \
++    .frac_size      = F,                                             \
++    .frac_shift     = DECOMPOSED_BINARY_POINT - F,                   \
++    .frac_lsb       = 1ull << (DECOMPOSED_BINARY_POINT - F),         \
++    .frac_lsbm1     = 1ull << ((DECOMPOSED_BINARY_POINT - F) - 1),   \
++    .round_mask     = (1ull << (DECOMPOSED_BINARY_POINT - F)) - 1,   \
++    .roundeven_mask = (2ull << (DECOMPOSED_BINARY_POINT - F)) - 1
++
++static const FloatFmt float16_params = {
++    FLOAT_PARAMS(5, 10)
++};
++
++static const FloatFmt float32_params = {
++    FLOAT_PARAMS(8, 23)
++};
++
++static const FloatFmt float64_params = {
++    FLOAT_PARAMS(11, 52)
++};
++
+ /*----------------------------------------------------------------------------
+ | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
+ | and 7, and returns the properly rounded 32-bit integer corresponding to the
 -- 
 2.15.1
