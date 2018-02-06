@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eixgD-00069W-Nt
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:28:38 -0500
+	(envelope-from <deller@gmx.de>) id 1eixnN-0002kb-Hz
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:36:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eixgA-0002QB-83
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:28:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eixgA-0002OU-1O
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:28:34 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-4-armbru@redhat.com>
-	<1cb0a904-25ff-fcac-bfac-7376683ed80d@redhat.com>
-	<87vafe4fvv.fsf@dusky.pond.sub.org>
-	<ef0c08bb-e277-1e86-cb3c-b4be13c0a0f4@redhat.com>
-Date: Tue, 06 Feb 2018 08:28:28 +0100
-In-Reply-To: <ef0c08bb-e277-1e86-cb3c-b4be13c0a0f4@redhat.com> (Eric Blake's
-	message of "Mon, 5 Feb 2018 09:46:44 -0600")
-Message-ID: <87lgg6fug3.fsf@dusky.pond.sub.org>
+	(envelope-from <deller@gmx.de>) id 1eixnK-0000eN-DZ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:36:01 -0500
+Received: from mout.gmx.net ([212.227.17.21]:53691)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1eixnK-0000dZ-3g
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:35:58 -0500
+References: <20180124232625.30105-1-richard.henderson@linaro.org>
+	<20180124232625.30105-43-richard.henderson@linaro.org>
+	<a38ff4ee-90a1-64e0-fb8c-4ad2de61c844@amsat.org>
+From: Helge Deller <deller@gmx.de>
+Message-ID: <2771b4dc-ade8-d1fb-4382-e83da8da9799@gmx.de>
+Date: Tue, 6 Feb 2018 08:35:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 03/21] qapi: New classes QAPIGenC,
- QAPIGenH, QAPIGenDoc
+In-Reply-To: <a38ff4ee-90a1-64e0-fb8c-4ad2de61c844@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 42/45] pc-bios: Add hppa-firmware.img
+ and git submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+On 04.02.2018 23:40, Philippe Mathieu-Daudé wrote:
+> Hi Helge,
 
-> On 02/03/2018 02:49 AM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->> 
->>> On 02/02/2018 07:03 AM, Markus Armbruster wrote:
->>>> These classes encapsulate accumulating and writing output.
->>>>
->>>> Convert C code generation to QAPIGenC and QAPIGenH.  The conversion is
->>>> rather shallow: most of the output accumulation is not converted.
->>>> Left for later.
->>>>
->>>> The indentation machinery uses a single global variable indent_level,
->>>> even though we generally interleave creation of a .c and its .h.  It
->>>> should become instance variable of QAPIGenC.  Also left for later.
->>>>
->>>> Documentation generation isn't converted, and QAPIGenDoc isn't used.
->>>> This will change shortly.
->>>>
->
->>>>  schema = QAPISchema(input_file)
->>>> -gen = QAPISchemaGenEventVisitor()
->>>> -schema.visit(gen)
->>>> -fdef.write(gen.defn)
->>>> -fdecl.write(gen.decl)
->>>> +vis = QAPISchemaGenEventVisitor()
->>>> +schema.visit(vis)
->>>> +genc.body(vis.defn)
->>>> +genh.body(vis.decl)
->>>
->>> I don't know if it is worth a sentence in the commit message that the
->>> visitor variable is renamed from 'gen' to 'vis' for less confusion with
->>> the new class instances 'genc' and 'genh'.
->> 
->> Did the rename give you pause when reviewing?
->
-> Enough to question whether it was intentional, since it wasn't mentioned
-> in the commit message (I obviously figured out that it was intentional
-> and useful, but the fact that I even pointed it out meant that I did
-> pause during the review).
+Hi Philippe,
 
-Okay, I'll try to make it clearer.
+> On 01/24/2018 08:26 PM, Richard Henderson wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  Makefile                  |   3 ++-
+>>  .gitmodules               |   3 +++
+>>  pc-bios/hppa-firmware.img | Bin 0 -> 461352 bytes
+>>  roms/seabios-hppa         |   1 +
+>>  4 files changed, 6 insertions(+), 1 deletion(-)
+>>  create mode 100755 pc-bios/hppa-firmware.img
+>>  create mode 160000 roms/seabios-hppa
+
+>> diff --git a/.gitmodules b/.gitmodules
+>> index 1500579638..7a8282df46 100644
+>> --- a/.gitmodules
+>> +++ b/.gitmodules
+>> @@ -40,3 +40,6 @@
+>>  [submodule "capstone"]
+>>  	path = capstone
+>>  	url = git://git.qemu.org/capstone.git
+>> +[submodule "roms/seabios-hppa"]
+>> +	path = roms/seabios-hppa
+>> +	url = git://github.com/hdeller/seabios-hppa.git
+> 
+> Do you think it is possible your SeaBIOS work gets merged upstream at
+> some time?
+
+Yes, that's my plan.
+My changes to the common code base aren't too invasive yet, so
+hopefully it's possible.
+
+Helge
