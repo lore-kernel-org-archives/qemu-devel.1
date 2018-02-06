@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej9Gf-0003CT-VG
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:51:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1ej9Ga-00032z-1l
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej9Ge-00043H-Dl
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:51:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40146 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1ej9GW-0003sq-S4
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50526 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej9Ge-00042E-4I
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:51:00 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej9GW-0003rf-IE
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:52 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  6 Feb 2018 20:50:42 +0100
-Message-Id: <20180206195044.8347-13-armbru@redhat.com>
+Date: Tue,  6 Feb 2018 20:50:36 +0100
+Message-Id: <20180206195044.8347-7-armbru@redhat.com>
 In-Reply-To: <20180206195044.8347-1-armbru@redhat.com>
 References: <20180206195044.8347-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/14] hw/sparc*: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PULL 06/14] hw/mips: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Paul Burton <paul.burton@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -84,204 +84,245 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Fabien Chouteau <chouteau@adacore.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Paul Burton <paul.burton@imgtec.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: "Herv=C3=A9 Poussineau" <hpoussin@reactos.org>
+
+Conversions that aren't followed by exit() dropped, because they might
+be inappropriate.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20180203084315.20497-12-armbru@redhat.com>
+Message-Id: <20180203084315.20497-6-armbru@redhat.com>
 ---
- hw/sparc/leon3.c     | 16 +++++++---------
- hw/sparc/sun4m.c     | 16 +++++++---------
- hw/sparc64/niagara.c |  4 ++--
- hw/sparc64/sun4u.c   | 10 +++++-----
- 4 files changed, 21 insertions(+), 25 deletions(-)
+ hw/mips/mips_fulong2e.c | 13 ++++++-------
+ hw/mips/mips_jazz.c     |  4 ++--
+ hw/mips/mips_malta.c    | 16 +++++++---------
+ hw/mips/mips_mipssim.c  | 11 +++++------
+ hw/mips/mips_r4k.c      | 16 +++++++---------
+ 5 files changed, 27 insertions(+), 33 deletions(-)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 8c66d5af24..bba3aa3dee 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -139,9 +140,8 @@ static void leon3_generic_hw_init(MachineState *machi=
-ne)
-=20
-     /* Allocate RAM */
-     if ((uint64_t)ram_size > (1UL << 30)) {
--        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d, maximum 1G\=
-n",
--                (unsigned int)(ram_size / (1024 * 1024)));
-+        error_report("Too much memory for this machine: %d, maximum 1G",
-+                     (unsigned int)(ram_size / (1024 * 1024)));
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 725e25a134..f68c625666 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -120,7 +120,7 @@ static int64_t load_kernel (CPUMIPSState *env)
+                            (uint64_t *)&kernel_low, (uint64_t *)&kernel_=
+high,
+                            0, EM_MIPS, 1, 0);
+     if (kernel_size < 0) {
+-        error_report("qemu: could not load kernel '%s': %s",
++        error_report("could not load kernel '%s': %s",
+                      loaderparams.kernel_filename,
+                      load_elf_strerror(kernel_size));
          exit(1);
-     }
-=20
-@@ -167,19 +167,18 @@ static void leon3_generic_hw_init(MachineState *mac=
-hine)
-     }
-=20
-     if (bios_size > prom_size) {
--        fprintf(stderr, "qemu: could not load prom '%s': file too big\n"=
-,
--                filename);
-+        error_report("could not load prom '%s': file too big", filename)=
-;
-         exit(1);
-     }
-=20
-     if (bios_size > 0) {
-         ret =3D load_image_targphys(filename, 0x00000000, bios_size);
-         if (ret < 0 || ret > prom_size) {
--            fprintf(stderr, "qemu: could not load prom '%s'\n", filename=
-);
-+            error_report("could not load prom '%s'", filename);
-             exit(1);
-         }
-     } else if (kernel_filename =3D=3D NULL && !qtest_enabled()) {
--        fprintf(stderr, "Can't read bios image %s\n", filename);
-+        error_report("Can't read bios image %s", filename);
-         exit(1);
-     }
-     g_free(filename);
-@@ -192,8 +191,7 @@ static void leon3_generic_hw_init(MachineState *machi=
-ne)
-         kernel_size =3D load_elf(kernel_filename, NULL, NULL, &entry, NU=
-LL, NULL,
-                                1 /* big endian */, EM_SPARC, 0, 0);
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-         if (bios_size <=3D 0) {
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index dd0038095b..f9892e38c3 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -259,8 +259,7 @@ static unsigned long sun4m_load_kernel(const char *ke=
-rnel_filename,
-                                               KERNEL_LOAD_ADDR,
-                                               RAM_size - KERNEL_LOAD_ADD=
-R);
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-=20
-@@ -271,8 +270,8 @@ static unsigned long sun4m_load_kernel(const char *ke=
-rnel_filename,
-                                               INITRD_LOAD_ADDR,
-                                               RAM_size - INITRD_LOAD_ADD=
-R);
-             if (initrd_size < 0) {
--                fprintf(stderr, "qemu: could not load initial ram disk '=
-%s'\n",
--                        initrd_filename);
-+                error_report("could not load initial ram disk '%s'",
-+                             initrd_filename);
+@@ -134,17 +134,16 @@ static int64_t load_kernel (CPUMIPSState *env)
+         if (initrd_size > 0) {
+             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
+_PAGE_MASK;
+             if (initrd_offset + initrd_size > ram_size) {
+-                fprintf(stderr,
+-                        "qemu: memory too small for initial ram disk '%s=
+'\n",
+-                        loaderparams.initrd_filename);
++                error_report("memory too small for initial ram disk '%s'=
+",
++                             loaderparams.initrd_filename);
                  exit(1);
              }
+             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
+name,
+                                      initrd_offset, ram_size - initrd_of=
+fset);
          }
-@@ -680,7 +679,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
-ame)
-         ret =3D -1;
+         if (initrd_size =3D=3D (target_ulong) -1) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
+n",
+-                    loaderparams.initrd_filename);
++            error_report("could not load initial ram disk '%s'",
++                         loaderparams.initrd_filename);
+             exit(1);
+         }
      }
-     if (ret < 0 || ret > PROM_SIZE_MAX) {
--        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
-+        error_report("could not load prom '%s'", bios_name);
+@@ -338,7 +337,7 @@ static void mips_fulong2e_init(MachineState *machine)
+=20
+     isa_bus =3D vt82c686b_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 0))=
+;
+     if (!isa_bus) {
+-        fprintf(stderr, "vt82c686b_init error\n");
++        error_report("vt82c686b_init error");
          exit(1);
      }
- }
-@@ -746,10 +745,9 @@ static void ram_init(hwaddr addr, ram_addr_t RAM_siz=
-e,
+=20
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index 0d2c0683ba..596f3c210e 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -268,10 +268,10 @@ static void mips_jazz_init(MachineState *machine,
+             sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(rc4030, 4));
+             break;
+         } else if (is_help_option(nd->model)) {
+-            fprintf(stderr, "qemu: Supported NICs: dp83932\n");
++            error_report("Supported NICs: dp83932");
+             exit(1);
+         } else {
+-            fprintf(stderr, "qemu: Unsupported NIC: %s\n", nd->model);
++            error_report("Unsupported NIC: %s", nd->model);
+             exit(1);
+         }
+     }
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 37f19428d6..7ca8ba2086 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -812,7 +812,7 @@ static int64_t load_kernel (void)
+                            NULL, (uint64_t *)&kernel_entry, NULL,
+                            (uint64_t *)&kernel_high, big_endian, EM_MIPS=
+, 1, 0);
+     if (kernel_size < 0) {
+-        error_report("qemu: could not load kernel '%s': %s",
++        error_report("could not load kernel '%s': %s",
+                      loaderparams.kernel_filename,
+                      load_elf_strerror(kernel_size));
+         exit(1);
+@@ -846,9 +846,8 @@ static int64_t load_kernel (void)
+             initrd_offset =3D (loaderparams.ram_low_size - initrd_size -=
+ 131072
+                              - ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
+             if (kernel_high >=3D initrd_offset) {
+-                fprintf(stderr,
+-                        "qemu: memory too small for initial ram disk '%s=
+'\n",
+-                        loaderparams.initrd_filename);
++                error_report("memory too small for initial ram disk '%s'=
+",
++                             loaderparams.initrd_filename);
+                 exit(1);
+             }
+             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
+name,
+@@ -856,8 +855,8 @@ static int64_t load_kernel (void)
+                                               ram_size - initrd_offset);
+         }
+         if (initrd_size =3D=3D (target_ulong) -1) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
+n",
+-                    loaderparams.initrd_filename);
++            error_report("could not load initial ram disk '%s'",
++                         loaderparams.initrd_filename);
+             exit(1);
+         }
+     }
+@@ -1034,9 +1033,8 @@ void mips_malta_init(MachineState *machine)
 =20
      /* allocate RAM */
-     if ((uint64_t)RAM_size > max_mem) {
+     if (ram_size > (2048u << 20)) {
 -        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d, maximum %d\=
-n",
--                (unsigned int)(RAM_size / (1024 * 1024)),
--                (unsigned int)(max_mem / (1024 * 1024)));
-+        error_report("Too much memory for this machine: %d, maximum %d",
-+                     (unsigned int)(RAM_size / (1024 * 1024)),
-+                     (unsigned int)(max_mem / (1024 * 1024)));
+-                "qemu: Too much memory for this machine: %d MB, maximum =
+2048 MB\n",
+-                ((unsigned int)ram_size / (1 << 20)));
++        error_report("Too much memory for this machine: %dMB, maximum 20=
+48MB",
++                     ((unsigned int)ram_size / (1 << 20)));
          exit(1);
      }
-     dev =3D qdev_create(NULL, "memory");
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index 7a723326c5..996ce2ada0 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -152,8 +152,8 @@ static void niagara_init(MachineState *machine)
-             dinfo->is_default =3D 1;
-             rom_add_file_fixed(blk_bs(blk)->filename, NIAGARA_VDISK_BASE=
-, -1);
-         } else {
--            fprintf(stderr, "qemu: could not load ram disk '%s'\n",
--                    blk_bs(blk)->filename);
-+            error_report("could not load ram disk '%s'",
-+                         blk_bs(blk)->filename);
-             exit(1);
-         }
-     }
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index a23cb26b0d..da28ab9413 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -168,8 +169,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
-filename,
-                                               RAM_size - KERNEL_LOAD_ADD=
-R);
-         }
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-         /* load initrd above kernel */
-@@ -181,8 +181,8 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
-filename,
-                                                *initrd_addr,
-                                                RAM_size - *initrd_addr);
-             if ((int)*initrd_size < 0) {
--                fprintf(stderr, "qemu: could not load initial ram disk '=
-%s'\n",
--                        initrd_filename);
-+                error_report("could not load initial ram disk '%s'",
-+                             initrd_filename);
+=20
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+index e5d3654586..e0ba5efc84 100644
+--- a/hw/mips/mips_mipssim.c
++++ b/hw/mips/mips_mipssim.c
+@@ -78,7 +78,7 @@ static int64_t load_kernel(void)
+         if ((entry & ~0x7fffffffULL) =3D=3D 0x80000000)
+             entry =3D (int32_t)entry;
+     } else {
+-        error_report("qemu: could not load kernel '%s': %s",
++        error_report("could not load kernel '%s': %s",
+                      loaderparams.kernel_filename,
+                      load_elf_strerror(kernel_size));
+         exit(1);
+@@ -92,17 +92,16 @@ static int64_t load_kernel(void)
+         if (initrd_size > 0) {
+             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
+_PAGE_MASK;
+             if (initrd_offset + initrd_size > loaderparams.ram_size) {
+-                fprintf(stderr,
+-                        "qemu: memory too small for initial ram disk '%s=
+'\n",
+-                        loaderparams.initrd_filename);
++                error_report("memory too small for initial ram disk '%s'=
+",
++                             loaderparams.initrd_filename);
                  exit(1);
              }
+             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
+name,
+                 initrd_offset, loaderparams.ram_size - initrd_offset);
          }
-@@ -422,7 +422,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
-ame)
-         ret =3D -1;
+         if (initrd_size =3D=3D (target_ulong) -1) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
+n",
+-                    loaderparams.initrd_filename);
++            error_report("could not load initial ram disk '%s'",
++                         loaderparams.initrd_filename);
+             exit(1);
+         }
      }
-     if (ret < 0 || ret > PROM_SIZE_MAX) {
--        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
-+        error_report("could not load prom '%s'", bios_name);
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 244bd41813..830ee7732c 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -98,7 +98,7 @@ static int64_t load_kernel(void)
+         if ((entry & ~0x7fffffffULL) =3D=3D 0x80000000)
+             entry =3D (int32_t)entry;
+     } else {
+-        error_report("qemu: could not load kernel '%s': %s",
++        error_report("could not load kernel '%s': %s",
+                      loaderparams.kernel_filename,
+                      load_elf_strerror(kernel_size));
+         exit(1);
+@@ -112,9 +112,8 @@ static int64_t load_kernel(void)
+         if (initrd_size > 0) {
+             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
+_PAGE_MASK;
+             if (initrd_offset + initrd_size > ram_size) {
+-                fprintf(stderr,
+-                        "qemu: memory too small for initial ram disk '%s=
+'\n",
+-                        loaderparams.initrd_filename);
++                error_report("memory too small for initial ram disk '%s'=
+",
++                             loaderparams.initrd_filename);
+                 exit(1);
+             }
+             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
+name,
+@@ -122,8 +121,8 @@ static int64_t load_kernel(void)
+                                               ram_size - initrd_offset);
+         }
+         if (initrd_size =3D=3D (target_ulong) -1) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
+n",
+-                    loaderparams.initrd_filename);
++            error_report("could not load initial ram disk '%s'",
++                         loaderparams.initrd_filename);
+             exit(1);
+         }
+     }
+@@ -196,9 +195,8 @@ void mips_r4k_init(MachineState *machine)
+=20
+     /* allocate RAM */
+     if (ram_size > (256 << 20)) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d MB, maximum =
+256 MB\n",
+-                ((unsigned int)ram_size / (1 << 20)));
++        error_report("Too much memory for this machine: %dMB, maximum 25=
+6MB",
++                     ((unsigned int)ram_size / (1 << 20)));
          exit(1);
      }
- }
+     memory_region_allocate_system_memory(ram, NULL, "mips_r4k.ram", ram_=
+size);
 --=20
 2.13.6
