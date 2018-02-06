@@ -1,34 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ej02N-00083H-B0
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:59:40 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ej03j-0000cA-5u
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ej02I-0001Hq-CP
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:59:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ej02I-0001GP-6u
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:59:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ej02H-0004Lv-3t
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 09:59:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 101242E80C9
-	for <qemu-devel@nongnu.org>; Tue,  6 Feb 2018 09:59:33 +0000 (UTC)
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ej03c-0002nT-Tr
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:01:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54930
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1ej03c-0002nE-Op
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:00:56 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w169x38c111226
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 05:00:51 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fya28rg4y-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 05:00:50 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Tue, 6 Feb 2018 10:00:48 -0000
+References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1517864246-11101-7-git-send-email-walling@linux.vnet.ibm.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Tue, 6 Feb 2018 11:00:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Feb 2018 09:50:22 -0000
-From: Thomas Huth <1416246@bugs.launchpad.net>
-Reply-To: Bug 1416246 <1416246@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150130060727.581.75467.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151791062211.10488.6257528824693247346.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1416246] Re: create guest fail when compile qemu
- with parameter "--disable-gtk"
+In-Reply-To: <1517864246-11101-7-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <e57e95f2-2780-d8a4-0fbd-6d3b594ee133@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 06/12] s390-ccw: parse and set boot menu
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,82 +44,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+On 05.02.2018 21:57, Collin L. Walling wrote:
+> Set boot menu options for an s390 guest and store them in
+> the iplb. These options are set via the QEMU command line
+> option:
+> 
+>     -boot menu=on|off[,splash-time=X]
+> 
+> or via the libvirt domain xml:
+> 
+>     <os>
+>       <bootmenu enable='yes|no' timeout='X'/>
+>     </os>
+> 
+> Where X represents some positive integer representing
+> milliseconds.
+> 
+> Any value set for loadparm will override all boot menu options.
+> If loadparm=PROMPT, then the menu will be enabled without a
+> timeout.
+> 
+> The absence of any boot options on the command line will flag
+> to later use the zipl boot loader values.
+> 
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/ipl.c          | 52 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/ipl.h          |  7 ++++++-
+>  pc-bios/s390-ccw/iplb.h |  4 +++-
+>  3 files changed, 61 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 3e3c3b8..227dccb 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -23,6 +23,8 @@
+>  #include "hw/s390x/ebcdic.h"
+>  #include "ipl.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/config-file.h"
+> +#include "qemu/cutils.h"
+> 
+>  #define KERN_IMAGE_START                0x010000UL
+>  #define KERN_PARM_AREA                  0x010480UL
+> @@ -219,6 +221,53 @@ static Property s390_ipl_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> 
+> +static void s390_ipl_set_boot_menu(IplParameterBlock *iplb)
+> +{
+> +    QemuOptsList *plist = qemu_find_opts("boot-opts");
+> +    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
+> +    uint8_t *flags;
+> +    uint16_t *timeout;
+> +    const char *tmp;
+> +    unsigned long result = 0;
+> +
+> +    switch (iplb->pbt) {
+> +    case S390_IPL_TYPE_CCW:
+> +    case S390_IPL_TYPE_QEMU_SCSI:
+> +        flags = &iplb->qipl.boot_menu_flags;
+> +        timeout = &iplb->qipl.boot_menu_timeout;
+> +        break;
+> +    default:
+> +        error_report("boot menu is not supported for this device type.");
+> +        return;
+> +    }
+> +
+> +    /* In the absence of -boot menu, use zipl parameters */
+> +    if (!qemu_opt_get(opts, "menu")) {
+> +        *flags = BOOT_MENU_FLAG_ZIPL_OPTS;
+> +    } else if (boot_menu) {
+> +        *flags = BOOT_MENU_FLAG_CMD_OPTS;
+> +
+> +        tmp = qemu_opt_get(opts, "splash-time");
+> +
+> +        if (tmp && qemu_strtoul(tmp, NULL, 10, &result)) {
+> +            error_report("splash-time value is invalid, forcing it to 0.");
+> +            *timeout = 0;
+> +            return;
+> +        }
+> +
+> +        result = (result + 500) / 1000; /* Round and convert to seconds */
+> +
+> +        if (result > 0xffff) {
+> +            error_report("splash-time value is greater than 65535000,"
+> +                         " forcing it to 65535000.");
+> +            *timeout = 0xffff;
+> +            return;
+> +        }
+> +
+> +        *timeout = cpu_to_be16(result);
+> +    }
+> +}
+> +
+>  static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>  {
+>      DeviceState *dev_st;
+> @@ -273,6 +322,9 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>          if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
+>              ipl->iplb.flags |= DIAG308_FLAGS_LP_VALID;
+>          }
+> +
+> +        s390_ipl_set_boot_menu(&ipl->iplb);> +
+Maybe it would be safer wrt migration to move that to
+s390_ipl_prepare_cpu()?
+>          return true;
+>      }
+> 
+[...]
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1416246
-
-Title:
-  create guest fail when compile qemu with parameter "--disable-gtk"
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Environment:
-  ------------
-  Host OS (ia32/ia32e/IA64):ia32e
-  Guest OS (ia32/ia32e/IA64):ia32e
-  Guest OS Type (Linux/Windows):Linux
-  kvm.git Commit:8fff5e374a2f6047d1bb52288af7da119bc75765
-  qemu.kvm Commit:16017c48547960539fcadb1f91d252124f442482
-  Host Kernel Version:3.19.0-rc3
-  Hardware:Ivytown_EP, Haswell_EP
-
-  =
-
-  Bug detailed description:
-  --------------------------
-  compile the qemu with disable gtk, the create guest , the guest create fa=
-il
-
-  note:
-  1.qemu.git: 699eae17b841e6784dc3864bf357e26bff1e9dfe
-  when compile the qemu with enable gtk or disable gtk, the guest create pa=
-ss
-
-  2. this should be a qemu bug
-  kvm.git   +  qemu.git   =3D result
-  8fff5e37  +  16017c48   =3D bad
-  8fff5e37  +  699eae17   =3D good
-
-  Reproduce steps:
-  ----------------
-  1. git clone git://vt-sync/qemu.git qemu.git
-  2. cd qemu.git
-  3. ./configure --target-list=3Dx86_64-softmmu --disable-sdl --disable-gtk
-  4. make -j16
-  5. ./x86_64-softmmu/qemu-system-x86_64 -enable-kvm -m 4G -smp 2 -net none=
- /root/rhel6u5.qcow
-
-  Current result:
-  ----------------
-  create gust fail when compile qemu with disable gtk
-
-  Expected result:
-  ----------------
-  create guest pass when compile qemu with disable or enable gtk
-
-  Basic root-causing log:
-  ----------------------
-  [root@vt-ivt2 qemu.git]# ./x86_64-softmmu/qemu-system-x86_64 -enable-kvm =
--m 4G -smp 2 -net none /root/rhel6u5-1.qcow =
-
-  qemu-system-x86_64: Invalid parameter 'to'
-  Segmentation fault (core dumped)
-
-  some dmesg message:
-  qemu-system-x86[96364]: segfault at 24 ip 00007fe6d9636a69 sp 00007fffc03=
-cf970 error 4 in qemu-system-x86_64[7fe6d9330000+4ba000]
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1416246/+subscriptions
+-- 
+Regards,
+ Viktor Mihajlovski
