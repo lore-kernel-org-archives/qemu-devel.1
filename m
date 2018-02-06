@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6Q4-0000az-3K
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Q4-0000bF-BH
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6Q0-0004xv-1g
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Q3-00052X-8P
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:32 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34511)
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37927)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej6Pz-0004vT-Qi
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:27 -0500
-Received: by mail-wr0-x243.google.com with SMTP id z6so2666126wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:48:27 -0800 (PST)
+	id 1ej6Q2-00052A-Tp
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:31 -0500
+Received: by mail-wm0-x242.google.com with SMTP id 141so5103685wme.3
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:48:30 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  6 Feb 2018 16:48:01 +0000
-Message-Id: <20180206164815.10084-9-alex.bennee@linaro.org>
+Date: Tue,  6 Feb 2018 16:48:03 +0000
+Message-Id: <20180206164815.10084-11-alex.bennee@linaro.org>
 In-Reply-To: <20180206164815.10084-1-alex.bennee@linaro.org>
 References: <20180206164815.10084-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 08/22] include/fpu/softfloat: add some
- float16 constants
+Subject: [Qemu-devel] [PATCH v4 10/22] fpu/softfloat: move the extract
+ functions to the top of the file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +33,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This defines the same set of common constants for float 16 as defined
-for 32 and 64 bit floats. These are often used by target helper
-functions. I've also removed constants that are not used by anybody.
+This is pure code-motion during re-factoring as the helpers will be
+needed earlier.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
 v2
-  - fixup constants, remove unused onces
+  - fix minor white space nit
 ---
- include/fpu/softfloat.h | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ fpu/softfloat.c | 120 +++++++++++++++++++++++++-------------------------------
+ 1 file changed, 54 insertions(+), 66 deletions(-)
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 59c06ef192..23824a3000 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -286,6 +286,11 @@ static inline float16 float16_set_sign(float16 a, int sign)
-     return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 3a4ab1355f..297e48f5c9 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -132,6 +132,60 @@ static inline flag extractFloat16Sign(float16 a)
+     return float16_val(a)>>15;
  }
  
-+#define float16_zero make_float16(0)
-+#define float16_one make_float16(0x3c00)
-+#define float16_half make_float16(0x3800)
-+#define float16_infinity make_float16(0x7c00)
++/*----------------------------------------------------------------------------
++| Returns the fraction bits of the single-precision floating-point value `a'.
++*----------------------------------------------------------------------------*/
++
++static inline uint32_t extractFloat32Frac(float32 a)
++{
++    return float32_val(a) & 0x007FFFFF;
++}
++
++/*----------------------------------------------------------------------------
++| Returns the exponent bits of the single-precision floating-point value `a'.
++*----------------------------------------------------------------------------*/
++
++static inline int extractFloat32Exp(float32 a)
++{
++    return (float32_val(a) >> 23) & 0xFF;
++}
++
++/*----------------------------------------------------------------------------
++| Returns the sign bit of the single-precision floating-point value `a'.
++*----------------------------------------------------------------------------*/
++
++static inline flag extractFloat32Sign(float32 a)
++{
++    return float32_val(a) >> 31;
++}
++
++/*----------------------------------------------------------------------------
++| Returns the fraction bits of the double-precision floating-point value `a'.
++*----------------------------------------------------------------------------*/
++
++static inline uint64_t extractFloat64Frac(float64 a)
++{
++    return float64_val(a) & LIT64(0x000FFFFFFFFFFFFF);
++}
++
++/*----------------------------------------------------------------------------
++| Returns the exponent bits of the double-precision floating-point value `a'.
++*----------------------------------------------------------------------------*/
++
++static inline int extractFloat64Exp(float64 a)
++{
++    return (float64_val(a) >> 52) & 0x7FF;
++}
++
++/*----------------------------------------------------------------------------
++| Returns the sign bit of the double-precision floating-point value `a'.
++*----------------------------------------------------------------------------*/
++
++static inline flag extractFloat64Sign(float64 a)
++{
++    return float64_val(a) >> 63;
++}
 +
  /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
- *----------------------------------------------------------------------------*/
-@@ -392,8 +397,6 @@ static inline float32 float32_set_sign(float32 a, int sign)
+ | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
+ | and 7, and returns the properly rounded 32-bit integer corresponding to the
+@@ -299,39 +353,6 @@ static int64_t roundAndPackUint64(flag zSign, uint64_t absZ0,
+     return absZ0;
+ }
  
- #define float32_zero make_float32(0)
- #define float32_one make_float32(0x3f800000)
--#define float32_ln2 make_float32(0x3f317218)
--#define float32_pi make_float32(0x40490fdb)
- #define float32_half make_float32(0x3f000000)
- #define float32_infinity make_float32(0x7f800000)
+-/*----------------------------------------------------------------------------
+-| Returns the fraction bits of the single-precision floating-point value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline uint32_t extractFloat32Frac( float32 a )
+-{
+-
+-    return float32_val(a) & 0x007FFFFF;
+-
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Returns the exponent bits of the single-precision floating-point value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline int extractFloat32Exp(float32 a)
+-{
+-
+-    return ( float32_val(a)>>23 ) & 0xFF;
+-
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Returns the sign bit of the single-precision floating-point value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline flag extractFloat32Sign( float32 a )
+-{
+-
+-    return float32_val(a)>>31;
+-
+-}
+-
+ /*----------------------------------------------------------------------------
+ | If `a' is denormal and we are in flush-to-zero mode then set the
+ | input-denormal exception and return zero. Otherwise just return the value.
+@@ -492,39 +513,6 @@ static float32
  
-@@ -506,7 +509,6 @@ static inline float64 float64_set_sign(float64 a, int sign)
- #define float64_zero make_float64(0)
- #define float64_one make_float64(0x3ff0000000000000LL)
- #define float64_ln2 make_float64(0x3fe62e42fefa39efLL)
--#define float64_pi make_float64(0x400921fb54442d18LL)
- #define float64_half make_float64(0x3fe0000000000000LL)
- #define float64_infinity make_float64(0x7ff0000000000000LL)
+ }
  
+-/*----------------------------------------------------------------------------
+-| Returns the fraction bits of the double-precision floating-point value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline uint64_t extractFloat64Frac( float64 a )
+-{
+-
+-    return float64_val(a) & LIT64( 0x000FFFFFFFFFFFFF );
+-
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Returns the exponent bits of the double-precision floating-point value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline int extractFloat64Exp(float64 a)
+-{
+-
+-    return ( float64_val(a)>>52 ) & 0x7FF;
+-
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Returns the sign bit of the double-precision floating-point value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline flag extractFloat64Sign( float64 a )
+-{
+-
+-    return float64_val(a)>>63;
+-
+-}
+-
+ /*----------------------------------------------------------------------------
+ | If `a' is denormal and we are in flush-to-zero mode then set the
+ | input-denormal exception and return zero. Otherwise just return the value.
 -- 
 2.15.1
