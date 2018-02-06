@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5Y7-0004bI-AF
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:48 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ej5YM-0004n3-1t
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5Y2-0006Jr-Bu
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:14107)
+	(envelope-from <dgilbert@redhat.com>) id 1ej5YL-0006kd-4n
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52226)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5Y2-0006J9-4h
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:52:42 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5YK-0006k2-Ul
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:53:01 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  6 Feb 2018 15:49:31 +0000
-Message-Id: <20180206154936.13565-10-dgilbert@redhat.com>
+Date: Tue,  6 Feb 2018 15:49:32 +0000
+Message-Id: <20180206154936.13565-11-dgilbert@redhat.com>
 In-Reply-To: <20180206154936.13565-1-dgilbert@redhat.com>
 References: <20180206154936.13565-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 09/14] tests: Add deprecated commands migration
- test
+Subject: [Qemu-devel] [PULL 10/14] tests: Create migrate-start-postcopy
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,54 @@ Cc: peterx@redhat.com, lvivier@redhat.com, groug@kaod.org, ross.lagerwall@citrix
 
 From: Juan Quintela <quintela@redhat.com>
 
-We add deprecated commands on a new test, so we don't have to add it
-on normal tests.
+This way, it is like the rest of commands
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/migration-test.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ tests/migration-test.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index ac4a916169..2a0b651cd1 100644
+index 2a0b651cd1..26a792c3aa 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -500,6 +500,51 @@ static void test_migrate_end(QTestState *from, QTestState *to)
-     cleanup("dest_serial");
+@@ -416,6 +416,15 @@ static void migrate(QTestState *who, const char *uri)
+     QDECREF(rsp);
  }
  
-+static void deprecated_set_downtime(QTestState *who, const double value)
++static void migrate_start_postcopy(QTestState *who)
 +{
 +    QDict *rsp;
-+    gchar *cmd;
-+    char *expected;
-+    int64_t result_int;
 +
-+    cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
-+                          "'arguments': { 'value': %g } }", value);
-+    rsp = qtest_qmp(who, cmd);
-+    g_free(cmd);
++    rsp = wait_command(who, "{ 'execute': 'migrate-start-postcopy' }");
 +    g_assert(qdict_haskey(rsp, "return"));
 +    QDECREF(rsp);
-+    result_int = value * 1000L;
-+    expected = g_strdup_printf("%" PRId64, result_int);
-+    migrate_check_parameter(who, "downtime-limit", expected);
-+    g_free(expected);
 +}
 +
-+static void deprecated_set_speed(QTestState *who, const char *value)
-+{
-+    QDict *rsp;
-+    gchar *cmd;
-+
-+    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
-+                          "'arguments': { 'value': %s } }", value);
-+    rsp = qtest_qmp(who, cmd);
-+    g_free(cmd);
-+    g_assert(qdict_haskey(rsp, "return"));
-+    QDECREF(rsp);
-+    migrate_check_parameter(who, "max-bandwidth", value);
-+}
-+
-+static void test_deprecated(void)
-+{
-+    QTestState *from;
-+
-+    from = qtest_start("");
-+
-+    deprecated_set_downtime(from, 0.12345);
-+    deprecated_set_speed(from, "12345");
-+
-+    qtest_quit(from);
-+}
-+
- static void test_migrate(void)
+ static void test_migrate_start(QTestState **from, QTestState **to,
+                                const char *uri)
+ {
+@@ -549,7 +558,6 @@ static void test_migrate(void)
  {
      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-@@ -563,6 +608,7 @@ int main(int argc, char **argv)
-     module_call_init(MODULE_INIT_QOM);
+     QTestState *from, *to;
+-    QDict *rsp;
  
-     qtest_add_func("/migration/postcopy/unix", test_migrate);
-+    qtest_add_func("/migration/deprecated", test_deprecated);
+     test_migrate_start(&from, &to, uri);
  
-     ret = g_test_run();
+@@ -570,9 +578,7 @@ static void test_migrate(void)
  
+     wait_for_migration_pass(from);
+ 
+-    rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
+-    g_assert(qdict_haskey(rsp, "return"));
+-    QDECREF(rsp);
++    migrate_start_postcopy(from);
+ 
+     if (!got_stop) {
+         qtest_qmp_eventwait(from, "STOP");
 -- 
 2.14.3
