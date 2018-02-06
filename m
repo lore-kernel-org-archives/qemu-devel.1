@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5Vs-0002UR-A1
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1ej5Vz-0002Yl-7r
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5Vq-0003uF-4k
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5Vp-0003tI-Qh
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:25 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  6 Feb 2018 15:49:24 +0000
-Message-Id: <20180206154936.13565-3-dgilbert@redhat.com>
-In-Reply-To: <20180206154936.13565-1-dgilbert@redhat.com>
-References: <20180206154936.13565-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 02/14] migration: Route errors down through
- migration_channel_connect
+	(envelope-from <eblake@redhat.com>) id 1ej5Vt-0003z1-54
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:35 -0500
+References: <20180206140722.10110-1-vsementsov@virtuozzo.com>
+	<20180206140722.10110-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c501a095-43e6-95f3-b7bb-96ab80f99689@redhat.com>
+Date: Tue, 6 Feb 2018 09:50:09 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180206140722.10110-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: add block latency histogram
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,164 +25,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com
-Cc: peterx@redhat.com, lvivier@redhat.com, groug@kaod.org, ross.lagerwall@citrix.com, wei.w.wang@intel.com, danielhb@linux.vnet.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 02/06/2018 08:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Set (and clear) histogram through new command
+> block-latency-histogram-set and show new statistics in
+> query-blockstats results.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   qapi/block-core.json | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>   block/qapi.c         | 31 ++++++++++++++++++++++++++
+>   blockdev.c           | 15 +++++++++++++
+>   3 files changed, 107 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 8225308904..4706a934d9 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -451,6 +451,63 @@
+>              'status': 'DirtyBitmapStatus'} }
+>   
+>   ##
+> +# @BlockLatencyHistogramInfo:
+> +#
+> +# Block latency histogram.
+> +#
+> +# @latency: list of latency points in microseconds. Equals to @latency parameter
+> +#           of last called block-latency-histogram-set.
 
-Route async errors (especially from sockets) down through
-migration_channel_connect and on to migrate_fd_connect where they
-can be cleaned up.
+Second sentence might read better as:
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/channel.c    | 32 ++++++++++++++++----------------
- migration/channel.h    |  3 ++-
- migration/exec.c       |  2 +-
- migration/fd.c         |  2 +-
- migration/socket.c     |  4 +---
- migration/tls.c        |  3 +--
- migration/trace-events |  2 +-
- 7 files changed, 23 insertions(+), 25 deletions(-)
+Matches the @latency parameter from the last call to 
+block-latency-histogram-set for the given device.
 
-diff --git a/migration/channel.c b/migration/channel.c
-index fdb7ddbd17..c5eaf0fa0e 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -55,29 +55,29 @@ void migration_channel_process_incoming(QIOChannel *ioc)
-  * @s: Current migration state
-  * @ioc: Channel to which we are connecting
-  * @hostname: Where we want to connect
-+ * @error: Error indicating failure to connect, free'd here
-  */
- void migration_channel_connect(MigrationState *s,
-                                QIOChannel *ioc,
--                               const char *hostname)
-+                               const char *hostname,
-+                               Error *error)
- {
-     trace_migration_set_outgoing_channel(
--        ioc, object_get_typename(OBJECT(ioc)), hostname);
-+        ioc, object_get_typename(OBJECT(ioc)), hostname, error);
- 
--    if (s->parameters.tls_creds &&
--        *s->parameters.tls_creds &&
--        !object_dynamic_cast(OBJECT(ioc),
--                             TYPE_QIO_CHANNEL_TLS)) {
--        Error *local_err = NULL;
--        migration_tls_channel_connect(s, ioc, hostname, &local_err);
--        if (local_err) {
--            migrate_fd_error(s, local_err);
--            error_free(local_err);
--        }
--    } else {
--        QEMUFile *f = qemu_fopen_channel_output(ioc);
-+    if (!error) {
-+        if (s->parameters.tls_creds &&
-+            *s->parameters.tls_creds &&
-+            !object_dynamic_cast(OBJECT(ioc),
-+                                 TYPE_QIO_CHANNEL_TLS)) {
-+            migration_tls_channel_connect(s, ioc, hostname, &error);
-+        } else {
-+            QEMUFile *f = qemu_fopen_channel_output(ioc);
- 
--        s->to_dst_file = f;
-+            s->to_dst_file = f;
- 
--        migrate_fd_connect(s, NULL);
-+        }
-     }
-+    migrate_fd_connect(s, error);
-+    error_free(error);
- }
-diff --git a/migration/channel.h b/migration/channel.h
-index e4b40579a1..67a461c28a 100644
---- a/migration/channel.h
-+++ b/migration/channel.h
-@@ -22,5 +22,6 @@ void migration_channel_process_incoming(QIOChannel *ioc);
- 
- void migration_channel_connect(MigrationState *s,
-                                QIOChannel *ioc,
--                               const char *hostname);
-+                               const char *hostname,
-+                               Error *error_in);
- #endif
-diff --git a/migration/exec.c b/migration/exec.c
-index f3be1baf2e..c9537974ad 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -39,7 +39,7 @@ void exec_start_outgoing_migration(MigrationState *s, const char *command, Error
-     }
- 
-     qio_channel_set_name(ioc, "migration-exec-outgoing");
--    migration_channel_connect(s, ioc, NULL);
-+    migration_channel_connect(s, ioc, NULL, NULL);
-     object_unref(OBJECT(ioc));
- }
- 
-diff --git a/migration/fd.c b/migration/fd.c
-index 30de4b9847..6284a97cba 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -39,7 +39,7 @@ void fd_start_outgoing_migration(MigrationState *s, const char *fdname, Error **
-     }
- 
-     qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-outgoing");
--    migration_channel_connect(s, ioc, NULL);
-+    migration_channel_connect(s, ioc, NULL, NULL);
-     object_unref(OBJECT(ioc));
- }
- 
-diff --git a/migration/socket.c b/migration/socket.c
-index 3a8232dd2d..e090097077 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -79,12 +79,10 @@ static void socket_outgoing_migration(QIOTask *task,
- 
-     if (qio_task_propagate_error(task, &err)) {
-         trace_migration_socket_outgoing_error(error_get_pretty(err));
--        migrate_fd_error(data->s, err);
--        error_free(err);
-     } else {
-         trace_migration_socket_outgoing_connected(data->hostname);
--        migration_channel_connect(data->s, sioc, data->hostname);
-     }
-+    migration_channel_connect(data->s, sioc, data->hostname, err);
-     object_unref(OBJECT(sioc));
- }
- 
-diff --git a/migration/tls.c b/migration/tls.c
-index 026a008667..a29b35b33c 100644
---- a/migration/tls.c
-+++ b/migration/tls.c
-@@ -118,11 +118,10 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
- 
-     if (qio_task_propagate_error(task, &err)) {
-         trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
--        migrate_fd_error(s, err);
-     } else {
-         trace_migration_tls_outgoing_handshake_complete();
--        migration_channel_connect(s, ioc, NULL);
-     }
-+    migration_channel_connect(s, ioc, NULL, err);
-     object_unref(OBJECT(ioc));
- }
- 
-diff --git a/migration/trace-events b/migration/trace-events
-index 6f29fcc686..93961dea16 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -114,7 +114,7 @@ migrate_transferred(uint64_t tranferred, uint64_t time_spent, double bandwidth,
- process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
- process_incoming_migration_co_postcopy_end_main(void) ""
- migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
--migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
-+migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
- 
- # migration/rdma.c
- qemu_rdma_accept_incoming_migration(void) ""
+> +#
+> +# @read: list of read-request counts corresponding to latency region.
+> +#        len(@read) = len(@latency) + 1
+> +#        @read[0] corresponds to latency region [0, @latency[0])
+> +#        for 0 < i < len(@latency): @read[i] corresponds to latency region
+> +#            [@latency[i-1], @latency[i])
+> +#        @read.last_element corresponds to latency region
+> +#            [@latency.last_element, +inf)
+> +#
+> +# @write: list of write-request counts (see @read semantics)
+> +#
+> +# @flush: list of flush-request counts (see @read semantics)
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'BlockLatencyHistogramInfo',
+> +  'data': {'latency': ['uint64'],
+> +           'read': ['uint64'],
+> +           'write': ['uint64'],
+> +           'flush': ['uint64'] } }
+
+Okay, I can see how this interface works.
+
+> +
+> +##
+> +# @block-latency-histogram-set:
+> +#
+> +# Add latency histogram to block device. If latency histogram alredy exists for
+
+s/latency/a latency/ (twice)
+s/alredy/already/
+
+> +# the device it will be removed and a new one created. Latency histogram may be
+
+s/Latency/The latency/
+
+> +# quered through query-blockstats.
+
+s/quered/queried/
+
+> +#
+> +# @device: device name to set latency histogram for.
+> +#
+> +# @latency: list of latency points in microseconds. The sequcence must be
+
+s/sequcence/sequence/
+
+> +#           ascending, elements must be greater than zero. Histogram latency
+> +#           regions would be
+> +#           [0, @latency[0]), ..., [@latency[i], @latency[i+1]), ...,
+> +#           [@latency.last_element, +inf)
+> +#
+> +# Returns: error if device is not found.
+> +#
+> +# Since: 2.12
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "block-latency-histogram-set",
+> +#      "arguments": { "device": "drive0",
+> +#                     "latency": [500000, 1000000, 2000000] } }
+> +# <- { "return": {} }
+> +##
+> +{ 'command': 'block-latency-histogram-set',
+> +  'data': {'device': 'str', 'latency': ['uint64'] } }
+
+The commit message mentioned that you can set and clear histogram 
+tracking; how does this interface let you clear things?  By passing a 
+0-length latency array?  If you violate the constraint (pass 
+non-ascending points, for example), does the previous latency map get 
+wiped out or is it still preserved unchanged?
+
+> +
+> +##
+>   # @BlockInfo:
+>   #
+>   # Block device information.  This structure describes a virtual device and
+> @@ -730,6 +787,8 @@
+>   # @timed_stats: Statistics specific to the set of previously defined
+>   #               intervals of time (Since 2.5)
+>   #
+> +# @latency-histogram: @BlockLatencyHistogramInfo. (Since 2.12)
+
+I'd mention that this only appears if block-latency-histogram-set has 
+been called.
+
+> +#
+>   # Since: 0.14.0
+>   ##
+>   { 'struct': 'BlockDeviceStats',
+> @@ -742,7 +801,8 @@
+>              'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
+>              'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
+>              'account_invalid': 'bool', 'account_failed': 'bool',
+> -           'timed_stats': ['BlockDeviceTimedStats'] } }
+> +           'timed_stats': ['BlockDeviceTimedStats'],
+> +           '*latency-histogram': 'BlockLatencyHistogramInfo' } }
+>   
+
+
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
