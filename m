@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej9Gg-0003Cc-3y
+	(envelope-from <armbru@redhat.com>) id 1ej9Gf-0003CT-VG
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:51:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej9Ge-000438-BI
+	(envelope-from <armbru@redhat.com>) id 1ej9Ge-00043H-Dl
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:51:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35244 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40146 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej9Ge-00042D-3x
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej9Ge-00042E-4I
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:51:00 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  6 Feb 2018 20:50:43 +0100
-Message-Id: <20180206195044.8347-14-armbru@redhat.com>
+Date: Tue,  6 Feb 2018 20:50:42 +0100
+Message-Id: <20180206195044.8347-13-armbru@redhat.com>
 In-Reply-To: <20180206195044.8347-1-armbru@redhat.com>
 References: <20180206195044.8347-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/14] hw/xen*: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PULL 12/14] hw/sparc*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -83,95 +83,205 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-xen_pt_log() was left with an fprintf(stderr,
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-
-Conversions that aren't followed by exit() dropped, because they might
-be inappropriate.
-
+Cc: Fabien Chouteau <chouteau@adacore.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20180203084315.20497-13-armbru@redhat.com>
+Message-Id: <20180203084315.20497-12-armbru@redhat.com>
 ---
- hw/xen/xen-common.c       | 5 +++--
- hw/xenpv/xen_machine_pv.c | 9 +++++----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ hw/sparc/leon3.c     | 16 +++++++---------
+ hw/sparc/sun4m.c     | 16 +++++++---------
+ hw/sparc64/niagara.c |  4 ++--
+ hw/sparc64/sun4u.c   | 10 +++++-----
+ 4 files changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 632a938dcc..afa1e3f404 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -9,6 +9,7 @@
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 8c66d5af24..bba3aa3dee 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
   */
-=20
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "hw/xen/xen_backend.h"
- #include "qmp-commands.h"
- #include "chardev/char.h"
-@@ -96,13 +97,13 @@ static void xenstore_record_dm_state(struct xs_handle=
- *xs, const char *state)
-     char path[50];
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -139,9 +140,8 @@ static void leon3_generic_hw_init(MachineState *machi=
+ne)
 =20
-     if (xs =3D=3D NULL) {
--        fprintf(stderr, "xenstore connection not initialized\n");
-+        error_report("xenstore connection not initialized");
+     /* Allocate RAM */
+     if ((uint64_t)ram_size > (1UL << 30)) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d, maximum 1G\=
+n",
+-                (unsigned int)(ram_size / (1024 * 1024)));
++        error_report("Too much memory for this machine: %d, maximum 1G",
++                     (unsigned int)(ram_size / (1024 * 1024)));
          exit(1);
      }
 =20
-     snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
-     if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
--        fprintf(stderr, "error recording dm state\n");
-+        error_report("error recording dm state");
+@@ -167,19 +167,18 @@ static void leon3_generic_hw_init(MachineState *mac=
+hine)
+     }
+=20
+     if (bios_size > prom_size) {
+-        fprintf(stderr, "qemu: could not load prom '%s': file too big\n"=
+,
+-                filename);
++        error_report("could not load prom '%s': file too big", filename)=
+;
+         exit(1);
+     }
+=20
+     if (bios_size > 0) {
+         ret =3D load_image_targphys(filename, 0x00000000, bios_size);
+         if (ret < 0 || ret > prom_size) {
+-            fprintf(stderr, "qemu: could not load prom '%s'\n", filename=
+);
++            error_report("could not load prom '%s'", filename);
+             exit(1);
+         }
+     } else if (kernel_filename =3D=3D NULL && !qtest_enabled()) {
+-        fprintf(stderr, "Can't read bios image %s\n", filename);
++        error_report("Can't read bios image %s", filename);
+         exit(1);
+     }
+     g_free(filename);
+@@ -192,8 +191,7 @@ static void leon3_generic_hw_init(MachineState *machi=
+ne)
+         kernel_size =3D load_elf(kernel_filename, NULL, NULL, &entry, NU=
+LL, NULL,
+                                1 /* big endian */, EM_SPARC, 0, 0);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         if (bios_size <=3D 0) {
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index dd0038095b..f9892e38c3 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -259,8 +259,7 @@ static unsigned long sun4m_load_kernel(const char *ke=
+rnel_filename,
+                                               KERNEL_LOAD_ADDR,
+                                               RAM_size - KERNEL_LOAD_ADD=
+R);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+=20
+@@ -271,8 +270,8 @@ static unsigned long sun4m_load_kernel(const char *ke=
+rnel_filename,
+                                               INITRD_LOAD_ADDR,
+                                               RAM_size - INITRD_LOAD_ADD=
+R);
+             if (initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '=
+%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
+         }
+@@ -680,7 +679,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
+ame)
+         ret =3D -1;
+     }
+     if (ret < 0 || ret > PROM_SIZE_MAX) {
+-        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
++        error_report("could not load prom '%s'", bios_name);
          exit(1);
      }
  }
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 69a52a9f93..44d67b87c4 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -23,6 +23,7 @@
-  */
+@@ -746,10 +745,9 @@ static void ram_init(hwaddr addr, ram_addr_t RAM_siz=
+e,
 =20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/xen/xen_backend.h"
-@@ -36,7 +37,7 @@ static void xen_init_pv(MachineState *machine)
-=20
-     /* Initialize backend core & drivers */
-     if (xen_be_init() !=3D 0) {
--        fprintf(stderr, "%s: xen backend core setup failed\n", __func__)=
-;
-+        error_report("%s: xen backend core setup failed", __func__);
+     /* allocate RAM */
+     if ((uint64_t)RAM_size > max_mem) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d, maximum %d\=
+n",
+-                (unsigned int)(RAM_size / (1024 * 1024)),
+-                (unsigned int)(max_mem / (1024 * 1024)));
++        error_report("Too much memory for this machine: %d, maximum %d",
++                     (unsigned int)(RAM_size / (1024 * 1024)),
++                     (unsigned int)(max_mem / (1024 * 1024)));
          exit(1);
      }
-=20
-@@ -51,18 +52,18 @@ static void xen_init_pv(MachineState *machine)
-         const char *initrd_filename =3D machine->initrd_filename;
-         if (xen_domain_build_pv(kernel_filename, initrd_filename,
-                                 kernel_cmdline) < 0) {
--            fprintf(stderr, "xen pv domain creation failed\n");
-+            error_report("xen pv domain creation failed");
+     dev =3D qdev_create(NULL, "memory");
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index 7a723326c5..996ce2ada0 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -152,8 +152,8 @@ static void niagara_init(MachineState *machine)
+             dinfo->is_default =3D 1;
+             rom_add_file_fixed(blk_bs(blk)->filename, NIAGARA_VDISK_BASE=
+, -1);
+         } else {
+-            fprintf(stderr, "qemu: could not load ram disk '%s'\n",
+-                    blk_bs(blk)->filename);
++            error_report("could not load ram disk '%s'",
++                         blk_bs(blk)->filename);
              exit(1);
          }
-         break;
      }
- #endif
-     case XEN_EMULATE:
--        fprintf(stderr, "xen emulation not implemented (yet)\n");
-+        error_report("xen emulation not implemented (yet)");
-         exit(1);
-         break;
-     default:
--        fprintf(stderr, "unhandled xen_mode %d\n", xen_mode);
-+        error_report("unhandled xen_mode %d", xen_mode);
-         exit(1);
-         break;
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index a23cb26b0d..da28ab9413 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -168,8 +169,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
+filename,
+                                               RAM_size - KERNEL_LOAD_ADD=
+R);
+         }
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         /* load initrd above kernel */
+@@ -181,8 +181,8 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
+filename,
+                                                *initrd_addr,
+                                                RAM_size - *initrd_addr);
+             if ((int)*initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '=
+%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
+         }
+@@ -422,7 +422,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
+ame)
+         ret =3D -1;
      }
+     if (ret < 0 || ret > PROM_SIZE_MAX) {
+-        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
++        error_report("could not load prom '%s'", bios_name);
+         exit(1);
+     }
+ }
 --=20
 2.13.6
