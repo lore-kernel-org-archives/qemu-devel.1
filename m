@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej5Bz-00072b-Kv
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:29:56 -0500
+	(envelope-from <eblake@redhat.com>) id 1ej5EO-0000MO-Hi
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:32:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej5Bv-0008Ud-Cd
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:29:55 -0500
-References: <20171207155102.66622-4-vsementsov@virtuozzo.com>
-	<74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
-	<7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-	<d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
-	<4e97de9a-bcdd-5e5d-275f-e6cac9473f0d@virtuozzo.com>
-	<79e5851b-f35e-23ea-4842-cc3b1d1e30ee@virtuozzo.com>
-	<1e2fd96e-5d07-3c52-33df-cf31490eb6ca@redhat.com>
-	<eccba06f-3a5f-7926-7fb5-ce56f01e94c7@virtuozzo.com>
-	<1298bc3d-c2bd-6fd5-5d3d-dabcae434874@redhat.com>
-	<2e145d8b-855f-9060-1b81-feb515067293@virtuozzo.com>
-	<20180126150511.GG2610@work-vm>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ac366ae3-d7e0-db65-d5ee-d276a42320da@virtuozzo.com>
-Date: Tue, 6 Feb 2018 18:29:39 +0300
+	(envelope-from <eblake@redhat.com>) id 1ej5EJ-0002Nw-Mu
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:32:24 -0500
+References: <20180206074622.157812-1-borntraeger@de.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4181f0ff-5a2d-bdaa-9e40-ae3cb6f4417c@redhat.com>
+Date: Tue, 6 Feb 2018 09:31:48 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180126150511.GG2610@work-vm>
+In-Reply-To: <20180206074622.157812-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/1] s390x/cpu: expose the guest crash
+ information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-26.01.2018 18:05, Dr. David Alan Gilbert wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->> 17.01.2018 19:03, Eric Blake wrote:
->>> On 01/17/2018 09:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>
->>>>>> I have a script (for managing libvirt guest, but it can be adopted for
->>>>>> qemu or even used for qemu monitor), which allows
->>>>>> me run qmp commands on vms as easy as:
->>>>>>
->>>>>> |qmp VMNAME query-block-jobs or qmp VMNAME nbd-server-remove name exp1
->>>>>> mode hard or even |
->>>>>>
->>>>>> |qmp VMNAME blockdev-add id disk driver qcow2 cache {writeback true
->>>>>> direct true} aio native discard unmap file {driver file filename
->>>>>> /tmp/somedisk} |||
->>>>> Yeah, there are various scripting solutions around QMP that can make it
->>>>> easier; but HMP is often still an easy front-line interface for
->>>>> experiments.
->>>>>
->>>> isn't it because these solutions are not available directly in monitor,
->>>> when HMP is?
->>> QMP can be directly accessed in a monitor; it just requires more typing.
->>>    If you are developing QMP commands, it may be easier to use
->>> ./scripts/qmp/qmp-shell (couple it with a readline wrapper, and you can
->>> even get tab-completion and history across sessions).  There's also
->>> things like libvirt's 'virsh qmp-monitor-command' for shell-scripting
->>> access to arbitrary QMP commands, provided your guest is run by libvirt.
->>>
->>>> may be, we need third type of monitor HQMP which is QMP with simplified
->>>> syntax? Or
->>>> allow qmp commands in simplified syntax directly in HMP?
->>> No, I don't think we need either thing.  Wrappers around existing
->>> monitors is better than bloating qemu proper with a third flavor of
->>> monitor.  And HMP is for humans, with no restrictions on back-compat
->>> changes, so if it doesn't do something you want for quick-and-dirty
->>> testing, you can either add a new HMP command, or just use QMP (or one
->>> of its wrappers, like qmp-shell) in the first place.  Ultimately, our
->>> long-term concern is only about the QMP interface; HMP is supposed to be
->>> convenient.  So if it starts costing too much time to port a QMP
->>> interface to HMP, then don't worry about it.
->>>
->> most of commands, ported to hmp are done in same style: they just call
->> corresponding qmp command.
->> Isn't it better to provide common interface for calling qmp commands through
->> HMP monitor, to never
->> create hmp versions of new commands? they will be available automatically.
-> It would be nice to do that, but they're not that consistent in how they
-> convert parameters and options, but I occasionally wonder if we could
-> automate more of it.
+On 02/06/2018 01:46 AM, Christian Borntraeger wrote:
+> This patch is the s390 implementation of guest crash information,
+> similar to commit d187e08dc4 ("i386/cpu: add crash-information QOM
+> property") and the related commits. We will detect several crash
+> reasons, with the "disabled wait" being the most important one, since
+> this is used by all s390 guests as a "panic like" notification.
+> 
 
+> 
+> Co-authored-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>   qapi/run-state.json   | 27 ++++++++++++++++++++++--
+>   target/s390x/cpu.c    | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>   target/s390x/cpu.h    | 11 ++++++++++
+>   target/s390x/helper.c |  5 ++++-
+>   target/s390x/kvm.c    | 15 +++++++-------
+>   vl.c                  |  6 ++++++
+>   6 files changed, 110 insertions(+), 11 deletions(-)
+> 
 
-What about allowing some new syntax in hmp, directly mapped to qmp?
+> 
+>  ##
+>  # @GuestPanicInformation:
+>  #
+>  # Information about a guest panic
+>  #
+> +# @type: Crash type that defines the hypervisor specific information
+> +#
+>  # Since: 2.9
+>  ##
+>  {'union': 'GuestPanicInformation',
+>   'base': {'type': 'GuestPanicInformationType'},
+>   'discriminator': 'type',
+> - 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
+> + 'data': { 'hyper-v': 'GuestPanicInformationHyperV',
+> +           's390': 'GuestPanicInformationS390' } }
+>  
 
-something like
+The qapi type has only integers (that the caller will presumably know 
+how to decode if it cares) and a human readable string.  Meanwhile,...
 
- >>> blockdev-add id disk driver qcow2 cache {writeback true direct 
-true} aio native discard unmap file {driver file filename /tmp/somedisk}
+> 
+> +/* Crash cases. */
+> +enum crash_reasons {
 
-?
+Doesn't seem to match our usual coding conventions of CamelCase for 
+names in the enum/struct/union namespace.
 
-Or it may be realized as a separate hmp command "qmp" (looks more safe 
-as a first step, however, I think previous variant (direct call) is better):
+> +    CRASH_REASON_UNKNOWN,  /* default value of 0 on reset */
+> +    CRASH_REASON_PGM,
+> +    CRASH_REASON_EXT,
+> +    CRASH_REASON_WAITPSW,
+> +    CRASH_REASON_OPEREXC,
 
- >>> qmp blockdev-add id disk driver qcow2 cache {writeback true direct 
-true} aio native discard unmap file {driver file filename /tmp/somedisk}
+...you have an internal enum for decoding some of those integer values 
+into specific human readable strings, but don't expose the enum over 
+QAPI.  Are we sure that's the interface we want to go with?  As long as 
+you are okay with that, then I can live with the interface change; I 
+just want to make sure that you are certain that the machine-based 
+consumer of the QMP command does not need to decode crash_reasons 
+because you left it as an internal enum.
 
-what do think? This looks simple to implement and should be useful.
+> +
+> +static void s390_cpu_get_crash_info_qom(Object *obj, Visitor *v,
+> +                                         const char *name, void *opaque,
+> +                                         Error **errp)
 
->
-> Dave
->
->> -- 
->> Best regards,
->> Vladimir
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Indentation is off.
 
 -- 
-Best regards,
-Vladimir
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
