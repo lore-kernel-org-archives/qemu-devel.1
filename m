@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ej5FE-0000xw-Bv
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:33:19 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ej5Pl-0006X3-JD
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:44:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ej5FA-0003XV-3C
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:33:16 -0500
-Date: Tue, 6 Feb 2018 16:32:37 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180206153237.GA4799@localhost.localdomain>
-References: <20170418143044.12187-1-famz@redhat.com>
-	<20170418143044.12187-3-famz@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1ej5Pg-0006OH-C5
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:44:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60052)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ej5Pg-0006NV-3r
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:44:04 -0500
+Date: Tue, 6 Feb 2018 15:44:00 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180206154400.GE13343@stefanha-x1.localdomain>
+References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
+	<20180202100843.GD13090@stefanha-x1.localdomain>
+	<CAFEAcA-5PwhJw9epXh+0_oe3E-vsVKkQDX3s1Go-FBzO=FA3zA@mail.gmail.com>
+	<20180205155108.GF28241@stefanha-x1.localdomain>
+	<CAFEAcA-vd3vEJ0i=2LtaR-NQjHoJVYWCNDHOmh3iREPcQsqR4A@mail.gmail.com>
+	<20180206091700.GB4942@stefanha-x1.localdomain>
+	<CAFEAcA-o3b0B1BhzTP5YdsXLyq50_WC7hzZU8vb-EmTOBKjhWA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="CGDBiGfvSTbxKZlW"
 Content-Disposition: inline
-In-Reply-To: <20170418143044.12187-3-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9-rc5 v4 2/2] block: Drain BH in
- bdrv_drained_begin
+In-Reply-To: <CAFEAcA-o3b0B1BhzTP5YdsXLyq50_WC7hzZU8vb-EmTOBKjhWA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Qemu Trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,138 +33,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jcody@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Nesrine Zouari <nesrine.zouari@enis.tn>, QEMU Developers <qemu-devel@nongnu.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
 
-Am 18.04.2017 um 16:30 hat Fam Zheng geschrieben:
-> During block job completion, nothing is preventing
-> block_job_defer_to_main_loop_bh from being called in a nested
-> aio_poll(), which is a trouble, such as in this code path:
-> 
->     qmp_block_commit
->       commit_active_start
->         bdrv_reopen
->           bdrv_reopen_multiple
->             bdrv_reopen_prepare
->               bdrv_flush
->                 aio_poll
->                   aio_bh_poll
->                     aio_bh_call
->                       block_job_defer_to_main_loop_bh
->                         stream_complete
->                           bdrv_reopen
-> 
-> block_job_defer_to_main_loop_bh is the last step of the stream job,
-> which should have been "paused" by the bdrv_drained_begin/end in
-> bdrv_reopen_multiple, but it is not done because it's in the form of a
-> main loop BH.
-> 
-> Similar to why block jobs should be paused between drained_begin and
-> drained_end, BHs they schedule must be excluded as well.  To achieve
-> this, this patch forces draining the BH in BDRV_POLL_WHILE.
-> 
-> As a side effect this fixes a hang in block_job_detach_aio_context
-> during system_reset when a block job is ready:
-> 
->     #0  0x0000555555aa79f3 in bdrv_drain_recurse
->     #1  0x0000555555aa825d in bdrv_drained_begin
->     #2  0x0000555555aa8449 in bdrv_drain
->     #3  0x0000555555a9c356 in blk_drain
->     #4  0x0000555555aa3cfd in mirror_drain
->     #5  0x0000555555a66e11 in block_job_detach_aio_context
->     #6  0x0000555555a62f4d in bdrv_detach_aio_context
->     #7  0x0000555555a63116 in bdrv_set_aio_context
->     #8  0x0000555555a9d326 in blk_set_aio_context
->     #9  0x00005555557e38da in virtio_blk_data_plane_stop
->     #10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd
->     #11 0x00005555559fa49b in virtio_bus_stop_ioeventfd
->     #12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd
->     #13 0x00005555559f6a18 in virtio_pci_reset
->     #14 0x00005555559139a9 in qdev_reset_one
->     #15 0x0000555555916738 in qbus_walk_children
->     #16 0x0000555555913318 in qdev_walk_children
->     #17 0x0000555555916738 in qbus_walk_children
->     #18 0x00005555559168ca in qemu_devices_reset
->     #19 0x000055555581fcbb in pc_machine_reset
->     #20 0x00005555558a4d96 in qemu_system_reset
->     #21 0x000055555577157a in main_loop_should_exit
->     #22 0x000055555577157a in main_loop
->     #23 0x000055555577157a in main
-> 
-> The rationale is that the loop in block_job_detach_aio_context cannot
-> make any progress in pausing/completing the job, because bs->in_flight
-> is 0, so bdrv_drain doesn't process the block_job_defer_to_main_loop
-> BH. With this patch, it does.
-> 
-> Reported-by: Jeff Cody <jcody@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-Fam, do you remember whether this was really only about drain? Because
-in that case...
+--CGDBiGfvSTbxKZlW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 97d4330..5ddc0cf 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -381,12 +381,13 @@ void bdrv_drain_all(void);
->  
->  #define BDRV_POLL_WHILE(bs, cond) ({                       \
->      bool waited_ = false;                                  \
-> +    bool busy_ = true;                                     \
->      BlockDriverState *bs_ = (bs);                          \
->      AioContext *ctx_ = bdrv_get_aio_context(bs_);          \
->      if (aio_context_in_iothread(ctx_)) {                   \
-> -        while ((cond)) {                                   \
-> -            aio_poll(ctx_, true);                          \
-> -            waited_ = true;                                \
-> +        while ((cond) || busy_) {                          \
-> +            busy_ = aio_poll(ctx_, (cond));                \
-> +            waited_ |= !!(cond) | busy_;                   \
->          }                                                  \
->      } else {                                               \
->          assert(qemu_get_current_aio_context() ==           \
-> @@ -398,11 +399,16 @@ void bdrv_drain_all(void);
->           */                                                \
->          assert(!bs_->wakeup);                              \
->          bs_->wakeup = true;                                \
-> -        while ((cond)) {                                   \
-> -            aio_context_release(ctx_);                     \
-> -            aio_poll(qemu_get_aio_context(), true);        \
-> -            aio_context_acquire(ctx_);                     \
-> -            waited_ = true;                                \
-> +        while (busy_) {                                    \
-> +            if ((cond)) {                                  \
-> +                waited_ = busy_ = true;                    \
-> +                aio_context_release(ctx_);                 \
-> +                aio_poll(qemu_get_aio_context(), true);    \
-> +                aio_context_acquire(ctx_);                 \
-> +            } else {                                       \
-> +                busy_ = aio_poll(ctx_, false);             \
-> +                waited_ |= busy_;                          \
-> +            }                                              \
->          }                                                  \
->          bs_->wakeup = false;                               \
->      }                                                      \
+On Tue, Feb 06, 2018 at 10:55:57AM +0000, Peter Maydell wrote:
+> On 6 February 2018 at 09:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > On Mon, Feb 05, 2018 at 03:55:01PM +0000, Peter Maydell wrote:
+> >> ...and "online processing of traces" is pretty much exactly
+> >> what an instrumentation plugin API is for.
+> >
+> > There are two cases for online processing:
+> >
+> > 1. Synchronous - this is what the instrumentation plugins will be able
+> >    to do.  It means that QEMU waits until the event has been processed,
+> >    and the plugin is therefore able to control QEMU.
+> >
+> > 2. Asynchronous - this is what LTTng UST does.  It means that the
+> >    process analyzing the trace does not hold up QEMU, but it cannot
+> >    control QEMU without some delay between trace events firing and
+> >    reacting to them.  I think Nesrine's use case is this one.
+> >
+> > #2 is useful for "real-time" graphs, for example.  That is still
+> > "oneline" but it doesn't require instrumentation plugins.
+> >
+> > Given that the instrumentation plugin API is still in early development,
+> > it would delay Nesrine's work and I recommend against depending on it.
+>=20
+> I don't really want us to end up with two separate ways of doing
+> basically the same thing that have been implemented entirely
+> independently.
 
-...fixing it in BDRV_POLL_WHILE() rather than the drain functions may
-have been a bad idea.
+I agree it shouldn't be duplicated.  The instrumentation plugin
+infrastructure can use tracing.
 
-I got a bug assigned where we have a large (200 GB) fragmented qcow2
-image, and qemu-img convert takes two hours before it even starts to
-copy data. What it does in this time is iterating through the whole
-image with bdrv_block_status_above() in order to estimate the work to be
-done (and of course it will repeat the same calls while actually copying
-data).
+What I'm not convinced of is that Nesrine's use case requires a plugin
+that can react to events within QEMU.  It seems like it just needs to
+export a stream of events to an external process - instrumentation
+plugins aren't needed for that, just use LTTng UST.
 
-One of the things I saw is that between each pair of lseek() calls, we
-also have unnecessary poll() calls, and these were introduced by this
-patch. If I modify bdrv_common_block_status_above() so that it doesn't
-poll if data.done == true already, the time needed to iterate through my
-test image is cut in half.
+> A lot of the problems you need to solve (like "how do we
+> configurably add tracing of things like guest register changes
+> into the generated code in a maintainable and efficient way")
+> are the same both ways.
 
-Now, of course, I'm still only seeing a few seconds for a 100 GB image,
-so there must be more that is wrong for the reporter, but it suggests to
-me that BDRV_POLL_WHILE() shouldn't be polling unconditionally when only
-one of its users actually needs this.
+Tracing already has special "tcg" events, which can be planted in
+generated code as well as triggered at translation time.  So I think
+this is already solved?
 
-Kevin
+> >> It would also let you put the logic of "how do we know what a
+> >> guest OS task switch is anyway" somewhere other than QEMU,
+> >> which is nice because that's very guest-OS specific.
+> >
+> > How do you envision that instrumentation plugins will monitor guest OS
+> > task switches if QEMU does not know about them?
+>=20
+> The plugin can register for information like changes of the
+> relevant system registers (and could potentially do cleverer
+> things like looking at guest in-memory task data structures).
+> QEMU doesn't need to know (and shouldn't know) that x86 CR3 or
+> Arm CONTEXTIDR are how you identify a guest OS task switch.
+>=20
+> > Without instrumentation plugins I would add a guest_x86_cr3_write trace
+> > event, for example.  Then the trace consumer can interpret that event as
+> > a task switch if it knows the guest OS always writes to the cr3 register
+> > on a task switch.  No instrumentation plugins are necessary in order to
+> > do this and it doesn't hardcode knowledge of guest OS task switching
+> > into QEMU either.
+>=20
+> This only works if you have a trace event for the register change,
+> which we don't.
+
+Adding a trace event for cr3 updates looks easy.
+
+Stefan
+
+--CGDBiGfvSTbxKZlW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaec1AAAoJEJykq7OBq3PIeB0IAKeCPMYo0dFtc9KWvV0imhla
+YvBHxgP47vb1SOj8LzvNTcAGVsabq2CYGvcS6FOKP4VxLMbkF+imYuYg5cWTQYuM
+EqVFanZng1fv3RNEsfuCwDGh9PE7k71SBluHtxcLZ14McR6e3+QxsIfDwXuwwP3G
+Yw0IiOddSWDHS7OtjjQbTgrqg3+xD0U3W5bcQSNAkmUp0g3H8hY0b32WhcPaskrh
+bsgDbBuNpWoYYuQcMMVIdcorBrGMTFPh6Bw3ZoWeEbLq2RQHkhk4Z9gaPPogyfeS
+Bn2swvefLFpZv4ce8KisLsTi1j6Dt59WCJfl4WSz/2YIGAbL8nWqOfz/jQ19tVA=
+=832a
+-----END PGP SIGNATURE-----
+
+--CGDBiGfvSTbxKZlW--
