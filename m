@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eiy0s-0001ao-0h
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:49:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1eiy16-0001mp-R6
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:50:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eiy0o-0001D9-UV
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:49:58 -0500
-Received: from mail-ve1eur01on0103.outbound.protection.outlook.com
-	([104.47.1.103]:58175
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1eiy0o-0001CZ-7t
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:49:54 -0500
-References: <151790197381.27004.13241184632371976036.stgit@bahia.lan>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <9f1237f2-5194-1cc5-dbc4-b453ff3ee7c4@virtuozzo.com>
-Date: Tue, 6 Feb 2018 10:49:47 +0300
+	(envelope-from <armbru@redhat.com>) id 1eiy11-0001L4-3K
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:50:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eiy10-0001JA-QW
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:50:06 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-10-armbru@redhat.com>
+	<1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
+	<878tca4ez9.fsf@dusky.pond.sub.org>
+	<13b80daf-db39-8183-2836-a13b2d4ef21b@redhat.com>
+Date: Tue, 06 Feb 2018 08:49:59 +0100
+In-Reply-To: <13b80daf-db39-8183-2836-a13b2d4ef21b@redhat.com> (Eric Blake's
+	message of "Mon, 5 Feb 2018 09:55:54 -0600")
+Message-ID: <87607aftg8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <151790197381.27004.13241184632371976036.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] migration: incoming postcopy advise sanity
- checks
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 09/21] qapi: Don't absolutize include
+ file name in error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-06.02.2018 10:26, Greg Kurz wrote:
-> If postcopy-ram was set on the source but not on the destination,
-> migration doesn't occur, the destination prints an error and boots
-> the guest:
->
-> qemu-system-ppc64: Expected vmdescription section, but got 0
->
-> We end up with two running instances.
->
-> This behaviour was introduced in 2.11 by commit 58110f0acb1a "migration:
-> split common postcopy out of ram postcopy" to prepare ground for the
-> upcoming dirty bitmap postcopy support. It adds a new case where the
-> source may send an empty postcopy advise because dirty bitmap doesn't
-> need to check page sizes like RAM postcopy does.
->
-> If the source has enabled postcopy-ram, then it sends an advise with
-> the page size values. If the destination hasn't enabled postcopy-ram,
-> then loadvm_postcopy_handle_advise() leaves the page size values on
-> the stream and returns. This confuses qemu_loadvm_state() later on
-> and causes the destination to start execution.
->
-> As discussed several times, postcopy-ram should be enabled both sides
-> to be functional. This patch changes the destination to perform some
-> extra checks on the advise length to ensure this is the case. Otherwise
-> an error is returned and migration is aborted.
->
-> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->   migration/savevm.c |   18 +++++++++++++++---
->   1 file changed, 15 insertions(+), 3 deletions(-)
->
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index b7908f62be3c..1c516fcbb8d7 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1376,7 +1376,8 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
->    * *might* happen - it might be skipped if precopy transferred everything
->    * quickly.
->    */
-> -static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-> +static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
-> +                                         uint16_t len)
->   {
->       PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
->       uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
-> @@ -1387,8 +1388,19 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
->           return -1;
->       }
->   
-> -    if (!migrate_postcopy_ram()) {
-> +    switch (len) {
-> +    case 0:
-> +        /* The source hasn't enabled postcopy-ram. Nothing to do. */
+Eric Blake <eblake@redhat.com> writes:
 
-should we error-out here if (migrate_postcopy_ram()) ?
-
->           return 0;
-> +    case 8 + 8:
-> +        if (!migrate_postcopy_ram()) {
-> +            error_report("RAM postcopy is disabled");
-> +            return -EINVAL;
-> +        }
-> +        break;
-> +    default:
-> +        error_report("CMD_POSTCOPY_ADVISE invalid length (%d)", len);
-> +        return -EINVAL;
->       }
->   
->       if (!postcopy_ram_supported_by_host(mis)) {
-> @@ -1807,7 +1819,7 @@ static int loadvm_process_command(QEMUFile *f)
->           return loadvm_handle_cmd_packaged(mis);
->   
->       case MIG_CMD_POSTCOPY_ADVISE:
-> -        return loadvm_postcopy_handle_advise(mis);
-> +        return loadvm_postcopy_handle_advise(mis, len);
->   
->       case MIG_CMD_POSTCOPY_LISTEN:
->           return loadvm_postcopy_handle_listen(mis);
+> On 02/03/2018 03:08 AM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> On 02/02/2018 07:03 AM, Markus Armbruster wrote:
+>>>> Error messages print absolute filenames of included files even gave a
+>>>
+>>> s/even gave/even when given/
+>> 
+>> I meant to write "even if the user gave".  Is that okay?
 >
+> Yes, that works too.
+>
+>> 
+>>>> relative one on the command line:
+>>>>
+>>>>      PYTHONPATH=scripts python -B tests/qapi-schema/test-qapi.py tests/qapi-schema/include-cycle.json
+>>>>     In file included from tests/qapi-schema/include-cycle.json:1:
+>>>>     In file included from /work/armbru/qemu/tests/qapi-schema/include-cycle-b.json:1:
+>>>>     /work/armbru/qemu/tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for include-cycle.json
+>>>>
+>>>> Improve this to
+>>>>
+>>>>     In file included from tests/qapi-schema/include-cycle.json:1:
+>>>>     In file included from tests/qapi-schema/include-cycle-b.json:1:
+>>>>     tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for include-cycle.json
+>>>
+>>> Nice, and makes developing new qapi tests a little less painful since
+>>> it's less modification to qapi-schema/*.err additions.
+>> 
+>> Probably not, as our make rule strips off $(SRC_PATH):
+>> 
+>> 	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -q $(SRC_PATH)/$*.err -
+>> 
+>> I've kept that, because it might also occur in stack backtraces.  I
+>> think.
+>
+> I still recall having to hand-edit .err files when doing a naive "run
+> the test to get the failure, then 'mv' the bad files into the expected
+> filenames, then rerun the tests";
 
+Whenever the Perl script does something, you can't simply move the
+.test.err to .err.  Annoying.
 
--- 
-Best regards,
-Vladimir
+A make target check-accept could automate the work.
+
+However, with this patch, the Perl script should do something less
+often.  I guess that's your point.
+
+Sorry for being slow on the update :)
+
+>                                   so I'm not sure if our make rule was
+> properly munging absolute names out of the file in the first place.  I'm
+> not too fussed about it, though, as adding new tests is less frequent
+> and it's still fairly easy to learn if you did it right or not by
+> whether 'make check' succeeds.
+>
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>> ---
+>>>>  scripts/qapi/common.py                | 12 ++++++------
+>>>>  tests/qapi-schema/include-no-file.err |  2 +-
+>>>>  2 files changed, 7 insertions(+), 7 deletions(-)
+>>>>
+>>>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> 
+>> Thanks!
+>> 
