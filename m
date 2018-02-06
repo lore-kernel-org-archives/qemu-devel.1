@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1Hq-0004vw-OC
+	(envelope-from <laurent@vivier.eu>) id 1ej1Hq-0004v6-2J
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1Hl-00026q-Id
+	(envelope-from <laurent@vivier.eu>) id 1ej1Hm-00029Q-Qw
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:42 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:49312)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1Hl-00023h-5V
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:37 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 06 Feb 2018 14:19:37 +0300
-Message-ID: <20180206111936.12592.68781.stgit@pasha-VirtualBox>
+Received: from mout.kundenserver.de ([212.227.126.130]:60313)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ej1Hm-00026X-E5
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:38 -0500
+References: <20180206095603.26500.5959.stgit@pasha-VirtualBox>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <edbe6648-476d-73fb-2a54-c7f55c7b4a21@vivier.eu>
+Date: Tue, 6 Feb 2018 12:19:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2] m68k: implement movep instruction
+In-Reply-To: <20180206095603.26500.5959.stgit@pasha-VirtualBox>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] m68k: implement movep instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,141 +27,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: huth@tuxfamily.org, dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: dovgaluk@ispras.ru
 
-This patch implements movep instruction. It moves data between a data register
-and alternate bytes within the address space starting at the location
-specified and incrementing by two.
+Le 06/02/2018 à 10:56, Pavel Dovgalyuk a écrit :
+> This patch implements movep instruction. It moves data between a data register
+> and alternate bytes within the address space starting at the location
+> specified and incrementing by two.
+> 
+> It was designed for the original 68000 and used in firmwares for
+> interfacing the 8-bit peripherals through the 16-bit data bus.
+> Without this patch opcode for this instruction is recognized as some bitop.
+> 
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+> ---
+>  target/m68k/translate.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 53 insertions(+)
+> 
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index f0e86a7..a849c74 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -2071,6 +2071,55 @@ DISAS_INSN(movem)
+>      tcg_temp_free(addr);
+>  }
+>  
+> +DISAS_INSN(movep)
+> +{
+> +    uint8_t i;
+> +    uint8_t op;
+> +    uint16_t displ;
+> +    TCGv reg;
+> +    TCGv addr;
+> +    TCGv abuf;
+> +    TCGv dbuf;
+> +
+> +    op = (insn >> 6) & 7;
+> +    displ = read_im16(env, s);
 
-It was designed for the original 68000 and used in firmwares for
-interfacing the 8-bit peripherals through the 16-bit data bus.
-Without this patch opcode for this instruction is recognized as some bitop.
+I think displacement can be negative (see gen_lea_indexed()):
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+    uint32_t displ = (int16_t)read_im16(env, s);
 
---
+> +
+> +    addr = AREG(insn, 0);
+> +    reg = DREG(insn, 9);
+> +
+> +    abuf = tcg_temp_new();
+> +    tcg_gen_addi_i32(abuf, addr, displ);
+> +    dbuf = tcg_temp_new();
+> +
+> +    if (op & 1) {
 
-v2: - disabled movep for Coldfire
-    - fixed gen_store/load usage
----
- target/m68k/cpu.c       |    3 +++
- target/m68k/cpu.h       |    1 +
- target/m68k/translate.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 57 insertions(+)
+insn & 0x40
 
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 98919b3..2b38b9b 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -113,6 +113,7 @@ static void m68000_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_M68000);
-     m68k_set_feature(env, M68K_FEATURE_USP);
-     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
-+    m68k_set_feature(env, M68K_FEATURE_MOVEP);
- }
- 
- static void m68020_cpu_initfn(Object *obj)
-@@ -135,6 +136,7 @@ static void m68020_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_BKPT);
-     m68k_set_feature(env, M68K_FEATURE_RTD);
-     m68k_set_feature(env, M68K_FEATURE_CHK2);
-+    m68k_set_feature(env, M68K_FEATURE_MOVEP);
- }
- #define m68030_cpu_initfn m68020_cpu_initfn
- 
-@@ -145,6 +147,7 @@ static void m68040_cpu_initfn(Object *obj)
- 
-     m68020_cpu_initfn(obj);
-     m68k_set_feature(env, M68K_FEATURE_M68040);
-+    m68k_set_feature(env, M68K_FEATURE_MOVEP);
- }
- 
- static void m68060_cpu_initfn(Object *obj)
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 627fb78..1d79885 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -492,6 +492,7 @@ enum m68k_features {
-     M68K_FEATURE_RTD,
-     M68K_FEATURE_CHK2,
-     M68K_FEATURE_M68040, /* instructions specific to MC68040 */
-+    M68K_FEATURE_MOVEP,
- };
- 
- static inline int m68k_feature(CPUM68KState *env, int feature)
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 34db97b..ddb5b34 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -2078,6 +2078,55 @@ DISAS_INSN(movem)
-     tcg_temp_free(addr);
- }
- 
-+DISAS_INSN(movep)
-+{
-+    uint8_t i;
-+    uint8_t op;
-+    uint16_t displ;
-+    TCGv reg;
-+    TCGv addr;
-+    TCGv abuf;
-+    TCGv dbuf;
-+
-+    op = (insn >> 6) & 7;
-+    displ = read_im16(env, s);
-+
-+    addr = AREG(insn, 0);
-+    reg = DREG(insn, 9);
-+
-+    abuf = tcg_temp_new();
-+    tcg_gen_addi_i32(abuf, addr, displ);
-+    dbuf = tcg_temp_new();
-+
-+    if (op & 1) {
-+        i = 4;
-+    } else {
-+        i = 2;
-+    }
-+
-+    if (op & 2) {
-+        for ( ; i > 0 ; i--) {
-+            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
-+            gen_store(s, OS_BYTE, abuf, dbuf, IS_USER(s));
-+            if (i > 1) {
-+                tcg_gen_addi_i32(abuf, abuf, 2);
-+            }
-+        }
-+    } else {
-+        tcg_gen_movi_i32(reg, 0);
-+        for ( ; i > 0 ; i--) {
-+            dbuf = gen_load(s, OS_BYTE, abuf, 1, IS_USER(s));
-+            tcg_gen_or_i32(reg, reg, dbuf);
-+            if (i > 1) {
-+                tcg_gen_shli_i32(reg, reg, 8);
-+                tcg_gen_addi_i32(abuf, abuf, 2);
-+            }
-+        }
-+    }
-+    tcg_temp_free(abuf);
-+    tcg_temp_free(dbuf);
-+}
-+
- DISAS_INSN(bitop_im)
- {
-     int opsize;
-@@ -5675,9 +5724,13 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(chk2,      00c0, f9c0, CHK2);
-     INSN(bitrev,    00c0, fff8, CF_ISA_APLUSC);
-     BASE(bitop_reg, 0100, f1c0);
-+    INSN(movep,     0108, f1f8, MOVEP);
-     BASE(bitop_reg, 0140, f1c0);
-+    INSN(movep,     0148, f1f8, MOVEP);
-     BASE(bitop_reg, 0180, f1c0);
-+    INSN(movep,     0188, f1f8, MOVEP);
-     BASE(bitop_reg, 01c0, f1c0);
-+    INSN(movep,     01c8, f1f8, MOVEP);
-     INSN(arith_im,  0280, fff8, CF_ISA_A);
-     INSN(arith_im,  0200, ff00, M68000);
-     INSN(undef,     02c0, ffc0, M68000);
+perhaps we don't need "op"?
+
+> +        i = 4;
+> +    } else {
+> +        i = 2;
+> +    }
+> +
+> +    if (op & 2) {
+
+insn & 0x80
+
+> +        for ( ; i > 0 ; i--) {> +            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
+> +            gen_store(s, OS_BYTE, abuf, dbuf);
+
+You can use directly tcg_gen_qemu_st8()
+
+> +            if (i > 1) {
+> +                tcg_gen_addi_i32(abuf, abuf, 2);
+> +            }
+> +        }
+> +    } else {
+> +        tcg_gen_movi_i32(reg, 0);
+
+I don't think we should clear the part we don't update.
+
+> +        for ( ; i > 0 ; i--) {
+> +            dbuf = gen_load(s, OS_BYTE, abuf, 1);
+
+You can use directly tcg_gen_qemu_ld8u()
+
+> +            tcg_gen_or_i32(reg, reg, dbuf);
+
+you can use tcg_gen_deposit_i32().
+
+> +            if (i > 1) {
+> +                tcg_gen_shli_i32(reg, reg, 8);
+
+useless with deposit.
+
+> +                tcg_gen_addi_i32(abuf, abuf, 2);
+> +            }
+> +        }
+> +    }
+> +    tcg_temp_free(abuf);
+> +    tcg_temp_free(dbuf);
+> +}
+> +
+>  DISAS_INSN(bitop_im)
+>  {
+>      int opsize;
+> @@ -5579,9 +5628,13 @@ void register_m68k_insns (CPUM68KState *env)
+>      INSN(chk2,      00c0, f9c0, CHK2);
+>      INSN(bitrev,    00c0, fff8, CF_ISA_APLUSC);
+>      BASE(bitop_reg, 0100, f1c0);
+> +    BASE(movep,     0108, f1f8);
+>      BASE(bitop_reg, 0140, f1c0);
+> +    BASE(movep,     0148, f1f8);
+>      BASE(bitop_reg, 0180, f1c0);
+> +    BASE(movep,     0188, f1f8);
+>      BASE(bitop_reg, 01c0, f1c0);
+> +    BASE(movep,     01c8, f1f8);
+>      INSN(arith_im,  0280, fff8, CF_ISA_A);
+>      INSN(arith_im,  0200, ff00, M68000);
+>      INSN(undef,     02c0, ffc0, M68000);
+> 
+
+You should try only one (movep, 0108, f138) after the last bitop_reg.
+And as Thomas said, you need a new feature.
+
+Thanks,
+Laurent
