@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej17y-0003Vy-TW
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:09:32 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej18y-0004eW-Am
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:10:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej17u-0003PX-Ik
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:09:30 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37858)
+	(envelope-from <alex.bennee@linaro.org>) id 1ej18x-0004Vj-1C
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:10:32 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38059)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej17u-0003P3-7j
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:09:26 -0500
-Received: by mail-wr0-x243.google.com with SMTP id a43so1456558wrc.4
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 03:09:26 -0800 (PST)
+	id 1ej18w-0004UL-La
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:10:30 -0500
+Received: by mail-wr0-x243.google.com with SMTP id t94so1458608wrc.5
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 03:10:30 -0800 (PST)
 References: <20180126045742.5487-1-richard.henderson@linaro.org>
-	<20180126045742.5487-15-richard.henderson@linaro.org>
+	<20180126045742.5487-17-richard.henderson@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180126045742.5487-15-richard.henderson@linaro.org>
-Date: Tue, 06 Feb 2018 11:09:23 +0000
-Message-ID: <87lgg6wf18.fsf@linaro.org>
+In-reply-to: <20180126045742.5487-17-richard.henderson@linaro.org>
+Date: Tue, 06 Feb 2018 11:10:28 +0000
+Message-ID: <87k1vqwezf.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 14/20] target/arm: Use vector
- infrastructure for aa64 dup/movi
+Subject: Re: [Qemu-devel] [PATCH v11 16/20] target/arm: Use vector
+ infrastructure for aa64 compares
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,151 +43,165 @@ Richard Henderson <richard.henderson@linaro.org> writes:
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  target/arm/translate-a64.c | 81 +++++++++++++++++++---------------------=
+>  target/arm/translate-a64.c | 93 +++++++++++++++++++++++++++++-----------=
 ------
->  1 file changed, 33 insertions(+), 48 deletions(-)
+>  1 file changed, 59 insertions(+), 34 deletions(-)
 >
 > diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 11310f1a7a..48088dbb29 100644
+> index 38400560db..c928c4787c 100644
 > --- a/target/arm/translate-a64.c
 > +++ b/target/arm/translate-a64.c
-> @@ -5890,10 +5890,7 @@ static void handle_simd_dupe(DisasContext *s, int =
-is_q, int rd, int rn,
->                               int imm5)
->  {
->      int size =3D ctz32(imm5);
-> -    int esize =3D 8 << size;
-> -    int elements =3D (is_q ? 128 : 64) / esize;
-> -    int index, i;
-> -    TCGv_i64 tmp;
-> +    int index =3D imm5 >> (size + 1);
->
->      if (size > 3 || (size =3D=3D 3 && !is_q)) {
->          unallocated_encoding(s);
-> @@ -5904,20 +5901,9 @@ static void handle_simd_dupe(DisasContext *s, int =
-is_q, int rd, int rn,
->          return;
+> @@ -7209,6 +7209,28 @@ static void disas_simd_scalar_three_reg_diff(Disas=
+Context *s, uint32_t insn)
 >      }
->
-> -    index =3D imm5 >> (size + 1);
-> -
-> -    tmp =3D tcg_temp_new_i64();
-> -    read_vec_element(s, tmp, rn, index, size);
-> -
-> -    for (i =3D 0; i < elements; i++) {
-> -        write_vec_element(s, tmp, rd, i, size);
-> -    }
-> -
-> -    if (!is_q) {
-> -        clear_vec_high(s, rd);
-> -    }
-> -
-> -    tcg_temp_free_i64(tmp);
-> +    tcg_gen_gvec_dup_mem(size, vec_full_reg_offset(s, rd),
-> +                         vec_reg_offset(s, rn, index, size),
-> +                         is_q ? 16 : 8, vec_full_reg_size(s));
 >  }
 >
->  /* DUP (element, scalar)
-> @@ -5966,9 +5952,7 @@ static void handle_simd_dupg(DisasContext *s, int i=
-s_q, int rd, int rn,
->                               int imm5)
->  {
->      int size =3D ctz32(imm5);
-> -    int esize =3D 8 << size;
-> -    int elements =3D (is_q ? 128 : 64)/esize;
-> -    int i =3D 0;
-> +    uint32_t dofs, oprsz, maxsz;
->
->      if (size > 3 || ((size =3D=3D 3) && !is_q)) {
->          unallocated_encoding(s);
-> @@ -5979,12 +5963,11 @@ static void handle_simd_dupg(DisasContext *s, int=
- is_q, int rd, int rn,
->          return;
->      }
->
-> -    for (i =3D 0; i < elements; i++) {
-> -        write_vec_element(s, cpu_reg(s, rn), rd, i, size);
-> -    }
-> -    if (!is_q) {
-> -        clear_vec_high(s, rd);
-> -    }
-> +    dofs =3D vec_full_reg_offset(s, rd);
-> +    oprsz =3D is_q ? 16 : 8;
-> +    maxsz =3D vec_full_reg_size(s);
+> +/* CMTST : test is "if (X & Y !=3D 0)". */
+> +static void gen_cmtst_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+> +{
+> +    tcg_gen_and_i32(d, a, b);
+> +    tcg_gen_setcondi_i32(TCG_COND_NE, d, d, 0);
+> +    tcg_gen_neg_i32(d, d);
+> +}
 > +
-> +    tcg_gen_gvec_dup_i64(size, dofs, oprsz, maxsz, cpu_reg(s, rn));
->  }
->
->  /* INS (Element)
-> @@ -6175,7 +6158,6 @@ static void disas_simd_mod_imm(DisasContext *s, uin=
-t32_t insn)
->      bool is_neg =3D extract32(insn, 29, 1);
->      bool is_q =3D extract32(insn, 30, 1);
->      uint64_t imm =3D 0;
-> -    TCGv_i64 tcg_rd, tcg_imm;
->      int i;
->
->      if (o2 !=3D 0 || ((cmode =3D=3D 0xf) && is_neg && !is_q)) {
-> @@ -6257,32 +6239,35 @@ static void disas_simd_mod_imm(DisasContext *s, u=
+> +static void gen_cmtst_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+> +{
+> +    tcg_gen_and_i64(d, a, b);
+> +    tcg_gen_setcondi_i64(TCG_COND_NE, d, d, 0);
+> +    tcg_gen_neg_i64(d, d);
+> +}
+> +
+> +static void gen_cmtst_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_ve=
+c b)
+> +{
+> +    tcg_gen_and_vec(vece, d, a, b);
+> +    tcg_gen_dupi_vec(vece, a, 0);
+> +    tcg_gen_cmp_vec(TCG_COND_NE, vece, d, d, a);
+> +}
+> +
+>  static void handle_3same_64(DisasContext *s, int opcode, bool u,
+>                              TCGv_i64 tcg_rd, TCGv_i64 tcg_rn, TCGv_i64 t=
+cg_rm)
+>  {
+> @@ -7252,10 +7274,7 @@ static void handle_3same_64(DisasContext *s, int o=
+pcode, bool u,
+>              cond =3D TCG_COND_EQ;
+>              goto do_cmop;
+>          }
+> -        /* CMTST : test is "if (X & Y !=3D 0)". */
+> -        tcg_gen_and_i64(tcg_rd, tcg_rn, tcg_rm);
+> -        tcg_gen_setcondi_i64(TCG_COND_NE, tcg_rd, tcg_rd, 0);
+> -        tcg_gen_neg_i64(tcg_rd, tcg_rd);
+> +        gen_cmtst_i64(tcg_rd, tcg_rn, tcg_rm);
+>          break;
+>      case 0x8: /* SSHL, USHL */
+>          if (u) {
+> @@ -9737,6 +9756,22 @@ static void disas_simd_3same_float(DisasContext *s=
+, uint32_t insn)
+>  /* Integer op subgroup of C3.6.16. */
+>  static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+>  {
+> +    static const GVecGen3 cmtst_op[4] =3D {
+> +        { .fni4 =3D gen_helper_neon_tst_u8,
+> +          .fniv =3D gen_cmtst_vec,
+> +          .vece =3D MO_8 },
+> +        { .fni4 =3D gen_helper_neon_tst_u16,
+> +          .fniv =3D gen_cmtst_vec,
+> +          .vece =3D MO_16 },
+> +        { .fni4 =3D gen_cmtst_i32,
+> +          .fniv =3D gen_cmtst_vec,
+> +          .vece =3D MO_32 },
+> +        { .fni8 =3D gen_cmtst_i64,
+> +          .fniv =3D gen_cmtst_vec,
+> +          .prefer_i64 =3D TCG_TARGET_REG_BITS =3D=3D 64,
+> +          .vece =3D MO_64 },
+> +    };
+> +
+>      int is_q =3D extract32(insn, 30, 1);
+>      int u =3D extract32(insn, 29, 1);
+>      int size =3D extract32(insn, 22, 2);
+> @@ -9745,6 +9780,7 @@ static void disas_simd_3same_int(DisasContext *s, u=
 int32_t insn)
->          imm =3D ~imm;
+>      int rn =3D extract32(insn, 5, 5);
+>      int rd =3D extract32(insn, 0, 5);
+>      int pass;
+> +    TCGCond cond;
+>
+>      switch (opcode) {
+>      case 0x13: /* MUL, PMUL */
+> @@ -9792,6 +9828,25 @@ static void disas_simd_3same_int(DisasContext *s, =
+uint32_t insn)
+>              gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_add, size);
+>          }
+>          return;
+> +    case 0x11:
+> +        if (!u) { /* CMTST */
+> +            gen_gvec_op3(s, is_q, rd, rn, rm, &cmtst_op[size]);
+> +            return;
+> +        }
+> +        /* else CMEQ */
+> +        cond =3D TCG_COND_EQ;
+> +        goto do_gvec_cmp;
+> +    case 0x06: /* CMGT, CMHI */
+> +        cond =3D u ? TCG_COND_GTU : TCG_COND_GT;
+> +        goto do_gvec_cmp;
+> +    case 0x07: /* CMGE, CMHS */
+> +        cond =3D u ? TCG_COND_GEU : TCG_COND_GE;
+> +    do_gvec_cmp:
+> +        tcg_gen_gvec_cmp(cond, size, vec_full_reg_offset(s, rd),
+> +                         vec_full_reg_offset(s, rn),
+> +                         vec_full_reg_offset(s, rm),
+> +                         is_q ? 16 : 8, vec_full_reg_size(s));
+> +        return;
 >      }
 >
-> -    tcg_imm =3D tcg_const_i64(imm);
-> -    tcg_rd =3D new_tmp_a64(s);
-> +    if (!((cmode & 0x9) =3D=3D 0x1 || (cmode & 0xd) =3D=3D 0x9)) {
-> +        /* MOVI or MVNI, with MVNI negation handled above.  */
-> +        tcg_gen_gvec_dup64i(vec_full_reg_offset(s, rd), is_q ? 16 : 8,
-> +                            vec_full_reg_size(s), imm);
-> +    } else {
-> +        TCGv_i64 tcg_imm =3D tcg_const_i64(imm);
-> +        TCGv_i64 tcg_rd =3D new_tmp_a64(s);
->
-> -    for (i =3D 0; i < 2; i++) {
-> -        int foffs =3D i ? fp_reg_hi_offset(s, rd) : fp_reg_offset(s, rd,=
- MO_64);
-> +        for (i =3D 0; i < 2; i++) {
-> +            int foffs =3D vec_reg_offset(s, rd, i, MO_64);
->
-> -        if (i =3D=3D 1 && !is_q) {
-> -            /* non-quad ops clear high half of vector */
-> -            tcg_gen_movi_i64(tcg_rd, 0);
-> -        } else if ((cmode & 0x9) =3D=3D 0x1 || (cmode & 0xd) =3D=3D 0x9)=
- {
-> -            tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
-> -            if (is_neg) {
-> -                /* AND (BIC) */
-> -                tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
-> +            if (i =3D=3D 1 && !is_q) {
-> +                /* non-quad ops clear high half of vector */
-> +                tcg_gen_movi_i64(tcg_rd, 0);
->              } else {
-> -                /* ORR */
-> -                tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
-> +                tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
-> +                if (is_neg) {
-> +                    /* AND (BIC) */
-> +                    tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
-> +                } else {
-> +                    /* ORR */
-> +                    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
-> +                }
+>      if (size =3D=3D 3) {
+> @@ -9874,26 +9929,6 @@ static void disas_simd_3same_int(DisasContext *s, =
+uint32_t insn)
+>                  genenvfn =3D fns[size][u];
+>                  break;
 >              }
-> -        } else {
-> -            /* MOVI */
-> -            tcg_gen_mov_i64(tcg_rd, tcg_imm);
-> +            tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
->          }
-> -        tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
-> -    }
->
-> -    tcg_temp_free_i64(tcg_imm);
-> +        tcg_temp_free_i64(tcg_imm);
-> +    }
->  }
->
->  /* AdvSIMD scalar copy
+> -            case 0x6: /* CMGT, CMHI */
+> -            {
+> -                static NeonGenTwoOpFn * const fns[3][2] =3D {
+> -                    { gen_helper_neon_cgt_s8, gen_helper_neon_cgt_u8 },
+> -                    { gen_helper_neon_cgt_s16, gen_helper_neon_cgt_u16 },
+> -                    { gen_helper_neon_cgt_s32, gen_helper_neon_cgt_u32 },
+> -                };
+> -                genfn =3D fns[size][u];
+> -                break;
+> -            }
+> -            case 0x7: /* CMGE, CMHS */
+> -            {
+> -                static NeonGenTwoOpFn * const fns[3][2] =3D {
+> -                    { gen_helper_neon_cge_s8, gen_helper_neon_cge_u8 },
+> -                    { gen_helper_neon_cge_s16, gen_helper_neon_cge_u16 },
+> -                    { gen_helper_neon_cge_s32, gen_helper_neon_cge_u32 },
+> -                };
+> -                genfn =3D fns[size][u];
+> -                break;
+> -            }
+>              case 0x8: /* SSHL, USHL */
+>              {
+>                  static NeonGenTwoOpFn * const fns[3][2] =3D {
+> @@ -9966,16 +10001,6 @@ static void disas_simd_3same_int(DisasContext *s,=
+ uint32_t insn)
+>                  genfn =3D fns[size][u];
+>                  break;
+>              }
+> -            case 0x11: /* CMTST, CMEQ */
+> -            {
+> -                static NeonGenTwoOpFn * const fns[3][2] =3D {
+> -                    { gen_helper_neon_tst_u8, gen_helper_neon_ceq_u8 },
+> -                    { gen_helper_neon_tst_u16, gen_helper_neon_ceq_u16 },
+> -                    { gen_helper_neon_tst_u32, gen_helper_neon_ceq_u32 },
+> -                };
+> -                genfn =3D fns[size][u];
+> -                break;
+> -            }
+>              case 0x13: /* MUL, PMUL */
+>                  if (u) {
+>                      /* PMUL */
 
 
 --
