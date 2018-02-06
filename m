@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej4p2-0008NY-Gz
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:06:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1ej4su-0002JO-Cp
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:10:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej4ox-0005Nm-TM
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:06:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ej4ox-0005NM-Mg
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:06:07 -0500
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-10-armbru@redhat.com>
-	<1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
-	<878tca4ez9.fsf@dusky.pond.sub.org>
-	<13b80daf-db39-8183-2836-a13b2d4ef21b@redhat.com>
-	<87607aftg8.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1ej4sp-0001QZ-Jf
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:10:12 -0500
+References: <20180206105204.14817-1-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <69d92223-dcdd-0f2a-f155-f6cadd0441af@redhat.com>
-Date: Tue, 6 Feb 2018 09:06:03 -0600
+Message-ID: <f72831d5-6990-d37d-6c20-6e43c1a7a171@redhat.com>
+Date: Tue, 6 Feb 2018 09:09:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <87607aftg8.fsf@dusky.pond.sub.org>
+In-Reply-To: <20180206105204.14817-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 09/21] qapi: Don't absolutize include
- file name in error messages
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block: include original filename when
+ reporting invalid URIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 02/06/2018 01:49 AM, Markus Armbruster wrote:
+On 02/06/2018 04:52 AM, Daniel P. Berrang=C3=A9 wrote:
+> Consider passing a JSON based block driver to "qemu-img commit"
+>=20
+> $ qemu-img commit 'json:{"driver":"qcow2","file":{"driver":"gluster",\
+>                    "volume":"gv0","path":"sn1.qcow2",
+>                    "server":[{"type":\
+> 		  "tcp","host":"10.73.199.197","port":"24007"}]},}'
+>=20
+> Currently it will commit the content and then report an incredibly
+> useless error message when trying to re-open the committed image:
+>=20
+>    qemu-img: invalid URI
+>    Usage: file=3Dgluster[+transport]://[host[:port]]volume/path[?socket=
+=3D...][,file.debug=3DN][,file.logfile=3D/path/filename.log]
+>=20
+> With this fix we get:
+>=20
+>    qemu-img: invalid URI json:{"server.0.host": "10.73.199.197",
+>        "driver": "gluster", "path": "luks.qcow2", "server.0.type":
+>        "tcp", "server.0.port": "24007", "volume": "gv0"}
+>=20
+> Of course the root cause problem still exists, but now we know
+> what actually needs fixing.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>   block/gluster.c  | 2 +-
+>   block/sheepdog.c | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
 
->>> Probably not, as our make rule strips off $(SRC_PATH):
->>>
->>> 	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -q $(SRC_PATH)/$*.err -
->>>
->>> I've kept that, because it might also occur in stack backtraces.  I
->>> think.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Ideally, we don't have any stack backtraces ;)  But we have indeed 
-historically checked in .err files with a backtrace that a later patch 
-in the series cleans up, so that part of the munging does indeed play a 
-role in a clean 'make check' for documenting an expected weakness in the 
-generator.
-
->>
->> I still recall having to hand-edit .err files when doing a naive "run
->> the test to get the failure, then 'mv' the bad files into the expected
->> filenames, then rerun the tests";
-> 
-> Whenever the Perl script does something, you can't simply move the
-> .test.err to .err.  Annoying.
-
-We could also munge the original output prior to creating .test.err; but 
-that also has drawbacks if it eats something that would have been useful 
-for debugging the test.
-
-> 
-> A make target check-accept could automate the work.
-
-Yeah, but I'm not sure how often we'd need to invoke it, or even 
-remember that it exists.  But it would at least avoid the issue of 
-having to debug a munged .test.err.
-
-> 
-> However, with this patch, the Perl script should do something less
-> often.  I guess that's your point.
-> 
-> Sorry for being slow on the update :)
-
-No problem; I figure you've got a lot on your mind as you are trying to 
-tie down loose ends before some much deserved time off.
-
-
--- 
+--=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
