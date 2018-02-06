@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42729)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ej1wO-00069t-O2
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:01:41 -0500
+	id 1ej22A-0001DY-JT
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ej1wF-0001mQ-5B
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:01:36 -0500
+	id 1ej227-0005Jc-Fn
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:07:34 -0500
+Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:40536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ej227-0005JB-9W
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:07:31 -0500
+Received: by mail-qt0-x22c.google.com with SMTP id s39so1927284qth.7
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 04:07:31 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180206103941.13985-1-peter.maydell@linaro.org>
+References: <20180126045742.5487-1-richard.henderson@linaro.org>
+	<87eflywebt.fsf@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f299cc78-6d7c-f66b-6662-e1498559ef21@amsat.org>
-Date: Tue, 6 Feb 2018 09:01:19 -0300
+Message-ID: <11092ca9-6389-f417-6afb-c214a9995cde@amsat.org>
+Date: Tue, 6 Feb 2018 09:07:21 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180206103941.13985-1-peter.maydell@linaro.org>
+In-Reply-To: <87eflywebt.fsf@linaro.org>
 Content-Type: multipart/signed; micalg=pgp-sha512;
 	protocol="application/pgp-signature";
-	boundary="mA3i7GS5yF3BbUkLiRFvAc7CoLhUGrong"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target/arm/translate.c: Fix
- missing 'break' for TT insns
+	boundary="d86olAwqnvZmpWKdKhX8l7rOdBLkof3ia"
+Subject: Re: [Qemu-devel] [PATCH v11 00/20] tcg: generic vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +35,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mA3i7GS5yF3BbUkLiRFvAc7CoLhUGrong
+--d86olAwqnvZmpWKdKhX8l7rOdBLkof3ia
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-Cc: patches@linaro.org
-Message-ID: <f299cc78-6d7c-f66b-6662-e1498559ef21@amsat.org>
-Subject: Re: [Qemu-arm] [PATCH] target/arm/translate.c: Fix missing 'break'
- for TT insns
-References: <20180206103941.13985-1-peter.maydell@linaro.org>
-In-Reply-To: <20180206103941.13985-1-peter.maydell@linaro.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Message-ID: <11092ca9-6389-f417-6afb-c214a9995cde@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v11 00/20] tcg: generic vector operations
+References: <20180126045742.5487-1-richard.henderson@linaro.org>
+ <87eflywebt.fsf@linaro.org>
+In-Reply-To: <87eflywebt.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/06/2018 07:39 AM, Peter Maydell wrote:
-> The code where we added the TT instruction was accidentally
-
-"In 5158de241b0 ..."
-
-> missing a 'break', which meant that after generating the code
-> to execute the TT we would fall through to 'goto illegal_op'
-> and generate code to take an UNDEF insn.>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-> ---
-> Doh...
+On 02/06/2018 08:24 AM, Alex Benn=C3=A9e wrote:
 >=20
->  target/arm/translate.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 55826b7e5a..572c4d1cb6 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -9926,6 +9926,7 @@ static void disas_thumb2_insn(DisasContext *s, ui=
-nt32_t insn)
->                          tcg_temp_free_i32(addr);
->                          tcg_temp_free_i32(op);
->                          store_reg(s, rd, ttresp);
-> +                        break;
->                      }
->                      goto illegal_op;
->                  }
->=20
+> I think this series is good to go.
+
+The x86 patch still require a volunteer to review ;)
 
 
---mA3i7GS5yF3BbUkLiRFvAc7CoLhUGrong
+--d86olAwqnvZmpWKdKhX8l7rOdBLkof3ia
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp5mQ8ACgkQ4+MsLN6t
-wN4aiBAAvWauOIxILXDXXVjX7VcRTb4/zxGy0gNbzGKUc1xhollp2g+2P7Jeq0qo
-svpwPajSeeu4Bd98TcC7lFi1GVBe3l0krZTeIFbW58kgi/VahMyBXATAQJwsu9Ac
-96XuMdH8l42XMfQ83KIyGgku+J2lQ270XPTqCRVw49X667kuXIlgolKWauuLJ2cf
-7Aw9/kkZjG5/QHzF2Lst+OzbnLSEd5z1rfKdx6usTTLlHGBSxTCcRXAfbNSrNJ2Y
-XO/AP7PzfhA+Xtl7+JIyNW11yUJwCMcSYbz2qS4X9PfuNE8FPaZnM+chGNoccZFs
-B2Zbg5o3ykq/KTqqdplqM+R9q2AyhTzsU2Xy39QtiDfHopNXI5goE5I4L7rJXPiT
-6gIQXrpZ70csIO9mX4h8y5HM1v/Bq8XO+EDXIkWPgcQvsH74j1FIKs595oyP4b9a
-MC7cSeAuBFzB9OkupmX8zGbEReuIZQwsvrAkXy+8So7aMnXQZKKrMmcAje7VpXbW
-sRiiynPoH44w04tlNtqhCAjKGP/nXaJagTpR7IqnvcRrzsewcWJgZ/MmqopNWrC7
-X5a76Kcq3bLjYD1yD66wXx4J8NOYpnYLyYu9zA7x+ddcHi+akn90ywp6yuzZMnRr
-vpx/voO7pOADgUcNILvRVbybPZeJBR0J6VMkK+MKzfFLBm17eYU=
-=AbIQ
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp5mnkACgkQ4+MsLN6t
+wN4YqBAAy4phTP8aE4MoMDAW0IQ/6CrsUtaTvMZ4X4HTzNwJUgiLrRkpoI4180O+
+ooi6hYfY7kqXJMvXqiO3jqK0qGQkfaS/3m9mzlZdCHb7w6EHl6fKge9GEU8l0jcj
+i/skMWmgWVZpKRFxaAfTP+Gtoe46Z09A3EZ9nihd0NrW8P+n6Ot3Gc9mZpvCGlbN
+Ay1VRQOz24XsSnck4tLX2i8LjV95e78XaLQ6A4aEP6v4sGw3qGbb46920vVzQF5F
+EHQpMr5QEE2cI//RMOjHFB99CR9i295sGZ98gxprOHpWup8dRvqIZ4qw8uOzTf9e
+hsnyAQWgujepkZATKJc9nK7QUc9W60DFP2LkfhPGxTatNOdRTg1yCm+P+CjyCvwe
+GfkmdqhzgWyjm1IfHFJ7qQt+qa7dqkVNQsiN6NqOIoxwpv0l2QlQUIRAmbIezMCk
+wUUD5jHsYYE3cgMgH31U3t+EHwZoOCqUXsLCCkkqdUjDPBDowN6kGM5MDnki2ZLc
+VJFBG1bNWc1k1pFHaS9+q7NVO7/E7v+ksSPNlro6f0ykEXuW2/DmkUnMG7fe8+QI
+6FdV/Yzp5LsFTDRQ7opJihMaNISUztdfSfcfdV71UEF/p6tzMMAQG2lKAN81EclC
+8GaHeTkWVK3h2kNlyacBzhQK4BY+RpTYImy0tQTCytTT5oplN7c=
+=R6d8
 -----END PGP SIGNATURE-----
 
---mA3i7GS5yF3BbUkLiRFvAc7CoLhUGrong--
+--d86olAwqnvZmpWKdKhX8l7rOdBLkof3ia--
