@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej1Mi-0000tF-8i
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:24:45 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ej1OK-0002Pd-90
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:26:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej1Mf-0007HR-3p
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:24:44 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:33621)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej1Me-0007F0-Pq
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:24:41 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id x4-v6so17394072wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 03:24:40 -0800 (PST)
-References: <20180126045742.5487-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180126045742.5487-1-richard.henderson@linaro.org>
-Date: Tue, 06 Feb 2018 11:24:38 +0000
-Message-ID: <87eflywebt.fsf@linaro.org>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ej1OH-0000K1-3E
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:26:24 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2374 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1ej1OG-0000Fb-Fx
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:26:21 -0500
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Tue, 6 Feb 2018 11:26:04 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7473AB80FF5@DGGEMM505-MBS.china.huawei.com>
+References: <1517565055-14588-1-git-send-email-jianjay.zhou@huawei.com>
+	<6228a861-c224-c326-6052-985bca0c8b33@redhat.com>
+In-Reply-To: <6228a861-c224-c326-6052-985bca0c8b33@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 00/20] tcg: generic vector operations
+Subject: Re: [Qemu-devel] [PATCH v3] tap: close fd conditionally when error
+ occured
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "mst@redhat.com" <mst@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Changes since v11:
->   * Use dup_const more.
->   * Cleanup some gvec 2i and 2s routines.
->   * Use more helpers and less gotos in target/arm/translate-a64.c.
-
-I think this series is good to go.
-
-A quick word on performance. I saw a slight dip for the string sort in
-Emilio's dbt-bench/nbench:
-
-  https://i.imgur.com/K5AFr1u.png
-
-And:
-
-                         NBench score; higher is better
-
-  140 +-+-----+------+-------+-------+------+-------+-------+------+-----+-+
-      |                           ****                                     |
-      |                           *  *##               development         |
-  120 +-+.........................*..*.#....................master.......+-+
-      |                           *  * #                                   |
-  100 +-+............####.........*..*.#.................................+-+
-      |              #  #         *  * #                                   |
-      |            ***  #         *  * #                                   |
-   80 +-+..........*.*..#.........*..*.#.........****###.................+-+
-      |            * *  #         *  * #         *  *  #                   |
-   60 +-+..........*.*..#.........*..*.#..***###.*..*..#.........***###..+-+
-      |            * *  # ****### *  * #  * *  # *  *  #         * *  #    |
-      |            * *  # *  *  # *  * #  * *  # *  *  # ****##  * *  #    |
-   40 +-+..........*.*..#.*..*..#.*..*.#..*.*..#.*..*..#.*..*.#..*.*..#..+-+
-      |            * *  # *  *  # *  * #  * *  # *  *  # *  * #  * *  #    |
-   20 +-+..........*.*..#.*..*..#.*..*.#..*.*..#.*..*..#.*..*.#..*.*..#..+-+
-      |    ****##  * *  # *  *  # *  * #  * *  # *  *  # *  * #  * *  #    |
-      |    *  * #  * *  # *  *  # *  * #  * *  # *  *  # *  * #  * *  #    |
-    0 +-+--****##--***###-****###-****##--***###-****###-****##--***###--+-+
-        NUMERIC STRING SOBITFIEFP EMULAASSIGNMENT IDEA   HUFFMAN gmean
-
-We think this is likely the strajust function which hits a loop
-utilising a single vector. We already know a single vector-op is a worse
-case given the latency but this improves if the code is -funrolled or
-ultimately re-built with support for bigger vectors ;-)
-
-I certainly don't think it's a blocker to merging given the other
-benchmarks look pretty good including slight wins on others.
-
->
->
-> Richard Henderson (20):
->   tcg: Allow multiple word entries into the constant pool
->   tcg: Add types and basic operations for host vectors
->   tcg: Standardize integral arguments to expanders
->   tcg: Add generic vector expanders
->   tcg: Add generic vector ops for constant shifts
->   tcg: Add generic vector ops for comparisons
->   tcg: Add generic vector ops for multiplication
->   tcg: Add generic helpers for saturating arithmetic
->   tcg: Add generic vector helpers with a scalar operand
->   tcg/optimize: Handle vector opcodes during optimize
->   target/arm: Align vector registers
->   target/arm: Use vector infrastructure for aa64 add/sub/logic
->   target/arm: Use vector infrastructure for aa64 mov/not/neg
->   target/arm: Use vector infrastructure for aa64 dup/movi
->   target/arm: Use vector infrastructure for aa64 constant shifts
->   target/arm: Use vector infrastructure for aa64 compares
->   target/arm: Use vector infrastructure for aa64 multiplies
->   target/arm: Use vector infrastructure for aa64 orr/bic immediate
->   tcg/i386: Add vector operations
->   tcg/aarch64: Add vector operations
->
->  Makefile.target              |    4 +-
->  accel/tcg/tcg-runtime.h      |  118 +++
->  target/arm/cpu.h             |    2 +-
->  tcg/aarch64/tcg-target.h     |   25 +-
->  tcg/aarch64/tcg-target.opc.h |    3 +
->  tcg/i386/tcg-target.h        |   41 +-
->  tcg/i386/tcg-target.opc.h    |   13 +
->  tcg/tcg-gvec-desc.h          |   49 +
->  tcg/tcg-op-gvec.h            |  306 ++++++
->  tcg/tcg-op.h                 |   52 +-
->  tcg/tcg-opc.h                |   46 +
->  tcg/tcg.h                    |   87 ++
->  accel/tcg/tcg-runtime-gvec.c |  997 +++++++++++++++++++
->  target/arm/translate-a64.c   |  979 ++++++++++++++-----
->  tcg/aarch64/tcg-target.inc.c |  588 ++++++++++-
->  tcg/i386/tcg-target.inc.c    |  987 ++++++++++++++++++-
->  tcg/optimize.c               |  150 +--
->  tcg/tcg-op-gvec.c            | 2215 ++++++++++++++++++++++++++++++++++++=
-++++++
->  tcg/tcg-op-vec.c             |  389 ++++++++
->  tcg/tcg-op.c                 |   42 +-
->  tcg/tcg-pool.inc.c           |  115 ++-
->  tcg/tcg.c                    |  125 ++-
->  accel/tcg/Makefile.objs      |    2 +-
->  configure                    |   48 +
->  tcg/README                   |   86 ++
->  25 files changed, 6973 insertions(+), 496 deletions(-)
->  create mode 100644 tcg/aarch64/tcg-target.opc.h
->  create mode 100644 tcg/i386/tcg-target.opc.h
->  create mode 100644 tcg/tcg-gvec-desc.h
->  create mode 100644 tcg/tcg-op-gvec.h
->  create mode 100644 accel/tcg/tcg-runtime-gvec.c
->  create mode 100644 tcg/tcg-op-gvec.c
->  create mode 100644 tcg/tcg-op-vec.c
-
-
---
-Alex Benn=C3=A9e
+SGkgSmFzb24sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24g
+V2FuZyBbbWFpbHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIEZlYnJ1
+YXJ5IDA2LCAyMDE4IDU6MjkgUE0NCj4gVG86IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VA
+aHVhd2VpLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogbXN0QHJlZGhhdC5jb207
+IGltYW1tZWRvQHJlZGhhdC5jb207IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdA
+aHVhd2VpLmNvbT47IHdhbmd4aW4gKFUpIDx3YW5neGlueGluLndhbmdAaHVhd2VpLmNvbT47IEdv
+bmdsZWkNCj4gKEFyZWkpIDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6
+IFtQQVRDSCB2M10gdGFwOiBjbG9zZSBmZCBjb25kaXRpb25hbGx5IHdoZW4gZXJyb3Igb2NjdXJl
+ZA0KPiANCj4gDQo+IA0KPiBPbiAyMDE45bm0MDLmnIgwMuaXpSAxNzo1MCwgSmF5IFpob3Ugd3Jv
+dGU6DQo+ID4gSWYgbmV0ZGV2X2FkZCB0YXAsaWQ9bmV0MCwuLi4sdmhvc3Q9b24gZmFpbGVkIGlu
+IG5ldF9pbml0X3RhcF9vbmUoKSwNCj4gPiB0aGUgZm9sbG93ZWQgdXAgZGV2aWNlX2FkZCB2aXJ0
+aW8tbmV0LXBjaSxuZXRkZXY9bmV0MCB3aWxsIGZhaWwgdG9vLA0KPiA+IHByaW50czoNCj4gPg0K
+PiA+ICAgICBUVU5TRVRPRkZMT0FEIGlvY3RsKCkgZmFpbGVkOiBCYWQgZmlsZSBkZXNjcmlwdG9y
+IFRVTlNFVE9GRkxPQUQNCj4gPiAgICAgaW9jdGwoKSBmYWlsZWQ6IEJhZCBmaWxlIGRlc2NyaXB0
+b3INCj4gPg0KPiA+IFRoZSByZWFzb24gaXMgdGhhdCB0aGUgZmQgb2YgdGFwIGlzIGNsb3NlZCB3
+aGVuIGVycm9yIG9jY3VyZWQgYWZ0ZXINCj4gPiBjYWxsaW5nIG5ldF9pbml0X3RhcF9vbmUoKS4N
+Cj4gPg0KPiA+IFRoZSBmZCBzaG91bGQgYmUgY2xvc2VkIHdoZW4gY2FsbGluZyBuZXRfaW5pdF90
+YXBfb25lIGZhaWxlZDoNCj4gPiAgICAgLSBpZiB0YXBfc2V0X3NuZGJ1ZigpIGZhaWxlZA0KPiA+
+ICAgICAtIGlmIHRhcF9zZXRfc25kYnVmKCkgc3VjY2VlZGVkIGJ1dCB2aG9zdCBmYWlsZWQgdG8g
+b3BlbiBvcg0KPiA+ICAgICAgIGluaXRpYWxpemUgd2l0aCB2aG9zdGZvcmNlIGZsYWcgb24gVGhl
+IGZkIHNob3VsZCBub3QgYmUgY2xvc2VkDQo+ID4ganVzdCBiZWNhdXNlIHZob3N0IGZhaWxlZCB0
+byBvcGVuIG9yIGluaXRpYWxpemUgYnV0IHdpdGhvdXQgdmhvc3Rmb3JjZQ0KPiA+IGZsYWcuIFNv
+IHRoZSBmb2xsb3dlZCB1cCBkZXZpY2VfYWRkIGNhbiBmYWxsIGJhY2sgdG8gdXNlcnNwYWNlIHZp
+cnRpbw0KPiA+IHN1Y2Nlc3NmdWxseS4NCj4gPg0KPiA+IFN1Z2dlc3RlZC1ieTogTWljaGFlbCBT
+LiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4NCj4gPiBTdWdnZXN0ZWQtYnk6IElnb3IgTWFtbWVk
+b3YgPGltYW1tZWRvQHJlZGhhdC5jb20+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBKYXNvbiBXYW5nIDxq
+YXNvd2FuZ0ByZWRoYXQuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEpheSBaaG91IDxqaWFuamF5
+Lnpob3VAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgIG5ldC90YXAuYyB8IDQ0ICsrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tDQo+ID4gICAxIGZpbGUgY2hhbmdl
+ZCwgMzIgaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0
+IGEvbmV0L3RhcC5jIGIvbmV0L3RhcC5jDQo+ID4gaW5kZXggOTc5ZTYyMi4uYzQ2YWIxNCAxMDA2
+NDQNCj4gPiAtLS0gYS9uZXQvdGFwLmMNCj4gPiArKysgYi9uZXQvdGFwLmMNCj4gPiBAQCAtNjUx
+LDcgKzY1MSw3IEBAIHN0YXRpYyB2b2lkIG5ldF9pbml0X3RhcF9vbmUoY29uc3QgTmV0ZGV2VGFw
+T3B0aW9ucw0KPiAqdGFwLCBOZXRDbGllbnRTdGF0ZSAqcGVlciwNCj4gPiAgICAgICB0YXBfc2V0
+X3NuZGJ1ZihzLT5mZCwgdGFwLCAmZXJyKTsNCj4gPiAgICAgICBpZiAoZXJyKSB7DQo+ID4gICAg
+ICAgICAgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIpOw0KPiA+IC0gICAgICAgIHJldHVybjsN
+Cj4gPiArICAgICAgICBnb3RvIGVycm9yOw0KPiA+ICAgICAgIH0NCj4gPg0KPiA+ICAgICAgIGlm
+ICh0YXAtPmhhc19mZCB8fCB0YXAtPmhhc19mZHMpIHsgQEAgLTY4NiwxNSArNjg2LDI2IEBAIHN0
+YXRpYw0KPiA+IHZvaWQgbmV0X2luaXRfdGFwX29uZShjb25zdCBOZXRkZXZUYXBPcHRpb25zICp0
+YXAsIE5ldENsaWVudFN0YXRlICpwZWVyLA0KPiA+ICAgICAgICAgICBpZiAodmhvc3RmZG5hbWUp
+IHsNCj4gPiAgICAgICAgICAgICAgIHZob3N0ZmQgPSBtb25pdG9yX2ZkX3BhcmFtKGN1cl9tb24s
+IHZob3N0ZmRuYW1lLCAmZXJyKTsNCj4gPiAgICAgICAgICAgICAgIGlmICh2aG9zdGZkID09IC0x
+KSB7DQo+ID4gLSAgICAgICAgICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsNCj4g
+PiAtICAgICAgICAgICAgICAgIHJldHVybjsNCj4gPiArICAgICAgICAgICAgICAgIGlmICh0YXAt
+Pmhhc192aG9zdGZvcmNlICYmIHRhcC0+dmhvc3Rmb3JjZSkgew0KPiA+ICsgICAgICAgICAgICAg
+ICAgICAgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIpOw0KPiA+ICsgICAgICAgICAgICAgICAg
+ICAgIGdvdG8gZXJyb3I7DQo+ID4gKyAgICAgICAgICAgICAgICB9IGVsc2Ugew0KPiA+ICsgICAg
+ICAgICAgICAgICAgICAgIHdhcm5fcmVwb3J0X2VycihlcnIpOw0KPiA+ICsgICAgICAgICAgICAg
+ICAgICAgIHJldHVybjsNCj4gPiArICAgICAgICAgICAgICAgIH0NCj4gPiAgICAgICAgICAgICAg
+IH0NCj4gPiAgICAgICAgICAgfSBlbHNlIHsNCj4gPiAgICAgICAgICAgICAgIHZob3N0ZmQgPSBv
+cGVuKCIvZGV2L3Zob3N0LW5ldCIsIE9fUkRXUik7DQo+ID4gICAgICAgICAgICAgICBpZiAodmhv
+c3RmZCA8IDApIHsNCj4gPiAtICAgICAgICAgICAgICAgIGVycm9yX3NldGdfZXJybm8oZXJycCwg
+ZXJybm8sDQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJ0YXA6IG9wZW4g
+dmhvc3QgY2hhciBkZXZpY2UgZmFpbGVkIik7DQo+ID4gLSAgICAgICAgICAgICAgICByZXR1cm47
+DQo+ID4gKyAgICAgICAgICAgICAgICBpZiAodGFwLT5oYXNfdmhvc3Rmb3JjZSAmJiB0YXAtPnZo
+b3N0Zm9yY2UpIHsNCj4gPiArICAgICAgICAgICAgICAgICAgICBlcnJvcl9zZXRnX2Vycm5vKGVy
+cnAsIGVycm5vLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgInRh
+cDogb3BlbiB2aG9zdCBjaGFyIGRldmljZSBmYWlsZWQiKTsNCj4gPiArICAgICAgICAgICAgICAg
+ICAgICBnb3RvIGVycm9yOw0KPiA+ICsgICAgICAgICAgICAgICAgfSBlbHNlIHsNCj4gPiArICAg
+ICAgICAgICAgICAgICAgICB3YXJuX3JlcG9ydCgidGFwOiBvcGVuIHZob3N0IGNoYXIgZGV2aWNl
+IGZhaWxlZDogJXMiLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmVy
+cm9yKGVycm5vKSk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgcmV0dXJuOw0KPiA+ICsgICAg
+ICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAgICAgICAgZmNu
+dGwodmhvc3RmZCwgRl9TRVRGTCwgT19OT05CTE9DSyk7DQo+ID4gICAgICAgICAgIH0NCj4gPiBA
+QCAtNzAyLDEyICs3MTMsMjMgQEAgc3RhdGljIHZvaWQgbmV0X2luaXRfdGFwX29uZShjb25zdA0K
+PiA+IE5ldGRldlRhcE9wdGlvbnMgKnRhcCwgTmV0Q2xpZW50U3RhdGUgKnBlZXIsDQo+ID4NCj4g
+PiAgICAgICAgICAgcy0+dmhvc3RfbmV0ID0gdmhvc3RfbmV0X2luaXQoJm9wdGlvbnMpOw0KPiA+
+ICAgICAgICAgICBpZiAoIXMtPnZob3N0X25ldCkgew0KPiA+IC0gICAgICAgICAgICBlcnJvcl9z
+ZXRnKGVycnAsDQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgInZob3N0LW5ldCByZXF1ZXN0
+ZWQgYnV0IGNvdWxkIG5vdCBiZSBpbml0aWFsaXplZCIpOw0KPiA+IC0gICAgICAgICAgICByZXR1
+cm47DQo+ID4gKyAgICAgICAgICAgIGlmICh0YXAtPmhhc192aG9zdGZvcmNlICYmIHRhcC0+dmhv
+c3Rmb3JjZSkgew0KPiA+ICsgICAgICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLA0KPiA+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAidmhvc3QtbmV0IHJlcXVlc3RlZCBidXQgY291bGQg
+bm90IGJlDQo+IGluaXRpYWxpemVkIik7DQo+ID4gKyAgICAgICAgICAgICAgICBnb3RvIGVycm9y
+Ow0KPiA+ICsgICAgICAgICAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgICAgICAgICAgd2Fybl9y
+ZXBvcnQoInZob3N0LW5ldCByZXF1ZXN0ZWQgYnV0IGNvdWxkIG5vdCBiZQ0KPiBpbml0aWFsaXpl
+ZCIpOw0KPiA+ICsgICAgICAgICAgICAgICAgcmV0dXJuOw0KPiA+ICsgICAgICAgICAgICB9DQo+
+IA0KPiBDYW4gd2UgcmVkdWNlIHRoZSBkdXBsaWNhdGlvbiBieSBkb2luZyBzdWNoIGluIGEgY29t
+bW9uIGVycm9yIGxhYmVsPw0KPiANCg0KWWVhaCwgSSBwbGFuIHRvIGRlZmluZSBpdCBsaWtlIHRo
+aXMgaW4gdmhvc3RfbmV0LmgNCg0KI2RlZmluZSBWSE9TVF9ORVRfSU5JVF9GQUlMRUQgXA0KICAg
+ICJ2aG9zdC1uZXQgcmVxdWVzdGVkIGJ1dCBjb3VsZCBub3QgYmUgaW5pdGlhbGl6ZWQiDQoNCj4g
+PiAgICAgICAgICAgfQ0KPiA+ICAgICAgIH0gZWxzZSBpZiAodmhvc3RmZG5hbWUpIHsNCj4gPiAt
+ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ2aG9zdGZkKHMpPSBpcyBub3QgdmFsaWQgd2l0aG91
+dCB2aG9zdCIpOw0KPiA+ICsgICAgICAgIHdhcm5fcmVwb3J0KCJ2aG9zdGZkKHMpPSBpcyBub3Qg
+dmFsaWQgd2l0aG91dCB2aG9zdCIpOw0KPiA+ICsgICAgICAgIHJldHVybjsNCj4gPiArICAgIH0N
+Cj4gPiArDQo+ID4gK2Vycm9yOg0KPiA+ICsgICAgaWYgKCF0YXAtPmhhc19mZCAmJiAhdGFwLT5o
+YXNfZmRzKSB7DQo+ID4gKyAgICAgICAgY2xvc2UoZmQpOw0KPiANCj4gSSBiZWxpZXZlIHlvdSBj
+YW4gZG8gdGhpcyBpbiB0aGUgY2FsbGVyIGJ5IHNldHRpbmcgZXJycCBhcHByb3ByaWF0ZWx5IChl
+LmcNCj4gZG9uJ3Qgc2V0IGl0IHdoZW4gd2Ugb25seSBuZWVkIGEgd2FybikuDQoNCllvdSdyZSBy
+aWdodCwgdGhhbmtzISA6KQ0KDQpSZWdhcmRzLA0KSmF5DQoNCj4gDQo+IFRoYW5rcw0KPiANCj4g
+PiAgICAgICB9DQo+ID4gICB9DQo+ID4NCj4gPiBAQCAtODc3LDcgKzg5OSw2IEBAIGZyZWVfZmFp
+bDoNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2bmV0X2hkciwgZmQsICZlcnIpOw0K
+PiA+ICAgICAgICAgICBpZiAoZXJyKSB7DQo+ID4gICAgICAgICAgICAgICBlcnJvcl9wcm9wYWdh
+dGUoZXJycCwgZXJyKTsNCj4gPiAtICAgICAgICAgICAgY2xvc2UoZmQpOw0KPiA+ICAgICAgICAg
+ICAgICAgcmV0dXJuIC0xOw0KPiA+ICAgICAgICAgICB9DQo+ID4gICAgICAgfSBlbHNlIHsNCj4g
+PiBAQCAtOTE2LDcgKzkzNyw2IEBAIGZyZWVfZmFpbDoNCj4gPiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgdmhvc3RmZG5hbWUsIHZuZXRfaGRyLCBmZCwgJmVycik7DQo+ID4gICAgICAg
+ICAgICAgICBpZiAoZXJyKSB7DQo+ID4gICAgICAgICAgICAgICAgICAgZXJyb3JfcHJvcGFnYXRl
+KGVycnAsIGVycik7DQo+ID4gLSAgICAgICAgICAgICAgICBjbG9zZShmZCk7DQo+ID4gICAgICAg
+ICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiA+ICAgICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAg
+ICB9DQoNCg==
