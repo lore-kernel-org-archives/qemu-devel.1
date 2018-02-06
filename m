@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej0ZW-00076G-GL
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:33:55 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ej0fE-0001oL-DJ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej0ZT-0006b7-Ck
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:33:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53646)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej0ZT-0006Y4-5A
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:33:51 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-15-armbru@redhat.com>
-	<CAMxuvayFe8fU5PMyX00k2tM=2-=ZQqsxd1PwMUxAFAx26chFRA@mail.gmail.com>
-	<87mv0nv73y.fsf@dusky.pond.sub.org>
-Date: Tue, 06 Feb 2018 11:33:45 +0100
-In-Reply-To: <87mv0nv73y.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Mon, 05 Feb 2018 15:33:37 +0100")
-Message-ID: <87h8qucsqe.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 14/21] qapi: Generate in source order
+	(envelope-from <pm215@archaic.org.uk>) id 1ej0fD-0001CL-KF
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:39:48 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  6 Feb 2018 10:39:41 +0000
+Message-Id: <20180206103941.13985-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm/translate.c: Fix missing 'break'
+ for TT insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +18,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Markus Armbruster <armbru@redhat.com> writes:
+The code where we added the TT instruction was accidentally
+missing a 'break', which meant that after generating the code
+to execute the TT we would fall through to 'goto illegal_op'
+and generate code to take an UNDEF insn.
 
-> Marc-Andre Lureau <mlureau@redhat.com> writes:
->
->> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
->>> The generators' conversion to visitors (merge commit 9e72681d16)
->>> changed the processing order of entities from source order to
->>> alphabetical order.  The next commit needs source order, so change it
->>> back.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  scripts/qapi/common.py                   |   4 +-
->>>  tests/qapi-schema/comments.out           |   2 +-
->>>  tests/qapi-schema/doc-bad-section.out    |   4 +-
->>>  tests/qapi-schema/doc-good.out           |  32 ++--
->>>  tests/qapi-schema/empty.out              |   2 +-
->>>  tests/qapi-schema/event-case.out         |   2 +-
->>>  tests/qapi-schema/ident-with-escape.out  |   6 +-
->>>  tests/qapi-schema/include-relpath.out    |   2 +-
->>>  tests/qapi-schema/include-repetition.out |   2 +-
->>>  tests/qapi-schema/include-simple.out     |   2 +-
->>>  tests/qapi-schema/indented-expr.out      |   2 +-
->>>  tests/qapi-schema/qapi-schema-test.out   | 320 +++++++++++++++----------------
->>>  12 files changed, 191 insertions(+), 189 deletions(-)
->>>
->>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->>> index d5b93e7381..3b97bf8702 100644
->>> --- a/scripts/qapi/common.py
->>> +++ b/scripts/qapi/common.py
->>> @@ -1471,6 +1471,7 @@ class QAPISchema(object):
->>>          parser = QAPISchemaParser(open(fname, 'r'))
->>>          exprs = check_exprs(parser.exprs)
->>>          self.docs = parser.docs
->>> +        self._entity_list = []
->>>          self._entity_dict = {}
->>>          self._predefining = True
->>>          self._def_predefineds()
->>> @@ -1482,6 +1483,7 @@ class QAPISchema(object):
->>>          # Only the predefined types are allowed to not have info
->>>          assert ent.info or self._predefining
->>>          assert ent.name not in self._entity_dict
->>> +        self._entity_list.append(ent)
->>>          self._entity_dict[ent.name] = ent
->>
->> Why not use the OrderedDict instead?
->
-> Fair question!  However, the next patch will create anonymous entities,
-> which get added only to ._entity_list, not _entity_dict.
->
-> [...]
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Doh...
 
-Flaw in QAPISchema.check():
+ target/arm/translate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-        for ent in self._entity_dict.values():
-            ent.check(self)
-
-Need to iterate over entity_list, or else we fail to check anonymous
-entities.  Currently harmless, as QAPISchemaInclude.check() does
-nothing.  I'll fix it.
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 55826b7e5a..572c4d1cb6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -9926,6 +9926,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                         tcg_temp_free_i32(addr);
+                         tcg_temp_free_i32(op);
+                         store_reg(s, rd, ttresp);
++                        break;
+                     }
+                     goto illegal_op;
+                 }
+-- 
+2.16.1
