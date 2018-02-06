@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ix-0005YS-FM
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:21 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ir-0005Qq-CZ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8iq-00086y-Em
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44114)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8im-00082k-3O
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:05 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43400)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1ej8iq-00086G-4G
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:04 -0500
+	id 1ej8il-00081p-Qs
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:00 -0500
 Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w16JFV1D117402
-	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 14:16:03 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fygkucwk2-1
+	w16JEKFP112135
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 14:15:59 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fygkucwfb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 14:16:02 -0500
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 14:15:58 -0500
 Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 6 Feb 2018 14:16:01 -0500
+	Tue, 6 Feb 2018 14:15:57 -0500
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue,  6 Feb 2018 13:14:58 -0600
+Date: Tue,  6 Feb 2018 13:14:23 -0600
 In-Reply-To: <20180206191515.25830-1-mdroth@linux.vnet.ibm.com>
 References: <20180206191515.25830-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20180206191515.25830-38-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 37/54] spapr: Add pseries-2.12 machine type
+Message-Id: <20180206191515.25830-3-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 02/54] block/iscsi: dont leave allocmap in an
+ invalid state on UNMAP failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,88 +39,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, christian.ehrhardt@canonical.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, christian.ehrhardt@canonical.com, Peter Lieven <pl@kamp.de>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: David Gibson <david@gibson.dropbear.id.au>
+From: Peter Lieven <pl@kamp.de>
 
-While we're at it fix a couple of small errors in the 2.11 and 2.10 models
-(they didn't have any real effect, but don't quite match the template).
+we forgot to set the allocmap to invalid if an UNMAP call fails.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit 2b6154120cbd7f5514cefd3c6084d39922d26d88)
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+Message-Id: <1512733868-9009-2-git-send-email-pl@kamp.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit aef172ffdc2f9c41d9cc043a55f1259e7c07e587)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c      | 26 +++++++++++++++++++++++---
- include/hw/compat.h |  2 ++
- 2 files changed, 25 insertions(+), 3 deletions(-)
+ block/iscsi.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 66d0ed5256..bedc39a2e5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3716,27 +3716,47 @@ static const TypeInfo spapr_machine_info = {
-     type_init(spapr_machine_register_##suffix)
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 4683f3b244..c532ec79d1 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -2,7 +2,7 @@
+  * QEMU Block driver for iSCSI images
+  *
+  * Copyright (c) 2010-2011 Ronnie Sahlberg <ronniesahlberg@gmail.com>
+- * Copyright (c) 2012-2016 Peter Lieven <pl@kamp.de>
++ * Copyright (c) 2012-2017 Peter Lieven <pl@kamp.de>
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -1128,6 +1128,9 @@ retry:
+         goto retry;
+     }
  
- /*
-+ * pseries-2.12
-+ */
-+static void spapr_machine_2_12_instance_options(MachineState *machine)
-+{
-+}
++    iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
++                               bytes >> BDRV_SECTOR_BITS);
 +
-+static void spapr_machine_2_12_class_options(MachineClass *mc)
-+{
-+    /* Defaults for the latest behaviour inherited from the base class */
-+}
-+
-+DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
-+
-+/*
-  * pseries-2.11
-  */
-+#define SPAPR_COMPAT_2_11                                              \
-+    HW_COMPAT_2_11
-+
- static void spapr_machine_2_11_instance_options(MachineState *machine)
- {
-+    spapr_machine_2_12_instance_options(machine);
- }
+     if (iTask.status == SCSI_STATUS_CHECK_CONDITION) {
+         /* the target might fail with a check condition if it
+            is not happy with the alignment of the UNMAP request
+@@ -1140,9 +1143,6 @@ retry:
+         goto out_unlock;
+     }
  
- static void spapr_machine_2_11_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class */
-+    spapr_machine_2_12_class_options(mc);
-+    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
- }
- 
--DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
-+DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
- 
- /*
-  * pseries-2.10
-  */
- #define SPAPR_COMPAT_2_10                                              \
--    HW_COMPAT_2_10                                                     \
-+    HW_COMPAT_2_10
- 
- static void spapr_machine_2_10_instance_options(MachineState *machine)
- {
-+    spapr_machine_2_11_instance_options(machine);
- }
- 
- static void spapr_machine_2_10_class_options(MachineClass *mc)
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index cf389b4e85..0d2a6ac468 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -1,6 +1,8 @@
- #ifndef HW_COMPAT_H
- #define HW_COMPAT_H
- 
-+#define HW_COMPAT_2_11
-+
- #define HW_COMPAT_2_10 \
-     {\
-         .driver   = "virtio-mouse-device",\
+-    iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                               bytes >> BDRV_SECTOR_BITS);
+-
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
+     return r;
 -- 
 2.11.0
