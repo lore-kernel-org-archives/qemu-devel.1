@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej1G3-00030A-Vc
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:17:52 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1Hq-0004vw-OC
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej1G0-0000Ft-PD
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:17:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52994)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej1G0-0000FZ-JQ
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:17:48 -0500
-Date: Tue, 6 Feb 2018 11:17:44 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180206111743.GC2518@work-vm>
-References: <20171101142526.1006-1-ross.lagerwall@citrix.com>
-	<20171101142526.1006-2-ross.lagerwall@citrix.com>
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1Hl-00026q-Id
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:42 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:49312)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1Hl-00023h-5V
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:37 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 06 Feb 2018 14:19:37 +0300
+Message-ID: <20180206111936.12592.68781.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171101142526.1006-2-ross.lagerwall@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] migration: Don't leak IO channels
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] m68k: implement movep instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +24,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: huth@tuxfamily.org, dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
 
-* Ross Lagerwall (ross.lagerwall@citrix.com) wrote:
-> Since qemu_fopen_channel_{in,out}put take references on the underlying
-> IO channels, make sure to release our references to them.
-> 
-> Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+This patch implements movep instruction. It moves data between a data register
+and alternate bytes within the address space starting at the location
+specified and incrementing by two.
 
-Queued for migration.
+It was designed for the original 68000 and used in firmwares for
+interfacing the 8-bit peripherals through the 16-bit data bus.
+Without this patch opcode for this instruction is recognized as some bitop.
 
-Dave
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 
-> ---
-> New in v2.
-> 
->  migration/savevm.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 4a88228..87557dd 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2259,6 +2259,7 @@ void qmp_xen_save_devices_state(const char *filename, Error **errp)
->      }
->      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-xen-save-state");
->      f = qemu_fopen_channel_output(QIO_CHANNEL(ioc));
-> +    object_unref(OBJECT(ioc));
->      ret = qemu_save_device_state(f);
->      qemu_fclose(f);
->      if (ret < 0) {
-> @@ -2292,6 +2293,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
->      }
->      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-xen-load-state");
->      f = qemu_fopen_channel_input(QIO_CHANNEL(ioc));
-> +    object_unref(OBJECT(ioc));
->  
->      ret = qemu_loadvm_state(f);
->      qemu_fclose(f);
-> -- 
-> 2.9.5
-> 
-> 
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+v2: - disabled movep for Coldfire
+    - fixed gen_store/load usage
+---
+ target/m68k/cpu.c       |    3 +++
+ target/m68k/cpu.h       |    1 +
+ target/m68k/translate.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 57 insertions(+)
+
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 98919b3..2b38b9b 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -113,6 +113,7 @@ static void m68000_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_M68000);
+     m68k_set_feature(env, M68K_FEATURE_USP);
+     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ 
+ static void m68020_cpu_initfn(Object *obj)
+@@ -135,6 +136,7 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
+     m68k_set_feature(env, M68K_FEATURE_RTD);
+     m68k_set_feature(env, M68K_FEATURE_CHK2);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+ 
+@@ -145,6 +147,7 @@ static void m68040_cpu_initfn(Object *obj)
+ 
+     m68020_cpu_initfn(obj);
+     m68k_set_feature(env, M68K_FEATURE_M68040);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ 
+ static void m68060_cpu_initfn(Object *obj)
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 627fb78..1d79885 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -492,6 +492,7 @@ enum m68k_features {
+     M68K_FEATURE_RTD,
+     M68K_FEATURE_CHK2,
+     M68K_FEATURE_M68040, /* instructions specific to MC68040 */
++    M68K_FEATURE_MOVEP,
+ };
+ 
+ static inline int m68k_feature(CPUM68KState *env, int feature)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 34db97b..ddb5b34 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2078,6 +2078,55 @@ DISAS_INSN(movem)
+     tcg_temp_free(addr);
+ }
+ 
++DISAS_INSN(movep)
++{
++    uint8_t i;
++    uint8_t op;
++    uint16_t displ;
++    TCGv reg;
++    TCGv addr;
++    TCGv abuf;
++    TCGv dbuf;
++
++    op = (insn >> 6) & 7;
++    displ = read_im16(env, s);
++
++    addr = AREG(insn, 0);
++    reg = DREG(insn, 9);
++
++    abuf = tcg_temp_new();
++    tcg_gen_addi_i32(abuf, addr, displ);
++    dbuf = tcg_temp_new();
++
++    if (op & 1) {
++        i = 4;
++    } else {
++        i = 2;
++    }
++
++    if (op & 2) {
++        for ( ; i > 0 ; i--) {
++            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
++            gen_store(s, OS_BYTE, abuf, dbuf, IS_USER(s));
++            if (i > 1) {
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    } else {
++        tcg_gen_movi_i32(reg, 0);
++        for ( ; i > 0 ; i--) {
++            dbuf = gen_load(s, OS_BYTE, abuf, 1, IS_USER(s));
++            tcg_gen_or_i32(reg, reg, dbuf);
++            if (i > 1) {
++                tcg_gen_shli_i32(reg, reg, 8);
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    }
++    tcg_temp_free(abuf);
++    tcg_temp_free(dbuf);
++}
++
+ DISAS_INSN(bitop_im)
+ {
+     int opsize;
+@@ -5675,9 +5724,13 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(chk2,      00c0, f9c0, CHK2);
+     INSN(bitrev,    00c0, fff8, CF_ISA_APLUSC);
+     BASE(bitop_reg, 0100, f1c0);
++    INSN(movep,     0108, f1f8, MOVEP);
+     BASE(bitop_reg, 0140, f1c0);
++    INSN(movep,     0148, f1f8, MOVEP);
+     BASE(bitop_reg, 0180, f1c0);
++    INSN(movep,     0188, f1f8, MOVEP);
+     BASE(bitop_reg, 01c0, f1c0);
++    INSN(movep,     01c8, f1f8, MOVEP);
+     INSN(arith_im,  0280, fff8, CF_ISA_A);
+     INSN(arith_im,  0200, ff00, M68000);
+     INSN(undef,     02c0, ffc0, M68000);
