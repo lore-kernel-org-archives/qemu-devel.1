@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej1Ps-0003zL-HF
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:28:01 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1f9-0006hp-Po
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:43:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej1Pp-0001Kq-BR
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:28:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej1Pp-0001KS-1x
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:27:57 -0500
-Date: Tue, 6 Feb 2018 11:27:52 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180206112752.GD2462@work-vm>
-References: <151791621042.19120.3103118434734245776.stgit@bahia>
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1f6-0004L9-Fl
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:43:47 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:52038)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1f6-0004Iw-3Y
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:43:44 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 06 Feb 2018 14:43:43 +0300
+Message-ID: <20180206114343.13816.78250.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <151791621042.19120.3103118434734245776.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v3] migration: incoming postcopy advise
- sanity checks
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v3] m68k: implement movep instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +24,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: huth@tuxfamily.org, dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
 
-* Greg Kurz (groug@kaod.org) wrote:
-> If postcopy-ram was set on the source but not on the destination,
-> migration doesn't occur, the destination prints an error and boots
-> the guest:
-> 
-> qemu-system-ppc64: Expected vmdescription section, but got 0
-> 
-> We end up with two running instances.
-> 
-> This behaviour was introduced in 2.11 by commit 58110f0acb1a "migration:
-> split common postcopy out of ram postcopy" to prepare ground for the
-> upcoming dirty bitmap postcopy support. It adds a new case where the
-> source may send an empty postcopy advise because dirty bitmap doesn't
-> need to check page sizes like RAM postcopy does.
-> 
-> If the source has enabled postcopy-ram, then it sends an advise with
-> the page size values. If the destination hasn't enabled postcopy-ram,
-> then loadvm_postcopy_handle_advise() leaves the page size values on
-> the stream and returns. This confuses qemu_loadvm_state() later on
-> and causes the destination to start execution.
-> 
-> As discussed several times, postcopy-ram should be enabled both sides
-> to be functional. This patch changes the destination to perform some
-> extra checks on the advise length to ensure this is the case. Otherwise
-> an error is returned and migration is aborted.
-> 
-> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This patch implements movep instruction. It moves data between a data register
+and alternate bytes within the address space starting at the location
+specified and incrementing by two.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+It was designed for the original 68000 and used in firmwares for
+interfacing the 8-bit peripherals through the 16-bit data bus.
+Without this patch opcode for this instruction is recognized as some bitop.
 
-and queued to replace v2.
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 
-Dave
-
-> ---
-> v3: - s/warn_report/error_report
-> 
-> v2: - error out if postcopy-ram is enabled but the source hasn't sent the
->       expected 16 byte advise
->     - more descriptive message if postcopy-ram is disabled but the source
->       has sent a 16 byte advise
-> ---
->  migration/savevm.c |   21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
-> 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index b7908f62be3c..c74b18dcf317 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1376,7 +1376,8 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
->   * *might* happen - it might be skipped if precopy transferred everything
->   * quickly.
->   */
-> -static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-> +static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
-> +                                         uint16_t len)
->  {
->      PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
->      uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
-> @@ -1387,8 +1388,22 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
->          return -1;
->      }
->  
-> -    if (!migrate_postcopy_ram()) {
-> +    switch (len) {
-> +    case 0:
-> +        if (migrate_postcopy_ram()) {
-> +            error_report("RAM postcopy is enabled but have 0 byte advise");
-> +            return -EINVAL;
-> +        }
->          return 0;
-> +    case 8 + 8:
-> +        if (!migrate_postcopy_ram()) {
-> +            error_report("RAM postcopy is disabled but have 16 byte advise");
-> +            return -EINVAL;
-> +        }
-> +        break;
-> +    default:
-> +        error_report("CMD_POSTCOPY_ADVISE invalid length (%d)", len);
-> +        return -EINVAL;
->      }
->  
->      if (!postcopy_ram_supported_by_host(mis)) {
-> @@ -1807,7 +1822,7 @@ static int loadvm_process_command(QEMUFile *f)
->          return loadvm_handle_cmd_packaged(mis);
->  
->      case MIG_CMD_POSTCOPY_ADVISE:
-> -        return loadvm_postcopy_handle_advise(mis);
-> +        return loadvm_postcopy_handle_advise(mis, len);
->  
->      case MIG_CMD_POSTCOPY_LISTEN:
->          return loadvm_postcopy_handle_listen(mis);
-> 
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+v3: - simplified movep function code
+    - joined movep masks
+
+v2: - disabled movep for Coldfire
+    - fixed gen_store/load usage
+---
+ target/m68k/cpu.c       |    2 ++
+ target/m68k/cpu.h       |    1 +
+ target/m68k/translate.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
+
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 98919b3..461db85 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -113,6 +113,7 @@ static void m68000_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_M68000);
+     m68k_set_feature(env, M68K_FEATURE_USP);
+     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ 
+ static void m68020_cpu_initfn(Object *obj)
+@@ -135,6 +136,7 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
+     m68k_set_feature(env, M68K_FEATURE_RTD);
+     m68k_set_feature(env, M68K_FEATURE_CHK2);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+ 
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 627fb78..1d79885 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -492,6 +492,7 @@ enum m68k_features {
+     M68K_FEATURE_RTD,
+     M68K_FEATURE_CHK2,
+     M68K_FEATURE_M68040, /* instructions specific to MC68040 */
++    M68K_FEATURE_MOVEP,
+ };
+ 
+ static inline int m68k_feature(CPUM68KState *env, int feature)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 34db97b..00e3efe 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2078,6 +2078,51 @@ DISAS_INSN(movem)
+     tcg_temp_free(addr);
+ }
+ 
++DISAS_INSN(movep)
++{
++    uint8_t i;
++    int16_t displ;
++    TCGv reg;
++    TCGv addr;
++    TCGv abuf;
++    TCGv dbuf;
++
++    displ = read_im16(env, s);
++
++    addr = AREG(insn, 0);
++    reg = DREG(insn, 9);
++
++    abuf = tcg_temp_new();
++    tcg_gen_addi_i32(abuf, addr, displ);
++    dbuf = tcg_temp_new();
++
++    if (insn & 0x40) {
++        i = 4;
++    } else {
++        i = 2;
++    }
++
++    if (insn & 0x80) {
++        for ( ; i > 0 ; i--) {
++            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
++            tcg_gen_qemu_st8(dbuf, abuf, IS_USER(s));
++            if (i > 1) {
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    } else {
++        for ( ; i > 0 ; i--) {
++            tcg_gen_qemu_ld8u(dbuf, abuf, IS_USER(s));
++            tcg_gen_deposit_i32(reg, reg, dbuf, i * 8, 8);
++            if (i > 1) {
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    }
++    tcg_temp_free(abuf);
++    tcg_temp_free(dbuf);
++}
++
+ DISAS_INSN(bitop_im)
+ {
+     int opsize;
+@@ -5678,6 +5723,7 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(bitop_reg, 0140, f1c0);
+     BASE(bitop_reg, 0180, f1c0);
+     BASE(bitop_reg, 01c0, f1c0);
++    INSN(movep,     0108, f138, MOVEP);
+     INSN(arith_im,  0280, fff8, CF_ISA_A);
+     INSN(arith_im,  0200, ff00, M68000);
+     INSN(undef,     02c0, ffc0, M68000);
