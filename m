@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ij-0005Fp-DN
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:59 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ij-0005Fo-HZ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ie-0007w1-5f
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8if-0007xC-8E
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57628)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56836)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1ej8id-0007vG-TC
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:52 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1ej8ie-0007wA-Ul
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:53 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w16JFXRn141351
-	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 14:15:51 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fyha5u38e-1
+	w16JF521064216
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 14:15:52 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fyhx2hbf8-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 14:15:50 -0500
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 14:15:51 -0500
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
 	Tue, 6 Feb 2018 14:15:49 -0500
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue,  6 Feb 2018 13:14:44 -0600
+Date: Tue,  6 Feb 2018 13:14:43 -0600
 In-Reply-To: <20180206191515.25830-1-mdroth@linux.vnet.ibm.com>
 References: <20180206191515.25830-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20180206191515.25830-24-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 23/54] i386: Add FEAT_8000_0008_EBX CPUID
- feature word
+Message-Id: <20180206191515.25830-23-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 22/54] i386: Add spec-ctrl CPUID bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,84 +42,42 @@ Cc: qemu-stable@nongnu.org, christian.ehrhardt@canonical.com, Eduardo Habkost <e
 
 From: Eduardo Habkost <ehabkost@redhat.com>
 
-Add the new feature word and the "ibpb" feature flag.
-
-Based on a patch by Paolo Bonzini.
+Add the feature name and a CPUID_7_0_EDX_SPEC_CTRL macro.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180109154519.25634-5-ehabkost@redhat.com>
+Message-Id: <20180109154519.25634-4-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-(cherry picked from commit 1b3420e1c4d523c49866cca4e7544753201cd43d)
+(cherry picked from commit a2381f0934432ef2cd47a335348ba8839632164c)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/i386/cpu.c | 19 ++++++++++++++++++-
- target/i386/cpu.h |  3 +++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index dddd62207c..36edc875fc 100644
+index 63279526a1..dddd62207c 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -482,6 +482,22 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .tcg_features = TCG_APM_FEATURES,
-         .unmigratable_flags = CPUID_APM_INVTSC,
-     },
-+    [FEAT_8000_0008_EBX] = {
-+        .feat_names = {
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            "ibpb", NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .cpuid_eax = 0x80000008,
-+        .cpuid_reg = R_EBX,
-+        .tcg_features = 0,
-+        .unmigratable_flags = 0,
-+    },
-     [FEAT_XSAVE] = {
-         .feat_names = {
-             "xsaveopt", "xsavec", "xgetbv1", "xsaves",
-@@ -3097,7 +3113,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         } else {
-             *eax = cpu->phys_bits;
-         }
--        *ebx = 0;
-+        *ebx = env->features[FEAT_8000_0008_EBX];
-         *ecx = 0;
-         *edx = 0;
-         if (cs->nr_cores * cs->nr_threads > 1) {
-@@ -3553,6 +3569,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
-         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
-         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
-+        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0008_EBX);
-         x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
-         x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
-         x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+@@ -458,7 +458,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, NULL, NULL,
++            NULL, NULL, "spec-ctrl", NULL,
+             NULL, NULL, NULL, NULL,
+         },
+         .cpuid_eax = 7,
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8bf9879f3e..f3d0ebb673 100644
+index 03de74a8d3..8bf9879f3e 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -454,6 +454,7 @@ typedef enum FeatureWord {
-     FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
-     FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
-     FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
-+    FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
-     FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
-     FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
-     FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
-@@ -644,6 +645,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
- #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+@@ -642,6 +642,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
  
-+#define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
-+
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
++#define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+ 
  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
  #define CPUID_XSAVE_XSAVEC     (1U << 1)
- #define CPUID_XSAVE_XGETBV1    (1U << 2)
 -- 
 2.11.0
