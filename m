@@ -1,39 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ej2ri-0008C8-PS
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 08:00:58 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1ej2wb-0002my-BC
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 08:05:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ej2rc-0005GR-H4
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 08:00:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ej2rc-0005Fc-7W
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 08:00:44 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w16D0Tvf097728
-	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 08:00:43 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fycty05gv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:00:42 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 6 Feb 2018 13:00:40 -0000
-References: <20180205102935.14736-1-david@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 6 Feb 2018 14:00:35 +0100
+	(envelope-from <arei.gonglei@huawei.com>) id 1ej2wV-0003mv-Df
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 08:05:53 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2313 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1ej2wV-0003ej-2W
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 08:05:47 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Tue, 6 Feb 2018 13:05:33 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA543EF3@DGGEMA505-MBX.china.huawei.com>
+References: <1517492876-28428-1-git-send-email-arei.gonglei@huawei.com>
+	<d2f644da-e6c8-da3a-55e4-13ae69c44fc4@redhat.com>
+	<CAFEAcA_6wg6aS_g0mGcNyjC57BVoU+pxdaRU3buM5J6b3XNW-Q@mail.gmail.com>
+	<fa226f5f-77c4-7167-29c6-9baf08737239@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA543B64@DGGEMA505-MBX.china.huawei.com>
+	<CAFEAcA_-j5baz-iy16TfzwcUgze1Fs9Fx=uKTkHJKuJ=hpjdqw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_-j5baz-iy16TfzwcUgze1Fs9Fx=uKTkHJKuJ=hpjdqw@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20180205102935.14736-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <e0bc1c70-26c4-bd8a-7d88-8749d305cb48@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] s390x/cpumodel: model PTFF
- subfunctions for Multiple-epoch facility
+Subject: Re: [Qemu-devel] [PATCH] rtc: placing RTC memory region outside BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,138 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-
-
-On 02/05/2018 11:29 AM, David Hildenbrand wrote:
-> For now, the kernel does not properly indicate configured CPU subfunctions
-> to the guest, but simply uses the host values (as support in KVM is still
-> missing). That's why we missed to model the PTFF subfunctions that come
-> with Multiple-epoch facility.
-> 
-> Let's properly add these, along with a new feature group.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-> ---
-> 
-> v1 -> v2:
-> - s/MEPOCH/MULTIPLE_EPOCH/ (only internally visible)
-> - Add the features to the z14 full model
-> - Clear the features if Multiple-epoch facility is not installed
-> 
->  target/s390x/cpu_features.c     |  5 +++++
->  target/s390x/cpu_features_def.h |  4 ++++
->  target/s390x/gen-features.c     | 11 +++++++++++
->  target/s390x/kvm.c              |  8 ++++++++
->  4 files changed, 28 insertions(+)
-> 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index 85d10b5710..a5619f2893 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -156,8 +156,12 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("ptff-qpc", S390_FEAT_TYPE_PTFF, 3, "PTFF Query Physical Clock"),
->      FEAT_INIT("ptff-qui", S390_FEAT_TYPE_PTFF, 4, "PTFF Query UTC Information"),
->      FEAT_INIT("ptff-qtou", S390_FEAT_TYPE_PTFF, 5, "PTFF Query TOD Offset User"),
-> +    FEAT_INIT("ptff-qsie", S390_FEAT_TYPE_PTFF, 10, "PTFF Query Steering Information Extended"),
-> +    FEAT_INIT("ptff-qtoue", S390_FEAT_TYPE_PTFF, 13, "PTFF Query TOD Offset User Extended"),
->      FEAT_INIT("ptff-sto", S390_FEAT_TYPE_PTFF, 65, "PTFF Set TOD Offset"),
->      FEAT_INIT("ptff-stou", S390_FEAT_TYPE_PTFF, 69, "PTFF Set TOD Offset User"),
-> +    FEAT_INIT("ptff-stoe", S390_FEAT_TYPE_PTFF, 73, "PTFF Set TOD Offset Extended"),
-> +    FEAT_INIT("ptff-stoue", S390_FEAT_TYPE_PTFF, 77, "PTFF Set TOD Offset User Extended"),
-> 
->      FEAT_INIT("kmac-dea", S390_FEAT_TYPE_KMAC, 1, "KMAC DEA"),
->      FEAT_INIT("kmac-tdea-128", S390_FEAT_TYPE_KMAC, 2, "KMAC TDEA-128"),
-> @@ -445,6 +449,7 @@ static S390FeatGroupDef s390_feature_groups[] = {
->      FEAT_GROUP_INIT("plo", PLO, "Perform-locked-operation facility"),
->      FEAT_GROUP_INIT("tods", TOD_CLOCK_STEERING, "Tod-clock-steering facility"),
->      FEAT_GROUP_INIT("gen13ptff", GEN13_PTFF, "PTFF enhancements introduced with z13"),
-> +    FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
->      FEAT_GROUP_INIT("msa", MSA, "Message-security-assist facility"),
->      FEAT_GROUP_INIT("msa1", MSA_EXT_1, "Message-security-assist-extension 1 facility"),
->      FEAT_GROUP_INIT("msa2", MSA_EXT_2, "Message-security-assist-extension 2 facility"),
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index 4d930871b4..7c5915c7b2 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -151,8 +151,12 @@ typedef enum {
->      S390_FEAT_PTFF_QPT,
->      S390_FEAT_PTFF_QUI,
->      S390_FEAT_PTFF_QTOU,
-> +    S390_FEAT_PTFF_QSIE,
-> +    S390_FEAT_PTFF_QTOUE,
->      S390_FEAT_PTFF_STO,
->      S390_FEAT_PTFF_STOU,
-> +    S390_FEAT_PTFF_STOE,
-> +    S390_FEAT_PTFF_STOUE,
-> 
->      /* KMAC */
->      S390_FEAT_KMAC_DEA,
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 58b6ac484e..716b06f726 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -59,6 +59,12 @@
->      S390_FEAT_PTFF_QTOU, \
->      S390_FEAT_PTFF_STOU
-> 
-> +#define S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF \
-> +    S390_FEAT_PTFF_QSIE, \
-> +    S390_FEAT_PTFF_QTOUE, \
-> +    S390_FEAT_PTFF_STOE, \
-> +    S390_FEAT_PTFF_STOUE
-> +
->  #define S390_FEAT_GROUP_MSA \
->      S390_FEAT_MSA, \
->      S390_FEAT_KMAC_DEA, \
-> @@ -219,6 +225,9 @@ static uint16_t group_TOD_CLOCK_STEERING[] = {
->  static uint16_t group_GEN13_PTFF[] = {
->      S390_FEAT_GROUP_GEN13_PTFF,
->  };
-> +static uint16_t group_MULTIPLE_EPOCH_PTFF[] = {
-> +    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
-> +};
->  static uint16_t group_MSA[] = {
->      S390_FEAT_GROUP_MSA,
->  };
-> @@ -466,6 +475,7 @@ static uint16_t full_GEN14_GA1[] = {
->      S390_FEAT_CMM_NT,
->      S390_FEAT_HPMA2,
->      S390_FEAT_SIE_KSS,
-> +    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
->  };
-> 
->  /* Default features (in order of release)
-> @@ -665,6 +675,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
->      FEAT_GROUP_INITIALIZER(PLO),
->      FEAT_GROUP_INITIALIZER(TOD_CLOCK_STEERING),
->      FEAT_GROUP_INITIALIZER(GEN13_PTFF),
-> +    FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
->      FEAT_GROUP_INITIALIZER(MSA),
->      FEAT_GROUP_INITIALIZER(MSA_EXT_1),
->      FEAT_GROUP_INITIALIZER(MSA_EXT_2),
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index bfd14723f1..deb870921b 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2221,6 +2221,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
->          return;
->      }
-> 
-> +    /* PTFF subfunctions might be indicated although kernel support missing */
-> +    if (!test_bit(S390_FEAT_MULTIPLE_EPOCH, model->features)) {
-> +        clear_bit(S390_FEAT_PTFF_QSIE, model->features);
-> +        clear_bit(S390_FEAT_PTFF_QTOUE, model->features);
-> +        clear_bit(S390_FEAT_PTFF_STOE, model->features);
-> +        clear_bit(S390_FEAT_PTFF_STOUE, model->features);
-> +    }
-> +
->      /* with cpu model support, CMM is only indicated if really available */
->      if (kvm_s390_cmma_available()) {
->          set_bit(S390_FEAT_CMM, model->features);
-> 
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBldGVyIE1heWRlbGwgW21h
+aWx0bzpwZXRlci5tYXlkZWxsQGxpbmFyby5vcmddDQo+IFNlbnQ6IFR1ZXNkYXksIEZlYnJ1YXJ5
+IDA2LCAyMDE4IDU6NDkgUE0NCj4gVG86IEdvbmdsZWkgKEFyZWkpDQo+IENjOiBQYW9sbyBCb256
+aW5pOyBRRU1VIERldmVsb3BlcnM7IEh1YW5nd2VpZG9uZyAoQykNCj4gU3ViamVjdDogUmU6IFtR
+ZW11LWRldmVsXSBbUEFUQ0hdIHJ0YzogcGxhY2luZyBSVEMgbWVtb3J5IHJlZ2lvbiBvdXRzaWRl
+IEJRTA0KPiANCj4gT24gNiBGZWJydWFyeSAyMDE4IGF0IDA4OjI0LCBHb25nbGVpIChBcmVpKSA8
+YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+IHdyb3RlOg0KPiA+IFNvLCB0YWtpbmcgQlFMIGlz
+IG5lY2Vzc2FyeSwgYW5kIHdoYXQgd2UgY2FuIGRvIGlzIHRyeWluZyBvdXIgYmVzdCB0byBuYXJy
+b3cNCj4gPiBkb3duIHRoZSBwcm9jZXNzIG9mIGxvY2tpbmcgPyBGb3IgZXhhbXBsZSwgZG8gdGhl
+IGZvbGxvd2luZyB3cmFwcGluZzoNCj4gPg0KPiA+IHN0YXRpYyB2b2lkIHJ0Y19yYXNpZV9pcnEo
+UlRDU3RhdGUgKnMpDQo+ID4gew0KPiA+ICAgICBxZW11X211dGV4X2xvY2tfaW90aHJlYWQoKTsN
+Cj4gPiAgICAgcWVtdV9pcnFfcmFpc2Uocy0+aXJxKTsNCj4gPiAgICAgcWVtdV9tdXRleF91bmxv
+Y2tfaW90aHJlYWQoKTsNCj4gPiB9DQo+ID4NCj4gPiBzdGF0aWMgdm9pZCBydGNfbG93ZXJfaXJx
+KFJUQ1N0YXRlICpzKQ0KPiA+IHsNCj4gPiAgICAgcWVtdV9tdXRleF9sb2NrX2lvdGhyZWFkKCk7
+DQo+ID4gICAgIHFlbXVfaXJxX2xvd2VyKHMtPmlycSk7DQo+ID4gICAgIHFlbXVfbXV0ZXhfdW5s
+b2NrX2lvdGhyZWFkKCk7DQo+ID4gfQ0KPiANCj4gSWYgeW91IGRvIHRoYXQgeW91J2xsIGFsc28g
+bmVlZCB0byBiZSBjYXJlZnVsIGFib3V0IG5vdCBjYWxsaW5nDQo+IHRob3NlIGZ1bmN0aW9ucyBm
+cm9tIGNvbnRleHRzIHdoZXJlIHlvdSBhbHJlYWR5IGhvbGQgdGhlIGlvdGhyZWFkDQo+IG11dGV4
+IChlZyB0aW1lciBjYWxsYmFja3MpLCBzaW5jZSB5b3UgY2FuJ3QgbG9jayBhIG11dGV4IHlvdQ0K
+PiBhbHJlYWR5IGhhdmUgbG9ja2VkLg0KPiANCkV4YWN0bHksIGFsbCBjb250ZXh0cyBjYXVzZWQg
+YnkgdGhlIG1haW4gcHJvY2Vzcy4gOikNClRocmVlIHRpbWVycyBjYWxsYmFja3MsIGNhbGxpbmcg
+cnRjX3Jlc2V0KCkuDQoNClRoYW5rcywNCi1Hb25nbGVpDQo=
