@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6Py-0000We-Eh
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:29 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Pu-0000T5-50
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej6Px-0004ro-Gp
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:26 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53519)
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Ps-0004hi-4i
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:22 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55163)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej6Px-0004pn-8O
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:25 -0500
-Received: by mail-wm0-x242.google.com with SMTP id t74so5035259wme.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:48:25 -0800 (PST)
+	id 1ej6Pr-0004g3-UG
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:20 -0500
+Received: by mail-wm0-x244.google.com with SMTP id i186so4987193wmi.4
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:48:19 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  6 Feb 2018 16:47:58 +0000
-Message-Id: <20180206164815.10084-6-alex.bennee@linaro.org>
+Date: Tue,  6 Feb 2018 16:47:55 +0000
+Message-Id: <20180206164815.10084-3-alex.bennee@linaro.org>
 In-Reply-To: <20180206164815.10084-1-alex.bennee@linaro.org>
 References: <20180206164815.10084-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 05/22] include/fpu/softfloat: implement
- float16_abs helper
+Subject: [Qemu-devel] [PATCH v4 02/22] include/fpu/softfloat: remove
+ USE_SOFTFLOAT_STRUCT_TYPES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +33,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This will be required when expanding the MINMAX() macro for 16
-bit/half-precision operations.
+It's not actively built and when enabled things fail to compile. I'm
+not sure the type-checking is really helping here. Seeing as we "own"
+our softfloat now lets remove the cruft.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/fpu/softfloat.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/fpu/softfloat.h | 27 ---------------------------
+ 1 file changed, 27 deletions(-)
 
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index f3b9008f78..1d34f2c3eb 100644
+index d5e99667b6..52af1412de 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -265,6 +265,13 @@ static inline int float16_is_zero_or_denormal(float16 a)
-     return (float16_val(a) & 0x7c00) == 0;
- }
- 
-+static inline float16 float16_abs(float16 a)
-+{
-+    /* Note that abs does *not* handle NaN specially, nor does
-+     * it flush denormal inputs to zero.
-+     */
-+    return make_float16(float16_val(a) & 0x7fff);
-+}
+@@ -103,32 +103,6 @@ enum {
  /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
+ | Software IEC/IEEE floating-point types.
  *----------------------------------------------------------------------------*/
+-/* Use structures for soft-float types.  This prevents accidentally mixing
+-   them with native int/float types.  A sufficiently clever compiler and
+-   sane ABI should be able to see though these structs.  However
+-   x86/gcc 3.x seems to struggle a bit, so leave them disabled by default.  */
+-//#define USE_SOFTFLOAT_STRUCT_TYPES
+-#ifdef USE_SOFTFLOAT_STRUCT_TYPES
+-typedef struct {
+-    uint16_t v;
+-} float16;
+-#define float16_val(x) (((float16)(x)).v)
+-#define make_float16(x) __extension__ ({ float16 f16_val = {x}; f16_val; })
+-#define const_float16(x) { x }
+-typedef struct {
+-    uint32_t v;
+-} float32;
+-/* The cast ensures an error if the wrong type is passed.  */
+-#define float32_val(x) (((float32)(x)).v)
+-#define make_float32(x) __extension__ ({ float32 f32_val = {x}; f32_val; })
+-#define const_float32(x) { x }
+-typedef struct {
+-    uint64_t v;
+-} float64;
+-#define float64_val(x) (((float64)(x)).v)
+-#define make_float64(x) __extension__ ({ float64 f64_val = {x}; f64_val; })
+-#define const_float64(x) { x }
+-#else
+ typedef uint16_t float16;
+ typedef uint32_t float32;
+ typedef uint64_t float64;
+@@ -141,7 +115,6 @@ typedef uint64_t float64;
+ #define const_float16(x) (x)
+ #define const_float32(x) (x)
+ #define const_float64(x) (x)
+-#endif
+ typedef struct {
+     uint64_t low;
+     uint16_t high;
 -- 
 2.15.1
