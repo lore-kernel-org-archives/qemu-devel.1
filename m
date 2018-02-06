@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ej73Z-00046N-L0
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:29:22 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ej78q-0007AY-8W
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:34:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ej73Y-0001Pd-G5
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:29:21 -0500
-Date: Tue, 6 Feb 2018 17:29:07 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180206172907.GL20001@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180206171642.19826-1-vsementsov@virtuozzo.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ej78p-0006T3-FM
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:34:48 -0500
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:38833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ej78p-0006SV-65
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 12:34:47 -0500
+Received: by mail-ot0-x233.google.com with SMTP id h14so1700549otj.5
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 09:34:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180206171642.19826-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: 205: support luks format
+In-Reply-To: <20180205185416.14391.5739.stgit@gimli.home>
+References: <20180205185416.14391.5739.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Feb 2018 17:34:25 +0000
+Message-ID: <CAFEAcA9HMpzXTOHH7sQxQfi9pR9WdJfpfqida6-vnv2yZzqXUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] VFIO updates 2018-02-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Feb 06, 2018 at 08:16:42PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Support default luks options in VM.add_drive and in new library
-> function qemu_img_create. Use it in 205 iotests.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-> 
-> instead of
->   [PATCH] iotests: 205: support only raw format
-> 
-> let's just support luks. This patch also makes it simple to support
-> luks in any other python iotest.
-> 
->  tests/qemu-iotests/205        |  4 ++--
->  tests/qemu-iotests/iotests.py | 33 +++++++++++++++++++++++++++++++++
->  2 files changed, 35 insertions(+), 2 deletions(-)
-> 
+On 5 February 2018 at 18:56, Alex Williamson <alex.williamson@redhat.com> wrote:
+> The following changes since commit f24ee107a07f093bd7ed475dd48d7ba57ea3d8fe:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180202-pull-request' into staging (2018-02-02 18:54:11 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20180205.0
+>
+> for you to fetch changes up to 98cc546baeedd43373ecd44c2392bbe9f0bc484c:
+>
+>   vfio/pci: Add option to disable GeForce quirks (2018-02-05 11:27:15 -0700)
+>
+> ----------------------------------------------------------------
+> VFIO updates 2018-02-05
+>
+>  - SPAPR in-kernel TCE accleration (Alexey Kardashevskiy)
+>
+>  - MSI-X relocation (Alex Williamson)
+>
+>  - Add missing platform mutex init (Eric Auger)
+>
+>  - Redundant variable cleanup (Alexey Kardashevskiy)
+>
+>  - Option to disable GeForce quirks (Alex Williamson)
+>
+> ----------------------------------------------------------------
 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 5a10b2d534..4b9a4445cd 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -58,6 +58,13 @@ qemu_default_machine = os.environ.get('QEMU_DEFAULT_MACHINE')
->  socket_scm_helper = os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_helper')
->  debug = False
->  
-> +luks_default_secret_id = 'luks_secret_default_iotests_id'
+Hi. This fails to build for Windows:
 
-Can we just call this  "keysec0", so we matchh convention used by
-the shell script based tests.
+hw/ppc/spapr_iommu.c:20:23: fatal error: sys/ioctl.h: No such file or directory
 
-> +luks_default_secret_data = '12345'
-
-The 'check' script exports an environment variable IMGKEYSECRET
-that is intended to be used as the default password for LUKS.
-
-> +luks_default_secret_object = 'secret,id=' + luks_default_secret_id + \
-> +                             ',data=' + luks_default_secret_data
-> +luks_default_key_secret_opt = 'key-secret=' + luks_default_secret_id
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
