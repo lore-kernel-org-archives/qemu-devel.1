@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ejBmp-0002Mj-Nn
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 17:32:25 -0500
+	(envelope-from <mst@redhat.com>) id 1ejCts-0001ZQ-7U
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 18:43:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ejBmo-0007yM-Hb
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 17:32:23 -0500
-Date: Tue, 6 Feb 2018 20:32:13 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180206223213.GG13301@localhost.localdomain>
-References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1ejCtp-0000PG-36
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 18:43:44 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56314 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejCto-0000OQ-SD
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 18:43:41 -0500
+Date: Wed, 7 Feb 2018 01:43:36 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180207013925-mutt-send-email-mst@kernel.org>
+References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
+	<1517915299-15349-4-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/25] generalize parsing of cpu_model
- (part 4)
+In-Reply-To: <1517915299-15349-4-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio-balloon: add a timer to
+ limit the free page report waiting time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,133 +28,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-I will try to summarize my comments here:
+On Tue, Feb 06, 2018 at 07:08:19PM +0800, Wei Wang wrote:
+> This patch adds a timer to limit the time that host waits for the free
+> page hints reported by the guest. Users can specify the time in ms via
+> "free-page-wait-time" command line option. If a user doesn't specify a
+> time, host waits till the guest finishes reporting all the free page
+> hints. The policy (wait for all the free page hints to be reported or
+> use a time limit) is determined by the orchestration layer.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
 
-* I suggest squashing patches 2-22 together.  This way we
-  shouldn't have any intermediate commits where "make check"
-  generates warnings, and the series is shorter.
-  * Or, even better: squash the CPU_RESOLVING_TYPE parts of 3-22
-    into one patch, and the tests/machine-none-test.c parts of
-    3-22 into patch 2.
+Looks like an option the migration command should get,
+as opposed to a device feature.
 
-* The linux-user/main.c hunk of patch 03/25 looks unnecessary.
-
-* I suggest testing all CPU models in patch 02/25, but this
-  shouldn't block the series.  Can be a follow-up patch.
-
-All the rest looks good to me.
-
-Thanks!
-
-
-On Tue, Jan 23, 2018 at 09:07:59AM +0100, Igor Mammedov wrote:
+> ---
+>  hw/virtio/virtio-balloon.c         | 84 +++++++++++++++++++++++++++++++++++++-
+>  hw/virtio/virtio-pci.c             |  3 ++
+>  include/hw/virtio/virtio-balloon.h |  4 ++
+>  3 files changed, 90 insertions(+), 1 deletion(-)
 > 
-> v3:
->   - use qtest_startf() instead of qtest_start()
->   - rename tests/machine-none.c to tests/machine-none-test.c
->   - introduce first CPU_RESOLVING_TYPE for all targets and
->     only then use it parse_cpu_model() 
->   - stop abusing  mc->default_cpu_type as resolving cpu type,
->     move cpu_parse_cpu_model() in to exec.c and embed in
->     CPU_RESOLVING_TYPE, so that callers won't have to know
->     about unnecessary detail
-> 
-> v2:
->   - implemented new approach only for x86/ARM (will be done for all targets
->     if approach seems acceptable)
->   - add test case for '-M none -cpu FOO' case
->   - redefine TARGET_DEFAULT_CPU_TYPE into CPU_RESOLVING_TYPE
->   - scrape off default cpu_model refactoring, so it would cause
->     less conflicts with Laurent's series where he tries to rework
->     defaults to use ELF hints of executed program
-> 
-> Series is finishing work on generalizing cpu_model parsing
-> and limiting parts that deal with inconsistent cpu_model
-> naming to "-cpu" CLI option in vl.c, bsd|linux-user/main.c
-> CLI and default cpu_model processing and FOO_cpu_class_by_name()
-> callbacks.
-> 
-> It introduces CPU_RESOLVING_TYPE which must be defined
-> by each target and is used by helper parse_cpu_model()
-> (former cpu_parse_cpu_model()) to get access to target
-> specific FOO_cpu_class_by_name() callback.
-> 
-> git tree for testing:
->    https://github.com/imammedo/qemu.git cpu_init_removal_v3
-> 
-> CC: Laurent Vivier <laurent@vivier.eu>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: qemu-s390x@nongnu.org
-> CC: qemu-ppc@nongnu.org
-> CC: qemu-arm@nongnu.org
-> 
-> Igor Mammedov (25):
->   nios2: 10m50_devboard: replace cpu_model with cpu_type
->   tests: add machine 'none' with -cpu test
->   arm: cpu: add CPU_RESOLVING_TYPE macro
->   x86: cpu: add CPU_RESOLVING_TYPE macro
->   alpha: cpu: add CPU_RESOLVING_TYPE macro
->   cris: cpu: add CPU_RESOLVING_TYPE macro
->   lm32: cpu: add CPU_RESOLVING_TYPE macro
->   m68k: cpu: add CPU_RESOLVING_TYPE macro
->   microblaze: cpu: add CPU_RESOLVING_TYPE macro
->   mips: cpu: add CPU_RESOLVING_TYPE macro
->   moxie: cpu: add CPU_RESOLVING_TYPE macro
->   nios2: cpu: add CPU_RESOLVING_TYPE macro
->   openrisc: cpu: add CPU_RESOLVING_TYPE macro
->   ppc: cpu: add CPU_RESOLVING_TYPE macro
->   s390x: cpu: add CPU_RESOLVING_TYPE macro
->   sh4: cpu: add CPU_RESOLVING_TYPE macro
->   sparc: cpu: add CPU_RESOLVING_TYPE macro
->   tricore: cpu: add CPU_RESOLVING_TYPE macro
->   unicore32: cpu: add CPU_RESOLVING_TYPE macro
->   xtensa: cpu: add CPU_RESOLVING_TYPE macro
->   hppa: cpu: add CPU_RESOLVING_TYPE macro
->   tilegx: cpu: add CPU_RESOLVING_TYPE macro
->   Use cpu_create(type) instead of cpu_init(cpu_model)
->   cpu: get rid of unused cpu_init() defines
->   cpu: get rid of cpu_generic_init()
-> 
->  include/qom/cpu.h         | 16 +-------
->  target/alpha/cpu.h        |  3 +-
->  target/arm/cpu.h          |  3 +-
->  target/cris/cpu.h         |  3 +-
->  target/hppa/cpu.h         |  2 +-
->  target/i386/cpu.h         |  3 +-
->  target/lm32/cpu.h         |  3 +-
->  target/m68k/cpu.h         |  3 +-
->  target/microblaze/cpu.h   |  2 +-
->  target/mips/cpu.h         |  3 +-
->  target/moxie/cpu.h        |  3 +-
->  target/nios2/cpu.h        |  2 +-
->  target/openrisc/cpu.h     |  3 +-
->  target/ppc/cpu.h          |  3 +-
->  target/s390x/cpu.h        |  3 +-
->  target/sh4/cpu.h          |  3 +-
->  target/sparc/cpu.h        |  5 +--
->  target/tilegx/cpu.h       |  2 +-
->  target/tricore/cpu.h      |  3 +-
->  target/unicore32/cpu.h    |  3 +-
->  target/xtensa/cpu.h       |  3 +-
->  bsd-user/main.c           |  4 +-
->  exec.c                    | 23 +++++++++++
->  hw/core/null-machine.c    |  6 +--
->  hw/nios2/10m50_devboard.c |  2 +-
->  linux-user/main.c         | 10 +++--
->  qom/cpu.c                 | 48 +----------------------
->  tests/Makefile.include    |  2 +
->  tests/machine-none-test.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++
->  vl.c                      | 10 ++---
->  30 files changed, 162 insertions(+), 114 deletions(-)
->  create mode 100644 tests/machine-none-test.c
-> 
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index b424d4e..9ee0de4 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -207,6 +207,65 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
+>      balloon_stats_change_timer(s, 0);
+>  }
+>  
+> +static void balloon_free_page_change_timer(VirtIOBalloon *s, int64_t ms)
+> +{
+> +    timer_mod(s->free_page_timer,
+> +              qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + ms);
+> +}
+> +
+> +static void balloon_stop_free_page_report(void *opaque)
+> +{
+> +    VirtIOBalloon *dev = opaque;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +
+> +    timer_del(dev->free_page_timer);
+> +    timer_free(dev->free_page_timer);
+> +    dev->free_page_timer = NULL;
+> +
+> +    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+> +        dev->host_stop_free_page = true;
+> +        virtio_notify_config(vdev);
+> +    }
+> +}
+> +
+> +static void balloon_free_page_get_wait_time(Object *obj, Visitor *v,
+> +                                            const char *name, void *opaque,
+> +                                            Error **errp)
+> +{
+> +    VirtIOBalloon *s = opaque;
+> +
+> +    visit_type_int(v, name, &s->free_page_wait_time, errp);
+> +}
+> +
+> +static void balloon_free_page_set_wait_time(Object *obj, Visitor *v,
+> +                                            const char *name, void *opaque,
+> +                                            Error **errp)
+> +{
+> +    VirtIOBalloon *s = opaque;
+> +    Error *local_err = NULL;
+> +    int64_t value;
+> +
+> +    visit_type_int(v, name, &value, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    if (value < 0) {
+> +        error_setg(errp, "free page wait time must be greater than zero");
+> +        return;
+> +    }
+> +
+> +    if (value > UINT32_MAX) {
+> +        error_setg(errp, "free page wait time value is too big");
+> +        return;
+> +    }
+> +
+> +    s->free_page_wait_time = value;
+> +    g_assert(s->free_page_timer == NULL);
+> +    s->free_page_timer = timer_new_ms(QEMU_CLOCK_REALTIME,
+> +                                      balloon_stop_free_page_report, s);
+> +}
+> +
+>  static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>  {
+>      VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
+> @@ -330,6 +389,7 @@ static void virtio_balloon_poll_free_page_hints(VirtIOBalloon *dev)
+>              if (id == dev->free_page_report_cmd_id) {
+>                  dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+>              } else {
+> +                dev->host_stop_free_page = false;
+>                  dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+>                  break;
+>              }
+> @@ -385,6 +445,10 @@ static void virtio_balloon_free_page_poll(void *opaque)
+>      virtio_notify_config(vdev);
+>      s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
+>  
+> +    if (s->free_page_wait_time) {
+> +        balloon_free_page_change_timer(s, s->free_page_wait_time);
+> +    }
+> +
+>      virtio_balloon_poll_free_page_hints(s);
+>  }
+>  
+> @@ -395,7 +459,19 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+>  
+>      config.num_pages = cpu_to_le32(dev->num_pages);
+>      config.actual = cpu_to_le32(dev->actual);
+> -    config.free_page_report_cmd_id = cpu_to_le32(dev->free_page_report_cmd_id);
+> +    if (dev->host_stop_free_page) {
+> +        /*
+> +         * Host is actively requesting to stop the free page reporting, send
+> +         * the stop sign to the guest. This happens when the migration thread
+> +         * has reached the phase to send pages to the destination while the
+> +         * guest hasn't done the reporting.
+> +         */
+> +        config.free_page_report_cmd_id =
+> +                                    VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID;
+> +    } else {
+> +        config.free_page_report_cmd_id =
+> +                                    cpu_to_le32(dev->free_page_report_cmd_id);
+> +    }
+>  
+>      trace_virtio_balloon_get_config(config.num_pages, config.actual);
+>      memcpy(config_data, &config, sizeof(struct virtio_balloon_config));
+> @@ -539,6 +615,7 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+>          s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE, NULL);
+>          s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+>          s->free_page_report_cmd_id = VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID;
+> +        s->host_stop_free_page = false;
+>      }
+>      reset_stats(s);
+>  }
+> @@ -602,6 +679,11 @@ static void virtio_balloon_instance_init(Object *obj)
+>                          balloon_stats_get_poll_interval,
+>                          balloon_stats_set_poll_interval,
+>                          NULL, s, NULL);
+> +
+> +    object_property_add(obj, "free-page-wait-time", "int",
+> +                        balloon_free_page_get_wait_time,
+> +                        balloon_free_page_set_wait_time,
+> +                        NULL, s, NULL);
+>  }
+>  
+>  static const VMStateDescription vmstate_virtio_balloon = {
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 6c75cca..3345104 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -2250,6 +2250,9 @@ static void virtio_balloon_pci_instance_init(Object *obj)
+>      object_property_add_alias(obj, "guest-stats-polling-interval",
+>                                OBJECT(&dev->vdev),
+>                                "guest-stats-polling-interval", &error_abort);
+> +    object_property_add_alias(obj, "free-page-wait-time",
+> +                              OBJECT(&dev->vdev),
+> +                              "free-page-wait-time", &error_abort);
+>  }
+>  
+>  static const TypeInfo virtio_balloon_pci_info = {
+> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+> index 11b4e01..c16855b 100644
+> --- a/include/hw/virtio/virtio-balloon.h
+> +++ b/include/hw/virtio/virtio-balloon.h
+> @@ -40,6 +40,8 @@ enum virtio_balloon_free_page_report_status {
+>  typedef struct VirtIOBalloon {
+>      VirtIODevice parent_obj;
+>      VirtQueue *ivq, *dvq, *svq, *free_page_vq;
+> +    /* Host is requesting the guest to stop free page reporting */
+> +    bool host_stop_free_page;
+>      uint32_t free_page_report_status;
+>      uint32_t num_pages;
+>      uint32_t actual;
+> @@ -49,8 +51,10 @@ typedef struct VirtIOBalloon {
+>      VirtQueueElement *stats_vq_elem;
+>      size_t stats_vq_offset;
+>      QEMUTimer *stats_timer;
+> +    QEMUTimer *free_page_timer;
+>      int64_t stats_last_update;
+>      int64_t stats_poll_interval;
+> +    int64_t free_page_wait_time;
+>      uint32_t host_features;
+>  } VirtIOBalloon;
+>  
 > -- 
-> 2.7.4
-> 
-> 
-
--- 
-Eduardo
+> 1.8.3.1
