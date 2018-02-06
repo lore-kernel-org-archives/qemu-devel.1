@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ej3tu-0002tq-9J
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:11 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uE-00038y-NQ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ej3tq-00042t-Cf
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:10 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180205151835.20812-26-mreitz@redhat.com>
-References: <20180205151835.20812-1-mreitz@redhat.com>
-	<20180205151835.20812-26-mreitz@redhat.com>
-Date: Tue, 06 Feb 2018 15:07:00 +0100
-Message-ID: <w51vafaciuz.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 25/26] block/curl: Implement
- bdrv_refresh_filename()
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uA-0004F7-PY
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:30 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue,  6 Feb 2018 17:07:20 +0300
+Message-Id: <20180206140722.10110-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 0/2] block latency histogram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,12 +17,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, vsementsov@virtuozzo.com
 
-On Mon 05 Feb 2018 04:18:34 PM CET, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+Vladimir Sementsov-Ogievskiy (2):
+  block/accounting: introduce latency histogram
+  qapi: add block latency histogram interface
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+ qapi/block-core.json       | 62 +++++++++++++++++++++++++++++++++-
+ include/block/accounting.h |  8 +++++
+ block/accounting.c         | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+ block/qapi.c               | 31 +++++++++++++++++
+ blockdev.c                 | 15 +++++++++
+ 5 files changed, 198 insertions(+), 1 deletion(-)
 
-Berto
+-- 
+2.11.1
