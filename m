@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ej5qs-0005Dd-8O
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:12:14 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej636-0004px-9W
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:24:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ej5qr-0006tQ-Az
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:12:10 -0500
-Date: Tue, 6 Feb 2018 16:11:41 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180206161141.GF13343@stefanha-x1.localdomain>
-References: <1517494591-39369-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ej633-0002YP-L6
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:24:48 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:45871)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ej633-0002XD-Ef
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:24:45 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id h9so2556291wre.12
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:24:45 -0800 (PST)
+References: <20180126045742.5487-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180126045742.5487-1-richard.henderson@linaro.org>
+Date: Tue, 06 Feb 2018 16:24:42 +0000
+Message-ID: <87bmh2w0fp.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FeAIMMcddNRN4P4/"
-Content-Disposition: inline
-In-Reply-To: <1517494591-39369-1-git-send-email-anton.nefedov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block: fix write with zero flag set and
- iovector provided
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 00/20] tcg: generic vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
---FeAIMMcddNRN4P4/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-On Thu, Feb 01, 2018 at 05:16:31PM +0300, Anton Nefedov wrote:
-> The normal bdrv_co_pwritev() use is either
->   - BDRV_REQ_ZERO_WRITE reset and iovector provided
->   - BDRV_REQ_ZERO_WRITE set and iovector =3D=3D NULL
->=20
-> while
->   - the flag reset and iovector =3D=3D NULL is an assertion failure
->     in bdrv_co_do_zero_pwritev()
->   - the flag set and iovector provided is in fact allowed
->     (the flag prevails and zeroes are written)
->=20
-> However the alignment logic does not support the latter case so the paddi=
-ng
-> areas get overwritten with zeroes.
+> Changes since v11:
+>   * Use dup_const more.
+>   * Cleanup some gvec 2i and 2s routines.
+>   * Use more helpers and less gotos in target/arm/translate-a64.c.
 
-Please include a test case.  Berto mentioned that bdrv_pwrite_zeroes()
-hits this issue, that might be one way to test it.
+I just noticed the aarch64 cross build breaks:
 
-> Solution could be to forbid such case or just use bdrv_co_do_zero_pwritev=
-()
-> alignment for it which also makes the code a bit more obvious anyway.
->=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  block/io.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/block/io.c b/block/io.c
-> index 7ea4023..cf63fd0 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1701,7 +1701,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
->       */
->      tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_WRITE);
-> =20
-> -    if (!qiov) {
-> +    if (flags & BDRV_REQ_ZERO_WRITE) {
->          ret =3D bdrv_co_do_zero_pwritev(child, offset, bytes, flags, &re=
-q);
->          goto out;
->      }
+n file included from /root/src/github.com/stsquad/qemu/tcg/tcg.c:296:0:
+/root/src/github.com/stsquad/qemu/tcg/aarch64/tcg-target.inc.c: In function=
+ 'tcg_out_dupi_vec':
+/root/src/github.com/stsquad/qemu/tcg/aarch64/tcg-target.inc.c:806:9: error=
+: implicit declaration of function 'new_pool_l2' [-Werror=3Dimplicit-functi=
+on-declaration]
+         new_pool_l2(s, R_AARCH64_CONDBR19, s->code_ptr, 0, v64, v64);
 
-Looks good.
+>
+> Changes since v10:
+>   * Squashed a fixup patch which escaped my attention while preparing
+>     the patch set.  Ho hum.
+>
+> Changes since v9:
+>   * Detect whether __attribute__((vector_size(16))) operations are
+>     supported by the host compiler.  This includes the case affecting
+>     ppc64 where gcc-4.8.5 crashes.  Note that gcc-7.2 does pass the
+>     test on ppc64.
+>
+>   * Dropped support for vector interleaves and element size changes.
+>     My target/arm patches were failing RISU checks on a big-endian host.
+>     I need to re-think what to do about host endianness and target
+>     representation of vector operations crossing lanes.  For now, only
+>     support generic vector operations that are agnostic to element order.
+>
+>
+> r~
+>
+>
+> Richard Henderson (20):
+>   tcg: Allow multiple word entries into the constant pool
+>   tcg: Add types and basic operations for host vectors
+>   tcg: Standardize integral arguments to expanders
+>   tcg: Add generic vector expanders
+>   tcg: Add generic vector ops for constant shifts
+>   tcg: Add generic vector ops for comparisons
+>   tcg: Add generic vector ops for multiplication
+>   tcg: Add generic helpers for saturating arithmetic
+>   tcg: Add generic vector helpers with a scalar operand
+>   tcg/optimize: Handle vector opcodes during optimize
+>   target/arm: Align vector registers
+>   target/arm: Use vector infrastructure for aa64 add/sub/logic
+>   target/arm: Use vector infrastructure for aa64 mov/not/neg
+>   target/arm: Use vector infrastructure for aa64 dup/movi
+>   target/arm: Use vector infrastructure for aa64 constant shifts
+>   target/arm: Use vector infrastructure for aa64 compares
+>   target/arm: Use vector infrastructure for aa64 multiplies
+>   target/arm: Use vector infrastructure for aa64 orr/bic immediate
+>   tcg/i386: Add vector operations
+>   tcg/aarch64: Add vector operations
+>
+>  Makefile.target              |    4 +-
+<snip>
 
---FeAIMMcddNRN4P4/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaedO9AAoJEJykq7OBq3PImFgH/j302ZkG20Ufsm+U5EP/nEuj
-5kZY2fcSCKqbXaaWcBQ/oXN3xldxNFKo8vVmcZJHacWEZ7b97VlwZrUbgdTFqZoJ
-ffAztGBErnXEBQIdUnX0xsmZgpwq90h7L74EczBvp5mwWglymMGgI+k1IEoCT1KR
-Z0RvV4gTjOj4KMrcDtuEtqiv5Lj1s0ab9gnQjUqhXd9pSjGxc4yc8nvqVprG0wpo
-2wmhJYYe/eiXK3MH3y6b7hyNBp2L1CYHuI1CDFo6eY2ECF3XjH1hqf5SQix6wd67
-7foI0KVYFPA/jrPwcaFnMPuG69PKoHQLnOyi+QtdWccJvlKqC8ywUlUmKzUEvdg=
-=IKml
------END PGP SIGNATURE-----
-
---FeAIMMcddNRN4P4/--
+--
+Alex Benn=C3=A9e
