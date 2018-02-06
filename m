@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej8vE-0000TN-QH
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:28:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ej97K-0002sj-Mu
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:41:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej8vD-00076w-UO
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:28:52 -0500
-References: <20180126193439.20219-1-eblake@redhat.com>
-	<20180129110844.GB20446@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2d9471a0-bdb4-6988-c926-62f6bdb7e39d@redhat.com>
-Date: Tue, 6 Feb 2018 13:28:41 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1ej97J-0006LO-Tx
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:41:22 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:33354)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ej97J-0006L8-NR
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:41:21 -0500
+Received: by mail-ot0-x241.google.com with SMTP id q9so2886062oti.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 11:41:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180129110844.GB20446@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Simplify
- bdrv_can_write_zeroes_with_unmap()
+In-Reply-To: <CAFEAcA8nStZMnTkOSTdPU2vHVGZegY0tpLv9T+w5BPUUuwzUQQ@mail.gmail.com>
+References: <20180122172643.29742-1-ard.biesheuvel@linaro.org>
+	<20180122172643.29742-2-ard.biesheuvel@linaro.org>
+	<CAFEAcA9zA=PTmxQH1W1ht8sj9HFMVKSb12dsm-jX6FQEmQR+FA@mail.gmail.com>
+	<CAKv+Gu80ngyOewT-J3sKVV2pn8e7SVspF8py_yiuQzY1KEEE-w@mail.gmail.com>
+	<CAKv+Gu8ZnyorvLnSackEyHCd7dRjN-Uh1Ywv_nj7iZwE=8z1og@mail.gmail.com>
+	<CAFEAcA_Kkg5HUqK8hT_6JMD9AMrBgD46tHODT8rM9Fp7o8PWBw@mail.gmail.com>
+	<CAFEAcA8nStZMnTkOSTdPU2vHVGZegY0tpLv9T+w5BPUUuwzUQQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Feb 2018 19:41:00 +0000
+Message-ID: <CAFEAcA_n23yw65QFUTuikY=0WZeMRySAnngeTBnObPFJPGqUUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] target/arm: implement SHA-512
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, pbonzini@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/29/2018 05:08 AM, Stefan Hajnoczi wrote:
-> On Fri, Jan 26, 2018 at 01:34:39PM -0600, Eric Blake wrote:
->> We don't need the can_write_zeroes_with_unmap field in
->> BlockDriverInfo, because it is redundant information with
->> supported_zero_flags & BDRV_REQ_MAY_UNMAP.  Note that
->> BlockDriverInfo and supported_zero_flags are both per-device
->> settings, rather than global state about the driver as a
->> whole, which means one or both of these bits of information
->> can already be conditional.  Let's audit how they were set:
->>
-...
->> Simplify the code by moving the conditional into
->> supported_zero_flags for all drivers, then dropping the
->> now-unused BDI field.  For callers that relied on
->> bdrv_can_write_zeroes_with_unmap(), we return the same
->> per-device settings for drivers that had conditions (no
->> observable change in behavior there); and can now return
->> true (instead of false) for drivers that support passthrough
->> (for example, the commit driver) which gives those drivers
->> the same fix as nbd just got in bca80059e.  For callers that
->> relied on supported_zero_flags, we now have a few more places
->> that can avoid a wasted call to pwrite_zeroes() that will
->> just fail with ENOTSUP.
->>
->> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> The commit id mentioned above is dependent on me not having to respin
->> my latest NBD pull request:
->>
->> Based-on: <20180126160411.4033-1-eblake@redhat.com>
->> ([PULL 0/8] NBD patches through 26 Jan)
+On 6 February 2018 at 19:15, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 6 February 2018 at 19:06, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> SM4EKEY, SM4E
+>
+> Sample SM4EKEY failure:
+> insn 0xce78cbdd (SM4EKEY V29.4S, V30.4S, V24.4S)
+>   V24   : 6ee7a2520059bd15bac75e4436b3a1bd
+>   V30   : a67d04e738f68da895ffd0c3e154e3e7
+>
+>   V29 actual:   a67d04e7b98aaef47bf01b8158da5407
+>   V29 expected: 8d492252b98aaef47bf01b8158da5407
+>
+> (top 32 bits are wrong)
+>
+> Sample SM4E failure:
+> insn 0xcec087dd (SM4E V29.4S, V30.4S)
+>   V30   : a67d04e738f68da895ffd0c3e154e3e7
+>   V29 actual  : e272e88588a781b7e77a90dd5641e34b
+>   V29 expected: a39884af88a781b7e77a90dd5641e34b
+>
+> (top 32 bits again)
+>
+> My test setup doesn't capture register values from
+> before the insn executes, which is awkward for SM4E since
+> it uses Vd as input as well as output. Probably the bug
+> is the same as SM4EKEY, though.
 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> 
+...and it's a pretty simple fix; we just weren't actually
+doing the 4th iteration of the algorithm:
 
-Thanks.
+diff --git a/target/arm/crypto_helper.c b/target/arm/crypto_helper.c
+index b42c7e046b..2c3af64a52 100644
+--- a/target/arm/crypto_helper.c
++++ b/target/arm/crypto_helper.c
+@@ -653,7 +653,7 @@ void HELPER(crypto_sm4e)(void *vd, void *vn)
+     union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
+     uint32_t t, i;
 
-Since this patch was discovered in relation to NBD code, I'm fine taking 
-it through my NBD queue; but it's also more generic to the block layer, 
-so I'm also fine if one of the other block maintainers grabs it first 
-through their tree.
+-    for (i = 0; i < 3; i++) {
++    for (i = 0; i < 4; i++) {
+         t = CR_ST_WORD(d, (i + 1) % 4) ^
+             CR_ST_WORD(d, (i + 2) % 4) ^
+             CR_ST_WORD(d, (i + 3) % 4) ^
+@@ -683,7 +683,7 @@ void HELPER(crypto_sm4ekey)(void *vd, void *vn, void* vm)
+     uint32_t t, i;
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+     d = n;
+-    for (i = 0; i < 3; i++) {
++    for (i = 0; i < 4; i++) {
+         t = CR_ST_WORD(d, (i + 1) % 4) ^
+             CR_ST_WORD(d, (i + 2) % 4) ^
+             CR_ST_WORD(d, (i + 3) % 4) ^
+
+That change is sufficient for SM4E and SM4EKEY to pass my tests.
+
+thanks
+-- PMM
