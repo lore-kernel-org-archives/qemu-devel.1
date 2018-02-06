@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eizNG-0000zX-CN
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:17:11 -0500
+	(envelope-from <thuth@redhat.com>) id 1eizTN-00044p-3W
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:23:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eizNB-0004eT-9e
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:17:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eizNB-0004df-1t
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:17:05 -0500
-Date: Tue, 6 Feb 2018 09:17:00 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180206091700.GB4942@stefanha-x1.localdomain>
-References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
-	<20180202100843.GD13090@stefanha-x1.localdomain>
-	<CAFEAcA-5PwhJw9epXh+0_oe3E-vsVKkQDX3s1Go-FBzO=FA3zA@mail.gmail.com>
-	<20180205155108.GF28241@stefanha-x1.localdomain>
-	<CAFEAcA-vd3vEJ0i=2LtaR-NQjHoJVYWCNDHOmh3iREPcQsqR4A@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1eizTI-0000N7-7D
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:23:29 -0500
+References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0c40e592-32e7-315e-fbad-1969c90b9b01@redhat.com>
+Date: Tue, 6 Feb 2018 10:23:08 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="1LKvkjL3sHcu1TtY"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-vd3vEJ0i=2LtaR-NQjHoJVYWCNDHOmh3iREPcQsqR4A@mail.gmail.com>
-Subject: Re: [Qemu-devel] Qemu Trace
+In-Reply-To: <1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 05/12] s390-ccw: move
+ auxiliary IPL data to separate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +25,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Nesrine Zouari <nesrine.zouari@enis.tn>, QEMU Developers <qemu-devel@nongnu.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-
---1LKvkjL3sHcu1TtY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Feb 05, 2018 at 03:55:01PM +0000, Peter Maydell wrote:
-> On 5 February 2018 at 15:51, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > The point of the instrumentation plugin API is for online analysis
-> > (stuff that cannot be post-processed offline) with the ability for the
-> > plugin to control QEMU (e.g. affect translation during a run).  That is
-> > not necessary for Nesrine's use case.
+On 05.02.2018 21:57, Collin L. Walling wrote:
+> The s390-ccw firmware needs some information in support of the
+> boot process which is not available on the native machine.
+> Examples are the netboot firmware load address and now the
+> boot menu parameters.
 >=20
-> ...but it hugely overlaps, because the most interesting
-> reason for having a trace plugin is to be able to do things
-> like tracing instruction flow, memory access and so on.
+> While storing that data in unused fields of the IPL parameter block
+> works, that approach could create problems if the parameter block
+> definition should change in the future. Because then a guest could
+> overwrite these fields using the set IPLB diagnose.
 >=20
-> > I see two main requirements in Nesrine's use case:
-> >
-> > 1. Instruction flow, memory access, and task switch trace.  This doesn't
-> > exist today and requires adding new trace events.
-> >
-> > 2. An external interface for processing traces.  There seems to be a
-> > requirement for doing it online and not by post-processing trace files.
-> > Therefore I suggested looking into LTTng UST, which has an efficient
-> > interface and libraries for tracing processes.  I think no QEMU changes
-> > are necessary here.
+> In fact the data in question is of more global nature and not really
+> tied to an IPL device, so separating it is rather logical.
 >=20
-> ...and "online processing of traces" is pretty much exactly
-> what an instrumentation plugin API is for.
+> This commit introduces a new structure to hold firmware relevant
+> IPL parameters set by QEMU. The data is stored at location 204 (dec)
+> and can contain up to 7 32-bit words. This area is available to
+> programming in the z/Architecture Principles of Operation and
+> can thus safely be used by the firmware until the IPL has completed.
 
-There are two cases for online processing:
+Sounds like a good idea.
 
-1. Synchronous - this is what the instrumentation plugins will be able
-   to do.  It means that QEMU waits until the event has been processed,
-   and the plugin is therefore able to control QEMU.
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/ipl.c          | 18 +++++++++++++++++-
+>  hw/s390x/ipl.h          | 11 +++++++++--
+>  pc-bios/s390-ccw/iplb.h | 12 ++++++++++--
+>  pc-bios/s390-ccw/main.c |  6 +++++-
+>  4 files changed, 41 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 0d06fc1..3e3c3b8 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -399,6 +399,20 @@ void s390_reipl_request(void)
+>      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>  }
+> =20
+> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
+> +{
+> +    S390IPLState *ipl =3D get_ipl_device();
+> +    uint8_t *addr;
+> +    uint64_t len =3D 4096;
+> +
+> +    addr =3D cpu_physical_memory_map(cpu->env.psa, &len, 1);
+> +    if (!addr || len < 204 + sizeof(QemuIplParameters)) {
+> +        error_report("Cannot set QEMU IPL parameters");
 
-2. Asynchronous - this is what LTTng UST does.  It means that the
-   process analyzing the trace does not hold up QEMU, but it cannot
-   control QEMU without some delay between trace events firing and
-   reacting to them.  I think Nesrine's use case is this one.
+I think you should return or exit() here. Otherwise the memcpy below
+accesses an illegal memory range.
 
-#2 is useful for "real-time" graphs, for example.  That is still
-"oneline" but it doesn't require instrumentation plugins.
+> +    }
+> +    memcpy(addr + 204, &ipl->iplb.qipl, sizeof(QemuIplParameters));
+> +    cpu_physical_memory_unmap(addr, len, 1, len);
+> +}
+> +
+>  void s390_ipl_prepare_cpu(S390CPU *cpu)
+>  {
+>      S390IPLState *ipl =3D get_ipl_device();
+> @@ -418,8 +432,10 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>              error_report_err(err);
+>              vm_stop(RUN_STATE_INTERNAL_ERROR);
+>          }
+> -        ipl->iplb.ccw.netboot_start_addr =3D cpu_to_be64(ipl->start_ad=
+dr);
+> +        ipl->iplb.qipl.netboot_start_addr =3D cpu_to_be64(ipl->start_a=
+ddr);
+>      }
+> +    s390_ipl_prepare_qipl(cpu);
+> +
+>  }
+> =20
+>  static void s390_ipl_reset(DeviceState *dev)
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index 8a705e0..68dcaf8 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -16,8 +16,7 @@
+>  #include "cpu.h"
+> =20
+>  struct IplBlockCcw {
+> -    uint64_t netboot_start_addr;
+> -    uint8_t  reserved0[77];
+> +    uint8_t  reserved0[85];
+>      uint8_t  ssid;
+>      uint16_t devno;
+>      uint8_t  vm_flags;
+> @@ -59,6 +58,13 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
+> =20
+>  #define DIAG308_FLAGS_LP_VALID 0x80
+> =20
+> +struct QemuIplParameters {
+> +    uint8_t  reserved1[4];
+> +    uint64_t netboot_start_addr;
+> +    uint8_t  reserved2[16];
+> +} QEMU_PACKED;
+> +typedef struct QemuIplParameters QemuIplParameters;
+> +
+>  union IplParameterBlock {
+>      struct {
+>          uint32_t len;
+> @@ -74,6 +80,7 @@ union IplParameterBlock {
+>              IplBlockFcp fcp;
+>              IplBlockQemuScsi scsi;
+>          };
+> +        QemuIplParameters qipl;
+>      } QEMU_PACKED;
 
-Given that the instrumentation plugin API is still in early development,
-it would delay Nesrine's work and I recommend against depending on it.
+Sorry if I get that wrong, but if you store that within
+IplParameterBlock, the information is still passed via DIAG 0x308, isn't
+it? (see handle_diag_308(), case 6). Is that really what was intended her=
+e?
 
-> It would also let you put the logic of "how do we know what a
-> guest OS task switch is anyway" somewhere other than QEMU,
-> which is nice because that's very guest-OS specific.
+[...]
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index e857ce4..825a1a3 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(=
+PAGE_SIZE)));
+>  static SubChannelId blk_schid =3D { .one =3D 1 };
+>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>  static char loadparm[8] =3D { 0, 0, 0, 0, 0, 0, 0, 0 };
+> +QemuIplParameters qipl;
+> =20
+>  /*
+>   * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+> @@ -81,6 +82,7 @@ static void virtio_setup(void)
+>      uint16_t dev_no;
+>      char ldp[] =3D "LOADPARM=3D[________]\n";
+>      VDev *vdev =3D virtio_get_device();
+> +    QemuIplParameters *early_qipl =3D (QemuIplParameters *)204;
 
-How do you envision that instrumentation plugins will monitor guest OS
-task switches if QEMU does not know about them?
+Could you please introduce a proper #define for that magic 204 value
+(and use it in s390_ipl_prepare_qipl, too)? ... so that it is later
+easier to grep for this.
 
-Without instrumentation plugins I would add a guest_x86_cr3_write trace
-event, for example.  Then the trace consumer can interpret that event as
-a task switch if it knows the guest OS always writes to the cr3 register
-on a task switch.  No instrumentation plugins are necessary in order to
-do this and it doesn't hardcode knowledge of guest OS task switching
-into QEMU either.
+>      /*
+>       * We unconditionally enable mss support. In every sane configurat=
+ion,
+> @@ -93,6 +95,8 @@ static void virtio_setup(void)
+>      memcpy(ldp + 10, loadparm, 8);
+>      sclp_print(ldp);
+> =20
+> +    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+> +
+>      if (store_iplb(&iplb)) {
+>          switch (iplb.pbt) {
+>          case S390_IPL_TYPE_CCW:
+> @@ -127,7 +131,7 @@ static void virtio_setup(void)
+> =20
+>      if (virtio_get_device_type() =3D=3D VIRTIO_ID_NET) {
+>          sclp_print("Network boot device detected\n");
+> -        vdev->netboot_start_addr =3D iplb.ccw.netboot_start_addr;
+> +        vdev->netboot_start_addr =3D qipl.netboot_start_addr;
+>      } else {
+>          virtio_blk_setup_device(blk_schid);
+> =20
+>=20
 
-Stefan
-
---1LKvkjL3sHcu1TtY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaeXKLAAoJEJykq7OBq3PIk7sIALCfoL/M7T1PrAzTz7ibSrIA
-yHXvqcLk8y3l1men5/pBgb4oUtggOYnOVrj+EmMEverGFzRPMg2zAPCmr/Y4HV4P
-toLbwTvGmmHkqQwY4yjNeBE/Nvz+3qo1Mzq09qR0QuS+621Wfww6s9VPXMDTQWyD
-q74K+TT9UyLWLKGf/Tmc+2CAWKulIyQtm6QsHiO37ATUeK8oV+X6KV4haemlXtZ3
-+L+bRX7B+Rd6EnrO08mxD1oyIraXDGBEIwGuEVWs8SiuK5nf6Bpbh8Wwra2LF2Ux
-2Xd4VQv92+OUTmbpLUD22EFOw1NREAeGi5Nc4/kE06SJGDrmXGDquBWOziY5jlM=
-=5/4A
------END PGP SIGNATURE-----
-
---1LKvkjL3sHcu1TtY--
+ Thomas
