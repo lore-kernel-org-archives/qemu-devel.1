@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eixwV-0007V8-Km
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:45:29 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eixxb-00085M-TE
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:46:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eixwS-0007b3-C5
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:45:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eixwR-0007aZ-SJ
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:45:24 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-7-armbru@redhat.com>
-	<05068311-b8db-69b0-9c86-50839994f630@redhat.com>
-	<87lgga4f7s.fsf@dusky.pond.sub.org>
-	<0e3ea662-418e-0574-3817-434b35e85887@redhat.com>
-Date: Tue, 06 Feb 2018 08:45:18 +0100
-In-Reply-To: <0e3ea662-418e-0574-3817-434b35e85887@redhat.com> (Eric Blake's
-	message of "Mon, 5 Feb 2018 09:52:41 -0600")
-Message-ID: <87a7wmfto1.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 06/21] qapi-gen: New common driver for
- code and doc generators
+	(envelope-from <borntraeger@de.ibm.com>) id 1eixxW-0007zX-7u
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:46:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57542)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eixxV-0007zI-V1
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:46:30 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w167isXH007371
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 02:46:28 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fy66ycaae-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 02:46:28 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 6 Feb 2018 07:46:25 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue,  6 Feb 2018 07:46:22 +0000
+Message-Id: <20180206074622.157812-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 1/1] s390x/cpu: expose the guest crash
+ information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,205 +36,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Eric Blake <eblake@redhat.com> writes:
+This patch is the s390 implementation of guest crash information,
+similar to commit d187e08dc4 ("i386/cpu: add crash-information QOM
+property") and the related commits. We will detect several crash
+reasons, with the "disabled wait" being the most important one, since
+this is used by all s390 guests as a "panic like" notification.
 
-> On 02/03/2018 03:03 AM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->> 
->>> On 02/02/2018 07:03 AM, Markus Armbruster wrote:
->>>> Whenever qapi-schema.json changes, we run six programs eleven times to
->>>> update eleven files.  This is silly.  Replace the six programs by a
->>>> single program that spits out all eleven files.
->>>
->>> Yay, about time!
->>>
->>> One program, but still invoked multiple times:
->>>
->
->>>>  rename scripts/{qapi2texi.py => qapi/doc.py} (92%)
->>>>  mode change 100755 => 100644
->>>
->>> Unintinentional?  We're inconsistent on which of our *.py files are
->>> executable in git.  Does it matter whether a file that is designed for
->>> use as a module is marked executable (if so, perhaps 5/21 should be
->>> adding the x attribute on other files, rather than this patch removing
->>> it on the doc generator).
->> 
->> qapi2texi.py is no longer runnable as a standalone program after this
->> patch.
->> 
->> So are qapi-{commands,events,introspect,types,visit}.py, but they never
->> had the executable bit set.
->
-> Okay, so dropping the bit consistently makes sense; still, a mention in
-> the commit message wouldn't hurt.
+Demonstrate these ways with examples as follows.
 
-Can do.
+  1. crash-information QOM property;
 
->>>> +++ b/Makefile
->>>
->>>> +qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
->>>> +qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h \
->>>> +qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal.c \
->>>> +qga/qapi-generated/qga-qapi.texi: \
->>>> +qga/qapi-generated/qapi-gen-timestamp ;
->>>> +qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
->>>> +	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
->>>> +		-o qga/qapi-generated -p "qga-" $<, \
->>>> +		"GEN","$(@:%-timestamp=%)")
->>>> +	@>$@
->>>
->>> once for qga,
->> 
->> That's the QAPI/QGA schema.  The commit message talks about the QAPI/QMP
->> schema.  I wish the two weren't named the same.
->
-> 7 files here,...
->
->> 
->> Modularization might make fusing them possible.  Whether that's a good
->> idea I don't know.
->> 
->>>> +qapi-types.c qapi-types.h \
->>>> +qapi-visit.c qapi-visit.h \
->>>> +qmp-commands.h qmp-marshal.c \
->>>> +qapi-event.c qapi-event.h \
->>>> +qmp-introspect.h qmp-introspect.c \
->>>> +qapi.texi: \
->>>> +qapi-gen-timestamp ;
->>>> +qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
->>>> +	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
->>>> +		-o "." -b $<, \
->>>> +		"GEN","$(@:%-timestamp=%)")
->>>> +	@>$@
->>>
->>> and again for the main level.  Still, a definite improvement!
->
-> 11 files here,...
->
->> 
->> Perhaps I can find a way to clarify the commit message.
->> 
->
-> [1]
->
->
->>>> -def main(argv):
->>>> -    (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
->>>> -
->>>> -    blurb = '''
->>>> - * Schema-defined QAPI/QMP commands
->>>> -'''
->>>> -
->>>> +def gen_commands(schema, output_dir, prefix):
->>>> +    blurb = ' * Schema-defined QAPI/QMP commands'
->>>
->>> Some churn on the definition of blurb; worth tidying this in the
->>> introduction earlier in the series?
->> 
->> Doesn't seem worth a separate patch, but I can try to reshuffle things
->> to reduce churn.
->
-> Yeah, my question was more about the conversion between multiline
-> '''...''' to single-line '...'; why not just use the single-line
-> construct earlier in the series when introducing the blurb variable.
+  Run qemu with -qmp unix:qmp-sock,server, then use utility "qmp-shell"
+  to execute "qom-get" command, and might get the result like,
 
-Introduced in PATCH 01:
+  (QEMU) qom-get path=/machine/cpu[0]/ property=crash-information
+  {"return": {"psw-addr": 1105350, "psw-mask": 562956395872256, "reason":
+   "disabled wait", "type": "s390"}}
 
-    -c_comment = '''
-    -/*
-    - * schema-defined QMP->QAPI command dispatch
-    +blurb = '''
-    + * Schema-defined QAPI/QMP commands
-      *
-      * Copyright IBM, Corp. 2011
-      *
-      * Authors:
-      *  Anthony Liguori   <aliguori@us.ibm.com>
-    - *
-    - * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-    - * See the COPYING.LIB file in the top-level directory.
-    - *
-    - */
-    -'''
+  2. GUEST_PANICKED event reporting;
 
-Shortened in PATCH 02:
+  Run qemu with a socket option, and telnet or nc to that,
+  -chardev socket,id=qmp,port=4444,host=localhost,server \
+  -mon chardev=qmp,mode=control,pretty=on \
+  Negotiating the mode by { "execute": "qmp_capabilities" }, and the crash
+  information will be reported on a guest crash event like,
 
-     blurb = '''
-      * Schema-defined QAPI/QMP commands
-    - *
-    - * Copyright IBM, Corp. 2011
-    - *
-    - * Authors:
-    - *  Anthony Liguori   <aliguori@us.ibm.com>
-     '''
+  {
+      "timestamp": {
+          "seconds": 1499931739,
+          "microseconds": 961296
+      },
+      "event": "GUEST_PANICKED",
+      "data": {
+          "action": "pause",
+          "info": {
+              "psw-addr": 1105350,
+              "reason": "disabled wait",
+              "psw-mask": 562956395872256,
+              "type": "s390"
+          }
+      }
+  }
 
-Reformatted in PATCH 06 (see above).
+  3. log;
 
-Moved in PATCH 16 to visitor's __init__ for types and visits (the rest
-aren't implemented, yet):
+  Run qemu with the parameters: -D <logfile> -d guest_errors, to
+  specify the logfile and log item. The results might be,
 
-     class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-    -    def __init__(self, opt_builtins):
-    +    def __init__(self, opt_builtins, prefix):
-             self._opt_builtins = opt_builtins
-    -        self.decl = None
-    -        self.defn = None
-    -        self._fwdecl = None
-    -        self._btin = None
-    +        self._prefix = prefix
-    +        blurb = ' * Schema-defined QAPI types'
-    +        self._genc = QAPIGenC(blurb, __doc__)
-    +        self._genh = QAPIGenH(blurb, __doc__)
+  Guest crashed
+  S390 crash parameters: (0x0000100000000000 0x0000000000000006)
+  S390 crash reason: operation exception loop
 
-Variable eliminated there in PATCH 17:
+Co-authored-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ qapi/run-state.json   | 27 ++++++++++++++++++++++--
+ target/s390x/cpu.c    | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/cpu.h    | 11 ++++++++++
+ target/s390x/helper.c |  5 ++++-
+ target/s390x/kvm.c    | 15 +++++++-------
+ vl.c                  |  6 ++++++
+ 6 files changed, 110 insertions(+), 11 deletions(-)
 
-    -        blurb = ' * Schema-defined QAPI types'
-    -        self._genc = QAPIGenC(blurb, __doc__)
-    -        self._genh = QAPIGenH(blurb, __doc__)
-    +        self._module = {}
-    +        self._add_module(None, ' * Built-in QAPI types')
-
-I could delay the reformatting until PATCH 16, or do it in PATCH 02.
-Feels like a wash to me, but if you have a preference...
-
-> You are right that creating blurb didn't need a separate patch, just
-> less churn over the series.
->
->>>>  
->>>> -qapi-py = $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.py
->>>> +# TODO don't duplicate $(SRC_PATH)/Makefile's qapi-py here
->>>> +qapi-py = $(SRC_PATH)/scripts/qapi/commands.py \
->>>> +$(SRC_PATH)/scripts/qapi/events.py \
->>>> +$(SRC_PATH)/scripts/qapi/introspect.py \
->>>> +$(SRC_PATH)/scripts/qapi/types.py \
->>>> +$(SRC_PATH)/scripts/qapi/visit.py \
->>>> +$(SRC_PATH)/scripts/qapi/common.py \
->>>> +$(SRC_PATH)/scripts/qapi/doc.py \
->>>> +$(SRC_PATH)/scripts/ordereddict.py \
->>>> +$(SRC_PATH)/scripts/qapi-gen.py
->>>
->>> So, were you counting these in the 11 generated files mentioned in the
->>> commit message? :)
->> 
->> I'm not sure I understand what you mean here...
->
-> [1] and 9 more files.  So, the commit message only mentioned the 11 QMP
-> files, rather than all 27 (if I counted right) QAPI generated files.  My
-> comments were trying to point out that you simplified more than just the
-> QMP code generation into fewer script invocations, and the counts looked
-> off since out of the three spots converted, only one of the spots had 11
-> files.
-
-The commit message talks only about the QAPI/QMP schema.  It's confusing
-because our poor taste in file names creates ambiguity: does
-qapi-schema.json refer to ./qapi-schema.json (i.e. the QAPI/QMP one),
-qga/qapi-schema.json, or both?
-
-Perhaps I should rename qapi-schema.json to qapi/schema.json.
-
-The commit message needs a note along the lines of "same for
-qga/qapi-schema.json".
+diff --git a/qapi/run-state.json b/qapi/run-state.json
+index bca46a8785..13901b4b22 100644
+--- a/qapi/run-state.json
++++ b/qapi/run-state.json
+@@ -320,22 +320,29 @@
+ #
+ # An enumeration of the guest panic information types
+ #
++# @hyper-v: hyper-v guest panic information type
++#
++# @s390: s390 guest panic information type (Since: 2.12)
++#
+ # Since: 2.9
+ ##
+ { 'enum': 'GuestPanicInformationType',
+-  'data': [ 'hyper-v'] }
++  'data': [ 'hyper-v', 's390' ] }
+ 
+ ##
+ # @GuestPanicInformation:
+ #
+ # Information about a guest panic
+ #
++# @type: Crash type that defines the hypervisor specific information
++#
+ # Since: 2.9
+ ##
+ {'union': 'GuestPanicInformation',
+  'base': {'type': 'GuestPanicInformationType'},
+  'discriminator': 'type',
+- 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
++ 'data': { 'hyper-v': 'GuestPanicInformationHyperV',
++           's390': 'GuestPanicInformationS390' } }
+ 
+ ##
+ # @GuestPanicInformationHyperV:
+@@ -350,3 +357,19 @@
+            'arg3': 'uint64',
+            'arg4': 'uint64',
+            'arg5': 'uint64' } }
++
++##
++# @GuestPanicInformationS390:
++#
++# S390 specific guest panic information (PSW)
++#
++# @psw-mask: control fields of guest PSW
++# @psw-addr: guest instruction address
++# @reason: guest crash reason in human readable form
++#
++# Since: 2.12
++##
++{'struct': 'GuestPanicInformationS390',
++ 'data': { 'psw-mask': 'uint64',
++           'psw-addr': 'uint64',
++           'reason': 'str' } }
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index d2e6b9f5c7..4c13864a0e 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -35,6 +35,8 @@
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ #include "qapi/visitor.h"
++#include "qapi-visit.h"
++#include "sysemu/hw_accel.h"
+ #include "exec/exec-all.h"
+ #include "hw/qdev-properties.h"
+ #ifndef CONFIG_USER_ONLY
+@@ -237,6 +239,58 @@ out:
+     error_propagate(errp, err);
+ }
+ 
++static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
++{
++    GuestPanicInformation *panic_info;
++    S390CPU *cpu = S390_CPU(cs);
++
++    cpu_synchronize_state(cs);
++    panic_info = g_malloc0(sizeof(GuestPanicInformation));
++
++    panic_info->type = GUEST_PANIC_INFORMATION_TYPE_S390;
++    panic_info->u.s390.psw_mask = cpu->env.psw.mask;
++    panic_info->u.s390.psw_addr = cpu->env.psw.addr;
++
++    switch (cpu->env.crash_reason) {
++    case CRASH_REASON_PGM:
++        panic_info->u.s390.reason = g_strdup("program interrupt loop");
++        break;
++    case CRASH_REASON_EXT:
++        panic_info->u.s390.reason = g_strdup("external interrupt loop");
++        break;
++    case CRASH_REASON_WAITPSW:
++        panic_info->u.s390.reason = g_strdup("disabled wait");
++        break;
++    case CRASH_REASON_OPEREXC:
++        panic_info->u.s390.reason = g_strdup("operation exception loop");
++        break;
++    default:
++        panic_info->u.s390.reason = g_strdup("unknown crash reason");
++        break;
++    }
++
++    return panic_info;
++}
++
++static void s390_cpu_get_crash_info_qom(Object *obj, Visitor *v,
++                                         const char *name, void *opaque,
++                                         Error **errp)
++{
++    CPUState *cs = CPU(obj);
++    GuestPanicInformation *panic_info;
++
++    if (!cs->crash_occurred) {
++        error_setg(errp, "No crash occured");
++        return;
++    }
++
++    panic_info = s390_cpu_get_crash_info(cs);
++
++    visit_type_GuestPanicInformation(v, "crash-information", &panic_info,
++                                     errp);
++    qapi_free_GuestPanicInformation(panic_info);
++}
++
+ static void s390_cpu_initfn(Object *obj)
+ {
+     CPUState *cs = CPU(obj);
+@@ -249,6 +303,8 @@ static void s390_cpu_initfn(Object *obj)
+     cs->env_ptr = env;
+     cs->halted = 1;
+     cs->exception_index = EXCP_HLT;
++    object_property_add(obj, "crash-information", "GuestPanicInformation",
++                        s390_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
+     s390_cpu_model_register_props(obj);
+ #if !defined(CONFIG_USER_ONLY)
+     qemu_get_timedate(&tm, 0);
+@@ -482,6 +538,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     cc->do_interrupt = s390_cpu_do_interrupt;
+ #endif
+     cc->dump_state = s390_cpu_dump_state;
++    cc->get_crash_info = s390_cpu_get_crash_info;
+     cc->set_pc = s390_cpu_set_pc;
+     cc->gdb_read_register = s390_cpu_gdb_read_register;
+     cc->gdb_write_register = s390_cpu_gdb_write_register;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index a1123ad621..2e671cbe88 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -77,6 +77,15 @@ typedef struct MchkQueue {
+     uint16_t type;
+ } MchkQueue;
+ 
++/* Crash cases. */
++enum crash_reasons {
++    CRASH_REASON_UNKNOWN,  /* default value of 0 on reset */
++    CRASH_REASON_PGM,
++    CRASH_REASON_EXT,
++    CRASH_REASON_WAITPSW,
++    CRASH_REASON_OPEREXC,
++};
++
+ struct CPUS390XState {
+     uint64_t regs[16];     /* GP registers */
+     /*
+@@ -102,6 +111,8 @@ struct CPUS390XState {
+ 
+     PSW psw;
+ 
++    enum crash_reasons crash_reason;
++
+     uint64_t cc_src;
+     uint64_t cc_dst;
+     uint64_t cc_vr;
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 35d9741918..56c3f13686 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -84,12 +84,15 @@ static inline bool is_special_wait_psw(uint64_t psw_addr)
+ 
+ void s390_handle_wait(S390CPU *cpu)
+ {
++    CPUState *cs = CPU(cpu);
++
+     if (s390_cpu_halt(cpu) == 0) {
+ #ifndef CONFIG_USER_ONLY
+         if (is_special_wait_psw(cpu->env.psw.addr)) {
+             qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+         } else {
+-            qemu_system_guest_panicked(NULL);
++            cpu->env.crash_reason = CRASH_REASON_WAITPSW;
++            qemu_system_guest_panicked(cpu_get_crash_info(cs));
+         }
+ #endif
+     }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 8736001156..e8d2b7410b 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1568,15 +1568,14 @@ static int handle_instruction(S390CPU *cpu, struct kvm_run *run)
+     return r;
+ }
+ 
+-static void unmanageable_intercept(S390CPU *cpu, const char *str, int pswoffset)
++static void unmanageable_intercept(S390CPU *cpu, enum crash_reasons reason,
++                                   int pswoffset)
+ {
+     CPUState *cs = CPU(cpu);
+ 
+-    error_report("Unmanageable %s! CPU%i new PSW: 0x%016lx:%016lx",
+-                 str, cs->cpu_index, ldq_phys(cs->as, cpu->env.psa + pswoffset),
+-                 ldq_phys(cs->as, cpu->env.psa + pswoffset + 8));
+     s390_cpu_halt(cpu);
+-    qemu_system_guest_panicked(NULL);
++    cpu->env.crash_reason = reason;
++    qemu_system_guest_panicked(cpu_get_crash_info(cs));
+ }
+ 
+ /* try to detect pgm check loops */
+@@ -1606,7 +1605,7 @@ static int handle_oper_loop(S390CPU *cpu, struct kvm_run *run)
+         !(oldpsw.mask & PSW_MASK_PSTATE) &&
+         (newpsw.mask & PSW_MASK_ASC) == (oldpsw.mask & PSW_MASK_ASC) &&
+         (newpsw.mask & PSW_MASK_DAT) == (oldpsw.mask & PSW_MASK_DAT)) {
+-        unmanageable_intercept(cpu, "operation exception loop",
++        unmanageable_intercept(cpu, CRASH_REASON_OPEREXC,
+                                offsetof(LowCore, program_new_psw));
+         return EXCP_HALTED;
+     }
+@@ -1627,12 +1626,12 @@ static int handle_intercept(S390CPU *cpu)
+             r = handle_instruction(cpu, run);
+             break;
+         case ICPT_PROGRAM:
+-            unmanageable_intercept(cpu, "program interrupt",
++            unmanageable_intercept(cpu, CRASH_REASON_PGM,
+                                    offsetof(LowCore, program_new_psw));
+             r = EXCP_HALTED;
+             break;
+         case ICPT_EXT_INT:
+-            unmanageable_intercept(cpu, "external interrupt",
++            unmanageable_intercept(cpu, CRASH_REASON_EXT,
+                                    offsetof(LowCore, external_new_psw));
+             r = EXCP_HALTED;
+             break;
+diff --git a/vl.c b/vl.c
+index e517a8d995..74ea60f248 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1761,6 +1761,12 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
+                           info->u.hyper_v.arg3,
+                           info->u.hyper_v.arg4,
+                           info->u.hyper_v.arg5);
++        } else if (info->type == GUEST_PANIC_INFORMATION_TYPE_S390) {
++            qemu_log_mask(LOG_GUEST_ERROR, "S390 crash parameters: (0x%016"
++                          PRIx64" 0x%016" PRIx64")\nS390 crash reason: %s\n",
++                          info->u.s390.psw_mask,
++                          info->u.s390.psw_addr,
++                          info->u.s390.reason);
+         }
+         qapi_free_GuestPanicInformation(info);
+     }
+-- 
+2.14.3
