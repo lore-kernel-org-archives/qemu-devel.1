@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uE-000399-Vu
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:32 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uG-0003As-UK
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uA-0004F9-Pa
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:30 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uB-0004FN-07
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:32 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  6 Feb 2018 17:07:21 +0300
-Message-Id: <20180206140722.10110-2-vsementsov@virtuozzo.com>
+Date: Tue,  6 Feb 2018 17:07:22 +0300
+Message-Id: <20180206140722.10110-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20180206140722.10110-1-vsementsov@virtuozzo.com>
 References: <20180206140722.10110-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 1/2] block/accounting: introduce latency
- histogram
+Subject: [Qemu-devel] [PATCH 2/2] qapi: add block latency histogram interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,149 +22,178 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, vsementsov@virtuozzo.com
 
-Introduce latency histogram statics for block devices.
-For each accounted operation type latency region [0, +inf) is
-divided into subregions by several points. Then, calculate
-hits for each subregion.
+Set (and clear) histogram through new command
+block-latency-histogram-set and show new statistics in
+query-blockstats results.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/accounting.h |  8 +++++
- block/accounting.c         | 83 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+)
+ qapi/block-core.json | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ block/qapi.c         | 31 ++++++++++++++++++++++++++
+ blockdev.c           | 15 +++++++++++++
+ 3 files changed, 107 insertions(+), 1 deletion(-)
 
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index b833d26d6c..7fbfc86c43 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -45,6 +45,12 @@ struct BlockAcctTimedStats {
-     QSLIST_ENTRY(BlockAcctTimedStats) entries;
- };
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 8225308904..4706a934d9 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -451,6 +451,63 @@
+            'status': 'DirtyBitmapStatus'} }
  
-+typedef struct BlockLatencyHistogram {
-+    int size;
-+    uint64_t *points; /* @size-1 points here (all points, except 0 and +inf) */
-+    uint64_t *histogram[BLOCK_MAX_IOTYPE]; /* @size elements for each type */
-+} BlockLatencyHistogram;
+ ##
++# @BlockLatencyHistogramInfo:
++#
++# Block latency histogram.
++#
++# @latency: list of latency points in microseconds. Equals to @latency parameter
++#           of last called block-latency-histogram-set.
++#
++# @read: list of read-request counts corresponding to latency region.
++#        len(@read) = len(@latency) + 1
++#        @read[0] corresponds to latency region [0, @latency[0])
++#        for 0 < i < len(@latency): @read[i] corresponds to latency region
++#            [@latency[i-1], @latency[i])
++#        @read.last_element corresponds to latency region
++#            [@latency.last_element, +inf)
++#
++# @write: list of write-request counts (see @read semantics)
++#
++# @flush: list of flush-request counts (see @read semantics)
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockLatencyHistogramInfo',
++  'data': {'latency': ['uint64'],
++           'read': ['uint64'],
++           'write': ['uint64'],
++           'flush': ['uint64'] } }
 +
- struct BlockAcctStats {
-     QemuMutex lock;
-     uint64_t nr_bytes[BLOCK_MAX_IOTYPE];
-@@ -57,6 +63,7 @@ struct BlockAcctStats {
-     QSLIST_HEAD(, BlockAcctTimedStats) intervals;
-     bool account_invalid;
-     bool account_failed;
-+    BlockLatencyHistogram latency_histogram;
- };
++##
++# @block-latency-histogram-set:
++#
++# Add latency histogram to block device. If latency histogram alredy exists for
++# the device it will be removed and a new one created. Latency histogram may be
++# quered through query-blockstats.
++#
++# @device: device name to set latency histogram for.
++#
++# @latency: list of latency points in microseconds. The sequcence must be
++#           ascending, elements must be greater than zero. Histogram latency
++#           regions would be
++#           [0, @latency[0]), ..., [@latency[i], @latency[i+1]), ...,
++#           [@latency.last_element, +inf)
++#
++# Returns: error if device is not found.
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "block-latency-histogram-set",
++#      "arguments": { "device": "drive0",
++#                     "latency": [500000, 1000000, 2000000] } }
++# <- { "return": {} }
++##
++{ 'command': 'block-latency-histogram-set',
++  'data': {'device': 'str', 'latency': ['uint64'] } }
++
++##
+ # @BlockInfo:
+ #
+ # Block device information.  This structure describes a virtual device and
+@@ -730,6 +787,8 @@
+ # @timed_stats: Statistics specific to the set of previously defined
+ #               intervals of time (Since 2.5)
+ #
++# @latency-histogram: @BlockLatencyHistogramInfo. (Since 2.12)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'BlockDeviceStats',
+@@ -742,7 +801,8 @@
+            'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
+            'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
+            'account_invalid': 'bool', 'account_failed': 'bool',
+-           'timed_stats': ['BlockDeviceTimedStats'] } }
++           'timed_stats': ['BlockDeviceTimedStats'],
++           '*latency-histogram': 'BlockLatencyHistogramInfo' } }
  
- typedef struct BlockAcctCookie {
-@@ -82,5 +89,6 @@ void block_acct_merge_done(BlockAcctStats *stats, enum BlockAcctType type,
- int64_t block_acct_idle_time_ns(BlockAcctStats *stats);
- double block_acct_queue_depth(BlockAcctTimedStats *stats,
-                               enum BlockAcctType type);
-+int block_latency_histogram_set(BlockAcctStats *stats, uint64List *latency);
- 
- #endif
-diff --git a/block/accounting.c b/block/accounting.c
-index 87ef5bbfaa..a34ef09015 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -94,6 +94,86 @@ void block_acct_start(BlockAcctStats *stats, BlockAcctCookie *cookie,
-     cookie->type = type;
+ ##
+ # @BlockStats:
+diff --git a/block/qapi.c b/block/qapi.c
+index fc10f0a565..715ed17a6b 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -389,6 +389,24 @@ static void bdrv_query_info(BlockBackend *blk, BlockInfo **p_info,
+     qapi_free_BlockInfo(info);
  }
  
-+/* block_latency_histogram_compare_func
-+ * Compare @key with interval [@el, @el+1), where @el+1 is a next array element
-+ * after @el.
-+ * Return: -1 if @key < @el
-+ *          0 if @key in [@el, @el+1)
-+ *         +1 if @key >= @el+1
-+ */
-+static int block_latency_histogram_compare_func(const void *key, const void *el)
++static uint64List *uint64_list(uint64_t *list, int size)
 +{
-+    uint64_t k = *(uint64_t *)key;
-+    uint64_t a = *(uint64_t *)el;
-+    uint64_t b = *((uint64_t *)el + 1);
-+
-+    return k < a ? -1 : (k < b ? 0 : 1);
-+}
-+
-+static void block_latency_histogram_account(BlockLatencyHistogram *hist,
-+                                            enum BlockAcctType type,
-+                                            int64_t latency_ns)
-+{
-+    uint64_t *data, *pos;
-+
-+    if (hist->points == NULL) {
-+        /* histogram disabled */
-+        return;
-+    }
-+
-+    data = hist->histogram[type];
-+
-+    if (latency_ns < hist->points[0]) {
-+        data[0]++;
-+        return;
-+    }
-+
-+    if (latency_ns >= hist->points[hist->size - 2]) {
-+        data[hist->size - 1]++;
-+        return;
-+    }
-+
-+    pos = bsearch(&latency_ns, hist->points, hist->size - 2,
-+                  sizeof(hist->points[0]),
-+                  block_latency_histogram_compare_func);
-+    assert(pos != NULL);
-+
-+    data[pos - hist->points + 1]++;
-+}
-+
-+int block_latency_histogram_set(BlockAcctStats *stats, uint64List *latency)
-+{
-+    BlockLatencyHistogram *hist = &stats->latency_histogram;
-+    uint64List *entry;
-+    uint64_t *ptr;
 +    int i;
-+    uint64_t prev = 0;
++    uint64List *out_list = NULL;
++    uint64List **pout_list = &out_list;
 +
-+    hist->size = 1;
-+
-+    for (entry = latency; entry; entry = entry->next) {
-+        if (entry->value <= prev) {
-+            return -EINVAL;
-+        }
-+        hist->size++;
-+        prev = entry->value;
++    for (i = 0; i < size; i++) {
++        uint64List *entry = g_new(uint64List, 1);
++        entry->value = list[i];
++        *pout_list = entry;
++        pout_list = &entry->next;
 +    }
 +
-+    hist->points = g_renew(uint64_t, hist->points, hist->size - 1);
-+    for (entry = latency, ptr = hist->points; entry;
-+         entry = entry->next, ptr++)
-+    {
-+        *ptr = entry->value;
-+    }
++    *pout_list = NULL;
 +
-+    for (i = 0; i < BLOCK_MAX_IOTYPE; i++) {
-+        hist->histogram[i] = g_renew(uint64_t, hist->histogram[i], hist->size);
-+        memset(hist->histogram[i], 0, hist->size * sizeof(uint64_t));
-+    }
-+
-+    return 0;
++    return out_list;
 +}
 +
- static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
-                                  bool failed)
+ static void bdrv_query_blk_stats(BlockDeviceStats *ds, BlockBackend *blk)
  {
-@@ -116,6 +196,9 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
-         stats->nr_ops[cookie->type]++;
+     BlockAcctStats *stats = blk_get_stats(blk);
+@@ -454,6 +472,19 @@ static void bdrv_query_blk_stats(BlockDeviceStats *ds, BlockBackend *blk)
+         dev_stats->avg_wr_queue_depth =
+             block_acct_queue_depth(ts, BLOCK_ACCT_WRITE);
      }
- 
-+    block_latency_histogram_account(&stats->latency_histogram, cookie->type,
-+                                    latency_ns);
 +
-     if (!failed || stats->account_failed) {
-         stats->total_time_ns[cookie->type] += latency_ns;
-         stats->last_access_time_ns = time_ns;
++    ds->has_latency_histogram = stats->latency_histogram.points != NULL;
++    if (ds->has_latency_histogram) {
++        BlockLatencyHistogramInfo *info = g_new0(BlockLatencyHistogramInfo, 1);
++        BlockLatencyHistogram *h = &stats->latency_histogram;
++
++        ds->latency_histogram = info;
++
++        info->latency = uint64_list(h->points, h->size - 1);
++        info->read = uint64_list(h->histogram[BLOCK_ACCT_READ], h->size);
++        info->write = uint64_list(h->histogram[BLOCK_ACCT_WRITE], h->size);
++        info->flush = uint64_list(h->histogram[BLOCK_ACCT_FLUSH], h->size);
++    }
+ }
+ 
+ static BlockStats *bdrv_query_bds_stats(BlockDriverState *bs,
+diff --git a/blockdev.c b/blockdev.c
+index 8e977eef11..dbf17aca0c 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -4176,6 +4176,21 @@ void qmp_x_blockdev_set_iothread(const char *node_name, StrOrNull *iothread,
+     aio_context_release(old_context);
+ }
+ 
++void qmp_block_latency_histogram_set(const char *device, uint64List *latency,
++                                     Error **errp)
++{
++    BlockBackend *blk = blk_by_name(device);
++    if (!blk) {
++        error_setg(errp, "Device '%s' not found", device);
++        return;
++    }
++
++    if (block_latency_histogram_set(blk_get_stats(blk), latency) < 0) {
++        error_setg(errp, "Invalid latency array");
++        return;
++    }
++}
++
+ QemuOptsList qemu_common_drive_opts = {
+     .name = "drive",
+     .head = QTAILQ_HEAD_INITIALIZER(qemu_common_drive_opts.head),
 -- 
 2.11.1
