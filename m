@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ej6FQ-0003U7-BH
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:37:37 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Pu-0000T7-5b
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ej6FN-0003Fh-Nu
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:37:32 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56626
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ej6FN-0003FR-Gp
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:37:29 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w16Ga1DG045449
-	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 11:37:28 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fyfr1s2dc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 11:37:27 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 6 Feb 2018 11:37:26 -0500
-References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1517864246-11101-12-git-send-email-walling@linux.vnet.ibm.com>
-	<0024946c-b47e-14cd-0b30-3a8009f76342@redhat.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 6 Feb 2018 11:37:22 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej6Pq-0004fE-Ol
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:22 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ej6Pq-0004dQ-IY
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:48:18 -0500
+Received: by mail-wr0-x242.google.com with SMTP id v15so2649510wrb.8
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:48:18 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue,  6 Feb 2018 16:47:54 +0000
+Message-Id: <20180206164815.10084-2-alex.bennee@linaro.org>
+In-Reply-To: <20180206164815.10084-1-alex.bennee@linaro.org>
+References: <20180206164815.10084-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <0024946c-b47e-14cd-0b30-3a8009f76342@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <d81608e4-9c74-e0e7-bf25-ccfb59b80204@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 11/12] s390-ccw: clear
- pending irqs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 01/22] fpu/softfloat: implement
+ float16_squash_input_denormal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,98 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 02/06/2018 05:07 AM, Thomas Huth wrote:
-> On 05.02.2018 21:57, Collin L. Walling wrote:
->> It is possible while waiting for multiple types of external
->> interrupts that we might have pending irqs remaining between
->> irq consumption and irq disabling. Those interrupts could
->> propagate to the guest after IPL completes and cause unwanted
->> behavior.
->>
->> To avoid this, we clear the write event mask to prevent further
->> service interrupts from ASCII events and then consume all pending
->> irqs for a miniscule duration. Once finished, we reset the write
->> event mask and resume business as usual.
->>
->> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->> ---
->>   pc-bios/s390-ccw/menu.c | 16 ++++++++++++++++
->>   pc-bios/s390-ccw/sclp.c | 12 ++++++++++++
->>   2 files changed, 28 insertions(+)
->>
->> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
->> index 85d285f..971f6b6 100644
->> --- a/pc-bios/s390-ccw/menu.c
->> +++ b/pc-bios/s390-ccw/menu.c
->> @@ -64,6 +64,20 @@ static inline bool check_clock_int(void)
->>       return *code =3D=3D 0x1004;
->>   }
->>  =20
->> +static void clear_pending_irqs(void)
->> +{
->> +    uint64_t time =3D 50 * TOD_CLOCK_SECOND / 0x3e8;
-> s/0x3e8/1000/ please.
+This will be required when expanding the MINMAX() macro for 16
+bit/half-precision operations.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ fpu/softfloat.c         | 15 +++++++++++++++
+ include/fpu/softfloat.h |  1 +
+ 2 files changed, 16 insertions(+)
 
-Agreed.
-
-
->
->> +    sclp_clear_write_mask();
->> +
->> +    set_clock_comparator(get_clock() + time);
->> +    enable_clock_int();
->> +    consume_sclp_int();
->> +    disable_clock_int();
->> +
->> +    sclp_setup(); /* re-enable write mask */
->> +}
-> I'm pretty much confused by this code. First, isn't there a small chanc=
-e
-> that there is a clock int between consume_sclp_int() and
-> disable_clock_int() (if consume_sclp_int() has consumed an SCLP
-> interrupt instead of a clock interrupt) ?
-
-
-By clearing the write mask, we can no longer send nor receive ASCII event=
-s
-(such as prints or keystrokes). Therefore we will not have any service
-interrupts originating from keystrokes.
-
-Theoretically, the only interrupt we should be waiting for in this case
-is from the clock.
-
-
-> Second, if you finally enable the SCLP write mask again, doesn't that
-> mean that there could be interrupts pending again afterwards?
-
-
-Yes.=C2=A0 When the write mask is re-enabled for cp_receive mask, we can =
-still
-get pending service interrupts originating from keystrokes (or other=20
-external,
-ASCII related interruptions). Hopefully the user does not fall asleep
-and smack their head on the keyboard during the IPL process. (joking)
-
-Ideally (as it was suggested in a previous review), we should refactor
-the consume_sclp_int so we can manually enable / disable service interrup=
-ts,
-but I think this is a good first step, no?
-
-We also might be able to get away with just not setting the receive mask =
-at
-all when we re-enable the write mask. That will prevent any interrupts fr=
-om
-keystrokes.
-
-
->
->   Thomas
->
-
-
---=20
-- Collin L Walling
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 433c5dad2d..3a4ab1355f 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -3488,6 +3488,21 @@ static float16 roundAndPackFloat16(flag zSign, int zExp,
+     return packFloat16(zSign, zExp, zSig >> 13);
+ }
+ 
++/*----------------------------------------------------------------------------
++| If `a' is denormal and we are in flush-to-zero mode then set the
++| input-denormal exception and return zero. Otherwise just return the value.
++*----------------------------------------------------------------------------*/
++float16 float16_squash_input_denormal(float16 a, float_status *status)
++{
++    if (status->flush_inputs_to_zero) {
++        if (extractFloat16Exp(a) == 0 && extractFloat16Frac(a) != 0) {
++            float_raise(float_flag_input_denormal, status);
++            return make_float16(float16_val(a) & 0x8000);
++        }
++    }
++    return a;
++}
++
+ static void normalizeFloat16Subnormal(uint32_t aSig, int *zExpPtr,
+                                       uint32_t *zSigPtr)
+ {
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 0f96a0edd1..d5e99667b6 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -277,6 +277,7 @@ void float_raise(uint8_t flags, float_status *status);
+ | If `a' is denormal and we are in flush-to-zero mode then set the
+ | input-denormal exception and return zero. Otherwise just return the value.
+ *----------------------------------------------------------------------------*/
++float16 float16_squash_input_denormal(float16 a, float_status *status);
+ float32 float32_squash_input_denormal(float32 a, float_status *status);
+ float64 float64_squash_input_denormal(float64 a, float_status *status);
+ 
+-- 
+2.15.1
