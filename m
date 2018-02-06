@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejAJU-0002vw-9L
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:58:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1ejAM3-0005Rm-FK
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 16:00:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejAJR-00049A-7x
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:58:00 -0500
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:42377)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejAJQ-00048k-VG
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:57:57 -0500
-Received: by mail-wr0-x22e.google.com with SMTP id 41so3406598wrc.9
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 12:57:56 -0800 (PST)
-References: <20180126045742.5487-1-richard.henderson@linaro.org>
-	<87bmh2w0fp.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87bmh2w0fp.fsf@linaro.org>
-Date: Tue, 06 Feb 2018 20:57:54 +0000
-Message-ID: <877erpx2ct.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1ejAM0-0006SD-6k
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 16:00:39 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60336 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ejAM0-0006S7-1Z
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 16:00:36 -0500
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-19-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7f5c57d6-3b57-cb3c-a4b4-3b5144afcef8@redhat.com>
+Date: Tue, 6 Feb 2018 15:00:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 00/20] tcg: generic vector operations
+In-Reply-To: <20180202130336.24719-19-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 18/21] qapi/common: Fix guardname() for
+ funny filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
+On 02/02/2018 07:03 AM, Markus Armbruster wrote:
+> guardname() fails to return a valid C identifier for arguments
+> containing anything but [A-Za-z0-9_.-'].  Fix that.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   scripts/qapi/common.py | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 7ffffc78d9..7d497b5b17 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -1860,7 +1860,7 @@ def mcgen(code, **kwds):
+>   
+>   
+>   def guardname(filename):
+> -    return c_name(filename, protect=False).upper()
+> +    return re.sub(r'[^A-Za-z0-9_]', '_', filename).upper()
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+For some choices of filename, the old code prefixes a q_ (via c_name) 
+which gets turned into Q_ in the final guard name.  The new code does 
+not.  Then again, all of the names protected by c_name() all contain 
+lower case, while guard names are all upper case; so we aren't 
+protecting ourselves from defining a reserved word; the main use for 
+c_name() is to protect ourselves where we are not changing case (for 
+example, _BOOL is no better than Q__BOOL as a guard name for a file 
+named _Bool).
 
-> Richard Henderson <richard.henderson@linaro.org> writes:
->
->> Changes since v11:
->>   * Use dup_const more.
->>   * Cleanup some gvec 2i and 2s routines.
->>   * Use more helpers and less gotos in target/arm/translate-a64.c.
->
-> I just noticed the aarch64 cross build breaks:
->
-> n file included from /root/src/github.com/stsquad/qemu/tcg/tcg.c:296:0:
-> /root/src/github.com/stsquad/qemu/tcg/aarch64/tcg-target.inc.c: In functi=
-on 'tcg_out_dupi_vec':
-> /root/src/github.com/stsquad/qemu/tcg/aarch64/tcg-target.inc.c:806:9: err=
-or: implicit declaration of function 'new_pool_l2' [-Werror=3Dimplicit-func=
-tion-declaration]
->          new_pool_l2(s, R_AARCH64_CONDBR19, s->code_ptr, 0, v64, v64);
+Might be worth mentioning this design consideration in the commit 
+message, but the change itself is reasonable.
 
-Ignore me, bad patch application that only affected that build.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
---
-Alex Benn=C3=A9e
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
