@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tY-0000Q5-De
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tY-0000Q3-DE
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tV-0002xj-FY
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tV-0002x0-1O
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:12 -0500
 Received: from mail-eopbgr00138.outbound.protection.outlook.com
 	([40.107.0.138]:58112
 	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ej9tV-0002u4-8P
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:09 -0500
+	id 1ej9tU-0002u4-BA
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:08 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Feb 2018 23:30:15 +0300
-Message-Id: <20180206203048.11096-2-rkagan@virtuozzo.com>
-In-Reply-To: <20180206203048.11096-1-rkagan@virtuozzo.com>
-References: <20180206203048.11096-1-rkagan@virtuozzo.com>
+Date: Tue,  6 Feb 2018 23:30:14 +0300
+Message-Id: <20180206203048.11096-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 01/34] hyperv: ensure VP index equal to
- QEMU cpu_index
+Subject: [Qemu-devel] [RFC PATCH 00/34] Hyper-V / VMBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,193 +29,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>, Ben Warren <ben@skyportsystems.com>, si-wei liu <si-wei.liu@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
-Hyper-V identifies vCPUs by Virtual Processor (VP) index which can be
-queried by the guest via HV_X64_MSR_VP_INDEX msr.  It is defined by the
-spec as a sequential number which can't exceed the maximum number of
-vCPUs per VM.
+This is a work-in-progress series with Hyper-V / VMBus device emulation.
+It's still very raw but it's testable so I'd appreciate feedback on
+whether the design is sound.
 
-It has to be owned by QEMU in order to preserve it across migration.
+This stuff can also be seen at https://src.openvz.org/scm/up/qemu.git.
 
-However, the initial implementation in KVM didn't allow to set this
-msr, and KVM used its own notion of VP index.  Fortunately, the way
-vCPUs are created in QEMU/KVM makes it likely that the KVM value is
-equal to QEMU cpu_index.
+Current status of the components included:
 
-So choose cpu_index as the value for vp_index, and push that to KVM on
-kernels that support setting the msr.  On older ones that don't, query
-the kernel value and assert that it's in sync with QEMU.
+* Hyper-V infrastructure (SynIC, VP_INDEX, events & messages, etc):
+  - works, mostly submission-ready but needs addressing some issues
 
-Besides, since handling errors from vCPU init at hotplug time is
-impossible, disable vCPU hotplug.
+* VMBus infrastructure (types, vmbus state machine, channel
+  communication, etc):
+  - works in main scenarios
 
-This patch also introduces accessor functions to wrap the mapping
-between a vCPU and its vp_index.  Besides, a few variables are renamed
-to avoid confusion of vp_index with vcpu_id (== apic_id).
+* SCSI controller:
+  - works in main scenarios
+  - supports multiqueue
+  - iothread-unaware
+  - performance competitive to virtio-scsi [*]
+  - can be used for booting [**]
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
----
- target/i386/hyperv.h |  5 ++++-
- target/i386/hyperv.c | 16 +++++++++++++---
- target/i386/kvm.c    | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 68 insertions(+), 4 deletions(-)
+* network interface:
+  - basic operation only
+  - no mac filtering
+  - no offloads
+  - no multiqueue
+  - can be used for booting with limitations [***]
 
-diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
-index 0c3b562018..82f4757975 100644
---- a/target/i386/hyperv.h
-+++ b/target/i386/hyperv.h
-@@ -32,11 +32,14 @@ struct HvSintRoute {
- 
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit);
- 
--HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
-+HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
-                                       HvSintAckClb sint_ack_clb);
- 
- void kvm_hv_sint_route_destroy(HvSintRoute *sint_route);
- 
- int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route);
- 
-+uint32_t hyperv_vp_index(X86CPU *cpu);
-+X86CPU *hyperv_find_vcpu(uint32_t vp_index);
-+
- #endif
-diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index a050c9d2d1..c9a4bb539d 100644
---- a/target/i386/hyperv.c
-+++ b/target/i386/hyperv.c
-@@ -16,6 +16,16 @@
- #include "hyperv.h"
- #include "hyperv-proto.h"
- 
-+uint32_t hyperv_vp_index(X86CPU *cpu)
-+{
-+    return CPU(cpu)->cpu_index;
-+}
-+
-+X86CPU *hyperv_find_vcpu(uint32_t vp_index)
-+{
-+    return X86_CPU(qemu_get_cpu(vp_index));
-+}
-+
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
- {
-     CPUX86State *env = &cpu->env;
-@@ -72,7 +82,7 @@ static void kvm_hv_sint_ack_handler(EventNotifier *notifier)
-     }
- }
- 
--HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
-+HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
-                                       HvSintAckClb sint_ack_clb)
- {
-     HvSintRoute *sint_route;
-@@ -92,7 +102,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
-     event_notifier_set_handler(&sint_route->sint_ack_notifier,
-                                kvm_hv_sint_ack_handler);
- 
--    gsi = kvm_irqchip_add_hv_sint_route(kvm_state, vcpu_id, sint);
-+    gsi = kvm_irqchip_add_hv_sint_route(kvm_state, vp_index, sint);
-     if (gsi < 0) {
-         goto err_gsi;
-     }
-@@ -105,7 +115,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
-     }
-     sint_route->gsi = gsi;
-     sint_route->sint_ack_clb = sint_ack_clb;
--    sint_route->vcpu_id = vcpu_id;
-+    sint_route->vcpu_id = vp_index;
-     sint_route->sint = sint;
- 
-     return sint_route;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ad4b159b28..dfce60e5cf 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -86,6 +86,7 @@ static bool has_msr_hv_hypercall;
- static bool has_msr_hv_crash;
- static bool has_msr_hv_reset;
- static bool has_msr_hv_vpindex;
-+static bool is_hv_vpindex_settable;
- static bool has_msr_hv_runtime;
- static bool has_msr_hv_synic;
- static bool has_msr_hv_stimer;
-@@ -682,6 +683,43 @@ static int hyperv_handle_properties(CPUState *cs)
-     return 0;
- }
- 
-+static int hyperv_init_vcpu(X86CPU *cpu)
-+{
-+    if (cpu->hyperv_vpindex && !is_hv_vpindex_settable) {
-+        /*
-+         * the kernel doesn't support setting vp_index; assert that its value
-+         * is in sync
-+         */
-+        int ret;
-+        struct {
-+            struct kvm_msrs info;
-+            struct kvm_msr_entry entries[1];
-+        } msr_data = {
-+            .info.nmsrs = 1,
-+            .entries[0].index = HV_X64_MSR_VP_INDEX,
-+        };
-+
-+        /*
-+         * handling errors from vcpu init at hotplug time is impossible, so
-+         * disallow cpu hotplug
-+         */
-+        MACHINE_GET_CLASS(current_machine)->hot_add_cpu = NULL;
-+
-+        ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        assert(ret == 1);
-+
-+        if (msr_data.entries[0].data != hyperv_vp_index(cpu)) {
-+            fprintf(stderr, "kernel's vp_index != QEMU's vp_index\n");
-+            return -ENXIO;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
- static Error *invtsc_mig_blocker;
- 
- #define KVM_MAX_CPUID_ENTRIES  100
-@@ -1038,6 +1076,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         has_msr_tsc_aux = false;
-     }
- 
-+    if (hyperv_enabled(cpu)) {
-+        r = hyperv_init_vcpu(cpu);
-+        if (r) {
-+            goto fail;
-+        }
-+    }
-+
-     return 0;
- 
-  fail:
-@@ -1220,6 +1265,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     has_pit_state2 = kvm_check_extension(s, KVM_CAP_PIT_STATE2);
- #endif
- 
-+    is_hv_vpindex_settable = kvm_check_extension(s, KVM_CAP_HYPERV_VP_INDEX);
-+
-     ret = kvm_get_supported_msrs(s);
-     if (ret < 0) {
-         return ret;
-@@ -1731,6 +1778,10 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-         if (has_msr_hv_runtime) {
-             kvm_msr_entry_add(cpu, HV_X64_MSR_VP_RUNTIME, env->msr_hv_runtime);
-         }
-+        if (cpu->hyperv_vpindex && has_msr_hv_vpindex &&
-+            is_hv_vpindex_settable) {
-+            kvm_msr_entry_add(cpu, HV_X64_MSR_VP_INDEX, hyperv_vp_index(cpu));
-+        }
-         if (cpu->hyperv_synic) {
-             int j;
- 
+Overall, it's in bad need for documentation, tests, proper patch split.
+Migration works but only tested very lightly.
+
+[*] basic measurements with fio rw=randread bs=4k iodepth=256 using
+    null-co backend give
+    o Windows guests: hv-scsi 10%-30% better than virtio-scsi
+    o Linux guests: hv-scsi 10%-20% worse than virtio-scsi
+    No performance analysis has been done yet.
+
+[**] patches for SeaBIOS and OVMF can be found at
+     https://src.openvz.org/scm/up/seabios.git and
+     https://src.openvz.org/scm/up/edk2.git
+
+[***] patches for iPXE can be found at
+      https://src.openvz.org/scm/up/ipxe.git, limitations:
+      - OVMF is yet unsupported
+      - iPXE takes over VMBus state management from SeaBIOS so after
+        iPXE failure to boot off hv-net booting off hv-scsi doesn't work
+
+Prerequisites:
+ - KVM 4.14+
+ - HYPERV_EVENTFD support (in kvm/queue) is optional but recommended for
+   better performance
+
+How to use:
+
+# qemu \
+    ... \
+    -machine ...,accel=kvm,vmbus \
+    -cpu ...,hv_vpindex,hv_synic,hv_stimer,(other hv_* recommended),kvm=off \
+    -nodefaults \
+    ...
+    -device hv-scsi,(usual scsi props),(instanceid=<uuid> optional) \
+    -drive ... \
+    -device scsi-hd,... \
+    ...
+    -netdev ... \
+    -device hv-net,(usual net props),(instanceid=<uuid> optional) \
+    ...
+
+
+Big kudos to Andrey Smetanin and Evgeny Yakovlev for their research and
+prototyping.
+
+Andrey Smetanin (1):
+  i386: Hyper-V VMBus ACPI DSDT entry
+
+Evgeny Yakovlev (1):
+  vmbus: build configuration
+
+Roman Kagan (32):
+  hyperv: ensure VP index equal to QEMU cpu_index
+  hyperv_testdev: refactor for readability
+  hyperv: cosmetic: g_malloc -> g_new
+  hyperv: synic: only setup ack notifier if there's a callback
+  hyperv: allow passing arbitrary data to sint ack callback
+  hyperv: address HvSintRoute by X86CPU pointer
+  hyperv: make HvSintRoute reference-counted
+  hyperv: qom-ify SynIC
+  hyperv: block SynIC use in QEMU in incompatible configurations
+  hyperv: make overlay pages for SynIC
+  hyperv: add synic message delivery
+  hyperv: add synic event flag signaling
+  hyperv: process SIGNAL_EVENT hypercall
+  hyperv: process POST_MESSAGE hypercall
+  hyperv_testdev: add SynIC message and event testmodes
+  hyperv: update copyright notices
+  [not to commit] import HYPERV_EVENTFD stuff from kernel
+  hyperv: add support for KVM_HYPERV_EVENTFD
+  vmbus: add vmbus protocol definitions
+  vmbus: vmbus implementation
+  i386: en/disable vmbus by a machine property
+  scsi: add Hyper-V/VMBus SCSI protocol definitions
+  scsi: add Hyper-V/VMBus SCSI controller
+  hv-scsi: limit the number of requests per notification
+  tests: hv-scsi: add start-stop test
+  net: add RNDIS definitions
+  net: add Hyper-V/VMBus network protocol definitions
+  net: add Hyper-V/VMBus net adapter
+  hv-net: add .bootindex support
+  loader: allow arbitrary basename for fw_cfg file roms
+  vmbus: add support for rom files
+  hv-net: define default rom file name
+
+ configure                      |   11 +
+ Makefile.objs                  |    1 +
+ hw/net/hvnet-proto.h           | 1161 +++++++++++++++++++
+ hw/net/rndis.h                 |  391 +++++++
+ hw/scsi/hvscsi-proto.h         |  150 +++
+ include/hw/i386/pc.h           |    8 +
+ include/hw/loader.h            |    2 +-
+ include/hw/vmbus/vmbus-proto.h |  222 ++++
+ include/hw/vmbus/vmbus.h       |  109 ++
+ include/sysemu/kvm.h           |    1 +
+ linux-headers/linux/kvm.h      |   14 +
+ target/i386/hyperv.h           |   40 +-
+ accel/kvm/kvm-all.c            |   15 +
+ hw/core/loader.c               |   43 +-
+ hw/i386/acpi-build.c           |   42 +
+ hw/i386/pc.c                   |   34 +
+ hw/i386/pc_piix.c              |    5 +
+ hw/i386/pc_q35.c               |    5 +
+ hw/misc/hyperv_testdev.c       |  267 ++++-
+ hw/net/hv-net.c                | 1450 +++++++++++++++++++++++
+ hw/scsi/hv-scsi.c              |  403 +++++++
+ hw/vmbus/vmbus.c               | 2475 ++++++++++++++++++++++++++++++++++++++++
+ target/i386/hyperv.c           |  681 ++++++++++-
+ target/i386/kvm.c              |   63 +-
+ target/i386/machine.c          |    9 +
+ tests/hv-scsi-test.c           |   57 +
+ util/qemu-config.c             |    4 +
+ hw/Makefile.objs               |    1 +
+ hw/net/Makefile.objs           |    2 +
+ hw/scsi/Makefile.objs          |    2 +
+ hw/scsi/trace-events           |    6 +
+ hw/vmbus/Makefile.objs         |    1 +
+ hw/vmbus/trace-events          |    8 +
+ tests/Makefile.include         |    3 +
+ 34 files changed, 7561 insertions(+), 125 deletions(-)
+ create mode 100644 hw/net/hvnet-proto.h
+ create mode 100644 hw/net/rndis.h
+ create mode 100644 hw/scsi/hvscsi-proto.h
+ create mode 100644 include/hw/vmbus/vmbus-proto.h
+ create mode 100644 include/hw/vmbus/vmbus.h
+ create mode 100644 hw/net/hv-net.c
+ create mode 100644 hw/scsi/hv-scsi.c
+ create mode 100644 hw/vmbus/vmbus.c
+ create mode 100644 tests/hv-scsi-test.c
+ create mode 100644 hw/vmbus/Makefile.objs
+ create mode 100644 hw/vmbus/trace-events
+
 -- 
 2.14.3
