@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tb-0000TQ-B8
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:16 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9td-0000W9-56
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tX-000302-Rz
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:15 -0500
-Received: from mail-db5eur01on0133.outbound.protection.outlook.com
-	([104.47.2.133]:39312
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tZ-00031R-R6
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:17 -0500
+Received: from mail-eopbgr00130.outbound.protection.outlook.com
+	([40.107.0.130]:53824
+	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ej9tX-0002z3-H1
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:11 -0500
+	id 1ej9tZ-00030f-HR
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:13 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Feb 2018 23:30:16 +0300
-Message-Id: <20180206203048.11096-3-rkagan@virtuozzo.com>
+Date: Tue,  6 Feb 2018 23:30:17 +0300
+Message-Id: <20180206203048.11096-4-rkagan@virtuozzo.com>
 In-Reply-To: <20180206203048.11096-1-rkagan@virtuozzo.com>
 References: <20180206203048.11096-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 02/34] hyperv_testdev: refactor for
- readability
+Subject: [Qemu-devel] [RFC PATCH 03/34] hyperv: cosmetic: g_malloc -> g_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,188 +31,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>, Ben Warren <ben@skyportsystems.com>, si-wei liu <si-wei.liu@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
-Make hyperv_testdev slightly easier to follow and enhance in future.
-For that, put the hyperv sint routes (wrapped in a helper structure) on
-a linked list rather than a fixed-size array.
-
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- hw/misc/hyperv_testdev.c | 114 ++++++++++++++++++++++-------------------------
- 1 file changed, 53 insertions(+), 61 deletions(-)
+ target/i386/hyperv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
-index dbd7cdda07..b47af477cb 100644
---- a/hw/misc/hyperv_testdev.c
-+++ b/hw/misc/hyperv_testdev.c
-@@ -12,6 +12,7 @@
-  */
+diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
+index c9a4bb539d..e762eac79f 100644
+--- a/target/i386/hyperv.c
++++ b/target/i386/hyperv.c
+@@ -88,7 +88,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+     HvSintRoute *sint_route;
+     int r, gsi;
  
- #include "qemu/osdep.h"
-+#include "qemu/queue.h"
- #include <linux/kvm.h>
- #include "hw/hw.h"
- #include "hw/qdev.h"
-@@ -20,12 +21,17 @@
- #include "target/i386/hyperv.h"
- #include "kvm_i386.h"
- 
--#define HV_TEST_DEV_MAX_SINT_ROUTES 64
-+typedef struct TestSintRoute {
-+    QLIST_ENTRY(TestSintRoute) le;
-+    uint8_t vpidx;
-+    uint8_t sint;
-+    HvSintRoute *sint_route;
-+} TestSintRoute;
- 
- struct HypervTestDev {
-     ISADevice parent_obj;
-     MemoryRegion sint_control;
--    HvSintRoute *sint_route[HV_TEST_DEV_MAX_SINT_ROUTES];
-+    QLIST_HEAD(, TestSintRoute) sint_routes;
- };
- typedef struct HypervTestDev HypervTestDev;
- 
-@@ -39,88 +45,74 @@ enum {
-     HV_TEST_DEV_SINT_ROUTE_SET_SINT
- };
- 
--static int alloc_sint_route_index(HypervTestDev *dev)
-+static void sint_route_create(HypervTestDev *dev, uint8_t vpidx, uint8_t sint)
- {
--    int i;
-+    TestSintRoute *sint_route;
- 
--    for (i = 0; i < ARRAY_SIZE(dev->sint_route); i++) {
--        if (dev->sint_route[i] == NULL) {
--            return i;
--        }
--    }
--    return -1;
--}
-+    sint_route = g_new0(TestSintRoute, 1);
-+    assert(sint_route);
- 
--static void free_sint_route_index(HypervTestDev *dev, int i)
--{
--    assert(i >= 0 && i < ARRAY_SIZE(dev->sint_route));
--    dev->sint_route[i] = NULL;
-+    sint_route->vpidx = vpidx;
-+    sint_route->sint = sint;
-+
-+    sint_route->sint_route = kvm_hv_sint_route_create(vpidx, sint, NULL);
-+    assert(sint_route->sint_route);
-+
-+    QLIST_INSERT_HEAD(&dev->sint_routes, sint_route, le);
- }
- 
--static int find_sint_route_index(HypervTestDev *dev, uint32_t vcpu_id,
--                                 uint32_t sint)
-+static TestSintRoute *sint_route_find(HypervTestDev *dev,
-+                                      uint8_t vpidx, uint8_t sint)
- {
--    HvSintRoute *sint_route;
--    int i;
-+    TestSintRoute *sint_route;
- 
--    for (i = 0; i < ARRAY_SIZE(dev->sint_route); i++) {
--        sint_route = dev->sint_route[i];
--        if (sint_route && sint_route->vcpu_id == vcpu_id &&
--            sint_route->sint == sint) {
--            return i;
-+    QLIST_FOREACH(sint_route, &dev->sint_routes, le) {
-+        if (sint_route->vpidx == vpidx && sint_route->sint == sint) {
-+            return sint_route;
-         }
-     }
--    return -1;
-+    assert(false);
-+    return NULL;
- }
- 
--static void hv_synic_test_dev_control(HypervTestDev *dev, uint32_t ctl,
--                                      uint32_t vcpu_id, uint32_t sint)
-+static void sint_route_destroy(HypervTestDev *dev, uint8_t vpidx, uint8_t sint)
- {
--    int i;
--    HvSintRoute *sint_route;
-+    TestSintRoute *sint_route;
- 
--    switch (ctl) {
--    case HV_TEST_DEV_SINT_ROUTE_CREATE:
--        i = alloc_sint_route_index(dev);
--        assert(i >= 0);
--        sint_route = kvm_hv_sint_route_create(vcpu_id, sint, NULL);
--        assert(sint_route);
--        dev->sint_route[i] = sint_route;
--        break;
--    case HV_TEST_DEV_SINT_ROUTE_DESTROY:
--        i = find_sint_route_index(dev, vcpu_id, sint);
--        assert(i >= 0);
--        sint_route = dev->sint_route[i];
--        kvm_hv_sint_route_destroy(sint_route);
--        free_sint_route_index(dev, i);
--        break;
--    case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
--        i = find_sint_route_index(dev, vcpu_id, sint);
--        assert(i >= 0);
--        sint_route = dev->sint_route[i];
--        kvm_hv_sint_route_set_sint(sint_route);
--        break;
--    default:
--        break;
--    }
-+    sint_route = sint_route_find(dev, vpidx, sint);
-+    QLIST_REMOVE(sint_route, le);
-+    kvm_hv_sint_route_destroy(sint_route->sint_route);
-+    g_free(sint_route);
-+}
-+
-+static void sint_route_set_sint(HypervTestDev *dev,
-+                                uint8_t vpidx, uint8_t sint)
-+{
-+    TestSintRoute *sint_route;
-+
-+    sint_route = sint_route_find(dev, vpidx, sint);
-+
-+    kvm_hv_sint_route_set_sint(sint_route->sint_route);
- }
- 
- static void hv_test_dev_control(void *opaque, hwaddr addr, uint64_t data,
-                                 uint32_t len)
- {
-     HypervTestDev *dev = HYPERV_TEST_DEV(opaque);
--    uint8_t ctl;
-+    uint8_t sint = data & 0xFF;
-+    uint8_t vpidx = (data >> 8ULL) & 0xFF;
-+    uint8_t ctl = (data >> 16ULL) & 0xFF;
- 
--    ctl = (data >> 16ULL) & 0xFF;
-     switch (ctl) {
-     case HV_TEST_DEV_SINT_ROUTE_CREATE:
-+        sint_route_create(dev, vpidx, sint);
-+        break;
-     case HV_TEST_DEV_SINT_ROUTE_DESTROY:
--    case HV_TEST_DEV_SINT_ROUTE_SET_SINT: {
--        uint8_t sint = data & 0xFF;
--        uint8_t vcpu_id = (data >> 8ULL) & 0xFF;
--        hv_synic_test_dev_control(dev, ctl, vcpu_id, sint);
-+        sint_route_destroy(dev, vpidx, sint);
-+        break;
-+    case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
-+        sint_route_set_sint(dev, vpidx, sint);
-         break;
--    }
-     default:
-         break;
-     }
-@@ -139,7 +131,7 @@ static void hv_test_dev_realizefn(DeviceState *d, Error **errp)
-     HypervTestDev *dev = HYPERV_TEST_DEV(d);
-     MemoryRegion *io = isa_address_space_io(isa);
- 
--    memset(dev->sint_route, 0, sizeof(dev->sint_route));
-+    QLIST_INIT(&dev->sint_routes);
-     memory_region_init_io(&dev->sint_control, OBJECT(dev),
-                           &synic_test_sint_ops, dev,
-                           "hyperv-testdev-ctl", 4);
+-    sint_route = g_malloc0(sizeof(*sint_route));
++    sint_route = g_new0(HvSintRoute, 1);
+     r = event_notifier_init(&sint_route->sint_set_notifier, false);
+     if (r) {
+         goto err;
 -- 
 2.14.3
