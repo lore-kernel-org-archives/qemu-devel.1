@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tp-0000lU-Or
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9to-0000jj-3H
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tm-00036g-CF
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:29 -0500
-Received: from mail-eopbgr00101.outbound.protection.outlook.com
-	([40.107.0.101]:58891
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tk-00035u-OR
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:28 -0500
+Received: from mail-eopbgr00099.outbound.protection.outlook.com
+	([40.107.0.99]:61504
 	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ej9tl-000360-O4
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:26 -0500
+	id 1ej9tk-00035N-DU
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:24 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Feb 2018 23:30:24 +0300
-Message-Id: <20180206203048.11096-11-rkagan@virtuozzo.com>
+Date: Tue,  6 Feb 2018 23:30:23 +0300
+Message-Id: <20180206203048.11096-10-rkagan@virtuozzo.com>
 In-Reply-To: <20180206203048.11096-1-rkagan@virtuozzo.com>
 References: <20180206203048.11096-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 10/34] hyperv: make overlay pages for SynIC
+Subject: [Qemu-devel] [RFC PATCH 09/34] hyperv: block SynIC use in QEMU in
+ incompatible configurations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,175 +32,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>, Ben Warren <ben@skyportsystems.com>, si-wei liu <si-wei.liu@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
-Per Hyper-V spec, SynIC message and event flag pages are to be
-implemented as so called overlay pages.  That is, they are owned by the
-hypervisor and, when mapped into the guest physical address space,
-overlay the guest physical pages such that
+Certain configurations do not allow SynIC to be used in QEMU.  In
+particular,
 
-1) the overlaid guest page becomes invisible to the guest CPUs until the
-   overlay page is turned off
-2) the contents of the overlay page is preserved when it's turned off
-   and back on, even at a different address; it's only zeroed at vcpu
-   reset
+- when hyperv_vpindex is off, SINT routes can't be used as they refer to
+  the destination vCPU by vp_index
 
-This particular nature of SynIC message and event flag pages is ignored
-in the current code, and guest physical pages are used directly instead.
-This (mostly) works because the actual guests seem not to depend on the
-features listed above.
+- older KVM (which doesn't expose KVM_CAP_HYPERV_SYNIC2) zeroes out
+  SynIC message and event pages on every msr load, breaking migration
 
-This patch implements those pages as the spec mandates.
+OTOH in-KVM users of SynIC -- SynIC timers -- do work in those
+configurations, and we shouldn't stop the guest from using them.
 
-Since the extra RAM regions, which introduce migration incompatibility,
-are only added when in_kvm_only == false, no extra compat logic is
-necessary.
+To cover both scenarios, introduce a (user-invisible) SynIC property
+that disallows to use the SynIC within QEMU but not in KVM.  The
+property is clear by default but is set via compat logic for older
+machine types.
+
+As a result, when hv_synic and a modern machine type are specified, QEMU
+will refuse to run unless vp_index is on and the kernel is recent
+enough.  OTOH with older machine types QEMU will fine run against an
+older kernel and/or without vp_index enabled but will refuse the in-QEMU
+uses of SynIC (e.g. VMBus).
+
+Also a function is added that allows the devices to query the status of
+SynIC support across vCPUs.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- target/i386/hyperv.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 64 insertions(+), 6 deletions(-)
+ include/hw/i386/pc.h |  5 ++++
+ target/i386/hyperv.h |  4 ++-
+ target/i386/hyperv.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ target/i386/kvm.c    |  8 +++---
+ 4 files changed, 80 insertions(+), 7 deletions(-)
 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index bb49165fe0..744f6a20d2 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -352,6 +352,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .property = "extended-tseg-mbytes",\
+         .value    = stringify(0),\
+     },\
++    {\
++        .driver   = "hyperv-synic",\
++        .property = "in-kvm-only",\
++        .value    = "on",\
++    },\
+ 
+ #define PC_COMPAT_2_8 \
+     HW_COMPAT_2_8 \
+diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
+index 20bbd7bb29..249bc15232 100644
+--- a/target/i386/hyperv.h
++++ b/target/i386/hyperv.h
+@@ -34,8 +34,10 @@ int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route);
+ uint32_t hyperv_vp_index(X86CPU *cpu);
+ X86CPU *hyperv_find_vcpu(uint32_t vp_index);
+ 
+-void hyperv_synic_add(X86CPU *cpu);
++int hyperv_synic_add(X86CPU *cpu);
+ void hyperv_synic_reset(X86CPU *cpu);
+ void hyperv_synic_update(X86CPU *cpu);
+ 
++bool hyperv_synic_usable(void);
++
+ #endif
 diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index 933bfe5bcb..514cd27216 100644
+index a27d33acb3..933bfe5bcb 100644
 --- a/target/i386/hyperv.c
 +++ b/target/i386/hyperv.c
-@@ -16,6 +16,9 @@
+@@ -14,6 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/main-loop.h"
  #include "qapi/error.h"
- #include "qemu/error-report.h"
++#include "qemu/error-report.h"
  #include "hw/qdev-properties.h"
-+#include "exec/address-spaces.h"
-+#include "sysemu/cpus.h"
-+#include "migration/vmstate.h"
  #include "hyperv.h"
  #include "hyperv-proto.h"
+@@ -23,6 +24,8 @@ typedef struct SynICState {
  
-@@ -29,6 +32,10 @@ typedef struct SynICState {
+     X86CPU *cpu;
+ 
++    bool in_kvm_only;
++
      bool enabled;
      hwaddr msg_page_addr;
      hwaddr evt_page_addr;
-+    MemoryRegion msg_page_mr;
-+    MemoryRegion evt_page_mr;
-+    struct hyperv_message_page *msg_page;
-+    struct hyperv_event_flags_page *evt_page;
- } SynICState;
+@@ -78,6 +81,10 @@ static void synic_update_evt_page_addr(SynICState *synic)
  
- #define TYPE_SYNIC "hyperv-synic"
-@@ -68,6 +75,17 @@ static void synic_update_msg_page_addr(SynICState *synic)
-     uint64_t msr = synic->cpu->env.msr_hv_synic_msg_page;
-     hwaddr new_addr = (msr & HV_SIMP_ENABLE) ? (msr & TARGET_PAGE_MASK) : 0;
- 
-+    if (new_addr == synic->msg_page_addr) {
-+        return;
-+    }
-+
-+    if (synic->msg_page_addr) {
-+        memory_region_del_subregion(get_system_memory(), &synic->msg_page_mr);
-+    }
-+    if (new_addr) {
-+        memory_region_add_subregion(get_system_memory(), new_addr,
-+                                    &synic->msg_page_mr);
-+    }
-     synic->msg_page_addr = new_addr;
- }
- 
-@@ -76,6 +94,17 @@ static void synic_update_evt_page_addr(SynICState *synic)
-     uint64_t msr = synic->cpu->env.msr_hv_synic_evt_page;
-     hwaddr new_addr = (msr & HV_SIEFP_ENABLE) ? (msr & TARGET_PAGE_MASK) : 0;
- 
-+    if (new_addr == synic->evt_page_addr) {
-+        return;
-+    }
-+
-+    if (synic->evt_page_addr) {
-+        memory_region_del_subregion(get_system_memory(), &synic->evt_page_mr);
-+    }
-+    if (new_addr) {
-+        memory_region_add_subregion(get_system_memory(), new_addr,
-+                                    &synic->evt_page_mr);
-+    }
-     synic->evt_page_addr = new_addr;
- }
- 
-@@ -90,6 +119,15 @@ static void synic_update(SynICState *synic)
-     synic_update_evt_page_addr(synic);
- }
- 
-+
-+static void async_synic_update(CPUState *cs, run_on_cpu_data data)
-+{
-+    SynICState *synic = data.host_ptr;
-+    qemu_mutex_lock_iothread();
-+    synic_update(synic);
-+    qemu_mutex_unlock_iothread();
-+}
-+
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+ static void synic_update(SynICState *synic)
  {
-     CPUX86State *env = &cpu->env;
-@@ -100,11 +138,6 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
-             return -1;
-         }
++    if (synic->in_kvm_only) {
++        return;
++    }
++
+     synic->enabled = synic->cpu->env.msr_hv_synic_control & HV_SYNIC_ENABLE;
+     synic_update_msg_page_addr(synic);
+     synic_update_evt_page_addr(synic);
+@@ -154,6 +161,7 @@ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+     }
  
--        /*
--         * For now just track changes in SynIC control and msg/evt pages msr's.
--         * When SynIC messaging/events processing will be added in future
--         * here we will do messages queues flushing and pages remapping.
--         */
-         switch (exit->u.synic.msr) {
-         case HV_X64_MSR_SCONTROL:
-             env->msr_hv_synic_control = exit->u.synic.control;
-@@ -118,7 +151,13 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
-         default:
-             return -1;
-         }
--        synic_update(get_synic(cpu));
-+        /*
-+         * this will run in this cpu thread before it returns to KVM, but in a
-+         * safe environment (i.e. when all cpus are quiescent) -- this is
-+         * necessary because we're changing memory hierarchy
-+         */
-+        async_safe_run_on_cpu(CPU(cpu), async_synic_update,
-+                              RUN_ON_CPU_HOST_PTR(get_synic(cpu)));
-         return 0;
-     case KVM_EXIT_HYPERV_HCALL: {
-         uint16_t code;
-@@ -258,12 +297,29 @@ static void synic_realize(DeviceState *dev, Error **errp)
+     synic = get_synic(cpu);
++    assert(!synic->in_kvm_only);
+ 
+     sint_route = g_new0(HvSintRoute, 1);
+     r = event_notifier_init(&sint_route->sint_set_notifier, false);
+@@ -240,17 +248,32 @@ int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route)
+     return event_notifier_set(&sint_route->sint_set_notifier);
+ }
+ 
++static Property synic_props[] = {
++    /* user-invisible, only used for compat handling */
++    DEFINE_PROP_BOOL("in-kvm-only", SynICState, in_kvm_only, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void synic_realize(DeviceState *dev, Error **errp)
  {
      Object *obj = OBJECT(dev);
      SynICState *synic = SYNIC(dev);
-+    char *msgp_name, *evtp_name;
-+    uint32_t vp_index;
  
-     if (synic->in_kvm_only) {
-         return;
-     }
- 
++    if (synic->in_kvm_only) {
++        return;
++    }
++
      synic->cpu = X86_CPU(obj->parent);
-+
-+    /* memory region names have to be globally unique */
-+    vp_index = hyperv_vp_index(synic->cpu);
-+    msgp_name = g_strdup_printf("synic-%u-msg-page", vp_index);
-+    evtp_name = g_strdup_printf("synic-%u-evt-page", vp_index);
-+
-+    memory_region_init_ram(&synic->msg_page_mr, obj, msgp_name,
-+                           sizeof(*synic->msg_page), &error_abort);
-+    memory_region_init_ram(&synic->evt_page_mr, obj, evtp_name,
-+                           sizeof(*synic->evt_page), &error_abort);
-+    synic->msg_page = memory_region_get_ram_ptr(&synic->msg_page_mr);
-+    synic->evt_page = memory_region_get_ram_ptr(&synic->evt_page_mr);
-+
-+    g_free(msgp_name);
-+    g_free(evtp_name);
  }
  
  static void synic_reset(DeviceState *dev)
-@@ -274,6 +330,8 @@ static void synic_reset(DeviceState *dev)
-         return;
-     }
- 
-+    memset(synic->msg_page, 0, sizeof(*synic->msg_page));
-+    memset(synic->evt_page, 0, sizeof(*synic->evt_page));
+ {
+     SynICState *synic = SYNIC(dev);
++
++    if (synic->in_kvm_only) {
++        return;
++    }
++
      synic_update(synic);
  }
  
+@@ -258,19 +281,45 @@ static void synic_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
++    dc->props = synic_props;
+     dc->realize = synic_realize;
+     dc->reset = synic_reset;
+     dc->user_creatable = false;
+ }
+ 
+-void hyperv_synic_add(X86CPU *cpu)
++int hyperv_synic_add(X86CPU *cpu)
+ {
+     Object *obj;
++    SynICState *synic;
++    uint32_t synic_cap;
++    int ret;
+ 
+     obj = object_new(TYPE_SYNIC);
+     object_property_add_child(OBJECT(cpu), "synic", obj, &error_abort);
+     object_unref(obj);
++
++    synic = SYNIC(obj);
++
++    if (!synic->in_kvm_only) {
++        synic_cap = KVM_CAP_HYPERV_SYNIC2;
++        if (!cpu->hyperv_vpindex) {
++            error_report("Hyper-V SynIC requires VP_INDEX support");
++            return -ENOSYS;
++        }
++    } else {
++        /* compat mode: only in-KVM SynIC timers supported */
++        synic_cap = KVM_CAP_HYPERV_SYNIC;
++    }
++
++    ret = kvm_vcpu_enable_cap(CPU(cpu), synic_cap, 0);
++    if (ret) {
++        error_report("failed to enable Hyper-V SynIC in KVM: %s",
++                     strerror(-ret));
++        return ret;
++    }
++
+     object_property_set_bool(obj, true, "realized", &error_abort);
++    return 0;
+ }
+ 
+ void hyperv_synic_reset(X86CPU *cpu)
+@@ -283,6 +332,25 @@ void hyperv_synic_update(X86CPU *cpu)
+     synic_update(get_synic(cpu));
+ }
+ 
++bool hyperv_synic_usable(void)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        X86CPU *cpu = X86_CPU(cs);
++
++        if (!cpu->hyperv_synic) {
++            return false;
++        }
++
++        if (get_synic(cpu)->in_kvm_only) {
++            return false;
++        }
++    }
++
++    return true;
++}
++
+ static const TypeInfo synic_type_info = {
+     .name = TYPE_SYNIC,
+     .parent = TYPE_DEVICE,
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 84c5cc2131..663501355b 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -717,12 +717,10 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+     }
+ 
+     if (cpu->hyperv_synic) {
+-        if (kvm_vcpu_enable_cap(CPU(cpu), KVM_CAP_HYPERV_SYNIC, 0)) {
+-            fprintf(stderr, "failed to enable Hyper-V SynIC\n");
+-            return -ENOSYS;
++        int ret = hyperv_synic_add(cpu);
++        if (ret) {
++            return ret;
+         }
+-
+-        hyperv_synic_add(cpu);
+     }
+ 
+     return 0;
 -- 
 2.14.3
