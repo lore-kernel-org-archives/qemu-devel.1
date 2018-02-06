@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejA7c-000791-Qp
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:45:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1ejAGk-00006x-7D
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:55:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejA7Z-0002Cs-Po
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:45:44 -0500
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:41107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejA7Z-0002CW-IC
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:45:41 -0500
-Received: by mail-wr0-x232.google.com with SMTP id v15so3373163wrb.8
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 12:45:41 -0800 (PST)
-References: <20180204041136.17525-1-richard.henderson@linaro.org>
-	<CAFEAcA8+zNg8S=sFuUwPKjzzJZFUYDZFU11nH+_M60wuXRAVrQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8+zNg8S=sFuUwPKjzzJZFUYDZFU11nH+_M60wuXRAVrQ@mail.gmail.com>
-Date: Tue, 06 Feb 2018 20:45:38 +0000
-Message-ID: <878tc5x2x9.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1ejAGh-0003KE-0i
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:55:10 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51966 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ejAGg-0003K0-SR
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:55:06 -0500
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-18-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <25d7eb04-6406-1194-a8e4-3506ea6c2765@redhat.com>
+Date: Tue, 6 Feb 2018 14:54:57 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/24] re-factor and add fp16 using glibc
- soft-fp
+In-Reply-To: <20180202130336.24719-18-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 17/21] qapi/types qapi/visit: Generate
+ built-in stuff into separate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, hsp.cat7@gmail.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
+On 02/02/2018 07:03 AM, Markus Armbruster wrote:
+> Linking code from multiple separate QAPI schemata into the same
+> program is possible, but involves some weirdness around built-in
+> types:
+> 
+> * We generate code for built-in types into .c only with option
+>    --builtins.  The user is responsible to generate code for exactly
+>    one QAPI schema per program with --builtins.
+> 
+> * We generate code for them it into .h regardless of --builtins,
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+s/them it/them/
 
-> On 4 February 2018 at 04:11, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> Or there's the code from glibc.  I know Peter didn't like the idea;
->> debugging this code is fairly painful -- the massive preprocessor
->> macros mean that you can't step through anything.  But at least we
->> have a good relationship with glibc, so merging patches back and
->> forth should be easy.
->
-> Yeah. I didn't like dealing with this code two decades ago
-> when I first encountered it, and it hasn't improved any.
-> It's pretty much write-only code, and it isn't going to be
-> any fun for debugging.
+>    guarded by #ifndef QAPI_VISIT_BUILTIN.  Because the code for
+>    built-in types is exactly the same in all of them, including any
+>    combination of these headers works.
+> 
+> Replace this contraption by something more conventional: generate code
+> for built-in types into their very own files: qapi-builtin-types.c,
+> qapi-builtin-visit.c, qapi-builtin-types.h, qapi-builtin-visit.h, but
+> only with --builtins.  Obey --output-dir, but ignore --prefix for
+> them.
+> 
+> Make qapi-types.h include qapi-builtin-types.h.  With multiple
+> schemata you now have multiple qapi-types.[ch], but only one
+> qapi-builtin-types.[ch].  Same for qapi-visit.[ch] and
+> qapi-builtin-visit.[ch].
+> 
+> Bonus: if all you need is built-in stuff, you can include a much
+> smaller header.  To be exploited shortly.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-I think I've managed to pull the performance back on softfloat-v4 thanks
-to the attribute(flatten) changes to addsub/div/mul/mulladd.
-
---
-Alex Benn=C3=A9e
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
