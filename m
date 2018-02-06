@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej999-0004aG-Vm
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:43:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1ej9Ga-000336-4F
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej998-00076J-WE
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:43:16 -0500
-References: <20180205151835.20812-1-mreitz@redhat.com>
-	<20180205151835.20812-19-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b9fa2031-a042-165a-47fd-e0d4b4a24738@redhat.com>
-Date: Tue, 6 Feb 2018 13:43:03 -0600
+	(envelope-from <armbru@redhat.com>) id 1ej9GW-0003sX-Qj
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33140 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej9GW-0003rY-HB
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:52 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  6 Feb 2018 20:50:37 +0100
+Message-Id: <20180206195044.8347-8-armbru@redhat.com>
+In-Reply-To: <20180206195044.8347-1-armbru@redhat.com>
+References: <20180206195044.8347-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180205151835.20812-19-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 18/26] block: Add sgfnt_runtime_opts to
- BlockDriver
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 07/14] hw/moxie: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +27,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Anthony Green <green@moxielogic.com>
 
-On 02/05/2018 09:18 AM, Max Reitz wrote:
-> This new field can be set by block drivers to list the runtime options
-> they accept that may influence the contents of the respective BDS. As of
-> a follow-up patch, this list will be used by the common
-> bdrv_refresh_filename() implementation to decide which options to put
-> into BDS.full_open_options (and consequently whether a JSON filename has
-> to be created), thus freeing the drivers of having to implement that
-> logic themselves.
-> 
-> Additionally, this patch adds the field to all of the block drivers that
-> need it and sets it accordingly.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-> +    /* Pointer to a NULL-terminated array of names of significant options that
-> +     * can be specified for bdrv_open(). A significant option is one that
-> +     * changes the data of a BDS.
-> +     * If this pointer is NULL, the array is considered empty.
-> +     * "filename" and "driver" are always considered significant. */
-> +    const char *const *sgfnt_runtime_opts;
+Replace a large number of the fprintf(stderr, "*\n" calls with
+error_report(). The functions were renamed with these commands and then
+compiler issues where manually fixed.
 
-Warning: Bikeshedding follows:
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|erro=
+r_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
+report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_repo=
+rt("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
+("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
+\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
+"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
+2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
+;|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
+Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
+}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
+ \
+    {} +
 
-s/sgfnt/vital/
+Some lines where then manually tweaked to pass checkpatch.
 
-might read easier (same number of letters, but has some vowels rthr thn 
-bng crptc bbrvtn).
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Anthony Green <green@moxielogic.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <20180203084315.20497-7-armbru@redhat.com>
+---
+ hw/moxie/moxiesim.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 6c200becab..0bbf770795 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -63,8 +63,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *lo=
+ader_params)
+                            0, 0);
+=20
+     if (kernel_size <=3D 0) {
+-        fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                loader_params->kernel_filename);
++        error_report("could not load kernel '%s'",
++                     loader_params->kernel_filename);
+         exit(1);
+     }
+=20
+@@ -77,9 +77,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *lo=
+ader_params)
+             initrd_offset =3D (kernel_high + ~TARGET_PAGE_MASK)
+               & TARGET_PAGE_MASK;
+             if (initrd_offset + initrd_size > loader_params->ram_size) {
+-                fprintf(stderr,
+-                        "qemu: memory too small for initial ram disk '%s=
+'\n",
+-                        loader_params->initrd_filename);
++                error_report("memory too small for initial ram disk '%s'=
+",
++                             loader_params->initrd_filename);
+                 exit(1);
+             }
+             initrd_size =3D load_image_targphys(loader_params->initrd_fi=
+lename,
+@@ -87,8 +86,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *lo=
+ader_params)
+                                               ram_size);
+         }
+         if (initrd_size =3D=3D (target_ulong)-1) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
+n",
+-                    loader_params->initrd_filename);
++            error_report("could not load initial ram disk '%s'",
++                         loader_params->initrd_filename);
+             exit(1);
+         }
+     }
+--=20
+2.13.6
