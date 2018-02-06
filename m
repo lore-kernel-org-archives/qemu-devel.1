@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej7eU-0001N0-5S
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:07:39 -0500
+	(envelope-from <berrange@redhat.com>) id 1ej7er-0001e6-35
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:07:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej7eQ-0002iK-5y
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:07:30 -0500
+	(envelope-from <berrange@redhat.com>) id 1ej7eq-0002qs-1u
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:07:53 -0500
+Date: Tue, 6 Feb 2018 18:07:42 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180206180742.GN20001@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180206171642.19826-1-vsementsov@virtuozzo.com>
 	<20180206172907.GL20001@redhat.com>
 	<b4ddc41e-0c96-7f91-96c6-957271baf6a4@virtuozzo.com>
-	<5af79798-357a-ab77-eae8-6e2e90e69707@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b579f3c9-6700-d2ff-5fe1-f8d1707f089f@virtuozzo.com>
-Date: Tue, 6 Feb 2018 21:07:15 +0300
 MIME-Version: 1.0
-In-Reply-To: <5af79798-357a-ab77-eae8-6e2e90e69707@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b4ddc41e-0c96-7f91-96c6-957271baf6a4@virtuozzo.com>
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
 Subject: Re: [Qemu-devel] [PATCH] iotests: 205: support luks format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,33 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com
 
-06.02.2018 21:04, Eric Blake wrote:
-> On 02/06/2018 11:57 AM, Vladimir Sementsov-Ogievskiy wrote:
->
->>>> +luks_default_secret_id =3D 'luks_secret_default_iotests_id'
->>> Can we just call this=C2=A0 "keysec0", so we matchh convention used by
->>> the shell script based tests.
->>
->> Here I'm trying to avoid intersection with some user-defined id.
->>
->
-> You're overthinking it.=C2=A0 We are only using this in the testsuite, an=
-d=20
-> nothing else in the testsuite is using 'keysec0' for anything except=20
-> the id of the secret to pass to encrypted disks.=C2=A0 The longer name=20
-> doesn't add any protection.=C2=A0 It might be different if we were trying=
-=20
-> to provide a reusable library for contexts outside the testsuite, but=20
-> since we are not doing that, we can rely on 'make check' failing as=20
-> evidence if we have any collisions in naming choices that need long=20
-> name munging as a workaround.
->
+On Tue, Feb 06, 2018 at 08:57:38PM +0300, Vladimir Sementsov-Ogievskiy wr=
+ote:
+> 06.02.2018 20:29, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, Feb 06, 2018 at 08:16:42PM +0300, Vladimir Sementsov-Ogievski=
+y wrote:
+> > > Support default luks options in VM.add_drive and in new library
+> > > function qemu_img_create. Use it in 205 iotests.
+> > >=20
+> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+> > > ---
+> > >=20
+> > > instead of
+> > >    [PATCH] iotests: 205: support only raw format
+> > >=20
+> > > let's just support luks. This patch also makes it simple to support
+> > > luks in any other python iotest.
+> > >=20
+> > >   tests/qemu-iotests/205        |  4 ++--
+> > >   tests/qemu-iotests/iotests.py | 33 ++++++++++++++++++++++++++++++=
++++
+> > >   2 files changed, 35 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iot=
+ests.py
+> > > index 5a10b2d534..4b9a4445cd 100644
+> > > --- a/tests/qemu-iotests/iotests.py
+> > > +++ b/tests/qemu-iotests/iotests.py
+> > > @@ -58,6 +58,13 @@ qemu_default_machine =3D os.environ.get('QEMU_DE=
+FAULT_MACHINE')
+> > >   socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket=
+_scm_helper')
+> > >   debug =3D False
+> > > +luks_default_secret_id =3D 'luks_secret_default_iotests_id'
+> > Can we just call this  "keysec0", so we matchh convention used by
+> > the shell script based tests.
+>=20
+> Here I'm trying to avoid intersection with some user-defined id.
 
-Ok
+The "user" here is the person writing individual I/O tests. They already
+have to know to avoid keysec0 because that's the standard we've defined
+for the shell based scripts. So I don't see any benefit to divering in
+the Python - just doubles the stuff they need to remember.
 
+Regards,
+Daniel
 --=20
-Best regards,
-Vladimir
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
