@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eizp4-0007pL-Gh
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:55 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eizpn-0008NQ-8Q
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eizp1-0008Br-BA
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eizp1-0008B0-2N
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:51 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w169jNj4046628
-	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 04:45:48 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fy62fh7ty-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 04:45:47 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 6 Feb 2018 09:45:44 -0000
-References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 6 Feb 2018 10:45:40 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1eizpi-0008Sx-NK
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:46:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50836)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eizpi-0008SF-DN
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:46:34 -0500
+Date: Tue, 6 Feb 2018 09:46:28 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180206094628.GA2462@work-vm>
+References: <151790197381.27004.13241184632371976036.stgit@bahia.lan>
+	<9f1237f2-5194-1cc5-dbc4-b453ff3ee7c4@virtuozzo.com>
+	<20180206094310.2a9cdc5c@bahia.lan>
+	<37d2afca-0b5a-8c69-4caf-8e0c190cba7e@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <3389032a-caf2-8d9a-ccf0-f7ce36b389d6@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 05/12] s390-ccw: move auxiliary IPL data
- to separate location
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37d2afca-0b5a-8c69-4caf-8e0c190cba7e@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: incoming postcopy advise sanity
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,179 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 02/05/2018 09:57 PM, Collin L. Walling wrote:
-> The s390-ccw firmware needs some information in support of the
-> boot process which is not available on the native machine.
-> Examples are the netboot firmware load address and now the
-> boot menu parameters.
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> 06.02.2018 11:43, Greg Kurz wrote:
+> > On Tue, 6 Feb 2018 10:49:47 +0300
+> > Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> > 
+> > > 06.02.2018 10:26, Greg Kurz wrote:
+> > > > If postcopy-ram was set on the source but not on the destination,
+> > > > migration doesn't occur, the destination prints an error and boots
+> > > > the guest:
+> > > > 
+> > > > qemu-system-ppc64: Expected vmdescription section, but got 0
+> > > > 
+> > > > We end up with two running instances.
+> > > > 
+> > > > This behaviour was introduced in 2.11 by commit 58110f0acb1a "migration:
+> > > > split common postcopy out of ram postcopy" to prepare ground for the
+> > > > upcoming dirty bitmap postcopy support. It adds a new case where the
+> > > > source may send an empty postcopy advise because dirty bitmap doesn't
+> > > > need to check page sizes like RAM postcopy does.
+> > > > 
+> > > > If the source has enabled postcopy-ram, then it sends an advise with
+> > > > the page size values. If the destination hasn't enabled postcopy-ram,
+> > > > then loadvm_postcopy_handle_advise() leaves the page size values on
+> > > > the stream and returns. This confuses qemu_loadvm_state() later on
+> > > > and causes the destination to start execution.
+> > > > 
+> > > > As discussed several times, postcopy-ram should be enabled both sides
+> > > > to be functional. This patch changes the destination to perform some
+> > > > extra checks on the advise length to ensure this is the case. Otherwise
+> > > > an error is returned and migration is aborted.
+> > > > 
+> > > > Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > >    migration/savevm.c |   18 +++++++++++++++---
+> > > >    1 file changed, 15 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > > index b7908f62be3c..1c516fcbb8d7 100644
+> > > > --- a/migration/savevm.c
+> > > > +++ b/migration/savevm.c
+> > > > @@ -1376,7 +1376,8 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+> > > >     * *might* happen - it might be skipped if precopy transferred everything
+> > > >     * quickly.
+> > > >     */
+> > > > -static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+> > > > +static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
+> > > > +                                         uint16_t len)
+> > > >    {
+> > > >        PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
+> > > >        uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
+> > > > @@ -1387,8 +1388,19 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+> > > >            return -1;
+> > > >        }
+> > > > -    if (!migrate_postcopy_ram()) {
+> > > > +    switch (len) {
+> > > > +    case 0:
+> > > > +        /* The source hasn't enabled postcopy-ram. Nothing to do. */
+> > > should we error-out here if (migrate_postcopy_ram()) ?
+> > > 
+> > I was also thinking so at first, but if the source hasn't enabled postcopy-ram,
+> > then RAM postcopy won't happen. Not sure why we should error out...
 > 
-> While storing that data in unused fields of the IPL parameter block
-> works, that approach could create problems if the parameter block
-> definition should change in the future. Because then a guest could
-> overwrite these fields using the set IPLB diagnose.
-> 
-> In fact the data in question is of more global nature and not really
-> tied to an IPL device, so separating it is rather logical.
-> 
-> This commit introduces a new structure to hold firmware relevant
-> IPL parameters set by QEMU. The data is stored at location 204 (dec)
-> and can contain up to 7 32-bit words. This area is available to
-> programming in the z/Architecture Principles of Operation and
-> can thus safely be used by the firmware until the IPL has completed.
+> if user enables dirty-bitmaps postcopy on source, and enables postcopy-ram
+> on target,
+> we will be here, with migrate_postcopy_ram()=true. and it should be error.
 
-This content is set by QEMU/the ccw bios on every IPL, so we do not
-have to change anything for migration. Correct?
+In that case it's probably worth it.
 
+> > 
+> > > >            return 0;
+> > > > +    case 8 + 8:
+> > > > +        if (!migrate_postcopy_ram()) {
+> > > > +            error_report("RAM postcopy is disabled");
+
+Can you make that a little bit more descriptive please:
+    error_report("RAM postcopy is disabled but have 16 byte advise");
+should do.
+
+Thanks,
+
+Dave
+
+> > > > +            return -EINVAL;
+> > > > +        }
+> > > > +        break;
+> > > > +    default:
+> > > > +        error_report("CMD_POSTCOPY_ADVISE invalid length (%d)", len);
+> > > > +        return -EINVAL;
+> > > >        }
+> > > >        if (!postcopy_ram_supported_by_host(mis)) {
+> > > > @@ -1807,7 +1819,7 @@ static int loadvm_process_command(QEMUFile *f)
+> > > >            return loadvm_handle_cmd_packaged(mis);
+> > > >        case MIG_CMD_POSTCOPY_ADVISE:
+> > > > -        return loadvm_postcopy_handle_advise(mis);
+> > > > +        return loadvm_postcopy_handle_advise(mis, len);
+> > > >        case MIG_CMD_POSTCOPY_LISTEN:
+> > > >            return loadvm_postcopy_handle_listen(mis);
+> > > 
 > 
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c          | 18 +++++++++++++++++-
->  hw/s390x/ipl.h          | 11 +++++++++--
->  pc-bios/s390-ccw/iplb.h | 12 ++++++++++--
->  pc-bios/s390-ccw/main.c |  6 +++++-
->  4 files changed, 41 insertions(+), 6 deletions(-)
 > 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 0d06fc1..3e3c3b8 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -399,6 +399,20 @@ void s390_reipl_request(void)
->      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->  }
+> -- 
+> Best regards,
+> Vladimir
 > 
-> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
-> +{
-> +    S390IPLState *ipl = get_ipl_device();
-> +    uint8_t *addr;
-> +    uint64_t len = 4096;
-> +
-> +    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
-> +    if (!addr || len < 204 + sizeof(QemuIplParameters)) {
-> +        error_report("Cannot set QEMU IPL parameters");
-> +    }
-> +    memcpy(addr + 204, &ipl->iplb.qipl, sizeof(QemuIplParameters));
-> +    cpu_physical_memory_unmap(addr, len, 1, len);
-> +}
-> +
->  void s390_ipl_prepare_cpu(S390CPU *cpu)
->  {
->      S390IPLState *ipl = get_ipl_device();
-> @@ -418,8 +432,10 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
->              error_report_err(err);
->              vm_stop(RUN_STATE_INTERNAL_ERROR);
->          }
-> -        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-> +        ipl->iplb.qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
->      }
-> +    s390_ipl_prepare_qipl(cpu);
-> +
->  }
-> 
->  static void s390_ipl_reset(DeviceState *dev)
-> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-> index 8a705e0..68dcaf8 100644
-> --- a/hw/s390x/ipl.h
-> +++ b/hw/s390x/ipl.h
-> @@ -16,8 +16,7 @@
->  #include "cpu.h"
-> 
->  struct IplBlockCcw {
-> -    uint64_t netboot_start_addr;
-> -    uint8_t  reserved0[77];
-> +    uint8_t  reserved0[85];
->      uint8_t  ssid;
->      uint16_t devno;
->      uint8_t  vm_flags;
-> @@ -59,6 +58,13 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
-> 
->  #define DIAG308_FLAGS_LP_VALID 0x80
-> 
-> +struct QemuIplParameters {
-> +    uint8_t  reserved1[4];
-> +    uint64_t netboot_start_addr;
-> +    uint8_t  reserved2[16];
-> +} QEMU_PACKED;
-> +typedef struct QemuIplParameters QemuIplParameters;
-> +
->  union IplParameterBlock {
->      struct {
->          uint32_t len;
-> @@ -74,6 +80,7 @@ union IplParameterBlock {
->              IplBlockFcp fcp;
->              IplBlockQemuScsi scsi;
->          };
-> +        QemuIplParameters qipl;
->      } QEMU_PACKED;
->      struct {
->          uint8_t  reserved1[110];
-> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-> index 890aed9..12f6e40 100644
-> --- a/pc-bios/s390-ccw/iplb.h
-> +++ b/pc-bios/s390-ccw/iplb.h
-> @@ -13,8 +13,7 @@
->  #define IPLB_H
-> 
->  struct IplBlockCcw {
-> -    uint64_t netboot_start_addr;
-> -    uint8_t  reserved0[77];
-> +    uint8_t  reserved0[85];
->      uint8_t  ssid;
->      uint16_t devno;
->      uint8_t  vm_flags;
-> @@ -73,6 +72,15 @@ typedef struct IplParameterBlock IplParameterBlock;
-> 
->  extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
-> 
-> +struct QemuIplParameters {
-> +    uint8_t  reserved1[4];
-> +    uint64_t netboot_start_addr;
-> +    uint8_t  reserved2[16];
-> +} __attribute__ ((packed));
-> +typedef struct QemuIplParameters QemuIplParameters;
-> +
-> +extern QemuIplParameters qipl;
-> +
->  #define S390_IPL_TYPE_FCP 0x00
->  #define S390_IPL_TYPE_CCW 0x02
->  #define S390_IPL_TYPE_QEMU_SCSI 0xff
-> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> index e857ce4..825a1a3 100644
-> --- a/pc-bios/s390-ccw/main.c
-> +++ b/pc-bios/s390-ccw/main.c
-> @@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
->  static SubChannelId blk_schid = { .one = 1 };
->  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
->  static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-> +QemuIplParameters qipl;
-> 
->  /*
->   * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
-> @@ -81,6 +82,7 @@ static void virtio_setup(void)
->      uint16_t dev_no;
->      char ldp[] = "LOADPARM=[________]\n";
->      VDev *vdev = virtio_get_device();
-> +    QemuIplParameters *early_qipl = (QemuIplParameters *)204;
-> 
->      /*
->       * We unconditionally enable mss support. In every sane configuration,
-> @@ -93,6 +95,8 @@ static void virtio_setup(void)
->      memcpy(ldp + 10, loadparm, 8);
->      sclp_print(ldp);
-> 
-> +    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-> +
->      if (store_iplb(&iplb)) {
->          switch (iplb.pbt) {
->          case S390_IPL_TYPE_CCW:
-> @@ -127,7 +131,7 @@ static void virtio_setup(void)
-> 
->      if (virtio_get_device_type() == VIRTIO_ID_NET) {
->          sclp_print("Network boot device detected\n");
-> -        vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
-> +        vdev->netboot_start_addr = qipl.netboot_start_addr;
->      } else {
->          virtio_blk_setup_device(blk_schid);
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
