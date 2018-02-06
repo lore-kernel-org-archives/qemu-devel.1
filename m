@@ -1,21 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eizyy-0005KC-Ly
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:56:09 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ej00t-0006iW-JH
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eizyt-0006pF-O4
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:56:08 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39852)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eizyt-0006p5-FU
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:56:03 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 06 Feb 2018 12:56:03 +0300
-Message-ID: <20180206095603.26500.5959.stgit@pasha-VirtualBox>
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ej00p-0007ny-8G
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:58:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1ej00o-0007nU-VH
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:58:03 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w169tVFB118738
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 04:58:01 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fy96mas3a-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 04:58:01 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Tue, 6 Feb 2018 09:57:59 -0000
+References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
+	<3389032a-caf2-8d9a-ccf0-f7ce36b389d6@de.ibm.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Tue, 6 Feb 2018 10:57:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <3389032a-caf2-8d9a-ccf0-f7ce36b389d6@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] m68k: implement movep instruction
+Message-Id: <8c7d5b99-bc38-1ed2-ca7c-e6a8fac65b32@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 05/12] s390-ccw: move auxiliary IPL data
+ to separate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +44,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
+To: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com
 
-This patch implements movep instruction. It moves data between a data register
-and alternate bytes within the address space starting at the location
-specified and incrementing by two.
-
-It was designed for the original 68000 and used in firmwares for
-interfacing the 8-bit peripherals through the 16-bit data bus.
-Without this patch opcode for this instruction is recognized as some bitop.
-
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
----
- target/m68k/translate.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
-
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f0e86a7..a849c74 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -2071,6 +2071,55 @@ DISAS_INSN(movem)
-     tcg_temp_free(addr);
- }
- 
-+DISAS_INSN(movep)
-+{
-+    uint8_t i;
-+    uint8_t op;
-+    uint16_t displ;
-+    TCGv reg;
-+    TCGv addr;
-+    TCGv abuf;
-+    TCGv dbuf;
-+
-+    op = (insn >> 6) & 7;
-+    displ = read_im16(env, s);
-+
-+    addr = AREG(insn, 0);
-+    reg = DREG(insn, 9);
-+
-+    abuf = tcg_temp_new();
-+    tcg_gen_addi_i32(abuf, addr, displ);
-+    dbuf = tcg_temp_new();
-+
-+    if (op & 1) {
-+        i = 4;
-+    } else {
-+        i = 2;
-+    }
-+
-+    if (op & 2) {
-+        for ( ; i > 0 ; i--) {
-+            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
-+            gen_store(s, OS_BYTE, abuf, dbuf);
-+            if (i > 1) {
-+                tcg_gen_addi_i32(abuf, abuf, 2);
-+            }
-+        }
-+    } else {
-+        tcg_gen_movi_i32(reg, 0);
-+        for ( ; i > 0 ; i--) {
-+            dbuf = gen_load(s, OS_BYTE, abuf, 1);
-+            tcg_gen_or_i32(reg, reg, dbuf);
-+            if (i > 1) {
-+                tcg_gen_shli_i32(reg, reg, 8);
-+                tcg_gen_addi_i32(abuf, abuf, 2);
-+            }
-+        }
-+    }
-+    tcg_temp_free(abuf);
-+    tcg_temp_free(dbuf);
-+}
-+
- DISAS_INSN(bitop_im)
- {
-     int opsize;
-@@ -5579,9 +5628,13 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(chk2,      00c0, f9c0, CHK2);
-     INSN(bitrev,    00c0, fff8, CF_ISA_APLUSC);
-     BASE(bitop_reg, 0100, f1c0);
-+    BASE(movep,     0108, f1f8);
-     BASE(bitop_reg, 0140, f1c0);
-+    BASE(movep,     0148, f1f8);
-     BASE(bitop_reg, 0180, f1c0);
-+    BASE(movep,     0188, f1f8);
-     BASE(bitop_reg, 01c0, f1c0);
-+    BASE(movep,     01c8, f1f8);
-     INSN(arith_im,  0280, fff8, CF_ISA_A);
-     INSN(arith_im,  0200, ff00, M68000);
-     INSN(undef,     02c0, ffc0, M68000);
+On 06.02.2018 10:45, Christian Borntraeger wrote:
+> On 02/05/2018 09:57 PM, Collin L. Walling wrote:
+>> The s390-ccw firmware needs some information in support of the
+>> boot process which is not available on the native machine.
+>> Examples are the netboot firmware load address and now the
+>> boot menu parameters.
+>>
+>> While storing that data in unused fields of the IPL parameter block
+>> works, that approach could create problems if the parameter block
+>> definition should change in the future. Because then a guest could
+>> overwrite these fields using the set IPLB diagnose.
+>>
+>> In fact the data in question is of more global nature and not really
+>> tied to an IPL device, so separating it is rather logical.
+>>
+>> This commit introduces a new structure to hold firmware relevant
+>> IPL parameters set by QEMU. The data is stored at location 204 (dec)
+>> and can contain up to 7 32-bit words. This area is available to
+>> programming in the z/Architecture Principles of Operation and
+>> can thus safely be used by the firmware until the IPL has completed.
+> 
+> This content is set by QEMU/the ccw bios on every IPL, so we do not
+> have to change anything for migration. Correct?
+> 
+Hm ... this is true for the netboot start address, but I am not sure
+about the boot menu parameters added in a follow on patch. I'll comment
+there...
+[...]
+-- 
+Regards,
+ Viktor Mihajlovski
