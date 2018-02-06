@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej17E-0002p0-D4
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:08:45 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ej17y-0003Vy-TW
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:09:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej17B-0002cn-4z
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:08:44 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:38048)
+	(envelope-from <alex.bennee@linaro.org>) id 1ej17u-0003PX-Ik
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:09:30 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej17A-0002cJ-TL
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:08:41 -0500
-Received: by mail-wr0-x242.google.com with SMTP id t94so1452549wrc.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 03:08:40 -0800 (PST)
+	id 1ej17u-0003P3-7j
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:09:26 -0500
+Received: by mail-wr0-x243.google.com with SMTP id a43so1456558wrc.4
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 03:09:26 -0800 (PST)
 References: <20180126045742.5487-1-richard.henderson@linaro.org>
-	<20180126045742.5487-14-richard.henderson@linaro.org>
+	<20180126045742.5487-15-richard.henderson@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180126045742.5487-14-richard.henderson@linaro.org>
-Date: Tue, 06 Feb 2018 11:08:37 +0000
-Message-ID: <87mv0mwf2i.fsf@linaro.org>
+In-reply-to: <20180126045742.5487-15-richard.henderson@linaro.org>
+Date: Tue, 06 Feb 2018 11:09:23 +0000
+Message-ID: <87lgg6wf18.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 13/20] target/arm: Use vector
- infrastructure for aa64 mov/not/neg
+Subject: Re: [Qemu-devel] [PATCH v11 14/20] target/arm: Use vector
+ infrastructure for aa64 dup/movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,114 +43,151 @@ Richard Henderson <richard.henderson@linaro.org> writes:
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  target/arm/translate-a64.c | 42 ++++++++++++++++++++++++++++++++++++----=
---
->  1 file changed, 36 insertions(+), 6 deletions(-)
+>  target/arm/translate-a64.c | 81 +++++++++++++++++++---------------------=
+------
+>  1 file changed, 33 insertions(+), 48 deletions(-)
 >
 > diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 5a4e62ae0f..11310f1a7a 100644
+> index 11310f1a7a..48088dbb29 100644
 > --- a/target/arm/translate-a64.c
 > +++ b/target/arm/translate-a64.c
-> @@ -86,6 +86,7 @@ typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCG=
-v_i32);
->  typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
+> @@ -5890,10 +5890,7 @@ static void handle_simd_dupe(DisasContext *s, int =
+is_q, int rd, int rn,
+>                               int imm5)
+>  {
+>      int size =3D ctz32(imm5);
+> -    int esize =3D 8 << size;
+> -    int elements =3D (is_q ? 128 : 64) / esize;
+> -    int index, i;
+> -    TCGv_i64 tmp;
+> +    int index =3D imm5 >> (size + 1);
 >
->  /* Note that the gvec expanders operate on offsets + sizes.  */
-> +typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t=
-);
->  typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
->                          uint32_t, uint32_t, uint32_t);
->
-> @@ -631,6 +632,14 @@ static TCGv_ptr get_fpstatus_ptr(void)
->      return statusptr;
->  }
->
-> +/* Expand a 2-operand AdvSIMD vector operation using an expander functio=
-n.  */
-> +static void gen_gvec_fn2(DisasContext *s, bool is_q, int rd, int rn,
-> +                         GVecGen2Fn *gvec_fn, int vece)
-> +{
-> +    gvec_fn(vece, vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
-> +            is_q ? 16 : 8, vec_full_reg_size(s));
-> +}
-> +
->  /* Expand a 3-operand AdvSIMD vector operation using an expander functio=
-n.  */
->  static void gen_gvec_fn3(DisasContext *s, bool is_q, int rd, int rn, int=
- rm,
->                           GVecGen3Fn *gvec_fn, int vece)
-> @@ -4596,14 +4605,17 @@ static void handle_fp_1src_double(DisasContext *s=
-, int opcode, int rd, int rn)
->      TCGv_i64 tcg_op;
->      TCGv_i64 tcg_res;
->
-> +    switch (opcode) {
-> +    case 0x0: /* FMOV */
-> +        gen_gvec_fn2(s, false, rd, rn, tcg_gen_gvec_mov, 0);
-> +        return;
-> +    }
-> +
->      fpst =3D get_fpstatus_ptr();
->      tcg_op =3D read_fp_dreg(s, rn);
->      tcg_res =3D tcg_temp_new_i64();
->
->      switch (opcode) {
-> -    case 0x0: /* FMOV */
-> -        tcg_gen_mov_i64(tcg_res, tcg_op);
-> -        break;
->      case 0x1: /* FABS */
->          gen_helper_vfp_absd(tcg_res, tcg_op);
->          break;
-> @@ -9185,7 +9197,11 @@ static void disas_simd_3same_logic(DisasContext *s=
-, uint32_t insn)
->          gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_andc, 0);
+>      if (size > 3 || (size =3D=3D 3 && !is_q)) {
+>          unallocated_encoding(s);
+> @@ -5904,20 +5901,9 @@ static void handle_simd_dupe(DisasContext *s, int =
+is_q, int rd, int rn,
 >          return;
->      case 2: /* ORR */
-> -        gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_or, 0);
-> +        if (rn =3D=3D rm) { /* MOV */
-> +            gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_mov, 0);
-> +        } else {
-> +            gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_or, 0);
-> +        }
->          return;
->      case 3: /* ORN */
->          gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_orc, 0);
-> @@ -10059,8 +10075,7 @@ static void disas_simd_two_reg_misc(DisasContext =
-*s, uint32_t insn)
->          return;
->      case 0x5: /* CNT, NOT, RBIT */
->          if (u && size =3D=3D 0) {
-> -            /* NOT: adjust size so we can use the 64-bits-at-a-time loop=
-. */
-> -            size =3D 3;
-> +            /* NOT */
->              break;
->          } else if (u && size =3D=3D 1) {
->              /* RBIT */
-> @@ -10312,6 +10327,21 @@ static void disas_simd_two_reg_misc(DisasContext=
- *s, uint32_t insn)
->          tcg_rmode =3D NULL;
 >      }
 >
-> +    switch (opcode) {
-> +    case 0x5:
-> +        if (u && size =3D=3D 0) { /* NOT */
-> +            gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_not, 0);
-> +            return;
-> +        }
-> +        break;
-> +    case 0xb:
-> +        if (u) { /* NEG */
-> +            gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_neg, size);
-> +            return;
-> +        }
-> +        break;
-> +    }
+> -    index =3D imm5 >> (size + 1);
+> -
+> -    tmp =3D tcg_temp_new_i64();
+> -    read_vec_element(s, tmp, rn, index, size);
+> -
+> -    for (i =3D 0; i < elements; i++) {
+> -        write_vec_element(s, tmp, rd, i, size);
+> -    }
+> -
+> -    if (!is_q) {
+> -        clear_vec_high(s, rd);
+> -    }
+> -
+> -    tcg_temp_free_i64(tmp);
+> +    tcg_gen_gvec_dup_mem(size, vec_full_reg_offset(s, rd),
+> +                         vec_reg_offset(s, rn, index, size),
+> +                         is_q ? 16 : 8, vec_full_reg_size(s));
+>  }
+>
+>  /* DUP (element, scalar)
+> @@ -5966,9 +5952,7 @@ static void handle_simd_dupg(DisasContext *s, int i=
+s_q, int rd, int rn,
+>                               int imm5)
+>  {
+>      int size =3D ctz32(imm5);
+> -    int esize =3D 8 << size;
+> -    int elements =3D (is_q ? 128 : 64)/esize;
+> -    int i =3D 0;
+> +    uint32_t dofs, oprsz, maxsz;
+>
+>      if (size > 3 || ((size =3D=3D 3) && !is_q)) {
+>          unallocated_encoding(s);
+> @@ -5979,12 +5963,11 @@ static void handle_simd_dupg(DisasContext *s, int=
+ is_q, int rd, int rn,
+>          return;
+>      }
+>
+> -    for (i =3D 0; i < elements; i++) {
+> -        write_vec_element(s, cpu_reg(s, rn), rd, i, size);
+> -    }
+> -    if (!is_q) {
+> -        clear_vec_high(s, rd);
+> -    }
+> +    dofs =3D vec_full_reg_offset(s, rd);
+> +    oprsz =3D is_q ? 16 : 8;
+> +    maxsz =3D vec_full_reg_size(s);
 > +
->      if (size =3D=3D 3) {
->          /* All 64-bit element operations can be shared with scalar 2misc=
- */
->          int pass;
+> +    tcg_gen_gvec_dup_i64(size, dofs, oprsz, maxsz, cpu_reg(s, rn));
+>  }
+>
+>  /* INS (Element)
+> @@ -6175,7 +6158,6 @@ static void disas_simd_mod_imm(DisasContext *s, uin=
+t32_t insn)
+>      bool is_neg =3D extract32(insn, 29, 1);
+>      bool is_q =3D extract32(insn, 30, 1);
+>      uint64_t imm =3D 0;
+> -    TCGv_i64 tcg_rd, tcg_imm;
+>      int i;
+>
+>      if (o2 !=3D 0 || ((cmode =3D=3D 0xf) && is_neg && !is_q)) {
+> @@ -6257,32 +6239,35 @@ static void disas_simd_mod_imm(DisasContext *s, u=
+int32_t insn)
+>          imm =3D ~imm;
+>      }
+>
+> -    tcg_imm =3D tcg_const_i64(imm);
+> -    tcg_rd =3D new_tmp_a64(s);
+> +    if (!((cmode & 0x9) =3D=3D 0x1 || (cmode & 0xd) =3D=3D 0x9)) {
+> +        /* MOVI or MVNI, with MVNI negation handled above.  */
+> +        tcg_gen_gvec_dup64i(vec_full_reg_offset(s, rd), is_q ? 16 : 8,
+> +                            vec_full_reg_size(s), imm);
+> +    } else {
+> +        TCGv_i64 tcg_imm =3D tcg_const_i64(imm);
+> +        TCGv_i64 tcg_rd =3D new_tmp_a64(s);
+>
+> -    for (i =3D 0; i < 2; i++) {
+> -        int foffs =3D i ? fp_reg_hi_offset(s, rd) : fp_reg_offset(s, rd,=
+ MO_64);
+> +        for (i =3D 0; i < 2; i++) {
+> +            int foffs =3D vec_reg_offset(s, rd, i, MO_64);
+>
+> -        if (i =3D=3D 1 && !is_q) {
+> -            /* non-quad ops clear high half of vector */
+> -            tcg_gen_movi_i64(tcg_rd, 0);
+> -        } else if ((cmode & 0x9) =3D=3D 0x1 || (cmode & 0xd) =3D=3D 0x9)=
+ {
+> -            tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
+> -            if (is_neg) {
+> -                /* AND (BIC) */
+> -                tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
+> +            if (i =3D=3D 1 && !is_q) {
+> +                /* non-quad ops clear high half of vector */
+> +                tcg_gen_movi_i64(tcg_rd, 0);
+>              } else {
+> -                /* ORR */
+> -                tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
+> +                tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
+> +                if (is_neg) {
+> +                    /* AND (BIC) */
+> +                    tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
+> +                } else {
+> +                    /* ORR */
+> +                    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
+> +                }
+>              }
+> -        } else {
+> -            /* MOVI */
+> -            tcg_gen_mov_i64(tcg_rd, tcg_imm);
+> +            tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
+>          }
+> -        tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
+> -    }
+>
+> -    tcg_temp_free_i64(tcg_imm);
+> +        tcg_temp_free_i64(tcg_imm);
+> +    }
+>  }
+>
+>  /* AdvSIMD scalar copy
 
 
 --
