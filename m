@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej636-0004px-9W
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:24:49 -0500
+	(envelope-from <prvs=568286362=ross.lagerwall@citrix.com>)
+	id 1ej69E-0008V8-JL
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ej633-0002YP-L6
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:24:48 -0500
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:45871)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ej633-0002XD-Ef
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:24:45 -0500
-Received: by mail-wr0-x22d.google.com with SMTP id h9so2556291wre.12
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 08:24:45 -0800 (PST)
-References: <20180126045742.5487-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180126045742.5487-1-richard.henderson@linaro.org>
-Date: Tue, 06 Feb 2018 16:24:42 +0000
-Message-ID: <87bmh2w0fp.fsf@linaro.org>
+	(envelope-from <prvs=568286362=ross.lagerwall@citrix.com>)
+	id 1ej69C-0007mB-0H
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:31:08 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:54381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=568286362=ross.lagerwall@citrix.com>)
+	id 1ej69B-0007jy-PE
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 11:31:05 -0500
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Tue, 6 Feb 2018 16:30:39 +0000
+Message-ID: <20180206163039.23661-1-ross.lagerwall@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 00/20] tcg: generic vector operations
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] migration/xen: Check return value of
+ qemu_fclose
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>
 
+QEMUFile uses buffered IO so when writing small amounts (such as the Xen
+device state file), the actual write call and any errors that may occur
+only happen as part of qemu_fclose(). Therefore, report IO errors when
+saving the device state under Xen by checking the return value of
+qemu_fclose().
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+---
+ migration/savevm.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> Changes since v11:
->   * Use dup_const more.
->   * Cleanup some gvec 2i and 2s routines.
->   * Use more helpers and less gotos in target/arm/translate-a64.c.
-
-I just noticed the aarch64 cross build breaks:
-
-n file included from /root/src/github.com/stsquad/qemu/tcg/tcg.c:296:0:
-/root/src/github.com/stsquad/qemu/tcg/aarch64/tcg-target.inc.c: In function=
- 'tcg_out_dupi_vec':
-/root/src/github.com/stsquad/qemu/tcg/aarch64/tcg-target.inc.c:806:9: error=
-: implicit declaration of function 'new_pool_l2' [-Werror=3Dimplicit-functi=
-on-declaration]
-         new_pool_l2(s, R_AARCH64_CONDBR19, s->code_ptr, 0, v64, v64);
-
->
-> Changes since v10:
->   * Squashed a fixup patch which escaped my attention while preparing
->     the patch set.  Ho hum.
->
-> Changes since v9:
->   * Detect whether __attribute__((vector_size(16))) operations are
->     supported by the host compiler.  This includes the case affecting
->     ppc64 where gcc-4.8.5 crashes.  Note that gcc-7.2 does pass the
->     test on ppc64.
->
->   * Dropped support for vector interleaves and element size changes.
->     My target/arm patches were failing RISU checks on a big-endian host.
->     I need to re-think what to do about host endianness and target
->     representation of vector operations crossing lanes.  For now, only
->     support generic vector operations that are agnostic to element order.
->
->
-> r~
->
->
-> Richard Henderson (20):
->   tcg: Allow multiple word entries into the constant pool
->   tcg: Add types and basic operations for host vectors
->   tcg: Standardize integral arguments to expanders
->   tcg: Add generic vector expanders
->   tcg: Add generic vector ops for constant shifts
->   tcg: Add generic vector ops for comparisons
->   tcg: Add generic vector ops for multiplication
->   tcg: Add generic helpers for saturating arithmetic
->   tcg: Add generic vector helpers with a scalar operand
->   tcg/optimize: Handle vector opcodes during optimize
->   target/arm: Align vector registers
->   target/arm: Use vector infrastructure for aa64 add/sub/logic
->   target/arm: Use vector infrastructure for aa64 mov/not/neg
->   target/arm: Use vector infrastructure for aa64 dup/movi
->   target/arm: Use vector infrastructure for aa64 constant shifts
->   target/arm: Use vector infrastructure for aa64 compares
->   target/arm: Use vector infrastructure for aa64 multiplies
->   target/arm: Use vector infrastructure for aa64 orr/bic immediate
->   tcg/i386: Add vector operations
->   tcg/aarch64: Add vector operations
->
->  Makefile.target              |    4 +-
-<snip>
-
---
-Alex Benn=C3=A9e
+diff --git a/migration/savevm.c b/migration/savevm.c
+index b7908f6..4b9d5be 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2267,8 +2267,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+     qio_channel_set_name(QIO_CHANNEL(ioc), "migration-xen-save-state");
+     f = qemu_fopen_channel_output(QIO_CHANNEL(ioc));
+     ret = qemu_save_device_state(f);
+-    qemu_fclose(f);
+-    if (ret < 0) {
++    if (ret < 0 || qemu_fclose(f) < 0) {
+         error_setg(errp, QERR_IO_ERROR);
+     } else {
+         /* libxl calls the QMP command "stop" before calling
+-- 
+2.9.5
