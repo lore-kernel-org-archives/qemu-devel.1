@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eizpn-0008NQ-8Q
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:46:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eizsn-0002Cr-2p
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eizpi-0008Sx-NK
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:46:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50836)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eizpi-0008SF-DN
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:46:34 -0500
-Date: Tue, 6 Feb 2018 09:46:28 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180206094628.GA2462@work-vm>
-References: <151790197381.27004.13241184632371976036.stgit@bahia.lan>
-	<9f1237f2-5194-1cc5-dbc4-b453ff3ee7c4@virtuozzo.com>
-	<20180206094310.2a9cdc5c@bahia.lan>
-	<37d2afca-0b5a-8c69-4caf-8e0c190cba7e@virtuozzo.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eizsg-0002HG-Uw
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:49:45 -0500
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:35246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eizsg-0002Gt-PL
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:49:38 -0500
+Received: by mail-oi0-x22e.google.com with SMTP id e15so892785oiy.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 01:49:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <37d2afca-0b5a-8c69-4caf-8e0c190cba7e@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: incoming postcopy advise sanity
- checks
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA543B64@DGGEMA505-MBX.china.huawei.com>
+References: <1517492876-28428-1-git-send-email-arei.gonglei@huawei.com>
+	<d2f644da-e6c8-da3a-55e4-13ae69c44fc4@redhat.com>
+	<CAFEAcA_6wg6aS_g0mGcNyjC57BVoU+pxdaRU3buM5J6b3XNW-Q@mail.gmail.com>
+	<fa226f5f-77c4-7167-29c6-9baf08737239@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA543B64@DGGEMA505-MBX.china.huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Feb 2018 09:49:17 +0000
+Message-ID: <CAFEAcA_-j5baz-iy16TfzwcUgze1Fs9Fx=uKTkHJKuJ=hpjdqw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] rtc: placing RTC memory region outside BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +32,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> 06.02.2018 11:43, Greg Kurz wrote:
-> > On Tue, 6 Feb 2018 10:49:47 +0300
-> > Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> > 
-> > > 06.02.2018 10:26, Greg Kurz wrote:
-> > > > If postcopy-ram was set on the source but not on the destination,
-> > > > migration doesn't occur, the destination prints an error and boots
-> > > > the guest:
-> > > > 
-> > > > qemu-system-ppc64: Expected vmdescription section, but got 0
-> > > > 
-> > > > We end up with two running instances.
-> > > > 
-> > > > This behaviour was introduced in 2.11 by commit 58110f0acb1a "migration:
-> > > > split common postcopy out of ram postcopy" to prepare ground for the
-> > > > upcoming dirty bitmap postcopy support. It adds a new case where the
-> > > > source may send an empty postcopy advise because dirty bitmap doesn't
-> > > > need to check page sizes like RAM postcopy does.
-> > > > 
-> > > > If the source has enabled postcopy-ram, then it sends an advise with
-> > > > the page size values. If the destination hasn't enabled postcopy-ram,
-> > > > then loadvm_postcopy_handle_advise() leaves the page size values on
-> > > > the stream and returns. This confuses qemu_loadvm_state() later on
-> > > > and causes the destination to start execution.
-> > > > 
-> > > > As discussed several times, postcopy-ram should be enabled both sides
-> > > > to be functional. This patch changes the destination to perform some
-> > > > extra checks on the advise length to ensure this is the case. Otherwise
-> > > > an error is returned and migration is aborted.
-> > > > 
-> > > > Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > ---
-> > > >    migration/savevm.c |   18 +++++++++++++++---
-> > > >    1 file changed, 15 insertions(+), 3 deletions(-)
-> > > > 
-> > > > diff --git a/migration/savevm.c b/migration/savevm.c
-> > > > index b7908f62be3c..1c516fcbb8d7 100644
-> > > > --- a/migration/savevm.c
-> > > > +++ b/migration/savevm.c
-> > > > @@ -1376,7 +1376,8 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
-> > > >     * *might* happen - it might be skipped if precopy transferred everything
-> > > >     * quickly.
-> > > >     */
-> > > > -static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-> > > > +static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
-> > > > +                                         uint16_t len)
-> > > >    {
-> > > >        PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
-> > > >        uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
-> > > > @@ -1387,8 +1388,19 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-> > > >            return -1;
-> > > >        }
-> > > > -    if (!migrate_postcopy_ram()) {
-> > > > +    switch (len) {
-> > > > +    case 0:
-> > > > +        /* The source hasn't enabled postcopy-ram. Nothing to do. */
-> > > should we error-out here if (migrate_postcopy_ram()) ?
-> > > 
-> > I was also thinking so at first, but if the source hasn't enabled postcopy-ram,
-> > then RAM postcopy won't happen. Not sure why we should error out...
-> 
-> if user enables dirty-bitmaps postcopy on source, and enables postcopy-ram
-> on target,
-> we will be here, with migrate_postcopy_ram()=true. and it should be error.
+On 6 February 2018 at 08:24, Gonglei (Arei) <arei.gonglei@huawei.com> wrote:
+> So, taking BQL is necessary, and what we can do is trying our best to narrow
+> down the process of locking ? For example, do the following wrapping:
+>
+> static void rtc_rasie_irq(RTCState *s)
+> {
+>     qemu_mutex_lock_iothread();
+>     qemu_irq_raise(s->irq);
+>     qemu_mutex_unlock_iothread();
+> }
+>
+> static void rtc_lower_irq(RTCState *s)
+> {
+>     qemu_mutex_lock_iothread();
+>     qemu_irq_lower(s->irq);
+>     qemu_mutex_unlock_iothread();
+> }
 
-In that case it's probably worth it.
+If you do that you'll also need to be careful about not calling
+those functions from contexts where you already hold the iothread
+mutex (eg timer callbacks), since you can't lock a mutex you
+already have locked.
 
-> > 
-> > > >            return 0;
-> > > > +    case 8 + 8:
-> > > > +        if (!migrate_postcopy_ram()) {
-> > > > +            error_report("RAM postcopy is disabled");
-
-Can you make that a little bit more descriptive please:
-    error_report("RAM postcopy is disabled but have 16 byte advise");
-should do.
-
-Thanks,
-
-Dave
-
-> > > > +            return -EINVAL;
-> > > > +        }
-> > > > +        break;
-> > > > +    default:
-> > > > +        error_report("CMD_POSTCOPY_ADVISE invalid length (%d)", len);
-> > > > +        return -EINVAL;
-> > > >        }
-> > > >        if (!postcopy_ram_supported_by_host(mis)) {
-> > > > @@ -1807,7 +1819,7 @@ static int loadvm_process_command(QEMUFile *f)
-> > > >            return loadvm_handle_cmd_packaged(mis);
-> > > >        case MIG_CMD_POSTCOPY_ADVISE:
-> > > > -        return loadvm_postcopy_handle_advise(mis);
-> > > > +        return loadvm_postcopy_handle_advise(mis, len);
-> > > >        case MIG_CMD_POSTCOPY_LISTEN:
-> > > >            return loadvm_postcopy_handle_listen(mis);
-> > > 
-> 
-> 
-> -- 
-> Best regards,
-> Vladimir
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
