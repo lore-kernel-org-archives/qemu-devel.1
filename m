@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tx-0000uK-1k
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tz-0000wq-5K
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tt-00039n-Ly
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:37 -0500
-Received: from mail-eopbgr00092.outbound.protection.outlook.com
-	([40.107.0.92]:23240
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tw-0003Bz-9h
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:39 -0500
+Received: from mail-eopbgr00109.outbound.protection.outlook.com
+	([40.107.0.109]:52480
 	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ej9tt-00039J-Bf
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:33 -0500
+	id 1ej9tv-00039t-W9
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:36 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Feb 2018 23:30:28 +0300
-Message-Id: <20180206203048.11096-15-rkagan@virtuozzo.com>
+Date: Tue,  6 Feb 2018 23:30:30 +0300
+Message-Id: <20180206203048.11096-17-rkagan@virtuozzo.com>
 In-Reply-To: <20180206203048.11096-1-rkagan@virtuozzo.com>
 References: <20180206203048.11096-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 14/34] hyperv: process POST_MESSAGE
- hypercall
+Subject: [Qemu-devel] [RFC PATCH 16/34] hyperv: update copyright notices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,160 +31,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>, Ben Warren <ben@skyportsystems.com>, si-wei liu <si-wei.liu@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
-Add handling of POST_MESSAGE hypercall.  For that, add an interface to
-regsiter a handler for the messages arrived from the guest on a
-particular connection id (IOW set up a message connection in Hyper-V
-speak).
-
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- target/i386/hyperv.h |  5 +++
- target/i386/hyperv.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 92 insertions(+)
+ target/i386/hyperv.h     | 1 +
+ hw/misc/hyperv_testdev.c | 1 +
+ target/i386/hyperv.c     | 1 +
+ 3 files changed, 3 insertions(+)
 
 diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
-index 4ce41fe314..fcc41caf1f 100644
+index fcc41caf1f..8b7fcd0b48 100644
 --- a/target/i386/hyperv.h
 +++ b/target/i386/hyperv.h
-@@ -43,6 +43,11 @@ int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *msg);
- 
- int hyperv_set_evt_flag(HvSintRoute *sint_route, unsigned evtno);
- 
-+struct hyperv_post_message_input;
-+typedef uint64_t (*HvMsgHandler)(const struct hyperv_post_message_input *msg,
-+                                 void *data);
-+int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data);
-+
- int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier);
- 
- #endif
+@@ -2,6 +2,7 @@
+  * QEMU KVM Hyper-V support
+  *
+  * Copyright (C) 2015 Andrey Smetanin <asmetanin@virtuozzo.com>
++ * Copyright (c) 2015-2018 Virtuozzo International GmbH.
+  *
+  * Authors:
+  *  Andrey Smetanin <asmetanin@virtuozzo.com>
+diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
+index 79077789e1..b9e1f1cc74 100644
+--- a/hw/misc/hyperv_testdev.c
++++ b/hw/misc/hyperv_testdev.c
+@@ -2,6 +2,7 @@
+  * QEMU KVM Hyper-V test device to support Hyper-V kvm-unit-tests
+  *
+  * Copyright (C) 2015 Andrey Smetanin <asmetanin@virtuozzo.com>
++ * Copyright (c) 2015-2018 Virtuozzo International GmbH.
+  *
+  * Authors:
+  *  Andrey Smetanin <asmetanin@virtuozzo.com>
 diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index 9cf1225385..3dc8a7acb0 100644
+index 3dc8a7acb0..e43cbb9322 100644
 --- a/target/i386/hyperv.c
 +++ b/target/i386/hyperv.c
-@@ -252,6 +252,14 @@ static void async_synic_update(CPUState *cs, run_on_cpu_data data)
-     qemu_mutex_unlock_iothread();
- }
- 
-+typedef struct MsgHandler {
-+    struct rcu_head rcu;
-+    QLIST_ENTRY(MsgHandler) le;
-+    uint32_t conn_id;
-+    HvMsgHandler handler;
-+    void *data;
-+} MsgHandler;
-+
- typedef struct EvtHandler {
-     struct rcu_head rcu;
-     QLIST_ENTRY(EvtHandler) le;
-@@ -259,15 +267,51 @@ typedef struct EvtHandler {
-     EventNotifier *notifier;
- } EvtHandler;
- 
-+static QLIST_HEAD(, MsgHandler) msg_handlers;
- static QLIST_HEAD(, EvtHandler) evt_handlers;
- static QemuMutex handlers_mutex;
- 
- static void __attribute__((constructor)) hv_init(void)
- {
-+    QLIST_INIT(&msg_handlers);
-     QLIST_INIT(&evt_handlers);
-     qemu_mutex_init(&handlers_mutex);
- }
- 
-+int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
-+{
-+    int ret;
-+    MsgHandler *mh;
-+
-+    qemu_mutex_lock(&handlers_mutex);
-+    QLIST_FOREACH(mh, &msg_handlers, le) {
-+        if (mh->conn_id == conn_id) {
-+            if (handler) {
-+                ret = -EEXIST;
-+            } else {
-+                QLIST_REMOVE_RCU(mh, le);
-+                g_free_rcu(mh, rcu);
-+                ret = 0;
-+            }
-+            goto unlock;
-+        }
-+    }
-+
-+    if (handler) {
-+        mh = g_new(MsgHandler, 1);
-+        mh->conn_id = conn_id;
-+        mh->handler = handler;
-+        mh->data = data;
-+        QLIST_INSERT_HEAD_RCU(&msg_handlers, mh, le);
-+        ret = 0;
-+    } else {
-+        ret = -ENOENT;
-+    }
-+unlock:
-+    qemu_mutex_unlock(&handlers_mutex);
-+    return ret;
-+}
-+
- int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier)
- {
-     int ret;
-@@ -301,6 +345,46 @@ unlock:
-     return ret;
- }
- 
-+static uint64_t hvcall_post_message(uint64_t param, bool fast)
-+{
-+    uint64_t ret;
-+    hwaddr len;
-+    struct hyperv_post_message_input *msg;
-+    MsgHandler *mh;
-+
-+    if (fast) {
-+        return HV_STATUS_INVALID_HYPERCALL_CODE;
-+    }
-+    if (param & (__alignof__(*msg) - 1)) {
-+        return HV_STATUS_INVALID_ALIGNMENT;
-+    }
-+
-+    len = sizeof(*msg);
-+    msg = cpu_physical_memory_map(param, &len, 0);
-+    if (len < sizeof(*msg)) {
-+        ret = HV_STATUS_INSUFFICIENT_MEMORY;
-+        goto unmap;
-+    }
-+    if (msg->payload_size > sizeof(msg->payload)) {
-+        ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
-+        goto unmap;
-+    }
-+
-+    ret = HV_STATUS_INVALID_CONNECTION_ID;
-+    rcu_read_lock();
-+    QLIST_FOREACH_RCU(mh, &msg_handlers, le) {
-+        if (mh->conn_id == (msg->connection_id & HV_CONNECTION_ID_MASK)) {
-+            ret = mh->handler(msg, mh->data);
-+            break;
-+        }
-+    }
-+    rcu_read_unlock();
-+
-+unmap:
-+    cpu_physical_memory_unmap(msg, len, 0, 0);
-+    return ret;
-+}
-+
- static uint64_t sigevent_params(hwaddr addr, uint32_t *conn_id)
- {
-     uint64_t ret;
-@@ -389,6 +473,9 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
-         uint64_t param = exit->u.hcall.params[0];
- 
-         switch (code) {
-+        case HV_POST_MESSAGE:
-+            exit->u.hcall.result = hvcall_post_message(param, fast);
-+            break;
-         case HV_SIGNAL_EVENT:
-             exit->u.hcall.result = hvcall_signal_event(param, fast);
-             break;
+@@ -2,6 +2,7 @@
+  * QEMU KVM Hyper-V support
+  *
+  * Copyright (C) 2015 Andrey Smetanin <asmetanin@virtuozzo.com>
++ * Copyright (c) 2015-2018 Virtuozzo International GmbH.
+  *
+  * Authors:
+  *  Andrey Smetanin <asmetanin@virtuozzo.com>
 -- 
 2.14.3
