@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eizp3-0007p8-AQ
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:54 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eizp4-0007pL-Gh
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eizp2-0008CO-4Y
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:53 -0500
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:39480)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eizp1-0008C0-Uh
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:52 -0500
-Received: by mail-oi0-x22d.google.com with SMTP id j188so880659oib.6
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 01:45:51 -0800 (PST)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eizp1-0008Br-BA
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57062)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eizp1-0008B0-2N
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:45:51 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w169jNj4046628
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 04:45:48 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fy62fh7ty-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 04:45:47 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 6 Feb 2018 09:45:44 -0000
+References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 6 Feb 2018 10:45:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <b1112be1-c1bf-ee94-f786-84f248e223c5@amsat.org>
-References: <20180205105720.14620-1-peter.maydell@linaro.org>
-	<20180205105720.14620-6-peter.maydell@linaro.org>
-	<b1112be1-c1bf-ee94-f786-84f248e223c5@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Feb 2018 09:45:30 +0000
-Message-ID: <CAFEAcA9=ty0TyC87=SYduk773iE_tnZ2tJkSq8-BC5cVtQwwdQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 5/8] hw/intc/armv7m_nvic:
- Implement cache ID registers
+In-Reply-To: <1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <3389032a-caf2-8d9a-ccf0-f7ce36b389d6@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 05/12] s390-ccw: move auxiliary IPL data
+ to separate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +43,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-On 5 February 2018 at 23:53, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Hi Peter,
->
-> On 02/05/2018 07:57 AM, Peter Maydell wrote:
->> M profile cores have a similar setup for cache ID registers
->> to A profile:
->>  * Cache Level ID Register (CLIDR) is a fixed value
->>  * Cache Type Register (CTR) is a fixed value
->>  * Cache Size ID Registers (CCSIDR) are a bank of registers;
->>    which one you see is selected by the Cache Size Selection
->>    Register (CSSELR)
->>
->> The only difference is that they're in the NVIC memory mapped
->> register space rather than being coprocessor registers.
->> Implement the M profile view of them.
->>
->> Since neither Cortex-M3 nor Cortex-M4 implement caches,
->> we don't need to update their init functions and can leave
->> the ctr/clidr/ccsidr[] fields in their ARMCPU structs at zero.
->> Newer cores (like the Cortex-M33) will want to be able to
->> set these ID registers to non-zero values, though.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> The CSSELR/CCSIDR parts are a bit under-motivated, because
->> the Cortex-M33 doesn't implement caches either and so they
->> are RAZ/WI for that as well as M3/M4, though I'd written all
->> the code before I realized that. This will be helpful if
->> we ever need a Cortex-M7 model, though (which does have
->> a couple of CSSIDR array entries).
->
-> I wonder if it is easier/faster to add a check for the "Instruction not
-> Data" bit and the level value is not 7 (not permitted) or simple comments=
-.
->
->> ---
->>  target/arm/cpu.h      |  9 +++++++++
->>  hw/intc/armv7m_nvic.c | 13 +++++++++++++
->>  target/arm/machine.c  | 36 ++++++++++++++++++++++++++++++++++++
->>  3 files changed, 58 insertions(+)
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index f21f68ec4a..99c7cb996f 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -453,6 +453,7 @@ typedef struct CPUARMState {
->>          uint32_t faultmask[M_REG_NUM_BANKS];
->>          uint32_t aircr; /* only holds r/w state if security extn implem=
-ented */
->>          uint32_t secure; /* Is CPU in Secure state? (not guest visible)=
- */
->> +        uint32_t csselr[M_REG_NUM_BANKS];
->>      } v7m;
->>
->>      /* Information associated with an exception about to be taken:
->> @@ -2443,6 +2444,14 @@ static inline int arm_debug_target_el(CPUARMState=
- *env)
->>      }
->>  }
->>
->> +static inline bool arm_v7m_csselr_razwi(ARMCPU *cpu)
->> +{
->> +    /* If all the CLIDR.Ctypem bits are 0 there are no caches, and
->> +     * CSSELR is RAZ/WI.
->> +     */
->> +    return (cpu->clidr & 0x001fffff) !=3D 0;
->> +}
->
-> Suggestion to be consistent with other bitfields:
->
-> /* V7M Cache Level ID (CLIDR) */
-> FIELD(V7M_CLIDR, CTYPE, 0, 7 * 3)
->
-> So we can use:
->
->     return (cpu->clidr & R_V7M_CLIDR_CTYPE_MASK) !=3D 0;
->
->> +
->>  static inline bool aa64_generate_debug_exceptions(CPUARMState *env)
->>  {
->>      if (arm_is_secure(env)) {
->> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
->> index eb49fd77c7..cc83c9e553 100644
->> --- a/hw/intc/armv7m_nvic.c
->> +++ b/hw/intc/armv7m_nvic.c
->> @@ -1025,6 +1025,14 @@ static uint32_t nvic_readl(NVICState *s, uint32_t=
- offset, MemTxAttrs attrs)
->>          return cpu->id_isar4;
->>      case 0xd74: /* ISAR5.  */
->>          return cpu->id_isar5;
->> +    case 0xd78: /* CLIDR */
->> +        return cpu->clidr;
->> +    case 0xd7c: /* CTR */
->> +        return cpu->ctr;
->> +    case 0xd80: /* CSSIDR */
->> +        return cpu->ccsidr[cpu->env.v7m.csselr[attrs.secure] & 0xf];
->
-> /* V7M Cache Size Selection (CSSELR) */
-> FIELD(V7M_CSSELR, LEVEL, 1, 3)
+On 02/05/2018 09:57 PM, Collin L. Walling wrote:
+> The s390-ccw firmware needs some information in support of the
+> boot process which is not available on the native machine.
+> Examples are the netboot firmware load address and now the
+> boot menu parameters.
+> 
+> While storing that data in unused fields of the IPL parameter block
+> works, that approach could create problems if the parameter block
+> definition should change in the future. Because then a guest could
+> overwrite these fields using the set IPLB diagnose.
+> 
+> In fact the data in question is of more global nature and not really
+> tied to an IPL device, so separating it is rather logical.
+> 
+> This commit introduces a new structure to hold firmware relevant
+> IPL parameters set by QEMU. The data is stored at location 204 (dec)
+> and can contain up to 7 32-bit words. This area is available to
+> programming in the z/Architecture Principles of Operation and
+> can thus safely be used by the firmware until the IPL has completed.
 
-Yes, but the index into the csselr[] array is by both the level
-field and the I/D bit: csselr[0] is L1 dcache, csselr[1] is
-L1 icache, csselr[2] is L2 dcache, and so on.
+This content is set by QEMU/the ccw bios on every IPL, so we do not
+have to change anything for migration. Correct?
 
-I guess we could define some field constants.
-
-thanks
--- PMM
+> 
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/ipl.c          | 18 +++++++++++++++++-
+>  hw/s390x/ipl.h          | 11 +++++++++--
+>  pc-bios/s390-ccw/iplb.h | 12 ++++++++++--
+>  pc-bios/s390-ccw/main.c |  6 +++++-
+>  4 files changed, 41 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 0d06fc1..3e3c3b8 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -399,6 +399,20 @@ void s390_reipl_request(void)
+>      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>  }
+> 
+> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
+> +{
+> +    S390IPLState *ipl = get_ipl_device();
+> +    uint8_t *addr;
+> +    uint64_t len = 4096;
+> +
+> +    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
+> +    if (!addr || len < 204 + sizeof(QemuIplParameters)) {
+> +        error_report("Cannot set QEMU IPL parameters");
+> +    }
+> +    memcpy(addr + 204, &ipl->iplb.qipl, sizeof(QemuIplParameters));
+> +    cpu_physical_memory_unmap(addr, len, 1, len);
+> +}
+> +
+>  void s390_ipl_prepare_cpu(S390CPU *cpu)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+> @@ -418,8 +432,10 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>              error_report_err(err);
+>              vm_stop(RUN_STATE_INTERNAL_ERROR);
+>          }
+> -        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+> +        ipl->iplb.qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+>      }
+> +    s390_ipl_prepare_qipl(cpu);
+> +
+>  }
+> 
+>  static void s390_ipl_reset(DeviceState *dev)
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index 8a705e0..68dcaf8 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -16,8 +16,7 @@
+>  #include "cpu.h"
+> 
+>  struct IplBlockCcw {
+> -    uint64_t netboot_start_addr;
+> -    uint8_t  reserved0[77];
+> +    uint8_t  reserved0[85];
+>      uint8_t  ssid;
+>      uint16_t devno;
+>      uint8_t  vm_flags;
+> @@ -59,6 +58,13 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
+> 
+>  #define DIAG308_FLAGS_LP_VALID 0x80
+> 
+> +struct QemuIplParameters {
+> +    uint8_t  reserved1[4];
+> +    uint64_t netboot_start_addr;
+> +    uint8_t  reserved2[16];
+> +} QEMU_PACKED;
+> +typedef struct QemuIplParameters QemuIplParameters;
+> +
+>  union IplParameterBlock {
+>      struct {
+>          uint32_t len;
+> @@ -74,6 +80,7 @@ union IplParameterBlock {
+>              IplBlockFcp fcp;
+>              IplBlockQemuScsi scsi;
+>          };
+> +        QemuIplParameters qipl;
+>      } QEMU_PACKED;
+>      struct {
+>          uint8_t  reserved1[110];
+> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+> index 890aed9..12f6e40 100644
+> --- a/pc-bios/s390-ccw/iplb.h
+> +++ b/pc-bios/s390-ccw/iplb.h
+> @@ -13,8 +13,7 @@
+>  #define IPLB_H
+> 
+>  struct IplBlockCcw {
+> -    uint64_t netboot_start_addr;
+> -    uint8_t  reserved0[77];
+> +    uint8_t  reserved0[85];
+>      uint8_t  ssid;
+>      uint16_t devno;
+>      uint8_t  vm_flags;
+> @@ -73,6 +72,15 @@ typedef struct IplParameterBlock IplParameterBlock;
+> 
+>  extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+> 
+> +struct QemuIplParameters {
+> +    uint8_t  reserved1[4];
+> +    uint64_t netboot_start_addr;
+> +    uint8_t  reserved2[16];
+> +} __attribute__ ((packed));
+> +typedef struct QemuIplParameters QemuIplParameters;
+> +
+> +extern QemuIplParameters qipl;
+> +
+>  #define S390_IPL_TYPE_FCP 0x00
+>  #define S390_IPL_TYPE_CCW 0x02
+>  #define S390_IPL_TYPE_QEMU_SCSI 0xff
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index e857ce4..825a1a3 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+>  static SubChannelId blk_schid = { .one = 1 };
+>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>  static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+> +QemuIplParameters qipl;
+> 
+>  /*
+>   * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+> @@ -81,6 +82,7 @@ static void virtio_setup(void)
+>      uint16_t dev_no;
+>      char ldp[] = "LOADPARM=[________]\n";
+>      VDev *vdev = virtio_get_device();
+> +    QemuIplParameters *early_qipl = (QemuIplParameters *)204;
+> 
+>      /*
+>       * We unconditionally enable mss support. In every sane configuration,
+> @@ -93,6 +95,8 @@ static void virtio_setup(void)
+>      memcpy(ldp + 10, loadparm, 8);
+>      sclp_print(ldp);
+> 
+> +    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+> +
+>      if (store_iplb(&iplb)) {
+>          switch (iplb.pbt) {
+>          case S390_IPL_TYPE_CCW:
+> @@ -127,7 +131,7 @@ static void virtio_setup(void)
+> 
+>      if (virtio_get_device_type() == VIRTIO_ID_NET) {
+>          sclp_print("Network boot device detected\n");
+> -        vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
+> +        vdev->netboot_start_addr = qipl.netboot_start_addr;
+>      } else {
+>          virtio_blk_setup_device(blk_schid);
+> 
