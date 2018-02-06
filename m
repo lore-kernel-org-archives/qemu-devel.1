@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38115)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1f9-0006hp-Po
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:43:48 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38997)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1ej1hu-0008L8-So
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1f6-0004L9-Fl
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:43:47 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:52038)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej1f6-0004Iw-3Y
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:43:44 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 06 Feb 2018 14:43:43 +0300
-Message-ID: <20180206114343.13816.78250.stgit@pasha-VirtualBox>
+	(envelope-from <pl@kamp.de>) id 1ej1hr-00069Y-PR
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:46:38 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:35800 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ej1hr-00067s-FO
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:46:35 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Tue, 6 Feb 2018 12:46:30 +0100
+References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
+	<20170919143829.GH2107@work-vm>
+	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
+	<20170919144130.GI2107@work-vm>
+	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
+	<20170921123625.GE2717@work-vm>
+	<b7f1d6ec-9511-ef3d-80d1-c52cf8adfc24@kamp.de>
+	<20171212170533.GG2409@work-vm>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <8ed6cb1e-4770-21ec-164e-7142e649eab3@kamp.de>
+Date: Tue, 6 Feb 2018 12:46:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3] m68k: implement movep instruction
+In-Reply-To: <20171212170533.GG2409@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Block Migration and CPU throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +37,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: huth@tuxfamily.org, dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
 
-This patch implements movep instruction. It moves data between a data register
-and alternate bytes within the address space starting at the location
-specified and incrementing by two.
+Am 12.12.2017 um 18:05 schrieb Dr. David Alan Gilbert:
+> * Peter Lieven (pl@kamp.de) wrote:
+>> Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
+>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
+>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
+>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>>>> Hi,
+>>>>>>>>
+>>>>>>>> I just noticed that CPU throttling and Block Migration don't work together very well.
+>>>>>>>> During block migration the throttling heuristic detects that we obviously make no progress
+>>>>>>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
+>>>>>>>>
+>>>>>>>> The result is that any VM is throttled by 99% during block migration.
+>>>>>>> Hmm that's unfortunate; do you have a bandwidth set lower than your
+>>>>>>> actual network connection? I'm just wondering if it's actually going
+>>>>>>> between the block and RAM iterative sections or getting stuck in ne.
+>>>>>> It happens also if source and dest are on the same machine and speed is set to 100G.
+>>>>> But does it happen if they're not and the speed is set low?
+>>>> Yes, it does. I noticed it in our test environment between different nodes with a 10G
+>>>> link in between. But its totally clear why it happens. During block migration we transfer
+>>>> all dirty memory pages in each round (if there is moderate memory load), but all dirty
+>>>> pages are obviously more than 50% of the transferred ram in that round.
+>>>> It is more exactly 100%. But the current logic triggers on this condition.
+>>>>
+>>>> I think I will go forward and send a patch which disables auto converge during
+>>>> block migration bulk stage.
+>>> Yes, that's fair;  it probably would also make sense to throttle the RAM
+>>> migration during the block migration bulk stage, since the chances are
+>>> it's not going to get far.  (I think in the nbd setup, the main
+>>> migration process isn't started until the end of bulk).
+>> Catching up with the idea of delaying ram migration until block bulk has completed.
+>> What do you think is the easiest way to achieve this?
+> <excavates inbox, and notices I never replied>
+>
+> I think the answer depends whether we think this is a 'special' or we
+> need a new general purpose mechanism.
+>
+> If it was really general then we'd probably want to split the iterative
+> stage in two somehow, and only do RAM in the second half.
+>
+> But I'm not sure it's worth it; I suspect the easiest way is:
+>
+>     a) Add a counter in migration/ram.c or in the RAM state somewhere
+>     b) Make ram_save_inhibit increment the counter
+>     c) Check the counter at the head of ram_save_iterate and just exit
+>       if it's none 0
+>     d) Call ram_save_inhibit from block_save_setup
+>     e) Then release it when you've finished the bulk stage
+>
+> Make sure you still count the RAM in the pending totals, otherwise
+> migration might think it's finished a bit early.
 
-It was designed for the original 68000 and used in firmwares for
-interfacing the 8-bit peripherals through the 16-bit data bus.
-Without this patch opcode for this instruction is recognized as some bitop.
+Is there any culprit I don't see or is it as easy as this?
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+diff --git a/migration/ram.c b/migration/ram.c
+index cb1950f..c67bcf1 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2255,6 +2255,13 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+      int64_t t0;
+      int done = 0;
 
---
-
-v3: - simplified movep function code
-    - joined movep masks
-
-v2: - disabled movep for Coldfire
-    - fixed gen_store/load usage
----
- target/m68k/cpu.c       |    2 ++
- target/m68k/cpu.h       |    1 +
- target/m68k/translate.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 49 insertions(+)
-
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 98919b3..461db85 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -113,6 +113,7 @@ static void m68000_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_M68000);
-     m68k_set_feature(env, M68K_FEATURE_USP);
-     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
-+    m68k_set_feature(env, M68K_FEATURE_MOVEP);
- }
- 
- static void m68020_cpu_initfn(Object *obj)
-@@ -135,6 +136,7 @@ static void m68020_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_BKPT);
-     m68k_set_feature(env, M68K_FEATURE_RTD);
-     m68k_set_feature(env, M68K_FEATURE_CHK2);
-+    m68k_set_feature(env, M68K_FEATURE_MOVEP);
- }
- #define m68030_cpu_initfn m68020_cpu_initfn
- 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 627fb78..1d79885 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -492,6 +492,7 @@ enum m68k_features {
-     M68K_FEATURE_RTD,
-     M68K_FEATURE_CHK2,
-     M68K_FEATURE_M68040, /* instructions specific to MC68040 */
-+    M68K_FEATURE_MOVEP,
- };
- 
- static inline int m68k_feature(CPUM68KState *env, int feature)
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 34db97b..00e3efe 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -2078,6 +2078,51 @@ DISAS_INSN(movem)
-     tcg_temp_free(addr);
- }
- 
-+DISAS_INSN(movep)
-+{
-+    uint8_t i;
-+    int16_t displ;
-+    TCGv reg;
-+    TCGv addr;
-+    TCGv abuf;
-+    TCGv dbuf;
++    if (blk_mig_bulk_active()) {
++        /* Avoid transferring RAM during bulk phase of block migration as
++         * the bulk phase will usually take a lot of time and transferring
++         * RAM updates again and again is pointless. */
++        goto out;
++    }
 +
-+    displ = read_im16(env, s);
-+
-+    addr = AREG(insn, 0);
-+    reg = DREG(insn, 9);
-+
-+    abuf = tcg_temp_new();
-+    tcg_gen_addi_i32(abuf, addr, displ);
-+    dbuf = tcg_temp_new();
-+
-+    if (insn & 0x40) {
-+        i = 4;
-+    } else {
-+        i = 2;
-+    }
-+
-+    if (insn & 0x80) {
-+        for ( ; i > 0 ; i--) {
-+            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
-+            tcg_gen_qemu_st8(dbuf, abuf, IS_USER(s));
-+            if (i > 1) {
-+                tcg_gen_addi_i32(abuf, abuf, 2);
-+            }
-+        }
-+    } else {
-+        for ( ; i > 0 ; i--) {
-+            tcg_gen_qemu_ld8u(dbuf, abuf, IS_USER(s));
-+            tcg_gen_deposit_i32(reg, reg, dbuf, i * 8, 8);
-+            if (i > 1) {
-+                tcg_gen_addi_i32(abuf, abuf, 2);
-+            }
-+        }
-+    }
-+    tcg_temp_free(abuf);
-+    tcg_temp_free(dbuf);
-+}
-+
- DISAS_INSN(bitop_im)
- {
-     int opsize;
-@@ -5678,6 +5723,7 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(bitop_reg, 0140, f1c0);
-     BASE(bitop_reg, 0180, f1c0);
-     BASE(bitop_reg, 01c0, f1c0);
-+    INSN(movep,     0108, f138, MOVEP);
-     INSN(arith_im,  0280, fff8, CF_ISA_A);
-     INSN(arith_im,  0200, ff00, M68000);
-     INSN(undef,     02c0, ffc0, M68000);
+      rcu_read_lock();
+      if (ram_list.version != rs->last_version) {
+          ram_state_reset(rs);
+@@ -2301,6 +2308,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+       */
+      ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+
++out:
+      qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+      ram_counters.transferred += 8;
+
+
+Peter
