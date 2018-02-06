@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eiyyW-0004R1-VX
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 03:51:41 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eiz0a-0005c4-EH
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 03:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eiyyO-0005eq-JV
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 03:51:37 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:40294)
+	(envelope-from <alex.bennee@linaro.org>) id 1eiz0X-0006tD-9f
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 03:53:44 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34224)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eiyyN-0005bH-VF
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 03:51:28 -0500
-Received: by mail-wm0-x243.google.com with SMTP id v123so2173793wmd.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 00:51:27 -0800 (PST)
+	id 1eiz0W-0006ru-TU
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 03:53:41 -0500
+Received: by mail-wr0-x243.google.com with SMTP id z6so1047577wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 00:53:40 -0800 (PST)
 References: <20180126045742.5487-1-richard.henderson@linaro.org>
-	<20180126045742.5487-2-richard.henderson@linaro.org>
+	<20180126045742.5487-3-richard.henderson@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180126045742.5487-2-richard.henderson@linaro.org>
-Date: Tue, 06 Feb 2018 08:51:24 +0000
-Message-ID: <871shyxzzn.fsf@linaro.org>
+In-reply-to: <20180126045742.5487-3-richard.henderson@linaro.org>
+Date: Tue, 06 Feb 2018 08:53:37 +0000
+Message-ID: <87zi4mwlbi.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 01/20] tcg: Allow multiple word entries
- into the constant pool
+Subject: Re: [Qemu-devel] [PATCH v11 02/20] tcg: Add types and basic
+ operations for host vectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,191 +37,824 @@ Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> This will be required for storing vector constants.
+> Nothing uses or enables them yet.
 >
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  tcg/tcg-pool.inc.c | 115 +++++++++++++++++++++++++++++++++++++++++++----=
-------
->  1 file changed, 93 insertions(+), 22 deletions(-)
+>  Makefile.target  |   4 +-
+>  tcg/tcg-op.h     |  27 +++++
+>  tcg/tcg-opc.h    |  25 +++++
+>  tcg/tcg.h        |  56 +++++++++++
+>  tcg/tcg-op-vec.c | 292 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  tcg/tcg.c        |  96 +++++++++++++++++-
+>  tcg/README       |  49 ++++++++++
+>  7 files changed, 543 insertions(+), 6 deletions(-)
+>  create mode 100644 tcg/tcg-op-vec.c
 >
-> diff --git a/tcg/tcg-pool.inc.c b/tcg/tcg-pool.inc.c
-> index 8a85131405..ecf7c9282b 100644
-> --- a/tcg/tcg-pool.inc.c
-> +++ b/tcg/tcg-pool.inc.c
-> @@ -22,39 +22,110 @@
+> diff --git a/Makefile.target b/Makefile.target
+> index f9a9da7e7c..7f30a1e725 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -93,8 +93,8 @@ all: $(PROGS) stap
+>  # cpu emulator library
+>  obj-y +=3D exec.o
+>  obj-y +=3D accel/
+> -obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
+> -obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o
+> +obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o
+> +obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/optimize.o
+>  obj-$(CONFIG_TCG_INTERPRETER) +=3D tcg/tci.o
+>  obj-$(CONFIG_TCG_INTERPRETER) +=3D disas/tci.o
+>  obj-y +=3D fpu/softfloat.o
+> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+> index ca07b32b65..0c02d86b8b 100644
+> --- a/tcg/tcg-op.h
+> +++ b/tcg/tcg-op.h
+> @@ -35,6 +35,10 @@ void tcg_gen_op4(TCGOpcode, TCGArg, TCGArg, TCGArg, TC=
+GArg);
+>  void tcg_gen_op5(TCGOpcode, TCGArg, TCGArg, TCGArg, TCGArg, TCGArg);
+>  void tcg_gen_op6(TCGOpcode, TCGArg, TCGArg, TCGArg, TCGArg, TCGArg, TCGA=
+rg);
 >
->  typedef struct TCGLabelPoolData {
->      struct TCGLabelPoolData *next;
-> -    tcg_target_ulong data;
->      tcg_insn_unit *label;
-> -    intptr_t addend;
-> -    int type;
-> +    int32_t addend;
-> +    uint16_t rtype;
-> +    uint16_t nlong;
-> +    tcg_target_ulong data[];
->  } TCGLabelPoolData;
->
->
-> -static void new_pool_label(TCGContext *s, tcg_target_ulong data, int typ=
-e,
-> -                           tcg_insn_unit *label, intptr_t addend)
-> +static TCGLabelPoolData *new_pool_alloc(TCGContext *s, int nlong, int rt=
-ype,
-> +                                        tcg_insn_unit *label, int addend)
->  {
-> -    TCGLabelPoolData *n =3D tcg_malloc(sizeof(*n));
-> -    TCGLabelPoolData *i, **pp;
-> +    TCGLabelPoolData *n =3D tcg_malloc(sizeof(TCGLabelPoolData)
-> +                                     + sizeof(tcg_target_ulong) * nlong);
->
-> -    n->data =3D data;
->      n->label =3D label;
-> -    n->type =3D type;
->      n->addend =3D addend;
-> +    n->rtype =3D rtype;
-> +    n->nlong =3D nlong;
-> +    return n;
-> +}
+> +void vec_gen_2(TCGOpcode, TCGType, unsigned, TCGArg, TCGArg);
+> +void vec_gen_3(TCGOpcode, TCGType, unsigned, TCGArg, TCGArg, TCGArg);
+> +void vec_gen_4(TCGOpcode, TCGType, unsigned, TCGArg, TCGArg, TCGArg, TCG=
+Arg);
 > +
-> +static void new_pool_insert(TCGContext *s, TCGLabelPoolData *n)
-> +{
-> +    TCGLabelPoolData *i, **pp;
-> +    int nlong =3D n->nlong;
+>  static inline void tcg_gen_op1_i32(TCGOpcode opc, TCGv_i32 a1)
+>  {
+>      tcg_gen_op1(opc, tcgv_i32_arg(a1));
+> @@ -903,6 +907,27 @@ void tcg_gen_atomic_or_fetch_i64(TCGv_i64, TCGv, TCG=
+v_i64, TCGArg, TCGMemOp);
+>  void tcg_gen_atomic_xor_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGM=
+emOp);
+>  void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGM=
+emOp);
 >
->      /* Insertion sort on the pool.  */
-> -    for (pp =3D &s->pool_labels; (i =3D *pp) && i->data < data; pp =3D &=
-i->next) {
-> -        continue;
-> +    for (pp =3D &s->pool_labels; (i =3D *pp) !=3D NULL; pp =3D &i->next)=
- {
-> +        if (nlong > i->nlong) {
-> +            break;
-> +        }
-> +        if (nlong < i->nlong) {
-> +            continue;
-> +        }
-> +        if (memcmp(n->data, i->data, sizeof(tcg_target_ulong) * nlong) >=
-=3D 0) {
-> +            break;
-> +        }
->      }
->      n->next =3D *pp;
->      *pp =3D n;
+> +void tcg_gen_mov_vec(TCGv_vec, TCGv_vec);
+> +void tcg_gen_dup_i32_vec(unsigned vece, TCGv_vec, TCGv_i32);
+> +void tcg_gen_dup_i64_vec(unsigned vece, TCGv_vec, TCGv_i64);
+> +void tcg_gen_dup8i_vec(TCGv_vec, uint32_t);
+> +void tcg_gen_dup16i_vec(TCGv_vec, uint32_t);
+> +void tcg_gen_dup32i_vec(TCGv_vec, uint32_t);
+> +void tcg_gen_dup64i_vec(TCGv_vec, uint64_t);
+> +void tcg_gen_add_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+> +void tcg_gen_sub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+> +void tcg_gen_and_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+> +void tcg_gen_or_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+> +void tcg_gen_xor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+> +void tcg_gen_andc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+> +void tcg_gen_orc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+> +void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+> +void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+> +
+> +void tcg_gen_ld_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset);
+> +void tcg_gen_st_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset);
+> +void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t=
+);
+> +
+>  #if TARGET_LONG_BITS =3D=3D 64
+>  #define tcg_gen_movi_tl tcg_gen_movi_i64
+>  #define tcg_gen_mov_tl tcg_gen_mov_i64
+> @@ -1001,6 +1026,7 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, T=
+CGv_i64, TCGArg, TCGMemOp);
+>  #define tcg_gen_atomic_and_fetch_tl tcg_gen_atomic_and_fetch_i64
+>  #define tcg_gen_atomic_or_fetch_tl tcg_gen_atomic_or_fetch_i64
+>  #define tcg_gen_atomic_xor_fetch_tl tcg_gen_atomic_xor_fetch_i64
+> +#define tcg_gen_dup_tl_vec  tcg_gen_dup_i64_vec
+>  #else
+>  #define tcg_gen_movi_tl tcg_gen_movi_i32
+>  #define tcg_gen_mov_tl tcg_gen_mov_i32
+> @@ -1098,6 +1124,7 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, T=
+CGv_i64, TCGArg, TCGMemOp);
+>  #define tcg_gen_atomic_and_fetch_tl tcg_gen_atomic_and_fetch_i32
+>  #define tcg_gen_atomic_or_fetch_tl tcg_gen_atomic_or_fetch_i32
+>  #define tcg_gen_atomic_xor_fetch_tl tcg_gen_atomic_xor_fetch_i32
+> +#define tcg_gen_dup_tl_vec  tcg_gen_dup_i32_vec
+>  #endif
+>
+>  #if UINTPTR_MAX =3D=3D UINT32_MAX
+> diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+> index 956fb1e9f3..b851ad4bca 100644
+> --- a/tcg/tcg-opc.h
+> +++ b/tcg/tcg-opc.h
+> @@ -204,8 +204,33 @@ DEF(qemu_ld_i64, DATA64_ARGS, TLADDR_ARGS, 1,
+>  DEF(qemu_st_i64, 0, TLADDR_ARGS + DATA64_ARGS, 1,
+>      TCG_OPF_CALL_CLOBBER | TCG_OPF_SIDE_EFFECTS | TCG_OPF_64BIT)
+>
+> +/* Host vector support.  */
+> +
+> +#define IMPLVEC  TCG_OPF_VECTOR | IMPL(TCG_TARGET_MAYBE_vec)
+> +
+> +DEF(mov_vec, 1, 1, 0, TCG_OPF_VECTOR | TCG_OPF_NOT_PRESENT)
+> +DEF(dupi_vec, 1, 0, 1, TCG_OPF_VECTOR | TCG_OPF_NOT_PRESENT)
+> +
+> +DEF(dup_vec, 1, 1, 0, IMPLVEC)
+> +DEF(dup2_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_REG_BITS =3D=3D 32))
+> +
+> +DEF(ld_vec, 1, 1, 1, IMPLVEC)
+> +DEF(st_vec, 0, 2, 1, IMPLVEC)
+> +
+> +DEF(add_vec, 1, 2, 0, IMPLVEC)
+> +DEF(sub_vec, 1, 2, 0, IMPLVEC)
+> +DEF(neg_vec, 1, 1, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_neg_vec))
+> +
+> +DEF(and_vec, 1, 2, 0, IMPLVEC)
+> +DEF(or_vec, 1, 2, 0, IMPLVEC)
+> +DEF(xor_vec, 1, 2, 0, IMPLVEC)
+> +DEF(andc_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_andc_vec))
+> +DEF(orc_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_orc_vec))
+> +DEF(not_vec, 1, 1, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_not_vec))
+> +
+>  #undef TLADDR_ARGS
+>  #undef DATA64_ARGS
+>  #undef IMPL
+>  #undef IMPL64
+> +#undef IMPLVEC
+>  #undef DEF
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 2ce497cebf..dce483b0ee 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -170,6 +170,27 @@ typedef uint64_t TCGRegSet;
+>  # error "Missing unsigned widening multiply"
+>  #endif
+>
+> +#if !defined(TCG_TARGET_HAS_v64) \
+> +    && !defined(TCG_TARGET_HAS_v128) \
+> +    && !defined(TCG_TARGET_HAS_v256)
+> +#define TCG_TARGET_MAYBE_vec            0
+> +#define TCG_TARGET_HAS_neg_vec          0
+> +#define TCG_TARGET_HAS_not_vec          0
+> +#define TCG_TARGET_HAS_andc_vec         0
+> +#define TCG_TARGET_HAS_orc_vec          0
+> +#else
+> +#define TCG_TARGET_MAYBE_vec            1
+> +#endif
+> +#ifndef TCG_TARGET_HAS_v64
+> +#define TCG_TARGET_HAS_v64              0
+> +#endif
+> +#ifndef TCG_TARGET_HAS_v128
+> +#define TCG_TARGET_HAS_v128             0
+> +#endif
+> +#ifndef TCG_TARGET_HAS_v256
+> +#define TCG_TARGET_HAS_v256             0
+> +#endif
+> +
+>  #ifndef TARGET_INSN_START_EXTRA_WORDS
+>  # define TARGET_INSN_START_WORDS 1
+>  #else
+> @@ -246,6 +267,11 @@ typedef struct TCGPool {
+>  typedef enum TCGType {
+>      TCG_TYPE_I32,
+>      TCG_TYPE_I64,
+> +
+> +    TCG_TYPE_V64,
+> +    TCG_TYPE_V128,
+> +    TCG_TYPE_V256,
+> +
+>      TCG_TYPE_COUNT, /* number of different types */
+>
+>      /* An alias for the size of the host register.  */
+> @@ -396,6 +422,8 @@ typedef tcg_target_ulong TCGArg;
+>      * TCGv_i32 : 32 bit integer type
+>      * TCGv_i64 : 64 bit integer type
+>      * TCGv_ptr : a host pointer type
+> +    * TCGv_vec : a host vector type; the exact size is not exposed
+> +                 to the CPU front-end code.
+>      * TCGv : an integer type the same size as target_ulong
+>               (an alias for either TCGv_i32 or TCGv_i64)
+>     The compiler's type checking will complain if you mix them
+> @@ -418,6 +446,7 @@ typedef tcg_target_ulong TCGArg;
+>  typedef struct TCGv_i32_d *TCGv_i32;
+>  typedef struct TCGv_i64_d *TCGv_i64;
+>  typedef struct TCGv_ptr_d *TCGv_ptr;
+> +typedef struct TCGv_vec_d *TCGv_vec;
+>  typedef TCGv_ptr TCGv_env;
+>  #if TARGET_LONG_BITS =3D=3D 32
+>  #define TCGv TCGv_i32
+> @@ -589,6 +618,9 @@ typedef struct TCGOp {
+>  #define TCGOP_CALLI(X)    (X)->param1
+>  #define TCGOP_CALLO(X)    (X)->param2
+>
+> +#define TCGOP_VECL(X)     (X)->param1
+> +#define TCGOP_VECE(X)     (X)->param2
+> +
+>  /* Make sure operands fit in the bitfields above.  */
+>  QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
+>
+> @@ -726,6 +758,11 @@ static inline TCGTemp *tcgv_ptr_temp(TCGv_ptr v)
+>      return tcgv_i32_temp((TCGv_i32)v);
 >  }
 >
-> +/* The "usual" for generic integer code.  */
-> +static inline void new_pool_label(TCGContext *s, tcg_target_ulong d, int=
- rtype,
-> +                                  tcg_insn_unit *label, int addend)
+> +static inline TCGTemp *tcgv_vec_temp(TCGv_vec v)
 > +{
-> +    TCGLabelPoolData *n =3D new_pool_alloc(s, 1, rtype, label, addend);
-> +    n->data[0] =3D d;
-> +    new_pool_insert(s, n);
+> +    return tcgv_i32_temp((TCGv_i32)v);
 > +}
 > +
-> +/* For v64 or v128, depending on the host.  */
-> +static inline void new_pool_l2(TCGContext *s, int rtype, tcg_insn_unit *=
-label,
-> +                               int addend, tcg_target_ulong d0,
-> +                               tcg_target_ulong d1)
-> +{
-> +    TCGLabelPoolData *n =3D new_pool_alloc(s, 2, rtype, label, addend);
-> +    n->data[0] =3D d0;
-> +    n->data[1] =3D d1;
-> +    new_pool_insert(s, n);
-> +}
-> +
-> +/* For v128 or v256, depending on the host.  */
-> +static inline void new_pool_l4(TCGContext *s, int rtype, tcg_insn_unit *=
-label,
-> +                               int addend, tcg_target_ulong d0,
-> +                               tcg_target_ulong d1, tcg_target_ulong d2,
-> +                               tcg_target_ulong d3)
-> +{
-> +    TCGLabelPoolData *n =3D new_pool_alloc(s, 4, rtype, label, addend);
-> +    n->data[0] =3D d0;
-> +    n->data[1] =3D d1;
-> +    n->data[2] =3D d2;
-> +    n->data[3] =3D d3;
-> +    new_pool_insert(s, n);
-> +}
-> +
-> +/* For v256, for 32-bit host.  */
-> +static inline void new_pool_l8(TCGContext *s, int rtype, tcg_insn_unit *=
-label,
-> +                               int addend, tcg_target_ulong d0,
-> +                               tcg_target_ulong d1, tcg_target_ulong d2,
-> +                               tcg_target_ulong d3, tcg_target_ulong d4,
-> +                               tcg_target_ulong d5, tcg_target_ulong d6,
-> +                               tcg_target_ulong d7)
-> +{
-> +    TCGLabelPoolData *n =3D new_pool_alloc(s, 8, rtype, label, addend);
-> +    n->data[0] =3D d0;
-> +    n->data[1] =3D d1;
-> +    n->data[2] =3D d2;
-> +    n->data[3] =3D d3;
-> +    n->data[4] =3D d4;
-> +    n->data[5] =3D d5;
-> +    n->data[6] =3D d6;
-> +    n->data[7] =3D d7;
-> +    new_pool_insert(s, n);
-> +}
-> +
->  /* To be provided by cpu/tcg-target.inc.c.  */
->  static void tcg_out_nop_fill(tcg_insn_unit *p, int count);
->
->  static bool tcg_out_pool_finalize(TCGContext *s)
+>  static inline TCGArg tcgv_i32_arg(TCGv_i32 v)
 >  {
->      TCGLabelPoolData *p =3D s->pool_labels;
-> -    tcg_target_ulong d, *a;
-> +    TCGLabelPoolData *l =3D NULL;
-> +    void *a;
+>      return temp_arg(tcgv_i32_temp(v));
+> @@ -741,6 +778,11 @@ static inline TCGArg tcgv_ptr_arg(TCGv_ptr v)
+>      return temp_arg(tcgv_ptr_temp(v));
+>  }
 >
->      if (p =3D=3D NULL) {
->          return true;
-> @@ -62,24 +133,24 @@ static bool tcg_out_pool_finalize(TCGContext *s)
+> +static inline TCGArg tcgv_vec_arg(TCGv_vec v)
+> +{
+> +    return temp_arg(tcgv_vec_temp(v));
+> +}
+> +
+>  static inline TCGv_i32 temp_tcgv_i32(TCGTemp *t)
+>  {
+>      (void)temp_idx(t); /* trigger embedded assert */
+> @@ -757,6 +799,11 @@ static inline TCGv_ptr temp_tcgv_ptr(TCGTemp *t)
+>      return (TCGv_ptr)temp_tcgv_i32(t);
+>  }
 >
->      /* ??? Round up to qemu_icache_linesize, but then do not round
->         again when allocating the next TranslationBlock structure.  */
-> -    a =3D (void *)ROUND_UP((uintptr_t)s->code_ptr, sizeof(tcg_target_ulo=
-ng));
-> +    a =3D (void *)ROUND_UP((uintptr_t)s->code_ptr,
-> +                         sizeof(tcg_target_ulong) * p->nlong);
->      tcg_out_nop_fill(s->code_ptr, (tcg_insn_unit *)a - s->code_ptr);
->      s->data_gen_ptr =3D a;
+> +static inline TCGv_vec temp_tcgv_vec(TCGTemp *t)
+> +{
+> +    return (TCGv_vec)temp_tcgv_i32(t);
+> +}
+> +
+>  #if TCG_TARGET_REG_BITS =3D=3D 32
+>  static inline TCGv_i32 TCGV_LOW(TCGv_i64 t)
+>  {
+> @@ -832,9 +879,12 @@ TCGTemp *tcg_global_mem_new_internal(TCGType, TCGv_p=
+tr,
 >
-> -    /* Ensure the first comparison fails.  */
-> -    d =3D p->data + 1;
+>  TCGv_i32 tcg_temp_new_internal_i32(int temp_local);
+>  TCGv_i64 tcg_temp_new_internal_i64(int temp_local);
+> +TCGv_vec tcg_temp_new_vec(TCGType type);
+> +TCGv_vec tcg_temp_new_vec_matching(TCGv_vec match);
+>
+>  void tcg_temp_free_i32(TCGv_i32 arg);
+>  void tcg_temp_free_i64(TCGv_i64 arg);
+> +void tcg_temp_free_vec(TCGv_vec arg);
+>
+>  static inline TCGv_i32 tcg_global_mem_new_i32(TCGv_ptr reg, intptr_t off=
+set,
+>                                                const char *name)
+> @@ -916,6 +966,8 @@ enum {
+>      /* Instruction is optional and not implemented by the host, or insn
+>         is generic and should not be implemened by the host.  */
+>      TCG_OPF_NOT_PRESENT  =3D 0x10,
+> +    /* Instruction operands are vectors.  */
+> +    TCG_OPF_VECTOR       =3D 0x20,
+>  };
+>
+>  typedef struct TCGOpDef {
+> @@ -981,6 +1033,10 @@ TCGv_i32 tcg_const_i32(int32_t val);
+>  TCGv_i64 tcg_const_i64(int64_t val);
+>  TCGv_i32 tcg_const_local_i32(int32_t val);
+>  TCGv_i64 tcg_const_local_i64(int64_t val);
+> +TCGv_vec tcg_const_zeros_vec(TCGType);
+> +TCGv_vec tcg_const_ones_vec(TCGType);
+> +TCGv_vec tcg_const_zeros_vec_matching(TCGv_vec);
+> +TCGv_vec tcg_const_ones_vec_matching(TCGv_vec);
+>
+>  TCGLabel *gen_new_label(void);
+>
+> diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
+> new file mode 100644
+> index 0000000000..9e4678878b
+> --- /dev/null
+> +++ b/tcg/tcg-op-vec.c
+> @@ -0,0 +1,292 @@
+> +/*
+> + * Tiny Code Generator for QEMU
+> + *
+> + * Copyright (c) 2018 Linaro, Inc.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "cpu.h"
+> +#include "exec/exec-all.h"
+> +#include "tcg.h"
+> +#include "tcg-op.h"
+> +#include "tcg-mo.h"
+> +
+> +/* Reduce the number of ifdefs below.  This assumes that all uses of
+> +   TCGV_HIGH and TCGV_LOW are properly protected by a conditional that
+> +   the compiler can eliminate.  */
+> +#if TCG_TARGET_REG_BITS =3D=3D 64
+> +extern TCGv_i32 TCGV_LOW_link_error(TCGv_i64);
+> +extern TCGv_i32 TCGV_HIGH_link_error(TCGv_i64);
+> +#define TCGV_LOW  TCGV_LOW_link_error
+> +#define TCGV_HIGH TCGV_HIGH_link_error
+> +#endif
+> +
+> +void vec_gen_2(TCGOpcode opc, TCGType type, unsigned vece, TCGArg r, TCG=
+Arg a)
+> +{
+> +    TCGOp *op =3D tcg_emit_op(opc);
+> +    TCGOP_VECL(op) =3D type - TCG_TYPE_V64;
+> +    TCGOP_VECE(op) =3D vece;
+> +    op->args[0] =3D r;
+> +    op->args[1] =3D a;
+> +}
+> +
+> +void vec_gen_3(TCGOpcode opc, TCGType type, unsigned vece,
+> +               TCGArg r, TCGArg a, TCGArg b)
+> +{
+> +    TCGOp *op =3D tcg_emit_op(opc);
+> +    TCGOP_VECL(op) =3D type - TCG_TYPE_V64;
+> +    TCGOP_VECE(op) =3D vece;
+> +    op->args[0] =3D r;
+> +    op->args[1] =3D a;
+> +    op->args[2] =3D b;
+> +}
+> +
+> +void vec_gen_4(TCGOpcode opc, TCGType type, unsigned vece,
+> +               TCGArg r, TCGArg a, TCGArg b, TCGArg c)
+> +{
+> +    TCGOp *op =3D tcg_emit_op(opc);
+> +    TCGOP_VECL(op) =3D type - TCG_TYPE_V64;
+> +    TCGOP_VECE(op) =3D vece;
+> +    op->args[0] =3D r;
+> +    op->args[1] =3D a;
+> +    op->args[2] =3D b;
+> +    op->args[3] =3D c;
+> +}
+> +
+> +static void vec_gen_op2(TCGOpcode opc, unsigned vece, TCGv_vec r, TCGv_v=
+ec a)
+> +{
+> +    TCGTemp *rt =3D tcgv_vec_temp(r);
+> +    TCGTemp *at =3D tcgv_vec_temp(a);
+> +    TCGType type =3D rt->base_type;
+> +
+> +    tcg_debug_assert(at->base_type =3D=3D type);
+> +    vec_gen_2(opc, type, vece, temp_arg(rt), temp_arg(at));
+> +}
+> +
+> +static void vec_gen_op3(TCGOpcode opc, unsigned vece,
+> +                        TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    TCGTemp *rt =3D tcgv_vec_temp(r);
+> +    TCGTemp *at =3D tcgv_vec_temp(a);
+> +    TCGTemp *bt =3D tcgv_vec_temp(b);
+> +    TCGType type =3D rt->base_type;
+> +
+> +    tcg_debug_assert(at->base_type =3D=3D type);
+> +    tcg_debug_assert(bt->base_type =3D=3D type);
+> +    vec_gen_3(opc, type, vece, temp_arg(rt), temp_arg(at), temp_arg(bt));
+> +}
+> +
+> +void tcg_gen_mov_vec(TCGv_vec r, TCGv_vec a)
+> +{
+> +    if (r !=3D a) {
+> +        vec_gen_op2(INDEX_op_mov_vec, 0, r, a);
+> +    }
+> +}
+> +
+> +#define MO_REG  (TCG_TARGET_REG_BITS =3D=3D 64 ? MO_64 : MO_32)
+> +
+> +static void tcg_gen_dupi_vec(TCGv_vec r, unsigned vece, TCGArg a)
+> +{
+> +    TCGTemp *rt =3D tcgv_vec_temp(r);
+> +    vec_gen_2(INDEX_op_dupi_vec, rt->base_type, vece, temp_arg(rt), a);
+> +}
+> +
+> +TCGv_vec tcg_const_zeros_vec(TCGType type)
+> +{
+> +    TCGv_vec ret =3D tcg_temp_new_vec(type);
+> +    tcg_gen_dupi_vec(ret, MO_REG, 0);
+> +    return ret;
+> +}
+> +
+> +TCGv_vec tcg_const_ones_vec(TCGType type)
+> +{
+> +    TCGv_vec ret =3D tcg_temp_new_vec(type);
+> +    tcg_gen_dupi_vec(ret, MO_REG, -1);
+> +    return ret;
+> +}
+> +
+> +TCGv_vec tcg_const_zeros_vec_matching(TCGv_vec m)
+> +{
+> +    TCGTemp *t =3D tcgv_vec_temp(m);
+> +    return tcg_const_zeros_vec(t->base_type);
+> +}
+> +
+> +TCGv_vec tcg_const_ones_vec_matching(TCGv_vec m)
+> +{
+> +    TCGTemp *t =3D tcgv_vec_temp(m);
+> +    return tcg_const_ones_vec(t->base_type);
+> +}
+> +
+> +void tcg_gen_dup64i_vec(TCGv_vec r, uint64_t a)
+> +{
+> +    if (TCG_TARGET_REG_BITS =3D=3D 32 && a =3D=3D deposit64(a, 32, 32, a=
+)) {
+> +        tcg_gen_dupi_vec(r, MO_32, a);
+> +    } else if (TCG_TARGET_REG_BITS =3D=3D 64 || a =3D=3D (uint64_t)(int3=
+2_t)a) {
+> +        tcg_gen_dupi_vec(r, MO_64, a);
+> +    } else {
+> +        TCGv_i64 c =3D tcg_const_i64(a);
+> +        tcg_gen_dup_i64_vec(MO_64, r, c);
+> +        tcg_temp_free_i64(c);
+> +    }
+> +}
+> +
+> +void tcg_gen_dup32i_vec(TCGv_vec r, uint32_t a)
+> +{
+> +    tcg_gen_dupi_vec(r, MO_REG, ((TCGArg)-1 / 0xffffffffu) * a);
+> +}
+> +
+> +void tcg_gen_dup16i_vec(TCGv_vec r, uint32_t a)
+> +{
+> +    tcg_gen_dupi_vec(r, MO_REG, ((TCGArg)-1 / 0xffff) * (a & 0xffff));
+> +}
+> +
+> +void tcg_gen_dup8i_vec(TCGv_vec r, uint32_t a)
+> +{
+> +    tcg_gen_dupi_vec(r, MO_REG, ((TCGArg)-1 / 0xff) * (a & 0xff));
+> +}
+> +
+> +void tcg_gen_dup_i64_vec(unsigned vece, TCGv_vec r, TCGv_i64 a)
+> +{
+> +    TCGArg ri =3D tcgv_vec_arg(r);
+> +    TCGTemp *rt =3D arg_temp(ri);
+> +    TCGType type =3D rt->base_type;
+> +
+> +    if (TCG_TARGET_REG_BITS =3D=3D 64) {
+> +        TCGArg ai =3D tcgv_i64_arg(a);
+> +        vec_gen_2(INDEX_op_dup_vec, type, MO_64, ri, ai);
+> +    } else if (vece =3D=3D MO_64) {
+> +        TCGArg al =3D tcgv_i32_arg(TCGV_LOW(a));
+> +        TCGArg ah =3D tcgv_i32_arg(TCGV_HIGH(a));
+> +        vec_gen_3(INDEX_op_dup2_vec, type, MO_64, ri, al, ah);
+> +    } else {
+> +        TCGArg ai =3D tcgv_i32_arg(TCGV_LOW(a));
+> +        vec_gen_2(INDEX_op_dup_vec, type, MO_64, ri, ai);
+> +    }
+> +}
+> +
+> +void tcg_gen_dup_i32_vec(unsigned vece, TCGv_vec r, TCGv_i32 a)
+> +{
+> +    TCGArg ri =3D tcgv_vec_arg(r);
+> +    TCGArg ai =3D tcgv_i32_arg(a);
+> +    TCGTemp *rt =3D arg_temp(ri);
+> +    TCGType type =3D rt->base_type;
+> +
+> +    vec_gen_2(INDEX_op_dup_vec, type, vece, ri, ai);
+> +}
+> +
+> +static void vec_gen_ldst(TCGOpcode opc, TCGv_vec r, TCGv_ptr b, TCGArg o)
+> +{
+> +    TCGArg ri =3D tcgv_vec_arg(r);
+> +    TCGArg bi =3D tcgv_ptr_arg(b);
+> +    TCGTemp *rt =3D arg_temp(ri);
+> +    TCGType type =3D rt->base_type;
+> +
+> +    vec_gen_3(opc, type, 0, ri, bi, o);
+> +}
+> +
+> +void tcg_gen_ld_vec(TCGv_vec r, TCGv_ptr b, TCGArg o)
+> +{
+> +    vec_gen_ldst(INDEX_op_ld_vec, r, b, o);
+> +}
+> +
+> +void tcg_gen_st_vec(TCGv_vec r, TCGv_ptr b, TCGArg o)
+> +{
+> +    vec_gen_ldst(INDEX_op_st_vec, r, b, o);
+> +}
+> +
+> +void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr b, TCGArg o, TCGType low_type)
+> +{
+> +    TCGArg ri =3D tcgv_vec_arg(r);
+> +    TCGArg bi =3D tcgv_ptr_arg(b);
+> +    TCGTemp *rt =3D arg_temp(ri);
+> +    TCGType type =3D rt->base_type;
+> +
+> +    tcg_debug_assert(low_type >=3D TCG_TYPE_V64);
+> +    tcg_debug_assert(low_type <=3D type);
+> +    vec_gen_3(INDEX_op_st_vec, low_type, 0, ri, bi, o);
+> +}
+> +
+> +void tcg_gen_add_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    vec_gen_op3(INDEX_op_add_vec, vece, r, a, b);
+> +}
+> +
+> +void tcg_gen_sub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    vec_gen_op3(INDEX_op_sub_vec, vece, r, a, b);
+> +}
+> +
+> +void tcg_gen_and_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    vec_gen_op3(INDEX_op_and_vec, 0, r, a, b);
+> +}
+> +
+> +void tcg_gen_or_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    vec_gen_op3(INDEX_op_or_vec, 0, r, a, b);
+> +}
+> +
+> +void tcg_gen_xor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    vec_gen_op3(INDEX_op_xor_vec, 0, r, a, b);
+> +}
+> +
+> +void tcg_gen_andc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    if (TCG_TARGET_HAS_andc_vec) {
+> +        vec_gen_op3(INDEX_op_andc_vec, 0, r, a, b);
+> +    } else {
+> +        TCGv_vec t =3D tcg_temp_new_vec_matching(r);
+> +        tcg_gen_not_vec(0, t, b);
+> +        tcg_gen_and_vec(0, r, a, t);
+> +        tcg_temp_free_vec(t);
+> +    }
+> +}
+> +
+> +void tcg_gen_orc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    if (TCG_TARGET_HAS_orc_vec) {
+> +        vec_gen_op3(INDEX_op_orc_vec, 0, r, a, b);
+> +    } else {
+> +        TCGv_vec t =3D tcg_temp_new_vec_matching(r);
+> +        tcg_gen_not_vec(0, t, b);
+> +        tcg_gen_or_vec(0, r, a, t);
+> +        tcg_temp_free_vec(t);
+> +    }
+> +}
+> +
+> +void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+> +{
+> +    if (TCG_TARGET_HAS_not_vec) {
+> +        vec_gen_op2(INDEX_op_not_vec, 0, r, a);
+> +    } else {
+> +        TCGv_vec t =3D tcg_const_ones_vec_matching(r);
+> +        tcg_gen_xor_vec(0, r, a, t);
+> +        tcg_temp_free_vec(t);
+> +    }
+> +}
+> +
+> +void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+> +{
+> +    if (TCG_TARGET_HAS_neg_vec) {
+> +        vec_gen_op2(INDEX_op_neg_vec, vece, r, a);
+> +    } else {
+> +        TCGv_vec t =3D tcg_const_zeros_vec_matching(r);
+> +        tcg_gen_sub_vec(vece, r, t, a);
+> +        tcg_temp_free_vec(t);
+> +    }
+> +}
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index 93caa0be93..42f0acdf8e 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -106,6 +106,18 @@ static void tcg_out_movi(TCGContext *s, TCGType type,
+>                           TCGReg ret, tcg_target_long arg);
+>  static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+>                         const int *const_args);
+> +#if TCG_TARGET_MAYBE_vec
+> +static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned vecl,
+> +                           unsigned vece, const TCGArg *args,
+> +                           const int *const_args);
+> +#else
+> +static inline void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned=
+ vecl,
+> +                                  unsigned vece, const TCGArg *args,
+> +                                  const int *const_args)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +#endif
+>  static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg, TCGReg a=
+rg1,
+>                         intptr_t arg2);
+>  static bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
+> @@ -146,8 +158,7 @@ struct tcg_region_state {
+>  };
+>
+>  static struct tcg_region_state region;
 > -
->      for (; p !=3D NULL; p =3D p->next) {
-> -        if (p->data !=3D d) {
-> -            d =3D p->data;
-> -            if (unlikely((void *)a > s->code_gen_highwater)) {
-> +        size_t size =3D sizeof(tcg_target_ulong) * p->nlong;
-> +        if (!l || l->nlong !=3D p->nlong || memcmp(l->data, p->data, siz=
-e)) {
-> +            if (unlikely(a > s->code_gen_highwater)) {
->                  return false;
->              }
-> -            *a++ =3D d;
-> +            memcpy(a, p->data, size);
-> +            a +=3D size;
-> +            l =3D p;
->          }
-> -        patch_reloc(p->label, p->type, (intptr_t)(a - 1), p->addend);
-> +        patch_reloc(p->label, p->rtype, (intptr_t)a - size, p->addend);
+> -static TCGRegSet tcg_target_available_regs[2];
+> +static TCGRegSet tcg_target_available_regs[TCG_TYPE_COUNT];
+>  static TCGRegSet tcg_target_call_clobber_regs;
+>
+>  #if TCG_TARGET_INSN_UNIT_SIZE =3D=3D 1
+> @@ -1026,6 +1037,41 @@ TCGv_i64 tcg_temp_new_internal_i64(int temp_local)
+>      return temp_tcgv_i64(t);
+>  }
+>
+> +TCGv_vec tcg_temp_new_vec(TCGType type)
+> +{
+> +    TCGTemp *t;
+> +
+> +#ifdef CONFIG_DEBUG_TCG
+> +    switch (type) {
+> +    case TCG_TYPE_V64:
+> +        assert(TCG_TARGET_HAS_v64);
+> +        break;
+> +    case TCG_TYPE_V128:
+> +        assert(TCG_TARGET_HAS_v128);
+> +        break;
+> +    case TCG_TYPE_V256:
+> +        assert(TCG_TARGET_HAS_v256);
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +#endif
+> +
+> +    t =3D tcg_temp_new_internal(type, 0);
+> +    return temp_tcgv_vec(t);
+> +}
+> +
+> +/* Create a new temp of the same type as an existing temp.  */
+> +TCGv_vec tcg_temp_new_vec_matching(TCGv_vec match)
+> +{
+> +    TCGTemp *t =3D tcgv_vec_temp(match);
+> +
+> +    tcg_debug_assert(t->temp_allocated !=3D 0);
+> +
+> +    t =3D tcg_temp_new_internal(t->base_type, 0);
+> +    return temp_tcgv_vec(t);
+> +}
+> +
+>  static void tcg_temp_free_internal(TCGTemp *ts)
+>  {
+>      TCGContext *s =3D tcg_ctx;
+> @@ -1057,6 +1103,11 @@ void tcg_temp_free_i64(TCGv_i64 arg)
+>      tcg_temp_free_internal(tcgv_i64_temp(arg));
+>  }
+>
+> +void tcg_temp_free_vec(TCGv_vec arg)
+> +{
+> +    tcg_temp_free_internal(tcgv_vec_temp(arg));
+> +}
+> +
+>  TCGv_i32 tcg_const_i32(int32_t val)
+>  {
+>      TCGv_i32 t0;
+> @@ -1114,6 +1165,9 @@ int tcg_check_temp_count(void)
+>     Test the runtime variable that controls each opcode.  */
+>  bool tcg_op_supported(TCGOpcode op)
+>  {
+> +    const bool have_vec
+> +        =3D TCG_TARGET_HAS_v64 | TCG_TARGET_HAS_v128 | TCG_TARGET_HAS_v2=
+56;
+> +
+>      switch (op) {
+>      case INDEX_op_discard:
+>      case INDEX_op_set_label:
+> @@ -1327,6 +1381,28 @@ bool tcg_op_supported(TCGOpcode op)
+>      case INDEX_op_mulsh_i64:
+>          return TCG_TARGET_HAS_mulsh_i64;
+>
+> +    case INDEX_op_mov_vec:
+> +    case INDEX_op_dup_vec:
+> +    case INDEX_op_dupi_vec:
+> +    case INDEX_op_ld_vec:
+> +    case INDEX_op_st_vec:
+> +    case INDEX_op_add_vec:
+> +    case INDEX_op_sub_vec:
+> +    case INDEX_op_and_vec:
+> +    case INDEX_op_or_vec:
+> +    case INDEX_op_xor_vec:
+> +        return have_vec;
+> +    case INDEX_op_dup2_vec:
+> +        return have_vec && TCG_TARGET_REG_BITS =3D=3D 32;
+> +    case INDEX_op_not_vec:
+> +        return have_vec && TCG_TARGET_HAS_not_vec;
+> +    case INDEX_op_neg_vec:
+> +        return have_vec && TCG_TARGET_HAS_neg_vec;
+> +    case INDEX_op_andc_vec:
+> +        return have_vec && TCG_TARGET_HAS_andc_vec;
+> +    case INDEX_op_orc_vec:
+> +        return have_vec && TCG_TARGET_HAS_orc_vec;
+> +
+>      case NB_OPS:
+>          break;
+>      }
+> @@ -1661,6 +1737,11 @@ void tcg_dump_ops(TCGContext *s)
+>              nb_iargs =3D def->nb_iargs;
+>              nb_cargs =3D def->nb_cargs;
+>
+> +            if (def->flags & TCG_OPF_VECTOR) {
+> +                col +=3D qemu_log("v%d,e%d,", 64 << TCGOP_VECL(op),
+> +                                8 << TCGOP_VECE(op));
+> +            }
+> +
+>              k =3D 0;
+>              for (i =3D 0; i < nb_oargs; i++) {
+>                  if (k !=3D 0) {
+> @@ -2890,8 +2971,13 @@ static void tcg_reg_alloc_op(TCGContext *s, const =
+TCGOp *op)
 >      }
 >
-> -    s->code_ptr =3D (void *)a;
-> +    s->code_ptr =3D a;
->      return true;
->  }
+>      /* emit instruction */
+> -    tcg_out_op(s, op->opc, new_args, const_args);
+> -
+> +    if (def->flags & TCG_OPF_VECTOR) {
+> +        tcg_out_vec_op(s, op->opc, TCGOP_VECL(op), TCGOP_VECE(op),
+> +                       new_args, const_args);
+> +    } else {
+> +        tcg_out_op(s, op->opc, new_args, const_args);
+> +    }
+> +
+>      /* move the outputs in the correct register if needed */
+>      for(i =3D 0; i < nb_oargs; i++) {
+>          ts =3D arg_temp(op->args[i]);
+> @@ -3239,10 +3325,12 @@ int tcg_gen_code(TCGContext *s, TranslationBlock =
+*tb)
+>          switch (opc) {
+>          case INDEX_op_mov_i32:
+>          case INDEX_op_mov_i64:
+> +        case INDEX_op_mov_vec:
+>              tcg_reg_alloc_mov(s, op);
+>              break;
+>          case INDEX_op_movi_i32:
+>          case INDEX_op_movi_i64:
+> +        case INDEX_op_dupi_vec:
+>              tcg_reg_alloc_movi(s, op);
+>              break;
+>          case INDEX_op_insn_start:
+> diff --git a/tcg/README b/tcg/README
+> index 03bfb6acd4..f4695307bd 100644
+> --- a/tcg/README
+> +++ b/tcg/README
+> @@ -503,6 +503,55 @@ of the memory access.
+>  For a 32-bit host, qemu_ld/st_i64 is guaranteed to only be used with a
+>  64-bit memory access specified in flags.
+>
+> +********* Host vector operations
+> +
+> +All of the vector ops have two parameters, TCGOP_VECL & TCGOP_VECE.
+> +The former specifies the length of the vector in log2 64-bit units; the
+> +later specifies the length of the element (if applicable) in log2 8-bit =
+units.
+> +E.g. VECL=3D1 -> 64 << 1 -> v128, and VECE=3D2 -> 1 << 2 -> i32.
+> +
+> +* mov_vec   v0, v1
+> +* ld_vec    v0, t1
+> +* st_vec    v0, t1
+> +
+> +  Move, load and store.
+> +
+> +* dup_vec  v0, r1
+> +
+> +  Duplicate the low N bits of R1 into VECL/VECE copies across V0.
+> +
+> +* dupi_vec v0, c
+> +
+> +  Similarly, for a constant.
+> +  Smaller values will be replicated to host register size by the expande=
+rs.
+> +
+> +* dup2_vec v0, r1, r2
+> +
+> +  Duplicate r2:r1 into VECL/64 copies across V0.  This opcode is
+> +  only present for 32-bit hosts.
+> +
+> +* add_vec   v0, v1, v2
+> +
+> +  v0 =3D v1 + v2, in elements across the vector.
+> +
+> +* sub_vec   v0, v1, v2
+> +
+> +  Similarly, v0 =3D v1 - v2.
+> +
+> +* neg_vec   v0, v1
+> +
+> +  Similarly, v0 =3D -v1.
+> +
+> +* and_vec   v0, v1, v2
+> +* or_vec    v0, v1, v2
+> +* xor_vec   v0, v1, v2
+> +* andc_vec  v0, v1, v2
+> +* orc_vec   v0, v1, v2
+> +* not_vec   v0, v1
+> +
+> +  Similarly, logical operations with and without compliment.
+> +  Note that VECE is unused.
+> +
+>  *********
+>
+>  Note 1: Some shortcuts are defined when the last operand is known to be
 
 
 --
