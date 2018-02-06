@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1eizDW-000456-7X
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:07:07 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eizI7-0006Jr-Ru
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:11:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1eizDT-0006mB-2L
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:07:06 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33795)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
-	id 1eizDS-0006lE-Lj
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:07:02 -0500
-Received: by mail-wm0-x241.google.com with SMTP id j21-v6so16880290wmh.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 01:07:02 -0800 (PST)
-Date: Tue, 6 Feb 2018 10:06:59 +0100
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Message-ID: <20180206090659.GX21802@cbox>
-References: <20180201205307.30343-1-christoffer.dall@linaro.org>
-	<431ec46d-33dd-71d8-9ea1-f331ba01bd62@amsat.org>
+	(envelope-from <arei.gonglei@huawei.com>) id 1eizI2-0001Wh-T0
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:11:51 -0500
+Received: from [45.249.212.255] (port=52230 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1eizI2-0001VS-I0
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 04:11:46 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Tue, 6 Feb 2018 08:24:36 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA543B64@DGGEMA505-MBX.china.huawei.com>
+References: <1517492876-28428-1-git-send-email-arei.gonglei@huawei.com>
+	<d2f644da-e6c8-da3a-55e4-13ae69c44fc4@redhat.com>
+	<CAFEAcA_6wg6aS_g0mGcNyjC57BVoU+pxdaRU3buM5J6b3XNW-Q@mail.gmail.com>
+	<fa226f5f-77c4-7167-29c6-9baf08737239@redhat.com>
+In-Reply-To: <fa226f5f-77c4-7167-29c6-9baf08737239@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="CE+1k2dSO48ffgeK"
-Content-Disposition: inline
-In-Reply-To: <431ec46d-33dd-71d8-9ea1-f331ba01bd62@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] target/arm/kvm: gic: Prevent creating
- userspace GICv3 with KVM
+Subject: Re: [Qemu-devel] [PATCH] rtc: placing RTC memory region outside BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alex Bennee <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-
---CE+1k2dSO48ffgeK
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi Philippe,
-
-On Mon, Feb 05, 2018 at 09:10:48PM -0300, Philippe Mathieu-Daud=E9 wrote:
->=20
-> On 02/01/2018 05:53 PM, Christoffer Dall wrote:
-> > KVM doesn't support emulating a GICv3 in userspace, only GICv2.  We
-> > currently attempt this anyway, and as a result a KVM guest doesn't
-> > receive interrupts and the user is left wondering why.  Report an error
-> > to the user if this particular combination is requested.
-> >=20
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  target/arm/kvm_arm.h | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >=20
-> > diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> > index ff53e9fafb..cfb7e5af72 100644
-> > --- a/target/arm/kvm_arm.h
-> > +++ b/target/arm/kvm_arm.h
-> > @@ -234,6 +234,10 @@ static inline const char *gicv3_class_name(void)
->=20
-> Any reason why these functions are inlined in this include?
-
-Not really sure what you mean?  What do you think would be a better
-approach?
-
->=20
-> Also - not related to your patch - while gicv3_class_name() is
-> self-explicit, gic_class_name() isn't (to me at least).
-
-I think I tend to see 'gic' as GICv2 and 'gicv3' as GICv3 in QEMU, but I
-don't remember the details of how you make the GIC be a proper GICv2 vs.
-the 11mpcore version thingy.
-
->=20
-> There are many check for gic_version 1/2/3 in virt.c, which we could
-> clean using more generic functions such gic_class_name(int gic_version)
-> and Co.
-
-Possibly.  Do note, that checking "which version of the GIC does this
-board contain" is a separate thing from "which particular mechanism do I
-use to emulate the GIC".
-
->=20
-> >          exit(1);
-> >  #endif
-> >      } else {
-> > +        if (kvm_enabled()) {
-> > +            error_report("Userspace GICv3 is not supported with KVM");
-> > +            exit(1);
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> > +        }
-> >          return "arm-gicv3";
-> >      }
-> >  }
-> >=20
->=20
-Thanks!
--Christoffer
-
---CE+1k2dSO48ffgeK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEcBAEBAgAGBQJaeXAzAAoJEEtpOizt6ddyq0gH/iiQZmmd7EZWOobAFvVEG5vc
-xnfi3tR8T1ca1aijpFDTAPS7J6EgO5MHkFIdAguw69cajns+C1/SUwEItcWXH1ZT
-LHCKkAmbNHY6zC7sSLc1SS7JPZYcrX+9+7pWiRx7El4o6tP5R7POwi06QxIwXm8+
-z0aDeq2PkM6WMHJ+4gjKzw6Wr09rc6Eig+IcUjdVflVBvLtL65Y+U7bUnDtoHSHB
-6BpvP0nUq5Kv7SRFur7I8eqAW7Cjugr2hDiUrxjYnt3cyhk452KUlhsWGcuC6+tG
-avjPU30hjMkDaQ2Mm2zXm6741rSHxZ8cD58JWgPV9jM/XM6V3GfdpQoJrQvcXOA=
-=Xdht
------END PGP SIGNATURE-----
-
---CE+1k2dSO48ffgeK--
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBhb2xvIEJvbnppbmkgW21h
+aWx0bzpwYm9uemluaUByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIEZlYnJ1YXJ5IDA1LCAy
+MDE4IDEwOjA0IFBNDQo+IFRvOiBQZXRlciBNYXlkZWxsDQo+IENjOiBHb25nbGVpIChBcmVpKTsg
+UUVNVSBEZXZlbG9wZXJzOyBIdWFuZ3dlaWRvbmcgKEMpDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1k
+ZXZlbF0gW1BBVENIXSBydGM6IHBsYWNpbmcgUlRDIG1lbW9yeSByZWdpb24gb3V0c2lkZSBCUUwN
+Cj4gDQo+IE9uIDA0LzAyLzIwMTggMTk6MDIsIFBldGVyIE1heWRlbGwgd3JvdGU6DQo+ID4gT24g
+MSBGZWJydWFyeSAyMDE4IGF0IDE0OjIzLCBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQu
+Y29tPiB3cm90ZToNCj4gPj4gT24gMDEvMDIvMjAxOCAwODo0NywgR29uZ2xlaSB3cm90ZToNCj4g
+Pj4+IGRpZmYgLS1naXQgYS9ody90aW1lci9tYzE0NjgxOHJ0Yy5jIGIvaHcvdGltZXIvbWMxNDY4
+MThydGMuYw0KPiA+Pj4gaW5kZXggMzVhMDVhNi4uZDlkOTljNSAxMDA2NDQNCj4gPj4+IC0tLSBh
+L2h3L3RpbWVyL21jMTQ2ODE4cnRjLmMNCj4gPj4+ICsrKyBiL2h3L3RpbWVyL21jMTQ2ODE4cnRj
+LmMNCj4gPj4+IEBAIC05ODYsNiArOTg2LDcgQEAgc3RhdGljIHZvaWQgcnRjX3JlYWxpemVmbihE
+ZXZpY2VTdGF0ZSAqZGV2LCBFcnJvcg0KPiAqKmVycnApDQo+ID4+PiAgICAgIHFlbXVfcmVnaXN0
+ZXJfc3VzcGVuZF9ub3RpZmllcigmcy0+c3VzcGVuZF9ub3RpZmllcik7DQo+ID4+Pg0KPiA+Pj4g
+ICAgICBtZW1vcnlfcmVnaW9uX2luaXRfaW8oJnMtPmlvLCBPQkpFQ1QocyksICZjbW9zX29wcywg
+cywgInJ0YyIsIDIpOw0KPiA+Pj4gKyAgICBtZW1vcnlfcmVnaW9uX2NsZWFyX2dsb2JhbF9sb2Nr
+aW5nKCZzLT5pbyk7DQo+ID4+PiAgICAgIGlzYV9yZWdpc3Rlcl9pb3BvcnQoaXNhZGV2LCAmcy0+
+aW8sIGJhc2UpOw0KPiA+Pj4NCj4gPj4+ICAgICAgcWRldl9zZXRfbGVnYWN5X2luc3RhbmNlX2lk
+KGRldiwgYmFzZSwgMyk7DQo+ID4+Pg0KPiA+Pg0KPiA+PiBUaGlzIGlzIG5vdCBlbm91Z2gsIHlv
+dSBuZWVkIHRvIGFkZCBhIG5ldyBsb2NrIG9yIHNvbWV0aGluZyBsaWtlIHRoYXQuDQo+ID4+IE90
+aGVyd2lzZSB0d28gdkNQVXMgY2FuIGFjY2VzcyB0aGUgUlRDIHRvZ2V0aGVyIGFuZCBtYWtlIGEg
+bWVzcy4NCj4gPg0KPiA+IERvIHlvdSBhbHNvIG5lZWQgdG8gZG8gc29tZXRoaW5nIHRvIHRha2Ug
+dGhlIGdsb2JhbCBsb2NrIGJlZm9yZQ0KPiA+IHJhaXNpbmcgdGhlIG91dGJvdW5kIElSUSBsaW5l
+IChzaW5jZSBpdCBtaWdodCBiZSBjb25uZWN0ZWQgdG8gYSBkZXZpY2UNCj4gPiB0aGF0IGRvZXMg
+bmVlZCB0aGUgZ2xvYmFsIGxvY2spLCBvciBhbSBJIGNvbmZ1c2VkID8NCj4gDQo+IFllcywgdGhh
+dCdzIGEgZ29vZCBwb2ludC4gIE1vc3Qgb2YgdGhlIHRpbWUgdGhlIElSUSBsaW5lIGlzIHJhaXNl
+ZCBpbiBhDQo+IHRpbWVyLCBidXQgbm90IGFsd2F5cy4NCj4gDQpTbywgdGFraW5nIEJRTCBpcyBu
+ZWNlc3NhcnksIGFuZCB3aGF0IHdlIGNhbiBkbyBpcyB0cnlpbmcgb3VyIGJlc3QgdG8gbmFycm93
+DQpkb3duIHRoZSBwcm9jZXNzIG9mIGxvY2tpbmcgPyBGb3IgZXhhbXBsZSwgZG8gdGhlIGZvbGxv
+d2luZyB3cmFwcGluZzoNCg0Kc3RhdGljIHZvaWQgcnRjX3Jhc2llX2lycShSVENTdGF0ZSAqcykN
+CnsNCiAgICBxZW11X211dGV4X2xvY2tfaW90aHJlYWQoKTsNCiAgICBxZW11X2lycV9yYWlzZShz
+LT5pcnEpOw0KICAgIHFlbXVfbXV0ZXhfdW5sb2NrX2lvdGhyZWFkKCk7DQp9DQoNCnN0YXRpYyB2
+b2lkIHJ0Y19sb3dlcl9pcnEoUlRDU3RhdGUgKnMpDQp7DQogICAgcWVtdV9tdXRleF9sb2NrX2lv
+dGhyZWFkKCk7DQogICAgcWVtdV9pcnFfbG93ZXIocy0+aXJxKTsNCiAgICBxZW11X211dGV4X3Vu
+bG9ja19pb3RocmVhZCgpOw0KfQ0KDQpUaGFua3MsDQotR29uZ2xlaQ0K
