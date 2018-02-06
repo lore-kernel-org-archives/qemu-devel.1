@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9td-0000W9-56
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:18 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9te-0000XH-F0
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tZ-00031R-R6
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:17 -0500
-Received: from mail-eopbgr00130.outbound.protection.outlook.com
-	([40.107.0.130]:53824
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tb-000320-5R
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:18 -0500
+Received: from mail-eopbgr00114.outbound.protection.outlook.com
+	([40.107.0.114]:60650
 	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ej9tZ-00030f-HR
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:13 -0500
+	id 1ej9ta-00031Z-Rk
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:15 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Feb 2018 23:30:17 +0300
-Message-Id: <20180206203048.11096-4-rkagan@virtuozzo.com>
+Date: Tue,  6 Feb 2018 23:30:18 +0300
+Message-Id: <20180206203048.11096-5-rkagan@virtuozzo.com>
 In-Reply-To: <20180206203048.11096-1-rkagan@virtuozzo.com>
 References: <20180206203048.11096-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 03/34] hyperv: cosmetic: g_malloc -> g_new
+Subject: [Qemu-devel] [RFC PATCH 04/34] hyperv: synic: only setup ack
+ notifier if there's a callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +32,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>, Ben Warren <ben@skyportsystems.com>, si-wei liu <si-wei.liu@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
+There's no point setting up an sint ack notifier if no callback is
+specified.
+
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- target/i386/hyperv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/hyperv.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
 diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index c9a4bb539d..e762eac79f 100644
+index e762eac79f..f3ffafa4e9 100644
 --- a/target/i386/hyperv.c
 +++ b/target/i386/hyperv.c
-@@ -88,7 +88,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+@@ -77,15 +77,14 @@ static void kvm_hv_sint_ack_handler(EventNotifier *notifier)
+     HvSintRoute *sint_route = container_of(notifier, HvSintRoute,
+                                            sint_ack_notifier);
+     event_notifier_test_and_clear(notifier);
+-    if (sint_route->sint_ack_clb) {
+-        sint_route->sint_ack_clb(sint_route);
+-    }
++    sint_route->sint_ack_clb(sint_route);
+ }
+ 
+ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+                                       HvSintAckClb sint_ack_clb)
+ {
      HvSintRoute *sint_route;
++    EventNotifier *ack_notifier;
      int r, gsi;
  
--    sint_route = g_malloc0(sizeof(*sint_route));
-+    sint_route = g_new0(HvSintRoute, 1);
-     r = event_notifier_init(&sint_route->sint_set_notifier, false);
-     if (r) {
+     sint_route = g_new0(HvSintRoute, 1);
+@@ -94,13 +93,15 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
          goto err;
+     }
+ 
+-    r = event_notifier_init(&sint_route->sint_ack_notifier, false);
+-    if (r) {
+-        goto err_sint_set_notifier;
+-    }
++    ack_notifier = sint_ack_clb ? &sint_route->sint_ack_notifier : NULL;
++    if (ack_notifier) {
++        r = event_notifier_init(ack_notifier, false);
++        if (r) {
++            goto err_sint_set_notifier;
++        }
+ 
+-    event_notifier_set_handler(&sint_route->sint_ack_notifier,
+-                               kvm_hv_sint_ack_handler);
++        event_notifier_set_handler(ack_notifier, kvm_hv_sint_ack_handler);
++    }
+ 
+     gsi = kvm_irqchip_add_hv_sint_route(kvm_state, vp_index, sint);
+     if (gsi < 0) {
+@@ -109,7 +110,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+ 
+     r = kvm_irqchip_add_irqfd_notifier_gsi(kvm_state,
+                                            &sint_route->sint_set_notifier,
+-                                           &sint_route->sint_ack_notifier, gsi);
++                                           ack_notifier, gsi);
+     if (r) {
+         goto err_irqfd;
+     }
+@@ -123,8 +124,10 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+ err_irqfd:
+     kvm_irqchip_release_virq(kvm_state, gsi);
+ err_gsi:
+-    event_notifier_set_handler(&sint_route->sint_ack_notifier, NULL);
+-    event_notifier_cleanup(&sint_route->sint_ack_notifier);
++    if (ack_notifier) {
++        event_notifier_set_handler(ack_notifier, NULL);
++        event_notifier_cleanup(ack_notifier);
++    }
+ err_sint_set_notifier:
+     event_notifier_cleanup(&sint_route->sint_set_notifier);
+ err:
+@@ -139,8 +142,10 @@ void kvm_hv_sint_route_destroy(HvSintRoute *sint_route)
+                                           &sint_route->sint_set_notifier,
+                                           sint_route->gsi);
+     kvm_irqchip_release_virq(kvm_state, sint_route->gsi);
+-    event_notifier_set_handler(&sint_route->sint_ack_notifier, NULL);
+-    event_notifier_cleanup(&sint_route->sint_ack_notifier);
++    if (sint_route->sint_ack_clb) {
++        event_notifier_set_handler(&sint_route->sint_ack_notifier, NULL);
++        event_notifier_cleanup(&sint_route->sint_ack_notifier);
++    }
+     event_notifier_cleanup(&sint_route->sint_set_notifier);
+     g_free(sint_route);
+ }
 -- 
 2.14.3
