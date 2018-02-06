@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej5Vz-0002Yl-7r
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ej5WA-0002nu-2L
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ej5Vt-0003z1-54
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:35 -0500
-References: <20180206140722.10110-1-vsementsov@virtuozzo.com>
-	<20180206140722.10110-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c501a095-43e6-95f3-b7bb-96ab80f99689@redhat.com>
-Date: Tue, 6 Feb 2018 09:50:09 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180206140722.10110-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: add block latency histogram
- interface
+	(envelope-from <dgilbert@redhat.com>) id 1ej5W0-00047W-Hy
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56244)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5Vz-00046i-Vl
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:36 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue,  6 Feb 2018 15:49:25 +0000
+Message-Id: <20180206154936.13565-4-dgilbert@redhat.com>
+In-Reply-To: <20180206154936.13565-1-dgilbert@redhat.com>
+References: <20180206154936.13565-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 03/14] migration/savevm.c: set
+ MAX_VM_CMD_PACKAGED_SIZE to 1ul << 32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,142 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com
+To: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: peterx@redhat.com, lvivier@redhat.com, groug@kaod.org, ross.lagerwall@citrix.com, wei.w.wang@intel.com, danielhb@linux.vnet.ibm.com
 
-On 02/06/2018 08:07 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Set (and clear) histogram through new command
-> block-latency-histogram-set and show new statistics in
-> query-blockstats results.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   qapi/block-core.json | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->   block/qapi.c         | 31 ++++++++++++++++++++++++++
->   blockdev.c           | 15 +++++++++++++
->   3 files changed, 107 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 8225308904..4706a934d9 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -451,6 +451,63 @@
->              'status': 'DirtyBitmapStatus'} }
->   
->   ##
-> +# @BlockLatencyHistogramInfo:
-> +#
-> +# Block latency histogram.
-> +#
-> +# @latency: list of latency points in microseconds. Equals to @latency parameter
-> +#           of last called block-latency-histogram-set.
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Second sentence might read better as:
+MAX_VM_CMD_PACKAGED_SIZE is a constant used in qemu_savevm_send_packaged
+and loadvm_handle_cmd_packaged to determine whether a package is too
+big to be sent or received. qemu_savevm_send_packaged is called inside
+postcopy_start (migration/migration.c) to send the MigrationState
+in a single blob to the destination, using the MIG_CMD_PACKAGED subcommand,
+which will read it up using loadvm_handle_cmd_packaged. If the blob is
+larger than MAX_VM_CMD_PACKAGED_SIZE, an error is thrown and the postcopy
+migration is aborted. Both MAX_VM_CMD_PACKAGED_SIZE and MIG_CMD_PACKAGED
+were introduced by commit 11cf1d984b ("MIG_CMD_PACKAGED: Send a packaged
+chunk ..."). The constant has its original value of 1ul << 24 (16MB).
 
-Matches the @latency parameter from the last call to 
-block-latency-histogram-set for the given device.
+The current MAX_VM_CMD_PACKAGED_SIZE value is not enough to support postcopy
+migration of bigger pseries guests. The blob size for a postcopy migration of
+a pseries guest with the following setup:
 
-> +#
-> +# @read: list of read-request counts corresponding to latency region.
-> +#        len(@read) = len(@latency) + 1
-> +#        @read[0] corresponds to latency region [0, @latency[0])
-> +#        for 0 < i < len(@latency): @read[i] corresponds to latency region
-> +#            [@latency[i-1], @latency[i])
-> +#        @read.last_element corresponds to latency region
-> +#            [@latency.last_element, +inf)
-> +#
-> +# @write: list of write-request counts (see @read semantics)
-> +#
-> +# @flush: list of flush-request counts (see @read semantics)
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'BlockLatencyHistogramInfo',
-> +  'data': {'latency': ['uint64'],
-> +           'read': ['uint64'],
-> +           'write': ['uint64'],
-> +           'flush': ['uint64'] } }
+qemu-system-ppc64 --nographic -vga none -machine pseries,accel=kvm -m 64G \
+-smp 1,maxcpus=32 -device virtio-blk-pci,drive=rootdisk \
+-drive file=f27.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
+-netdev user,id=u1 -net nic,netdev=u1
 
-Okay, I can see how this interface works.
+Goes around 12MB. Bumping the RAM to 128G makes the blob sizes goes to 20MB.
+With 256G the blob goes to 37MB - more than twice the current maximum size.
+At this moment the pseries machine can handle guests with up to 1TB of RAM,
+making this postcopy blob goes to 128MB of size approximately.
 
-> +
-> +##
-> +# @block-latency-histogram-set:
-> +#
-> +# Add latency histogram to block device. If latency histogram alredy exists for
+Following the discussions made in [1], there is a need to understand what
+devices are aggressively consuming the blob in that manner and see if that
+can be mitigated. Until then, we can set MAX_VM_CMD_PACKAGED_SIZE to the
+maximum value allowed. Since the size is a 32 bit int variable, we can set
+it as 1ul << 32, giving a maximum blob size of 4G that is enough to support
+postcopy migration of 32TB RAM guests given the above constraints.
 
-s/latency/a latency/ (twice)
-s/alredy/already/
+[1] https://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg06313.html
 
-> +# the device it will be removed and a new one created. Latency histogram may be
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/savevm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-s/Latency/The latency/
-
-> +# quered through query-blockstats.
-
-s/quered/queried/
-
-> +#
-> +# @device: device name to set latency histogram for.
-> +#
-> +# @latency: list of latency points in microseconds. The sequcence must be
-
-s/sequcence/sequence/
-
-> +#           ascending, elements must be greater than zero. Histogram latency
-> +#           regions would be
-> +#           [0, @latency[0]), ..., [@latency[i], @latency[i+1]), ...,
-> +#           [@latency.last_element, +inf)
-> +#
-> +# Returns: error if device is not found.
-> +#
-> +# Since: 2.12
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "block-latency-histogram-set",
-> +#      "arguments": { "device": "drive0",
-> +#                     "latency": [500000, 1000000, 2000000] } }
-> +# <- { "return": {} }
-> +##
-> +{ 'command': 'block-latency-histogram-set',
-> +  'data': {'device': 'str', 'latency': ['uint64'] } }
-
-The commit message mentioned that you can set and clear histogram 
-tracking; how does this interface let you clear things?  By passing a 
-0-length latency array?  If you violate the constraint (pass 
-non-ascending points, for example), does the previous latency map get 
-wiped out or is it still preserved unchanged?
-
-> +
-> +##
->   # @BlockInfo:
->   #
->   # Block device information.  This structure describes a virtual device and
-> @@ -730,6 +787,8 @@
->   # @timed_stats: Statistics specific to the set of previously defined
->   #               intervals of time (Since 2.5)
->   #
-> +# @latency-histogram: @BlockLatencyHistogramInfo. (Since 2.12)
-
-I'd mention that this only appears if block-latency-histogram-set has 
-been called.
-
-> +#
->   # Since: 0.14.0
->   ##
->   { 'struct': 'BlockDeviceStats',
-> @@ -742,7 +801,8 @@
->              'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
->              'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
->              'account_invalid': 'bool', 'account_failed': 'bool',
-> -           'timed_stats': ['BlockDeviceTimedStats'] } }
-> +           'timed_stats': ['BlockDeviceTimedStats'],
-> +           '*latency-histogram': 'BlockLatencyHistogramInfo' } }
->   
-
-
+diff --git a/migration/savevm.c b/migration/savevm.c
+index b7908f62be..b8e9c532af 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -81,7 +81,7 @@ enum qemu_vm_cmd {
+     MIG_CMD_MAX
+ };
+ 
+-#define MAX_VM_CMD_PACKAGED_SIZE (1ul << 24)
++#define MAX_VM_CMD_PACKAGED_SIZE UINT32_MAX
+ static struct mig_cmd_args {
+     ssize_t     len; /* -1 = variable */
+     const char *name;
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
