@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1ej0XN-0005jM-Lx
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:31:47 -0500
+	(envelope-from <armbru@redhat.com>) id 1ej0ZW-00076G-GL
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:33:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1ej0XH-000583-RO
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:31:41 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44547)
+	(envelope-from <armbru@redhat.com>) id 1ej0ZT-0006b7-Ck
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:33:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1ej0XH-00057f-L6
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:31:35 -0500
-Received: from relay2.suse.de (charybdis-ext.suse.de [195.135.220.254])
-	by mx2.suse.de (Postfix) with ESMTP id 9C8DDAD05
-	for <qemu-devel@nongnu.org>; Tue,  6 Feb 2018 10:31:34 +0000 (UTC)
-From: Andreas Schwab <schwab@suse.de>
-References: <mvmmv0nk6g7.fsf@suse.de>
-Date: Tue, 06 Feb 2018 11:31:34 +0100
-In-Reply-To: <mvmmv0nk6g7.fsf@suse.de> (Andreas Schwab's message of "Mon, 05
-	Feb 2018 12:43:20 +0100")
-Message-ID: <mvmvafah0jd.fsf@suse.de>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej0ZT-0006Y4-5A
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:33:51 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-15-armbru@redhat.com>
+	<CAMxuvayFe8fU5PMyX00k2tM=2-=ZQqsxd1PwMUxAFAx26chFRA@mail.gmail.com>
+	<87mv0nv73y.fsf@dusky.pond.sub.org>
+Date: Tue, 06 Feb 2018 11:33:45 +0100
+In-Reply-To: <87mv0nv73y.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Mon, 05 Feb 2018 15:33:37 +0100")
+Message-ID: <87h8qucsqe.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] linux-user: Implement copy_file_range
+Subject: Re: [Qemu-devel] [PATCH RFC 14/21] qapi: Generate in source order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Marc-Andre Lureau <mlureau@redhat.com>
+Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
-No attempt is made to emulate it on the host.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
----
-v2: fix spacing
----
- linux-user/syscall.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+> Marc-Andre Lureau <mlureau@redhat.com> writes:
+>
+>> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
+>>> The generators' conversion to visitors (merge commit 9e72681d16)
+>>> changed the processing order of entities from source order to
+>>> alphabetical order.  The next commit needs source order, so change it
+>>> back.
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>  scripts/qapi/common.py                   |   4 +-
+>>>  tests/qapi-schema/comments.out           |   2 +-
+>>>  tests/qapi-schema/doc-bad-section.out    |   4 +-
+>>>  tests/qapi-schema/doc-good.out           |  32 ++--
+>>>  tests/qapi-schema/empty.out              |   2 +-
+>>>  tests/qapi-schema/event-case.out         |   2 +-
+>>>  tests/qapi-schema/ident-with-escape.out  |   6 +-
+>>>  tests/qapi-schema/include-relpath.out    |   2 +-
+>>>  tests/qapi-schema/include-repetition.out |   2 +-
+>>>  tests/qapi-schema/include-simple.out     |   2 +-
+>>>  tests/qapi-schema/indented-expr.out      |   2 +-
+>>>  tests/qapi-schema/qapi-schema-test.out   | 320 +++++++++++++++----------------
+>>>  12 files changed, 191 insertions(+), 189 deletions(-)
+>>>
+>>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+>>> index d5b93e7381..3b97bf8702 100644
+>>> --- a/scripts/qapi/common.py
+>>> +++ b/scripts/qapi/common.py
+>>> @@ -1471,6 +1471,7 @@ class QAPISchema(object):
+>>>          parser = QAPISchemaParser(open(fname, 'r'))
+>>>          exprs = check_exprs(parser.exprs)
+>>>          self.docs = parser.docs
+>>> +        self._entity_list = []
+>>>          self._entity_dict = {}
+>>>          self._predefining = True
+>>>          self._def_predefineds()
+>>> @@ -1482,6 +1483,7 @@ class QAPISchema(object):
+>>>          # Only the predefined types are allowed to not have info
+>>>          assert ent.info or self._predefining
+>>>          assert ent.name not in self._entity_dict
+>>> +        self._entity_list.append(ent)
+>>>          self._entity_dict[ent.name] = ent
+>>
+>> Why not use the OrderedDict instead?
+>
+> Fair question!  However, the next patch will create anonymous entities,
+> which get added only to ._entity_list, not _entity_dict.
+>
+> [...]
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index bed154139e..92b4f59c05 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1033,6 +1033,12 @@ safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
- safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
-               size_t, len, unsigned *, prio, const struct timespec *, timeout)
- #endif
-+#if defined(TARGET_NR_copy_file_range) && defined(__NR_copy_file_range)
-+safe_syscall6(ssize_t, copy_file_range, int, infd, loff_t *, pinoff,
-+              int, outfd, loff_t *, poutoff, size_t, length,
-+              unsigned int, flags)
-+#endif
-+
- /* We do ioctl like this rather than via safe_syscall3 to preserve the
-  * "third argument might be integer or pointer or not present" behaviour of
-  * the libc function.
-@@ -12601,6 +12607,39 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-         ret = get_errno(kcmp(arg1, arg2, arg3, arg4, arg5));
-         break;
- #endif
-+#if defined(TARGET_NR_copy_file_range) && defined(__NR_copy_file_range)
-+    case TARGET_NR_copy_file_range:
-+        {
-+            loff_t inoff, outoff;
-+            loff_t *pinoff = NULL, *poutoff = NULL;
-+
-+            if (arg2) {
-+                if (get_user_u64(inoff, arg2)) {
-+                    goto efault;
-+                }
-+                pinoff = &inoff;
-+            }
-+            if (arg4) {
-+                if (get_user_u64(outoff, arg4)) {
-+                    goto efault;
-+                }
-+                poutoff = &outoff;
-+            }
-+            ret = get_errno(safe_copy_file_range(arg1, pinoff, arg3, poutoff,
-+                                                 arg5, arg6));
-+            if (arg2) {
-+                if (put_user_u64(inoff, arg2)) {
-+                    goto efault;
-+                }
-+            }
-+            if (arg4) {
-+                if (put_user_u64(outoff, arg4)) {
-+                    goto efault;
-+                }
-+            }
-+        }
-+        break;
-+#endif
- 
-     default:
-     unimplemented:
--- 
-2.16.1
+Flaw in QAPISchema.check():
 
+        for ent in self._entity_dict.values():
+            ent.check(self)
 
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+Need to iterate over entity_list, or else we fail to check anonymous
+entities.  Currently harmless, as QAPISchemaInclude.check() does
+nothing.  I'll fix it.
