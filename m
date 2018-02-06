@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ej1Hq-0004v6-2J
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:44 -0500
+	(envelope-from <armbru@redhat.com>) id 1ej1IZ-0005bs-Tv
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:20:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ej1Hm-00029Q-Qw
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:42 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:60313)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ej1Hm-00026X-E5
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:19:38 -0500
-References: <20180206095603.26500.5959.stgit@pasha-VirtualBox>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <edbe6648-476d-73fb-2a54-c7f55c7b4a21@vivier.eu>
-Date: Tue, 6 Feb 2018 12:19:34 +0100
+	(envelope-from <armbru@redhat.com>) id 1ej1IV-0002vA-K5
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:20:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej1IV-0002ur-8p
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 06:20:23 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180111213250.16511-1-marcandre.lureau@redhat.com>
+	<20180111213250.16511-8-marcandre.lureau@redhat.com>
+Date: Tue, 06 Feb 2018 12:20:18 +0100
+In-Reply-To: <20180111213250.16511-8-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Thu, 11 Jan 2018 22:32:06 +0100")
+Message-ID: <87a7wmcqkt.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180206095603.26500.5959.stgit@pasha-VirtualBox>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] m68k: implement movep instruction
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 07/51] qapi: leave the ifcond attribute
+ undefined until check()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +30,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: dovgaluk@ispras.ru
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>
 
-Le 06/02/2018 à 10:56, Pavel Dovgalyuk a écrit :
-> This patch implements movep instruction. It moves data between a data register
-> and alternate bytes within the address space starting at the location
-> specified and incrementing by two.
-> 
-> It was designed for the original 68000 and used in firmwares for
-> interfacing the 8-bit peripherals through the 16-bit data bus.
-> Without this patch opcode for this instruction is recognized as some bitop.
-> 
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Second thoughts...
+
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> We commonly initialize attributes to None in .init(), then set their
+> real value in .check().  Accessing the attribute before .check()
+> yields None.  If we're lucky, the code that accesses the attribute
+> prematurely chokes on None.
+>
+> It won't for .ifcond, because None is a legitimate value.
+>
+> Leave the ifcond attribute undefined until check().
+>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  target/m68k/translate.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 53 insertions(+)
-> 
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index f0e86a7..a849c74 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -2071,6 +2071,55 @@ DISAS_INSN(movem)
->      tcg_temp_free(addr);
->  }
->  
-> +DISAS_INSN(movep)
-> +{
-> +    uint8_t i;
-> +    uint8_t op;
-> +    uint16_t displ;
-> +    TCGv reg;
-> +    TCGv addr;
-> +    TCGv abuf;
-> +    TCGv dbuf;
-> +
-> +    op = (insn >> 6) & 7;
-> +    displ = read_im16(env, s);
+>  scripts/qapi.py | 21 +++++++++++++++++----
+>  1 file changed, 17 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 8f54dead8d..4d2c214f19 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -1011,13 +1011,19 @@ class QAPISchemaEntity(object):
+>          # such place).
+>          self.info =3D info
+>          self.doc =3D doc
+> -        self.ifcond =3D listify_cond(ifcond)
+> +        self._ifcond =3D ifcond  # self.ifcond is set after check()
+>=20=20
+>      def c_name(self):
+>          return c_name(self.name)
+>=20=20
+>      def check(self, schema):
+> -        pass
+> +        if isinstance(self._ifcond, QAPISchemaType):
+> +            # inherit the condition from a type
+> +            typ =3D self._ifcond
+> +            typ.check(schema)
+> +            self.ifcond =3D typ.ifcond
+> +        else:
+> +            self.ifcond =3D listify_cond(self._ifcond)
 
-I think displacement can be negative (see gen_lea_indexed()):
+Whenever we add a .check(), we need to prove QAPISchema.check()'s
+recursion still terminates, and terminates the right way.
 
-    uint32_t displ = (int16_t)read_im16(env, s);
+Argument before this patch: we recurse only into types contained in
+types, e.g. an object type's base type, and we detect and report cycles
+as "Object %s contains itself", in QAPISchemaObjectType.check().
 
-> +
-> +    addr = AREG(insn, 0);
-> +    reg = DREG(insn, 9);
-> +
-> +    abuf = tcg_temp_new();
-> +    tcg_gen_addi_i32(abuf, addr, displ);
-> +    dbuf = tcg_temp_new();
-> +
-> +    if (op & 1) {
+The .check() added here recurses into a type.  If this creates a cycle,
+it'll be caught and reported as "contains itself".  We still need to
+show that the error message remains accurate.
 
-insn & 0x40
+We .check() here to inherit .ifcond from a type.  As far as I can tell,
+we use this inheritance feature only to inherit an array's condition
+from its element type.  That's safe, because an array does contain its
+elements.
 
-perhaps we don't need "op"?
+This is hardly a rigorous proof.  Just enough to make me believe your
+code works.
 
-> +        i = 4;
-> +    } else {
-> +        i = 2;
-> +    }
-> +
-> +    if (op & 2) {
+However, I suspect adding the inheritance feature at the entity level
+complicates the correctness argument without real need.  Can we restrict
+it to array elements?  Have QAPISchemaArrayType.check() resolve
+type-valued ._ifcond, and all the others choke on it?
 
-insn & 0x80
+>=20=20
+>      def is_implicit(self):
+>          return not self.info
+> @@ -1138,6 +1144,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+>          self.prefix =3D prefix
+>=20=20
+>      def check(self, schema):
+> +        QAPISchemaType.check(self, schema)
+>          seen =3D {}
+>          for v in self.values:
+>              v.check_clash(self.info, seen)
+> @@ -1170,8 +1177,10 @@ class QAPISchemaArrayType(QAPISchemaType):
+>          self.element_type =3D None
+>=20=20
+>      def check(self, schema):
+> +        QAPISchemaType.check(self, schema)
+>          self.element_type =3D schema.lookup_type(self._element_type_name)
+>          assert self.element_type
+> +        self.element_type.check(schema)
 
-> +        for ( ; i > 0 ; i--) {> +            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
-> +            gen_store(s, OS_BYTE, abuf, dbuf);
+This .check is locally obvious: an array contains its elements.
 
-You can use directly tcg_gen_qemu_st8()
+>          self.ifcond =3D self.element_type.ifcond
+>=20=20
+>      def is_implicit(self):
+> @@ -1214,6 +1223,7 @@ class QAPISchemaObjectType(QAPISchemaType):
+>          self.members =3D None
+>=20=20
+>      def check(self, schema):
+> +        QAPISchemaType.check(self, schema)
+>          if self.members is False:               # check for cycles
+>              raise QAPISemError(self.info,
+>                                 "Object %s contains itself" % self.name)
+> @@ -1396,6 +1406,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+>          self.variants =3D variants
+>=20=20
+>      def check(self, schema):
+> +        QAPISchemaType.check(self, schema)
+>          self.variants.tag_member.check(schema)
+>          # Not calling self.variants.check_clash(), because there's nothi=
+ng
+>          # to clash with
+> @@ -1438,6 +1449,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+>          self.boxed =3D boxed
+>=20=20
+>      def check(self, schema):
+> +        QAPISchemaEntity.check(self, schema)
+>          if self._arg_type_name:
+>              self.arg_type =3D schema.lookup_type(self._arg_type_name)
+>              assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+> @@ -1471,6 +1483,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+>          self.boxed =3D boxed
+>=20=20
+>      def check(self, schema):
+> +        QAPISchemaEntity.check(self, schema)
+>          if self._arg_type_name:
+>              self.arg_type =3D schema.lookup_type(self._arg_type_name)
+>              assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+> @@ -1589,7 +1602,7 @@ class QAPISchema(object):
+>              # But it's not tight: the disjunction need not imply it.  We
+>              # may end up compiling useless wrapper types.
+>              # TODO kill simple unions or implement the disjunction
+> -            assert ifcond =3D=3D typ.ifcond
+> +            assert ifcond =3D=3D typ._ifcond
 
-> +            if (i > 1) {
-> +                tcg_gen_addi_i32(abuf, abuf, 2);
-> +            }
-> +        }
-> +    } else {
-> +        tcg_gen_movi_i32(reg, 0);
+pylint complains
 
-I don't think we should clear the part we don't update.
+    W:1605,29: Access to a protected member _ifcond of a client class (prot=
+ected-access)
 
-> +        for ( ; i > 0 ; i--) {
-> +            dbuf = gen_load(s, OS_BYTE, abuf, 1);
+Layering violation.  Tolerable, I think.
 
-You can use directly tcg_gen_qemu_ld8u()
-
-> +            tcg_gen_or_i32(reg, reg, dbuf);
-
-you can use tcg_gen_deposit_i32().
-
-> +            if (i > 1) {
-> +                tcg_gen_shli_i32(reg, reg, 8);
-
-useless with deposit.
-
-> +                tcg_gen_addi_i32(abuf, abuf, 2);
-> +            }
-> +        }
-> +    }
-> +    tcg_temp_free(abuf);
-> +    tcg_temp_free(dbuf);
-> +}
-> +
->  DISAS_INSN(bitop_im)
->  {
->      int opsize;
-> @@ -5579,9 +5628,13 @@ void register_m68k_insns (CPUM68KState *env)
->      INSN(chk2,      00c0, f9c0, CHK2);
->      INSN(bitrev,    00c0, fff8, CF_ISA_APLUSC);
->      BASE(bitop_reg, 0100, f1c0);
-> +    BASE(movep,     0108, f1f8);
->      BASE(bitop_reg, 0140, f1c0);
-> +    BASE(movep,     0148, f1f8);
->      BASE(bitop_reg, 0180, f1c0);
-> +    BASE(movep,     0188, f1f8);
->      BASE(bitop_reg, 01c0, f1c0);
-> +    BASE(movep,     01c8, f1f8);
->      INSN(arith_im,  0280, fff8, CF_ISA_A);
->      INSN(arith_im,  0200, ff00, M68000);
->      INSN(undef,     02c0, ffc0, M68000);
-> 
-
-You should try only one (movep, 0108, f138) after the last bitop_reg.
-And as Thomas said, you need a new feature.
-
-Thanks,
-Laurent
+>          else:
+>              self._def_entity(QAPISchemaObjectType(name, info, doc, ifcon=
+d,
+>                                                    None, members, None))
+> @@ -1635,7 +1648,7 @@ class QAPISchema(object):
+>              assert len(typ) =3D=3D 1
+>              typ =3D self._make_array_type(typ[0], info)
+>          typ =3D self._make_implicit_object_type(
+> -            typ, info, None, self.lookup_type(typ).ifcond,
+> +            typ, info, None, self.lookup_type(typ),
+>              'wrapper', [self._make_member('data', typ, info)])
+>          return QAPISchemaObjectTypeVariant(case, typ)
