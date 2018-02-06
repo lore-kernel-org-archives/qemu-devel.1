@@ -1,39 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ii-0005Eo-AP
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:16:00 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ij-0005Fp-DN
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8if-0007xb-Ks
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:56 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60746
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ej8ie-0007w1-5f
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:57 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1ej8if-0007x0-F6
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:53 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w16JEJcV056297
-	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 14:15:53 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fygjbwcmx-1
+	id 1ej8id-0007vG-TC
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:15:52 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w16JFXRn141351
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 14:15:51 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fyha5u38e-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 14:15:52 -0500
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 14:15:50 -0500
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 6 Feb 2018 14:15:52 -0500
+	Tue, 6 Feb 2018 14:15:49 -0500
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue,  6 Feb 2018 13:14:47 -0600
+Date: Tue,  6 Feb 2018 13:14:44 -0600
 In-Reply-To: <20180206191515.25830-1-mdroth@linux.vnet.ibm.com>
 References: <20180206191515.25830-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20180206191515.25830-27-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 26/54] linux-user: Fix locking order in
- fork_start()
+Message-Id: <20180206191515.25830-24-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 23/54] i386: Add FEAT_8000_0008_EBX CPUID
+ feature word
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,51 +39,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, christian.ehrhardt@canonical.com, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-stable@nongnu.org, christian.ehrhardt@canonical.com, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-Our locking order is that the tb lock should be taken
-inside the mmap_lock, but fork_start() grabs locks the
-other way around. This means that if a heavily multithreaded
-guest process (such as Java) calls fork() it can deadlock,
-with the thread that called fork() stuck in fork_start()
-with the tb lock and waiting for the mmap lock, but some
-other thread in tb_find() with the mmap lock and waiting
-for the tb lock. The cpu_list_lock() should also always be
-taken last, not first.
+Add the new feature word and the "ibpb" feature flag.
 
-Fix this by making fork_start() grab the locks in the
-right order. The order in which we drop locks doesn't
-matter, so we leave fork_end() the way it is.
+Based on a patch by Paolo Bonzini.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-Id: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-(cherry picked from commit 024949caf32805f4cc3e7d363a80084b47aac1f6)
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20180109154519.25634-5-ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+(cherry picked from commit 1b3420e1c4d523c49866cca4e7544753201cd43d)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- linux-user/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/i386/cpu.c | 19 ++++++++++++++++++-
+ target/i386/cpu.h |  3 +++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 6286661bd3..146ee3e4ba 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -128,9 +128,9 @@ int cpu_get_pic_interrupt(CPUX86State *env)
- /* Make sure everything is in a consistent state for calling fork().  */
- void fork_start(void)
- {
--    cpu_list_lock();
--    qemu_mutex_lock(&tb_ctx.tb_lock);
-     mmap_fork_start();
-+    qemu_mutex_lock(&tb_ctx.tb_lock);
-+    cpu_list_lock();
- }
-=20
- void fork_end(int child)
---=20
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index dddd62207c..36edc875fc 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -482,6 +482,22 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .tcg_features = TCG_APM_FEATURES,
+         .unmigratable_flags = CPUID_APM_INVTSC,
+     },
++    [FEAT_8000_0008_EBX] = {
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            "ibpb", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid_eax = 0x80000008,
++        .cpuid_reg = R_EBX,
++        .tcg_features = 0,
++        .unmigratable_flags = 0,
++    },
+     [FEAT_XSAVE] = {
+         .feat_names = {
+             "xsaveopt", "xsavec", "xgetbv1", "xsaves",
+@@ -3097,7 +3113,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         } else {
+             *eax = cpu->phys_bits;
+         }
+-        *ebx = 0;
++        *ebx = env->features[FEAT_8000_0008_EBX];
+         *ecx = 0;
+         *edx = 0;
+         if (cs->nr_cores * cs->nr_threads > 1) {
+@@ -3553,6 +3569,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
++        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0008_EBX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+         x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 8bf9879f3e..f3d0ebb673 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -454,6 +454,7 @@ typedef enum FeatureWord {
+     FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
+     FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
+     FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
++    FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
+     FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
+     FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
+     FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
+@@ -644,6 +645,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+ 
++#define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
++
+ #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+ #define CPUID_XSAVE_XSAVEC     (1U << 1)
+ #define CPUID_XSAVE_XGETBV1    (1U << 2)
+-- 
 2.11.0
