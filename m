@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ej8Pk-0007Lk-Um
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:56:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1ej8R7-00009k-2x
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ej8Pk-00039m-6R
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:56:21 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1ej8Pk-00039X-15
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:56:20 -0500
-Received: by mail-oi0-x243.google.com with SMTP id l8so2135960oig.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 10:56:19 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ej8R3-0003bN-Et
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 13:57:45 -0500
+References: <20180206182507.21753-1-vsementsov@virtuozzo.com>
+	<20180206182629.GQ20001@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <55cf676e-eae0-e694-c89b-778b0225730b@redhat.com>
+Date: Tue, 6 Feb 2018 12:57:29 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9zA=PTmxQH1W1ht8sj9HFMVKSb12dsm-jX6FQEmQR+FA@mail.gmail.com>
-References: <20180122172643.29742-1-ard.biesheuvel@linaro.org>
-	<20180122172643.29742-2-ard.biesheuvel@linaro.org>
-	<CAFEAcA9zA=PTmxQH1W1ht8sj9HFMVKSb12dsm-jX6FQEmQR+FA@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Tue, 6 Feb 2018 18:56:18 +0000
-Message-ID: <CAKv+Gu80ngyOewT-J3sKVV2pn8e7SVspF8py_yiuQzY1KEEE-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 1/4] target/arm: implement SHA-512
- instructions
+In-Reply-To: <20180206182629.GQ20001@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: 205: support luks format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On 6 February 2018 at 18:45, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 22 January 2018 at 17:26, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> This implements emulation of the new SHA-512 instructions that have
->> been added as an optional extensions to the ARMv8 Crypto Extensions
->> in ARM v8.2.
+On 02/06/2018 12:26 PM, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Feb 06, 2018 at 09:25:07PM +0300, Vladimir Sementsov-Ogievskiy =
+wrote:
+>> Support default luks options in VM.add_drive and in new library
+>> function qemu_img_create. Use it in 205 iotests.
 >>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->
->
->> +void HELPER(crypto_sha512h)(void *vd, void *vn, void *vm)
->> +{
->> +    uint64_t *rd = vd;
->> +    uint64_t *rn = vn;
->> +    uint64_t *rm = vm;
->> +
->> +    rd[1] += S1_512(rm[1]) + cho512(rm[1], rn[0], rn[1]);
->> +    rd[0] += S1_512(rd[1] + rm[0]) + cho512(rd[1] + rm[0], rm[1], rn[0]);
->
-> This gives the wrong answer if the destination register
-> happens to be the same as one of the inputs, because the
-> assignment to rd[1] will overwrite the input before the
-> calculation of rd[0] uses it.
->
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>=20
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-It is supposed to use the new value of rd[1], so this is expected.
+Thanks. I'll take this through my NBD queue.
 
-> Some extra temporaries should fix this. I'll try fixing
-> that up locally and see if it passes tests then.
->
-> thanks
-> -- PMM
+git git://repo.or.cz/qemu/ericb.git nbd
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
