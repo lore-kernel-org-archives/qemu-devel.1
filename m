@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1ejBiW-0006by-NX
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 17:27:57 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ejBmp-0002Mj-Nn
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 17:32:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1ejBiT-0003Xu-J0
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 17:27:56 -0500
-Received: from mail-co1nam03on0617.outbound.protection.outlook.com
-	([2a01:111:f400:fe48::617]:45164
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1ejBiT-0003Vz-91
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 17:27:53 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 6 Feb 2018 14:23:04 -0800
-Message-ID: <194e8907cd60d814ae9daab63e2b0948c206989c.1517955702.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1517955702.git.alistair.francis@xilinx.com>
-References: <cover.1517955702.git.alistair.francis@xilinx.com>
+	(envelope-from <ehabkost@redhat.com>) id 1ejBmo-0007yM-Hb
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 17:32:23 -0500
+Date: Tue, 6 Feb 2018 20:32:13 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180206223213.GG13301@localhost.localdomain>
+References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 2/2] xlnx-zynqmp-pmu: Connect the PMU IOMOD
- PIT devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/25] generalize parsing of cpu_model
+ (part 4)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +23,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+I will try to summarize my comments here:
 
- hw/microblaze/xlnx-zynqmp-pmu.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+* I suggest squashing patches 2-22 together.  This way we
+  shouldn't have any intermediate commits where "make check"
+  generates warnings, and the series is shorter.
+  * Or, even better: squash the CPU_RESOLVING_TYPE parts of 3-22
+    into one patch, and the tests/machine-none-test.c parts of
+    3-22 into patch 2.
 
-diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-index 999a5657cf..f466c56e45 100644
---- a/hw/microblaze/xlnx-zynqmp-pmu.c
-+++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -26,6 +26,7 @@
- 
- #include "hw/intc/xlnx-zynqmp-ipi.h"
- #include "hw/intc/xlnx-pmu-iomod-intc.h"
-+#include "hw/timer/xlnx-pmu-iomod-pit.h"
- 
- /* Define the PMU device */
- 
-@@ -40,6 +41,7 @@
- #define XLNX_ZYNQMP_PMU_INTC_ADDR   0xFFD40000
- 
- #define XLNX_ZYNQMP_PMU_NUM_IPIS    4
-+#define XLNX_ZYNQMP_PMU_NUM_PITS    4
- 
- static const uint64_t ipi_addr[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
-     0xFF340000, 0xFF350000, 0xFF360000, 0xFF370000,
-@@ -48,6 +50,13 @@ static const uint64_t ipi_irq[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
-     19, 20, 21, 22,
- };
- 
-+static const uint64_t pit_addr[XLNX_ZYNQMP_PMU_NUM_PITS] = {
-+    0xFFD40040, 0xFFD40050, 0xFFD40060, 0xFFD40070,
-+};
-+static const uint64_t pit_irq[XLNX_ZYNQMP_PMU_NUM_PITS] = {
-+    3, 4, 5, 6,
-+};
-+
- typedef struct XlnxZynqMPPMUSoCState {
-     /*< private >*/
-     DeviceState parent_obj;
-@@ -147,7 +156,9 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
-     MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
-     MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
-     XlnxZynqMPIPI *ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
-+    XlnxPMUPIT *pit[XLNX_ZYNQMP_PMU_NUM_PITS];
-     qemu_irq irq[32];
-+    qemu_irq hit_in;
-     int i;
- 
-     /* Create the ROM */
-@@ -186,6 +197,30 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
-         sysbus_connect_irq(SYS_BUS_DEVICE(ipi[i]), 0, irq[ipi_irq[i]]);
-     }
- 
-+    /* Create and connect the IOMOD PIT devices */
-+    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_PITS; i++) {
-+        pit[i] = g_new0(XlnxPMUPIT, 1);
-+        object_initialize(pit[i], sizeof(XlnxPMUPIT), TYPE_XLNX_ZYNQMP_IOMODULE_PIT);
-+        qdev_set_parent_bus(DEVICE(pit[i]), sysbus_get_default());
-+    }
-+
-+    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_PITS; i++) {
-+        object_property_set_bool(OBJECT(pit[i]), true, "realized",
-+                                 &error_abort);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(pit[i]), 0, pit_addr[i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(pit[i]), 0, irq[pit_irq[i]]);
-+    }
-+
-+    /* PIT1 hits into PIT0 */
-+    hit_in = qdev_get_gpio_in_named(DEVICE(pit[0]), "ps_hit_in", 0);
-+    qdev_connect_gpio_out_named(DEVICE(pit[1]), "ps_hit_out", 0, hit_in);
-+
-+    /* PIT3 hits into PIT2 */
-+    hit_in = qdev_get_gpio_in_named(DEVICE(pit[2]), "ps_hit_in", 0);
-+    qdev_connect_gpio_out_named(DEVICE(pit[3]), "ps_hit_out", 0, hit_in);
-+
-+    /* TODO: PIT0 and PIT2 "ps_config" GPIO goes to The GPO1 device. */
-+
-     /* Load the kernel */
-     microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-                            machine->ram_size,
+* The linux-user/main.c hunk of patch 03/25 looks unnecessary.
+
+* I suggest testing all CPU models in patch 02/25, but this
+  shouldn't block the series.  Can be a follow-up patch.
+
+All the rest looks good to me.
+
+Thanks!
+
+
+On Tue, Jan 23, 2018 at 09:07:59AM +0100, Igor Mammedov wrote:
+> 
+> v3:
+>   - use qtest_startf() instead of qtest_start()
+>   - rename tests/machine-none.c to tests/machine-none-test.c
+>   - introduce first CPU_RESOLVING_TYPE for all targets and
+>     only then use it parse_cpu_model() 
+>   - stop abusing  mc->default_cpu_type as resolving cpu type,
+>     move cpu_parse_cpu_model() in to exec.c and embed in
+>     CPU_RESOLVING_TYPE, so that callers won't have to know
+>     about unnecessary detail
+> 
+> v2:
+>   - implemented new approach only for x86/ARM (will be done for all targets
+>     if approach seems acceptable)
+>   - add test case for '-M none -cpu FOO' case
+>   - redefine TARGET_DEFAULT_CPU_TYPE into CPU_RESOLVING_TYPE
+>   - scrape off default cpu_model refactoring, so it would cause
+>     less conflicts with Laurent's series where he tries to rework
+>     defaults to use ELF hints of executed program
+> 
+> Series is finishing work on generalizing cpu_model parsing
+> and limiting parts that deal with inconsistent cpu_model
+> naming to "-cpu" CLI option in vl.c, bsd|linux-user/main.c
+> CLI and default cpu_model processing and FOO_cpu_class_by_name()
+> callbacks.
+> 
+> It introduces CPU_RESOLVING_TYPE which must be defined
+> by each target and is used by helper parse_cpu_model()
+> (former cpu_parse_cpu_model()) to get access to target
+> specific FOO_cpu_class_by_name() callback.
+> 
+> git tree for testing:
+>    https://github.com/imammedo/qemu.git cpu_init_removal_v3
+> 
+> CC: Laurent Vivier <laurent@vivier.eu>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: qemu-s390x@nongnu.org
+> CC: qemu-ppc@nongnu.org
+> CC: qemu-arm@nongnu.org
+> 
+> Igor Mammedov (25):
+>   nios2: 10m50_devboard: replace cpu_model with cpu_type
+>   tests: add machine 'none' with -cpu test
+>   arm: cpu: add CPU_RESOLVING_TYPE macro
+>   x86: cpu: add CPU_RESOLVING_TYPE macro
+>   alpha: cpu: add CPU_RESOLVING_TYPE macro
+>   cris: cpu: add CPU_RESOLVING_TYPE macro
+>   lm32: cpu: add CPU_RESOLVING_TYPE macro
+>   m68k: cpu: add CPU_RESOLVING_TYPE macro
+>   microblaze: cpu: add CPU_RESOLVING_TYPE macro
+>   mips: cpu: add CPU_RESOLVING_TYPE macro
+>   moxie: cpu: add CPU_RESOLVING_TYPE macro
+>   nios2: cpu: add CPU_RESOLVING_TYPE macro
+>   openrisc: cpu: add CPU_RESOLVING_TYPE macro
+>   ppc: cpu: add CPU_RESOLVING_TYPE macro
+>   s390x: cpu: add CPU_RESOLVING_TYPE macro
+>   sh4: cpu: add CPU_RESOLVING_TYPE macro
+>   sparc: cpu: add CPU_RESOLVING_TYPE macro
+>   tricore: cpu: add CPU_RESOLVING_TYPE macro
+>   unicore32: cpu: add CPU_RESOLVING_TYPE macro
+>   xtensa: cpu: add CPU_RESOLVING_TYPE macro
+>   hppa: cpu: add CPU_RESOLVING_TYPE macro
+>   tilegx: cpu: add CPU_RESOLVING_TYPE macro
+>   Use cpu_create(type) instead of cpu_init(cpu_model)
+>   cpu: get rid of unused cpu_init() defines
+>   cpu: get rid of cpu_generic_init()
+> 
+>  include/qom/cpu.h         | 16 +-------
+>  target/alpha/cpu.h        |  3 +-
+>  target/arm/cpu.h          |  3 +-
+>  target/cris/cpu.h         |  3 +-
+>  target/hppa/cpu.h         |  2 +-
+>  target/i386/cpu.h         |  3 +-
+>  target/lm32/cpu.h         |  3 +-
+>  target/m68k/cpu.h         |  3 +-
+>  target/microblaze/cpu.h   |  2 +-
+>  target/mips/cpu.h         |  3 +-
+>  target/moxie/cpu.h        |  3 +-
+>  target/nios2/cpu.h        |  2 +-
+>  target/openrisc/cpu.h     |  3 +-
+>  target/ppc/cpu.h          |  3 +-
+>  target/s390x/cpu.h        |  3 +-
+>  target/sh4/cpu.h          |  3 +-
+>  target/sparc/cpu.h        |  5 +--
+>  target/tilegx/cpu.h       |  2 +-
+>  target/tricore/cpu.h      |  3 +-
+>  target/unicore32/cpu.h    |  3 +-
+>  target/xtensa/cpu.h       |  3 +-
+>  bsd-user/main.c           |  4 +-
+>  exec.c                    | 23 +++++++++++
+>  hw/core/null-machine.c    |  6 +--
+>  hw/nios2/10m50_devboard.c |  2 +-
+>  linux-user/main.c         | 10 +++--
+>  qom/cpu.c                 | 48 +----------------------
+>  tests/Makefile.include    |  2 +
+>  tests/machine-none-test.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++
+>  vl.c                      | 10 ++---
+>  30 files changed, 162 insertions(+), 114 deletions(-)
+>  create mode 100644 tests/machine-none-test.c
+> 
+> -- 
+> 2.7.4
+> 
+> 
+
 -- 
-2.14.1
+Eduardo
