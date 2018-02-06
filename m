@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1eixnN-0002kb-Hz
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:36:02 -0500
+	(envelope-from <peterx@redhat.com>) id 1eixrB-0004gT-2q
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1eixnK-0000eN-DZ
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:36:01 -0500
-Received: from mout.gmx.net ([212.227.17.21]:53691)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1eixnK-0000dZ-3g
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:35:58 -0500
-References: <20180124232625.30105-1-richard.henderson@linaro.org>
-	<20180124232625.30105-43-richard.henderson@linaro.org>
-	<a38ff4ee-90a1-64e0-fb8c-4ad2de61c844@amsat.org>
-From: Helge Deller <deller@gmx.de>
-Message-ID: <2771b4dc-ade8-d1fb-4382-e83da8da9799@gmx.de>
-Date: Tue, 6 Feb 2018 08:35:51 +0100
-MIME-Version: 1.0
-In-Reply-To: <a38ff4ee-90a1-64e0-fb8c-4ad2de61c844@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 42/45] pc-bios: Add hppa-firmware.img
- and git submodule
+	(envelope-from <peterx@redhat.com>) id 1eixr7-000346-Uz
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:39:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52732)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eixr7-00033c-Nc
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:39:53 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3CC1128221
+	for <qemu-devel@nongnu.org>; Tue,  6 Feb 2018 07:39:52 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue,  6 Feb 2018 15:39:33 +0800
+Message-Id: <20180206073933.4071-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] pci/bus: let it has higher migration
+ priority
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +28,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On 04.02.2018 23:40, Philippe Mathieu-Daudé wrote:
-> Hi Helge,
+In the past, we prioritized IOMMU migration so that we have such a
+priority order:
 
-Hi Philippe,
+    IOMMU > PCI Devices
 
-> On 01/24/2018 08:26 PM, Richard Henderson wrote:
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  Makefile                  |   3 ++-
->>  .gitmodules               |   3 +++
->>  pc-bios/hppa-firmware.img | Bin 0 -> 461352 bytes
->>  roms/seabios-hppa         |   1 +
->>  4 files changed, 6 insertions(+), 1 deletion(-)
->>  create mode 100755 pc-bios/hppa-firmware.img
->>  create mode 160000 roms/seabios-hppa
+When migrating a guest with both vIOMMU and a pcie-root-port, we'll
+always migrate vIOMMU first, since pci buses will be seen to have the
+same priority of general PCI devices.
 
->> diff --git a/.gitmodules b/.gitmodules
->> index 1500579638..7a8282df46 100644
->> --- a/.gitmodules
->> +++ b/.gitmodules
->> @@ -40,3 +40,6 @@
->>  [submodule "capstone"]
->>  	path = capstone
->>  	url = git://git.qemu.org/capstone.git
->> +[submodule "roms/seabios-hppa"]
->> +	path = roms/seabios-hppa
->> +	url = git://github.com/hdeller/seabios-hppa.git
-> 
-> Do you think it is possible your SeaBIOS work gets merged upstream at
-> some time?
+That's problematic.
 
-Yes, that's my plan.
-My changes to the common code base aren't too invasive yet, so
-hopefully it's possible.
+The thing is that PCI bus number information is stored in the root port,
+and that is needed by vIOMMU during post_load(), e.g., to figure out
+context entry for a device.  If we don't have correct bus numbers for
+devices, we won't be able to recover device state of the DMAR memory
+regions, and things will be messed up.
 
-Helge
+So let's boost the PCIe root ports to be even with higher priority:
+
+   PCIe Root Port > IOMMU > PCI Devices
+
+A smoke test shows that this patch fixes bug 1538953.
+
+Also, apply this rule to all the PCI bus/bridge devices: ioh3420,
+xio3130_downstream, xio3130_upstream, pcie_pci_bridge, pci-pci bridge,
+i82801b11.
+
+I noted that we set pcie_pci_bridge_dev_vmstate twice.  Clean that up
+together.
+
+CC: Alex Williamson <alex.williamson@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Juan Quintela <quintela@redhat.com>
+CC: Laurent Vivier <lvivier@redhat.com>
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1538953
+Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v2:
+- add more devices that Marcel mentioned
+- rename to MIG_PRI_PCI_BUS
+- remove one useless line in existing code
+---
+ hw/pci-bridge/gen_pcie_root_port.c | 1 +
+ hw/pci-bridge/i82801b11.c          | 1 +
+ hw/pci-bridge/ioh3420.c            | 1 +
+ hw/pci-bridge/pci_bridge_dev.c     | 1 +
+ hw/pci-bridge/pcie_pci_bridge.c    | 2 +-
+ hw/pci-bridge/xio3130_downstream.c | 1 +
+ hw/pci-bridge/xio3130_upstream.c   | 1 +
+ include/migration/vmstate.h        | 1 +
+ 8 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+index 0e2f2e8bf1..435fbaa60e 100644
+--- a/hw/pci-bridge/gen_pcie_root_port.c
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -101,6 +101,7 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
+ 
+ static const VMStateDescription vmstate_rp_dev = {
+     .name = "pcie-root-port",
++    .priority = MIG_PRI_PCI_BUS,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .post_load = pcie_cap_slot_post_load,
+diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+index cb522bf30c..60df9b2c96 100644
+--- a/hw/pci-bridge/i82801b11.c
++++ b/hw/pci-bridge/i82801b11.c
+@@ -80,6 +80,7 @@ err_bridge:
+ 
+ static const VMStateDescription i82801b11_bridge_dev_vmstate = {
+     .name = "i82801b11_bridge",
++    .priority = MIG_PRI_PCI_BUS,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
+         VMSTATE_END_OF_LIST()
+diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+index 5f56a2feb6..a7bfbdd238 100644
+--- a/hw/pci-bridge/ioh3420.c
++++ b/hw/pci-bridge/ioh3420.c
+@@ -83,6 +83,7 @@ static void ioh3420_interrupts_uninit(PCIDevice *d)
+ 
+ static const VMStateDescription vmstate_ioh3420 = {
+     .name = "ioh-3240-express-root-port",
++    .priority = MIG_PRI_PCI_BUS,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .post_load = pcie_cap_slot_post_load,
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index d56f6638c2..b2d861d216 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -174,6 +174,7 @@ static bool pci_device_shpc_present(void *opaque, int version_id)
+ 
+ static const VMStateDescription pci_bridge_dev_vmstate = {
+     .name = "pci_bridge",
++    .priority = MIG_PRI_PCI_BUS,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
+         SHPC_VMSTATE(shpc, PCIDevice, pci_device_shpc_present),
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+index a4d827c99d..e5ac7974cf 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -129,6 +129,7 @@ static Property pcie_pci_bridge_dev_properties[] = {
+ 
+ static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
+         .name = TYPE_PCIE_PCI_BRIDGE_DEV,
++        .priority = MIG_PRI_PCI_BUS,
+         .fields = (VMStateField[]) {
+             VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
+             SHPC_VMSTATE(shpc, PCIDevice, NULL),
+@@ -178,7 +179,6 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+     k->config_write = pcie_pci_bridge_write_config;
+     dc->vmsd = &pcie_pci_bridge_dev_vmstate;
+     dc->props = pcie_pci_bridge_dev_properties;
+-    dc->vmsd = &pcie_pci_bridge_dev_vmstate;
+     dc->reset = &pcie_pci_bridge_reset;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     hc->plug = pcie_pci_bridge_hotplug_cb;
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+index 1e09d2afb7..4dd2e65118 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -161,6 +161,7 @@ static Property xio3130_downstream_props[] = {
+ 
+ static const VMStateDescription vmstate_xio3130_downstream = {
+     .name = "xio3130-express-downstream-port",
++    .priority = MIG_PRI_PCI_BUS,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .post_load = pcie_cap_slot_post_load,
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+index 227997ce46..c5f02a6ee8 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -133,6 +133,7 @@ PCIEPort *xio3130_upstream_init(PCIBus *bus, int devfn, bool multifunction,
+ 
+ static const VMStateDescription vmstate_xio3130_upstream = {
+     .name = "xio3130-express-upstream-port",
++    .priority = MIG_PRI_PCI_BUS,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 8c3889433c..df463fd33d 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -148,6 +148,7 @@ enum VMStateFlags {
+ typedef enum {
+     MIG_PRI_DEFAULT = 0,
+     MIG_PRI_IOMMU,              /* Must happen before PCI devices */
++    MIG_PRI_PCI_BUS,            /* Must happen before IOMMU */
+     MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
+     MIG_PRI_GICV3,              /* Must happen before the ITS */
+     MIG_PRI_MAX,
+-- 
+2.14.3
