@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ej4vg-0004P1-6U
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:13:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1ej52v-0000c5-53
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:20:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ej4va-00034X-Lf
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:13:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1ej52r-00010y-5T
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:20:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ej52q-0000yo-UX
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:20:29 -0500
+References: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
+	<1516369485-5374-11-git-send-email-zhangckid@gmail.com>
+	<87zi4qf4yi.fsf@dusky.pond.sub.org>
+	<CAK3tnvLsUp8CdpThNMSXR62JRSd1D+wGGZowixJF04CQ6e858g@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <812d3335-30d3-28ed-ca9e-7f5b1b9caaca@redhat.com>
+Date: Tue, 6 Feb 2018 09:20:17 -0600
 MIME-Version: 1.0
-In-Reply-To: <24dcdefa-51f6-c3c1-61a2-c0f3eff7a800@amsat.org>
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-6-andrew.smirnov@gmail.com>
-	<24dcdefa-51f6-c3c1-61a2-c0f3eff7a800@amsat.org>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Tue, 6 Feb 2018 07:12:48 -0800
-Message-ID: <CAHQ1cqG6x8wNm8_B0X_OsE--KPAwPcxbBVc1cJYP9PHHLdZsbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 05/14] i.MX: Add code to emulate i.MX7
- SNVS IP-block
+In-Reply-To: <CAK3tnvLsUp8CdpThNMSXR62JRSd1D+wGGZowixJF04CQ6e858g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4 10/16] qmp event: Add COLO_EXIT event to
+ notify users while exited COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Zhang Chen <zhangckid@gmail.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Jan 31, 2018 at 9:10 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On 01/15/2018 10:37 PM, Andrey Smirnov wrote:
->> Add code to emulate SNVS IP-block. Currently only the bits needed to
->> be able to emulate machine shutdown are implemented.
+On 02/05/2018 09:13 PM, Zhang Chen wrote:
+
+>>> +##
+>>> +{ 'event': 'COLO_EXIT',
+>>> +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
 >>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Cc: qemu-devel@nongnu.org
->> Cc: qemu-arm@nongnu.org
->> Cc: yurovsky@gmail.com
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->> ---
->>  hw/misc/Makefile.objs       |  1 +
->>  hw/misc/imx7_snvs.c         | 83 ++++++++++++++++++++++++++++++++++++++=
-+++++++
->>  include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
->>  3 files changed, 119 insertions(+)
->>  create mode 100644 hw/misc/imx7_snvs.c
->>  create mode 100644 include/hw/misc/imx7_snvs.h
+>> Standard question when I see a new event: is there a way to poll for the
+>> event's information?  If not, why don't we need one?
 >>
->> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
->> index 4b2b705a6c..019886912c 100644
->> --- a/hw/misc/Makefile.objs
->> +++ b/hw/misc/Makefile.objs
->> @@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) +=3D imx6_ccm.o
->>  obj-$(CONFIG_IMX) +=3D imx6_src.o
->>  obj-$(CONFIG_IMX) +=3D imx7_ccm.o
->>  obj-$(CONFIG_IMX) +=3D imx2_wdt.o
->> +obj-$(CONFIG_IMX) +=3D imx7_snvs.o
->>  obj-$(CONFIG_MILKYMIST) +=3D milkymist-hpdmc.o
->>  obj-$(CONFIG_MILKYMIST) +=3D milkymist-pfpu.o
->>  obj-$(CONFIG_MAINSTONE) +=3D mst_fpga.o
->> diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
->> new file mode 100644
->> index 0000000000..670b9f4639
->> --- /dev/null
->> +++ b/hw/misc/imx7_snvs.c
->> @@ -0,0 +1,83 @@
->> +/*
->> + * IMX7 Secure Non-Volatile Storage
->> + *
->> + * Copyright (c) 2017, Impinj, Inc.
->> + *
->> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or l=
-ater.
->> + * See the COPYING file in the top-level directory.
->> + *
->> + * Bare minimum emulation code needed to support being able to shut
->> + * down linux guest gracefully.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/misc/imx7_snvs.h"
->> +#include "qemu/log.h"
->> +#include "sysemu/sysemu.h"
->> +
->> +static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned si=
-ze)
->> +{
->> +    return 0;
->> +}
->> +
->> +static void imx7_snvs_write(void *opaque, hwaddr offset,
->> +                            uint64_t v, unsigned size)
->> +{
->> +    const uint32_t value =3D v;
->> +    const uint32_t mask  =3D SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
->> +
->> +    if (offset =3D=3D SNVS_LPCR && ((value & mask) =3D=3D mask)) {
->> +        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
->> +    }
->> +}
->> +
->> +static const struct MemoryRegionOps imx7_snvs_ops =3D {
->> +    .read =3D imx7_snvs_read,
->
-> Same here, you can remove the imx7_snvs_read() function since
-> memory_region_dispatch_read() takes care of this and return 0.
->
+>>
+> Your means is we'd better print the information to a log file or something
+> like that for all qemu events?
+> CC  Eric Blake <eblake@redhat.com>
+> any idea about this?
 
-Hmm, I don't think I agree both from reading code and trying this out.
-Without .read callback the call chain ends up being the following
-memory_region_dispatch_read() -> memory_region_dispatch_read1() ->
-access_with_adjusted_size(..., memory_region_oldmmio_read_accessor,
-...) -> memory_region_oldmmio_read_accessor() ->
-mr->ops->old_mmio.read[ctz32(size)]() -> SEGFAULT
+Nothing to add, Markus is right - implementing a new mechanism that logs 
+all events as they are issued, and teaching libvirt to parse that log at 
+startup, is more work than just implementing a query-foo command that 
+libvirt already knows how to use to query current state on first connect 
+(and based on that query, make an intelligent decision on whether at 
+least one event was missed during downtime).  So far, no one has come up 
+with an event that is so important it must be logged, when compared to 
+the working alternative of just having events be ways to optimize 
+performance so that the query- command doesn't have to be polled all the 
+time, but no severe loss if the event is missed because the query- can 
+be used in its place.
 
-As much as I'd love to get rid of dummy .read callback, I don't see a
-way to do that, unfortunately.
-
-Thanks,
-Andrey Smirnov
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
