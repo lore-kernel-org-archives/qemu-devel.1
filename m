@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej9Ga-00032z-1l
+	(envelope-from <armbru@redhat.com>) id 1ej9Ga-00032r-0x
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej9GW-0003sq-S4
+	(envelope-from <armbru@redhat.com>) id 1ej9GW-0003t8-Up
 	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50526 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej9GW-0003rf-IE
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 14:50:52 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  6 Feb 2018 20:50:36 +0100
-Message-Id: <20180206195044.8347-7-armbru@redhat.com>
+Date: Tue,  6 Feb 2018 20:50:40 +0100
+Message-Id: <20180206195044.8347-11-armbru@redhat.com>
 In-Reply-To: <20180206195044.8347-1-armbru@redhat.com>
 References: <20180206195044.8347-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/14] hw/mips: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PULL 10/14] hw/ppc: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +24,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Paul Burton <paul.burton@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-ppc@nongnu.org
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -81,248 +77,272 @@ find ./* -type f -exec sed -i \
  \
     {} +
 
-Some lines where then manually tweaked to pass checkpatch.
+Some lines were then manually tweaked to pass checkpatch and some curly
+braces were added to match QEMU style.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Paul Burton <paul.burton@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: "Herv=C3=A9 Poussineau" <hpoussin@reactos.org>
+Cc: qemu-ppc@nongnu.org
 
 Conversions that aren't followed by exit() dropped, because they might
 be inappropriate.
 
+Also trim trailing punctuation from error messages.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20180203084315.20497-6-armbru@redhat.com>
+Message-Id: <20180203084315.20497-10-armbru@redhat.com>
 ---
- hw/mips/mips_fulong2e.c | 13 ++++++-------
- hw/mips/mips_jazz.c     |  4 ++--
- hw/mips/mips_malta.c    | 16 +++++++---------
- hw/mips/mips_mipssim.c  | 11 +++++------
- hw/mips/mips_r4k.c      | 16 +++++++---------
- 5 files changed, 27 insertions(+), 33 deletions(-)
+ hw/ppc/e500.c          | 16 ++++++++--------
+ hw/ppc/mac_newworld.c  |  2 +-
+ hw/ppc/mac_oldworld.c  |  2 +-
+ hw/ppc/ppc405_boards.c | 15 ++++++---------
+ hw/ppc/ppc440_bamboo.c | 16 ++++++++--------
+ hw/ppc/prep.c          |  4 ++--
+ hw/ppc/virtex_ml507.c  |  4 ++--
+ 7 files changed, 28 insertions(+), 31 deletions(-)
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 725e25a134..f68c625666 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -120,7 +120,7 @@ static int64_t load_kernel (CPUMIPSState *env)
-                            (uint64_t *)&kernel_low, (uint64_t *)&kernel_=
-high,
-                            0, EM_MIPS, 1, 0);
-     if (kernel_size < 0) {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
-         exit(1);
-@@ -134,17 +134,16 @@ static int64_t load_kernel (CPUMIPSState *env)
-         if (initrd_size > 0) {
-             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
-_PAGE_MASK;
-             if (initrd_offset + initrd_size > ram_size) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-                                      initrd_offset, ram_size - initrd_of=
-fset);
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index c4fe06ea2a..343bba93ce 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -811,8 +811,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+         cs =3D CPU(cpu);
+=20
+         if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
+-            fprintf(stderr, "MMU model %i not supported by this machine.=
+\n",
+-                env->mmu_model);
++            error_report("MMU model %i not supported by this machine",
++                         env->mmu_model);
+             exit(1);
          }
-         if (initrd_size =3D=3D (target_ulong) -1) {
+=20
+@@ -959,8 +959,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+                                           cur_base,
+                                           ram_size - cur_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    machine->kernel_filename);
++            error_report("could not load kernel '%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
+=20
+@@ -974,8 +974,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+                                           ram_size - initrd_base);
+=20
+         if (initrd_size < 0) {
 -            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
 n",
--                    loaderparams.initrd_filename);
+-                    machine->initrd_filename);
 +            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
++                         machine->initrd_filename);
+             exit(1);
+         }
+=20
+@@ -1016,7 +1016,7 @@ void ppce500_init(MachineState *machine, PPCE500Par=
+ams *params)
+         kernel_size =3D load_uimage(filename, &bios_entry, &loadaddr, NU=
+LL,
+                                   NULL, NULL);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load firmware '%s'\n", file=
+name);
++            error_report("could not load firmware '%s'", filename);
              exit(1);
          }
      }
-@@ -338,7 +337,7 @@ static void mips_fulong2e_init(MachineState *machine)
-=20
-     isa_bus =3D vt82c686b_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 0))=
-;
-     if (!isa_bus) {
--        fprintf(stderr, "vt82c686b_init error\n");
-+        error_report("vt82c686b_init error");
+@@ -1029,7 +1029,7 @@ void ppce500_init(MachineState *machine, PPCE500Par=
+ams *params)
+                                        initrd_base, initrd_size,
+                                        kernel_base, kernel_size);
+     if (dt_size < 0) {
+-        fprintf(stderr, "couldn't load device tree\n");
++        error_report("couldn't load device tree");
          exit(1);
      }
-=20
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 0d2c0683ba..596f3c210e 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -268,10 +268,10 @@ static void mips_jazz_init(MachineState *machine,
-             sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(rc4030, 4));
-             break;
-         } else if (is_help_option(nd->model)) {
--            fprintf(stderr, "qemu: Supported NICs: dp83932\n");
-+            error_report("Supported NICs: dp83932");
+     assert(dt_size < DTB_MAX_SIZE);
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 3fa7c429d5..b832417a56 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -270,7 +270,7 @@ static void ppc_core99_init(MachineState *machine)
+             }
+         }
+         if (ppc_boot_device =3D=3D '\0') {
+-            fprintf(stderr, "No valid boot device for Mac99 machine\n");
++            error_report("No valid boot device for Mac99 machine");
              exit(1);
+         }
+     }
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 010ea36bf2..d1f4546613 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -218,7 +218,7 @@ static void ppc_heathrow_init(MachineState *machine)
+ #endif
+         }
+         if (ppc_boot_device =3D=3D '\0') {
+-            fprintf(stderr, "No valid boot device for G3 Beige machine\n=
+");
++            error_report("No valid boot device for G3 Beige machine");
+             exit(1);
+         }
+     }
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 6f7f2ee168..0b658931ee 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -331,8 +331,7 @@ static void ref405ep_init(MachineState *machine)
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base=
+,
+                                           ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         printf("Load kernel size %ld at " TARGET_FMT_lx,
+@@ -343,8 +342,8 @@ static void ref405ep_init(MachineState *machine)
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_=
+base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '=
+%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
          } else {
--            fprintf(stderr, "qemu: Unsupported NIC: %s\n", nd->model);
-+            error_report("Unsupported NIC: %s", nd->model);
+@@ -621,8 +620,7 @@ static void taihu_405ep_init(MachineState *machine)
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base=
+,
+                                           ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
              exit(1);
          }
-     }
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 37f19428d6..7ca8ba2086 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -812,7 +812,7 @@ static int64_t load_kernel (void)
-                            NULL, (uint64_t *)&kernel_entry, NULL,
-                            (uint64_t *)&kernel_high, big_endian, EM_MIPS=
-, 1, 0);
-     if (kernel_size < 0) {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
-         exit(1);
-@@ -846,9 +846,8 @@ static int64_t load_kernel (void)
-             initrd_offset =3D (loaderparams.ram_low_size - initrd_size -=
- 131072
-                              - ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
-             if (kernel_high >=3D initrd_offset) {
+         /* load initrd */
+@@ -631,9 +629,8 @@ static void taihu_405ep_init(MachineState *machine)
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_=
+base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
 -                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
+-                        "qemu: could not load initial ram disk '%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
                  exit(1);
              }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-@@ -856,8 +855,8 @@ static int64_t load_kernel (void)
-                                               ram_size - initrd_offset);
-         }
-         if (initrd_size =3D=3D (target_ulong) -1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
-n",
--                    loaderparams.initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
-             exit(1);
-         }
-     }
-@@ -1034,9 +1033,8 @@ void mips_malta_init(MachineState *machine)
+         } else {
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index a299206fd4..8641986a71 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -12,6 +12,7 @@
+  */
 =20
-     /* allocate RAM */
-     if (ram_size > (2048u << 20)) {
--        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d MB, maximum =
-2048 MB\n",
--                ((unsigned int)ram_size / (1 << 20)));
-+        error_report("Too much memory for this machine: %dMB, maximum 20=
-48MB",
-+                     ((unsigned int)ram_size / (1 << 20)));
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "net/net.h"
+@@ -188,8 +189,8 @@ static void bamboo_init(MachineState *machine)
+     env =3D &cpu->env;
+=20
+     if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+-        fprintf(stderr, "MMU model %i not supported by this machine.\n",
+-            env->mmu_model);
++        error_report("MMU model %i not supported by this machine",
++                     env->mmu_model);
          exit(1);
      }
 =20
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index e5d3654586..e0ba5efc84 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -78,7 +78,7 @@ static int64_t load_kernel(void)
-         if ((entry & ~0x7fffffffULL) =3D=3D 0x80000000)
-             entry =3D (int32_t)entry;
-     } else {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
+@@ -229,7 +230,7 @@ static void bamboo_init(MachineState *machine)
+                                 NULL);
+     pcibus =3D (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (!pcibus) {
+-        fprintf(stderr, "couldn't create PCI controller!\n");
++        error_report("couldn't create PCI controller");
          exit(1);
-@@ -92,17 +92,16 @@ static int64_t load_kernel(void)
-         if (initrd_size > 0) {
-             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
-_PAGE_MASK;
-             if (initrd_offset + initrd_size > loaderparams.ram_size) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-                 initrd_offset, loaderparams.ram_size - initrd_offset);
-         }
-         if (initrd_size =3D=3D (target_ulong) -1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
-n",
--                    loaderparams.initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
-             exit(1);
-         }
      }
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 244bd41813..830ee7732c 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -98,7 +98,7 @@ static int64_t load_kernel(void)
-         if ((entry & ~0x7fffffffULL) =3D=3D 0x80000000)
-             entry =3D (int32_t)entry;
-     } else {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
-         exit(1);
-@@ -112,9 +112,8 @@ static int64_t load_kernel(void)
-         if (initrd_size > 0) {
-             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
-_PAGE_MASK;
-             if (initrd_offset + initrd_size > ram_size) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-@@ -122,8 +121,8 @@ static int64_t load_kernel(void)
-                                               ram_size - initrd_offset);
-         }
-         if (initrd_size =3D=3D (target_ulong) -1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
-n",
--                    loaderparams.initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
-             exit(1);
-         }
-     }
-@@ -196,9 +195,8 @@ void mips_r4k_init(MachineState *machine)
 =20
-     /* allocate RAM */
-     if (ram_size > (256 << 20)) {
--        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d MB, maximum =
-256 MB\n",
--                ((unsigned int)ram_size / (1 << 20)));
-+        error_report("Too much memory for this machine: %dMB, maximum 25=
-6MB",
-+                     ((unsigned int)ram_size / (1 << 20)));
+@@ -270,8 +271,7 @@ static void bamboo_init(MachineState *machine)
+         }
+         /* XXX try again as binary */
+         if (success < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+     }
+@@ -282,8 +282,8 @@ static void bamboo_init(MachineState *machine)
+                                           ram_size - RAMDISK_ADDR);
+=20
+         if (initrd_size < 0) {
+-            fprintf(stderr, "qemu: could not load ram disk '%s' at %x\n"=
+,
+-                    initrd_filename, RAMDISK_ADDR);
++            error_report("could not load ram disk '%s' at %x",
++                         initrd_filename, RAMDISK_ADDR);
+             exit(1);
+         }
+     }
+@@ -292,7 +292,7 @@ static void bamboo_init(MachineState *machine)
+     if (kernel_filename) {
+         if (bamboo_load_device_tree(FDT_ADDR, ram_size, RAMDISK_ADDR,
+                                     initrd_size, kernel_cmdline) < 0) {
+-            fprintf(stderr, "couldn't load device tree\n");
++            error_report("couldn't load device tree");
+             exit(1);
+         }
+     }
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index af08ac319a..096d4d4cfb 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -574,7 +574,7 @@ static void ppc_prep_init(MachineState *machine)
+             }
+         }
+         if (ppc_boot_device =3D=3D '\0') {
+-            fprintf(stderr, "No valid boot device for Mac99 machine\n");
++            error_report("No valid boot device for Mac99 machine");
+             exit(1);
+         }
+     }
+@@ -595,7 +595,7 @@ static void ppc_prep_init(MachineState *machine)
+     qdev_init_nofail(dev);
+     pci_bus =3D (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (pci_bus =3D=3D NULL) {
+-        fprintf(stderr, "Couldn't create PCI host controller.\n");
++        error_report("Couldn't create PCI host controller");
          exit(1);
      }
-     memory_region_allocate_system_memory(ram, NULL, "mips_r4k.ram", ram_=
-size);
+     sysctrl->contiguous_map_irq =3D qdev_get_gpio_in(dev, 0);
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 9fe7655074..485d9affb2 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -223,8 +223,8 @@ static void virtex_init(MachineState *machine)
+     env =3D &cpu->env;
+=20
+     if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+-        fprintf(stderr, "MMU model %i not supported by this machine.\n",
+-            env->mmu_model);
++        error_report("MMU model %i not supported by this machine",
++                     env->mmu_model);
+         exit(1);
+     }
+=20
 --=20
 2.13.6
