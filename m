@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ej2bD-000400-Qn
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:43:49 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej2by-0004h3-KY
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:44:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ej2bC-0006dK-I9
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:43:47 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180123035837.16578-1-f4bug@amsat.org>
-	<20180123035837.16578-5-f4bug@amsat.org>
-	<CAKmqyKMoUcPhkr8bM1DU1QeBaRbJ9kAfOp_j-vFxf1y8p=1AbA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5a373a1f-6289-a216-cd02-254402069c12@amsat.org>
-Date: Tue, 6 Feb 2018 09:43:36 -0300
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej2bv-000717-H8
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:44:34 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:58516)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ej2bv-00070O-4s
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:44:31 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 06 Feb 2018 15:44:31 +0300
+Message-ID: <20180206124431.31433.91946.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMoUcPhkr8bM1DU1QeBaRbJ9kAfOp_j-vFxf1y8p=1AbA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] hw/sd/pl181: expose a SDBus and
- connect the SDCard to it
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v4] m68k: implement movep instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +24,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Michael Walle <michael@walle.cc>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: huth@tuxfamily.org, dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
 
-Hi Alistair,
+This patch implements movep instruction. It moves data between a data register
+and alternate bytes within the address space starting at the location
+specified and incrementing by two.
 
-On 01/31/2018 01:41 PM, Alistair Francis wrote:
-> On Mon, Jan 22, 2018 at 7:58 PM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> using the sdbus_*() API.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/sd/pl181.c | 31 ++++++++++++++++++++-----------
->>  1 file changed, 20 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
->> index 3ba1f7dd23..ce696c5d7d 100644
->> --- a/hw/sd/pl181.c
->> +++ b/hw/sd/pl181.c
->> @@ -33,6 +33,7 @@ typedef struct PL181State {
->>      SysBusDevice parent_obj;
->>
->>      MemoryRegion iomem;
->> +    SDBus sdbus;
->>      SDState *card;
-> 
-> Shouludn't card be removed?
+It was designed for the original 68000 and used in firmwares for
+interfacing the 8-bit peripherals through the 16-bit data bus.
+Without this patch opcode for this instruction is recognized as some bitop.
 
-Not yet :( It is still used by sd_set_cb() in pl181_reset().
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 
-In my first approach [1] I added the SDBus SLAVE/MASTER interfaces and
-the cards inserted/readonly signals were only accessible by the bus, not
-the HCI, leaving the SDCard objects only pluggable to SDBus (removing
-the sdbus_reparent_card() need). But since it was out of scope for the
-UHS cards goal, I kept it for later.
+--
 
-[1]
-http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02318.html
+v4: - fixed offset calculation misprint
 
-> 
-> Alistair
-> 
->>      uint32_t clock;
->>      uint32_t power;
->> @@ -179,7 +180,7 @@ static void pl181_send_command(PL181State *s)
->>      request.cmd = s->cmd & PL181_CMD_INDEX;
->>      request.arg = s->cmdarg;
->>      DPRINTF("Command %d %08x\n", request.cmd, request.arg);
->> -    rlen = sd_do_command(s->card, &request, response);
->> +    rlen = sdbus_do_command(&s->sdbus, &request, response);
->>      if (rlen < 0)
->>          goto error;
->>      if (s->cmd & PL181_CMD_RESPONSE) {
->> @@ -223,12 +224,12 @@ static void pl181_fifo_run(PL181State *s)
->>      int is_read;
->>
->>      is_read = (s->datactrl & PL181_DATA_DIRECTION) != 0;
->> -    if (s->datacnt != 0 && (!is_read || sd_data_ready(s->card))
->> +    if (s->datacnt != 0 && (!is_read || sdbus_data_ready(&s->sdbus))
->>              && !s->linux_hack) {
->>          if (is_read) {
->>              n = 0;
->>              while (s->datacnt && s->fifo_len < PL181_FIFO_LEN) {
->> -                value |= (uint32_t)sd_read_data(s->card) << (n * 8);
->> +                value |= (uint32_t)sdbus_read_data(&s->sdbus) << (n * 8);
->>                  s->datacnt--;
->>                  n++;
->>                  if (n == 4) {
->> @@ -249,7 +250,7 @@ static void pl181_fifo_run(PL181State *s)
->>                  }
->>                  n--;
->>                  s->datacnt--;
->> -                sd_write_data(s->card, value & 0xff);
->> +                sdbus_write_data(&s->sdbus, value & 0xff);
->>                  value >>= 8;
->>              }
->>          }
->> @@ -480,10 +481,6 @@ static void pl181_reset(DeviceState *d)
->>
->>      /* We can assume our GPIO outputs have been wired up now */
->>      sd_set_cb(s->card, s->cardstatus[0], s->cardstatus[1]);
->> -    /* Since we're still using the legacy SD API the card is not plugged
->> -     * into any bus, and we must reset it manually.
->> -     */
->> -    device_reset(DEVICE(s->card));
->>  }
->>
->>  static void pl181_init(Object *obj)
->> @@ -502,14 +499,26 @@ static void pl181_init(Object *obj)
->>  static void pl181_realize(DeviceState *dev, Error **errp)
->>  {
->>      PL181State *s = PL181(dev);
->> +    DeviceState *carddev;
->>      DriveInfo *dinfo;
->> +    Error *err = NULL;
->> +
->> +    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
->> +                        dev, "sd-bus");
->>
->> +    /* Create and plug in the sd card */
->>      /* FIXME use a qdev drive property instead of drive_get_next() */
->>      dinfo = drive_get_next(IF_SD);
->> -    s->card = sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, false);
->> -    if (s->card == NULL) {
->> -        error_setg(errp, "sd_init failed");
->> +    carddev = qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
->> +    if (dinfo) {
->> +        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
->> +    }
->> +    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
->> +    if (err) {
->> +        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
->> +        return;
->>      }
->> +    s->card = SD_CARD(carddev);
->>  }
->>
->>  static void pl181_class_init(ObjectClass *klass, void *data)
->> --
->> 2.15.1
->>
->>
+v3: - simplified movep function code
+    - joined movep masks
+
+v2: - disabled movep for Coldfire
+    - fixed gen_store/load usage
+---
+ target/m68k/cpu.c       |    2 ++
+ target/m68k/cpu.h       |    1 +
+ target/m68k/translate.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
+
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 98919b3..461db85 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -113,6 +113,7 @@ static void m68000_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_M68000);
+     m68k_set_feature(env, M68K_FEATURE_USP);
+     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ 
+ static void m68020_cpu_initfn(Object *obj)
+@@ -135,6 +136,7 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
+     m68k_set_feature(env, M68K_FEATURE_RTD);
+     m68k_set_feature(env, M68K_FEATURE_CHK2);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+ 
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 627fb78..1d79885 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -492,6 +492,7 @@ enum m68k_features {
+     M68K_FEATURE_RTD,
+     M68K_FEATURE_CHK2,
+     M68K_FEATURE_M68040, /* instructions specific to MC68040 */
++    M68K_FEATURE_MOVEP,
+ };
+ 
+ static inline int m68k_feature(CPUM68KState *env, int feature)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 34db97b..70c7583 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2078,6 +2078,51 @@ DISAS_INSN(movem)
+     tcg_temp_free(addr);
+ }
+ 
++DISAS_INSN(movep)
++{
++    uint8_t i;
++    int16_t displ;
++    TCGv reg;
++    TCGv addr;
++    TCGv abuf;
++    TCGv dbuf;
++
++    displ = read_im16(env, s);
++
++    addr = AREG(insn, 0);
++    reg = DREG(insn, 9);
++
++    abuf = tcg_temp_new();
++    tcg_gen_addi_i32(abuf, addr, displ);
++    dbuf = tcg_temp_new();
++
++    if (insn & 0x40) {
++        i = 4;
++    } else {
++        i = 2;
++    }
++
++    if (insn & 0x80) {
++        for ( ; i > 0 ; i--) {
++            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
++            tcg_gen_qemu_st8(dbuf, abuf, IS_USER(s));
++            if (i > 1) {
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    } else {
++        for ( ; i > 0 ; i--) {
++            tcg_gen_qemu_ld8u(dbuf, abuf, IS_USER(s));
++            tcg_gen_deposit_i32(reg, reg, dbuf, (i - 1) * 8, 8);
++            if (i > 1) {
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    }
++    tcg_temp_free(abuf);
++    tcg_temp_free(dbuf);
++}
++
+ DISAS_INSN(bitop_im)
+ {
+     int opsize;
+@@ -5678,6 +5723,7 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(bitop_reg, 0140, f1c0);
+     BASE(bitop_reg, 0180, f1c0);
+     BASE(bitop_reg, 01c0, f1c0);
++    INSN(movep,     0108, f138, MOVEP);
+     INSN(arith_im,  0280, fff8, CF_ISA_A);
+     INSN(arith_im,  0200, ff00, M68000);
+     INSN(undef,     02c0, ffc0, M68000);
