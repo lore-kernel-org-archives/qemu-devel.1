@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej07L-0003Hy-4k
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:04:49 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1ej083-0003zD-9D
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ej07G-0004Si-4h
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:04:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42630)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ej07F-0004SV-VL
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:04:42 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180111213250.16511-1-marcandre.lureau@redhat.com>
-	<20180111213250.16511-4-marcandre.lureau@redhat.com>
-Date: Tue, 06 Feb 2018 11:04:35 +0100
-In-Reply-To: <20180111213250.16511-4-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Thu, 11 Jan 2018 22:32:02 +0100")
-Message-ID: <878tc6e8ng.fsf@dusky.pond.sub.org>
+	(envelope-from <dovgaluk@ispras.ru>) id 1ej07t-0004po-Js
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:05:31 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:40976)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1ej07t-0004oz-0e
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 05:05:21 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180206095526.26436.86301.stgit@pasha-VirtualBox>
+	<CAFEAcA9+H_WYPUgORtcVLKMHj1D=Fqah_ibVFp-G2LOQ1n5jdA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9+H_WYPUgORtcVLKMHj1D=Fqah_ibVFp-G2LOQ1n5jdA@mail.gmail.com>
+Date: Tue, 6 Feb 2018 13:05:20 +0300
+Message-ID: <000b01d39f31$ff465690$fdd303b0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 03/51] qapi: generate a literal qobject
- for introspection
+Content-Language: ru
+Subject: Re: [Qemu-devel] [ PATCH ] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,17 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cleber Rosa <crosa@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, 'Laurent Vivier' <laurent@vivier.eu>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+> On 6 February 2018 at 09:55, Pavel Dovgalyuk =
+<Pavel.Dovgaluk@ispras.ru> wrote:
+> > This set of patches includex fixes from Alex Benn=C3=A9e for fixing
+> > BQL and replay locks after inventing the MTTCG. It also includes =
+some
+> > additional replay patches that makes this set of fixes working.
+> > It is also fixes some vmstate creation (and loading) issues
+> > in record/replay modes:
+> >  - VM start/stop fixes in replay mode
+> >  - overlay creation for blkreplay filter
+> >  - fixes for vmstate save/load in record/replay mode
+> >  - fixes for host clock vmstate
+>=20
+> This cover letter text doesn't seem to match the patch
+> description?
 
-> Replace the generated json string with a literal qobject. The later is
-> easier to deal with, at run time as well as compile time: adding #if
-> conditionals will be easier than in a json string.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Yes, I accidentally sent the cover letter with the single patch.
+Please ignore it.
 
-I verified that the output of query-qmp-schema is not changed.
-Mentioning that in the commit message wouldn't hurt.
+Pavel Dovgalyuk
