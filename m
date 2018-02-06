@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5WF-0002sm-6X
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:56 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ej5WN-00031y-Gb
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:51:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ej5WB-0004Gc-Eq
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50212)
+	(envelope-from <dgilbert@redhat.com>) id 1ej5WJ-0004Q4-LH
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5WB-0004Fx-8I
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:47 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ej5WJ-0004PM-GF
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 10:50:55 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  6 Feb 2018 15:49:26 +0000
-Message-Id: <20180206154936.13565-5-dgilbert@redhat.com>
+Date: Tue,  6 Feb 2018 15:49:27 +0000
+Message-Id: <20180206154936.13565-6-dgilbert@redhat.com>
 In-Reply-To: <20180206154936.13565-1-dgilbert@redhat.com>
 References: <20180206154936.13565-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 04/14] migration: use s->threshold_size inside
- migration_update_counters
+Subject: [Qemu-devel] [PULL 05/14] migration: Drop current address parameter
+ from save_zero_page()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, quintela@redhat.com
 Cc: peterx@redhat.com, lvivier@redhat.com, groug@kaod.org, ross.lagerwall@citrix.com, wei.w.wang@intel.com, danielhb@linux.vnet.ibm.com
 
-From: Wei Wang <wei.w.wang@intel.com>
+From: Juan Quintela <quintela@redhat.com>
 
-Fixes: b15df1ae50 ("migration: cleanup stats update into function")
-The threshold size is changed to be recorded in s->threshold_size.
+It already has RAMBlock and offset, it can calculate it itself.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ migration/ram.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 1fbd304c66..44cbfb0ddd 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2169,7 +2169,6 @@ static void migration_update_counters(MigrationState *s,
-                                       int64_t current_time)
+diff --git a/migration/ram.c b/migration/ram.c
+index cb1950f3eb..5a109efeda 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -907,11 +907,10 @@ static void migration_bitmap_sync(RAMState *rs)
+  * @rs: current RAM state
+  * @block: block that contains the page we want to send
+  * @offset: offset inside the block for the page
+- * @p: pointer to the page
+  */
+-static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
+-                          uint8_t *p)
++static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
  {
-     uint64_t transferred, time_spent;
--    int64_t threshold_size;
-     double bandwidth;
++    uint8_t *p = block->host + offset;
+     int pages = -1;
  
-     if (current_time < s->iteration_start_time + BUFFER_DELAY) {
-@@ -2179,7 +2178,7 @@ static void migration_update_counters(MigrationState *s,
-     transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-     time_spent = current_time - s->iteration_start_time;
-     bandwidth = (double)transferred / time_spent;
--    threshold_size = bandwidth * s->parameters.downtime_limit;
-+    s->threshold_size = bandwidth * s->parameters.downtime_limit;
- 
-     s->mbps = (((double) transferred * 8.0) /
-                ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
-@@ -2199,7 +2198,7 @@ static void migration_update_counters(MigrationState *s,
-     s->iteration_initial_bytes = qemu_ftell(s->to_dst_file);
- 
-     trace_migrate_transferred(transferred, time_spent,
--                              bandwidth, threshold_size);
-+                              bandwidth, s->threshold_size);
- }
- 
- /* Migration thread iteration status */
+     if (is_zero_range(p, TARGET_PAGE_SIZE)) {
+@@ -984,7 +983,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+             }
+         }
+     } else {
+-        pages = save_zero_page(rs, block, offset, p);
++        pages = save_zero_page(rs, block, offset);
+         if (pages > 0) {
+             /* Must let xbzrle know, otherwise a previous (now 0'd) cached
+              * page would be stale
+@@ -1160,7 +1159,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+          */
+         if (block != rs->last_sent_block) {
+             flush_compressed_data(rs);
+-            pages = save_zero_page(rs, block, offset, p);
++            pages = save_zero_page(rs, block, offset);
+             if (pages == -1) {
+                 /* Make sure the first page is sent out before other pages */
+                 bytes_xmit = save_page_header(rs, rs->f, block, offset |
+@@ -1180,7 +1179,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+                 ram_release_pages(block->idstr, offset, pages);
+             }
+         } else {
+-            pages = save_zero_page(rs, block, offset, p);
++            pages = save_zero_page(rs, block, offset);
+             if (pages == -1) {
+                 pages = compress_page_with_multi_thread(rs, block, offset);
+             } else {
 -- 
 2.14.3
