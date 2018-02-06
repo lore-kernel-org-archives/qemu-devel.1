@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1ej9yE-0006AY-MQ
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:36:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ej9zP-0007Dx-1w
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:37:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1ej9yB-0005jt-B4
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:36:02 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:45220)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jack.schwartz@oracle.com>)
-	id 1ej9yB-0005ip-1G
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:35:59 -0500
-References: <20180129204344.196196-1-anatol.pomozov@gmail.com>
-	<0052103f-9d90-fe35-eac1-b10966c829f6@oracle.com>
-	<20180131091217.GA3598@localhost.localdomain>
-	<CAOMFOmVVQupKSnXBdS5xNvo5gOp9zXncMHi4wP9DV0URLwjf1w@mail.gmail.com>
-From: Jack Schwartz <jack.schwartz@oracle.com>
-Message-ID: <cd325981-dbf6-19f8-7058-69349e65cd78@oracle.com>
-Date: Tue, 6 Feb 2018 12:35:45 -0800
+	(envelope-from <pbonzini@redhat.com>) id 1ej9zL-0006OY-Q8
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:37:15 -0500
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:51356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ej9zL-0006O4-KU
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:37:11 -0500
+Received: by mail-wm0-f68.google.com with SMTP id r71so6243219wmd.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 12:37:11 -0800 (PST)
+References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8xGrkYY14hm6htgs3oqB1gaKHFRLktz2x0tOFageDqYQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4ce6f2ad-2287-2155-277b-977e48167687@redhat.com>
+Date: Tue, 6 Feb 2018 21:37:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAOMFOmVVQupKSnXBdS5xNvo5gOp9zXncMHi4wP9DV0URLwjf1w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA8xGrkYY14hm6htgs3oqB1gaKHFRLktz2x0tOFageDqYQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] multiboot: Change multiboot_info from
- array of bytes to a C struct
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/47] Misc patches for 2018-02-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,187 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>, Kevin Wolf <kwolf@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Anatol and Kevin.
+On 06/02/2018 20:18, Peter Maydell wrote:
+> Hi. I'm afraid this fails to build the all-linux-static config:
+> 
+>   LINK    ivshmem-client
+> [usual linker gripes about getpwuid &c in static binaries deleted]
+> /usr/lib/gcc/x86_64-linux-gnu/5/libubsan.a(sanitizer_linux_libcdep.o):
+> In function `__sanitizer::SetEnv(cha
+> r const*, char const*)':
+> (.text+0x41b): undefined reference to `dlsym'
+> /usr/lib/gcc/x86_64-linux-gnu/5/libubsan.a(sanitizer_linux_libcdep.o):
+> In function `__sanitizer::InitTlsSiz
+> e()':
+> (.text+0x553): undefined reference to `dlsym'
+> collect2: error: ld returned 1 exit status
 
-Kevin and Anatol, thanks for your replies.
+Uhm, what is all-linux-static?  Is it using --enable-debug?
 
-A few comments inline close to the bottom...
-
-On 2018-02-05 13:43, Anatol Pomozov wrote:
-> Hi
->
-> On Wed, Jan 31, 2018 at 1:12 AM, Kevin Wolf <kwolf@redhat.com> wrote:
->> Am 31.01.2018 um 00:15 hat Jack Schwartz geschrieben:
->>> Hi Anatol and Kevin.
->>>
->>> Even though I am new to Qemu, I have a patch to deliver for
->>> multiboot.c (as you know) and so I feel familiar enough to do a revie=
-w
->>> of this patch.  One comment is probably more for maintainers.
->> The Multiboot code is essentially unmaintained. It's technically part =
-of
->> the PC/x86 subsystem, but their maintainers don't seem to care at all.
->> So in order to make any progress here, I decided that I will send a
->> pull request for Multiboot once we have the patches ready (as a one-ti=
-me
->> thing, without officially making myself the maintainer).
->>
->> So I am the closest thing to a maintainer that we have here, and while
->> I'm familiar with some of the Multiboot-specific code, I don't really
->> know the ELF code and don't have a lot of time to spend here.
->>
->> Therefore it's very welcome if you review the patches of each other,
->> even if you're not perfectly familiar with the code, as there is
->> probably noone else who could do a better review.
->>
->>> On 01/29/18 12:43, Anatol Pomozov wrote:
->>>> @@ -253,11 +228,11 @@ int load_multiboot(FWCfgState *fw_cfg,
->>>>                mb_load_size =3D mb_kernel_size;
->>>>            }
->>>> -        /* Valid if mh_flags sets MULTIBOOT_HEADER_HAS_VBE.
->>>> -        uint32_t mh_mode_type =3D ldl_p(header+i+32);
->>>> -        uint32_t mh_width =3D ldl_p(header+i+36);
->>>> -        uint32_t mh_height =3D ldl_p(header+i+40);
->>>> -        uint32_t mh_depth =3D ldl_p(header+i+44); */
->>>> +        /* Valid if mh_flags sets MULTIBOOT_VIDEO_MODE.
->>>> +        uint32_t mh_mode_type =3D ldl_p(&multiboot_header->mode_typ=
-e);
->>>> +        uint32_t mh_width =3D ldl_p(&multiboot_header->width);
->>>> +        uint32_t mh_height =3D ldl_p(&multiboot_header->height);
->>>> +        uint32_t mh_depth =3D ldl_p(&multiboot_header->depth); */
->>> This question is probably more for maintainers...
->>>
->>> In the patch series I submitted, people were OK that I was going to d=
-elete
->>> these lines since they were only comments anyway.  Your approach leav=
-es
->>> these lines in and updates them even though they are comments.  Which=
- way is
->>> preferred?
->> As far as I am concerned, I honestly don't mind either way. It's
->> trivial code, so we won't lose anything by removing it.
-> This change suppose to be a refactoring and tries to avoid functional
-> changes. I can remove it in a separate change.
->
->> The ideal solution would be just implementing support for it, of cours=
-e.
->> If we wanted to do that, I think we would have to pass the values
->> through fw_cfg and then set the VBE mode in the Mutiboot option rom.
->>
->>>>            mb_debug("multiboot: mh_header_addr =3D %#x\n", mh_header=
-_addr);
->>>>            mb_debug("multiboot: mh_load_addr =3D %#x\n", mh_load_add=
-r);
->>>> @@ -295,14 +270,15 @@ int load_multiboot(FWCfgState *fw_cfg,
->>>>        }
->>>>        mbs.mb_buf_size +=3D cmdline_len;
->>>> -    mbs.mb_buf_size +=3D MB_MOD_SIZE * mbs.mb_mods_avail;
->>>> +    mbs.mb_buf_size +=3D sizeof(multiboot_module_t) * mbs.mb_mods_a=
-vail;
->>>>        mbs.mb_buf_size +=3D strlen(bootloader_name) + 1;
->>>>        mbs.mb_buf_size =3D TARGET_PAGE_ALIGN(mbs.mb_buf_size);
->>>>        /* enlarge mb_buf to hold cmdlines, bootloader, mb-info struc=
-ts */
->>>>        mbs.mb_buf            =3D g_realloc(mbs.mb_buf, mbs.mb_buf_si=
-ze);
->>>> -    mbs.offset_cmdlines   =3D mbs.offset_mbinfo + mbs.mb_mods_avail=
- * MB_MOD_SIZE;
->>>> +    mbs.offset_cmdlines   =3D mbs.offset_mbinfo +
->>>> +        mbs.mb_mods_avail * sizeof(multiboot_module_t);
->>>>        mbs.offset_bootloader =3D mbs.offset_cmdlines + cmdline_len;
->>>>        if (initrd_filename) {
->>>> @@ -348,22 +324,22 @@ int load_multiboot(FWCfgState *fw_cfg,
->>>>        char kcmdline[strlen(kernel_filename) + strlen(kernel_cmdline=
-) + 2];
->>>>        snprintf(kcmdline, sizeof(kcmdline), "%s %s",
->>>>                 kernel_filename, kernel_cmdline);
->>>> -    stl_p(bootinfo + MBI_CMDLINE, mb_add_cmdline(&mbs, kcmdline));
->>>> +    stl_p(&bootinfo.cmdline, mb_add_cmdline(&mbs, kcmdline));
->>>> -    stl_p(bootinfo + MBI_BOOTLOADER, mb_add_bootloader(&mbs, bootlo=
-ader_name));
->>>> +    stl_p(&bootinfo.boot_loader_name, mb_add_bootloader(&mbs, bootl=
-oader_name));
->>>> -    stl_p(bootinfo + MBI_MODS_ADDR,  mbs.mb_buf_phys + mbs.offset_m=
-binfo);
->>>> -    stl_p(bootinfo + MBI_MODS_COUNT, mbs.mb_mods_count); /* mods_co=
-unt */
->>>> +    stl_p(&bootinfo.mods_addr,  mbs.mb_buf_phys + mbs.offset_mbinfo=
-);
->>>> +    stl_p(&bootinfo.mods_count, mbs.mb_mods_count); /* mods_count *=
-/
->>>>        /* the kernel is where we want it to be now */
->>>> -    stl_p(bootinfo + MBI_FLAGS, MULTIBOOT_FLAGS_MEMORY
->>>> -                                | MULTIBOOT_FLAGS_BOOT_DEVICE
->>>> -                                | MULTIBOOT_FLAGS_CMDLINE
->>>> -                                | MULTIBOOT_FLAGS_MODULES
->>>> -                                | MULTIBOOT_FLAGS_MMAP
->>>> -                                | MULTIBOOT_FLAGS_BOOTLOADER);
->>>> -    stl_p(bootinfo + MBI_BOOT_DEVICE, 0x8000ffff); /* XXX: use the =
--boot switch? */
->>>> -    stl_p(bootinfo + MBI_MMAP_ADDR,   ADDR_E820_MAP);
->>>> +    stl_p(&bootinfo.flags, MULTIBOOT_INFO_MEMORY
->>>> +                           | MULTIBOOT_INFO_BOOTDEV
->>>> +                           | MULTIBOOT_INFO_CMDLINE
->>>> +                           | MULTIBOOT_INFO_MODS
->>>> +                           | MULTIBOOT_INFO_MEM_MAP
->>>> +                           | MULTIBOOT_INFO_BOOT_LOADER_NAME);
->>>> +    stl_p(&bootinfo.boot_device, 0x8000ffff); /* XXX: use the -boot=
- switch? */
->>>> +    stl_p(&bootinfo.mmap_addr, ADDR_E820_MAP);
->>>>        mb_debug("multiboot: mh_entry_addr =3D %#x\n", mh_entry_addr)=
-;
->>>>        mb_debug("           mb_buf_phys   =3D "TARGET_FMT_plx"\n", m=
-bs.mb_buf_phys);
->>>> @@ -371,7 +347,7 @@ int load_multiboot(FWCfgState *fw_cfg,
->>>>        mb_debug("           mb_mods_count =3D %d\n", mbs.mb_mods_cou=
-nt);
->>>>        /* save bootinfo off the stack */
->>>> -    mb_bootinfo_data =3D g_memdup(bootinfo, sizeof(bootinfo));
->>>> +    mb_bootinfo_data =3D g_memdup(&bootinfo, sizeof(bootinfo));
->>>>        /* Pass variables to option rom */
->>>>        fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, mh_entry_addr);
->>> <snip>
->>>> diff --git a/tests/multiboot/mmap.c b/tests/multiboot/mmap.c
->>>> index 766b003f38..9cba8b07e0 100644
->>>> --- a/tests/multiboot/mmap.c
->>>> +++ b/tests/multiboot/mmap.c
->>>> @@ -21,15 +21,17 @@
->>>>     */
->>>>    #include "libc.h"
->>>> -#include "multiboot.h"
->>>> +#include "../../hw/i386/multiboot_header.h"
->>> Suggestion: create a multiboot subdir under include, and put
->>> multiboot_header.h and other multiboot includes there.  This way you =
-can
->>> just #include "multiboot/multiboot_header.h" which seems cleaner to m=
-e than
->>> "../../hw/i386/multiboot_header.h"
->> Good point, but do we even have multiple header files for Multiboot to
->> justify a whole subdirectory?
-> I do not think there is a justification for it. +1 for keeping it in "/=
-include/"
->> There is include/hw/loader.h and include/elf.h, so I would suggest tha=
-t
->> we add the new header as either include/hw/multiboot.h or directly
->> include/multiboot.h.
-OK.=C2=A0 This makes the include list cleaner without having to add anoth=
-er=20
-subdirectory.
-
-... or put both multiboot header files under include/hw/i386 to keep=20
-them together in an existing, appropriate and more specific directory.
->> There is already ./hw/i386/multiboot.h file so it is going to be
->> confusing to have multiple files with the same name.
->>
->> I propose to rename ./hw/i386/multiboot.h to something like
->> ./hw/i386/multiboot_loader.h or ./hw/i386/load_multiboot.h
-Filename change sounds good.
-
-Also, to avoid confusion with tests/multiboot/multiboot.h, I suggest=20
-renaming that header file to tests/multiboot/multiboot_test.h
-
- =C2=A0=C2=A0=C2=A0 Thanks,
- =C2=A0=C2=A0=C2=A0 Jack
+Paolo
