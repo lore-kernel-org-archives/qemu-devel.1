@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uG-0003As-UK
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:34 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1ej3uY-0003QO-9i
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ej3uB-0004FN-07
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:32 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  6 Feb 2018 17:07:22 +0300
-Message-Id: <20180206140722.10110-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20180206140722.10110-1-vsementsov@virtuozzo.com>
-References: <20180206140722.10110-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 2/2] qapi: add block latency histogram interface
+	(envelope-from <arei.gonglei@huawei.com>) id 1ej3uS-0004Sm-Vl
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:50 -0500
+Received: from [45.249.212.35] (port=33460 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1ej3uS-0004Ql-BZ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 09:07:44 -0500
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Tue, 6 Feb 2018 22:07:19 +0800
+Message-ID: <1517926039-86416-1-git-send-email-arei.gonglei@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] rtc: placing RTC memory region outside BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,181 +24,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, vsementsov@virtuozzo.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, weidong.huang@huawei.com, peter.maydell@linaro.org, Gonglei <arei.gonglei@huawei.com>
 
-Set (and clear) histogram through new command
-block-latency-histogram-set and show new statistics in
-query-blockstats results.
+As windows guest use rtc as the clock source device,
+and access rtc frequently. Let's move the rtc memory
+region outside BQL to decrease overhead for windows guests.
+Meanwhile, adding a new lock to avoid different vCPUs
+access the RTC together.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+$ cat strace_c.sh
+strace -tt -p $1 -c -o result_$1.log &
+sleep $2
+pid=$(pidof strace)
+kill $pid
+cat result_$1.log
+
+Before appling this change:
+$ ./strace_c.sh 10528 30
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 93.87    0.119070          30      4000           ppoll
+  3.27    0.004148           2      2038           ioctl
+  2.66    0.003370           2      2014           futex
+  0.09    0.000113           1       106           read
+  0.09    0.000109           1       104           io_getevents
+  0.02    0.000029           1        30           poll
+  0.00    0.000000           0         1           write
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.126839                  8293           total
+
+After appling the change:
+$ ./strace_c.sh 23829 30
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 92.86    0.067441          16      4094           ppoll
+  4.85    0.003522           2      2136           ioctl
+  1.17    0.000850           4       189           futex
+  0.54    0.000395           2       202           read
+  0.52    0.000379           2       202           io_getevents
+  0.05    0.000037           1        30           poll
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.072624                  6853           total
+
+The futex call number decreases ~90.6% on an idle windows 7 guest.
+
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 ---
- qapi/block-core.json | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- block/qapi.c         | 31 ++++++++++++++++++++++++++
- blockdev.c           | 15 +++++++++++++
- 3 files changed, 107 insertions(+), 1 deletion(-)
+v2->v1:
+ a)Adding a new lock to avoid different vCPUs
+   access the RTC together. [Paolo]
+ b)Taking the BQL before raising the outbound IRQ line. [Peter]
+ c)Don't hold BQL if it was holden. [Peter]
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 8225308904..4706a934d9 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -451,6 +451,63 @@
-            'status': 'DirtyBitmapStatus'} }
- 
- ##
-+# @BlockLatencyHistogramInfo:
-+#
-+# Block latency histogram.
-+#
-+# @latency: list of latency points in microseconds. Equals to @latency parameter
-+#           of last called block-latency-histogram-set.
-+#
-+# @read: list of read-request counts corresponding to latency region.
-+#        len(@read) = len(@latency) + 1
-+#        @read[0] corresponds to latency region [0, @latency[0])
-+#        for 0 < i < len(@latency): @read[i] corresponds to latency region
-+#            [@latency[i-1], @latency[i])
-+#        @read.last_element corresponds to latency region
-+#            [@latency.last_element, +inf)
-+#
-+# @write: list of write-request counts (see @read semantics)
-+#
-+# @flush: list of flush-request counts (see @read semantics)
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockLatencyHistogramInfo',
-+  'data': {'latency': ['uint64'],
-+           'read': ['uint64'],
-+           'write': ['uint64'],
-+           'flush': ['uint64'] } }
-+
-+##
-+# @block-latency-histogram-set:
-+#
-+# Add latency histogram to block device. If latency histogram alredy exists for
-+# the device it will be removed and a new one created. Latency histogram may be
-+# quered through query-blockstats.
-+#
-+# @device: device name to set latency histogram for.
-+#
-+# @latency: list of latency points in microseconds. The sequcence must be
-+#           ascending, elements must be greater than zero. Histogram latency
-+#           regions would be
-+#           [0, @latency[0]), ..., [@latency[i], @latency[i+1]), ...,
-+#           [@latency.last_element, +inf)
-+#
-+# Returns: error if device is not found.
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "block-latency-histogram-set",
-+#      "arguments": { "device": "drive0",
-+#                     "latency": [500000, 1000000, 2000000] } }
-+# <- { "return": {} }
-+##
-+{ 'command': 'block-latency-histogram-set',
-+  'data': {'device': 'str', 'latency': ['uint64'] } }
-+
-+##
- # @BlockInfo:
- #
- # Block device information.  This structure describes a virtual device and
-@@ -730,6 +787,8 @@
- # @timed_stats: Statistics specific to the set of previously defined
- #               intervals of time (Since 2.5)
- #
-+# @latency-histogram: @BlockLatencyHistogramInfo. (Since 2.12)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'BlockDeviceStats',
-@@ -742,7 +801,8 @@
-            'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
-            'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
-            'account_invalid': 'bool', 'account_failed': 'bool',
--           'timed_stats': ['BlockDeviceTimedStats'] } }
-+           'timed_stats': ['BlockDeviceTimedStats'],
-+           '*latency-histogram': 'BlockLatencyHistogramInfo' } }
- 
- ##
- # @BlockStats:
-diff --git a/block/qapi.c b/block/qapi.c
-index fc10f0a565..715ed17a6b 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -389,6 +389,24 @@ static void bdrv_query_info(BlockBackend *blk, BlockInfo **p_info,
-     qapi_free_BlockInfo(info);
- }
- 
-+static uint64List *uint64_list(uint64_t *list, int size)
-+{
-+    int i;
-+    uint64List *out_list = NULL;
-+    uint64List **pout_list = &out_list;
-+
-+    for (i = 0; i < size; i++) {
-+        uint64List *entry = g_new(uint64List, 1);
-+        entry->value = list[i];
-+        *pout_list = entry;
-+        pout_list = &entry->next;
-+    }
-+
-+    *pout_list = NULL;
-+
-+    return out_list;
-+}
-+
- static void bdrv_query_blk_stats(BlockDeviceStats *ds, BlockBackend *blk)
- {
-     BlockAcctStats *stats = blk_get_stats(blk);
-@@ -454,6 +472,19 @@ static void bdrv_query_blk_stats(BlockDeviceStats *ds, BlockBackend *blk)
-         dev_stats->avg_wr_queue_depth =
-             block_acct_queue_depth(ts, BLOCK_ACCT_WRITE);
+ hw/timer/mc146818rtc.c | 55 ++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 47 insertions(+), 8 deletions(-)
+
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 35a05a6..f0a2a62 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -85,6 +85,7 @@ typedef struct RTCState {
+     uint16_t irq_reinject_on_ack_count;
+     uint32_t irq_coalesced;
+     uint32_t period;
++    QemuMutex rtc_lock;
+     QEMUTimer *coalesced_timer;
+     Notifier clock_reset_notifier;
+     LostTickPolicy lost_tick_policy;
+@@ -125,6 +126,36 @@ static void rtc_coalesced_timer_update(RTCState *s)
      }
-+
-+    ds->has_latency_histogram = stats->latency_histogram.points != NULL;
-+    if (ds->has_latency_histogram) {
-+        BlockLatencyHistogramInfo *info = g_new0(BlockLatencyHistogramInfo, 1);
-+        BlockLatencyHistogram *h = &stats->latency_histogram;
-+
-+        ds->latency_histogram = info;
-+
-+        info->latency = uint64_list(h->points, h->size - 1);
-+        info->read = uint64_list(h->histogram[BLOCK_ACCT_READ], h->size);
-+        info->write = uint64_list(h->histogram[BLOCK_ACCT_WRITE], h->size);
-+        info->flush = uint64_list(h->histogram[BLOCK_ACCT_FLUSH], h->size);
-+    }
  }
  
- static BlockStats *bdrv_query_bds_stats(BlockDriverState *bs,
-diff --git a/blockdev.c b/blockdev.c
-index 8e977eef11..dbf17aca0c 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -4176,6 +4176,21 @@ void qmp_x_blockdev_set_iothread(const char *node_name, StrOrNull *iothread,
-     aio_context_release(old_context);
- }
- 
-+void qmp_block_latency_histogram_set(const char *device, uint64List *latency,
-+                                     Error **errp)
++static void rtc_rasie_irq(RTCState *s)
 +{
-+    BlockBackend *blk = blk_by_name(device);
-+    if (!blk) {
-+        error_setg(errp, "Device '%s' not found", device);
-+        return;
++    bool unlocked = !qemu_mutex_iothread_locked();
++
++    if (unlocked) {
++        qemu_mutex_lock_iothread();
 +    }
 +
-+    if (block_latency_histogram_set(blk_get_stats(blk), latency) < 0) {
-+        error_setg(errp, "Invalid latency array");
-+        return;
++    qemu_irq_raise(s->irq);
++
++    if (unlocked) {
++        qemu_mutex_unlock_iothread();
 +    }
 +}
 +
- QemuOptsList qemu_common_drive_opts = {
-     .name = "drive",
-     .head = QTAILQ_HEAD_INITIALIZER(qemu_common_drive_opts.head),
++static void rtc_lower_irq(RTCState *s)
++{
++    bool unlocked = !qemu_mutex_iothread_locked();
++
++    if (unlocked) {
++        qemu_mutex_lock_iothread();
++    }
++
++    qemu_irq_lower(s->irq);
++
++    if (unlocked) {
++        qemu_mutex_unlock_iothread();
++    }
++}
++
+ static QLIST_HEAD(, RTCState) rtc_devices =
+     QLIST_HEAD_INITIALIZER(rtc_devices);
+ 
+@@ -141,7 +172,7 @@ void qmp_rtc_reset_reinjection(Error **errp)
+ static bool rtc_policy_slew_deliver_irq(RTCState *s)
+ {
+     apic_reset_irq_delivered();
+-    qemu_irq_raise(s->irq);
++    rtc_rasie_irq(s);
+     return apic_get_irq_delivered();
+ }
+ 
+@@ -277,8 +308,9 @@ static void rtc_periodic_timer(void *opaque)
+                 DPRINTF_C("cmos: coalesced irqs increased to %d\n",
+                           s->irq_coalesced);
+             }
+-        } else
+-            qemu_irq_raise(s->irq);
++        } else {
++            rtc_rasie_irq(s);
++        }
+     }
+ }
+ 
+@@ -459,7 +491,7 @@ static void rtc_update_timer(void *opaque)
+     s->cmos_data[RTC_REG_C] |= irqs;
+     if ((new_irqs & s->cmos_data[RTC_REG_B]) != 0) {
+         s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
+-        qemu_irq_raise(s->irq);
++        rtc_rasie_irq(s);
+     }
+     check_update_timer(s);
+ }
+@@ -471,6 +503,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+     uint32_t old_period;
+     bool update_periodic_timer;
+ 
++    qemu_mutex_lock(&s->rtc_lock);
+     if ((addr & 1) == 0) {
+         s->cmos_index = data & 0x7f;
+     } else {
+@@ -560,10 +593,10 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+              * becomes enabled, raise an interrupt immediately.  */
+             if (data & s->cmos_data[RTC_REG_C] & REG_C_MASK) {
+                 s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
+-                qemu_irq_raise(s->irq);
++                rtc_rasie_irq(s);
+             } else {
+                 s->cmos_data[RTC_REG_C] &= ~REG_C_IRQF;
+-                qemu_irq_lower(s->irq);
++                rtc_lower_irq(s);
+             }
+             s->cmos_data[RTC_REG_B] = data;
+ 
+@@ -583,6 +616,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+             break;
+         }
+     }
++    qemu_mutex_unlock(&s->rtc_lock);
+ }
+ 
+ static inline int rtc_to_bcd(RTCState *s, int a)
+@@ -710,6 +744,7 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
+     if ((addr & 1) == 0) {
+         return 0xff;
+     } else {
++        qemu_mutex_lock(&s->rtc_lock);
+         switch(s->cmos_index) {
+ 	case RTC_IBM_PS2_CENTURY_BYTE:
+             s->cmos_index = RTC_CENTURY;
+@@ -737,7 +772,7 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
+             break;
+         case RTC_REG_C:
+             ret = s->cmos_data[s->cmos_index];
+-            qemu_irq_lower(s->irq);
++            rtc_lower_irq(s);
+             s->cmos_data[RTC_REG_C] = 0x00;
+             if (ret & (REG_C_UF | REG_C_AF)) {
+                 check_update_timer(s);
+@@ -762,6 +797,7 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
+         }
+         CMOS_DPRINTF("cmos: read index=0x%02x val=0x%02x\n",
+                      s->cmos_index, ret);
++        qemu_mutex_unlock(&s->rtc_lock);
+         return ret;
+     }
+ }
+@@ -909,7 +945,7 @@ static void rtc_reset(void *opaque)
+     s->cmos_data[RTC_REG_C] &= ~(REG_C_UF | REG_C_IRQF | REG_C_PF | REG_C_AF);
+     check_update_timer(s);
+ 
+-    qemu_irq_lower(s->irq);
++    rtc_lower_irq(s);
+ 
+     if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
+         s->irq_coalesced = 0;
+@@ -960,6 +996,8 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
+ 
+     rtc_set_date_from_host(isadev);
+ 
++    qemu_mutex_init(&s->rtc_lock);
++
+     switch (s->lost_tick_policy) {
+ #ifdef TARGET_I386
+     case LOST_TICK_POLICY_SLEW:
+@@ -986,6 +1024,7 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
+     qemu_register_suspend_notifier(&s->suspend_notifier);
+ 
+     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
++    memory_region_clear_global_locking(&s->io);
+     isa_register_ioport(isadev, &s->io, base);
+ 
+     qdev_set_legacy_instance_id(dev, base, 3);
 -- 
-2.11.1
+1.8.3.1
