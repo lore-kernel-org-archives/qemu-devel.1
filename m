@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eixrB-0004gT-2q
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:39:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1eixwV-0007V8-Km
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:45:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eixr7-000346-Uz
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:39:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52732)
+	(envelope-from <armbru@redhat.com>) id 1eixwS-0007b3-C5
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:45:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eixr7-00033c-Nc
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:39:53 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CC1128221
-	for <qemu-devel@nongnu.org>; Tue,  6 Feb 2018 07:39:52 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue,  6 Feb 2018 15:39:33 +0800
-Message-Id: <20180206073933.4071-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] pci/bus: let it has higher migration
- priority
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eixwR-0007aZ-SJ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 02:45:24 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-7-armbru@redhat.com>
+	<05068311-b8db-69b0-9c86-50839994f630@redhat.com>
+	<87lgga4f7s.fsf@dusky.pond.sub.org>
+	<0e3ea662-418e-0574-3817-434b35e85887@redhat.com>
+Date: Tue, 06 Feb 2018 08:45:18 +0100
+In-Reply-To: <0e3ea662-418e-0574-3817-434b35e85887@redhat.com> (Eric Blake's
+	message of "Mon, 5 Feb 2018 09:52:41 -0600")
+Message-ID: <87a7wmfto1.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 06/21] qapi-gen: New common driver for
+ code and doc generators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,167 +31,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-In the past, we prioritized IOMMU migration so that we have such a
-priority order:
+Eric Blake <eblake@redhat.com> writes:
 
-    IOMMU > PCI Devices
+> On 02/03/2018 03:03 AM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> On 02/02/2018 07:03 AM, Markus Armbruster wrote:
+>>>> Whenever qapi-schema.json changes, we run six programs eleven times to
+>>>> update eleven files.  This is silly.  Replace the six programs by a
+>>>> single program that spits out all eleven files.
+>>>
+>>> Yay, about time!
+>>>
+>>> One program, but still invoked multiple times:
+>>>
+>
+>>>>  rename scripts/{qapi2texi.py => qapi/doc.py} (92%)
+>>>>  mode change 100755 => 100644
+>>>
+>>> Unintinentional?  We're inconsistent on which of our *.py files are
+>>> executable in git.  Does it matter whether a file that is designed for
+>>> use as a module is marked executable (if so, perhaps 5/21 should be
+>>> adding the x attribute on other files, rather than this patch removing
+>>> it on the doc generator).
+>> 
+>> qapi2texi.py is no longer runnable as a standalone program after this
+>> patch.
+>> 
+>> So are qapi-{commands,events,introspect,types,visit}.py, but they never
+>> had the executable bit set.
+>
+> Okay, so dropping the bit consistently makes sense; still, a mention in
+> the commit message wouldn't hurt.
 
-When migrating a guest with both vIOMMU and a pcie-root-port, we'll
-always migrate vIOMMU first, since pci buses will be seen to have the
-same priority of general PCI devices.
+Can do.
 
-That's problematic.
+>>>> +++ b/Makefile
+>>>
+>>>> +qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
+>>>> +qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h \
+>>>> +qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal.c \
+>>>> +qga/qapi-generated/qga-qapi.texi: \
+>>>> +qga/qapi-generated/qapi-gen-timestamp ;
+>>>> +qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
+>>>> +	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+>>>> +		-o qga/qapi-generated -p "qga-" $<, \
+>>>> +		"GEN","$(@:%-timestamp=%)")
+>>>> +	@>$@
+>>>
+>>> once for qga,
+>> 
+>> That's the QAPI/QGA schema.  The commit message talks about the QAPI/QMP
+>> schema.  I wish the two weren't named the same.
+>
+> 7 files here,...
+>
+>> 
+>> Modularization might make fusing them possible.  Whether that's a good
+>> idea I don't know.
+>> 
+>>>> +qapi-types.c qapi-types.h \
+>>>> +qapi-visit.c qapi-visit.h \
+>>>> +qmp-commands.h qmp-marshal.c \
+>>>> +qapi-event.c qapi-event.h \
+>>>> +qmp-introspect.h qmp-introspect.c \
+>>>> +qapi.texi: \
+>>>> +qapi-gen-timestamp ;
+>>>> +qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
+>>>> +	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+>>>> +		-o "." -b $<, \
+>>>> +		"GEN","$(@:%-timestamp=%)")
+>>>> +	@>$@
+>>>
+>>> and again for the main level.  Still, a definite improvement!
+>
+> 11 files here,...
+>
+>> 
+>> Perhaps I can find a way to clarify the commit message.
+>> 
+>
+> [1]
+>
+>
+>>>> -def main(argv):
+>>>> -    (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
+>>>> -
+>>>> -    blurb = '''
+>>>> - * Schema-defined QAPI/QMP commands
+>>>> -'''
+>>>> -
+>>>> +def gen_commands(schema, output_dir, prefix):
+>>>> +    blurb = ' * Schema-defined QAPI/QMP commands'
+>>>
+>>> Some churn on the definition of blurb; worth tidying this in the
+>>> introduction earlier in the series?
+>> 
+>> Doesn't seem worth a separate patch, but I can try to reshuffle things
+>> to reduce churn.
+>
+> Yeah, my question was more about the conversion between multiline
+> '''...''' to single-line '...'; why not just use the single-line
+> construct earlier in the series when introducing the blurb variable.
 
-The thing is that PCI bus number information is stored in the root port,
-and that is needed by vIOMMU during post_load(), e.g., to figure out
-context entry for a device.  If we don't have correct bus numbers for
-devices, we won't be able to recover device state of the DMAR memory
-regions, and things will be messed up.
+Introduced in PATCH 01:
 
-So let's boost the PCIe root ports to be even with higher priority:
+    -c_comment = '''
+    -/*
+    - * schema-defined QMP->QAPI command dispatch
+    +blurb = '''
+    + * Schema-defined QAPI/QMP commands
+      *
+      * Copyright IBM, Corp. 2011
+      *
+      * Authors:
+      *  Anthony Liguori   <aliguori@us.ibm.com>
+    - *
+    - * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
+    - * See the COPYING.LIB file in the top-level directory.
+    - *
+    - */
+    -'''
 
-   PCIe Root Port > IOMMU > PCI Devices
+Shortened in PATCH 02:
 
-A smoke test shows that this patch fixes bug 1538953.
+     blurb = '''
+      * Schema-defined QAPI/QMP commands
+    - *
+    - * Copyright IBM, Corp. 2011
+    - *
+    - * Authors:
+    - *  Anthony Liguori   <aliguori@us.ibm.com>
+     '''
 
-Also, apply this rule to all the PCI bus/bridge devices: ioh3420,
-xio3130_downstream, xio3130_upstream, pcie_pci_bridge, pci-pci bridge,
-i82801b11.
+Reformatted in PATCH 06 (see above).
 
-I noted that we set pcie_pci_bridge_dev_vmstate twice.  Clean that up
-together.
+Moved in PATCH 16 to visitor's __init__ for types and visits (the rest
+aren't implemented, yet):
 
-CC: Alex Williamson <alex.williamson@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Juan Quintela <quintela@redhat.com>
-CC: Laurent Vivier <lvivier@redhat.com>
-Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1538953
-Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
-v2:
-- add more devices that Marcel mentioned
-- rename to MIG_PRI_PCI_BUS
-- remove one useless line in existing code
----
- hw/pci-bridge/gen_pcie_root_port.c | 1 +
- hw/pci-bridge/i82801b11.c          | 1 +
- hw/pci-bridge/ioh3420.c            | 1 +
- hw/pci-bridge/pci_bridge_dev.c     | 1 +
- hw/pci-bridge/pcie_pci_bridge.c    | 2 +-
- hw/pci-bridge/xio3130_downstream.c | 1 +
- hw/pci-bridge/xio3130_upstream.c   | 1 +
- include/migration/vmstate.h        | 1 +
- 8 files changed, 8 insertions(+), 1 deletion(-)
+     class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+    -    def __init__(self, opt_builtins):
+    +    def __init__(self, opt_builtins, prefix):
+             self._opt_builtins = opt_builtins
+    -        self.decl = None
+    -        self.defn = None
+    -        self._fwdecl = None
+    -        self._btin = None
+    +        self._prefix = prefix
+    +        blurb = ' * Schema-defined QAPI types'
+    +        self._genc = QAPIGenC(blurb, __doc__)
+    +        self._genh = QAPIGenH(blurb, __doc__)
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index 0e2f2e8bf1..435fbaa60e 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -101,6 +101,7 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
- 
- static const VMStateDescription vmstate_rp_dev = {
-     .name = "pcie-root-port",
-+    .priority = MIG_PRI_PCI_BUS,
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .post_load = pcie_cap_slot_post_load,
-diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-index cb522bf30c..60df9b2c96 100644
---- a/hw/pci-bridge/i82801b11.c
-+++ b/hw/pci-bridge/i82801b11.c
-@@ -80,6 +80,7 @@ err_bridge:
- 
- static const VMStateDescription i82801b11_bridge_dev_vmstate = {
-     .name = "i82801b11_bridge",
-+    .priority = MIG_PRI_PCI_BUS,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
-         VMSTATE_END_OF_LIST()
-diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-index 5f56a2feb6..a7bfbdd238 100644
---- a/hw/pci-bridge/ioh3420.c
-+++ b/hw/pci-bridge/ioh3420.c
-@@ -83,6 +83,7 @@ static void ioh3420_interrupts_uninit(PCIDevice *d)
- 
- static const VMStateDescription vmstate_ioh3420 = {
-     .name = "ioh-3240-express-root-port",
-+    .priority = MIG_PRI_PCI_BUS,
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .post_load = pcie_cap_slot_post_load,
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-index d56f6638c2..b2d861d216 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -174,6 +174,7 @@ static bool pci_device_shpc_present(void *opaque, int version_id)
- 
- static const VMStateDescription pci_bridge_dev_vmstate = {
-     .name = "pci_bridge",
-+    .priority = MIG_PRI_PCI_BUS,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
-         SHPC_VMSTATE(shpc, PCIDevice, pci_device_shpc_present),
-diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-index a4d827c99d..e5ac7974cf 100644
---- a/hw/pci-bridge/pcie_pci_bridge.c
-+++ b/hw/pci-bridge/pcie_pci_bridge.c
-@@ -129,6 +129,7 @@ static Property pcie_pci_bridge_dev_properties[] = {
- 
- static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
-         .name = TYPE_PCIE_PCI_BRIDGE_DEV,
-+        .priority = MIG_PRI_PCI_BUS,
-         .fields = (VMStateField[]) {
-             VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
-             SHPC_VMSTATE(shpc, PCIDevice, NULL),
-@@ -178,7 +179,6 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
-     k->config_write = pcie_pci_bridge_write_config;
-     dc->vmsd = &pcie_pci_bridge_dev_vmstate;
-     dc->props = pcie_pci_bridge_dev_properties;
--    dc->vmsd = &pcie_pci_bridge_dev_vmstate;
-     dc->reset = &pcie_pci_bridge_reset;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     hc->plug = pcie_pci_bridge_hotplug_cb;
-diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-index 1e09d2afb7..4dd2e65118 100644
---- a/hw/pci-bridge/xio3130_downstream.c
-+++ b/hw/pci-bridge/xio3130_downstream.c
-@@ -161,6 +161,7 @@ static Property xio3130_downstream_props[] = {
- 
- static const VMStateDescription vmstate_xio3130_downstream = {
-     .name = "xio3130-express-downstream-port",
-+    .priority = MIG_PRI_PCI_BUS,
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .post_load = pcie_cap_slot_post_load,
-diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
-index 227997ce46..c5f02a6ee8 100644
---- a/hw/pci-bridge/xio3130_upstream.c
-+++ b/hw/pci-bridge/xio3130_upstream.c
-@@ -133,6 +133,7 @@ PCIEPort *xio3130_upstream_init(PCIBus *bus, int devfn, bool multifunction,
- 
- static const VMStateDescription vmstate_xio3130_upstream = {
-     .name = "xio3130-express-upstream-port",
-+    .priority = MIG_PRI_PCI_BUS,
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 8c3889433c..df463fd33d 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -148,6 +148,7 @@ enum VMStateFlags {
- typedef enum {
-     MIG_PRI_DEFAULT = 0,
-     MIG_PRI_IOMMU,              /* Must happen before PCI devices */
-+    MIG_PRI_PCI_BUS,            /* Must happen before IOMMU */
-     MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
-     MIG_PRI_GICV3,              /* Must happen before the ITS */
-     MIG_PRI_MAX,
--- 
-2.14.3
+Variable eliminated there in PATCH 17:
+
+    -        blurb = ' * Schema-defined QAPI types'
+    -        self._genc = QAPIGenC(blurb, __doc__)
+    -        self._genh = QAPIGenH(blurb, __doc__)
+    +        self._module = {}
+    +        self._add_module(None, ' * Built-in QAPI types')
+
+I could delay the reformatting until PATCH 16, or do it in PATCH 02.
+Feels like a wash to me, but if you have a preference...
+
+> You are right that creating blurb didn't need a separate patch, just
+> less churn over the series.
+>
+>>>>  
+>>>> -qapi-py = $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.py
+>>>> +# TODO don't duplicate $(SRC_PATH)/Makefile's qapi-py here
+>>>> +qapi-py = $(SRC_PATH)/scripts/qapi/commands.py \
+>>>> +$(SRC_PATH)/scripts/qapi/events.py \
+>>>> +$(SRC_PATH)/scripts/qapi/introspect.py \
+>>>> +$(SRC_PATH)/scripts/qapi/types.py \
+>>>> +$(SRC_PATH)/scripts/qapi/visit.py \
+>>>> +$(SRC_PATH)/scripts/qapi/common.py \
+>>>> +$(SRC_PATH)/scripts/qapi/doc.py \
+>>>> +$(SRC_PATH)/scripts/ordereddict.py \
+>>>> +$(SRC_PATH)/scripts/qapi-gen.py
+>>>
+>>> So, were you counting these in the 11 generated files mentioned in the
+>>> commit message? :)
+>> 
+>> I'm not sure I understand what you mean here...
+>
+> [1] and 9 more files.  So, the commit message only mentioned the 11 QMP
+> files, rather than all 27 (if I counted right) QAPI generated files.  My
+> comments were trying to point out that you simplified more than just the
+> QMP code generation into fewer script invocations, and the counts looked
+> off since out of the three spots converted, only one of the spots had 11
+> files.
+
+The commit message talks only about the QAPI/QMP schema.  It's confusing
+because our poor taste in file names creates ambiguity: does
+qapi-schema.json refer to ./qapi-schema.json (i.e. the QAPI/QMP one),
+qga/qapi-schema.json, or both?
+
+Perhaps I should rename qapi-schema.json to qapi/schema.json.
+
+The commit message needs a note along the lines of "same for
+qga/qapi-schema.json".
