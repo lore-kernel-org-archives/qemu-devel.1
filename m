@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ej2gz-00010x-IY
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:49:46 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ej2lB-0003ul-P9
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ej2gw-0004vU-Gs
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:49:45 -0500
-Date: Tue, 6 Feb 2018 13:49:34 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180206134934.1b1bb2b3.cohuck@redhat.com>
-In-Reply-To: <20180206074622.157812-1-borntraeger@de.ibm.com>
-References: <20180206074622.157812-1-borntraeger@de.ibm.com>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ej2l7-00083r-37
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:54:05 -0500
+Received: from [45.249.212.35] (port=42796 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1ej2l6-0007xc-N1
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:54:01 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Tue, 6 Feb 2018 20:53:44 +0800
+Message-ID: <1517921624-14756-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/1] s390x/cpu: expose the guest crash
- information
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4] tap: setting error appropriately when
+ calling net_init_tap_one()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, jianjay.zhou@huawei.com
 
-On Tue,  6 Feb 2018 07:46:22 +0000
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+If netdev_add tap,id=net0,...,vhost=on failed in net_init_tap_one(),
+the followed up device_add virtio-net-pci,netdev=net0 will fail
+too, prints:
 
-> This patch is the s390 implementation of guest crash information,
-> similar to commit d187e08dc4 ("i386/cpu: add crash-information QOM
-> property") and the related commits. We will detect several crash
-> reasons, with the "disabled wait" being the most important one, since
-> this is used by all s390 guests as a "panic like" notification.
-> 
-> Demonstrate these ways with examples as follows.
-> 
->   1. crash-information QOM property;
-> 
->   Run qemu with -qmp unix:qmp-sock,server, then use utility "qmp-shell"
->   to execute "qom-get" command, and might get the result like,
-> 
->   (QEMU) qom-get path=/machine/cpu[0]/ property=crash-information
->   {"return": {"psw-addr": 1105350, "psw-mask": 562956395872256, "reason":
->    "disabled wait", "type": "s390"}}
+   TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
+   ioctl() failed: Bad file descriptor
 
-Hm, for me cpu0 shows up under /machine/unattached/device[0].
+The reason is that the fd of tap is closed when error occured after
+calling net_init_tap_one().
 
-> 
->   2. GUEST_PANICKED event reporting;
-> 
->   Run qemu with a socket option, and telnet or nc to that,
->   -chardev socket,id=qmp,port=4444,host=localhost,server \
->   -mon chardev=qmp,mode=control,pretty=on \
->   Negotiating the mode by { "execute": "qmp_capabilities" }, and the crash
->   information will be reported on a guest crash event like,
-> 
->   {
->       "timestamp": {
->           "seconds": 1499931739,
->           "microseconds": 961296
->       },
->       "event": "GUEST_PANICKED",
->       "data": {
->           "action": "pause",
->           "info": {
->               "psw-addr": 1105350,
->               "reason": "disabled wait",
->               "psw-mask": 562956395872256,
->               "type": "s390"
->           }
->       }
->   }
-> 
->   3. log;
-> 
->   Run qemu with the parameters: -D <logfile> -d guest_errors, to
->   specify the logfile and log item. The results might be,
-> 
->   Guest crashed
->   S390 crash parameters: (0x0000100000000000 0x0000000000000006)
->   S390 crash reason: operation exception loop
-> 
-> Co-authored-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  qapi/run-state.json   | 27 ++++++++++++++++++++++--
->  target/s390x/cpu.c    | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  target/s390x/cpu.h    | 11 ++++++++++
->  target/s390x/helper.c |  5 ++++-
->  target/s390x/kvm.c    | 15 +++++++-------
->  vl.c                  |  6 ++++++
->  6 files changed, 110 insertions(+), 11 deletions(-)
+The fd should be closed when calling net_init_tap_one failed:
+   - if tap_set_sndbuf() failed
+   - if tap_set_sndbuf() succeeded but vhost failed to open or
+     initialize with vhostforce flag on
+The fd should not be closed just because vhost failed to open or
+initialize but without vhostforce flag. So the followed up
+device_add can fall back to userspace virtio successfully.
 
-Looks good to me. Will apply, but waiting for an ack/review.
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+---
+v4: - reduce duplication
+    - close the fd by caller
+    - tweak the title
+
+v3: - set errp appropriately
+---
+ include/net/vhost_net.h |  3 +++
+ net/tap.c               | 24 ++++++++++++++++++------
+ 2 files changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+index afc1499..77e4739 100644
+--- a/include/net/vhost_net.h
++++ b/include/net/vhost_net.h
+@@ -4,6 +4,9 @@
+ #include "net/net.h"
+ #include "hw/virtio/vhost-backend.h"
+ 
++#define VHOST_NET_INIT_FAILED \
++    "vhost-net requested but could not be initialized"
++
+ struct vhost_net;
+ typedef struct vhost_net VHostNetState;
+ 
+diff --git a/net/tap.c b/net/tap.c
+index 979e622..14d230f 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -686,14 +686,23 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+         if (vhostfdname) {
+             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
+             if (vhostfd == -1) {
+-                error_propagate(errp, err);
++                if (tap->has_vhostforce && tap->vhostforce) {
++                    error_propagate(errp, err);
++                } else {
++                    warn_report_err(err);
++                }
+                 return;
+             }
+         } else {
+             vhostfd = open("/dev/vhost-net", O_RDWR);
+             if (vhostfd < 0) {
+-                error_setg_errno(errp, errno,
+-                                 "tap: open vhost char device failed");
++                if (tap->has_vhostforce && tap->vhostforce) {
++                    error_setg_errno(errp, errno,
++                                     "tap: open vhost char device failed");
++                } else {
++                    warn_report("tap: open vhost char device failed: %s",
++                                strerror(errno));
++                }
+                 return;
+             }
+             fcntl(vhostfd, F_SETFL, O_NONBLOCK);
+@@ -702,12 +711,15 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+ 
+         s->vhost_net = vhost_net_init(&options);
+         if (!s->vhost_net) {
+-            error_setg(errp,
+-                       "vhost-net requested but could not be initialized");
++            if (tap->has_vhostforce && tap->vhostforce) {
++                error_setg(errp, VHOST_NET_INIT_FAILED);
++            } else {
++                warn_report(VHOST_NET_INIT_FAILED);
++            }
+             return;
+         }
+     } else if (vhostfdname) {
+-        error_setg(errp, "vhostfd(s)= is not valid without vhost");
++        warn_report("vhostfd(s)= is not valid without vhost");
+     }
+ }
+ 
+-- 
+1.8.3.1
