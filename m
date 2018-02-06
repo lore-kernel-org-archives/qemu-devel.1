@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9u3-00010s-7e
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:44 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9u5-00011K-Gi
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ej9tz-0003Cz-6k
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:42 -0500
-Received: from mail-db5eur01on0101.outbound.protection.outlook.com
-	([104.47.2.101]:55583
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	(envelope-from <rkagan@virtuozzo.com>) id 1ej9u2-0003Ed-5p
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:45 -0500
+Received: from mail-eopbgr00120.outbound.protection.outlook.com
+	([40.107.0.120]:37069
+	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ej9ty-0003Cf-SF
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:39 -0500
+	id 1ej9u1-0003E0-Rq
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 15:31:42 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Feb 2018 23:30:31 +0300
-Message-Id: <20180206203048.11096-18-rkagan@virtuozzo.com>
+Date: Tue,  6 Feb 2018 23:30:32 +0300
+Message-Id: <20180206203048.11096-19-rkagan@virtuozzo.com>
 In-Reply-To: <20180206203048.11096-1-rkagan@virtuozzo.com>
 References: <20180206203048.11096-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 17/34] [not to commit] import
- HYPERV_EVENTFD stuff from kernel
+Subject: [Qemu-devel] [RFC PATCH 18/34] hyperv: add support for
+ KVM_HYPERV_EVENTFD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +32,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>, Ben Warren <ben@skyportsystems.com>, si-wei liu <si-wei.liu@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
-Allow to build and test HYPERV_EVENTD until it comes through the regular
-kernel headers import.
+When setting up a notifier for Hyper-V event connection, attempt to use
+the KVM-assisted one first, and fall back to userspace handling of the
+hypercall if the kernel doesn't provide the requested feature.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- linux-headers/linux/kvm.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ include/sysemu/kvm.h |  1 +
+ accel/kvm/kvm-all.c  | 15 +++++++++++++++
+ target/i386/hyperv.c | 21 ++++++++++++++++++++-
+ 3 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index d92c9b2f0e..47100cb6a3 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -934,6 +934,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_AIS_MIGRATION 150
- #define KVM_CAP_PPC_GET_CPU_CHAR 151
- #define KVM_CAP_S390_BPB 152
-+#define KVM_CAP_HYPERV_EVENTFD 153
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index bbf12a1723..70ad0a54b7 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -496,6 +496,7 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi);
+ void kvm_pc_gsi_handler(void *opaque, int n, int level);
+ void kvm_pc_setup_irq_routing(bool pci_enabled);
+ void kvm_init_irq_routing(KVMState *s);
++int kvm_set_hv_event_notifier(KVMState *s, uint32_t conn_id, EventNotifier *n);
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ /**
+  * kvm_arch_irqchip_create:
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f290f487a5..c3ba87b701 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1423,6 +1423,21 @@ static void kvm_irqchip_create(MachineState *machine, KVMState *s)
+     s->gsimap = g_hash_table_new(g_direct_hash, g_direct_equal);
+ }
  
-@@ -1363,6 +1364,9 @@ struct kvm_s390_ucas_mapping {
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
- 
-+/* Available with KVM_CAP_HYPERV_EVENTFD */
-+#define KVM_HYPERV_EVENTFD        _IOW(KVMIO,  0xbd, struct kvm_hyperv_eventfd)
++int kvm_set_hv_event_notifier(KVMState *s, uint32_t conn_id, EventNotifier *n)
++{
++    struct kvm_hyperv_eventfd hvevfd = {
++        .conn_id = conn_id,
++        .fd = n ? event_notifier_get_fd(n) : -1,
++        .flags = n ? 0 : KVM_HYPERV_EVENTFD_DEASSIGN,
++    };
 +
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
- #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-@@ -1423,4 +1427,14 @@ struct kvm_assigned_msix_entry {
- #define KVM_ARM_DEV_EL1_PTIMER		(1 << 1)
- #define KVM_ARM_DEV_PMU			(1 << 2)
++    if (!kvm_check_extension(s, KVM_CAP_HYPERV_EVENTFD)) {
++        return -ENOSYS;
++    }
++
++    return kvm_vm_ioctl(s, KVM_HYPERV_EVENTFD, &hvevfd);
++}
++
+ /* Find number of supported CPUs using the recommended
+  * procedure from the kernel API documentation to cope with
+  * older kernels that may be missing capabilities.
+diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
+index e43cbb9322..63dcb23fa8 100644
+--- a/target/i386/hyperv.c
++++ b/target/i386/hyperv.c
+@@ -313,7 +313,8 @@ unlock:
+     return ret;
+ }
  
-+struct kvm_hyperv_eventfd {
-+	__u32 conn_id;
-+	__s32 fd;
-+	__u32 flags;
-+	__u32 padding[3];
-+};
+-int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier)
++static int hyperv_set_evt_notifier_userspace(uint32_t conn_id,
++                                             EventNotifier *notifier)
+ {
+     int ret;
+     EvtHandler *eh;
+@@ -346,6 +347,24 @@ unlock:
+     return ret;
+ }
+ 
++static bool hv_evt_notifier_userspace;
 +
-+#define KVM_HYPERV_CONN_ID_MASK		0x00ffffff
-+#define KVM_HYPERV_EVENTFD_DEASSIGN	(1 << 0)
++int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier)
++{
++    if (!hv_evt_notifier_userspace) {
++        int ret = kvm_set_hv_event_notifier(kvm_state, conn_id, notifier);
++        if (ret != -ENOSYS) {
++            return ret;
++        }
 +
- #endif /* __LINUX_KVM_H */
++        hv_evt_notifier_userspace = true;
++        warn_report("Hyper-V event signaling in KVM not supported; "
++                    "using slower userspace hypercall processing");
++    }
++
++    return hyperv_set_evt_notifier_userspace(conn_id, notifier);
++}
++
+ static uint64_t hvcall_post_message(uint64_t param, bool fast)
+ {
+     uint64_t ret;
 -- 
 2.14.3
