@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ej2EX-0008T0-Vf
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:20:29 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ej2Gz-0001iu-Fd
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:22:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ej2EV-0005mv-RT
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:20:21 -0500
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-11-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA-40ucm8WZOEJC_1r4MdFXEPuX=GM2FC3hKZamLbijM7w@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <bdb379f2-5272-dd5c-056d-da487dd21500@redhat.com>
-Date: Tue, 6 Feb 2018 13:19:32 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ej2Gu-0006kd-5S
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:22:53 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:37753)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ej2Gt-0006kW-Sn
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 07:22:48 -0500
+Received: by mail-qt0-x242.google.com with SMTP id s27so1886907qts.4
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 04:22:47 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180123020820.1288-1-f4bug@amsat.org>
+	<0090cd85-3277-3c8c-5399-0681bbe2ab86@amsat.org>
+	<CAKmqyKMA9RteZfQruGj9zhtOe_Sm4XnL7U-CtkXW4Pjd7pRVRQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6a429aa1-4f12-20a1-8d37-834998e5dce5@amsat.org>
+Date: Tue, 6 Feb 2018 09:22:40 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-40ucm8WZOEJC_1r4MdFXEPuX=GM2FC3hKZamLbijM7w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 10/20] hw/arm/smmuv3: Implement
- translate callback
+In-Reply-To: <CAKmqyKMA9RteZfQruGj9zhtOe_Sm4XnL7U-CtkXW4Pjd7pRVRQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="SBWo8s5cCr3JvVyYOBDxmyAX9g7GORtgg"
+Subject: Re: [Qemu-devel] [PATCH v9 00/16] SDHCI: clean v1/v2 Specs (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,315 +36,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Krzysztof Kozlowski <krzk@kernel.org>, Kevin O'Connor <kevin@koconnor.net>, Marcel Apfelbaum <marcel@redhat.com>
 
-Hi Peter,
-On 09/10/17 19:45, Peter Maydell wrote:
-> On 1 September 2017 at 18:21, Eric Auger <eric.auger@redhat.com> wrote:
->> This patch implements the IOMMU Memory Region translate()
->> callback. Most of the code relates to the translation
->> configuration decoding and check (STE, CD).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SBWo8s5cCr3JvVyYOBDxmyAX9g7GORtgg
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Alistair Francis <alistair.francis@xilinx.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Kevin O'Connor <kevin@koconnor.net>,
+ Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <6a429aa1-4f12-20a1-8d37-834998e5dce5@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v9 00/16] SDHCI: clean v1/v2 Specs (part 2)
+References: <20180123020820.1288-1-f4bug@amsat.org>
+ <0090cd85-3277-3c8c-5399-0681bbe2ab86@amsat.org>
+ <CAKmqyKMA9RteZfQruGj9zhtOe_Sm4XnL7U-CtkXW4Pjd7pRVRQ@mail.gmail.com>
+In-Reply-To: <CAKmqyKMA9RteZfQruGj9zhtOe_Sm4XnL7U-CtkXW4Pjd7pRVRQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/31/2018 01:26 PM, Alistair Francis wrote:
+> On Wed, Jan 31, 2018 at 6:09 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org> wrote:
+>> ping?
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/arm/smmuv3-internal.h | 182 +++++++++++++++++++++++-
->>  hw/arm/smmuv3.c          | 351 ++++++++++++++++++++++++++++++++++++++++++++++-
->>  hw/arm/trace-events      |   9 ++
->>  3 files changed, 537 insertions(+), 5 deletions(-)
+>> Patches missing review: 2 (PCI qtesting),11,13,15
+>=20
+> Sorry about the slowness. Besides 2 they should be all reviewed now,
+> let me know if anything else needs to be done.
+
+Thanks for reviewing the whole series!
+
+> As for 2 I don't have much experience with Qtest, I'll try to go over
+> it, but ideally someone who knows Qtest should look at it.
+
+Yes. This patch is provided for completeness but is not
+required/blocking. I can split it away for later and respin.
+
+Paolo/Stefan do you mind reviewing patch #2?
+It uses the qpci API to access the SDHCI via PCI, as suggested
+2 months ago when I started SDHCI qtesting.
+
+Thanks,
+
+Phil.
+
+>> On 01/22/2018 11:08 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Since v8:
+>>> - we keep the 'capareg' property, this simplify a lot the series
+>>> - the Zynq 7000 uses the datasheet CAPAREG
+>>> - reset R-b/A-b
+>>>
+>>> Since v7:
+>>> - use error_propagate()
+>>>
+>>> Since v6:
+>>> - rebased on upstream to use DEFINE_SDHCI_COMMON_PROPERTIES
+>>> - included qtests back
+>>> - add PCI qtests
+>>> - series was getting big, splitting again; next one is "implement Spe=
+c v3"
+>>> - following Alistair advice, new properties default to current
+>>>   SDHC_CAPAB_REG_DEFAULT (probably 'default' for historical reason, b=
+eing
+>>>   the first capabilities set). This leads to weird properties imho, i=
+=2Ee.
+>>>   defaulting 'max-frequency' to 52 MHz, the Exynos SoC has to set thi=
+s
+>>>   property to 0.
+>>> - addressed Alistair reviews
+>>> - confirmed the Exynos4210 specs after chatting on IRC with Krzysztof=
+
+>>>   Kozlowski who kindly verified in the datasheet.
+>>>
+>>> Since v5:
+>>> - addressed Alistair reviews
+>>> - dropped "abstract generic-sdhci"
+>>> - dropped Linux Device Tree names
+>>> - split qtests in another series
+>>> - change the bcm2835 minimum blocksize to 1KB (Andrew Baumann)
+>>> - added Alistair R-b
+>>> - based on Alistair work:
+>>>   - add SD tunning sequence via Host Control 2 to use UHS-I cards
+>>>   - add CMD/DAT[] fields in the Present State (used in next series
+>>>     to switch card voltage)
+>>>
+>>> based on Alistair work:
+>>> - add SD tunning sequence via Host Control 2 to use UHS-I cards
+>>> - add CMD/DAT[] fields in the Present State (used in next series
+>>>   to switch card voltage)
+>>>
+>>> Since v4 ("SDHCI: add qtests and fix few issues"):
+>>> - spec_version default to v2 (current behaviour)
+>>> - addressed Alistair review (no v1, tell user about valid version)
+>>>
+>>> Since v3:
+>>> - no change, but split back in 2 series, 1st part is "SDHCI: housekee=
+ping v5",
+>>>
+>>> Since v2:
+>>> - more detailed 'capabilities', all boards converted to use these pro=
+perties
+>>> - since all qtests pass, removed the previous 'capareg' property
+>>> - added Stefan/Alistair R-b
+>>> - corrected 'access' LED behavior (Alistair's review)
+>>> - more uses of the registerfields API
+>>> - remove some dead code
+>>> - cosmetix:
+>>>   - added more comments
+>>>   - renamed a pair of registers
+>>>   - reordered few struct members
+>>>
+>>> Since v1:
+>>> - addressed Alistair Francis review comments, added some R-b
+>>> - only move register defines to "sd-internal.h"
+>>> - fixed deposit64() arguments
+>>> - dropped unuseful s->fifo_buffer =3D NULL
+>>> - use a qemu_irq for the LED, restrict the logging to ON/OFF
+>>> - fixed a trace format string error
+>>> - included Andrey Smirnov ACMD12ERRSTS write patch
+>>> - dropped few unuseful patches, and separate the Python polemical one=
+s for later
+>>>
+>>> From the "SDHCI housekeeping" series:
+>>> - 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
+>>> - 2,3: we somehow beautiful the code, no logical changes,
+>>> - 4-7: we refactor the common sysbus/pci qdev code,
+>>> - 8-10: we add plenty of trace events which will result useful later,=
+
+>>> - 11: we finally expose a "dma-memory" property.
+>>> From the "SDHCI: add a qtest and fix few issues" series:
+>>> - 12,13: fix registers
+>>> - 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far=
+)
+>>> - 15-20: HCI qtest
+>>>
+>>> Regards,
+>>>
+>>> Phil.
+>>>
+>>> $ git backport-diff with v8
+>>> 001/16:[----] [--] 'sdhci: use error_propagate(local_err) in realize(=
+)'
+>>> 002/16:[0004] [FC] 'sdhci: add qtest to check the SD capabilities reg=
+ister'
+>>> 003/16:[----] [--] 'sdhci: add check_capab_readonly() qtest'
+>>> 004/16:[----] [--] 'sdhci: add a check_capab_baseclock() qtest'
+>>> 005/16:[----] [--] 'sdhci: add a check_capab_sdma() qtest'
+>>> 006/16:[----] [--] 'sdhci: add qtest to check the SD Spec version'
+>>> 007/16:[0022] [FC] 'sdhci: add a 'spec_version property' (default to =
+v2)'
+>>> 008/16:[down] 'sdhci: use a numeric value for the default CAPAB regis=
+ter'
+>>> 009/16:[down] 'sdhci: simplify sdhci_get_fifolen()'
+>>> 010/16:[down] 'sdhci: check the Spec v1 capabilities correctness'
+>>> 011/16:[----] [--] 'sdhci: add BLOCK_SIZE_MASK for DMA'
+>>> 012/16:[----] [--] 'sdhci: Fix 64-bit ADMA2'
+>>> 013/16:[down] 'sdhci: check Spec v2 capabilities (DMA and 64-bit bus)=
+'
+>>> 014/16:[down] 'hw/arm/exynos4210: access the 64-bit capareg with qdev=
+_prop_set_uint64()'
+>>> 015/16:[down] 'hw/arm/exynos4210: add a comment about a very similar =
+SDHCI (Spec. v2)'
+>>> 016/16:[down] 'hw/arm/xilinx_zynq: fix the capabilities register to m=
+atch the datasheet'
+>>>
+>>> Philippe Mathieu-Daud=C3=A9 (15):
+>>>   sdhci: use error_propagate(local_err) in realize()
+>>>   sdhci: add qtest to check the SD capabilities register
+>>>   sdhci: add check_capab_readonly() qtest
+>>>   sdhci: add a check_capab_baseclock() qtest
+>>>   sdhci: add a check_capab_sdma() qtest
+>>>   sdhci: add qtest to check the SD Spec version
+>>>   sdhci: add a 'spec_version property' (default to v2)
+>>>   sdhci: use a numeric value for the default CAPAB register
+>>>   sdhci: simplify sdhci_get_fifolen()
+>>>   sdhci: check the Spec v1 capabilities correctness
+>>>   sdhci: add BLOCK_SIZE_MASK for DMA
+>>>   sdhci: check Spec v2 capabilities (DMA and 64-bit bus)
+>>>   hw/arm/exynos4210: access the 64-bit capareg with qdev_prop_set_uin=
+t64()
+>>>   hw/arm/exynos4210: add a comment about a very similar SDHCI (Spec. =
+v2)
+>>>   hw/arm/xilinx_zynq: fix the capabilities register to match the data=
+sheet
+>>>
+>>> Sai Pavan Boddu (1):
+>>>   sdhci: Fix 64-bit ADMA2
+>>>
+>>>  include/hw/sd/sdhci.h  |   2 +
+>>>  hw/sd/sdhci-internal.h |  43 ++++++---
+>>>  hw/arm/exynos4210.c    |  14 ++-
+>>>  hw/arm/xilinx_zynq.c   |  53 +++++-----
+>>>  hw/sd/sdhci.c          | 257 ++++++++++++++++++++++++++++++++-------=
+----------
+>>>  tests/sdhci-test.c     | 216 +++++++++++++++++++++++++++++++++++++++=
+++
+>>>  hw/sd/trace-events     |   1 +
+>>>  tests/Makefile.include |   3 +
+>>>  8 files changed, 464 insertions(+), 125 deletions(-)
+>>>  create mode 100644 tests/sdhci-test.c
+>>>
 >>
->> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
->> index e3e9828..f9f95ae 100644
->> --- a/hw/arm/smmuv3-internal.h
->> +++ b/hw/arm/smmuv3-internal.h
->> @@ -399,7 +399,185 @@ typedef enum evt_err {
->>      SMMU_EVT_E_PAGE_REQ     = 0x24,
->>  } SMMUEvtErr;
->>
->> -void smmuv3_record_event(SMMUV3State *s, hwaddr iova,
->> -                         uint32_t sid, bool is_write, SMMUEvtErr type);
->> +/*****************************
->> + * Configuration Data
->> + *****************************/
->> +
->> +typedef struct __smmu_data2  STEDesc; /* STE Level 1 Descriptor */
->> +typedef struct __smmu_data16 Ste;     /* Stream Table Entry(STE) */
->> +typedef struct __smmu_data2  CDDesc;  /* CD Level 1 Descriptor */
->> +typedef struct __smmu_data16 Cd;      /* Context Descriptor(CD) */
->> +
->> +/*****************************
->> + * STE fields
->> + *****************************/
->> +
->> +#define STE_VALID(x)   extract32((x)->word[0], 0, 1) /* 0 */
->> +#define STE_CONFIG(x)  extract32((x)->word[0], 1, 3)
->> +enum {
->> +    STE_CONFIG_NONE      = 0,
->> +    STE_CONFIG_BYPASS    = 4,       /* S1 Bypass    , S2 Bypass */
->> +    STE_CONFIG_S1        = 5,       /* S1 Translate , S2 Bypass */
->> +    STE_CONFIG_S2        = 6,       /* S1 Bypass    , S2 Translate */
->> +    STE_CONFIG_NESTED    = 7,       /* S1 Translate , S2 Translate */
->> +};
->> +#define STE_S1FMT(x)   extract32((x)->word[0], 4, 2)
->> +#define STE_S1CDMAX(x) extract32((x)->word[1], 27, 5)
->> +#define STE_EATS(x)    extract32((x)->word[2], 28, 2)
->> +#define STE_STRW(x)    extract32((x)->word[2], 30, 2)
->> +#define STE_S2VMID(x)  extract32((x)->word[4], 0, 16)
->> +#define STE_S2T0SZ(x)  extract32((x)->word[5], 0, 6)
->> +#define STE_S2SL0(x)   extract32((x)->word[5], 6, 2)
->> +#define STE_S2TG(x)    extract32((x)->word[5], 14, 2)
->> +#define STE_S2PS(x)    extract32((x)->word[5], 16, 3)
->> +#define STE_S2AA64(x)  extract32((x)->word[5], 19, 1)
->> +#define STE_S2HD(x)    extract32((x)->word[5], 24, 1)
->> +#define STE_S2HA(x)    extract32((x)->word[5], 25, 1)
->> +#define STE_S2S(x)     extract32((x)->word[5], 26, 1)
->> +#define STE_CTXPTR(x)                                           \
->> +    ({                                                          \
->> +        unsigned long addr;                                     \
->> +        addr = (uint64_t)extract32((x)->word[1], 0, 16) << 32;  \
->> +        addr |= (uint64_t)((x)->word[0] & 0xffffffc0);          \
->> +        addr;                                                   \
->> +    })
->> +
->> +#define STE_S2TTB(x)                                            \
->> +    ({                                                          \
->> +        unsigned long addr;                                     \
->> +        addr = (uint64_t)extract32((x)->word[7], 0, 16) << 32;  \
->> +        addr |= (uint64_t)((x)->word[6] & 0xfffffff0);          \
->> +        addr;                                                   \
->> +    })
->> +
->> +static inline int is_ste_bypass(Ste *ste)
-> 
-> Types which are acronyms are all-caps, so STE, CD.
-> 
->> +{
->> +    return STE_CONFIG(ste) == STE_CONFIG_BYPASS;
->> +}
->> +
->> +static inline bool is_ste_stage1(Ste *ste)
->> +{
->> +    return STE_CONFIG(ste) == STE_CONFIG_S1;
->> +}
->> +
->> +static inline bool is_ste_stage2(Ste *ste)
->> +{
->> +    return STE_CONFIG(ste) == STE_CONFIG_S2;
->> +}
->> +
->> +/**
->> + * is_s2granule_valid - Check the stage 2 translation granule size
->> + * advertised in the STE matches any IDR5 supported value
->> + */
->> +static inline bool is_s2granule_valid(Ste *ste)
->> +{
->> +    int idr5_format = 0;
->> +
->> +    switch (STE_S2TG(ste)) {
->> +    case 0: /* 4kB */
->> +        idr5_format = 0x1;
->> +        break;
->> +    case 1: /* 64 kB */
->> +        idr5_format = 0x4;
->> +        break;
->> +    case 2: /* 16 kB */
->> +        idr5_format = 0x2;
->> +        break;
->> +    case 3: /* reserved */
->> +        break;
->> +    }
->> +    idr5_format &= SMMU_IDR5_GRAN;
->> +    return idr5_format;
->> +}
->> +
->> +static inline int oas2bits(int oas_field)
->> +{
->> +    switch (oas_field) {
->> +    case 0b011:
->> +        return 42;
->> +    case 0b100:
->> +        return 44;
->> +    default:
->> +        return 32 + (1 << oas_field);
->> +   }
->> +}
->> +
->> +static inline int pa_range(Ste *ste)
->> +{
->> +    int oas_field = MIN(STE_S2PS(ste), SMMU_IDR5_OAS);
->> +
->> +    if (!STE_S2AA64(ste)) {
->> +        return 40;
->> +    }
->> +
->> +    return oas2bits(oas_field);
->> +}
->> +
->> +#define MAX_PA(ste) ((1 << pa_range(ste)) - 1)
->> +
->> +/*****************************
->> + * CD fields
->> + *****************************/
->> +#define CD_VALID(x)   extract32((x)->word[0], 30, 1)
->> +#define CD_ASID(x)    extract32((x)->word[1], 16, 16)
->> +#define CD_TTB(x, sel)                                      \
->> +    ({                                                      \
->> +        uint64_t hi, lo;                                    \
->> +        hi = extract32((x)->word[(sel) * 2 + 3], 0, 16);    \
->> +        hi <<= 32;                                          \
->> +        lo = (x)->word[(sel) * 2 + 2] & ~0xf;               \
->> +        hi | lo;                                            \
->> +    })
->> +
->> +#define CD_TSZ(x, sel)   extract32((x)->word[0], (16 * (sel)) + 0, 6)
->> +#define CD_TG(x, sel)    extract32((x)->word[0], (16 * (sel)) + 6, 2)
->> +#define CD_EPD(x, sel)   extract32((x)->word[0], (16 * (sel)) + 14, 1)
->> +
->> +#define CD_T0SZ(x)    CD_TSZ((x), 0)
->> +#define CD_T1SZ(x)    CD_TSZ((x), 1)
->> +#define CD_TG0(x)     CD_TG((x), 0)
->> +#define CD_TG1(x)     CD_TG((x), 1)
->> +#define CD_EPD0(x)    CD_EPD((x), 0)
->> +#define CD_EPD1(x)    CD_EPD((x), 1)
->> +#define CD_IPS(x)     extract32((x)->word[1], 0, 3)
->> +#define CD_AARCH64(x) extract32((x)->word[1], 9, 1)
->> +#define CD_TTB0(x)    CD_TTB((x), 0)
->> +#define CD_TTB1(x)    CD_TTB((x), 1)
->> +
->> +#define CDM_VALID(x)    ((x)->word[0] & 0x1)
->> +
->> +static inline int is_cd_valid(SMMUV3State *s, Ste *ste, Cd *cd)
->> +{
->> +    return CD_VALID(cd);
->> +}
->> +
->> +/**
->> + * tg2granule - Decodes the CD translation granule size field according
->> + * to the TT in use
->> + * @bits: TG0/1 fiels
->> + * @tg1: if set, @bits belong to TG1, otherwise belong to TG0
->> + */
->> +static inline int tg2granule(int bits, bool tg1)
->> +{
->> +    switch (bits) {
->> +    case 1:
->> +        return tg1 ? 14 : 16;
->> +    case 2:
->> +        return tg1 ? 12 : 14;
->> +    case 3:
->> +        return tg1 ? 16 : 12;
->> +    default:
->> +        return 12;
->> +    }
->> +}
->> +
->> +#define L1STD_L2PTR(stm) ({                                 \
->> +            uint64_t hi, lo;                            \
->> +            hi = (stm)->word[1];                        \
->> +            lo = (stm)->word[0] & ~(uint64_t)0x1f;      \
->> +            hi << 32 | lo;                              \
->> +        })
->> +
->> +#define L1STD_SPAN(stm) (extract32((stm)->word[0], 0, 4))
->>
->>  #endif
->> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
->> index 7470576..20fbce6 100644
->> --- a/hw/arm/smmuv3.c
->> +++ b/hw/arm/smmuv3.c
->> @@ -160,9 +160,9 @@ static void smmuv3_write_evtq(SMMUV3State *s, Evt *evt)
->>  /*
->>   * smmuv3_record_event - Record an event
->>   */
->> -void smmuv3_record_event(SMMUV3State *s, hwaddr iova,
->> -                         uint32_t sid, IOMMUAccessFlags perm,
->> -                         SMMUEvtErr type)
->> +static void smmuv3_record_event(SMMUV3State *s, hwaddr iova,
->> +                                uint32_t sid, IOMMUAccessFlags perm,
->> +                                SMMUEvtErr type)
->>  {
->>      Evt evt;
->>      bool rnw = perm & IOMMU_RO;
->> @@ -306,6 +306,348 @@ static inline void smmu_update_base_reg(SMMUV3State *s, uint64_t *base,
->>      *base = val & ~(SMMU_BASE_RA | 0x3fULL);
->>  }
->>
->> +/*
->> + * All SMMU data structures are little endian, and are aligned to 8 bytes
->> + * L1STE/STE/L1CD/CD, Queue entries in CMDQ/EVTQ/PRIQ
->> + */
->> +static inline int smmu_get_ste(SMMUV3State *s, hwaddr addr, Ste *buf)
->> +{
->> +    trace_smmuv3_get_ste(addr);
->> +    return dma_memory_read(&address_space_memory, addr, buf, sizeof(*buf));
-> 
-> Why dma_memory_read() here when we were using other memory access
-> functions for things like TLB table walks earlier?
-> 
-> Incidentally, the spec requires us to perform memory accesses as
-> at least 64-bit single-copy atomic (see 3.21.3) -- does this do that?
-> (This gets important with SMP when the guest on another CPU might
-> be updating the STE or page table entry at the same time as we're
-> reading it...)
 
-Among all your comments on v7, here is the one I am the least
-comfortable with. I was not able to figure out whether
-dma_memory_read(), which I use now for all the descriptor accesses
-guarantees this 64b single copy atomicity.
 
-Unrelated, I also did not change command descriptor field decoding (you
-suggested to use registerfields.h). cmd struct is a a structure laid out
-in guest RAM so I was not sure about how to use the register API for
-this decoding.
+--SBWo8s5cCr3JvVyYOBDxmyAX9g7GORtgg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-With respect to the GPLv2 license issue, at the moment, I have not been
-able to get an ACK from any Broadcom representative for transforming it
-into "v2 or later". I will continue trying getting this approval though.
+-----BEGIN PGP SIGNATURE-----
 
-The IOMMU is not instantiated anymore using sysbus-fdt. it is
-instantiated according to a machine option, still set to false by
-default, given the performance overhead.
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp5nhAACgkQ4+MsLN6t
+wN4b6BAApQ4ecIFkDjHMDlVpd/O28UONb87D4r4+5laKxMoC9KsQpshUstkxASQk
+wZcY8fG4d1pr0a4EwvwsVUyHr/vyTNj3RdpU1h99oW6Mn/HqX6kv8kwl2CzYeSwK
+9BPy4xu2Zq+s7JjvGliZ2ChFSeQQg/elHmXdzSwsgm8RrWQEXEPRF2aqGCG3+AO9
+LHpvA6y9GhEcD0goSqt+KoqcF1QBuRj/Lfi+KYv5RaQAySYjpdkSxPUD/y9dYZhL
+KwL4VqXrN65f3XuThwE8XhzYWORJrJHy4Ftf2VrvyBoR5CQSYs0yUaxPlt3SWiAQ
+8yT9SHBgWsywGMT1TFlojvGYSDAtNKGwnOFidP0iqhk/zNcTaqJATecNfLPXIeLY
+Ss6kIMAzvlUoYwMps4P3SBZoGyQzdh1wKFC2J5PMx/XRMiF2zIezsU1m/3GN+NV/
+RwDoaxP26s5OBYC//HqlFjX/+UZiwd3ei1yX3tXYbtggBB7CP4OCIISw14N1JSuK
+qGx+Xn53abOXo92FXtGYni8evmllkymYDl2RSlrpaDquQUSJSB80XKUFfWIVg/gg
+sR0S8qiOElvdQDuXiQbMw7brf0/3QieEkvu4p412nyUNCtE1X5P4nqngZtBzgeVQ
+EOHarvR/jK9stzNfKoHwXyLLSYsR31Labfh4naEn6tjtArVlJdY=
+=6Y+8
+-----END PGP SIGNATURE-----
 
-Otherwise I think I covered all your comments in v8.
-
-As I mentioned in my cover letter I intend to submit separate patches
-later on for
-- vhost integration
-- TLB emulation (as done on intel iommu),
-
-as the code base already is huge and I am reluctant to add some other
-features until the basic functionality has not stabilized.
-
-Thanks
-
-Eric
-> 
->> +}
->> +
->> +/*
->> + * For now we only support CD with a single entry, 'ssid' is used to identify
->> + * otherwise
->> + */
->> +static inline int smmu_get_cd(SMMUV3State *s, Ste *ste, uint32_t ssid, Cd *buf)
->> +{
->> +    hwaddr addr = STE_CTXPTR(ste);
->> +
->> +    if (STE_S1CDMAX(ste) != 0) {
->> +        error_report("Multilevel Ctx Descriptor not supported yet");
->> +    }
->> +
->> +    trace_smmuv3_get_cd(addr);
->> +    return dma_memory_read(&address_space_memory, addr, buf, sizeof(*buf));
->> +}
->> +
->> +/**
->> + * is_ste_consistent - Check validity of STE
->> + * according to 6.2.1 Validity of STE
->> + * TODO: check the relevance of each check and compliance
->> + * with this spec chapter
-> 
-> Good idea :-)
-> 
-> thanks
-> -- PMM
-> 
+--SBWo8s5cCr3JvVyYOBDxmyAX9g7GORtgg--
