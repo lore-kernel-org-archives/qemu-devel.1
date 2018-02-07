@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejSzk-0004MF-Ny
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:54:54 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ejT2n-0007Je-3a
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:58:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejSzj-0000je-M7
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:54:52 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38876 helo=mx1.redhat.com)
+	(envelope-from <alex.williamson@redhat.com>) id 1ejT2i-0001lU-2m
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:58:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39746)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejSzj-0000jN-FK
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:54:51 -0500
-References: <20180207160638.98872-1-brijesh.singh@amd.com>
-	<20180207160638.98872-5-brijesh.singh@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <70d2e5cd-6b31-efc0-a48d-259defe4316b@redhat.com>
-Date: Wed, 7 Feb 2018 17:54:41 +0100
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ejT2h-0001l8-PI
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:57:55 -0500
+Date: Wed, 7 Feb 2018 09:57:46 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180207095746.14cef887@w520.home>
+In-Reply-To: <c98a2d5c-19e9-813c-c58f-77583e7873ff@redhat.com>
+References: <20180207000731.32764.95992.stgit@gimli.home>
+	<c98a2d5c-19e9-813c-c58f-77583e7873ff@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180207160638.98872-5-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 05/26] target/i386: add memory
- encryption feature cpuid support
+Subject: Re: [Qemu-devel] [RFC PATCH] vfio/pci: Add ioeventfd support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,144 +28,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
 
-On 07/02/2018 17:06, Brijesh Singh wrote:
-> AMD EPYC processors support memory encryption feature. The feature
-> is reported through CPUID 8000_001F[EAX].
-> 
-> Fn8000_001F [EAX]:
->  Bit 0   Secure Memory Encryption (SME) supported
->  Bit 1   Secure Encrypted Virtualization (SEV) supported
->  Bit 2   Page flush MSR supported
->  Bit 3   Ecrypted State (SEV-ES) support
-> 
-> when memory encryption feature is reported, CPUID 8000_001F[EBX] should
-> provide additional information regarding the feature (such as which page
-> table bit is used to mark pages as encrypted etc). The information in EBX
-> and ECX may vary from one family to another hence we use the host cpuid
-> to populate the EBX information.
-> 
-> The details for memory encryption CPUID is available in AMD APM
-> (https://support.amd.com/TechDocs/24594.pdf) Section E.4.17
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  target/i386/cpu.c | 36 ++++++++++++++++++++++++++++++++++++
->  target/i386/cpu.h |  6 ++++++
->  2 files changed, 42 insertions(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index a49d2221adc9..4147eb6e18a9 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -234,6 +234,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
->  #define TCG_EXT4_FEATURES 0
->  #define TCG_SVM_FEATURES 0
->  #define TCG_KVM_FEATURES 0
-> +#define TCG_MEM_ENCRYPT_FEATURES 0
->  #define TCG_7_0_EBX_FEATURES (CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_SMAP | \
->            CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ADX | \
->            CPUID_7_0_EBX_PCOMMIT | CPUID_7_0_EBX_CLFLUSHOPT |            \
-> @@ -545,6 +546,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->          .cpuid_reg = R_EDX,
->          .tcg_features = ~0U,
->      },
-> +    [FEAT_MEM_ENCRYPT] = {
-> +        .feat_names = {
-> +            "sme", "sev", "page-flush-msr", "sev-es",
+On Wed, 7 Feb 2018 16:46:19 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-Why would sme ever be on in a guest?  That is, would a guest care about
-whether SME is on in the host?
-
-Paolo
-
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +        },
-> +        .cpuid_eax = 0x8000001F, .cpuid_reg = R_EAX,
-> +        .tcg_features = TCG_MEM_ENCRYPT_FEATURES,
-> +    }
->  };
->  
->  typedef struct X86RegisterInfo32 {
-> @@ -1965,6 +1980,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =
->              CPUID_6_EAX_ARAT,
-> +        /* Missing: SEV_ES */
-> +        .features[FEAT_MEM_ENCRYPT] =
-> +            CPUID_8000_001F_EAX_SME | CPUID_8000_001F_EAX_SEV,
->          .xlevel = 0x8000000A,
->          .model_id = "AMD EPYC Processor",
->      },
-> @@ -3589,6 +3607,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *edx = 0;
->          }
->          break;
-> +    case 0x8000001F:
-> +        if (env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_SEV) {
-> +            *eax = env->features[FEAT_MEM_ENCRYPT];
-> +            host_cpuid(0x8000001F, 0, NULL, ebx, NULL, NULL);
-> +            *ecx = 0;
-> +            *edx = 0;
-> +        } else {
-> +            *eax = 0;
-> +            *ebx = 0;
-> +            *ecx = 0;
-> +            *edx = 0;
-> +        }
-> +        break;
->      case 0xC0000000:
->          *eax = env->cpuid_xlevel2;
->          *ebx = 0;
-> @@ -4036,10 +4067,15 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
->          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
-> +        x86_cpu_adjust_feat_level(cpu, FEAT_MEM_ENCRYPT);
->          /* SVM requires CPUID[0x8000000A] */
->          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
->              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
->          }
-> +        /* SEV requires CPUID[0x8000001F] */
-> +        if ((env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_SEV)) {
-> +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
-> +        }
->      }
->  
->      /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index f91e37d25dea..f7a0ab20fdd1 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -483,6 +483,7 @@ typedef enum FeatureWord {
->      FEAT_6_EAX,         /* CPUID[6].EAX */
->      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
->      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-> +    FEAT_MEM_ENCRYPT,   /* CPUID[8000_001F].EAX */
->      FEATURE_WORDS,
->  } FeatureWord;
->  
-> @@ -679,6 +680,11 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  
->  #define CPUID_6_EAX_ARAT       (1U << 2)
->  
-> +#define CPUID_8000_001F_EAX_SME             (1U << 0) /* SME */
-> +#define CPUID_8000_001F_EAX_SEV             (1U << 1) /* SEV */
-> +#define CPUID_8000_001F_EAX_PAGE_FLUSH_MSR  (1U << 2) /* Page flush MSR */
-> +#define CPUID_8000_001F_EAX_SEV_ES          (1U << 3) /* SEV-ES */
-> +
->  /* CPUID[0x80000007].EDX flags: */
->  #define CPUID_APM_INVTSC       (1U << 8)
->  
+> Hi Alex,
 > 
+> On 07/02/18 01:08, Alex Williamson wrote:
+> > The ioeventfd here is actually irqfd handling of an ioeventfd such as
+> > supported in KVM.  A user is able to pre-program a device write to
+> > occur when the eventfd triggers.  This is yet another instance of
+> > eventfd-irqfd triggering between KVM and vfio.  The impetus for this
+> > is high frequency writes to pages which are virtualized in QEMU.
+> > Enabling this near-direct write path for selected registers within
+> > the virtualized page can improve performance and reduce overhead.
+> > Specifically this is initially targeted at NVIDIA graphics cards where
+> > the driver issues a write to an MMIO register within a virtualized
+> > region in order to allow the MSI interrupt to re-trigger.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>  
+> 
+> fyi it does not apply anymore on master (conflict in
+> include/uapi/linux/vfio.h on GFX stuff)
+
+Sorry, I should have noted that this was against v4.15, I didn't want
+the churn of the merge window since I was benchmarking against this.
+Will update for non-RFC.
+
+...
+> > +long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+> > +			uint64_t data, int count, int fd)
+> > +{
+> > +	struct pci_dev *pdev = vdev->pdev;
+> > +	loff_t pos = offset & VFIO_PCI_OFFSET_MASK;
+> > +	int ret, bar = VFIO_PCI_OFFSET_TO_INDEX(offset);
+> > +	struct vfio_pci_ioeventfd *ioeventfd;
+> > +	int (*handler)(void *, void *);
+> > +	unsigned long val;
+> > +
+> > +	/* Only support ioeventfds into BARs */
+> > +	if (bar > VFIO_PCI_BAR5_REGION_INDEX)
+> > +		return -EINVAL;
+> > +
+> > +	if (pos + count > pci_resource_len(pdev, bar))
+> > +		return -EINVAL;
+> > +
+> > +	/* Disallow ioeventfds working around MSI-X table writes */
+> > +	if (bar == vdev->msix_bar &&
+> > +	    !(pos + count <= vdev->msix_offset ||
+> > +	      pos >= vdev->msix_offset + vdev->msix_size))
+> > +		return -EINVAL;
+> > +
+> > +	switch (count) {
+> > +	case 1:
+> > +		handler = &vfio_pci_ioeventfd_handler8;
+> > +		val = data;
+> > +		break;
+> > +	case 2:
+> > +		handler = &vfio_pci_ioeventfd_handler16;
+> > +		val = le16_to_cpu(data);
+> > +		break;
+> > +	case 4:
+> > +		handler = &vfio_pci_ioeventfd_handler32;
+> > +		val = le32_to_cpu(data);
+> > +		break;
+> > +#ifdef iowrite64
+> > +	case 8:
+> > +		handler = &vfio_pci_ioeventfd_handler64;
+> > +		val = le64_to_cpu(data);
+> > +		break;
+> > +#endif
+> > +	default:
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	ret = vfio_pci_setup_barmap(vdev, bar);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	mutex_lock(&vdev->ioeventfds_lock);
+> > +
+> > +	list_for_each_entry(ioeventfd, &vdev->ioeventfds_list, next) {
+> > +		if (ioeventfd->pos == pos && ioeventfd->bar == bar &&
+> > +		    ioeventfd->data == data && ioeventfd->count == count) {
+> > +			if (fd == -1) {
+> > +				vfio_virqfd_disable(&ioeventfd->virqfd);
+> > +				list_del(&ioeventfd->next);
+> > +				kfree(ioeventfd);
+> > +				ret = 0;
+> > +			} else
+> > +				ret = -EEXIST;
+> > +
+> > +			goto out_unlock;
+> > +		}
+> > +	}
+> > +
+> > +	if (fd < 0) {
+> > +		ret = -ENODEV;
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	ioeventfd = kzalloc(sizeof(*ioeventfd), GFP_KERNEL);
+> > +	if (!ioeventfd) {
+> > +		ret = -ENOMEM;
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	ioeventfd->pos = pos;
+> > +	ioeventfd->bar = bar;
+> > +	ioeventfd->data = data;
+> > +	ioeventfd->count = count;
+> > +
+> > +	ret = vfio_virqfd_enable(vdev->barmap[ioeventfd->bar] + ioeventfd->pos,  
+> nit: bar and pos could be used directly
+
+Indeed, probably leftover from development.  Fixed and re-wrapped the
+following lines.
+
+> > +				 handler, NULL, (void *)val,
+> > +				 &ioeventfd->virqfd, fd);
+> > +	if (ret) {
+> > +		kfree(ioeventfd);
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	list_add(&ioeventfd->next, &vdev->ioeventfds_list);
+> > +
+> > +out_unlock:
+> > +	mutex_unlock(&vdev->ioeventfds_lock);
+> > +
+> > +	return ret;
+> > +}
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index e3301dbd27d4..07966a5f0832 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -503,6 +503,30 @@ struct vfio_pci_hot_reset {
+> >  
+> >  #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
+> >  
+> > +/**
+> > + * VFIO_DEVICE_IOEVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 14,
+> > + *                              struct vfio_device_ioeventfd)
+> > + *
+> > + * Perform a write to the device at the specified device fd offset, with
+> > + * the specified data and width when the provided eventfd is triggered.  
+> don't you want to document the limitation on BAR only and excluding the
+> MSIx table.
+
+Sure, we could.  This is also just an acceleration interface, it's not
+required for functionality, so a user can probe the capabilities by
+trying to enable an ioeventfd to test for support.  I don't really want
+to add a flag to each region to identify support or create yet another
+sparse map identifying which sections of regions are supported.  We
+could enable this for PCI config space, but I didn't think it really
+made sense (and I was too lazy).  Real PCI config space (not MMIO
+mirrors of config space on GPUs) should never be a performance path,
+therefore I question if there's any ROI for the code to support it.
+Device specific regions would need to be handled on a case by case
+basis, and I don't think we have any cases yet were it makes sense
+(IIRC the IGD regions are read-only).  Of course ROMs are read-only, so
+it doesn't make sense to support them.
+
+I also note that this patch of course only supports directly assigned
+vfio-pci devices, not vfio-platform and not mdev devices.  Since the
+ioctl is intended to be device agnostic, maybe we could have a default
+handler that simply uses the device file write interface.  At least one
+issue there is that those expect a user buffer.  I'll look into how I
+might add the support more generically, if perhaps less optimized.
+
+Does it seem like a sufficient user API to try and ioeventfd and be
+prepared for it to fail?  Given that this is a new ioctl, users need to
+do that for backwards compatibility anyway.
+
+Something I forgot to mention in my rush to send this out is that I
+debated whether to create a new ioctl or re-use the SET_IRQS ioctl.  In
+the end, I couldn't resolve how to handle the index, start, and count
+fields, so I created this new ioctl.  Would we create an ioeventfd
+index?  We couldn't simply pass an array of ioeventfds since each needs
+to be associated with an offset, data, and size, so we'd need a new
+data type with a structure encompassing those fields.  In the end it
+obviously didn't make sense to me to re-use SET_IRQS, but if others can
+come up with something that makes sense, I'm open to it.  Thanks,
+
+Alex
