@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ejRcB-0002ns-Ih
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:26:28 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejRcU-00035w-Af
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:26:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ejRc8-0004fd-Fu
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:26:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ejRc8-0004fC-An
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:26:24 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7025BE1854
-	for <qemu-devel@nongnu.org>; Wed,  7 Feb 2018 15:26:23 +0000 (UTC)
-Date: Wed, 7 Feb 2018 13:25:52 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180207152552.GK3291@localhost.localdomain>
-References: <20180207125710.GJ3291@localhost.localdomain>
-	<1518013857-4372-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejRcR-0004mQ-5J
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:26:46 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:38578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejRcR-0004mC-0y
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:26:43 -0500
+Received: by mail-qt0-x241.google.com with SMTP id z10so2116797qti.5
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 07:26:42 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180207151925.26325-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5b4c1a42-2a75-56f0-d9f1-3a9b2df00bec@amsat.org>
+Date: Wed, 7 Feb 2018 12:26:39 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1518013857-4372-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] cpu: drop unnecessary NULL check and
- cpu_common_class_by_name()
+In-Reply-To: <20180207151925.26325-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] .travis.yml: add --disable-linux-user for
+ some jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,21 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Feb 07, 2018 at 03:30:57PM +0100, Igor Mammedov wrote:
-> both do nothing as for the first all callers
->    parse_cpu_model() and qmp_query_cpu_model_()
-> should provide non NULL value, so just abort if it's not so.
+On 02/07/2018 12:19 PM, Alex Bennée wrote:
+> The modules and co-routine builds are only really relevant to softmmu
+> builds and regularly timeout on Travis. Let's disable linux-user
+> builds here for more headroom.
 > 
-> While at it drop cpu_common_class_by_name() which is not need
-> any more as every target has CPUClass::class_by_name callback
-> by now, though abort in case a new arch will forget to define one.
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  .travis.yml | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
--- 
-Eduardo
+> diff --git a/.travis.yml b/.travis.yml
+> index f583839755..a6bd01b0a1 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -51,9 +51,9 @@ env:
+>      - CONFIG=""
+>      - CONFIG="--enable-debug --enable-debug-tcg --enable-trace-backends=log"
+>      - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-uuid --disable-libusb"
+> -    - CONFIG="--enable-modules"
+> -    - CONFIG="--with-coroutine=ucontext"
+> -    - CONFIG="--with-coroutine=sigaltstack"
+> +    - CONFIG="--enable-modules --disable-linux-user"
+> +    - CONFIG="--with-coroutine=ucontext --disable-linux-user"
+> +    - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
+>  git:
+>    # we want to do this ourselves
+>    submodules: false
+> 
