@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTe-00019J-Ni
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:36 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ejOTp-0001KS-Rg
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTa-0004Tf-2x
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:26 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:47640)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTZ-0004TM-Qu
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:22 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 07 Feb 2018 15:05:23 +0300
-Message-ID: <20180207120523.5389.91342.stgit@pasha-VirtualBox>
-In-Reply-To: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
-References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	(envelope-from <pbonzini@redhat.com>) id 1ejOTk-0004XG-Qi
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:37 -0500
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:54436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejOTk-0004Wh-CV
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:32 -0500
+Received: by mail-wm0-f66.google.com with SMTP id i186so2678676wmi.4
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 04:05:32 -0800 (PST)
+References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8xGrkYY14hm6htgs3oqB1gaKHFRLktz2x0tOFageDqYQ@mail.gmail.com>
+	<4ce6f2ad-2287-2155-277b-977e48167687@redhat.com>
+	<CAFEAcA_mAK2jeX9Uu=Mtx4PUOVToXFW351OKgu6B4A0kj_79aw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4c81a8d5-5d88-2f31-13be-4ae12007b2b3@redhat.com>
+Date: Wed, 7 Feb 2018 13:05:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA_mAK2jeX9Uu=Mtx4PUOVToXFW351OKgu6B4A0kj_79aw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v6 16/20] replay: avoid recursive call of
- checkpoints
+Subject: Re: [Qemu-devel] [PULL 00/47] Misc patches for 2018-02-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +32,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This patch adds a flag which denies recursive call of replay_checkpoint
-function. Checkpoints may be accompanied by the hardware events. When event
-is processed, virtual device may invoke timer modification functions that
-also invoke the checkpoint function. This leads to infinite loop.
+On 07/02/2018 12:55, Peter Maydell wrote:
+> On 6 February 2018 at 20:37, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 06/02/2018 20:18, Peter Maydell wrote:
+>>> Hi. I'm afraid this fails to build the all-linux-static config:
+>>>
+>>>   LINK    ivshmem-client
+>>> [usual linker gripes about getpwuid &c in static binaries deleted]
+>>> /usr/lib/gcc/x86_64-linux-gnu/5/libubsan.a(sanitizer_linux_libcdep.o):
+>>> In function `__sanitizer::SetEnv(cha
+>>> r const*, char const*)':
+>>> (.text+0x41b): undefined reference to `dlsym'
+>>> /usr/lib/gcc/x86_64-linux-gnu/5/libubsan.a(sanitizer_linux_libcdep.o):
+>>> In function `__sanitizer::InitTlsSiz
+>>> e()':
+>>> (.text+0x553): undefined reference to `dlsym'
+>>> collect2: error: ld returned 1 exit status
+>>
+>> Uhm, what is all-linux-static?  Is it using --enable-debug?
+> 
+> Yeah, it's a config with --enable-debug --static --disable-system
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- replay/replay.c |   14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Ok, I'll drop the change to enable --enable-sanitizers when you give
+--enable-debug.  It's premature.
 
-diff --git a/replay/replay.c b/replay/replay.c
-index 585c5de..c676dd4 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -176,13 +176,24 @@ void replay_shutdown_request(ShutdownCause cause)
- bool replay_checkpoint(ReplayCheckpoint checkpoint)
- {
-     bool res = false;
-+    static bool in_checkpoint;
-     assert(EVENT_CHECKPOINT + checkpoint <= EVENT_CHECKPOINT_LAST);
--    replay_save_instructions();
- 
-     if (!replay_file) {
-         return true;
-     }
- 
-+    if (in_checkpoint) {
-+        /* If we are already in checkpoint, then there is no need
-+           for additional synchronization.
-+           Recursion occurs when HW event modifies timers.
-+           Timer modification may invoke the checkpoint and
-+           proceed to recursion. */
-+        return true;
-+    }
-+    in_checkpoint = true;
-+
-+    replay_save_instructions();
- 
-     if (replay_mode == REPLAY_MODE_PLAY) {
-         g_assert(replay_mutex_locked());
-@@ -204,6 +215,7 @@ bool replay_checkpoint(ReplayCheckpoint checkpoint)
-         res = true;
-     }
- out:
-+    in_checkpoint = false;
-     return res;
- }
- 
+Paolo
