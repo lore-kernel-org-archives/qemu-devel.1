@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejPn9-0006pg-BP
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:29:40 -0500
+	(envelope-from <marcel@redhat.com>) id 1ejPtg-0004jl-2X
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:36:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejPn8-0000h3-7z
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:29:39 -0500
-References: <151800962781.204.820918804384569617@bdbb90650ae5>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f4623a77-131f-dce7-a02a-2095e84f6935@virtuozzo.com>
-Date: Wed, 7 Feb 2018 16:29:23 +0300
+	(envelope-from <marcel@redhat.com>) id 1ejPtb-000575-2w
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:36:24 -0500
+References: <20180207121027.32466-1-lersek@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <ca07e122-dedc-91cc-7469-8518618349ae@redhat.com>
+Date: Wed, 7 Feb 2018 15:35:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <151800962781.204.820918804384569617@bdbb90650ae5>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180207121027.32466-1-lersek@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] block latency histogram
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pci-bridge/i82801b11: clear bridge
+ registers on platform reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org
 
-looks strange and unrelated.
+Hi Laszlo,
 
-07.02.2018 16:20, no-reply@patchew.org wrote:
-> Hi,
->
-> This series failed build test on ppc host. Please find the details below.
->
-> Type: series
-> Subject: [Qemu-devel] [PATCH v2 0/2] block latency histogram
-> Message-id: 20180207125037.13510-1-vsementsov@virtuozzo.com
->
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> # Testing script will be invoked under the git checkout with
-> # HEAD pointing to a commit that has the patches applied on top of "base"
-> # branch
-> set -e
-> echo "=== ENV ==="
-> env
-> echo "=== PACKAGES ==="
-> rpm -qa
-> echo "=== TEST BEGIN ==="
-> INSTALL=$PWD/install
-> BUILD=$PWD/build
-> mkdir -p $BUILD $INSTALL
-> SRC=$PWD
-> cd $BUILD
-> $SRC/configure --prefix=$INSTALL
-> make -j100
-> # XXX: we need reliable clean up
-> # make check -j100 V=1
-> make install
-> === TEST SCRIPT END ===
->
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> error: RPC failed; result=18, HTTP code = 200
-> fatal: The remote end hung up unexpectedly
-> error: Could not fetch 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Traceback (most recent call last):
->    File "/home/patchew/patchew/patchew-cli", line 504, in test_one
->      git_clone_repo(clone, r["repo"], r["head"], logf)
->    File "/home/patchew/patchew/patchew-cli", line 48, in git_clone_repo
->      stdout=logf, stderr=logf)
->    File "/usr/lib64/python3.4/subprocess.py", line 558, in check_call
->      raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['git', 'remote', 'add', '-f', '--mirror=fetch', '3c8cf5a9c21ff8782164d1def7f44bd888713384', 'https://github.com/patchew-project/qemu']' returned non-zero exit status 1
->
->
->
+On 07/02/2018 14:10, Laszlo Ersek wrote:
+> The "i82801b11-bridge" device model is a descendant of "base-pci-bridge"
+> (TYPE_PCI_BRIDGE). However, unlike other similar devices, such as
+> 
+> - pci-bridge,
+> - pcie-pci-bridge,
+> - PCIE Root Port,
+> - xio3130 switch upstream and downstream ports,
+> - dec-21154-p2p-bridge,
+> - pbm-bridge,
+> - xilinx-pcie-root,
+> 
+> "i82801b11-bridge" does not clear the bridge specific registers at
+> platform reset.
+> 
+> This is a problem because devices on "i82801b11-bridge" continue to
+> respond to config space cycles after platform reset, when addressed with
+> the bus number that was previously programmed into the secondary bus
+> number register of "i82801b11-bridge". This error breaks OVMF's search for
+> extra (PXB) root buses, for example.
+> 
+
+Now I understand why we didn't catch the error until now. Nobody
+tried to use the pxb device with the dmi-pci bridge.
+
+> The device class reset method for "i82801b11-bridge" is currently NULL;
+
+This is sad, the device was always broken.
+
+> set it directly to pci_bridge_reset(), like the last three bridge models
+> in the above listing do.
+> 
+
+Thanks for catching it!
+
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+
+Thanks,
+Marcel
+
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: qemu-stable@nongnu.org
+> Ref: https://bugzilla.redhat.com/show_bug.cgi?id=1541839
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 > ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
-
-
--- 
-Best regards,
-Vladimir
+>  hw/pci-bridge/i82801b11.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+> index cb522bf30c31..ebf7f5f0e81c 100644
+> --- a/hw/pci-bridge/i82801b11.c
+> +++ b/hw/pci-bridge/i82801b11.c
+> @@ -98,6 +98,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
+>      k->realize = i82801b11_bridge_realize;
+>      k->config_write = pci_bridge_write_config;
+>      dc->vmsd = &i82801b11_bridge_dev_vmstate;
+> +    dc->reset = pci_bridge_reset;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>  }
+>  
+> 
