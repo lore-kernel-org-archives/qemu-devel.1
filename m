@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTy-0001Ra-O9
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ejOVD-0002dB-K0
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:07:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTw-0004aZ-91
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:45 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:47748)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTw-0004aP-1e
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:44 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 07 Feb 2018 15:05:45 +0300
-Message-ID: <20180207120545.5389.69361.stgit@pasha-VirtualBox>
-In-Reply-To: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
-References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	(envelope-from <imammedo@redhat.com>) id 1ejOV3-0004tA-Tq
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:07:03 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56294 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ejOV3-0004sj-PC
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:06:53 -0500
+Date: Wed, 7 Feb 2018 13:06:35 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180207130635.4033f8b8@redhat.com>
+In-Reply-To: <ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
+References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
+	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
+	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
+	<502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
+	<20180205181521.47232aa4@redhat.com>
+	<5155622d-cc49-d24c-7a7d-24ebb9ca2331@redhat.com>
+	<ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v6 20/20] replay: don't drain/flush bdrv
- queue while RR is working
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: "Tan, Jianfeng" <jianfeng.tan@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-In record/replay mode bdrv queue is controlled by replay mechanism.
-It does not allow saving or loading the snapshots
-when bdrv queue is not empty. Stopping the VM is not blocked by nonempty
-queue, but flushing the queue is still impossible there,
-because it may cause deadlocks in replay mode.
-This patch disables bdrv_drain_all and bdrv_flush_all in
-record/replay mode.
+On Wed, 7 Feb 2018 07:49:58 +0000
+"Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- block/io.c |   22 ++++++++++++++++++++++
- cpus.c     |    2 --
- 2 files changed, 22 insertions(+), 2 deletions(-)
+> > -----Original Message-----
+> > From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> > Sent: Tuesday, February 6, 2018 1:32 AM
+> > To: Igor Mammedov
+> > Cc: Tan, Jianfeng; qemu-devel@nongnu.org; Jason Wang; Maxime Coquelin;
+> > Michael S . Tsirkin
+> > Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
+> > migration
+> >=20
+> > On 05/02/2018 18:15, Igor Mammedov wrote: =20
+> > >>>
+> > >>> Then we would have both ram block named pc.ram:
+> > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 Block Name=C2=A0=C2=A0=C2=A0 PSize
+> > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc.ram=C2=A0=
+=C2=A0=C2=A0=C2=A0 4 KiB
+> > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /objects/pc.ram=C2=A0=C2=A0=C2=A0 2 =
+MiB
+> > >>>
+> > >>> But I assume it's a corner case which not really happen. =20
+> > >> Yeah, you're right. :/  I hadn't thought of hotplug.  It can happen =
+indeed. =20
+> > >
+> > > perhaps we should fail object_add memory-backend-foo if it resulted
+> > > in creating ramblock with duplicate id =20
+> >=20
+> > Note that it would only be duplicated with Jianfeng's patch.  So I'm
+> > worried that his patch is worse than what we have now, because it may
+> > create conflicts with system RAMBlock names are not necessarily
+> > predictable.  Right now, -object creates RAMBlock names that are nicely
+> > constrained within /object/. =20
+>=20
+> So we are trading off between the benefit it takes and the bad effect it =
+brings.
+>=20
+> I'm wondering if the above example is the only failed case this patch lea=
+ds to, i.e, only there is a ram named "pc.ram" and "/object/pc.ram" in the =
+src VM?
+>=20
+> Please also consider the second option, that adding an alias name for RAM=
+Block; I'm not a big fan for that one, as it just pushes the problem to Ope=
+nStack/Libvirt.
+looking at provided CLI examples it's configuration issue on src and dst,
+one shall not mix numa and non numa variants.
 
-diff --git a/block/io.c b/block/io.c
-index 7ea4023..e773e68 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -31,6 +31,7 @@
- #include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-+#include "sysemu/replay.h"
- 
- #define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
- 
-@@ -407,6 +408,13 @@ void bdrv_drain_all_begin(void)
-     BdrvNextIterator it;
-     GSList *aio_ctxs = NULL, *ctx;
- 
-+    /* bdrv queue is managed by record/replay,
-+       waiting for finishing the I/O requests may
-+       be infinite */
-+    if (replay_events_enabled()) {
-+        return;
-+    }
-+
-     /* BDRV_POLL_WHILE() for a node can only be called from its own I/O thread
-      * or the main loop AioContext. We potentially use BDRV_POLL_WHILE() on
-      * nodes in several different AioContexts, so make sure we're in the main
-@@ -458,6 +466,13 @@ void bdrv_drain_all_end(void)
-     BlockDriverState *bs;
-     BdrvNextIterator it;
- 
-+    /* bdrv queue is managed by record/replay,
-+       waiting for finishing the I/O requests may
-+       be endless */
-+    if (replay_events_enabled()) {
-+        return;
-+    }
-+
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-@@ -1839,6 +1854,13 @@ int bdrv_flush_all(void)
-     BlockDriverState *bs = NULL;
-     int result = 0;
- 
-+    /* bdrv queue is managed by record/replay,
-+       creating new flush request for stopping
-+       the VM may break the determinism */
-+    if (replay_events_enabled()) {
-+        return result;
-+    }
-+
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
-         int ret;
-diff --git a/cpus.c b/cpus.c
-index c1821ae..5185274 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1005,7 +1005,6 @@ static int do_vm_stop(RunState state)
-     }
- 
-     bdrv_drain_all();
--    replay_disable_events();
-     ret = bdrv_flush_all();
- 
-     return ret;
-@@ -1987,7 +1986,6 @@ int vm_prepare_start(void)
-         qapi_event_send_stop(&error_abort);
-         res = -1;
-     } else {
--        replay_enable_events();
-         cpu_enable_ticks();
-         runstate_set(RUN_STATE_RUNNING);
-         vm_state_notify(1, RUN_STATE_RUNNING);
+> Or any other suggestions?
+Fix configuration, namely dst side of it (i.e. use the same -m only variant
+without -numa as it's on src).
+
+BTW, what are you trying to achieve adding -numa on dst?
+
+> Thanks,
+> Jianfeng
