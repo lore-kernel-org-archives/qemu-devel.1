@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ejOPC-0005av-QA
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:00:55 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejORE-0007Jt-N7
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:03:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ejOP9-0000pe-0I
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:00:50 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:42002)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1ejOP8-0000pL-RK
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:00:46 -0500
-Received: by mail-io0-x244.google.com with SMTP id 25so1727316ioj.9
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 04:00:46 -0800 (PST)
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejOR9-00023N-Vd
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:02:56 -0500
+Received: from mga02.intel.com ([134.134.136.20]:12396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1ejOR9-000229-HI
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:02:51 -0500
+Date: Wed, 7 Feb 2018 20:02:43 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180207120243.s54iryfqao7ccu6l@hz-desktop>
+References: <20180207073331.14158-1-haozhong.zhang@intel.com>
+	<20180207073331.14158-7-haozhong.zhang@intel.com>
+	<20180207114910.GC2665@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <CABoDooMmKtM5Kwr2Vwp9=jPLBHkYUFDGfdee6TFn8uC-NetLFA@mail.gmail.com>
-References: <20180207111729.15737-1-ard.biesheuvel@linaro.org>
-	<20180207111729.15737-6-ard.biesheuvel@linaro.org>
-	<874lmtvx2l.fsf@linaro.org>
-	<CAKv+Gu8Gh-unEST2RB5bchq5jX9OSV=z=CAGGzBWWdAQYuAySQ@mail.gmail.com>
-	<CABoDooMmKtM5Kwr2Vwp9=jPLBHkYUFDGfdee6TFn8uC-NetLFA@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 7 Feb 2018 12:00:45 +0000
-Message-ID: <CAKv+Gu9QobkROEknP3Nu72nBYxW4Cnu3qC8iEYt4TuQ9i+JY0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] target/arm: enable user-mode SHA-3,
- SM3, SM4 and SHA-512 instruction support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180207114910.GC2665@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration/ram: ensure write
+ persistence on loading normal pages to PMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +30,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Desnogues <laurent.desnogues@gmail.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-On 7 February 2018 at 11:57, Laurent Desnogues
-<laurent.desnogues@gmail.com> wrote:
-> On Wed, Feb 7, 2018 at 12:53 PM, Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
->> On 7 February 2018 at 11:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>>
->>> Ard Biesheuvel <ard.biesheuvel@linaro.org> writes:
->>>
->>>> Add support for the new ARMv8.2 SHA-3, SM3, SM4 and SHA-512 instructio=
-ns to
->>>> AArch64 user mode emulation.
->>>
->>> Are you aware of any processors with ARMv8.2 available yet? It might be
->>> nice to have a more recent model for system emulation and the pieces
->>> seems to be coming together.
->>>
->>
->> I think Peter's idea was to have so kind of 'max' cpu type that
->> enables all optional extensions in system emulation mode.
->> AFAIK none of the Cortex-Axx cores that are public are available with
->> these crypto features.
->
-> Cortex-A75 is ARMv8.2.  It should be available in devices this year.
->
+On 02/07/18 11:49 +0000, Dr. David Alan Gilbert wrote:
+> * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
+> > When loading a normal page to persistent memory, load its data by
+> > libpmem function pmem_memcpy_nodrain() instead of memcpy(). Combined
+> > with a call to pmem_drain() at the end of memory loading, we can
+> > guarantee all those normal pages are persistenly loaded to PMEM.
+> > 
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > ---
+> >  include/migration/qemu-file-types.h |  1 +
+> >  include/qemu/pmem.h                 |  6 ++++++
+> >  migration/qemu-file.c               | 41 ++++++++++++++++++++++++++++---------
+> >  migration/ram.c                     |  6 +++++-
+> >  4 files changed, 43 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/include/migration/qemu-file-types.h b/include/migration/qemu-file-types.h
+> > index bd6d7dd7f9..bb5c547498 100644
+> > --- a/include/migration/qemu-file-types.h
+> > +++ b/include/migration/qemu-file-types.h
+> > @@ -34,6 +34,7 @@ void qemu_put_be16(QEMUFile *f, unsigned int v);
+> >  void qemu_put_be32(QEMUFile *f, unsigned int v);
+> >  void qemu_put_be64(QEMUFile *f, uint64_t v);
+> >  size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size);
+> > +size_t qemu_get_buffer_to_pmem(QEMUFile *f, uint8_t *buf, size_t size);
+> >  
+> >  int qemu_get_byte(QEMUFile *f);
+> >  
+> > diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+> > index 861d8ecc21..77ee1fc4eb 100644
+> > --- a/include/qemu/pmem.h
+> > +++ b/include/qemu/pmem.h
+> > @@ -26,6 +26,12 @@ pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
+> >      return memcpy(pmemdest, src, len);
+> >  }
+> >  
+> > +static inline void *
+> > +pmem_memcpy_nodrain(void *pmemdest, const void *src, size_t len)
+> > +{
+> > +    return memcpy(pmemdest, src, len);
+> > +}
+> > +
+> >  static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
+> >  {
+> >      return memset(pmemdest, c, len);
+> > diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> > index 2ab2bf362d..7e573010d9 100644
+> > --- a/migration/qemu-file.c
+> > +++ b/migration/qemu-file.c
+> > @@ -26,6 +26,7 @@
+> >  #include "qemu-common.h"
+> >  #include "qemu/error-report.h"
+> >  #include "qemu/iov.h"
+> > +#include "qemu/pmem.h"
+> >  #include "migration.h"
+> >  #include "qemu-file.h"
+> >  #include "trace.h"
+> > @@ -471,15 +472,8 @@ size_t qemu_peek_buffer(QEMUFile *f, uint8_t **buf, size_t size, size_t offset)
+> >      return size;
+> >  }
+> >  
+> > -/*
+> > - * Read 'size' bytes of data from the file into buf.
+> > - * 'size' can be larger than the internal buffer.
+> > - *
+> > - * It will return size bytes unless there was an error, in which case it will
+> > - * return as many as it managed to read (assuming blocking fd's which
+> > - * all current QEMUFile are)
+> > - */
+> > -size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
+> > +static size_t
+> > +qemu_get_buffer_common(QEMUFile *f, uint8_t *buf, size_t size, bool is_pmem)
+> >  {
+> >      size_t pending = size;
+> >      size_t done = 0;
+> > @@ -492,7 +486,11 @@ size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
+> >          if (res == 0) {
+> >              return done;
+> >          }
+> > -        memcpy(buf, src, res);
+> > +        if (!is_pmem) {
+> > +            memcpy(buf, src, res);
+> > +        } else {
+> > +            pmem_memcpy_nodrain(buf, src, res);
+> > +        }
+> 
+> I see why you're doing it, but again I'm surprised it's ended up having
+> to modify qemu-file.
 
-Yeah, but according to the docs on infocenter.arm.com, it does not
-implement the newer crypto instructions.
+Well, the current programming model of pmem requires users to take
+special care on the data persistence, so QEMU (as a user of pmem) has
+to do that as well.
+
+> 
+> >          qemu_file_skip(f, res);
+> >          buf += res;
+> >          pending -= res;
+> > @@ -501,6 +499,29 @@ size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
+> >      return done;
+> >  }
+> >  
+> > +/*
+> > + * Read 'size' bytes of data from the file into buf.
+> > + * 'size' can be larger than the internal buffer.
+> > + *
+> > + * It will return size bytes unless there was an error, in which case it will
+> > + * return as many as it managed to read (assuming blocking fd's which
+> > + * all current QEMUFile are)
+> > + */
+> > +size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
+> > +{
+> > +    return qemu_get_buffer_common(f, buf, size, false);
+> > +}
+> > +
+> > +/*
+> > + * Mostly the same as qemu_get_buffer(), except that
+> > + * 1) it's for the case that 'buf' is in the persistent memory, and
+> > + * 2) it takes necessary operations to ensure the data persistence in 'buf'.
+> > + */
+> > +size_t qemu_get_buffer_to_pmem(QEMUFile *f, uint8_t *buf, size_t size)
+> > +{
+> > +    return qemu_get_buffer_common(f, buf, size, true);
+> > +}
+> > +
+> >  /*
+> >   * Read 'size' bytes of data from the file.
+> >   * 'size' can be larger than the internal buffer.
+> > diff --git a/migration/ram.c b/migration/ram.c
+> > index 5a0e503818..5a79bbff64 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -2950,7 +2950,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> >              break;
+> >  
+> >          case RAM_SAVE_FLAG_PAGE:
+> > -            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+> > +            if (!is_pmem) {
+> > +                qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+> > +            } else {
+> > +                qemu_get_buffer_to_pmem(f, host, TARGET_PAGE_SIZE);
+> > +            }
+> 
+> can you just expose qemu_get_buffer_common instead of making it static
+> and just pass in the is_pmem flag.
+
+Or perhaps passing a memcpyfunc function similarly to your comment on
+patch 5.
+
+Thanks,
+Haozhong
+
+> 
+> Dave
+> 
+> >              break;
+> >  
+> >          case RAM_SAVE_FLAG_COMPRESS_PAGE:
+> > -- 
+> > 2.14.1
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
