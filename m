@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejSmM-0000C5-Jp
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:41:08 -0500
+	(envelope-from <mst@redhat.com>) id 1ejSog-0002G0-D1
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:43:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejSmH-00085t-LF
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:41:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59438 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ejSod-00011v-9W
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:43:26 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36096 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejSmH-00085e-H2
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:40:57 -0500
-References: <CAFEAcA8ges1g2TOGKYBG+xtjxGHWsg+Hr81eSxcQrLNPV4CUNg@mail.gmail.com>
-	<20180206190432.GF3291@localhost.localdomain>
-	<CAFEAcA8gwSqNpVD5xfk_yEz0OUMwa2rrfKaEhBXq5KravJmOag@mail.gmail.com>
-	<f87c71eb-78b8-e7a8-ac77-575212a94c7e@redhat.com>
-	<CAFEAcA-Y6C-E_2=dEuQAA1ryeyzmCYKZUf-Fh-4jaQMhnU9Kkg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3131facd-2630-a159-15c3-0013332bf805@redhat.com>
-Date: Wed, 7 Feb 2018 17:38:21 +0100
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejSod-00010m-3S
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:43:23 -0500
+Date: Wed, 7 Feb 2018 18:43:21 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180207175416-mutt-send-email-mst@kernel.org>
+References: <20180125040328.22867-1-tiwei.bie@intel.com>
+	<20180125040328.22867-7-tiwei.bie@intel.com>
+	<20180126015553-mutt-send-email-mst@kernel.org>
+	<28ab37d5-6cf6-866d-9167-e14e7441415f@redhat.com>
+	<20180126055759.vu4qwdpjbzf4mg4j@debian-xvivbkq.sh.intel.com>
+	<CAKgT0UcCKxBmm23tOXreTQwKsY4wqLF1MwtQm7ND7Ee0Td0rjQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Y6C-E_2=dEuQAA1ryeyzmCYKZUf-Fh-4jaQMhnU9Kkg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] how to handle QOM 'container' objects whose
- contents depend on QOM properties?
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UcCKxBmm23tOXreTQwKsY4wqLF1MwtQm7ND7Ee0Td0rjQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1 6/6] vhost-user: add
+ VFIO based accelerators support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +33,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Tiwei Bie <tiwei.bie@intel.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-On 07/02/2018 17:22, Peter Maydell wrote:
->> Just to understand the context better, when you buy a SoC (presumably as
->> IP) can you also configure it to hardwire different CPU config signals?
->
-> Usually if you buy an SoC you're buying the silicon, not
-> the IP. I think the usual case is that the SoC ties the
-> CPU config signals to 0 or 1 (part of the SoC designer's
-> job is configuring the semi-configurable bits of IP the
-> way they want when they put them all together). It would
-> certainly be in theory possible for the SoC to instead
-> route those signals out to pins on the SoC for the board
-> to tie off, but my impression is that's not a likely design
-> choice.
+On Sun, Feb 04, 2018 at 01:49:46PM -0800, Alexander Duyck wrote:
+> On Thu, Jan 25, 2018 at 9:57 PM, Tiwei Bie <tiwei.bie@intel.com> wrote:
+> > On Fri, Jan 26, 2018 at 11:41:27AM +0800, Jason Wang wrote:
+> >> On 2018=E5=B9=B401=E6=9C=8826=E6=97=A5 07:59, Michael S. Tsirkin wro=
+te:
+> >> > > The virtual IOMMU isn't supported by the accelerators for now.
+> >> > > Because vhost-user currently lacks of an efficient way to share
+> >> > > the IOMMU table in VM to vhost backend. That's why the software
+> >> > > implementation of virtual IOMMU support in vhost-user backend
+> >> > > can't support dynamic mapping well.
+> >> > What exactly is meant by that? vIOMMU seems to work for people,
+> >> > it's not that fast if you change mappings all the time,
+> >> > but e.g. dpdk within guest doesn't.
+> >>
+> >> Yes, software implementation support dynamic mapping for sure. I thi=
+nk the
+> >> point is, current vhost-user backend can not program hardware IOMMU.=
+ So it
+> >> can not let hardware accelerator to cowork with software vIOMMU.
+> >
+> > Vhost-user backend can program hardware IOMMU. Currently
+> > vhost-user backend (or more precisely the vDPA driver in
+> > vhost-user backend) will use the memory table (delivered
+> > by the VHOST_USER_SET_MEM_TABLE message) to program the
+> > IOMMU via vfio, and that's why accelerators can use the
+> > GPA (guest physical address) in descriptors directly.
+> >
+> > Theoretically, we can use the IOVA mapping info (delivered
+> > by the VHOST_USER_IOTLB_MSG message) to program the IOMMU,
+> > and accelerators will be able to use IOVA. But the problem
+> > is that in vhost-user QEMU won't push all the IOVA mappings
+> > to backend directly. Backend needs to ask for those info
+> > when it meets a new IOVA. Such design and implementation
+> > won't work well for dynamic mappings anyway and couldn't
+> > be supported by hardware accelerators.
+> >
+> >> I think
+> >> that's another call to implement the offloaded path inside qemu whic=
+h has
+> >> complete support for vIOMMU co-operated VFIO.
+> >
+> > Yes, that's exactly what we want. After revisiting the
+> > last paragraph in the commit message, I found it's not
+> > really accurate. The practicability of dynamic mappings
+> > support is a common issue for QEMU. It also exists for
+> > vfio (hw/vfio in QEMU). If QEMU needs to trap all the
+> > map/unmap events, the data path performance couldn't be
+> > high. If we want to thoroughly fix this issue especially
+> > for vfio (hw/vfio in QEMU), we need to have the offload
+> > path Jason mentioned in QEMU. And I think accelerators
+> > could use it too.
+> >
+> > Best regards,
+> > Tiwei Bie
+>=20
+> I wonder if we couldn't look at coming up with an altered security
+> model for the IOMMU drivers to address some of the performance issues
+> seen with typical hardware IOMMU?
+>=20
+> In the case of most network devices, we seem to be moving toward a
+> model where the Rx pages are mapped for an extended period of time and
+> see a fairly high rate of reuse. As such pages mapped as being
+> writable or read/write by the device are left mapped for an extended
+> period of time while Tx pages, which are read only, are often
+> mapped/unmapped since they are coming from some other location in the
+> kernel beyond the driver's control.
+>=20
+> If we were to somehow come up with a model where the read-only(Tx)
+> pages had access to a pre-allocated memory mapped address, and the
+> read/write(descriptor rings), write-only(Rx) pages were provided with
+> dynamic addresses we might be able to come up with a solution that
+> would allow for fairly high network performance while at least
+> protecting from memory corruption. The only issue it would open up is
+> that the device would have the ability to read any/all memory on the
+> guest. I was wondering about doing something like this with the vIOMMU
+> with VFIO for the Intel NICs this way since an interface like igb,
+> ixgbe, ixgbevf, i40e, or i40evf would probably show pretty good
+> performance under such a model and as long as the writable pages were
+> being tracked by the vIOMMU. It could even allow for live migration
+> support if the vIOMMU provided the info needed for migratable/dirty
+> page tracking and we held off on migrating any of the dynamically
+> mapped pages until after they were either unmapped or an FLR reset the
+> device.
+>=20
+> Thanks.
+>=20
+> - Alex
 
-Yeah, that's why I was wondering if buying an SoC as configurable IP was
-a thing at all.  In that case, I would just make things less
-configurable and, if needed, hack the configurability with -global.
 
-Paolo
+
+It might be a good idea to change the iommu instead - how about a
+variant of strict in intel iommu which forces an IOTLB flush after
+invalidating a writeable mapping but not a RO mapping?  Not sure what the
+name would be - relaxed-ro?
+
+This is probably easier than poking at the drivers and net core.
+
+Keeping the RX pages mapped in the IOMMU was envisioned for XDP.
+That might be a good place to start.
+
+--=20
+MST
