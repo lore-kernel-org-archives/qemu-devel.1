@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejSyj-0003NB-2X
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:53:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ejSzk-0004MF-Ny
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejSyg-0008Vw-1G
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:53:49 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36338 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1ejSzj-0000je-M7
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:54:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38876 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejSyf-0008V4-S1
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:53:45 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejSzj-0000jN-FK
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:54:51 -0500
 References: <20180207160638.98872-1-brijesh.singh@amd.com>
-	<20180207160638.98872-4-brijesh.singh@amd.com>
+	<20180207160638.98872-5-brijesh.singh@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5454b283-6fa1-3c0c-56b2-e82c08fd50a4@redhat.com>
-Date: Wed, 7 Feb 2018 17:53:36 +0100
+Message-ID: <70d2e5cd-6b31-efc0-a48d-259defe4316b@redhat.com>
+Date: Wed, 7 Feb 2018 17:54:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180207160638.98872-4-brijesh.singh@amd.com>
+In-Reply-To: <20180207160638.98872-5-brijesh.singh@amd.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 04/26] monitor/i386: use debug APIs when
- accessing guest memory
+Subject: Re: [Qemu-devel] [PATCH v7 05/26] target/i386: add memory
+ encryption feature cpuid support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +33,140 @@ To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Richard Henderson <rth@twiddle.net>
 
 On 07/02/2018 17:06, Brijesh Singh wrote:
->  
->      sum = 0;
->      for(addr = start; addr < (start + size); addr++) {
-> -        uint8_t val = address_space_ldub(&address_space_memory, addr,
-> -                                         MEMTXATTRS_UNSPECIFIED, NULL);
-> +        uint8_t buf[0];
-> +        uint8_t val;
-> +        cpu_physical_memory_read_debug(addr, buf, 1);
-> +        val = ldub_p(buf);
+> AMD EPYC processors support memory encryption feature. The feature
+> is reported through CPUID 8000_001F[EAX].
+> 
+> Fn8000_001F [EAX]:
+>  Bit 0   Secure Memory Encryption (SME) supported
+>  Bit 1   Secure Encrypted Virtualization (SEV) supported
+>  Bit 2   Page flush MSR supported
+>  Bit 3   Ecrypted State (SEV-ES) support
+> 
+> when memory encryption feature is reported, CPUID 8000_001F[EBX] should
+> provide additional information regarding the feature (such as which page
+> table bit is used to mark pages as encrypted etc). The information in EBX
+> and ECX may vary from one family to another hence we use the host cpuid
+> to populate the EBX information.
+> 
+> The details for memory encryption CPUID is available in AMD APM
+> (https://support.amd.com/TechDocs/24594.pdf) Section E.4.17
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  target/i386/cpu.c | 36 ++++++++++++++++++++++++++++++++++++
+>  target/i386/cpu.h |  6 ++++++
+>  2 files changed, 42 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index a49d2221adc9..4147eb6e18a9 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -234,6 +234,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+>  #define TCG_EXT4_FEATURES 0
+>  #define TCG_SVM_FEATURES 0
+>  #define TCG_KVM_FEATURES 0
+> +#define TCG_MEM_ENCRYPT_FEATURES 0
+>  #define TCG_7_0_EBX_FEATURES (CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_SMAP | \
+>            CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ADX | \
+>            CPUID_7_0_EBX_PCOMMIT | CPUID_7_0_EBX_CLFLUSHOPT |            \
+> @@ -545,6 +546,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          .cpuid_reg = R_EDX,
+>          .tcg_features = ~0U,
+>      },
+> +    [FEAT_MEM_ENCRYPT] = {
+> +        .feat_names = {
+> +            "sme", "sev", "page-flush-msr", "sev-es",
 
-This is a buffer overflow on "buf".  All you need is
-
-    cpu_physical_memory_read_debug(addr, &val, 1);
-
-Thanks,
+Why would sme ever be on in a guest?  That is, would a guest care about
+whether SME is on in the host?
 
 Paolo
 
->          /* BSD sum algorithm ('sum' Unix command) */
->          sum = (sum >> 1) | (sum << 15);
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +        },
+> +        .cpuid_eax = 0x8000001F, .cpuid_reg = R_EAX,
+> +        .tcg_features = TCG_MEM_ENCRYPT_FEATURES,
+> +    }
+>  };
+>  
+>  typedef struct X86RegisterInfo32 {
+> @@ -1965,6 +1980,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_XSAVE_XGETBV1,
+>          .features[FEAT_6_EAX] =
+>              CPUID_6_EAX_ARAT,
+> +        /* Missing: SEV_ES */
+> +        .features[FEAT_MEM_ENCRYPT] =
+> +            CPUID_8000_001F_EAX_SME | CPUID_8000_001F_EAX_SEV,
+>          .xlevel = 0x8000000A,
+>          .model_id = "AMD EPYC Processor",
+>      },
+> @@ -3589,6 +3607,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>              *edx = 0;
+>          }
+>          break;
+> +    case 0x8000001F:
+> +        if (env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_SEV) {
+> +            *eax = env->features[FEAT_MEM_ENCRYPT];
+> +            host_cpuid(0x8000001F, 0, NULL, ebx, NULL, NULL);
+> +            *ecx = 0;
+> +            *edx = 0;
+> +        } else {
+> +            *eax = 0;
+> +            *ebx = 0;
+> +            *ecx = 0;
+> +            *edx = 0;
+> +        }
+> +        break;
+>      case 0xC0000000:
+>          *eax = env->cpuid_xlevel2;
+>          *ebx = 0;
+> @@ -4036,10 +4067,15 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+> +        x86_cpu_adjust_feat_level(cpu, FEAT_MEM_ENCRYPT);
+>          /* SVM requires CPUID[0x8000000A] */
+>          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+>              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+>          }
+> +        /* SEV requires CPUID[0x8000001F] */
+> +        if ((env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_SEV)) {
+> +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
+> +        }
+>      }
+>  
+>      /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index f91e37d25dea..f7a0ab20fdd1 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -483,6 +483,7 @@ typedef enum FeatureWord {
+>      FEAT_6_EAX,         /* CPUID[6].EAX */
+>      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
+>      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
+> +    FEAT_MEM_ENCRYPT,   /* CPUID[8000_001F].EAX */
+>      FEATURE_WORDS,
+>  } FeatureWord;
+>  
+> @@ -679,6 +680,11 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  
+>  #define CPUID_6_EAX_ARAT       (1U << 2)
+>  
+> +#define CPUID_8000_001F_EAX_SME             (1U << 0) /* SME */
+> +#define CPUID_8000_001F_EAX_SEV             (1U << 1) /* SEV */
+> +#define CPUID_8000_001F_EAX_PAGE_FLUSH_MSR  (1U << 2) /* Page flush MSR */
+> +#define CPUID_8000_001F_EAX_SEV_ES          (1U << 3) /* SEV-ES */
+> +
+>  /* CPUID[0x80000007].EDX flags: */
+>  #define CPUID_APM_INVTSC       (1U << 8)
+>  
+> 
