@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ejOIP-00084z-Jm
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:53:50 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ejOIt-000055-G8
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ejOIO-0003Jn-KQ
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:53:49 -0500
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:55809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1ejOIO-0003Jh-Fk
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:53:48 -0500
-Received: by mail-it0-x243.google.com with SMTP id b66so1929303itd.5
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 03:53:48 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1ejOIq-0003T0-Ci
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:54:19 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59126 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejOIp-0003Sq-Uc
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:54:16 -0500
+Date: Wed, 7 Feb 2018 11:54:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180207115406.GD2665@work-vm>
+References: <20180207073331.14158-1-haozhong.zhang@intel.com>
+	<20180207073331.14158-8-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <874lmtvx2l.fsf@linaro.org>
-References: <20180207111729.15737-1-ard.biesheuvel@linaro.org>
-	<20180207111729.15737-6-ard.biesheuvel@linaro.org>
-	<874lmtvx2l.fsf@linaro.org>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 7 Feb 2018 11:53:47 +0000
-Message-ID: <CAKv+Gu8Gh-unEST2RB5bchq5jX9OSV=z=CAGGzBWWdAQYuAySQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] target/arm: enable user-mode SHA-3,
- SM3, SM4 and SHA-512 instruction support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180207073331.14158-8-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/8] migration/ram: ensure write
+ persistence on loading compressed pages to PMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-On 7 February 2018 at 11:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
->
-> Ard Biesheuvel <ard.biesheuvel@linaro.org> writes:
->
->> Add support for the new ARMv8.2 SHA-3, SM3, SM4 and SHA-512 instructions=
- to
->> AArch64 user mode emulation.
->
-> Are you aware of any processors with ARMv8.2 available yet? It might be
-> nice to have a more recent model for system emulation and the pieces
-> seems to be coming together.
->
+* Haozhong Zhang (haozhong.zhang@intel.com) wrote:
+> When loading a compressed page to persistent memory, flush CPU cache
+> after the data is decompressed. Combined with a call to pmem_drain()
+> at the end of memory loading, we can guarantee those compressed pages
+> are persistently loaded to PMEM.
 
-I think Peter's idea was to have so kind of 'max' cpu type that
-enables all optional extensions in system emulation mode.
-AFAIK none of the Cortex-Axx cores that are public are available with
-these crypto features.
+Can you explain why this can use the flush and doesn't need the special
+memset?
 
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> ---
->>  linux-user/elfload.c | 19 +++++++++++++++++++
->>  target/arm/cpu64.c   |  4 ++++
->>  2 files changed, 23 insertions(+)
->>
->> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
->> index 20f3d8c2c373..7922ab8eab79 100644
->> --- a/linux-user/elfload.c
->> +++ b/linux-user/elfload.c
->> @@ -512,6 +512,21 @@ enum {
->>      ARM_HWCAP_A64_SHA1          =3D 1 << 5,
->>      ARM_HWCAP_A64_SHA2          =3D 1 << 6,
->>      ARM_HWCAP_A64_CRC32         =3D 1 << 7,
->> +    ARM_HWCAP_A64_ATOMICS       =3D 1 << 8,
->> +    ARM_HWCAP_A64_FPHP          =3D 1 << 9,
->> +    ARM_HWCAP_A64_ASIMDHP       =3D 1 << 10,
->> +    ARM_HWCAP_A64_CPUID         =3D 1 << 11,
->> +    ARM_HWCAP_A64_ASIMDRDM      =3D 1 << 12,
->> +    ARM_HWCAP_A64_JSCVT         =3D 1 << 13,
->> +    ARM_HWCAP_A64_FCMA          =3D 1 << 14,
->> +    ARM_HWCAP_A64_LRCPC         =3D 1 << 15,
->> +    ARM_HWCAP_A64_DCPOP         =3D 1 << 16,
->> +    ARM_HWCAP_A64_SHA3          =3D 1 << 17,
->> +    ARM_HWCAP_A64_SM3           =3D 1 << 18,
->> +    ARM_HWCAP_A64_SM4           =3D 1 << 19,
->> +    ARM_HWCAP_A64_ASIMDDP       =3D 1 << 20,
->> +    ARM_HWCAP_A64_SHA512        =3D 1 << 21,
->> +    ARM_HWCAP_A64_SVE           =3D 1 << 22,
->>  };
->>
->>  #define ELF_HWCAP get_elf_hwcap()
->> @@ -532,6 +547,10 @@ static uint32_t get_elf_hwcap(void)
->>      GET_FEATURE(ARM_FEATURE_V8_SHA1, ARM_HWCAP_A64_SHA1);
->>      GET_FEATURE(ARM_FEATURE_V8_SHA256, ARM_HWCAP_A64_SHA2);
->>      GET_FEATURE(ARM_FEATURE_CRC, ARM_HWCAP_A64_CRC32);
->> +    GET_FEATURE(ARM_FEATURE_V8_SHA3, ARM_HWCAP_A64_SHA3);
->> +    GET_FEATURE(ARM_FEATURE_V8_SM3, ARM_HWCAP_A64_SM3);
->> +    GET_FEATURE(ARM_FEATURE_V8_SM4, ARM_HWCAP_A64_SM4);
->> +    GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
->>  #undef GET_FEATURE
->>
->>      return hwcaps;
->> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
->> index 670c07ab6ed4..1c330adc281b 100644
->> --- a/target/arm/cpu64.c
->> +++ b/target/arm/cpu64.c
->> @@ -224,6 +224,10 @@ static void aarch64_any_initfn(Object *obj)
->>      set_feature(&cpu->env, ARM_FEATURE_V8_AES);
->>      set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
->>      set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
->> +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA512);
->> +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA3);
->> +    set_feature(&cpu->env, ARM_FEATURE_V8_SM3);
->> +    set_feature(&cpu->env, ARM_FEATURE_V8_SM4);
->>      set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
->>      set_feature(&cpu->env, ARM_FEATURE_CRC);
->>      cpu->ctr =3D 0x80038003; /* 32 byte I and D cacheline size, VIPT ic=
-ache */
->
->
-> --
-> Alex Benn=C3=A9e
+Dave
+
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> ---
+>  include/qemu/pmem.h |  4 ++++
+>  migration/ram.c     | 16 +++++++++++-----
+>  2 files changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+> index 77ee1fc4eb..20e3f6e71d 100644
+> --- a/include/qemu/pmem.h
+> +++ b/include/qemu/pmem.h
+> @@ -37,6 +37,10 @@ static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
+>      return memset(pmemdest, c, len);
+>  }
+>  
+> +static inline void pmem_flush(const void *addr, size_t len)
+> +{
+> +}
+> +
+>  static inline void pmem_drain(void)
+>  {
+>  }
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 5a79bbff64..924d2b9537 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -274,6 +274,7 @@ struct DecompressParam {
+>      void *des;
+>      uint8_t *compbuf;
+>      int len;
+> +    bool is_pmem;
+>  };
+>  typedef struct DecompressParam DecompressParam;
+>  
+> @@ -2502,7 +2503,7 @@ static void *do_data_decompress(void *opaque)
+>      DecompressParam *param = opaque;
+>      unsigned long pagesize;
+>      uint8_t *des;
+> -    int len;
+> +    int len, rc;
+>  
+>      qemu_mutex_lock(&param->mutex);
+>      while (!param->quit) {
+> @@ -2518,8 +2519,11 @@ static void *do_data_decompress(void *opaque)
+>               * not a problem because the dirty page will be retransferred
+>               * and uncompress() won't break the data in other pages.
+>               */
+> -            uncompress((Bytef *)des, &pagesize,
+> -                       (const Bytef *)param->compbuf, len);
+> +            rc = uncompress((Bytef *)des, &pagesize,
+> +                            (const Bytef *)param->compbuf, len);
+> +            if (rc == Z_OK && param->is_pmem) {
+> +                pmem_flush(des, len);
+> +            }
+>  
+>              qemu_mutex_lock(&decomp_done_lock);
+>              param->done = true;
+> @@ -2605,7 +2609,8 @@ static void compress_threads_load_cleanup(void)
+>  }
+>  
+>  static void decompress_data_with_multi_threads(QEMUFile *f,
+> -                                               void *host, int len)
+> +                                               void *host, int len,
+> +                                               bool is_pmem)
+>  {
+>      int idx, thread_count;
+>  
+> @@ -2619,6 +2624,7 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+>                  qemu_get_buffer(f, decomp_param[idx].compbuf, len);
+>                  decomp_param[idx].des = host;
+>                  decomp_param[idx].len = len;
+> +                decomp_param[idx].is_pmem = is_pmem;
+>                  qemu_cond_signal(&decomp_param[idx].cond);
+>                  qemu_mutex_unlock(&decomp_param[idx].mutex);
+>                  break;
+> @@ -2964,7 +2970,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>                  ret = -EINVAL;
+>                  break;
+>              }
+> -            decompress_data_with_multi_threads(f, host, len);
+> +            decompress_data_with_multi_threads(f, host, len, is_pmem);
+>              break;
+>  
+>          case RAM_SAVE_FLAG_XBZRLE:
+> -- 
+> 2.14.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
