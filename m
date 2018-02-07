@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejOTp-0001KS-Rg
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:38 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTp-0001K9-ID
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejOTk-0004XG-Qi
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTl-0004XV-EJ
 	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:37 -0500
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:54436)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejOTk-0004Wh-CV
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:32 -0500
-Received: by mail-wm0-f66.google.com with SMTP id i186so2678676wmi.4
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 04:05:32 -0800 (PST)
-References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8xGrkYY14hm6htgs3oqB1gaKHFRLktz2x0tOFageDqYQ@mail.gmail.com>
-	<4ce6f2ad-2287-2155-277b-977e48167687@redhat.com>
-	<CAFEAcA_mAK2jeX9Uu=Mtx4PUOVToXFW351OKgu6B4A0kj_79aw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4c81a8d5-5d88-2f31-13be-4ae12007b2b3@redhat.com>
-Date: Wed, 7 Feb 2018 13:05:29 +0100
+Received: from mail.ispras.ru ([83.149.199.45]:47692)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOTk-0004X4-UF
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:05:33 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Wed, 07 Feb 2018 15:05:34 +0300
+Message-ID: <20180207120534.5389.46888.stgit@pasha-VirtualBox>
+In-Reply-To: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_mAK2jeX9Uu=Mtx4PUOVToXFW351OKgu6B4A0kj_79aw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/47] Misc patches for 2018-02-05
+Subject: [Qemu-devel] [RFC PATCH v6 18/20] replay: don't process async
+ events when warping the clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-On 07/02/2018 12:55, Peter Maydell wrote:
-> On 6 February 2018 at 20:37, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 06/02/2018 20:18, Peter Maydell wrote:
->>> Hi. I'm afraid this fails to build the all-linux-static config:
->>>
->>>   LINK    ivshmem-client
->>> [usual linker gripes about getpwuid &c in static binaries deleted]
->>> /usr/lib/gcc/x86_64-linux-gnu/5/libubsan.a(sanitizer_linux_libcdep.o):
->>> In function `__sanitizer::SetEnv(cha
->>> r const*, char const*)':
->>> (.text+0x41b): undefined reference to `dlsym'
->>> /usr/lib/gcc/x86_64-linux-gnu/5/libubsan.a(sanitizer_linux_libcdep.o):
->>> In function `__sanitizer::InitTlsSiz
->>> e()':
->>> (.text+0x553): undefined reference to `dlsym'
->>> collect2: error: ld returned 1 exit status
->>
->> Uhm, what is all-linux-static?  Is it using --enable-debug?
-> 
-> Yeah, it's a config with --enable-debug --static --disable-system
+Virtual clock is warped from iothread and vcpu thread. When the hardware
+events associated with warp checkpoint, then interrupt delivering may be
+non-deterministic if checkpoint is processed in different threads in record
+and replay.
+This patch disables event processing for clock warp checkpoint and leaves
+all hardware events to other checkpoints (e.g., virtual clock).
 
-Ok, I'll drop the change to enable --enable-sanitizers when you give
---enable-debug.  It's premature.
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-Paolo
+--
+
+v4: added assert for replay_save_events function
+---
+ replay/replay-events.c |    1 +
+ replay/replay.c        |    7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/replay/replay-events.c b/replay/replay-events.c
+index 54dd9d2..3d5fc8a 100644
+--- a/replay/replay-events.c
++++ b/replay/replay-events.c
+@@ -205,6 +205,7 @@ static void replay_save_event(Event *event, int checkpoint)
+ void replay_save_events(int checkpoint)
+ {
+     g_assert(replay_mutex_locked());
++    g_assert(checkpoint != CHECKPOINT_CLOCK_WARP_START);
+     while (!QTAILQ_EMPTY(&events_list)) {
+         Event *event = QTAILQ_FIRST(&events_list);
+         replay_save_event(event, checkpoint);
+diff --git a/replay/replay.c b/replay/replay.c
+index c676dd4..e3794fc 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -211,7 +211,12 @@ bool replay_checkpoint(ReplayCheckpoint checkpoint)
+     } else if (replay_mode == REPLAY_MODE_RECORD) {
+         g_assert(replay_mutex_locked());
+         replay_put_event(EVENT_CHECKPOINT + checkpoint);
+-        replay_save_events(checkpoint);
++        /* This checkpoint belongs to several threads.
++           Processing events from different threads is
++           non-deterministic */
++        if (checkpoint != CHECKPOINT_CLOCK_WARP_START) {
++            replay_save_events(checkpoint);
++        }
+         res = true;
+     }
+ out:
