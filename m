@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSFs-00061d-4K
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:31 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ejSFw-00064l-3U
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSFo-0006x3-2d
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:28 -0500
-Received: from mail-by2nam03on0082.outbound.protection.outlook.com
-	([104.47.42.82]:39492
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1ejSFr-0006yF-1R
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:32 -0500
+Received: from mail-bl2nam02on0057.outbound.protection.outlook.com
+	([104.47.38.57]:21504
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1ejSFn-0006wj-OS
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:24 -0500
+	id 1ejSFq-0006y1-Qh
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:26 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  7 Feb 2018 10:06:27 -0600
-Message-Id: <20180207160638.98872-15-brijesh.singh@amd.com>
+Date: Wed,  7 Feb 2018 10:06:30 -0600
+Message-Id: <20180207160638.98872-18-brijesh.singh@amd.com>
 In-Reply-To: <20180207160638.98872-1-brijesh.singh@amd.com>
 References: <20180207160638.98872-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 15/26] sev: add command to create launch
- memory encryption context
+Subject: [Qemu-devel] [PATCH v7 18/26] sev: add support to LAUNCH_MEASURE
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,187 +32,167 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
 
-The KVM_SEV_LAUNCH_START command creates a new VM encryption key (VEK).
-The encryption key created with the command will be used for encrypting
-the bootstrap images (such as guest bios).
+During machine creation we encrypted the guest bios image, the
+LAUNCH_MEASURE command can be used to retrieve the measurement of
+the encrypted memory region. This measurement is a signature of
+the memory contents that can be sent to the guest owner as an
+attestation that the memory was encrypted correctly by the firmware.
+VM management tools like libvirt can query the measurement using
+query-launch-measure QMP command.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- accel/kvm/sev.c        | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++
- accel/kvm/trace-events |  2 +
- include/sysemu/sev.h   | 10 +++++
- 3 files changed, 111 insertions(+)
+ accel/kvm/sev.c        | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ accel/kvm/trace-events |  1 +
+ accel/stubs/kvm-stub.c |  5 ++++
+ include/sysemu/sev.h   |  2 ++
+ 4 files changed, 75 insertions(+)
 
 diff --git a/accel/kvm/sev.c b/accel/kvm/sev.c
-index 2c4bbba3c367..2ecc6a1d1ad3 100644
+index 4414bda25509..8d99c6cda4d2 100644
 --- a/accel/kvm/sev.c
 +++ b/accel/kvm/sev.c
-@@ -29,6 +29,17 @@ static int sev_fd;
+@@ -19,6 +19,7 @@
+ #include "sysemu/sev.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
++#include "qapi-event.h"
+ 
+ #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+ #define DEFAULT_SEV_DEVICE      "/dev/sev"
+@@ -26,6 +27,7 @@
+ static uint64_t me_mask;
+ static bool sev_active;
+ static int sev_fd;
++static SEVState *sev_state;
  
  #define SEV_FW_MAX_ERROR      0x17
  
-+static SevGuestState current_sev_guest_state = SEV_STATE_UNINIT;
-+
-+static const char *const sev_state_str[] = {
-+    "uninit",
-+    "lupdate",
-+    "secret",
-+    "running",
-+    "supdate",
-+    "rupdate",
-+};
-+
- static const char *const sev_fw_errlist[] = {
-     "",
-     "Platform state is invalid",
-@@ -86,6 +97,16 @@ fw_error_to_str(int code)
-     return sev_fw_errlist[code];
+@@ -483,6 +485,68 @@ err:
+     return ret;
  }
  
 +static void
-+sev_set_guest_state(SevGuestState new_state)
++sev_launch_get_measure(Notifier *notifier, void *unused)
 +{
-+    assert(new_state < SEV_STATE_MAX);
++    int ret, error;
++    guchar *data;
++    SEVState *s = sev_state;
++    struct kvm_sev_launch_measure *measurement;
 +
-+    trace_kvm_sev_change_state(sev_state_str[current_sev_guest_state],
-+                               sev_state_str[new_state]);
-+    current_sev_guest_state = new_state;
++    if (!sev_check_state(SEV_STATE_LUPDATE)) {
++        return;
++    }
++
++    measurement = g_malloc0(sizeof(*measurement));
++    if (!measurement) {
++        return;
++    }
++
++    /* query the measurement blob length */
++    ret = sev_ioctl(KVM_SEV_LAUNCH_MEASURE, measurement, &error);
++    if (!measurement->len) {
++        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
++                     __func__, ret, error, fw_error_to_str(errno));
++        goto free_measurement;
++    }
++
++    data = g_malloc(measurement->len);
++    if (s->measurement) {
++        goto free_data;
++    }
++
++    measurement->uaddr = (unsigned long)data;
++
++    /* get the measurement blob */
++    ret = sev_ioctl(KVM_SEV_LAUNCH_MEASURE, measurement, &error);
++    if (ret) {
++        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
++                     __func__, ret, error, fw_error_to_str(errno));
++        goto free_data;
++    }
++
++    sev_set_guest_state(SEV_STATE_SECRET);
++
++    /* encode the measurement value and emit the event */
++    s->measurement = g_base64_encode(data, measurement->len);
++    trace_kvm_sev_launch_measurement(s->measurement);
++
++free_data:
++    g_free(data);
++free_measurement:
++    g_free(measurement);
 +}
 +
- static void
- sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
- {
-@@ -337,6 +358,7 @@ sev_get_me_mask(void)
- void
- sev_get_current_state(char **state)
- {
-+    *state = g_strdup(sev_state_str[current_sev_guest_state]);
- }
- 
- bool
-@@ -355,6 +377,76 @@ sev_get_policy(uint32_t *policy)
- {
- }
- 
-+static int
-+sev_read_file_base64(const char *filename, guchar **data, gsize *len)
++char *
++sev_get_launch_measurement(void)
 +{
-+    gsize sz;
-+    gchar *base64;
-+    GError *error = NULL;
-+
-+    if (!g_file_get_contents(filename, &base64, &sz, &error)) {
-+        error_report("failed to read '%s' (%s)", filename, error->message);
-+        return -1;
-+    }
-+
-+    *data = g_base64_decode(base64, len);
-+    return 0;
++    return g_strdup(sev_state->measurement);
 +}
 +
-+static int
-+sev_launch_start(SEVState *s)
-+{
-+    gsize sz;
-+    int ret = 1;
-+    int fw_error;
-+    QSevGuestInfo *sev = s->sev_info;
-+    struct kvm_sev_launch_start *start;
-+    guchar *session = NULL, *dh_cert = NULL;
-+
-+    start = g_malloc0(sizeof(*start));
-+    if (!start) {
-+        return 1;
-+    }
-+
-+    start->handle = object_property_get_int(OBJECT(sev), "handle",
-+                                            &error_abort);
-+    start->policy = object_property_get_int(OBJECT(sev), "policy",
-+                                            &error_abort);
-+    if (sev->session_file) {
-+        if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
-+            return 1;
-+        }
-+        start->session_uaddr = (unsigned long)session;
-+        start->session_len = sz;
-+    }
-+
-+    if (sev->dh_cert_file) {
-+        if (sev_read_file_base64(sev->dh_cert_file, &dh_cert, &sz) < 0) {
-+            return 1;
-+        }
-+        start->dh_uaddr = (unsigned long)dh_cert;
-+        start->dh_len = sz;
-+    }
-+
-+    trace_kvm_sev_launch_start(start->policy, session, dh_cert);
-+    ret = sev_ioctl(KVM_SEV_LAUNCH_START, start, &fw_error);
-+    if (ret < 0) {
-+        error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
-+                __func__, ret, fw_error, fw_error_to_str(fw_error));
-+        return 1;
-+    }
-+
-+    object_property_set_int(OBJECT(sev), start->handle, "handle",
-+                            &error_abort);
-+    sev_set_guest_state(SEV_STATE_LUPDATE);
-+
-+    g_free(start);
-+    g_free(session);
-+    g_free(dh_cert);
-+
-+    return 0;
-+}
++static Notifier sev_machine_done_notify = {
++    .notify = sev_launch_get_measure,
++};
 +
  void *
  sev_guest_init(const char *id)
  {
-@@ -398,6 +490,13 @@ sev_guest_init(const char *id)
-         goto err;
-     }
+@@ -535,6 +599,9 @@ sev_guest_init(const char *id)
  
-+    ret = sev_launch_start(s);
-+    if (ret) {
-+        error_report("%s: failed to create encryption context", __func__);
-+        goto err;
-+    }
-+
-+
      sev_active = true;
      ram_block_notifier_add(&sev_ram_notifier);
++    qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
++
++    sev_state = s;
  
+     return s;
+ err:
 diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-index 364c84bd7a73..5d993ca08e5f 100644
+index bd92f868b73a..19742bf9dd30 100644
 --- a/accel/kvm/trace-events
 +++ b/accel/kvm/trace-events
-@@ -17,3 +17,5 @@ kvm_irqchip_release_virq(int virq) "virq %d"
- kvm_sev_init(void) ""
- kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
- kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
-+kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
-+kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
+@@ -20,3 +20,4 @@ kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
+ kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
+ kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
+ kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
++kvm_sev_launch_measurement(const char *value) "data %s"
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index e7d579e3e54f..d0f1aa6d6f9a 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -133,6 +133,11 @@ void sev_get_policy(uint32_t *policy)
+ {
+ }
+ 
++char *sev_get_launch_measurement(void)
++{
++    return NULL;
++}
++
+ bool kvm_memcrypt_enabled(void)
+ {
+     return false;
 diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-index 121e7e4aa44c..08014a9c94ff 100644
+index f7af1a00c510..c173ad33f8bb 100644
 --- a/include/sysemu/sev.h
 +++ b/include/sysemu/sev.h
-@@ -58,6 +58,16 @@ struct QSevGuestInfoClass {
-     ObjectClass parent_class;
- };
+@@ -30,6 +30,7 @@ extern uint64_t sev_get_me_mask(void);
+ extern void sev_get_current_state(char **state);
+ extern void sev_get_fw_version(uint8_t *major, uint8_t *minor, uint8_t *build);
+ extern void sev_get_policy(uint32_t *policy);
++extern char *sev_get_launch_measurement(void);
  
-+typedef enum {
-+    SEV_STATE_UNINIT = 0,
-+    SEV_STATE_LUPDATE,
-+    SEV_STATE_SECRET,
-+    SEV_STATE_RUNNING,
-+    SEV_STATE_SUPDATE,
-+    SEV_STATE_RUPDATE,
-+    SEV_STATE_MAX
-+} SevGuestState;
-+
+ typedef struct QSevGuestInfo QSevGuestInfo;
+ typedef struct QSevGuestInfoClass QSevGuestInfoClass;
+@@ -70,6 +71,7 @@ typedef enum {
+ 
  struct SEVState {
      QSevGuestInfo *sev_info;
++    gchar *measurement;
  };
+ 
+ typedef struct SEVState SEVState;
 -- 
 2.14.3
