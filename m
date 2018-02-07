@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1ejOLv-0002nD-GG
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:57:28 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ejOOd-00056R-W7
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:00:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1ejOLu-0005Nu-Sg
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:57:27 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37036)
+	(envelope-from <pbonzini@redhat.com>) id 1ejOOZ-0000em-2i
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:00:16 -0500
+Received: from mail-wr0-f176.google.com ([209.85.128.176]:44500)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1ejOLu-0005NN-NF
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:57:26 -0500
-Received: by mail-oi0-x243.google.com with SMTP id t78so454521oih.4
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 03:57:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejOOY-0000dg-Qo
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:00:11 -0500
+Received: by mail-wr0-f176.google.com with SMTP id v31so713911wrc.11
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 04:00:10 -0800 (PST)
+References: <20180206203048.11096-1-rkagan@virtuozzo.com>
+	<20180206203048.11096-21-rkagan@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b68ff4bb-3c1e-04b7-16c6-25ce75806163@redhat.com>
+Date: Wed, 7 Feb 2018 13:00:07 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu8Gh-unEST2RB5bchq5jX9OSV=z=CAGGzBWWdAQYuAySQ@mail.gmail.com>
-References: <20180207111729.15737-1-ard.biesheuvel@linaro.org>
-	<20180207111729.15737-6-ard.biesheuvel@linaro.org>
-	<874lmtvx2l.fsf@linaro.org>
-	<CAKv+Gu8Gh-unEST2RB5bchq5jX9OSV=z=CAGGzBWWdAQYuAySQ@mail.gmail.com>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Wed, 7 Feb 2018 12:57:25 +0100
-Message-ID: <CABoDooMmKtM5Kwr2Vwp9=jPLBHkYUFDGfdee6TFn8uC-NetLFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] target/arm: enable user-mode SHA-3,
- SM3, SM4 and SHA-512 instruction support
+In-Reply-To: <20180206203048.11096-21-rkagan@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 20/34] vmbus: vmbus implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,32 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
 
-On Wed, Feb 7, 2018 at 12:53 PM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> On 7 February 2018 at 11:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->>
->> Ard Biesheuvel <ard.biesheuvel@linaro.org> writes:
->>
->>> Add support for the new ARMv8.2 SHA-3, SM3, SM4 and SHA-512 instruction=
-s to
->>> AArch64 user mode emulation.
->>
->> Are you aware of any processors with ARMv8.2 available yet? It might be
->> nice to have a more recent model for system emulation and the pieces
->> seems to be coming together.
->>
->
-> I think Peter's idea was to have so kind of 'max' cpu type that
-> enables all optional extensions in system emulation mode.
-> AFAIK none of the Cortex-Axx cores that are public are available with
-> these crypto features.
+On 06/02/2018 21:30, Roman Kagan wrote:
+> Add the VMBus infrastructure -- bus, devices, root bridge, vmbus state
+> machine, vmbus channel interactions, etc.
+> 
+> TODO:
+>  - split into smaller palatable pieces
+>  - more comments
+>  - check and handle corner cases
+> 
+> Kudos to Evgeny Yakovlev (formerly eyakovlev@virtuozzo.com) and Andrey
+> Smetatin (formerly asmetanin@virtuozzo.com) for research and
+> prototyping.
 
-Cortex-A75 is ARMv8.2.  It should be available in devices this year.
+I admit I haven't looked at this patch almost at all, but the SCSI code
+seems sane so it cannot be that bad. :)  It doesn't seem that easy to
+split, too.
 
-HTH,
+Adding doc comments to the header file would be already enough IMO.
 
-Laurent
+Paolo
