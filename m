@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejKEa-0004Ly-Sh
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:33:38 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejKF7-0004mA-QW
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejKEX-00086g-PC
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:33:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50822 helo=mx1.redhat.com)
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejKF4-0000T6-NK
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:09 -0500
+Received: from mga11.intel.com ([192.55.52.93]:8241)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejKEX-000867-K9
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:33:33 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed,  7 Feb 2018 08:33:24 +0100
-Message-Id: <1517988804-15597-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [qemu-web PATCH v2] Add a blog post with the
- presentations from DevConf and FOSDEM 2018
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1ejKF4-0000S5-FX
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:06 -0500
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Wed,  7 Feb 2018 15:33:23 +0800
+Message-Id: <20180207073331.14158-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v2 0/8] nvdimm: guarantee persistence of QEMU
+ writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +23,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Otubo <otubo@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Pankaj Gupta <pagupta@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-Let's provide some links to the videos from FOSDEM and DevConf.
+This v2 patch series extends v1 [1] by covering the migration path as
+well.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eduardo Otubo <otubo@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2:
- - Added link to the virtio 1.1 talk
- - Added links to the schedules of the virtualization tracks
+QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
+live migration. If the backend is on the persistent memory, QEMU needs
+to take proper operations to ensure its writes persistent on the
+persistent memory. Otherwise, a host power failure may result in the
+loss the guest data on the persistent memory.
 
- _posts/2018-02-06-devconf-fosdem.md | 46 +++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 46 insertions(+)
- create mode 100644 _posts/2018-02-06-devconf-fosdem.md
+This patch series is based on Marcel's patch "mem: add share parameter
+to memory-backend-ram" [2] because of the changes in patch 1.
 
-diff --git a/_posts/2018-02-06-devconf-fosdem.md b/_posts/2018-02-06-devc=
-onf-fosdem.md
-new file mode 100644
-index 0000000..74f7eb4
---- /dev/null
-+++ b/_posts/2018-02-06-devconf-fosdem.md
-@@ -0,0 +1,46 @@
-+---
-+layout: post
-+title:  "Presentations from DevConf and FOSDEM 2018"
-+date:   2018-02-06 17:00:00 +0100
-+author: Thomas Huth
-+categories: [presentations, conferences]
-+---
-+During the past two weeks, there were two important conferences for Open
-+Source developers in Europe, where you could also enjoy some QEMU relate=
-d
-+presentations. The following QEMU-related talks were held at the
-+[DevConf 2018](https://devconf.cz/cz/2018) conference in Brno:
-+
-+* [Eliminating guest page cache](https://www.youtube.com/watch?v=3DNG0n5=
-MTXOa4)
-+  by Pankaj Gupta
-+
-+* [Anatomy of KVM Guest](https://www.youtube.com/watch?v=3Dt-MSukwDqeM)
-+  by Prasad J Pandit
-+
-+* [QEMU Sandboxing for dummies](https://www.youtube.com/watch?v=3D_7yGia=
-fZdVc)
-+  by Eduardo Otubo
-+
-+And at the [FOSDEM 2018](https://fosdem.org/2018/) in Brussels, you coul=
-d
-+listen to the following QEMU related talks:
-+
-+* [QEMU in UEFI](https://fosdem.org/2018/schedule/event/vai_qemu_in_uefi=
-/)
-+  by Alexander Graf
-+
-+* [What's new in Virtio 1.1](https://fosdem.org/2018/schedule/event/virt=
-io/)
-+  by Jens Freimann
-+
-+* [Live Block Device Operations in
-+  QEMU](https://fosdem.org/2018/schedule/event/vai_qemu_live_dev_operati=
-ons/)
-+  by Kashyap Chamarthy
-+
-+* [Vectors Meet
-+  Virtualization](https://fosdem.org/2018/schedule/event/vai_vectors_mee=
-t_virtualization/)
-+  by Alex Benn=C3=A9e
-+
-+* [Finding your way through the QEMU parameter
-+  jungle](https://fosdem.org/2018/schedule/event/vai_qemu_jungle/)
-+  by Thomas Huth
-+
-+More virtualization related talks can be found in the [schedule from
-+the DevConf](https://devconfcz2018.sched.com/type/virtualization) and
-+in the [schedule from the
-+FOSDEM](https://fosdem.org/2018/schedule/track/virtualization_and_iaas/)=
-.
---=20
-1.8.3.1
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
+[2] http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg00768.html
+
+Changes in v2:
+ * (Patch 1) Use a flags parameter in file ram allocation functions.
+ * (Patch 2) Add a new option 'pmem' to hostmem-file.
+ * (Patch 3) Use libpmem to operate on the persistent memory, rather
+   than re-implementing those operations in QEMU.
+ * (Patch 5-8) Consider the write persistence in the migration path.
+
+Haozhong Zhang (8):
+ [1/8] memory, exec: switch file ram allocation functions to 'flags' parameters
+ [2/8] hostmem-file: add the 'pmem' option
+ [3/8] configure: add libpmem support
+ [4/8] mem/nvdimm: ensure write persistence to PMEM in label emulation
+ [5/8] migration/ram: ensure write persistence on loading zero pages to PMEM
+ [6/8] migration/ram: ensure write persistence on loading normal pages to PMEM
+ [7/8] migration/ram: ensure write persistence on loading compressed pages to PMEM
+ [8/8] migration/ram: ensure write persistence on loading xbzrle pages to PMEM
+
+ backends/hostmem-file.c             | 27 +++++++++++++-
+ configure                           | 35 ++++++++++++++++++
+ docs/nvdimm.txt                     | 14 ++++++++
+ exec.c                              | 23 +++++++++---
+ hw/mem/nvdimm.c                     |  9 ++++-
+ include/exec/memory.h               | 12 +++++--
+ include/exec/ram_addr.h             | 28 +++++++++++++--
+ include/migration/qemu-file-types.h |  1 +
+ include/qemu/pmem.h                 | 50 ++++++++++++++++++++++++++
+ memory.c                            |  8 +++--
+ migration/qemu-file.c               | 41 +++++++++++++++------
+ migration/ram.c                     | 71 ++++++++++++++++++++++++++++---------
+ migration/xbzrle.c                  | 20 +++++++++--
+ migration/xbzrle.h                  |  1 +
+ numa.c                              |  2 +-
+ qemu-options.hx                     |  9 ++++-
+ 16 files changed, 308 insertions(+), 43 deletions(-)
+ create mode 100644 include/qemu/pmem.h
+
+-- 
+2.14.1
