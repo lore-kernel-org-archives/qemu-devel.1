@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ejQUj-0003b4-NS
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:14:42 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejQg2-000092-BA
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ejQUe-0004IW-On
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:14:41 -0500
-Received: from mail-ua0-f181.google.com ([209.85.217.181]:37779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1ejQUe-0004IA-JS
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:14:36 -0500
-Received: by mail-ua0-f181.google.com with SMTP id q8so619910uae.4
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 06:14:36 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejQfw-0001cg-1u
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:26:22 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
+	<20180207042438.15422-5-andrew.smirnov@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <202480a7-a417-f973-73a1-19c3a813f1f7@amsat.org>
+Date: Wed, 7 Feb 2018 11:26:11 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180207131014.GB3765@localhost.localdomain>
-References: <20170418143044.12187-1-famz@redhat.com>
-	<20170418143044.12187-3-famz@redhat.com>
-	<20180206153237.GA4799@localhost.localdomain>
-	<CAK1Eb9=h4435CkK-eSz_YqAbVaz8Mvnx=VuB_BtSRHgZOfCLfA@mail.gmail.com>
-	<20180207105110.GA3765@localhost.localdomain>
-	<CAK1Eb9=jyFNqrTa9YK4EzS_t6bWGCVxsfzmmt25w49go02BZRA@mail.gmail.com>
-	<20180207131014.GB3765@localhost.localdomain>
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 7 Feb 2018 22:14:05 +0800
-Message-ID: <CAK1Eb9m6Vbq1CLxqj+9v9_tk-U4s6+xhtE3+9okiaEWM+1mGeA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.9-rc5 v4 2/2] block: Drain BH in
- bdrv_drained_begin
+In-Reply-To: <20180207042438.15422-5-andrew.smirnov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 04/14] i.MX: Add code to
+ emulate i.MX2 watchdog IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,102 +29,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeffrey Cody <jcody@redhat.com>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-On Wed, Feb 7, 2018 at 9:10 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 07.02.2018 um 13:39 hat Fam Zheng geschrieben:
->> On Wed, Feb 7, 2018 at 6:51 PM, Kevin Wolf <kwolf@redhat.com> wrote:
->> > Am 07.02.2018 um 02:48 hat Fam Zheng geschrieben:
->> >> On Tue, Feb 6, 2018 at 11:32 PM, Kevin Wolf <kwolf@redhat.com> wrote:
->> >> > I got a bug assigned where we have a large (200 GB) fragmented qcow2
->> >> > image, and qemu-img convert takes two hours before it even starts to
->> >> > copy data. What it does in this time is iterating through the whole
->> >> > image with bdrv_block_status_above() in order to estimate the work to be
->> >> > done (and of course it will repeat the same calls while actually copying
->> >> > data).
->> >>
->> >> The convert_iteration_sectors loop looks wasteful. Why cannot we
->> >> report progress simply based on (offset/size) * 100% so we don't need
->> >> to do this estimation?
->> >
->> > The assumption is that it's quick and it makes the progress much more
->> > meaningful. You know those progress bars that slowly crawl towards 50%
->> > and then suddenly complete within a second. Or the first 20% are quick,
->> > but then things get really slow. They are not a great example.
->> >
->> > There must have been something wrong with that image file that was
->> > reported, because they reported that it was the only image causing
->> > trouble and if they copied it away, it became quick, too.
->> >
->> > Even for a maximally fragmented 100 GB qcow2 image it only takes about a
->> > second on my laptop. So while I don't feel as certain about the loop as
->> > before, in practice it normally doesn't seem to hurt.
->>
->> No doubt about normal cases. I was unsure about corner cases like
->> slow-ish NFS etc.
->
-> Yeah, NFS seems to be a bit slow. Not two-hours-slow, but when I tried
-> it with a localhost NFS server, the same operation that took two seconds
-> directly from the local file system took about 40s over NFS. They seem
-> to go over the network for each lseek() instead of caching the file map.
-> Maybe something to fix in the NFS kernel driver.
->
->> A little bit of intelligence would be limiting the time for the loop
->> to a few seconds, for example, "IMG_CVT_EST_SCALE *
->> bdrv_getlength(bs)", or a less linear map.
->
-> I don't understand. What would IMG_CVT_EST_SCALE be? Isn't the problem
-> that this isn't a constant factor but can be anywhere between 0% and
-> 100% depending on the specific image?
+Hi Andrey,
 
-This is going to be quite arbitrary, just to make sure we don't waste
-a very long time on maximal fragmented images, or on slow lseek()
-scenarios. Something like this:
+On 02/07/2018 01:24 AM, Andrey Smirnov wrote:
+> Add enough code to emulate i.MX2 watchdog IP block so it would be
+> possible to reboot the machine running Linux Guest.
+> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+>  hw/misc/Makefile.objs      |  1 +
+>  hw/misc/imx2_wdt.c         | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/misc/imx2_wdt.h | 33 +++++++++++++++++
 
-#define IMG_CVT_EST_SCALE ((1 << 40) / 30)
+I recommend you to setup scripts/git.orderfile to ease review.
 
-    time_t start = time(NULL);
-    while (sector_num < s->total_sectors) {
-        if (time(NULL) - start > MAX(30, bdrv_getlength() /
-IMG_CVT_EST_SCALE)) {
-            /* Too much time spent on counting allocation, just fall
-back to bdrv_get_allocated_file_size */
-            s->allocated_sectors = bdrv_get_allocated_file_size(bs);
-            break;
-        }
-        n = convert_iteration_sectors(s, sector_num);
-        ...
-    }
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-So we loop for at most 30 seconds (for >1TB images).
-
->
->> >> > One of the things I saw is that between each pair of lseek() calls, we
->> >> > also have unnecessary poll() calls, and these were introduced by this
->> >> > patch. If I modify bdrv_common_block_status_above() so that it doesn't
->> >> > poll if data.done == true already, the time needed to iterate through my
->> >> > test image is cut in half.
->> >> >
->> >> > Now, of course, I'm still only seeing a few seconds for a 100 GB image,
->> >> > so there must be more that is wrong for the reporter, but it suggests to
->> >> > me that BDRV_POLL_WHILE() shouldn't be polling unconditionally when only
->> >> > one of its users actually needs this.
->> >>
->> >> Sounds fine to me. Maybe we could add a boolean parameter to
->> >> BDRV_POLL_WHILE?
->> >
->> > Why not call aio_poll() explicitly in the BDRV_POLL_WHILE() condition in
->> > the one place that needs it?
->>
->> Yes, that is better. Do you have a patch? Or do you want me to work on one?
->
-> I don't have a patch yet. If you want to write one, be my guest.
->
-> Otherwise I'd just take a to-do note for when I get back to my
-> bdrv_drain work. There is still one or two series left to do anyway, and
-> I think it would fit in there.
-
-Thought that so I asked, I'll leave it to you then. :)
-
-Fam
+>  3 files changed, 123 insertions(+)
+>  create mode 100644 hw/misc/imx2_wdt.c
+>  create mode 100644 include/hw/misc/imx2_wdt.h
+> 
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index a28e5e49b0..4b2b705a6c 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -34,6 +34,7 @@ obj-$(CONFIG_IMX) += imx25_ccm.o
+>  obj-$(CONFIG_IMX) += imx6_ccm.o
+>  obj-$(CONFIG_IMX) += imx6_src.o
+>  obj-$(CONFIG_IMX) += imx7_ccm.o
+> +obj-$(CONFIG_IMX) += imx2_wdt.o
+>  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+>  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+>  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+> diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+> new file mode 100644
+> index 0000000000..e47e442592
+> --- /dev/null
+> +++ b/hw/misc/imx2_wdt.c
+> @@ -0,0 +1,89 @@
+> +/*
+> + * Copyright (c) 2018, Impinj, Inc.
+> + *
+> + * i.MX2 Watchdog IP block
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/bitops.h"
+> +#include "sysemu/watchdog.h"
+> +
+> +#include "hw/misc/imx2_wdt.h"
+> +
+> +#define IMX2_WDT_WCR_WDA    BIT(5)      /* -> External Reset WDOG_B */
+> +#define IMX2_WDT_WCR_SRS    BIT(4)      /* -> Software Reset Signal */
+> +
+> +static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
+> +                              unsigned int size)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void imx2_wdt_write(void *opaque, hwaddr addr,
+> +                           uint64_t value, unsigned int size)
+> +{
+> +    if (addr == IMX2_WDT_WCR &&
+> +        (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))) {
+> +        watchdog_perform_action();
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps imx2_wdt_ops = {
+> +    .read  = imx2_wdt_read,
+> +    .write = imx2_wdt_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .impl = {
+> +        /*
+> +         * Our device would not work correctly if the guest was doing
+> +         * unaligned access. This might not be a limitation on the
+> +         * real device but in practice there is no reason for a guest
+> +         * to access this device unaligned.
+> +         */
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +        .unaligned = false,
+> +    },
+> +};
+> +
+> +static void imx2_wdt_realize(DeviceState *dev, Error **errp)
+> +{
+> +    IMX2WdtState *s = IMX2_WDT(dev);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(dev),
+> +                          &imx2_wdt_ops, s,
+> +                          TYPE_IMX2_WDT".mmio",
+> +                          IMX2_WDT_REG_NUM * sizeof(uint16_t));
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
+> +}
+> +
+> +static void imx2_wdt_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = imx2_wdt_realize;
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +}
+> +
+> +static const TypeInfo imx2_wdt_info = {
+> +    .name          = TYPE_IMX2_WDT,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(IMX2WdtState),
+> +    .class_init    = imx2_wdt_class_init,
+> +};
+> +
+> +static WatchdogTimerModel model = {
+> +    .wdt_name = "imx2-watchdog",
+> +    .wdt_description = "i.MX2 Watchdog",
+> +};
+> +
+> +static void imx2_wdt_register_type(void)
+> +{
+> +    watchdog_add_model(&model);
+> +    type_register_static(&imx2_wdt_info);
+> +}
+> +type_init(imx2_wdt_register_type)
+> diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+> new file mode 100644
+> index 0000000000..8afc99a10e
+> --- /dev/null
+> +++ b/include/hw/misc/imx2_wdt.h
+> @@ -0,0 +1,33 @@
+> +/*
+> + * Copyright (c) 2017, Impinj, Inc.
+> + *
+> + * i.MX2 Watchdog IP block
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef IMX2_WDT_H
+> +#define IMX2_WDT_H
+> +
+> +#include "hw/sysbus.h"
+> +
+> +#define TYPE_IMX2_WDT "imx2.wdt"
+> +#define IMX2_WDT(obj) OBJECT_CHECK(IMX2WdtState, (obj), TYPE_IMX2_WDT)
+> +
+> +enum IMX2WdtRegisters {
+> +    IMX2_WDT_WCR     = 0x0000,
+> +    IMX2_WDT_REG_NUM = 0x0008 / sizeof(uint16_t) + 1,
+> +};
+> +
+> +
+> +typedef struct IMX2WdtState {
+> +    /* <private> */
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion mmio;
+> +} IMX2WdtState;
+> +
+> +#endif /* IMX7_SNVS_H */
+> 
