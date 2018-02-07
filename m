@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejRx1-0007RI-4c
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:47:59 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ejS1h-0002B5-Ac
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:52:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejRww-0000oA-UB
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:47:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37050 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ejRww-0000nz-PA
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:47:54 -0500
-References: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f0b0adfe-d399-a3e7-386a-a00f5d8aff2b@redhat.com>
-Date: Wed, 7 Feb 2018 09:47:52 -0600
+	(envelope-from <stefanha@redhat.com>) id 1ejS1g-0003zp-DT
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:52:49 -0500
+Date: Wed, 7 Feb 2018 15:52:22 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180207155222.GB1446@stefanha-x1.localdomain>
+References: <20180201110708.8080-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: improve documentation of
- postcopy-ram
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oLBj+sq0vYjzfsbl"
+Content-Disposition: inline
+In-Reply-To: <20180201110708.8080-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] vl: pause vcpus before stopping
+ iothreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>
 
-On 02/07/2018 09:41 AM, Greg Kurz wrote:
-> This capability must have the same value on both source and destination,
-> otherwise migration fails (commit 875fcd013ab6 "migration: incoming
-> postcopy advise sanity checks").
-> 
-> Let's write it down in various places where postcopy-ram is documented.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+--oLBj+sq0vYjzfsbl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Feb 01, 2018 at 11:07:08AM +0000, Stefan Hajnoczi wrote:
+> Commit dce8921b2baaf95974af8176406881872067adfa ("iothread: Stop threads
+> before main() quits") introduced iothread_stop_all() to avoid the
+> following virtio-scsi assertion failure:
+>=20
+>   assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx);
+>=20
+> Back then the assertion failed because when bdrv_close_all() made
+> d->conf.blk NULL, blk_get_aio_context() returned the global AioContext
+> instead of s->ctx.
+>=20
+> The same assertion can still fail today when vcpus submit new I/O
+> requests after iothread_stop_all() has moved the BDS to the global
+> AioContext.
+>=20
+> This patch hardens the iothread_stop_all() approach by pausing vcpus
+> before calling iothread_stop_all().
+>=20
+> Note that the assertion failure is a race condition.  It is not possible
+> to reproduce it reliably.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->   docs/devel/migration.rst |    4 ++--
->   hmp-commands.hx          |    3 ++-
->   qapi/migration.json      |   10 ++++++----
->   3 files changed, 10 insertions(+), 7 deletions(-)
+> v2:
+>  * Add comment explaining rationale for this ordering and why it's safe.
+>    [Kevin]
+>=20
+>  vl.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Stefan
+
+--oLBj+sq0vYjzfsbl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaeyC2AAoJEJykq7OBq3PIHXsIAJbcSlPYJ8TqRJGWIwbvfaSu
+BFBZupfDLfX7clzNyrPWiW7UIDt1Fa4oCFNq5gc1/X18DJwBt+L5IgsSwF+01ibs
+2tibQMc7AIHU8SFDgdLqYaHQock4FqVN5/zveJVMhw2ypy8Eq+c2dvNirURjVYmo
+YWLsumYJX1ECkUe6myanyxCeT75vCRbGY1wD4SFyAAnJ2TpZddVsnqF6A5XinHm2
+2xASMBuyVyfgTQ1mAcG8wpoNU4rWuD8pSfrNJ0d4+qtRyPLK5B7FF7lRMY7RadQ9
+wydIlRNdKVcs1R6e21620+hOX130EorLS9lbmPtRh22PQ8tH/cYJMGltUeTZ1a0=
+=3Mp6
+-----END PGP SIGNATURE-----
+
+--oLBj+sq0vYjzfsbl--
