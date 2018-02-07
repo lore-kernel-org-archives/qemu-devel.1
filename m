@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ek3Bq-0001le-Jy
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:33:48 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ek3HI-00051u-Bw
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:39:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ek3Bo-0007rH-Ui
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:33:46 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:33994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ek3Bo-0007r3-MQ
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:33:44 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id l10so6865800oth.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 23:33:44 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1ek3HF-0001aM-A5
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:39:24 -0500
+Resent-Message-Id: <E1ek3HF-0001aM-A5@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21125)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ek3HF-0001Zv-26
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:39:21 -0500
+In-Reply-To: <1518046997-22714-1-git-send-email-mjc@sifive.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151804753284.267.1961024641475204958@bdbb90650ae5>
 MIME-Version: 1.0
-In-Reply-To: <82554ae4-5348-f30b-3b77-64754046198b@linaro.org>
-References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
-	<1518053328-34687-13-git-send-email-mjc@sifive.com>
-	<82554ae4-5348-f30b-3b77-64754046198b@linaro.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 9 Feb 2018 20:33:43 +1300
-Message-ID: <CAHNT7NsYT_bPpiOx2oUqsYCCAU1TOhx3ytAoU-a6pTbkkA_pnA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 12/23] RISC-V HTIF Console
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 7 Feb 2018 15:52:13 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v1] Implement support for IEEE 754-201x
+ minimumNumber/maximumNumber
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: mjc@sifive.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, peter.maydell@linaro.org
 
-On Fri, Feb 9, 2018 at 5:35 AM, Richard Henderson <
-richard.henderson@linaro.org> wrote:
-
-> On 02/07/2018 05:28 PM, Michael Clark wrote:
-> > +++ b/hw/riscv/riscv_elf.c
-> > @@ -0,0 +1,244 @@
-> > +/*
-> > + * elf.c - A simple package for manipulating symbol tables in elf
-> binaries.
-> > + *
-> > + * Taken from
-> > + * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/
-> > + * ftrace/elf.c
-> > + *
-> > + */
-> > +#include <stdio.h>
-> > +#include <stdlib.h>
-> > +#include <unistd.h>
-> > +#include <string.h>
-> > +#include <sys/stat.h>
-> > +#include <sys/types.h>
-> > +#include <sys/mman.h>
-> > +#include <errno.h>
-> > +#include <fcntl.h>
-> > +#include <glib.h>
-> > +
-> > +#include "hw/riscv/riscv_elf.h"
-> > +
-> > +/*
-> > + * elf_open - Map a binary into the address space and extract the
-> > + * locations of the static and dynamic symbol tables and their string
-> > + * tables. Return this information in a Elf object file handle that will
-> > + * be passed to all of the other elf functions.
-> > + */
-> > +Elf_obj64 *elf_open64(const char *filename)
-> > +{
-> > +    int i, fd;
-> > +    struct stat sbuf;
-> > +    Elf_obj64 *ep;
-> > +    Elf64_Shdr *shdr;
-> > +
-> > +    ep = g_new(Elf_obj64, 1);
-> > +
-> > +    /* Do some consistency checks on the binary */
-> > +    fd = open(filename, O_RDONLY);
-> > +    if (fd == -1) {
-> > +        fprintf(stderr, "Can't open \"%s\": %s\n", filename,
-> strerror(errno));
-> > +        exit(1);
-> > +    }
-> > +    if (fstat(fd, &sbuf) == -1) {
-> > +        fprintf(stderr, "Can't stat \"%s\": %s\n", filename,
-> strerror(errno));
-> > +        exit(1);
-> > +    }
-> > +    if (sbuf.st_size < sizeof(Elf64_Ehdr)) {
-> > +        fprintf(stderr, "\"%s\" is not an ELF binary object\n",
-> filename);
-> > +        exit(1);
-> > +    }
-> > +
-> > +    /* It looks OK, so map the Elf binary into our address space */
-> > +    ep->mlen = sbuf.st_size;
-> > +    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
-> > +    if (ep->maddr == (void *)-1) {
-> > +        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename,
-> strerror(errno));
-> > +        exit(1);
-> > +    }
-> > +    close(fd);
-> > +
-> > +    /* The Elf binary begins with the Elf header */
-> > +    ep->ehdr = ep->maddr;
-> > +
-> > +    /* check we have a 64-bit little-endian RISC-V ELF object */
-> > +    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-> > +        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-> > +        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-> > +        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
-> > +        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS64 ||
-> > +        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
-> > +        ep->ehdr->e_machine != EM_RISCV)
-> > +    {
-> > +        fprintf(stderr, "\"%s\" is not a 64-bit RISC-V ELF object\n",
-> filename);
-> > +        exit(1);
-> > +    }
-> > +
-> > +    /*
-> > +     * Find the static and dynamic symbol tables and their string
-> > +     * tables in the the mapped binary. The sh_link field in symbol
-> > +     * table section headers gives the section index of the string
-> > +     * table for that symbol table.
-> > +     */
-> > +    shdr = (Elf64_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
->
-> This duplicates, badly, existing code within include/hw/elf_ops.h.
->
-> In particular, this fails to bswap these fields.  As such, this code will
-> only
-> work on little-endian hosts.
->
-
-There is enough information in the structures held in the syminfo table
-used by the disassembler however elf_ops.h currently throws away all
-symbols that are not STT_FUNC, and we are after STT_OBJECT symbols. We
-would need to add an option to load_elf to load the entire symbol table.
-Also, it runs qsort on the table by address, so we'd need to do a linear
-scan for the HTIF symbols by name. There are only two symbols we need:
-'fromhost' and 'tohost'.
-
-        /* We are only interested in function symbols.
-           Throw everything else away.  */
-        if (syms[i].st_shndx == SHN_UNDEF ||
-                syms[i].st_shndx >= SHN_LORESERVE ||
-                ELF_ST_TYPE(syms[i].st_info) != STT_FUNC) {
-            nsyms--;
-            if (i < nsyms) {
-                syms[i] = syms[nsyms];
-            }
-            continue;
-        }
-
-It would be really nice if HTIF just specified registers in device-tree;
-alas it doesn't; and there is still quite a bit of code that depend on
-using these magic HTIF 'fromhost' and 'tohost' symbols. riscv-tests for one
-uses the HTIF mechanism and spike the official ISA simulator uses HTIF for
-IO.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTgwNDY5OTctMjI3MTQtMS1naXQtc2VuZC1lbWFpbC1tamNAc2lmaXZlLmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxXSBJbXBsZW1lbnQgc3VwcG9ydCBmb3Ig
+SUVFRSA3NTQtMjAxeCBtaW5pbXVtTnVtYmVyL21heGltdW1OdW1iZXIKCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
+b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29t
+bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
+JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
+ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
+ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
+ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
+JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjFkYmU3ODA5MmMgSW1wbGVtZW50IHN1cHBvcnQgZm9yIElFRUUgNzU0LTIwMXggbWluaW11bU51
+bWJlci9tYXhpbXVtTnVtYmVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzE6IEltcGxlbWVudCBzdXBwb3J0IGZvciBJRUVFIDc1NC0yMDF4IG1pbmltdW1OdW1iZXIvbWF4
+aW11bU51bWJlci4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4
+Old4VikKIzg1OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6Nzc3MzoKKyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIGZsb2F0X3N0YXR1cyAqc3RhdHVzKSAgICAgICAgICAgICAgICAgIFwK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzkxOiBGSUxFOiBmcHUv
+c29mdGZsb2F0LmM6Nzc3OToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZsb2F0
+X3N0YXR1cyAqc3RhdHVzKSAgICAgICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDk0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
+bGlzdHMub3Jn
