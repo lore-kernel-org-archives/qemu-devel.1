@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7Y-000792-FR
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7V-000757-Kk
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7V-00010Y-Cm
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7U-0000zC-EE
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:49 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  7 Feb 2018 18:58:30 +0300
-Message-Id: <20180207155837.92351-6-vsementsov@virtuozzo.com>
+Date: Wed,  7 Feb 2018 18:58:33 +0300
+Message-Id: <20180207155837.92351-9-vsementsov@virtuozzo.com>
 In-Reply-To: <20180207155837.92351-1-vsementsov@virtuozzo.com>
 References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v10 05/12] migration: introduce postcopy-only
- pending
+Subject: [Qemu-devel] [PATCH v10 08/12] migration/qemu-file: add
+ qemu_put_counted_string()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,223 +23,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-There would be savevm states (dirty-bitmap) which can migrate only in
-postcopy stage. The corresponding pending is introduced here.
+Add function opposite to qemu_get_counted_string.
+qemu_put_counted_string puts one-byte length of the string (string
+should not be longer than 255 characters), and then it puts the string,
+without last zero byte.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- include/migration/register.h | 17 +++++++++++++++--
- migration/savevm.h           |  5 +++--
- hw/s390x/s390-stattrib.c     |  7 ++++---
- migration/block.c            |  7 ++++---
- migration/migration.c        | 16 +++++++++-------
- migration/ram.c              |  9 +++++----
- migration/savevm.c           | 13 ++++++++-----
- migration/trace-events       |  2 +-
- 8 files changed, 49 insertions(+), 27 deletions(-)
+ migration/qemu-file.h |  2 ++
+ migration/qemu-file.c | 13 +++++++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/include/migration/register.h b/include/migration/register.h
-index f4f7bdc177..9436a87678 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -37,8 +37,21 @@ typedef struct SaveVMHandlers {
-     int (*save_setup)(QEMUFile *f, void *opaque);
-     void (*save_live_pending)(QEMUFile *f, void *opaque,
-                               uint64_t threshold_size,
--                              uint64_t *non_postcopiable_pending,
--                              uint64_t *postcopiable_pending);
-+                              uint64_t *res_precopy_only,
-+                              uint64_t *res_compatible,
-+                              uint64_t *res_postcopy_only);
-+    /* Note for save_live_pending:
-+     * - res_precopy_only is for data which must be migrated in precopy phase
-+     *     or in stopped state, in other words - before target vm start
-+     * - res_compatible is for data which may be migrated in any phase
-+     * - res_postcopy_only is for data which must be migrated in postcopy phase
-+     *     or in stopped state, in other words - after source vm stop
-+     *
-+     * Sum of res_postcopy_only, res_compatible and res_postcopy_only is the
-+     * whole amount of pending data.
-+     */
+diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+index aae4e5ed36..f4f356ab12 100644
+--- a/migration/qemu-file.h
++++ b/migration/qemu-file.h
+@@ -174,4 +174,6 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
+                              ram_addr_t offset, size_t size,
+                              uint64_t *bytes_sent);
+ 
++void qemu_put_counted_string(QEMUFile *f, const char *name);
 +
+ #endif
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 2ab2bf362d..e85f501f86 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -734,6 +734,19 @@ size_t qemu_get_counted_string(QEMUFile *f, char buf[256])
+ }
+ 
+ /*
++ * Put a string with one preceding byte containing its length. The length of
++ * the string should be less than 256.
++ */
++void qemu_put_counted_string(QEMUFile *f, const char *str)
++{
++    size_t len = strlen(str);
 +
-     LoadStateHandler *load_state;
-     int (*load_setup)(QEMUFile *f, void *opaque);
-     int (*load_cleanup)(void *opaque);
-diff --git a/migration/savevm.h b/migration/savevm.h
-index 295c4a1f2c..cf4f0d37ca 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -38,8 +38,9 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f);
- int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
-                                        bool inactivate_disks);
- void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
--                               uint64_t *res_non_postcopiable,
--                               uint64_t *res_postcopiable);
-+                               uint64_t *res_precopy_only,
-+                               uint64_t *res_compatible,
-+                               uint64_t *res_postcopy_only);
- void qemu_savevm_send_ping(QEMUFile *f, uint32_t value);
- void qemu_savevm_send_open_return_path(QEMUFile *f);
- int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index 2902f54f11..dd3fbfd1eb 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -183,15 +183,16 @@ static int cmma_save_setup(QEMUFile *f, void *opaque)
- }
- 
- static void cmma_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
--                             uint64_t *non_postcopiable_pending,
--                             uint64_t *postcopiable_pending)
-+                              uint64_t *res_precopy_only,
-+                              uint64_t *res_compatible,
-+                              uint64_t *res_postcopy_only)
- {
-     S390StAttribState *sas = S390_STATTRIB(opaque);
-     S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-     long long res = sac->get_dirtycount(sas);
- 
-     if (res >= 0) {
--        *non_postcopiable_pending += res;
-+        *res_precopy_only += res;
-     }
- }
- 
-diff --git a/migration/block.c b/migration/block.c
-index 1f03946797..5652ca3337 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -866,8 +866,9 @@ static int block_save_complete(QEMUFile *f, void *opaque)
- }
- 
- static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
--                               uint64_t *non_postcopiable_pending,
--                               uint64_t *postcopiable_pending)
-+                               uint64_t *res_precopy_only,
-+                               uint64_t *res_compatible,
-+                               uint64_t *res_postcopy_only)
- {
-     /* Estimate pending number of bytes to send */
-     uint64_t pending;
-@@ -888,7 +889,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
- 
-     DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
-     /* We don't do postcopy */
--    *non_postcopiable_pending += pending;
-+    *res_precopy_only += pending;
- }
- 
- static int block_load(QEMUFile *f, void *opaque, int version_id)
-diff --git a/migration/migration.c b/migration/migration.c
-index c99a4e62d7..3beedd676e 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2215,21 +2215,23 @@ typedef enum {
-  */
- static MigIterateState migration_iteration_run(MigrationState *s)
- {
--    uint64_t pending_size, pend_post, pend_nonpost;
-+    uint64_t pending_size, pend_pre, pend_compat, pend_post;
-     bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
- 
--    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
--                              &pend_nonpost, &pend_post);
--    pending_size = pend_nonpost + pend_post;
-+    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
-+                              &pend_compat, &pend_post);
-+    pending_size = pend_pre + pend_compat + pend_post;
- 
-     trace_migrate_pending(pending_size, s->threshold_size,
--                          pend_post, pend_nonpost);
-+                          pend_pre, pend_compat, pend_post);
- 
-     if (pending_size && pending_size >= s->threshold_size) {
-         /* Still a significant amount to transfer */
-         if (migrate_postcopy() && !in_postcopy &&
--            pend_nonpost <= s->threshold_size &&
--            atomic_read(&s->start_postcopy)) {
-+            pend_pre <= s->threshold_size &&
-+            (atomic_read(&s->start_postcopy) ||
-+             (pend_pre + pend_compat <= s->threshold_size)))
-+        {
-             if (postcopy_start(s)) {
-                 error_report("%s: postcopy failed to start", __func__);
-             }
-diff --git a/migration/ram.c b/migration/ram.c
-index cb1950f3eb..38b1b2486a 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2359,8 +2359,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- }
- 
- static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
--                             uint64_t *non_postcopiable_pending,
--                             uint64_t *postcopiable_pending)
-+                             uint64_t *res_precopy_only,
-+                             uint64_t *res_compatible,
-+                             uint64_t *res_postcopy_only)
- {
-     RAMState **temp = opaque;
-     RAMState *rs = *temp;
-@@ -2380,9 +2381,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
- 
-     if (migrate_postcopy_ram()) {
-         /* We can do postcopy, and all the data is postcopiable */
--        *postcopiable_pending += remaining_size;
-+        *res_compatible += remaining_size;
-     } else {
--        *non_postcopiable_pending += remaining_size;
-+        *res_precopy_only += remaining_size;
-     }
- }
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index b7908f62be..c3c60a15e3 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1218,13 +1218,15 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
-  * for units that can't do postcopy.
-  */
- void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
--                               uint64_t *res_non_postcopiable,
--                               uint64_t *res_postcopiable)
-+                               uint64_t *res_precopy_only,
-+                               uint64_t *res_compatible,
-+                               uint64_t *res_postcopy_only)
- {
-     SaveStateEntry *se;
- 
--    *res_non_postcopiable = 0;
--    *res_postcopiable = 0;
-+    *res_precopy_only = 0;
-+    *res_compatible = 0;
-+    *res_postcopy_only = 0;
- 
- 
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-@@ -1237,7 +1239,8 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
-             }
-         }
-         se->ops->save_live_pending(f, se->opaque, threshold_size,
--                                   res_non_postcopiable, res_postcopiable);
-+                                   res_precopy_only, res_compatible,
-+                                   res_postcopy_only);
-     }
- }
- 
-diff --git a/migration/trace-events b/migration/trace-events
-index 6f29fcc686..a04fffb877 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -86,7 +86,7 @@ migrate_fd_cleanup(void) ""
- migrate_fd_error(const char *error_desc) "error=%s"
- migrate_fd_cancel(void) ""
- migrate_handle_rp_req_pages(const char *rbname, size_t start, size_t len) "in %s at 0x%zx len 0x%zx"
--migrate_pending(uint64_t size, uint64_t max, uint64_t post, uint64_t nonpost) "pending size %" PRIu64 " max %" PRIu64 " (post=%" PRIu64 " nonpost=%" PRIu64 ")"
-+migrate_pending(uint64_t size, uint64_t max, uint64_t pre, uint64_t compat, uint64_t post) "pending size %" PRIu64 " max %" PRIu64 " (pre = %" PRIu64 " compat=%" PRIu64 " post=%" PRIu64 ")"
- migrate_send_rp_message(int msg_type, uint16_t len) "%d: len %d"
- migration_completion_file_err(void) ""
- migration_completion_postcopy_end(void) ""
++    assert(len < 256);
++    qemu_put_byte(f, len);
++    qemu_put_buffer(f, (const uint8_t *)str, len);
++}
++
++/*
+  * Set the blocking state of the QEMUFile.
+  * Note: On some transports the OS only keeps a single blocking state for
+  *       both directions, and thus changing the blocking on the main
 -- 
 2.11.1
