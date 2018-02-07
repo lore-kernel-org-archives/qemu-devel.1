@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ejDZ0-0007JI-C2
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 19:26:15 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ejDZ6-0007Og-Se
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 19:26:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ejDYx-0004ZS-7d
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 19:26:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47834)
+	(envelope-from <alex.williamson@redhat.com>) id 1ejDZ5-0004r5-ML
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 19:26:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ejDYx-0004XP-1Q
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 19:26:11 -0500
+	id 1ejDZ5-0004pb-EU
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 19:26:19 -0500
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 06 Feb 2018 17:26:07 -0700
-Message-ID: <20180207001615.1156.10547.stgit@gimli.home>
+Date: Tue, 06 Feb 2018 17:26:15 -0700
+Message-ID: <20180207002615.1156.74568.stgit@gimli.home>
+In-Reply-To: <20180207001615.1156.10547.stgit@gimli.home>
+References: <20180207001615.1156.10547.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH 0/5] vfio: ioeventfd support
+Subject: [Qemu-devel] [RFC PATCH 1/5] vfio/quirks: Add common quirk alloc
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +31,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.williamson@redhat.com, kvm@vger.kernel.org
 
-For the matching kernel patch, see:
+This will later be used to include list initialization
 
-https://lkml.org/lkml/2018/2/6/866
-
-This series enables ioeventfd support and makes use of a proposed vfio
-kernel ioeventfd interface for accelerating high frequency writes
-through to the device.  In the specific case addressed, the writes are
-to a range of MMIO space virtualized in QEMU for NVIDIA GeForce
-support, but which also hosts a register which is used to allow the
-MSI interrupt for the device to re-trigger.  Applications which
-generate a very high interrupt rate on the GPU can see noticeable
-overhead as a result of this trap through QEMU.  We added an option
-for users to disable these quirks entirely for non-Geforce cards[1]
-for optimal performance, but for GeForce users and users that can't
-tweak their VM config, this gets us to within 95% of that performance
-for an interrupt intensive micro-benchmark (from 83%).  I'd be
-interested in more typical benchmark results to understand if there's
-an improvement there as well.  Thanks,
-
-Alex
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg06878.html
-
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
+ hw/vfio/pci-quirks.c |   48 +++++++++++++++++++++---------------------------
+ 1 file changed, 21 insertions(+), 27 deletions(-)
 
-Alex Williamson (5):
-      vfio/quirks: Add common quirk alloc helper
-      vfio/quirks: Add generic support for ioveventfds
-      vfio/quirks: Automatic ioeventfd enabling for NVIDIA BAR0 quirks
-      vfio: Update linux header
-      vfio/quirks: Enable ioeventfd quirks to be handled by vfio directly
-
-
- hw/vfio/pci-quirks.c       |  184 +++++++++++++++++++++++++++++++++++++-------
- hw/vfio/pci.h              |   13 +++
- linux-headers/linux/vfio.h |   24 ++++++
- 3 files changed, 192 insertions(+), 29 deletions(-)
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index e5779a7ad35b..10af23217292 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -275,6 +275,15 @@ static const MemoryRegionOps vfio_ati_3c3_quirk = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
++static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
++{
++    VFIOQuirk *quirk = g_malloc0(sizeof(*quirk));
++    quirk->mem = g_new0(MemoryRegion, nr_mem);
++    quirk->nr_mem = nr_mem;
++
++    return quirk;
++}
++
+ static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
+ {
+     VFIOQuirk *quirk;
+@@ -288,9 +297,7 @@ static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
+         return;
+     }
+ 
+-    quirk = g_malloc0(sizeof(*quirk));
+-    quirk->mem = g_new0(MemoryRegion, 1);
+-    quirk->nr_mem = 1;
++    quirk = vfio_quirk_alloc(1);
+ 
+     memory_region_init_io(quirk->mem, OBJECT(vdev), &vfio_ati_3c3_quirk, vdev,
+                           "vfio-ati-3c3-quirk", 1);
+@@ -323,9 +330,7 @@ static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+         return;
+     }
+ 
+-    quirk = g_malloc0(sizeof(*quirk));
+-    quirk->mem = g_new0(MemoryRegion, 2);
+-    quirk->nr_mem = 2;
++    quirk = vfio_quirk_alloc(2);
+     window = quirk->data = g_malloc0(sizeof(*window) +
+                                      sizeof(VFIOConfigWindowMatch));
+     window->vdev = vdev;
+@@ -371,10 +376,9 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
+         return;
+     }
+ 
+-    quirk = g_malloc0(sizeof(*quirk));
++    quirk = vfio_quirk_alloc(1);
+     mirror = quirk->data = g_malloc0(sizeof(*mirror));
+-    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
+-    quirk->nr_mem = 1;
++    mirror->mem = quirk->mem;
+     mirror->vdev = vdev;
+     mirror->offset = 0x4000;
+     mirror->bar = nr;
+@@ -548,10 +552,8 @@ static void vfio_vga_probe_nvidia_3d0_quirk(VFIOPCIDevice *vdev)
+         return;
+     }
+ 
+-    quirk = g_malloc0(sizeof(*quirk));
++    quirk = vfio_quirk_alloc(2);
+     quirk->data = data = g_malloc0(sizeof(*data));
+-    quirk->mem = g_new0(MemoryRegion, 2);
+-    quirk->nr_mem = 2;
+     data->vdev = vdev;
+ 
+     memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_nvidia_3d4_quirk,
+@@ -667,9 +669,7 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
+         return;
+     }
+ 
+-    quirk = g_malloc0(sizeof(*quirk));
+-    quirk->mem = g_new0(MemoryRegion, 4);
+-    quirk->nr_mem = 4;
++    quirk = vfio_quirk_alloc(4);
+     bar5 = quirk->data = g_malloc0(sizeof(*bar5) +
+                                    (sizeof(VFIOConfigWindowMatch) * 2));
+     window = &bar5->window;
+@@ -762,10 +762,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
+         return;
+     }
+ 
+-    quirk = g_malloc0(sizeof(*quirk));
++    quirk = vfio_quirk_alloc(1);
+     mirror = quirk->data = g_malloc0(sizeof(*mirror));
+-    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
+-    quirk->nr_mem = 1;
++    mirror->mem = quirk->mem;
+     mirror->vdev = vdev;
+     mirror->offset = 0x88000;
+     mirror->bar = nr;
+@@ -781,10 +780,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
+ 
+     /* The 0x1800 offset mirror only seems to get used by legacy VGA */
+     if (vdev->vga) {
+-        quirk = g_malloc0(sizeof(*quirk));
++        quirk = vfio_quirk_alloc(1);
+         mirror = quirk->data = g_malloc0(sizeof(*mirror));
+-        mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
+-        quirk->nr_mem = 1;
++        mirror->mem = quirk->mem;
+         mirror->vdev = vdev;
+         mirror->offset = 0x1800;
+         mirror->bar = nr;
+@@ -945,9 +943,7 @@ static void vfio_probe_rtl8168_bar2_quirk(VFIOPCIDevice *vdev, int nr)
+         return;
+     }
+ 
+-    quirk = g_malloc0(sizeof(*quirk));
+-    quirk->mem = g_new0(MemoryRegion, 2);
+-    quirk->nr_mem = 2;
++    quirk = vfio_quirk_alloc(2);
+     quirk->data = rtl = g_malloc0(sizeof(*rtl));
+     rtl->vdev = vdev;
+ 
+@@ -1507,9 +1503,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     }
+ 
+     /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
+-    quirk = g_malloc0(sizeof(*quirk));
+-    quirk->mem = g_new0(MemoryRegion, 2);
+-    quirk->nr_mem = 2;
++    quirk = vfio_quirk_alloc(2);
+     igd = quirk->data = g_malloc0(sizeof(*igd));
+     igd->vdev = vdev;
+     igd->index = ~0;
