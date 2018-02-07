@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ejKFG-0004tt-M7
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:22 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejKFK-0004y6-23
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ejKFF-0000bZ-H4
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:18 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejKFH-0000cv-QK
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:22 -0500
 Received: from mga09.intel.com ([134.134.136.24]:13680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1ejKFF-0000Td-5R
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:17 -0500
+	id 1ejKFH-0000Td-H3
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:19 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Wed,  7 Feb 2018 15:33:28 +0800
-Message-Id: <20180207073331.14158-6-haozhong.zhang@intel.com>
+Date: Wed,  7 Feb 2018 15:33:29 +0800
+Message-Id: <20180207073331.14158-7-haozhong.zhang@intel.com>
 In-Reply-To: <20180207073331.14158-1-haozhong.zhang@intel.com>
 References: <20180207073331.14158-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 5/8] migration/ram: ensure write persistence
- on loading zero pages to PMEM
+Subject: [Qemu-devel] [PATCH v2 6/8] migration/ram: ensure write persistence
+ on loading normal pages to PMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,144 +28,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-When loading a zero page, check whether it will be loaded to
-persistent memory If yes, load it by libpmem function
-pmem_memset_nodrain().  Combined with a call to pmem_drain() at the
-end of RAM loading, we can guarantee all those zero pages are
-persistently loaded.
-
-Depending on the host HW/SW configurations, pmem_drain() can be
-"sfence".  Therefore, we do not call pmem_drain() after each
-pmem_memset_nodrain(), or use pmem_memset_persist() (equally
-pmem_memset_nodrain() + pmem_drain()), in order to avoid unnecessary
-overhead.
+When loading a normal page to persistent memory, load its data by
+libpmem function pmem_memcpy_nodrain() instead of memcpy(). Combined
+with a call to pmem_drain() at the end of memory loading, we can
+guarantee all those normal pages are persistenly loaded to PMEM.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 ---
- include/qemu/pmem.h |  9 +++++++++
- migration/ram.c     | 34 +++++++++++++++++++++++++++++-----
- 2 files changed, 38 insertions(+), 5 deletions(-)
+ include/migration/qemu-file-types.h |  1 +
+ include/qemu/pmem.h                 |  6 ++++++
+ migration/qemu-file.c               | 41 ++++++++++++++++++++++++++++---------
+ migration/ram.c                     |  6 +++++-
+ 4 files changed, 43 insertions(+), 11 deletions(-)
 
+diff --git a/include/migration/qemu-file-types.h b/include/migration/qemu-file-types.h
+index bd6d7dd7f9..bb5c547498 100644
+--- a/include/migration/qemu-file-types.h
++++ b/include/migration/qemu-file-types.h
+@@ -34,6 +34,7 @@ void qemu_put_be16(QEMUFile *f, unsigned int v);
+ void qemu_put_be32(QEMUFile *f, unsigned int v);
+ void qemu_put_be64(QEMUFile *f, uint64_t v);
+ size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size);
++size_t qemu_get_buffer_to_pmem(QEMUFile *f, uint8_t *buf, size_t size);
+ 
+ int qemu_get_byte(QEMUFile *f);
+ 
 diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
-index 9017596ff0..861d8ecc21 100644
+index 861d8ecc21..77ee1fc4eb 100644
 --- a/include/qemu/pmem.h
 +++ b/include/qemu/pmem.h
-@@ -26,6 +26,15 @@ pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
+@@ -26,6 +26,12 @@ pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
      return memcpy(pmemdest, src, len);
  }
  
-+static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
++static inline void *
++pmem_memcpy_nodrain(void *pmemdest, const void *src, size_t len)
 +{
-+    return memset(pmemdest, c, len);
++    return memcpy(pmemdest, src, len);
 +}
 +
-+static inline void pmem_drain(void)
-+{
-+}
-+
- #endif /* CONFIG_LIBPMEM */
+ static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
+ {
+     return memset(pmemdest, c, len);
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 2ab2bf362d..7e573010d9 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -26,6 +26,7 @@
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "qemu/iov.h"
++#include "qemu/pmem.h"
+ #include "migration.h"
+ #include "qemu-file.h"
+ #include "trace.h"
+@@ -471,15 +472,8 @@ size_t qemu_peek_buffer(QEMUFile *f, uint8_t **buf, size_t size, size_t offset)
+     return size;
+ }
  
- #endif /* !QEMU_PMEM_H */
+-/*
+- * Read 'size' bytes of data from the file into buf.
+- * 'size' can be larger than the internal buffer.
+- *
+- * It will return size bytes unless there was an error, in which case it will
+- * return as many as it managed to read (assuming blocking fd's which
+- * all current QEMUFile are)
+- */
+-size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
++static size_t
++qemu_get_buffer_common(QEMUFile *f, uint8_t *buf, size_t size, bool is_pmem)
+ {
+     size_t pending = size;
+     size_t done = 0;
+@@ -492,7 +486,11 @@ size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
+         if (res == 0) {
+             return done;
+         }
+-        memcpy(buf, src, res);
++        if (!is_pmem) {
++            memcpy(buf, src, res);
++        } else {
++            pmem_memcpy_nodrain(buf, src, res);
++        }
+         qemu_file_skip(f, res);
+         buf += res;
+         pending -= res;
+@@ -501,6 +499,29 @@ size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
+     return done;
+ }
+ 
++/*
++ * Read 'size' bytes of data from the file into buf.
++ * 'size' can be larger than the internal buffer.
++ *
++ * It will return size bytes unless there was an error, in which case it will
++ * return as many as it managed to read (assuming blocking fd's which
++ * all current QEMUFile are)
++ */
++size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
++{
++    return qemu_get_buffer_common(f, buf, size, false);
++}
++
++/*
++ * Mostly the same as qemu_get_buffer(), except that
++ * 1) it's for the case that 'buf' is in the persistent memory, and
++ * 2) it takes necessary operations to ensure the data persistence in 'buf'.
++ */
++size_t qemu_get_buffer_to_pmem(QEMUFile *f, uint8_t *buf, size_t size)
++{
++    return qemu_get_buffer_common(f, buf, size, true);
++}
++
+ /*
+  * Read 'size' bytes of data from the file.
+  * 'size' can be larger than the internal buffer.
 diff --git a/migration/ram.c b/migration/ram.c
-index cb1950f3eb..5a0e503818 100644
+index 5a0e503818..5a79bbff64 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -49,6 +49,7 @@
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
- #include "migration/block.h"
-+#include "qemu/pmem.h"
- 
- /***********************************************************/
- /* ram save/restore */
-@@ -2467,6 +2468,20 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
-     return block->host + offset;
- }
- 
-+static void ram_handle_compressed_common(void *host, uint8_t ch, uint64_t size,
-+                                         bool is_pmem)
-+{
-+    if (!ch && is_zero_range(host, size)) {
-+        return;
-+    }
-+
-+    if (!is_pmem) {
-+        memset(host, ch, size);
-+    } else {
-+        pmem_memset_nodrain(host, ch, size);
-+    }
-+}
-+
- /**
-  * ram_handle_compressed: handle the zero page case
-  *
-@@ -2479,9 +2494,7 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
-  */
- void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
- {
--    if (ch != 0 || !is_zero_range(host, size)) {
--        memset(host, ch, size);
--    }
-+    return ram_handle_compressed_common(host, ch, size, false);
- }
- 
- static void *do_data_decompress(void *opaque)
-@@ -2823,6 +2836,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     bool postcopy_running = postcopy_is_running();
-     /* ADVISE is earlier, it shows the source has the postcopy capability on */
-     bool postcopy_advised = postcopy_is_advised();
-+    bool need_pmem_drain = false;
- 
-     seq_iter++;
- 
-@@ -2848,6 +2862,8 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         ram_addr_t addr, total_ram_bytes;
-         void *host = NULL;
-         uint8_t ch;
-+        RAMBlock *block = NULL;
-+        bool is_pmem = false;
- 
-         addr = qemu_get_be64(f);
-         flags = addr & ~TARGET_PAGE_MASK;
-@@ -2864,7 +2880,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
- 
-         if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-                      RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
--            RAMBlock *block = ram_block_from_stream(f, flags);
-+            block = ram_block_from_stream(f, flags);
- 
-             host = host_from_ram_block_offset(block, addr);
-             if (!host) {
-@@ -2874,6 +2890,9 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-             }
-             ramblock_recv_bitmap_set(block, host);
-             trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
-+
-+            is_pmem = ramblock_is_pmem(block);
-+            need_pmem_drain = need_pmem_drain || is_pmem;
-         }
- 
-         switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
-@@ -2927,7 +2946,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
- 
-         case RAM_SAVE_FLAG_ZERO:
-             ch = qemu_get_byte(f);
--            ram_handle_compressed(host, ch, TARGET_PAGE_SIZE);
-+            ram_handle_compressed_common(host, ch, TARGET_PAGE_SIZE, is_pmem);
+@@ -2950,7 +2950,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
              break;
  
          case RAM_SAVE_FLAG_PAGE:
-@@ -2970,6 +2989,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     }
+-            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
++            if (!is_pmem) {
++                qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
++            } else {
++                qemu_get_buffer_to_pmem(f, host, TARGET_PAGE_SIZE);
++            }
+             break;
  
-     wait_for_decompress_done();
-+
-+    if (need_pmem_drain) {
-+        pmem_drain();
-+    }
-+
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
-     return ret;
+         case RAM_SAVE_FLAG_COMPRESS_PAGE:
 -- 
 2.14.1
