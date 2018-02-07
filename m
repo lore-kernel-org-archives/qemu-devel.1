@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ejNhV-0003v7-HB
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ejNhn-000476-WD
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:16:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ejNhR-0004uN-58
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:41 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2315 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1ejNhQ-0004tX-JA
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:36 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 7 Feb 2018 11:15:24 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA546703@DGGEMA505-MBX.china.huawei.com>
-References: <1517486372-22868-1-git-send-email-arei.gonglei@huawei.com>
-	<2815392f-407f-b9f2-24e7-4bbca477f40c@redhat.com>
-In-Reply-To: <2815392f-407f-b9f2-24e7-4bbca477f40c@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1ejNhj-00050k-33
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:59 -0500
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:36605)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejNhi-00050G-S4
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:55 -0500
+Received: by mail-wm0-f41.google.com with SMTP id f3so2589623wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 03:15:54 -0800 (PST)
+References: <20180206203048.11096-1-rkagan@virtuozzo.com>
+	<20180206203048.11096-28-rkagan@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e6efa53a-3a65-e15d-9ee2-89dcaded1b22@redhat.com>
+Date: Wed, 7 Feb 2018 12:15:50 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] vl: fix possible int overflow for
- qemu_timedate_diff()
+In-Reply-To: <20180206203048.11096-28-rkagan@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 27/34] tests: hv-scsi: add start-stop
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: shenghualong <shenghualong@huawei.com>
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
-dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogVHVlc2RheSwgRmVicnVhcnkgMDYsIDIw
-MTggMTE6NTIgUE0NCj4gVG86IEdvbmdsZWkgKEFyZWkpOyBxZW11LWRldmVsQG5vbmdudS5vcmcN
-Cj4gQ2M6IHNoZW5naHVhbG9uZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSB2bDogZml4IHBvc3Np
-YmxlIGludCBvdmVyZmxvdyBmb3IgcWVtdV90aW1lZGF0ZV9kaWZmKCkNCj4gDQo+IE9uIDAxLzAy
-LzIwMTggMTI6NTksIEdvbmdsZWkgd3JvdGU6DQo+ID4gRnJvbTogc2hlbmdodWFsb25nIDxzaGVu
-Z2h1YWxvbmdAaHVhd2VpLmNvbT4NCj4gPg0KPiA+IFdoZW4gdGhlIFdpbmRvd3MgZ3Vlc3QgdXNl
-cnMgc2V0IHRoZSB0aW1lIHRvIHllYXIgMjA5OSwNCj4gPiB0aGUgcmV0dXJuIHZhbHVlIG9mIHFl
-bXVfdGltZWRhdGVfZGlmZigpIHdpbGwgb3ZlcmZsb3cNCj4gPiB3aXRoIHZhcmlhYmxlIGNsb2Nr
-IG1vZGUgYXMgYmVsb3cgZm9ybWF0Og0KPiA+DQo+ID4gIDxjbG9jayBvZmZzZXQ9J3ZhcmlhYmxl
-JyBhZGp1c3RtZW50PSctMTIwMTU2ODQwNScgYmFzaXM9J3V0Yyc+DQo+ID4NCj4gPiBMZXQncyBj
-aGFuZ2UgdGhlIHJldHVybiB2YWx1ZSBvZiBxZW11X3RpbWVkYXRlX2RpZmYoKSBmcm9tDQo+ID4g
-aW50IHRvIHRpbWVfdCB0byBmaXggdGhlIHBvc3NpYmxlIG92ZXJmbG93IHByb2JsZW0uDQo+ID4N
-Cj4gPiBTaWduZWQtb2ZmLWJ5OiBzaGVuZ2h1YWxvbmcgPHNoZW5naHVhbG9uZ0BodWF3ZWkuY29t
-Pg0KPiA+IFNpZ25lZC1vZmYtYnk6IEdvbmdsZWkgPGFyZWkuZ29uZ2xlaUBodWF3ZWkuY29tPg0K
-PiANCj4gVGhhbmtzLCB0aGlzIG1ha2VzIHNlbnNlLiAgSG93ZXZlciwgbG9va2luZyBhdCB0aGUg
-dXNlcnMsIHlvdSBzaG91bGQNCj4gYWxzbyBjaGFuZ2UgdGhlIHR5cGUgb2Y6DQo+IA0KPiAtIHRo
-ZSBkaWZmIHZhcmlhYmxlIGluIGh3L3RpbWVyL200OHQ1OS5jIGZ1bmN0aW9uIHNldF9hbGFybTsN
-Cj4gDQo+IC0gdGhlIG9mZnNldCBhcmd1bWVudCBvZiB0aGUgUlRDX0NIQU5HRSBRQVBJIGV2ZW50
-ICh0byBpbnQ2NCkNCj4gDQo+IC0gdGhlIHNlY19vZmZzZXQgYW5kIGFsbV9zZWMgZmllbGRzIG9m
-IE1lbmVsYXVzU3RhdGUgaW4gaHcvdGltZXIvdHdsOTIyMzAuYw0KPiANCj4gLSB0aGUgb2Zmc2V0
-IGFyZ3VtZW50IG9mIHFlbXVfZ2V0X3RpbWVkYXRlLg0KPiANCk9LLCB3aWxsIGRvLg0KDQpUaGFu
-a3MsDQotR29uZ2xlaQ0KDQo+IFRoYW5rcywNCj4gDQo+IFBhb2xvDQo+IA0KPiA+IC0tLQ0KPiA+
-ICBpbmNsdWRlL3FlbXUtY29tbW9uLmggfCAyICstDQo+ID4gIHZsLmMgICAgICAgICAgICAgICAg
-ICB8IDQgKystLQ0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
-dGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3FlbXUtY29tbW9uLmggYi9p
-bmNsdWRlL3FlbXUtY29tbW9uLmgNCj4gPiBpbmRleCAwNTMxOWI5Li42ZmI4MGFhIDEwMDY0NA0K
-PiA+IC0tLSBhL2luY2x1ZGUvcWVtdS1jb21tb24uaA0KPiA+ICsrKyBiL2luY2x1ZGUvcWVtdS1j
-b21tb24uaA0KPiA+IEBAIC0zMyw3ICszMyw3IEBAIGludCBxZW11X21haW4oaW50IGFyZ2MsIGNo
-YXIgKiphcmd2LCBjaGFyICoqZW52cCk7DQo+ID4gICNlbmRpZg0KPiA+DQo+ID4gIHZvaWQgcWVt
-dV9nZXRfdGltZWRhdGUoc3RydWN0IHRtICp0bSwgaW50IG9mZnNldCk7DQo+ID4gLWludCBxZW11
-X3RpbWVkYXRlX2RpZmYoc3RydWN0IHRtICp0bSk7DQo+ID4gK3RpbWVfdCBxZW11X3RpbWVkYXRl
-X2RpZmYoc3RydWN0IHRtICp0bSk7DQo+ID4NCj4gPiAgI2RlZmluZSBxZW11X2lzYWxudW0oYykJ
-CWlzYWxudW0oKHVuc2lnbmVkIGNoYXIpKGMpKQ0KPiA+ICAjZGVmaW5lIHFlbXVfaXNhbHBoYShj
-KQkJaXNhbHBoYSgodW5zaWduZWQgY2hhcikoYykpDQo+ID4gZGlmZiAtLWdpdCBhL3ZsLmMgYi92
-bC5jDQo+ID4gaW5kZXggZTUxN2E4ZC4uOWQyMjVkYSAxMDA2NDQNCj4gPiAtLS0gYS92bC5jDQo+
-ID4gKysrIGIvdmwuYw0KPiA+IEBAIC0xNDYsNyArMTQ2LDcgQEAgaW50IG5iX25pY3M7DQo+ID4g
-IE5JQ0luZm8gbmRfdGFibGVbTUFYX05JQ1NdOw0KPiA+ICBpbnQgYXV0b3N0YXJ0Ow0KPiA+ICBz
-dGF0aWMgaW50IHJ0Y191dGMgPSAxOw0KPiA+IC1zdGF0aWMgaW50IHJ0Y19kYXRlX29mZnNldCA9
-IC0xOyAvKiAtMSBtZWFucyBubyBjaGFuZ2UgKi8NCj4gPiArc3RhdGljIHRpbWVfdCBydGNfZGF0
-ZV9vZmZzZXQgPSAtMTsgLyogLTEgbWVhbnMgbm8gY2hhbmdlICovDQo+ID4gIFFFTVVDbG9ja1R5
-cGUgcnRjX2Nsb2NrOw0KPiA+ICBpbnQgdmdhX2ludGVyZmFjZV90eXBlID0gVkdBX05PTkU7DQo+
-ID4gIHN0YXRpYyBpbnQgZnVsbF9zY3JlZW4gPSAwOw0KPiA+IEBAIC04MTIsNyArODEyLDcgQEAg
-dm9pZCBxZW11X2dldF90aW1lZGF0ZShzdHJ1Y3QgdG0gKnRtLCBpbnQgb2Zmc2V0KQ0KPiA+ICAg
-ICAgfQ0KPiA+ICB9DQo+ID4NCj4gPiAtaW50IHFlbXVfdGltZWRhdGVfZGlmZihzdHJ1Y3QgdG0g
-KnRtKQ0KPiA+ICt0aW1lX3QgcWVtdV90aW1lZGF0ZV9kaWZmKHN0cnVjdCB0bSAqdG0pDQo+ID4g
-IHsNCj4gPiAgICAgIHRpbWVfdCBzZWNvbmRzOw0KPiA+DQo+ID4NCg0K
+On 06/02/2018 21:30, Roman Kagan wrote:
+> +    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> +        g_printerr("Hyper-V / VMBus are only available on x86\n");
+> +        exit(EXIT_FAILURE);
+> +    }
+
+This shouldn't be needed.
+
+> +
+> +    if (access("/dev/kvm", R_OK | W_OK)) {
+
+Maybe try opening it too?  In theory you could have a /dev/kvm device
+that triggers loading the kvm module (see
+https://github.com/systemd/systemd/pull/7795 for gory details).
+
+Paolo
+
+> +        g_printerr("Hyper-V / VMBus can only be used with KVM\n");
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    return qtest_pc_boot(cmd, extra_opts ? : "");
