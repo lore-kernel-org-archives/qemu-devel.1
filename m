@@ -1,33 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejFKA-0002Fi-7h
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:19:04 -0500
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ejFuA-0001OS-G2
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejFK6-0006Qo-Tg
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:19:02 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35106)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejFK6-0006PQ-NS
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:18:58 -0500
-Received: by mail-qk0-x244.google.com with SMTP id 69so5026017qkz.2
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 18:18:58 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1517955702.git.alistair.francis@xilinx.com>
-	<378759b13cf65246de7ce565045f877e4a224aa0.1517955702.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8dead98d-dd14-6019-74f4-fee860b16410@amsat.org>
-Date: Tue, 6 Feb 2018 23:18:53 -0300
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ejFu7-0007y2-Da
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:56:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53990
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1ejFu7-0007xj-7I
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:56:11 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w172sTrh082471
+	for <qemu-devel@nongnu.org>; Tue, 6 Feb 2018 21:56:10 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fyqtvthxm-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 21:56:09 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Tue, 6 Feb 2018 21:56:09 -0500
+References: <20180205072258.5968-1-zyimin@linux.vnet.ibm.com>
+	<20180206112326.455bf5b0.cohuck@redhat.com>
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Wed, 7 Feb 2018 10:56:01 +0800
 MIME-Version: 1.0
-In-Reply-To: <378759b13cf65246de7ce565045f877e4a224aa0.1517955702.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] timer: Initial commit of
- xlnx-pmu-iomod-pit device
+In-Reply-To: <20180206112326.455bf5b0.cohuck@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Message-Id: <a2faea2f-111b-f193-2c55-57d3e9e0ee57@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] s390x/pci: fixup and optimize IOTLB
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,361 +43,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair23@gmail.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
 
-Hi Alistair,
 
-On 02/06/2018 07:23 PM, Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> 
->  include/hw/timer/xlnx-pmu-iomod-pit.h |  58 ++++++++
->  hw/timer/xlnx-pmu-iomod-pit.c         | 241 ++++++++++++++++++++++++++++++++++
->  hw/timer/Makefile.objs                |   2 +
->  3 files changed, 301 insertions(+)
->  create mode 100644 include/hw/timer/xlnx-pmu-iomod-pit.h
->  create mode 100644 hw/timer/xlnx-pmu-iomod-pit.c
-> 
-> diff --git a/include/hw/timer/xlnx-pmu-iomod-pit.h b/include/hw/timer/xlnx-pmu-iomod-pit.h
-> new file mode 100644
-> index 0000000000..15f9f0dee5
-> --- /dev/null
-> +++ b/include/hw/timer/xlnx-pmu-iomod-pit.h
-> @@ -0,0 +1,58 @@
-> +/*
-> + * QEMU model of Xilinx I/O Module PIT
-> + *
-> + * Copyright (c) 2013 Xilinx Inc
 
-I'm glad you upstream this :)
-
-> + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/ptimer.h"
-> +
-> +#define TYPE_XLNX_ZYNQMP_IOMODULE_PIT "xlnx.pmu_iomodule"
-> +
-> +#define XLNX_ZYNQMP_IOMODULE_PIT(obj) \
-> +     OBJECT_CHECK(XlnxPMUPIT, (obj), TYPE_XLNX_ZYNQMP_IOMODULE_PIT)
-> +
-> +#define XLNX_ZYNQMP_IOMODULE_PIT_R_MAX (0x08 + 1)
-
-I assume this part is generated, removing 'XLNX_' shortens a bit.
-
-> +
-> +typedef struct XlnxPMUPIT {
-> +    SysBusDevice parent_obj;
-> +    MemoryRegion iomem;
-> +
-> +    QEMUBH *bh;
-> +    ptimer_state *ptimer;
-> +
-> +    qemu_irq irq;
-> +    /* IRQ to pulse out when present timer hits zero */
-> +    qemu_irq hit_out;
-> +
-> +    /* Counter in Pre-Scalar(ps) Mode */
-> +    uint32_t ps_counter;
-> +    /* ps_mode irq-in to enable/disable pre-scalar */
-> +    bool ps_enable;
-> +    /* State var to remember hit_in level */
-> +    bool ps_level;
-> +
-> +    uint32_t frequency;
-
-I personally prefer explicit that kind of unit when possible:
-"frequency_hz".
-
-> +
-> +    uint32_t regs[XLNX_ZYNQMP_IOMODULE_PIT_R_MAX];
-> +    RegisterInfo regs_info[XLNX_ZYNQMP_IOMODULE_PIT_R_MAX];
-> +} XlnxPMUPIT;
-> diff --git a/hw/timer/xlnx-pmu-iomod-pit.c b/hw/timer/xlnx-pmu-iomod-pit.c
-> new file mode 100644
-> index 0000000000..cdfef1a440
-> --- /dev/null
-> +++ b/hw/timer/xlnx-pmu-iomod-pit.c
-> @@ -0,0 +1,241 @@
-> +/*
-> + * QEMU model of Xilinx I/O Module PIT
-> + *
-> + * Copyright (c) 2013 Xilinx Inc
-> + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/ptimer.h"
-> +#include "hw/register.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/log.h"
-> +#include "qapi/error.h"
-> +#include "hw/timer/xlnx-pmu-iomod-pit.h"
-> +
-> +#ifndef XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG
-> +#define XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG 0
-> +#endif
-> +
-> +REG32(PIT_PRELOAD, 0x00)
-> +REG32(PIT_COUNTER, 0x04)
-> +REG32(PIT_CONTROL, 0x08)
-> +    FIELD(PIT_CONTROL, PRELOAD, 1, 1)
-> +    FIELD(PIT_CONTROL, EN, 0, 1)
-> +
-> +static uint64_t xlnx_iomod_pit_ctr_pr(RegisterInfo *reg, uint64_t val)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(reg->opaque);
-> +    uint32_t ret;
-
-Can you use uint64_t and return explicitly masking with UINT32_MAX?
-
-> +
-> +    if (s->ps_enable) {
-> +        ret = s->ps_counter;
-> +    } else {
-> +        ret = ptimer_get_count(s->ptimer);
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +static void xlnx_iomod_pit_control_pw(RegisterInfo *reg, uint64_t val)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(reg->opaque);
-> +
-> +    ptimer_stop(s->ptimer);
-> +
-> +    if (val & R_PIT_CONTROL_EN_MASK) {
-> +        if (s->ps_enable) {
-> +            /* pre-scalar mode do-Nothing here */
-> +            s->ps_counter = s->regs[R_PIT_PRELOAD];
-> +        } else {
-> +            ptimer_set_limit(s->ptimer, s->regs[R_PIT_PRELOAD], 1);
-> +            ptimer_run(s->ptimer, !(val & R_PIT_CONTROL_PRELOAD_MASK));
-> +
-
-> +        }
-> +    }
-> +}
-> +
-> +static const RegisterAccessInfo xlnx_iomod_pit_regs_info[] = {
-> +    { .name = "PIT_PRELOAD",  .addr = A_PIT_PRELOAD,
-> +        .ro = 0xffffffff,
-> +    },{ .name = "PIT_COUNTER",  .addr = A_PIT_COUNTER,
-> +        .ro = 0xffffffff,
-> +        .post_read = xlnx_iomod_pit_ctr_pr,
-> +    },{ .name = "PIT_CONTROL",  .addr = A_PIT_CONTROL,
-> +        .rsvd = 0xfffffffc,
-> +        .post_write = xlnx_iomod_pit_control_pw,
-> +    }
-> +};
-> +
-> +static void xlnx_iomod_pit_timer_hit(void *opaque)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
-> +
-> +    qemu_irq_pulse(s->irq);
-> +
-> +    /* hit_out to make another pit move it's counter in pre-scalar mode. */
-> +    qemu_irq_pulse(s->hit_out);
-> +}
-> +
-> +static void xlnx_iomod_pit_ps_config(void *opaque, int n, int level)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
-> +
-> +    s->ps_enable = level;
-> +}
-> +
-> +static void xlnx_iomod_pit_ps_hit_in(void *opaque, int n, int level)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
-> +
-> +    if (!ARRAY_FIELD_EX32(s->regs, PIT_CONTROL, EN)) {
-> +        /* PIT disabled */
-> +        return;
-> +    }
-> +
-> +    /* Count only on positive edge */
-> +    if (!s->ps_level && level) {
-> +        if (s->ps_counter) {
-> +            s->ps_counter--;
-> +        }
-> +        s->ps_level = level;
-> +    } else {
-> +        /* Not on positive edge */
-> +        s->ps_level = level;
-> +        return;
-> +    }
-> +
-> +    /* If timer expires, try to preload or stop */
-> +    if (s->ps_counter == 0) {
-> +        xlnx_iomod_pit_timer_hit(opaque);
-> +
-> +        /* Check for pit preload/one-shot mode */
-> +        if (ARRAY_FIELD_EX32(s->regs, PIT_CONTROL, PRELOAD)) {
-> +            /* Preload Mode, Reload the ps_counter */
-> +            s->ps_counter = s->regs[R_PIT_PRELOAD];
-> +        } else {
-> +            /* One-Shot mode, turn off the timer */
-> +            s->regs[R_PIT_CONTROL] &= ~R_PIT_CONTROL_PRELOAD_MASK;
-> +        }
-> +    }
-> +}
-> +
-> +static void xlnx_iomod_pit_reset(DeviceState *dev)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(dev);
-> +    unsigned int i;
-> +
-> +    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
-> +        register_reset(&s->regs_info[i]);
-> +    }
-> +
-> +    s->ps_level = false;
-> +}
-> +
-> +static const MemoryRegionOps xlnx_iomod_pit_ops = {
-> +    .read = register_read_memory,
-> +    .write = register_write_memory,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static void xlnx_iomod_pit_realize(DeviceState *dev, Error **errp)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(dev);
-> +
-> +    s->bh = qemu_bh_new(xlnx_iomod_pit_timer_hit, s);
-> +    s->ptimer = ptimer_init(s->bh, PTIMER_POLICY_DEFAULT);
-> +    ptimer_set_freq(s->ptimer, s->frequency);
-> +
-> +    /* IRQ out to pulse when present timer expires/reloads */
-> +    qdev_init_gpio_out_named(dev, &s->hit_out, "ps_hit_out", 1);
-> +
-> +    /* IRQ in to enable pre-scalar mode. Routed from gpo1 */
-> +    qdev_init_gpio_in_named(dev, xlnx_iomod_pit_ps_config, "ps_config", 1);
-> +
-> +    /* hit_out of neighbouring PIT is received as hit_in */
-> +    qdev_init_gpio_in_named(dev, xlnx_iomod_pit_ps_hit_in, "ps_hit_in", 1);
-> +}
-> +
-> +static void xlnx_iomod_pit_init(Object *obj)
-> +{
-> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(obj);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-> +    RegisterInfoArray *reg_array;
-> +
-> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
-> +                       XLNX_ZYNQMP_IOMODULE_PIT_R_MAX * 4);
-> +    reg_array =
-> +        register_init_block32(DEVICE(obj), xlnx_iomod_pit_regs_info,
-> +                              ARRAY_SIZE(xlnx_iomod_pit_regs_info),
-> +                              s->regs_info, s->regs,
-> +                              &xlnx_iomod_pit_ops,
-> +                              XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG,
-> +                              XLNX_ZYNQMP_IOMODULE_PIT_R_MAX * 4);
-> +    memory_region_add_subregion(&s->iomem,
-> +                                0x0,
-> +                                &reg_array->mem);
-> +    sysbus_init_mmio(sbd, &s->iomem);
-> +    sysbus_init_irq(sbd, &s->irq);
-> +}
-> +
-> +static const VMStateDescription vmstate_xlnx_iomod_pit = {
-> +    .name = TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_END_OF_LIST(),
-> +    }
-> +};
-> +
-> +static Property xlnx_iomod_pit_properties[] = {
-> +    DEFINE_PROP_UINT32("frequency", XlnxPMUPIT, frequency, 66000000),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void xlnx_iomod_pit_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->reset = xlnx_iomod_pit_reset;
-> +    dc->realize = xlnx_iomod_pit_realize;
-> +    dc->props = xlnx_iomod_pit_properties;
-> +    dc->vmsd = &vmstate_xlnx_iomod_pit;
-> +}
-> +
-> +static const TypeInfo xlnx_iomod_pit_info = {
-> +    .name          = TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(XlnxPMUPIT),
-> +    .class_init    = xlnx_iomod_pit_class_init,
-> +    .instance_init = xlnx_iomod_pit_init,
-> +};
-> +
-> +static void xlnx_iomod_pit_register_types(void)
-> +{
-> +    type_register_static(&xlnx_iomod_pit_info);
-> +}
-> +
-> +type_init(xlnx_iomod_pit_register_types)
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 8c19eac3b6..805c480cad 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -43,3 +43,5 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
->  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
->  common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
->  common-obj-$(CONFIG_MSF2) += mss-timer.o
-> +
-> +common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-pmu-iomod-pit.o
-> 
-
-Patch looks good to me but I'm not confident with ptimers to add a R-b.
-
-Regards,
-
-Phil.
+=D4=DA 2018/2/6 =CF=C2=CE=E76:23, Cornelia Huck =D0=B4=B5=C0:
+> On Mon,  5 Feb 2018 15:22:55 +0800
+> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+>
+>> This series contains three patches,
+>> 1) optimizes the code including walking DMA tables and rpcit handler
+>> 2) fixes the issue caused by IOTLB global refresh
+>> 3) uses the right pal and pba when registering ioat
+>>
+>> The issue mentioned above was found when we tested SMC-r tools. This
+>> behavior has been introduced when linux guest started using a global
+>> refresh to purge the whole IOTLB of invalid entries in a lazy fashion
+>> instead of flushing each entry when invalidating table entries.
+>>
+>> The previous QEMU implementation didn't keep track of the mapping,
+>> didn't handle correctly the global flush demand from the guest and a
+>> major part of the IOTLB entries were not flushed.
+>>
+>> Consequently linux kernel on the host keeping the previous mapping
+>> reports, as it should, -EEXIST DMA mapping error on the next mapping
+>> with the same IOVA. The second patch fixes this issue.
+> Introducing a local tracking mechanism still feels a bit awkward to me
+> (even though it works, of course). If nobody else needs such a thing,
+> our best choice is to do it like that, though.
+Caching iotlb entries is also helpful for us to support 2G mapping in=20
+future.
+>
+>> During the investigation, we noticed that the current code walking
+>> PCI IOMMU page tables didn't check important flags of table entries,
+>> including:
+>> 1) protection bit
+>> 2) table length
+>> 3) table offset
+>> 4) intermediate tables' invalid bit
+>> 5) format control bit
+>>
+>> We implement the checking in the first patch before handling the
+>> IOTLB global refresh issue. To keep track of the mapped IOTLB entries
+>> and be able to check if the host IOTLB entries need to be refreshed
+>> we implement a IOTLB cache in QEMU, and introduce some helper
+>> functions to check these bits. All S390IOTLBEntry instances are stored
+>> in a new hashtable which are indexed by IOVA. Each PCI device has its
+>> own IOMMU. Therefore each IOMMU also has its own hashtable caching
+>> corresponding PCI device's DMA entries. Finally, we split 1M
+>> contiguous DMA range into 4K pages to do DMA map, and the code about
+>> error notification is also optimized.
+>>
+>> Change log:
+>> v1->v2:
+>> 1) update commit messages
+>> 2) move some changes from the 2nd patch to the 1st patch
+>> 3) define macros for 'ett' in the 1st patch
+>>
+>> Yi Min Zhao (3):
+>>    s390x/pci: fixup the code walking IOMMU tables
+>>    s390x/pci: fixup global refresh
+>>    s390x/pci: use the right pal and pba in reg_ioat()
+>>
+>>   hw/s390x/s390-pci-bus.c  | 233 +++++++++++++++++++++++++++++++++++++=
++---------
+>>   hw/s390x/s390-pci-bus.h  |  17 ++++
+>>   hw/s390x/s390-pci-inst.c | 103 ++++++++++++++-------
+>>   3 files changed, 275 insertions(+), 78 deletions(-)
+>>
+> I have played with these patches and some virtio-pci devices (since I
+> don't have access to real zpci cards), and it worked both under kvm and
+> under tcg. So I'm inclined to apply this (I can't review further due to
+> missing documentation), unless the pci folks have further comments.
+Thanks!
+>
+>
