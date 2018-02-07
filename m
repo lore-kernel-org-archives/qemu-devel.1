@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejNdv-0001a7-TN
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:12:04 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1ejNgx-0003WK-VA
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejNdq-00028R-W7
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:11:59 -0500
-Received: from mail-wr0-f170.google.com ([209.85.128.170]:38300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejNdq-000285-Ob
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:11:54 -0500
-Received: by mail-wr0-f170.google.com with SMTP id t94so569346wrc.5
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 03:11:54 -0800 (PST)
-References: <20180206203048.11096-1-rkagan@virtuozzo.com>
-	<20180206203048.11096-26-rkagan@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <61ab4454-9aa3-7291-8b54-bcaee1f74bf0@redhat.com>
-Date: Wed, 7 Feb 2018 12:11:50 +0100
+	(envelope-from <arei.gonglei@huawei.com>) id 1ejNgr-0004Bd-1G
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:05 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2314 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1ejNgq-00049i-DP
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:15:00 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Wed, 7 Feb 2018 11:14:47 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA5466F6@DGGEMA505-MBX.china.huawei.com>
+References: <1517926039-86416-1-git-send-email-arei.gonglei@huawei.com>
+	<CAFEAcA9eNYTOBrQ8f9VXodp+qMgQpBDfC58iC5OK+bpif7f=5A@mail.gmail.com>
+In-Reply-To: <CAFEAcA9eNYTOBrQ8f9VXodp+qMgQpBDfC58iC5OK+bpif7f=5A@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20180206203048.11096-26-rkagan@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 25/34] scsi: add Hyper-V/VMBus SCSI
- controller
+Subject: Re: [Qemu-devel] [PATCH v2] rtc: placing RTC memory region outside
+ BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On 06/02/2018 21:30, Roman Kagan wrote:
-> +    blk_io_plug(d->conf.blk);
-> +    if (scsi_req_enqueue(sreq)) {
-> +        scsi_req_continue(sreq);
-> +    }
-> +    blk_io_unplug(d->conf.blk);
-
-Is plug/unplug really useful?
-
-Paolo
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBNYXlkZWxsIFttYWls
+dG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnXQ0KPiBTZW50OiBUdWVzZGF5LCBGZWJydWFyeSAw
+NiwgMjAxOCAxMDozNiBQTQ0KPiBUbzogR29uZ2xlaSAoQXJlaSkNCj4gQ2M6IFFFTVUgRGV2ZWxv
+cGVyczsgUGFvbG8gQm9uemluaTsgSHVhbmd3ZWlkb25nIChDKQ0KPiBTdWJqZWN0OiBSZTogW1BB
+VENIIHYyXSBydGM6IHBsYWNpbmcgUlRDIG1lbW9yeSByZWdpb24gb3V0c2lkZSBCUUwNCj4gDQo+
+IE9uIDYgRmVicnVhcnkgMjAxOCBhdCAxNDowNywgR29uZ2xlaSA8YXJlaS5nb25nbGVpQGh1YXdl
+aS5jb20+IHdyb3RlOg0KPiA+IEFzIHdpbmRvd3MgZ3Vlc3QgdXNlIHJ0YyBhcyB0aGUgY2xvY2sg
+c291cmNlIGRldmljZSwNCj4gPiBhbmQgYWNjZXNzIHJ0YyBmcmVxdWVudGx5LiBMZXQncyBtb3Zl
+IHRoZSBydGMgbWVtb3J5DQo+ID4gcmVnaW9uIG91dHNpZGUgQlFMIHRvIGRlY3JlYXNlIG92ZXJo
+ZWFkIGZvciB3aW5kb3dzIGd1ZXN0cy4NCj4gPiBNZWFud2hpbGUsIGFkZGluZyBhIG5ldyBsb2Nr
+IHRvIGF2b2lkIGRpZmZlcmVudCB2Q1BVcw0KPiA+IGFjY2VzcyB0aGUgUlRDIHRvZ2V0aGVyLg0K
+PiA+DQo+ID4gJCBjYXQgc3RyYWNlX2Muc2gNCj4gPiBzdHJhY2UgLXR0IC1wICQxIC1jIC1vIHJl
+c3VsdF8kMS5sb2cgJg0KPiA+IHNsZWVwICQyDQo+ID4gcGlkPSQocGlkb2Ygc3RyYWNlKQ0KPiA+
+IGtpbGwgJHBpZA0KPiA+IGNhdCByZXN1bHRfJDEubG9nDQo+ID4NCj4gPiBCZWZvcmUgYXBwbGlu
+ZyB0aGlzIGNoYW5nZToNCj4gPiAkIC4vc3RyYWNlX2Muc2ggMTA1MjggMzANCj4gPiAlIHRpbWUg
+ICAgIHNlY29uZHMgIHVzZWNzL2NhbGwgICAgIGNhbGxzICAgIGVycm9ycyBzeXNjYWxsDQo+ID4g
+LS0tLS0tIC0tLS0tLS0tLS0tIC0tLS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0t
+LS0tLS0tLS0tLQ0KPiA+ICA5My44NyAgICAwLjExOTA3MCAgICAgICAgICAzMCAgICAgIDQwMDAg
+ICAgICAgICAgIHBwb2xsDQo+ID4gICAzLjI3ICAgIDAuMDA0MTQ4ICAgICAgICAgICAyICAgICAg
+MjAzOCAgICAgICAgICAgaW9jdGwNCj4gPiAgIDIuNjYgICAgMC4wMDMzNzAgICAgICAgICAgIDIg
+ICAgICAyMDE0ICAgICAgICAgICBmdXRleA0KPiA+ICAgMC4wOSAgICAwLjAwMDExMyAgICAgICAg
+ICAgMSAgICAgICAxMDYgICAgICAgICAgIHJlYWQNCj4gPiAgIDAuMDkgICAgMC4wMDAxMDkgICAg
+ICAgICAgIDEgICAgICAgMTA0ICAgICAgICAgICBpb19nZXRldmVudHMNCj4gPiAgIDAuMDIgICAg
+MC4wMDAwMjkgICAgICAgICAgIDEgICAgICAgIDMwICAgICAgICAgICBwb2xsDQo+ID4gICAwLjAw
+ICAgIDAuMDAwMDAwICAgICAgICAgICAwICAgICAgICAgMSAgICAgICAgICAgd3JpdGUNCj4gPiAt
+LS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0tLS0t
+LS0tLS0tLS0tDQo+ID4gMTAwLjAwICAgIDAuMTI2ODM5ICAgICAgICAgICAgICAgICAgODI5MyAg
+ICAgICAgICAgdG90YWwNCj4gPg0KPiA+IEFmdGVyIGFwcGxpbmcgdGhlIGNoYW5nZToNCj4gPiAk
+IC4vc3RyYWNlX2Muc2ggMjM4MjkgMzANCj4gPiAlIHRpbWUgICAgIHNlY29uZHMgIHVzZWNzL2Nh
+bGwgICAgIGNhbGxzICAgIGVycm9ycyBzeXNjYWxsDQo+ID4gLS0tLS0tIC0tLS0tLS0tLS0tIC0t
+LS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tLS0tLS0tLQ0KPiA+ICA5Mi44
+NiAgICAwLjA2NzQ0MSAgICAgICAgICAxNiAgICAgIDQwOTQgICAgICAgICAgIHBwb2xsDQo+ID4g
+ICA0Ljg1ICAgIDAuMDAzNTIyICAgICAgICAgICAyICAgICAgMjEzNiAgICAgICAgICAgaW9jdGwN
+Cj4gPiAgIDEuMTcgICAgMC4wMDA4NTAgICAgICAgICAgIDQgICAgICAgMTg5ICAgICAgICAgICBm
+dXRleA0KPiA+ICAgMC41NCAgICAwLjAwMDM5NSAgICAgICAgICAgMiAgICAgICAyMDIgICAgICAg
+ICAgIHJlYWQNCj4gPiAgIDAuNTIgICAgMC4wMDAzNzkgICAgICAgICAgIDIgICAgICAgMjAyICAg
+ICAgICAgICBpb19nZXRldmVudHMNCj4gPiAgIDAuMDUgICAgMC4wMDAwMzcgICAgICAgICAgIDEg
+ICAgICAgIDMwICAgICAgICAgICBwb2xsDQo+ID4gLS0tLS0tIC0tLS0tLS0tLS0tIC0tLS0tLS0t
+LS0tIC0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tLS0tLS0tLQ0KPiA+IDEwMC4wMCAgICAw
+LjA3MjYyNCAgICAgICAgICAgICAgICAgIDY4NTMgICAgICAgICAgIHRvdGFsDQo+ID4NCj4gPiBU
+aGUgZnV0ZXggY2FsbCBudW1iZXIgZGVjcmVhc2VzIH45MC42JSBvbiBhbiBpZGxlIHdpbmRvd3Mg
+NyBndWVzdC4NCj4gDQo+IFRoZXNlIGFyZSB0aGUgc2FtZSBmaWd1cmVzIGFzIGZyb20gdjEgLS0g
+aXQgd291bGQgYmUgaW50ZXJlc3RpbmcNCj4gdG8gY2hlY2sgd2hldGhlciB0aGUgYWRkaXRpb25h
+bCBsb2NraW5nIHRoYXQgdjIgYWRkcyBoYXMgYWZmZWN0ZWQNCj4gdGhlIHJlc3VsdHMuDQo+IA0K
+T2gsIHllcy4gdGhlIGZ1dGV4IG51bWJlciBvZiB2MiBkb24ndCBkZWNsaW5lIGNvbXBhcmVkIHRv
+byBtdWNoIHRvIHYxIGJlY2F1c2UgaXQNCnRha2VzIHRoZSBCUUwgYmVmb3JlIHJhaXNpbmcgdGhl
+IG91dGJvdW5kIElSUSBsaW5lIG5vdy4NCg0KQmVmb3JlIGFwcGx5aW5nIHYyOg0KIyAuL3N0cmFj
+ZV9jLnNoIDg3NzYgMzANCiUgdGltZSAgICAgc2Vjb25kcyAgdXNlY3MvY2FsbCAgICAgY2FsbHMg
+ICAgZXJyb3JzIHN5c2NhbGwNCi0tLS0tLSAtLS0tLS0tLS0tLSAtLS0tLS0tLS0tLSAtLS0tLS0t
+LS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0tLS0tLS0NCiA3OC4wMSAgICAwLjE2NDE4OCAgICAgICAg
+ICAyNiAgICAgIDY0MzYgICAgICAgICAgIHBwb2xsDQogIDguMzkgICAgMC4wMTc2NTAgICAgICAg
+ICAgIDUgICAgICAzNzAwICAgICAgICAzOSBmdXRleA0KICA3LjY4ICAgIDAuMDE2MTU3ICAgICAg
+ICAgICA2ICAgICAgMjc1OCAgICAgICAgICAgaW9jdGwNCiAgNS40OCAgICAwLjAxMTUzMCAgICAg
+ICAgICAgMyAgICAgIDQ1ODYgICAgICAxMTEzIHJlYWQNCiAgMC4zMCAgICAwLjAwMDY0MCAgICAg
+ICAgICAyMCAgICAgICAgMzIgICAgICAgICAgIGlvX3N1Ym1pdA0KICAwLjE1ICAgIDAuMDAwMzE3
+ICAgICAgICAgICA0ICAgICAgICA4OSAgICAgICAgICAgd3JpdGUNCi0tLS0tLSAtLS0tLS0tLS0t
+LSAtLS0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0tLS0tLS0NCjEwMC4w
+MCAgICAwLjIxMDQ4MiAgICAgICAgICAgICAgICAgMTc2MDEgICAgICAxMTUyIHRvdGFsDQoNCkFm
+dGVyIGFwcGx5aW5nIHYyOg0KIyAuL3N0cmFjZV9jLnNoIDE1OTY4IDMwDQolIHRpbWUgICAgIHNl
+Y29uZHMgIHVzZWNzL2NhbGwgICAgIGNhbGxzICAgIGVycm9ycyBzeXNjYWxsDQotLS0tLS0gLS0t
+LS0tLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0tLS0tLS0tLS0tLS0t
+DQogNzguMjggICAgMC4xNzExMTcgICAgICAgICAgMjcgICAgICA2MjcyICAgICAgICAgICBwcG9s
+bA0KICA4LjUwICAgIDAuMDE4NTcxICAgICAgICAgICA1ICAgICAgMzY2MyAgICAgICAgMjEgZnV0
+ZXgNCiAgNy43NiAgICAwLjAxNjk3MyAgICAgICAgICAgNiAgICAgIDI3MzIgICAgICAgICAgIGlv
+Y3RsDQogIDQuODUgICAgMC4wMTA1OTcgICAgICAgICAgIDMgICAgICA0MTE1ICAgICAgIDg1MyBy
+ZWFkDQogIDAuMzEgICAgMC4wMDA2NzIgICAgICAgICAgMTEgICAgICAgIDYzICAgICAgICAgICBp
+b19zdWJtaXQNCiAgMC4zMCAgICAwLjAwMDY1OSAgICAgICAgICAgNCAgICAgICAxODAgICAgICAg
+ICAgIHdyaXRlDQotLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0t
+LS0tLSAtLS0tLS0tLS0tLS0tLS0tDQoxMDAuMDAgICAgMC4yMTg1ODkgICAgICAgICAgICAgICAg
+IDE3MDI1ICAgICAgIDg3NCB0b3RhbA0KDQo+IERvZXMgdGhlIHBhdGNoIGltcHJvdmUgcGVyZm9y
+bWFuY2UgaW4gYSBtb3JlIGludGVyZXN0aW5nIHVzZQ0KPiBjYXNlIHRoYW4gInRoZSBndWVzdCBp
+cyBqdXN0IGlkbGUiID8NCj4gDQpJIHRoaW5rIHNvLCBhZnRlciBhbGwsIHRoZSBzY29wZSBvZiB0
+aGUgbG9ja2luZyBpcyByZWR1Y2VkIC4gDQpCZXNpZGVzIHRoaXMsIGNhbiB3ZSBvcHRpbWl6ZSB0
+aGUgcnRjIHRpbWVyIHRvIGF2b2lkIHRvIGhvbGQgQlFMIA0KYnkgc2VwYXJhdGUgdGhyZWFkcz8N
+Cg0KPiA+ICtzdGF0aWMgdm9pZCBydGNfcmFzaWVfaXJxKFJUQ1N0YXRlICpzKQ0KPiANCj4gVHlw
+bzogc2hvdWxkIGJlICJyYWlzZSIuDQo+IA0KR29vZCBjYXRjaC4gOikNCg0KVGhhbmtzLA0KLUdv
+bmdsZWkNCg==
