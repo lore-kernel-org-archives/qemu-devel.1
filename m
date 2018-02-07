@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejU9g-0004YZ-3r
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:09:13 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ejUD5-0006aV-At
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejU9b-00065N-9T
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:09:12 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40892 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejU9b-00065B-4R
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:09:07 -0500
-Date: Wed, 7 Feb 2018 18:08:48 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180207180848.GU2665@work-vm>
-References: <20180207073331.14158-1-haozhong.zhang@intel.com>
-	<20180207073331.14158-8-haozhong.zhang@intel.com>
-	<20180207115406.GD2665@work-vm>
-	<20180207121525.5pyrld36k5xbm373@hz-desktop>
-	<20180207130355.GH2665@work-vm>
-	<20180207132023.yuf2lp3jrhg2qytz@hz-desktop>
-	<20180207132412.GJ2665@work-vm>
-	<CAPcyv4j7s6M6RNKKOQqrOkovsp0Z4uAXFjURBeG5QSp_-uzm+w@mail.gmail.com>
+	(envelope-from <brijesh.singh@amd.com>) id 1ejUCz-0007yF-Jt
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:12:43 -0500
+Received: from mail-sn1nam02on0074.outbound.protection.outlook.com
+	([104.47.36.74]:52480
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ejUCz-0007xn-3c
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:12:37 -0500
+References: <20180207160638.98872-1-brijesh.singh@amd.com>
+	<20180207160638.98872-26-brijesh.singh@amd.com>
+	<14588677-a845-be1e-449f-901ade4a8fe6@redhat.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <dce6f9a2-e3e6-b75c-cc34-2fdfc30321f6@amd.com>
+Date: Wed, 7 Feb 2018 12:12:25 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4j7s6M6RNKKOQqrOkovsp0Z4uAXFjURBeG5QSp_-uzm+w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] migration/ram: ensure write
- persistence on loading compressed pages to PMEM
+In-Reply-To: <14588677-a845-be1e-449f-901ade4a8fe6@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 26/26] qmp: add query-sev-launch-measure
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: brijesh.singh@amd.com, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
 
-* Dan Williams (dan.j.williams@intel.com) wrote:
-> On Wed, Feb 7, 2018 at 5:24 AM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> >> On 02/07/18 13:03 +0000, Dr. David Alan Gilbert wrote:
-> >> > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> >> > > On 02/07/18 11:54 +0000, Dr. David Alan Gilbert wrote:
-> >> > > > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> >> > > > > When loading a compressed page to persistent memory, flush CPU cache
-> >> > > > > after the data is decompressed. Combined with a call to pmem_drain()
-> >> > > > > at the end of memory loading, we can guarantee those compressed pages
-> >> > > > > are persistently loaded to PMEM.
-> >> > > >
-> >> > > > Can you explain why this can use the flush and doesn't need the special
-> >> > > > memset?
-> >> > >
-> >> > > The best approach to ensure the write persistence is to operate pmem
-> >> > > all via libpmem, e.g., pmem_memcpy_nodrain() + pmem_drain(). However,
-> >> > > the write to pmem in this case is performed by uncompress() which is
-> >> > > implemented out of QEMU and libpmem. It may or may not use libpmem,
-> >> > > which is not controlled by QEMU. Therefore, we have to use the less
-> >> > > optimal approach, that is to flush cache for all pmem addresses that
-> >> > > uncompress() may have written, i.e.,/e.g., memcpy() and/or memset() in
-> >> > > uncompress(), and pmem_flush() + pmem_drain() in QEMU.
-> >> >
-> >> > In what way is it less optimal?
-> >> > If that's a legal thing to do, then why not just do a pmem_flush +
-> >> > pmem_drain right at the end of the ram loading and leave all the rest of
-> >> > the code untouched?
-> >>
-> >> For example, the implementation pmem_memcpy_nodrain() prefers to use
-> >> movnt instructions w/o flush to write pmem if those instructions are
-> >> available, and falls back to memcpy() + flush if movnt are not
-> >> available, so I suppose the latter is less optimal.
-> >
-> > But if you use normal memcpy calls to copy a few GB of RAM in an
-> > incoming migrate and then do a single flush at the end, isn't that
-> > better?
-> 
-> Not really, because now you've needlessly polluted the cache and are
-> spending CPU looping over the cachelines that could have been bypassed
-> with movnt.
 
-What's different in the pmem case?   Isn't what you've said true in the
-normal migrate case as well?
 
-Dave
+On 02/07/2018 10:29 AM, Eric Blake wrote:
+...
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> +#
+>> +# Since: 2.12
+>> +#
+>> +# Notes: If measurement is not available then a null measurement is=20
+>> returned.
+>=20
+> Null measurement, as in empty string?=C2=A0 Would it be better to have=20
+> query-sev-launch-measure return an error instead of an=20
+> SevLaunchMeasureInfo with a null measurement in that case?
+>=20
+
+Yes, an empty string when measurement is not available. I can certainly=20
+change it to return an error when measurement is not available.
+
+
+>> +##
+>> +{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
+>> +
+>> +##
+>> +# @query-sev-launch-measure:
+>> +#
+>> +# Query the SEV guest launch information.
+>> +#
+>> +# Returns: The @SevLaunchMeasureInfo for the guest
+>> +#
+>> +# Since: 2.12
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "query-sev-launch-measure" }
+>> +# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
+>> +#
+>=20
+>=20
