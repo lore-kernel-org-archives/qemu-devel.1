@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIJ-0000FU-RU
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:17 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIL-0000HE-B7
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIH-0003A2-M1
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:15 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIJ-0003BU-MF
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:17 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Tue,  6 Feb 2018 20:24:27 -0800
-Message-Id: <20180207042438.15422-4-andrew.smirnov@gmail.com>
+Date: Tue,  6 Feb 2018 20:24:29 -0800
+Message-Id: <20180207042438.15422-6-andrew.smirnov@gmail.com>
 In-Reply-To: <20180207042438.15422-1-andrew.smirnov@gmail.com>
 References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 03/14] i.MX: Add code to emulate i.MX7 CCM,
- PMU and ANALOG IP blocks
+Subject: [Qemu-devel] [PATCH v5 05/14] i.MX: Add code to emulate i.MX7 SNVS
+ IP-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,7 +26,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Add minimal code needed to allow upstream Linux guest to boot.
+Add code to emulate SNVS IP-block. Currently only the bits needed to
+be able to emulate machine shutdown are implemented.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -39,148 +40,69 @@ Cc: yurovsky@gmail.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/misc/Makefile.objs      |   1 +
- hw/misc/imx7_ccm.c         | 277 +++++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/imx7_ccm.h | 139 +++++++++++++++++++++++
- 3 files changed, 417 insertions(+)
- create mode 100644 hw/misc/imx7_ccm.c
- create mode 100644 include/hw/misc/imx7_ccm.h
+ hw/misc/Makefile.objs       |  1 +
+ hw/misc/imx7_snvs.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
+ 3 files changed, 119 insertions(+)
+ create mode 100644 hw/misc/imx7_snvs.c
+ create mode 100644 include/hw/misc/imx7_snvs.h
 
 diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index d517f83e81..a28e5e49b0 100644
+index 4b2b705a6c..019886912c 100644
 --- a/hw/misc/Makefile.objs
 +++ b/hw/misc/Makefile.objs
-@@ -33,6 +33,7 @@ obj-$(CONFIG_IMX) += imx31_ccm.o
- obj-$(CONFIG_IMX) += imx25_ccm.o
- obj-$(CONFIG_IMX) += imx6_ccm.o
+@@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx6_ccm.o
  obj-$(CONFIG_IMX) += imx6_src.o
-+obj-$(CONFIG_IMX) += imx7_ccm.o
+ obj-$(CONFIG_IMX) += imx7_ccm.o
+ obj-$(CONFIG_IMX) += imx2_wdt.o
++obj-$(CONFIG_IMX) += imx7_snvs.o
  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/imx7_ccm.c b/hw/misc/imx7_ccm.c
+diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
 new file mode 100644
-index 0000000000..d90c48bfec
+index 0000000000..4df482b282
 --- /dev/null
-+++ b/hw/misc/imx7_ccm.c
-@@ -0,0 +1,277 @@
++++ b/hw/misc/imx7_snvs.c
+@@ -0,0 +1,83 @@
 +/*
-+ * Copyright (c) 2018, Impinj, Inc.
++ * IMX7 Secure Non-Volatile Storage
 + *
-+ * i.MX7 CCM, PMU and ANALOG IP blocks emulation code
++ * Copyright (c) 2018, Impinj, Inc.
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
++ *
++ * Bare minimum emulation code needed to support being able to shut
++ * down linux guest gracefully.
 + */
 +
 +#include "qemu/osdep.h"
++#include "hw/misc/imx7_snvs.h"
 +#include "qemu/log.h"
++#include "sysemu/sysemu.h"
 +
-+#include "hw/misc/imx7_ccm.h"
-+
-+static void imx7_analog_reset(DeviceState *dev)
++static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
 +{
-+    IMX7AnalogState *s = IMX7_ANALOG(dev);
-+
-+    memset(s->pmu, 0, sizeof(s->pmu));
-+    memset(s->analog, 0, sizeof(s->analog));
-+
-+    s->analog[ANALOG_PLL_ARM]         = 0x00002042;
-+    s->analog[ANALOG_PLL_DDR]         = 0x0060302c;
-+    s->analog[ANALOG_PLL_DDR_SS]      = 0x00000000;
-+    s->analog[ANALOG_PLL_DDR_NUM]     = 0x06aaac4d;
-+    s->analog[ANALOG_PLL_DDR_DENOM]   = 0x100003ec;
-+    s->analog[ANALOG_PLL_480]         = 0x00002000;
-+    s->analog[ANALOG_PLL_480A]        = 0x52605a56;
-+    s->analog[ANALOG_PLL_480B]        = 0x52525216;
-+    s->analog[ANALOG_PLL_ENET]        = 0x00001fc0;
-+    s->analog[ANALOG_PLL_AUDIO]       = 0x0001301b;
-+    s->analog[ANALOG_PLL_AUDIO_SS]    = 0x00000000;
-+    s->analog[ANALOG_PLL_AUDIO_NUM]   = 0x05f5e100;
-+    s->analog[ANALOG_PLL_AUDIO_DENOM] = 0x2964619c;
-+    s->analog[ANALOG_PLL_VIDEO]       = 0x0008201b;
-+    s->analog[ANALOG_PLL_VIDEO_SS]    = 0x00000000;
-+    s->analog[ANALOG_PLL_VIDEO_NUM]   = 0x0000f699;
-+    s->analog[ANALOG_PLL_VIDEO_DENOM] = 0x000f4240;
-+    s->analog[ANALOG_PLL_MISC0]       = 0x00000000;
-+
-+    /* all PLLs need to be locked */
-+    s->analog[ANALOG_PLL_ARM]   |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_DDR]   |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_480]   |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_480A]  |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_480B]  |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_ENET]  |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_AUDIO] |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_VIDEO] |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_MISC0] |= ANALOG_PLL_LOCK;
-+
-+    /*
-+     * Since I couldn't find any info about this in the reference
-+     * manual the value of this register is based strictly on matching
-+     * what Linux kernel expects it to be.
-+     */
-+    s->analog[ANALOG_DIGPROG]  = 0x720000;
-+    /*
-+     * Set revision to be 1.0 (Arbitrary choice, no particular
-+     * reason).
-+     */
-+    s->analog[ANALOG_DIGPROG] |= 0x000010;
++    return 0;
 +}
 +
-+static void imx7_ccm_reset(DeviceState *dev)
++static void imx7_snvs_write(void *opaque, hwaddr offset,
++                            uint64_t v, unsigned size)
 +{
-+    IMX7CCMState *s = IMX7_CCM(dev);
++    const uint32_t value = v;
++    const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
 +
-+    memset(s->ccm, 0, sizeof(s->ccm));
++    if (offset == SNVS_LPCR && ((value & mask) == mask)) {
++        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    }
 +}
 +
-+#define CCM_INDEX(offset)   (((offset) & ~(hwaddr)0xF) / sizeof(uint32_t))
-+#define CCM_BITOP(offset)   ((offset) & (hwaddr)0xF)
-+
-+enum {
-+    CCM_BITOP_NONE = 0x00,
-+    CCM_BITOP_SET  = 0x04,
-+    CCM_BITOP_CLR  = 0x08,
-+    CCM_BITOP_TOG  = 0x0C,
-+};
-+
-+static uint64_t imx7_set_clr_tog_read(void *opaque, hwaddr offset,
-+                                      unsigned size)
-+{
-+    const uint32_t *mmio = opaque;
-+
-+    return mmio[CCM_INDEX(offset)];
-+}
-+
-+static void imx7_set_clr_tog_write(void *opaque, hwaddr offset,
-+                                   uint64_t value, unsigned size)
-+{
-+    const uint8_t  bitop = CCM_BITOP(offset);
-+    const uint32_t index = CCM_INDEX(offset);
-+    uint32_t *mmio = opaque;
-+
-+    switch (bitop) {
-+    case CCM_BITOP_NONE:
-+        mmio[index]  = value;
-+        break;
-+    case CCM_BITOP_SET:
-+        mmio[index] |= value;
-+        break;
-+    case CCM_BITOP_CLR:
-+        mmio[index] &= ~value;
-+        break;
-+    case CCM_BITOP_TOG:
-+        mmio[index] ^= value;
-+        break;
-+    };
-+}
-+
-+static const struct MemoryRegionOps imx7_set_clr_tog_ops = {
-+    .read = imx7_set_clr_tog_read,
-+    .write = imx7_set_clr_tog_write,
++static const struct MemoryRegionOps imx7_snvs_ops = {
++    .read = imx7_snvs_read,
++    .write = imx7_snvs_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
@@ -195,162 +117,47 @@ index 0000000000..d90c48bfec
 +    },
 +};
 +
-+static const struct MemoryRegionOps imx7_digprog_ops = {
-+    .read = imx7_set_clr_tog_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false,
-+    },
-+};
-+
-+static void imx7_ccm_init(Object *obj)
++static void imx7_snvs_init(Object *obj)
 +{
 +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7CCMState *s = IMX7_CCM(obj);
++    IMX7SNVSState *s = IMX7_SNVS(obj);
 +
-+    memory_region_init_io(&s->iomem,
-+                          obj,
-+                          &imx7_set_clr_tog_ops,
-+                          s->ccm,
-+                          TYPE_IMX7_CCM ".ccm",
-+                          sizeof(s->ccm));
++    memory_region_init_io(&s->mmio, obj, &imx7_snvs_ops, s,
++                          TYPE_IMX7_SNVS, 0x1000);
 +
-+    sysbus_init_mmio(sd, &s->iomem);
++    sysbus_init_mmio(sd, &s->mmio);
 +}
 +
-+static void imx7_analog_init(Object *obj)
-+{
-+    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7AnalogState *s = IMX7_ANALOG(obj);
-+
-+    memory_region_init(&s->mmio.container, obj, TYPE_IMX7_ANALOG,
-+                       0x10000);
-+
-+    memory_region_init_io(&s->mmio.analog,
-+                          obj,
-+                          &imx7_set_clr_tog_ops,
-+                          s->analog,
-+                          TYPE_IMX7_ANALOG,
-+                          sizeof(s->analog));
-+
-+    memory_region_add_subregion(&s->mmio.container,
-+                                0x60, &s->mmio.analog);
-+
-+    memory_region_init_io(&s->mmio.pmu,
-+                          obj,
-+                          &imx7_set_clr_tog_ops,
-+                          s->pmu,
-+                          TYPE_IMX7_ANALOG ".pmu",
-+                          sizeof(s->pmu));
-+
-+    memory_region_add_subregion(&s->mmio.container,
-+                                0x200, &s->mmio.pmu);
-+
-+    memory_region_init_io(&s->mmio.digprog,
-+                          obj,
-+                          &imx7_digprog_ops,
-+                          &s->analog[ANALOG_DIGPROG],
-+                          TYPE_IMX7_ANALOG ".digprog",
-+                          sizeof(uint32_t));
-+
-+    memory_region_add_subregion_overlap(&s->mmio.container,
-+                                        0x800, &s->mmio.digprog, 10);
-+
-+
-+    sysbus_init_mmio(sd, &s->mmio.container);
-+}
-+
-+static const VMStateDescription vmstate_imx7_ccm = {
-+    .name = TYPE_IMX7_CCM,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(ccm, IMX7CCMState, CCM_MAX),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static uint32_t imx7_ccm_get_clock_frequency(IMXCCMState *dev, IMXClk clock)
-+{
-+    /*
-+     * This function is "consumed" by GPT emulation code, however on
-+     * i.MX7 each GPT block can have their own clock root. This means
-+     * that this functions needs somehow to know requester's identity
-+     * and the way to pass it: be it via additional IMXClk constants
-+     * or by adding another argument to this method needs to be
-+     * figured out
-+     */
-+    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Not implemented\n",
-+                  TYPE_IMX7_CCM, __func__);
-+    return 0;
-+}
-+
-+static void imx7_ccm_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    IMXCCMClass *ccm = IMX_CCM_CLASS(klass);
-+
-+    dc->reset = imx7_ccm_reset;
-+    dc->vmsd  = &vmstate_imx7_ccm;
-+    dc->desc  = "i.MX7 Clock Control Module";
-+
-+    ccm->get_clock_frequency = imx7_ccm_get_clock_frequency;
-+}
-+
-+static const TypeInfo imx7_ccm_info = {
-+    .name          = TYPE_IMX7_CCM,
-+    .parent        = TYPE_IMX_CCM,
-+    .instance_size = sizeof(IMX7CCMState),
-+    .instance_init = imx7_ccm_init,
-+    .class_init    = imx7_ccm_class_init,
-+};
-+
-+static const VMStateDescription vmstate_imx7_analog = {
-+    .name = TYPE_IMX7_ANALOG,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(analog, IMX7AnalogState, ANALOG_MAX),
-+        VMSTATE_UINT32_ARRAY(pmu,    IMX7AnalogState, PMU_MAX),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static void imx7_analog_class_init(ObjectClass *klass, void *data)
++static void imx7_snvs_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = imx7_analog_reset;
-+    dc->vmsd  = &vmstate_imx7_analog;
-+    dc->desc  = "i.MX7 Analog Module";
++    dc->desc  = "i.MX7 Secure Non-Volatile Storage Module";
 +}
 +
-+static const TypeInfo imx7_analog_info = {
-+    .name          = TYPE_IMX7_ANALOG,
++static const TypeInfo imx7_snvs_info = {
++    .name          = TYPE_IMX7_SNVS,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMX7AnalogState),
-+    .instance_init = imx7_analog_init,
-+    .class_init    = imx7_analog_class_init,
++    .instance_size = sizeof(IMX7SNVSState),
++    .instance_init = imx7_snvs_init,
++    .class_init    = imx7_snvs_class_init,
 +};
 +
-+static void imx7_ccm_register_type(void)
++static void imx7_snvs_register_type(void)
 +{
-+    type_register_static(&imx7_ccm_info);
-+    type_register_static(&imx7_analog_info);
++    type_register_static(&imx7_snvs_info);
 +}
-+type_init(imx7_ccm_register_type)
-diff --git a/include/hw/misc/imx7_ccm.h b/include/hw/misc/imx7_ccm.h
++type_init(imx7_snvs_register_type)
+diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
 new file mode 100644
-index 0000000000..9538f37d98
+index 0000000000..255f8f26f9
 --- /dev/null
-+++ b/include/hw/misc/imx7_ccm.h
-@@ -0,0 +1,139 @@
++++ b/include/hw/misc/imx7_snvs.h
+@@ -0,0 +1,35 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * i.MX7 CCM, PMU and ANALOG IP blocks emulation code
++ * i.MX7 SNVS block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
@@ -358,133 +165,29 @@ index 0000000000..9538f37d98
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef IMX7_CCM_H
-+#define IMX7_CCM_H
++#ifndef IMX7_SNVS_H
++#define IMX7_SNVS_H
 +
-+#include "hw/misc/imx_ccm.h"
 +#include "qemu/bitops.h"
++#include "hw/sysbus.h"
 +
-+enum IMX7AnalogRegisters {
-+    ANALOG_PLL_ARM,
-+    ANALOG_PLL_ARM_SET,
-+    ANALOG_PLL_ARM_CLR,
-+    ANALOG_PLL_ARM_TOG,
-+    ANALOG_PLL_DDR,
-+    ANALOG_PLL_DDR_SET,
-+    ANALOG_PLL_DDR_CLR,
-+    ANALOG_PLL_DDR_TOG,
-+    ANALOG_PLL_DDR_SS,
-+    ANALOG_PLL_DDR_SS_SET,
-+    ANALOG_PLL_DDR_SS_CLR,
-+    ANALOG_PLL_DDR_SS_TOG,
-+    ANALOG_PLL_DDR_NUM,
-+    ANALOG_PLL_DDR_NUM_SET,
-+    ANALOG_PLL_DDR_NUM_CLR,
-+    ANALOG_PLL_DDR_NUM_TOG,
-+    ANALOG_PLL_DDR_DENOM,
-+    ANALOG_PLL_DDR_DENOM_SET,
-+    ANALOG_PLL_DDR_DENOM_CLR,
-+    ANALOG_PLL_DDR_DENOM_TOG,
-+    ANALOG_PLL_480,
-+    ANALOG_PLL_480_SET,
-+    ANALOG_PLL_480_CLR,
-+    ANALOG_PLL_480_TOG,
-+    ANALOG_PLL_480A,
-+    ANALOG_PLL_480A_SET,
-+    ANALOG_PLL_480A_CLR,
-+    ANALOG_PLL_480A_TOG,
-+    ANALOG_PLL_480B,
-+    ANALOG_PLL_480B_SET,
-+    ANALOG_PLL_480B_CLR,
-+    ANALOG_PLL_480B_TOG,
-+    ANALOG_PLL_ENET,
-+    ANALOG_PLL_ENET_SET,
-+    ANALOG_PLL_ENET_CLR,
-+    ANALOG_PLL_ENET_TOG,
-+    ANALOG_PLL_AUDIO,
-+    ANALOG_PLL_AUDIO_SET,
-+    ANALOG_PLL_AUDIO_CLR,
-+    ANALOG_PLL_AUDIO_TOG,
-+    ANALOG_PLL_AUDIO_SS,
-+    ANALOG_PLL_AUDIO_SS_SET,
-+    ANALOG_PLL_AUDIO_SS_CLR,
-+    ANALOG_PLL_AUDIO_SS_TOG,
-+    ANALOG_PLL_AUDIO_NUM,
-+    ANALOG_PLL_AUDIO_NUM_SET,
-+    ANALOG_PLL_AUDIO_NUM_CLR,
-+    ANALOG_PLL_AUDIO_NUM_TOG,
-+    ANALOG_PLL_AUDIO_DENOM,
-+    ANALOG_PLL_AUDIO_DENOM_SET,
-+    ANALOG_PLL_AUDIO_DENOM_CLR,
-+    ANALOG_PLL_AUDIO_DENOM_TOG,
-+    ANALOG_PLL_VIDEO,
-+    ANALOG_PLL_VIDEO_SET,
-+    ANALOG_PLL_VIDEO_CLR,
-+    ANALOG_PLL_VIDEO_TOG,
-+    ANALOG_PLL_VIDEO_SS,
-+    ANALOG_PLL_VIDEO_SS_SET,
-+    ANALOG_PLL_VIDEO_SS_CLR,
-+    ANALOG_PLL_VIDEO_SS_TOG,
-+    ANALOG_PLL_VIDEO_NUM,
-+    ANALOG_PLL_VIDEO_NUM_SET,
-+    ANALOG_PLL_VIDEO_NUM_CLR,
-+    ANALOG_PLL_VIDEO_NUM_TOG,
-+    ANALOG_PLL_VIDEO_DENOM,
-+    ANALOG_PLL_VIDEO_DENOM_SET,
-+    ANALOG_PLL_VIDEO_DENOM_CLR,
-+    ANALOG_PLL_VIDEO_DENOM_TOG,
-+    ANALOG_PLL_MISC0,
-+    ANALOG_PLL_MISC0_SET,
-+    ANALOG_PLL_MISC0_CLR,
-+    ANALOG_PLL_MISC0_TOG,
 +
-+    ANALOG_DIGPROG = 0x800 / sizeof(uint32_t),
-+    ANALOG_MAX,
-+
-+    ANALOG_PLL_LOCK = BIT(31)
++enum IMX7SNVSRegisters {
++    SNVS_LPCR = 0x38,
++    SNVS_LPCR_TOP   = BIT(6),
++    SNVS_LPCR_DP_EN = BIT(5)
 +};
 +
-+enum IMX7CCMRegisters {
-+    CCM_MAX = 0xBE00 / sizeof(uint32_t) + 1,
-+};
++#define TYPE_IMX7_SNVS "imx7.snvs"
++#define IMX7_SNVS(obj) OBJECT_CHECK(IMX7SNVSState, (obj), TYPE_IMX7_SNVS)
 +
-+enum IMX7PMURegisters {
-+    PMU_MAX = 0x140 / sizeof(uint32_t),
-+};
-+
-+#define TYPE_IMX7_CCM "imx7.ccm"
-+#define IMX7_CCM(obj) OBJECT_CHECK(IMX7CCMState, (obj), TYPE_IMX7_CCM)
-+
-+typedef struct IMX7CCMState {
++typedef struct IMX7SNVSState {
 +    /* <private> */
-+    IMXCCMState parent_obj;
++    SysBusDevice parent_obj;
 +
-+    /* <public> */
-+    MemoryRegion iomem;
++    MemoryRegion mmio;
++} IMX7SNVSState;
 +
-+    uint32_t ccm[CCM_MAX];
-+} IMX7CCMState;
-+
-+
-+#define TYPE_IMX7_ANALOG "imx7.analog"
-+#define IMX7_ANALOG(obj) OBJECT_CHECK(IMX7AnalogState, (obj), TYPE_IMX7_ANALOG)
-+
-+typedef struct IMX7AnalogState {
-+    /* <private> */
-+    IMXCCMState parent_obj;
-+
-+    /* <public> */
-+    struct {
-+        MemoryRegion container;
-+        MemoryRegion analog;
-+        MemoryRegion digprog;
-+        MemoryRegion pmu;
-+    } mmio;
-+
-+    uint32_t analog[ANALOG_MAX];
-+    uint32_t pmu[PMU_MAX];
-+} IMX7AnalogState;
-+
-+#endif /* IMX7_CCM_H */
++#endif /* IMX7_SNVS_H */
 -- 
 2.14.3
