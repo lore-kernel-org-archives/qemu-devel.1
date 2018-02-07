@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ejKFO-00053w-HT
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:27 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1ejKLM-0003id-Hm
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ejKFN-0000gY-8P
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:26 -0500
-Received: from mga09.intel.com ([134.134.136.24]:13680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1ejKFM-0000Td-Rr
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:34:25 -0500
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Wed,  7 Feb 2018 15:33:31 +0800
-Message-Id: <20180207073331.14158-9-haozhong.zhang@intel.com>
-In-Reply-To: <20180207073331.14158-1-haozhong.zhang@intel.com>
-References: <20180207073331.14158-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 8/8] migration/ram: ensure write persistence
- on loading xbzrle pages to PMEM
+	(envelope-from <dovgaluk@ispras.ru>) id 1ejKLJ-0007z2-EX
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:40:36 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:47650)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1ejKLJ-0007y5-64
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 02:40:33 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180206124431.31433.91946.stgit@pasha-VirtualBox>
+	<0dfe3d4e-fc7e-8fdf-214c-f1c7a0b6f027@vivier.eu>
+	<000c01d39f4e$9af80f90$d0e82eb0$@ru>
+	<144d840e-8ae8-437a-5ca8-c86593869e9b@vivier.eu>
+In-Reply-To: <144d840e-8ae8-437a-5ca8-c86593869e9b@vivier.eu>
+Date: Wed, 7 Feb 2018 10:40:34 +0300
+Message-ID: <000301d39fe6$f011f700$d035e500$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v4] m68k: implement movep instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,120 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: 'Laurent Vivier' <laurent@vivier.eu>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: huth@tuxfamily.org
 
-When loading a xbzrle encoded page to persistent memory, load the data
-via libpmem function pmem_memcpy_nodrain() instead of memcpy().
-Combined with a call to pmem_drain() at the end of memory loading, we
-can guarantee those xbzrle encoded pages are persistently loaded to PMEM.
+> From: Laurent Vivier [mailto:laurent@vivier.eu]
+> Le 06/02/2018 =C3=A0 14:30, Pavel Dovgalyuk a =C3=A9crit :
+> >> From: Laurent Vivier [mailto:laurent@vivier.eu]
+> > Thanks!
+> >
+> > By the way, we also handled reset interrupt, but it is not =
+compatible with other m68k
+> platforms:
+> >
+> > @@ -66,8 +66,9 @@ static void m68k_cpu_reset(CPUState *s)
+> >      cpu_m68k_set_fpcr(env, 0);
+> >      env->fpsr =3D 0;
+> >
+> > -    /* TODO: We should set PC from the interrupt vector.  */
+> > -    env->pc =3D 0;
+> > +    env->vbr =3D 0;
+> > +    /* PC and SP (for m68k) will be initialized by the reset =
+handler */
+> > +    s->exception_index =3D EXCP_RESET;
+> >  }
+> >
+> > @@ -378,6 +380,8 @@ static void m68k_interrupt_all(CPUM68KState =
+*env, int is_hw)
+> >          cpu_m68k_set_sr(env, sr &=3D ~SR_M);
+> >          sp =3D env->aregs[7] & ~1;
+> >          do_stack_frame(env, &sp, 1, oldsr, 0, retaddr);
+> > +    } else if (cs->exception_index =3D=3D EXCP_RESET) {
+> > +        sp =3D cpu_ldl_kernel(env, env->vbr + vector - 4);
+> >      } else {
+> >          do_stack_frame(env, &sp, 0, oldsr, 0, retaddr);
+> >      }
+>=20
+> It looks better of what I have already coded :)
+>=20
+> Do you work using code in
+> https://github.com/vivier/qemu-m68k , branch q800-dev ?
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
----
- migration/ram.c    | 15 ++++++++++-----
- migration/xbzrle.c | 20 ++++++++++++++++++--
- migration/xbzrle.h |  1 +
- 3 files changed, 29 insertions(+), 7 deletions(-)
+No, it was a project for our students couple of years ago.
+We used Qemu 2.3 with not-yet-included patches for 68000.
+I believe that someday we'll port our peripherals onto the new version.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 924d2b9537..87f977617d 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2388,10 +2388,10 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-     }
- }
- 
--static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
-+static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host, bool is_pmem)
- {
-     unsigned int xh_len;
--    int xh_flags;
-+    int xh_flags, rc;
-     uint8_t *loaded_data;
- 
-     /* extract RLE header */
-@@ -2413,8 +2413,13 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
-     qemu_get_buffer_in_place(f, &loaded_data, xh_len);
- 
-     /* decode RLE */
--    if (xbzrle_decode_buffer(loaded_data, xh_len, host,
--                             TARGET_PAGE_SIZE) == -1) {
-+    if (!is_pmem) {
-+        rc = xbzrle_decode_buffer(loaded_data, xh_len, host, TARGET_PAGE_SIZE);
-+    } else {
-+        rc = xbzrle_decode_buffer_to_pmem(loaded_data, xh_len, host,
-+                                          TARGET_PAGE_SIZE);
-+    }
-+    if (rc == -1) {
-         error_report("Failed to load XBZRLE page - decode error!");
-         return -1;
-     }
-@@ -2974,7 +2979,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-             break;
- 
-         case RAM_SAVE_FLAG_XBZRLE:
--            if (load_xbzrle(f, addr, host) < 0) {
-+            if (load_xbzrle(f, addr, host, is_pmem) < 0) {
-                 error_report("Failed to decompress XBZRLE page at "
-                              RAM_ADDR_FMT, addr);
-                 ret = -EINVAL;
-diff --git a/migration/xbzrle.c b/migration/xbzrle.c
-index 1ba482ded9..499d8e1bfb 100644
---- a/migration/xbzrle.c
-+++ b/migration/xbzrle.c
-@@ -12,6 +12,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qemu/cutils.h"
-+#include "qemu/pmem.h"
- #include "xbzrle.h"
- 
- /*
-@@ -126,7 +127,8 @@ int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
-     return d;
- }
- 
--int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
-+static int xbzrle_decode_buffer_common(uint8_t *src, int slen, uint8_t *dst,
-+                                       int dlen, bool is_pmem)
- {
-     int i = 0, d = 0;
-     int ret;
-@@ -167,10 +169,24 @@ int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
-             return -1;
-         }
- 
--        memcpy(dst + d, src + i, count);
-+        if (!is_pmem) {
-+            memcpy(dst + d, src + i, count);
-+        } else {
-+            pmem_memcpy_nodrain(dst + d, src + i, count);
-+        }
-         d += count;
-         i += count;
-     }
- 
-     return d;
- }
-+
-+int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
-+{
-+    return xbzrle_decode_buffer_common(src, slen, dst, dlen, false);
-+}
-+
-+int xbzrle_decode_buffer_to_pmem(uint8_t *src, int slen, uint8_t *dst, int dlen)
-+{
-+    return xbzrle_decode_buffer_common(src, slen, dst, dlen, true);
-+}
-diff --git a/migration/xbzrle.h b/migration/xbzrle.h
-index a0db507b9c..ac5ae32666 100644
---- a/migration/xbzrle.h
-+++ b/migration/xbzrle.h
-@@ -18,4 +18,5 @@ int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
-                          uint8_t *dst, int dlen);
- 
- int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen);
-+int xbzrle_decode_buffer_to_pmem(uint8_t *src, int slen, uint8_t *dst, int dlen);
- #endif
--- 
-2.14.1
+There were some fixes for processing the interrupts. As I can see, all =
+of them are
+not needed for the mainline Qemu.
+
+We didn't find a solution for 24-bit address bus of 68000. Macintosh =
+stores 32-bit values=20
+in address registers and uses them to access the memory. We just =
+duplicated the memory layout,
+but I believe that there is a better solution.
+
+> I'm already emulating a Quadra 800, it can help for Macintosh-128k
+
+Here is the repository with Mac-128: https://github.com/Dovgalyuk/qemu
+We didn't finally fix all the bugs, but it can boot the OS, using some =
+hacks.
+One of the hack is related to IWM. We couldn't emulate all timings for =
+that.
+CPU controls disk rotation speed through controlling the strobe signal.
+It was hard to synchronize this, because icount wasn't fully working and =
+we used
+semihosting - we intercepted the file operation system calls and didn't =
+execute
+ROM code, emulating them in Qemu instead.
+
+Pavel Dovgalyuk
