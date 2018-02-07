@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43098)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1ejWl0-0005iO-J3
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 15:55:56 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54454)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mst@redhat.com>) id 1ejXlD-0008Tk-Fx
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:00:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1ejWkx-0007DO-Gk
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 15:55:54 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:47043 helo=mx01.kamp.de)
+	(envelope-from <mst@redhat.com>) id 1ejXl9-0007sA-IG
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:00:11 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45052 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ejWkx-0007Ax-6r
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 15:55:51 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Wed, 7 Feb 2018 21:55:44 +0100
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-From: Peter Lieven <pl@kamp.de>
-In-Reply-To: <20180207182930.GV2665@work-vm>
-Date: Wed, 7 Feb 2018 21:56:00 +0100
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejXl9-0007rm-Ak
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:00:07 -0500
+Date: Wed, 7 Feb 2018 23:59:47 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180207202015-mutt-send-email-mst@kernel.org>
+References: <20180125040328.22867-1-tiwei.bie@intel.com>
+	<20180125040328.22867-7-tiwei.bie@intel.com>
+	<20180126015553-mutt-send-email-mst@kernel.org>
+	<28ab37d5-6cf6-866d-9167-e14e7441415f@redhat.com>
+	<20180126055759.vu4qwdpjbzf4mg4j@debian-xvivbkq.sh.intel.com>
+	<CAKgT0UcCKxBmm23tOXreTQwKsY4wqLF1MwtQm7ND7Ee0Td0rjQ@mail.gmail.com>
+	<20180207175416-mutt-send-email-mst@kernel.org>
+	<CAKgT0UciD4XyAovFt0vyeJBCisjjE3i4_tFu3SMMYrmWpxos1A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UciD4XyAovFt0vyeJBCisjjE3i4_tFu3SMMYrmWpxos1A@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <66CC7380-04E1-4656-A9BF-F075FC109C94@kamp.de>
-References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
-	<20170919143829.GH2107@work-vm>
-	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
-	<20170919144130.GI2107@work-vm>
-	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
-	<20170921123625.GE2717@work-vm>
-	<b7f1d6ec-9511-ef3d-80d1-c52cf8adfc24@kamp.de>
-	<20171212170533.GG2409@work-vm>
-	<8ed6cb1e-4770-21ec-164e-7142e649eab3@kamp.de>
-	<20180207182930.GV2665@work-vm>
-Subject: Re: [Qemu-devel] Block Migration and CPU throttling
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1 6/6] vhost-user: add
+ VFIO based accelerators support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,102 +35,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Tiwei Bie <tiwei.bie@intel.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-
-> Am 07.02.2018 um 19:29 schrieb Dr. David Alan Gilbert =
-<dgilbert@redhat.com>:
+On Wed, Feb 07, 2018 at 10:02:24AM -0800, Alexander Duyck wrote:
+> On Wed, Feb 7, 2018 at 8:43 AM, Michael S. Tsirkin <mst@redhat.com> wro=
+te:
+> > On Sun, Feb 04, 2018 at 01:49:46PM -0800, Alexander Duyck wrote:
+> >> On Thu, Jan 25, 2018 at 9:57 PM, Tiwei Bie <tiwei.bie@intel.com> wro=
+te:
+> >> > On Fri, Jan 26, 2018 at 11:41:27AM +0800, Jason Wang wrote:
+> >> >> On 2018=E5=B9=B401=E6=9C=8826=E6=97=A5 07:59, Michael S. Tsirkin =
+wrote:
+> >> >> > > The virtual IOMMU isn't supported by the accelerators for now=
+.
+> >> >> > > Because vhost-user currently lacks of an efficient way to sha=
+re
+> >> >> > > the IOMMU table in VM to vhost backend. That's why the softwa=
+re
+> >> >> > > implementation of virtual IOMMU support in vhost-user backend
+> >> >> > > can't support dynamic mapping well.
+> >> >> > What exactly is meant by that? vIOMMU seems to work for people,
+> >> >> > it's not that fast if you change mappings all the time,
+> >> >> > but e.g. dpdk within guest doesn't.
+> >> >>
+> >> >> Yes, software implementation support dynamic mapping for sure. I =
+think the
+> >> >> point is, current vhost-user backend can not program hardware IOM=
+MU. So it
+> >> >> can not let hardware accelerator to cowork with software vIOMMU.
+> >> >
+> >> > Vhost-user backend can program hardware IOMMU. Currently
+> >> > vhost-user backend (or more precisely the vDPA driver in
+> >> > vhost-user backend) will use the memory table (delivered
+> >> > by the VHOST_USER_SET_MEM_TABLE message) to program the
+> >> > IOMMU via vfio, and that's why accelerators can use the
+> >> > GPA (guest physical address) in descriptors directly.
+> >> >
+> >> > Theoretically, we can use the IOVA mapping info (delivered
+> >> > by the VHOST_USER_IOTLB_MSG message) to program the IOMMU,
+> >> > and accelerators will be able to use IOVA. But the problem
+> >> > is that in vhost-user QEMU won't push all the IOVA mappings
+> >> > to backend directly. Backend needs to ask for those info
+> >> > when it meets a new IOVA. Such design and implementation
+> >> > won't work well for dynamic mappings anyway and couldn't
+> >> > be supported by hardware accelerators.
+> >> >
+> >> >> I think
+> >> >> that's another call to implement the offloaded path inside qemu w=
+hich has
+> >> >> complete support for vIOMMU co-operated VFIO.
+> >> >
+> >> > Yes, that's exactly what we want. After revisiting the
+> >> > last paragraph in the commit message, I found it's not
+> >> > really accurate. The practicability of dynamic mappings
+> >> > support is a common issue for QEMU. It also exists for
+> >> > vfio (hw/vfio in QEMU). If QEMU needs to trap all the
+> >> > map/unmap events, the data path performance couldn't be
+> >> > high. If we want to thoroughly fix this issue especially
+> >> > for vfio (hw/vfio in QEMU), we need to have the offload
+> >> > path Jason mentioned in QEMU. And I think accelerators
+> >> > could use it too.
+> >> >
+> >> > Best regards,
+> >> > Tiwei Bie
+> >>
+> >> I wonder if we couldn't look at coming up with an altered security
+> >> model for the IOMMU drivers to address some of the performance issue=
+s
+> >> seen with typical hardware IOMMU?
+> >>
+> >> In the case of most network devices, we seem to be moving toward a
+> >> model where the Rx pages are mapped for an extended period of time a=
+nd
+> >> see a fairly high rate of reuse. As such pages mapped as being
+> >> writable or read/write by the device are left mapped for an extended
+> >> period of time while Tx pages, which are read only, are often
+> >> mapped/unmapped since they are coming from some other location in th=
+e
+> >> kernel beyond the driver's control.
+> >>
+> >> If we were to somehow come up with a model where the read-only(Tx)
+> >> pages had access to a pre-allocated memory mapped address, and the
+> >> read/write(descriptor rings), write-only(Rx) pages were provided wit=
+h
+> >> dynamic addresses we might be able to come up with a solution that
+> >> would allow for fairly high network performance while at least
+> >> protecting from memory corruption. The only issue it would open up i=
+s
+> >> that the device would have the ability to read any/all memory on the
+> >> guest. I was wondering about doing something like this with the vIOM=
+MU
+> >> with VFIO for the Intel NICs this way since an interface like igb,
+> >> ixgbe, ixgbevf, i40e, or i40evf would probably show pretty good
+> >> performance under such a model and as long as the writable pages wer=
+e
+> >> being tracked by the vIOMMU. It could even allow for live migration
+> >> support if the vIOMMU provided the info needed for migratable/dirty
+> >> page tracking and we held off on migrating any of the dynamically
+> >> mapped pages until after they were either unmapped or an FLR reset t=
+he
+> >> device.
+> >>
+> >> Thanks.
+> >>
+> >> - Alex
+> >
+> >
+> >
+> > It might be a good idea to change the iommu instead - how about a
+> > variant of strict in intel iommu which forces an IOTLB flush after
+> > invalidating a writeable mapping but not a RO mapping?  Not sure what=
+ the
+> > name would be - relaxed-ro?
+> >
+> > This is probably easier than poking at the drivers and net core.
+> >
+> > Keeping the RX pages mapped in the IOMMU was envisioned for XDP.
+> > That might be a good place to start.
 >=20
-> * Peter Lieven (pl@kamp.de) wrote:
->> Am 12.12.2017 um 18:05 schrieb Dr. David Alan Gilbert:
->>> * Peter Lieven (pl@kamp.de) wrote:
->>>> Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
->>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
->>>>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
->>>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>>>>>> Hi,
->>>>>>>>>>=20
->>>>>>>>>> I just noticed that CPU throttling and Block Migration don't =
-work together very well.
->>>>>>>>>> During block migration the throttling heuristic detects that =
-we obviously make no progress
->>>>>>>>>> in ram transfer. But the reason is the running block =
-migration and not a too high dirty pages rate.
->>>>>>>>>>=20
->>>>>>>>>> The result is that any VM is throttled by 99% during block =
-migration.
->>>>>>>>> Hmm that's unfortunate; do you have a bandwidth set lower than =
-your
->>>>>>>>> actual network connection? I'm just wondering if it's actually =
-going
->>>>>>>>> between the block and RAM iterative sections or getting stuck =
-in ne.
->>>>>>>> It happens also if source and dest are on the same machine and =
-speed is set to 100G.
->>>>>>> But does it happen if they're not and the speed is set low?
->>>>>> Yes, it does. I noticed it in our test environment between =
-different nodes with a 10G
->>>>>> link in between. But its totally clear why it happens. During =
-block migration we transfer
->>>>>> all dirty memory pages in each round (if there is moderate memory =
-load), but all dirty
->>>>>> pages are obviously more than 50% of the transferred ram in that =
-round.
->>>>>> It is more exactly 100%. But the current logic triggers on this =
-condition.
->>>>>>=20
->>>>>> I think I will go forward and send a patch which disables auto =
-converge during
->>>>>> block migration bulk stage.
->>>>> Yes, that's fair;  it probably would also make sense to throttle =
-the RAM
->>>>> migration during the block migration bulk stage, since the chances =
-are
->>>>> it's not going to get far.  (I think in the nbd setup, the main
->>>>> migration process isn't started until the end of bulk).
->>>> Catching up with the idea of delaying ram migration until block =
-bulk has completed.
->>>> What do you think is the easiest way to achieve this?
->>> <excavates inbox, and notices I never replied>
->>>=20
->>> I think the answer depends whether we think this is a 'special' or =
-we
->>> need a new general purpose mechanism.
->>>=20
->>> If it was really general then we'd probably want to split the =
-iterative
->>> stage in two somehow, and only do RAM in the second half.
->>>=20
->>> But I'm not sure it's worth it; I suspect the easiest way is:
->>>=20
->>>    a) Add a counter in migration/ram.c or in the RAM state somewhere
->>>    b) Make ram_save_inhibit increment the counter
->>>    c) Check the counter at the head of ram_save_iterate and just =
-exit
->>>      if it's none 0
->>>    d) Call ram_save_inhibit from block_save_setup
->>>    e) Then release it when you've finished the bulk stage
->>>=20
->>> Make sure you still count the RAM in the pending totals, otherwise
->>> migration might think it's finished a bit early.
->>=20
->> Is there any culprit I don't see or is it as easy as this?
+> My plan is to update the Intel IOMMU driver first since it seems like
+> something that shouldn't require too much expertise in the operation
+> of the IOMMU to accomplish. My idea was more along the lines of
+> something like a "iommu=3Dread-only-pt" or maybe "iommu=3Dpt-ro" where =
+the
+> Tx data would be identity mapped, and the descriptor rings and Rx data
+> could be in the dynamic mapping setup. The idea is loosely based on
+> the existing "iommu=3Dpt" option that is normally used on the host if
+> you want to avoid the cost for dynamic mapping. Basically we just need
+> to keep an eye on the number of mappings that the device can write to.
+> Ideally if we leave the Tx as identity mapped that means we never have
+> to actually write to update any mapping which would mean no having to
+> jump into the hypervisor to deal with the update.
+
+Just noting that updating page tables does not require jumping
+to the hypervisor by itself. Only invalidation requires that.
+
+> The fact that most
+> of the drivers already leave the Rx buffers and descriptor rings
+> statically mapped should essentially take care of the rest for us.
+> What this would become is a version of "iommu=3Dpt" where the user care=
+s
+> about preventing the device from possibly corrupting memory, but would
+> still like better performance at the cost of the device being able to
+> ready and/all memory on the system.
 >=20
-> Hmm, looks promising doesn't it;  might need an include or two tidied
-> up, but looks worth a try.   Just be careful that there are no cases
-> where block migration can't transfer data in that state, otherwise =
-we'll
-> keep coming back to here and spewing empty sections.
+> As far as if it is strict or not I don't know how much we would need
+> to worry about that for the migration case. Essentially a deferred
+> IOTLB flush would result in us having extra pages marked as dirty and
+> non-migratable, but we would need to see how much overhead there is in
+> the migration to deal with those extra pages versus the cost of having
+> to do an IOTLB flush on every unmap call.
+>=20
+> Anyway this is an idea that just occurred to me the other day so I
+> still need to do some more research into how easy/difficult
+> implementing a solution like this would be.
+>=20
+> Thanks.
+>=20
+> - Alex
 
-I already tested it and it actually works.
+Right. And I think if you do a straight pt, then this is not
+a security as much as a robustness feature. I guess both
+have a place under the sun.
 
-What would you expect to be cleaned up before it would be a proper =
-patch?
-
-Are there any implications with RDMA and/or post copy migration?
-Is block migration possible at all with those?
-
-Peter=
+--=20
+MST
