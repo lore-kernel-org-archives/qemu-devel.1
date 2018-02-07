@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejXlD-0008Tk-Fx
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:00:13 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ejXr2-0003WW-L8
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejXl9-0007sA-IG
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:00:11 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45052 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejXl9-0007rm-Ak
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:00:07 -0500
-Date: Wed, 7 Feb 2018 23:59:47 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180207202015-mutt-send-email-mst@kernel.org>
-References: <20180125040328.22867-1-tiwei.bie@intel.com>
-	<20180125040328.22867-7-tiwei.bie@intel.com>
-	<20180126015553-mutt-send-email-mst@kernel.org>
-	<28ab37d5-6cf6-866d-9167-e14e7441415f@redhat.com>
-	<20180126055759.vu4qwdpjbzf4mg4j@debian-xvivbkq.sh.intel.com>
-	<CAKgT0UcCKxBmm23tOXreTQwKsY4wqLF1MwtQm7ND7Ee0Td0rjQ@mail.gmail.com>
-	<20180207175416-mutt-send-email-mst@kernel.org>
-	<CAKgT0UciD4XyAovFt0vyeJBCisjjE3i4_tFu3SMMYrmWpxos1A@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1ejXr1-0004HO-Aj
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:06:12 -0500
+References: <20180119205847.7141-1-jsnow@redhat.com>
+	<20180119205847.7141-2-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <24fc02c2-cf2a-4a62-8828-80cb14a8ecdc@redhat.com>
+Date: Wed, 7 Feb 2018 23:05:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAKgT0UciD4XyAovFt0vyeJBCisjjE3i4_tFu3SMMYrmWpxos1A@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1 6/6] vhost-user: add
- VFIO based accelerators support
+In-Reply-To: <20180119205847.7141-2-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="yeftwnRoNHo2EgOCgodgRUupCfxRT1p0G"
+Subject: Re: [Qemu-devel] [PATCH v2 01/13] blockjob: record time of last
+ entrance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,169 +25,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Tiwei Bie <tiwei.bie@intel.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
-On Wed, Feb 07, 2018 at 10:02:24AM -0800, Alexander Duyck wrote:
-> On Wed, Feb 7, 2018 at 8:43 AM, Michael S. Tsirkin <mst@redhat.com> wro=
-te:
-> > On Sun, Feb 04, 2018 at 01:49:46PM -0800, Alexander Duyck wrote:
-> >> On Thu, Jan 25, 2018 at 9:57 PM, Tiwei Bie <tiwei.bie@intel.com> wro=
-te:
-> >> > On Fri, Jan 26, 2018 at 11:41:27AM +0800, Jason Wang wrote:
-> >> >> On 2018=E5=B9=B401=E6=9C=8826=E6=97=A5 07:59, Michael S. Tsirkin =
-wrote:
-> >> >> > > The virtual IOMMU isn't supported by the accelerators for now=
-.
-> >> >> > > Because vhost-user currently lacks of an efficient way to sha=
-re
-> >> >> > > the IOMMU table in VM to vhost backend. That's why the softwa=
-re
-> >> >> > > implementation of virtual IOMMU support in vhost-user backend
-> >> >> > > can't support dynamic mapping well.
-> >> >> > What exactly is meant by that? vIOMMU seems to work for people,
-> >> >> > it's not that fast if you change mappings all the time,
-> >> >> > but e.g. dpdk within guest doesn't.
-> >> >>
-> >> >> Yes, software implementation support dynamic mapping for sure. I =
-think the
-> >> >> point is, current vhost-user backend can not program hardware IOM=
-MU. So it
-> >> >> can not let hardware accelerator to cowork with software vIOMMU.
-> >> >
-> >> > Vhost-user backend can program hardware IOMMU. Currently
-> >> > vhost-user backend (or more precisely the vDPA driver in
-> >> > vhost-user backend) will use the memory table (delivered
-> >> > by the VHOST_USER_SET_MEM_TABLE message) to program the
-> >> > IOMMU via vfio, and that's why accelerators can use the
-> >> > GPA (guest physical address) in descriptors directly.
-> >> >
-> >> > Theoretically, we can use the IOVA mapping info (delivered
-> >> > by the VHOST_USER_IOTLB_MSG message) to program the IOMMU,
-> >> > and accelerators will be able to use IOVA. But the problem
-> >> > is that in vhost-user QEMU won't push all the IOVA mappings
-> >> > to backend directly. Backend needs to ask for those info
-> >> > when it meets a new IOVA. Such design and implementation
-> >> > won't work well for dynamic mappings anyway and couldn't
-> >> > be supported by hardware accelerators.
-> >> >
-> >> >> I think
-> >> >> that's another call to implement the offloaded path inside qemu w=
-hich has
-> >> >> complete support for vIOMMU co-operated VFIO.
-> >> >
-> >> > Yes, that's exactly what we want. After revisiting the
-> >> > last paragraph in the commit message, I found it's not
-> >> > really accurate. The practicability of dynamic mappings
-> >> > support is a common issue for QEMU. It also exists for
-> >> > vfio (hw/vfio in QEMU). If QEMU needs to trap all the
-> >> > map/unmap events, the data path performance couldn't be
-> >> > high. If we want to thoroughly fix this issue especially
-> >> > for vfio (hw/vfio in QEMU), we need to have the offload
-> >> > path Jason mentioned in QEMU. And I think accelerators
-> >> > could use it too.
-> >> >
-> >> > Best regards,
-> >> > Tiwei Bie
-> >>
-> >> I wonder if we couldn't look at coming up with an altered security
-> >> model for the IOMMU drivers to address some of the performance issue=
-s
-> >> seen with typical hardware IOMMU?
-> >>
-> >> In the case of most network devices, we seem to be moving toward a
-> >> model where the Rx pages are mapped for an extended period of time a=
-nd
-> >> see a fairly high rate of reuse. As such pages mapped as being
-> >> writable or read/write by the device are left mapped for an extended
-> >> period of time while Tx pages, which are read only, are often
-> >> mapped/unmapped since they are coming from some other location in th=
-e
-> >> kernel beyond the driver's control.
-> >>
-> >> If we were to somehow come up with a model where the read-only(Tx)
-> >> pages had access to a pre-allocated memory mapped address, and the
-> >> read/write(descriptor rings), write-only(Rx) pages were provided wit=
-h
-> >> dynamic addresses we might be able to come up with a solution that
-> >> would allow for fairly high network performance while at least
-> >> protecting from memory corruption. The only issue it would open up i=
-s
-> >> that the device would have the ability to read any/all memory on the
-> >> guest. I was wondering about doing something like this with the vIOM=
-MU
-> >> with VFIO for the Intel NICs this way since an interface like igb,
-> >> ixgbe, ixgbevf, i40e, or i40evf would probably show pretty good
-> >> performance under such a model and as long as the writable pages wer=
-e
-> >> being tracked by the vIOMMU. It could even allow for live migration
-> >> support if the vIOMMU provided the info needed for migratable/dirty
-> >> page tracking and we held off on migrating any of the dynamically
-> >> mapped pages until after they were either unmapped or an FLR reset t=
-he
-> >> device.
-> >>
-> >> Thanks.
-> >>
-> >> - Alex
-> >
-> >
-> >
-> > It might be a good idea to change the iommu instead - how about a
-> > variant of strict in intel iommu which forces an IOTLB flush after
-> > invalidating a writeable mapping but not a RO mapping?  Not sure what=
- the
-> > name would be - relaxed-ro?
-> >
-> > This is probably easier than poking at the drivers and net core.
-> >
-> > Keeping the RX pages mapped in the IOMMU was envisioned for XDP.
-> > That might be a good place to start.
->=20
-> My plan is to update the Intel IOMMU driver first since it seems like
-> something that shouldn't require too much expertise in the operation
-> of the IOMMU to accomplish. My idea was more along the lines of
-> something like a "iommu=3Dread-only-pt" or maybe "iommu=3Dpt-ro" where =
-the
-> Tx data would be identity mapped, and the descriptor rings and Rx data
-> could be in the dynamic mapping setup. The idea is loosely based on
-> the existing "iommu=3Dpt" option that is normally used on the host if
-> you want to avoid the cost for dynamic mapping. Basically we just need
-> to keep an eye on the number of mappings that the device can write to.
-> Ideally if we leave the Tx as identity mapped that means we never have
-> to actually write to update any mapping which would mean no having to
-> jump into the hypervisor to deal with the update.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--yeftwnRoNHo2EgOCgodgRUupCfxRT1p0G
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com
+Message-ID: <24fc02c2-cf2a-4a62-8828-80cb14a8ecdc@redhat.com>
+Subject: Re: [PATCH v2 01/13] blockjob: record time of last entrance
+References: <20180119205847.7141-1-jsnow@redhat.com>
+ <20180119205847.7141-2-jsnow@redhat.com>
+In-Reply-To: <20180119205847.7141-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Just noting that updating page tables does not require jumping
-to the hypervisor by itself. Only invalidation requires that.
+On 2018-01-19 21:58, John Snow wrote:
+> The mirror job makes a semi-inaccurate record of the last time we yield=
+ed
+> by recording the last time we left a "pause", but this doesn't always
+> correlate to the time we actually last successfully ceded control.
+>=20
+> Record the time we last *exited* a yield centrally. In other words, rec=
+ord
+> the time we began execution of this job to know how long we have been
+> selfish for.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/mirror.c           | 8 ++------
+>  blockjob.c               | 2 ++
+>  include/block/blockjob.h | 5 +++++
+>  3 files changed, 9 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/block/mirror.c b/block/mirror.c
+> index c9badc1203..88f4e8964d 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -63,7 +63,6 @@ typedef struct MirrorBlockJob {
+>      QSIMPLEQ_HEAD(, MirrorBuffer) buf_free;
+>      int buf_free_count;
+> =20
+> -    uint64_t last_pause_ns;
+>      unsigned long *in_flight_bitmap;
+>      int in_flight;
+>      int64_t bytes_in_flight;
+> @@ -596,8 +595,7 @@ static void mirror_throttle(MirrorBlockJob *s)
+>  {
+>      int64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> =20
+> -    if (now - s->last_pause_ns > SLICE_TIME) {
+> -        s->last_pause_ns =3D now;
+> +    if (now - s->common.last_enter_ns > SLICE_TIME) {
+>          block_job_sleep_ns(&s->common, 0);
+>      } else {
+>          block_job_pause_point(&s->common);
+> @@ -769,7 +767,6 @@ static void coroutine_fn mirror_run(void *opaque)
+> =20
+>      mirror_free_init(s);
+> =20
+> -    s->last_pause_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+>      if (!s->is_none_mode) {
+>          ret =3D mirror_dirty_init(s);
+>          if (ret < 0 || block_job_is_cancelled(&s->common)) {
+> @@ -803,7 +800,7 @@ static void coroutine_fn mirror_run(void *opaque)
+>           * We do so every SLICE_TIME nanoseconds, or when there is an =
+error,
+>           * or when the source is clean, whichever comes first.
+>           */
+> -        delta =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - s->last_pau=
+se_ns;
+> +        delta =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - s->common.l=
+ast_enter_ns;
 
-> The fact that most
-> of the drivers already leave the Rx buffers and descriptor rings
-> statically mapped should essentially take care of the rest for us.
-> What this would become is a version of "iommu=3Dpt" where the user care=
-s
-> about preventing the device from possibly corrupting memory, but would
-> still like better performance at the cost of the device being able to
-> ready and/all memory on the system.
->=20
-> As far as if it is strict or not I don't know how much we would need
-> to worry about that for the migration case. Essentially a deferred
-> IOTLB flush would result in us having extra pages marked as dirty and
-> non-migratable, but we would need to see how much overhead there is in
-> the migration to deal with those extra pages versus the cost of having
-> to do an IOTLB flush on every unmap call.
->=20
-> Anyway this is an idea that just occurred to me the other day so I
-> still need to do some more research into how easy/difficult
-> implementing a solution like this would be.
->=20
-> Thanks.
->=20
-> - Alex
+The horror.
 
-Right. And I think if you do a straight pt, then this is not
-a security as much as a robustness feature. I guess both
-have a place under the sun.
+>          if (delta < SLICE_TIME &&
+>              s->common.iostatus =3D=3D BLOCK_DEVICE_IO_STATUS_OK) {
+>              if (s->in_flight >=3D MAX_IN_FLIGHT || s->buf_free_count =3D=
+=3D 0 ||
+> @@ -878,7 +875,6 @@ static void coroutine_fn mirror_run(void *opaque)
+>              delay_ns =3D (s->in_flight =3D=3D 0 && cnt =3D=3D 0 ? SLIC=
+E_TIME : 0);
+>              block_job_sleep_ns(&s->common, delay_ns);
+>          }
+> -        s->last_pause_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+>      }
 
---=20
-MST
+Hmmm.  So you're now relying on block_job_sleep_ns() updating
+last_enter_ns.  But it will only do so if we actually do sleep, which we
+will not if the block job has been cancelled.
+
+Then, last_enter_ns will stay at its current value indefinitely because
+neither block_job_sleep_ns() nor block_job_pause_point() will yield.
+OK, so at this point we should leave the mirror loop.  There are three
+points where this is done:
+
+(1) If s->ret < 0.  OK, let's hope it isn't.
+(2) If cnt =3D=3D 0 && should_complete.  We'll come back to that.
+(3) If !s->synced && block_job_is_cancelled(...).  So basically now, if
+the job has not emitted a READY event yet.
+
+But if we have emitted the READY, we have to wait for cnt =3D=3D 0 &&
+should_complete (note that should_complete in turn will only be set if
+s->in_flight =3D=3D 0 && cnt =3D=3D 0).  But unless delta < SLICE_TIME, w=
+e will
+never do another mirror_iteration(), so unless we have already started
+the necessary requests, they will never be started and we will loop forev=
+er.
+
+So try this on master (I prefixed the QMP lines with in/out depending on
+the direction -- note that it's important to have the block-job-cancel
+on the same line the human-monitor-command finishes on so they are
+executed right after each other!):
+
+$ ./qemu-img create -f qcow2 foo.qcow2 64M
+$ x86_64-softmmu/qemu-system-x86_64 -qmp stdio
+In: {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
+"package": " (v2.9.0-632-g4a52d43-dirty)"}, "capabilities": []}}
+Out: {"execute":"qmp_capabilities"}
+In: {"return": {}}
+Out: {"execute":"object-add","arguments":
+      {"qom-type":"throttle-group","id":"tg0","props":{"limits":
+=C2=A0        {"bps-total":16777216}}}}
+In: {"return": {}}
+Out: {"execute":"blockdev-add","arguments":
+      {"node-name":"source","driver":"qcow2","file":
+       {"driver":"file","filename":"foo.qcow2"}}}
+In: {"return": {}}
+Out: {"execute":"blockdev-add","arguments":
+      {"node-name":"target","driver":"throttle",
+       "throttle-group":"tg0","file":
+       {"driver":"null-co","size":67108864}}}
+In: {"return": {}}
+Out: {"execute":"blockdev-mirror","arguments":
+     {"job-id":"mirror","device":"source","target":"target",
+      "sync":"full"}}
+In: {"return": {}}
+In: {"timestamp": {"seconds": 1518040566, "microseconds": 658111},
+     "event": "BLOCK_JOB_READY", "data":
+     {"device": "mirror", "len": 67108864, "offset": 67108864,
+      "speed": 0, "type": "mirror"}}
+Out: {"execute":"human-monitor-command","arguments":
+      {"command-line":"qemu-io source \"write 0 64M\""}
+     }{"execute":"block-job-cancel","arguments":{"device":"mirror"}}
+In: wrote 67108864/67108864 bytes at offset 0
+In: 64 MiB, 1 ops; 0.0310 sec (2.011 GiB/sec and 32.1823 ops/sec)
+In: {"return": ""}
+In: {"return": {}}
+In: {"timestamp": {"seconds": 1518040578, "microseconds": 626669},
+     "event": "BLOCK_JOB_COMPLETED", "data":
+     {"device": "mirror", "len": 134217728, "offset": 134217728,
+      "speed": 0, "type": "mirror"}}
+
+But with your patch, the BLOCK_JOB_COMPLETED never appears (it should
+take four seconds).
+
+> =20
+>  immediate_exit:
+> diff --git a/blockjob.c b/blockjob.c
+> index f5cea84e73..2a9ff66b95 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -321,6 +321,7 @@ void block_job_start(BlockJob *job)
+>      job->pause_count--;
+>      job->busy =3D true;
+>      job->paused =3D false;
+> +    job->last_enter_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+>      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+>  }
+> =20
+> @@ -786,6 +787,7 @@ static void block_job_do_yield(BlockJob *job, uint6=
+4_t ns)
+>      job->busy =3D false;
+>      block_job_unlock();
+>      qemu_coroutine_yield();
+> +    job->last_enter_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> =20
+>      /* Set by block_job_enter before re-entering the coroutine.  */
+>      assert(job->busy);
+> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+> index 00403d9482..e965845c94 100644
+> --- a/include/block/blockjob.h
+> +++ b/include/block/blockjob.h
+> @@ -141,6 +141,11 @@ typedef struct BlockJob {
+>       */
+>      QEMUTimer sleep_timer;
+> =20
+> +    /**
+> +     * Timestamp of the last yield
+
+A yield has two timestamps, one pre-yield, one post-yield.  Maybe it
+should be noted that this records the post-yield one because that's not
+what I'd assume just based on the comment, but OTOH the name of the
+variable should be enough to clear that up.
+
+Max
+
+> +     */
+> +    uint64_t last_enter_ns;
+> +
+>      /** Non-NULL if this job is part of a transaction */
+>      BlockJobTxn *txn;
+>      QLIST_ENTRY(BlockJob) txn_list;
+>=20
+
+
+
+--yeftwnRoNHo2EgOCgodgRUupCfxRT1p0G
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp7eDQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A/wYH/RhJzW3rgXK9uS3/END70sWy3aMPNzEj
+/lHX9QYut0idzxL/CY4E6VTyOQLM0JlwBnIDl2I/zOKo0i6GEs3b1yGBXMYorIa+
+1y2oG555QgoHCbCIKI6nPc4IWFhfB5L/HFHLkqRpAIhS5lmbc/1CUs1h9tS1U1W5
+I5V5dQO5lJLLtmkaCWgd9u1iqLpQR4e7Hktgzgvem/q0Hw0hyTJKESu1FIKCe7C5
+gPDnUbLi5/kNW1l++h5ysNwK8ZwGC8fGnfM4hlOVlhIFXc/cbewn/5SjAyeF9gO2
+3fcEHmBRElKHwYJPt+nNqIyetBdTv7d9rHhGJso2aP1RPaP/uhQ1LQE=
+=kQcE
+-----END PGP SIGNATURE-----
+
+--yeftwnRoNHo2EgOCgodgRUupCfxRT1p0G--
