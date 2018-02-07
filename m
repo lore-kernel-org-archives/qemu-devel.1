@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejYd3-00077n-5r
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:50 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ejYd3-00078E-RM
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejYcy-0004fh-Vw
+	(envelope-from <richard.henderson@linaro.org>) id 1ejYd0-0004gZ-7H
 	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:49 -0500
-Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:36371)
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39057)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ejYcy-0004f0-Ov
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:44 -0500
-Received: by mail-pl0-x231.google.com with SMTP id v3-v6so984793plg.3
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 14:55:44 -0800 (PST)
+	id 1ejYcz-0004g1-VT
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:46 -0500
+Received: by mail-pl0-x241.google.com with SMTP id o13-v6so983952pli.6
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 14:55:45 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  7 Feb 2018 14:55:20 -0800
-Message-Id: <20180207225540.31698-1-richard.henderson@linaro.org>
+Date: Wed,  7 Feb 2018 14:55:21 -0800
+Message-Id: <20180207225540.31698-2-richard.henderson@linaro.org>
+In-Reply-To: <20180207225540.31698-1-richard.henderson@linaro.org>
+References: <20180207225540.31698-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/20] tcg: generic vector operaions
+Subject: [Qemu-devel] [PULL 01/20] tcg: Allow multiple word entries into the
+ constant pool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +33,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Aside from r-b markers, there is only one minor change from v11.
+This will be required for storing vector constants.
 
-The check_operand_size assert loosened to allow 8-byte operation
-with a large (in this case 32-byte) clear.  Previously we'd test
-the clear size and require the operation be a multiple of 16.
-This showed up during an AdvSIMD insn with SVE enabled.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-pool.inc.c | 115 +++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 93 insertions(+), 22 deletions(-)
 
-
-r~
-
-
-The following changes since commit 17a5bbb44df9a4a79166332bc26e2d8ca6bd8fa8:
-
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-02-06' into staging (2018-02-07 16:26:01 +0000)
-
-are available in the Git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-tcg-20180207
-
-for you to fetch changes up to b63799b11c17e8f1068dbd05c18cbb9c9aa69c56:
-
-  tcg/aarch64: Add vector operations (2018-02-07 14:47:50 -0800)
-
-----------------------------------------------------------------
-tcg generic vectors
-
-----------------------------------------------------------------
-Richard Henderson (20):
-      tcg: Allow multiple word entries into the constant pool
-      tcg: Add types and basic operations for host vectors
-      tcg: Standardize integral arguments to expanders
-      tcg: Add generic vector expanders
-      tcg: Add generic vector ops for constant shifts
-      tcg: Add generic vector ops for comparisons
-      tcg: Add generic vector ops for multiplication
-      tcg: Add generic helpers for saturating arithmetic
-      tcg: Add generic vector helpers with a scalar operand
-      tcg/optimize: Handle vector opcodes during optimize
-      target/arm: Align vector registers
-      target/arm: Use vector infrastructure for aa64 add/sub/logic
-      target/arm: Use vector infrastructure for aa64 mov/not/neg
-      target/arm: Use vector infrastructure for aa64 dup/movi
-      target/arm: Use vector infrastructure for aa64 constant shifts
-      target/arm: Use vector infrastructure for aa64 compares
-      target/arm: Use vector infrastructure for aa64 multiplies
-      target/arm: Use vector infrastructure for aa64 orr/bic immediate
-      tcg/i386: Add vector operations
-      tcg/aarch64: Add vector operations
-
- Makefile.target              |    4 +-
- accel/tcg/tcg-runtime.h      |  118 +++
- target/arm/cpu.h             |    2 +-
- tcg/aarch64/tcg-target.h     |   25 +-
- tcg/aarch64/tcg-target.opc.h |    3 +
- tcg/i386/tcg-target.h        |   41 +-
- tcg/i386/tcg-target.opc.h    |   13 +
- tcg/tcg-gvec-desc.h          |   49 +
- tcg/tcg-op-gvec.h            |  306 ++++++
- tcg/tcg-op.h                 |   52 +-
- tcg/tcg-opc.h                |   46 +
- tcg/tcg.h                    |   87 ++
- accel/tcg/tcg-runtime-gvec.c |  997 +++++++++++++++++++
- target/arm/translate-a64.c   |  975 ++++++++++++++-----
- tcg/aarch64/tcg-target.inc.c |  588 ++++++++++-
- tcg/i386/tcg-target.inc.c    |  987 ++++++++++++++++++-
- tcg/optimize.c               |  150 +--
- tcg/tcg-op-gvec.c            | 2216 ++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-vec.c             |  389 ++++++++
- tcg/tcg-op.c                 |   42 +-
- tcg/tcg-pool.inc.c           |  115 ++-
- tcg/tcg.c                    |  125 ++-
- accel/tcg/Makefile.objs      |    2 +-
- configure                    |   48 +
- tcg/README                   |   86 ++
- 25 files changed, 6970 insertions(+), 496 deletions(-)
- create mode 100644 tcg/aarch64/tcg-target.opc.h
- create mode 100644 tcg/i386/tcg-target.opc.h
- create mode 100644 tcg/tcg-gvec-desc.h
- create mode 100644 tcg/tcg-op-gvec.h
- create mode 100644 accel/tcg/tcg-runtime-gvec.c
- create mode 100644 tcg/tcg-op-gvec.c
- create mode 100644 tcg/tcg-op-vec.c
+diff --git a/tcg/tcg-pool.inc.c b/tcg/tcg-pool.inc.c
+index 8a85131405..ecf7c9282b 100644
+--- a/tcg/tcg-pool.inc.c
++++ b/tcg/tcg-pool.inc.c
+@@ -22,39 +22,110 @@
+ 
+ typedef struct TCGLabelPoolData {
+     struct TCGLabelPoolData *next;
+-    tcg_target_ulong data;
+     tcg_insn_unit *label;
+-    intptr_t addend;
+-    int type;
++    int32_t addend;
++    uint16_t rtype;
++    uint16_t nlong;
++    tcg_target_ulong data[];
+ } TCGLabelPoolData;
+ 
+ 
+-static void new_pool_label(TCGContext *s, tcg_target_ulong data, int type,
+-                           tcg_insn_unit *label, intptr_t addend)
++static TCGLabelPoolData *new_pool_alloc(TCGContext *s, int nlong, int rtype,
++                                        tcg_insn_unit *label, int addend)
+ {
+-    TCGLabelPoolData *n = tcg_malloc(sizeof(*n));
+-    TCGLabelPoolData *i, **pp;
++    TCGLabelPoolData *n = tcg_malloc(sizeof(TCGLabelPoolData)
++                                     + sizeof(tcg_target_ulong) * nlong);
+ 
+-    n->data = data;
+     n->label = label;
+-    n->type = type;
+     n->addend = addend;
++    n->rtype = rtype;
++    n->nlong = nlong;
++    return n;
++}
++
++static void new_pool_insert(TCGContext *s, TCGLabelPoolData *n)
++{
++    TCGLabelPoolData *i, **pp;
++    int nlong = n->nlong;
+ 
+     /* Insertion sort on the pool.  */
+-    for (pp = &s->pool_labels; (i = *pp) && i->data < data; pp = &i->next) {
+-        continue;
++    for (pp = &s->pool_labels; (i = *pp) != NULL; pp = &i->next) {
++        if (nlong > i->nlong) {
++            break;
++        }
++        if (nlong < i->nlong) {
++            continue;
++        }
++        if (memcmp(n->data, i->data, sizeof(tcg_target_ulong) * nlong) >= 0) {
++            break;
++        }
+     }
+     n->next = *pp;
+     *pp = n;
+ }
+ 
++/* The "usual" for generic integer code.  */
++static inline void new_pool_label(TCGContext *s, tcg_target_ulong d, int rtype,
++                                  tcg_insn_unit *label, int addend)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 1, rtype, label, addend);
++    n->data[0] = d;
++    new_pool_insert(s, n);
++}
++
++/* For v64 or v128, depending on the host.  */
++static inline void new_pool_l2(TCGContext *s, int rtype, tcg_insn_unit *label,
++                               int addend, tcg_target_ulong d0,
++                               tcg_target_ulong d1)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 2, rtype, label, addend);
++    n->data[0] = d0;
++    n->data[1] = d1;
++    new_pool_insert(s, n);
++}
++
++/* For v128 or v256, depending on the host.  */
++static inline void new_pool_l4(TCGContext *s, int rtype, tcg_insn_unit *label,
++                               int addend, tcg_target_ulong d0,
++                               tcg_target_ulong d1, tcg_target_ulong d2,
++                               tcg_target_ulong d3)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 4, rtype, label, addend);
++    n->data[0] = d0;
++    n->data[1] = d1;
++    n->data[2] = d2;
++    n->data[3] = d3;
++    new_pool_insert(s, n);
++}
++
++/* For v256, for 32-bit host.  */
++static inline void new_pool_l8(TCGContext *s, int rtype, tcg_insn_unit *label,
++                               int addend, tcg_target_ulong d0,
++                               tcg_target_ulong d1, tcg_target_ulong d2,
++                               tcg_target_ulong d3, tcg_target_ulong d4,
++                               tcg_target_ulong d5, tcg_target_ulong d6,
++                               tcg_target_ulong d7)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 8, rtype, label, addend);
++    n->data[0] = d0;
++    n->data[1] = d1;
++    n->data[2] = d2;
++    n->data[3] = d3;
++    n->data[4] = d4;
++    n->data[5] = d5;
++    n->data[6] = d6;
++    n->data[7] = d7;
++    new_pool_insert(s, n);
++}
++
+ /* To be provided by cpu/tcg-target.inc.c.  */
+ static void tcg_out_nop_fill(tcg_insn_unit *p, int count);
+ 
+ static bool tcg_out_pool_finalize(TCGContext *s)
+ {
+     TCGLabelPoolData *p = s->pool_labels;
+-    tcg_target_ulong d, *a;
++    TCGLabelPoolData *l = NULL;
++    void *a;
+ 
+     if (p == NULL) {
+         return true;
+@@ -62,24 +133,24 @@ static bool tcg_out_pool_finalize(TCGContext *s)
+ 
+     /* ??? Round up to qemu_icache_linesize, but then do not round
+        again when allocating the next TranslationBlock structure.  */
+-    a = (void *)ROUND_UP((uintptr_t)s->code_ptr, sizeof(tcg_target_ulong));
++    a = (void *)ROUND_UP((uintptr_t)s->code_ptr,
++                         sizeof(tcg_target_ulong) * p->nlong);
+     tcg_out_nop_fill(s->code_ptr, (tcg_insn_unit *)a - s->code_ptr);
+     s->data_gen_ptr = a;
+ 
+-    /* Ensure the first comparison fails.  */
+-    d = p->data + 1;
+-
+     for (; p != NULL; p = p->next) {
+-        if (p->data != d) {
+-            d = p->data;
+-            if (unlikely((void *)a > s->code_gen_highwater)) {
++        size_t size = sizeof(tcg_target_ulong) * p->nlong;
++        if (!l || l->nlong != p->nlong || memcmp(l->data, p->data, size)) {
++            if (unlikely(a > s->code_gen_highwater)) {
+                 return false;
+             }
+-            *a++ = d;
++            memcpy(a, p->data, size);
++            a += size;
++            l = p;
+         }
+-        patch_reloc(p->label, p->type, (intptr_t)(a - 1), p->addend);
++        patch_reloc(p->label, p->rtype, (intptr_t)a - size, p->addend);
+     }
+ 
+-    s->code_ptr = (void *)a;
++    s->code_ptr = a;
+     return true;
+ }
+-- 
+2.14.3
