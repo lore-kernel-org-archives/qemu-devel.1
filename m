@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejRKX-0007KF-Pr
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:08:18 -0500
+	(envelope-from <berto@igalia.com>) id 1ejRMr-0000u8-HU
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:10:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejRKT-0000Or-Rs
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:08:13 -0500
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:38572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejRKT-0000My-MK
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:08:09 -0500
-Received: by mail-oi0-x22e.google.com with SMTP id j15so875382oii.5
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 07:08:09 -0800 (PST)
+	(envelope-from <berto@igalia.com>) id 1ejRMn-0002QF-5s
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:10:37 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1516366207-109842-8-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516366207-109842-8-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Wed, 07 Feb 2018 16:10:31 +0100
+Message-ID: <w51y3k4u97c.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <87372cx2y2.fsf@linaro.org>
-References: <20180207111729.15737-1-ard.biesheuvel@linaro.org>
-	<20180207111729.15737-6-ard.biesheuvel@linaro.org>
-	<87372cx2y2.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Feb 2018 15:07:48 +0000
-Message-ID: <CAFEAcA_y3kzwHc8g5q4+xtDpuOggSiVGm=gVgndVA1dxdG1KTQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] target/arm: enable user-mode SHA-3,
- SM3, SM4 and SHA-512 instruction support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 7/8] file-posix: account
+ discard operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On 7 February 2018 at 14:57, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
+On Fri 19 Jan 2018 01:50:06 PM CET, Anton Nefedov wrote:
+> This will help to identify how many of the user-issued discard operations
+> (accounted on a device level) have actually suceeded down on the host file
+> (even though the numbers will not be exactly the same if non-raw format
+> driver is used (e.g. qcow2 sending metadata discards)).
 >
-> Ard Biesheuvel <ard.biesheuvel@linaro.org> writes:
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/file-posix.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
 >
->> Add support for the new ARMv8.2 SHA-3, SM3, SM4 and SHA-512 instructions=
- to
->> AArch64 user mode emulation.
->
-> So another problem I've come across is I can't turn this off. I ended up
-> doing that in my FP16 series because otherwise existing RISU tests get
-> broken. However having an optional flag for each little set of
-> instructions seems overkill.
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 36ee89e..544ae58 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -158,6 +158,11 @@ typedef struct BDRVRawState {
+>      bool page_cache_inconsistent:1;
+>      bool has_fallocate;
+>      bool needs_alignment;
+> +    struct {
+> +        int64_t discard_nb_ok;
+> +        int64_t discard_nb_failed;
+> +        int64_t discard_bytes_ok;
+> +    } stats;
 
-Why do the existing tests break? Are they checking UNDEF
-for previously-reserved bits of the encoding space?
+Shouldn't this new structure be defined in a header file so other
+drivers can use it? Or did you define it here because you don't see that
+happening soon?
 
-> Have you run any RISU tests? If you want you can add this to the
-> aarch64.risu to generate some test patterns.
+The rest of the patch looks good.
 
-I wrote some risu patterns for testing these. I was going
-to send the patch out tomorrow...
-
-(I used the tag A64_C82 rather than A64_V.)
-
-thanks
--- PMM
+Berto
