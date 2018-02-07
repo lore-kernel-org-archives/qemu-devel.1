@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ejRrN-0004Dk-HV
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:42:10 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ejRvv-0006ib-2z
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:46:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ejRrJ-000576-QC
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:42:09 -0500
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:45402)
+	(envelope-from <eric.auger@redhat.com>) id 1ejRvq-00085R-30
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:46:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46836 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ejRrJ-00053u-J3
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:42:05 -0500
-Received: from player157.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 68BEC119890
-	for <qemu-devel@nongnu.org>; Wed,  7 Feb 2018 16:41:53 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 07 Feb 2018 16:41:43 +0100
-Message-ID: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1ejRvp-00084G-Sy
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:46:46 -0500
+References: <20180207000731.32764.95992.stgit@gimli.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <c98a2d5c-19e9-813c-c58f-77583e7873ff@redhat.com>
+Date: Wed, 7 Feb 2018 16:46:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180207000731.32764.95992.stgit@gimli.home>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] migration: improve documentation of
- postcopy-ram
+Subject: Re: [Qemu-devel] [RFC PATCH] vfio/pci: Add ioeventfd support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +27,381 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
 
-This capability must have the same value on both source and destination,
-otherwise migration fails (commit 875fcd013ab6 "migration: incoming
-postcopy advise sanity checks").
+Hi Alex,
 
-Let's write it down in various places where postcopy-ram is documented.
+On 07/02/18 01:08, Alex Williamson wrote:
+> The ioeventfd here is actually irqfd handling of an ioeventfd such as
+> supported in KVM.  A user is able to pre-program a device write to
+> occur when the eventfd triggers.  This is yet another instance of
+> eventfd-irqfd triggering between KVM and vfio.  The impetus for this
+> is high frequency writes to pages which are virtualized in QEMU.
+> Enabling this near-direct write path for selected registers within
+> the virtualized page can improve performance and reduce overhead.
+> Specifically this is initially targeted at NVIDIA graphics cards where
+> the driver issues a write to an MMIO register within a virtualized
+> region in order to allow the MSI interrupt to re-trigger.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- docs/devel/migration.rst |    4 ++--
- hmp-commands.hx          |    3 ++-
- qapi/migration.json      |   10 ++++++----
- 3 files changed, 10 insertions(+), 7 deletions(-)
+fyi it does not apply anymore on master (conflict in
+include/uapi/linux/vfio.h on GFX stuff)
+> ---
+>  drivers/vfio/pci/vfio_pci.c         |   33 +++++++
+>  drivers/vfio/pci/vfio_pci_private.h |   14 +++
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |  165 ++++++++++++++++++++++++++++++++---
+>  include/uapi/linux/vfio.h           |   24 +++++
+>  4 files changed, 224 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index f041b1a6cf66..c8e7297a61a3 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -302,6 +302,7 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+>  {
+>  	struct pci_dev *pdev = vdev->pdev;
+>  	struct vfio_pci_dummy_resource *dummy_res, *tmp;
+> +	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;
+>  	int i, bar;
+>  
+>  	/* Stop the device from further DMA */
+> @@ -311,6 +312,14 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+>  				VFIO_IRQ_SET_ACTION_TRIGGER,
+>  				vdev->irq_type, 0, 0, NULL);
+>  
+> +	/* Device closed, don't need mutex here */
+> +	list_for_each_entry_safe(ioeventfd, ioeventfd_tmp,
+> +				 &vdev->ioeventfds_list, next) {
+> +		vfio_virqfd_disable(&ioeventfd->virqfd);
+> +		list_del(&ioeventfd->next);
+> +		kfree(ioeventfd);
+> +	}
+> +
+>  	vdev->virq_disabled = false;
+>  
+>  	for (i = 0; i < vdev->num_regions; i++)
+> @@ -1039,6 +1048,28 @@ static long vfio_pci_ioctl(void *device_data,
+>  
+>  		kfree(groups);
+>  		return ret;
+> +	} else if (cmd == VFIO_DEVICE_IOEVENTFD) {
+> +		struct vfio_device_ioeventfd ioeventfd;
+> +		int count;
+> +
+> +		minsz = offsetofend(struct vfio_device_ioeventfd, fd);
+> +
+> +		if (copy_from_user(&ioeventfd, (void __user*)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (ioeventfd.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		if (ioeventfd.flags & ~VFIO_DEVICE_IOEVENTFD_SIZE_MASK)
+> +			return -EINVAL;
+> +
+> +		count = ioeventfd.flags & VFIO_DEVICE_IOEVENTFD_SIZE_MASK;
+> +
+> +		if (hweight8(count) != 1 || ioeventfd.fd < -1)
+> +			return -EINVAL;
+> +
+> +		return vfio_pci_ioeventfd(vdev, ioeventfd.offset,
+> +					  ioeventfd.data, count, ioeventfd.fd);
+>  	}
+>  
+>  	return -ENOTTY;
+> @@ -1217,6 +1248,8 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+>  	mutex_init(&vdev->igate);
+>  	spin_lock_init(&vdev->irqlock);
+> +	mutex_init(&vdev->ioeventfds_lock);
+> +	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+>  
+>  	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+>  	if (ret) {
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index f561ac1c78a0..23797622396e 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -29,6 +29,15 @@
+>  #define PCI_CAP_ID_INVALID		0xFF	/* default raw access */
+>  #define PCI_CAP_ID_INVALID_VIRT		0xFE	/* default virt access */
+>  
+> +struct vfio_pci_ioeventfd {
+> +	struct list_head	next;
+> +	struct virqfd		*virqfd;
+> +	loff_t			pos;
+> +	uint64_t		data;
+> +	int			bar;
+> +	int			count;
+> +};
+> +
+>  struct vfio_pci_irq_ctx {
+>  	struct eventfd_ctx	*trigger;
+>  	struct virqfd		*unmask;
+> @@ -95,6 +104,8 @@ struct vfio_pci_device {
+>  	struct eventfd_ctx	*err_trigger;
+>  	struct eventfd_ctx	*req_trigger;
+>  	struct list_head	dummy_resources_list;
+> +	struct mutex		ioeventfds_lock;
+> +	struct list_head	ioeventfds_list;
+>  };
+>  
+>  #define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
+> @@ -120,6 +131,9 @@ extern ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  			       size_t count, loff_t *ppos, bool iswrite);
+>  
+> +extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+> +			       uint64_t data, int count, int fd);
+> +
+>  extern int vfio_pci_init_perm_bits(void);
+>  extern void vfio_pci_uninit_perm_bits(void);
+>  
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index 357243d76f10..55bb4517d4ba 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/pci.h>
+>  #include <linux/uaccess.h>
+>  #include <linux/io.h>
+> +#include <linux/vfio.h>
+>  #include <linux/vgaarb.h>
+>  
+>  #include "vfio_pci_private.h"
+> @@ -113,6 +114,30 @@ static ssize_t do_io_rw(void __iomem *io, char __user *buf,
+>  	return done;
+>  }
+>  
+> +static int vfio_pci_setup_barmap(struct vfio_pci_device *vdev, int bar)
+> +{
+> +	struct pci_dev *pdev = vdev->pdev;
+> +	int ret;
+> +	void __iomem *io;
+> +
+> +	if (vdev->barmap[bar])
+> +		return 0;
+> +
+> +	ret = pci_request_selected_regions(pdev, 1 << bar, "vfio");
+> +	if (ret)
+> +		return ret;
+> +
+> +	io = pci_iomap(pdev, bar, 0);
+> +	if (!io) {
+> +		pci_release_selected_regions(pdev, 1 << bar);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	vdev->barmap[bar] = io;
+> +
+> +	return 0;
+> +}
+> +
+>  ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  			size_t count, loff_t *ppos, bool iswrite)
+>  {
+> @@ -147,22 +172,13 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  		if (!io)
+>  			return -ENOMEM;
+>  		x_end = end;
+> -	} else if (!vdev->barmap[bar]) {
+> -		int ret;
+> -
+> -		ret = pci_request_selected_regions(pdev, 1 << bar, "vfio");
+> +	} else {
+> +		int ret = vfio_pci_setup_barmap(vdev, bar);
+>  		if (ret)
+>  			return ret;
+>  
+> -		io = pci_iomap(pdev, bar, 0);
+> -		if (!io) {
+> -			pci_release_selected_regions(pdev, 1 << bar);
+> -			return -ENOMEM;
+> -		}
+> -
+> -		vdev->barmap[bar] = io;
+> -	} else
+>  		io = vdev->barmap[bar];
+> +	}
+>  
+>  	if (bar == vdev->msix_bar) {
+>  		x_start = vdev->msix_offset;
+> @@ -242,3 +258,128 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  
+>  	return done;
+>  }
+> +
+> +static int vfio_pci_ioeventfd_handler8(void *opaque, void *data)
+> +{
+> +	iowrite8((unsigned long)data, opaque);
+> +	return 0;
+> +}
+> +
+> +static int vfio_pci_ioeventfd_handler16(void *opaque, void *data)
+> +{
+> +	iowrite16((unsigned long)data, opaque);
+> +	return 0;
+> +}
+> +
+> +static int vfio_pci_ioeventfd_handler32(void *opaque, void *data)
+> +{
+> +	iowrite32((unsigned long)data, opaque);
+> +	return 0;
+> +}
+> +
+> +#ifdef iowrite64
+> +static int vfio_pci_ioeventfd_handler64(void *opaque, void *data)
+> +{
+> +	iowrite64((unsigned long)data, opaque);
+> +	return 0;
+> +}
+> +#endif
+> +
+> +long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+> +			uint64_t data, int count, int fd)
+> +{
+> +	struct pci_dev *pdev = vdev->pdev;
+> +	loff_t pos = offset & VFIO_PCI_OFFSET_MASK;
+> +	int ret, bar = VFIO_PCI_OFFSET_TO_INDEX(offset);
+> +	struct vfio_pci_ioeventfd *ioeventfd;
+> +	int (*handler)(void *, void *);
+> +	unsigned long val;
+> +
+> +	/* Only support ioeventfds into BARs */
+> +	if (bar > VFIO_PCI_BAR5_REGION_INDEX)
+> +		return -EINVAL;
+> +
+> +	if (pos + count > pci_resource_len(pdev, bar))
+> +		return -EINVAL;
+> +
+> +	/* Disallow ioeventfds working around MSI-X table writes */
+> +	if (bar == vdev->msix_bar &&
+> +	    !(pos + count <= vdev->msix_offset ||
+> +	      pos >= vdev->msix_offset + vdev->msix_size))
+> +		return -EINVAL;
+> +
+> +	switch (count) {
+> +	case 1:
+> +		handler = &vfio_pci_ioeventfd_handler8;
+> +		val = data;
+> +		break;
+> +	case 2:
+> +		handler = &vfio_pci_ioeventfd_handler16;
+> +		val = le16_to_cpu(data);
+> +		break;
+> +	case 4:
+> +		handler = &vfio_pci_ioeventfd_handler32;
+> +		val = le32_to_cpu(data);
+> +		break;
+> +#ifdef iowrite64
+> +	case 8:
+> +		handler = &vfio_pci_ioeventfd_handler64;
+> +		val = le64_to_cpu(data);
+> +		break;
+> +#endif
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	ret = vfio_pci_setup_barmap(vdev, bar);
+> +	if (ret)
+> +		return ret;
+> +
+> +	mutex_lock(&vdev->ioeventfds_lock);
+> +
+> +	list_for_each_entry(ioeventfd, &vdev->ioeventfds_list, next) {
+> +		if (ioeventfd->pos == pos && ioeventfd->bar == bar &&
+> +		    ioeventfd->data == data && ioeventfd->count == count) {
+> +			if (fd == -1) {
+> +				vfio_virqfd_disable(&ioeventfd->virqfd);
+> +				list_del(&ioeventfd->next);
+> +				kfree(ioeventfd);
+> +				ret = 0;
+> +			} else
+> +				ret = -EEXIST;
+> +
+> +			goto out_unlock;
+> +		}
+> +	}
+> +
+> +	if (fd < 0) {
+> +		ret = -ENODEV;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ioeventfd = kzalloc(sizeof(*ioeventfd), GFP_KERNEL);
+> +	if (!ioeventfd) {
+> +		ret = -ENOMEM;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ioeventfd->pos = pos;
+> +	ioeventfd->bar = bar;
+> +	ioeventfd->data = data;
+> +	ioeventfd->count = count;
+> +
+> +	ret = vfio_virqfd_enable(vdev->barmap[ioeventfd->bar] + ioeventfd->pos,
+nit: bar and pos could be used directly
+> +				 handler, NULL, (void *)val,
+> +				 &ioeventfd->virqfd, fd);
+> +	if (ret) {
+> +		kfree(ioeventfd);
+> +		goto out_unlock;
+> +	}
+> +
+> +	list_add(&ioeventfd->next, &vdev->ioeventfds_list);
+> +
+> +out_unlock:
+> +	mutex_unlock(&vdev->ioeventfds_lock);
+> +
+> +	return ret;
+> +}
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index e3301dbd27d4..07966a5f0832 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -503,6 +503,30 @@ struct vfio_pci_hot_reset {
+>  
+>  #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
+>  
+> +/**
+> + * VFIO_DEVICE_IOEVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 14,
+> + *                              struct vfio_device_ioeventfd)
+> + *
+> + * Perform a write to the device at the specified device fd offset, with
+> + * the specified data and width when the provided eventfd is triggered.
+don't you want to document the limitation on BAR only and excluding the
+MSIx table.
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +struct vfio_device_ioeventfd {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +#define VFIO_DEVICE_IOEVENTFD_8		(1 << 0) /* 1-byte write */
+> +#define VFIO_DEVICE_IOEVENTFD_16	(1 << 1) /* 2-byte write */
+> +#define VFIO_DEVICE_IOEVENTFD_32	(1 << 2) /* 4-byte write */
+> +#define VFIO_DEVICE_IOEVENTFD_64	(1 << 3) /* 8-byte write */
+> +#define VFIO_DEVICE_IOEVENTFD_SIZE_MASK	(0xf)
+kvm_ioeventfd is using a _u32 len but well this is maybe simpler here to
+test sizes?
+> +	__u64	offset;			/* device fd offset of write */
+> +	__u64	data;			/* data to be written */
+> +	__s32	fd;			/* -1 for de-assignment */
+> +};
 
-diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-index bf97080dac2f..9d1b7657f0cf 100644
---- a/docs/devel/migration.rst
-+++ b/docs/devel/migration.rst
-@@ -387,8 +387,8 @@ doesn't finish in a given time the switch is made to postcopy.
- Enabling postcopy
- -----------------
- 
--To enable postcopy, issue this command on the monitor prior to the
--start of migration:
-+To enable postcopy, issue this command on the monitor (both source and
-+destination) prior to the start of migration:
- 
- ``migrate_set_capability postcopy-ram on``
- 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 15620c94d3fc..d26eb4119b9d 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1041,7 +1041,8 @@ ETEXI
-         .params     = "",
-         .help       = "Followup to a migration command to switch the migration"
-                       " to postcopy mode. The postcopy-ram capability must "
--                      "be set before the original migration command.",
-+                      "be set on both source and destination before the "
-+                      "original migration command .",
-         .cmd        = hmp_migrate_start_postcopy,
-     },
- 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 4cd3d1315884..7f465a1902ce 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -327,8 +327,10 @@
- #          to speed up convergence of RAM migration. (since 1.6)
- #
- # @postcopy-ram: Start executing on the migration target before all of RAM has
--#          been migrated, pulling the remaining pages along as needed. NOTE: If
--#          the migration fails during postcopy the VM will fail.  (since 2.6)
-+#          been migrated, pulling the remaining pages along as needed. The
-+#          capacity must have the same setting on both source and target
-+#          or migration will not even start. NOTE: If the migration fails during
-+#          postcopy the VM will fail.  (since 2.6)
- #
- # @x-colo: If enabled, migration will never end, and the state of the VM on the
- #        primary side will be migrated continuously to the VM on secondary
-@@ -742,8 +744,8 @@
- # @migrate-start-postcopy:
- #
- # Followup to a migration command to switch the migration to postcopy mode.
--# The postcopy-ram capability must be set before the original migration
--# command.
-+# The postcopy-ram capability must be set on both source and destination
-+# before the original migration command.
- #
- # Since: 2.5
- #
+Otherwise it looks good to me.
+
+Thanks
+
+Eric
+> +
+> +#define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 14)
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
+> 
+> 
