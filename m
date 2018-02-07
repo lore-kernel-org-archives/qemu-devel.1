@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejY72-0005SL-U7
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:22:46 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ejYCD-0007om-B1
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejY6z-0008PZ-LR
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:22:44 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:42641)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejY6z-0008PR-GK
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:22:41 -0500
-Received: by mail-qt0-x242.google.com with SMTP id i8so3773953qtj.9
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 14:22:41 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180123032135.28863-1-f4bug@amsat.org>
-	<20180123032135.28863-11-f4bug@amsat.org>
-	<CAKmqyKMds=ebER8+5t+HKOA4xDVE+-MGjSkWZXVMa06LGw7ggQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <810cad96-3bd6-3567-ba2f-4fbe0bde365b@amsat.org>
-Date: Wed, 7 Feb 2018 19:22:36 -0300
+	(envelope-from <mreitz@redhat.com>) id 1ejYCC-0003FU-CZ
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:28:05 -0500
+References: <20180119205847.7141-1-jsnow@redhat.com>
+	<20180119205847.7141-9-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <32b9a0be-dad2-d26e-1db4-8cb0e06d55be@redhat.com>
+Date: Wed, 7 Feb 2018 23:27:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMds=ebER8+5t+HKOA4xDVE+-MGjSkWZXVMa06LGw7ggQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 10/12] sdcard: rename sd_set_$REG()
- functions called once as sd_reset_$REG()
+In-Reply-To: <20180119205847.7141-9-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="V0rjGlWb3JGt4MG0q7kKE74rj0anp75SQ"
+Subject: Re: [Qemu-devel] [PATCH v2 08/13] allow block_job_relax to return
+ -ECANCELED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,130 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
-Hi Alistair,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--V0rjGlWb3JGt4MG0q7kKE74rj0anp75SQ
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com
+Message-ID: <32b9a0be-dad2-d26e-1db4-8cb0e06d55be@redhat.com>
+Subject: Re: [PATCH v2 08/13] allow block_job_relax to return -ECANCELED
+References: <20180119205847.7141-1-jsnow@redhat.com>
+ <20180119205847.7141-9-jsnow@redhat.com>
+In-Reply-To: <20180119205847.7141-9-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 01/31/2018 01:28 PM, Alistair Francis wrote:
-> On Mon, Jan 22, 2018 at 7:21 PM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> All are only called once at reset.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> I don't think this patch gets us anything, in the future someone might
-> use the functions to set values and then this new name will be
-> confusing. Can we drop this patch?
+On 2018-01-19 21:58, John Snow wrote:
+> This is just an optimization for callers who are likely going to
+> want to check quite close to this call if the job was canceled or
+> not anyway.
 
-This is indeed the purpose of this patch, be explicit than these
-functions are here to reset default values and not set anything (except
-value at reset).
+But jobs are =E2=80=9Ccancelled=E2=80=9D and not =E2=80=9Ccanceled=E2=80=9D=
+=2E
 
-I personally prefer to use explicit self-documenting names to avoid such
-confusions.
+!!!
 
-I'll drop it from this series and eventually reintroduce it in last part
-where MMC functions do set values different than reset values.
+>=20
+> Along the same lines, add the return to block_job_pause_point and
+> block_job_sleep_ns, so we don't have to re-check it quite so
+> excessively.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  blockjob.c                   | 28 +++++++++++++++++-----------
+>  include/block/blockjob_int.h |  8 +++++---
+>  2 files changed, 22 insertions(+), 14 deletions(-)
 
-> 
-> Alistair
-> 
->> ---
->>  hw/sd/sd.c | 31 ++++++++++++++++++-------------
->>  1 file changed, 18 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> index c46e9c2818..8b5022a7db 100644
->> --- a/hw/sd/sd.c
->> +++ b/hw/sd/sd.c
->> @@ -269,7 +269,7 @@ static uint16_t sd_crc16(void *message, size_t width)
->>      return shift_reg;
->>  }
->>
->> -static void sd_set_ocr(SDState *sd)
->> +static void sd_reset_ocr(SDState *sd)
->>  {
->>      /* All voltages OK, Standard Capacity SD Memory Card, not yet powered up */
->>      sd->ocr = 0x00ffff00;
->> @@ -285,7 +285,7 @@ static void sd_ocr_powerup(void *opaque)
->>      sd->ocr |= OCR_POWER_UP;
->>  }
->>
->> -static void sd_set_scr(SDState *sd)
->> +static void sd_reset_scr(SDState *sd)
->>  {
->>      sd->scr[0] = 0x00;         /* SCR Structure */
->>      sd->scr[1] = 0x2f;         /* SD Security Support */
->> @@ -304,7 +304,7 @@ static void sd_set_scr(SDState *sd)
->>  #define MDT_YR 2006
->>  #define MDT_MON        2
->>
->> -static void sd_set_cid(SDState *sd)
->> +static void sd_reset_cid(SDState *sd)
->>  {
->>      sd->cid[0] = MID;          /* Fake card manufacturer ID (MID) */
->>      sd->cid[1] = OID[0];       /* OEM/Application ID (OID) */
->> @@ -336,7 +336,7 @@ static const uint8_t sd_csd_rw_mask[16] = {
->>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc, 0xfe,
->>  };
->>
->> -static void sd_set_csd(SDState *sd, uint64_t size)
->> +static void sd_reset_csd(SDState *sd, uint64_t size)
->>  {
->>      uint32_t csize = (size >> (CMULT_SHIFT + HWBLOCK_SHIFT)) - 1;
->>      uint32_t sectsize = (1 << (SECTOR_SHIFT + 1)) - 1;
->> @@ -391,6 +391,11 @@ static void sd_set_csd(SDState *sd, uint64_t size)
->>      }
->>  }
->>
->> +static void sd_reset_rca(SDState *sd)
->> +{
->> +    sd->rca = 0;
->> +}
->> +
->>  static void sd_set_rca(SDState *sd)
->>  {
->>      sd->rca += 0x4567;
+[...]
 
-Here is an example where set_rsa() is not the same than reset_rsa().
+> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.=
+h
+> index 5f1520fab7..1ceb47e1e6 100644
+> --- a/include/block/blockjob_int.h
+> +++ b/include/block/blockjob_int.h
+> @@ -147,7 +147,7 @@ void *block_job_create(const char *job_id, const Bl=
+ockJobDriver *driver,
+>   * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediate=
+ly
+>   * interrupt the wait.
+>   */
+> -void block_job_sleep_ns(BlockJob *job, int64_t ns);
+> +int block_job_sleep_ns(BlockJob *job, int64_t ns);
+> =20
+>  /**
+>   * block_job_yield:
+> @@ -167,8 +167,10 @@ void block_job_yield(BlockJob *job);
+>   * If delay_ns is 0, yield if it has been SLICE_TIME
+>   * nanoseconds since the last yield. Otherwise, check
+>   * if we need to yield for a pause event.
+> + *
+> + * returns ECANCELED if the job has been canceled.
 
->> @@ -405,12 +410,12 @@ static void sd_set_rca(SDState *sd)
->>  #define CARD_STATUS_B  0x00c01e00
->>  #define CARD_STATUS_C  0xfd39a028
->>
->> -static void sd_set_cardstatus(SDState *sd)
->> +static void sd_reset_cardstatus(SDState *sd)
->>  {
->>      sd->card_status = 0x00000100;
->>  }
->>
->> -static void sd_set_sdstatus(SDState *sd)
->> +static void sd_reset_sdstatus(SDState *sd)
->>  {
->>      memset(sd->sd_status, 0, 64);
->>  }
->> @@ -494,13 +499,13 @@ static void sd_reset(DeviceState *dev)
->>      sect = sd_addr_to_wpnum(size) + 1;
->>
->>      sd->state = sd_idle_state;
->> -    sd->rca = 0x0000;
->> -    sd_set_ocr(sd);
->> -    sd_set_scr(sd);
->> -    sd_set_cid(sd);
->> -    sd_set_csd(sd, size);
->> -    sd_set_cardstatus(sd);
->> -    sd_set_sdstatus(sd);
->> +    sd_reset_rca(sd);
->> +    sd_reset_ocr(sd);
->> +    sd_reset_scr(sd);
->> +    sd_reset_cid(sd);
->> +    sd_reset_csd(sd, size);
->> +    sd_reset_cardstatus(sd);
->> +    sd_reset_sdstatus(sd);
->>
->>      g_free(sd->wp_groups);
->>      sd->wp_switch = sd->blk ? blk_is_read_only(sd->blk) : false;
->> --
->> 2.15.1
->>
->>
+-ECANCELED, please.
+
+With that fixed:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+>   */
+> -void block_job_relax(BlockJob *job, int64_t delay_ns);
+> +int block_job_relax(BlockJob *job, int64_t delay_ns);
+> =20
+>  /**
+>   * block_job_pause_all:
+> @@ -217,7 +219,7 @@ bool block_job_is_cancelled(BlockJob *job);
+>   * Pause now if block_job_pause() has been called.  Block jobs that pe=
+rform
+>   * lots of I/O must call this between requests so that the job can be =
+paused.
+>   */
+> -void coroutine_fn block_job_pause_point(BlockJob *job);
+> +int coroutine_fn block_job_pause_point(BlockJob *job);
+> =20
+>  /**
+>   * block_job_enter:
+>=20
+
+
+
+--V0rjGlWb3JGt4MG0q7kKE74rj0anp75SQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp7fVgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A+R8IAIPCAtJT2KZTJiPXQUTllZj7K/EuOcJv
+WWh5M+n/eR75eaKFRLmG3z5QKGcxI3QCCDAfWphYthofaNf5bvzyHXOvpj+Zjdhi
+/x/A/z8C4DL4HtpkoRIIOMKT0goQ4YgmQLHt4J5lkEUqeNbpuUlwRXKH5eUzGYXG
+oyeIjX1YUP3OkNEP59QDXsPTJuxLxpVfuyFmnnSnzfhwPlO6CSHes1xrNSNoiFge
+rSRpTOpxaV1kEGBnyaAkHOC9yrKs9iI8Mzy5xH5xYUwaDLGfRqklhQoWi95Oo70N
+8+Zrlt+E3yGYo2ZKUeQ0gp9d6eYBNH+MajuA0Wg2/jH3RO5sl7nFD9Y=
+=4h+S
+-----END PGP SIGNATURE-----
+
+--V0rjGlWb3JGt4MG0q7kKE74rj0anp75SQ--
