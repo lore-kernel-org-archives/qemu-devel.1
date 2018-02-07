@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejV8W-0001WT-FT
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:12:05 -0500
+	(envelope-from <lcapitulino@redhat.com>) id 1ejVB7-0003sb-8L
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:14:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejV8T-00006x-96
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:12:04 -0500
-References: <20180207123833.211687-1-borntraeger@de.ibm.com>
-	<b4c61e4f-4bbd-39d6-0e72-57e9ae1694fe@de.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <770c4e4f-ed2b-8fd5-8344-4b920b0273a1@redhat.com>
-Date: Wed, 7 Feb 2018 13:11:43 -0600
+	(envelope-from <lcapitulino@redhat.com>) id 1ejVB6-0002yU-EF
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:14:45 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36504 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lcapitulino@redhat.com>)
+	id 1ejVB6-0002x4-3S
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:14:44 -0500
+Date: Wed, 7 Feb 2018 14:14:40 -0500
+From: Luiz Capitulino <lcapitulino@redhat.com>
+Message-ID: <20180207141440.57ae0ee5@redhat.com>
+In-Reply-To: <c0464781-02dd-afeb-f7a8-345ccf8fe4f4@redhat.com>
+References: <20180207175014.11157-1-lcapitulino@redhat.com>
+	<20180207175014.11157-3-lcapitulino@redhat.com>
+	<c0464781-02dd-afeb-f7a8-345ccf8fe4f4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b4c61e4f-4bbd-39d6-0e72-57e9ae1694fe@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6] s390x/cpu: expose the guest crash
- information
+Subject: Re: [Qemu-devel] [PATCH 2/2] qmp: document query-cpus performance
+ issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, ehabkost@redhat.com, berrange@redhat.com, mihajlov@linux.vnet.ibm.com
 
-On 02/07/2018 12:44 PM, Christian Borntraeger wrote:
+On Wed, 7 Feb 2018 12:50:59 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
->> +        } else if (info->type == GUEST_PANIC_INFORMATION_TYPE_S390) {
->> +            qemu_log_mask(LOG_GUEST_ERROR, " on cpu %d: %s\n"
->> +                          "PSW: 0x%016" PRIx64 " 0x%016" PRIx64"\n",
->> +                          info->u.s390.core,
->> +                          qapi_enum_lookup(&S390CrashReason_lookup,
->> +                                           info->u.s390.reason),
+> On 02/07/2018 11:50 AM, Luiz Capitulino wrote:
+> > Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
+> > ---
+> >   qapi-schema.json | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/qapi-schema.json b/qapi-schema.json
+> > index 82d6f12b53..0665a14dba 100644
+> > --- a/qapi-schema.json
+> > +++ b/qapi-schema.json
+> > @@ -526,6 +526,10 @@
+> >   #
+> >   # Returns a list of information about each virtual CPU.
+> >   #
+> > +# WARNING: This command incurs a performance penalty for latency
+> > +#          sensitive workloads and hence it's not recommended to
+> > +#          to be used in production. Use query-cpus-fast instead
+> > +#  
 > 
-> Question for the qapi people. Would you prefer S390CrashReason_str instead?
+> Ah, I asked for this on 1/2.  You could squash these.
+> 
+> I didn't review the code, just the interface, so if you squash them, you 
+> can add the weaker:
+> 
+> Acked-by: Eric Blake <eblake@redhat.com>
 
-Yes, S390CrashReason_str(info->u.s390.reason) is a more legible way to 
-spell this same lookup, and leaves the door open if we later change how 
-the internal &S390CrashReason_lookup[] behaves.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+OK, I'll wait for more review and do the changes you requested.
