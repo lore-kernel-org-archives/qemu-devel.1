@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ejH38-000165-0Y
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:09:35 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejH4P-00027Z-Ht
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:10:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ejH33-0002p9-Qp
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:09:33 -0500
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:38082)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ejH33-0002ov-IW
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:09:29 -0500
-Received: by mail-it0-x241.google.com with SMTP id k6so554740ita.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 20:09:29 -0800 (PST)
-References: <20180207000731.32764.95992.stgit@gimli.home>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <cfe31ae1-2557-d15a-45a2-0ba03d8d71fa@ozlabs.ru>
-Date: Wed, 7 Feb 2018 15:09:22 +1100
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejH4M-0003Mt-C3
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:10:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180207000731.32764.95992.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] vfio/pci: Add ioeventfd support
+In-Reply-To: <f1dde4c8-ab85-05ec-5b46-ea00ba9dabc9@redhat.com>
+References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
+	<20180116013709.13830-10-andrew.smirnov@gmail.com>
+	<76017d4e-0b11-93a4-94c7-553f7baee3ff@zoho.com>
+	<CAHQ1cqG=7_T5L4mofXJ5s5t7Dr7=VH13W75TfYRw_ajU=_apxw@mail.gmail.com>
+	<f1dde4c8-ab85-05ec-5b46-ea00ba9dabc9@redhat.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Tue, 6 Feb 2018 20:10:39 -0800
+Message-ID: <CAHQ1cqFEYrGZfoJFyLqn3heYNhXV+YV23wJsXm2nZv=9y6FE3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
+ IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,376 +27,712 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 07/02/18 11:08, Alex Williamson wrote:
-> The ioeventfd here is actually irqfd handling of an ioeventfd such as
-> supported in KVM.  A user is able to pre-program a device write to
-> occur when the eventfd triggers.  This is yet another instance of
-> eventfd-irqfd triggering between KVM and vfio.  The impetus for this
-> is high frequency writes to pages which are virtualized in QEMU.
-> Enabling this near-direct write path for selected registers within
-> the virtualized page can improve performance and reduce overhead.
-> Specifically this is initially targeted at NVIDIA graphics cards where
-> the driver issues a write to an MMIO register within a virtualized
-> region in order to allow the MSI interrupt to re-trigger.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c         |   33 +++++++
->  drivers/vfio/pci/vfio_pci_private.h |   14 +++
->  drivers/vfio/pci/vfio_pci_rdwr.c    |  165 ++++++++++++++++++++++++++++++++---
->  include/uapi/linux/vfio.h           |   24 +++++
->  4 files changed, 224 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index f041b1a6cf66..c8e7297a61a3 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -302,6 +302,7 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
->  {
->  	struct pci_dev *pdev = vdev->pdev;
->  	struct vfio_pci_dummy_resource *dummy_res, *tmp;
-> +	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;
->  	int i, bar;
->  
->  	/* Stop the device from further DMA */
-> @@ -311,6 +312,14 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
->  				VFIO_IRQ_SET_ACTION_TRIGGER,
->  				vdev->irq_type, 0, 0, NULL);
->  
-> +	/* Device closed, don't need mutex here */
-> +	list_for_each_entry_safe(ioeventfd, ioeventfd_tmp,
-> +				 &vdev->ioeventfds_list, next) {
-> +		vfio_virqfd_disable(&ioeventfd->virqfd);
-> +		list_del(&ioeventfd->next);
-> +		kfree(ioeventfd);
-> +	}
-> +
->  	vdev->virq_disabled = false;
->  
->  	for (i = 0; i < vdev->num_regions; i++)
-> @@ -1039,6 +1048,28 @@ static long vfio_pci_ioctl(void *device_data,
->  
->  		kfree(groups);
->  		return ret;
-> +	} else if (cmd == VFIO_DEVICE_IOEVENTFD) {
-> +		struct vfio_device_ioeventfd ioeventfd;
-> +		int count;
-> +
-> +		minsz = offsetofend(struct vfio_device_ioeventfd, fd);
-> +
-> +		if (copy_from_user(&ioeventfd, (void __user*)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (ioeventfd.argsz < minsz)
-> +			return -EINVAL;
-> +
-> +		if (ioeventfd.flags & ~VFIO_DEVICE_IOEVENTFD_SIZE_MASK)
-> +			return -EINVAL;
-> +
-> +		count = ioeventfd.flags & VFIO_DEVICE_IOEVENTFD_SIZE_MASK;
-> +
-> +		if (hweight8(count) != 1 || ioeventfd.fd < -1)
-> +			return -EINVAL;
-> +
-> +		return vfio_pci_ioeventfd(vdev, ioeventfd.offset,
-> +					  ioeventfd.data, count, ioeventfd.fd);
->  	}
->  
->  	return -ENOTTY;
-> @@ -1217,6 +1248,8 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	vdev->irq_type = VFIO_PCI_NUM_IRQS;
->  	mutex_init(&vdev->igate);
->  	spin_lock_init(&vdev->irqlock);
-> +	mutex_init(&vdev->ioeventfds_lock);
-> +	INIT_LIST_HEAD(&vdev->ioeventfds_list);
->  
->  	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
->  	if (ret) {
-> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> index f561ac1c78a0..23797622396e 100644
-> --- a/drivers/vfio/pci/vfio_pci_private.h
-> +++ b/drivers/vfio/pci/vfio_pci_private.h
-> @@ -29,6 +29,15 @@
->  #define PCI_CAP_ID_INVALID		0xFF	/* default raw access */
->  #define PCI_CAP_ID_INVALID_VIRT		0xFE	/* default virt access */
->  
-> +struct vfio_pci_ioeventfd {
-> +	struct list_head	next;
-> +	struct virqfd		*virqfd;
-> +	loff_t			pos;
-> +	uint64_t		data;
-> +	int			bar;
-> +	int			count;
-> +};
-> +
->  struct vfio_pci_irq_ctx {
->  	struct eventfd_ctx	*trigger;
->  	struct virqfd		*unmask;
-> @@ -95,6 +104,8 @@ struct vfio_pci_device {
->  	struct eventfd_ctx	*err_trigger;
->  	struct eventfd_ctx	*req_trigger;
->  	struct list_head	dummy_resources_list;
-> +	struct mutex		ioeventfds_lock;
-> +	struct list_head	ioeventfds_list;
->  };
->  
->  #define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
-> @@ -120,6 +131,9 @@ extern ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
->  extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
->  			       size_t count, loff_t *ppos, bool iswrite);
->  
-> +extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
-> +			       uint64_t data, int count, int fd);
-> +
->  extern int vfio_pci_init_perm_bits(void);
->  extern void vfio_pci_uninit_perm_bits(void);
->  
-> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-> index 357243d76f10..55bb4517d4ba 100644
-> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
-> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-> @@ -17,6 +17,7 @@
->  #include <linux/pci.h>
->  #include <linux/uaccess.h>
->  #include <linux/io.h>
-> +#include <linux/vfio.h>
->  #include <linux/vgaarb.h>
->  
->  #include "vfio_pci_private.h"
-> @@ -113,6 +114,30 @@ static ssize_t do_io_rw(void __iomem *io, char __user *buf,
->  	return done;
->  }
->  
-> +static int vfio_pci_setup_barmap(struct vfio_pci_device *vdev, int bar)
-> +{
-> +	struct pci_dev *pdev = vdev->pdev;
-> +	int ret;
-> +	void __iomem *io;
-> +
-> +	if (vdev->barmap[bar])
-> +		return 0;
-> +
-> +	ret = pci_request_selected_regions(pdev, 1 << bar, "vfio");
-> +	if (ret)
-> +		return ret;
-> +
-> +	io = pci_iomap(pdev, bar, 0);
-> +	if (!io) {
-> +		pci_release_selected_regions(pdev, 1 << bar);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	vdev->barmap[bar] = io;
-> +
-> +	return 0;
-> +}
-> +
->  ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
->  			size_t count, loff_t *ppos, bool iswrite)
->  {
-> @@ -147,22 +172,13 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
->  		if (!io)
->  			return -ENOMEM;
->  		x_end = end;
-> -	} else if (!vdev->barmap[bar]) {
-> -		int ret;
-> -
-> -		ret = pci_request_selected_regions(pdev, 1 << bar, "vfio");
-> +	} else {
-> +		int ret = vfio_pci_setup_barmap(vdev, bar);
->  		if (ret)
->  			return ret;
->  
-> -		io = pci_iomap(pdev, bar, 0);
-> -		if (!io) {
-> -			pci_release_selected_regions(pdev, 1 << bar);
-> -			return -ENOMEM;
-> -		}
-> -
-> -		vdev->barmap[bar] = io;
-> -	} else
->  		io = vdev->barmap[bar];
-> +	}
->  
->  	if (bar == vdev->msix_bar) {
->  		x_start = vdev->msix_offset;
-> @@ -242,3 +258,128 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
->  
->  	return done;
->  }
-> +
-> +static int vfio_pci_ioeventfd_handler8(void *opaque, void *data)
-> +{
-> +	iowrite8((unsigned long)data, opaque);
-> +	return 0;
-> +}
-> +
-> +static int vfio_pci_ioeventfd_handler16(void *opaque, void *data)
-> +{
-> +	iowrite16((unsigned long)data, opaque);
-> +	return 0;
-> +}
-> +
-> +static int vfio_pci_ioeventfd_handler32(void *opaque, void *data)
-> +{
-> +	iowrite32((unsigned long)data, opaque);
-> +	return 0;
-> +}
-> +
-> +#ifdef iowrite64
-> +static int vfio_pci_ioeventfd_handler64(void *opaque, void *data)
-> +{
-> +	iowrite64((unsigned long)data, opaque);
-> +	return 0;
-> +}
-> +#endif
-> +
-> +long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
-> +			uint64_t data, int count, int fd)
-> +{
-> +	struct pci_dev *pdev = vdev->pdev;
-> +	loff_t pos = offset & VFIO_PCI_OFFSET_MASK;
-> +	int ret, bar = VFIO_PCI_OFFSET_TO_INDEX(offset);
-> +	struct vfio_pci_ioeventfd *ioeventfd;
-> +	int (*handler)(void *, void *);
-> +	unsigned long val;
-> +
-> +	/* Only support ioeventfds into BARs */
-> +	if (bar > VFIO_PCI_BAR5_REGION_INDEX)
-> +		return -EINVAL;
-> +
-> +	if (pos + count > pci_resource_len(pdev, bar))
-> +		return -EINVAL;
-> +
-> +	/* Disallow ioeventfds working around MSI-X table writes */
-> +	if (bar == vdev->msix_bar &&
-> +	    !(pos + count <= vdev->msix_offset ||
-> +	      pos >= vdev->msix_offset + vdev->msix_size))
-> +		return -EINVAL;
-> +
-> +	switch (count) {
-> +	case 1:
-> +		handler = &vfio_pci_ioeventfd_handler8;
-> +		val = data;
-> +		break;
-> +	case 2:
-> +		handler = &vfio_pci_ioeventfd_handler16;
-> +		val = le16_to_cpu(data);
-> +		break;
-> +	case 4:
-> +		handler = &vfio_pci_ioeventfd_handler32;
-> +		val = le32_to_cpu(data);
-> +		break;
-> +#ifdef iowrite64
-> +	case 8:
-> +		handler = &vfio_pci_ioeventfd_handler64;
-> +		val = le64_to_cpu(data);
-> +		break;
-> +#endif
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret = vfio_pci_setup_barmap(vdev, bar);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mutex_lock(&vdev->ioeventfds_lock);
-> +
-> +	list_for_each_entry(ioeventfd, &vdev->ioeventfds_list, next) {
-> +		if (ioeventfd->pos == pos && ioeventfd->bar == bar &&
-> +		    ioeventfd->data == data && ioeventfd->count == count) {
-> +			if (fd == -1) {
-> +				vfio_virqfd_disable(&ioeventfd->virqfd);
-> +				list_del(&ioeventfd->next);
-> +				kfree(ioeventfd);
-> +				ret = 0;
-> +			} else
-> +				ret = -EEXIST;
-> +
-> +			goto out_unlock;
-> +		}
-> +	}
-> +
-> +	if (fd < 0) {
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ioeventfd = kzalloc(sizeof(*ioeventfd), GFP_KERNEL);
-> +	if (!ioeventfd) {
-> +		ret = -ENOMEM;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ioeventfd->pos = pos;
-> +	ioeventfd->bar = bar;
-> +	ioeventfd->data = data;
-> +	ioeventfd->count = count;
-> +
-> +	ret = vfio_virqfd_enable(vdev->barmap[ioeventfd->bar] + ioeventfd->pos,
-> +				 handler, NULL, (void *)val,
-> +				 &ioeventfd->virqfd, fd);
-> +	if (ret) {
-> +		kfree(ioeventfd);
-> +		goto out_unlock;
-> +	}
-> +
-> +	list_add(&ioeventfd->next, &vdev->ioeventfds_list);
-> +
-> +out_unlock:
-> +	mutex_unlock(&vdev->ioeventfds_lock);
-> +
-> +	return ret;
-> +}
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index e3301dbd27d4..07966a5f0832 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -503,6 +503,30 @@ struct vfio_pci_hot_reset {
->  
->  #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
->  
-> +/**
-> + * VFIO_DEVICE_IOEVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 14,
-> + *                              struct vfio_device_ioeventfd)
-> + *
-> + * Perform a write to the device at the specified device fd offset, with
-> + * the specified data and width when the provided eventfd is triggered.
-> + *
-> + * Return: 0 on success, -errno on failure.
-> + */
-> +struct vfio_device_ioeventfd {
-> +	__u32	argsz;
-> +	__u32	flags;
-> +#define VFIO_DEVICE_IOEVENTFD_8		(1 << 0) /* 1-byte write */
-> +#define VFIO_DEVICE_IOEVENTFD_16	(1 << 1) /* 2-byte write */
-> +#define VFIO_DEVICE_IOEVENTFD_32	(1 << 2) /* 4-byte write */
-> +#define VFIO_DEVICE_IOEVENTFD_64	(1 << 3) /* 8-byte write */
-> +#define VFIO_DEVICE_IOEVENTFD_SIZE_MASK	(0xf)
-> +	__u64	offset;			/* device fd offset of write */
-> +	__u64	data;			/* data to be written */
-> +	__s32	fd;			/* -1 for de-assignment */
-> +};
-> +
-> +#define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 14)
+On Wed, Jan 31, 2018 at 4:13 AM, Marcel Apfelbaum <marcel@redhat.com> wrote=
+:
+> On 30/01/2018 19:49, Andrey Smirnov wrote:
+>> On Tue, Jan 30, 2018 at 5:18 AM, Marcel Apfelbaum
+>> <marcel.apfelbaum@zoho.com> wrote:
+>>> Hi Andrei,
+>>>
+>>> Sorry for letting you wait,
+>>> I have some comments/questions below.
+>>>
+>>>
+>>> On 16/01/2018 3:37, Andrey Smirnov wrote:
+>>>>
+>>>> Add code needed to get a functional PCI subsytem when using in
+>>>> conjunction with upstream Linux guest (4.13+). Tested to work against
+>>>> "e1000e" (network adapter, using MSI interrupts) as well as
+>>>> "usb-ehci" (USB controller, using legacy PCI interrupts).
+>>>>
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>> Cc: Jason Wang <jasowang@redhat.com>
+>>>> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>> Cc: qemu-devel@nongnu.org
+>>>> Cc: qemu-arm@nongnu.org
+>>>> Cc: yurovsky@gmail.com
+>>>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>>>> ---
+>>>>   default-configs/arm-softmmu.mak  |   2 +
+>>>>   hw/pci-host/Makefile.objs        |   2 +
+>>>>   hw/pci-host/designware.c         | 618
+>>>> +++++++++++++++++++++++++++++++++++++++
+>>>>   include/hw/pci-host/designware.h |  93 ++++++
+>>>>   include/hw/pci/pci_ids.h         |   2 +
+>>>>   5 files changed, 717 insertions(+)
+>>>>   create mode 100644 hw/pci-host/designware.c
+>>>>   create mode 100644 include/hw/pci-host/designware.h
+>>>>
+>>>> diff --git a/default-configs/arm-softmmu.mak
+>>>> b/default-configs/arm-softmmu.mak
+>>>> index b0d6e65038..0c5ae914ed 100644
+>>>> --- a/default-configs/arm-softmmu.mak
+>>>> +++ b/default-configs/arm-softmmu.mak
+>>>> @@ -132,3 +132,5 @@ CONFIG_GPIO_KEY=3Dy
+>>>>   CONFIG_MSF2=3Dy
+>>>>   CONFIG_FW_CFG_DMA=3Dy
+>>>>   CONFIG_XILINX_AXI=3Dy
+>>>> +CONFIG_PCI_DESIGNWARE=3Dy
+>>>> +
+>>>> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+>>>> index 9c7909cf44..0e2c0a123b 100644
+>>>> --- a/hw/pci-host/Makefile.objs
+>>>> +++ b/hw/pci-host/Makefile.objs
+>>>> @@ -17,3 +17,5 @@ common-obj-$(CONFIG_PCI_PIIX) +=3D piix.o
+>>>>   common-obj-$(CONFIG_PCI_Q35) +=3D q35.o
+>>>>   common-obj-$(CONFIG_PCI_GENERIC) +=3D gpex.o
+>>>>   common-obj-$(CONFIG_PCI_XILINX) +=3D xilinx-pcie.o
+>>>> +
+>>>> +common-obj-$(CONFIG_PCI_DESIGNWARE) +=3D designware.o
+>>>> diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+>>>> new file mode 100644
+>>>> index 0000000000..98fff5e5f3
+>>>> --- /dev/null
+>>>> +++ b/hw/pci-host/designware.c
+>>>> @@ -0,0 +1,618 @@
+>>>> +/*
+>>>> + * Copyright (c) 2017, Impinj, Inc.
+>>>
+>>> 2018 :)
+>>>
+>>>> + *
+>>>> + * Designware PCIe IP block emulation
+>>>> + *
+>>>> + * This library is free software; you can redistribute it and/or
+>>>> + * modify it under the terms of the GNU Lesser General Public
+>>>> + * License as published by the Free Software Foundation; either
+>>>> + * version 2 of the License, or (at your option) any later version.
+>>>> + *
+>>>> + * This library is distributed in the hope that it will be useful,
+>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>>>> + * Lesser General Public License for more details.
+>>>> + *
+>>>> + * You should have received a copy of the GNU Lesser General Public
+>>>> + * License along with this library; if not, see
+>>>> + * <http://www.gnu.org/licenses/>.
+>>>> + */
+>>>> +
+>>>> +#include "qemu/osdep.h"
+>>>> +#include "qapi/error.h"
+>>>> +#include "hw/pci/msi.h"
+>>>> +#include "hw/pci/pci_bridge.h"
+>>>> +#include "hw/pci/pci_host.h"
+>>>> +#include "hw/pci/pcie_port.h"
+>>>> +#include "hw/pci-host/designware.h"
+>>>> +
+>>>> +#define PCIE_PORT_LINK_CONTROL          0x710
+>>>> +
+>>>> +#define PCIE_PHY_DEBUG_R1               0x72C
+>>>> +#define PCIE_PHY_DEBUG_R1_XMLH_LINK_UP  BIT(4)
+>>>> +
+>>>> +#define PCIE_LINK_WIDTH_SPEED_CONTROL   0x80C
+>>>> +
+>>>> +#define PCIE_MSI_ADDR_LO                0x820
+>>>> +#define PCIE_MSI_ADDR_HI                0x824
+>>>> +#define PCIE_MSI_INTR0_ENABLE           0x828
+>>>> +#define PCIE_MSI_INTR0_MASK             0x82C
+>>>> +#define PCIE_MSI_INTR0_STATUS           0x830
+>>>> +
+>>>> +#define PCIE_ATU_VIEWPORT               0x900
+>>>> +#define PCIE_ATU_REGION_INBOUND         (0x1 << 31)
+>>>> +#define PCIE_ATU_REGION_OUTBOUND        (0x0 << 31)
+>>>> +#define PCIE_ATU_REGION_INDEX2          (0x2 << 0)
+>>>> +#define PCIE_ATU_REGION_INDEX1          (0x1 << 0)
+>>>> +#define PCIE_ATU_REGION_INDEX0          (0x0 << 0)
+>>>> +#define PCIE_ATU_CR1                    0x904
+>>>> +#define PCIE_ATU_TYPE_MEM               (0x0 << 0)
+>>>> +#define PCIE_ATU_TYPE_IO                (0x2 << 0)
+>>>> +#define PCIE_ATU_TYPE_CFG0              (0x4 << 0)
+>>>> +#define PCIE_ATU_TYPE_CFG1              (0x5 << 0)
+>>>> +#define PCIE_ATU_CR2                    0x908
+>>>> +#define PCIE_ATU_ENABLE                 (0x1 << 31)
+>>>> +#define PCIE_ATU_BAR_MODE_ENABLE        (0x1 << 30)
+>>>> +#define PCIE_ATU_LOWER_BASE             0x90C
+>>>> +#define PCIE_ATU_UPPER_BASE             0x910
+>>>> +#define PCIE_ATU_LIMIT                  0x914
+>>>> +#define PCIE_ATU_LOWER_TARGET           0x918
+>>>> +#define PCIE_ATU_BUS(x)                 (((x) >> 24) & 0xff)
+>>>> +#define PCIE_ATU_DEVFN(x)               (((x) >> 16) & 0xff)
+>>>> +#define PCIE_ATU_UPPER_TARGET           0x91C
+>>>> +
+>>>> +static DesignwarePCIEHost *
+>>>> +designware_pcie_root_to_host(DesignwarePCIERoot *root)
+>>>> +{
+>>>> +    BusState *bus =3D qdev_get_parent_bus(DEVICE(root));
+>>>> +    return DESIGNWARE_PCIE_HOST(bus->parent);
+>>>> +}
+>>>> +
+>>>> +static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
+>>>> +                                           uint64_t val, unsigned len=
+)
+>>>> +{
+>>>> +    DesignwarePCIERoot *root =3D DESIGNWARE_PCIE_ROOT(opaque);
+>>>> +    DesignwarePCIEHost *host =3D designware_pcie_root_to_host(root);
+>>>> +
+>>>> +    root->msi.intr[0].status |=3D (1 << val) & root->msi.intr[0].enab=
+le;
+>>>> +
+>>>> +    if (root->msi.intr[0].status & ~root->msi.intr[0].mask) {
+>>>> +        qemu_set_irq(host->pci.irqs[0], 1);
+>>>
+>>>
+>>> Sorry for the possibly dumb question, but "msi_write"
+>>> will result in raising an INTx ?
+>>
+>> Correct, that's the intention. I wouldn't be surprised if I missed a
+>> better/canonical way to implement this.
+>>
+>
+> Not sure of a "better" way. The point was the "msi" naming
+> that suggests edge interrupts, while resulting into level interrupts.
+> I was wondering about the naming, nothing more.
+>
+>>>>
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +const MemoryRegionOps designware_pci_host_msi_ops =3D {
+>>>> +    .write =3D designware_pcie_root_msi_write,
+>>>> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+>>>
+>>>
+>>> You may want to limit the access size.
+>>
+>> Good point, will do.
+>>
+>>>>
+>>>> +};
+>>>> +
+>>>> +static void designware_pcie_root_update_msi_mapping(DesignwarePCIERoo=
+t
+>>>> *root)
+>>>> +
+>>>> +{
+>>>> +    DesignwarePCIEHost *host =3D designware_pcie_root_to_host(root);
+>>>> +    MemoryRegion *address_space =3D &host->pci.memory;
+>>>> +    MemoryRegion *mem =3D &root->msi.iomem;
+>>>> +    const uint64_t base =3D root->msi.base;
+>>>> +    const bool enable =3D root->msi.intr[0].enable;
+>>>> +
+>>>> +    if (memory_region_is_mapped(mem)) {
+>>>> +        memory_region_del_subregion(address_space, mem);
+>>>> +        object_unparent(OBJECT(mem));
+>>>> +    }
+>>>> +
+>>>> +    if (enable) {
+>>>> +        memory_region_init_io(mem, OBJECT(root),
+>>>> +                              &designware_pci_host_msi_ops,
+>>>> +                              root, "pcie-msi", 0x1000);
+>>>> +
+>>>> +        memory_region_add_subregion(address_space, base, mem);
+>>>
+>>>
+>>> What happens if is enabled twice?
+>>
+>> Ideally this shouldn't happen since this function is only called when
+>> PCIE_MSI_INTR0_ENABLE transitions from "All IRQs disabled" to "At
+>> least one IRQ enabled" or the inverse (via "update_msi_mapping" in
+>> designware_pcie_root_config_write).
+>>
+>> But, assuming I got my logic wrong there, my thinking was that if it
+>> gets enabled for the second time, first "if" statement in
+>> designware_pcie_root_update_msi_mapping() would remove old
+>> MemoryRegion and second one would add it back, so it end up being a
+>> "no-op". I might be violating some API usage rules, so, please don't
+>> hesitate to call me out on this if I do.
+>>
+>
+> OK, so I am pretty sure we call "memory_region_init_io" only once
+> in the init/realize part.
+>
+> Then, if the address mappings is getting changed between the calls
+> you can use memory_region_del_subregion/memory_region_add_subregion on up=
+date.
+>
+> If the mappings remains the same you can use memory_region_set_enabled
+> to disable/enable the memory region.
+>
 
+Sounds good. Will do in v5.
 
-Is this a first ioctl with endianness fixed to little-endian? I'd suggest
-to comment on that as things like vfio_info_cap_header do use the host
-endianness.
+>>> Is it possible to be also disabled?
+>>>
+>>
+>> Yes, similar to the case above, except the "if (enabled)" is not going
+>> to be executed and there'd be no MemoryRegion to trigger MSI
+>> interrupt.
+>>
+>>>
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +static DesignwarePCIEViewport *
+>>>> +designware_pcie_root_get_current_viewport(DesignwarePCIERoot *root)
+>>>> +{
+>>>> +    const unsigned int idx =3D root->atu_viewport & 0xF;
+>>>> +    const unsigned int dir =3D !!(root->atu_viewport &
+>>>> PCIE_ATU_REGION_INBOUND);
+>>>> +    return &root->viewports[dir][idx];
+>>>> +}
+>>>> +
+>>>> +static uint32_t
+>>>> +designware_pcie_root_config_read(PCIDevice *d, uint32_t address, int =
+len)
+>>>> +{
+>>>> +    DesignwarePCIERoot *root =3D DESIGNWARE_PCIE_ROOT(d);
+>>>> +    DesignwarePCIEViewport *viewport =3D
+>>>> +        designware_pcie_root_get_current_viewport(root);
+>>>> +
+>>>> +    uint32_t val;
+>>>> +
+>>>> +    switch (address) {
+>>>> +    case PCIE_PORT_LINK_CONTROL:
+>>>> +    case PCIE_LINK_WIDTH_SPEED_CONTROL:
+>>>> +        val =3D 0xDEADBEEF;
+>>>> +        /* No-op */
+>>>
+>>>
+>>> Not really a no-op
+>>>
+>>
+>> What I meant by "no-op" is that those registers do not implement their
+>> actual function and instead return obviously bogus value. I'll change
+>> the comment to state that in a more explicit way.
+>>
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_ADDR_LO:
+>>>> +        val =3D root->msi.base;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_ADDR_HI:
+>>>> +        val =3D root->msi.base >> 32;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_INTR0_ENABLE:
+>>>> +        val =3D root->msi.intr[0].enable;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_INTR0_MASK:
+>>>> +        val =3D root->msi.intr[0].mask;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_INTR0_STATUS:
+>>>> +        val =3D root->msi.intr[0].status;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_PHY_DEBUG_R1:
+>>>> +        val =3D PCIE_PHY_DEBUG_R1_XMLH_LINK_UP;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_VIEWPORT:
+>>>> +        val =3D root->atu_viewport;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_LOWER_BASE:
+>>>> +        val =3D viewport->base;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_UPPER_BASE:
+>>>> +        val =3D viewport->base >> 32;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_LOWER_TARGET:
+>>>> +        val =3D viewport->target;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_UPPER_TARGET:
+>>>> +        val =3D viewport->target >> 32;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_LIMIT:
+>>>> +        val =3D viewport->limit;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_CR1:
+>>>> +    case PCIE_ATU_CR2:          /* FALLTHROUGH */
+>>>> +        val =3D viewport->cr[(address - PCIE_ATU_CR1) / sizeof(uint32=
+_t)];
+>>>> +        break;
+>>>> +
+>>>> +    default:
+>>>> +        val =3D pci_default_read_config(d, address, len);
+>>>> +        break;
+>>>> +    }
+>>>> +
+>>>> +    return val;
+>>>> +}
+>>>> +
+>>>> +static uint64_t designware_pcie_root_data_read(void *opaque,
+>>>> +                                               hwaddr addr, unsigned =
+len)
+>>>> +{
+>>>> +    DesignwarePCIERoot *root =3D DESIGNWARE_PCIE_ROOT(opaque);
+>>>> +    DesignwarePCIEViewport *viewport =3D
+>>>> +        designware_pcie_root_get_current_viewport(root);
+>>>> +
+>>>> +    const uint8_t busnum =3D PCIE_ATU_BUS(viewport->target);
+>>>> +    const uint8_t devfn  =3D PCIE_ATU_DEVFN(viewport->target);
+>>>> +    PCIBus    *pcibus    =3D pci_get_bus(PCI_DEVICE(root));
+>>>> +    PCIDevice *pcidev    =3D pci_find_device(pcibus, busnum, devfn);
+>>>> +
+>>>> +    if (pcidev) {
+>>>> +        addr &=3D PCI_CONFIG_SPACE_SIZE - 1;
+>>>> +
+>>>> +        return pci_host_config_read_common(pcidev, addr,
+>>>> +                                           PCI_CONFIG_SPACE_SIZE, len=
+);
+>>>> +    }
+>>>
+>>> You can use "pci_data_read" instead
+>>
+>> Good to know, will change.
+>>
+>>>>
+>>>> +
+>>>> +    return UINT64_MAX;
+>>>> +}
+>>>> +
+>>>> +static void designware_pcie_root_data_write(void *opaque, hwaddr addr=
+,
+>>>> +                                            uint64_t val, unsigned le=
+n)
+>>>> +{
+>>>> +    DesignwarePCIERoot *root =3D DESIGNWARE_PCIE_ROOT(opaque);
+>>>> +    DesignwarePCIEViewport *viewport =3D
+>>>> +        designware_pcie_root_get_current_viewport(root);
+>>>> +    const uint8_t busnum =3D PCIE_ATU_BUS(viewport->target);
+>>>> +    const uint8_t devfn  =3D PCIE_ATU_DEVFN(viewport->target);
+>>>> +    PCIBus    *pcibus    =3D pci_get_bus(PCI_DEVICE(root));
+>>>> +    PCIDevice *pcidev    =3D pci_find_device(pcibus, busnum, devfn);
+>>>> +
+>>>> +    if (pcidev) {
+>>>> +        addr &=3D PCI_CONFIG_SPACE_SIZE - 1;
+>>>> +        pci_host_config_write_common(pcidev, addr,
+>>>> +                                     PCI_CONFIG_SPACE_SIZE,
+>>>> +                                     val, len);
+>>>> +    }
+>>>
+>>> You can use pci_data_write instead.
+>>>
+>>
+>> Ditto.
+>>
+>>>> +}
+>>>> +
+>>>> +const MemoryRegionOps designware_pci_host_conf_ops =3D {
+>>>> +    .read =3D designware_pcie_root_data_read,
+>>>> +    .write =3D designware_pcie_root_data_write,
+>>>> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+>>>
+>>>
+>>> Maybe you want to limit the access size also here.
+>>>
+>>
+>> OK, will do.
+>>
+>>>> +};
+>>>> +
+>>>> +static void designware_pcie_update_viewport(DesignwarePCIERoot *root,
+>>>> +                                            DesignwarePCIEViewport
+>>>> *viewport)
+>>>> +{
+>>>> +    DesignwarePCIEHost *host =3D designware_pcie_root_to_host(root);
+>>>> +
+>>>> +    MemoryRegion *mem     =3D &viewport->memory;
+>>>> +    const uint64_t target =3D viewport->target;
+>>>> +    const uint64_t base   =3D viewport->base;
+>>>> +    const uint64_t size   =3D (uint64_t)viewport->limit - base + 1;
+>>>> +    const bool inbound    =3D viewport->inbound;
+>>>> +
+>>>> +    MemoryRegion *source, *destination;
+>>>> +    const char *direction;
+>>>> +    char *name;
+>>>> +
+>>>> +    if (inbound) {
+>>>> +        source      =3D &host->pci.address_space_root;
+>>>> +        destination =3D get_system_memory();
+>>>> +        direction   =3D "Inbound";
+>>>> +    } else {
+>>>> +        source      =3D get_system_memory();
+>>>> +        destination =3D &host->pci.memory;
+>>>> +        direction   =3D "Outbound";
+>>>> +    }
+>>>> +
+>>>> +    if (memory_region_is_mapped(mem)) {
+>>>> +        /* Before we modify anything, unmap and destroy the region */
+>>>
+>>>
+>>> I saw this also before. Can you please explain a little
+>>> why/when do you need to destroy prev mappings?
+>>>
+>>
+>> They are going to be updated every time a viewport (inbound or
+>> outbound) in address translation unit (iATU) is reconfigured. Because
+>> PCIE_ATU_*_TARGET register is used to configure which deivce/bus to
+>> address outgoing configuration TLP to, they (viewports) get
+>> reconfigured quite a bit. Corresponding functions in Linux kernel
+>> would be dw_pcie_prog_outbound_atu() and dw_pcie_rd_other_conf(). I
+>> wouldn't be surprised that the way I went about implementing it is far
+>> from optimal, so let me know if it is.
+>>
+>
+> The same as above, I think memory_region_init_io should be used once.
+>
 
+Will do in v5.
 
+>
+>>>> +        memory_region_del_subregion(source, mem);
+>>>> +        object_unparent(OBJECT(mem));
+>>>> +    }
+>>>> +
+>>>> +    name =3D g_strdup_printf("PCI %s Viewport %p", direction, viewpor=
+t);
+>>>> +
+>>>> +    switch (viewport->cr[0]) {
+>>>> +    case PCIE_ATU_TYPE_MEM:
+>>>> +        memory_region_init_alias(mem, OBJECT(root), name,
+>>>> +                                 destination, target, size);
+>>>> +        break;
+>>>> +    case PCIE_ATU_TYPE_CFG0:
+>>>> +    case PCIE_ATU_TYPE_CFG1:    /* FALLTHROUGH */
+>>>> +        if (inbound) {
+>>>> +            goto exit;
+>>>> +        }
+>>>> +
+>>>> +        memory_region_init_io(mem, OBJECT(root),
+>>>> +                              &designware_pci_host_conf_ops,
+>>>> +                              root, name, size);
+>>>> +        break;
+>>>> +    }
+>>>> +
+>>>> +    if (inbound) {
+>>>> +        memory_region_add_subregion_overlap(source, base,
+>>>> +                                            mem, -1);
+>>>> +    } else {
+>>>> +        memory_region_add_subregion(source, base, mem);
+>>>> +    }
+>>>> +
+>>>> + exit:
+>>>> +    g_free(name);
+>>>> +}
+>>>> +
+>>>> +static void designware_pcie_root_config_write(PCIDevice *d, uint32_t
+>>>> address,
+>>>> +                                              uint32_t val, int len)
+>>>> +{
+>>>> +    DesignwarePCIERoot *root =3D DESIGNWARE_PCIE_ROOT(d);
+>>>> +    DesignwarePCIEHost *host =3D designware_pcie_root_to_host(root);
+>>>> +    DesignwarePCIEViewport *viewport =3D
+>>>> +        designware_pcie_root_get_current_viewport(root);
+>>>> +
+>>>> +    switch (address) {
+>>>> +    case PCIE_PORT_LINK_CONTROL:
+>>>> +    case PCIE_LINK_WIDTH_SPEED_CONTROL:
+>>>> +    case PCIE_PHY_DEBUG_R1:
+>>>> +        /* No-op */
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_ADDR_LO:
+>>>> +        root->msi.base &=3D 0xFFFFFFFF00000000ULL;
+>>>> +        root->msi.base |=3D val;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_ADDR_HI:
+>>>> +        root->msi.base &=3D 0x00000000FFFFFFFFULL;
+>>>> +        root->msi.base |=3D (uint64_t)val << 32;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_INTR0_ENABLE: {
+>>>> +        const bool update_msi_mapping =3D !root->msi.intr[0].enable ^
+>>>> !!val;
+>>>> +
+>>>> +        root->msi.intr[0].enable =3D val;
+>>>> +
+>>>> +        if (update_msi_mapping) {
+>>>> +            designware_pcie_root_update_msi_mapping(root);
+>>>> +        }
+>>>> +        break;
+>>>> +    }
+>>>> +
+>>>> +    case PCIE_MSI_INTR0_MASK:
+>>>> +        root->msi.intr[0].mask =3D val;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_MSI_INTR0_STATUS:
+>>>> +        root->msi.intr[0].status ^=3D val;
+>>>> +        if (!root->msi.intr[0].status) {
+>>>> +            qemu_set_irq(host->pci.irqs[0], 0);
+>>>> +        }
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_VIEWPORT:
+>>>> +        root->atu_viewport =3D val;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_LOWER_BASE:
+>>>> +        viewport->base &=3D 0xFFFFFFFF00000000ULL;
+>>>> +        viewport->base |=3D val;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_UPPER_BASE:
+>>>> +        viewport->base &=3D 0x00000000FFFFFFFFULL;
+>>>> +        viewport->base |=3D (uint64_t)val << 32;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_LOWER_TARGET:
+>>>> +        viewport->target &=3D 0xFFFFFFFF00000000ULL;
+>>>> +        viewport->target |=3D val;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_UPPER_TARGET:
+>>>> +        viewport->target &=3D 0x00000000FFFFFFFFULL;
+>>>> +        viewport->target |=3D val;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_LIMIT:
+>>>> +        viewport->limit =3D val;
+>>>> +        break;
+>>>> +
+>>>> +    case PCIE_ATU_CR1:
+>>>> +        viewport->cr[0] =3D val;
+>>>> +        break;
+>>>> +    case PCIE_ATU_CR2:
+>>>> +        viewport->cr[1] =3D val;
+>>>> +
+>>>> +        if (viewport->cr[1] & PCIE_ATU_ENABLE) {
+>>>> +            designware_pcie_update_viewport(root, viewport);
+>>>> +         }
+>>>> +        break;
+>>>> +
+>>>> +    default:
+>>>> +        pci_bridge_write_config(d, address, val, len);
+>>>> +        break;
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +static int designware_pcie_root_init(PCIDevice *dev)
+>>>> +{
+>>>
+>>>
+>>> Please use "realize" function rather than init.
+>>> We want to get rid of it eventually.
+>>
+>> OK, will do.
+>>
+>>>>
+>>>> +    DesignwarePCIERoot *root =3D DESIGNWARE_PCIE_ROOT(dev);
+>>>> +    PCIBridge *br =3D PCI_BRIDGE(dev);
+>>>> +    DesignwarePCIEViewport *viewport;
+>>>> +    size_t i;
+>>>> +
+>>>> +    br->bus_name  =3D "dw-pcie";
+>>>> +
+>>>> +    pci_set_word(dev->config + PCI_COMMAND,
+>>>> +                 PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
+>>>> +
+>>>> +    pci_config_set_interrupt_pin(dev->config, 1);
+>>>> +    pci_bridge_initfn(dev, TYPE_PCI_BUS);
+>>>
+>>> So this is a PCI Express Root Port "sitting" on PCI bus?
+>>
+>> Yes, it is a built-in PCIe bridge, whose configuration space is mapped
+>> into CPU's address space (designware_pci_host_conf_ops) and the rest
+>> of PCIe hierarchy is presented through it.
+>
+> My point was: is the bus PCIe or PCI? Because you used:
+>   pci_bridge_initfn(dev, TYPE_PCI_BUS);
+> and not
+>   pci_bridge_initfn(dev, TYPE_PCIE_BUS);
+>
 
-> +
->  /* -------- API for Type1 VFIO IOMMU -------- */
->  
->  /**
-> 
+Oops, my bad. Will fix in v5.
 
+>>
+>>>
+>>>> +
+>>>> +    pcie_port_init_reg(dev);
+>>>> +
+>>>> +    pcie_cap_init(dev, 0x70, PCI_EXP_TYPE_ROOT_PORT,
+>>>> +                  0, &error_fatal);
+>>>> +
+>>>> +    msi_nonbroken =3D true;
+>>>> +    msi_init(dev, 0x50, 32, true, true, &error_fatal);
+>>>> +
+>>>> +    for (i =3D 0; i < DESIGNWARE_PCIE_NUM_VIEWPORTS; i++) {
+>>>> +        viewport =3D &root->viewports[DESIGNWARE_PCIE_VIEWPORT_INBOUN=
+D][i];
+>>>> +        viewport->inbound =3D true;
+>>>> +    }
+>>>> +
+>>>> +    /*
+>>>> +     * If no inbound iATU windows are configured, HW defaults to
+>>>> +     * letting inbound TLPs to pass in. We emulate that by exlicitly
+>>>> +     * configuring first inbound window to cover all of target's
+>>>> +     * address space.
+>>>> +     *
+>>>> +     * NOTE: This will not work correctly for the case when first
+>>>> +     * configured inbound window is window 0
+>>>> +     */
+>>>> +    viewport =3D &root->viewports[DESIGNWARE_PCIE_VIEWPORT_INBOUND][0=
+];
+>>>> +    viewport->base   =3D 0x0000000000000000ULL;
+>>>> +    viewport->target =3D 0x0000000000000000ULL;
+>>>> +    viewport->limit  =3D UINT32_MAX;
+>>>> +    viewport->cr[0]  =3D PCIE_ATU_TYPE_MEM;
+>>>> +
+>>>> +    designware_pcie_update_viewport(root, viewport);
+>>>> +
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +static void designware_pcie_set_irq(void *opaque, int irq_num, int le=
+vel)
+>>>> +{
+>>>> +    DesignwarePCIEHost *host =3D DESIGNWARE_PCIE_HOST(opaque);
+>>>> +
+>>>> +    qemu_set_irq(host->pci.irqs[irq_num], level);
+>>>> +}
+>>>> +
+>>>> +static const char *designware_pcie_host_root_bus_path(PCIHostState
+>>>> *host_bridge,
+>>>> +                                                      PCIBus *rootbus=
+)
+>>>> +{
+>>>> +    return "0000:00";
+>>>> +}
+>>>> +
+>>>> +
+>>>> +static void designware_pcie_root_class_init(ObjectClass *klass, void
+>>>> *data)
+>>>> +{
+>>>> +    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+>>>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>>>> +
+>>>> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>>>> +
+>>>> +    k->vendor_id =3D PCI_VENDOR_ID_SYNOPSYS;
+>>>> +    k->device_id =3D 0xABCD;
+>>>> +    k->revision =3D 0;
+>>>> +    k->class_id =3D PCI_CLASS_BRIDGE_HOST;
+>>>
+>>> So is a Root Port with call is "BRIDGE_HOST" ?
+>>>
+>>
+>> I think I am missing some PCI subsystem knowledge to understand that
+>> question, would you mind re-phrasing it?
+>
+> Sure, a Root Port is a type of PCI bridge, so I was expecting
+> the class id to be: PCI_CLASS_BRIDGE_PCI and not PCI_CLASS_BRIDGE_HOST.
+>
 
--- 
-Alexey
+Yeah, that just mistake on my part since real HW reports
+0604/PCI_CLASS_BRIDGE_PCI. Will fix in v5.
+
+Thanks,
+Andrey Smirnov
