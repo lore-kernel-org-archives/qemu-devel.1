@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejOVa-0002ui-PY
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:07:32 -0500
+	(envelope-from <lersek@redhat.com>) id 1ejOYl-00060U-Ux
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:10:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejOVX-0005Ac-6v
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:07:26 -0500
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:35633)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejOVW-00059q-VG
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:07:23 -0500
-Received: by mail-ot0-x22b.google.com with SMTP id a2so576808otf.2
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 04:07:22 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180205230900.11344-1-ehabkost@redhat.com>
-References: <20180205230900.11344-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Feb 2018 12:07:02 +0000
-Message-ID: <CAFEAcA_MsgdkO2JWrukJ36Bn-645oJJvTn7pQ2LKnTR6BCaG=w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/21] Python queue, 2018-02-05
+	(envelope-from <lersek@redhat.com>) id 1ejOYg-0006nY-5S
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:10:43 -0500
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Wed,  7 Feb 2018 13:10:27 +0100
+Message-Id: <20180207121027.32466-1-lersek@redhat.com>
+Subject: [Qemu-devel] [PATCH] pci-bridge/i82801b11: clear bridge registers
+ on platform reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +18,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+To: qemu devel list <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-stable@nongnu.org
 
-On 5 February 2018 at 23:08, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit f24ee107a07f093bd7ed475dd48d7ba57ea3d8fe:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180202-pull-request' into staging (2018-02-02 18:54:11 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 356dc290f0ef930a24b6af3a0908b1cb58ad47c9:
->
->   docker: change Fedora images to run with python3 (2018-02-05 19:53:55 -0200)
->
-> ----------------------------------------------------------------
-> Python queue, 2018-02-05
->
-> ----------------------------------------------------------------
+The "i82801b11-bridge" device model is a descendant of "base-pci-bridge"
+(TYPE_PCI_BRIDGE). However, unlike other similar devices, such as
 
-Applied, thanks. (I've also updated one of my local build configs
-to use --with-python=python3; thanks to Daniel Berrange for the suggestion.)
+- pci-bridge,
+- pcie-pci-bridge,
+- PCIE Root Port,
+- xio3130 switch upstream and downstream ports,
+- dec-21154-p2p-bridge,
+- pbm-bridge,
+- xilinx-pcie-root,
 
--- PMM
+"i82801b11-bridge" does not clear the bridge specific registers at
+platform reset.
+
+This is a problem because devices on "i82801b11-bridge" continue to
+respond to config space cycles after platform reset, when addressed with
+the bus number that was previously programmed into the secondary bus
+number register of "i82801b11-bridge". This error breaks OVMF's search for
+extra (PXB) root buses, for example.
+
+The device class reset method for "i82801b11-bridge" is currently NULL;
+set it directly to pci_bridge_reset(), like the last three bridge models
+in the above listing do.
+
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-stable@nongnu.org
+Ref: https://bugzilla.redhat.com/show_bug.cgi?id=1541839
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
+ hw/pci-bridge/i82801b11.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+index cb522bf30c31..ebf7f5f0e81c 100644
+--- a/hw/pci-bridge/i82801b11.c
++++ b/hw/pci-bridge/i82801b11.c
+@@ -98,6 +98,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
+     k->realize = i82801b11_bridge_realize;
+     k->config_write = pci_bridge_write_config;
+     dc->vmsd = &i82801b11_bridge_dev_vmstate;
++    dc->reset = pci_bridge_reset;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+-- 
+2.14.1.3.gb7cf6e02401b
