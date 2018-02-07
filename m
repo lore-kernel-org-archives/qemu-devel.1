@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejPi4-0001Y7-3t
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:24:25 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ejPn5-0006mt-7x
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:29:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejPi0-0005xt-TZ
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:24:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60904 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejPi0-0005xJ-N9
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:24:20 -0500
-Date: Wed, 7 Feb 2018 13:24:12 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180207132412.GJ2665@work-vm>
-References: <20180207073331.14158-1-haozhong.zhang@intel.com>
-	<20180207073331.14158-8-haozhong.zhang@intel.com>
-	<20180207115406.GD2665@work-vm>
-	<20180207121525.5pyrld36k5xbm373@hz-desktop>
-	<20180207130355.GH2665@work-vm>
-	<20180207132023.yuf2lp3jrhg2qytz@hz-desktop>
+	(envelope-from <borntraeger@de.ibm.com>) id 1ejPn0-0000Y8-G5
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:29:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ejPn0-0000Xe-8m
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:29:30 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w17DTDvZ100562
+	for <qemu-devel@nongnu.org>; Wed, 7 Feb 2018 08:29:28 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fyxt0axnb-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 08:29:28 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 7 Feb 2018 13:29:25 -0000
+References: <20180207123833.211687-1-borntraeger@de.ibm.com>
+	<db339d3b-2425-8055-0c1a-890a6f0d4039@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 7 Feb 2018 14:29:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180207132023.yuf2lp3jrhg2qytz@hz-desktop>
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] migration/ram: ensure write
- persistence on loading compressed pages to PMEM
+In-Reply-To: <db339d3b-2425-8055-0c1a-890a6f0d4039@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1216cef6-00fd-683d-2bf2-1673ee272c0d@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6] s390x/cpu: expose the guest crash
+ information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,146 +43,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
 
-* Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> On 02/07/18 13:03 +0000, Dr. David Alan Gilbert wrote:
-> > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> > > On 02/07/18 11:54 +0000, Dr. David Alan Gilbert wrote:
-> > > > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> > > > > When loading a compressed page to persistent memory, flush CPU cache
-> > > > > after the data is decompressed. Combined with a call to pmem_drain()
-> > > > > at the end of memory loading, we can guarantee those compressed pages
-> > > > > are persistently loaded to PMEM.
-> > > > 
-> > > > Can you explain why this can use the flush and doesn't need the special
-> > > > memset?
-> > > 
-> > > The best approach to ensure the write persistence is to operate pmem
-> > > all via libpmem, e.g., pmem_memcpy_nodrain() + pmem_drain(). However,
-> > > the write to pmem in this case is performed by uncompress() which is
-> > > implemented out of QEMU and libpmem. It may or may not use libpmem,
-> > > which is not controlled by QEMU. Therefore, we have to use the less
-> > > optimal approach, that is to flush cache for all pmem addresses that
-> > > uncompress() may have written, i.e.,/e.g., memcpy() and/or memset() in
-> > > uncompress(), and pmem_flush() + pmem_drain() in QEMU.
-> > 
-> > In what way is it less optimal?
-> > If that's a legal thing to do, then why not just do a pmem_flush +
-> > pmem_drain right at the end of the ram loading and leave all the rest of
-> > the code untouched?
+
+
+On 02/07/2018 02:21 PM, David Hildenbrand wrote:
+> On 07.02.2018 13:38, Christian Borntraeger wrote:
+>> This patch is the s390 implementation of guest crash information,
+>> similar to commit d187e08dc4 ("i386/cpu: add crash-information QOM
+>> property") and the related commits. We will detect several crash
+>> reasons, with the "disabled wait" being the most important one, since
+>> this is used by all s390 guests as a "panic like" notification.
+>>
+>> Demonstrate these ways with examples as follows.
+>>
+>>   1. crash-information QOM property;
+>>
+>>   Run qemu with -qmp unix:qmp-sock,server, then use utility "qmp-shell"
+>>   to execute "qom-get" command, and might get the result like,
+>>
+>>   (QEMU) (QEMU) qom-get path=/machine/unattached/device[0] \
+>>       property=crash-information
+>>   {"return": {"core": 0, "reason": "disabledwait", "psw-mask": 562956395872256, \
+>>       "type": "s390", "psw-addr": 1102832}}
+>>
+>>   2. GUEST_PANICKED event reporting;
+>>
+>>   Run qemu with a socket option, and telnet or nc to that,
+>>   -chardev socket,id=qmp,port=4444,host=localhost,server \
+>>   -mon chardev=qmp,mode=control,pretty=on \
+>>   Negotiating the mode by { "execute": "qmp_capabilities" }, and the crash
+>>   information will be reported on a guest crash event like,
+>>
+>>   {
+>>     "timestamp": {
+>>         "seconds": 1518004739,
+>>         "microseconds": 552563
+>>     },
+>>     "event": "GUEST_PANICKED",
+>>     "data": {
+>>         "action": "pause",
+>>         "info": {
+>>             "core": 0,
+>>             "psw-addr": 1102832,
+>>             "reason": "disabledwait",
+>>             "psw-mask": 562956395872256,
+>>             "type": "s390"
+>>         }
+>>     }
+>>   }
+>>
+>>   3. log;
+>>
+>>   Run qemu with the parameters: -D <logfile> -d guest_errors, to
+>>   specify the logfile and log item. The results might be,
+>>
+>>   Guest crashed on cpu 0: disabledwait
+>>   PSW: 0x0002000180000000 0x000000000010d3f0
+>>
+>> Co-authored-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>> V5->V6: - use qapi enum
+>> 	- add core id to the crash parameters
+>> 	- indent fixes
+>> 	- rework debug log message to reuse the enum string
+>> 	- update patch description
+>>
+>>  qapi/run-state.json   | 54 +++++++++++++++++++++++++++++++++++++++++++++++++--
+>>  target/s390x/cpu.c    | 41 ++++++++++++++++++++++++++++++++++++++
+>>  target/s390x/cpu.h    |  2 ++
+>>  target/s390x/helper.c |  5 ++++-
+>>  target/s390x/kvm.c    | 15 +++++++-------
+>>  vl.c                  | 12 ++++++++++--
+>>  6 files changed, 116 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/qapi/run-state.json b/qapi/run-state.json
+>> index bca46a8785..328c86b4bb 100644
+>> --- a/qapi/run-state.json
+>> +++ b/qapi/run-state.json
+>> @@ -320,22 +320,29 @@
+>>  #
+>>  # An enumeration of the guest panic information types
+>>  #
+>> +# @hyper-v: hyper-v guest panic information type
+>> +#
+>> +# @s390: s390 guest panic information type (Since: 2.12)
+>> +#
+>>  # Since: 2.9
+>>  ##
+>>  { 'enum': 'GuestPanicInformationType',
+>> -  'data': [ 'hyper-v'] }
+>> +  'data': [ 'hyper-v', 's390' ] }
+>>  
+>>  ##
+>>  # @GuestPanicInformation:
+>>  #
+>>  # Information about a guest panic
+>>  #
+>> +# @type: Crash type that defines the hypervisor specific information
+>> +#
+>>  # Since: 2.9
+>>  ##
+>>  {'union': 'GuestPanicInformation',
+>>   'base': {'type': 'GuestPanicInformationType'},
+>>   'discriminator': 'type',
+>> - 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
+>> + 'data': { 'hyper-v': 'GuestPanicInformationHyperV',
+>> +           's390': 'GuestPanicInformationS390' } }
+>>  
+>>  ##
+>>  # @GuestPanicInformationHyperV:
+>> @@ -350,3 +357,46 @@
+>>             'arg3': 'uint64',
+>>             'arg4': 'uint64',
+>>             'arg5': 'uint64' } }
+>> +
+>> +##
+>> +# @S390CrashReason:
+>> +#
+>> +# Reason why the CPU is in a crashed state.
+>> +#
+>> +# @unknown: no crash reason was set
+>> +#
+>> +# @disabledwait: the CPU has entered a disabled wait state
+>> +#
+>> +# @extintloop: timer interrupt with new PSW enabled for timer
 > 
-> For example, the implementation pmem_memcpy_nodrain() prefers to use
-> movnt instructions w/o flush to write pmem if those instructions are
-> available, and falls back to memcpy() + flush if movnt are not
-> available, so I suppose the latter is less optimal.
+> Is this CPU timer or CKC? Or both?
 
-But if you use normal memcpy calls to copy a few GB of RAM in an
-incoming migrate and then do a single flush at the end, isn't that
-better?
-
-Dave
-
-> Haozhong
-> 
-> > 
-> > Dave
-> > 
-> > > Haozhong
-> > > 
-> > > > 
-> > > > Dave
-> > > > 
-> > > > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > > > > ---
-> > > > >  include/qemu/pmem.h |  4 ++++
-> > > > >  migration/ram.c     | 16 +++++++++++-----
-> > > > >  2 files changed, 15 insertions(+), 5 deletions(-)
-> > > > > 
-> > > > > diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
-> > > > > index 77ee1fc4eb..20e3f6e71d 100644
-> > > > > --- a/include/qemu/pmem.h
-> > > > > +++ b/include/qemu/pmem.h
-> > > > > @@ -37,6 +37,10 @@ static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
-> > > > >      return memset(pmemdest, c, len);
-> > > > >  }
-> > > > >  
-> > > > > +static inline void pmem_flush(const void *addr, size_t len)
-> > > > > +{
-> > > > > +}
-> > > > > +
-> > > > >  static inline void pmem_drain(void)
-> > > > >  {
-> > > > >  }
-> > > > > diff --git a/migration/ram.c b/migration/ram.c
-> > > > > index 5a79bbff64..924d2b9537 100644
-> > > > > --- a/migration/ram.c
-> > > > > +++ b/migration/ram.c
-> > > > > @@ -274,6 +274,7 @@ struct DecompressParam {
-> > > > >      void *des;
-> > > > >      uint8_t *compbuf;
-> > > > >      int len;
-> > > > > +    bool is_pmem;
-> > > > >  };
-> > > > >  typedef struct DecompressParam DecompressParam;
-> > > > >  
-> > > > > @@ -2502,7 +2503,7 @@ static void *do_data_decompress(void *opaque)
-> > > > >      DecompressParam *param = opaque;
-> > > > >      unsigned long pagesize;
-> > > > >      uint8_t *des;
-> > > > > -    int len;
-> > > > > +    int len, rc;
-> > > > >  
-> > > > >      qemu_mutex_lock(&param->mutex);
-> > > > >      while (!param->quit) {
-> > > > > @@ -2518,8 +2519,11 @@ static void *do_data_decompress(void *opaque)
-> > > > >               * not a problem because the dirty page will be retransferred
-> > > > >               * and uncompress() won't break the data in other pages.
-> > > > >               */
-> > > > > -            uncompress((Bytef *)des, &pagesize,
-> > > > > -                       (const Bytef *)param->compbuf, len);
-> > > > > +            rc = uncompress((Bytef *)des, &pagesize,
-> > > > > +                            (const Bytef *)param->compbuf, len);
-> > > > > +            if (rc == Z_OK && param->is_pmem) {
-> > > > > +                pmem_flush(des, len);
-> > > > > +            }
-> > > > >  
-> > > > >              qemu_mutex_lock(&decomp_done_lock);
-> > > > >              param->done = true;
-> > > > > @@ -2605,7 +2609,8 @@ static void compress_threads_load_cleanup(void)
-> > > > >  }
-> > > > >  
-> > > > >  static void decompress_data_with_multi_threads(QEMUFile *f,
-> > > > > -                                               void *host, int len)
-> > > > > +                                               void *host, int len,
-> > > > > +                                               bool is_pmem)
-> > > > >  {
-> > > > >      int idx, thread_count;
-> > > > >  
-> > > > > @@ -2619,6 +2624,7 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
-> > > > >                  qemu_get_buffer(f, decomp_param[idx].compbuf, len);
-> > > > >                  decomp_param[idx].des = host;
-> > > > >                  decomp_param[idx].len = len;
-> > > > > +                decomp_param[idx].is_pmem = is_pmem;
-> > > > >                  qemu_cond_signal(&decomp_param[idx].cond);
-> > > > >                  qemu_mutex_unlock(&decomp_param[idx].mutex);
-> > > > >                  break;
-> > > > > @@ -2964,7 +2970,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-> > > > >                  ret = -EINVAL;
-> > > > >                  break;
-> > > > >              }
-> > > > > -            decompress_data_with_multi_threads(f, host, len);
-> > > > > +            decompress_data_with_multi_threads(f, host, len, is_pmem);
-> > > > >              break;
-> > > > >  
-> > > > >          case RAM_SAVE_FLAG_XBZRLE:
-> > > > > -- 
-> > > > > 2.14.1
-> > > > > 
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+both. The kernel will give this to QEMU if one timer is going to be
+delivered but the new PSW is enabled for external interrupts.
