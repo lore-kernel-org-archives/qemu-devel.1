@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejQha-0001RO-WB
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:28:00 -0500
+	(envelope-from <piotr.jerzy.jurkiewicz@gmail.com>)
+	id 1ejGjM-0008Hu-1e
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 22:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejQhX-0002AE-Gl
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:27:58 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
-	<20180207042438.15422-14-andrew.smirnov@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cb7e0d04-9de7-43c2-d9e3-e900d1d9b7f8@amsat.org>
-Date: Wed, 7 Feb 2018 11:27:51 -0300
+	(envelope-from <piotr.jerzy.jurkiewicz@gmail.com>)
+	id 1ejGjH-00075w-6G
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 22:49:08 -0500
+Received: from mail-lf0-x230.google.com ([2a00:1450:4010:c07::230]:43486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <piotr.jerzy.jurkiewicz@gmail.com>)
+	id 1ejGjG-00075C-UA
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 22:49:03 -0500
+Received: by mail-lf0-x230.google.com with SMTP id o89so5799894lfg.10
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 19:49:02 -0800 (PST)
+Received: from [192.168.1.100] (static-202-152.is.net.pl. [217.144.202.152])
+	by smtp.googlemail.com with ESMTPSA id
+	s185sm100103lfs.71.2018.02.06.19.48.59 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 06 Feb 2018 19:48:59 -0800 (PST)
+From: Piotr Jurkiewicz <piotr.jerzy.jurkiewicz@gmail.com>
+Message-ID: <a54566c9-a54d-4d7f-35e3-6f94ae99bc06@gmail.com>
+Date: Wed, 7 Feb 2018 04:48:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180207042438.15422-14-andrew.smirnov@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 13/14] hw/arm: Move virt's PSCI DT fixup
- code to arm/boot.c
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Allow to use virtfs as overlayfs upper dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,193 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
+To: qemu-devel@nongnu.org
 
-On 02/07/2018 01:24 AM, Andrey Smirnov wrote:
-> Move virt's PSCI DT fixup code to arm/boot.c and set this fixup to
-> happen automatically for every board that doesn't mark "psci-conduit"
-> as disabled. This way emulated boards other than "virt" that rely on
-> PSIC for SMP could benefit from that code.
-> 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Hi,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+in order to obtain Docker-like experience I am trying to set up 
+overlayfs merged directory inside VM. Both upper and lower directories 
+are mounted with virtfs/9pfs from outside of the VM. However, current 
+implementation of virtfs makes its usage as upper filesystem impossible.
 
-> ---
->  hw/arm/boot.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/arm/virt.c | 61 -------------------------------------------------------
->  2 files changed, 65 insertions(+), 61 deletions(-)
-> 
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index c2720c8046..18ada9152c 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -384,6 +384,69 @@ static void set_kernel_args_old(const struct arm_boot_info *info)
->      }
->  }
->  
-> +static void fdt_add_psci_node(void *fdt)
-> +{
-> +    uint32_t cpu_suspend_fn;
-> +    uint32_t cpu_off_fn;
-> +    uint32_t cpu_on_fn;
-> +    uint32_t migrate_fn;
-> +    ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(0));
-> +    const char *psci_method;
-> +    int64_t psci_conduit;
-> +
-> +    psci_conduit = object_property_get_int(OBJECT(armcpu),
-> +                                           "psci-conduit",
-> +                                           &error_abort);
-> +    switch (psci_conduit) {
-> +    case QEMU_PSCI_CONDUIT_DISABLED:
-> +        return;
-> +    case QEMU_PSCI_CONDUIT_HVC:
-> +        psci_method = "hvc";
-> +        break;
-> +    case QEMU_PSCI_CONDUIT_SMC:
-> +        psci_method = "smc";
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    qemu_fdt_add_subnode(fdt, "/psci");
-> +    if (armcpu->psci_version == 2) {
-> +        const char comp[] = "arm,psci-0.2\0arm,psci";
-> +        qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
-> +
-> +        cpu_off_fn = QEMU_PSCI_0_2_FN_CPU_OFF;
-> +        if (arm_feature(&armcpu->env, ARM_FEATURE_AARCH64)) {
-> +            cpu_suspend_fn = QEMU_PSCI_0_2_FN64_CPU_SUSPEND;
-> +            cpu_on_fn = QEMU_PSCI_0_2_FN64_CPU_ON;
-> +            migrate_fn = QEMU_PSCI_0_2_FN64_MIGRATE;
-> +        } else {
-> +            cpu_suspend_fn = QEMU_PSCI_0_2_FN_CPU_SUSPEND;
-> +            cpu_on_fn = QEMU_PSCI_0_2_FN_CPU_ON;
-> +            migrate_fn = QEMU_PSCI_0_2_FN_MIGRATE;
-> +        }
-> +    } else {
-> +        qemu_fdt_setprop_string(fdt, "/psci", "compatible", "arm,psci");
-> +
-> +        cpu_suspend_fn = QEMU_PSCI_0_1_FN_CPU_SUSPEND;
-> +        cpu_off_fn = QEMU_PSCI_0_1_FN_CPU_OFF;
-> +        cpu_on_fn = QEMU_PSCI_0_1_FN_CPU_ON;
-> +        migrate_fn = QEMU_PSCI_0_1_FN_MIGRATE;
-> +    }
-> +
-> +    /* We adopt the PSCI spec's nomenclature, and use 'conduit' to refer
-> +     * to the instruction that should be used to invoke PSCI functions.
-> +     * However, the device tree binding uses 'method' instead, so that is
-> +     * what we should use here.
-> +     */
-> +    qemu_fdt_setprop_string(fdt, "/psci", "method", psci_method);
-> +
-> +    qemu_fdt_setprop_cell(fdt, "/psci", "cpu_suspend", cpu_suspend_fn);
-> +    qemu_fdt_setprop_cell(fdt, "/psci", "cpu_off", cpu_off_fn);
-> +    qemu_fdt_setprop_cell(fdt, "/psci", "cpu_on", cpu_on_fn);
-> +    qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
-> +}
-> +
->  /**
->   * load_dtb() - load a device tree binary image into memory
->   * @addr:       the address to load the image at
-> @@ -540,6 +603,8 @@ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->          }
->      }
->  
-> +    fdt_add_psci_node(fdt);
-> +
->      if (binfo->modify_dtb) {
->          binfo->modify_dtb(binfo, fdt);
->      }
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index b334c82eda..dbb3c8036a 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -244,66 +244,6 @@ static void create_fdt(VirtMachineState *vms)
->      }
->  }
->  
-> -static void fdt_add_psci_node(const VirtMachineState *vms)
-> -{
-> -    uint32_t cpu_suspend_fn;
-> -    uint32_t cpu_off_fn;
-> -    uint32_t cpu_on_fn;
-> -    uint32_t migrate_fn;
-> -    void *fdt = vms->fdt;
-> -    ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(0));
-> -    const char *psci_method;
-> -
-> -    switch (vms->psci_conduit) {
-> -    case QEMU_PSCI_CONDUIT_DISABLED:
-> -        return;
-> -    case QEMU_PSCI_CONDUIT_HVC:
-> -        psci_method = "hvc";
-> -        break;
-> -    case QEMU_PSCI_CONDUIT_SMC:
-> -        psci_method = "smc";
-> -        break;
-> -    default:
-> -        g_assert_not_reached();
-> -    }
-> -
-> -    qemu_fdt_add_subnode(fdt, "/psci");
-> -    if (armcpu->psci_version == 2) {
-> -        const char comp[] = "arm,psci-0.2\0arm,psci";
-> -        qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
-> -
-> -        cpu_off_fn = QEMU_PSCI_0_2_FN_CPU_OFF;
-> -        if (arm_feature(&armcpu->env, ARM_FEATURE_AARCH64)) {
-> -            cpu_suspend_fn = QEMU_PSCI_0_2_FN64_CPU_SUSPEND;
-> -            cpu_on_fn = QEMU_PSCI_0_2_FN64_CPU_ON;
-> -            migrate_fn = QEMU_PSCI_0_2_FN64_MIGRATE;
-> -        } else {
-> -            cpu_suspend_fn = QEMU_PSCI_0_2_FN_CPU_SUSPEND;
-> -            cpu_on_fn = QEMU_PSCI_0_2_FN_CPU_ON;
-> -            migrate_fn = QEMU_PSCI_0_2_FN_MIGRATE;
-> -        }
-> -    } else {
-> -        qemu_fdt_setprop_string(fdt, "/psci", "compatible", "arm,psci");
-> -
-> -        cpu_suspend_fn = QEMU_PSCI_0_1_FN_CPU_SUSPEND;
-> -        cpu_off_fn = QEMU_PSCI_0_1_FN_CPU_OFF;
-> -        cpu_on_fn = QEMU_PSCI_0_1_FN_CPU_ON;
-> -        migrate_fn = QEMU_PSCI_0_1_FN_MIGRATE;
-> -    }
-> -
-> -    /* We adopt the PSCI spec's nomenclature, and use 'conduit' to refer
-> -     * to the instruction that should be used to invoke PSCI functions.
-> -     * However, the device tree binding uses 'method' instead, so that is
-> -     * what we should use here.
-> -     */
-> -    qemu_fdt_setprop_string(fdt, "/psci", "method", psci_method);
-> -
-> -    qemu_fdt_setprop_cell(fdt, "/psci", "cpu_suspend", cpu_suspend_fn);
-> -    qemu_fdt_setprop_cell(fdt, "/psci", "cpu_off", cpu_off_fn);
-> -    qemu_fdt_setprop_cell(fdt, "/psci", "cpu_on", cpu_on_fn);
-> -    qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
-> -}
-> -
->  static void fdt_add_timer_nodes(const VirtMachineState *vms)
->  {
->      /* On real hardware these interrupts are level-triggered.
-> @@ -1409,7 +1349,6 @@ static void machvirt_init(MachineState *machine)
->      }
->      fdt_add_timer_nodes(vms);
->      fdt_add_cpu_nodes(vms);
-> -    fdt_add_psci_node(vms);
->  
->      memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
->                                           machine->ram_size);
-> 
+1. Upper filesystem must support the creation of trusted.* extended 
+attributes.
+
+9pfs has support for getting/setting xattrs, but calls operating on 
+attributes other than user.* and system.posix_acl_* are dropped.
+
+2. Upper filesystem must provide valid d_type in readdir responses.
+
+This works, but only in case of 'passtrough' and 'none' security models. 
+In the case of 'mapped-xattr' and 'mapped-file' models, d_type is being 
+zeroes to DT_UNKNOWN during readdir() call.
+
+All these limitations can be resolved pretty easily, but requires some 
+design decisions. I can prepare appropriate patches.
+
+Ad. 1.
+
+Why are operations on attributes other than than user.* and 
+system.posix_acl_* forbidden? Is this due to security reasons?
+
+If so, can we map all of them to user.virtfs namespace, similarly as 
+system.posix_acl_* are being mapped to user.virtfs.system.posix_acl_* in 
+'mapping' mode already? This way any trusted/security/system attributes 
+will be effective only when mounted via virtfs inside VM.
+
+Ad. 2.
+
+local_readdir() can fill entry->d_type with the right DT_* value by 
+obtaining file type from mapping and translating it with IFTODT() macro. 
+This would, however, require reading 'user.virtfs.mode' for each 
+direntry during readdir() call, what can affect performance. If so, this 
+behavior would probably need to be controlled with some runtime option.
+
+'mapped-xattr' and 'mapped-file' models are essential for running qemu 
+with overlayfs as non-root, because overlayfs creates device nodes, what 
+is possible for unprivileged user only with these models.
+
+I am looking forward for your opinions.
+
+Piotr
