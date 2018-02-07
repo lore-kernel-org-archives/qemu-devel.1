@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIL-0000HE-B7
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:18 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIN-0000Jr-J3
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIJ-0003BU-MF
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:17 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejHIM-0003HM-GQ
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 23:25:19 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Tue,  6 Feb 2018 20:24:29 -0800
-Message-Id: <20180207042438.15422-6-andrew.smirnov@gmail.com>
+Date: Tue,  6 Feb 2018 20:24:31 -0800
+Message-Id: <20180207042438.15422-8-andrew.smirnov@gmail.com>
 In-Reply-To: <20180207042438.15422-1-andrew.smirnov@gmail.com>
 References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 05/14] i.MX: Add code to emulate i.MX7 SNVS
- IP-block
+Subject: [Qemu-devel] [PATCH v5 07/14] i.MX: Add i.MX7 GPT variant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +25,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Add code to emulate SNVS IP-block. Currently only the bits needed to
-be able to emulate machine shutdown are implemented.
+Add minimal code needed to allow upstream Linux guest to boot.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -37,157 +35,80 @@ Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/misc/Makefile.objs       |  1 +
- hw/misc/imx7_snvs.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
- 3 files changed, 119 insertions(+)
- create mode 100644 hw/misc/imx7_snvs.c
- create mode 100644 include/hw/misc/imx7_snvs.h
+ hw/timer/imx_gpt.c         | 25 +++++++++++++++++++++++++
+ include/hw/timer/imx_gpt.h |  1 +
+ 2 files changed, 26 insertions(+)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 4b2b705a6c..019886912c 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx6_ccm.o
- obj-$(CONFIG_IMX) += imx6_src.o
- obj-$(CONFIG_IMX) += imx7_ccm.o
- obj-$(CONFIG_IMX) += imx2_wdt.o
-+obj-$(CONFIG_IMX) += imx7_snvs.o
- obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
- obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
- obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
-new file mode 100644
-index 0000000000..4df482b282
---- /dev/null
-+++ b/hw/misc/imx7_snvs.c
-@@ -0,0 +1,83 @@
-+/*
-+ * IMX7 Secure Non-Volatile Storage
-+ *
-+ * Copyright (c) 2018, Impinj, Inc.
-+ *
-+ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ * Bare minimum emulation code needed to support being able to shut
-+ * down linux guest gracefully.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/misc/imx7_snvs.h"
-+#include "qemu/log.h"
-+#include "sysemu/sysemu.h"
-+
-+static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    return 0;
-+}
-+
-+static void imx7_snvs_write(void *opaque, hwaddr offset,
-+                            uint64_t v, unsigned size)
-+{
-+    const uint32_t value = v;
-+    const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
-+
-+    if (offset == SNVS_LPCR && ((value & mask) == mask)) {
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+    }
-+}
-+
-+static const struct MemoryRegionOps imx7_snvs_ops = {
-+    .read = imx7_snvs_read,
-+    .write = imx7_snvs_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        /*
-+         * Our device would not work correctly if the guest was doing
-+         * unaligned access. This might not be a limitation on the real
-+         * device but in practice there is no reason for a guest to access
-+         * this device unaligned.
-+         */
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false,
-+    },
+diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
+index 4b9b54bf2e..65e4ee6bcf 100644
+--- a/hw/timer/imx_gpt.c
++++ b/hw/timer/imx_gpt.c
+@@ -113,6 +113,17 @@ static const IMXClk imx6_gpt_clocks[] = {
+     CLK_HIGH,      /* 111 reference clock */
+ };
+ 
++static const IMXClk imx7_gpt_clocks[] = {
++    CLK_NONE,      /* 000 No clock source */
++    CLK_IPG,       /* 001 ipg_clk, 532MHz*/
++    CLK_IPG_HIGH,  /* 010 ipg_clk_highfreq */
++    CLK_EXT,       /* 011 External clock */
++    CLK_32k,       /* 100 ipg_clk_32k */
++    CLK_HIGH,      /* 101 reference clock */
++    CLK_NONE,      /* 110 not defined */
++    CLK_NONE,      /* 111 not defined */
 +};
 +
-+static void imx7_snvs_init(Object *obj)
+ static void imx_gpt_set_freq(IMXGPTState *s)
+ {
+     uint32_t clksrc = extract32(s->cr, GPT_CR_CLKSRC_SHIFT, 3);
+@@ -512,6 +523,13 @@ static void imx6_gpt_init(Object *obj)
+     s->clocks = imx6_gpt_clocks;
+ }
+ 
++static void imx7_gpt_init(Object *obj)
 +{
-+    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7SNVSState *s = IMX7_SNVS(obj);
++    IMXGPTState *s = IMX_GPT(obj);
 +
-+    memory_region_init_io(&s->mmio, obj, &imx7_snvs_ops, s,
-+                          TYPE_IMX7_SNVS, 0x1000);
-+
-+    sysbus_init_mmio(sd, &s->mmio);
++    s->clocks = imx7_gpt_clocks;
 +}
 +
-+static void imx7_snvs_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->desc  = "i.MX7 Secure Non-Volatile Storage Module";
-+}
-+
-+static const TypeInfo imx7_snvs_info = {
-+    .name          = TYPE_IMX7_SNVS,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMX7SNVSState),
-+    .instance_init = imx7_snvs_init,
-+    .class_init    = imx7_snvs_class_init,
+ static const TypeInfo imx25_gpt_info = {
+     .name = TYPE_IMX25_GPT,
+     .parent = TYPE_SYS_BUS_DEVICE,
+@@ -532,11 +550,18 @@ static const TypeInfo imx6_gpt_info = {
+     .instance_init = imx6_gpt_init,
+ };
+ 
++static const TypeInfo imx7_gpt_info = {
++    .name = TYPE_IMX7_GPT,
++    .parent = TYPE_IMX25_GPT,
++    .instance_init = imx7_gpt_init,
 +};
 +
-+static void imx7_snvs_register_type(void)
-+{
-+    type_register_static(&imx7_snvs_info);
-+}
-+type_init(imx7_snvs_register_type)
-diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
-new file mode 100644
-index 0000000000..255f8f26f9
---- /dev/null
-+++ b/include/hw/misc/imx7_snvs.h
-@@ -0,0 +1,35 @@
-+/*
-+ * Copyright (c) 2017, Impinj, Inc.
-+ *
-+ * i.MX7 SNVS block emulation code
-+ *
-+ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef IMX7_SNVS_H
-+#define IMX7_SNVS_H
-+
-+#include "qemu/bitops.h"
-+#include "hw/sysbus.h"
-+
-+
-+enum IMX7SNVSRegisters {
-+    SNVS_LPCR = 0x38,
-+    SNVS_LPCR_TOP   = BIT(6),
-+    SNVS_LPCR_DP_EN = BIT(5)
-+};
-+
-+#define TYPE_IMX7_SNVS "imx7.snvs"
-+#define IMX7_SNVS(obj) OBJECT_CHECK(IMX7SNVSState, (obj), TYPE_IMX7_SNVS)
-+
-+typedef struct IMX7SNVSState {
-+    /* <private> */
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+} IMX7SNVSState;
-+
-+#endif /* IMX7_SNVS_H */
+ static void imx_gpt_register_types(void)
+ {
+     type_register_static(&imx25_gpt_info);
+     type_register_static(&imx31_gpt_info);
+     type_register_static(&imx6_gpt_info);
++    type_register_static(&imx7_gpt_info);
+ }
+ 
+ type_init(imx_gpt_register_types)
+diff --git a/include/hw/timer/imx_gpt.h b/include/hw/timer/imx_gpt.h
+index eac59b2a70..20ccb327c4 100644
+--- a/include/hw/timer/imx_gpt.h
++++ b/include/hw/timer/imx_gpt.h
+@@ -77,6 +77,7 @@
+ #define TYPE_IMX25_GPT "imx25.gpt"
+ #define TYPE_IMX31_GPT "imx31.gpt"
+ #define TYPE_IMX6_GPT "imx6.gpt"
++#define TYPE_IMX7_GPT "imx7.gpt"
+ 
+ #define TYPE_IMX_GPT TYPE_IMX25_GPT
+ 
 -- 
 2.14.3
