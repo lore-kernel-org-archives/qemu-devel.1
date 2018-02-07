@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejS3u-0003la-3S
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ejS4P-0004Er-6o
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejS3s-0006hg-Ed
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:06 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57778 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejS3s-0006hL-8v
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:04 -0500
-Date: Wed, 7 Feb 2018 15:55:01 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180207155500.GO2665@work-vm>
-References: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] migration: improve documentation of
- postcopy-ram
+	(envelope-from <cohuck@redhat.com>) id 1ejS4O-0007B0-9t
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:37 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Wed,  7 Feb 2018 16:55:28 +0100
+Message-Id: <20180207155531.28446-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] s390x: maintainership reorg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +17,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, thuth@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-* Greg Kurz (groug@kaod.org) wrote:
-> This capability must have the same value on both source and destination,
-> otherwise migration fails (commit 875fcd013ab6 "migration: incoming
-> postcopy advise sanity checks").
-> 
-> Let's write it down in various places where postcopy-ram is documented.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Hi,
 
-Thanks,
+s390x maintainership is currently a bit like a huge pile of stuff routed
+through one person who is not even listed as the maintainer for some
+of the areas. Let's try to clean this up a bit.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Patch 1 is basically making official what I actually have been doing in
+the last months; that is, acting as the overall s390x maintainer. There
+does not seem to be the concept of "overall arch maintainer" in MAINTAINERS
+so far, so I added it.
 
-> ---
->  docs/devel/migration.rst |    4 ++--
->  hmp-commands.hx          |    3 ++-
->  qapi/migration.json      |   10 ++++++----
->  3 files changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-> index bf97080dac2f..9d1b7657f0cf 100644
-> --- a/docs/devel/migration.rst
-> +++ b/docs/devel/migration.rst
-> @@ -387,8 +387,8 @@ doesn't finish in a given time the switch is made to postcopy.
->  Enabling postcopy
->  -----------------
->  
-> -To enable postcopy, issue this command on the monitor prior to the
-> -start of migration:
-> +To enable postcopy, issue this command on the monitor (both source and
-> +destination) prior to the start of migration:
->  
->  ``migrate_set_capability postcopy-ram on``
->  
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 15620c94d3fc..d26eb4119b9d 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1041,7 +1041,8 @@ ETEXI
->          .params     = "",
->          .help       = "Followup to a migration command to switch the migration"
->                        " to postcopy mode. The postcopy-ram capability must "
-> -                      "be set before the original migration command.",
-> +                      "be set on both source and destination before the "
-> +                      "original migration command .",
->          .cmd        = hmp_migrate_start_postcopy,
->      },
->  
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 4cd3d1315884..7f465a1902ce 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -327,8 +327,10 @@
->  #          to speed up convergence of RAM migration. (since 1.6)
->  #
->  # @postcopy-ram: Start executing on the migration target before all of RAM has
-> -#          been migrated, pulling the remaining pages along as needed. NOTE: If
-> -#          the migration fails during postcopy the VM will fail.  (since 2.6)
-> +#          been migrated, pulling the remaining pages along as needed. The
-> +#          capacity must have the same setting on both source and target
-> +#          or migration will not even start. NOTE: If the migration fails during
-> +#          postcopy the VM will fail.  (since 2.6)
->  #
->  # @x-colo: If enabled, migration will never end, and the state of the VM on the
->  #        primary side will be migrated continuously to the VM on secondary
-> @@ -742,8 +744,8 @@
->  # @migrate-start-postcopy:
->  #
->  # Followup to a migration command to switch the migration to postcopy mode.
-> -# The postcopy-ram capability must be set before the original migration
-> -# command.
-> +# The postcopy-ram capability must be set on both source and destination
-> +# before the original migration command.
->  #
->  # Since: 2.5
->  #
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Where I want to go is basically a submaintainership model for s390x,
+i.e. that I integrate the work in various areas and send it on. Patch 2
+serves as a step in that direction, as Thomas has volunteered to look
+after the s390-ccw bios (thanks!)
+
+If that works out well, I plan to split out other parts as well. That
+would make a lot of sense for those parts which I lack documentation
+for, and also for parts where other folks could do a good job as well.
+
+Speaking of other people: Patch 3 adds David as an additional maintainer
+for tcg (thanks!).
+
+Cornelia Huck (3):
+  MAINTAINERS: add myself as overall s390x maintainer
+  MAINTAINERS: reorganize s390-ccw bios maintainership
+  MAINTAINERS: add David as additional tcg/s390 maintainer
+
+ MAINTAINERS | 35 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
+
+-- 
+2.13.6
