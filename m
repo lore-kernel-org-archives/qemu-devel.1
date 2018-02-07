@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ejYe9-0008CL-Pw
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:56:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ejYjQ-0004o8-QD
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 18:02:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ejYe8-0005S6-Rw
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:56:57 -0500
-References: <20180119205847.7141-1-jsnow@redhat.com>
-	<20180119205847.7141-12-jsnow@redhat.com>
-	<98b08bf5-6ac1-a1df-e92d-046b7975e3de@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bb48a32b-4e40-0741-60aa-84ae6328e0e2@redhat.com>
-Date: Wed, 7 Feb 2018 23:56:31 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ejYjQ-0000cJ-3u
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 18:02:24 -0500
+Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:41589)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ejYjP-0000c6-Ub
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 18:02:24 -0500
+Received: by mail-ot0-x236.google.com with SMTP id r23so2427977ote.8
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 15:02:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <98b08bf5-6ac1-a1df-e92d-046b7975e3de@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HEWj5I5rsTtYEeYEUoqVHyhgEoqVlIGIm"
-Subject: Re: [Qemu-devel] [PATCH v2 11/13] block/mirror: remove
- block_job_sleep_ns calls
+In-Reply-To: <1518017115-43611-1-git-send-email-pbonzini@redhat.com>
+References: <1518017115-43611-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Feb 2018 23:02:02 +0000
+Message-ID: <CAFEAcA8tafETwc8G0Gk6nks7EqQuxvJuscH-eYFq3BJ7Zyi+AQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/47] Misc patches for 2018-02-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HEWj5I5rsTtYEeYEUoqVHyhgEoqVlIGIm
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com
-Message-ID: <bb48a32b-4e40-0741-60aa-84ae6328e0e2@redhat.com>
-Subject: Re: [PATCH v2 11/13] block/mirror: remove block_job_sleep_ns calls
-References: <20180119205847.7141-1-jsnow@redhat.com>
- <20180119205847.7141-12-jsnow@redhat.com>
- <98b08bf5-6ac1-a1df-e92d-046b7975e3de@redhat.com>
-In-Reply-To: <98b08bf5-6ac1-a1df-e92d-046b7975e3de@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 7 February 2018 at 15:25, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit f24ee107a07f093bd7ed475dd48d7ba57ea3d8fe:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180202-pull-request' into staging (2018-02-02 18:54:11 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 19306806ae30b7fb5fe61a9130c6995402acad00:
+>
+>   Add the WHPX acceleration enlightenments (2018-02-07 14:09:26 +0100)
+>
 
-On 2018-02-07 23:46, Max Reitz wrote:
-> On 2018-01-19 21:58, John Snow wrote:
->> We're attempting to slacken the mirror loop in three different places,=
+Applied, thanks.
 
->> but we can combine these three attempts. Combine the early loop call t=
-o
->> block_job_pause_point with the two late-loop calls to block_job_sleep_=
-ns.
->>
->> When delay_ns is 0 and it has not been SLICE_TIME since the last yield=
-,
->> block_job_relax is merely a call to block_job_pause_point, so this sho=
-uld
->> be equivalent with the exception that if we have managed to not yield =
-at
->> all in the last SLICE_TIME ns, we will now do so.
->>
->> I am not sure that condition was possible,
->> so this loop should be equivalent.
->=20
-> Well, to me it even sounds like a positive change if it was a change.
-> We want the job to yield after SLICE_TIME ns, after all, and I don't
-> think it matters where that happens, exactly.
->=20
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/mirror.c     | 22 +++++++++++-----------
->>  block/trace-events |  2 +-
->>  2 files changed, 12 insertions(+), 12 deletions(-)
->>
->> diff --git a/block/mirror.c b/block/mirror.c
->> index a0e0044de2..192e03694f 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
->> @@ -761,7 +761,7 @@ static void coroutine_fn mirror_run(void *opaque)
->>      assert(!s->dbi);
->>      s->dbi =3D bdrv_dirty_iter_new(s->dirty_bitmap);
->>      for (;;) {
->> -        uint64_t delay_ns =3D 0;
->> +        static uint64_t delay_ns =3D 0;
->=20
-> Errr.  Are you sure about that?
->=20
-> Now every mirror job in the qeny process will share this single
-> variable.  Was that your intention?
-
-("Errr" @myself for "qeny")
-
-
---HEWj5I5rsTtYEeYEUoqVHyhgEoqVlIGIm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp7hB8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A/Y8IAJ4ocgJ48dXOQU1ROqAhfjRWlwrw3AjE
-R4WqZzeVjqYJcKGi4gYNxoOEg/YF1uiHSfoTaQx7uWE3OHbtVYcMM5KU4WsNsLln
-ln6WBY+5GStMoyT0mZA9FYpgwTkoguvwqitpPGn+22fk2r6uveL2zW4AR9HMMjKg
-R+kSgl2r0BuMg6OuOqzvuS1nEGFFux0FaQToJalFyiaBOjyNbGtSDlSajCh0N8Pa
-o0acg+VV2N9lmDV+9x4YNB0y+XLRjY/rzEdUQGlvwp3+HD7XtVukDsZ8BcQHh9LL
-lmS7f8K2k3h+rsMpmu4saSbZ5ns9KWTJsugkYPYKnzs9jTLBMUh2lD8=
-=RZtT
------END PGP SIGNATURE-----
-
---HEWj5I5rsTtYEeYEUoqVHyhgEoqVlIGIm--
+-- PMM
