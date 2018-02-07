@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSFw-00065f-TI
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:36 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ejSFn-0005wp-B5
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSFt-0006zM-TO
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:32 -0500
-Received: from mail-by2nam01on0079.outbound.protection.outlook.com
-	([104.47.34.79]:51968
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1ejSFj-0006v9-Bt
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:23 -0500
+Received: from mail-bl2nam02on0059.outbound.protection.outlook.com
+	([104.47.38.59]:9136
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1ejSFt-0006yU-DV
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:29 -0500
+	id 1ejSFj-0006uu-3z
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:19 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  7 Feb 2018 10:06:32 -0600
-Message-Id: <20180207160638.98872-20-brijesh.singh@amd.com>
+Date: Wed,  7 Feb 2018 10:06:24 -0600
+Message-Id: <20180207160638.98872-12-brijesh.singh@amd.com>
 In-Reply-To: <20180207160638.98872-1-brijesh.singh@amd.com>
 References: <20180207160638.98872-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 20/26] hw: i386: set ram_debug_ops when
- memory encryption is enabled
+Subject: [Qemu-devel] [PATCH v7 12/26] kvm: introduce memory encryption APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +29,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
 
-When memory encryption is enabled, the guest RAM and boot flash ROM will
-contain the encrypted data. By setting the debug ops allow us to invoke
-encryption APIs when accessing the memory for the debug purposes.
+Inorder to integerate the Secure Encryption Virtualization (SEV) support
+add few high-level memory encryption APIs which can be used for encrypting
+the guest memory region.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- hw/i386/pc.c       | 9 +++++++++
- hw/i386/pc_sysfw.c | 6 ++++++
- 2 files changed, 15 insertions(+)
+ accel/kvm/kvm-all.c    | 30 ++++++++++++++++++++++++++++++
+ accel/stubs/kvm-stub.c | 14 ++++++++++++++
+ include/sysemu/kvm.h   | 25 +++++++++++++++++++++++++
+ 3 files changed, 69 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ccc50baa85e0..ba451c0dc520 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1357,6 +1357,15 @@ void pc_memory_init(PCMachineState *pcms,
-         e820_add_entry(0x100000000ULL, pcms->above_4g_mem_size, E820_RAM);
-     }
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 6e5f3fd65066..f1fb826f0648 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -107,6 +107,8 @@ struct KVMState
  
-+    /*
-+     * When memory encryption is enabled, the guest RAM will be encrypted with
-+     * a guest unique key. Set the debug ops so that any debug access to the
-+     * guest RAM will go through the memory encryption APIs.
-+     */
-+    if (kvm_memcrypt_enabled()) {
-+        kvm_memcrypt_set_debug_ops(ram);
+     /* memory encryption */
+     void *memcrypt_handle;
++    int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
++    void (*memcrypt_debug_ops)(void *handle, MemoryRegion *mr);
+ };
+ 
+ KVMState *kvm_state;
+@@ -142,6 +144,34 @@ int kvm_get_max_memslots(void)
+     return s->nr_slots;
+ }
+ 
++bool kvm_memcrypt_enabled(void)
++{
++    if (kvm_state && kvm_state->memcrypt_handle) {
++        return true;
 +    }
 +
-     if (!pcmc->has_reserved_memory &&
-         (machine->ram_slots ||
-          (machine->maxram_size > machine->ram_size))) {
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 8ddbbf74d330..3d149b1c9f3c 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -180,6 +180,12 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
-                     error_report("failed to encrypt pflash rom");
-                     exit(1);
-                 }
++    return false;
++}
 +
-+                /*
-+                 * The pflash ROM is encrypted, set the debug ops so that any
-+                 * debug accesses will use memory encryption APIs.
-+                 */
-+                kvm_memcrypt_set_debug_ops(flash_mem);
-             }
-         }
-     }
++int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
++{
++    if (kvm_state->memcrypt_handle &&
++        kvm_state->memcrypt_encrypt_data) {
++        return kvm_state->memcrypt_encrypt_data(kvm_state->memcrypt_handle,
++                                              ptr, len);
++    }
++
++    return 1;
++}
++
++void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
++{
++    if (kvm_state->memcrypt_handle &&
++        kvm_state->memcrypt_debug_ops) {
++        kvm_state->memcrypt_debug_ops(kvm_state->memcrypt_handle, mr);
++    }
++}
++
+ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+ {
+     KVMState *s = kvm_state;
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index bb78a1f1b950..e7d579e3e54f 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -133,6 +133,20 @@ void sev_get_policy(uint32_t *policy)
+ {
+ }
+ 
++bool kvm_memcrypt_enabled(void)
++{
++    return false;
++}
++
++int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
++{
++  return 1;
++}
++
++void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
++{
++}
++
+ #ifndef CONFIG_USER_ONLY
+ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+ {
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index bbf12a172339..4a5db5dde390 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -231,6 +231,31 @@ int kvm_destroy_vcpu(CPUState *cpu);
+  */
+ bool kvm_arm_supports_user_irq(void);
+ 
++/**
++ * kvm_memcrypt_enabled - return boolean indicating whether memory encryption
++ *                        is enabled
++ * Returns: 1 memory encryption is enabled
++ *          0 memory encryption is disabled
++ */
++bool kvm_memcrypt_enabled(void);
++
++/**
++ * kvm_memcrypt_encrypt_data: encrypt the memory range
++ *
++ * Return: 1 failed to encrypt the range
++ *         0 succesfully encrypted memory region
++ */
++int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
++
++/**
++ * kvm_memcrypt_set_debug_ram_ops: set debug_ram_ops callback
++ *
++ * When debug_ram_ops is set, debug access to this memory region will use
++ * memory encryption APIs.
++ */
++void kvm_memcrypt_set_debug_ops(MemoryRegion *mr);
++
++
+ #ifdef NEED_CPU_H
+ #include "cpu.h"
+ 
 -- 
 2.14.3
