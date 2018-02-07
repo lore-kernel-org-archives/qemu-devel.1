@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejYd3-00078E-RM
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:51 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ejYd4-00078d-Hk
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejYd0-0004gZ-7H
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:49 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39057)
+	(envelope-from <richard.henderson@linaro.org>) id 1ejYd3-0004jP-5d
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:50 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:40200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ejYcz-0004g1-VT
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:46 -0500
-Received: by mail-pl0-x241.google.com with SMTP id o13-v6so983952pli.6
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 14:55:45 -0800 (PST)
+	id 1ejYd2-0004id-UL
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 17:55:49 -0500
+Received: by mail-pl0-x242.google.com with SMTP id g18-v6so980374plo.7
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 14:55:48 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  7 Feb 2018 14:55:21 -0800
-Message-Id: <20180207225540.31698-2-richard.henderson@linaro.org>
+Date: Wed,  7 Feb 2018 14:55:23 -0800
+Message-Id: <20180207225540.31698-4-richard.henderson@linaro.org>
 In-Reply-To: <20180207225540.31698-1-richard.henderson@linaro.org>
 References: <20180207225540.31698-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/20] tcg: Allow multiple word entries into the
- constant pool
+Subject: [Qemu-devel] [PULL 03/20] tcg: Standardize integral arguments to
+ expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,176 +33,198 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-This will be required for storing vector constants.
+Some functions use intN_t arguments, some use uintN_t, some just
+used "unsigned".  To aid putting function pointers in tables, we
+need consistency.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-pool.inc.c | 115 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 93 insertions(+), 22 deletions(-)
+ tcg/tcg-op.h | 16 ++++++++--------
+ tcg/tcg-op.c | 42 +++++++++++++++++++++---------------------
+ 2 files changed, 29 insertions(+), 29 deletions(-)
 
-diff --git a/tcg/tcg-pool.inc.c b/tcg/tcg-pool.inc.c
-index 8a85131405..ecf7c9282b 100644
---- a/tcg/tcg-pool.inc.c
-+++ b/tcg/tcg-pool.inc.c
-@@ -22,39 +22,110 @@
- 
- typedef struct TCGLabelPoolData {
-     struct TCGLabelPoolData *next;
--    tcg_target_ulong data;
-     tcg_insn_unit *label;
--    intptr_t addend;
--    int type;
-+    int32_t addend;
-+    uint16_t rtype;
-+    uint16_t nlong;
-+    tcg_target_ulong data[];
- } TCGLabelPoolData;
- 
- 
--static void new_pool_label(TCGContext *s, tcg_target_ulong data, int type,
--                           tcg_insn_unit *label, intptr_t addend)
-+static TCGLabelPoolData *new_pool_alloc(TCGContext *s, int nlong, int rtype,
-+                                        tcg_insn_unit *label, int addend)
- {
--    TCGLabelPoolData *n = tcg_malloc(sizeof(*n));
--    TCGLabelPoolData *i, **pp;
-+    TCGLabelPoolData *n = tcg_malloc(sizeof(TCGLabelPoolData)
-+                                     + sizeof(tcg_target_ulong) * nlong);
- 
--    n->data = data;
-     n->label = label;
--    n->type = type;
-     n->addend = addend;
-+    n->rtype = rtype;
-+    n->nlong = nlong;
-+    return n;
-+}
-+
-+static void new_pool_insert(TCGContext *s, TCGLabelPoolData *n)
-+{
-+    TCGLabelPoolData *i, **pp;
-+    int nlong = n->nlong;
- 
-     /* Insertion sort on the pool.  */
--    for (pp = &s->pool_labels; (i = *pp) && i->data < data; pp = &i->next) {
--        continue;
-+    for (pp = &s->pool_labels; (i = *pp) != NULL; pp = &i->next) {
-+        if (nlong > i->nlong) {
-+            break;
-+        }
-+        if (nlong < i->nlong) {
-+            continue;
-+        }
-+        if (memcmp(n->data, i->data, sizeof(tcg_target_ulong) * nlong) >= 0) {
-+            break;
-+        }
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 0c02d86b8b..a684ab5890 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -269,12 +269,12 @@ void tcg_gen_mb(TCGBar);
+ void tcg_gen_addi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_subfi_i32(TCGv_i32 ret, int32_t arg1, TCGv_i32 arg2);
+ void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+-void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2);
++void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_ori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_xori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+-void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
+-void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
+-void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
++void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
++void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
++void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_muli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_div_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
+ void tcg_gen_rem_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
+@@ -458,12 +458,12 @@ static inline void tcg_gen_not_i32(TCGv_i32 ret, TCGv_i32 arg)
+ void tcg_gen_addi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_subfi_i64(TCGv_i64 ret, int64_t arg1, TCGv_i64 arg2);
+ void tcg_gen_subi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+-void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2);
++void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_ori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_xori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+-void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2);
+-void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2);
+-void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2);
++void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
++void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
++void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_muli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_div_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
+ void tcg_gen_rem_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 0c509bfe46..3467787323 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -140,7 +140,7 @@ void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
      }
-     n->next = *pp;
-     *pp = n;
  }
  
-+/* The "usual" for generic integer code.  */
-+static inline void new_pool_label(TCGContext *s, tcg_target_ulong d, int rtype,
-+                                  tcg_insn_unit *label, int addend)
-+{
-+    TCGLabelPoolData *n = new_pool_alloc(s, 1, rtype, label, addend);
-+    n->data[0] = d;
-+    new_pool_insert(s, n);
-+}
-+
-+/* For v64 or v128, depending on the host.  */
-+static inline void new_pool_l2(TCGContext *s, int rtype, tcg_insn_unit *label,
-+                               int addend, tcg_target_ulong d0,
-+                               tcg_target_ulong d1)
-+{
-+    TCGLabelPoolData *n = new_pool_alloc(s, 2, rtype, label, addend);
-+    n->data[0] = d0;
-+    n->data[1] = d1;
-+    new_pool_insert(s, n);
-+}
-+
-+/* For v128 or v256, depending on the host.  */
-+static inline void new_pool_l4(TCGContext *s, int rtype, tcg_insn_unit *label,
-+                               int addend, tcg_target_ulong d0,
-+                               tcg_target_ulong d1, tcg_target_ulong d2,
-+                               tcg_target_ulong d3)
-+{
-+    TCGLabelPoolData *n = new_pool_alloc(s, 4, rtype, label, addend);
-+    n->data[0] = d0;
-+    n->data[1] = d1;
-+    n->data[2] = d2;
-+    n->data[3] = d3;
-+    new_pool_insert(s, n);
-+}
-+
-+/* For v256, for 32-bit host.  */
-+static inline void new_pool_l8(TCGContext *s, int rtype, tcg_insn_unit *label,
-+                               int addend, tcg_target_ulong d0,
-+                               tcg_target_ulong d1, tcg_target_ulong d2,
-+                               tcg_target_ulong d3, tcg_target_ulong d4,
-+                               tcg_target_ulong d5, tcg_target_ulong d6,
-+                               tcg_target_ulong d7)
-+{
-+    TCGLabelPoolData *n = new_pool_alloc(s, 8, rtype, label, addend);
-+    n->data[0] = d0;
-+    n->data[1] = d1;
-+    n->data[2] = d2;
-+    n->data[3] = d3;
-+    n->data[4] = d4;
-+    n->data[5] = d5;
-+    n->data[6] = d6;
-+    n->data[7] = d7;
-+    new_pool_insert(s, n);
-+}
-+
- /* To be provided by cpu/tcg-target.inc.c.  */
- static void tcg_out_nop_fill(tcg_insn_unit *p, int count);
- 
- static bool tcg_out_pool_finalize(TCGContext *s)
+-void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
++void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
  {
-     TCGLabelPoolData *p = s->pool_labels;
--    tcg_target_ulong d, *a;
-+    TCGLabelPoolData *l = NULL;
-+    void *a;
- 
-     if (p == NULL) {
-         return true;
-@@ -62,24 +133,24 @@ static bool tcg_out_pool_finalize(TCGContext *s)
- 
-     /* ??? Round up to qemu_icache_linesize, but then do not round
-        again when allocating the next TranslationBlock structure.  */
--    a = (void *)ROUND_UP((uintptr_t)s->code_ptr, sizeof(tcg_target_ulong));
-+    a = (void *)ROUND_UP((uintptr_t)s->code_ptr,
-+                         sizeof(tcg_target_ulong) * p->nlong);
-     tcg_out_nop_fill(s->code_ptr, (tcg_insn_unit *)a - s->code_ptr);
-     s->data_gen_ptr = a;
- 
--    /* Ensure the first comparison fails.  */
--    d = p->data + 1;
--
-     for (; p != NULL; p = p->next) {
--        if (p->data != d) {
--            d = p->data;
--            if (unlikely((void *)a > s->code_gen_highwater)) {
-+        size_t size = sizeof(tcg_target_ulong) * p->nlong;
-+        if (!l || l->nlong != p->nlong || memcmp(l->data, p->data, size)) {
-+            if (unlikely(a > s->code_gen_highwater)) {
-                 return false;
-             }
--            *a++ = d;
-+            memcpy(a, p->data, size);
-+            a += size;
-+            l = p;
+     TCGv_i32 t0;
+     /* Some cases can be optimized here.  */
+@@ -148,17 +148,17 @@ void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
+     case 0:
+         tcg_gen_movi_i32(ret, 0);
+         return;
+-    case 0xffffffffu:
++    case -1:
+         tcg_gen_mov_i32(ret, arg1);
+         return;
+-    case 0xffu:
++    case 0xff:
+         /* Don't recurse with tcg_gen_ext8u_i32.  */
+         if (TCG_TARGET_HAS_ext8u_i32) {
+             tcg_gen_op2_i32(INDEX_op_ext8u_i32, ret, arg1);
+             return;
          }
--        patch_reloc(p->label, p->type, (intptr_t)(a - 1), p->addend);
-+        patch_reloc(p->label, p->rtype, (intptr_t)a - size, p->addend);
+         break;
+-    case 0xffffu:
++    case 0xffff:
+         if (TCG_TARGET_HAS_ext16u_i32) {
+             tcg_gen_op2_i32(INDEX_op_ext16u_i32, ret, arg1);
+             return;
+@@ -199,9 +199,9 @@ void tcg_gen_xori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
      }
- 
--    s->code_ptr = (void *)a;
-+    s->code_ptr = a;
-     return true;
  }
+ 
+-void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
++void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 32);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 32);
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+@@ -211,9 +211,9 @@ void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
++void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 32);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 32);
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+@@ -223,9 +223,9 @@ void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
++void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 32);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 32);
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+@@ -1201,7 +1201,7 @@ void tcg_gen_subi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     }
+ }
+ 
+-void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
++void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+     TCGv_i64 t0;
+ 
+@@ -1216,23 +1216,23 @@ void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
+     case 0:
+         tcg_gen_movi_i64(ret, 0);
+         return;
+-    case 0xffffffffffffffffull:
++    case -1:
+         tcg_gen_mov_i64(ret, arg1);
+         return;
+-    case 0xffull:
++    case 0xff:
+         /* Don't recurse with tcg_gen_ext8u_i64.  */
+         if (TCG_TARGET_HAS_ext8u_i64) {
+             tcg_gen_op2_i64(INDEX_op_ext8u_i64, ret, arg1);
+             return;
+         }
+         break;
+-    case 0xffffu:
++    case 0xffff:
+         if (TCG_TARGET_HAS_ext16u_i64) {
+             tcg_gen_op2_i64(INDEX_op_ext16u_i64, ret, arg1);
+             return;
+         }
+         break;
+-    case 0xffffffffull:
++    case 0xffffffffu:
+         if (TCG_TARGET_HAS_ext32u_i64) {
+             tcg_gen_op2_i64(INDEX_op_ext32u_i64, ret, arg1);
+             return;
+@@ -1332,9 +1332,9 @@ static inline void tcg_gen_shifti_i64(TCGv_i64 ret, TCGv_i64 arg1,
+     }
+ }
+ 
+-void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
++void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 64);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 64);
+     if (TCG_TARGET_REG_BITS == 32) {
+         tcg_gen_shifti_i64(ret, arg1, arg2, 0, 0);
+     } else if (arg2 == 0) {
+@@ -1346,9 +1346,9 @@ void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
++void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 64);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 64);
+     if (TCG_TARGET_REG_BITS == 32) {
+         tcg_gen_shifti_i64(ret, arg1, arg2, 1, 0);
+     } else if (arg2 == 0) {
+@@ -1360,9 +1360,9 @@ void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
++void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 64);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 64);
+     if (TCG_TARGET_REG_BITS == 32) {
+         tcg_gen_shifti_i64(ret, arg1, arg2, 1, 1);
+     } else if (arg2 == 0) {
 -- 
 2.14.3
