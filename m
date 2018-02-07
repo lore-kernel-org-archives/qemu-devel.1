@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ejS2l-0002wG-Cd
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:53:56 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ejS3u-0003la-3S
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ejS2k-0005hR-EO
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:53:55 -0500
-Date: Wed, 7 Feb 2018 15:53:45 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180207155345.GC1446@stefanha-x1.localdomain>
-References: <20180207071758.6818-1-w.bumiller@proxmox.com>
+	(envelope-from <dgilbert@redhat.com>) id 1ejS3s-0006hg-Ed
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:06 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57778 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejS3s-0006hL-8v
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:55:04 -0500
+Date: Wed, 7 Feb 2018 15:55:01 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180207155500.GO2665@work-vm>
+References: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ALfTUftag+2gvp1h"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180207071758.6818-1-w.bumiller@proxmox.com>
-Subject: Re: [Qemu-devel] [PATCH] ratelimit: don't align wait time with
- slices
+In-Reply-To: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] migration: improve documentation of
+ postcopy-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Cc: qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
+* Greg Kurz (groug@kaod.org) wrote:
+> This capability must have the same value on both source and destination,
+> otherwise migration fails (commit 875fcd013ab6 "migration: incoming
+> postcopy advise sanity checks").
+> 
+> Let's write it down in various places where postcopy-ram is documented.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
---ALfTUftag+2gvp1h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks,
 
-On Wed, Feb 07, 2018 at 08:17:58AM +0100, Wolfgang Bumiller wrote:
-> It is possible for rate limited writes to keep overshooting a slice's
-> quota by a tiny amount causing the slice-aligned waiting period to
-> effectively halve the rate.
->=20
-> Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
-> Copied the Ccs from the discussion thread, hope that's fine, as I also
-> just noticed that for my reply containing this snippet I had hit reply
-> on the mail that did not contain those Ccs yet, sorry about that.
->=20
->  include/qemu/ratelimit.h | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---ALfTUftag+2gvp1h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaeyEJAAoJEJykq7OBq3PINHcIAJLr/zZyf7siADqH2lnJChr4
-c774v2NdxuNqad65nCLiYjkCd5FnOmikJC/jqveNswYjyo6p6OVIx6cLYZH2UbLx
-iOvC7VfuoAnOhwG1MOFgT4tDjMMJZimPMD5BljDNLA41ZMXWp6/ejgQwuiQisMBO
-8m8OtdF1ll6c5zKkOrDItFuCrXruZLoSkbzwLRiYdzpKhe5WCaUQMRaR48G8vEpt
-S18BEwDrA7B/9wB8cvWFqEcZHrE+fy1ILvHjbZB9Y/uAxth8nQMxrRMT/Gf1+zcg
-06RHVPmN1rLrqfJe6gk4Va3TLDwfSVI321eny8w6qAo4VycLu0PPPO17J2zP3lc=
-=65sE
------END PGP SIGNATURE-----
-
---ALfTUftag+2gvp1h--
+>  docs/devel/migration.rst |    4 ++--
+>  hmp-commands.hx          |    3 ++-
+>  qapi/migration.json      |   10 ++++++----
+>  3 files changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+> index bf97080dac2f..9d1b7657f0cf 100644
+> --- a/docs/devel/migration.rst
+> +++ b/docs/devel/migration.rst
+> @@ -387,8 +387,8 @@ doesn't finish in a given time the switch is made to postcopy.
+>  Enabling postcopy
+>  -----------------
+>  
+> -To enable postcopy, issue this command on the monitor prior to the
+> -start of migration:
+> +To enable postcopy, issue this command on the monitor (both source and
+> +destination) prior to the start of migration:
+>  
+>  ``migrate_set_capability postcopy-ram on``
+>  
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 15620c94d3fc..d26eb4119b9d 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1041,7 +1041,8 @@ ETEXI
+>          .params     = "",
+>          .help       = "Followup to a migration command to switch the migration"
+>                        " to postcopy mode. The postcopy-ram capability must "
+> -                      "be set before the original migration command.",
+> +                      "be set on both source and destination before the "
+> +                      "original migration command .",
+>          .cmd        = hmp_migrate_start_postcopy,
+>      },
+>  
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 4cd3d1315884..7f465a1902ce 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -327,8 +327,10 @@
+>  #          to speed up convergence of RAM migration. (since 1.6)
+>  #
+>  # @postcopy-ram: Start executing on the migration target before all of RAM has
+> -#          been migrated, pulling the remaining pages along as needed. NOTE: If
+> -#          the migration fails during postcopy the VM will fail.  (since 2.6)
+> +#          been migrated, pulling the remaining pages along as needed. The
+> +#          capacity must have the same setting on both source and target
+> +#          or migration will not even start. NOTE: If the migration fails during
+> +#          postcopy the VM will fail.  (since 2.6)
+>  #
+>  # @x-colo: If enabled, migration will never end, and the state of the VM on the
+>  #        primary side will be migrated continuously to the VM on secondary
+> @@ -742,8 +744,8 @@
+>  # @migrate-start-postcopy:
+>  #
+>  # Followup to a migration command to switch the migration to postcopy mode.
+> -# The postcopy-ram capability must be set before the original migration
+> -# command.
+> +# The postcopy-ram capability must be set on both source and destination
+> +# before the original migration command.
+>  #
+>  # Since: 2.5
+>  #
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
