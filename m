@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ejV8G-0001Hy-GS
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:11:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1ejV8W-0001WT-FT
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:12:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ejV8D-0008P9-B9
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:11:48 -0500
-Received: from mail-ve1eur01hn032e.outbound.protection.outlook.com
-	([2a01:111:f400:fe1f::32e]:10564
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ejV8C-0008OC-Vt
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:11:45 -0500
-Date: Wed, 7 Feb 2018 22:11:26 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180207191126.GD18247@rkaganb.sw.ru>
-References: <20180206203048.11096-1-rkagan@virtuozzo.com>
-	<20180206203048.11096-13-rkagan@virtuozzo.com>
-	<ac191902-8f59-8064-f5cf-39bf79f4d035@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ejV8T-00006x-96
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:12:04 -0500
+References: <20180207123833.211687-1-borntraeger@de.ibm.com>
+	<b4c61e4f-4bbd-39d6-0e72-57e9ae1694fe@de.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <770c4e4f-ed2b-8fd5-8344-4b920b0273a1@redhat.com>
+Date: Wed, 7 Feb 2018 13:11:43 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac191902-8f59-8064-f5cf-39bf79f4d035@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 12/34] hyperv: add synic event flag
- signaling
+In-Reply-To: <b4c61e4f-4bbd-39d6-0e72-57e9ae1694fe@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6] s390x/cpu: expose the guest crash
+ information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
 
-On Wed, Feb 07, 2018 at 11:58:58AM +0100, Paolo Bonzini wrote:
-> On 06/02/2018 21:30, Roman Kagan wrote:
-> > +/*
-> > + * Set given event flag for a given sint on a given vcpu, and signal the sint.
-> > + */
-> > +int hyperv_set_evt_flag(HvSintRoute *sint_route, unsigned evtno)
+On 02/07/2018 12:44 PM, Christian Borntraeger wrote:
+
+>> +        } else if (info->type == GUEST_PANIC_INFORMATION_TYPE_S390) {
+>> +            qemu_log_mask(LOG_GUEST_ERROR, " on cpu %d: %s\n"
+>> +                          "PSW: 0x%016" PRIx64 " 0x%016" PRIx64"\n",
+>> +                          info->u.s390.core,
+>> +                          qapi_enum_lookup(&S390CrashReason_lookup,
+>> +                                           info->u.s390.reason),
 > 
-> Any reason (e.g. something from the spec) not to spell "event" and
-> "eventno" in full?
+> Question for the qapi people. Would you prefer S390CrashReason_str instead?
 
-None beyond me being on the "shortest-comprehensible-name" camp :)
+Yes, S390CrashReason_str(info->u.s390.reason) is a more legible way to 
+spell this same lookup, and leaves the door open if we later change how 
+the internal &S390CrashReason_lookup[] behaves.
 
-I thought "evt" was unambiguously parsed as "event", and "msg" as
-"message".  Isn't it?
-
-Thanks,
-Roman.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
