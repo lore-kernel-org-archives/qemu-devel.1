@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejSZZ-0003j0-IX
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:27:50 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ejSaM-0004qr-Kq
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:28:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejSZU-0006t0-Pc
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:27:49 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47718 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejSZU-0006sm-Jd
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:27:44 -0500
-Date: Wed, 7 Feb 2018 16:27:25 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180207162724.GP2665@work-vm>
-References: <20180206163039.23661-1-ross.lagerwall@citrix.com>
+	(envelope-from <cohuck@redhat.com>) id 1ejSaI-0007t2-Q5
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:28:38 -0500
+Date: Wed, 7 Feb 2018 17:28:27 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180207172827.6af1486b.cohuck@redhat.com>
+In-Reply-To: <5b0fccea-dce9-ebc9-4f9e-995056d84fe3@amsat.org>
+References: <20180207155531.28446-1-cohuck@redhat.com>
+	<20180207155531.28446-2-cohuck@redhat.com>
+	<5b0fccea-dce9-ebc9-4f9e-995056d84fe3@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180206163039.23661-1-ross.lagerwall@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/xen: Check return value of
- qemu_fclose
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] MAINTAINERS: add myself as overall
+ s390x maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, thuth@redhat.com, david@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
 
-* Ross Lagerwall (ross.lagerwall@citrix.com) wrote:
-> QEMUFile uses buffered IO so when writing small amounts (such as the Xen
-> device state file), the actual write call and any errors that may occur
-> only happen as part of qemu_fclose(). Therefore, report IO errors when
-> saving the device state under Xen by checking the return value of
-> qemu_fclose().
-> 
-> Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+On Wed, 7 Feb 2018 13:24:09 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> On 02/07/2018 12:55 PM, Cornelia Huck wrote:
+> > All your mainframes are belong to me. =20
+>=20
+> =3D)
+>=20
+> >=20
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  MAINTAINERS | 23 +++++++++++++++++++++++
+> >  1 file changed, 23 insertions(+)
+> >=20
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index bbc3a617c2..e24273a574 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -76,6 +76,29 @@ K: ^Subject:.*(?i)trivial
+> >  T: git git://git.corpit.ru/qemu.git trivial-patches
+> >  T: git git://github.com/vivier/qemu.git trivial-patches
+> > =20
+> > +Architecture support
+> > +--------------------
+> > +S390
+> > +M: Cornelia Huck <cohuck@redhat.com>
+> > +S: Supported
+> > +F: default-configs/s390x-softmmu.mak
+> > +F: gdb-xml/s390*.xml
+> > +F: hw/char/sclp*.[hc]
+> > +F: hw/char/terminal3270.c
+> > +F: hw/intc/s390_flic.c
+> > +F: hw/intc/s390_flic_kvm.c
+> > +F: hw/s390x/
+> > +F: hw/vfio/ccw.c
+> > +F: hw/watchdog/wdt_diag288.c
+> > +F: include/hw/s390x/
+> > +F: include/hw/watchdog/wdt_diag288.h
+> > +F: pc-bios/s390-ccw/
+> > +F: pc-bios/s390-ccw.img
+> > +F: target/s390x/
+> > +K: ^Subject:.*(?i)s390(x|) =20
+>=20
+> (x|) -> x?
 
-> ---
->  migration/savevm.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index b7908f6..4b9d5be 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2267,8 +2267,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
->      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-xen-save-state");
->      f = qemu_fopen_channel_output(QIO_CHANNEL(ioc));
->      ret = qemu_save_device_state(f);
-> -    qemu_fclose(f);
-> -    if (ret < 0) {
-> +    if (ret < 0 || qemu_fclose(f) < 0) {
->          error_setg(errp, QERR_IO_ERROR);
->      } else {
->          /* libxl calls the QMP command "stop" before calling
-> -- 
-> 2.9.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Probably (my perl regexp fu is very lacking).
+
+>=20
+> > +T: git git://github.com/cohuck/qemu.git s390-next
+> > +L: qemu-s390x@nongnu.org
+> > +
+> >  Guest CPU cores (TCG):
+> >  ----------------------
+> >  Overall
+> >  =20
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Thanks!
