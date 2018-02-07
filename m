@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ejQDo-0007d7-EM
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:57:18 -0500
+	(envelope-from <berrange@redhat.com>) id 1ejQHH-0002b3-UL
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:00:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ejQDl-0008NB-DH
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:57:12 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:57590)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ejQDl-0008Lg-3I
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:57:09 -0500
-References: <151799695576.147.5866177190489987115@bdbb90650ae5>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <381c5681-a194-6750-06ac-7afeda9173f7@vivier.eu>
-Date: Wed, 7 Feb 2018 14:57:02 +0100
+	(envelope-from <berrange@redhat.com>) id 1ejQHB-0003N9-Vg
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:00:48 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33564 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ejQHB-0003Mo-R2
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 09:00:41 -0500
+Date: Wed, 7 Feb 2018 14:00:37 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180207140037.GK32061@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180207135642.GA21399@aepfle.de>
 MIME-Version: 1.0
-In-Reply-To: <151799695576.147.5866177190489987115@bdbb90650ae5>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [patch] linux-user/syscall.c: Fix missing break
- for host_to_target_cmsg
+Content-Disposition: inline
+In-Reply-To: <20180207135642.GA21399@aepfle.de>
+Subject: Re: [Qemu-devel] sed invocation for keycodemapdb not portable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, rnsastry@linux.vnet.ibm.com, Peter Maydell <peter.maydell@linaro.org>
+To: Olaf Hering <olaf@aepfle.de>
+Cc: qemu-devel@nongnu.org
 
-Le 07/02/2018 à 10:49, no-reply@patchew.org a écrit :
-> Hi,
+On Wed, Feb 07, 2018 at 02:56:47PM +0100, Olaf Hering wrote:
+> With commit 927128222b ("ui: add keycodemapdb repository as a GIT
+> submodule") sed is called with -E, which requires a recent sed.
+> The version of sed shipped with SLE11 is 4.1.5, which does not
+> understand the option '-E'. As a result xen-4.11 will fail to build.
 > 
-> This series failed build test on s390x host. Please find the details below.
-...
->   CC      aarch64_be-linux-user/linux-user/syscall.o
-> In file included from /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/qemu.h:16:0,
->                  from /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall.c:118:
-> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall.c: In function ‘do_sendrecvmsg_locked’:
-> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall_defs.h:308:61: error: ‘tgt_len’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->  #define TARGET_CMSG_LEN(len) (sizeof(struct target_cmsghdr) + (len))
->                                                              ^
-> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall.c:1797:13: note: ‘tgt_len’ was declared here
->          int tgt_len, tgt_space;
->              ^~~~~~~
+> Is there a way to achive the same result in some other way?
 
-it seems gcc disagrees with Coverity...
+Sorry, I've got a patch queued already that fixes this, but haven't send
+a pull request.
 
-I think this should fixed like:
 
- diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 74378947f0..d7fbe334eb 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1824,8 +1824,10 @@ static inline abi_long host_to_target_cmsg(struct
-target_msghdr *target_msgh,
-                 tgt_len = sizeof(struct target_timeval);
-                 break;
-             default:
-+                tgt_len = len;
-                 break;
-             }
-+            break;
-         default:
-             tgt_len = len;
-             break;
-
-Peter?
-
-Thanks,
-Laurent
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
