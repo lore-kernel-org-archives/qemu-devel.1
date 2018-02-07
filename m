@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ejUmW-0005EQ-6x
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:49:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1ejUmw-0005YF-Ur
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ejUmS-0005Qz-AQ
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:49:20 -0500
-Received: from mail-db5eur03hn0233.outbound.protection.outlook.com
-	([104.47.10.233]:54779
-	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ejUmS-0005QV-0N
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:49:16 -0500
-Date: Wed, 7 Feb 2018 21:49:03 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180207184903.GB18247@rkaganb.sw.ru>
-References: <20180206203048.11096-1-rkagan@virtuozzo.com>
-	<20180206203048.11096-10-rkagan@virtuozzo.com>
-	<9db7ccde-9f6c-7074-7d4c-46a16d687774@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ejUms-0005Yv-VY
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:49:47 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40600 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ejUms-0005Yp-PZ
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:49:42 -0500
+References: <20180207175014.11157-1-lcapitulino@redhat.com>
+	<20180207175014.11157-2-lcapitulino@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ee002ca0-c634-7708-fbb9-800797cf9539@redhat.com>
+Date: Wed, 7 Feb 2018 12:49:38 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9db7ccde-9f6c-7074-7d4c-46a16d687774@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 09/34] hyperv: block SynIC use in QEMU
- in incompatible configurations
+In-Reply-To: <20180207175014.11157-2-lcapitulino@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +28,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
+To: Luiz Capitulino <lcapitulino@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, ehabkost@redhat.com, berrange@redhat.com, mihajlov@linux.vnet.ibm.com
 
-On Wed, Feb 07, 2018 at 11:46:30AM +0100, Paolo Bonzini wrote:
-> On 06/02/2018 21:30, Roman Kagan wrote:
-> > Certain configurations do not allow SynIC to be used in QEMU.  In
-> > particular,
-> > 
-> > - when hyperv_vpindex is off, SINT routes can't be used as they refer to
-> >   the destination vCPU by vp_index
-> > 
-> > - older KVM (which doesn't expose KVM_CAP_HYPERV_SYNIC2) zeroes out
-> >   SynIC message and event pages on every msr load, breaking migration
-> > 
-> > OTOH in-KVM users of SynIC -- SynIC timers -- do work in those
-> > configurations, and we shouldn't stop the guest from using them.
-> > 
-> > To cover both scenarios, introduce a (user-invisible) SynIC property
-> > that disallows to use the SynIC within QEMU but not in KVM.  The
-> > property is clear by default but is set via compat logic for older
-> > machine types.
-> > 
-> > As a result, when hv_synic and a modern machine type are specified, QEMU
-> > will refuse to run unless vp_index is on and the kernel is recent
-> > enough.  OTOH with older machine types QEMU will fine run against an
-> > older kernel and/or without vp_index enabled but will refuse the in-QEMU
-> > uses of SynIC (e.g. VMBus).
-> > 
-> > Also a function is added that allows the devices to query the status of
-> > SynIC support across vCPUs.
-> > 
-> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+On 02/07/2018 11:50 AM, Luiz Capitulino wrote:
+> The query-cpus command has an extremely serious side effect:
+> it always interrupt all running vCPUs so that they can run
+
+s/interrupt/interrupts/
+
+> ioctl calls. This can cause a huge performance degradation for
+> some workloads. And most of the information retrieved by the
+> ioctl calls are not even used by query-cpus.
 > 
-> FWIW I'm okay with just requiring a new-enough kernel when using SynIC.
-> It's always been experimental.
+> This commit introduces a replacement for query-cpus called
+> query-cpus-fast, which has the following features:
+> 
+>   o Never interrupt vCPUs threads. query-cpus-fast only returns
+>     vCPU information maintained by QEMU itself, which should be
+>     sufficient for most management software needs
+> 
+>   o Make "halted" field optional: we only return it if the
+>     halted state is maintained by QEMU. But this also gives
+>     the option of dropping the field in the future (see below)
+> 
+>   o Drop irrelevant fields such as "current", "pc" and "arch"
+> 
+>   o Rename some fields for better clarification & proper naming
+>     standard
+> 
+> The "halted" field is somewhat controversial. On the one hand,
+> it offers a convenient way to know if a guest CPU is idle or
+> running. On the other hand, it's a field that can change many
+> times a second. In fact, the halted state can change even
+> before query-cpus-fast has returned. This makes one wonder if
+> this field should be dropped all together. Having the "halted"
+> field as optional gives a better option for dropping it in
+> the future, since we can just stop returning it.
 
-Well, synic timers are available since linux-4.5 and qemu-2.6, and
-they're also supported in libvirt for some time, so there probably are
-VMs using it.  It would be harsh to make them fail migrating to a new
-QEMU.
+Makes sense to me.
 
-Roman.
+> 
+> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
+> ---
+>   cpus.c               | 44 ++++++++++++++++++++++++++++++++
+>   hmp-commands-info.hx | 14 +++++++++++
+>   hmp.c                | 24 ++++++++++++++++++
+>   hmp.h                |  1 +
+>   qapi-schema.json     | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   5 files changed, 154 insertions(+)
+> 
+
+> +++ b/hmp-commands-info.hx
+> @@ -157,6 +157,20 @@ STEXI
+>   @item info cpus
+>   @findex info cpus
+>   Show infos for each CPU.
+
+Pre-existing, but...
+
+> +ETEXI
+> +
+> +    {
+> +        .name       = "cpus_fast",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show infos for each CPU without performance penalty",
+
+...copied here.  s/infos/information/ in public-facing documentation, 
+while we're touching it.
+
+
+> +++ b/qapi-schema.json
+> @@ -558,6 +558,77 @@
+>   ##
+>   { 'command': 'query-cpus', 'returns': ['CpuInfo'] }
+>   
+> +##
+> +# @CpuInfo2:
+
+Good thing that type names aren't part of our introspection ABI.  Would 
+CpuInfoLite or CpuInfoFast make the code any more legible?
+
+> +#
+> +# Information about a virtual CPU
+> +#
+> +# @cpu-index: index of the virtual CPU
+> +#
+> +# @halted: true if the virtual CPU is in the halt state.  Halt usually refers
+> +#          to a processor specific low power mode. This field is optional,
+> +#          it is only present if the halted state can be retrieved without
+> +#          a performance penalty
+
+Disclaimer is good.
+
+> +#
+> +# @qom-path: path to the CPU object in the QOM tree
+> +#
+> +# @thread-id: ID of the underlying host thread
+> +#
+> +# @props: properties describing to which node/socket/core/thread
+> +#         virtual CPU belongs to, provided if supported by board
+> +#
+> +# Since: 2.12
+> +#
+> +# Notes: @halted is a transient state that changes frequently.  By the time the
+> +#        data is sent to the client, the guest may no longer be halted.
+> +##
+> +{ 'struct': 'CpuInfo2',
+> +  'data': {'cpu-index': 'int', '*halted': 'bool', 'qom-path': 'str',
+> +           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
+
+Looks reasonable.
+
+> +
+> +##
+> +# @query-cpus-fast:
+> +#
+> +# Returns information about all virtual CPUs. This command does not
+> +# incur a performance penalty and should be used in production
+> +# instead of query-cpus.
+> +#
+> +# Returns: list of @CpuInfo2
+> +#
+> +# Notes: The CPU architecture name is not returned by query-cpus-fast.
+> +#        Use query-target to retreive that information.
+
+s/retreive/retrieve/
+
+
+> +##
+> +{ 'command': 'query-cpus-fast', 'returns': [ 'CpuInfo2' ] }
+> +
+
+Also, please add some docs to 'query-cpus' pointing to 'query-cpus-fast'.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
