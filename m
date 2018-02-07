@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejNkV-00068i-4N
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:18:48 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejNkq-0006SE-4B
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejNkQ-0006Sx-7k
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:18:47 -0500
-Received: from mail-wr0-f176.google.com ([209.85.128.176]:40850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejNkP-0006SL-TT
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:18:42 -0500
-Received: by mail-wr0-f176.google.com with SMTP id i56so585970wra.7
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 03:18:41 -0800 (PST)
-References: <20180206203048.11096-1-rkagan@virtuozzo.com>
-	<20180206203048.11096-34-rkagan@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aad05cf2-fe8e-5d0a-a47c-2be496af39da@redhat.com>
-Date: Wed, 7 Feb 2018 12:18:38 +0100
+	(envelope-from <haozhong.zhang@intel.com>) id 1ejNkl-0006a6-0X
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:19:07 -0500
+Received: from mga05.intel.com ([192.55.52.43]:3803)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1ejNkk-0006Xz-J6
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 06:19:02 -0500
+Date: Wed, 7 Feb 2018 19:18:55 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180207111855.2o2zq3evrkwypomw@hz-desktop>
+References: <20180207073331.14158-1-haozhong.zhang@intel.com>
+	<20180207073331.14158-6-haozhong.zhang@intel.com>
+	<1091122025.1148119.1517998640676.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180206203048.11096-34-rkagan@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 33/34] vmbus: add support for rom files
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1091122025.1148119.1517998640676.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] migration/ram: ensure write
+ persistence on loading zero pages to PMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +30,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, mst@redhat.com, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 06/02/2018 21:30, Roman Kagan wrote:
-> In order to leverage third-party drivers for VMBus devices in firmware
-> (in particular, there's a case with iPXE driver for hv-net in SeaBIOS
-> and OVMF), introduce an infrastructure to supply such drivers as option
-> ROMs.
+On 02/07/18 05:17 -0500, Pankaj Gupta wrote:
 > 
-> To make it easy for the firmware to locate such ROMs, they are stored in
-> fw_cfg with names "vmbus/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.rom" for
-> default class ROMs (where xxx... is the class GUID) and
-> "vmbus/dev/yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy.rom" for per-device
-> (i.e. specified via .romfile property) ROMs (where yyy... is the device
-> instance GUID).
+> > 
+> > When loading a zero page, check whether it will be loaded to
+> > persistent memory If yes, load it by libpmem function
+> > pmem_memset_nodrain().  Combined with a call to pmem_drain() at the
+> > end of RAM loading, we can guarantee all those zero pages are
+> > persistently loaded.
+> > 
+> > Depending on the host HW/SW configurations, pmem_drain() can be
+> > "sfence".  Therefore, we do not call pmem_drain() after each
+> > pmem_memset_nodrain(), or use pmem_memset_persist() (equally
+> > pmem_memset_nodrain() + pmem_drain()), in order to avoid unnecessary
+> > overhead.
 > 
-> The format and the calling convention for the ROMs is out of scope for
-> this patch: QEMU doesn't try to interpret them.
+> Are you saying we don't need 'pmem_drain()'?
 
-Out of curiosity, do you have a SCSI driver for SeaBIOS and/or OVMF?
+pmem_drain() is called only once after all ram blocks are loaded.
 
-Thanks,
+> 
+> I can see its called in patch 5 in ram_load? But
+> I also see empty definition. Anything I am missing here?
 
-Paolo
+Functions defined in include/qemu/pmem.h are stubs and used only when
+QEMU is not compiled with libpmem. When QEMU is compiled with
+--enabled-libpmem, the one in libpmem is used.
+
+Haozhong
+
+> 
+> Thanks,
+> Pankaj
+> 
+> > 
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > ---
+> >  include/qemu/pmem.h |  9 +++++++++
+> >  migration/ram.c     | 34 +++++++++++++++++++++++++++++-----
+> >  2 files changed, 38 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+> > index 9017596ff0..861d8ecc21 100644
+> > --- a/include/qemu/pmem.h
+> > +++ b/include/qemu/pmem.h
+> > @@ -26,6 +26,15 @@ pmem_memcpy_persist(void *pmemdest, const void *src,
+> > size_t len)
+> >      return memcpy(pmemdest, src, len);
+> >  }
+> >  
+> > +static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
+> > +{
+> > +    return memset(pmemdest, c, len);
+> > +}
+> > +
+> > +static inline void pmem_drain(void)
+> > +{
+> > +}
+> > +
+> >  #endif /* CONFIG_LIBPMEM */
+> >  
+> >  #endif /* !QEMU_PMEM_H */
+> > diff --git a/migration/ram.c b/migration/ram.c
+> > index cb1950f3eb..5a0e503818 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -49,6 +49,7 @@
+> >  #include "qemu/rcu_queue.h"
+> >  #include "migration/colo.h"
+> >  #include "migration/block.h"
+> > +#include "qemu/pmem.h"
+> >  
+> >  /***********************************************************/
+> >  /* ram save/restore */
+> > @@ -2467,6 +2468,20 @@ static inline void
+> > *host_from_ram_block_offset(RAMBlock *block,
+> >      return block->host + offset;
+> >  }
+> >  
+> > +static void ram_handle_compressed_common(void *host, uint8_t ch, uint64_t
+> > size,
+> > +                                         bool is_pmem)
+> > +{
+> > +    if (!ch && is_zero_range(host, size)) {
+> > +        return;
+> > +    }
+> > +
+> > +    if (!is_pmem) {
+> > +        memset(host, ch, size);
+> > +    } else {
+> > +        pmem_memset_nodrain(host, ch, size);
+> > +    }
+> > +}
+> > +
+> >  /**
+> >   * ram_handle_compressed: handle the zero page case
+> >   *
+> > @@ -2479,9 +2494,7 @@ static inline void *host_from_ram_block_offset(RAMBlock
+> > *block,
+> >   */
+> >  void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
+> >  {
+> > -    if (ch != 0 || !is_zero_range(host, size)) {
+> > -        memset(host, ch, size);
+> > -    }
+> > +    return ram_handle_compressed_common(host, ch, size, false);
+> >  }
+> >  
+> >  static void *do_data_decompress(void *opaque)
+> > @@ -2823,6 +2836,7 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> > version_id)
+> >      bool postcopy_running = postcopy_is_running();
+> >      /* ADVISE is earlier, it shows the source has the postcopy capability on
+> >      */
+> >      bool postcopy_advised = postcopy_is_advised();
+> > +    bool need_pmem_drain = false;
+> >  
+> >      seq_iter++;
+> >  
+> > @@ -2848,6 +2862,8 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> > version_id)
+> >          ram_addr_t addr, total_ram_bytes;
+> >          void *host = NULL;
+> >          uint8_t ch;
+> > +        RAMBlock *block = NULL;
+> > +        bool is_pmem = false;
+> >  
+> >          addr = qemu_get_be64(f);
+> >          flags = addr & ~TARGET_PAGE_MASK;
+> > @@ -2864,7 +2880,7 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> > version_id)
+> >  
+> >          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+> >                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+> > -            RAMBlock *block = ram_block_from_stream(f, flags);
+> > +            block = ram_block_from_stream(f, flags);
+> >  
+> >              host = host_from_ram_block_offset(block, addr);
+> >              if (!host) {
+> > @@ -2874,6 +2890,9 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> > version_id)
+> >              }
+> >              ramblock_recv_bitmap_set(block, host);
+> >              trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
+> > +
+> > +            is_pmem = ramblock_is_pmem(block);
+> > +            need_pmem_drain = need_pmem_drain || is_pmem;
+> >          }
+> >  
+> >          switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
+> > @@ -2927,7 +2946,7 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> > version_id)
+> >  
+> >          case RAM_SAVE_FLAG_ZERO:
+> >              ch = qemu_get_byte(f);
+> > -            ram_handle_compressed(host, ch, TARGET_PAGE_SIZE);
+> > +            ram_handle_compressed_common(host, ch, TARGET_PAGE_SIZE,
+> > is_pmem);
+> >              break;
+> >  
+> >          case RAM_SAVE_FLAG_PAGE:
+> > @@ -2970,6 +2989,11 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> > version_id)
+> >      }
+> >  
+> >      wait_for_decompress_done();
+> > +
+> > +    if (need_pmem_drain) {
+> > +        pmem_drain();
+> > +    }
+> > +
+> >      rcu_read_unlock();
+> >      trace_ram_load_complete(ret, seq_iter);
+> >      return ret;
+> > --
+> > 2.14.1
+> > 
+> > 
+> > 
