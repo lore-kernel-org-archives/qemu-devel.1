@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejLT9-000536-Md
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 03:52:45 -0500
+	(envelope-from <krarun88@gmail.com>) id 1ejLVa-0006qL-OO
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 03:55:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejLT8-00049s-9u
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 03:52:43 -0500
-Date: Wed, 7 Feb 2018 09:52:25 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180207095225.0400fce9@redhat.com>
-In-Reply-To: <20180206223213.GG13301@localhost.localdomain>
-References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
-	<20180206223213.GG13301@localhost.localdomain>
+	(envelope-from <krarun88@gmail.com>) id 1ejLVW-0006lQ-BR
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 03:55:14 -0500
+Received: from mail-it0-x234.google.com ([2607:f8b0:4001:c0b::234]:51637)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <krarun88@gmail.com>) id 1ejLVW-0006kg-6o
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 03:55:10 -0500
+Received: by mail-it0-x234.google.com with SMTP id p139so1375052itb.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 00:55:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 00/25] generalize parsing of cpu_model
- (part 4)
+From: Arun raj <krarun88@gmail.com>
+Date: Wed, 7 Feb 2018 14:25:08 +0530
+Message-ID: <CAEZT4RNYVuFvwyp9VR94HAgVmz-_MFyd0yjEDRP8_iJ=D5XcKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Regarding Network interface on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,163 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
 
-On Tue, 6 Feb 2018 20:32:13 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Hi,
 
-> I will try to summarize my comments here:
+I'm new to QEMU and using latest QEMU-2.11.50 version. i installed ubuntu
+16.04 in QEMU and my host system has 4.4 kernel
 
-Thanks for review
+following command is i'm using to run the QEMU :
 
-> * I suggest squashing patches 2-22 together.  This way we
->   shouldn't have any intermediate commits where "make check"
->   generates warnings, and the series is shorter.
->   * Or, even better: squash the CPU_RESOLVING_TYPE parts of 3-22
->     into one patch, and the tests/machine-none-test.c parts of
->     3-22 into patch 2.
-CPU_RESOLVING_TYPE parts we split to simplify review
-for target maintainers.
-I'll respin squashing them into one commit.
+qemu-system-x86_64 -machine q35,kernel_irqchip=split -m 1G -enable-kvm -smp
+4 -device intel-iommu,intremap=on,x-buggy-eim=on -cpu
+kvm64,-kvm_pv_eoi,-kvm_steal_time,-kvm_asyncpf,-kvmclock,+vmx -drive
+file=testing.img,format=raw,id=disk,if=none -device ide-hd,drive=disk
+-serial stdio -serial vc -netdev user,id=net -device
+e1000e,addr=2.0,netdev=net -device intel-hda,addr=1b.0 -device hda-duplex
 
-> 
-> * The linux-user/main.c hunk of patch 03/25 looks unnecessary.
-Indeed, I think it was a leftover slipped in from previous revision
-where I was touching default cpus handling in *-user targets,
-with the later dropped from series it's not needed.
+But in QEMU i can't able to access the internet and ping also not working.
+Is there any additional command is require to solve this issue?
 
-> * I suggest testing all CPU models in patch 02/25, but this
->   shouldn't block the series.  Can be a follow-up patch.
-the goal of the test is that refactoring didn't regress
-'none' machine after following change in 23/25:
 
-@@ -24,9 +24,9 @@ static void machine_none_init(MachineState *mch)
- {
-     CPUState *cpu = NULL;
- 
--    /* Initialize CPU (if a model has been specified) */
--    if (mch->cpu_model) {
--        cpu = cpu_init(mch->cpu_model);
-+    /* Initialize CPU (if user asked for it) */
-+    if (mch->cpu_type) {
-+        cpu = cpu_create(mch->cpu_type);
-
-for that it's sufficient to probe one cpu model.
-
-We can do all cpus probing later if there will be need in it,
-but that's not related to this series and would just waste
-'make check' time if it won't be doing something meaningful
-with probed cpu.
-
-> All the rest looks good to me.
-> 
-> Thanks!
-> 
-> 
-> On Tue, Jan 23, 2018 at 09:07:59AM +0100, Igor Mammedov wrote:
-> > 
-> > v3:
-> >   - use qtest_startf() instead of qtest_start()
-> >   - rename tests/machine-none.c to tests/machine-none-test.c
-> >   - introduce first CPU_RESOLVING_TYPE for all targets and
-> >     only then use it parse_cpu_model() 
-> >   - stop abusing  mc->default_cpu_type as resolving cpu type,
-> >     move cpu_parse_cpu_model() in to exec.c and embed in
-> >     CPU_RESOLVING_TYPE, so that callers won't have to know
-> >     about unnecessary detail
-> > 
-> > v2:
-> >   - implemented new approach only for x86/ARM (will be done for all targets
-> >     if approach seems acceptable)
-> >   - add test case for '-M none -cpu FOO' case
-> >   - redefine TARGET_DEFAULT_CPU_TYPE into CPU_RESOLVING_TYPE
-> >   - scrape off default cpu_model refactoring, so it would cause
-> >     less conflicts with Laurent's series where he tries to rework
-> >     defaults to use ELF hints of executed program
-> > 
-> > Series is finishing work on generalizing cpu_model parsing
-> > and limiting parts that deal with inconsistent cpu_model
-> > naming to "-cpu" CLI option in vl.c, bsd|linux-user/main.c
-> > CLI and default cpu_model processing and FOO_cpu_class_by_name()
-> > callbacks.
-> > 
-> > It introduces CPU_RESOLVING_TYPE which must be defined
-> > by each target and is used by helper parse_cpu_model()
-> > (former cpu_parse_cpu_model()) to get access to target
-> > specific FOO_cpu_class_by_name() callback.
-> > 
-> > git tree for testing:
-> >    https://github.com/imammedo/qemu.git cpu_init_removal_v3
-> > 
-> > CC: Laurent Vivier <laurent@vivier.eu>
-> > CC: Eduardo Habkost <ehabkost@redhat.com>
-> > CC: qemu-s390x@nongnu.org
-> > CC: qemu-ppc@nongnu.org
-> > CC: qemu-arm@nongnu.org
-> > 
-> > Igor Mammedov (25):
-> >   nios2: 10m50_devboard: replace cpu_model with cpu_type
-> >   tests: add machine 'none' with -cpu test
-> >   arm: cpu: add CPU_RESOLVING_TYPE macro
-> >   x86: cpu: add CPU_RESOLVING_TYPE macro
-> >   alpha: cpu: add CPU_RESOLVING_TYPE macro
-> >   cris: cpu: add CPU_RESOLVING_TYPE macro
-> >   lm32: cpu: add CPU_RESOLVING_TYPE macro
-> >   m68k: cpu: add CPU_RESOLVING_TYPE macro
-> >   microblaze: cpu: add CPU_RESOLVING_TYPE macro
-> >   mips: cpu: add CPU_RESOLVING_TYPE macro
-> >   moxie: cpu: add CPU_RESOLVING_TYPE macro
-> >   nios2: cpu: add CPU_RESOLVING_TYPE macro
-> >   openrisc: cpu: add CPU_RESOLVING_TYPE macro
-> >   ppc: cpu: add CPU_RESOLVING_TYPE macro
-> >   s390x: cpu: add CPU_RESOLVING_TYPE macro
-> >   sh4: cpu: add CPU_RESOLVING_TYPE macro
-> >   sparc: cpu: add CPU_RESOLVING_TYPE macro
-> >   tricore: cpu: add CPU_RESOLVING_TYPE macro
-> >   unicore32: cpu: add CPU_RESOLVING_TYPE macro
-> >   xtensa: cpu: add CPU_RESOLVING_TYPE macro
-> >   hppa: cpu: add CPU_RESOLVING_TYPE macro
-> >   tilegx: cpu: add CPU_RESOLVING_TYPE macro
-> >   Use cpu_create(type) instead of cpu_init(cpu_model)
-> >   cpu: get rid of unused cpu_init() defines
-> >   cpu: get rid of cpu_generic_init()
-> > 
-> >  include/qom/cpu.h         | 16 +-------
-> >  target/alpha/cpu.h        |  3 +-
-> >  target/arm/cpu.h          |  3 +-
-> >  target/cris/cpu.h         |  3 +-
-> >  target/hppa/cpu.h         |  2 +-
-> >  target/i386/cpu.h         |  3 +-
-> >  target/lm32/cpu.h         |  3 +-
-> >  target/m68k/cpu.h         |  3 +-
-> >  target/microblaze/cpu.h   |  2 +-
-> >  target/mips/cpu.h         |  3 +-
-> >  target/moxie/cpu.h        |  3 +-
-> >  target/nios2/cpu.h        |  2 +-
-> >  target/openrisc/cpu.h     |  3 +-
-> >  target/ppc/cpu.h          |  3 +-
-> >  target/s390x/cpu.h        |  3 +-
-> >  target/sh4/cpu.h          |  3 +-
-> >  target/sparc/cpu.h        |  5 +--
-> >  target/tilegx/cpu.h       |  2 +-
-> >  target/tricore/cpu.h      |  3 +-
-> >  target/unicore32/cpu.h    |  3 +-
-> >  target/xtensa/cpu.h       |  3 +-
-> >  bsd-user/main.c           |  4 +-
-> >  exec.c                    | 23 +++++++++++
-> >  hw/core/null-machine.c    |  6 +--
-> >  hw/nios2/10m50_devboard.c |  2 +-
-> >  linux-user/main.c         | 10 +++--
-> >  qom/cpu.c                 | 48 +----------------------
-> >  tests/Makefile.include    |  2 +
-> >  tests/machine-none-test.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++
-> >  vl.c                      | 10 ++---
-> >  30 files changed, 162 insertions(+), 114 deletions(-)
-> >  create mode 100644 tests/machine-none-test.c
-> > 
-> > -- 
-> > 2.7.4
-> > 
-> >   
-> 
+Regards,
+Arun
