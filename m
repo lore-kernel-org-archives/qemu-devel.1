@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejPOO-0006nx-Gq
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:04:10 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ejPT0-0003Fo-5i
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:08:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejPOK-0007ne-7P
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:04:04 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42802 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1ejPSw-0002Jt-4R
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:08:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60046 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejPOK-0007nP-2g
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:04:00 -0500
-Date: Wed, 7 Feb 2018 13:03:56 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejPSv-0002JQ-Vl
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:08:46 -0500
+Date: Wed, 7 Feb 2018 13:08:27 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180207130355.GH2665@work-vm>
+Message-ID: <20180207130827.GI2665@work-vm>
 References: <20180207073331.14158-1-haozhong.zhang@intel.com>
-	<20180207073331.14158-8-haozhong.zhang@intel.com>
-	<20180207115406.GD2665@work-vm>
-	<20180207121525.5pyrld36k5xbm373@hz-desktop>
+	<20180207073331.14158-9-haozhong.zhang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180207121525.5pyrld36k5xbm373@hz-desktop>
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] migration/ram: ensure write
- persistence on loading compressed pages to PMEM
+In-Reply-To: <20180207073331.14158-9-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] migration/ram: ensure write
+ persistence on loading xbzrle pages to PMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +28,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
 * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> On 02/07/18 11:54 +0000, Dr. David Alan Gilbert wrote:
-> > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> > > When loading a compressed page to persistent memory, flush CPU cache
-> > > after the data is decompressed. Combined with a call to pmem_drain()
-> > > at the end of memory loading, we can guarantee those compressed pages
-> > > are persistently loaded to PMEM.
-> > 
-> > Can you explain why this can use the flush and doesn't need the special
-> > memset?
+> When loading a xbzrle encoded page to persistent memory, load the data
+> via libpmem function pmem_memcpy_nodrain() instead of memcpy().
+> Combined with a call to pmem_drain() at the end of memory loading, we
+> can guarantee those xbzrle encoded pages are persistently loaded to PMEM.
 > 
-> The best approach to ensure the write persistence is to operate pmem
-> all via libpmem, e.g., pmem_memcpy_nodrain() + pmem_drain(). However,
-> the write to pmem in this case is performed by uncompress() which is
-> implemented out of QEMU and libpmem. It may or may not use libpmem,
-> which is not controlled by QEMU. Therefore, we have to use the less
-> optimal approach, that is to flush cache for all pmem addresses that
-> uncompress() may have written, i.e.,/e.g., memcpy() and/or memset() in
-> uncompress(), and pmem_flush() + pmem_drain() in QEMU.
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> ---
+>  migration/ram.c    | 15 ++++++++++-----
+>  migration/xbzrle.c | 20 ++++++++++++++++++--
+>  migration/xbzrle.h |  1 +
+>  3 files changed, 29 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 924d2b9537..87f977617d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2388,10 +2388,10 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+>      }
+>  }
+>  
+> -static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
+> +static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host, bool is_pmem)
+>  {
+>      unsigned int xh_len;
+> -    int xh_flags;
+> +    int xh_flags, rc;
+>      uint8_t *loaded_data;
+>  
+>      /* extract RLE header */
+> @@ -2413,8 +2413,13 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
+>      qemu_get_buffer_in_place(f, &loaded_data, xh_len);
+>  
+>      /* decode RLE */
+> -    if (xbzrle_decode_buffer(loaded_data, xh_len, host,
+> -                             TARGET_PAGE_SIZE) == -1) {
+> +    if (!is_pmem) {
+> +        rc = xbzrle_decode_buffer(loaded_data, xh_len, host, TARGET_PAGE_SIZE);
+> +    } else {
+> +        rc = xbzrle_decode_buffer_to_pmem(loaded_data, xh_len, host,
+> +                                          TARGET_PAGE_SIZE);
+> +    }
+> +    if (rc == -1) {
+>          error_report("Failed to load XBZRLE page - decode error!");
+>          return -1;
+>      }
+> @@ -2974,7 +2979,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>              break;
+>  
+>          case RAM_SAVE_FLAG_XBZRLE:
+> -            if (load_xbzrle(f, addr, host) < 0) {
+> +            if (load_xbzrle(f, addr, host, is_pmem) < 0) {
+>                  error_report("Failed to decompress XBZRLE page at "
+>                               RAM_ADDR_FMT, addr);
+>                  ret = -EINVAL;
+> diff --git a/migration/xbzrle.c b/migration/xbzrle.c
+> index 1ba482ded9..499d8e1bfb 100644
+> --- a/migration/xbzrle.c
+> +++ b/migration/xbzrle.c
+> @@ -12,6 +12,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "qemu/cutils.h"
+> +#include "qemu/pmem.h"
+>  #include "xbzrle.h"
+>  
+>  /*
+> @@ -126,7 +127,8 @@ int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
+>      return d;
+>  }
+>  
+> -int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
+> +static int xbzrle_decode_buffer_common(uint8_t *src, int slen, uint8_t *dst,
+> +                                       int dlen, bool is_pmem)
+>  {
+>      int i = 0, d = 0;
+>      int ret;
+> @@ -167,10 +169,24 @@ int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
+>              return -1;
+>          }
+>  
+> -        memcpy(dst + d, src + i, count);
+> +        if (!is_pmem) {
+> +            memcpy(dst + d, src + i, count);
+> +        } else {
+> +            pmem_memcpy_nodrain(dst + d, src + i, count);
+> +        }
+>          d += count;
+>          i += count;
+>      }
+>  
+>      return d;
+>  }
+> +
+> +int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
+> +{
+> +    return xbzrle_decode_buffer_common(src, slen, dst, dlen, false);
+> +}
+> +
+> +int xbzrle_decode_buffer_to_pmem(uint8_t *src, int slen, uint8_t *dst, int dlen)
+> +{
+> +    return xbzrle_decode_buffer_common(src, slen, dst, dlen, true);
+> +}
 
-In what way is it less optimal?
-If that's a legal thing to do, then why not just do a pmem_flush +
-pmem_drain right at the end of the ram loading and leave all the rest of
-the code untouched?
+Again I wouldn't bother with these two wrappers, just add the is_pmem
+flag or pointer to xbzrle_decode_buffer.  Note that in xbzrle load this
+is doing lots of small copies; I'm not sure if this changes your needs.
 
 Dave
 
-> Haozhong
+> diff --git a/migration/xbzrle.h b/migration/xbzrle.h
+> index a0db507b9c..ac5ae32666 100644
+> --- a/migration/xbzrle.h
+> +++ b/migration/xbzrle.h
+> @@ -18,4 +18,5 @@ int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
+>                           uint8_t *dst, int dlen);
+>  
+>  int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen);
+> +int xbzrle_decode_buffer_to_pmem(uint8_t *src, int slen, uint8_t *dst, int dlen);
+>  #endif
+> -- 
+> 2.14.1
 > 
-> > 
-> > Dave
-> > 
-> > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > > ---
-> > >  include/qemu/pmem.h |  4 ++++
-> > >  migration/ram.c     | 16 +++++++++++-----
-> > >  2 files changed, 15 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
-> > > index 77ee1fc4eb..20e3f6e71d 100644
-> > > --- a/include/qemu/pmem.h
-> > > +++ b/include/qemu/pmem.h
-> > > @@ -37,6 +37,10 @@ static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
-> > >      return memset(pmemdest, c, len);
-> > >  }
-> > >  
-> > > +static inline void pmem_flush(const void *addr, size_t len)
-> > > +{
-> > > +}
-> > > +
-> > >  static inline void pmem_drain(void)
-> > >  {
-> > >  }
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index 5a79bbff64..924d2b9537 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -274,6 +274,7 @@ struct DecompressParam {
-> > >      void *des;
-> > >      uint8_t *compbuf;
-> > >      int len;
-> > > +    bool is_pmem;
-> > >  };
-> > >  typedef struct DecompressParam DecompressParam;
-> > >  
-> > > @@ -2502,7 +2503,7 @@ static void *do_data_decompress(void *opaque)
-> > >      DecompressParam *param = opaque;
-> > >      unsigned long pagesize;
-> > >      uint8_t *des;
-> > > -    int len;
-> > > +    int len, rc;
-> > >  
-> > >      qemu_mutex_lock(&param->mutex);
-> > >      while (!param->quit) {
-> > > @@ -2518,8 +2519,11 @@ static void *do_data_decompress(void *opaque)
-> > >               * not a problem because the dirty page will be retransferred
-> > >               * and uncompress() won't break the data in other pages.
-> > >               */
-> > > -            uncompress((Bytef *)des, &pagesize,
-> > > -                       (const Bytef *)param->compbuf, len);
-> > > +            rc = uncompress((Bytef *)des, &pagesize,
-> > > +                            (const Bytef *)param->compbuf, len);
-> > > +            if (rc == Z_OK && param->is_pmem) {
-> > > +                pmem_flush(des, len);
-> > > +            }
-> > >  
-> > >              qemu_mutex_lock(&decomp_done_lock);
-> > >              param->done = true;
-> > > @@ -2605,7 +2609,8 @@ static void compress_threads_load_cleanup(void)
-> > >  }
-> > >  
-> > >  static void decompress_data_with_multi_threads(QEMUFile *f,
-> > > -                                               void *host, int len)
-> > > +                                               void *host, int len,
-> > > +                                               bool is_pmem)
-> > >  {
-> > >      int idx, thread_count;
-> > >  
-> > > @@ -2619,6 +2624,7 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
-> > >                  qemu_get_buffer(f, decomp_param[idx].compbuf, len);
-> > >                  decomp_param[idx].des = host;
-> > >                  decomp_param[idx].len = len;
-> > > +                decomp_param[idx].is_pmem = is_pmem;
-> > >                  qemu_cond_signal(&decomp_param[idx].cond);
-> > >                  qemu_mutex_unlock(&decomp_param[idx].mutex);
-> > >                  break;
-> > > @@ -2964,7 +2970,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-> > >                  ret = -EINVAL;
-> > >                  break;
-> > >              }
-> > > -            decompress_data_with_multi_threads(f, host, len);
-> > > +            decompress_data_with_multi_threads(f, host, len, is_pmem);
-> > >              break;
-> > >  
-> > >          case RAM_SAVE_FLAG_XBZRLE:
-> > > -- 
-> > > 2.14.1
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
