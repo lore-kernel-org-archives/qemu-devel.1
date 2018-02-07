@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejUoD-0006rL-Ag
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:51:06 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1ejV3E-0007KC-5F
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:06:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejUo9-0006J3-EF
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:51:05 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43654 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ejUo9-0006Ii-AF
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:51:01 -0500
-References: <20180207175014.11157-1-lcapitulino@redhat.com>
-	<20180207175014.11157-3-lcapitulino@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c0464781-02dd-afeb-f7a8-345ccf8fe4f4@redhat.com>
-Date: Wed, 7 Feb 2018 12:50:59 -0600
+	(envelope-from <rkagan@virtuozzo.com>) id 1ejV3B-0003Jn-0C
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:06:36 -0500
+Received: from mail-db5eur03hn0213.outbound.protection.outlook.com
+	([104.47.10.213]:7825
+	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1ejV3A-0003Iy-F7
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 14:06:32 -0500
+Date: Wed, 7 Feb 2018 22:06:15 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180207190615.GC18247@rkaganb.sw.ru>
+References: <20180206203048.11096-1-rkagan@virtuozzo.com>
+	<20180206203048.11096-12-rkagan@virtuozzo.com>
+	<10ea956e-3a47-9da4-2005-af5b1c636518@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180207175014.11157-3-lcapitulino@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qmp: document query-cpus performance
- issue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <10ea956e-3a47-9da4-2005-af5b1c636518@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 11/34] hyperv: add synic message
+ delivery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luiz Capitulino <lcapitulino@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, ehabkost@redhat.com, berrange@redhat.com, mihajlov@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
 
-On 02/07/2018 11:50 AM, Luiz Capitulino wrote:
-> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
-> ---
->   qapi-schema.json | 4 ++++
->   1 file changed, 4 insertions(+)
+On Wed, Feb 07, 2018 at 11:58:08AM +0100, Paolo Bonzini wrote:
+> On 06/02/2018 21:30, Roman Kagan wrote:
+> > +
+> > +    HvSintMsgCb msg_cb;
+> > +    void *msg_cb_data;
+> > +    struct hyperv_message *msg;
+> > +    /*
+> > +     * the state of the message staged in .msg:
+> > +     * 0        - the staging area is not in use (after init or message
+> > +     *            successfully delivered to guest)
+> > +     * -EBUSY   - the staging area is being used in vcpu thread
+> > +     * -EAGAIN  - delivery attempt failed due to slot being busy, retry
+> > +     * -EXXXX   - error
+> > +     */
+> > +    int msg_status;
+> > +
 > 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 82d6f12b53..0665a14dba 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -526,6 +526,10 @@
->   #
->   # Returns a list of information about each virtual CPU.
->   #
-> +# WARNING: This command incurs a performance penalty for latency
-> +#          sensitive workloads and hence it's not recommended to
-> +#          to be used in production. Use query-cpus-fast instead
-> +#
+> Access to these fields needs to be protected by a mutex (the refcount is
+> okay because it is only released in the bottom half).
 
-Ah, I asked for this on 1/2.  You could squash these.
+Hmm, I'll double-check, but the original idea was that this stuff is
+only used/ref-d/unref-d in the main thread so no mutex was necessary.
 
-I didn't review the code, just the interface, so if you squash them, you 
-can add the weaker:
+> Please also add
+> comments regarding which fields are read-only, which are accessed under
+> BQL, etc.
+> 
+> Also, msg_status's handling of EBUSY/EAGAIN is a bit strange, like:
+> 
+> +    if (ret == -EBUSY) {
+> +        return -EAGAIN;
+> +    }
+> +    if (ret) {
+> +        return ret;
+> +    }
+> 
+> I wonder if it would be better to change -EBUSY to 1, or to split
+> msg_status into two fields, such as msg_status (filled by the vCPU
+> thread) and msg_state which can be HYPERV_MSG_STATE_{FREE,BUSY,POSTED}.
+> msg_status is only valid if the state is POSTED, and sint_msg_bh then
+> moves the state back to FREE.
 
-Acked-by: Eric Blake <eblake@redhat.com>
+Fair enough, that code isn't easy to follow.  I'll give this your
+suggestion a try.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+Roman.
