@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejSXj-0007Ab-C0
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:25:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ejSZZ-0003j0-IX
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:27:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejSXe-0005Ix-Qy
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:25:55 -0500
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:40210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejSXe-0005In-N6
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:25:50 -0500
-Received: by mail-ot0-x230.google.com with SMTP id s4so1323932oth.7
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 08:25:50 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1ejSZU-0006t0-Pc
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:27:49 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47718 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejSZU-0006sm-Jd
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:27:44 -0500
+Date: Wed, 7 Feb 2018 16:27:25 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180207162724.GP2665@work-vm>
+References: <20180206163039.23661-1-ross.lagerwall@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20180206184101.14644.84734.stgit@gimli.home>
-References: <20180206184101.14644.84734.stgit@gimli.home>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Feb 2018 16:25:29 +0000
-Message-ID: <CAFEAcA-FTTdfwOrKQtRf3A2DRnNCgd=J0MUSX5E-e_F74dGFjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] VFIO updates 2018-02-06
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180206163039.23661-1-ross.lagerwall@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/xen: Check return value of
+ qemu_fclose
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-On 6 February 2018 at 18:42, Alex Williamson <alex.williamson@redhat.com> wrote:
-> The following changes since commit 20e0d439a6ded635ec89f6135c08cd5541c68962:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20180204' into staging (2018-02-06 14:21:41 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20180206.0
->
-> for you to fetch changes up to db32d0f43839627f54a1a7f8eee17baa770f52d2:
->
->   vfio/pci: Add option to disable GeForce quirks (2018-02-06 11:08:27 -0700)
->
-> ----------------------------------------------------------------
-> VFIO updates 2018-02-06
->
->  - SPAPR in-kernel TCE accleration (Alexey Kardashevskiy)
->
->  - MSI-X relocation (Alex Williamson)
->
->  - Add missing platform mutex init (Eric Auger)
->
->  - Redundant variable cleanup (Alexey Kardashevskiy)
->
->  - Option to disable GeForce quirks (Alex Williamson)
+* Ross Lagerwall (ross.lagerwall@citrix.com) wrote:
+> QEMUFile uses buffered IO so when writing small amounts (such as the Xen
+> device state file), the actual write call and any errors that may occur
+> only happen as part of qemu_fclose(). Therefore, report IO errors when
+> saving the device state under Xen by checking the return value of
+> qemu_fclose().
+> 
+> Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
 
-Applied, thanks.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
--- PMM
+> ---
+>  migration/savevm.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index b7908f6..4b9d5be 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2267,8 +2267,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+>      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-xen-save-state");
+>      f = qemu_fopen_channel_output(QIO_CHANNEL(ioc));
+>      ret = qemu_save_device_state(f);
+> -    qemu_fclose(f);
+> -    if (ret < 0) {
+> +    if (ret < 0 || qemu_fclose(f) < 0) {
+>          error_setg(errp, QERR_IO_ERROR);
+>      } else {
+>          /* libxl calls the QMP command "stop" before calling
+> -- 
+> 2.9.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
