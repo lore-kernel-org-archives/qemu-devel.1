@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejUKd-0002Wa-3j
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:20:32 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ejULa-0003Pk-2u
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejUKb-0005Iu-OY
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:20:31 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  7 Feb 2018 15:19:29 -0300
-Message-Id: <20180207181929.8701-17-f4bug@amsat.org>
-In-Reply-To: <20180207181929.8701-1-f4bug@amsat.org>
-References: <20180207181929.8701-1-f4bug@amsat.org>
+	(envelope-from <borntraeger@de.ibm.com>) id 1ejULX-000675-JY
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:21:30 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39530)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ejULX-000665-Ab
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 13:21:27 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w17IL2dR038425
+	for <qemu-devel@nongnu.org>; Wed, 7 Feb 2018 13:21:26 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g06d3rnbg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 13:21:25 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 7 Feb 2018 18:21:22 -0000
+References: <20180207155531.28446-1-cohuck@redhat.com>
+	<20180207155531.28446-3-cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 7 Feb 2018 19:21:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10 16/16] hw/arm/xilinx_zynq: fix the
- capabilities register to match the datasheet
+In-Reply-To: <20180207155531.28446-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <e1eb4a58-19f0-3e08-5188-560c9efdde28@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 2/3] MAINTAINERS: reorganize
+ s390-ccw bios maintainership
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +43,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:Xilinx Zynq" <qemu-arm@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: thuth@redhat.com, david@redhat.com, agraf@suse.de, rth@twiddle.net
 
-checking Xilinx datasheet "UG585" (v1.12.1)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- hw/arm/xilinx_zynq.c | 53 ++++++++++++++++++++++++++++------------------------
- tests/sdhci-test.c   |  5 +++++
- 2 files changed, 34 insertions(+), 24 deletions(-)
+On 02/07/2018 04:55 PM, Cornelia Huck wrote:
+> Split it out from the s390-ccw-virtio machine, add Thomas as a
+> maintainer in addition to Christian.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 1836a4ed45..0f76333770 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -61,6 +61,8 @@ static const int dma_irqs[8] = {
- #define SLCR_XILINX_UNLOCK_KEY  0xdf0d
- #define SLCR_XILINX_LOCK_KEY    0x767b
- 
-+#define ZYNQ_SDHCI_CAPABILITIES 0x69ec0080  /* Datasheet: UG585 (v1.12.1) */
-+
- #define ARMV7_IMM16(x) (extract32((x),  0, 12) | \
-                         extract32((x), 12,  4) << 16)
- 
-@@ -165,10 +167,8 @@ static void zynq_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
--    DeviceState *dev, *carddev;
-+    DeviceState *dev;
-     SysBusDevice *busdev;
--    DriveInfo *di;
--    BlockBackend *blk;
-     qemu_irq pic[64];
-     int n;
- 
-@@ -247,27 +247,32 @@ static void zynq_init(MachineState *machine)
-     gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
-     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
- 
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
--
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
-+    for (n = 0; n < 2; n++) {
-+        int hci_irq = n ? 79 : 56;
-+        hwaddr hci_addr = n ? 0xE0101000 : 0xE0100000;
-+        DriveInfo *di;
-+        BlockBackend *blk;
-+        DeviceState *carddev;
-+
-+        /* Compatible with:
-+         * - SD Host Controller Specification Version 2.0 Part A2
-+         * - SDIO Specification Version 2.0
-+         * - MMC Specification Version 3.31
-+         */
-+        dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-+        qdev_prop_set_uint8(dev, "sd-spec-version", 2);
-+        qdev_prop_set_uint64(dev, "capareg", ZYNQ_SDHCI_CAPABILITIES);
-+        qdev_init_nofail(dev);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, hci_addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[hci_irq - IRQ_OFFSET]);
-+
-+        di = drive_get_next(IF_SD);
-+        blk = di ? blk_by_legacy_dinfo(di) : NULL;
-+        carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
-+        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(carddev), true, "realized",
-+                                 &error_fatal);
-+    }
- 
-     dev = qdev_create(NULL, TYPE_ZYNQ_XADC);
-     qdev_init_nofail(dev);
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index ee12c4be7b..3f3370e224 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -41,6 +41,11 @@ static const struct sdhci_t {
-     /* Exynos4210 */
-     { "arm",    "smdkc210",
-         {0x12510000, 2, 0,  {1, 0x5e80080} } },
-+
-+    /* Zynq-7000 */
-+    { "arm",    "xilinx-zynq-a9",   /* Datasheet: UG585 (v1.12.1) */
-+        {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
-+
- };
- 
- typedef struct QSDHCI {
--- 
-2.16.1
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+Thanks Thomas for volunteering to co-maintain.
+> ---
+>  MAINTAINERS | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e24273a574..bd2dc7ed7c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -855,15 +855,22 @@ F: hw/char/sclp*.[hc]
+>  F: hw/char/terminal3270.c
+>  F: hw/s390x/
+>  F: include/hw/s390x/
+> -F: pc-bios/s390-ccw/
+>  F: hw/watchdog/wdt_diag288.c
+>  F: include/hw/watchdog/wdt_diag288.h
+> -F: pc-bios/s390-ccw.img
+>  F: default-configs/s390x-softmmu.mak
+>  T: git git://github.com/cohuck/qemu.git s390-next
+>  T: git git://github.com/borntraeger/qemu.git s390-next
+>  L: qemu-s390x@nongnu.org
+> 
+> +S390-ccw Bios
+> +M: Christian Borntraeger <borntraeger@de.ibm.com>
+> +M: Thomas Huth <thuth@redhat.com>
+> +S: Supported
+> +F: pc-bios/s390-ccw/
+> +F: pc-bios/s390-ccw.img
+> +T: git git://github.com/borntraeger/qemu.git s390-next
+> +L: qemu-s390x@nongnu.org
+> +
+>  UniCore32 Machines
+>  -------------
+>  PKUnity-3 SoC initramfs-with-busybox
+> 
