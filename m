@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejPK0-0002ya-TN
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:59:34 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ejPOO-0006nx-Gq
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:04:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ejPJx-000438-12
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:59:32 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60378 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1ejPOK-0007ne-7P
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:04:04 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42802 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejPJw-00042A-Rd
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:59:28 -0500
-Date: Wed, 7 Feb 2018 12:59:00 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ejPOK-0007nP-2g
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 08:04:00 -0500
+Date: Wed, 7 Feb 2018 13:03:56 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180207125859.GG2665@work-vm>
+Message-ID: <20180207130355.GH2665@work-vm>
 References: <20180207073331.14158-1-haozhong.zhang@intel.com>
-	<20180207073331.14158-6-haozhong.zhang@intel.com>
-	<20180207113841.GB2665@work-vm>
-	<20180207115207.qeqld4v3hl246qu4@hz-desktop>
-	<20180207125141.cajtcvlsatwplfxh@hz-desktop>
+	<20180207073331.14158-8-haozhong.zhang@intel.com>
+	<20180207115406.GD2665@work-vm>
+	<20180207121525.5pyrld36k5xbm373@hz-desktop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180207125141.cajtcvlsatwplfxh@hz-desktop>
-Subject: Re: [Qemu-devel] [PATCH v2 5/8] migration/ram: ensure write
- persistence on loading zero pages to PMEM
+In-Reply-To: <20180207121525.5pyrld36k5xbm373@hz-desktop>
+Subject: Re: [Qemu-devel] [PATCH v2 7/8] migration/ram: ensure write
+ persistence on loading compressed pages to PMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +33,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
 * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> On 02/07/18 19:52 +0800, Haozhong Zhang wrote:
-> > On 02/07/18 11:38 +0000, Dr. David Alan Gilbert wrote:
-> > > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> > > > When loading a zero page, check whether it will be loaded to
-> > > > persistent memory If yes, load it by libpmem function
-> > > > pmem_memset_nodrain().  Combined with a call to pmem_drain() at the
-> > > > end of RAM loading, we can guarantee all those zero pages are
-> > > > persistently loaded.
-> > > 
-> > > I'm surprised pmem is this invasive to be honest;   I hadn't expected
-> > > the need for special memcpy's etc everywhere.  We're bound to miss some.
-> > > I assume there's separate kernel work needed to make postcopy work;
-> > > certainly the patches here don't seem to touch the postcopy path.
+> On 02/07/18 11:54 +0000, Dr. David Alan Gilbert wrote:
+> > * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
+> > > When loading a compressed page to persistent memory, flush CPU cache
+> > > after the data is decompressed. Combined with a call to pmem_drain()
+> > > at the end of memory loading, we can guarantee those compressed pages
+> > > are persistently loaded to PMEM.
 > > 
-> > This link at
-> > https://wiki.qemu.org/Features/PostCopyLiveMigration#Conflicts shows
-> > that postcopy with memory-backend-file requires kernel support. Can
-> > you point me the details of the required kernel support, so that I can
-> > understand what would be needed to NVDIMM postcopy?
+> > Can you explain why this can use the flush and doesn't need the special
+> > memset?
 > 
-> I saw test_ramblock_postcopiable() requires the ram block not be
-> mmap'ed with MAP_SHARED. The only pmem device (i.e., device DAX e.g.,
-> /dev/dax0.0) that can be safely used as the backend of vNVDIMM must be
-> shared mapped which is required by kernel, so postcopy does not work
-> with pmem right now. Even if the private mmap was supported for device
-> dax, it would still make little sense to private mmap it in QEMU,
-> because vNVDIMM intends to be non-volatile.
+> The best approach to ensure the write persistence is to operate pmem
+> all via libpmem, e.g., pmem_memcpy_nodrain() + pmem_drain(). However,
+> the write to pmem in this case is performed by uncompress() which is
+> implemented out of QEMU and libpmem. It may or may not use libpmem,
+> which is not controlled by QEMU. Therefore, we have to use the less
+> optimal approach, that is to flush cache for all pmem addresses that
+> uncompress() may have written, i.e.,/e.g., memcpy() and/or memset() in
+> uncompress(), and pmem_flush() + pmem_drain() in QEMU.
 
-I've got patches which do shareable for vhost-user at the moment;
-(I've posted a few versions and I'm working on an updated set).
-However, it's probably more than just the shareable that needs thinking
-about for a device like that.
+In what way is it less optimal?
+If that's a legal thing to do, then why not just do a pmem_flush +
+pmem_drain right at the end of the ram loading and leave all the rest of
+the code untouched?
 
 Dave
 
 > Haozhong
+> 
+> > 
+> > Dave
+> > 
+> > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > > ---
+> > >  include/qemu/pmem.h |  4 ++++
+> > >  migration/ram.c     | 16 +++++++++++-----
+> > >  2 files changed, 15 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+> > > index 77ee1fc4eb..20e3f6e71d 100644
+> > > --- a/include/qemu/pmem.h
+> > > +++ b/include/qemu/pmem.h
+> > > @@ -37,6 +37,10 @@ static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
+> > >      return memset(pmemdest, c, len);
+> > >  }
+> > >  
+> > > +static inline void pmem_flush(const void *addr, size_t len)
+> > > +{
+> > > +}
+> > > +
+> > >  static inline void pmem_drain(void)
+> > >  {
+> > >  }
+> > > diff --git a/migration/ram.c b/migration/ram.c
+> > > index 5a79bbff64..924d2b9537 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -274,6 +274,7 @@ struct DecompressParam {
+> > >      void *des;
+> > >      uint8_t *compbuf;
+> > >      int len;
+> > > +    bool is_pmem;
+> > >  };
+> > >  typedef struct DecompressParam DecompressParam;
+> > >  
+> > > @@ -2502,7 +2503,7 @@ static void *do_data_decompress(void *opaque)
+> > >      DecompressParam *param = opaque;
+> > >      unsigned long pagesize;
+> > >      uint8_t *des;
+> > > -    int len;
+> > > +    int len, rc;
+> > >  
+> > >      qemu_mutex_lock(&param->mutex);
+> > >      while (!param->quit) {
+> > > @@ -2518,8 +2519,11 @@ static void *do_data_decompress(void *opaque)
+> > >               * not a problem because the dirty page will be retransferred
+> > >               * and uncompress() won't break the data in other pages.
+> > >               */
+> > > -            uncompress((Bytef *)des, &pagesize,
+> > > -                       (const Bytef *)param->compbuf, len);
+> > > +            rc = uncompress((Bytef *)des, &pagesize,
+> > > +                            (const Bytef *)param->compbuf, len);
+> > > +            if (rc == Z_OK && param->is_pmem) {
+> > > +                pmem_flush(des, len);
+> > > +            }
+> > >  
+> > >              qemu_mutex_lock(&decomp_done_lock);
+> > >              param->done = true;
+> > > @@ -2605,7 +2609,8 @@ static void compress_threads_load_cleanup(void)
+> > >  }
+> > >  
+> > >  static void decompress_data_with_multi_threads(QEMUFile *f,
+> > > -                                               void *host, int len)
+> > > +                                               void *host, int len,
+> > > +                                               bool is_pmem)
+> > >  {
+> > >      int idx, thread_count;
+> > >  
+> > > @@ -2619,6 +2624,7 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+> > >                  qemu_get_buffer(f, decomp_param[idx].compbuf, len);
+> > >                  decomp_param[idx].des = host;
+> > >                  decomp_param[idx].len = len;
+> > > +                decomp_param[idx].is_pmem = is_pmem;
+> > >                  qemu_cond_signal(&decomp_param[idx].cond);
+> > >                  qemu_mutex_unlock(&decomp_param[idx].mutex);
+> > >                  break;
+> > > @@ -2964,7 +2970,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> > >                  ret = -EINVAL;
+> > >                  break;
+> > >              }
+> > > -            decompress_data_with_multi_threads(f, host, len);
+> > > +            decompress_data_with_multi_threads(f, host, len, is_pmem);
+> > >              break;
+> > >  
+> > >          case RAM_SAVE_FLAG_XBZRLE:
+> > > -- 
+> > > 2.14.1
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
