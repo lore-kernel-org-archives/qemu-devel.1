@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejLj7-0006Ca-6V
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 04:09:16 -0500
+	(envelope-from <kchamart@redhat.com>) id 1ejLoq-0001lg-6y
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 04:15:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejLj3-0007g6-Vw
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 04:09:13 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56048 helo=mx1.redhat.com)
+	(envelope-from <kchamart@redhat.com>) id 1ejLol-0004Do-L0
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 04:15:08 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53672 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejLj3-0007di-Qj
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 04:09:09 -0500
-References: <CAEZT4RNYVuFvwyp9VR94HAgVmz-_MFyd0yjEDRP8_iJ=D5XcKQ@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d82e7abb-9f6d-0ed3-6c4d-05dd99d98450@redhat.com>
-Date: Wed, 7 Feb 2018 10:08:56 +0100
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ejLol-0004DV-GM
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 04:15:03 -0500
+Date: Wed, 7 Feb 2018 10:14:47 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180207091445.lglh65i3w4s43lkf@eukaryote>
+References: <1517988804-15597-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEZT4RNYVuFvwyp9VR94HAgVmz-_MFyd0yjEDRP8_iJ=D5XcKQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1517988804-15597-1-git-send-email-thuth@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Regarding Network interface on QEMU
+Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Add a blog post with the
+ presentations from DevConf and FOSDEM 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Arun raj <krarun88@gmail.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Otubo <otubo@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Pankaj Gupta <pagupta@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 07.02.2018 09:55, Arun raj wrote:
-> Hi,
+On Wed, Feb 07, 2018 at 08:33:24AM +0100, Thomas Huth wrote:
+> Let's provide some links to the videos from FOSDEM and DevConf.
+>
+> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Eduardo Otubo <otubo@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Added link to the virtio 1.1 talk
+>  - Added links to the schedules of the virtualization tracks
 >=20
-> I'm new to QEMU and using latest QEMU-2.11.50 version. i installed ubun=
-tu
-> 16.04 in QEMU and my host system has 4.4 kernel
->=20
-> following command is i'm using to run the QEMU :
->=20
-> qemu-system-x86_64 -machine q35,kernel_irqchip=3Dsplit -m 1G -enable-kv=
-m -smp
-> 4 -device intel-iommu,intremap=3Don,x-buggy-eim=3Don -cpu
-> kvm64,-kvm_pv_eoi,-kvm_steal_time,-kvm_asyncpf,-kvmclock,+vmx -drive
-> file=3Dtesting.img,format=3Draw,id=3Ddisk,if=3Dnone -device ide-hd,driv=
-e=3Ddisk
-> -serial stdio -serial vc -netdev user,id=3Dnet -device
-> e1000e,addr=3D2.0,netdev=3Dnet -device intel-hda,addr=3D1b.0 -device hd=
-a-duplex
->=20
-> But in QEMU i can't able to access the internet and ping also not worki=
-ng.
+>  _posts/2018-02-06-devconf-fosdem.md | 46 +++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 46 insertions(+)
+>  create mode 100644 _posts/2018-02-06-devconf-fosdem.md
 
-It's normal that "ping" (or rather ICMP) is not working by default with
-the "-netdev user" backend. The "user" backend is using NAT. But you
-should be able to get to the outside via TCP. See this URL for details:
+Thanks for writing this post.  Looks good to me.
 
-https://wiki.qemu.org/Documentation/Networking#User_Networking_.28SLIRP.2=
-9
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
 
-Do you see a network interface in the guest? Does it have an IP address?
-I.e. what's the output of "ifconfig" or "ip addr" in the guest? Does it b=
-ehave
-behave differently if you use another type of NIC, e.g. "virtio-net-pci"
-instead of "e1000e"?
+[...]
 
- Thomas
+--=20
+/kashyap
