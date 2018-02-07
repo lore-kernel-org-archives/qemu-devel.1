@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ejErL-0005cI-FC
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 20:49:16 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejFKA-0002Fi-7h
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ejErG-0008AM-Hw
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 20:49:15 -0500
-Received: from mail-ua0-f178.google.com ([209.85.217.178]:41422)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejFK6-0006Qo-Tg
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:19:02 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35106)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1ejErG-00085B-C7
-	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 20:49:10 -0500
-Received: by mail-ua0-f178.google.com with SMTP id f5so2527563ual.8
-	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 17:49:08 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejFK6-0006PQ-NS
+	for qemu-devel@nongnu.org; Tue, 06 Feb 2018 21:18:58 -0500
+Received: by mail-qk0-x244.google.com with SMTP id 69so5026017qkz.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Feb 2018 18:18:58 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1517955702.git.alistair.francis@xilinx.com>
+	<378759b13cf65246de7ce565045f877e4a224aa0.1517955702.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8dead98d-dd14-6019-74f4-fee860b16410@amsat.org>
+Date: Tue, 6 Feb 2018 23:18:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180206153237.GA4799@localhost.localdomain>
-References: <20170418143044.12187-1-famz@redhat.com>
-	<20170418143044.12187-3-famz@redhat.com>
-	<20180206153237.GA4799@localhost.localdomain>
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 7 Feb 2018 09:48:37 +0800
-Message-ID: <CAK1Eb9=h4435CkK-eSz_YqAbVaz8Mvnx=VuB_BtSRHgZOfCLfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.9-rc5 v4 2/2] block: Drain BH in
- bdrv_drained_begin
+In-Reply-To: <378759b13cf65246de7ce565045f877e4a224aa0.1517955702.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] timer: Initial commit of
+ xlnx-pmu-iomod-pit device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +36,361 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeffrey Cody <jcody@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+Cc: alistair23@gmail.com
 
-On Tue, Feb 6, 2018 at 11:32 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 18.04.2017 um 16:30 hat Fam Zheng geschrieben:
->> During block job completion, nothing is preventing
->> block_job_defer_to_main_loop_bh from being called in a nested
->> aio_poll(), which is a trouble, such as in this code path:
->>
->>     qmp_block_commit
->>       commit_active_start
->>         bdrv_reopen
->>           bdrv_reopen_multiple
->>             bdrv_reopen_prepare
->>               bdrv_flush
->>                 aio_poll
->>                   aio_bh_poll
->>                     aio_bh_call
->>                       block_job_defer_to_main_loop_bh
->>                         stream_complete
->>                           bdrv_reopen
->>
->> block_job_defer_to_main_loop_bh is the last step of the stream job,
->> which should have been "paused" by the bdrv_drained_begin/end in
->> bdrv_reopen_multiple, but it is not done because it's in the form of a
->> main loop BH.
->>
->> Similar to why block jobs should be paused between drained_begin and
->> drained_end, BHs they schedule must be excluded as well.  To achieve
->> this, this patch forces draining the BH in BDRV_POLL_WHILE.
->>
->> As a side effect this fixes a hang in block_job_detach_aio_context
->> during system_reset when a block job is ready:
->>
->>     #0  0x0000555555aa79f3 in bdrv_drain_recurse
->>     #1  0x0000555555aa825d in bdrv_drained_begin
->>     #2  0x0000555555aa8449 in bdrv_drain
->>     #3  0x0000555555a9c356 in blk_drain
->>     #4  0x0000555555aa3cfd in mirror_drain
->>     #5  0x0000555555a66e11 in block_job_detach_aio_context
->>     #6  0x0000555555a62f4d in bdrv_detach_aio_context
->>     #7  0x0000555555a63116 in bdrv_set_aio_context
->>     #8  0x0000555555a9d326 in blk_set_aio_context
->>     #9  0x00005555557e38da in virtio_blk_data_plane_stop
->>     #10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd
->>     #11 0x00005555559fa49b in virtio_bus_stop_ioeventfd
->>     #12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd
->>     #13 0x00005555559f6a18 in virtio_pci_reset
->>     #14 0x00005555559139a9 in qdev_reset_one
->>     #15 0x0000555555916738 in qbus_walk_children
->>     #16 0x0000555555913318 in qdev_walk_children
->>     #17 0x0000555555916738 in qbus_walk_children
->>     #18 0x00005555559168ca in qemu_devices_reset
->>     #19 0x000055555581fcbb in pc_machine_reset
->>     #20 0x00005555558a4d96 in qemu_system_reset
->>     #21 0x000055555577157a in main_loop_should_exit
->>     #22 0x000055555577157a in main_loop
->>     #23 0x000055555577157a in main
->>
->> The rationale is that the loop in block_job_detach_aio_context cannot
->> make any progress in pausing/completing the job, because bs->in_flight
->> is 0, so bdrv_drain doesn't process the block_job_defer_to_main_loop
->> BH. With this patch, it does.
->>
->> Reported-by: Jeff Cody <jcody@redhat.com>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->
-> Fam, do you remember whether this was really only about drain? Because
-> in that case...
+Hi Alistair,
 
-Yes I believe so.
+On 02/06/2018 07:23 PM, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
+> 
+>  include/hw/timer/xlnx-pmu-iomod-pit.h |  58 ++++++++
+>  hw/timer/xlnx-pmu-iomod-pit.c         | 241 ++++++++++++++++++++++++++++++++++
+>  hw/timer/Makefile.objs                |   2 +
+>  3 files changed, 301 insertions(+)
+>  create mode 100644 include/hw/timer/xlnx-pmu-iomod-pit.h
+>  create mode 100644 hw/timer/xlnx-pmu-iomod-pit.c
+> 
+> diff --git a/include/hw/timer/xlnx-pmu-iomod-pit.h b/include/hw/timer/xlnx-pmu-iomod-pit.h
+> new file mode 100644
+> index 0000000000..15f9f0dee5
+> --- /dev/null
+> +++ b/include/hw/timer/xlnx-pmu-iomod-pit.h
+> @@ -0,0 +1,58 @@
+> +/*
+> + * QEMU model of Xilinx I/O Module PIT
+> + *
+> + * Copyright (c) 2013 Xilinx Inc
 
->
->> diff --git a/include/block/block.h b/include/block/block.h
->> index 97d4330..5ddc0cf 100644
->> --- a/include/block/block.h
->> +++ b/include/block/block.h
->> @@ -381,12 +381,13 @@ void bdrv_drain_all(void);
->>
->>  #define BDRV_POLL_WHILE(bs, cond) ({                       \
->>      bool waited_ = false;                                  \
->> +    bool busy_ = true;                                     \
->>      BlockDriverState *bs_ = (bs);                          \
->>      AioContext *ctx_ = bdrv_get_aio_context(bs_);          \
->>      if (aio_context_in_iothread(ctx_)) {                   \
->> -        while ((cond)) {                                   \
->> -            aio_poll(ctx_, true);                          \
->> -            waited_ = true;                                \
->> +        while ((cond) || busy_) {                          \
->> +            busy_ = aio_poll(ctx_, (cond));                \
->> +            waited_ |= !!(cond) | busy_;                   \
->>          }                                                  \
->>      } else {                                               \
->>          assert(qemu_get_current_aio_context() ==           \
->> @@ -398,11 +399,16 @@ void bdrv_drain_all(void);
->>           */                                                \
->>          assert(!bs_->wakeup);                              \
->>          bs_->wakeup = true;                                \
->> -        while ((cond)) {                                   \
->> -            aio_context_release(ctx_);                     \
->> -            aio_poll(qemu_get_aio_context(), true);        \
->> -            aio_context_acquire(ctx_);                     \
->> -            waited_ = true;                                \
->> +        while (busy_) {                                    \
->> +            if ((cond)) {                                  \
->> +                waited_ = busy_ = true;                    \
->> +                aio_context_release(ctx_);                 \
->> +                aio_poll(qemu_get_aio_context(), true);    \
->> +                aio_context_acquire(ctx_);                 \
->> +            } else {                                       \
->> +                busy_ = aio_poll(ctx_, false);             \
->> +                waited_ |= busy_;                          \
->> +            }                                              \
->>          }                                                  \
->>          bs_->wakeup = false;                               \
->>      }                                                      \
->
-> ...fixing it in BDRV_POLL_WHILE() rather than the drain functions may
-> have been a bad idea.
->
-> I got a bug assigned where we have a large (200 GB) fragmented qcow2
-> image, and qemu-img convert takes two hours before it even starts to
-> copy data. What it does in this time is iterating through the whole
-> image with bdrv_block_status_above() in order to estimate the work to be
-> done (and of course it will repeat the same calls while actually copying
-> data).
+I'm glad you upstream this :)
 
-The convert_iteration_sectors loop looks wasteful. Why cannot we
-report progress simply based on (offset/size) * 100% so we don't need
-to do this estimation?
+> + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/ptimer.h"
+> +
+> +#define TYPE_XLNX_ZYNQMP_IOMODULE_PIT "xlnx.pmu_iomodule"
+> +
+> +#define XLNX_ZYNQMP_IOMODULE_PIT(obj) \
+> +     OBJECT_CHECK(XlnxPMUPIT, (obj), TYPE_XLNX_ZYNQMP_IOMODULE_PIT)
+> +
+> +#define XLNX_ZYNQMP_IOMODULE_PIT_R_MAX (0x08 + 1)
 
->
-> One of the things I saw is that between each pair of lseek() calls, we
-> also have unnecessary poll() calls, and these were introduced by this
-> patch. If I modify bdrv_common_block_status_above() so that it doesn't
-> poll if data.done == true already, the time needed to iterate through my
-> test image is cut in half.
->
-> Now, of course, I'm still only seeing a few seconds for a 100 GB image,
-> so there must be more that is wrong for the reporter, but it suggests to
-> me that BDRV_POLL_WHILE() shouldn't be polling unconditionally when only
-> one of its users actually needs this.
+I assume this part is generated, removing 'XLNX_' shortens a bit.
 
-Sounds fine to me. Maybe we could add a boolean parameter to BDRV_POLL_WHILE?
+> +
+> +typedef struct XlnxPMUPIT {
+> +    SysBusDevice parent_obj;
+> +    MemoryRegion iomem;
+> +
+> +    QEMUBH *bh;
+> +    ptimer_state *ptimer;
+> +
+> +    qemu_irq irq;
+> +    /* IRQ to pulse out when present timer hits zero */
+> +    qemu_irq hit_out;
+> +
+> +    /* Counter in Pre-Scalar(ps) Mode */
+> +    uint32_t ps_counter;
+> +    /* ps_mode irq-in to enable/disable pre-scalar */
+> +    bool ps_enable;
+> +    /* State var to remember hit_in level */
+> +    bool ps_level;
+> +
+> +    uint32_t frequency;
 
-Fam
+I personally prefer explicit that kind of unit when possible:
+"frequency_hz".
+
+> +
+> +    uint32_t regs[XLNX_ZYNQMP_IOMODULE_PIT_R_MAX];
+> +    RegisterInfo regs_info[XLNX_ZYNQMP_IOMODULE_PIT_R_MAX];
+> +} XlnxPMUPIT;
+> diff --git a/hw/timer/xlnx-pmu-iomod-pit.c b/hw/timer/xlnx-pmu-iomod-pit.c
+> new file mode 100644
+> index 0000000000..cdfef1a440
+> --- /dev/null
+> +++ b/hw/timer/xlnx-pmu-iomod-pit.c
+> @@ -0,0 +1,241 @@
+> +/*
+> + * QEMU model of Xilinx I/O Module PIT
+> + *
+> + * Copyright (c) 2013 Xilinx Inc
+> + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/ptimer.h"
+> +#include "hw/register.h"
+> +#include "qemu/main-loop.h"
+> +#include "qemu/log.h"
+> +#include "qapi/error.h"
+> +#include "hw/timer/xlnx-pmu-iomod-pit.h"
+> +
+> +#ifndef XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG
+> +#define XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG 0
+> +#endif
+> +
+> +REG32(PIT_PRELOAD, 0x00)
+> +REG32(PIT_COUNTER, 0x04)
+> +REG32(PIT_CONTROL, 0x08)
+> +    FIELD(PIT_CONTROL, PRELOAD, 1, 1)
+> +    FIELD(PIT_CONTROL, EN, 0, 1)
+> +
+> +static uint64_t xlnx_iomod_pit_ctr_pr(RegisterInfo *reg, uint64_t val)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(reg->opaque);
+> +    uint32_t ret;
+
+Can you use uint64_t and return explicitly masking with UINT32_MAX?
+
+> +
+> +    if (s->ps_enable) {
+> +        ret = s->ps_counter;
+> +    } else {
+> +        ret = ptimer_get_count(s->ptimer);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void xlnx_iomod_pit_control_pw(RegisterInfo *reg, uint64_t val)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(reg->opaque);
+> +
+> +    ptimer_stop(s->ptimer);
+> +
+> +    if (val & R_PIT_CONTROL_EN_MASK) {
+> +        if (s->ps_enable) {
+> +            /* pre-scalar mode do-Nothing here */
+> +            s->ps_counter = s->regs[R_PIT_PRELOAD];
+> +        } else {
+> +            ptimer_set_limit(s->ptimer, s->regs[R_PIT_PRELOAD], 1);
+> +            ptimer_run(s->ptimer, !(val & R_PIT_CONTROL_PRELOAD_MASK));
+> +
+
+> +        }
+> +    }
+> +}
+> +
+> +static const RegisterAccessInfo xlnx_iomod_pit_regs_info[] = {
+> +    { .name = "PIT_PRELOAD",  .addr = A_PIT_PRELOAD,
+> +        .ro = 0xffffffff,
+> +    },{ .name = "PIT_COUNTER",  .addr = A_PIT_COUNTER,
+> +        .ro = 0xffffffff,
+> +        .post_read = xlnx_iomod_pit_ctr_pr,
+> +    },{ .name = "PIT_CONTROL",  .addr = A_PIT_CONTROL,
+> +        .rsvd = 0xfffffffc,
+> +        .post_write = xlnx_iomod_pit_control_pw,
+> +    }
+> +};
+> +
+> +static void xlnx_iomod_pit_timer_hit(void *opaque)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
+> +
+> +    qemu_irq_pulse(s->irq);
+> +
+> +    /* hit_out to make another pit move it's counter in pre-scalar mode. */
+> +    qemu_irq_pulse(s->hit_out);
+> +}
+> +
+> +static void xlnx_iomod_pit_ps_config(void *opaque, int n, int level)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
+> +
+> +    s->ps_enable = level;
+> +}
+> +
+> +static void xlnx_iomod_pit_ps_hit_in(void *opaque, int n, int level)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
+> +
+> +    if (!ARRAY_FIELD_EX32(s->regs, PIT_CONTROL, EN)) {
+> +        /* PIT disabled */
+> +        return;
+> +    }
+> +
+> +    /* Count only on positive edge */
+> +    if (!s->ps_level && level) {
+> +        if (s->ps_counter) {
+> +            s->ps_counter--;
+> +        }
+> +        s->ps_level = level;
+> +    } else {
+> +        /* Not on positive edge */
+> +        s->ps_level = level;
+> +        return;
+> +    }
+> +
+> +    /* If timer expires, try to preload or stop */
+> +    if (s->ps_counter == 0) {
+> +        xlnx_iomod_pit_timer_hit(opaque);
+> +
+> +        /* Check for pit preload/one-shot mode */
+> +        if (ARRAY_FIELD_EX32(s->regs, PIT_CONTROL, PRELOAD)) {
+> +            /* Preload Mode, Reload the ps_counter */
+> +            s->ps_counter = s->regs[R_PIT_PRELOAD];
+> +        } else {
+> +            /* One-Shot mode, turn off the timer */
+> +            s->regs[R_PIT_CONTROL] &= ~R_PIT_CONTROL_PRELOAD_MASK;
+> +        }
+> +    }
+> +}
+> +
+> +static void xlnx_iomod_pit_reset(DeviceState *dev)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(dev);
+> +    unsigned int i;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
+> +        register_reset(&s->regs_info[i]);
+> +    }
+> +
+> +    s->ps_level = false;
+> +}
+> +
+> +static const MemoryRegionOps xlnx_iomod_pit_ops = {
+> +    .read = register_read_memory,
+> +    .write = register_write_memory,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +    },
+> +};
+> +
+> +static void xlnx_iomod_pit_realize(DeviceState *dev, Error **errp)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(dev);
+> +
+> +    s->bh = qemu_bh_new(xlnx_iomod_pit_timer_hit, s);
+> +    s->ptimer = ptimer_init(s->bh, PTIMER_POLICY_DEFAULT);
+> +    ptimer_set_freq(s->ptimer, s->frequency);
+> +
+> +    /* IRQ out to pulse when present timer expires/reloads */
+> +    qdev_init_gpio_out_named(dev, &s->hit_out, "ps_hit_out", 1);
+> +
+> +    /* IRQ in to enable pre-scalar mode. Routed from gpo1 */
+> +    qdev_init_gpio_in_named(dev, xlnx_iomod_pit_ps_config, "ps_config", 1);
+> +
+> +    /* hit_out of neighbouring PIT is received as hit_in */
+> +    qdev_init_gpio_in_named(dev, xlnx_iomod_pit_ps_hit_in, "ps_hit_in", 1);
+> +}
+> +
+> +static void xlnx_iomod_pit_init(Object *obj)
+> +{
+> +    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(obj);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +    RegisterInfoArray *reg_array;
+> +
+> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
+> +                       XLNX_ZYNQMP_IOMODULE_PIT_R_MAX * 4);
+> +    reg_array =
+> +        register_init_block32(DEVICE(obj), xlnx_iomod_pit_regs_info,
+> +                              ARRAY_SIZE(xlnx_iomod_pit_regs_info),
+> +                              s->regs_info, s->regs,
+> +                              &xlnx_iomod_pit_ops,
+> +                              XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG,
+> +                              XLNX_ZYNQMP_IOMODULE_PIT_R_MAX * 4);
+> +    memory_region_add_subregion(&s->iomem,
+> +                                0x0,
+> +                                &reg_array->mem);
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +    sysbus_init_irq(sbd, &s->irq);
+> +}
+> +
+> +static const VMStateDescription vmstate_xlnx_iomod_pit = {
+> +    .name = TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_END_OF_LIST(),
+> +    }
+> +};
+> +
+> +static Property xlnx_iomod_pit_properties[] = {
+> +    DEFINE_PROP_UINT32("frequency", XlnxPMUPIT, frequency, 66000000),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void xlnx_iomod_pit_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->reset = xlnx_iomod_pit_reset;
+> +    dc->realize = xlnx_iomod_pit_realize;
+> +    dc->props = xlnx_iomod_pit_properties;
+> +    dc->vmsd = &vmstate_xlnx_iomod_pit;
+> +}
+> +
+> +static const TypeInfo xlnx_iomod_pit_info = {
+> +    .name          = TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(XlnxPMUPIT),
+> +    .class_init    = xlnx_iomod_pit_class_init,
+> +    .instance_init = xlnx_iomod_pit_init,
+> +};
+> +
+> +static void xlnx_iomod_pit_register_types(void)
+> +{
+> +    type_register_static(&xlnx_iomod_pit_info);
+> +}
+> +
+> +type_init(xlnx_iomod_pit_register_types)
+> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+> index 8c19eac3b6..805c480cad 100644
+> --- a/hw/timer/Makefile.objs
+> +++ b/hw/timer/Makefile.objs
+> @@ -43,3 +43,5 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
+>  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+>  common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+>  common-obj-$(CONFIG_MSF2) += mss-timer.o
+> +
+> +common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-pmu-iomod-pit.o
+> 
+
+Patch looks good to me but I'm not confident with ptimers to add a R-b.
+
+Regards,
+
+Phil.
