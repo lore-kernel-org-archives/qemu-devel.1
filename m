@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7X-00077B-1H
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7X-000781-Ks
 	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7U-0000zR-GK
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7U-0000zs-W6
 	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:51 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  7 Feb 2018 18:58:29 +0300
-Message-Id: <20180207155837.92351-5-vsementsov@virtuozzo.com>
+Date: Wed,  7 Feb 2018 18:58:36 +0300
+Message-Id: <20180207155837.92351-12-vsementsov@virtuozzo.com>
 In-Reply-To: <20180207155837.92351-1-vsementsov@virtuozzo.com>
 References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v10 04/12] dirty-bitmap: add locked state
+Subject: [Qemu-devel] [PATCH v10 11/12] iotests: add dirty bitmap migration
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,149 +23,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-Add special state, when qmp operations on the bitmap are disabled.
-It is needed during bitmap migration. "Frozen" state is not
-appropriate here, because it looks like bitmap is unchanged.
+The test starts two vms (vm_a, vm_b), create dirty bitmap in
+the first one, do several writes to corresponding device and
+then migrate vm_a to vm_b.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json         |  5 ++++-
- include/block/dirty-bitmap.h |  3 +++
- block/dirty-bitmap.c         | 16 ++++++++++++++++
- blockdev.c                   | 19 +++++++++++++++++++
- 4 files changed, 42 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/169     | 141 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/169.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 147 insertions(+)
+ create mode 100755 tests/qemu-iotests/169
+ create mode 100644 tests/qemu-iotests/169.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 1d44c439e9..236586a5e1 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -426,10 +426,13 @@
- # @active: The bitmap is actively monitoring for new writes, and can be cleared,
- #          deleted, or used for backup operations.
- #
-+# @locked: The bitmap is currently in-use by some operation and can not be
-+#          cleared, deleted, or used for backup operations. (Since 2.12)
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+new file mode 100755
+index 0000000000..8801f73b10
+--- /dev/null
++++ b/tests/qemu-iotests/169
+@@ -0,0 +1,141 @@
++#!/usr/bin/env python
 +#
- # Since: 2.4
- ##
- { 'enum': 'DirtyBitmapStatus',
--  'data': ['active', 'disabled', 'frozen'] }
-+  'data': ['active', 'disabled', 'frozen', 'locked'] }
- 
- ##
- # @BlockDirtyInfo:
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index b2e1fd913a..9daaf38897 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -68,6 +68,8 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
- void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
-                                        bool persistent);
-+void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
++# Tests for dirty bitmaps migration.
++#
++# Copyright (c) 2016-2017 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
- 
- /* Functions that require manual locking.  */
- void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
-@@ -87,6 +89,7 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
- bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
- bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
-+bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap);
- bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index ce00ff3474..221bcb9996 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -40,6 +40,8 @@ struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
-     HBitmap *bitmap;            /* Dirty bitmap implementation */
-     HBitmap *meta;              /* Meta dirty bitmap */
-+    bool qmp_locked;                /* Bitmap is frozen, it can't be modified
-+                                   through QMP */
-     BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
-     char *name;                 /* Optional non-empty unique ID */
-     int64_t size;               /* Size of the bitmap, in bytes */
-@@ -183,6 +185,18 @@ bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)
-     return bitmap->successor;
- }
- 
-+void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked)
-+{
-+    qemu_mutex_lock(bitmap->mutex);
-+    bitmap->qmp_locked = qmp_locked;
-+    qemu_mutex_unlock(bitmap->mutex);
-+}
++import os
++import iotests
++import time
++import itertools
++import operator
++import new
++from iotests import qemu_img
 +
-+bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap)
-+{
-+    return bitmap->qmp_locked;
-+}
 +
- /* Called with BQL taken.  */
- bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
- {
-@@ -194,6 +208,8 @@ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
- {
-     if (bdrv_dirty_bitmap_frozen(bitmap)) {
-         return DIRTY_BITMAP_STATUS_FROZEN;
-+    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
-+        return DIRTY_BITMAP_STATUS_LOCKED;
-     } else if (!bdrv_dirty_bitmap_enabled(bitmap)) {
-         return DIRTY_BITMAP_STATUS_DISABLED;
-     } else {
-diff --git a/blockdev.c b/blockdev.c
-index a1dc39345a..2cbe9ff8ea 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2113,6 +2113,9 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
-     if (bdrv_dirty_bitmap_frozen(state->bitmap)) {
-         error_setg(errp, "Cannot modify a frozen bitmap");
-         return;
-+    } else if (bdrv_dirty_bitmap_qmp_locked(state->bitmap)) {
-+        error_setg(errp, "Cannot modify a locked bitmap");
-+        return;
-     } else if (!bdrv_dirty_bitmap_enabled(state->bitmap)) {
-         error_setg(errp, "Cannot clear a disabled bitmap");
-         return;
-@@ -2857,6 +2860,11 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-                    "Bitmap '%s' is currently frozen and cannot be removed",
-                    name);
-         return;
-+    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
-+        error_setg(errp,
-+                   "Bitmap '%s' is currently locked and cannot be removed",
-+                   name);
-+        return;
-     }
- 
-     if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
-@@ -2891,6 +2899,11 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-                    "Bitmap '%s' is currently frozen and cannot be modified",
-                    name);
-         return;
-+    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
-+        error_setg(errp,
-+                   "Bitmap '%s' is currently locked and cannot be modified",
-+                   name);
-+        return;
-     } else if (!bdrv_dirty_bitmap_enabled(bitmap)) {
-         error_setg(errp,
-                    "Bitmap '%s' is currently disabled and cannot be cleared",
-@@ -3365,6 +3378,12 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-             bdrv_unref(target_bs);
-             goto out;
-         }
-+        if (bdrv_dirty_bitmap_qmp_locked(bmap)) {
-+            error_setg(errp,
-+                       "Bitmap '%s' is currently locked and cannot be used for "
-+                       "backup", backup->bitmap);
-+            goto out;
-+        }
-     }
- 
-     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
++disk_a = os.path.join(iotests.test_dir, 'disk_a')
++disk_b = os.path.join(iotests.test_dir, 'disk_b')
++size = '1M'
++mig_file = os.path.join(iotests.test_dir, 'mig_file')
++
++
++class TestDirtyBitmapMigration(iotests.QMPTestCase):
++    def tearDown(self):
++        self.vm_a.shutdown()
++        self.vm_b.shutdown()
++        os.remove(disk_a)
++        os.remove(disk_b)
++        os.remove(mig_file)
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk_a, size)
++        qemu_img('create', '-f', iotests.imgfmt, disk_b, size)
++
++        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
++        self.vm_a.launch()
++
++        self.vm_b = iotests.VM(path_suffix='b')
++        self.vm_b.add_incoming("exec: cat '" + mig_file + "'")
++
++    def add_bitmap(self, vm, granularity, persistent):
++        params = {'node': 'drive0',
++                  'name': 'bitmap0',
++                  'granularity': granularity}
++        if persistent:
++            params['persistent'] = True
++            params['autoload'] = True
++
++        result = vm.qmp('block-dirty-bitmap-add', **params)
++        self.assert_qmp(result, 'return', {});
++
++    def get_bitmap_hash(self, vm):
++        result = vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                        node='drive0', name='bitmap0')
++        return result['return']['sha256']
++
++    def check_bitmap(self, vm, sha256):
++        result = vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                        node='drive0', name='bitmap0')
++        if sha256:
++            self.assert_qmp(result, 'return/sha256', sha256);
++        else:
++            self.assert_qmp(result, 'error/desc',
++                            "Dirty bitmap 'bitmap0' not found");
++
++    def do_test_migration(self, persistent, migrate_bitmaps, online,
++                          shared_storage):
++        granularity = 512
++
++        # regions = ((start, count), ...)
++        regions = ((0, 0x10000),
++                   (0xf0000, 0x10000),
++                   (0xa0201, 0x1000))
++
++        should_migrate = migrate_bitmaps or persistent and shared_storage
++
++        self.vm_b.add_drive(disk_a if shared_storage else disk_b)
++
++        if online:
++            os.mkfifo(mig_file)
++            self.vm_b.launch()
++
++        self.add_bitmap(self.vm_a, granularity, persistent)
++        for r in regions:
++            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % r)
++        sha256 = self.get_bitmap_hash(self.vm_a)
++
++        if migrate_bitmaps:
++            result = self.vm_a.qmp('migrate-set-capabilities',
++                                   capabilities=[{'capability': 'dirty-bitmaps',
++                                                  'state': True}])
++            self.assert_qmp(result, 'return', {})
++
++        result = self.vm_a.qmp('migrate', uri='exec:cat>' + mig_file)
++        self.vm_a.event_wait("STOP")
++
++        if not online:
++            self.vm_a.shutdown()
++            self.vm_b.launch()
++
++        self.vm_b.event_wait("RESUME", timeout=10.0)
++
++        self.check_bitmap(self.vm_b, sha256 if should_migrate else False)
++
++        if should_migrate:
++            self.vm_b.shutdown()
++            self.vm_b.launch()
++            self.check_bitmap(self.vm_b, sha256 if persistent else False)
++
++
++def inject_test_case(klass, name, method, *args, **kwargs):
++    mc = operator.methodcaller(method, *args, **kwargs)
++    setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
++
++for cmb in list(itertools.product((True, False), repeat=3)):
++    name = ('_' if cmb[0] else '_not_') + 'persistent_'
++    name += ('_' if cmb[1] else '_not_') + 'migbitmap_'
++    name += '_online' if cmb[2] else '_offline'
++
++    # TODO fix shared-storage bitmap migration and enable cases for it
++    args = list(cmb) + [False]
++
++    inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migration',
++                     *args)
++
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
+new file mode 100644
+index 0000000000..594c16f49f
+--- /dev/null
++++ b/tests/qemu-iotests/169.out
+@@ -0,0 +1,5 @@
++........
++----------------------------------------------------------------------
++Ran 8 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index a2dfe79d86..498c52c4c1 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -169,6 +169,7 @@
+ 162 auto quick
+ 163 rw auto quick
+ 165 rw auto quick
++169 rw auto quick
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
 -- 
 2.11.1
