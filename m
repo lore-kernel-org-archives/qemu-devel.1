@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSFq-0005zz-Fb
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:28 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ejSFt-000626-TU
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSFm-0006wZ-Fd
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:26 -0500
-Received: from mail-by2nam03on0054.outbound.protection.outlook.com
-	([104.47.42.54]:27472
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1ejSFp-0006xo-UB
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:29 -0500
+Received: from mail-bl2nam02on0067.outbound.protection.outlook.com
+	([104.47.38.67]:57016
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1ejSFm-0006w7-52
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:22 -0500
+	id 1ejSFp-0006xb-Na
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:25 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  7 Feb 2018 10:06:26 -0600
-Message-ID: <20180207160638.98872-14-brijesh.singh@amd.com>
+Date: Wed,  7 Feb 2018 10:06:29 -0600
+Message-Id: <20180207160638.98872-17-brijesh.singh@amd.com>
 In-Reply-To: <20180207160638.98872-1-brijesh.singh@amd.com>
 References: <20180207160638.98872-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 14/26] hmp: add 'info sev' command
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 17/26] target/i386: encrypt bios rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +29,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-The command can be used to show the SEV information when memory
-encryption is enabled on AMD platform.
+SEV requires that guest bios must be encrypted before booting the guest.
 
-Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- hmp-commands-info.hx | 14 ++++++++++++++
- hmp.c                | 19 +++++++++++++++++++
- hmp.h                |  1 +
- 3 files changed, 34 insertions(+)
+ hw/i386/pc_sysfw.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index ad590a4ffb2b..236811c465d2 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -865,6 +865,20 @@ STEXI
- @findex info memory_size_summary
- Display the amount of initially allocated and present hotpluggable (if
- enabled) memory in bytes.
-+ETEXI
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index 6b183747fcea..8ddbbf74d330 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -112,6 +112,8 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
+     pflash_t *system_flash;
+     MemoryRegion *flash_mem;
+     char name[64];
++    void *flash_ptr;
++    int ret, flash_size;
+ 
+     sector_bits = 12;
+     sector_size = 1 << sector_bits;
+@@ -168,6 +170,17 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
+         if (unit == 0) {
+             flash_mem = pflash_cfi01_get_memory(system_flash);
+             pc_isa_bios_init(rom_memory, flash_mem, size);
 +
-+    {
-+        .name       =3D "sev",
-+        .args_type  =3D "",
-+        .params     =3D "",
-+        .help       =3D "show SEV information",
-+        .cmd        =3D hmp_info_sev,
-+    },
-+
-+STEXI
-+@item info sev
-+@findex info sev
-+Show SEV information.
- ETEXI
-=20
- STEXI
-diff --git a/hmp.c b/hmp.c
-index b3de32d219b5..8d5aa33a022f 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2922,3 +2922,22 @@ void hmp_info_memory_size_summary(Monitor *mon, cons=
-t QDict *qdict)
++            /* Encrypt the pflash boot ROM */
++            if (kvm_memcrypt_enabled()) {
++                flash_ptr = memory_region_get_ram_ptr(flash_mem);
++                flash_size = memory_region_size(flash_mem);
++                ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
++                if (ret) {
++                    error_report("failed to encrypt pflash rom");
++                    exit(1);
++                }
++            }
+         }
      }
-     hmp_handle_error(mon, &err);
  }
-+
-+void hmp_info_sev(Monitor *mon, const QDict *qdict)
-+{
-+    SevInfo *info;
-+
-+    info =3D qmp_query_sev(NULL);
-+    monitor_printf(mon, "sev support: ");
-+    monitor_printf(mon, "%s\n", info->enabled ? "enabled" : "disabled");
-+
-+    if (info->enabled) {
-+        monitor_printf(mon, "state: %s\n", info->state);
-+        monitor_printf(mon, "policy: 0x%x\n", info->policy);
-+        monitor_printf(mon, "build id: %u\n", info->build_id);
-+        monitor_printf(mon, "api version: %u.%u\n",
-+                       info->api_major, info->api_minor);
-+    }
-+
-+    qapi_free_SevInfo(info);
-+}
-diff --git a/hmp.h b/hmp.h
-index 536cb91caa4b..802e0619551d 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -148,5 +148,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict=
-);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
-+void hmp_info_sev(Monitor *mon, const QDict *qdict);
-=20
- #endif
---=20
+-- 
 2.14.3
