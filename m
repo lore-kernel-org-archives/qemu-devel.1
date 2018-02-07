@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ejORE-0007Jt-N7
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:03:05 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOSF-0008DQ-4G
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:04:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ejOR9-00023N-Vd
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:02:56 -0500
-Received: from mga02.intel.com ([134.134.136.20]:12396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1ejOR9-000229-HI
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:02:51 -0500
-Date: Wed, 7 Feb 2018 20:02:43 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180207120243.s54iryfqao7ccu6l@hz-desktop>
-References: <20180207073331.14158-1-haozhong.zhang@intel.com>
-	<20180207073331.14158-7-haozhong.zhang@intel.com>
-	<20180207114910.GC2665@work-vm>
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOSA-0003SA-3U
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:03:59 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:47248)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ejOS9-0003Og-N4
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 07:03:54 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Wed, 07 Feb 2018 15:03:53 +0300
+Message-ID: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180207114910.GC2665@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration/ram: ensure write
- persistence on loading normal pages to PMEM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,167 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-On 02/07/18 11:49 +0000, Dr. David Alan Gilbert wrote:
-> * Haozhong Zhang (haozhong.zhang@intel.com) wrote:
-> > When loading a normal page to persistent memory, load its data by
-> > libpmem function pmem_memcpy_nodrain() instead of memcpy(). Combined
-> > with a call to pmem_drain() at the end of memory loading, we can
-> > guarantee all those normal pages are persistenly loaded to PMEM.
-> > 
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > ---
-> >  include/migration/qemu-file-types.h |  1 +
-> >  include/qemu/pmem.h                 |  6 ++++++
-> >  migration/qemu-file.c               | 41 ++++++++++++++++++++++++++++---------
-> >  migration/ram.c                     |  6 +++++-
-> >  4 files changed, 43 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/include/migration/qemu-file-types.h b/include/migration/qemu-file-types.h
-> > index bd6d7dd7f9..bb5c547498 100644
-> > --- a/include/migration/qemu-file-types.h
-> > +++ b/include/migration/qemu-file-types.h
-> > @@ -34,6 +34,7 @@ void qemu_put_be16(QEMUFile *f, unsigned int v);
-> >  void qemu_put_be32(QEMUFile *f, unsigned int v);
-> >  void qemu_put_be64(QEMUFile *f, uint64_t v);
-> >  size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size);
-> > +size_t qemu_get_buffer_to_pmem(QEMUFile *f, uint8_t *buf, size_t size);
-> >  
-> >  int qemu_get_byte(QEMUFile *f);
-> >  
-> > diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
-> > index 861d8ecc21..77ee1fc4eb 100644
-> > --- a/include/qemu/pmem.h
-> > +++ b/include/qemu/pmem.h
-> > @@ -26,6 +26,12 @@ pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
-> >      return memcpy(pmemdest, src, len);
-> >  }
-> >  
-> > +static inline void *
-> > +pmem_memcpy_nodrain(void *pmemdest, const void *src, size_t len)
-> > +{
-> > +    return memcpy(pmemdest, src, len);
-> > +}
-> > +
-> >  static inline void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
-> >  {
-> >      return memset(pmemdest, c, len);
-> > diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> > index 2ab2bf362d..7e573010d9 100644
-> > --- a/migration/qemu-file.c
-> > +++ b/migration/qemu-file.c
-> > @@ -26,6 +26,7 @@
-> >  #include "qemu-common.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/iov.h"
-> > +#include "qemu/pmem.h"
-> >  #include "migration.h"
-> >  #include "qemu-file.h"
-> >  #include "trace.h"
-> > @@ -471,15 +472,8 @@ size_t qemu_peek_buffer(QEMUFile *f, uint8_t **buf, size_t size, size_t offset)
-> >      return size;
-> >  }
-> >  
-> > -/*
-> > - * Read 'size' bytes of data from the file into buf.
-> > - * 'size' can be larger than the internal buffer.
-> > - *
-> > - * It will return size bytes unless there was an error, in which case it will
-> > - * return as many as it managed to read (assuming blocking fd's which
-> > - * all current QEMUFile are)
-> > - */
-> > -size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
-> > +static size_t
-> > +qemu_get_buffer_common(QEMUFile *f, uint8_t *buf, size_t size, bool is_pmem)
-> >  {
-> >      size_t pending = size;
-> >      size_t done = 0;
-> > @@ -492,7 +486,11 @@ size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
-> >          if (res == 0) {
-> >              return done;
-> >          }
-> > -        memcpy(buf, src, res);
-> > +        if (!is_pmem) {
-> > +            memcpy(buf, src, res);
-> > +        } else {
-> > +            pmem_memcpy_nodrain(buf, src, res);
-> > +        }
-> 
-> I see why you're doing it, but again I'm surprised it's ended up having
-> to modify qemu-file.
+This set of patches moves replay lock upper in the function call tree.
+Now replay lock functions similar to BQL in older version and allows
+deterministic execution of the threads in icount mode.
+It is also fixes some vmstate creation (and loading) issues
+in record/replay modes:
+ - VM start/stop fixes in replay mode
+ - overlay creation for blkreplay filter
+ - fixes for vmstate save/load in record/replay mode
+ - fixes for host clock vmstate
 
-Well, the current programming model of pmem requires users to take
-special care on the data persistence, so QEMU (as a user of pmem) has
-to do that as well.
+There is also a set of helper scripts written by Alex Benn=C3=A9e
+for debugging the record/replay code.
 
-> 
-> >          qemu_file_skip(f, res);
-> >          buf += res;
-> >          pending -= res;
-> > @@ -501,6 +499,29 @@ size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
-> >      return done;
-> >  }
-> >  
-> > +/*
-> > + * Read 'size' bytes of data from the file into buf.
-> > + * 'size' can be larger than the internal buffer.
-> > + *
-> > + * It will return size bytes unless there was an error, in which case it will
-> > + * return as many as it managed to read (assuming blocking fd's which
-> > + * all current QEMUFile are)
-> > + */
-> > +size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size)
-> > +{
-> > +    return qemu_get_buffer_common(f, buf, size, false);
-> > +}
-> > +
-> > +/*
-> > + * Mostly the same as qemu_get_buffer(), except that
-> > + * 1) it's for the case that 'buf' is in the persistent memory, and
-> > + * 2) it takes necessary operations to ensure the data persistence in 'buf'.
-> > + */
-> > +size_t qemu_get_buffer_to_pmem(QEMUFile *f, uint8_t *buf, size_t size)
-> > +{
-> > +    return qemu_get_buffer_common(f, buf, size, true);
-> > +}
-> > +
-> >  /*
-> >   * Read 'size' bytes of data from the file.
-> >   * 'size' can be larger than the internal buffer.
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 5a0e503818..5a79bbff64 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -2950,7 +2950,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-> >              break;
-> >  
-> >          case RAM_SAVE_FLAG_PAGE:
-> > -            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
-> > +            if (!is_pmem) {
-> > +                qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
-> > +            } else {
-> > +                qemu_get_buffer_to_pmem(f, host, TARGET_PAGE_SIZE);
-> > +            }
-> 
-> can you just expose qemu_get_buffer_common instead of making it static
-> and just pass in the is_pmem flag.
+v6 changes:
+ - removed BQL optimization at all
+ - refined replay lock patches
+ - removed lock/unlock from replay-audio
 
-Or perhaps passing a memcpyfunc function similarly to your comment on
-patch 5.
+v5 changes:
+ - removed patch for narrowing BQL-protected code
+ - disabled bdrv_(drain/flush)_all for record/replay mode
 
-Thanks,
-Haozhong
+v4 changes:
+ - removed upstreamed patches
+ - added patch for saving async queue state in replay
+ - minor fixes
 
-> 
-> Dave
-> 
-> >              break;
-> >  
-> >          case RAM_SAVE_FLAG_COMPRESS_PAGE:
-> > -- 
-> > 2.14.1
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+v3 changes:
+ - removed upstreamed patches
+ - fixed bug with recursive checkpoints
+ - fixed bug with icount warp checkpoint
+
+v2 changes:
+ - updated lock/unlock logic (as suggested by Paolo Bonzini)
+ - updated cpu execution loop to avoid races in setting/resetting exit re=
+quest (as suggested by Paolo Bonzini)
+ - minor changes
+
+---
+
+Alex Benn=C3=A9e (5):
+      replay/replay.c: bump REPLAY_VERSION again
+      replay/replay-internal.c: track holding of replay_lock
+      replay: make locking visible outside replay code
+      replay: push replay_mutex_lock up the call tree
+      scripts/replay-dump.py: replay log dumper
+
+Pavel Dovgalyuk (15):
+      cpu-exec: fix exception_index handling
+      block: implement bdrv_snapshot_goto for blkreplay
+      blkreplay: create temporary overlay for underlaying devices
+      replay: disable default snapshot for record/replay
+      replay: fix processing async events
+      replay: fixed replay_enable_events
+      replay: fix save/load vm for non-empty queue
+      replay: added replay log format description
+      replay: save prior value of the host clock
+      replay: don't destroy mutex at exit
+      replay: check return values of fwrite
+      replay: avoid recursive call of checkpoints
+      replay: don't process async events when warping the clock
+      replay: save vmstate of the asynchronous events
+      replay: don't drain/flush bdrv queue while RR is working
+
+
+ accel/tcg/cpu-exec.c     |    5 +
+ block/blkreplay.c        |   73 +++++++++++
+ block/io.c               |   22 +++
+ cpus.c                   |   26 +++-
+ docs/replay.txt          |   91 ++++++++++++++
+ include/qemu/timer.h     |   14 ++
+ include/sysemu/replay.h  |   19 +++
+ migration/savevm.c       |   13 ++
+ replay/replay-audio.c    |   14 +-
+ replay/replay-char.c     |   21 +--
+ replay/replay-events.c   |   75 +++++------
+ replay/replay-internal.c |   47 ++++++-
+ replay/replay-internal.h |   15 ++
+ replay/replay-snapshot.c |   12 ++
+ replay/replay-time.c     |   10 +
+ replay/replay.c          |   62 ++++++---
+ scripts/replay-dump.py   |  308 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+ stubs/replay.c           |   16 ++
+ util/main-loop.c         |   15 ++
+ util/qemu-timer.c        |   12 ++
+ vl.c                     |   12 +-
+ 21 files changed, 769 insertions(+), 113 deletions(-)
+ create mode 100755 scripts/replay-dump.py
+
+--=20
+Pavel Dovgalyuk
