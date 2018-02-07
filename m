@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7W-000766-CV
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7X-00077B-1H
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7U-0000yj-8V
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:50 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ejS7U-0000zR-GK
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 10:58:51 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  7 Feb 2018 18:58:34 +0300
-Message-Id: <20180207155837.92351-10-vsementsov@virtuozzo.com>
+Date: Wed,  7 Feb 2018 18:58:29 +0300
+Message-Id: <20180207155837.92351-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20180207155837.92351-1-vsementsov@virtuozzo.com>
 References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v10 09/12] migration: add is_active_iterate
- handler
+Subject: [Qemu-devel] [PATCH v10 04/12] dirty-bitmap: add locked state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +22,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-Only-postcopy savevm states (dirty-bitmap) don't need live iteration, so
-to disable them and stop transporting empty sections there is a new
-savevm handler.
+Add special state, when qmp operations on the bitmap are disabled.
+It is needed during bitmap migration. "Frozen" state is not
+appropriate here, because it looks like bitmap is unchanged.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- include/migration/register.h | 9 +++++++++
- migration/savevm.c           | 5 +++++
- 2 files changed, 14 insertions(+)
+ qapi/block-core.json         |  5 ++++-
+ include/block/dirty-bitmap.h |  3 +++
+ block/dirty-bitmap.c         | 16 ++++++++++++++++
+ blockdev.c                   | 19 +++++++++++++++++++
+ 4 files changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/include/migration/register.h b/include/migration/register.h
-index 9436a87678..f6f12f9b1a 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -26,6 +26,15 @@ typedef struct SaveVMHandlers {
-     bool (*is_active)(void *opaque);
-     bool (*has_postcopy)(void *opaque);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1d44c439e9..236586a5e1 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -426,10 +426,13 @@
+ # @active: The bitmap is actively monitoring for new writes, and can be cleared,
+ #          deleted, or used for backup operations.
+ #
++# @locked: The bitmap is currently in-use by some operation and can not be
++#          cleared, deleted, or used for backup operations. (Since 2.12)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'DirtyBitmapStatus',
+-  'data': ['active', 'disabled', 'frozen'] }
++  'data': ['active', 'disabled', 'frozen', 'locked'] }
  
-+    /* is_active_iterate
-+     * If it is not NULL then qemu_savevm_state_iterate will skip iteration if
-+     * it returns false. For example, it is needed for only-postcopy-states,
-+     * which needs to be handled by qemu_savevm_state_setup and
-+     * qemu_savevm_state_pending, but do not need iterations until not in
-+     * postcopy stage.
-+     */
-+    bool (*is_active_iterate)(void *opaque);
+ ##
+ # @BlockDirtyInfo:
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index b2e1fd913a..9daaf38897 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -68,6 +68,8 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+                                        bool persistent);
++void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
 +
-     /* This runs outside the iothread lock in the migration case, and
-      * within the lock in the savevm case.  The callback had better only
-      * use data that is local to the migration thread or protected
-diff --git a/migration/savevm.c b/migration/savevm.c
-index c3c60a15e3..e5d557458e 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1026,6 +1026,11 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
-                 continue;
-             }
+ 
+ /* Functions that require manual locking.  */
+ void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
+@@ -87,6 +89,7 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
++bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap);
+ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+                                         BdrvDirtyBitmap *bitmap);
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index ce00ff3474..221bcb9996 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -40,6 +40,8 @@ struct BdrvDirtyBitmap {
+     QemuMutex *mutex;
+     HBitmap *bitmap;            /* Dirty bitmap implementation */
+     HBitmap *meta;              /* Meta dirty bitmap */
++    bool qmp_locked;                /* Bitmap is frozen, it can't be modified
++                                   through QMP */
+     BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
+     char *name;                 /* Optional non-empty unique ID */
+     int64_t size;               /* Size of the bitmap, in bytes */
+@@ -183,6 +185,18 @@ bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)
+     return bitmap->successor;
+ }
+ 
++void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked)
++{
++    qemu_mutex_lock(bitmap->mutex);
++    bitmap->qmp_locked = qmp_locked;
++    qemu_mutex_unlock(bitmap->mutex);
++}
++
++bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap)
++{
++    return bitmap->qmp_locked;
++}
++
+ /* Called with BQL taken.  */
+ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+ {
+@@ -194,6 +208,8 @@ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
+ {
+     if (bdrv_dirty_bitmap_frozen(bitmap)) {
+         return DIRTY_BITMAP_STATUS_FROZEN;
++    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
++        return DIRTY_BITMAP_STATUS_LOCKED;
+     } else if (!bdrv_dirty_bitmap_enabled(bitmap)) {
+         return DIRTY_BITMAP_STATUS_DISABLED;
+     } else {
+diff --git a/blockdev.c b/blockdev.c
+index a1dc39345a..2cbe9ff8ea 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2113,6 +2113,9 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
+     if (bdrv_dirty_bitmap_frozen(state->bitmap)) {
+         error_setg(errp, "Cannot modify a frozen bitmap");
+         return;
++    } else if (bdrv_dirty_bitmap_qmp_locked(state->bitmap)) {
++        error_setg(errp, "Cannot modify a locked bitmap");
++        return;
+     } else if (!bdrv_dirty_bitmap_enabled(state->bitmap)) {
+         error_setg(errp, "Cannot clear a disabled bitmap");
+         return;
+@@ -2857,6 +2860,11 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+                    "Bitmap '%s' is currently frozen and cannot be removed",
+                    name);
+         return;
++    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
++        error_setg(errp,
++                   "Bitmap '%s' is currently locked and cannot be removed",
++                   name);
++        return;
+     }
+ 
+     if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+@@ -2891,6 +2899,11 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
+                    "Bitmap '%s' is currently frozen and cannot be modified",
+                    name);
+         return;
++    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
++        error_setg(errp,
++                   "Bitmap '%s' is currently locked and cannot be modified",
++                   name);
++        return;
+     } else if (!bdrv_dirty_bitmap_enabled(bitmap)) {
+         error_setg(errp,
+                    "Bitmap '%s' is currently disabled and cannot be cleared",
+@@ -3365,6 +3378,12 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+             bdrv_unref(target_bs);
+             goto out;
          }
-+        if (se->ops && se->ops->is_active_iterate) {
-+            if (!se->ops->is_active_iterate(se->opaque)) {
-+                continue;
-+            }
++        if (bdrv_dirty_bitmap_qmp_locked(bmap)) {
++            error_setg(errp,
++                       "Bitmap '%s' is currently locked and cannot be used for "
++                       "backup", backup->bitmap);
++            goto out;
 +        }
-         /*
-          * In the postcopy phase, any device that doesn't know how to
-          * do postcopy should have saved it's state in the _complete
+     }
+ 
+     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
 -- 
 2.11.1
