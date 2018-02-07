@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSG4-0006BY-Uf
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:42 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejSNg-00054x-IP
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ejSG0-00072n-WE
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:40 -0500
-Received: from mail-bl2nam02on0049.outbound.protection.outlook.com
-	([104.47.38.49]:23040
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1ejSG0-00072O-QR
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:07:36 -0500
-From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  7 Feb 2018 10:06:38 -0600
-Message-ID: <20180207160638.98872-26-brijesh.singh@amd.com>
-In-Reply-To: <20180207160638.98872-1-brijesh.singh@amd.com>
-References: <20180207160638.98872-1-brijesh.singh@amd.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ejSNf-0005xK-Hf
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 11:15:32 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180207160302.15651-1-eblake@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <502805c5-e418-a27c-2a94-ae88c6efb12f@amsat.org>
+Date: Wed, 7 Feb 2018 13:15:21 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 26/26] qmp: add query-sev-launch-measure
- command
+In-Reply-To: <20180207160302.15651-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] Drop unneeded system header includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, armbru@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-The command can be used by libvirt to retrieve the measurement of SEV guest=
-.
-This measurement is a signature of the memory contents that was encrypted
-through the LAUNCH_UPDATE_DATA.
+On 02/07/2018 01:03 PM, Eric Blake wrote:
+> <memory.h> is a non-standard obsolete header that was long ago
+> replaced by <string.h>.
+> 
+> <malloc.h> is a non-standard header; it is not obsolete (we must
+> use it for malloc_trim, for example), but generally should not
+> be used in files that just need malloc() and friends, where
+> <stdlib.h> is the standard header.
+> 
+> And since osdep.h already guarantees string.h and stdlib.h, we
+> can drop these unusual system header includes as redundant
+> rather than replacing them.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- qapi-schema.json | 30 ++++++++++++++++++++++++++++++
- qmp.c            | 14 ++++++++++++++
- 2 files changed, 44 insertions(+)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 447ebb15266e..19331bff8883 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3236,3 +3236,33 @@
- #
- ##
- { 'command': 'query-sev', 'returns': 'SevInfo' }
-+
-+##
-+# @SevLaunchMeasureInfo:
-+#
-+# SEV Guest Launch measurement information
-+#
-+# @data: the measurement value encoded in base64
-+#
-+# Since: 2.12
-+#
-+# Notes: If measurement is not available then a null measurement is return=
-ed.
-+##
-+{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
-+
-+##
-+# @query-sev-launch-measure:
-+#
-+# Query the SEV guest launch information.
-+#
-+# Returns: The @SevLaunchMeasureInfo for the guest
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "query-sev-launch-measure" }
-+# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
-+#
-+##
-+{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInfo'=
- }
-diff --git a/qmp.c b/qmp.c
-index 1a5cfad09dd0..5fb19b9d0db3 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -733,3 +733,17 @@ SevInfo *qmp_query_sev(Error **errp)
-=20
-     return info;
- }
-+
-+SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
-+{
-+    SevLaunchMeasureInfo *info =3D NULL;
-+
-+    if (sev_enabled()) {
-+        info =3D g_malloc0(sizeof(*info));
-+        info->data =3D sev_get_launch_measurement();
-+    } else {
-+        error_setg(errp, "SEV is not enabled");
-+    }
-+
-+    return info;
-+}
---=20
-2.14.3
+> ---
+> 
+> Based-on: <20180207124009.12376-1-armbru@redhat.com>
+> ([PULL 00/20] Miscellaneous patches for 2018-02-07)
+> 
+>  target/i386/hax-windows.h | 2 --
+>  target/i386/hvf/x86_mmu.c | 1 -
+>  2 files changed, 3 deletions(-)
+> 
+> diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
+> index 004f8676949..20e2f85407b 100644
+> --- a/target/i386/hax-windows.h
+> +++ b/target/i386/hax-windows.h
+> @@ -20,8 +20,6 @@
+>  #ifndef TARGET_I386_HAX_WINDOWS_H
+>  #define TARGET_I386_HAX_WINDOWS_H
+> 
+> -#include <memory.h>
+> -#include <malloc.h>
+>  #include <winioctl.h>
+>  #include <windef.h>
+> 
+> diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
+> index c6be2cca357..d5a0efe7188 100644
+> --- a/target/i386/hvf/x86_mmu.c
+> +++ b/target/i386/hvf/x86_mmu.c
+> @@ -17,7 +17,6 @@
+>   */
+> 
+>  #include "qemu/osdep.h"
+> -#include <memory.h>
+>  #include "panic.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+> 
