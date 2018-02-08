@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1ejhtu-0001iX-1x
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 03:49:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1ejiWY-0003mU-Q4
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:29:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1ejhtp-0003wr-2n
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 03:49:50 -0500
-References: <20180207161730.17194-1-lvivier@redhat.com>
-	<20180207212148.73c77de1@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <ccacc847-3778-3446-ae87-84413b2c3892@redhat.com>
-Date: Thu, 8 Feb 2018 09:49:30 +0100
+	(envelope-from <berrange@redhat.com>) id 1ejiWV-0002m2-IW
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:29:46 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40954 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ejiWV-0002l4-FM
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:29:43 -0500
+Date: Thu, 8 Feb 2018 09:29:28 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180208092928.GN20703@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180207175014.11157-1-lcapitulino@redhat.com>
+	<20180207175014.11157-3-lcapitulino@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180207212148.73c77de1@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr: check smp_threads < vsmt
+Content-Disposition: inline
+In-Reply-To: <20180207175014.11157-3-lcapitulino@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] qmp: document query-cpus performance
+ issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Luiz Capitulino <lcapitulino@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, ehabkost@redhat.com, mihajlov@linux.vnet.ibm.com
 
-On 07/02/2018 21:21, Greg Kurz wrote:
-> On Wed,  7 Feb 2018 17:17:30 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
+On Wed, Feb 07, 2018 at 12:50:14PM -0500, Luiz Capitulino wrote:
+> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
+> ---
+>  qapi-schema.json | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
->> We ignore silently the value of smp_threads when we set
->> the VSMT value, and if smp_threads is greater than VSMT
->> kernel is going into trouble later.
->>
->> Fixes: 8904e5a750
->> ("spapr: Adjust default VSMT value for better migration compatibility")
->>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> ---
->>  hw/ppc/spapr.c | 17 ++++++++---------
->>  1 file changed, 8 insertions(+), 9 deletions(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 32a876be56..638b3cafd0 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -2294,15 +2294,7 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
->>      }
->>  
->>      /* Detemine the VSMT mode to use: */
->> -    if (vsmt_user) {
->> -        if (spapr->vsmt < smp_threads) {
->> -            error_setg(&local_err, "Cannot support VSMT mode %d"
->> -                         " because it must be >= threads/core (%d)",
->> -                         spapr->vsmt, smp_threads);
-> 
-> In this case, we'd error out because the user requested two settings that
-> are known to be incompatible.
-> 
->> -            goto out;
->> -        }
->> -        /* In this case, spapr->vsmt has been set by the command line */
->> -    } else {
->> +    if (!vsmt_user) {
->>          /*
->>           * Default VSMT value is tricky, because we need it to be as
->>           * consistent as possible (for migration), but this requires
->> @@ -2313,6 +2305,13 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
->>          spapr->vsmt = 8;
-> 
-> In this case, we'd error out because the user requested a setting that is
-> incompatible with our default. Maybe worth a separate error message ?
-> 
-> "Cannot support %d threads/core because it must be <= to default VSMT mode (8)"
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 82d6f12b53..0665a14dba 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -526,6 +526,10 @@
+>  #
+>  # Returns a list of information about each virtual CPU.
+>  #
+> +# WARNING: This command incurs a performance penalty for latency
+> +#          sensitive workloads and hence it's not recommended to
+> +#          to be used in production. Use query-cpus-fast instead
 
-I'm going to update the error message.
+I suggest being more explicit about exactly what the problem is, so people
+understand implications if they choose to still use it. ie
 
-Thanks,
-Laurent
+  This command causes vCPU threads to exit to userspace, which causes
+  an small interruption guest CPU execution. This will have a negative
+  impact on realtime guests and other latency sensitive guest workloads.
+  It is recommended to use query-cpus-fast instead of this command to
+  avoid the vCPU interruption.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
