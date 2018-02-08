@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejrnj-0002ml-Rb
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:09 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ejrnm-0002pP-2r
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejrni-0000iZ-NU
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ejrnk-0000l7-RT
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:10 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  8 Feb 2018 20:23:01 +0100
-Message-Id: <20180208192328.16550-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 00/27] x-blockdev-create for protocols and qcow2
+Date: Thu,  8 Feb 2018 20:23:03 +0100
+Message-Id: <20180208192328.16550-3-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-1-kwolf@redhat.com>
+References: <20180208192328.16550-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/27] block/qapi: Add qcow2 create options to
+ schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,95 +23,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This series implements a minimal QMP command that allows to create an
-image file on the protocol level or an image format on a given block
-node.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qapi/block-core.json | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-Eventually, the interface is going to change to some kind of an async
-command (possibly a (non-)block job), but that will require more work on
-the job infrastructure first, so let's first QAPIfy image creation in
-the block drivers. In this series, I'm going for a synchronous command
-that is prefixed with x- for now.
-
-This series converts qcow2 and all protocol drivers that allow an actual
-image creation. This means that drivers which only check if the already
-existing storage is good enough are not converted (e.g. host_device,
-iscsi). The old behaviour was useful because 'qemu-img create' wants to
-create both protocol and format layer, but with the separation in QMP,
-you can just leave out the protocol layer creation when the device
-already exists.
-
-Please note that for some of the protocol drivers (gluster, rbd and
-sheepdog) I don't have a test setup ready. For those, I only tested
-with a fake server address to check that the option are parsed correctly
-up to this point and an appropriate error is returned without crashing.
-
-If you are a maintainer of one of these protocols and you are
-interested in keeping image creation working for your protocol, you
-probably want to test this series on a real setup and give me some
-feedback. If you don't, I'll just merge the patches and hope that they
-won't break anything.
-
-Kevin Wolf (27):
-  block/qapi: Introduce BlockdevCreateOptions
-  block/qapi: Add qcow2 create options to schema
-  qcow2: Let qcow2_create() handle protocol layer
-  qcow2: Pass BlockdevCreateOptions to qcow2_create2()
-  qcow2: Use BlockdevRef in qcow2_create2()
-  qcow2: Use QCryptoBlockCreateOptions in qcow2_create2()
-  qcow2: Handle full/falloc preallocation in qcow2_create2()
-  util: Add qemu_opts_to_qdict_filtered()
-  qdict: Introduce qdict_rename_keys()
-  qcow2: Use visitor for options in qcow2_create()
-  block: x-blockdev-create QMP command
-  file-posix: Support .bdrv_co_create
-  file-win32: Support .bdrv_co_create
-  gluster: Support .bdrv_co_create
-  rbd: Support .bdrv_co_create
-  nfs: Use QAPI options in nfs_client_open()
-  nfs: Support .bdrv_co_create
-  sheepdog: QAPIfy "redundacy" create option
-  sheepdog: Support .bdrv_co_create
-  ssh: Use QAPI BlockdevOptionsSsh object
-  ssh: QAPIfy host-key-check option
-  ssh: Pass BlockdevOptionsSsh to connect_to_ssh()
-  ssh: Support .bdrv_co_create
-  file-posix: Fix no-op bdrv_truncate() with falloc preallocation
-  block: Fail bdrv_truncate() with negative size
-  qemu-iotests: Test qcow2 over file image creation with QMP
-  qemu-iotests: Test ssh image creation over QMP
-
- qapi/block-core.json       | 326 ++++++++++++++++++++++++++++++++-
- include/block/block.h      |   2 +
- include/block/block_int.h  |   2 +
- include/qapi/qmp/qdict.h   |   6 +
- include/qemu/option.h      |   2 +
- block.c                    |  54 +++++-
- block/create.c             |  75 ++++++++
- block/file-posix.c         |  91 +++++++---
- block/file-win32.c         |  45 ++++-
- block/gluster.c            | 149 ++++++++++------
- block/nfs.c                | 236 +++++++++++-------------
- block/qcow2.c              | 386 +++++++++++++++++++++++++--------------
- block/rbd.c                | 137 +++++++++-----
- block/sheepdog.c           | 286 ++++++++++++++++++++---------
- block/ssh.c                | 298 +++++++++++++++++--------------
- qobject/qdict.c            |  30 ++++
- util/qemu-option.c         |  37 +++-
- block/Makefile.objs        |   2 +-
- tests/qemu-iotests/049.out |   8 +-
- tests/qemu-iotests/112.out |   4 +-
- tests/qemu-iotests/206     | 436 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/206.out | 209 ++++++++++++++++++++++
- tests/qemu-iotests/207     | 261 +++++++++++++++++++++++++++
- tests/qemu-iotests/207.out |  75 ++++++++
- tests/qemu-iotests/group   |   2 +
- 25 files changed, 2525 insertions(+), 634 deletions(-)
- create mode 100644 block/create.c
- create mode 100755 tests/qemu-iotests/206
- create mode 100644 tests/qemu-iotests/206.out
- create mode 100755 tests/qemu-iotests/207
- create mode 100644 tests/qemu-iotests/207.out
-
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index b59b1430bb..aade602a04 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3338,6 +3338,49 @@
+ { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+ 
+ ##
++# @BlockdevQcow2Version:
++#
++# @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
++# @v3:  The extended QCOW2 format as introduced in qemu 1.1 (version 3)
++#
++# Since: 2.12
++##
++{ 'enum': 'BlockdevQcow2Version',
++  'data': [ 'v2', 'v3' ] }
++
++
++##
++# @BlockdevCreateOptionsQcow2:
++#
++# Driver specific image creation options for qcow2.
++#
++# @file             Node to create the image format on
++# @size             Size of the virtual disk in bytes
++# @version          Compatibility level (default: v3)
++# @backing-file     File name of the backing file if a backing file
++#                   should be used
++# @backing-fmt      Name of the block driver to use for the backing file
++# @encrypt          Encryption options if the image should be encrypted
++# @cluster-size     qcow2 cluster size in bytes (default: 65536)
++# @preallocation    Preallocation mode for the new image (default: off)
++# @lazy-refcounts   True if refcounts may be updated lazily (default: off)
++# @refcount-bits    Width of reference counts in bits (default: 16)
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsQcow2',
++  'data': { 'file':             'BlockdevRef',
++            'size':             'size',
++            '*version':         'BlockdevQcow2Version',
++            '*backing-file':    'str',
++            '*backing-fmt':     'BlockdevDriver',
++            '*encrypt':         'QCryptoBlockCreateOptions',
++            '*cluster-size':    'size',
++            '*preallocation':   'PreallocMode',
++            '*lazy-refcounts':  'bool',
++            '*refcount-bits':   'int' } }
++
++##
+ # @BlockdevCreateNotSupported:
+ #
+ # This is used for all drivers that don't support creating images.
+@@ -3380,7 +3423,7 @@
+       'null-aio':       'BlockdevCreateNotSupported',
+       'null-co':        'BlockdevCreateNotSupported',
+       'parallels':      'BlockdevCreateNotSupported',
+-      'qcow2':          'BlockdevCreateNotSupported',
++      'qcow2':          'BlockdevCreateOptionsQcow2',
+       'qcow':           'BlockdevCreateNotSupported',
+       'qed':            'BlockdevCreateNotSupported',
+       'quorum':         'BlockdevCreateNotSupported',
 -- 
 2.13.6
