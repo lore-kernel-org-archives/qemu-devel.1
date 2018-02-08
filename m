@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejr70-0004jW-9S
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:39:59 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ejr8l-0006WW-4o
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:41:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejr6x-0007Ln-3X
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:39:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejr6w-0007K7-6w
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:39:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejr6v-0004et-3R
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 18:39:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0535B2E80CB
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 18:39:53 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1ejr8h-00006w-VU
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:41:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ejr8h-00006Q-Mq
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:41:43 -0500
+Date: Thu, 8 Feb 2018 11:41:23 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180208114123.29256c60@w520.home>
+In-Reply-To: <dddd1f95-1146-5af5-0d85-c25d0b6c931e@redhat.com>
+References: <20180207001615.1156.10547.stgit@gimli.home>
+	<20180207002646.1156.37051.stgit@gimli.home>
+	<dddd1f95-1146-5af5-0d85-c25d0b6c931e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Feb 2018 18:26:05 -0000
-From: Thomas Huth <1254786@bugs.launchpad.net>
-Reply-To: Bug 1254786 <1254786@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131125163240.27695.53246.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151811436553.29730.9026982009524726099.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1254786] Re: qemu-m68k-static: illegal
- instruction ebc0 during debootstrap second stage
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 5/5] vfio/quirks: Enable ioeventfd
+ quirks to be handled by vfio directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? There should now be support for "normal" 68k
-CPUs, too...
+On Thu, 8 Feb 2018 12:42:15 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+> Hi Alex,
+> On 07/02/18 01:26, Alex Williamson wrote:
+> > With vfio ioeventfd support, we can program vfio-pci to perform a
+> > specified BAR write when an eventfd is triggered.  This allows the
+> > KVM ioeventfd to be wired directly to vfio-pci, entirely avoiding
+> > userspace handling for these events.  On the same micro-benchmark
+> > where the ioeventfd got us to almost 90% of performance versus
+> > disabling the GeForce quirks, this gets us to within 95%.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >  hw/vfio/pci-quirks.c |   42 ++++++++++++++++++++++++++++++++++++------
+> >  1 file changed, 36 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> > index e739efe601b1..35a4d5197e2d 100644
+> > --- a/hw/vfio/pci-quirks.c
+> > +++ b/hw/vfio/pci-quirks.c
+> > @@ -16,6 +16,7 @@
+> >  #include "qemu/range.h"
+> >  #include "qapi/error.h"
+> >  #include "qapi/visitor.h"
+> > +#include <sys/ioctl.h>
+> >  #include "hw/nvram/fw_cfg.h"
+> >  #include "pci.h"
+> >  #include "trace.h"
+> > @@ -287,13 +288,27 @@ static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
+> >      return quirk;
+> >  }
+> >  
+> > -static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
+> > +static void vfio_ioeventfd_exit(VFIOPCIDevice *vdev, VFIOIOEventFD *ioeventfd)
+> >  {
+> > +    struct vfio_device_ioeventfd vfio_ioeventfd;
+> > +
+> >      QLIST_REMOVE(ioeventfd, next);
+> > +
+> >      memory_region_del_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
+> >                                ioeventfd->match_data, ioeventfd->data,
+> >                                &ioeventfd->e);
+> > +
+> >      qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e), NULL, NULL, NULL);
+> > +
+> > +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
+> > +    vfio_ioeventfd.flags = ioeventfd->size;
+> > +    vfio_ioeventfd.data = ioeventfd->data;
+> > +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
+> > +                            ioeventfd->region_addr;
+> > +    vfio_ioeventfd.fd = -1;
+> > +
+> > +    ioctl(vdev->vbasedev.fd, VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
+> > +
+> >      event_notifier_cleanup(&ioeventfd->e);
+> >      g_free(ioeventfd);
+> >  }
+> > @@ -315,6 +330,8 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
+> >                                            hwaddr region_addr)
+> >  {
+> >      VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
+> > +    struct vfio_device_ioeventfd vfio_ioeventfd;
+> > +    char vfio_enabled = '+';
+> >  
+> >      if (event_notifier_init(&ioeventfd->e, 0)) {
+> >          g_free(ioeventfd);
+> > @@ -329,15 +346,28 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
+> >      ioeventfd->region = region;
+> >      ioeventfd->region_addr = region_addr;
+> >  
+> > -    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
+> > -                        vfio_ioeventfd_handler, NULL, ioeventfd);
+> > +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
+> > +    vfio_ioeventfd.flags = ioeventfd->size;
+> > +    vfio_ioeventfd.data = ioeventfd->data;
+> > +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
+> > +                            ioeventfd->region_addr;
+> > +    vfio_ioeventfd.fd = event_notifier_get_fd(&ioeventfd->e);
+> > +
+> > +    if (ioctl(vdev->vbasedev.fd,
+> > +              VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd) != 0) {
+> > +        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
+> > +                            vfio_ioeventfd_handler, NULL, ioeventfd);
+> > +        vfio_enabled = '-';
+> > +    }
+> > +
+> >      memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr,
+> >                                ioeventfd->size, ioeventfd->match_data,
+> >                                ioeventfd->data, &ioeventfd->e);
+> >  
+> >      info_report("Enabled automatic ioeventfd acceleration for %s region %d, "
+> > -                "offset 0x%"HWADDR_PRIx", data 0x%"PRIx64", size %u",
+> > -                vdev->vbasedev.name, region->nr, region_addr, data, size);
+> > +                "offset 0x%"HWADDR_PRIx", data 0x%"PRIx64", size %u, vfio%c",
+> > +                vdev->vbasedev.name, region->nr, region_addr, data, size,
+> > +                vfio_enabled);  
+> Not sure if this message is really helpful for the end-user to
+> understand what happens. Maybe adding a trace event when everything
+> happens as it should and an error_report if we failed setting up the
+> vfio kernel handler, explaining the sub-optimal performance that can result.
 
--- =
+For right now, I think it is useful.  Maybe when we get a few kernels
+beyond when the vfio support is introduced and we know how different
+devices are behaving and what ioeventfds get added, it might make sense
+to switch to a trace interface.  I don't think we can legitimately
+trigger an error_report for a feature which is just an accelerator and
+isn't even in upstream kernels yet (though arguably it would be
+upstream by the time this gets into QEMU).  For now it let's me ask
+users to try it and they don't need to learn how to use tracing to send
+reports that can be easily verified that both the QEMU and kernel bits
+are in place and functional.  Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1254786
-
-Title:
-  qemu-m68k-static: illegal instruction ebc0 during debootstrap second
-  stage
-
-Status in QEMU:
-  Incomplete
-Status in qemu-linaro package in Ubuntu:
-  New
-
-Bug description:
-  Host: Ubuntu Precise amd64
-  Guest: Debian (ports) sid m68k
-
-  $ sudo qemu-debootstrap --no-check-gpg --arch=3Dm68k sid m68k http://ftp.=
-debian-ports.org/debian
-  I: Running command: debootstrap --arch m68k --foreign --no-check-gpg sid =
-m68k http://ftp.debian-ports.org/debian
-  [...]
-  I: Running command: chroot m68k /debootstrap/debootstrap --second-stage
-  qemu: fatal: Illegal instruction: ebc0 @ f67e5662
-  D0 =3D 6ffffef5   A0 =3D f67fbf58   F0 =3D 0000000000000000 (           0)
-  D1 =3D 0000010a   A1 =3D 00000000   F1 =3D 0000000000000000 (           0)
-  D2 =3D 0000000f   A2 =3D 00000000   F2 =3D 0000000000000000 (           0)
-  D3 =3D 00000000   A3 =3D f67e0000   F3 =3D 0000000000000000 (           0)
-  D4 =3D 00000000   A4 =3D 00000000   F4 =3D 0000000000000000 (           0)
-  D5 =3D 00000000   A5 =3D f67fc000   F5 =3D 0000000000000000 (           0)
-  D6 =3D 00000000   A6 =3D f6fff7cc   F6 =3D 0000000000000000 (           0)
-  D7 =3D 00000000   A7 =3D f6fff580   F7 =3D 0000000000000000 (           0)
-  PC =3D f67e5662   SR =3D 0000 ----- FPRESULT =3D            0
-  Aborted (core dumped)
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 12.04
-  Package: qemu-user-static 1.0.50-2012.03-0ubuntu2.1
-  ProcVersionSignature: Ubuntu 3.8.0-33.48~precise1-generic 3.8.13.11
-  Uname: Linux 3.8.0-33-generic x86_64
-  NonfreeKernelModules: wl
-  ApportVersion: 2.0.1-0ubuntu17.6
-  Architecture: amd64
-  Date: Mon Nov 25 16:08:26 2013
-  Dependencies:
-   =
-
-  InstallationMedia: Ubuntu 12.04.3 LTS "Precise Pangolin" - Release amd64 =
-(20130820.1)
-  MarkForUpload: True
-  ProcEnviron:
-   LANGUAGE=3Den_GB:en
-   TERM=3Dxterm
-   PATH=3D(custom, no user)
-   LANG=3Den_GB.UTF-8
-   SHELL=3D/bin/bash
-  SourcePackage: qemu-linaro
-  UpgradeStatus: No upgrade log present (probably fresh install)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1254786/+subscriptions
+Alex
