@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ejrGj-0005Oo-NH
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:50:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1ejrLL-0001SY-Bc
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:54:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ejrGf-0005Nl-IW
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:50:01 -0500
-Resent-Message-Id: <E1ejrGf-0005Nl-IW@eggs.gnu.org>
-In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151811576893.315.13984750922250615297@bdbb90650ae5>
+	(envelope-from <bounces@canonical.com>) id 1ejrLG-0008AO-Ca
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:54:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48638)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ejrLG-0008A9-6V
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:54:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ejrLF-0008D9-4l
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 18:54:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EE5122E80C9
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 18:54:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 8 Feb 2018 10:49:29 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/32] Add ARMv8.2 half-precision
- functions
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Feb 2018 18:41:31 -0000
+From: Thomas Huth <1343827@bugs.launchpad.net>
+Reply-To: Bug 1343827 <1343827@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140718061500.9209.75334.malonedeb@gac.canonical.com>
+Message-Id: <151811529192.29511.11355793284188440536.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1343827] Re: block.c: multiwrite_merge()
+ truncates overlapping requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,152 +37,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjA4MTczMTU3LjI0NzA1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzMyXSBBZGQgQVJNdjguMiBoYWxmLXBy
-ZWNpc2lvbiBmdW5jdGlvbnMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
-CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
-CmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
-Z10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMjA4MTczMTU3LjI0NzA1LTEtYWxleC5iZW5u
-ZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwMjA4MTczMTU3LjI0NzA1LTEtYWxleC5iZW5u
-ZWVAbGluYXJvLm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMjA4
-MTgyMjIzLjI1NjItMS1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAyMDgxODIy
-MjMuMjU2Mi0xLXBib256aW5pQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo4MjhmZGY4MDM5IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgYWxsIHNpbmdsZSBvcCBGUDE2
-IHRvIGhhbmRsZV9mcF8xc3JjX2hhbGYKYmIxMjM0N2RmMCBhcm0vdHJhbnNsYXRlLWE2NDogaW1w
-bGVtZW50IHNpbWRfc2NhbGFyX3RocmVlX3JlZ19zYW1lX2ZwMTYKOWQ5MGU2NThjNSBhcm0vdHJh
-bnNsYXRlLWE2NDogYWRkIGFsbCBGUDE2IG9wcyBpbiBzaW1kX3NjYWxhcl9wYWlyd2lzZQoxOGU0
-ZDZmMWQyIGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGTU9WIHRvIHNpbWRfbW9kX2ltbQo0
-ODdkMjE3ODVhIGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGUlNRUlRFIHRvIHNpbWRfdHdv
-X3JlZ19taXNjX2ZwMTYKZTY4N2VlZTAzZCBhcm0vaGVscGVyLmM6IHJlLWZhY3RvciByc3FydGUg
-YW5kIGFkZCByc3FydGVfZjE2CjQwNzg1OTY4OTUgYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2
-IEZTUVJUIHRvIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYKMTRlMjQ3M2EwMSBhcm0vdHJhbnNsYXRl
-LWE2NDogYWRkIEZQMTYgRlJDUFggdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNgowMDgwYjlmZWIx
-IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGUkVDUEUKMzIyMDMxYTVjOSBhcm0vaGVscGVy
-LmM6IHJlLWZhY3RvciByZWNwZSBhbmQgYWRkIHJlY2VwZV9mMTYKOTkzOTZlZmZjZSBhcm0vdHJh
-bnNsYXRlLWE2NDogYWRkIEZQMTYgRk5FRy9GQUJTIHRvIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYK
-ZmMwZjlkYmQwYSBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgU0NWVEYvVUNWRlQgdG8gc2lt
-ZF90d29fcmVnX21pc2NfZnAxNgplZDc3NTg4ZjNmIGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAx
-NiBGQ014eCAoemVybykgdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNgoyOGI2YTZhNzcyIGFybS90
-cmFuc2xhdGUtYTY0OiBhZGQgRkNWVHh4IHRvIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYKYzhjZTJm
-NzM2ZCBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgRlBSSU5UeCB0byBzaW1kX3R3b19yZWdf
-bWlzY19mcDE2CjkwMDU2MWFlMzYgYXJtL3RyYW5zbGF0ZS1hNjQ6IGluaXRpYWwgZGVjb2RlIGZv
-ciBzaW1kX3R3b19yZWdfbWlzY19mcDE2CmQ1NWY4ZmQyZDQgYXJtL3RyYW5zbGF0ZS1hNjQ6IGFk
-ZCBGUDE2IHgyIG9wcyBmb3Igc2ltZF9pbmRleGVkCjc5MjAwYmYzM2UgYXJtL3RyYW5zbGF0ZS1h
-NjQ6IGFkZCBGUDE2IEZNVUxYL01MUy9GTUxBIHRvIHNpbWRfaW5kZXhlZAplZWJjYzNhZWI2IGFy
-bS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBwYWlyd2lzZSBvcHMgc2ltZF90aHJlZV9yZWdfc2Ft
-ZV9mcDE2CmE3ZDQyYzEwOWQgYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZSW0VDUC9TUVJU
-XVMgdG8gc2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2CmY0ZjhmMDA4M2IgYXJtL3RyYW5zbGF0ZS1h
-NjQ6IGFkZCBGUDE2IEZNVUxBL1gvUyB0byBzaW1kX3RocmVlX3JlZ19zYW1lX2ZwMTYKZjk5OTQx
-MDNjYSBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgRltBXUNbRVEvR0UvR1RdIHRvIHNpbWRf
-dGhyZWVfcmVnX3NhbWVfZnAxNgo3NDBiNTcxY2M3IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAx
-NiBGQUREL0ZBQkQvRlNVQi9GTVVML0ZESVYgdG8gc2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2CjIy
-MTAyNGI4NzAgYXJtL3RyYW5zbGF0ZS1hNjQ6IGluaXRpYWwgZGVjb2RlIGZvciBzaW1kX3RocmVl
-X3JlZ19zYW1lX2ZwMTYKZTU1Y2Q2OGIyZSBhcm0vdHJhbnNsYXRlLWE2NDogaGFuZGxlXzNzYW1l
-XzY0IGNvbW1lbnQgZml4CmU5NjFjMmJlZTQgYXJtL3RyYW5zbGF0ZS1hNjQ6IGltcGxlbWVudCBo
-YWxmLXByZWNpc2lvbiBGKE1JTnxNQVgpKFZ8Tk1WKQpjMTc3Yzk1MDkxIHRhcmdldC9hcm0vaGVs
-cGVyOiBwYXNzIGV4cGxpY2l0IGZwc3QgdG8gc2V0X3Jtb2RlCjcxZmU3OTUzZjIgdGFyZ2V0L2Fy
-bS9jcHUuaDogYWRkIGFkZGl0aW9uYWwgZmxvYXRfc3RhdHVzIGZsYWdzCmMyYmJmZmUwNGQgdGFy
-Z2V0L2FybS9jcHUuaDogdXBkYXRlIGNvbW1lbnQgZm9yIGhhbGYtcHJlY2lzaW9uIHZhbHVlcwpm
-NWYwZTNmYTc5IHRhcmdldC9hcm0vY3B1NjQ6IGFsbG93IGZwMTYgdG8gYmUgZGlzYWJsZWQKYWI5
-NTRiMDZiYyB0YXJnZXQvYXJtL2NwdTY0OiBpbnRyb2R1Y2UgQVJNX1Y4X0ZQMTYgZmVhdHVyZSBi
-aXQKN2MzYjQxZWZlOCBpbmNsdWRlL2V4ZWMvaGVscGVyLWhlYWQuaDogc3VwcG9ydCBmMTYgaW4g
-aGVscGVyIGNhbGxzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzMyOiBp
-bmNsdWRlL2V4ZWMvaGVscGVyLWhlYWQuaDogc3VwcG9ydCBmMTYgaW4gaGVscGVyIGNhbGxzLi4u
-CkNoZWNraW5nIFBBVENIIDIvMzI6IHRhcmdldC9hcm0vY3B1NjQ6IGludHJvZHVjZSBBUk1fVjhf
-RlAxNiBmZWF0dXJlIGJpdC4uLgpDaGVja2luZyBQQVRDSCAzLzMyOiB0YXJnZXQvYXJtL2NwdTY0
-OiBhbGxvdyBmcDE2IHRvIGJlIGRpc2FibGVkLi4uCkNoZWNraW5nIFBBVENIIDQvMzI6IHRhcmdl
-dC9hcm0vY3B1Lmg6IHVwZGF0ZSBjb21tZW50IGZvciBoYWxmLXByZWNpc2lvbiB2YWx1ZXMuLi4K
-Q2hlY2tpbmcgUEFUQ0ggNS8zMjogdGFyZ2V0L2FybS9jcHUuaDogYWRkIGFkZGl0aW9uYWwgZmxv
-YXRfc3RhdHVzIGZsYWdzLi4uCkNoZWNraW5nIFBBVENIIDYvMzI6IHRhcmdldC9hcm0vaGVscGVy
-OiBwYXNzIGV4cGxpY2l0IGZwc3QgdG8gc2V0X3Jtb2RlLi4uCkNoZWNraW5nIFBBVENIIDcvMzI6
-IGFybS90cmFuc2xhdGUtYTY0OiBpbXBsZW1lbnQgaGFsZi1wcmVjaXNpb24gRihNSU58TUFYKShW
-fE5NVikuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8zMjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGhhbmRsZV8z
-c2FtZV82NCBjb21tZW50IGZpeC4uLgpDaGVja2luZyBQQVRDSCA5LzMyOiBhcm0vdHJhbnNsYXRl
-LWE2NDogaW5pdGlhbCBkZWNvZGUgZm9yIHNpbWRfdGhyZWVfcmVnX3NhbWVfZnAxNi4uLgpDaGVj
-a2luZyBQQVRDSCAxMC8zMjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZBREQvRkFCRC9G
-U1VCL0ZNVUwvRkRJViB0byBzaW1kX3RocmVlX3JlZ19zYW1lX2ZwMTYuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTEvMzI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGW0FdQ1tFUS9HRS9HVF0gdG8g
-c2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2Li4uCkNoZWNraW5nIFBBVENIIDEyLzMyOiBhcm0vdHJh
-bnNsYXRlLWE2NDogYWRkIEZQMTYgRk1VTEEvWC9TIHRvIHNpbWRfdGhyZWVfcmVnX3NhbWVfZnAx
-Ni4uLgpDaGVja2luZyBQQVRDSCAxMy8zMjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZS
-W0VDUC9TUVJUXVMgdG8gc2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2Li4uCkNoZWNraW5nIFBBVENI
-IDE0LzMyOiBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgcGFpcndpc2Ugb3BzIHNpbWRfdGhy
-ZWVfcmVnX3NhbWVfZnAxNi4uLgpDaGVja2luZyBQQVRDSCAxNS8zMjogYXJtL3RyYW5zbGF0ZS1h
-NjQ6IGFkZCBGUDE2IEZNVUxYL01MUy9GTUxBIHRvIHNpbWRfaW5kZXhlZC4uLgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2
-NC5jOjEwODA3OgorICAgICAgICBpZiAoc2l6ZSA9PSAxIHx8IChzaXplIDwgMiAmJiAhYXJtX2Rj
-X2ZlYXR1cmUocywgQVJNX0ZFQVRVUkVfVjhfRlAxNikpKSB7CgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojNzQ6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5jOjEwOTY5
-OgorICAgICAgICAgICAgICAgIHJlYWRfdmVjX2VsZW1lbnRfaTMyKHMsIHRjZ19yZXMsIHJkLCBw
-YXNzLCBpc19zY2FsYXIgPyBzaXplIDogTU9fMzIpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzc4OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzoxMDk3MzoKKyAg
-ICAgICAgICAgICAgICAgICAgICAgIC8qIEFzIHVzdWFsIGZvciBBUk0sIHNlcGFyYXRlIG5lZ2F0
-aW9uIGZvciBmdXNlZCBtdWx0aXBseS1hZGQgKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiM4MTogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0LmM6MTA5NzY6CisgICAg
-ICAgICAgICAgICAgICAgIGdlbl9oZWxwZXJfYWR2c2ltZF9tdWxhZGRoKHRjZ19yZXMsIHRjZ19v
-cCwgdGNnX2lkeCwgdGNnX3JlcywgZnBzdCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojODU6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5jOjEwOTgwOgorICAgICAg
-ICAgICAgICAgICAgICAgICAgLyogQXMgdXN1YWwgZm9yIEFSTSwgc2VwYXJhdGUgbmVnYXRpb24g
-Zm9yIGZ1c2VkIG11bHRpcGx5LWFkZCAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
-cnMKIzg4OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzoxMDk4MzoKKyAgICAgICAg
-ICAgICAgICAgICAgZ2VuX2hlbHBlcl92ZnBfbXVsYWRkcyh0Y2dfcmVzLCB0Y2dfb3AsIHRjZ19p
-ZHgsIHRjZ19yZXMsIGZwc3QpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEw
-MjogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0LmM6MTA5OTM6CisgICAgICAgICAgICAg
-ICAgICAgICAgICBnZW5faGVscGVyX2FkdnNpbWRfbXVseGgodGNnX3JlcywgdGNnX29wLCB0Y2df
-aWR4LCBmcHN0KTsKCnRvdGFsOiAwIGVycm9ycywgNyB3YXJuaW5ncywgOTcgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAx
-Ni8zMjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IHgyIG9wcyBmb3Igc2ltZF9pbmRleGVk
-Li4uCkNoZWNraW5nIFBBVENIIDE3LzMyOiBhcm0vdHJhbnNsYXRlLWE2NDogaW5pdGlhbCBkZWNv
-ZGUgZm9yIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMzI6IGFy
-bS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGUFJJTlR4IHRvIHNpbWRfdHdvX3JlZ19taXNjX2Zw
-MTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMzI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRkNWVHh4
-IHRvIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMzI6IGFybS90
-cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGQ014eCAoemVybykgdG8gc2ltZF90d29fcmVnX21pc2Nf
-ZnAxNi4uLgpDaGVja2luZyBQQVRDSCAyMS8zMjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2
-IFNDVlRGL1VDVkZUIHRvIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYuLi4KRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyNTogRklMRTogdGFy
-Z2V0L2FybS9oZWxwZXIuYzoxMDg4NToKK0ZMT0FUX0NPTlZTKHNpLCBoLCAxNiwgKQoKdG90YWw6
-IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMTIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjIvMzI6IGFybS90cmFuc2xh
-dGUtYTY0OiBhZGQgRlAxNiBGTkVHL0ZBQlMgdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNi4uLgpD
-aGVja2luZyBQQVRDSCAyMy8zMjogYXJtL2hlbHBlci5jOiByZS1mYWN0b3IgcmVjcGUgYW5kIGFk
-ZCByZWNlcGVfZjE2Li4uCkNoZWNraW5nIFBBVENIIDI0LzMyOiBhcm0vdHJhbnNsYXRlLWE2NDog
-YWRkIEZQMTYgRlJFQ1BFLi4uCkNoZWNraW5nIFBBVENIIDI1LzMyOiBhcm0vdHJhbnNsYXRlLWE2
-NDogYWRkIEZQMTYgRlJDUFggdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNi4uLgpDaGVja2luZyBQ
-QVRDSCAyNi8zMjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZTUVJUIHRvIHNpbWRfdHdv
-X3JlZ19taXNjX2ZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvMzI6IGFybS9oZWxwZXIuYzogcmUt
-ZmFjdG9yIHJzcXJ0ZSBhbmQgYWRkIHJzcXJ0ZV9mMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjgvMzI6
-IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGUlNRUlRFIHRvIHNpbWRfdHdvX3JlZ19taXNj
-X2ZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjkvMzI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAx
-NiBGTU9WIHRvIHNpbWRfbW9kX2ltbS4uLgpDaGVja2luZyBQQVRDSCAzMC8zMjogYXJtL3RyYW5z
-bGF0ZS1hNjQ6IGFkZCBhbGwgRlAxNiBvcHMgaW4gc2ltZF9zY2FsYXJfcGFpcndpc2UuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMzEvMzI6IGFybS90cmFuc2xhdGUtYTY0OiBpbXBsZW1lbnQgc2ltZF9zY2Fs
-YXJfdGhyZWVfcmVnX3NhbWVfZnAxNi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojMzY6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5jOjc3NzU6CitzdGF0aWMgdm9p
-ZCBkaXNhc19zaW1kX3NjYWxhcl90aHJlZV9yZWdfc2FtZV9mcDE2KERpc2FzQ29udGV4dCAqcywg
-dWludDMyX3QgaW5zbikKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTE0IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFU
-Q0ggMzIvMzI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgYWxsIHNpbmdsZSBvcCBGUDE2IHRvIGhh
-bmRsZV9mcF8xc3JjX2hhbGYuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Triaging old bug tickets... has Stefan's fix be included? Could we close
+this ticket nowadays?
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1343827
+
+Title:
+  block.c: multiwrite_merge() truncates overlapping requests
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  If the list of requests passed to multiwrite_merge() contains two
+  requests where the first is for a range of sectors that is a strict
+  subset of the second's, the second request is truncated to end where
+  the first starts, so the second half of the second request is lost.
+
+  This is easy to reproduce by running fio against a virtio-blk device
+  running on qemu 2.1.0-rc1 with the below fio script. At least with fio
+  2.0.13, the randwrite pass will issue overlapping bios to the block
+  driver, which the kernel is happy to pass along to qemu:
+
+  [global]
+  randrepeat=3D0
+  ioengine=3Dlibaio
+  iodepth=3D64
+  direct=3D1
+  size=3D1M
+  numjobs=3D1
+  verify_fatal=3D1
+  verify_dump=3D1
+
+  filename=3D$dev
+
+  [seqwrite]
+  blocksize_range=3D4k-1M
+  rw=3Dwrite
+  verify=3Dcrc32c-intel
+
+  [randwrite]
+  stonewall
+  blocksize_range=3D4k-1M
+  rw=3Drandwrite
+  verify=3Dmeta
+
+  Here is a naive fix for the problem that simply avoids merging
+  problematic requests. I guess a better solution would be to redo
+  qemu_iovec_concat() to do the right thing.
+
+  diff -ur old/qemu-2.1.0-rc2/block.c qemu-2.1.0-rc2/block.c
+  --- old/qemu-2.1.0-rc2/block.c  2014-07-15 14:49:14.000000000 -0700
+  +++ qemu-2.1.0-rc2/block.c      2014-07-17 23:03:14.224169741 -0700
+  @@ -4460,7 +4460,9 @@
+           int64_t oldreq_last =3D reqs[outidx].sector + reqs[outidx].nb_se=
+ctors;
+   =
+
+           // Handle exactly sequential writes and overlapping writes.
+  -        if (reqs[i].sector <=3D oldreq_last) {
+  +        // If this request ends before the previous one, don't merge.
+  +        if (reqs[i].sector <=3D oldreq_last &&
+  +            reqs[i].sector + reqs[i].nb_sectors >=3D oldreq_last) {
+               merge =3D 1;
+           }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1343827/+subscriptions
