@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejma6-0000Ut-LX
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:49:43 -0500
+	(envelope-from <bounces@canonical.com>) id 1ejmbJ-0001Ux-78
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejma5-0003SG-H9
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:49:42 -0500
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:38642)
+	(envelope-from <bounces@canonical.com>) id 1ejmbF-0003xk-SC
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejma5-0003Rv-Bw
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:49:41 -0500
-Received: by mail-ot0-x229.google.com with SMTP id h14so4359065otj.5
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:49:41 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ejmbF-0003xQ-Lm
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ejmbC-0005pR-S7
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 13:50:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 57D852E81A1
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 13:50:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180207042438.15422-1-andrew.smirnov@gmail.com>
-References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Feb 2018 13:49:20 +0000
-Message-ID: <CAFEAcA8ERQQadvAdqhWbK+6hbLtvFMrA=X8R7UBcQpAKifDpOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 00/14] Initial i.MX7 support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Feb 2018 13:37:32 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1738767 <1738767@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151359638511.16639.9243776100393876848.malonedeb@soybean.canonical.com>
+Message-Id: <151809705286.29573.15139483661138306472.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738767] Re: Cannot build QEMU on RHEL6 because
+ of MAP_HUGETLB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 7 February 2018 at 04:24, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> Hi everyone,
->
-> This v5 of the patch series containing the work that I've done in
-> order to enable support for i.MX7 emulation in QEMU.
+I think we can close this bug: the build fails on RHEL6.4, but succeeded
+on RHEL6.7.
 
-Thanks; I'm applying this to target-arm.next. There are a few minor
-tweaks I'm going to make in the process, but I think that's better
-than making you do yet another respin. Those changes are:
- * dropped stray blank-line-at-end-of-file from a few patches
- * fixed a couple of over-80-columnns lines
- * added a ESDHC_UNDOCUMENTED_REG27 define as suggested by Philippe
-   (I didn't reorder the switches to put 'default' last though, as
-   that didn't seem necessary to me)
+Probably related to: https://access.redhat.com/solutions/320613
 
-If you get back to me today about the GPL-2-vs-2-or-later question
-for patch 13 I'll make that change too. Otherwise I'll drop 13
-and 14 for the moment.
+-- =
 
-thanks
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738767
+
+Title:
+  Cannot build QEMU on RHEL6 because of MAP_HUGETLB
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  Hello,
+  I've just downloaded qemu-2.11.0 sources and I wanted to build QEMU on RH=
+EL6 x86_64, for various targets, amonst which arm-linux-user.
+
+  The build fails because /usr/include/bits/mman.h does not define
+  MAP_HUGETLB.
+
+  I think it is needed since commit 541e16904.
+
+  I'm not sure if RHEL6 is still supported by QEMU? If so, can you fix
+  this problem?
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738767/+subscriptions
