@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejmLd-0001rD-7V
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:34:46 -0500
+	(envelope-from <marcel@redhat.com>) id 1ejmQ8-0004Hi-T3
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:39:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejmLZ-0000wf-9S
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:34:45 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:46700)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejmLZ-0000wV-4e
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:34:41 -0500
-Received: by mail-qt0-x241.google.com with SMTP id u6so5714749qtg.13
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:34:41 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180208105754.19924-1-danielhb@linux.vnet.ibm.com>
-	<caaad0dd-3f8e-a414-48ed-b6535d5a83a4@amsat.org>
-	<CAFEAcA90+5RL+WPVDS00NH8WuLmG4C0Ou74v-m20+RB6zYz8WQ@mail.gmail.com>
-	<91dde6c1-e282-37dd-d843-eb6b186e8bff@amsat.org>
-Message-ID: <c68fa4de-fad8-a686-2f87-3de0ede8f949@amsat.org>
-Date: Thu, 8 Feb 2018 10:34:33 -0300
+	(envelope-from <marcel@redhat.com>) id 1ejmQ4-0003KG-VI
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:39:24 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39722 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ejmQ4-0003Jn-Ph
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:39:20 -0500
+References: <20180205102659.60552-1-marcel@redhat.com>
+	<CAFEAcA8OO7jEeAe5UWKBqSb_+tap7OVM2YxEsqWDVZV8jN7cmA@mail.gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <51f8addc-8c6c-4532-1a59-b4c0098f6c68@redhat.com>
+Date: Thu, 8 Feb 2018 15:38:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <91dde6c1-e282-37dd-d843-eb6b186e8bff@amsat.org>
+In-Reply-To: <CAFEAcA8OO7jEeAe5UWKBqSb_+tap7OVM2YxEsqWDVZV8jN7cmA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/audio/sb16.c: missing break
- statement
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/4] RDMA patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,58 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, John Arbuckle <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, yuval.shaia@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>, dotanb@mellanox.com
 
-On 02/08/2018 10:16 AM, Philippe Mathieu-Daudé wrote:
-> On 02/08/2018 10:01 AM, Peter Maydell wrote:
->> On 8 February 2018 at 12:15, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>> Hi Daniel,
->>>
->>> On 02/08/2018 07:57 AM, Daniel Henrique Barboza wrote:
->>>> This patch adds a break in the switch() statement of complete(),
->>>> value 0x42:
->>>>
->>>>     case 0x42:              /* FT2 sets output freq with this, go figure */
->>>>         qemu_log_mask(LOG_UNIMP, "cmd 0x42 might not do what it think it"
->>>>                       " should\n");
->>>>         break; <-------
->>>>     case 0x41:
->>>
->>> It seems this is an intentional fallthrough, I understand cmd 0x42 is
->>> expected to do the same of 0x41 and _a bit more_ (see commit 85571bc7415).
+Hi Peter,
+
+On 08/02/2018 14:59, Peter Maydell wrote:
+> On 5 February 2018 at 10:26, Marcel Apfelbaum <marcel@redhat.com> wrote:
+>> The following changes since commit f24ee107a07f093bd7ed475dd48d7ba57ea3d8fe:
 >>
->> Yes, I agree; I wrote a bit about this in this thread:
->> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02081.html
+>>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180202-pull-request' into staging (2018-02-02 18:54:11 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   https://github.com/marcel-apf/qemu tags/rdma-pull-request
+>>
+>> for you to fetch changes up to f172ba1b02724fb66dabd69cd553cfa625b413e5:
+>>
+>>   MAINTAINERS: add entry for hw/rdma (2018-02-05 11:53:00 +0200)
+>>
+>> ----------------------------------------------------------------
+>> PVRDMA implementation
+>>
+>> ----------------------------------------------------------------
+>> Marcel Apfelbaum (3):
+>>       mem: add share parameter to memory-backend-ram
+>>       docs: add pvrdma device documentation.
+>>       MAINTAINERS: add entry for hw/rdma
+>>
+>> Yuval Shaia (1):
+>>       pvrdma: initial implementation
 > 
-> Oh, very useful link!
-> 
->> (though my guess is that actually 0x42 is supposed to do exactly
->> what 0x41 does, and that the LOG_UNIMP should maybe just be removed).
-> 
-> I now understand 0x42 sets the dsp input sampling freq, the model seems
-> to be designed with output in mind, then added input support (using same
-> freq as output).
+> Hi. The technical details of this pullreq are all fine (pgp
+> key, format, etc), and it passes my build tests. But I gave
+> this pullreq a bit of a closer inspection than I normally
+> would, since it's your first, and there are a few things I
+> thought worth bringing up:
 
-Now I see Fabrice comment "FT2 sets output freq with this, go figure"
-and agree with him.
-
-I like to think this is a bug in Fast Tracker 2, so Peter suggestion
-about using LOG_GUEST_ERROR here might be clever.
+Thanks for doing it!
 
 > 
-> So imho the simpler/safer fix would be:
+> (1) I notice that some of the new files in this pullreq are licensed
+> as "GPL, version 2", rather than "version 2 or any later version".
+> Did you really mean that? Per 'LICENSE', we have a strong preference
+> for 2-or-later for new code.
 > 
->   case 0x42:
->       if (dsp_get_hilo(s) != s->freq) {
->           qemu_log_mask(LOG_UNIMP,
->                         "input sampling freq different than "
->                         "output not implemented");
->       }
->       /* fallthrough */
->   case 0x41:
->       ...
+
+No real preference, I will modify the license.
+
+> (2) Some new files have no copyright or license comment at the
+> top of them. Can you fix that, please?
 > 
-> and the correct fix would be split s->freq in {s->freq_in, s->freq_out}
-> but nobody ever required this during at least 14 years.
+
+Sure.
+
+> (3) Some of the new headers use kernel-internals __u32 etc types.
+> This isn't portable. ('HACKING' has some suggestions for types you
+> might want instead.)
+> 
+
+We do not "use" the __u32 types, we just copied a kernel file
+for structures used for communication between the guest driver
+and the QEMU code. We had a look on how it is done and
+we use the model that adds macros __u32 -> uint32_t,
+so the "__types" do not really create such problems.
+
+> (4) One of your patches doesn't have any reviewed-by tags.
+> We don't always manage to review everything, but it is
+> nicer if we can get review, especially for patches from
+> new submaintainers.
+> 
+
+The patch did receive several questions/comments and all
+of them were addressed, but indeed no RB tag was given.
+Since the patch was in the mailing list for over a month
+and *was* reviewed, I thought is enough.
+I will ping Eduardo, he had the latest comments for it.
+
+
+> (5) This is an absolutely enormous diffstat for a single commit:
+>  26 files changed, 5149 insertions(+), 4 deletions(-)
+> 
+
+On the github where the project was developed we have thousands of commits,
+so it can't be used.
+It was reviewed closely by one reviewer and got a lot
+of comments from others.
+That being said, we will try to split it in a few patches
+and send a new version.
+
+Thanks for the comments,
+Marcel
+
+> thanks
+> -- PMM
 > 
