@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjV6-0006ic-57
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:21 -0500
+	(envelope-from <peterx@redhat.com>) id 1ejjV7-0006kR-Ux
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjV3-0005ci-Tz
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:20 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41324 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ejjV6-0005df-TC
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:21 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41332 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjV3-0005cT-P5
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:17 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjV6-0005dT-Od
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:20 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Thu,  8 Feb 2018 18:31:17 +0800
-Message-Id: <20180208103132.28452-14-peterx@redhat.com>
+Date: Thu,  8 Feb 2018 18:31:18 +0800
+Message-Id: <20180208103132.28452-15-peterx@redhat.com>
 In-Reply-To: <20180208103132.28452-1-peterx@redhat.com>
 References: <20180208103132.28452-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 13/28] migration: new state
- "postcopy-recover"
+Subject: [Qemu-devel] [PATCH v6 14/28] migration: wakeup dst ram-load-thread
+ for recover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,164 +27,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Introducing new migration state "postcopy-recover". If a migration
-procedure is paused and the connection is rebuilt afterward
-successfully, we'll switch the source VM state from "postcopy-paused" to
-the new state "postcopy-recover", then we'll do the resume logic in the
-migration thread (along with the return path thread).
+On the destination side, we cannot wake up all the threads when we got
+reconnected. The first thing to do is to wake up the main load thread,
+so that we can continue to receive valid messages from source again and
+reply when needed.
 
-This patch only do the state switch on source side. Another following up
-patch will handle the state switching on destination side using the same
-status bit.
+At this point, we switch the destination VM state from postcopy-paused
+back to postcopy-recover.
+
+Now we are finally ready to do the resume logic.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 76 ++++++++++++++++++++++++++++++++++++++-------------
- qapi/migration.json   |  4 ++-
- 2 files changed, 60 insertions(+), 20 deletions(-)
+ migration/migration.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 2088a1d1bf..6c5e422616 100644
+index 6c5e422616..6503b26386 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -559,6 +559,7 @@ static bool migration_is_setup_or_active(int state)
-     case MIGRATION_STATUS_ACTIVE:
-     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-     case MIGRATION_STATUS_POSTCOPY_PAUSED:
-+    case MIGRATION_STATUS_POSTCOPY_RECOVER:
-     case MIGRATION_STATUS_SETUP:
-     case MIGRATION_STATUS_PRE_SWITCHOVER:
-     case MIGRATION_STATUS_DEVICE:
-@@ -639,6 +640,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
-     case MIGRATION_STATUS_PRE_SWITCHOVER:
-     case MIGRATION_STATUS_DEVICE:
-     case MIGRATION_STATUS_POSTCOPY_PAUSED:
-+    case MIGRATION_STATUS_POSTCOPY_RECOVER:
-          /* TODO add some postcopy stats */
-         info->has_status = true;
-         info->has_total_time = true;
-@@ -2245,6 +2247,13 @@ typedef enum MigThrError {
-     MIG_THR_ERR_FATAL = 2,
- } MigThrError;
+@@ -427,8 +427,34 @@ static void migration_incoming_process(void)
  
-+/* Return zero if success, or <0 for error */
-+static int postcopy_do_resume(MigrationState *s)
-+{
-+    /* TODO: do the resume logic */
-+    return 0;
-+}
-+
- /*
-  * We don't return until we are in a safe state to continue current
-  * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
-@@ -2253,29 +2262,55 @@ typedef enum MigThrError {
- static MigThrError postcopy_pause(MigrationState *s)
+ void migration_fd_process_incoming(QEMUFile *f)
  {
-     assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
--    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
--                      MIGRATION_STATUS_POSTCOPY_PAUSED);
- 
--    /* Current channel is possibly broken. Release it. */
--    assert(s->to_dst_file);
--    qemu_file_shutdown(s->to_dst_file);
--    qemu_fclose(s->to_dst_file);
--    s->to_dst_file = NULL;
-+    while (true) {
-+        migrate_set_state(&s->state, s->state,
-+                          MIGRATION_STATUS_POSTCOPY_PAUSED);
- 
--    error_report("Detected IO failure for postcopy. "
--                 "Migration paused.");
-+        /* Current channel is possibly broken. Release it. */
-+        assert(s->to_dst_file);
-+        qemu_file_shutdown(s->to_dst_file);
-+        qemu_fclose(s->to_dst_file);
-+        s->to_dst_file = NULL;
- 
--    /*
--     * We wait until things fixed up. Then someone will setup the
--     * status back for us.
--     */
--    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
--        qemu_sem_wait(&s->postcopy_pause_sem);
--    }
-+        error_report("Detected IO failure for postcopy. "
-+                     "Migration paused.");
- 
--    trace_postcopy_pause_continued();
+-    migration_incoming_setup(f);
+-    migration_incoming_process();
++    MigrationIncomingState *mis = migration_incoming_get_current();
++
++    if (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
++        /* Resumed from a paused postcopy migration */
++
++        mis->from_src_file = f;
++        /* Postcopy has standalone thread to do vm load */
++        qemu_file_set_blocking(f, true);
++
++        /* Re-configure the return path */
++        mis->to_src_file = qemu_file_get_return_path(f);
++
++        migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
++                          MIGRATION_STATUS_POSTCOPY_RECOVER);
++
 +        /*
-+         * We wait until things fixed up. Then someone will setup the
-+         * status back for us.
++         * Here, we only wake up the main loading thread (while the
++         * fault thread will still be waiting), so that we can receive
++         * commands from source now, and answer it if needed. The
++         * fault thread will be woken up afterwards until we are sure
++         * that source is ready to reply to page requests.
 +         */
-+        while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-+            qemu_sem_wait(&s->postcopy_pause_sem);
-+        }
-+
-+        if (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
-+            /* Woken up by a recover procedure. Give it a shot */
- 
--    return MIG_THR_ERR_RECOVERED;
-+            /*
-+             * Firstly, let's wake up the return path now, with a new
-+             * return path channel.
-+             */
-+            qemu_sem_post(&s->postcopy_pause_rp_sem);
-+
-+            /* Do the resume logic */
-+            if (postcopy_do_resume(s) == 0) {
-+                /* Let's continue! */
-+                trace_postcopy_pause_continued();
-+                return MIG_THR_ERR_RECOVERED;
-+            } else {
-+                /*
-+                 * Something wrong happened during the recovery, let's
-+                 * pause again. Pause is always better than throwing
-+                 * data away.
-+                 */
-+                continue;
-+            }
-+        } else {
-+            /* This is not right... Time to quit. */
-+            return MIG_THR_ERR_FATAL;
-+        }
++        qemu_sem_post(&mis->postcopy_pause_sem_dst);
++    } else {
++        /* New incoming migration */
++        migration_incoming_setup(f);
++        migration_incoming_process();
 +    }
  }
  
- static MigThrError migration_detect_error(MigrationState *s)
-@@ -2595,7 +2630,10 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
-     }
- 
-     if (resume) {
--        /* TODO: do the resume logic */
-+        /* Wakeup the main migration thread to do the recovery */
-+        migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
-+                          MIGRATION_STATUS_POSTCOPY_RECOVER);
-+        qemu_sem_post(&s->postcopy_pause_sem);
-         return;
-     }
- 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 9d6ccfec6b..055130314d 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -91,6 +91,8 @@
- #
- # @postcopy-paused: during postcopy but paused. (since 2.12)
- #
-+# @postcopy-recover: trying to recover from a paused postcopy. (since 2.11)
-+#
- # @completed: migration is finished.
- #
- # @failed: some error occurred during migration process.
-@@ -109,7 +111,7 @@
- { 'enum': 'MigrationStatus',
-   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
-             'active', 'postcopy-active', 'postcopy-paused',
--            'completed', 'failed', 'colo',
-+            'postcopy-recover', 'completed', 'failed', 'colo',
-             'pre-switchover', 'device' ] }
- 
- ##
+ void migration_ioc_process_incoming(QIOChannel *ioc)
 -- 
 2.14.3
