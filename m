@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejkt2-0002St-0y
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 07:01:13 -0500
+	(envelope-from <david@redhat.com>) id 1ejl1m-0006OD-0Z
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 07:10:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejkt0-0002UO-Bc
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 07:01:07 -0500
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:36242)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejkt0-0002U5-6v
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 07:01:06 -0500
-Received: by mail-ot0-x229.google.com with SMTP id m20so4081460otf.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 04:01:05 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1ejl1h-0007fW-ID
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 07:10:09 -0500
+References: <20180207155531.28446-1-cohuck@redhat.com>
+	<20180207155531.28446-4-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <ae6ace58-ea78-f254-1f5d-4d0d8987bcc0@redhat.com>
+Date: Thu, 8 Feb 2018 13:09:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180207111729.15737-1-ard.biesheuvel@linaro.org>
-References: <20180207111729.15737-1-ard.biesheuvel@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Feb 2018 12:00:44 +0000
-Message-ID: <CAFEAcA-8VDnCxd974nP8TkWnEOAp8JJ8zG96Mzq2hj2nDCA8mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 0/5] target-arm: add SHA-3,
- SM3 and SHA512 instruction support
+In-Reply-To: <20180207155531.28446-4-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] MAINTAINERS: add David as additional
+ tcg/s390 maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, thuth@redhat.com
 
-On 7 February 2018 at 11:17, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> Changes since v5:
-> - fix use of same register for destination and source in SHA-512 code
-> - use correct free() function in SHA-3 code
-> - drop helper for sm3ss1 in SM3 code
-> - include fixed version of SM4 (correct # of iterations)
-> - enable SM4 in user mode emulator
+On 07.02.2018 16:55, Cornelia Huck wrote:
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index bd2dc7ed7c..b30d2ca23a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -236,6 +236,7 @@ F: disas/ppc.c
+>  S390
+>  M: Richard Henderson <rth@twiddle.net>
+>  M: Alexander Graf <agraf@suse.de>
+> +M: David Hildenbrand <david@redhat.com>
+>  S: Maintained
+>  F: target/s390x/
+>  F: hw/s390x/
+> 
 
-Thanks -- this version passes all my tests and I've put it into
-target-arm.next.
+Thanks for the trust!
 
--- PMM
+Acked-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David / dhildenb
