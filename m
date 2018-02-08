@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3L-0003Hk-7J
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:09 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3I-0003EV-GA
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3J-0006V2-Fe
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:07 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:40756)
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3F-0006Na-60
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:04 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:43108)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejq3J-0006TJ-5l
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:05 -0500
-Received: by mail-wr0-x243.google.com with SMTP id o76so2442999wrb.7
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:05 -0800 (PST)
+	id 1ejq3E-0006MB-Ux
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:01 -0500
+Received: by mail-wr0-x236.google.com with SMTP id b52so5552048wrd.10
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:00 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:31 +0000
-Message-Id: <20180208173157.24705-7-alex.bennee@linaro.org>
-In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
+Date: Thu,  8 Feb 2018 17:31:25 +0000
+Message-Id: <20180208173157.24705-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 06/32] target/arm/helper: pass explicit fpst
- to set_rmode
+Subject: [Qemu-devel] [PATCH v2 00/32] Add ARMv8.2 half-precision functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,216 +28,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-As the rounding mode is now split between FP16 and the rest of
-floating point we need to be explicit when tweaking it. Instead of
-passing the CPU env we now pass the appropriate fpst pointer directly.
+Hi,
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/helper.c        |  4 ++--
- target/arm/helper.h        |  2 +-
- target/arm/translate-a64.c | 26 +++++++++++++-------------
- target/arm/translate.c     | 12 ++++++------
- 4 files changed, 22 insertions(+), 22 deletions(-)
+Some of this was posted before as part of the various partial patch
+series when we first started messing around with FP16 in softfloat.
+This series is now just the ARM bits and expects to have the V4
+softfloat patches as a prerequisite:
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 1cc3d43a9f..72522c125c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10974,9 +10974,9 @@ VFP_CONV_FIX_A64(uq, s, 32, 64, uint64)
- /* Set the current fp rounding mode and return the old one.
-  * The argument is a softfloat float_round_ value.
-  */
--uint32_t HELPER(set_rmode)(uint32_t rmode, CPUARMState *env)
-+uint32_t HELPER(set_rmode)(uint32_t rmode, void *fpstp)
- {
--    float_status *fp_status = &env->vfp.fp_status;
-+    float_status *fp_status = fpstp;
- 
-     uint32_t prev_rmode = get_float_rounding_mode(fp_status);
-     set_float_rounding_mode(rmode, fp_status);
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 5dec2e6262..40dcd74cfd 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -167,7 +167,7 @@ DEF_HELPER_3(vfp_uhtod, f64, i64, i32, ptr)
- DEF_HELPER_3(vfp_ultod, f64, i64, i32, ptr)
- DEF_HELPER_3(vfp_uqtod, f64, i64, i32, ptr)
- 
--DEF_HELPER_FLAGS_2(set_rmode, TCG_CALL_NO_RWG, i32, i32, env)
-+DEF_HELPER_FLAGS_2(set_rmode, TCG_CALL_NO_RWG, i32, i32, ptr)
- DEF_HELPER_FLAGS_2(set_neon_rmode, TCG_CALL_NO_RWG, i32, i32, env)
- 
- DEF_HELPER_2(vfp_fcvt_f16_to_f32, f32, i32, env)
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 1afa669e6e..531ac5999c 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -4540,10 +4540,10 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
-     {
-         TCGv_i32 tcg_rmode = tcg_const_i32(arm_rmode_to_sf(opcode & 7));
- 
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-         gen_helper_rints(tcg_res, tcg_op, fpst);
- 
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-         tcg_temp_free_i32(tcg_rmode);
-         break;
-     }
-@@ -4596,10 +4596,10 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
-     {
-         TCGv_i32 tcg_rmode = tcg_const_i32(arm_rmode_to_sf(opcode & 7));
- 
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-         gen_helper_rintd(tcg_res, tcg_op, fpst);
- 
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-         tcg_temp_free_i32(tcg_rmode);
-         break;
-     }
-@@ -5126,7 +5126,7 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
- 
-         tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rmode));
- 
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
- 
-         if (is_double) {
-             TCGv_i64 tcg_double = read_fp_dreg(s, rn);
-@@ -5173,7 +5173,7 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
-             tcg_temp_free_i32(tcg_single);
-         }
- 
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-         tcg_temp_free_i32(tcg_rmode);
- 
-         if (!sf) {
-@@ -6946,8 +6946,8 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
-     assert(!(is_scalar && is_q));
- 
-     tcg_rmode = tcg_const_i32(arm_rmode_to_sf(FPROUNDING_ZERO));
--    gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-     tcg_fpstatus = get_fpstatus_ptr(false);
-+    gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-     tcg_shift = tcg_const_i32(fracbits);
- 
-     if (is_double) {
-@@ -6993,7 +6993,7 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
- 
-     tcg_temp_free_ptr(tcg_fpstatus);
-     tcg_temp_free_i32(tcg_shift);
--    gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+    gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-     tcg_temp_free_i32(tcg_rmode);
- }
- 
-@@ -8262,8 +8262,8 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
- 
-     if (is_fcvt) {
-         tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rmode));
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-         tcg_fpstatus = get_fpstatus_ptr(false);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-     } else {
-         tcg_rmode = NULL;
-         tcg_fpstatus = NULL;
-@@ -8328,7 +8328,7 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
-     }
- 
-     if (is_fcvt) {
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-         tcg_temp_free_i32(tcg_rmode);
-         tcg_temp_free_ptr(tcg_fpstatus);
-     }
-@@ -10249,14 +10249,14 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-         return;
-     }
- 
--    if (need_fpstatus) {
-+    if (need_fpstatus || need_rmode) {
-         tcg_fpstatus = get_fpstatus_ptr(false);
-     } else {
-         tcg_fpstatus = NULL;
-     }
-     if (need_rmode) {
-         tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rmode));
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-     } else {
-         tcg_rmode = NULL;
-     }
-@@ -10485,7 +10485,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-     }
- 
-     if (need_rmode) {
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-         tcg_temp_free_i32(tcg_rmode);
-     }
-     if (need_fpstatus) {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 55826b7e5a..9aee67f067 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3144,7 +3144,7 @@ static int handle_vrint(uint32_t insn, uint32_t rd, uint32_t rm, uint32_t dp,
-     TCGv_i32 tcg_rmode;
- 
-     tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rounding));
--    gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
- 
-     if (dp) {
-         TCGv_i64 tcg_op;
-@@ -3168,7 +3168,7 @@ static int handle_vrint(uint32_t insn, uint32_t rd, uint32_t rm, uint32_t dp,
-         tcg_temp_free_i32(tcg_res);
-     }
- 
--    gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-     tcg_temp_free_i32(tcg_rmode);
- 
-     tcg_temp_free_ptr(fpst);
-@@ -3185,7 +3185,7 @@ static int handle_vcvt(uint32_t insn, uint32_t rd, uint32_t rm, uint32_t dp,
-     tcg_shift = tcg_const_i32(0);
- 
-     tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rounding));
--    gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
- 
-     if (dp) {
-         TCGv_i64 tcg_double, tcg_res;
-@@ -3223,7 +3223,7 @@ static int handle_vcvt(uint32_t insn, uint32_t rd, uint32_t rm, uint32_t dp,
-         tcg_temp_free_i32(tcg_single);
-     }
- 
--    gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-     tcg_temp_free_i32(tcg_rmode);
- 
-     tcg_temp_free_i32(tcg_shift);
-@@ -3893,13 +3893,13 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         TCGv_ptr fpst = get_fpstatus_ptr(0);
-                         TCGv_i32 tcg_rmode;
-                         tcg_rmode = tcg_const_i32(float_round_to_zero);
--                        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+                        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-                         if (dp) {
-                             gen_helper_rintd(cpu_F0d, cpu_F0d, fpst);
-                         } else {
-                             gen_helper_rints(cpu_F0s, cpu_F0s, fpst);
-                         }
--                        gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
-+                        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-                         tcg_temp_free_i32(tcg_rmode);
-                         tcg_temp_free_ptr(fpst);
-                         break;
+  https://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg01330.html
+
+Alternatively you can grab the full tree from:
+
+  https://github.com/stsquad/qemu/tree/arm-fp16-v2
+
+I've tested with the following RISU test binaries:
+
+  http://people.linaro.org/~alex.bennee/testcases/arm64.risu/testcases.armv8.2_hp.tar.xz
+
+And of course I ran the original RISU tests with:
+
+  -cpu any,fp16=off
+
+But I guess we really just need to carefully regenerate the testcases
+to not include UNDEF's which get added with future revisions of the
+specification.
+
+Anyway please review.
+
+Alex Bennée (32):
+  include/exec/helper-head.h: support f16 in helper calls
+  target/arm/cpu64: introduce ARM_V8_FP16 feature bit
+  target/arm/cpu64: allow fp16 to be disabled
+  target/arm/cpu.h: update comment for half-precision values
+  target/arm/cpu.h: add additional float_status flags
+  target/arm/helper: pass explicit fpst to set_rmode
+  arm/translate-a64: implement half-precision F(MIN|MAX)(V|NMV)
+  arm/translate-a64: handle_3same_64 comment fix
+  arm/translate-a64: initial decode for simd_three_reg_same_fp16
+  arm/translate-a64: add FP16 FADD/FABD/FSUB/FMUL/FDIV to
+    simd_three_reg_same_fp16
+  arm/translate-a64: add FP16 F[A]C[EQ/GE/GT] to
+    simd_three_reg_same_fp16
+  arm/translate-a64: add FP16 FMULA/X/S to simd_three_reg_same_fp16
+  arm/translate-a64: add FP16 FR[ECP/SQRT]S to simd_three_reg_same_fp16
+  arm/translate-a64: add FP16 pairwise ops simd_three_reg_same_fp16
+  arm/translate-a64: add FP16 FMULX/MLS/FMLA to simd_indexed
+  arm/translate-a64: add FP16 x2 ops for simd_indexed
+  arm/translate-a64: initial decode for simd_two_reg_misc_fp16
+  arm/translate-a64: add FP16 FPRINTx to simd_two_reg_misc_fp16
+  arm/translate-a64: add FCVTxx to simd_two_reg_misc_fp16
+  arm/translate-a64: add FP16 FCMxx (zero) to simd_two_reg_misc_fp16
+  arm/translate-a64: add FP16 SCVTF/UCVFT to simd_two_reg_misc_fp16
+  arm/translate-a64: add FP16 FNEG/FABS to simd_two_reg_misc_fp16
+  arm/helper.c: re-factor recpe and add recepe_f16
+  arm/translate-a64: add FP16 FRECPE
+  arm/translate-a64: add FP16 FRCPX to simd_two_reg_misc_fp16
+  arm/translate-a64: add FP16 FSQRT to simd_two_reg_misc_fp16
+  arm/helper.c: re-factor rsqrte and add rsqrte_f16
+  arm/translate-a64: add FP16 FRSQRTE to simd_two_reg_misc_fp16
+  arm/translate-a64: add FP16 FMOV to simd_mod_imm
+  arm/translate-a64: add all FP16 ops in simd_scalar_pairwise
+  arm/translate-a64: implement simd_scalar_three_reg_same_fp16
+  arm/translate-a64: add all single op FP16 to handle_fp_1src_half
+
+ include/exec/helper-head.h |    3 +
+ target/arm/cpu.h           |   24 +-
+ target/arm/cpu64.c         |   28 +
+ target/arm/helper-a64.c    |  274 ++++++++++
+ target/arm/helper-a64.h    |   34 ++
+ target/arm/helper.c        |  466 +++++++++--------
+ target/arm/helper.h        |   14 +-
+ target/arm/translate-a64.c | 1229 +++++++++++++++++++++++++++++++++++++-------
+ target/arm/translate.c     |   12 +-
+ 9 files changed, 1676 insertions(+), 408 deletions(-)
+
 -- 
 2.15.1
