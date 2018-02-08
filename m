@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejmbJ-0001Ux-78
+	(envelope-from <bounces@canonical.com>) id 1ejmbJ-0001Uw-6J
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejmbF-0003xk-SC
+	(envelope-from <bounces@canonical.com>) id 1ejmbG-0003xv-2b
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50972)
+Received: from indium.canonical.com ([91.189.90.7]:50988)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejmbF-0003xQ-Lm
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:53 -0500
+	id 1ejmbF-0003xV-Sh
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejmbC-0005pR-S7
+	id 1ejmbD-0005sM-7a
 	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 13:50:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 57D852E81A1
+	by loganberry.canonical.com (Postfix) with ESMTP id C4B272E81A9
 	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 13:50:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Feb 2018 13:37:32 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Date: Thu, 08 Feb 2018 13:44:32 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 Reply-To: Bug 1738767 <1738767@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151359638511.16639.9243776100393876848.malonedeb@soybean.canonical.com>
-Message-Id: <151809705286.29573.15139483661138306472.malone@chaenomeles.canonical.com>
+Message-Id: <151809747279.10229.127216187267171519.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1738767] Re: Cannot build QEMU on RHEL6 because
  of MAP_HUGETLB
@@ -39,10 +39,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I think we can close this bug: the build fails on RHEL6.4, but succeeded
-on RHEL6.7.
+This was fixed by the distro updating their glibc-headers pakcage:
 
-Probably related to: https://access.redhat.com/solutions/320613
+* Tue Jul 23 2013 Alexandre Oliva <aoliva@redhat.com> - 2.12-1.119
+- Add MAP_HUGETLB and MAP_STACK support (#916986).
+- Update translation for stale file handle error (#970776).
+
+The build works in the current centos6 docker image and has been
+confirmed to build on later RHEL6 (RHEL6.7).
 
 -- =
 
