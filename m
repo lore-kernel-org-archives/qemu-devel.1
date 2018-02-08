@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3R-0003OH-8I
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3T-0003Q0-8L
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3O-0006iG-Ra
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:13 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52929)
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3R-0006re-Ms
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:15 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:40756)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejq3O-0006h7-JW
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:10 -0500
-Received: by mail-wm0-x242.google.com with SMTP id g1so10887196wmg.2
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:10 -0800 (PST)
+	id 1ejq3R-0006qJ-Dw
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:13 -0500
+Received: by mail-wr0-x242.google.com with SMTP id o76so2443512wrb.7
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:13 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:34 +0000
-Message-Id: <20180208173157.24705-10-alex.bennee@linaro.org>
+Date: Thu,  8 Feb 2018 17:31:51 +0000
+Message-Id: <20180208173157.24705-27-alex.bennee@linaro.org>
 In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
 References: <20180208173157.24705-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 09/32] arm/translate-a64: initial decode for
- simd_three_reg_same_fp16
+Subject: [Qemu-devel] [PATCH v2 26/32] arm/translate-a64: add FP16 FSQRT to
+ simd_two_reg_misc_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,111 +33,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-This is the initial decode skeleton for the Advanced SIMD three same
-instruction group.
-
-The fprintf is purely to aid debugging as the additional instructions
-are added. It will be removed once the group is complete.
-
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/translate-a64.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 77 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 2dd958c0e7..5392f83794 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -9794,6 +9794,82 @@ static void disas_simd_three_reg_same(DisasContext *s, uint32_t insn)
+---
+v2
+  remove superfluous helpers
+---
+ target/arm/helper-a64.c    | 13 +++++++++++++
+ target/arm/helper-a64.h    |  1 +
+ target/arm/translate-a64.c |  5 +++++
+ 3 files changed, 19 insertions(+)
+
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 38cdc13b3e..7952a6bfff 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -833,3 +833,16 @@ uint32_t HELPER(advsimd_f16touinth)(float16 a, void *fpstp)
      }
+     return float16_to_uint16(a, fpst);
  }
- 
++
 +/*
-+ * Advanced SIMD three same (ARMv8.2 FP16 variants)
-+ *
-+ *  31  30  29  28       24 23  22 21 20  16 15 14 13    11 10  9    5 4    0
-+ * +---+---+---+-----------+---------+------+-----+--------+---+------+------+
-+ * | 0 | Q | U | 0 1 1 1 0 | a | 1 0 |  Rm  | 0 0 | opcode | 1 |  Rn  |  Rd  |
-+ * +---+---+---+-----------+---------+------+-----+--------+---+------+------+
-+ *
-+ * This includes FMULX, FCMEQ (register), FRECPS, FRSQRTS, FCMGE
-+ * (register), FACGE, FABD, FCMGT (register) and FACGT.
-+ *
++ * Square Root and Reciprocal square root
 + */
-+static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
++
++float16 HELPER(sqrt_f16)(float16 a, void *fpstp)
 +{
-+    int opcode, fpopcode;
-+    int is_q, u, a, rm, rn, rd;
-+    int datasize, elements;
-+    int pass;
-+    TCGv_ptr fpst;
++    float_status *s = fpstp;
 +
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+
-+    if (!fp_access_check(s)) {
-+        return;
-+    }
-+
-+    /* For these floating point ops, the U, a and opcode bits
-+     * together indicate the operation.
-+     */
-+    opcode = extract32(insn, 11, 3);
-+    u = extract32(insn, 29, 1);
-+    a = extract32(insn, 23, 1);
-+    is_q = extract32(insn, 30, 1);
-+    rm = extract32(insn, 16, 5);
-+    rn = extract32(insn, 5, 5);
-+    rd = extract32(insn, 0, 5);
-+
-+    fpopcode = opcode | (a << 3) |  (u << 4);
-+    datasize = is_q ? 128 : 64;
-+    elements = datasize / 16;
-+
-+    fpst = get_fpstatus_ptr(true);
-+
-+    for (pass = 0; pass < elements; pass++) {
-+        TCGv_i32 tcg_op1 = tcg_temp_new_i32();
-+        TCGv_i32 tcg_op2 = tcg_temp_new_i32();
-+        TCGv_i32 tcg_res = tcg_temp_new_i32();
-+
-+        read_vec_element_i32(s, tcg_op1, rn, pass, MO_16);
-+        read_vec_element_i32(s, tcg_op2, rm, pass, MO_16);
-+
-+        switch (fpopcode) {
-+        default:
-+            fprintf(stderr, "%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
-+                    __func__, insn, fpopcode, s->pc);
-+            g_assert_not_reached();
-+        }
-+
-+        write_vec_element_i32(s, tcg_res, rd, pass, MO_16);
-+        tcg_temp_free_i32(tcg_res);
-+        tcg_temp_free_i32(tcg_op1);
-+        tcg_temp_free_i32(tcg_op2);
-+    }
-+
-+    tcg_temp_free_ptr(fpst);
-+
-+    if (!is_q) {
-+        /* non-quad vector op */
-+        clear_vec_high(s, rd);
-+    }
-+
++    return float16_sqrt(a, s);
 +}
 +
- static void handle_2misc_widening(DisasContext *s, int opcode, bool is_q,
-                                   int size, int rn, int rd)
- {
-@@ -11199,6 +11275,7 @@ static const AArch64DecodeTable data_proc_simd[] = {
-     { 0x4e280800, 0xff3e0c00, disas_crypto_aes },
-     { 0x5e000000, 0xff208c00, disas_crypto_three_reg_sha },
-     { 0x5e280800, 0xff3e0c00, disas_crypto_two_reg_sha },
-+    { 0x0e400400, 0x9f60c400, disas_simd_three_reg_same_fp16 },
-     { 0x00000000, 0x00000000, NULL }
- };
- 
++
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index d8a55142b5..905125bab1 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -81,3 +81,4 @@ DEF_HELPER_2(advsimd_rinth_exact, f16, f16, ptr)
+ DEF_HELPER_2(advsimd_rinth, f16, f16, ptr)
+ DEF_HELPER_2(advsimd_f16tosinth, i32, f16, ptr)
+ DEF_HELPER_2(advsimd_f16touinth, i32, f16, ptr)
++DEF_HELPER_2(sqrt_f16, f16, f16, ptr)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index b6cd4dd8f2..587d072d27 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -10925,6 +10925,8 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+     case 0x6f: /* FNEG */
+         need_fpst = false;
+         break;
++    case 0x7f: /* FSQRT (vector) */
++        break;
+     default:
+         fprintf(stderr, "%s: insn %#04x fpop %#2x\n", __func__, insn, fpop);
+         g_assert_not_reached();
+@@ -11039,6 +11041,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+             case 0x6f: /* FNEG */
+                 tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
+                 break;
++            case 0x7f: /* FSQRT */
++                gen_helper_sqrt_f16(tcg_res, tcg_op, tcg_fpstatus);
++                break;
+             default:
+                 g_assert_not_reached();
+             }
 -- 
 2.15.1
