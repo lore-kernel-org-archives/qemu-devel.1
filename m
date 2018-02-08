@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjVm-0007Ko-C5
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:33:03 -0500
+	(envelope-from <peterx@redhat.com>) id 1ejjVr-0007Nd-QG
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:33:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjVh-0005rz-Gf
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:33:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36040 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ejjVm-0005tk-41
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:33:07 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41364 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjVh-0005rZ-Aj
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:57 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjVl-0005tG-St
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:33:02 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Thu,  8 Feb 2018 18:31:30 +0800
-Message-Id: <20180208103132.28452-27-peterx@redhat.com>
+Date: Thu,  8 Feb 2018 18:31:31 +0800
+Message-Id: <20180208103132.28452-28-peterx@redhat.com>
 In-Reply-To: <20180208103132.28452-1-peterx@redhat.com>
 References: <20180208103132.28452-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 26/28] hmp/migration: add migrate_recover
- command
+Subject: [Qemu-devel] [PATCH v6 27/28] migration/qmp: add command
+ migrate-pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Sister command to migrate-recover in QMP.
+It pauses an ongoing migration.  Currently it only supports postcopy.
+Note that this command will work on either side of the migration.
+Basically when we trigger this on one side, it'll interrupt the other
+side as well since the other side will get notified on the disconnect
+event.
+
+However, it's still possible that the other side is not notified, for
+example, when the network is totally broken, or due to some firewall
+configuration changes.  In that case, we will also need to run the same
+command on the other side so both sides will go into the paused state.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hmp-commands.hx | 13 +++++++++++++
- hmp.c           | 10 ++++++++++
- hmp.h           |  1 +
- 3 files changed, 24 insertions(+)
+ migration/migration.c | 27 +++++++++++++++++++++++++++
+ qapi/migration.json   | 16 ++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 28ed5a7a13..7563f3eaa0 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -955,7 +955,20 @@ STEXI
- @findex migrate_incoming
- Continue an incoming migration using the @var{uri} (that has the same syntax
- as the -incoming option).
-+ETEXI
- 
-+    {
-+        .name       = "migrate_recover",
-+        .args_type  = "uri:s",
-+        .params     = "uri",
-+        .help       = "Continue a paused incoming postcopy migration",
-+        .cmd        = hmp_migrate_recover,
-+    },
-+
-+STEXI
-+@item migrate_recover @var{uri}
-+@findex migrate_recover
-+Continue a paused incoming postcopy migration using the @var{uri}.
- ETEXI
- 
-     {
-diff --git a/hmp.c b/hmp.c
-index 6f8eec8365..4062d3fdba 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1519,6 +1519,16 @@ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
+diff --git a/migration/migration.c b/migration/migration.c
+index bb57ed9ade..139abec0c3 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1448,6 +1448,33 @@ void qmp_migrate_recover(const char *uri, Error **errp)
+     qemu_start_incoming_migration(uri, errp);
  }
  
-+void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
++void qmp_migrate_pause(Error **errp)
 +{
-+    Error *err = NULL;
-+    const char *uri = qdict_get_str(qdict, "uri");
++    MigrationState *ms = migrate_get_current();
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    int ret;
 +
-+    qmp_migrate_recover(uri, &err);
++    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        /* Source side, during postcopy */
++        ret = qemu_file_shutdown(ms->to_dst_file);
++        if (ret) {
++            error_setg(errp, "Failed to pause source migration");
++        }
++        return;
++    }
 +
-+    hmp_handle_error(mon, &err);
++    if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        ret = qemu_file_shutdown(mis->from_src_file);
++        if (ret) {
++            error_setg(errp, "Failed to pause destination migration");
++        }
++        return;
++    }
++
++    error_setg(errp, "migrate-pause is currently only supported "
++               "during postcopy-active state");
 +}
 +
- /* Kept for backwards compatibility */
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
+ bool migration_is_blocked(Error **errp)
  {
-diff --git a/hmp.h b/hmp.h
-index 536cb91caa..0d53fe78d9 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -70,6 +70,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
- void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
- void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
-+void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
+     if (qemu_savevm_state_blocked(errp)) {
+diff --git a/qapi/migration.json b/qapi/migration.json
+index dfbcb02d4c..3d9cfeb8f1 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1192,3 +1192,19 @@
+ ##
+ { 'command': 'migrate-recover', 'data': { 'uri': 'str' },
+   'allow-oob': true }
++
++##
++# @migrate-pause:
++#
++# Pause a migration.  Currently it only supports postcopy.
++#
++# Returns: nothing.
++#
++# Example:
++#
++# -> { "execute": "migrate-pause" }
++# <- { "return": {} }
++#
++# Since: 2.12
++##
++{ 'command': 'migrate-pause', 'allow-oob': true }
 -- 
 2.14.3
