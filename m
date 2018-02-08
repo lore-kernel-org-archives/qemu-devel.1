@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1ejnxp-00089l-Gs
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:18:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1ejnzO-0000rL-45
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1ejnxl-0003lv-H2
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:18:17 -0500
-Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:32550)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1ejnxl-0003eD-4K
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:18:13 -0500
-Date: Thu, 8 Feb 2018 17:17:22 +0200
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20180208151722.5wrjrbi6dy7akdai@postretch>
-References: <CAJSP0QUpUG11mDRvyN1OWQ2m7Pn_btG2D27C_h=EnpcqEyXLZQ@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1ejnzK-0004ro-1A
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:19:54 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37030 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ejnzJ-0004rc-SS
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:19:49 -0500
+References: <1518083288-20410-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3e34d51f-e4d1-a69b-1fac-c4d1982834c2@redhat.com>
+Date: Thu, 8 Feb 2018 09:19:41 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="n6dl3yfq7cej2524"
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QUpUG11mDRvyN1OWQ2m7Pn_btG2D27C_h=EnpcqEyXLZQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] Throttling filter node status?
+In-Reply-To: <1518083288-20410-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] S390: Expose s390-specific CPU info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+
+On 02/08/2018 03:48 AM, Viktor Mihajlovski wrote:
+> Presently s390x is the only architecture not exposing specific
+> CPU information via QMP query-cpus. Upstream discussion has shown
+> that it could make sense to report the architecture specific CPU
+> state, e.g. to detect that a CPU has been stopped.
+> 
+> With this change the output of query-cpus will look like this on
+> s390:
+> 
+>      [{"arch": "s390", "current": true,
+>        "props": {"core-id": 0}, "cpu_state": "operating", "CPU": 0,
+>        "qom_path": "/machine/unattached/device[0]",
+>        "halted": false, "thread_id": 63115},
+>       {"arch": "s390", "current": false,
+>        "props": {"core-id": 1}, "cpu_state": "stopped", "CPU": 1,
+>        "qom_path": "/machine/unattached/device[1]",
+>        "halted": true, "thread_id": 63116}]
+> 
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> ---
+
+> +++ b/qapi-schema.json
+> @@ -413,7 +413,7 @@
+>   # Since: 2.6
+>   ##
+>   { 'enum': 'CpuInfoArch',
+> -  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
+> +  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 's390', 'other' ] }
+
+Missing a documentation line that mentions when the enum grew. Also, has 
+a conflict with this other proposed addition, which demonstrates what 
+the documentation should look like (should be easy to resolve, though):
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01986.html
 
 
---n6dl3yfq7cej2524
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>   ##
+> +# @CpuInfoS390State:
+> +#
+> +# An enumeration of cpu states that can be assumed by a virtual
+> +# S390 CPU
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'enum': 'CpuInfoS390State',
+> +  'data': [ 'uninitialized', 'stopped', 'check_stop', 'operating', 'load' ] }
+> +
 
-On Wed, Feb 07, 2018 at 06:35:20PM +0000, Stefan Hajnoczi wrote:
->Hi Manos,
->I hope you're doing well and that you've had a good time at university
->after Google Summer of Code.
->
->Do you have time to work on getting the remainder of your GSoC work
->merged over the coming weeks?
->
->If not, don't feel bad but please let us know so someone can take over
->the patches.
->
->Stefan
+Is there a consistency reason for naming this 'check_stop', or can we go 
+with our preference for using dash 'check-stop'?
 
-Hi Stefan, thanks for the reminder. I will try to catch up in the=20
-following days.
+> +##
+> +# @CpuInfoS390:
+> +#
+> +# Additional information about a virtual S390 CPU
+> +#
+> +# @cpu_state: the CPUs state
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'CpuInfoS390', 'data': { 'cpu_state': 'CpuInfoS390State' } }
 
---n6dl3yfq7cej2524
-Content-Type: application/pgp-signature; name="signature.asc"
+Likewise for 'cpu-state'
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlp8af4ACgkQc2J8L2kN
-9xAugg/9Gs4Ms7d5GNwODlDLaypZEGaH3Ak/pkoAkCNucrpTF05X5yvXPVRtCrif
-/6Zrf6xW1VYwobWoCq662VuvR/9xfL2vpy9QfFOzU5esl4psDhh5WalX6kJehP1L
-Pa+8PEj2ZB/Ta6FZdgmDVcFJCrs6rt6XqfF7erdrlaBKguxf+AOK7XKT8MCuOTag
-Q5Od3WsHYN47i0z73ocaeonuBGlEYgRBLCnmN2UwrFijcoCnuQF2c+8FwnQsBC2Y
-rHeOlXrWMvl4hyMJq75Yej/ZRojTgGjY7Tv2vpXPt8InR/b07R6sXRgT5iEd5Mxc
-vedPk3kMJ/fXQt0Ig+Fju2o0BexB5b3mzD8azDOTfEtdQobsw1cLqBkM8+tZ/boV
-f4YunYEDsVtSSSzgJETDQx1UzCIeCFUtbEWMf8JlTYxlk9eOVaCcA/9UWvjMOX15
-01JvfIMaebU+y/0qU8cD3NaefUR/fmob7+w1FiCk1cykjBU5cjgwCmg8KErXTSf4
-WXekqEgm3KaCdmHpnYKc4TCI9jojZrYk+VQBcQPTOcRscxnmdDx7xXN4ubxO7g9Q
-mAhQvplVC/8pycsecDiEBT4SEQG0H3ZHut4PJh/7ECU30uIhcxoS/EDA5/o7T2ur
-pe3m6MM9QqB2X5TH67er2KLMygrletPA8DDTg0+fJqwAZt/9Qzo=
-=+DUl
------END PGP SIGNATURE-----
-
---n6dl3yfq7cej2524--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
