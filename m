@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ejvc6-0000Cr-0G
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:28:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ejvdU-0001BX-Fk
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:29:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ejvc2-0000it-PE
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:28:21 -0500
-Date: Fri, 9 Feb 2018 10:28:10 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ejvdS-0001Xp-Rl
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:29:48 -0500
+Date: Fri, 9 Feb 2018 10:29:08 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180208232810.GC11634@umbus.fritz.box>
-References: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
+Message-ID: <20180208232908.GD11634@umbus.fritz.box>
+References: <20180130131716.5899D7456D5@zero.eik.bme.hu>
+	<20180130194935.GL12900@umbus>
+	<alpine.BSF.2.21.1802011250090.39992@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ncSAzJYg3Aa9+CRW"
+	protocol="application/pgp-signature"; boundary="Hf61M2y+wYpnELGG"
 Content-Disposition: inline
-In-Reply-To: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] spapr: add missing break in
- h_get_cpu_characteristics()
+In-Reply-To: <alpine.BSF.2.21.1802011250090.39992@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH] sii3112: Change angle brackets to quotes
+ in #include lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
 
---ncSAzJYg3Aa9+CRW
+--Hf61M2y+wYpnELGG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 01, 2018 at 08:47:41PM +0100, Greg Kurz wrote:
-> Detected by Coverity (CID 1385702). This fixes the recently added hyperca=
-ll
-> to let guests properly apply Spectre and Meltdown workarounds.
+On Thu, Feb 01, 2018 at 12:51:04PM +0100, BALATON Zoltan wrote:
+> On Wed, 31 Jan 2018, David Gibson wrote:
+> > On Tue, Jan 30, 2018 at 02:10:10PM +0100, BALATON Zoltan wrote:
+> > > This matches what other files do for qemu includes
+> > >=20
+> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> >=20
+> > Applied, thanks.
 >=20
-> Fixes: c59704b25473 "target/ppc/spapr: Add H-Call H_GET_CPU_CHARACTERISTI=
-CS"
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Thanks but Markus instead included this in his cleanup patches here:
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg00075.html
+> so you can drop this from your tree now.
 
-Applied to ppc-for-2.12, thanks.
-
-> ---
->  hw/ppc/spapr_hcall.c |    1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 4d0e6eb0cf1d..596f58378a40 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1697,6 +1697,7 @@ static target_ulong h_get_cpu_characteristics(Power=
-PCCPU *cpu,
->      switch (safe_indirect_branch) {
->      case SPAPR_CAP_FIXED:
->          characteristics |=3D H_CPU_CHAR_BCCTRL_SERIALISED;
-> +        break;
->      default: /* broken */
->          assert(safe_indirect_branch =3D=3D SPAPR_CAP_BROKEN);
->          break;
->=20
+Ok, done.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -69,24 +56,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ncSAzJYg3Aa9+CRW
+--Hf61M2y+wYpnELGG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp83QgACgkQbDjKyiDZ
-s5LWQhAAkUmluj3q60Ys1bKqxBc/8T5DrBw653Ija1UyouGvuXJQsTI4ME4lCH5S
-0HYXMiq7myMV8roEGY0l0nNFsfX4tQZOEZX4pMYVWLsDkC8ttZXpNoTj8tuOWnGH
-wLCPCPk3nbjGFGXpoG2m2Q6wUT2l43jeBgnjm495kSpnzy6l4aNtI6OO3JOSBFuc
-ruy/VKk7/X1s8mYBE4TMDT0E3nbDwRBTPZ7D8y6nAR0vmNQkhL6knCQBUrvQiwcA
-+A+V6CbZM7OidVvyR9Nb6Hb0yzvJC9icihO7IeUQCWTtp63SZVk5HMh/XRRZLkSz
-WIPo47fTF8nuo05AAQZfoXeWNyvn/TosADavszdf1aHzUdnbOhb+M46p9AMbZUso
-vfJD2RmTMabK8t3wIvcJjG4TWxBqhA8ireMQFomGId06bDyKlyCViZU73t8X2Vpk
-4MSpwAV6sLVnq9S0I43D+QPnLoFKGD/t5EuFXfSoUL8LSqI1gFb8RV4D9UfxpWSG
-415vHSpv52FuuQNKmahsLI6HiObyS4dpaR+vtUP4QOBzLlZi9Q9Vb0bBbzh2nRqS
-8qQC0cuBFiOHysrvROpno+ruWQoiggCyAxKV1bebu0QIcgU2luoy/2HxXjxLSC/4
-+nnXt8aXiFwCBAsX6Ynq+T/UxwqeU/a5iwfajhAgOv1OPBFJXxc=
-=OsDv
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp83UQACgkQbDjKyiDZ
+s5IspBAAsia6f+f/NNkZBp28CoAD83341pLadU9y238RKiLf8DN3Kw1RFgltLcFn
+O4+dX36mNeueEQ9Yr4R7N30rs/oEkIjA0xIff/92EeiTDWj69iwAKWNfirNGvUNA
+Kk9XB2g5LiBfFHiBXPud2VPp2vSJC4aMauYgIxyE8+MSwTiIDCyC/eyrDPU4akmj
+h33KAfopAg66/0T4LMOV9wy2Pvk6JW/1DKKmczA23spbaDnUfZPoHOR+tFvWz614
+l6yR3hjBlrelb2RMN1FEf+QZQWVDPGWw8mkmJZhSt2yKZX38sB4vNoLlbJPj0d15
+9QBOjV+Y2QiXndWj6ojh3/T8g0ol0L2b3R+u381Q/3p840UFUwy8uHQ6WVOVOc1j
+Ka/FmVaGroQBnJZRwjbGhHjejlU5sQh35HZ8AvlpXgbSN3TrjQDX9B6CE5F/u57g
+T4zfHcMN2jgSC3MzZWVuCyE9SmLw3mTs8q8MBiIn8FCzRVzqJQHDpfuYdX0A3/tS
+5EWsxrV1+aUbm5idAriIso70TVgf3kwew6Hcadqtl08NYOKmjjEEiLjP1rho0sPL
+chlvGEnOQyY+SPwAZ/vSGgzpXNVBpz+OWFoCjBHGorS3jtnnALOLUoY69SCSJuWm
+Op4LE9MINz06MtrPQgnZyGCq4g4e6zfB66vJWX6N3vO2wGO0B34=
+=LRdY
 -----END PGP SIGNATURE-----
 
---ncSAzJYg3Aa9+CRW--
+--Hf61M2y+wYpnELGG--
