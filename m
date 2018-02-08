@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejmbJ-0001Uw-6J
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ejmbr-0001yd-8i
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejmbG-0003xv-2b
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50988)
+	(envelope-from <peter.maydell@linaro.org>) id 1ejmbq-0004Dx-IM
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:51:31 -0500
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:45284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejmbF-0003xV-Sh
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:50:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejmbD-0005sM-7a
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 13:50:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C4B272E81A9
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 13:50:46 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ejmbq-0004Dn-De
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:51:30 -0500
+Received: by mail-oi0-x235.google.com with SMTP id c189so3498439oib.12
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:51:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <c68fa4de-fad8-a686-2f87-3de0ede8f949@amsat.org>
+References: <20180208105754.19924-1-danielhb@linux.vnet.ibm.com>
+	<caaad0dd-3f8e-a414-48ed-b6535d5a83a4@amsat.org>
+	<CAFEAcA90+5RL+WPVDS00NH8WuLmG4C0Ou74v-m20+RB6zYz8WQ@mail.gmail.com>
+	<91dde6c1-e282-37dd-d843-eb6b186e8bff@amsat.org>
+	<c68fa4de-fad8-a686-2f87-3de0ede8f949@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Feb 2018 13:51:09 +0000
+Message-ID: <CAFEAcA9v6Jwdk0X9qpYAmHfOq-cK_W7rSg+zdNu=-_BTfaDTaw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Feb 2018 13:44:32 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Reply-To: Bug 1738767 <1738767@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151359638511.16639.9243776100393876848.malonedeb@soybean.canonical.com>
-Message-Id: <151809747279.10229.127216187267171519.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738767] Re: Cannot build QEMU on RHEL6 because
- of MAP_HUGETLB
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/audio/sb16.c: missing break
+ statement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +34,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, John Arbuckle <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-This was fixed by the distro updating their glibc-headers pakcage:
+On 8 February 2018 at 13:34, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> Now I see Fabrice comment "FT2 sets output freq with this, go figure"
+> and agree with him.
+>
+> I like to think this is a bug in Fast Tracker 2, so Peter suggestion
+> about using LOG_GUEST_ERROR here might be clever.
+>
+>>
+>> So imho the simpler/safer fix would be:
+>>
+>>   case 0x42:
+>>       if (dsp_get_hilo(s) !=3D s->freq) {
+>>           qemu_log_mask(LOG_UNIMP,
+>>                         "input sampling freq different than "
+>>                         "output not implemented");
+>>       }
+>>       /* fallthrough */
+>>   case 0x41:
+>>       ...
 
-* Tue Jul 23 2013 Alexandre Oliva <aoliva@redhat.com> - 2.12-1.119
-- Add MAP_HUGETLB and MAP_STACK support (#916986).
-- Update translation for stale file handle error (#970776).
+Wouldn't this falsely report a warning for guest code that really
+is trying to set the input sampling frequency and doesn't care
+about output?
 
-The build works in the current centos6 docker image and has been
-confirmed to build on later RHEL6 (RHEL6.7).
+>> and the correct fix would be split s->freq in {s->freq_in, s->freq_out}
 
--- =
+...but that would differ from the hardware implementation, which
+(apparently) uses a single frequency for both.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738767
-
-Title:
-  Cannot build QEMU on RHEL6 because of MAP_HUGETLB
-
-Status in QEMU:
-  Won't Fix
-
-Bug description:
-  Hello,
-  I've just downloaded qemu-2.11.0 sources and I wanted to build QEMU on RH=
-EL6 x86_64, for various targets, amonst which arm-linux-user.
-
-  The build fails because /usr/include/bits/mman.h does not define
-  MAP_HUGETLB.
-
-  I think it is needed since commit 541e16904.
-
-  I'm not sure if RHEL6 is still supported by QEMU? If so, can you fix
-  this problem?
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738767/+subscriptions
+thanks
+-- PMM
