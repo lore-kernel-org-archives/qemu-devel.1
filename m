@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejqBY-00033b-Sg
+	(envelope-from <alex.bennee@linaro.org>) id 1ejqBY-00033G-L4
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:40:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejqBV-0000V1-M3
+	(envelope-from <alex.bennee@linaro.org>) id 1ejqBW-0000Vd-7W
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:40:36 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:43522)
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39185)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejqBV-0000Tx-AN
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:40:33 -0500
-Received: by mail-wr0-x241.google.com with SMTP id b52so5580334wrd.10
+	id 1ejqBV-0000Ui-UE
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:40:34 -0500
+Received: by mail-wm0-x243.google.com with SMTP id b21so11520027wme.4
 	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:40:33 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:52 +0000
-Message-Id: <20180208173157.24705-28-alex.bennee@linaro.org>
+Date: Thu,  8 Feb 2018 17:31:47 +0000
+Message-Id: <20180208173157.24705-23-alex.bennee@linaro.org>
 In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
 References: <20180208173157.24705-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 27/32] arm/helper.c: re-factor rsqrte and
- add rsqrte_f16
+Subject: [Qemu-devel] [PATCH v2 22/32] arm/translate-a64: add FP16 FNEG/FABS
+ to simd_two_reg_misc_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,318 +33,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Much like recpe the ARM ARM has simplified the pseudo code for the
-calculation which is done on a fixed point 9 bit integer maths. So
-while adding f16 we can also clean this up to be a little less heavy
-on the floating point and just return the fractional part and leave
-the calle's to do the final packing of the result.
+As these operations doesn't use the fpstatus pointer we can be smarter
+about allocating it. The negh can also be done with a bitwise xor rather
+than calling a helper.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v2
-  - checkpatch fixes
----
- target/arm/helper.c | 221 ++++++++++++++++++++++++----------------------------
- target/arm/helper.h |   1 +
- 2 files changed, 104 insertions(+), 118 deletions(-)
+ target/arm/translate-a64.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 6cfab94c38..a16cc1b36b 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11338,56 +11338,97 @@ float64 HELPER(recpe_f64)(float64 input, void *fpstp)
- /* The algorithm that must be used to calculate the estimate
-  * is specified by the ARM ARM.
-  */
--static float64 recip_sqrt_estimate(float64 a, float_status *real_fp_status)
--{
--    /* These calculations mustn't set any fp exception flags,
--     * so we use a local copy of the fp_status.
--     */
--    float_status dummy_status = *real_fp_status;
--    float_status *s = &dummy_status;
--    float64 q;
--    int64_t q_int;
--
--    if (float64_lt(a, float64_half, s)) {
--        /* range 0.25 <= a < 0.5 */
--
--        /* a in units of 1/512 rounded down */
--        /* q0 = (int)(a * 512.0);  */
--        q = float64_mul(float64_512, a, s);
--        q_int = float64_to_int64_round_to_zero(q, s);
--
--        /* reciprocal root r */
--        /* r = 1.0 / sqrt(((double)q0 + 0.5) / 512.0);  */
--        q = int64_to_float64(q_int, s);
--        q = float64_add(q, float64_half, s);
--        q = float64_div(q, float64_512, s);
--        q = float64_sqrt(q, s);
--        q = float64_div(float64_one, q, s);
-+
-+static int do_recip_sqrt_estimate(int a)
-+{
-+    int b, estimate;
-+
-+    assert(128 <= a && a < 512);
-+    if (a < 256) {
-+        a = a * 2 + 1;
-     } else {
--        /* range 0.5 <= a < 1.0 */
-+        a = (a >> 1) << 1;
-+        a = (a + 1) * 2;
-+    }
-+    b = 512;
-+    while (a * (b + 1) * (b + 1) < (1 << 28)) {
-+        b += 1;
-+    }
-+    estimate = (b + 1) / 2;
-+    assert(256 <= estimate && estimate < 512);
-+
-+    return estimate;
-+}
-+
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 5baf0261ff..da3c7bfa85 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -10801,6 +10801,7 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+     TCGv_i32 tcg_rmode = NULL;
+     TCGv_ptr tcg_fpstatus = NULL;
+     bool need_rmode = false;
++    bool need_fpst = true;
+     int rmode;
  
--        /* a in units of 1/256 rounded down */
--        /* q1 = (int)(a * 256.0); */
--        q = float64_mul(float64_256, a, s);
--        int64_t q_int = float64_to_int64_round_to_zero(q, s);
-+static uint64_t recip_sqrt_estimate(int *exp , int exp_off, uint64_t frac)
-+{
-+    int estimate;
-+    uint32_t scaled;
- 
--        /* reciprocal root r */
--        /* r = 1.0 /sqrt(((double)q1 + 0.5) / 256); */
--        q = int64_to_float64(q_int, s);
--        q = float64_add(q, float64_half, s);
--        q = float64_div(q, float64_256, s);
--        q = float64_sqrt(q, s);
--        q = float64_div(float64_one, q, s);
-+    if (*exp == 0) {
-+        while (extract64(frac, 51, 1) == 0) {
-+            frac = frac << 1;
-+            *exp -= 1;
-+        }
-+        frac = extract64(frac, 0, 51) << 1;
-     }
--    /* r in units of 1/256 rounded to nearest */
--    /* s = (int)(256.0 * r + 0.5); */
- 
--    q = float64_mul(q, float64_256,s );
--    q = float64_add(q, float64_half, s);
--    q_int = float64_to_int64_round_to_zero(q, s);
-+    if (*exp & 1) {
-+        /* scaled = UInt('01':fraction<51:45>) */
-+        scaled = deposit32(1 << 7, 0, 7, extract64(frac, 45, 7));
-+    } else {
-+        /* scaled = UInt('1':fraction<51:44>) */
-+        scaled = deposit32(1 << 8, 0, 8, extract64(frac, 44, 8));
-+    }
-+    estimate = do_recip_sqrt_estimate(scaled);
- 
--    /* return (double)s / 256.0;*/
--    return float64_div(int64_to_float64(q_int, s), float64_256, s);
-+    *exp = (exp_off - *exp) / 2;
-+    return extract64(estimate, 0, 8) << 44;
-+}
-+
-+float16 HELPER(rsqrte_f16)(float16 input, void *fpstp)
-+{
-+    float_status *s = fpstp;
-+    float16 f16 = float16_squash_input_denormal(input, s);
-+    uint16_t val = float16_val(f16);
-+    bool f16_sign = float16_is_neg(f16);
-+    int f16_exp = extract32(val, 10, 5);
-+    uint16_t f16_frac = extract32(val, 0, 10);
-+    uint64_t f64_frac;
-+
-+    if (float16_is_any_nan(f16)) {
-+        float16 nan = f16;
-+        if (float16_is_signaling_nan(f16, s)) {
-+            float_raise(float_flag_invalid, s);
-+            nan = float16_maybe_silence_nan(f16, s);
-+        }
-+        if (s->default_nan_mode) {
-+            nan =  float16_default_nan(s);
-+        }
-+        return nan;
-+    } else if (float16_is_zero(f16)) {
-+        float_raise(float_flag_divbyzero, s);
-+        return float16_set_sign(float16_infinity, f16_sign);
-+    } else if (f16_sign) {
-+        float_raise(float_flag_invalid, s);
-+        return float16_default_nan(s);
-+    } else if (float16_is_infinity(f16)) {
-+        return float16_zero;
-+    }
-+
-+    /* Scale and normalize to a double-precision value between 0.25 and 1.0,
-+     * preserving the parity of the exponent.  */
-+
-+    f64_frac = ((uint64_t) f16_frac) << (52 - 10);
-+
-+    f64_frac = recip_sqrt_estimate(&f16_exp, 44, f64_frac);
-+
-+    /* result = sign : result_exp<4:0> : estimate<7:0> : Zeros(2) */
-+    val = deposit32(0, 15, 1, f16_sign);
-+    val = deposit32(val, 10, 5, f16_exp);
-+    val = deposit32(val, 2, 8, extract64(f64_frac, 52 - 8, 8));
-+    return make_float16(val);
- }
- 
- float32 HELPER(rsqrte_f32)(float32 input, void *fpstp)
-@@ -11395,13 +11436,10 @@ float32 HELPER(rsqrte_f32)(float32 input, void *fpstp)
-     float_status *s = fpstp;
-     float32 f32 = float32_squash_input_denormal(input, s);
-     uint32_t val = float32_val(f32);
--    uint32_t f32_sbit = 0x80000000 & val;
--    int32_t f32_exp = extract32(val, 23, 8);
-+    uint32_t f32_sign = float32_is_neg(f32);
-+    int f32_exp = extract32(val, 23, 8);
-     uint32_t f32_frac = extract32(val, 0, 23);
-     uint64_t f64_frac;
--    uint64_t val64;
--    int result_exp;
--    float64 f64;
- 
-     if (float32_is_any_nan(f32)) {
-         float32 nan = f32;
-@@ -11427,32 +11465,13 @@ float32 HELPER(rsqrte_f32)(float32 input, void *fpstp)
-      * preserving the parity of the exponent.  */
- 
-     f64_frac = ((uint64_t) f32_frac) << 29;
--    if (f32_exp == 0) {
--        while (extract64(f64_frac, 51, 1) == 0) {
--            f64_frac = f64_frac << 1;
--            f32_exp = f32_exp-1;
--        }
--        f64_frac = extract64(f64_frac, 0, 51) << 1;
--    }
--
--    if (extract64(f32_exp, 0, 1) == 0) {
--        f64 = make_float64(((uint64_t) f32_sbit) << 32
--                           | (0x3feULL << 52)
--                           | f64_frac);
--    } else {
--        f64 = make_float64(((uint64_t) f32_sbit) << 32
--                           | (0x3fdULL << 52)
--                           | f64_frac);
--    }
- 
--    result_exp = (380 - f32_exp) / 2;
-+    f64_frac = recip_sqrt_estimate(&f32_exp, 380, f64_frac);
- 
--    f64 = recip_sqrt_estimate(f64, s);
--
--    val64 = float64_val(f64);
--
--    val = ((result_exp & 0xff) << 23)
--        | ((val64 >> 29)  & 0x7fffff);
-+    /* result = sign : result_exp<4:0> : estimate<7:0> : Zeros(15) */
-+    val = deposit32(0, 31, 1, f32_sign);
-+    val = deposit32(val, 23, 8, f32_exp);
-+    val = deposit32(val, 15, 8, extract64(f64_frac, 52 - 8, 8));
-     return make_float32(val);
- }
- 
-@@ -11461,11 +11480,9 @@ float64 HELPER(rsqrte_f64)(float64 input, void *fpstp)
-     float_status *s = fpstp;
-     float64 f64 = float64_squash_input_denormal(input, s);
-     uint64_t val = float64_val(f64);
--    uint64_t f64_sbit = 0x8000000000000000ULL & val;
--    int64_t f64_exp = extract64(val, 52, 11);
-+    bool f64_sign = float64_is_neg(f64);
-+    int f64_exp = extract64(val, 52, 11);
-     uint64_t f64_frac = extract64(val, 0, 52);
--    int64_t result_exp;
--    uint64_t result_frac;
- 
-     if (float64_is_any_nan(f64)) {
-         float64 nan = f64;
-@@ -11487,36 +11504,13 @@ float64 HELPER(rsqrte_f64)(float64 input, void *fpstp)
-         return float64_zero;
-     }
- 
--    /* Scale and normalize to a double-precision value between 0.25 and 1.0,
--     * preserving the parity of the exponent.  */
--
--    if (f64_exp == 0) {
--        while (extract64(f64_frac, 51, 1) == 0) {
--            f64_frac = f64_frac << 1;
--            f64_exp = f64_exp - 1;
--        }
--        f64_frac = extract64(f64_frac, 0, 51) << 1;
--    }
-+    f64_frac = recip_sqrt_estimate(&f64_exp, 3068, f64_frac);
- 
--    if (extract64(f64_exp, 0, 1) == 0) {
--        f64 = make_float64(f64_sbit
--                           | (0x3feULL << 52)
--                           | f64_frac);
--    } else {
--        f64 = make_float64(f64_sbit
--                           | (0x3fdULL << 52)
--                           | f64_frac);
--    }
--
--    result_exp = (3068 - f64_exp) / 2;
--
--    f64 = recip_sqrt_estimate(f64, s);
--
--    result_frac = extract64(float64_val(f64), 0, 52);
--
--    return make_float64(f64_sbit |
--                        ((result_exp & 0x7ff) << 52) |
--                        result_frac);
-+    /* result = sign : result_exp<4:0> : estimate<7:0> : Zeros(44) */
-+    val = deposit64(0, 61, 1, f64_sign);
-+    val = deposit64(val, 52, 11, f64_exp);
-+    val = deposit64(val, 44, 8, extract64(f64_frac, 52 - 8, 8));
-+    return make_float64(val);
- }
- 
- uint32_t HELPER(recpe_u32)(uint32_t a, void *fpstp)
-@@ -11536,24 +11530,15 @@ uint32_t HELPER(recpe_u32)(uint32_t a, void *fpstp)
- 
- uint32_t HELPER(rsqrte_u32)(uint32_t a, void *fpstp)
- {
--    float_status *fpst = fpstp;
--    float64 f64;
-+    int estimate;
- 
-     if ((a & 0xc0000000) == 0) {
-         return 0xffffffff;
-     }
- 
--    if (a & 0x80000000) {
--        f64 = make_float64((0x3feULL << 52)
--                           | ((uint64_t)(a & 0x7fffffff) << 21));
--    } else { /* bits 31-30 == '01' */
--        f64 = make_float64((0x3fdULL << 52)
--                           | ((uint64_t)(a & 0x3fffffff) << 22));
--    }
--
--    f64 = recip_sqrt_estimate(f64, fpst);
-+    estimate = do_recip_sqrt_estimate(extract32(a, 23, 9));
- 
--    return 0x80000000 | ((float64_val(f64) >> 21) & 0x7fffffff);
-+    return deposit32(0, 23, 9, estimate);
- }
- 
- /* VFPv4 fused multiply-accumulate */
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index e962b5392b..9b01006ea6 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -195,6 +195,7 @@ DEF_HELPER_3(rsqrts_f32, f32, f32, f32, env)
- DEF_HELPER_FLAGS_2(recpe_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
- DEF_HELPER_FLAGS_2(recpe_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
- DEF_HELPER_FLAGS_2(recpe_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
-+DEF_HELPER_FLAGS_2(rsqrte_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
- DEF_HELPER_FLAGS_2(rsqrte_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
- DEF_HELPER_FLAGS_2(rsqrte_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
- DEF_HELPER_2(recpe_u32, i32, i32, ptr)
+     if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+@@ -10917,6 +10918,10 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+         need_rmode = true;
+         rmode = FPROUNDING_ZERO;
+         break;
++    case 0x2f: /* FABS */
++    case 0x6f: /* FNEG */
++        need_fpst = false;
++        break;
+     default:
+         fprintf(stderr, "%s: insn %#04x fpop %#2x\n", __func__, insn, fpop);
+         g_assert_not_reached();
+@@ -10970,6 +10975,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+         case 0x7b: /* FCVTZU */
+             gen_helper_advsimd_f16touinth(tcg_res, tcg_op, tcg_fpstatus);
+             break;
++        case 0x6f: /* FNEG */
++            tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
++            break;
+         default:
+             g_assert_not_reached();
+         }
+@@ -11013,6 +11021,12 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+             case 0x59: /* FRINTX */
+                 gen_helper_advsimd_rinth_exact(tcg_res, tcg_op, tcg_fpstatus);
+                 break;
++            case 0x2f: /* FABS */
++                gen_helper_advsimd_absh(tcg_res, tcg_op);
++                break;
++            case 0x6f: /* FNEG */
++                tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
++                break;
+             default:
+                 g_assert_not_reached();
+             }
 -- 
 2.15.1
