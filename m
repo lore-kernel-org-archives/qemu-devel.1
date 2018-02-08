@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42198)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpO7-0008OR-RX
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:32 -0500
+	id 1ejpOC-0008R7-EA
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpO6-0004IC-Up
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:31 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:32812)
+	id 1ejpO9-0004Jv-OU
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:34 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:41212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpO6-0004I1-Py
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:30 -0500
-Received: by mail-qk0-x243.google.com with SMTP id c82so6448812qka.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:49:30 -0800 (PST)
+	id 1ejpO9-0004Jm-J5
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:33 -0500
+Received: by mail-qt0-x242.google.com with SMTP id a9so389385qtj.8
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:49:33 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Feb 2018 13:48:08 -0300
-Message-Id: <20180208164818.7961-21-f4bug@amsat.org>
+Date: Thu,  8 Feb 2018 13:48:09 -0300
+Message-Id: <20180208164818.7961-22-f4bug@amsat.org>
 In-Reply-To: <20180208164818.7961-1-f4bug@amsat.org>
 References: <20180208164818.7961-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 20/30] sdbus: add trace events
+Subject: [Qemu-devel] [PATCH v11 21/30] sdhci: implement UHS-I voltage switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,79 +36,168 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
 
+[based on a patch from Alistair Francis <alistair.francis@xilinx.com>
+ from qemu/xilinx tag xilinx-v2015.2]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/sd/core.c       | 14 ++++++++++++--
- hw/sd/trace-events |  5 +++++
- 2 files changed, 17 insertions(+), 2 deletions(-)
+ include/hw/sd/sd.h    | 16 ++++++++++++++++
+ include/hw/sd/sdhci.h |  1 +
+ hw/sd/core.c          | 13 +++++++++++++
+ hw/sd/sd.c            | 13 +++++++++++++
+ hw/sd/sdhci.c         | 12 +++++++++++-
+ hw/sd/trace-events    |  1 +
+ 6 files changed, 55 insertions(+), 1 deletion(-)
 
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 96caefe373..f086679493 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -55,6 +55,20 @@
+ #define AKE_SEQ_ERROR		(1 << 3)
+ #define OCR_CCS_BITN        30
+ 
++typedef enum {
++    SD_VOLTAGE_0_4V     = 400,  /* currently not supported */
++    SD_VOLTAGE_1_8V     = 1800,
++    SD_VOLTAGE_3_0V     = 3000,
++    SD_VOLTAGE_3_3V     = 3300,
++} sd_voltage_mv_t;
++
++typedef enum  {
++    UHS_NOT_SUPPORTED   = 0,
++    UHS_I               = 1,
++    UHS_II              = 2,    /* currently not supported */
++    UHS_III             = 3,    /* currently not supported */
++} sd_uhs_mode_t;
++
+ typedef enum {
+     sd_none = -1,
+     sd_bc = 0,	/* broadcast -- no response */
+@@ -88,6 +102,7 @@ typedef struct {
+     void (*write_data)(SDState *sd, uint8_t value);
+     uint8_t (*read_data)(SDState *sd);
+     bool (*data_ready)(SDState *sd);
++    void (*set_voltage)(SDState *sd, uint16_t millivolts);
+     void (*enable)(SDState *sd, bool enable);
+     bool (*get_inserted)(SDState *sd);
+     bool (*get_readonly)(SDState *sd);
+@@ -134,6 +149,7 @@ void sd_enable(SDState *sd, bool enable);
+ /* Functions to be used by qdevified callers (working via
+  * an SDBus rather than directly with SDState)
+  */
++void sdbus_set_voltage(SDBus *sdbus, uint16_t millivolts);
+ int sdbus_do_command(SDBus *sd, SDRequest *req, uint8_t *response);
+ void sdbus_write_data(SDBus *sd, uint8_t value);
+ uint8_t sdbus_read_data(SDBus *sd);
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index 05ac0e763f..129d212337 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -94,6 +94,7 @@ typedef struct SDHCIState {
+     /* Configurable properties */
+     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
+     uint8_t sd_spec_version;
++    uint8_t uhs_mode;
+ } SDHCIState;
+ 
+ #define TYPE_PCI_SDHCI "sdhci-pci"
 diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 295dc44ab7..498284f109 100644
+index 498284f109..6d198ea775 100644
 --- a/hw/sd/core.c
 +++ b/hw/sd/core.c
-@@ -23,6 +23,12 @@
- #include "hw/qdev-core.h"
- #include "sysemu/block-backend.h"
- #include "hw/sd/sd.h"
-+#include "trace.h"
-+
-+static inline const char *sdbus_name(SDBus *sdbus)
-+{
-+    return sdbus->qbus.name;
-+}
- 
- static SDState *get_card(SDBus *sdbus)
- {
-@@ -39,6 +45,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint8_t *response)
- {
-     SDState *card = get_card(sdbus);
- 
-+    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc);
-     if (card) {
-         SDCardClass *sc = SD_CARD_GET_CLASS(card);
- 
-@@ -52,6 +59,7 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
- {
-     SDState *card = get_card(sdbus);
- 
-+    trace_sdbus_write(sdbus_name(sdbus), value);
-     if (card) {
-         SDCardClass *sc = SD_CARD_GET_CLASS(card);
- 
-@@ -62,14 +70,16 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
- uint8_t sdbus_read_data(SDBus *sdbus)
- {
-     SDState *card = get_card(sdbus);
-+    uint8_t value = 0;
- 
-     if (card) {
-         SDCardClass *sc = SD_CARD_GET_CLASS(card);
- 
--        return sc->read_data(card);
-+        value = sc->read_data(card);
-     }
-+    trace_sdbus_read(sdbus_name(sdbus), value);
- 
--    return 0;
-+    return value;
+@@ -41,6 +41,19 @@ static SDState *get_card(SDBus *sdbus)
+     return SD_CARD(kid->child);
  }
  
- bool sdbus_data_ready(SDBus *sdbus)
++void sdbus_set_voltage(SDBus *sdbus, uint16_t millivolts)
++{
++    SDState *card = get_card(sdbus);
++
++    trace_sdbus_set_voltage(sdbus_name(sdbus), millivolts);
++    if (card) {
++        SDCardClass *sc = SD_CARD_GET_CLASS(card);
++
++        assert(sc->set_voltage);
++        sc->set_voltage(card, millivolts);
++    }
++}
++
+ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint8_t *response)
+ {
+     SDState *card = get_card(sdbus);
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 73e405a04f..a8d7a522c0 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -128,6 +128,18 @@ struct SDState {
+     bool enable;
+ };
+ 
++static void sd_set_voltage(SDState *sd, uint16_t millivolts)
++{
++    switch (millivolts) {
++    case 3001 ... 3600: /* SD_VOLTAGE_3_3V */
++    case 2001 ... 3000: /* SD_VOLTAGE_3_0V */
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "SD card voltage not supported: %.3fV",
++                      millivolts / 1000.f);
++    }
++}
++
+ static void sd_set_mode(SDState *sd)
+ {
+     switch (sd->state) {
+@@ -1926,6 +1938,7 @@ static void sd_class_init(ObjectClass *klass, void *data)
+     dc->reset = sd_reset;
+     dc->bus_type = TYPE_SD_BUS;
+ 
++    sc->set_voltage = sd_set_voltage;
+     sc->do_command = sd_do_command;
+     sc->write_data = sd_write_data;
+     sc->read_data = sd_read_data;
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 9f56eb55e2..d2df1fb728 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1255,7 +1255,16 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+         sdhci_update_irq(s);
+         break;
+     case SDHC_ACMD12ERRSTS:
+-        MASKED_WRITE(s->acmd12errsts, mask, value);
++        MASKED_WRITE(s->acmd12errsts, mask, value & UINT16_MAX);
++        if (s->uhs_mode >= UHS_I) {
++            MASKED_WRITE(s->hostctl2, mask >> 16, value >> 16);
++
++            if (FIELD_EX32(s->hostctl2, SDHC_HOSTCTL2, V18_ENA)) {
++                sdbus_set_voltage(&s->sdbus, SD_VOLTAGE_1_8V);
++            } else {
++                sdbus_set_voltage(&s->sdbus, SD_VOLTAGE_3_3V);
++            }
++        }
+         break;
+ 
+     case SDHC_CAPAB:
+@@ -1310,6 +1319,7 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+ 
+ #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
+     DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
++    DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
+     \
+     /* Capabilities registers provide information on supported
+      * features of this specific host controller implementation */ \
 diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index 78d8707669..ea2746c8b7 100644
+index ea2746c8b7..84d2f398b1 100644
 --- a/hw/sd/trace-events
 +++ b/hw/sd/trace-events
-@@ -1,5 +1,10 @@
- # See docs/devel/tracing.txt for syntax documentation.
+@@ -4,6 +4,7 @@
+ sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t crc) "@%s CMD%02d arg 0x%08x crc 0x%02x"
+ sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+ sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
++sdbus_set_voltage(const char *bus_name, uint16_t millivolts) "@%s %u (mV)"
  
-+# hw/sd/core.c
-+sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t crc) "@%s CMD%02d arg 0x%08x crc 0x%02x"
-+sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
-+sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
-+
  # hw/sd/sdhci.c
  sdhci_set_inserted(const char *level) "card state changed: %s"
- sdhci_send_command(uint8_t cmd, uint32_t arg) "CMD%02u ARG[0x%08x]"
 -- 
 2.16.1
