@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rnsastry@linux.vnet.ibm.com>) id 1ejiv4-00011n-Fz
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:55:07 -0500
+	(envelope-from <armbru@redhat.com>) id 1ejivX-0001PD-Gd
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:55:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rnsastry@linux.vnet.ibm.com>) id 1ejiuz-0001li-Jb
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:55:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45058
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rnsastry@linux.vnet.ibm.com>)
-	id 1ejiuw-0001k4-0Z
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:55:01 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w189sdTD003611
-	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 04:54:56 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g0kpp1y7b-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 04:54:56 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <rnsastry@linux.vnet.ibm.com>;
-	Thu, 8 Feb 2018 04:54:54 -0500
+	(envelope-from <armbru@redhat.com>) id 1ejivS-0001zL-Lr
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:55:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33960 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ejivS-0001zC-FJ
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 04:55:30 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-7-armbru@redhat.com>
+	<CAMxuvawWTd+HWx3seEstJA1YQp3EypH1a7UQ_h-XPR73hXHwTQ@mail.gmail.com>
+	<871shzjvnv.fsf@dusky.pond.sub.org>
+Date: Thu, 08 Feb 2018 10:55:28 +0100
+In-Reply-To: <871shzjvnv.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Mon, 05 Feb 2018 16:36:20 +0100")
+Message-ID: <876077st4f.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Thu, 08 Feb 2018 15:26:16 +0530
-From: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
-In-Reply-To: <381c5681-a194-6750-06ac-7afeda9173f7@vivier.eu>
-References: <151799695576.147.5866177190489987115@bdbb90650ae5>
-	<381c5681-a194-6750-06ac-7afeda9173f7@vivier.eu>
-Message-Id: <56e236398cf70cc2f2b431ea7660b3bd@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [patch] linux-user/syscall.c: Fix missing break
- for host_to_target_cmsg
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 06/21] qapi-gen: New common driver for
+ code and doc generators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,91 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Marc-Andre Lureau <mlureau@redhat.com>
+Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
-On 2018-02-07 19:27, Laurent Vivier wrote:
-> Le 07/02/2018 =C3=A0 10:49, no-reply@patchew.org a =C3=A9crit=C2=A0:
->> Hi,
->>=20
->> This series failed build test on s390x host. Please find the details=20
->> below.
-> ...
->>   CC      aarch64_be-linux-user/linux-user/syscall.o
->> In file included from=20
->> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/qemu.h:16:0,
->>                  from=20
->> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall.c:118:
->> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall.c: In=20
->> function =E2=80=98do_sendrecvmsg_locked=E2=80=99:
->> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall_defs.h:308=
-:61:=20
->> error: =E2=80=98tgt_len=E2=80=99 may be used uninitialized in this fun=
-ction=20
->> [-Werror=3Dmaybe-uninitialized]
->>  #define TARGET_CMSG_LEN(len) (sizeof(struct target_cmsghdr) + (len))
->>                                                              ^
->> /var/tmp/patchew-tester-tmp-ewjgn083/src/linux-user/syscall.c:1797:13:=
-=20
->> note: =E2=80=98tgt_len=E2=80=99 was declared here
->>          int tgt_len, tgt_space;
->>              ^~~~~~~
->=20
-> it seems gcc disagrees with Coverity...
->=20
-> I think this should fixed like:
->=20
->  diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 74378947f0..d7fbe334eb 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -1824,8 +1824,10 @@ static inline abi_long=20
-> host_to_target_cmsg(struct
-> target_msghdr *target_msgh,
->                  tgt_len =3D sizeof(struct target_timeval);
->                  break;
->              default:
-> +                tgt_len =3D len;
->                  break;
+Markus Armbruster <armbru@redhat.com> writes:
 
-In my view this will result in assigning a wrong value to =E2=80=98tgt_le=
-n=E2=80=99=20
-at this =E2=80=98switch-case=E2=80=99 condition.
-Instead looking at the option of initializing =E2=80=98tgt_len' to =E2=80=
-=980=E2=80=99.
+> Marc-Andre Lureau <mlureau@redhat.com> writes:
+>
+>> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
+[...]
+>>> diff --git a/scripts/qapi2texi.py b/scripts/qapi/doc.py
+>>> old mode 100755
+>>> new mode 100644
+>>> similarity index 92%
+>>> rename from scripts/qapi2texi.py
+>>> rename to scripts/qapi/doc.py
+>>> index 924b374cd3..1f57f6e1c2
+>>> --- a/scripts/qapi2texi.py
+>>> +++ b/scripts/qapi/doc.py
+>>> @@ -4,10 +4,9 @@
+>>>  # This work is licensed under the terms of the GNU LGPL, version 2+.
+>>>  # See the COPYING file in the top-level directory.
+>>>  """This script produces the documentation of a qapi schema in texinfo format"""
+>>> +
+>>>  import re
+>>> -import sys
+>>> -
+>>> -import qapi
+>>> +import qapi.common
+>>>
+>>>  MSG_FMT = """
+>>>  @deftypefn {type} {{}} {name}
+>>> @@ -196,7 +195,7 @@ def texi_entity(doc, what, base=None, variants=None,
+>>>              + texi_sections(doc))
+>>>
+>>>
+>>> -class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
+>>> +class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
+>>
+>> Would be a bit easier to read and more consitent with a top-level
+>> "from qapi.common import QAPISchemaVisitor"
+>
+> Can do.
 
-@@ -1789,7 +1789,7 @@
-         void *target_data =3D TARGET_CMSG_DATA(target_cmsg);
+The obvious patch (appended) doesn't work, because doc_required is
+always False in gen_doc().  WTF?!?
 
-         int len =3D cmsg->cmsg_len - sizeof(struct cmsghdr);
--        int tgt_len, tgt_space;
-+        int tgt_len =3D 0, tgt_space;
+[...]
 
-         /* We never copy a half-header but may copy half-data;
-          * this is Linux's behaviour in put_cmsg(). Note that
-@@ -1821,6 +1821,7 @@
-             default:
-                 break;
-             }
-+        break;
-         default:
-             tgt_len =3D len;
-             break;
 
-Re-sending this mail because earlier one not reached the mailing list.=20
-Please accept my apologies if it is a duplicate.
-
->              }
-> +            break;
->          default:
->              tgt_len =3D len;
->              break;
->=20
-> Peter?
->=20
-> Thanks,
-> Laurent
-
---=20
-Regards,
-R.Nageswara Sastry
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 4027722032..919e77b79e 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -7,7 +7,7 @@
+ 
+ from __future__ import print_function
+ import re
+-import qapi.common
++from qapi.common import doc_required, QAPIGenDoc, QAPISchemaVisitor
+ 
+ MSG_FMT = """
+ @deftypefn {type} {{}} {name}
+@@ -196,7 +196,7 @@ def texi_entity(doc, what, base=None, variants=None,
+             + texi_sections(doc))
+ 
+ 
+-class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
++class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
+     def __init__(self):
+         self.out = None
+         self.cur_doc = None
+@@ -272,7 +272,7 @@ def texi_schema(schema):
+ 
+ 
+ def gen_doc(schema, output_dir, prefix):
+-    if qapi.common.doc_required:
+-        gen = qapi.common.QAPIGenDoc()
++    if doc_required:
++        gen = QAPIGenDoc()
+         gen.add(texi_schema(schema))
+         gen.write(output_dir, prefix + 'qapi.texi')
