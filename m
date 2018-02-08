@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ejqr5-0007Ae-15
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:23:32 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ejqsH-0008Gr-OK
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:24:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ejqr0-00005q-Va
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:23:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36954)
+	(envelope-from <alex.williamson@redhat.com>) id 1ejqsD-0000xm-Oi
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:24:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ejqr0-00005Q-NB
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:23:26 -0500
-Date: Thu, 8 Feb 2018 16:23:23 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180208182323.GC13981@localhost.localdomain>
-References: <1517414266-12077-1-git-send-email-luwei.kang@intel.com>
-	<20180207145358.GI13301@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167EC22C8@SHSMSX101.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ejqsD-0000xG-GY
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:24:41 -0500
+Date: Thu, 8 Feb 2018 11:24:36 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180208112436.35ac74a1@w520.home>
+In-Reply-To: <983af1c6-a57a-43d8-2237-88e0d736905f@redhat.com>
+References: <20180207001615.1156.10547.stgit@gimli.home>
+	<20180207002632.1156.53770.stgit@gimli.home>
+	<983af1c6-a57a-43d8-2237-88e0d736905f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E167EC22C8@SHSMSX101.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] i386: Add Intel Processor Trace
- feature support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/5] vfio/quirks: Automatic ioeventfd
+ enabling for NVIDIA BAR0 quirks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,187 +30,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Kang, Luwei" <luwei.kang@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Thu, Feb 08, 2018 at 01:24:46AM +0000, Kang, Luwei wrote:
-> > On Wed, Jan 31, 2018 at 11:57:45PM +0800, Luwei Kang wrote:
-> > > From: Chao Peng <chao.p.peng@linux.intel.com>
-> > >
-> > > Expose Intel Processor Trace feature to guest.
-> > >
-> > > To make Intel PT live migration safe and get same CPUID information
-> > > with same CPU model on diffrent host. CPUID[14] is constant in this
-> > > patch. Intel PT use EPT is first supported in IceLake, the CPUID[14]
-> > > get on this machine as default value. Intel PT would be disabled If
-> > > any machine don't support this minial feature list.
-> > >
-> > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > > Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-> > > ---
-> > >  target/i386/cpu.c | 53
-> > > +++++++++++++++++++++++++++++++++++++++++++++++++++--
-> > >  target/i386/cpu.h |  1 +
-> > >  target/i386/kvm.c | 23 +++++++++++++++++++++++
-> > >  3 files changed, 75 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
-> > > a49d222..aaa427a 100644
-> > > --- a/target/i386/cpu.c
-> > > +++ b/target/i386/cpu.c
-> > > @@ -172,7 +172,14 @@
-> > >  #define L2_ITLB_4K_ASSOC       4
-> > >  #define L2_ITLB_4K_ENTRIES   512
-> > >
-> > > -
-> > > +/* CPUID Leaf 0x14 constants: */
-> > > +#define INTLE_PT_MAX_SUBLEAF     0x1
-> > 
-> > Typo.
-> > 
-> > > +#define INTEL_PT_MINIMAL_EBX     0xf
-> > > +#define INTEL_PT_MINIMAL_ECX     0x7
-> > 
-> > I suggest documenting what capabilities are included in
-> > INTEL_PT_MINIMAL_* here.
-> > 
-> > 
-> > > +#define INTLE_PT_ADDR_RANGES_NUM 0x2 /* Number of configurable
-> > > +address ranges */
-> > 
-> > Typo.
-> > 
-> > > +#define INTEL_PT_MTC_BITMAP      (0x0249 << 16) /* Support ART(0,3,6,9) */
-> > > +#define INTEL_PT_CYCLE_BITMAP    0x1fff         /* Support 0,2^(0~11) */
-> > > +#define INTEL_PT_PSB_BITMAP      (0x003f << 16) /* Support 2K,4K,8K,16K,32K,64K */
-> > >
-> > >  static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
-> > >                                       uint32_t vendor2, uint32_t
-> > > vendor3) @@ -427,7 +434,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> > >              NULL, NULL, "mpx", NULL,
-> > >              "avx512f", "avx512dq", "rdseed", "adx",
-> > >              "smap", "avx512ifma", "pcommit", "clflushopt",
-> > > -            "clwb", NULL, "avx512pf", "avx512er",
-> > > +            "clwb", "intel-pt", "avx512pf", "avx512er",
-> > >              "avx512cd", "sha-ni", "avx512bw", "avx512vl",
-> > >          },
-> > >          .cpuid_eax = 7,
-> > > @@ -3452,6 +3459,27 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> > >          }
-> > >          break;
-> > >      }
-> > > +    case 0x14: {
-> > > +        /* Intel Processor Trace Enumeration */
-> > > +        *eax = 0;
-> > > +        *ebx = 0;
-> > > +        *ecx = 0;
-> > > +        *edx = 0;
-> > > +        if (!(env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) ||
-> > > +            !kvm_enabled()) {
-> > > +            break;
-> > > +        }
-> > > +
-> > > +        if (count == 0) {
-> > > +            *eax = INTLE_PT_MAX_SUBLEAF;
-> > > +            *ebx = INTEL_PT_MINIMAL_EBX;
-> > > +            *ecx = INTEL_PT_MINIMAL_ECX;
-> > > +        } else if (count == 1) {
-> > > +            *eax = INTEL_PT_MTC_BITMAP | INTLE_PT_ADDR_RANGES_NUM;
-> > > +            *ebx = INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP;
-> > > +        }
-> > > +        break;
-> > > +    }
-> > >      case 0x40000000:
-> > >          /*
-> > >           * CPUID code in kvm_arch_init_vcpu() ignores stuff @@
-> > > -4082,6 +4110,27 @@ static int x86_cpu_filter_features(X86CPU *cpu)
-> > >          }
-> > >      }
-> > >
-> > > +    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-> > 
-> > What if the accelerator is not KVM, but is reporting intel-pt as supported?
+On Thu, 8 Feb 2018 12:10:02 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
+
+> Hi Alex,
 > 
-> I have add this check in cpu_x86_cpuid() but I think we'd better add kvm_enabled() check here as well.
-> What is your opinion?
-
-The function is going to crash if KVM is not enabled and the
-accelerator returns intel-pt is supported, as cpu->kvm_state will
-be NULL.
-
+> On 07/02/18 01:26, Alex Williamson wrote:
+> > Record data writes that come through the NVIDIA BAR0 quirk, if we get
+> > enough in a row that we're only passing through, automatically enable
+> > an ioeventfd for it.  The primary target for this is the MSI-ACK
+> > that NVIDIA uses to allow the MSI interrupt to re-trigger, which is a
+> > 4-byte write, data value 0x0 to offset 0x704 into the quirk, 0x88704
+> > into BAR0 MMIO space.  For an interrupt latency sensitive micro-
+> > benchmark, this takes us from 83% of performance versus disabling the
+> > quirk entirely (which GeForce cannot do), to to almost 90%.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >  hw/vfio/pci-quirks.c |   89 +++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  hw/vfio/pci.h        |    2 +
+> >  2 files changed, 89 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> > index e4cf4ea2dd9c..e739efe601b1 100644lg  
 > 
-> > 
-> > > +        KVMState *s = CPU(cpu)->kvm_state;
-> > > +        uint32_t eax_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_EAX);
-> > > +        uint32_t ebx_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_EBX);
-> > > +        uint32_t ecx_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_ECX);
-> > > +        uint32_t eax_1 = kvm_arch_get_supported_cpuid(s, 0x14, 1, R_EAX);
-> > > +        uint32_t ebx_1 = kvm_arch_get_supported_cpuid(s, 0x14, 1,
-> > > + R_EBX);
-> > > +
-> > > +        if (!eax_0 ||
-> > 
-> > OK.
-> > 
-> > > +           ((ebx_0 & INTEL_PT_MINIMAL_EBX) != INTEL_PT_MINIMAL_EBX)
-> > > + ||
-> > 
-> > How do we know if KVM is going to emulate #GP properly when
-> > setting a bit that is supported by the host CPU but cleared
-> > on the guest CPUID?  Do we care?
-> 
-> I think it need KVM make this check and Qemu don't need aware
-> this.
-> For example, EBX[0].CR3_filter (IA32_RTIT_CTL.cr3 can't be set
-> if 0) is support by host but we mask off this bit in kvm guest.
-> Qemu will set the CPUID to KVM by ioctl KVM_SET_CPUID2. KVM
-> will trap the behavior when KVM guest want to set
-> IA32_RTIT_CTL.cr3. If we find EBX[0].CR3_filter is not
-> supported a #GP will be emulated. This check will added in KVM
-> patch set V5 and it still working in progress.
+> > --- a/hw/vfio/pci-quirks.c
+> > +++ b/hw/vfio/pci-quirks.c
+> > @@ -203,6 +203,7 @@ typedef struct VFIOConfigMirrorQuirk {
+> >      uint32_t offset;
+> >      uint8_t bar;
+> >      MemoryRegion *mem;
+> > +    uint8_t data[];  
+> Do you foresee other usages of data besides the LastDataSet?
 
-I was assuming there would be released Linux versions where this
-wasn't implemented yet.  If nothing was merged yet, we should be
-safe.
+Sure, LastDataSet is just a very crude tracking mechanism, I could
+imagine some kind of device specific LRU array.  Any quirk wanting to
+add additional analytics on top of this generic quirk could make use of
+it.  I didn't want to pollute the generic quirk with LastDataSet since
+there are other users, but I also didn't want to complicate the shared
+free'ing path we have by simply adding a pointer.  Thus embedding quirk
+specific data is what I went with here.
+
+> >  } VFIOConfigMirrorQuirk;
+> >  
+> >  static uint64_t vfio_generic_quirk_mirror_read(void *opaque,
+> > @@ -297,6 +298,50 @@ static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
+> >      g_free(ioeventfd);
+> >  }
+> >    
+> add a comment? user handler in case kvm ioeventfd setup failed?
+
+As you correctly updated later, we're only setting up the kvm-user
+ioeventfd handler in this patch.  This is the handler when that
+succeeds.  Once we add vfio ioeventfd support, this handler will
+hopefully never get used, but we still need to support kernels that
+won't have vfio ioeventfd support and this alone does still provide a
+performance improvement.
+
+> > +static void vfio_ioeventfd_handler(void *opaque)
+> > +{
+> > +    VFIOIOEventFD *ioeventfd = opaque;
+> > +
+> > +    if (event_notifier_test_and_clear(&ioeventfd->e)) {
+> > +        vfio_region_write(ioeventfd->region, ioeventfd->region_addr,
+> > +                          ioeventfd->data, ioeventfd->size);
+> > +    }
+> > +}
+> > +
+> > +static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
+> > +                                          MemoryRegion *mr, hwaddr addr,
+> > +                                          unsigned size, uint64_t data,
+> > +                                          VFIORegion *region,
+> > +                                          hwaddr region_addr)
+> > +{
+> > +    VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
+> > +
+> > +    if (event_notifier_init(&ioeventfd->e, 0)) {
+> > +        g_free(ioeventfd);
+> > +        return NULL;
+> > +    }
+> > +
+> > +    ioeventfd->mr = mr;
+> > +    ioeventfd->addr = addr;
+> > +    ioeventfd->size = size;
+> > +    ioeventfd->match_data = true;
+> > +    ioeventfd->data = data;
+> > +    ioeventfd->region = region;
+> > +    ioeventfd->region_addr = region_addr;  
+> I found difficult to follow the different addr semantic.
+> I understand region_add is the offset % bar and addr is the offset %
+> mirror region. Maybe more explicit names would help (region = bar_region
+> and region_addr = bar_offset)
+
+I was trying to avoid PCI specific fields for VFIOIOEventFD, but
+basically we're dealing with two different sets of base and offset.
+The first is the MemoryRegion of the quirk and the offset relative to
+that MemoryRegion.  Those are used by memory_region_add_eventfd() for
+establishing the kvm ioeventfd.  The second is the region and
+region_addr, which identify the vfio region and offset relative to the
+region so that we can actually handle it with vfio_region_write().
+
+I agree though that these are confusing and maybe comments are a
+solution as I can't think of better names:
+
+    /*
+     * MemoryRegion and relative offset, plus additional ioeventfd setup
+     * parameters for configuring and later tearing down KVM ioeventfd.
+     */
+    ioeventfd->mr = mr;
+    ioeventfd->addr = addr;
+    ioeventfd->size = size;
+    ioeventfd->match_data = true;
+    ioeventfd->data = data;
+    /*
+     * VFIORegion and relative offset for implementing the userspace
+     * handler.  data & size fields shared for both uses.
+     */
+    ioeventfd->region = region;
+    ioeventfd->region_addr = region_addr;
 
 
-> 
-> > 
-> > > +           ((ecx_0 & INTEL_PT_MINIMAL_ECX) != INTEL_PT_MINIMAL_ECX)
-> > > + ||
-> > 
-> > Same comment as above.
-> > 
-> > Also: bit 31 must match the host, meaning we must reject a
-> > host where ecx_0 & (1 << 31) is set.
-> 
-> Get it, will add in next version.
-> 
-> > 
-> > 
-> > > +           ((eax_1 & (INTLE_PT_ADDR_RANGES_NUM | INTEL_PT_MTC_BITMAP)) !=
-> > > +                (INTLE_PT_ADDR_RANGES_NUM | INTEL_PT_MTC_BITMAP)) ||
-> > 
-> > This will make the code accept hosts with 3 address ranges
-> > (0b011), but reject ones with 4 address ranges (0b100).  This
-> > doesn't sound right to me.
-> 
-> I see, will fix it.
-> 
-> > 
-> > 
-> > > +           ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) !=
-> > > +                (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP))) {
-> > 
-> > How do we know if KVM is going to emulate #GP properly when
-> > setting an invalid CycThresh or PSBFreq value?  Do we care?
-> 
-> It will check in KVM and will emulate a #GP if set an invalid
-> value but I think qemu can't aware this.  From my point of
-> view, I think qemu don't need to care or get this information.
+> > +
+> > +    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
+> > +                        vfio_ioeventfd_handler, NULL, ioeventfd);
+> > +    memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr,
+> > +                              ioeventfd->size, ioeventfd->match_data,
+> > +                              ioeventfd->data, &ioeventfd->e);
+> > +
+> > +    info_report("Enabled automatic ioeventfd acceleration for %s region %d, "
+> > +                "offset 0x%"HWADDR_PRIx", data 0x%"PRIx64", size %u",
+> > +                vdev->vbasedev.name, region->nr, region_addr, data, size);
+> > +
+> > +    return ioeventfd;
+> > +}
+> > +
+> >  static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
+> >  {
+> >      VFIOQuirk *quirk;
+> > @@ -732,6 +777,13 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
+> >      trace_vfio_quirk_nvidia_bar5_probe(vdev->vbasedev.name);
+> >  }
+> >  
+> > +typedef struct LastDataSet {
+> > +    hwaddr addr;
+> > +    uint64_t data;
+> > +    unsigned size;
+> > +    int count;
+> > +} LastDataSet;
+> > +
+> >  /*
+> >   * Finally, BAR0 itself.  We want to redirect any accesses to either
+> >   * 0x1800 or 0x88000 through the PCI config space access functions.
+> > @@ -742,6 +794,7 @@ static void vfio_nvidia_quirk_mirror_write(void *opaque, hwaddr addr,
+> >      VFIOConfigMirrorQuirk *mirror = opaque;
+> >      VFIOPCIDevice *vdev = mirror->vdev;
+> >      PCIDevice *pdev = &vdev->pdev;
+> > +    LastDataSet *last = (LastDataSet *)&mirror->data;
+> >  
+> >      vfio_generic_quirk_mirror_write(opaque, addr, data, size);
+> >  
+> > @@ -756,6 +809,38 @@ static void vfio_nvidia_quirk_mirror_write(void *opaque, hwaddr addr,
+> >                            addr + mirror->offset, data, size);
+> >          trace_vfio_quirk_nvidia_bar0_msi_ack(vdev->vbasedev.name);
+> >      }
+> > +
+> > +    /*
+> > +     * Automatically add an ioeventfd to handle any repeated write with the
+> > +     * same data and size above the standard PCI config space header.  This is
+> > +     * primarily expected to accelerate the MSI-ACK behavior, such as noted
+> > +     * above.  Current hardware/drivers should trigger an ioeventfd at config
+> > +     * offset 0x704 (region offset 0x88704), with data 0x0, size 4.
+> > +     */
+> > +    if (addr > PCI_STD_HEADER_SIZEOF) {
+> > +        if (addr != last->addr || data != last->data || size != last->size) {
+> > +            last->addr = addr;
+> > +            last->data = data;
+> > +            last->size = size;
+> > +            last->count = 1;
+> > +        } else if (++last->count > 10) {  
+> So here is the naive question about the "10" choice and also the fact
+> this needs to be consecutive accesses. I guess you observed this works
+> but at first sight this is not obvious to me.
 
-If all KVM versions that return 0x14 on GET_SUPPORTED_CPUID will
-emulate #GP properly, this will be OK.
+Initially when I started working on this I used the previously known
+MSI-ACK behavior, which was a write to the MSI capability ID register,
+but I quickly figured out it didn't do anything because my current guest
+setup uses the 0x704 offset noted in the comment above.  So I continued
+developing with 0x704 hard coded.  But I have no idea if everything
+uses 0x704 now or some drivers might still use the capability ID, or
+what NVIDIA might switch to next.  So I wanted to make this dynamic and
+I figured that shouldn't anything that gets repeated calls through here
+with the same data that we're not modifying on the way to hardware
+benefit from this acceleration.  Then I started thinking about what
+frequency of write should trigger this switch-over, but the time
+component of that is hard to deal with, so I found that I could just
+drop it.  The MSI-ACK behavior means that we see a pretty continuous
+stream of writes to the same offset, same data, so that triggers right
+away.  Interestingly, after the MSI-ACK triggers the ioeventfd, we even
+add another for a relatively low frequency write.  I wouldn't have
+bothered with this one otherwise, but I don't see the harm in leaving
+it since we're setup for a datamatch we'll only trigger the ioeventfd
+if it remains the same.  So basically to answer your question, it's 10
+because it seemed like a reasonable watermark and it works.  If we had
+to, we could use some sort of LRU array, but this is simple.
 
--- 
-Eduardo
+> Does anyone check potential overlaps between ioeventfd's [addr, addr +
+> size -1]?
+
+Do we need to?  KVM will only trigger the ioeventfd if we match the
+address, data, and size, so AIUI we could have multiple ioeventfds
+covering the same area with different data or size and there's nothing
+wrong with that.  I wondered whether we need some sort of pruning
+algorithm, but once we've enabled kvm-vfio acceleration, QEMU no longer
+has any idea which are being used.  Maybe we could arbitrarily decide
+some fixed number limit for a device, but currently I think the limit
+is based on the user's open file limit.  Thanks,
+
+Alex
