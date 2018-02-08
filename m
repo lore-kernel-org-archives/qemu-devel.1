@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ejpfj-0006pb-KJ
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:07:47 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ejpqA-0007j3-Ay
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:18:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ejpfe-0005Oz-Gw
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:07:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53606
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1ejpfe-0005Or-B6
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:07:38 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w18H4YLZ103559
-	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 12:07:37 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g0stpthqs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 12:07:37 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Thu, 8 Feb 2018 17:07:34 -0000
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-References: <1518108236-20081-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-Date: Thu, 8 Feb 2018 18:07:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <1518108236-20081-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <aadd8575-6bcb-d851-2d54-3143b9bf70df@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] S390: Expose s390-specific CPU info
+	(envelope-from <stefanha@redhat.com>) id 1ejpq8-0003dY-F1
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:18:30 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55428 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ejpq8-0003XC-9Y
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:18:28 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Thu,  8 Feb 2018 17:18:06 +0000
+Message-Id: <20180208171807.24267-3-stefanha@redhat.com>
+In-Reply-To: <20180208171807.24267-1-stefanha@redhat.com>
+References: <20180208171807.24267-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/3] block: test blk_aio_flush() with blk->root
+ == NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,49 +25,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Luiz Capitulino <lcapitulino@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, armbru@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, dgilbert@redhat.com, Alexander Graf <agraf@suse.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, mark.kanda@oracle.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 08.02.2018 17:43, Viktor Mihajlovski wrote:
-> Presently s390x is the only architecture not exposing specific
-> CPU information via QMP query-cpus. Upstream discussion has shown
-> that it could make sense to report the architecture specific CPU
-> state, e.g. to detect that a CPU has been stopped.
-> 
-> With this change the output of query-cpus will look like this on
-> s390:
-> 
->    [
->      {"arch": "s390", "current": true,
->       "props": {"core-id": 0}, "cpu-state": "operating", "CPU": 0,
->       "qom_path": "/machine/unattached/device[0]",
->       "halted": false, "thread_id": 63115},
->      {"arch": "s390", "current": false,
->       "props": {"core-id": 1}, "cpu-state": "stopped", "CPU": 1,
->       "qom_path": "/machine/unattached/device[1]",
->       "halted": true, "thread_id": 63116}
->    ]
-> 
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-> ---
-> 
-> v1 -> v2:
->  - qapi-schema.json: fixed style issues, typos, improved enum naming
->  - hmp.c: added missing newline (printing cpu state)
-> 
->  cpus.c                     |  6 ++++++
->  hmp.c                      |  4 ++++
->  hw/s390x/s390-virtio-ccw.c |  2 +-
->  qapi-schema.json           | 28 +++++++++++++++++++++++++++-
->  target/s390x/cpu.c         | 24 ++++++++++++------------
->  target/s390x/cpu.h         |  7 ++-----
->  target/s390x/kvm.c         |  8 ++++----
->  target/s390x/sigp.c        | 38 +++++++++++++++++++-------------------
->  8 files changed, 75 insertions(+), 42 deletions(-)
-> 
+From: Kevin Wolf <kwolf@redhat.com>
 
-sorry, forgot to cc the maintainers
-[...]
+This patch adds test cases for the scenario where blk_aio_flush() is
+called on a BlockBackend with no root.  Calling drain afterwards should
+complete the requests with -ENOMEDIUM.
 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/Makefile.include     |  2 ++
+ tests/test-block-backend.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
+ create mode 100644 tests/test-block-backend.c
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f41da235ae..1a457c29bc 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -83,6 +83,7 @@ gcov-files-test-hbitmap-y = blockjob.c
+ check-unit-y += tests/test-bdrv-drain$(EXESUF)
+ check-unit-y += tests/test-blockjob$(EXESUF)
+ check-unit-y += tests/test-blockjob-txn$(EXESUF)
++check-unit-y += tests/test-block-backend$(EXESUF)
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ gcov-files-test-x86-cpuid-y =
+@@ -609,6 +610,7 @@ tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
+ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
++tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+diff --git a/tests/test-block-backend.c b/tests/test-block-backend.c
+new file mode 100644
+index 0000000000..fd59f02bd0
+--- /dev/null
++++ b/tests/test-block-backend.c
+@@ -0,0 +1,82 @@
++/*
++ * BlockBackend tests
++ *
++ * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++
++static void test_drain_aio_error_flush_cb(void *opaque, int ret)
++{
++    bool *completed = opaque;
++
++    g_assert(ret == -ENOMEDIUM);
++    *completed = true;
++}
++
++static void test_drain_aio_error(void)
++{
++    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    BlockAIOCB *acb;
++    bool completed = false;
++
++    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
++    g_assert(acb != NULL);
++    g_assert(completed == false);
++
++    blk_drain(blk);
++    g_assert(completed == true);
++
++    blk_unref(blk);
++}
++
++static void test_drain_all_aio_error(void)
++{
++    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    BlockAIOCB *acb;
++    bool completed = false;
++
++    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
++    g_assert(acb != NULL);
++    g_assert(completed == false);
++
++    blk_drain_all();
++    g_assert(completed == true);
++
++    blk_unref(blk);
++}
++
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
++
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/block-backend/drain_aio_error", test_drain_aio_error);
++    g_test_add_func("/block-backend/drain_all_aio_error",
++                    test_drain_all_aio_error);
++
++    return g_test_run();
++}
 -- 
-Regards,
- Viktor Mihajlovski
+2.14.3
