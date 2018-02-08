@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1ejatQ-0005sy-Gc
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 20:20:53 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ejavZ-0007H1-Ru
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 20:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1ejatM-0003Ev-Gy
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 20:20:52 -0500
-Received: from mga01.intel.com ([192.55.52.88]:27393)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
-	id 1ejatM-0003EZ-8B
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 20:20:48 -0500
-References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
-	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
-	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
-	<502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
-	<20180205181521.47232aa4@redhat.com>
-	<5155622d-cc49-d24c-7a7d-24ebb9ca2331@redhat.com>
-	<ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
-	<20180207130635.4033f8b8@redhat.com>
-From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
-Message-ID: <8474af94-7bff-a7b5-e316-b8a0e332467e@intel.com>
-Date: Thu, 8 Feb 2018 09:20:45 +0800
+	(envelope-from <aik@ozlabs.ru>) id 1ejavV-0003uL-SB
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 20:23:05 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:39590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ejavV-0003uB-KH
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 20:23:01 -0500
+Received: by mail-pg0-x243.google.com with SMTP id w17so1036639pgv.6
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 17:23:01 -0800 (PST)
+References: <20180207000731.32764.95992.stgit@gimli.home>
+	<cfe31ae1-2557-d15a-45a2-0ba03d8d71fa@ozlabs.ru>
+	<20180206212538.50ef0e13@w520.home>
+	<6014d60c-9bdb-4dc0-7cd7-9299005d9c5a@ozlabs.ru>
+	<20180207071253.7c606594@w520.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <86c09adf-c4ab-5eca-629a-4d6c6a5692be@ozlabs.ru>
+Date: Thu, 8 Feb 2018 12:22:53 +1100
 MIME-Version: 1.0
-In-Reply-To: <20180207130635.4033f8b8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180207071253.7c606594@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
+Subject: Re: [Qemu-devel] [RFC PATCH] vfio/pci: Add ioeventfd support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
 
-
-
-On 2/7/2018 8:06 PM, Igor Mammedov wrote:
-> On Wed, 7 Feb 2018 07:49:58 +0000
-> "Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
->
->>> -----Original Message-----
->>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->>> Sent: Tuesday, February 6, 2018 1:32 AM
->>> To: Igor Mammedov
->>> Cc: Tan, Jianfeng; qemu-devel@nongnu.org; Jason Wang; Maxime Coquelin;
->>> Michael S . Tsirkin
->>> Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
->>> migration
+On 08/02/18 01:12, Alex Williamson wrote:
+> On Wed, 7 Feb 2018 15:48:26 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> On 07/02/18 15:25, Alex Williamson wrote:
+>>> On Wed, 7 Feb 2018 15:09:22 +1100
+>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:  
+>>>> On 07/02/18 11:08, Alex Williamson wrote:  
+>>>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>>>>> index e3301dbd27d4..07966a5f0832 100644
+>>>>> --- a/include/uapi/linux/vfio.h
+>>>>> +++ b/include/uapi/linux/vfio.h
+>>>>> @@ -503,6 +503,30 @@ struct vfio_pci_hot_reset {
+>>>>>  
+>>>>>  #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
+>>>>>  
+>>>>> +/**
+>>>>> + * VFIO_DEVICE_IOEVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 14,
+>>>>> + *                              struct vfio_device_ioeventfd)
+>>>>> + *
+>>>>> + * Perform a write to the device at the specified device fd offset, with
+>>>>> + * the specified data and width when the provided eventfd is triggered.
+>>>>> + *
+>>>>> + * Return: 0 on success, -errno on failure.
+>>>>> + */
+>>>>> +struct vfio_device_ioeventfd {
+>>>>> +	__u32	argsz;
+>>>>> +	__u32	flags;
+>>>>> +#define VFIO_DEVICE_IOEVENTFD_8		(1 << 0) /* 1-byte write */
+>>>>> +#define VFIO_DEVICE_IOEVENTFD_16	(1 << 1) /* 2-byte write */
+>>>>> +#define VFIO_DEVICE_IOEVENTFD_32	(1 << 2) /* 4-byte write */
+>>>>> +#define VFIO_DEVICE_IOEVENTFD_64	(1 << 3) /* 8-byte write */
+>>>>> +#define VFIO_DEVICE_IOEVENTFD_SIZE_MASK	(0xf)
+>>>>> +	__u64	offset;			/* device fd offset of write */
+>>>>> +	__u64	data;			/* data to be written */
+>>>>> +	__s32	fd;			/* -1 for de-assignment */
+>>>>> +};
+>>>>> +
+>>>>> +#define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 14)    
+>>>>
+>>>>
+>>>> Is this a first ioctl with endianness fixed to little-endian? I'd suggest
+>>>> to comment on that as things like vfio_info_cap_header do use the host
+>>>> endianness.  
 >>>
->>> On 05/02/2018 18:15, Igor Mammedov wrote:
->>>>>> Then we would have both ram block named pc.ram:
->>>>>>                Block Name    PSize
->>>>>>                        pc.ram     4 KiB
->>>>>>        /objects/pc.ram    2 MiB
->>>>>>
->>>>>> But I assume it's a corner case which not really happen.
->>>>> Yeah, you're right. :/  I hadn't thought of hotplug.  It can happen indeed.
->>>> perhaps we should fail object_add memory-backend-foo if it resulted
->>>> in creating ramblock with duplicate id
->>> Note that it would only be duplicated with Jianfeng's patch.  So I'm
->>> worried that his patch is worse than what we have now, because it may
->>> create conflicts with system RAMBlock names are not necessarily
->>> predictable.  Right now, -object creates RAMBlock names that are nicely
->>> constrained within /object/.
->> So we are trading off between the benefit it takes and the bad effect it brings.
+>>> Look at our current read and write interface, we call leXX_to_cpu
+>>> before calling iowriteXX there and I think a user would logically
+>>> expect to use the same data format here as they would there.  
 >>
->> I'm wondering if the above example is the only failed case this patch leads to, i.e, only there is a ram named "pc.ram" and "/object/pc.ram" in the src VM?
+>> If the data is "char data[8]" (i.e. bytestream), then it can be expected to
+>> be device/bus endian (i.e. PCI == little endian), but if it is u64 - then I
+>> am not so sure really, and this made me look around. It could be "__le64
+>> data" too.
 >>
->> Please also consider the second option, that adding an alias name for RAMBlock; I'm not a big fan for that one, as it just pushes the problem to OpenStack/Libvirt.
-> looking at provided CLI examples it's configuration issue on src and dst,
-> one shall not mix numa and non numa variants.
+>>> Also note
+>>> that iowriteXX does a cpu_to_leXX, so are we really defining the
+>>> interface as little-endian or are we just trying to make ourselves
+>>> endian neutral and counter that implicit conversion?  Thanks,  
+>>
+>> Defining it LE is fine, I just find it a bit confusing when
+>> vfio_info_cap_header is host endian but vfio_device_ioeventfd is not.
+> 
+> But I don't think we are defining the interface as little-endian.
+> iowriteXX does a cpu_to_leXX byteswap.  Therefore in order to maintain
+> endian neutrality, if the data does a cpu->le swap on the way out, I
+> need to do a le->cpu swap on the way in, right?  Please defend the
+> assertion that we're creating a little-endian interface.  Thanks,
 
-Aha, that's another thing we also want to change. We now add numa at dst 
-node, only because without -numa, we cannot set up the file-baked memory 
-with share=on.
 
-For example, "-m xG -mem-path xxx" can set up a file-baked memory, but 
-the file is not share-able.
+vfio_pci_ioctl() passes "endian-neutral" ioeventfd.data to
+vfio_pci_ioeventfd() which immediately does the leXX_to_cpu() conversion
+(and uses the result later on in iowriteXX(), which is not VFIO API) so I
+read it as the ioctl really expects LE.
 
->
->> Or any other suggestions?
-> Fix configuration, namely dst side of it (i.e. use the same -m only variant
-> without -numa as it's on src).
->
-> BTW, what are you trying to achieve adding -numa on dst?
+The QEMU part - vfio_nvidia_mirror_quirk MR - does not swap bytes but the
+MR itself it declared DEVICE_LITTLE_ENDIAN which means
+vfio_nvidia_quirk_mirror_write() receives byteswapped @data in the host
+endian == bigendian on a big endian host. So the ioctl() handler will
+receive a BE value, do byteswap #1 in leXX_to_cpu(), and then do byteswap
+#2 in iowriteXX() so after all a BE will be written to a device. So I'd say
+we rather do not need leXX_to_cpu() in vfio_pci_ioeventfd(). Correct me
+where I am wrong. Thanks,
 
-See above reply.
 
-Thanks,
-Jianfeng
+
+-- 
+Alexey
