@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejncS-0005S0-92
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1ejncf-0005cA-Rd
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejncN-0005Mp-3r
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:12 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47892)
+	(envelope-from <bounces@canonical.com>) id 1ejncc-0005Vu-Lf
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:25 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48386)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejncM-0005MU-QD
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:07 -0500
+	id 1ejncc-0005Uv-CI
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:22 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejncL-0007oj-BV
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 14:56:05 +0000
+	id 1ejnca-0007zG-1x
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 14:56:20 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5141B2E80C7
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 14:56:05 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 062582E80D4
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 14:56:20 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Date: Thu, 08 Feb 2018 14:36:05 -0000
-From: Launchpad Bug Tracker <1484990@bugs.launchpad.net>
-Reply-To: Bug 1484990 <1484990@bugs.launchpad.net>
+From: Launchpad Bug Tracker <1350435@bugs.launchpad.net>
+Reply-To: Bug 1350435 <1350435@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150814145418.19376.19961.malonedeb@wampee.canonical.com>
-Message-Id: <151810057273.12722.11712838217686769647.malone@ackee.canonical.com>
+References: <20140730162025.27276.9650.malonedeb@soybean.canonical.com>
+Message-Id: <151810057134.12722.9789147457318428651.malone@ackee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1484990] Re: fsfreeze-hook script should also
- ignored dpkg generated files
+Subject: [Qemu-devel] [Bug 1350435] Re: tcg.c:1693: tcg fatal error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -166,39 +165,35 @@ ot
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1484990
+https://bugs.launchpad.net/bugs/1350435
 
 Title:
-  fsfreeze-hook script should also ignored dpkg generated files
+  tcg.c:1693: tcg fatal error
 
+Status in launchpad-buildd:
+  Won't Fix
 Status in QEMU:
-  New
+  Fix Released
 Status in qemu package in Ubuntu:
   Fix Released
 
 Bug description:
-  Hello,
-
-  In the fsfreeze-hook script, the following code check if some of the
-  files should be ignored:
+  this started happening after the launchpad buildd trusty deploy
+  https://code.launchpad.net/~costamagnagianfranco/+archive/ubuntu/firefox/=
++build/6224439
 
   =
 
-  # Check whether file $1 is a backup or rpm-generated file and should be i=
-gnored
-  is_ignored_file() {
-      case "$1" in
-          *~ | *.bak | *.orig | *.rpmnew | *.rpmorig | *.rpmsave | *.sample)
-              return 0 ;;
-      esac
-      return 1
-  }
+  debconf-updatepo
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault (core dumped)
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault (core dumped)
+  /build/buildd/qemu-2.0.0+dfsg/tcg/tcg.c:1693: tcg fatal error
+  /build/buildd/qemu-2.0.0+dfsg/tcg/tcg.c:1693: tcg fatal error
 
-  The functions should probably also skip dpkg generated files.
-
-  I've found a list of the different extensions in the systemd source
-  tree:
-  https://github.com/systemd/systemd/blob/master/src/basic/util.c#L1871
+  this seems to be the patch needed
+  https://patches.linaro.org/32473/
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1484990/+subscriptions
+https://bugs.launchpad.net/launchpad-buildd/+bug/1350435/+subscriptions
