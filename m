@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejrnm-0002qj-Oo
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ejrnt-0002v4-F6
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejrnl-0000m5-Oy
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ejrnr-0000ua-VE
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:17 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  8 Feb 2018 20:23:02 +0100
-Message-Id: <20180208192328.16550-2-kwolf@redhat.com>
+Date: Thu,  8 Feb 2018 20:23:06 +0100
+Message-Id: <20180208192328.16550-6-kwolf@redhat.com>
 In-Reply-To: <20180208192328.16550-1-kwolf@redhat.com>
 References: <20180208192328.16550-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/27] block/qapi: Introduce
- BlockdevCreateOptions
+Subject: [Qemu-devel] [PATCH 05/27] qcow2: Use BlockdevRef in qcow2_create2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +22,208 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This creates a BlockdevCreateOptions union type that will contain all of
-the options for image creation. We'll start out with an empty struct
-type BlockdevCreateDummy for all drivers.
+Instead of passing a separate BlockDriverState* into qcow2_create2(),
+make use of the BlockdevRef that is included in BlockdevCreateOptions.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ include/block/block.h |  1 +
+ block.c               | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c         | 38 ++++++++++++++++++++++++--------------
+ 3 files changed, 72 insertions(+), 14 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 8225308904..b59b1430bb 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3338,6 +3338,67 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+diff --git a/include/block/block.h b/include/block/block.h
+index 9b12774ddf..4b11f814a8 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -258,6 +258,7 @@ BdrvChild *bdrv_open_child(const char *filename,
+                            BlockDriverState* parent,
+                            const BdrvChildRole *child_role,
+                            bool allow_none, Error **errp);
++BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp);
+ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
+                          Error **errp);
+ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+diff --git a/block.c b/block.c
+index a8da4f2b25..f24d89e7de 100644
+--- a/block.c
++++ b/block.c
+@@ -32,6 +32,8 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qobject-output-visitor.h"
++#include "qapi-visit.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/notify.h"
+@@ -2405,6 +2407,51 @@ BdrvChild *bdrv_open_child(const char *filename,
+     return c;
+ }
  
- ##
-+# @BlockdevCreateNotSupported:
-+#
-+# This is used for all drivers that don't support creating images.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateNotSupported', 'data': {}}
++/* TODO Future callers may need to specify parent/child_role in order for
++ * option inheritance to work. Existing callers use it for the root node. */
++BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
++{
++    BlockDriverState *bs = NULL;
++    Error *local_err = NULL;
++    QObject *obj = NULL;
++    QDict *qdict = NULL;
++    const char *reference = NULL;
++    Visitor *v = NULL;
 +
-+##
-+# @BlockdevCreateOptions:
-+#
-+# Options for creating an image format on a given node.
-+#
-+# @driver           block driver to create the image format
-+#
-+# Since: 2.12
-+##
-+{ 'union': 'BlockdevCreateOptions',
-+  'base': {
-+      'driver':         'BlockdevDriver' },
-+  'discriminator': 'driver',
-+  'data': {
-+      'blkdebug':       'BlockdevCreateNotSupported',
-+      'blkverify':      'BlockdevCreateNotSupported',
-+      'bochs':          'BlockdevCreateNotSupported',
-+      'cloop':          'BlockdevCreateNotSupported',
-+      'dmg':            'BlockdevCreateNotSupported',
-+      'file':           'BlockdevCreateNotSupported',
-+      'ftp':            'BlockdevCreateNotSupported',
-+      'ftps':           'BlockdevCreateNotSupported',
-+      'gluster':        'BlockdevCreateNotSupported',
-+      'host_cdrom':     'BlockdevCreateNotSupported',
-+      'host_device':    'BlockdevCreateNotSupported',
-+      'http':           'BlockdevCreateNotSupported',
-+      'https':          'BlockdevCreateNotSupported',
-+      'iscsi':          'BlockdevCreateNotSupported',
-+      'luks':           'BlockdevCreateNotSupported',
-+      'nbd':            'BlockdevCreateNotSupported',
-+      'nfs':            'BlockdevCreateNotSupported',
-+      'null-aio':       'BlockdevCreateNotSupported',
-+      'null-co':        'BlockdevCreateNotSupported',
-+      'parallels':      'BlockdevCreateNotSupported',
-+      'qcow2':          'BlockdevCreateNotSupported',
-+      'qcow':           'BlockdevCreateNotSupported',
-+      'qed':            'BlockdevCreateNotSupported',
-+      'quorum':         'BlockdevCreateNotSupported',
-+      'raw':            'BlockdevCreateNotSupported',
-+      'rbd':            'BlockdevCreateNotSupported',
-+      'replication':    'BlockdevCreateNotSupported',
-+      'sheepdog':       'BlockdevCreateNotSupported',
-+      'ssh':            'BlockdevCreateNotSupported',
-+      'throttle':       'BlockdevCreateNotSupported',
-+      'vdi':            'BlockdevCreateNotSupported',
-+      'vhdx':           'BlockdevCreateNotSupported',
-+      'vmdk':           'BlockdevCreateNotSupported',
-+      'vpc':            'BlockdevCreateNotSupported',
-+      'vvfat':          'BlockdevCreateNotSupported',
-+      'vxhs':           'BlockdevCreateNotSupported'
-+  } }
++    if (ref->type == QTYPE_QSTRING) {
++        reference = ref->u.reference;
++    } else {
++        BlockdevOptions *options = &ref->u.definition;
++        assert(ref->type == QTYPE_QDICT);
 +
-+##
- # @blockdev-open-tray:
- #
- # Opens a block device's tray. If there is a block driver state tree inserted as
++        v = qobject_output_visitor_new(&obj);
++        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            goto fail;
++        }
++        visit_complete(v, &obj);
++
++        qdict = qobject_to_qdict(obj);
++        qdict_flatten(qdict);
++
++        /* bdrv_open_inherit() defaults to the values in bdrv_flags (for
++         * compatibility with other callers) rather than what we want as the
++         * real defaults. Apply the defaults here instead. */
++        qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
++        qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
++        qdict_set_default_str(qdict, BDRV_OPT_READ_ONLY, "off");
++    }
++
++    bs = bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, errp);
++    obj = NULL;
++
++fail:
++    qobject_decref(obj);
++    visit_free(v);
++    return bs;
++}
++
+ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+                                                    int flags,
+                                                    QDict *snapshot_options,
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4ab6ed15c2..30f5fbcc37 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2705,8 +2705,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
+     return refcount_bits;
+ }
+ 
+-static int qcow2_create2(BlockDriverState *bs,
+-                         BlockdevCreateOptions *create_options,
++static int qcow2_create2(BlockdevCreateOptions *create_options,
+                          QemuOpts *opts, const char *encryptfmt, Error **errp)
+ {
+     BlockdevCreateOptionsQcow2 *qcow2_opts;
+@@ -2724,7 +2723,8 @@ static int qcow2_create2(BlockDriverState *bs,
+      * 2 GB for 64k clusters, and we don't want to have a 2 GB initial file
+      * size for any qcow2 image.
+      */
+-    BlockBackend *blk;
++    BlockBackend *blk = NULL;
++    BlockDriverState *bs = NULL;
+     QCowHeader *header;
+     size_t cluster_size;
+     int version;
+@@ -2733,10 +2733,15 @@ static int qcow2_create2(BlockDriverState *bs,
+     Error *local_err = NULL;
+     int ret;
+ 
+-    /* Validate options and set default values */
+     assert(create_options->driver == BLOCKDEV_DRIVER_QCOW2);
+     qcow2_opts = &create_options->u.qcow2;
+ 
++    bs = bdrv_open_blockdev_ref(qcow2_opts->file, errp);
++    if (bs == NULL) {
++        return -EIO;
++    }
++
++    /* Validate options and set default values */
+     if (!QEMU_IS_ALIGNED(qcow2_opts->size, BDRV_SECTOR_SIZE)) {
+         error_setg(errp, "Image size must be a multiple of 512 bytes");
+         ret = -EINVAL;
+@@ -2765,7 +2770,8 @@ static int qcow2_create2(BlockDriverState *bs,
+     }
+ 
+     if (!validate_cluster_size(cluster_size, errp)) {
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+ 
+     if (!qcow2_opts->has_preallocation) {
+@@ -2776,11 +2782,13 @@ static int qcow2_create2(BlockDriverState *bs,
+     {
+         error_setg(errp, "Backing file and preallocation cannot be used at "
+                    "the same time");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+     if (qcow2_opts->has_backing_fmt && !qcow2_opts->has_backing_file) {
+         error_setg(errp, "Backing format cannot be used without backing file");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+ 
+     if (!qcow2_opts->has_lazy_refcounts) {
+@@ -2789,7 +2797,8 @@ static int qcow2_create2(BlockDriverState *bs,
+     if (version < 3 && qcow2_opts->lazy_refcounts) {
+         error_setg(errp, "Lazy refcounts only supported with compatibility "
+                    "level 1.1 and above (use compat=1.1 or greater)");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+ 
+     if (!qcow2_opts->has_refcount_bits) {
+@@ -2800,13 +2809,15 @@ static int qcow2_create2(BlockDriverState *bs,
+     {
+         error_setg(errp, "Refcount width must be a power of two and may not "
+                    "exceed 64 bits");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+     if (version < 3 && qcow2_opts->refcount_bits != 16) {
+         error_setg(errp, "Different refcount widths than 16 bits require "
+                    "compatibility level 1.1 or above (use compat=1.1 or "
+                    "greater)");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+     refcount_order = ctz32(qcow2_opts->refcount_bits);
+ 
+@@ -2964,9 +2975,8 @@ static int qcow2_create2(BlockDriverState *bs,
+ 
+     ret = 0;
+ out:
+-    if (blk) {
+-        blk_unref(blk);
+-    }
++    blk_unref(blk);
++    bdrv_unref(bs);
+     return ret;
+ }
+ 
+@@ -3094,7 +3104,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+             .refcount_bits      = refcount_bits,
+         },
+     };
+-    ret = qcow2_create2(bs, &create_options, opts, encryptfmt, errp);
++    ret = qcow2_create2(&create_options, opts, encryptfmt, errp);
+     if (ret < 0) {
+         goto finish;
+     }
 -- 
 2.13.6
