@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbor-000610-8T
+	(envelope-from <famz@redhat.com>) id 1ejbor-00060u-7Z
 	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbon-0004Ik-2n
+	(envelope-from <famz@redhat.com>) id 1ejbon-0004JK-9K
 	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:13 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51466 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49838 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ejbom-0004Hb-Tx
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:08 -0500
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ejbon-0004IR-3B
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:09 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Thu,  8 Feb 2018 10:19:38 +0800
-Message-Id: <20180208021953.7354-2-famz@redhat.com>
+Date: Thu,  8 Feb 2018 10:19:39 +0800
+Message-Id: <20180208021953.7354-3-famz@redhat.com>
 In-Reply-To: <20180208021953.7354-1-famz@redhat.com>
 References: <20180208021953.7354-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/16] docker: change Fedora base image to
- fedora:27
+Subject: [Qemu-devel] [PULL 02/16] test-coroutine: add simple CoMutex test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +28,100 @@ Cc: Peter Maydell <peter.maydell@linaro.org>
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Using "fedora:latest" makes behavior different depending on when you
-actually pulled the image from the docker repository.  In my case,
-the supposedly "latest" image was a Fedora 25 download from 8 months
-ago, and the new "test-debug" test was failing.
+In preparation for adding a similar test using QemuLockable, add a very
+simple testcase that has two interleaved calls to lock and unlock.
 
-Use "27" to improve reproducibility and make it clear when the image
-is obsolete.
-
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1515755504-21341-1-git-send-email-pbonzini@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180203153935.8056-2-pbonzini@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/dockerfiles/fedora.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/test-coroutine.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-index 26ede4f1d6..994a35a332 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -1,4 +1,4 @@
--FROM fedora:latest
-+FROM fedora:27
- ENV PACKAGES \
-     ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostna=
-me \
-     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
---=20
+diff --git a/tests/test-coroutine.c b/tests/test-coroutine.c
+index 76c646107e..ab8fdf701e 100644
+--- a/tests/test-coroutine.c
++++ b/tests/test-coroutine.c
+@@ -175,7 +175,7 @@ static void coroutine_fn c1_fn(void *opaque)
+     qemu_coroutine_enter(c2);
+ }
+ 
+-static void test_co_queue(void)
++static void test_no_dangling_access(void)
+ {
+     Coroutine *c1;
+     Coroutine *c2;
+@@ -195,6 +195,51 @@ static void test_co_queue(void)
+     *c1 = tmp;
+ }
+ 
++static bool locked;
++static int done;
++
++static void coroutine_fn mutex_fn(void *opaque)
++{
++    CoMutex *m = opaque;
++    qemu_co_mutex_lock(m);
++    assert(!locked);
++    locked = true;
++    qemu_coroutine_yield();
++    locked = false;
++    qemu_co_mutex_unlock(m);
++    done++;
++}
++
++static void do_test_co_mutex(CoroutineEntry *entry, void *opaque)
++{
++    Coroutine *c1 = qemu_coroutine_create(entry, opaque);
++    Coroutine *c2 = qemu_coroutine_create(entry, opaque);
++
++    done = 0;
++    qemu_coroutine_enter(c1);
++    g_assert(locked);
++    qemu_coroutine_enter(c2);
++
++    /* Unlock queues c2.  It is then started automatically when c1 yields or
++     * terminates.
++     */
++    qemu_coroutine_enter(c1);
++    g_assert_cmpint(done, ==, 1);
++    g_assert(locked);
++
++    qemu_coroutine_enter(c2);
++    g_assert_cmpint(done, ==, 2);
++    g_assert(!locked);
++}
++
++static void test_co_mutex(void)
++{
++    CoMutex m;
++
++    qemu_co_mutex_init(&m);
++    do_test_co_mutex(mutex_fn, &m);
++}
++
+ /*
+  * Check that creation, enter, and return work
+  */
+@@ -422,7 +467,7 @@ int main(int argc, char **argv)
+      * crash, so skip it.
+      */
+     if (CONFIG_COROUTINE_POOL) {
+-        g_test_add_func("/basic/co_queue", test_co_queue);
++        g_test_add_func("/basic/no-dangling-access", test_no_dangling_access);
+     }
+ 
+     g_test_add_func("/basic/lifecycle", test_lifecycle);
+@@ -432,6 +477,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/basic/entered", test_entered);
+     g_test_add_func("/basic/in_coroutine", test_in_coroutine);
+     g_test_add_func("/basic/order", test_order);
++    g_test_add_func("/locking/co-mutex", test_co_mutex);
+     if (g_test_perf()) {
+         g_test_add_func("/perf/lifecycle", perf_lifecycle);
+         g_test_add_func("/perf/nesting", perf_nesting);
+-- 
 2.14.3
