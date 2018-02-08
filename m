@@ -1,20 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lcapitulino@redhat.com>) id 1ejo9f-0001vj-5R
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:30:32 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ejoAC-0002S5-IN
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lcapitulino@redhat.com>) id 1ejo9a-000207-NW
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:30:31 -0500
-Date: Thu, 8 Feb 2018 10:30:24 -0500
-From: Luiz Capitulino <lcapitulino@redhat.com>
-Message-ID: <20180208103024.35d962c9@redhat.com>
-In-Reply-To: <20180208162126.3426623b.cohuck@redhat.com>
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ejoA8-0002BI-Q5
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:31:04 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1ejoA8-0002Ay-Ho
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:31:00 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w18FQeHH134393
+	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 10:30:57 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g0s6n07jn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 10:30:57 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Thu, 8 Feb 2018 15:30:54 -0000
 References: <1518083288-20410-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<20180208090904.5a9c88df@redhat.com>
-	<20180208162126.3426623b.cohuck@redhat.com>
+	<3e34d51f-e4d1-a69b-1fac-c4d1982834c2@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Thu, 8 Feb 2018 16:30:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <3e34d51f-e4d1-a69b-1fac-c4d1982834c2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Message-Id: <4fd72954-ed19-fe96-f7b6-d238a373c71c@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] S390: Expose s390-specific CPU info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,67 +42,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, 8 Feb 2018 16:21:26 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 08.02.2018 16:19, Eric Blake wrote:
+>=20
+> Missing a documentation line that mentions when the enum grew. Also, ha=
+s
+> a conflict with this other proposed addition, which demonstrates what
+> the documentation should look like (should be easy to resolve, though):
+> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01986.html
+>=20
+Good pointer, thanks. So the enum conflict would be resolved on a
+first-to-ack base?
+>=20
+>> =C2=A0 ##
+>> +# @CpuInfoS390State:
+>> +#
+>> +# An enumeration of cpu states that can be assumed by a virtual
+>> +# S390 CPU
+>> +#
+>> +# Since: 2.12
+>> +##
+>> +{ 'enum': 'CpuInfoS390State',
+>> +=C2=A0 'data': [ 'uninitialized', 'stopped', 'check_stop', 'operating=
+',
+>> 'load' ] }
+>> +
+>=20
+> Is there a consistency reason for naming this 'check_stop', or can we g=
+o
+> with our preference for using dash 'check-stop'?
+No specific reason, I've based that on the definitions previously in
+target/s390x/cpu.h, same thing for cpu-state. Will update.
+>=20
+>> +##
+>> +# @CpuInfoS390:
+>> +#
+>> +# Additional information about a virtual S390 CPU
+>> +#
+>> +# @cpu_state: the CPUs state
+>> +#
+>> +# Since: 2.12
+>> +##
+>> +{ 'struct': 'CpuInfoS390', 'data': { 'cpu_state': 'CpuInfoS390State' =
+} }
+>=20
+> Likewise for 'cpu-state'
+>=20
 
-> On Thu, 8 Feb 2018 09:09:04 -0500
-> Luiz Capitulino <lcapitulino@redhat.com> wrote:
-> 
-> > On Thu,  8 Feb 2018 10:48:08 +0100
-> > Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
-> >   
-> > > Presently s390x is the only architecture not exposing specific
-> > > CPU information via QMP query-cpus. Upstream discussion has shown
-> > > that it could make sense to report the architecture specific CPU
-> > > state, e.g. to detect that a CPU has been stopped.    
-> > 
-> > I'd very strongly advise against extending query-cpus. Note that the
-> > latency problems with query-cpus exists in all archs, it's just a
-> > matter of time for it to pop up for s390 use-cases too.
-> > 
-> > I think there's three options for this change:
-> > 
-> >  1. If this doesn't require interrupting vCPU threads, then you
-> >     could rebase this on top of query-cpus-fast  
-> 
-> From my perspective, rebasing on top of query-cpus-fast looks like a
-> good idea. This would imply that we need architecture-specific fields
-> for the new interface as well, though.
 
-That's not a problem. I mean, to be honest I think I'd slightly prefer
-to keep things separate and add a new command for each arch that needs
-its specific information, but that's just personal preference. The only
-strong requirement for query-cpus-fast is that it doesn't interrupt
-vCPU threads.
-
-> 
-> > 
-> >  2. If you plan to keep adding s390 state/registers to QMP commands,
-> >     then you could consider adding a query-s390-cpu-state or add
-> >     a query-cpu-state command that accepts the arch name as a parameter  
-> 
-> Personally, I don't see a need for more fields. But maybe I'm just
-> unimaginative.
-> 
-> > 
-> >  3. If you end up needing to expose state that actually needs an
-> >     ioctl, then we should consider porting info registers to QMP
-> >   
-> > > 
-> > > With this change the output of query-cpus will look like this on
-> > > s390:
-> > > 
-> > >     [{"arch": "s390", "current": true,
-> > >       "props": {"core-id": 0}, "cpu_state": "operating", "CPU": 0,
-> > >       "qom_path": "/machine/unattached/device[0]",
-> > >       "halted": false, "thread_id": 63115},
-> > >      {"arch": "s390", "current": false,
-> > >       "props": {"core-id": 1}, "cpu_state": "stopped", "CPU": 1,
-> > >       "qom_path": "/machine/unattached/device[1]",
-> > >       "halted": true, "thread_id": 63116}]
-> > > 
-> > > Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>  
-> 
+--=20
+Regards,
+ Viktor Mihajlovski
