@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejvdc-0001IY-2r
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:29:57 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ejvhd-000431-Ta
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejvda-0001cV-RM
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:29:56 -0500
-References: <20180208192328.16550-1-kwolf@redhat.com>
-	<20180208192328.16550-5-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <78712c7a-a8f0-5d7b-d1f5-d37fcb178655@redhat.com>
-Date: Thu, 8 Feb 2018 17:29:41 -0600
+	(envelope-from <alistair23@gmail.com>) id 1ejvhc-0005aW-Sm
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:34:05 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ejvhc-0005Zi-Lu
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:34:04 -0500
+Received: by mail-lf0-x244.google.com with SMTP id k19so8782950lfj.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 15:34:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180208192328.16550-5-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/27] qcow2: Pass BlockdevCreateOptions to
- qcow2_create2()
+In-Reply-To: <CAFEAcA_XagA3SuqNTHd06nH4nTXTNztRBAYOQxF8cJmaVXBhoQ@mail.gmail.com>
+References: <1517776881-14115-1-git-send-email-rbraun@sceen.net>
+	<CAFEAcA_XagA3SuqNTHd06nH4nTXTNztRBAYOQxF8cJmaVXBhoQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 8 Feb 2018 15:33:32 -0800
+Message-ID: <CAKmqyKOecR8kg3ec1jNbxV+VmZFeQw+sjC8LGBNAaR6pcOwrHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/char/stm32f2xx_usart: improve TXE/TC
+ bit handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,122 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Braun <rbraun@sceen.net>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 02/08/2018 01:23 PM, Kevin Wolf wrote:
-> All of the simple options are now passed to qcow2_create2() in a
-> BlockdevCreateOptions object. Still missing: node-name and the
-> encryption options.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block/qcow2.c | 190 ++++++++++++++++++++++++++++++++++++++++++++++------------
->   1 file changed, 152 insertions(+), 38 deletions(-)
-> 
+On Thu, Feb 8, 2018 at 6:58 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 4 February 2018 at 20:41, Richard Braun <rbraun@sceen.net> wrote:
+>> Consider that data is always immediately sent. As a result, keep
+>> the SR_TXE and SR_TC bits always set. In addition, fix the reset value
+>> of the USART status register.
+>
+> Do you know what the data sheet means when it says that TC
+> can be cleared by "a read from the USART_SR register followed
+> by a write to the USART_DR register" ?
 
-> -static size_t qcow2_opt_get_cluster_size_del(QemuOpts *opts, Error **errp)
-> +static bool validate_cluster_size(size_t cluster_size, Error **errp)
->   {
-> -    size_t cluster_size;
-> -    int cluster_bits;
-> -
-> -    cluster_size = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE,
-> -                                         DEFAULT_CLUSTER_SIZE);
-> -    cluster_bits = ctz32(cluster_size);
-> +    int cluster_bits = ctz32(cluster_size);
->       if (cluster_bits < MIN_CLUSTER_BITS || cluster_bits > MAX_CLUSTER_BITS ||
->           (1 << cluster_bits) != cluster_size)
+I'm not sure if they have to be consecutive or as long as they
+eventually happen it's fine.
 
-Pre-existing, but why are we manually calling ctz32() instead of using 
-is_power_of_2()?
+I no longer have HW to test on so it's hard to say.
 
-> @@ -2720,10 +2726,92 @@ static int qcow2_create2(BlockDriverState *bs, int64_t total_size,
->        */
->       BlockBackend *blk;
->       QCowHeader *header;
-> +    size_t cluster_size;
-> +    int version;
-> +    int refcount_order;
->       uint64_t* refcount_table;
->       Error *local_err = NULL;
->       int ret;
->   
-> +    /* Validate options and set default values */
-> +    assert(create_options->driver == BLOCKDEV_DRIVER_QCOW2);
-> +    qcow2_opts = &create_options->u.qcow2;
-> +
-> +    if (!QEMU_IS_ALIGNED(qcow2_opts->size, BDRV_SECTOR_SIZE)) {
-> +        error_setg(errp, "Image size must be a multiple of 512 bytes");
-> +        ret = -EINVAL;
-> +        goto out;
-> +    }
+>
+> If we supported interrupts properly (which we don't seem to)
+> I suspect we'd need something more than "TXE and TC are always set",
+> or the guest would probably never clear the TXE and TC interrupts.
+>
+> cc'ing Alistair, who wrote the stm32 USART code.
+>
+>> Signed-off-by: Richard Braun <rbraun@sceen.net>
+>> ---
+>>  hw/char/stm32f2xx_usart.c         | 4 ----
+>>  include/hw/char/stm32f2xx_usart.h | 7 ++++++-
+>>  2 files changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+>> index 07b462d4b6..a914f98a2a 100644
+>> --- a/hw/char/stm32f2xx_usart.c
+>> +++ b/hw/char/stm32f2xx_usart.c
+>> @@ -96,12 +96,10 @@ static uint64_t stm32f2xx_usart_read(void *opaque, hwaddr addr,
+>>      switch (addr) {
+>>      case USART_SR:
+>>          retvalue = s->usart_sr;
+>> -        s->usart_sr &= ~USART_SR_TC;
 
-This check looks new.  Does it really belong in this patch?  And it does 
-NOT match what qemu-img can currently do, nor the fact that qcow2 
-supports byte-based addressing:
+This does seem to be the wrong behavior. It should be cleared after
+writing to the USART_DR register (and after this read).
 
-$ qemu-img create -f qcow2 tmp 12345
-Formatting 'tmp', fmt=qcow2 size=12345 cluster_size=65536 
-lazy_refcounts=off refcount_bits=16
+>>          qemu_chr_fe_accept_input(&s->chr);
+>>          return retvalue;
+>>      case USART_DR:
+>>          DB_PRINT("Value: 0x%" PRIx32 ", %c\n", s->usart_dr, (char) s->usart_dr);
+>> -        s->usart_sr |= USART_SR_TXE;
 
-> +    if (!qcow2_opts->has_lazy_refcounts) {
-> +        qcow2_opts->lazy_refcounts = false;
-> +    }
-> +    if (version < 3 && qcow2_opts->lazy_refcounts) {
-> +        error_setg(errp, "Lazy refcounts only supported with compatibility "
-> +                   "level 1.1 and above (use compat=1.1 or greater)");
+Doesn't software expect this to be set? Maybe this was just a nasty
+workaround to ensure it was set at some point.
 
-Do we want to reword this error message at all, now that QMP spells it 
-'v3'?  Should qemu-img be taught to accept 'compat=v3' as a synonym to 
-'compat=1.1'?
+>>          s->usart_sr &= ~USART_SR_RXNE;
+>>          qemu_chr_fe_accept_input(&s->chr);
+>>          qemu_set_irq(s->irq, 0);
+>> @@ -151,8 +149,6 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
+>>              /* XXX this blocks entire thread. Rewrite to use
+>>               * qemu_chr_fe_write and background I/O callbacks */
+>>              qemu_chr_fe_write_all(&s->chr, &ch, 1);
+>> -            s->usart_sr |= USART_SR_TC;
+>> -            s->usart_sr &= ~USART_SR_TXE;
+>
+> The guest can clear the TC and TXE bits by writing to the USART_SR
+> directly, so this code should set both of them, I think ?
 
-> +        return -EINVAL;
-> +    }
-> +
-> +    if (!qcow2_opts->has_refcount_bits) {
-> +        qcow2_opts->refcount_bits = 16;
-> +    }
-> +    if (qcow2_opts->refcount_bits > 64 ||
-> +        !is_power_of_2(qcow2_opts->refcount_bits))
-> +    {
-> +        error_setg(errp, "Refcount width must be a power of two and may not "
-> +                   "exceed 64 bits");
-> +        return -EINVAL;
-> +    }
-> +    if (version < 3 && qcow2_opts->refcount_bits != 16) {
-> +        error_setg(errp, "Different refcount widths than 16 bits require "
-> +                   "compatibility level 1.1 or above (use compat=1.1 or "
-> +                   "greater)");
+Shouldn't this clear both?
 
-and again
+TXE: "It is cleared by a write to the USART_DR register."
+TC: "a read from the USART_SR register followed by a write to the
+USART_DR register"
 
-> @@ -2978,9 +3068,33 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
->       }
->   
->       /* Create the qcow2 image (format layer) */
-> -    ret = qcow2_create2(bs, size, backing_file, backing_fmt, flags,
-> -                        cluster_size, prealloc, opts, version, refcount_order,
-> -                        encryptfmt, errp);
-> +    create_options = (BlockdevCreateOptions) {
-> +        .driver         = BLOCKDEV_DRIVER_QCOW2,
-> +        .u.qcow2        = {
-> +            .file               = &(BlockdevRef) {
-> +                .type               = QTYPE_QSTRING,
-> +                .u.reference        = bs->node_name,
-> +            },
-> +            .size               = size,
-> +            .has_version        = true,
-> +            .version            = version == 2
-> +                                  ? BLOCKDEV_QCOW2_VERSION_V2
-> +                                  : BLOCKDEV_QCOW2_VERSION_V3,
-> +            .has_backing_file   = (backing_file != NULL),
-> +            .backing_file       = backing_file,
-> +            .has_backing_fmt    = (backing_fmt != NULL),
+I guess the TC should only clear after a read though.
 
-I might have spelled it '= !!backing_fmt', but your way is fine too.
+>
+>>          }
+>>          return;
+>>      case USART_BRR:
+>> diff --git a/include/hw/char/stm32f2xx_usart.h b/include/hw/char/stm32f2xx_usart.h
+>> index 9d03a7527c..bbba3965a1 100644
+>> --- a/include/hw/char/stm32f2xx_usart.h
+>> +++ b/include/hw/char/stm32f2xx_usart.h
+>> @@ -37,7 +37,12 @@
+>>  #define USART_CR3  0x14
+>>  #define USART_GTPR 0x18
+>>
+>> -#define USART_SR_RESET 0x00C00000
+>> +/*
+>> + * XXX The reset value mentioned in 24.6.1 Status register seems bogus.
+>> + * Looking at Table 98 USART register map and reset values, it seems it
+>> + * should be 0xc0, and that's how real hardware behaves.
+>> + */
+>> +#define USART_SR_RESET (USART_SR_TXE | USART_SR_TC)
+>>
+>>  #define USART_SR_TXE  (1 << 7)
+>>  #define USART_SR_TC   (1 << 6)
+>
+> Yep, I agree that the previous reset value was wrong.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Ah, that is confusing that it's different in different places. The new
+one looks fine though.
+
+Alistair
+
+>
+> thanks
+> -- PMM
+>
