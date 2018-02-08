@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpOR-0000Gj-TE
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejpOR-0000G8-Ct
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpOR-0004TA-6U
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejpOQ-0004Sf-K6
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:51 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Feb 2018 13:48:15 -0300
-Message-Id: <20180208164818.7961-28-f4bug@amsat.org>
-In-Reply-To: <20180208164818.7961-1-f4bug@amsat.org>
-References: <20180208164818.7961-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 27/30] hw/arm/xilinx_zynqmp: enable the
- UHS-I mode
+In-Reply-To: <CAFEAcA8Hjsb+KW4A0ks696+zXOeDErndeQDFvOqshyONpyaSSg@mail.gmail.com>
+References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
+	<20180207042438.15422-13-andrew.smirnov@gmail.com>
+	<CAFEAcA8Hjsb+KW4A0ks696+zXOeDErndeQDFvOqshyONpyaSSg@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Thu, 8 Feb 2018 08:49:46 -0800
+Message-ID: <CAHQ1cqGQaWiqY1Hg514frugOE4-kUAxXFgFvX4-Gs5tDRgcsMQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 12/14] i.MX: Add i.MX7 SOC
+ implementation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +24,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-see the Xilinx datasheet "UG1085" (v1.7)
+On Thu, Feb 8, 2018 at 5:26 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 7 February 2018 at 04:24, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>> The following interfaces are partially or fully emulated:
+>
+> Hi Andrey. I was just going through this series to apply to
+> target-arm.next, and I noticed that fsl-imx7.c is GPL-2-or-later,
+> but fsl-imx7.h is GPL-2-only. Is that intentional?
+>
+> If this is just an accidental error, and you send an email to
+> say you meant 2-or-later, then I can fix this in my target-arm
+> tree by copying the license paragraphs from fsl-imx7.c to fsl-imx7.h.
+>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- hw/arm/xlnx-zynqmp.c | 1 +
- 1 file changed, 1 insertion(+)
+This is just a mistake on my part. Feel free to change to whatever
+makes most sense.
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index e39ad73bec..4b93a3abd2 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -400,6 +400,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-          */
-         object_property_set_uint(sdhci, 3, "sd-spec-version", &err);
-         object_property_set_uint(sdhci, SDHCI_CAPABILITIES, "capareg", &err);
-+        object_property_set_uint(sdhci, UHS_I, "uhs", &err);
-         object_property_set_bool(sdhci, true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
--- 
-2.16.1
+Thanks,
+Andrey Smrinov
