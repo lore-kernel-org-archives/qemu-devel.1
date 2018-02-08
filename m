@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejnbi-0004qc-9i
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:55:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1ejncS-0005S0-92
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ejnbc-0004z1-Go
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:55:26 -0500
-References: <20180208132336.6519-1-edgar.kaziakhmedov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <60f2b126-21f2-c46b-d4c9-143b28b1f613@redhat.com>
-Date: Thu, 8 Feb 2018 08:54:57 -0600
+	(envelope-from <bounces@canonical.com>) id 1ejncN-0005Mp-3r
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47892)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ejncM-0005MU-QD
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:56:07 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ejncL-0007oj-BV
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 14:56:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5141B2E80C7
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 14:56:05 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180208132336.6519-1-edgar.kaziakhmedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: increase maximum size of the
- PWRITE_ZERO request
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Feb 2018 14:36:05 -0000
+From: Launchpad Bug Tracker <1484990@bugs.launchpad.net>
+Reply-To: Bug 1484990 <1484990@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150814145418.19376.19961.malonedeb@wampee.canonical.com>
+Message-Id: <151810057273.12722.11712838217686769647.malone@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1484990] Re: fsfreeze-hook script should also
+ ignored dpkg generated files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +37,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
+To: qemu-devel@nongnu.org
 
-On 02/08/2018 07:23 AM, Edgar Kaziakhmedov wrote:
-> Upstream NBD protocol implementation supports an efficient zero out
-> mechanism over the wire, along with the ability to check whether a
-> client allows using a hole.
-> 
-> Accordingly, since PWRITE_ZERO doesn't involve any payload on the wire,
-> increase a maximum size of the PWRITE_ZERO request up to 1Gb (aligned).
-> Moreover, such change will decrease the number of PWRITE_ZERO NBD commands
-> in comparison with the current 32M limit. The benefits of
-> the larger constraint can be examined in a block mirroring over NBD.
+This bug was fixed in the package qemu - 1:2.11+dfsg-1ubuntu1
 
-We've got a potential problem.  Unless you have out-of-band 
-communication of the maximum NBD_CMD_WRITE_ZEROES sizing (or if the NBD 
-protocol is enhanced to advertise that as an additional piece of block 
-size information during NBD_OPT_GO), then a client CANNOT assume that 
-the server will accept a request this large.  We MIGHT get lucky if all 
-existing servers that accept WRITE_ZEROES requests either act on large 
-requests or reply with EINVAL but do not outright drop the connection 
-(which is different from servers that DO outright drop the connection 
-for an NBD_CMD_WRITE larger than 32M).  But I don't know if that's how 
-all servers behave, so sending a too-large WRITE_ZEROES request may have 
-the unintended consequence of killing the connection.
+---------------
+qemu (1:2.11+dfsg-1ubuntu1) bionic; urgency=3Dmedium
 
-I'm adding the NBD list; perhaps before accepting this into qemu, I 
-should revive my earlier attempt at codifying an NBD_OPT_GO info 
-advertisement for maximum trim/zero sizing, which would let clients have 
-a guarantee that their choice of sizing won't cause unexpected failures.
+  * Merge with Debian testing, among other fixes this includes
+    - fix fatal error on negative maxcpus (LP: #1722495)
+    - fix segfault on dump-guest-memory on guests without memory (LP: #1723=
+381)
+    - linux user threading issues (LP: #1350435)
+    - TOD-Clock Epoch Extension Support on s390x (LP: #1732691)
+    Remaining changes:
+    - qemu-kvm to systemd unit
+      - d/qemu-kvm-init: script for QEMU KVM preparation modules, ksm,
+        hugepages and architecture specifics
+      - d/qemu-kvm.service: systemd unit to call qemu-kvm-init
+      - d/qemu-system-common.install: install systemd unit and helper script
+      - d/qemu-system-common.maintscript: clean old sysv and upstart scripts
+      - d/qemu-system-common.qemu-kvm.default: defaults for
+        /etc/default/qemu-kvm
+      - d/rules: install /etc/default/qemu-kvm
+    - Enable nesting by default
+      - set nested=3D1 module option on intel. (is default on amd)
+      - re-load kvm_intel.ko if it was loaded without nested=3D1
+      - d/p/ubuntu/expose-vmx_qemu64cpu.patch: expose nested kvm by default
+        in qemu64 cpu type.
+      - d/p/ubuntu/enable-svm-by-default.patch: Enable nested svm by default
+        in qemu64 on amd
+    - libvirt/qemu user/group support
+      - qemu-system-common.postinst: remove acl placed by udev, and add ude=
+vadm
+        trigger.
+      - qemu-system-common.preinst: add kvm group if needed
+    - Distribution specific machine type
+      - d/p/ubuntu/define-ubuntu-machine-types.patch: define distro machine
+        types to ease future live vm migration.
+      - d/qemu-system-x86.NEWS Info on fixed machine type defintions
+    - improved dependencies
+      - Make qemu-system-common depend on qemu-block-extra
+      - Make qemu-utils depend on qemu-block-extra
+      - let qemu-utils recommend sharutils
+    - s390x support
+      - Create qemu-system-s390x package
+      - Include s390-ccw.img firmware
+      - Enable numa support for s390x
+    - ppc64[le] support
+      - d/qemu-system-ppc.links provide usr/bin/qemu-system-ppc64le symlink
+    - arch aware kvm wrappers
+  * Added Changes
+    - update VCS-git to match the bionic branch
+    - sdl2 is yet too unstable for the LTS Ubuntu release given the reports
+      we still see upstream and in Debian - furthermore sdl2 isn't in main =
+yet,
+      so we revert related changes to stick with the proven for now:
+      - 0fd25810 - do not build-depend on libx11-dev (libsdl2-dev already
+                   depends on it)
+      - 9594f820 - switch from sdl1.2 to sdl2 (#870025)
+    - d/qemu-system-x86.README.Debian: document intention of nested being
+      default is comfort, not full support
+    - update Ubuntu machine types for qemu 2.11
+    - qemu-guest-agent: freeze-hook fixes (LP: #1484990)
+      - d/p/guest-agent-freeze-hook-skip-dpkg-artifacts.patch
+      - d/qemu-guest-agent.install: provide /etc/qemu/fsfreeze-hook
+      - d/qemu-guest-agent.dirs: provide /etc/qemu/fsfreeze-hook.d
+    - Create and install pxe netboot images for KVM s390x (LP: #1732094)
+      - d/rules enable install s390x-netboot.img
+      - debian/patches/ubuntu/partial-SLOF-for-s390x-netboot-compilation.pa=
+tch
+    - d/control-in: enable RDMA support in qemu (LP: #1692476)
+    - on s390x provide facility bits 81 (ppa15) and 82 (bpb) (LP: #1743560)
+      - d/p/ubuntu/linux-headers-update-to-4.15-rc1.patch
+      - d/p/ubuntu/linux-headers-update-4.15-rc9.patch
+      - d/p/ubuntu/lp1743560-s390x-kvm-Handle-bpb-feature.patch
+      - d/p/ubuntu/lp1743560-s390x-kvm-provide-stfle.81.patch
+    - tolerate ipxe size change on migrations to >=3D18.04 (LP: #1713490)
+      - d/p/ubuntu/pre-bionic-256k-ipxe-efi-roms.patch: old machine types
+        reference 256k path
+      - d/control: depend on ipxe-qemu-256k-compat-efi-roms to be able to
+        handle incoming migrations from former releases.
+    - d/control-in: enable seccomp on s390x
+  * Dropped changes (no more needed):
+    - Dropped VHOST_NET_ENABLED and KVM_HUGEPAGES from /etc/default/qemu-kvm
+      The functionality is retained for upgraders, but is deprecated.
+      Post 18.04 the implementation for these configurations will be remove=
+d.
+  * Dropped changes (in Debian now):
+    - ppc64[le] support
+      - Enable seccomp for ppc64el
+      - bump libseccomp-dev dependency, 2.3 is the minimum for ppc64
+    - disable missing x32 architecture
+    - d/rules: or32 is now named or1k (since 4a09d0bb)
+    - d/qemu-system-common.docs: new paths since (ac06724a)
+    - d/qemu-system-common.install: qmp-commands.txt removed, but replaced
+      by qapi-schema.json which is already packaged (since 4d8bb958)
+    - d/p/02_kfreebsd.patch: utimensat is no more optional upstream (Update
+      to Debian patch to match qemu 2.10)
+    - d/qemu-system-common.docs: adapt new path of live-block-operations.rst
+      since 8508eee7
+    - d/qemu-system-common.docs: adapt q35 config paths since 9ca019c1
+    - make nios2/hppa not installed explicitly until further stablized
+    - d/qemu-guest-agent.install: add the new guest agent reference man page
+      qemu-ga-ref
+    - d/qemu-system-common.install: add the now generated qapi/qmp reference
+      along the qapi intro
+    - d/not-installed: ignore further generated (since 56e8bdd4) files in
+      dh_missing that are already provided in other formats qemu-doc,
+      qemu-qmp-ref,qemu-ga-ref
+  * Dropped changes (integrated upstream):
+    - d/p/detect-ITS-and-skip-usage-on-older-kernel.patch to avoid crashes
+      on arm64 when doing suspend/resume and reboots due to older kernels n=
+ot
+      supporting ITS (LP 1731051).
+    - Apply linux-user-return-EINVAL-from-prctl-PR_-_SECCOMP.patch from
+      James Cowgill to prevent qemu-user from forwarding prctl seccomp
+      calls (LP 1726394)
+    - update to upstream 2.10.1 point release (LP 1722808)
 
-> 
-> Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-> ---
->   block/nbd.c         | 2 +-
->   include/block/nbd.h | 3 +++
->   2 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/nbd.c b/block/nbd.c
-> index 94220f6d14..3641d9244e 100644
-> --- a/block/nbd.c
-> +++ b/block/nbd.c
-> @@ -477,7 +477,7 @@ static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
->       uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
-> 
->       bs->bl.max_pdiscard = max;
-> -    bs->bl.max_pwrite_zeroes = max;
-> +    bs->bl.max_pwrite_zeroes = NBD_MAX_PWRITE_ZERO_SIZE;
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 22 Jan
+2018 14:35:18 +0100
 
-max_discard should get the same treatment, whatever we decide (yes, it 
-is feasible that a server may have different limits for NBD_CMD_TRIM 
-than for NBD_CMD_WRITE_ZEROES, but in general, it's probably easier if 
-both commands share theh same limit as both have very similar 
-implementations).
+** Changed in: qemu (Ubuntu)
+       Status: Fix Committed =3D> Fix Released
 
->       bs->bl.max_transfer = max;
-> 
->       if (s->info.opt_block &&
-> diff --git a/include/block/nbd.h b/include/block/nbd.h
-> index ee74ec391a..e2f18e2332 100644
-> --- a/include/block/nbd.h
-> +++ b/include/block/nbd.h
-> @@ -182,6 +182,9 @@ enum {
->   /* Maximum size of a single READ/WRITE data buffer */
->   #define NBD_MAX_BUFFER_SIZE (32 * 1024 * 1024)
-> 
-> +/* Maximum size of a single PWRITE_ZERO request 1Gb */
-> +#define NBD_MAX_PWRITE_ZERO_SIZE (1024 * 1024 * 1024)
-> +
->   /* Maximum size of an export name. The NBD spec requires 256 and
->    * suggests that servers support up to 4096, but we stick to only the
->    * required size so that we can stack-allocate the names, and because
-> --
-> 2.11.0
-> 
-> 
+-- =
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1484990
+
+Title:
+  fsfreeze-hook script should also ignored dpkg generated files
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Fix Released
+
+Bug description:
+  Hello,
+
+  In the fsfreeze-hook script, the following code check if some of the
+  files should be ignored:
+
+  =
+
+  # Check whether file $1 is a backup or rpm-generated file and should be i=
+gnored
+  is_ignored_file() {
+      case "$1" in
+          *~ | *.bak | *.orig | *.rpmnew | *.rpmorig | *.rpmsave | *.sample)
+              return 0 ;;
+      esac
+      return 1
+  }
+
+  The functions should probably also skip dpkg generated files.
+
+  I've found a list of the different extensions in the systemd source
+  tree:
+  https://github.com/systemd/systemd/blob/master/src/basic/util.c#L1871
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1484990/+subscriptions
