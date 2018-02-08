@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ejk61-0006Iz-O6
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:10:31 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ejk6D-0006W5-Ng
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ejk5y-0005IM-33
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:10:29 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60240 helo=mx1.redhat.com)
+	(envelope-from <eric.auger@redhat.com>) id 1ejk6A-0005N9-ET
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:10:41 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36040 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1ejk5x-0005F9-P1
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:10:25 -0500
+	id 1ejk6A-0005Mx-8d
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:10:38 -0500
 References: <20180207001615.1156.10547.stgit@gimli.home>
-	<20180207002632.1156.53770.stgit@gimli.home>
+	<20180207002615.1156.74568.stgit@gimli.home>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <983af1c6-a57a-43d8-2237-88e0d736905f@redhat.com>
-Date: Thu, 8 Feb 2018 12:10:02 +0100
+Message-ID: <b48b5e4d-dc91-acc4-1e72-45c287e9a597@redhat.com>
+Date: Thu, 8 Feb 2018 12:10:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180207002632.1156.53770.stgit@gimli.home>
+In-Reply-To: <20180207002615.1156.74568.stgit@gimli.home>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/5] vfio/quirks: Automatic ioeventfd
- enabling for NVIDIA BAR0 quirks
+Subject: Re: [Qemu-devel] [RFC PATCH 1/5] vfio/quirks: Add common quirk
+ alloc helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,193 +33,144 @@ To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org
 
 Hi Alex,
-
 On 07/02/18 01:26, Alex Williamson wrote:
-> Record data writes that come through the NVIDIA BAR0 quirk, if we get
-> enough in a row that we're only passing through, automatically enable
-> an ioeventfd for it.  The primary target for this is the MSI-ACK
-> that NVIDIA uses to allow the MSI interrupt to re-trigger, which is a
-> 4-byte write, data value 0x0 to offset 0x704 into the quirk, 0x88704
-> into BAR0 MMIO space.  For an interrupt latency sensitive micro-
-> benchmark, this takes us from 83% of performance versus disabling the
-> quirk entirely (which GeForce cannot do), to to almost 90%.
+> This will later be used to include list initialization
 > 
 > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 > ---
->  hw/vfio/pci-quirks.c |   89 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  hw/vfio/pci.h        |    2 +
->  2 files changed, 89 insertions(+), 2 deletions(-)
+>  hw/vfio/pci-quirks.c |   48 +++++++++++++++++++++---------------------------
+>  1 file changed, 21 insertions(+), 27 deletions(-)
 > 
 > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index e4cf4ea2dd9c..e739efe601b1 100644lg
-
+> index e5779a7ad35b..10af23217292 100644
 > --- a/hw/vfio/pci-quirks.c
 > +++ b/hw/vfio/pci-quirks.c
-> @@ -203,6 +203,7 @@ typedef struct VFIOConfigMirrorQuirk {
->      uint32_t offset;
->      uint8_t bar;
->      MemoryRegion *mem;
-> +    uint8_t data[];
-Do you foresee other usages of data besides the LastDataSet?
->  } VFIOConfigMirrorQuirk;
+> @@ -275,6 +275,15 @@ static const MemoryRegionOps vfio_ati_3c3_quirk = {
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>  };
 >  
->  static uint64_t vfio_generic_quirk_mirror_read(void *opaque,
-> @@ -297,6 +298,50 @@ static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
->      g_free(ioeventfd);
->  }
->  
-add a comment? user handler in case kvm ioeventfd setup failed?
-> +static void vfio_ioeventfd_handler(void *opaque)
+> +static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
 > +{
-> +    VFIOIOEventFD *ioeventfd = opaque;
+> +    VFIOQuirk *quirk = g_malloc0(sizeof(*quirk));
+nit: Peter advised the usage of g_new0 as well for that kind of alloc.
+> +    quirk->mem = g_new0(MemoryRegion, nr_mem);
+> +    quirk->nr_mem = nr_mem;
 > +
-> +    if (event_notifier_test_and_clear(&ioeventfd->e)) {
-> +        vfio_region_write(ioeventfd->region, ioeventfd->region_addr,
-> +                          ioeventfd->data, ioeventfd->size);
-> +    }
-> +}
-> +
-> +static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
-> +                                          MemoryRegion *mr, hwaddr addr,
-> +                                          unsigned size, uint64_t data,
-> +                                          VFIORegion *region,
-> +                                          hwaddr region_addr)
-> +{
-> +    VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
-> +
-> +    if (event_notifier_init(&ioeventfd->e, 0)) {
-> +        g_free(ioeventfd);
-> +        return NULL;
-> +    }
-> +
-> +    ioeventfd->mr = mr;
-> +    ioeventfd->addr = addr;
-> +    ioeventfd->size = size;
-> +    ioeventfd->match_data = true;
-> +    ioeventfd->data = data;
-> +    ioeventfd->region = region;
-> +    ioeventfd->region_addr = region_addr;
-I found difficult to follow the different addr semantic.
-I understand region_add is the offset % bar and addr is the offset %
-mirror region. Maybe more explicit names would help (region = bar_region
-and region_addr = bar_offset)
-> +
-> +    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> +                        vfio_ioeventfd_handler, NULL, ioeventfd);
-> +    memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr,
-> +                              ioeventfd->size, ioeventfd->match_data,
-> +                              ioeventfd->data, &ioeventfd->e);
-> +
-> +    info_report("Enabled automatic ioeventfd acceleration for %s region %d, "
-> +                "offset 0x%"HWADDR_PRIx", data 0x%"PRIx64", size %u",
-> +                vdev->vbasedev.name, region->nr, region_addr, data, size);
-> +
-> +    return ioeventfd;
+> +    return quirk;
 > +}
 > +
 >  static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
 >  {
 >      VFIOQuirk *quirk;
-> @@ -732,6 +777,13 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
->      trace_vfio_quirk_nvidia_bar5_probe(vdev->vbasedev.name);
->  }
->  
-> +typedef struct LastDataSet {
-> +    hwaddr addr;
-> +    uint64_t data;
-> +    unsigned size;
-> +    int count;
-> +} LastDataSet;
-> +
->  /*
->   * Finally, BAR0 itself.  We want to redirect any accesses to either
->   * 0x1800 or 0x88000 through the PCI config space access functions.
-> @@ -742,6 +794,7 @@ static void vfio_nvidia_quirk_mirror_write(void *opaque, hwaddr addr,
->      VFIOConfigMirrorQuirk *mirror = opaque;
->      VFIOPCIDevice *vdev = mirror->vdev;
->      PCIDevice *pdev = &vdev->pdev;
-> +    LastDataSet *last = (LastDataSet *)&mirror->data;
->  
->      vfio_generic_quirk_mirror_write(opaque, addr, data, size);
->  
-> @@ -756,6 +809,38 @@ static void vfio_nvidia_quirk_mirror_write(void *opaque, hwaddr addr,
->                            addr + mirror->offset, data, size);
->          trace_vfio_quirk_nvidia_bar0_msi_ack(vdev->vbasedev.name);
+> @@ -288,9 +297,7 @@ static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
+>          return;
 >      }
-> +
-> +    /*
-> +     * Automatically add an ioeventfd to handle any repeated write with the
-> +     * same data and size above the standard PCI config space header.  This is
-> +     * primarily expected to accelerate the MSI-ACK behavior, such as noted
-> +     * above.  Current hardware/drivers should trigger an ioeventfd at config
-> +     * offset 0x704 (region offset 0x88704), with data 0x0, size 4.
-> +     */
-> +    if (addr > PCI_STD_HEADER_SIZEOF) {
-> +        if (addr != last->addr || data != last->data || size != last->size) {
-> +            last->addr = addr;
-> +            last->data = data;
-> +            last->size = size;
-> +            last->count = 1;
-> +        } else if (++last->count > 10) {
-So here is the naive question about the "10" choice and also the fact
-this needs to be consecutive accesses. I guess you observed this works
-but at first sight this is not obvious to me.
-
-Does anyone check potential overlaps between ioeventfd's [addr, addr +
-size -1]?
-> +            VFIOIOEventFD *ioeventfd;
-> +
-> +            ioeventfd = vfio_ioeventfd_init(vdev, mirror->mem, addr, size, data,
-> +                                            &vdev->bars[mirror->bar].region,
-> +                                            mirror->offset + addr);
-> +            if (ioeventfd) {
-> +                VFIOQuirk *quirk;
-> +
-> +                QLIST_FOREACH(quirk, &vdev->bars[mirror->bar].quirks, next) {
-> +                    if (quirk->data == mirror) {
-> +                        QLIST_INSERT_HEAD(&quirk->ioeventfds, ioeventfd, next);
-> +                        break;
-> +                    }
-> +                }
-> +            }
-> +        }
-> +    }
+>  
+> -    quirk = g_malloc0(sizeof(*quirk));
+> -    quirk->mem = g_new0(MemoryRegion, 1);
+> -    quirk->nr_mem = 1;
+> +    quirk = vfio_quirk_alloc(1);
+>  
+>      memory_region_init_io(quirk->mem, OBJECT(vdev), &vfio_ati_3c3_quirk, vdev,
+>                            "vfio-ati-3c3-quirk", 1);
+> @@ -323,9 +330,7 @@ static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>          return;
+>      }
+>  
+> -    quirk = g_malloc0(sizeof(*quirk));
+> -    quirk->mem = g_new0(MemoryRegion, 2);
+> -    quirk->nr_mem = 2;
+> +    quirk = vfio_quirk_alloc(2);
+>      window = quirk->data = g_malloc0(sizeof(*window) +
+>                                       sizeof(VFIOConfigWindowMatch));
+>      window->vdev = vdev;
+> @@ -371,10 +376,9 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
+>          return;
+>      }
+>  
+> -    quirk = g_malloc0(sizeof(*quirk));
+> +    quirk = vfio_quirk_alloc(1);
+>      mirror = quirk->data = g_malloc0(sizeof(*mirror));
+> -    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
+> -    quirk->nr_mem = 1;
+> +    mirror->mem = quirk->mem;
+>      mirror->vdev = vdev;
+>      mirror->offset = 0x4000;
+>      mirror->bar = nr;
+> @@ -548,10 +552,8 @@ static void vfio_vga_probe_nvidia_3d0_quirk(VFIOPCIDevice *vdev)
+>          return;
+>      }
+>  
+> -    quirk = g_malloc0(sizeof(*quirk));
+> +    quirk = vfio_quirk_alloc(2);
+>      quirk->data = data = g_malloc0(sizeof(*data));
+> -    quirk->mem = g_new0(MemoryRegion, 2);
+> -    quirk->nr_mem = 2;
+>      data->vdev = vdev;
+>  
+>      memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_nvidia_3d4_quirk,
+> @@ -667,9 +669,7 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
+>          return;
+>      }
+>  
+> -    quirk = g_malloc0(sizeof(*quirk));
+> -    quirk->mem = g_new0(MemoryRegion, 4);
+> -    quirk->nr_mem = 4;
+> +    quirk = vfio_quirk_alloc(4);
+>      bar5 = quirk->data = g_malloc0(sizeof(*bar5) +
+>                                     (sizeof(VFIOConfigWindowMatch) * 2));
+>      window = &bar5->window;
+> @@ -762,10 +762,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
+>          return;
+>      }
+>  
+> -    quirk = g_malloc0(sizeof(*quirk));
+> +    quirk = vfio_quirk_alloc(1);
+>      mirror = quirk->data = g_malloc0(sizeof(*mirror));
+> -    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
+> -    quirk->nr_mem = 1;
+> +    mirror->mem = quirk->mem;
+>      mirror->vdev = vdev;
+>      mirror->offset = 0x88000;
+>      mirror->bar = nr;
+> @@ -781,10 +780,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
+>  
+>      /* The 0x1800 offset mirror only seems to get used by legacy VGA */
+>      if (vdev->vga) {
+> -        quirk = g_malloc0(sizeof(*quirk));
+> +        quirk = vfio_quirk_alloc(1);
+>          mirror = quirk->data = g_malloc0(sizeof(*mirror));
+> -        mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
+> -        quirk->nr_mem = 1;
+> +        mirror->mem = quirk->mem;
+>          mirror->vdev = vdev;
+>          mirror->offset = 0x1800;
+>          mirror->bar = nr;
+> @@ -945,9 +943,7 @@ static void vfio_probe_rtl8168_bar2_quirk(VFIOPCIDevice *vdev, int nr)
+>          return;
+>      }
+>  
+> -    quirk = g_malloc0(sizeof(*quirk));
+> -    quirk->mem = g_new0(MemoryRegion, 2);
+> -    quirk->nr_mem = 2;
+> +    quirk = vfio_quirk_alloc(2);
+>      quirk->data = rtl = g_malloc0(sizeof(*rtl));
+>      rtl->vdev = vdev;
+>  
+> @@ -1507,9 +1503,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>      }
+>  
+>      /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
+> -    quirk = g_malloc0(sizeof(*quirk));
+> -    quirk->mem = g_new0(MemoryRegion, 2);
+> -    quirk->nr_mem = 2;
+> +    quirk = vfio_quirk_alloc(2);
+>      igd = quirk->data = g_malloc0(sizeof(*igd));
+>      igd->vdev = vdev;
+>      igd->index = ~0;
+> 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
->  }
->  
->  static const MemoryRegionOps vfio_nvidia_mirror_quirk = {
-> @@ -776,7 +861,7 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
->      }
->  
->      quirk = vfio_quirk_alloc(1);
-> -    mirror = quirk->data = g_malloc0(sizeof(*mirror));
-> +    mirror = quirk->data = g_malloc0(sizeof(*mirror) + sizeof(LastDataSet));
->      mirror->mem = quirk->mem;
->      mirror->vdev = vdev;
->      mirror->offset = 0x88000;
-> @@ -794,7 +879,7 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
->      /* The 0x1800 offset mirror only seems to get used by legacy VGA */
->      if (vdev->vga) {
->          quirk = vfio_quirk_alloc(1);
-> -        mirror = quirk->data = g_malloc0(sizeof(*mirror));
-> +        mirror = quirk->data = g_malloc0(sizeof(*mirror) + sizeof(LastDataSet));
->          mirror->mem = quirk->mem;
->          mirror->vdev = vdev;
->          mirror->offset = 0x1800;
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index 146065c2f715..ec53b9935725 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -32,6 +32,8 @@ typedef struct VFIOIOEventFD {
->      bool match_data;
->      uint64_t data;
->      EventNotifier e;
-> +    VFIORegion *region;
-> +    hwaddr region_addr;
->  } VFIOIOEventFD;
->  
->  typedef struct VFIOQuirk {
-> 
