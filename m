@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejrnm-0002ql-QB
+	(envelope-from <kwolf@redhat.com>) id 1ejrnm-0002qj-Oo
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejrnl-0000lw-M8
+	(envelope-from <kwolf@redhat.com>) id 1ejrnl-0000m5-Oy
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:10 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  8 Feb 2018 20:23:04 +0100
-Message-Id: <20180208192328.16550-4-kwolf@redhat.com>
+Date: Thu,  8 Feb 2018 20:23:02 +0100
+Message-Id: <20180208192328.16550-2-kwolf@redhat.com>
 In-Reply-To: <20180208192328.16550-1-kwolf@redhat.com>
 References: <20180208192328.16550-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 03/27] qcow2: Let qcow2_create() handle
- protocol layer
+Subject: [Qemu-devel] [PATCH 01/27] block/qapi: Introduce
+ BlockdevCreateOptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +23,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Currently, qcow2_create() only parses the QemuOpts and then calls
-qcow2_create2() for the actual image creation, which includes both the
-creation of the actual file on the file system and writing a valid empty
-qcow2 image into that file.
-
-The plan is that qcow2_create2() becomes the function that implements
-the functionality for a future 'blockdev-create' QMP command, which only
-creates the qcow2 layer on an already opened file node.
-
-This is a first step towards that goal: Let's move out anything that
-deals with the protocol layer from qcow2_create2() into qcow2_create().
-This means that qcow2_create2() doesn't need a file name any more.
+This creates a BlockdevCreateOptions union type that will contain all of
+the options for image creation. We'll start out with an empty struct
+type BlockdevCreateDummy for all drivers.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2.c | 64 +++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 38 insertions(+), 26 deletions(-)
+ qapi/block-core.json | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 1f80961e1b..6134c0d40c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2698,7 +2698,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
-     return refcount_bits;
- }
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 8225308904..b59b1430bb 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3338,6 +3338,67 @@
+ { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
  
--static int qcow2_create2(const char *filename, int64_t total_size,
-+static int qcow2_create2(BlockDriverState *bs, int64_t total_size,
-                          const char *backing_file, const char *backing_format,
-                          int flags, size_t cluster_size, PreallocMode prealloc,
-                          QemuOpts *opts, int version, int refcount_order,
-@@ -2724,28 +2724,11 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-     Error *local_err = NULL;
-     int ret;
- 
--    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
--        int64_t prealloc_size =
--            qcow2_calc_prealloc_size(total_size, cluster_size, refcount_order);
--        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
--        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
--                     &error_abort);
--    }
--
--    ret = bdrv_create_file(filename, opts, &local_err);
-+    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-+    ret = blk_insert_bs(blk, bs, errp);
-     if (ret < 0) {
--        error_propagate(errp, local_err);
--        return ret;
--    }
--
--    blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
--                       &local_err);
--    if (blk == NULL) {
--        error_propagate(errp, local_err);
--        return -EIO;
-+        goto out;
-     }
--
-     blk_set_allow_write_beyond_eof(blk, true);
- 
-     /* Write the header */
-@@ -2800,7 +2783,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-      */
-     options = qdict_new();
-     qdict_put_str(options, "driver", "qcow2");
--    blk = blk_new_open(filename, NULL, options,
-+    qdict_put_str(options, "file", bs->node_name);
-+    blk = blk_new_open(NULL, NULL, options,
-                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
-                        &local_err);
-     if (blk == NULL) {
-@@ -2872,7 +2856,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-      */
-     options = qdict_new();
-     qdict_put_str(options, "driver", "qcow2");
--    blk = blk_new_open(filename, NULL, options,
-+    qdict_put_str(options, "file", bs->node_name);
-+    blk = blk_new_open(NULL, NULL, options,
-                        BDRV_O_RDWR | BDRV_O_NO_BACKING | BDRV_O_NO_IO,
-                        &local_err);
-     if (blk == NULL) {
-@@ -2902,6 +2887,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-     uint64_t refcount_bits;
-     int refcount_order;
-     char *encryptfmt = NULL;
-+    BlockDriverState *bs = NULL;
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -2970,12 +2956,38 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
- 
-     refcount_order = ctz32(refcount_bits);
- 
--    ret = qcow2_create2(filename, size, backing_file, backing_fmt, flags,
-+    /* Create and open the file (protocol layer) */
-+    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
-+        int64_t prealloc_size =
-+            qcow2_calc_prealloc_size(size, cluster_size, refcount_order);
-+        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
-+        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
-+                     &error_abort);
-+    }
+ ##
++# @BlockdevCreateNotSupported:
++#
++# This is used for all drivers that don't support creating images.
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateNotSupported', 'data': {}}
 +
-+    ret = bdrv_create_file(filename, opts, errp);
-+    if (ret < 0) {
-+        goto finish;
-+    }
++##
++# @BlockdevCreateOptions:
++#
++# Options for creating an image format on a given node.
++#
++# @driver           block driver to create the image format
++#
++# Since: 2.12
++##
++{ 'union': 'BlockdevCreateOptions',
++  'base': {
++      'driver':         'BlockdevDriver' },
++  'discriminator': 'driver',
++  'data': {
++      'blkdebug':       'BlockdevCreateNotSupported',
++      'blkverify':      'BlockdevCreateNotSupported',
++      'bochs':          'BlockdevCreateNotSupported',
++      'cloop':          'BlockdevCreateNotSupported',
++      'dmg':            'BlockdevCreateNotSupported',
++      'file':           'BlockdevCreateNotSupported',
++      'ftp':            'BlockdevCreateNotSupported',
++      'ftps':           'BlockdevCreateNotSupported',
++      'gluster':        'BlockdevCreateNotSupported',
++      'host_cdrom':     'BlockdevCreateNotSupported',
++      'host_device':    'BlockdevCreateNotSupported',
++      'http':           'BlockdevCreateNotSupported',
++      'https':          'BlockdevCreateNotSupported',
++      'iscsi':          'BlockdevCreateNotSupported',
++      'luks':           'BlockdevCreateNotSupported',
++      'nbd':            'BlockdevCreateNotSupported',
++      'nfs':            'BlockdevCreateNotSupported',
++      'null-aio':       'BlockdevCreateNotSupported',
++      'null-co':        'BlockdevCreateNotSupported',
++      'parallels':      'BlockdevCreateNotSupported',
++      'qcow2':          'BlockdevCreateNotSupported',
++      'qcow':           'BlockdevCreateNotSupported',
++      'qed':            'BlockdevCreateNotSupported',
++      'quorum':         'BlockdevCreateNotSupported',
++      'raw':            'BlockdevCreateNotSupported',
++      'rbd':            'BlockdevCreateNotSupported',
++      'replication':    'BlockdevCreateNotSupported',
++      'sheepdog':       'BlockdevCreateNotSupported',
++      'ssh':            'BlockdevCreateNotSupported',
++      'throttle':       'BlockdevCreateNotSupported',
++      'vdi':            'BlockdevCreateNotSupported',
++      'vhdx':           'BlockdevCreateNotSupported',
++      'vmdk':           'BlockdevCreateNotSupported',
++      'vpc':            'BlockdevCreateNotSupported',
++      'vvfat':          'BlockdevCreateNotSupported',
++      'vxhs':           'BlockdevCreateNotSupported'
++  } }
 +
-+    bs = bdrv_open(filename, NULL, NULL,
-+                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
-+    if (bs == NULL) {
-+        ret = -EIO;
-+        goto finish;
-+    }
-+
-+    /* Create the qcow2 image (format layer) */
-+    ret = qcow2_create2(bs, size, backing_file, backing_fmt, flags,
-                         cluster_size, prealloc, opts, version, refcount_order,
--                        encryptfmt, &local_err);
--    error_propagate(errp, local_err);
-+                        encryptfmt, errp);
-+    if (ret < 0) {
-+        goto finish;
-+    }
- 
- finish:
-+    bdrv_unref(bs);
-+
-     g_free(backing_file);
-     g_free(backing_fmt);
-     g_free(encryptfmt);
++##
+ # @blockdev-open-tray:
+ #
+ # Opens a block device's tray. If there is a block driver state tree inserted as
 -- 
 2.13.6
