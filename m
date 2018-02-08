@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjUW-0006EH-Dr
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:50 -0500
+	(envelope-from <peterx@redhat.com>) id 1ejjUg-0006Ln-Hv
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjUV-0005O7-4C
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:44 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41300 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ejjUe-0005Ry-FN
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:54 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42922 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjUU-0005Nu-V0
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:43 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjUe-0005Rc-9S
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:52 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Thu,  8 Feb 2018 18:31:06 +0800
-Message-Id: <20180208103132.28452-3-peterx@redhat.com>
+Date: Thu,  8 Feb 2018 18:31:09 +0800
+Message-Id: <20180208103132.28452-6-peterx@redhat.com>
 In-Reply-To: <20180208103132.28452-1-peterx@redhat.com>
 References: <20180208103132.28452-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 02/28] migration: reuse
- mis->userfault_quit_fd
+Subject: [Qemu-devel] [PATCH v6 05/28] migration: implement "postcopy-pause"
+ src logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +27,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-It was only used for quitting the page fault thread before. Let it be
-something more useful - now we can use it to notify a "wake" for the
-page fault thread (for any reason), and it only means "quit" if the
-fault_thread_quit is set.
+Now when network down for postcopy, the source side will not fail the
+migration. Instead we convert the status into this new paused state, and
+we will try to wait for a rescue in the future.
 
-Since we changed what it does, renaming it to userfault_event_fd.
+If a recovery is detected, migration_thread() will reset its local
+variables to prepare for that.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.h    |  6 ++++--
- migration/postcopy-ram.c | 29 ++++++++++++++++++++---------
- 2 files changed, 24 insertions(+), 11 deletions(-)
+ migration/migration.c  | 99 +++++++++++++++++++++++++++++++++++++++++++++++---
+ migration/migration.h  |  3 ++
+ migration/trace-events |  1 +
+ 3 files changed, 97 insertions(+), 6 deletions(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index e8a79bb181..de5ee9c1d4 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2154,6 +2154,80 @@ bool migrate_colo_enabled(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_X_COLO];
+ }
+ 
++typedef enum MigThrError {
++    /* No error detected */
++    MIG_THR_ERR_NONE = 0,
++    /* Detected error, but resumed successfully */
++    MIG_THR_ERR_RECOVERED = 1,
++    /* Detected fatal error, need to exit */
++    MIG_THR_ERR_FATAL = 2,
++} MigThrError;
++
++/*
++ * We don't return until we are in a safe state to continue current
++ * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
++ * MIG_THR_ERR_FATAL if unrecovery failure happened.
++ */
++static MigThrError postcopy_pause(MigrationState *s)
++{
++    assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
++    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
++                      MIGRATION_STATUS_POSTCOPY_PAUSED);
++
++    /* Current channel is possibly broken. Release it. */
++    assert(s->to_dst_file);
++    qemu_file_shutdown(s->to_dst_file);
++    qemu_fclose(s->to_dst_file);
++    s->to_dst_file = NULL;
++
++    error_report("Detected IO failure for postcopy. "
++                 "Migration paused.");
++
++    /*
++     * We wait until things fixed up. Then someone will setup the
++     * status back for us.
++     */
++    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
++        qemu_sem_wait(&s->postcopy_pause_sem);
++    }
++
++    trace_postcopy_pause_continued();
++
++    return MIG_THR_ERR_RECOVERED;
++}
++
++static MigThrError migration_detect_error(MigrationState *s)
++{
++    int ret;
++
++    /* Try to detect any file errors */
++    ret = qemu_file_get_error(s->to_dst_file);
++
++    if (!ret) {
++        /* Everything is fine */
++        return MIG_THR_ERR_NONE;
++    }
++
++    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE && ret == -EIO) {
++        /*
++         * For postcopy, we allow the network to be down for a
++         * while. After that, it can be continued by a
++         * recovery phase.
++         */
++        return postcopy_pause(s);
++    } else {
++        /*
++         * For precopy (or postcopy with error outside IO), we fail
++         * with no time.
++         */
++        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
++        trace_migration_thread_file_err();
++
++        /* Time to stop the migration, now. */
++        return MIG_THR_ERR_FATAL;
++    }
++}
++
+ static void migration_calculate_complete(MigrationState *s)
+ {
+     uint64_t bytes = qemu_ftell(s->to_dst_file);
+@@ -2310,6 +2384,7 @@ static void *migration_thread(void *opaque)
+ {
+     MigrationState *s = opaque;
+     int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
++    MigThrError thr_error;
+ 
+     rcu_register_thread();
+ 
+@@ -2359,13 +2434,22 @@ static void *migration_thread(void *opaque)
+             }
+         }
+ 
+-        if (qemu_file_get_error(s->to_dst_file)) {
+-            if (migration_is_setup_or_active(s->state)) {
+-                migrate_set_state(&s->state, s->state,
+-                                  MIGRATION_STATUS_FAILED);
+-            }
+-            trace_migration_thread_file_err();
++        /*
++         * Try to detect any kind of failures, and see whether we
++         * should stop the migration now.
++         */
++        thr_error = migration_detect_error(s);
++        if (thr_error == MIG_THR_ERR_FATAL) {
++            /* Stop migration */
+             break;
++        } else if (thr_error == MIG_THR_ERR_RECOVERED) {
++            /*
++             * Just recovered from a e.g. network failure, reset all
++             * the local variables. This is important to avoid
++             * breaking transferred_bytes and bandwidth calculation
++             */
++            s->iteration_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++            s->iteration_initial_bytes = 0;
+         }
+ 
+         current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+@@ -2523,6 +2607,7 @@ static void migration_instance_finalize(Object *obj)
+     g_free(params->tls_hostname);
+     g_free(params->tls_creds);
+     qemu_sem_destroy(&ms->pause_sem);
++    qemu_sem_destroy(&ms->postcopy_pause_sem);
+ }
+ 
+ static void migration_instance_init(Object *obj)
+@@ -2551,6 +2636,8 @@ static void migration_instance_init(Object *obj)
+     params->has_x_multifd_channels = true;
+     params->has_x_multifd_page_count = true;
+     params->has_xbzrle_cache_size = true;
++
++    qemu_sem_init(&ms->postcopy_pause_sem, 0);
+ }
+ 
+ /*
 diff --git a/migration/migration.h b/migration/migration.h
-index d3b214e5ba..eb36ea9278 100644
+index eb36ea9278..3e4af0a831 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -36,6 +36,8 @@ struct MigrationIncomingState {
-     bool           have_fault_thread;
-     QemuThread     fault_thread;
-     QemuSemaphore  fault_thread_sem;
-+    /* Set this when we want the fault thread to quit */
-+    bool           fault_thread_quit;
- 
-     bool           have_listen_thread;
-     QemuThread     listen_thread;
-@@ -43,8 +45,8 @@ struct MigrationIncomingState {
- 
-     /* For the kernel to send us notifications */
-     int       userfault_fd;
--    /* To tell the fault_thread to quit */
--    int       userfault_quit_fd;
-+    /* To notify the fault_thread to wake, e.g., when need to quit */
-+    int       userfault_event_fd;
-     QEMUFile *to_src_file;
-     QemuMutex rp_mutex;    /* We send replies from multiple threads */
-     void     *postcopy_tmp_page;
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index bec6c2c66b..9ad4f20f82 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -387,17 +387,18 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-          * currently be at 0, we're going to increment it to 1
-          */
-         tmp64 = 1;
--        if (write(mis->userfault_quit_fd, &tmp64, 8) == 8) {
-+        atomic_set(&mis->fault_thread_quit, 1);
-+        if (write(mis->userfault_event_fd, &tmp64, 8) == 8) {
-             trace_postcopy_ram_incoming_cleanup_join();
-             qemu_thread_join(&mis->fault_thread);
-         } else {
-             /* Not much we can do here, but may as well report it */
--            error_report("%s: incrementing userfault_quit_fd: %s", __func__,
-+            error_report("%s: incrementing userfault_event_fd: %s", __func__,
-                          strerror(errno));
-         }
-         trace_postcopy_ram_incoming_cleanup_closeuf();
-         close(mis->userfault_fd);
--        close(mis->userfault_quit_fd);
-+        close(mis->userfault_event_fd);
-         mis->have_fault_thread = false;
-     }
- 
-@@ -520,7 +521,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
-         pfd[0].fd = mis->userfault_fd;
-         pfd[0].events = POLLIN;
-         pfd[0].revents = 0;
--        pfd[1].fd = mis->userfault_quit_fd;
-+        pfd[1].fd = mis->userfault_event_fd;
-         pfd[1].events = POLLIN; /* Waiting for eventfd to go positive */
-         pfd[1].revents = 0;
- 
-@@ -530,8 +531,18 @@ static void *postcopy_ram_fault_thread(void *opaque)
-         }
- 
-         if (pfd[1].revents) {
--            trace_postcopy_ram_fault_thread_quit();
--            break;
-+            uint64_t tmp64 = 0;
+@@ -178,6 +178,9 @@ struct MigrationState
+     bool send_configuration;
+     /* Whether we send section footer during migration */
+     bool send_section_footer;
 +
-+            /* Consume the signal */
-+            if (read(mis->userfault_event_fd, &tmp64, 8) != 8) {
-+                /* Nothing obviously nicer than posting this error. */
-+                error_report("%s: read() failed", __func__);
-+            }
-+
-+            if (atomic_read(&mis->fault_thread_quit)) {
-+                trace_postcopy_ram_fault_thread_quit();
-+                break;
-+            }
-         }
++    /* Needed by postcopy-pause state */
++    QemuSemaphore postcopy_pause_sem;
+ };
  
-         ret = read(mis->userfault_fd, &msg, sizeof(msg));
-@@ -610,9 +621,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-     }
- 
-     /* Now an eventfd we use to tell the fault-thread to quit */
--    mis->userfault_quit_fd = eventfd(0, EFD_CLOEXEC);
--    if (mis->userfault_quit_fd == -1) {
--        error_report("%s: Opening userfault_quit_fd: %s", __func__,
-+    mis->userfault_event_fd = eventfd(0, EFD_CLOEXEC);
-+    if (mis->userfault_event_fd == -1) {
-+        error_report("%s: Opening userfault_event_fd: %s", __func__,
-                      strerror(errno));
-         close(mis->userfault_fd);
-         return -1;
+ void migrate_set_state(int *state, int old_state, int new_state);
+diff --git a/migration/trace-events b/migration/trace-events
+index 93961dea16..7afbb3e791 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -99,6 +99,7 @@ migration_thread_setup_complete(void) ""
+ open_return_path_on_source(void) ""
+ open_return_path_on_source_continue(void) ""
+ postcopy_start(void) ""
++postcopy_pause_continued(void) ""
+ postcopy_start_set_run(void) ""
+ source_return_path_thread_bad_end(void) ""
+ source_return_path_thread_end(void) ""
 -- 
 2.14.3
