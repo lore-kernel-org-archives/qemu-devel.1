@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejsVy-0002HJ-Bz
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:51 -0500
+	(envelope-from <thuth@redhat.com>) id 1ejsW0-0002JJ-Gm
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejsVx-0002J4-Af
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53826 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1ejsVy-0002Ju-Lf
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60194 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejsVx-0002Ij-5C
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:49 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejsVy-0002Jd-G3
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:50 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7E0AF404084A
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 20:09:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 32937EAEA8
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 20:09:50 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  8 Feb 2018 21:09:28 +0100
-Message-Id: <1518120582-26647-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 00/14] qtest patches
+Date: Thu,  8 Feb 2018 21:09:31 +0100
+Message-Id: <1518120582-26647-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1518120582-26647-1-git-send-email-thuth@redhat.com>
+References: <1518120582-26647-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 03/14] libqos: Track QTestState with QPCIBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +31,360 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Here's a set of qtest patches that have been posted to the list before
-and are IMHO ready for inclusion. I've included the patches from Eric's
-"Preliminary libqtest cleanups" series that do not need major reworks
-(the rest needs some more love later), and some additional entries for
-the boot-serial tester. If there are no objections, I'll sent a PULL
-request for these patches next week.
+From: Eric Blake <eblake@redhat.com>
 
-Eric Blake (10):
-  libqtest: Use qemu_strtoul()
-  libqos: Track QTestState with QPCIBus
-  libqos: Use explicit QTestState for fw_cfg operations
-  libqos: Use explicit QTestState for rtas operations
-  libqos: Use explicit QTestState for i2c operations
-  libqos: Use explicit QTestState for ahci operations
-  libqos: Use explicit QTestState for remaining libqos operations
-  qmp-test: Drop dependence on global_qtest
-  tests/boot-sector: Drop dependence on global_qtest
-  wdt_ib700-test: Drop dependence on global_qtest
+When initializing a QPCIBus, track which QTestState the bus is
+associated with (so that a later patch can then explicitly use
+that test state for all communication on the bus, rather than
+blindly relying on global_qtest).  Update the initialization
+functions to take another parameter, and update all callers to
+pass in state (for now, most callers get away with passing the
+current global_qtest as the current state, although this required
+fixing the order of initialization to ensure qtest_start() is
+called before qpci_init*() in rtl8139-test, and provided an
+opportunity to pass in the allocator in e1000e-test).
 
-Markus Armbruster (1):
-  tests: Clean up wait for event
+Touch up some allocations to use g_new0() rather than g_malloc()
+while in the area, and simplify some code (all implementations
+of QOSOps provide a .init_allocator() that never fails).
 
-Thomas Huth (2):
-  tests/boot-serial: Enable the boot-serial test on SPARC machines, too
-  tests/boot-serial: Add tests for PowerPC Mac machines
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+[thuth: Removed hunk from vhost-user-test.c that is not required anymore,
+ and fixed conflict in qtest_vboot()]
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/ahci-test.c         |  2 +-
+ tests/e1000e-test.c       |  6 +++---
+ tests/i440fx-test.c       |  2 +-
+ tests/ide-test.c          |  2 +-
+ tests/libqos/ahci.c       |  4 ++--
+ tests/libqos/ahci.h       |  2 +-
+ tests/libqos/libqos.c     | 10 +++-------
+ tests/libqos/libqos.h     |  2 +-
+ tests/libqos/pci-pc.c     |  7 ++++---
+ tests/libqos/pci-pc.h     |  2 +-
+ tests/libqos/pci-spapr.c  |  7 ++++---
+ tests/libqos/pci-spapr.h  |  2 +-
+ tests/libqos/pci.h        |  1 +
+ tests/q35-test.c          |  4 ++--
+ tests/rtl8139-test.c      |  5 +++--
+ tests/tco-test.c          |  2 +-
+ tests/usb-hcd-ehci-test.c |  2 +-
+ tests/vhost-user-test.c   |  2 +-
+ 18 files changed, 32 insertions(+), 32 deletions(-)
 
-Wei Huang (1):
-  tests/boot-serial-test: Add support for the aarch64 virt machine
-
- tests/Makefile.include      |  3 ++
- tests/ahci-test.c           |  3 +-
- tests/bios-tables-test.c    |  2 +-
- tests/boot-order-test.c     |  8 ++--
- tests/boot-sector.c         |  8 ++--
- tests/boot-sector.h         |  6 ++-
- tests/boot-serial-test.c    | 16 ++++++++
- tests/ds1338-test.c         |  6 +--
- tests/e1000e-test.c         |  8 ++--
- tests/fw_cfg-test.c         | 13 ++-----
- tests/i440fx-test.c         |  2 +-
- tests/ide-test.c            |  4 +-
- tests/ivshmem-test.c        |  1 +
- tests/libqos/ahci.c         | 49 ++++++++++++------------
- tests/libqos/ahci.h         |  2 +-
- tests/libqos/fw_cfg.c       | 14 ++++---
- tests/libqos/fw_cfg.h       | 10 +++--
- tests/libqos/i2c-imx.c      | 67 ++++++++++++++++-----------------
- tests/libqos/i2c-omap.c     | 45 ++++++++++++-----------
- tests/libqos/i2c.h          |  7 +++-
- tests/libqos/libqos-pc.c    |  2 +-
- tests/libqos/libqos.c       | 40 +++++++-------------
- tests/libqos/libqos.h       |  4 +-
- tests/libqos/malloc-pc.c    |  8 ++--
- tests/libqos/malloc-pc.h    |  4 +-
- tests/libqos/malloc-spapr.c |  4 +-
- tests/libqos/malloc-spapr.h |  2 +-
- tests/libqos/malloc.h       |  1 +
- tests/libqos/pci-pc.c       | 13 +++----
- tests/libqos/pci-pc.h       |  2 +-
- tests/libqos/pci-spapr.c    | 25 ++++++++-----
- tests/libqos/pci-spapr.h    |  2 +-
- tests/libqos/pci.h          |  1 +
- tests/libqos/rtas.c         | 36 ++++++++++--------
- tests/libqos/rtas.h         | 12 +++---
- tests/libqtest.c            | 19 +++++++---
- tests/megasas-test.c        |  5 ++-
- tests/pxe-test.c            |  2 +-
- tests/q35-test.c            |  4 +-
- tests/qmp-test.c            | 35 +++++++++---------
- tests/rtas-test.c           |  3 +-
- tests/rtl8139-test.c        |  5 ++-
- tests/tco-test.c            |  5 +--
- tests/tmp105-test.c         |  6 +--
- tests/usb-hcd-ehci-test.c   |  2 +-
- tests/usb-hcd-uhci-test.c   |  1 +
- tests/vhost-user-test.c     |  4 +-
- tests/virtio-9p-test.c      |  1 +
- tests/virtio-blk-test.c     |  1 +
- tests/virtio-net-test.c     | 15 +++++---
- tests/virtio-scsi-test.c    | 16 ++++----
- tests/vmgenid-test.c        |  2 +-
- tests/wdt_ib700-test.c      | 90 ++++++++++++++++++++-------------------=
-------
- 53 files changed, 339 insertions(+), 307 deletions(-)
-
---=20
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index 3934e62..d9c99b7 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -160,7 +160,7 @@ static AHCIQState *ahci_vboot(const char *cli, va_list ap)
+     alloc_set_flags(s->parent->alloc, ALLOC_LEAK_ASSERT);
+ 
+     /* Verify that we have an AHCI device present. */
+-    s->dev = get_ahci_device(&s->fingerprint);
++    s->dev = get_ahci_device(s->parent->qts, &s->fingerprint);
+ 
+     return s;
+ }
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index c612dc6..d8085d9 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -392,12 +392,12 @@ static void data_test_init(e1000e_device *d)
+     qtest_start(cmdline);
+     g_free(cmdline);
+ 
+-    test_bus = qpci_init_pc(NULL);
+-    g_assert_nonnull(test_bus);
+-
+     test_alloc = pc_alloc_init();
+     g_assert_nonnull(test_alloc);
+ 
++    test_bus = qpci_init_pc(global_qtest, test_alloc);
++    g_assert_nonnull(test_bus);
++
+     e1000e_device_init(test_bus, d);
+ }
+ 
+diff --git a/tests/i440fx-test.c b/tests/i440fx-test.c
+index e9d05c8..4390e55 100644
+--- a/tests/i440fx-test.c
++++ b/tests/i440fx-test.c
+@@ -38,7 +38,7 @@ static QPCIBus *test_start_get_bus(const TestData *s)
+     cmdline = g_strdup_printf("-smp %d", s->num_cpus);
+     qtest_start(cmdline);
+     g_free(cmdline);
+-    return qpci_init_pc(NULL);
++    return qpci_init_pc(global_qtest, NULL);
+ }
+ 
+ static void test_i440fx_defaults(gconstpointer opaque)
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index aa9de06..b2237b6 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -143,7 +143,7 @@ static QPCIDevice *get_pci_device(QPCIBar *bmdma_bar, QPCIBar *ide_bar)
+     uint16_t vendor_id, device_id;
+ 
+     if (!pcibus) {
+-        pcibus = qpci_init_pc(NULL);
++        pcibus = qpci_init_pc(global_qtest, NULL);
+     }
+ 
+     /* Find PCI device and verify it's the right one */
+diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+index 13c0749..40c532e 100644
+--- a/tests/libqos/ahci.c
++++ b/tests/libqos/ahci.c
+@@ -123,13 +123,13 @@ bool is_atapi(AHCIQState *ahci, uint8_t port)
+ /**
+  * Locate, verify, and return a handle to the AHCI device.
+  */
+-QPCIDevice *get_ahci_device(uint32_t *fingerprint)
++QPCIDevice *get_ahci_device(QTestState *qts, uint32_t *fingerprint)
+ {
+     QPCIDevice *ahci;
+     uint32_t ahci_fingerprint;
+     QPCIBus *pcibus;
+ 
+-    pcibus = qpci_init_pc(NULL);
++    pcibus = qpci_init_pc(qts, NULL);
+ 
+     /* Find the AHCI PCI device and verify it's the right one. */
+     ahci = qpci_device_find(pcibus, QPCI_DEVFN(0x1F, 0x02));
+diff --git a/tests/libqos/ahci.h b/tests/libqos/ahci.h
+index 5f9627b..715ca1e 100644
+--- a/tests/libqos/ahci.h
++++ b/tests/libqos/ahci.h
+@@ -571,7 +571,7 @@ void ahci_free(AHCIQState *ahci, uint64_t addr);
+ void ahci_clean_mem(AHCIQState *ahci);
+ 
+ /* Device management */
+-QPCIDevice *get_ahci_device(uint32_t *fingerprint);
++QPCIDevice *get_ahci_device(QTestState *qts, uint32_t *fingerprint);
+ void free_ahci_device(QPCIDevice *dev);
+ void ahci_pci_enable(AHCIQState *ahci);
+ void start_ahci_device(AHCIQState *ahci);
+diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+index 991bc1a..7a76c1e 100644
+--- a/tests/libqos/libqos.c
++++ b/tests/libqos/libqos.c
+@@ -17,18 +17,14 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
+ {
+     char *cmdline;
+ 
+-    struct QOSState *qs = g_new(QOSState, 1);
++    QOSState *qs = g_new0(QOSState, 1);
+ 
+     cmdline = g_strdup_vprintf(cmdline_fmt, ap);
+     qs->qts = qtest_start(cmdline);
+     qs->ops = ops;
+     if (ops) {
+-        if (ops->init_allocator) {
+-            qs->alloc = ops->init_allocator(ALLOC_NO_FLAGS);
+-        }
+-        if (ops->qpci_init && qs->alloc) {
+-            qs->pcibus = ops->qpci_init(qs->alloc);
+-        }
++        qs->alloc = ops->init_allocator(ALLOC_NO_FLAGS);
++        qs->pcibus = ops->qpci_init(qs->qts, qs->alloc);
+     }
+ 
+     g_free(cmdline);
+diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
+index 2319697..78e5c04 100644
+--- a/tests/libqos/libqos.h
++++ b/tests/libqos/libqos.h
+@@ -10,7 +10,7 @@ typedef struct QOSState QOSState;
+ typedef struct QOSOps {
+     QGuestAllocator *(*init_allocator)(QAllocOpts);
+     void (*uninit_allocator)(QGuestAllocator *);
+-    QPCIBus *(*qpci_init)(QGuestAllocator *alloc);
++    QPCIBus *(*qpci_init)(QTestState *qts, QGuestAllocator *alloc);
+     void (*qpci_free)(QPCIBus *bus);
+     void (*shutdown)(QOSState *);
+ } QOSOps;
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index 02ce499..e267fd1 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -115,11 +115,11 @@ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint3
+     outl(0xcfc, value);
+ }
+ 
+-QPCIBus *qpci_init_pc(QGuestAllocator *alloc)
++QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
+ {
+-    QPCIBusPC *ret;
++    QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
+ 
+-    ret = g_malloc(sizeof(*ret));
++    assert(qts);
+ 
+     ret->bus.pio_readb = qpci_pc_pio_readb;
+     ret->bus.pio_readw = qpci_pc_pio_readw;
+@@ -142,6 +142,7 @@ QPCIBus *qpci_init_pc(QGuestAllocator *alloc)
+     ret->bus.config_writew = qpci_pc_config_writew;
+     ret->bus.config_writel = qpci_pc_config_writel;
+ 
++    ret->bus.qts = qts;
+     ret->bus.pio_alloc_ptr = 0xc000;
+     ret->bus.mmio_alloc_ptr = 0xE0000000;
+     ret->bus.mmio_limit = 0x100000000ULL;
+diff --git a/tests/libqos/pci-pc.h b/tests/libqos/pci-pc.h
+index 9479b51..491eeac 100644
+--- a/tests/libqos/pci-pc.h
++++ b/tests/libqos/pci-pc.h
+@@ -16,7 +16,7 @@
+ #include "libqos/pci.h"
+ #include "libqos/malloc.h"
+ 
+-QPCIBus *qpci_init_pc(QGuestAllocator *alloc);
++QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc);
+ void     qpci_free_pc(QPCIBus *bus);
+ 
+ #endif
+diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+index 2043f1e..ef52fcb 100644
+--- a/tests/libqos/pci-spapr.c
++++ b/tests/libqos/pci-spapr.c
+@@ -154,11 +154,11 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+ #define SPAPR_PCI_MMIO32_WIN_SIZE    0x80000000 /* 2 GiB */
+ #define SPAPR_PCI_IO_WIN_SIZE        0x10000
+ 
+-QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
++QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc)
+ {
+-    QPCIBusSPAPR *ret;
++    QPCIBusSPAPR *ret = g_new0(QPCIBusSPAPR, 1);
+ 
+-    ret = g_malloc(sizeof(*ret));
++    assert(qts);
+ 
+     ret->alloc = alloc;
+ 
+@@ -197,6 +197,7 @@ QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
+     ret->mmio32.pci_base = SPAPR_PCI_MMIO32_WIN_SIZE;
+     ret->mmio32.size = SPAPR_PCI_MMIO32_WIN_SIZE;
+ 
++    ret->bus.qts = qts;
+     ret->bus.pio_alloc_ptr = 0xc000;
+     ret->bus.mmio_alloc_ptr = ret->mmio32.pci_base;
+     ret->bus.mmio_limit = ret->mmio32.pci_base + ret->mmio32.size;
+diff --git a/tests/libqos/pci-spapr.h b/tests/libqos/pci-spapr.h
+index 4192126..387686d 100644
+--- a/tests/libqos/pci-spapr.h
++++ b/tests/libqos/pci-spapr.h
+@@ -11,7 +11,7 @@
+ #include "libqos/malloc.h"
+ #include "libqos/pci.h"
+ 
+-QPCIBus *qpci_init_spapr(QGuestAllocator *alloc);
++QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc);
+ void     qpci_free_spapr(QPCIBus *bus);
+ 
+ #endif
+diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
+index ed48061..429c382 100644
+--- a/tests/libqos/pci.h
++++ b/tests/libqos/pci.h
+@@ -48,6 +48,7 @@ struct QPCIBus {
+     void (*config_writel)(QPCIBus *bus, int devfn,
+                           uint8_t offset, uint32_t value);
+ 
++    QTestState *qts;
+     uint16_t pio_alloc_ptr;
+     uint64_t mmio_alloc_ptr, mmio_limit;
+ };
+diff --git a/tests/q35-test.c b/tests/q35-test.c
+index f98bed7..e149c4c 100644
+--- a/tests/q35-test.c
++++ b/tests/q35-test.c
+@@ -86,7 +86,7 @@ static void test_smram_lock(void)
+ 
+     qtest_start("-M q35");
+ 
+-    pcibus = qpci_init_pc(NULL);
++    pcibus = qpci_init_pc(global_qtest, NULL);
+     g_assert(pcibus != NULL);
+ 
+     pcidev = qpci_device_find(pcibus, 0);
+@@ -145,7 +145,7 @@ static void test_tseg_size(const void *data)
+     g_free(cmdline);
+ 
+     /* locate the DRAM controller */
+-    pcibus = qpci_init_pc(NULL);
++    pcibus = qpci_init_pc(global_qtest, NULL);
+     g_assert(pcibus != NULL);
+     pcidev = qpci_device_find(pcibus, 0);
+     g_assert(pcidev != NULL);
+diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
+index 7de7dc4..68bfc42 100644
+--- a/tests/rtl8139-test.c
++++ b/tests/rtl8139-test.c
+@@ -35,7 +35,7 @@ static QPCIDevice *get_device(void)
+ {
+     QPCIDevice *dev;
+ 
+-    pcibus = qpci_init_pc(NULL);
++    pcibus = qpci_init_pc(global_qtest, NULL);
+     qpci_device_foreach(pcibus, 0x10ec, 0x8139, save_fn, &dev);
+     g_assert(dev != NULL);
+ 
+@@ -197,11 +197,12 @@ int main(int argc, char **argv)
+ {
+     int ret;
+ 
++    qtest_start("-device rtl8139");
++
+     g_test_init(&argc, &argv, NULL);
+     qtest_add_func("/rtl8139/nop", nop);
+     qtest_add_func("/rtl8139/timer", test_init);
+ 
+-    qtest_start("-device rtl8139");
+     ret = g_test_run();
+ 
+     qtest_end();
+diff --git a/tests/tco-test.c b/tests/tco-test.c
+index bed66a3..5567b79 100644
+--- a/tests/tco-test.c
++++ b/tests/tco-test.c
+@@ -62,7 +62,7 @@ static void test_init(TestData *d)
+     global_qtest = qs;
+     qtest_irq_intercept_in(qs, "ioapic");
+ 
+-    d->bus = qpci_init_pc(NULL);
++    d->bus = qpci_init_pc(qs, NULL);
+     d->dev = qpci_device_find(d->bus, QPCI_DEVFN(0x1f, 0x00));
+     g_assert(d->dev != NULL);
+ 
+diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
+index 944eb1c..55d4743 100644
+--- a/tests/usb-hcd-ehci-test.c
++++ b/tests/usb-hcd-ehci-test.c
+@@ -52,7 +52,7 @@ static void ehci_port_test(struct qhc *hc, int port, uint32_t expect)
+ 
+ static void test_init(void)
+ {
+-    pcibus = qpci_init_pc(NULL);
++    pcibus = qpci_init_pc(global_qtest, NULL);
+     g_assert(pcibus != NULL);
+ 
+     qusb_pci_init_one(pcibus, &uhci1, QPCI_DEVFN(0x1d, 0), 4);
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index ec6ac9d..07b7e8a 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -169,7 +169,7 @@ static void init_virtio_dev(TestServer *s, uint32_t features_mask)
+     uint32_t features;
+     int i;
+ 
+-    s->bus = qpci_init_pc(NULL);
++    s->bus = qpci_init_pc(global_qtest, NULL);
+     g_assert_nonnull(s->bus);
+ 
+     s->dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
+-- 
 1.8.3.1
