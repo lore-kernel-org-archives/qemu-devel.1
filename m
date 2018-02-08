@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejjGL-0004bD-Kf
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:17:06 -0500
+	(envelope-from <jianfeng.tan@intel.com>) id 1ejjHi-0005aF-UW
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejjGK-0005NV-RD
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:17:05 -0500
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:35306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejjGK-0005NO-L6
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:17:04 -0500
-Received: by mail-ot0-x22b.google.com with SMTP id a2so3826969otf.2
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 02:17:04 -0800 (PST)
+	(envelope-from <jianfeng.tan@intel.com>) id 1ejjHf-0005u4-O3
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:18:30 -0500
+Received: from mga18.intel.com ([134.134.136.126]:52316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
+	id 1ejjHf-0005sN-DA
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:18:27 -0500
+References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
+	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
+	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
+	<502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
+	<20180205181521.47232aa4@redhat.com>
+	<5155622d-cc49-d24c-7a7d-24ebb9ca2331@redhat.com>
+	<ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
+	<20180207130635.4033f8b8@redhat.com>
+	<8474af94-7bff-a7b5-e316-b8a0e332467e@intel.com>
+	<20180208105111.7a776513@redhat.com>
+From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
+Message-ID: <53186984-2111-ed5e-0d47-65db12f22ea3@intel.com>
+Date: Thu, 8 Feb 2018 18:18:20 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180207163322.25820-1-jsnow@redhat.com>
-References: <20180207163322.25820-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Feb 2018 10:16:43 +0000
-Message-ID: <CAFEAcA-jt0CD4T3mzTrT2Fsn3mGpXjjA3z=v9L6hz88z+aEggg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Ide patches
+In-Reply-To: <20180208105111.7a776513@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 7 February 2018 at 16:33, John Snow <jsnow@redhat.com> wrote:
-> The following changes since commit 0833df03f4206a6cf416fbb3d380fa95c8e61fba:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180206a' into staging (2018-02-07 12:07:23 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to 29e1d473ccb0703044541959df443c175ea5f5da:
->
->   ide-test: test trim requests (2018-02-07 11:25:22 -0500)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Anton Nefedov (1):
->   ide-test: test trim requests
->
->  tests/ide-test.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 71 insertions(+)
->
 
-Applied, thanks.
 
--- PMM
+On 2/8/2018 5:51 PM, Igor Mammedov wrote:
+> On Thu, 8 Feb 2018 09:20:45 +0800
+> "Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
+>
+>> On 2/7/2018 8:06 PM, Igor Mammedov wrote:
+>>> On Wed, 7 Feb 2018 07:49:58 +0000
+>>> "Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
+>>>   
+>>>>> -----Original Message-----
+>>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>>>>> Sent: Tuesday, February 6, 2018 1:32 AM
+>>>>> To: Igor Mammedov
+>>>>> Cc: Tan, Jianfeng; qemu-devel@nongnu.org; Jason Wang; Maxime Coquelin;
+>>>>> Michael S . Tsirkin
+>>>>> Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
+>>>>> migration
+>>>>>
+>>>>> On 05/02/2018 18:15, Igor Mammedov wrote:
+>>>>>>>> Then we would have both ram block named pc.ram:
+>>>>>>>>                 Block Name    PSize
+>>>>>>>>                         pc.ram     4 KiB
+>>>>>>>>         /objects/pc.ram    2 MiB
+>>>>>>>>
+>>>>>>>> But I assume it's a corner case which not really happen.
+>>>>>>> Yeah, you're right. :/  I hadn't thought of hotplug.  It can happen indeed.
+>>>>>> perhaps we should fail object_add memory-backend-foo if it resulted
+>>>>>> in creating ramblock with duplicate id
+>>>>> Note that it would only be duplicated with Jianfeng's patch.  So I'm
+>>>>> worried that his patch is worse than what we have now, because it may
+>>>>> create conflicts with system RAMBlock names are not necessarily
+>>>>> predictable.  Right now, -object creates RAMBlock names that are nicely
+>>>>> constrained within /object/.
+>>>> So we are trading off between the benefit it takes and the bad effect it brings.
+>>>>
+>>>> I'm wondering if the above example is the only failed case this patch leads to, i.e, only there is a ram named "pc.ram" and "/object/pc.ram" in the src VM?
+>>>>
+>>>> Please also consider the second option, that adding an alias name for RAMBlock; I'm not a big fan for that one, as it just pushes the problem to OpenStack/Libvirt.
+>>> looking at provided CLI examples it's configuration issue on src and dst,
+>>> one shall not mix numa and non numa variants.
+>> Aha, that's another thing we also want to change. We now add numa at dst
+>> node, only because without -numa, we cannot set up the file-baked memory
+>> with share=on.
+> then shouldn't you start src with the same -numa to begin with,
+> changing such things on the fly is not supported.
+
+Yes, you are describing the best practice. But we are originally trying 
+to migrate without any changes to QEMU.
+
+> General rule is that machine on dst has to be the same as on src.
+
+OK.
+
+> (with backend not visible to guest it possible might be changed
+> but it's hard to tell if something would break due to that
+> or would continue working in future since doesn't go along with above rule)
+>
+>> For example, "-m xG -mem-path xxx" can set up a file-baked memory, but
+>> the file is not share-able.
+> It could be solved by adding memdev option to machine,
+> which would allow to specify backend object. And then on
+> top make -mem-path alias new option to clean thing up.
+
+Do you mean?
+
+src vm: -m xG
+dst vm: -m xG,memdev=pc.ram -object 
+memory-backend-file,id=pc.ram,size=xG,mem-path=xxx,share=on ...
+
+
+>
+> But then again, You'd need to start both src and dst
+> with the same option.
+
+Yeah, got it :-)
