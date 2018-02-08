@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ejdoV-00011Y-Km
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:28:00 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ejdpc-0001sl-SC
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:29:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ejdoR-00084n-KZ
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:27:59 -0500
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:56106)
+	(envelope-from <aik@ozlabs.ru>) id 1ejdpb-000159-OQ
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:29:08 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:35705)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ejdoR-00084M-Dh
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:27:55 -0500
-Received: by mail-it0-x241.google.com with SMTP id b66so5037306itd.5
-	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 20:27:54 -0800 (PST)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ejdpb-00014q-In
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:29:07 -0500
+Received: by mail-it0-x241.google.com with SMTP id e1so4947878ita.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 20:29:07 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+	by smtp.googlemail.com with ESMTPSA id
+	w6sm3294468itc.5.2018.02.07.20.29.05 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 07 Feb 2018 20:29:06 -0800 (PST)
+References: <20180201093651.33801-1-aik@ozlabs.ru>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20171026014139.46221-1-aik@ozlabs.ru>
-	<82b6cfcf-70ae-2817-8eb8-fe630d3bec95@ozlabs.ru>
-	<70dce2ac-5278-d7c1-744d-83de8e111faf@ozlabs.ru>
-	<bebff732-86de-d7e2-93d5-a33fa44f5763@ozlabs.ru>
-Message-ID: <bef12936-8383-d455-8753-5f04bb58827d@ozlabs.ru>
-Date: Thu, 8 Feb 2018 15:27:48 +1100
+Message-ID: <daf0cada-23d2-6dcb-3d6a-022ac646b492@ozlabs.ru>
+Date: Thu, 8 Feb 2018 15:29:02 +1100
 MIME-Version: 1.0
-In-Reply-To: <bebff732-86de-d7e2-93d5-a33fa44f5763@ozlabs.ru>
+In-Reply-To: <20180201093651.33801-1-aik@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] machine: Polish -machine xxx,help
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] slirp: Update forwarding IP
+ address if guest receiver non-default IP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +35,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 02/02/18 13:45, Alexey Kardashevskiy wrote:
-> On 29/01/18 16:03, Alexey Kardashevskiy wrote:
->> On 15/12/17 15:47, Alexey Kardashevskiy wrote:
->>> On 26/10/17 12:41, Alexey Kardashevskiy wrote:
->>>> The "-machine xxx,help" prints kernel-irqchip possible values as
->>>> "OnOffSplit", this adds separators to the printed line.
->>>>
->>>> Also, since only lower case letters are specified in qapi/common.json,
->>>> this changes the letter cases too.
->>>>
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>
->>> ping?
->>
->>
->> anyone?
+On 01/02/18 20:36, Alexey Kardashevskiy wrote:
+> If we run QEMU with -netdev user,id=USER0,hostfwd=tcp::2222-:22, it starts
+> a DHCP server and starts allocating client IPs from 10.0.2.15 so
+> this is what the guest normally receives. Since QEMU automatically adds
+> the DHCP starting address into the forwarding table, everything works.
+> This is the table before guest started:
 > 
-> Let's try trivial list now :)
+> (qemu) info usernet
+> VLAN -1 (USER0):
+>   Protocol[State]    FD  Source Address  Port   Dest. Address  Port RecvQ SendQ
+>   TCP[HOST_FORWARD]  11               *  2222       10.0.2.15    22     0     0
+> 
+> However if the guest happens to have DHCP lease (for example, 10.0.2.16),
+> the forwarding stops working. The guest can still reach the outer world
+> (which is expected).
+> 
+> This updates the forwarding table when QEMU confirms the requested IP
+> to the guest.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> 
+> Does this look any useful?
 
 
-And ping again :)
+It does not seem like it does very much but .... :)
 
 
 > 
+> Sure I can remove /var/lib/dhcp/dhclient.enp0s1.leases in the guest or
+> start QEMU with the DHCP start address equal to what the guest wants to
+> reserve but it is quite confusing why such a simple config just does not
+> work.
 > 
->>
->>>
->>>
->>>> ---
->>>>
->>>> aik@fstn1-p1:~$ ./qemu-system-ppc64 -machine pseries,help 2>&1 | grep kernel-irqchip
->>>>
->>>> Was:
->>>> pseries-2.11.kernel-irqchip=OnOffSplit (Configure KVM in-kernel irqchip)
->>>>
->>>> Now:
->>>> pseries-2.11.kernel-irqchip=on|off|split (Configure KVM in-kernel irqchip)
->>>> ---
->>>>  hw/core/machine.c | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/core/machine.c b/hw/core/machine.c
->>>> index 36c2fb069c..bd3db14e12 100644
->>>> --- a/hw/core/machine.c
->>>> +++ b/hw/core/machine.c
->>>> @@ -506,7 +506,7 @@ static void machine_class_init(ObjectClass *oc, void *data)
->>>>      object_class_property_set_description(oc, "accel",
->>>>          "Accelerator list", &error_abort);
->>>>  
->>>> -    object_class_property_add(oc, "kernel-irqchip", "OnOffSplit",
->>>> +    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
->>>>          NULL, machine_set_kernel_irqchip,
->>>>          NULL, NULL, &error_abort);
->>>>      object_class_property_set_description(oc, "kernel-irqchip",
->>>>
->>>
->>>
->>
->>
+> Found this with the brand new Ubuntu 17.10 which runs dhcp and something
+> called "netplan" and the guest ends up with 2 IPs from 10.0.2.x network.
+> After disabling netplan, the lease remains and it is not 10.0.2.15 but
+> rather .16 or .17.
 > 
+> Comments? Thanks.
+> 
+> ---
+>  slirp/libslirp.h |  2 ++
+>  slirp/bootp.c    |  2 ++
+>  slirp/slirp.c    | 27 +++++++++++++++++++++++++++
+>  3 files changed, 31 insertions(+)
+> 
+> diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+> index 540b3e5..6779081 100644
+> --- a/slirp/libslirp.h
+> +++ b/slirp/libslirp.h
+> @@ -33,6 +33,8 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp,
+>                        struct in_addr guest_addr, int guest_port);
+>  int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
+>                           struct in_addr host_addr, int host_port);
+> +void slirp_update_hostfwd(Slirp *slirp, struct in_addr old_guest_addr,
+> +                          struct in_addr new_guest_addr);
+>  int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
+>                     struct in_addr *guest_addr, int guest_port);
+>  
+> diff --git a/slirp/bootp.c b/slirp/bootp.c
+> index 5dd1a41..5876004 100644
+> --- a/slirp/bootp.c
+> +++ b/slirp/bootp.c
+> @@ -225,6 +225,8 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
+>      /* Update ARP table for this IP address */
+>      arp_table_add(slirp, daddr.sin_addr.s_addr, client_ethaddr);
+>  
+> +    slirp_update_hostfwd(slirp, slirp->vdhcp_startaddr, daddr.sin_addr);
+> +
+>      saddr.sin_addr = slirp->vhost_addr;
+>      saddr.sin_port = htons(BOOTP_SERVER);
+>  
+> diff --git a/slirp/slirp.c b/slirp/slirp.c
+> index 1cb6b07..a9d8a16 100644
+> --- a/slirp/slirp.c
+> +++ b/slirp/slirp.c
+> @@ -1061,6 +1061,33 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp, struct in_addr host_addr,
+>      return 0;
+>  }
+>  
+> +static void slirp_do_update_hostfwd(Slirp *slirp, struct socket *head,
+> +                                    struct in_addr old_guest_addr,
+> +                                    struct in_addr new_guest_addr)
+> +{
+> +    struct socket *so;
+> +    char oldaddr[17], newaddr[17];
+> +
+> +    for (so = head->so_next; so != head; so = so->so_next) {
+> +        if ((so->so_state & SS_HOSTFWD) &&
+> +            so->lhost.sin.sin_addr.s_addr == old_guest_addr.s_addr) {
+> +            strncpy(oldaddr, inet_ntoa(old_guest_addr), sizeof(oldaddr) - 1);
+> +            strncpy(newaddr, inet_ntoa(new_guest_addr), sizeof(newaddr) - 1);
+> +            DEBUG_ARGS((dfd, "Updating forwarding from %s:%d to %s:%d\n",
+> +                       oldaddr, ntohs(so->lhost.sin.sin_port),
+> +                       newaddr, ntohs(so->lhost.sin.sin_port)));
+> +            so->lhost.sin.sin_addr = new_guest_addr;
+> +        }
+> +    }
+> +}
+> +
+> +void slirp_update_hostfwd(Slirp *slirp, struct in_addr old_guest_addr,
+> +                          struct in_addr new_guest_addr)
+> +{
+> +    slirp_do_update_hostfwd(slirp, &slirp->udb, old_guest_addr, new_guest_addr);
+> +    slirp_do_update_hostfwd(slirp, &slirp->tcb, old_guest_addr, new_guest_addr);
+> +}
+> +
+>  int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
+>                     struct in_addr *guest_addr, int guest_port)
+>  {
 > 
 
 
