@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3I-0003Eq-R0
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:05 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3I-0003ES-FH
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3H-0006S2-IL
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3F-0006O7-Jc
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:04 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52157)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35507)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejq3H-0006Qr-Cy
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:03 -0500
-Received: by mail-wm0-x244.google.com with SMTP id r71so10968235wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:03 -0800 (PST)
+	id 1ejq3F-0006N4-Dg
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:01 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r78so11505044wme.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:01 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:28 +0000
-Message-Id: <20180208173157.24705-4-alex.bennee@linaro.org>
+Date: Thu,  8 Feb 2018 17:31:26 +0000
+Message-Id: <20180208173157.24705-2-alex.bennee@linaro.org>
 In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
 References: <20180208173157.24705-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 03/32] target/arm/cpu64: allow fp16 to be
- disabled
+Subject: [Qemu-devel] [PATCH v2 01/32] include/exec/helper-head.h: support
+ f16 in helper calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +31,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-While for CONFIG_USER_ONLY it is policy for the "cpu" to be the most
-capable is can be this does cause problems. For example legacy RISU
-runs would fail as there are a bunch of implemented instructions which
-would have caused failures that now trigger actual calculations.
+This allows us to explicitly pass float16 to helpers rather than
+assuming uint32_t and dealing with the result. Of course they will be
+passed in i32 sized registers by default.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu64.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ include/exec/helper-head.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 973614dfc6..0dc4debd9c 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -275,6 +275,26 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
-     }
- }
- 
-+#ifdef CONFIG_USER_ONLY
-+static bool aarch64_cpu_get_fp16(Object *obj, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    return arm_feature(&cpu->env, ARM_FEATURE_V8_FP16);
-+}
-+
-+static void aarch64_cpu_set_fp16(Object *obj, bool value, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    if (value == false) {
-+        unset_feature(&cpu->env, ARM_FEATURE_V8_FP16);
-+    } else {
-+        set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
-+    }
-+}
-+#endif
-+
- static void aarch64_cpu_initfn(Object *obj)
- {
-     object_property_add_bool(obj, "aarch64", aarch64_cpu_get_aarch64,
-@@ -283,6 +303,13 @@ static void aarch64_cpu_initfn(Object *obj)
-                                     "Set on/off to enable/disable aarch64 "
-                                     "execution state ",
-                                     NULL);
-+#ifdef CONFIG_USER_ONLY
-+    object_property_add_bool(obj, "fp16", aarch64_cpu_get_fp16,
-+                             aarch64_cpu_set_fp16, NULL);
-+    object_property_set_description(obj, "fp16",
-+                                    "Set on/off to enable/disable FP16 extensions ",
-+                                    NULL);
-+#endif
- }
- 
- static void aarch64_cpu_finalizefn(Object *obj)
+diff --git a/include/exec/helper-head.h b/include/exec/helper-head.h
+index e1fd08f2ba..15b6a68de3 100644
+--- a/include/exec/helper-head.h
++++ b/include/exec/helper-head.h
+@@ -26,6 +26,7 @@
+ #define dh_alias_int i32
+ #define dh_alias_i64 i64
+ #define dh_alias_s64 i64
++#define dh_alias_f16 i32
+ #define dh_alias_f32 i32
+ #define dh_alias_f64 i64
+ #define dh_alias_ptr ptr
+@@ -38,6 +39,7 @@
+ #define dh_ctype_int int
+ #define dh_ctype_i64 uint64_t
+ #define dh_ctype_s64 int64_t
++#define dh_ctype_f16 float16
+ #define dh_ctype_f32 float32
+ #define dh_ctype_f64 float64
+ #define dh_ctype_ptr void *
+@@ -94,6 +96,7 @@
+ #define dh_is_signed_s32 1
+ #define dh_is_signed_i64 0
+ #define dh_is_signed_s64 1
++#define dh_is_signed_f16 0
+ #define dh_is_signed_f32 0
+ #define dh_is_signed_f64 0
+ #define dh_is_signed_tl  0
 -- 
 2.15.1
