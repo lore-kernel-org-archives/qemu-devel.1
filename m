@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42285)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpOH-0008VJ-4X
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:42 -0500
+	id 1ejpOJ-00005g-14
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpOF-0004Ma-4S
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:41 -0500
+	id 1ejpOI-0004Nu-6w
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:49:43 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Feb 2018 13:48:11 -0300
-Message-Id: <20180208164818.7961-24-f4bug@amsat.org>
+Date: Thu,  8 Feb 2018 13:48:12 -0300
+Message-Id: <20180208164818.7961-25-f4bug@amsat.org>
 In-Reply-To: <20180208164818.7961-1-f4bug@amsat.org>
 References: <20180208164818.7961-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 23/30] hw/arm/bcm2835_peripherals:
- implement SDHCI Spec v3
+Subject: [Qemu-devel] [PATCH v11 24/30] hw/arm/bcm2835_peripherals: change
+ maximum block size to 1kB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
+following the datasheet.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/arm/bcm2835_peripherals.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ hw/arm/bcm2835_peripherals.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 12e0dd11af..ca971e83e0 100644
+index ca971e83e0..13b63970d7 100644
 --- a/hw/arm/bcm2835_peripherals.c
 +++ b/hw/arm/bcm2835_peripherals.c
-@@ -254,14 +254,19 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(&s->peri_mr, RNG_OFFSET,
-                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0));
+@@ -19,7 +19,7 @@
+ #define BCM2835_VC_PERI_BASE 0x7e000000
  
--    /* Extended Mass Media Controller */
--    object_property_set_int(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "capareg",
--                            &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--
-+    /* Extended Mass Media Controller
-+     *
-+     * Compatible with:
-+     * - SD Host Controller Specification Version 3.0 Draft 1.0
-+     * - SDIO Specification Version 3.0
-+     * - MMC Specification Version 4.4
-+     *
-+     * For the exact details please refer to the Arasan documentation:
-+     *   SD3.0_Host_AHB_eMMC4.4_Usersguide_ver5.9_jan11_10.pdf
-+     */
-+    object_property_set_uint(OBJECT(&s->sdhci), 3, "sd-spec-version", &err);
-+    object_property_set_uint(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "capareg",
-+                             &err);
-     object_property_set_bool(OBJECT(&s->sdhci), true, "pending-insert-quirk",
-                              &err);
-     if (err) {
+ /* Capabilities for SD controller: no DMA, high-speed, default clocks etc. */
+-#define BCM2835_SDHC_CAPAREG 0x52034b4
++#define BCM2835_SDHC_CAPAREG 0x52134b4
+ 
+ static void bcm2835_peripherals_init(Object *obj)
+ {
 -- 
 2.16.1
