@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejm4W-0007NT-MG
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:17:10 -0500
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1ejmBW-0002C7-CG
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:24:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejm4R-0007UP-0H
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:17:04 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:45061)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejm4Q-0007UH-Qo
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:16:58 -0500
-Received: by mail-qk0-x242.google.com with SMTP id x127so5507461qkb.12
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:16:58 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180208105754.19924-1-danielhb@linux.vnet.ibm.com>
-	<caaad0dd-3f8e-a414-48ed-b6535d5a83a4@amsat.org>
-	<CAFEAcA90+5RL+WPVDS00NH8WuLmG4C0Ou74v-m20+RB6zYz8WQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <91dde6c1-e282-37dd-d843-eb6b186e8bff@amsat.org>
-Date: Thu, 8 Feb 2018 10:16:53 -0300
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1ejmBV-0003lO-7V
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:24:18 -0500
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Date: Thu,  8 Feb 2018 16:23:36 +0300
+Message-Id: <20180208132336.6519-1-edgar.kaziakhmedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA90+5RL+WPVDS00NH8WuLmG4C0Ou74v-m20+RB6zYz8WQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/audio/sb16.c: missing break
- statement
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 1/1] nbd: increase maximum size of the
+ PWRITE_ZERO request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +22,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, John Arbuckle <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 02/08/2018 10:01 AM, Peter Maydell wrote:
-> On 8 February 2018 at 12:15, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Hi Daniel,
->>
->> On 02/08/2018 07:57 AM, Daniel Henrique Barboza wrote:
->>> This patch adds a break in the switch() statement of complete(),
->>> value 0x42:
->>>
->>>     case 0x42:              /* FT2 sets output freq with this, go figure */
->>>         qemu_log_mask(LOG_UNIMP, "cmd 0x42 might not do what it think it"
->>>                       " should\n");
->>>         break; <-------
->>>     case 0x41:
->>
->> It seems this is an intentional fallthrough, I understand cmd 0x42 is
->> expected to do the same of 0x41 and _a bit more_ (see commit 85571bc7415).
-> 
-> Yes, I agree; I wrote a bit about this in this thread:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02081.html
+Upstream NBD protocol implementation supports an efficient zero out
+mechanism over the wire, along with the ability to check whether a
+client allows using a hole.
 
-Oh, very useful link!
+Accordingly, since PWRITE_ZERO doesn't involve any payload on the wire,
+increase a maximum size of the PWRITE_ZERO request up to 1Gb (aligned).
+Moreover, such change will decrease the number of PWRITE_ZERO NBD commands
+in comparison with the current 32M limit. The benefits of
+the larger constraint can be examined in a block mirroring over NBD.
 
-> (though my guess is that actually 0x42 is supposed to do exactly
-> what 0x41 does, and that the LOG_UNIMP should maybe just be removed).
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+---
+ block/nbd.c         | 2 +-
+ include/block/nbd.h | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-I now understand 0x42 sets the dsp input sampling freq, the model seems
-to be designed with output in mind, then added input support (using same
-freq as output).
+diff --git a/block/nbd.c b/block/nbd.c
+index 94220f6d14..3641d9244e 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -477,7 +477,7 @@ static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
+     uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
 
-So imho the simpler/safer fix would be:
+     bs->bl.max_pdiscard = max;
+-    bs->bl.max_pwrite_zeroes = max;
++    bs->bl.max_pwrite_zeroes = NBD_MAX_PWRITE_ZERO_SIZE;
+     bs->bl.max_transfer = max;
 
-  case 0x42:
-      if (dsp_get_hilo(s) != s->freq) {
-          qemu_log_mask(LOG_UNIMP,
-                        "input sampling freq different than "
-                        "output not implemented");
-      }
-      /* fallthrough */
-  case 0x41:
-      ...
+     if (s->info.opt_block &&
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index ee74ec391a..e2f18e2332 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -182,6 +182,9 @@ enum {
+ /* Maximum size of a single READ/WRITE data buffer */
+ #define NBD_MAX_BUFFER_SIZE (32 * 1024 * 1024)
 
-and the correct fix would be split s->freq in {s->freq_in, s->freq_out}
-but nobody ever required this during at least 14 years.
++/* Maximum size of a single PWRITE_ZERO request 1Gb */
++#define NBD_MAX_PWRITE_ZERO_SIZE (1024 * 1024 * 1024)
++
+ /* Maximum size of an export name. The NBD spec requires 256 and
+  * suggests that servers support up to 4096, but we stick to only the
+  * required size so that we can stack-allocate the names, and because
+--
+2.11.0
