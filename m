@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejroC-0003EQ-K5
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ejroK-0003OC-P8
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejroB-0001Gp-H6
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ejroJ-0001d4-68
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:24:44 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  8 Feb 2018 20:23:13 +0100
-Message-Id: <20180208192328.16550-13-kwolf@redhat.com>
+Date: Thu,  8 Feb 2018 20:23:15 +0100
+Message-Id: <20180208192328.16550-15-kwolf@redhat.com>
 In-Reply-To: <20180208192328.16550-1-kwolf@redhat.com>
 References: <20180208192328.16550-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/27] file-posix: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH 14/27] gluster: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,175 +22,312 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to file, which enables
+This adds the .bdrv_co_create driver callback to gluster, which enables
 image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 20 +++++++++++++-
- block/file-posix.c   | 77 +++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 74 insertions(+), 23 deletions(-)
+ qapi/block-core.json |  18 ++++++-
+ block/gluster.c      | 149 +++++++++++++++++++++++++++++++++------------------
+ 2 files changed, 115 insertions(+), 52 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c0e61483af..6f3461c751 100644
+index 6f3461c751..5b4cd6bd12 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3338,6 +3338,24 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+@@ -3356,6 +3356,22 @@
+             '*nocow':           'bool' } }
  
  ##
-+# @BlockdevCreateOptionsFile:
++# @BlockdevCreateOptionsGluster:
 +#
-+# Driver specific image creation options for file.
++# Driver specific image creation options for gluster.
 +#
-+# @filename         Filename for the new image file
++# @location         Where to store the new image file
 +# @size             Size of the virtual disk in bytes
 +# @preallocation    Preallocation mode for the new image (default: off)
-+# @nocow            Turn off copy-on-write (valid only on btrfs; default: off)
 +#
 +# Since: 2.12
 +##
-+{ 'struct': 'BlockdevCreateOptionsFile',
-+  'data': { 'filename':         'str',
++{ 'struct': 'BlockdevCreateOptionsGluster',
++  'data': { 'location':         'BlockdevOptionsGluster',
 +            'size':             'size',
-+            '*preallocation':   'PreallocMode',
-+            '*nocow':           'bool' } }
++            '*preallocation':   'PreallocMode' } }
 +
 +##
  # @BlockdevQcow2Version:
  #
  # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-@@ -3408,7 +3426,7 @@
-       'bochs':          'BlockdevCreateNotSupported',
-       'cloop':          'BlockdevCreateNotSupported',
-       'dmg':            'BlockdevCreateNotSupported',
--      'file':           'BlockdevCreateNotSupported',
-+      'file':           'BlockdevCreateOptionsFile',
+@@ -3429,7 +3445,7 @@
+       'file':           'BlockdevCreateOptionsFile',
        'ftp':            'BlockdevCreateNotSupported',
        'ftps':           'BlockdevCreateNotSupported',
-       'gluster':        'BlockdevCreateNotSupported',
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 36ee89e940..9ae5b7dcdf 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1979,33 +1979,25 @@ static int64_t raw_get_allocated_file_size(BlockDriverState *bs)
-     return (int64_t)st.st_blocks * 512;
+-      'gluster':        'BlockdevCreateNotSupported',
++      'gluster':        'BlockdevCreateOptionsGluster',
+       'host_cdrom':     'BlockdevCreateNotSupported',
+       'host_device':    'BlockdevCreateNotSupported',
+       'http':           'BlockdevCreateNotSupported',
+diff --git a/block/gluster.c b/block/gluster.c
+index 0f4265a3a4..b7e2b7fa2b 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -652,9 +652,11 @@ out:
+     return -errno;
  }
  
--static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
-+static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
+-static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+-                                      const char *filename,
+-                                      QDict *options, Error **errp)
++/* Converts options given in @filename and the @options QDict into the QAPI
++ * object @gconf. */
++static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
++                              const char *filename,
++                              QDict *options, Error **errp)
  {
-+    BlockdevCreateOptionsFile *file_opts;
-     int fd;
-     int result = 0;
--    int64_t total_size = 0;
--    bool nocow = false;
--    PreallocMode prealloc;
--    char *buf = NULL;
--    Error *local_err = NULL;
- 
--    strstart(filename, "file:", &filename);
-+    /* Validate options and set default values */
-+    assert(options->driver == BLOCKDEV_DRIVER_FILE);
-+    file_opts = &options->u.file;
- 
--    /* Read out options */
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
--    nocow = qemu_opt_get_bool(opts, BLOCK_OPT_NOCOW, false);
--    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
--                               PREALLOC_MODE_OFF, &local_err);
--    g_free(buf);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        result = -EINVAL;
--        goto out;
-+    if (!file_opts->has_nocow) {
-+        file_opts->nocow = false;
+     int ret;
+     if (filename) {
+@@ -665,8 +667,7 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+                                     "[host[:port]]volume/path[?socket=...]"
+                                     "[,file.debug=N]"
+                                     "[,file.logfile=/path/filename.log]\n");
+-            errno = -ret;
+-            return NULL;
++            return ret;
+         }
+     } else {
+         ret = qemu_gluster_parse_json(gconf, options, errp);
+@@ -682,10 +683,23 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+                              "file.server.1.transport=unix,"
+                              "file.server.1.socket=/var/run/glusterd.socket ..."
+                              "\n");
+-            errno = -ret;
+-            return NULL;
++            return ret;
+         }
 +    }
-+    if (!file_opts->has_preallocation) {
-+        file_opts->preallocation = PREALLOC_MODE_OFF;
++
++    return 0;
++}
++
++static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
++                                      const char *filename,
++                                      QDict *options, Error **errp)
++{
++    int ret;
+ 
++    ret = qemu_gluster_parse(gconf, filename, options, errp);
++    if (ret < 0) {
++        errno = -ret;
++        return NULL;
      }
  
--    fd = qemu_open(filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-+    /* Create file */
-+    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-                    0644);
-     if (fd < 0) {
-         result = -errno;
-@@ -2013,7 +2005,7 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+     return qemu_gluster_glfs_init(gconf, errp);
+@@ -962,64 +976,33 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
+ }
+ #endif
+ 
+-static int qemu_gluster_create(const char *filename,
+-                               QemuOpts *opts, Error **errp)
++static int qemu_gluster_co_create(BlockdevCreateOptions *options,
++                                  Error **errp)
+ {
+-    BlockdevOptionsGluster *gconf;
++    BlockdevCreateOptionsGluster *opts = &options->u.gluster;
+     struct glfs *glfs;
+     struct glfs_fd *fd;
+     int ret = 0;
+-    PreallocMode prealloc;
+-    int64_t total_size = 0;
+-    char *tmp = NULL;
+-    Error *local_err = NULL;
+-
+-    gconf = g_new0(BlockdevOptionsGluster, 1);
+-    gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
+-                                           GLUSTER_DEBUG_DEFAULT);
+-    if (gconf->debug < 0) {
+-        gconf->debug = 0;
+-    } else if (gconf->debug > GLUSTER_DEBUG_MAX) {
+-        gconf->debug = GLUSTER_DEBUG_MAX;
+-    }
+-    gconf->has_debug = true;
+ 
+-    gconf->logfile = qemu_opt_get_del(opts, GLUSTER_OPT_LOGFILE);
+-    if (!gconf->logfile) {
+-        gconf->logfile = g_strdup(GLUSTER_LOGFILE_DEFAULT);
+-    }
+-    gconf->has_logfile = true;
++    assert(options->driver == BLOCKDEV_DRIVER_GLUSTER);
+ 
+-    glfs = qemu_gluster_init(gconf, filename, NULL, errp);
++    glfs = qemu_gluster_glfs_init(opts->location, errp);
+     if (!glfs) {
+         ret = -errno;
          goto out;
      }
  
--    if (nocow) {
-+    if (file_opts->nocow) {
- #ifdef __linux__
-         /* Set NOCOW flag to solve performance issue on fs like btrfs.
-          * This is an optimisation. The FS_IOC_SETFLAGS ioctl return value
-@@ -2028,7 +2020,8 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
- #endif
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
+-
+-    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+-    prealloc = qapi_enum_parse(&PreallocMode_lookup, tmp, PREALLOC_MODE_OFF,
+-                               &local_err);
+-    g_free(tmp);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-        goto out;
+-    }
+-
+-    fd = glfs_creat(glfs, gconf->path,
++    fd = glfs_creat(glfs, opts->location->path,
+                     O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
+     if (!fd) {
+         ret = -errno;
+         goto out;
      }
  
--    result = raw_regular_truncate(fd, total_size, prealloc, errp);
-+    result = raw_regular_truncate(fd, file_opts->size, file_opts->preallocation,
-+                                  errp);
-     if (result < 0) {
-         goto out_close;
+-    switch (prealloc) {
++    switch (opts->preallocation) {
+ #ifdef CONFIG_GLUSTERFS_FALLOCATE
+     case PREALLOC_MODE_FALLOC:
+-        if (glfs_fallocate(fd, 0, 0, total_size)) {
++        if (glfs_fallocate(fd, 0, 0, opts->size)) {
+             error_setg(errp, "Could not preallocate data for the new file");
+             ret = -errno;
+         }
+@@ -1027,8 +1010,8 @@ static int qemu_gluster_create(const char *filename,
+ #endif /* CONFIG_GLUSTERFS_FALLOCATE */
+ #ifdef CONFIG_GLUSTERFS_ZEROFILL
+     case PREALLOC_MODE_FULL:
+-        if (!glfs_ftruncate(fd, total_size)) {
+-            if (glfs_zerofill(fd, 0, total_size)) {
++        if (!glfs_ftruncate(fd, opts->size)) {
++            if (glfs_zerofill(fd, 0, opts->size)) {
+                 error_setg(errp, "Could not zerofill the new file");
+                 ret = -errno;
+             }
+@@ -1039,7 +1022,7 @@ static int qemu_gluster_create(const char *filename,
+         break;
+ #endif /* CONFIG_GLUSTERFS_ZEROFILL */
+     case PREALLOC_MODE_OFF:
+-        if (glfs_ftruncate(fd, total_size) != 0) {
++        if (glfs_ftruncate(fd, opts->size) != 0) {
+             ret = -errno;
+             error_setg(errp, "Could not resize file");
+         }
+@@ -1047,7 +1030,7 @@ static int qemu_gluster_create(const char *filename,
+     default:
+         ret = -EINVAL;
+         error_setg(errp, "Unsupported preallocation mode: %s",
+-                   PreallocMode_str(prealloc));
++                   PreallocMode_str(opts->preallocation));
+         break;
      }
-@@ -2042,6 +2035,45 @@ out:
-     return result;
+ 
+@@ -1055,11 +1038,71 @@ static int qemu_gluster_create(const char *filename,
+         ret = -errno;
+     }
+ out:
+-    qapi_free_BlockdevOptionsGluster(gconf);
+     glfs_clear_preopened(glfs);
+     return ret;
  }
  
-+static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
++static int qemu_gluster_create(const char *filename,
++                               QemuOpts *opts, Error **errp)
 +{
-+    BlockdevCreateOptions options;
-+    int64_t total_size = 0;
-+    bool nocow = false;
-+    PreallocMode prealloc;
-+    char *buf = NULL;
++    BlockdevCreateOptions *options;
++    BlockdevCreateOptionsGluster *gopts;
++    BlockdevOptionsGluster *gconf;
++    char *tmp = NULL;
 +    Error *local_err = NULL;
++    int ret;
 +
-+    /* Skip file: protocol prefix */
-+    strstart(filename, "file:", &filename);
++    options = g_new0(BlockdevCreateOptions, 1);
++    options->driver = BLOCKDEV_DRIVER_GLUSTER;
++    gopts = &options->u.gluster;
 +
-+    /* Read out options */
-+    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                          BDRV_SECTOR_SIZE);
-+    nocow = qemu_opt_get_bool(opts, BLOCK_OPT_NOCOW, false);
-+    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
-+                               PREALLOC_MODE_OFF, &local_err);
-+    g_free(buf);
++    gconf = g_new0(BlockdevOptionsGluster, 1);
++    gopts->location = gconf;
++
++    gopts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++                           BDRV_SECTOR_SIZE);
++
++    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
++    gopts->preallocation = qapi_enum_parse(&PreallocMode_lookup, tmp,
++                                           PREALLOC_MODE_OFF, &local_err);
++    g_free(tmp);
 +    if (local_err) {
 +        error_propagate(errp, local_err);
-+        return -EINVAL;
++        ret = -EINVAL;
++        goto fail;
 +    }
 +
-+    options = (BlockdevCreateOptions) {
-+        .driver     = BLOCKDEV_DRIVER_FILE,
-+        .u.file     = {
-+            .filename           = (char *) filename,
-+            .size               = total_size,
-+            .has_preallocation  = true,
-+            .preallocation      = prealloc,
-+            .has_nocow          = true,
-+            .nocow              = nocow,
-+        },
-+    };
-+    return raw_co_create(&options, errp);
++    gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
++                                           GLUSTER_DEBUG_DEFAULT);
++    if (gconf->debug < 0) {
++        gconf->debug = 0;
++    } else if (gconf->debug > GLUSTER_DEBUG_MAX) {
++        gconf->debug = GLUSTER_DEBUG_MAX;
++    }
++    gconf->has_debug = true;
++
++    gconf->logfile = qemu_opt_get_del(opts, GLUSTER_OPT_LOGFILE);
++    if (!gconf->logfile) {
++        gconf->logfile = g_strdup(GLUSTER_LOGFILE_DEFAULT);
++    }
++    gconf->has_logfile = true;
++
++    ret = qemu_gluster_parse(gconf, filename, NULL, errp);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = qemu_gluster_co_create(options, errp);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = 0;
++fail:
++    qapi_free_BlockdevCreateOptions(options);
++    return ret;
 +}
 +
- /*
-  * Find allocation range in @bs around offset @start.
-  * May change underlying file descriptor's file offset.
-@@ -2278,6 +2310,7 @@ BlockDriver bdrv_file = {
-     .bdrv_reopen_commit = raw_reopen_commit,
-     .bdrv_reopen_abort = raw_reopen_abort,
-     .bdrv_close = raw_close,
-+    .bdrv_co_create = raw_co_create,
-     .bdrv_create = raw_create,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
-     .bdrv_co_get_block_status = raw_co_get_block_status,
+ static coroutine_fn int qemu_gluster_co_rw(BlockDriverState *bs,
+                                            int64_t sector_num, int nb_sectors,
+                                            QEMUIOVector *qiov, int write)
+@@ -1425,6 +1468,7 @@ static BlockDriver bdrv_gluster = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
+@@ -1453,6 +1497,7 @@ static BlockDriver bdrv_gluster_tcp = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
+@@ -1481,6 +1526,7 @@ static BlockDriver bdrv_gluster_unix = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
+@@ -1515,6 +1561,7 @@ static BlockDriver bdrv_gluster_rdma = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
 -- 
 2.13.6
