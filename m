@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1ejj6S-0007CG-0d
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:06:52 -0500
+	(envelope-from <berto@igalia.com>) id 1ejjAF-000116-Vy
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:10:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1ejj6M-0000TV-Dw
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:06:51 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:41031)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
-	id 1ejj6M-0000TA-6w
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:06:46 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id r23so3787651ote.8
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 02:06:45 -0800 (PST)
+	(envelope-from <berto@igalia.com>) id 1ejjAB-0002Jf-RE
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:10:47 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180207162920.28386-1-pbonzini@redhat.com>
+References: <20180207162920.28386-1-pbonzini@redhat.com>
+Date: Thu, 08 Feb 2018 11:10:40 +0100
+Message-ID: <w514lmrrdun.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-From: Ramy Sameh <ramysameh26@gmail.com>
-Date: Thu, 8 Feb 2018 12:06:44 +0200
-Message-ID: <CAF6HrYx6fKVAACMN1TFV_9xKU42RP1yULQpwjvV9jtDExZq8JA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Questions regarding how QEMU initializes virtual
- peripherals
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: early check for
+ blockers on drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +22,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Mona Safar <Mona.Safar@eng.asu.edu.eg>, Watheq <watheq@gmail.com>, Ahmed Aly <ahmedaly50@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-Hello all,
+On Wed 07 Feb 2018 05:29:20 PM CET, Paolo Bonzini wrote:
+> Even if an op blocker is present for BLOCK_OP_TYPE_MIRROR_SOURCE,
+> it is checked a bit late and the result is that the target is
+> created even if drive-mirror subsequently fails.  Add an early
+> check to avoid this.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockdev.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/blockdev.c b/blockdev.c
+> index 8e977eef11..c7e2e0a00e 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3565,6 +3565,11 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+>          return;
+>      }
+>  
+> +    /* Early check to avoid creating target */
+> +    if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_MIRROR_SOURCE, errp)) {
+> +        return;
+> +    }
+> +
+>      aio_context = bdrv_get_aio_context(bs);
+>      aio_context_acquire(aio_context);
 
-I am working with QEMU to simulate VersatilePB board.
+Do we need to hold the AioContext in order to check for op blockers?
 
-I am trying to understand how QEMU initialize the virtual peripherals (e.g.
-UART, vectored Interrupt controller .. etc).
-
-When I traced the code, I found a function called "object_init_with_type"
-in object.c, in which the function pointer "ti->instance_init(obj)" seems
-to call the peripherals initialization functions.
-
-*I have couple of questions here:*
-1.) Some peripheral initialization functions are called multiple times such
-as pl011_init, why is that ?
-2.) Where is the entry point for the whole initialization functionalities
-(that will eventually call "object_init_with_type")
-
-Thank you.
-
--- 
-Best Regards,
-Ramy Sameh
-Embedded Software Engineer
+Berto
