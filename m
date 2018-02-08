@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ejmvF-0003lE-V5
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:11:35 -0500
+	(envelope-from <marcel@redhat.com>) id 1ejmwK-0004j4-95
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:12:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ejmvB-0000rX-US
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:11:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51324)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1ejmvB-0000qz-Ks
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:11:29 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w18EBPqZ050988
-	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 09:11:28 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g0qx5gj4q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:11:27 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Thu, 8 Feb 2018 07:11:26 -0700
-References: <20180208105754.19924-1-danielhb@linux.vnet.ibm.com>
-	<caaad0dd-3f8e-a414-48ed-b6535d5a83a4@amsat.org>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Thu, 8 Feb 2018 12:11:20 -0200
+	(envelope-from <marcel@redhat.com>) id 1ejmwJ-0001Ms-2e
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:12:40 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49614 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ejmwI-0001Me-Oa
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:12:38 -0500
+References: <20180205102659.60552-1-marcel@redhat.com>
+	<CAFEAcA8OO7jEeAe5UWKBqSb_+tap7OVM2YxEsqWDVZV8jN7cmA@mail.gmail.com>
+	<51f8addc-8c6c-4532-1a59-b4c0098f6c68@redhat.com>
+	<f7b61733-f25a-31b5-7b55-d9a41b6d3f10@amsat.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <c685b567-ad73-feff-08db-c952ac1f4c6f@redhat.com>
+Date: Thu, 8 Feb 2018 16:12:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <caaad0dd-3f8e-a414-48ed-b6535d5a83a4@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <f7b61733-f25a-31b5-7b55-d9a41b6d3f10@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <36d28bb7-5e8d-f1f6-4ecd-bd5e986a5dfc@linux.vnet.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/audio/sb16.c: missing break
- statement
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/4] RDMA patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,54 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: dotanb@mellanox.com, QEMU Developers <qemu-devel@nongnu.org>, yuval.shaia@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-SGV5LA0KDQpPbiAwMi8wOC8yMDE4IDEwOjE1IEFNLCBQaGlsaXBwZSBNYXRoaWV1LURhdWTD
-qSB3cm90ZToNCj4gSGkgRGFuaWVsLA0KPg0KPiBPbiAwMi8wOC8yMDE4IDA3OjU3IEFNLCBE
-YW5pZWwgSGVucmlxdWUgQmFyYm96YSB3cm90ZToNCj4+IFRoaXMgcGF0Y2ggYWRkcyBhIGJy
-ZWFrIGluIHRoZSBzd2l0Y2goKSBzdGF0ZW1lbnQgb2YgY29tcGxldGUoKSwNCj4+IHZhbHVl
-IDB4NDI6DQo+Pg0KPj4gICAgICBjYXNlIDB4NDI6ICAgICAgICAgICAgICAvKiBGVDIgc2V0
-cyBvdXRwdXQgZnJlcSB3aXRoIHRoaXMsIGdvIGZpZ3VyZSAqLw0KPj4gICAgICAgICAgcWVt
-dV9sb2dfbWFzayhMT0dfVU5JTVAsICJjbWQgMHg0MiBtaWdodCBub3QgZG8gd2hhdCBpdCB0
-aGluayBpdCINCj4+ICAgICAgICAgICAgICAgICAgICAgICAgIiBzaG91bGRcbiIpOw0KPj4g
-ICAgICAgICAgYnJlYWs7IDwtLS0tLS0tDQo+PiAgICAgIGNhc2UgMHg0MToNCj4gSXQgc2Vl
-bXMgdGhpcyBpcyBhbiBpbnRlbnRpb25hbCBmYWxsdGhyb3VnaCwgSSB1bmRlcnN0YW5kIGNt
-ZCAweDQyIGlzDQo+IGV4cGVjdGVkIHRvIGRvIHRoZSBzYW1lIG9mIDB4NDEgYW5kIF9hIGJp
-dCBtb3JlXyAoc2VlIGNvbW1pdCA4NTU3MWJjNzQxNSkuDQoNClBlcmhhcHMgaXQgc2hvdWxk
-IGJlIG1vcmUgZXhwbGljaXQgdGhlbj8gU29tZXRoaW5nIGxpa2UNCg0KIMKgwqDCoMKgwqDC
-oMKgIGNhc2UgMHg0MDoNCiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHMtPnRpbWVfY29uc3Qg
-PSBkc3BfZ2V0X2RhdGEgKHMpOw0KIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbGRlYnVnICgi
-c2V0IHRpbWUgY29uc3QgJWRcbiIsIHMtPnRpbWVfY29uc3QpOw0KIMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgYnJlYWs7DQoNCiDCoMKgwqDCoMKgwqDCoCBjYXNlIDB4NDE6DQogwqDCoMKg
-wqDCoMKgwqAgY2FzZSAweDQyOg0KIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocy0+
-Y21kID09IDB4NDIpIHsNCiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8q
-IEZUMiBzZXRzIG91dHB1dCBmcmVxIHdpdGggdGhpcywgZ28gZmlndXJlICovDQogwqAgwqDC
-oCDCoMKgwqDCoMKgwqDCoMKgwqDCoCBxZW11X2xvZ19tYXNrKExPR19VTklNUCwgImNtZCAw
-eDQyIG1pZ2h0IG5vdCBkbyB3aGF0IGl0IA0KdGhpbmsgaXQiDQogwqDCoMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgIiBzaG91bGRcbiIpOw0KIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfQ0KIMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgcy0+ZnJlcSA9IGRzcF9nZXRfaGlsbyAocyk7DQogwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBsZGVidWcgKCJzZXQgZnJlcSAlZFxuIiwgcy0+ZnJlcSk7DQogwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBicmVhazsNCg0KIMKgwqDCoMKgwqDCoMKgIGNhc2UgMHg0
-ODoNCg0KDQoNCj4NCj4+IFRoZSBpc3N1ZSB3YXMgZm91bmQgYnkgQ292ZXJpdHkgKCMxMzg1
-ODQxKToNCj4+DQo+PiAgICAgIENJRCAxMzg1ODQxOiAgQ29udHJvbCBmbG93IGlzc3VlcyAg
-KE1JU1NJTkdfQlJFQUspDQo+PiAgICAgIFRoZSBjYXNlIGZvciB2YWx1ZSAiNjYiIGlzIG5v
-dCB0ZXJtaW5hdGVkIGJ5IGEgJ2JyZWFrJyBzdGF0ZW1lbnQuDQo+Pg0KPj4gRml4ZXM6IDhl
-YzY2MGI4MGUgKCJody9hdWRpby9zYjE2LmM6IGNoYW5nZSBkb2xvZygpIHRvIHFlbXVfbG9n
-X21hc2soKSIpDQo+PiBTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgSGVucmlxdWUgQmFyYm96YSA8
-ZGFuaWVsaGJAbGludXgudm5ldC5pYm0uY29tPg0KPj4gQ0M6IEpvaG4gQXJidWNrbGUgPHBy
-b2dyYW1taW5na2lkeEBnbWFpbC5jb20+DQo+PiBDQzogR2VyZCBIb2ZmbWFubiA8a3JheGVs
-QHJlZGhhdC5jb20+DQo+PiAtLS0NCj4+ICAgaHcvYXVkaW8vc2IxNi5jIHwgMSArDQo+PiAg
-IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9o
-dy9hdWRpby9zYjE2LmMgYi9ody9hdWRpby9zYjE2LmMNCj4+IGluZGV4IDMxZGUyNjRhYjcu
-LmIyZmRjZDg0MzcgMTAwNjQ0DQo+PiAtLS0gYS9ody9hdWRpby9zYjE2LmMNCj4+ICsrKyBi
-L2h3L2F1ZGlvL3NiMTYuYw0KPj4gQEAgLTc0NCw2ICs3NDQsNyBAQCBzdGF0aWMgdm9pZCBj
-b21wbGV0ZSAoU0IxNlN0YXRlICpzKQ0KPj4gICAgICAgICAgIGNhc2UgMHg0MjogICAgICAg
-ICAgICAgIC8qIEZUMiBzZXRzIG91dHB1dCBmcmVxIHdpdGggdGhpcywgZ28gZmlndXJlICov
-DQo+PiAgICAgICAgICAgICAgIHFlbXVfbG9nX21hc2soTE9HX1VOSU1QLCAiY21kIDB4NDIg
-bWlnaHQgbm90IGRvIHdoYXQgaXQgdGhpbmsgaXQiDQo+PiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIiBzaG91bGRcbiIpOw0KPj4gKyAgICAgICAgICAgIGJyZWFrOw0KPj4gICAg
-ICAgICAgIGNhc2UgMHg0MToNCj4+ICAgICAgICAgICAgICAgcy0+ZnJlcSA9IGRzcF9nZXRf
-aGlsbyAocyk7DQo+PiAgICAgICAgICAgICAgIGxkZWJ1ZyAoInNldCBmcmVxICVkXG4iLCBz
-LT5mcmVxKTsNCj4+DQoNCg==
+On 08/02/2018 16:01, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Marcel,
+>=20
+> On 02/08/2018 10:38 AM, Marcel Apfelbaum wrote:
+>> On 08/02/2018 14:59, Peter Maydell wrote:
+>>> On 5 February 2018 at 10:26, Marcel Apfelbaum <marcel@redhat.com> wro=
+te:
+>>>> The following changes since commit f24ee107a07f093bd7ed475dd48d7ba57=
+ea3d8fe:
+>>>
+>>> Hi. The technical details of this pullreq are all fine (pgp
+>>> key, format, etc), and it passes my build tests. But I gave
+>>> this pullreq a bit of a closer inspection than I normally
+>>> would, since it's your first, and there are a few things I
+>>> thought worth bringing up:
+>>
+>> Thanks for doing it!
+>>
+>>>
+>>> (1) I notice that some of the new files in this pullreq are licensed
+>>> as "GPL, version 2", rather than "version 2 or any later version".
+>>> Did you really mean that? Per 'LICENSE', we have a strong preference
+>>> for 2-or-later for new code.
+>>>
+>>
+>> No real preference, I will modify the license.
+>>
+>>> (2) Some new files have no copyright or license comment at the
+>>> top of them. Can you fix that, please?
+>>>
+>>
+>> Sure.
+>>
+>>> (3) Some of the new headers use kernel-internals __u32 etc types.
+>>> This isn't portable. ('HACKING' has some suggestions for types you
+>>> might want instead.)
+>>>
+>>
+>> We do not "use" the __u32 types, we just copied a kernel file
+>> for structures used for communication between the guest driver
+>> and the QEMU code. We had a look on how it is done and
+>> we use the model that adds macros __u32 -> uint32_t,
+>> so the "__types" do not really create such problems.
+>>
+>>> (4) One of your patches doesn't have any reviewed-by tags.
+>>> We don't always manage to review everything, but it is
+>>> nicer if we can get review, especially for patches from
+>>> new submaintainers.
+>>>
+>>
+>> The patch did receive several questions/comments and all
+>> of them were addressed, but indeed no RB tag was given.
+>> Since the patch was in the mailing list for over a month
+>> and *was* reviewed, I thought is enough.
+>> I will ping Eduardo, he had the latest comments for it.
+>>
+>>
+>>> (5) This is an absolutely enormous diffstat for a single commit:
+>>>  26 files changed, 5149 insertions(+), 4 deletions(-)
+>>>
+>>
+>> On the github where the project was developed we have thousands of com=
+mits,
+>> so it can't be used.
+>> It was reviewed closely by one reviewer and got a lot
+>> of comments from others.
+>> That being said, we will try to split it in a few patches
+>> and send a new version.
+>=20
+> I spent some time to review this but got lost when it became too
+> specific (this is not really my area).
+> I was hoping some of the VMware folks could review this.
+>=20
+
+The code was reviewed by someone from Mellanox and
+we have an RDMA developer from Oracle looking into it to.
+For V10 we will have a second RB for the device, it should be enough.
+
+> KVM related stuffs are hard to test, but we have some qtests (migration
+> mostly). Adding some tests for this huge code addition would be really
+> great.
+>=20
+
+It is in our plans, yes.
+We saw the avocado guys are returning to QEMU, I will ask their help in s=
+etting
+up an avocado test. It should take some time and we are developing the de=
+vice
+over an year offline making it had to maintain/review, so
+we will work on the tests in parallel with the device submission.
+
+Thanks,
+Marcel
+
+> Regards,
+>=20
+> Phil.
+>=20
