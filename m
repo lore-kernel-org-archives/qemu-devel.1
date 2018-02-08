@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ejtLx-0001D6-Hz
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 16:03:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1ejtNy-0003BT-9F
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 16:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ejtLw-0005yo-DF
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 16:03:33 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34635)
+	(envelope-from <bounces@canonical.com>) id 1ejtNu-0007Gi-A4
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 16:05:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46734)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ejtLw-0005yF-7I
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 16:03:32 -0500
-Received: by mail-oi0-x242.google.com with SMTP id k15so4527814oib.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 13:03:32 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ejtNu-0007GE-3b
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 16:05:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ejtNs-0005aj-VG
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 21:05:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E990C2E8042
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 21:05:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <36012021-2859-8690-002d-aaef6b3b8bae@linaro.org>
-References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
-	<1518053328-34687-7-git-send-email-mjc@sifive.com>
-	<36012021-2859-8690-002d-aaef6b3b8bae@linaro.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 9 Feb 2018 10:03:31 +1300
-Message-ID: <CAHNT7NvjnUz0RHdYpRoaK1rM_6tWJZcK8uhpj90-WRmh_Q4Ayw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 06/23] Softfloat support for IEEE
- 754-201x minimumNumber/maximumNumber
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Feb 2018 20:55:21 -0000
+From: Doug Gale <doug16k@gmail.com>
+Reply-To: Bug 1748296 <1748296@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151812332204.10331.17425660234309724521.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1748296] [NEW] TCG throws Invalid Opcode when
+ executing x86 BMI shlx instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +36,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
 
-On Fri, Feb 9, 2018 at 3:35 AM, Richard Henderson <
-richard.henderson@linaro.org> wrote:
+Public bug reported:
 
-> On 02/07/2018 05:28 PM, Michael Clark wrote:
-> > QEMU currently implements IEEE 754-2008 minNum/maxNum. This patch adds
-> > support for IEEE 754-201x minimumNumber/maximumNumber which is required
-> > by the RISC-V port.
-> >
-> > minNum(x, y) is defined as
-> > - min(x, y) if neither is NaN
-> > - if one of x and y is a number and one is qNaN, return the number
-> > - if both are qNaN, or either is sNaN, return NaN
-> >
-> > minimumNumber(x, y) is defined as
-> > - min(x, y) if neither is NaN
-> > - if one of x and y is a number and one is qNaN or sNaN, return the
-> number
-> > - if both are NaN, return the number
-> >
-> > Both functions signal the invalid exception on sNaN inputs.
-> >
-> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > ---
->
-> Thanks for the description of the function.  We've got a reorg of softfloat
-> pending at the moment; I'd want to defer this patch until that set has
-> landed.
->
+I am unable to use BMI in my project when running under TCG. I narrowed
+the problem down to incorrect instruction decoding for BMI instructions
+(which have a 2 byte VEX prefix). The gen_sse function in translate.c
+reaches the goto label do_0f_38_fx, but b does not equal 0x1f7, 0x2f7,
+or 0x3f7, so the switch takes the default path and raises an invalid
+opcode exception.
 
-Noted.
+The code executes correctly and passes the test under KVM.
 
-We should also add a mention of minimumNumber/maximumNumber to the
-preceeding comment, which isn't in the current version of the patch. e.g.
+I have created a complete repro here: https://github.com/doug65536/qemu-
+bmibug
 
- * minimumnumber() and maximumnumber() functions correspond to
-minimumNumber()
- * and maximumNumber() from the IEEE-754 201x specification.
+The makefile has the following utility targets:
+
+debug-kvm: Build and run the VM using KVM and wait for gdbstub attach
+
+run: Run the test case with TCG, make fails if the test fails. (It will
+fail)
+
+run-kvm: Run the test case with KVM, make fails if the test fails. (It
+will succeed)
+
+debug: Build and run the VM with TCG and wait for GDB attach
+
+attach-gdb: Run GDB and attach to KVM gdbstub
+
+The VM runs with -cpu max. CPUID reports support for BMI, BMI2, and ABM.
+
+You can quickly verify the issue by executing `make run-kvm` to confirm
+that KVM passes, then `make run` to confirm that TCG fails.
+
+I believe the bug affects other BMI, BMI2, and ABM instructions, but I
+have only completely verified incorrect execution of SHLX.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1748296
+
+Title:
+  TCG throws Invalid Opcode when executing x86 BMI shlx instruction
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am unable to use BMI in my project when running under TCG. I
+  narrowed the problem down to incorrect instruction decoding for BMI
+  instructions (which have a 2 byte VEX prefix). The gen_sse function in
+  translate.c reaches the goto label do_0f_38_fx, but b does not equal
+  0x1f7, 0x2f7, or 0x3f7, so the switch takes the default path and
+  raises an invalid opcode exception.
+
+  The code executes correctly and passes the test under KVM.
+
+  I have created a complete repro here: https://github.com/doug65536
+  /qemu-bmibug
+
+  The makefile has the following utility targets:
+
+  debug-kvm: Build and run the VM using KVM and wait for gdbstub attach
+
+  run: Run the test case with TCG, make fails if the test fails. (It
+  will fail)
+
+  run-kvm: Run the test case with KVM, make fails if the test fails. (It
+  will succeed)
+
+  debug: Build and run the VM with TCG and wait for GDB attach
+
+  attach-gdb: Run GDB and attach to KVM gdbstub
+
+  The VM runs with -cpu max. CPUID reports support for BMI, BMI2, and
+  ABM.
+
+  You can quickly verify the issue by executing `make run-kvm` to
+  confirm that KVM passes, then `make run` to confirm that TCG fails.
+
+  I believe the bug affects other BMI, BMI2, and ABM instructions, but I
+  have only completely verified incorrect execution of SHLX.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1748296/+subscriptions
