@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ejkb7-0002cG-7y
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:42:38 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ejklw-0007We-GE
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:53:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ejkb3-0000ZU-1h
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:42:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42954 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1ejkb2-0000ZC-Sc
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:42:32 -0500
-References: <20180207001615.1156.10547.stgit@gimli.home>
-	<20180207002646.1156.37051.stgit@gimli.home>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <dddd1f95-1146-5af5-0d85-c25d0b6c931e@redhat.com>
-Date: Thu, 8 Feb 2018 12:42:15 +0100
+	(envelope-from <cohuck@redhat.com>) id 1ejklt-0006Ny-En
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:53:48 -0500
+Date: Thu, 8 Feb 2018 12:53:24 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180208125324.40e3c26e.cohuck@redhat.com>
+In-Reply-To: <47ffc4f7-a66b-0328-d0bf-2d06ad0f7c30@de.ibm.com>
+References: <20180202094241.59537-1-borntraeger@de.ibm.com>
+	<8d3af693-3dd8-20b7-c7c1-38d7c6cce65d@de.ibm.com>
+	<20180202113301.0522c7bc.cohuck@redhat.com>
+	<20180202113513.15c37b32.cohuck@redhat.com>
+	<47ffc4f7-a66b-0328-d0bf-2d06ad0f7c30@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180207002646.1156.37051.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 5/5] vfio/quirks: Enable ioeventfd
- quirks to be handled by vfio directly
+Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling -->
+ stable 2.11.1?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi Alex,
-On 07/02/18 01:26, Alex Williamson wrote:
-> With vfio ioeventfd support, we can program vfio-pci to perform a
-> specified BAR write when an eventfd is triggered.  This allows the
-> KVM ioeventfd to be wired directly to vfio-pci, entirely avoiding
-> userspace handling for these events.  On the same micro-benchmark
-> where the ioeventfd got us to almost 90% of performance versus
-> disabling the GeForce quirks, this gets us to within 95%.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  hw/vfio/pci-quirks.c |   42 ++++++++++++++++++++++++++++++++++++------
->  1 file changed, 36 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index e739efe601b1..35a4d5197e2d 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -16,6 +16,7 @@
->  #include "qemu/range.h"
->  #include "qapi/error.h"
->  #include "qapi/visitor.h"
-> +#include <sys/ioctl.h>
->  #include "hw/nvram/fw_cfg.h"
->  #include "pci.h"
->  #include "trace.h"
-> @@ -287,13 +288,27 @@ static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
->      return quirk;
->  }
->  
-> -static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
-> +static void vfio_ioeventfd_exit(VFIOPCIDevice *vdev, VFIOIOEventFD *ioeventfd)
->  {
-> +    struct vfio_device_ioeventfd vfio_ioeventfd;
-> +
->      QLIST_REMOVE(ioeventfd, next);
-> +
->      memory_region_del_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
->                                ioeventfd->match_data, ioeventfd->data,
->                                &ioeventfd->e);
-> +
->      qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e), NULL, NULL, NULL);
-> +
-> +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-> +    vfio_ioeventfd.flags = ioeventfd->size;
-> +    vfio_ioeventfd.data = ioeventfd->data;
-> +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-> +                            ioeventfd->region_addr;
-> +    vfio_ioeventfd.fd = -1;
-> +
-> +    ioctl(vdev->vbasedev.fd, VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
-> +
->      event_notifier_cleanup(&ioeventfd->e);
->      g_free(ioeventfd);
->  }
-> @@ -315,6 +330,8 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
->                                            hwaddr region_addr)
->  {
->      VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
-> +    struct vfio_device_ioeventfd vfio_ioeventfd;
-> +    char vfio_enabled = '+';
->  
->      if (event_notifier_init(&ioeventfd->e, 0)) {
->          g_free(ioeventfd);
-> @@ -329,15 +346,28 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
->      ioeventfd->region = region;
->      ioeventfd->region_addr = region_addr;
->  
-> -    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> -                        vfio_ioeventfd_handler, NULL, ioeventfd);
-> +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-> +    vfio_ioeventfd.flags = ioeventfd->size;
-> +    vfio_ioeventfd.data = ioeventfd->data;
-> +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-> +                            ioeventfd->region_addr;
-> +    vfio_ioeventfd.fd = event_notifier_get_fd(&ioeventfd->e);
-> +
-> +    if (ioctl(vdev->vbasedev.fd,
-> +              VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd) != 0) {
-> +        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> +                            vfio_ioeventfd_handler, NULL, ioeventfd);
-> +        vfio_enabled = '-';
-> +    }
-> +
->      memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr,
->                                ioeventfd->size, ioeventfd->match_data,
->                                ioeventfd->data, &ioeventfd->e);
->  
->      info_report("Enabled automatic ioeventfd acceleration for %s region %d, "
-> -                "offset 0x%"HWADDR_PRIx", data 0x%"PRIx64", size %u",
-> -                vdev->vbasedev.name, region->nr, region_addr, data, size);
-> +                "offset 0x%"HWADDR_PRIx", data 0x%"PRIx64", size %u, vfio%c",
-> +                vdev->vbasedev.name, region->nr, region_addr, data, size,
-> +                vfio_enabled);
-Not sure if this message is really helpful for the end-user to
-understand what happens. Maybe adding a trace event when everything
-happens as it should and an error_report if we failed setting up the
-vfio kernel handler, explaining the sub-optimal performance that can result.
+On Thu, 8 Feb 2018 12:30:28 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Thanks
-
-Eric
->  
->      return ioeventfd;
->  }
-> @@ -1767,7 +1797,7 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr)
->  
->      QLIST_FOREACH(quirk, &bar->quirks, next) {
->          while (!QLIST_EMPTY(&quirk->ioeventfds)) {
-> -            vfio_ioeventfd_exit(QLIST_FIRST(&quirk->ioeventfds));
-> +            vfio_ioeventfd_exit(vdev, QLIST_FIRST(&quirk->ioeventfds));
->          }
->  
->          for (i = 0; i < quirk->nr_mem; i++) {
+> On 02/02/2018 11:35 AM, Cornelia Huck wrote:
+> > On Fri, 2 Feb 2018 11:33:01 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >   
+> >> On Fri, 2 Feb 2018 10:43:18 +0100
+> >> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >>  
+> >>> On 02/02/2018 10:42 AM, Christian Borntraeger wrote:    
+> >>>> commit 67915de9f038 ("s390x/event-facility: variable-length event
+> >>>> masks") switches the sclp receive/send mask. This broke the sclp
+> >>>> lm console.    
+> >>
+> >> Hum. Probably should add sclp-lm to my test setup.
+> >>  
+> >>>>
+> >>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >>>> Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
+> >>>> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>      
+> >>>
+> >>> opps. Please fixup yourself Conny :-)    
+> >>
+> >> Well, you did cc: the original author :)
+> >>  
+> >>>     
+> >>>> Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> >>>> Cc: qemu-stable@nongnu.org
+> >>>> ---
+> >>>>  hw/s390x/event-facility.c | 4 ++--
+> >>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> >>>> index b0f71f4554..155a69467b 100644
+> >>>> --- a/hw/s390x/event-facility.c
+> >>>> +++ b/hw/s390x/event-facility.c
+> >>>> @@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+> >>>>      ef->receive_mask = be32_to_cpu(tmp_mask);
+> >>>>
+> >>>>      /* return the SCLP's capability masks to the guest */
+> >>>> -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
+> >>>> +    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
+> >>>>      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+> >>>>                mask_length, sizeof(tmp_mask));
+> >>>> -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
+> >>>> +    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
+> >>>>      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+> >>>>                mask_length, sizeof(tmp_mask));
+> >>>>       
+> >>>     
+> >>
+> >> Thanks, applied.  
+> > 
+> > Oh, and as always, I still take R-bs until I prepare a pull req.
+> >   
 > 
+> Would be good to have that in 2.11.1 stable as well I think
+> 
+
+FWIW, this is queued in s390-next and will go into a pull request in
+the next days. Not sure if anything else is needed?
