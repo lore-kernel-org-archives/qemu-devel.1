@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ejdFv-0003iD-OS
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 22:52:16 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ejdoV-00011Y-Km
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:28:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ejdFs-00080x-Ki
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 22:52:15 -0500
-Received: from mga06.intel.com ([134.134.136.31]:45052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ejdFs-0007wi-AZ
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 22:52:12 -0500
-Message-ID: <5A7BCA07.2000704@intel.com>
-Date: Thu, 08 Feb 2018 11:54:47 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <aik@ozlabs.ru>) id 1ejdoR-00084n-KZ
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:27:59 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:56106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ejdoR-00084M-Dh
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 23:27:55 -0500
+Received: by mail-it0-x241.google.com with SMTP id b66so5037306itd.5
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 20:27:54 -0800 (PST)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <20171026014139.46221-1-aik@ozlabs.ru>
+	<82b6cfcf-70ae-2817-8eb8-fe630d3bec95@ozlabs.ru>
+	<70dce2ac-5278-d7c1-744d-83de8e111faf@ozlabs.ru>
+	<bebff732-86de-d7e2-93d5-a33fa44f5763@ozlabs.ru>
+Message-ID: <bef12936-8383-d455-8753-5f04bb58827d@ozlabs.ru>
+Date: Thu, 8 Feb 2018 15:27:48 +1100
 MIME-Version: 1.0
-References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
-	<1517915299-15349-3-git-send-email-wei.w.wang@intel.com>
-	<20180207014345-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180207014345-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <bebff732-86de-d7e2-93d5-a33fa44f5763@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: use the free page
- reporting feature from balloon
+Subject: Re: [Qemu-devel] [PATCH qemu v2] machine: Polish -machine xxx,help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +32,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 02/07/2018 07:57 AM, Michael S. Tsirkin wrote:
-> On Tue, Feb 06, 2018 at 07:08:18PM +0800, Wei Wang wrote:
->> Use the free page reporting feature from the balloon device to clear the
->> bits corresponding to guest free pages from the dirty bitmap, so that the
->> free memory are not sent.
+On 02/02/18 13:45, Alexey Kardashevskiy wrote:
+> On 29/01/18 16:03, Alexey Kardashevskiy wrote:
+>> On 15/12/17 15:47, Alexey Kardashevskiy wrote:
+>>> On 26/10/17 12:41, Alexey Kardashevskiy wrote:
+>>>> The "-machine xxx,help" prints kernel-irqchip possible values as
+>>>> "OnOffSplit", this adds separators to the printed line.
+>>>>
+>>>> Also, since only lower case letters are specified in qapi/common.json,
+>>>> this changes the letter cases too.
+>>>>
+>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>
+>>> ping?
 >>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
->> CC: Juan Quintela <quintela@redhat.com>
-> What the patch seems to do is stop migration
-> completely - blocking until guest completes the reporting.
->
-> Which makes no sense to me, since it's just an optimization.
-> Why not proceed with the migration? What do we have to loose?
-
-If we want the optimization to run in parallel with the migration 
-thread, we will need to create another polling thread, like 
-multithreading compression. In that way, we will waste some host CPU. 
-For example, the migration thread may proceed to send pages to the 
-destination while the optimization thread is in progress, but those 
-pages may turn out to be free pages (this is likely in the bulk stage) 
-which don't need to be sent. In that case, why not let the migration 
-thread wait a little bit (i.e. put the optimization into the migration 
-thread) and proceed to do some useful things, instead of pretending to 
-proceed but doing useless things?
-
-The current plan of this patch is to skip free pages for the bulk stage 
-only. I'm not sure if it would be useful for the 2nd stage onward, which 
-basically relies on the dirty logging to send pages that have been 
-written by the guest. For example, if the guest is not so active while 
-live migration happens, there will be very few dirty bits. This 
-optimization would be mostly clearing "0" bits from the dirty bitmap.
+>>
+>> anyone?
+> 
+> Let's try trivial list now :)
 
 
-> I imagine some people might want to defer migration until reporting
-> completes to reduce the load on the network. Fair enough,
-> but it does not look like you actually measured the reduction
-> in traffic. So I suggest you work on that as a separate feature.
->
-
-I have the traffic data actually. Tested with 8G idle guest, Legacy v.s. 
-Optimization: ~390MB v.s. ~337MB.
-The legacy case has the zero page checking optimization, so the traffic 
-reduction is not very obvious. But zero checking has much more overhead, 
-which is demonstrated by the migration time (this optimization takes 
-~14% of the legacy migration time).
+And ping again :)
 
 
-Best,
-Wei
+> 
+> 
+>>
+>>>
+>>>
+>>>> ---
+>>>>
+>>>> aik@fstn1-p1:~$ ./qemu-system-ppc64 -machine pseries,help 2>&1 | grep kernel-irqchip
+>>>>
+>>>> Was:
+>>>> pseries-2.11.kernel-irqchip=OnOffSplit (Configure KVM in-kernel irqchip)
+>>>>
+>>>> Now:
+>>>> pseries-2.11.kernel-irqchip=on|off|split (Configure KVM in-kernel irqchip)
+>>>> ---
+>>>>  hw/core/machine.c | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>>>> index 36c2fb069c..bd3db14e12 100644
+>>>> --- a/hw/core/machine.c
+>>>> +++ b/hw/core/machine.c
+>>>> @@ -506,7 +506,7 @@ static void machine_class_init(ObjectClass *oc, void *data)
+>>>>      object_class_property_set_description(oc, "accel",
+>>>>          "Accelerator list", &error_abort);
+>>>>  
+>>>> -    object_class_property_add(oc, "kernel-irqchip", "OnOffSplit",
+>>>> +    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
+>>>>          NULL, machine_set_kernel_irqchip,
+>>>>          NULL, NULL, &error_abort);
+>>>>      object_class_property_set_description(oc, "kernel-irqchip",
+>>>>
+>>>
+>>>
+>>
+>>
+> 
+> 
+
+
+-- 
+Alexey
