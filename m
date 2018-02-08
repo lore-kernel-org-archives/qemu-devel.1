@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejotq-0002Wk-1C
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:18:14 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ejouh-0003Ef-6H
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejotp-00014w-4t
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:18:14 -0500
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:36860)
+	(envelope-from <stefanha@gmail.com>) id 1ejoug-0001OH-AD
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:19:07 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:44721)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejoto-00014R-Vy
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:18:13 -0500
-Received: by mail-oi0-x22d.google.com with SMTP id 24so3871954oij.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:18:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ejoug-0001Nx-3h
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:19:06 -0500
+Received: by mail-wr0-x236.google.com with SMTP id v31so5279163wrc.11
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:19:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180208021953.7354-1-famz@redhat.com>
-References: <20180208021953.7354-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Feb 2018 16:17:51 +0000
-Message-ID: <CAFEAcA9Deo==b3MwY3LLacY2yYHq99oS7_+=sR+1+Y+v7o1SQQ@mail.gmail.com>
+In-Reply-To: <20180208151722.5wrjrbi6dy7akdai@postretch>
+References: <CAJSP0QUpUG11mDRvyN1OWQ2m7Pn_btG2D27C_h=EnpcqEyXLZQ@mail.gmail.com>
+	<20180208151722.5wrjrbi6dy7akdai@postretch>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 8 Feb 2018 16:19:04 +0000
+Message-ID: <CAJSP0QW-QY9Ytbcb_QmsYy4VTCKZpo5+JjoHg0LaZW=kOHNBHA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/16] Docker and block patches
+Subject: Re: [Qemu-devel] Throttling filter node status?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 8 February 2018 at 02:19, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit 7b213bb4755dc99e447c19c532768ef5105b9771:
+On Thu, Feb 8, 2018 at 3:17 PM, Manos Pitsidianakis
+<el13635@mail.ntua.gr> wrote:
+> On Wed, Feb 07, 2018 at 06:35:20PM +0000, Stefan Hajnoczi wrote:
+>>
+>> Hi Manos,
+>> I hope you're doing well and that you've had a good time at university
+>> after Google Summer of Code.
+>>
+>> Do you have time to work on getting the remainder of your GSoC work
+>> merged over the coming weeks?
+>>
+>> If not, don't feel bad but please let us know so someone can take over
+>> the patches.
+>>
+>> Stefan
 >
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-02-07 20:40:36 +0000)
 >
-> are available in the Git repository at:
->
->   git://github.com/famz/qemu.git tags/staging-pull-request
->
-> for you to fetch changes up to 4eb995603479f0f7aff14b518f8ada16fe694ca7:
->
->   docs: Add docs/devel/testing.rst (2018-02-08 09:23:07 +0800)
->
-> ----------------------------------------------------------------
->
->  - The docker, coroutine and block patches from the earlier version
->  - The testing documentation
->
-> ----------------------------------------------------------------
+> Hi Stefan, thanks for the reminder. I will try to catch up in the following
+> days.
 
-Applied, thanks.
+Excellent, thanks!
 
--- PMM
+Stefan
