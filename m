@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbpC-0006QN-HL
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:38 -0500
+	(envelope-from <famz@redhat.com>) id 1ejbpH-0006Wu-Do
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbp8-0004WB-G5
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:34 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51478 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1ejbpD-0004YR-V6
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:39 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49650 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ejbp8-0004W4-8n
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:30 -0500
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ejbpD-0004YL-P3
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:35 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Thu,  8 Feb 2018 10:19:50 +0800
-Message-Id: <20180208021953.7354-14-famz@redhat.com>
+Date: Thu,  8 Feb 2018 10:19:53 +0800
+Message-Id: <20180208021953.7354-17-famz@redhat.com>
 In-Reply-To: <20180208021953.7354-1-famz@redhat.com>
 References: <20180208021953.7354-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 13/16] block: Move NVMe constants to a separate
- header
+Subject: [Qemu-devel] [PULL 16/16] docs: Add docs/devel/testing.rst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,1449 +26,613 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
+To make our efforts on QEMU testing easier to consume by contributors,
+let's add a document. For example, Patchew reports build errors on
+patches that should be relatively easy to reproduce with a few steps, and
+it is much nicer if there is such a documentation that it can refer to.
+
+This focuses on how to run existing tests and how to write new test
+cases, without going into the frameworks themselves.
+
+The VM based testing section is moved from tests/vm/README which now
+is a single line pointing to the new doc.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20180116060901.17413-8-famz@redhat.com>
+Message-Id: <20180201022046.9425-1-famz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/nvme.c         |   7 +-
- hw/block/nvme.h      | 698 +-------------------------------------------------
- include/block/nvme.h | 700 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 702 insertions(+), 703 deletions(-)
- create mode 100644 include/block/nvme.h
+ docs/devel/testing.rst | 486 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/vm/README        |  90 +--------
+ 2 files changed, 487 insertions(+), 89 deletions(-)
+ create mode 100644 docs/devel/testing.rst
 
-diff --git a/block/nvme.c b/block/nvme.c
-index a487b4d381..e9d0e218fc 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -22,12 +22,7 @@
- #include "block/block_int.h"
- #include "trace.h"
- 
--/* TODO: Move nvme spec definitions from hw/block/nvme.h into a separate file
-- * that doesn't depend on dma/pci headers. */
--#include "sysemu/dma.h"
--#include "hw/pci/pci.h"
--#include "hw/block/block.h"
--#include "hw/block/nvme.h"
-+#include "block/nvme.h"
- 
- #define NVME_SQ_ENTRY_BYTES 64
- #define NVME_CQ_ENTRY_BYTES 16
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 7b62dad072..8f3981121d 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -1,703 +1,7 @@
- #ifndef HW_NVME_H
- #define HW_NVME_H
- #include "qemu/cutils.h"
--
--typedef struct NvmeBar {
--    uint64_t    cap;
--    uint32_t    vs;
--    uint32_t    intms;
--    uint32_t    intmc;
--    uint32_t    cc;
--    uint32_t    rsvd1;
--    uint32_t    csts;
--    uint32_t    nssrc;
--    uint32_t    aqa;
--    uint64_t    asq;
--    uint64_t    acq;
--    uint32_t    cmbloc;
--    uint32_t    cmbsz;
--} NvmeBar;
--
--enum NvmeCapShift {
--    CAP_MQES_SHIFT     = 0,
--    CAP_CQR_SHIFT      = 16,
--    CAP_AMS_SHIFT      = 17,
--    CAP_TO_SHIFT       = 24,
--    CAP_DSTRD_SHIFT    = 32,
--    CAP_NSSRS_SHIFT    = 33,
--    CAP_CSS_SHIFT      = 37,
--    CAP_MPSMIN_SHIFT   = 48,
--    CAP_MPSMAX_SHIFT   = 52,
--};
--
--enum NvmeCapMask {
--    CAP_MQES_MASK      = 0xffff,
--    CAP_CQR_MASK       = 0x1,
--    CAP_AMS_MASK       = 0x3,
--    CAP_TO_MASK        = 0xff,
--    CAP_DSTRD_MASK     = 0xf,
--    CAP_NSSRS_MASK     = 0x1,
--    CAP_CSS_MASK       = 0xff,
--    CAP_MPSMIN_MASK    = 0xf,
--    CAP_MPSMAX_MASK    = 0xf,
--};
--
--#define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
--#define NVME_CAP_CQR(cap)   (((cap) >> CAP_CQR_SHIFT)    & CAP_CQR_MASK)
--#define NVME_CAP_AMS(cap)   (((cap) >> CAP_AMS_SHIFT)    & CAP_AMS_MASK)
--#define NVME_CAP_TO(cap)    (((cap) >> CAP_TO_SHIFT)     & CAP_TO_MASK)
--#define NVME_CAP_DSTRD(cap) (((cap) >> CAP_DSTRD_SHIFT)  & CAP_DSTRD_MASK)
--#define NVME_CAP_NSSRS(cap) (((cap) >> CAP_NSSRS_SHIFT)  & CAP_NSSRS_MASK)
--#define NVME_CAP_CSS(cap)   (((cap) >> CAP_CSS_SHIFT)    & CAP_CSS_MASK)
--#define NVME_CAP_MPSMIN(cap)(((cap) >> CAP_MPSMIN_SHIFT) & CAP_MPSMIN_MASK)
--#define NVME_CAP_MPSMAX(cap)(((cap) >> CAP_MPSMAX_SHIFT) & CAP_MPSMAX_MASK)
--
--#define NVME_CAP_SET_MQES(cap, val)   (cap |= (uint64_t)(val & CAP_MQES_MASK)  \
--                                                           << CAP_MQES_SHIFT)
--#define NVME_CAP_SET_CQR(cap, val)    (cap |= (uint64_t)(val & CAP_CQR_MASK)   \
--                                                           << CAP_CQR_SHIFT)
--#define NVME_CAP_SET_AMS(cap, val)    (cap |= (uint64_t)(val & CAP_AMS_MASK)   \
--                                                           << CAP_AMS_SHIFT)
--#define NVME_CAP_SET_TO(cap, val)     (cap |= (uint64_t)(val & CAP_TO_MASK)    \
--                                                           << CAP_TO_SHIFT)
--#define NVME_CAP_SET_DSTRD(cap, val)  (cap |= (uint64_t)(val & CAP_DSTRD_MASK) \
--                                                           << CAP_DSTRD_SHIFT)
--#define NVME_CAP_SET_NSSRS(cap, val)  (cap |= (uint64_t)(val & CAP_NSSRS_MASK) \
--                                                           << CAP_NSSRS_SHIFT)
--#define NVME_CAP_SET_CSS(cap, val)    (cap |= (uint64_t)(val & CAP_CSS_MASK)   \
--                                                           << CAP_CSS_SHIFT)
--#define NVME_CAP_SET_MPSMIN(cap, val) (cap |= (uint64_t)(val & CAP_MPSMIN_MASK)\
--                                                           << CAP_MPSMIN_SHIFT)
--#define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
--                                                            << CAP_MPSMAX_SHIFT)
--
--enum NvmeCcShift {
--    CC_EN_SHIFT     = 0,
--    CC_CSS_SHIFT    = 4,
--    CC_MPS_SHIFT    = 7,
--    CC_AMS_SHIFT    = 11,
--    CC_SHN_SHIFT    = 14,
--    CC_IOSQES_SHIFT = 16,
--    CC_IOCQES_SHIFT = 20,
--};
--
--enum NvmeCcMask {
--    CC_EN_MASK      = 0x1,
--    CC_CSS_MASK     = 0x7,
--    CC_MPS_MASK     = 0xf,
--    CC_AMS_MASK     = 0x7,
--    CC_SHN_MASK     = 0x3,
--    CC_IOSQES_MASK  = 0xf,
--    CC_IOCQES_MASK  = 0xf,
--};
--
--#define NVME_CC_EN(cc)     ((cc >> CC_EN_SHIFT)     & CC_EN_MASK)
--#define NVME_CC_CSS(cc)    ((cc >> CC_CSS_SHIFT)    & CC_CSS_MASK)
--#define NVME_CC_MPS(cc)    ((cc >> CC_MPS_SHIFT)    & CC_MPS_MASK)
--#define NVME_CC_AMS(cc)    ((cc >> CC_AMS_SHIFT)    & CC_AMS_MASK)
--#define NVME_CC_SHN(cc)    ((cc >> CC_SHN_SHIFT)    & CC_SHN_MASK)
--#define NVME_CC_IOSQES(cc) ((cc >> CC_IOSQES_SHIFT) & CC_IOSQES_MASK)
--#define NVME_CC_IOCQES(cc) ((cc >> CC_IOCQES_SHIFT) & CC_IOCQES_MASK)
--
--enum NvmeCstsShift {
--    CSTS_RDY_SHIFT      = 0,
--    CSTS_CFS_SHIFT      = 1,
--    CSTS_SHST_SHIFT     = 2,
--    CSTS_NSSRO_SHIFT    = 4,
--};
--
--enum NvmeCstsMask {
--    CSTS_RDY_MASK   = 0x1,
--    CSTS_CFS_MASK   = 0x1,
--    CSTS_SHST_MASK  = 0x3,
--    CSTS_NSSRO_MASK = 0x1,
--};
--
--enum NvmeCsts {
--    NVME_CSTS_READY         = 1 << CSTS_RDY_SHIFT,
--    NVME_CSTS_FAILED        = 1 << CSTS_CFS_SHIFT,
--    NVME_CSTS_SHST_NORMAL   = 0 << CSTS_SHST_SHIFT,
--    NVME_CSTS_SHST_PROGRESS = 1 << CSTS_SHST_SHIFT,
--    NVME_CSTS_SHST_COMPLETE = 2 << CSTS_SHST_SHIFT,
--    NVME_CSTS_NSSRO         = 1 << CSTS_NSSRO_SHIFT,
--};
--
--#define NVME_CSTS_RDY(csts)     ((csts >> CSTS_RDY_SHIFT)   & CSTS_RDY_MASK)
--#define NVME_CSTS_CFS(csts)     ((csts >> CSTS_CFS_SHIFT)   & CSTS_CFS_MASK)
--#define NVME_CSTS_SHST(csts)    ((csts >> CSTS_SHST_SHIFT)  & CSTS_SHST_MASK)
--#define NVME_CSTS_NSSRO(csts)   ((csts >> CSTS_NSSRO_SHIFT) & CSTS_NSSRO_MASK)
--
--enum NvmeAqaShift {
--    AQA_ASQS_SHIFT  = 0,
--    AQA_ACQS_SHIFT  = 16,
--};
--
--enum NvmeAqaMask {
--    AQA_ASQS_MASK   = 0xfff,
--    AQA_ACQS_MASK   = 0xfff,
--};
--
--#define NVME_AQA_ASQS(aqa) ((aqa >> AQA_ASQS_SHIFT) & AQA_ASQS_MASK)
--#define NVME_AQA_ACQS(aqa) ((aqa >> AQA_ACQS_SHIFT) & AQA_ACQS_MASK)
--
--enum NvmeCmblocShift {
--    CMBLOC_BIR_SHIFT  = 0,
--    CMBLOC_OFST_SHIFT = 12,
--};
--
--enum NvmeCmblocMask {
--    CMBLOC_BIR_MASK  = 0x7,
--    CMBLOC_OFST_MASK = 0xfffff,
--};
--
--#define NVME_CMBLOC_BIR(cmbloc) ((cmbloc >> CMBLOC_BIR_SHIFT)  & \
--                                 CMBLOC_BIR_MASK)
--#define NVME_CMBLOC_OFST(cmbloc)((cmbloc >> CMBLOC_OFST_SHIFT) & \
--                                 CMBLOC_OFST_MASK)
--
--#define NVME_CMBLOC_SET_BIR(cmbloc, val)  \
--    (cmbloc |= (uint64_t)(val & CMBLOC_BIR_MASK) << CMBLOC_BIR_SHIFT)
--#define NVME_CMBLOC_SET_OFST(cmbloc, val) \
--    (cmbloc |= (uint64_t)(val & CMBLOC_OFST_MASK) << CMBLOC_OFST_SHIFT)
--
--enum NvmeCmbszShift {
--    CMBSZ_SQS_SHIFT   = 0,
--    CMBSZ_CQS_SHIFT   = 1,
--    CMBSZ_LISTS_SHIFT = 2,
--    CMBSZ_RDS_SHIFT   = 3,
--    CMBSZ_WDS_SHIFT   = 4,
--    CMBSZ_SZU_SHIFT   = 8,
--    CMBSZ_SZ_SHIFT    = 12,
--};
--
--enum NvmeCmbszMask {
--    CMBSZ_SQS_MASK   = 0x1,
--    CMBSZ_CQS_MASK   = 0x1,
--    CMBSZ_LISTS_MASK = 0x1,
--    CMBSZ_RDS_MASK   = 0x1,
--    CMBSZ_WDS_MASK   = 0x1,
--    CMBSZ_SZU_MASK   = 0xf,
--    CMBSZ_SZ_MASK    = 0xfffff,
--};
--
--#define NVME_CMBSZ_SQS(cmbsz)  ((cmbsz >> CMBSZ_SQS_SHIFT)   & CMBSZ_SQS_MASK)
--#define NVME_CMBSZ_CQS(cmbsz)  ((cmbsz >> CMBSZ_CQS_SHIFT)   & CMBSZ_CQS_MASK)
--#define NVME_CMBSZ_LISTS(cmbsz)((cmbsz >> CMBSZ_LISTS_SHIFT) & CMBSZ_LISTS_MASK)
--#define NVME_CMBSZ_RDS(cmbsz)  ((cmbsz >> CMBSZ_RDS_SHIFT)   & CMBSZ_RDS_MASK)
--#define NVME_CMBSZ_WDS(cmbsz)  ((cmbsz >> CMBSZ_WDS_SHIFT)   & CMBSZ_WDS_MASK)
--#define NVME_CMBSZ_SZU(cmbsz)  ((cmbsz >> CMBSZ_SZU_SHIFT)   & CMBSZ_SZU_MASK)
--#define NVME_CMBSZ_SZ(cmbsz)   ((cmbsz >> CMBSZ_SZ_SHIFT)    & CMBSZ_SZ_MASK)
--
--#define NVME_CMBSZ_SET_SQS(cmbsz, val)   \
--    (cmbsz |= (uint64_t)(val &  CMBSZ_SQS_MASK)  << CMBSZ_SQS_SHIFT)
--#define NVME_CMBSZ_SET_CQS(cmbsz, val)   \
--    (cmbsz |= (uint64_t)(val & CMBSZ_CQS_MASK) << CMBSZ_CQS_SHIFT)
--#define NVME_CMBSZ_SET_LISTS(cmbsz, val) \
--    (cmbsz |= (uint64_t)(val & CMBSZ_LISTS_MASK) << CMBSZ_LISTS_SHIFT)
--#define NVME_CMBSZ_SET_RDS(cmbsz, val)   \
--    (cmbsz |= (uint64_t)(val & CMBSZ_RDS_MASK) << CMBSZ_RDS_SHIFT)
--#define NVME_CMBSZ_SET_WDS(cmbsz, val)   \
--    (cmbsz |= (uint64_t)(val & CMBSZ_WDS_MASK) << CMBSZ_WDS_SHIFT)
--#define NVME_CMBSZ_SET_SZU(cmbsz, val)   \
--    (cmbsz |= (uint64_t)(val & CMBSZ_SZU_MASK) << CMBSZ_SZU_SHIFT)
--#define NVME_CMBSZ_SET_SZ(cmbsz, val)    \
--    (cmbsz |= (uint64_t)(val & CMBSZ_SZ_MASK) << CMBSZ_SZ_SHIFT)
--
--#define NVME_CMBSZ_GETSIZE(cmbsz) \
--    (NVME_CMBSZ_SZ(cmbsz) * (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz))))
--
--typedef struct NvmeCmd {
--    uint8_t     opcode;
--    uint8_t     fuse;
--    uint16_t    cid;
--    uint32_t    nsid;
--    uint64_t    res1;
--    uint64_t    mptr;
--    uint64_t    prp1;
--    uint64_t    prp2;
--    uint32_t    cdw10;
--    uint32_t    cdw11;
--    uint32_t    cdw12;
--    uint32_t    cdw13;
--    uint32_t    cdw14;
--    uint32_t    cdw15;
--} NvmeCmd;
--
--enum NvmeAdminCommands {
--    NVME_ADM_CMD_DELETE_SQ      = 0x00,
--    NVME_ADM_CMD_CREATE_SQ      = 0x01,
--    NVME_ADM_CMD_GET_LOG_PAGE   = 0x02,
--    NVME_ADM_CMD_DELETE_CQ      = 0x04,
--    NVME_ADM_CMD_CREATE_CQ      = 0x05,
--    NVME_ADM_CMD_IDENTIFY       = 0x06,
--    NVME_ADM_CMD_ABORT          = 0x08,
--    NVME_ADM_CMD_SET_FEATURES   = 0x09,
--    NVME_ADM_CMD_GET_FEATURES   = 0x0a,
--    NVME_ADM_CMD_ASYNC_EV_REQ   = 0x0c,
--    NVME_ADM_CMD_ACTIVATE_FW    = 0x10,
--    NVME_ADM_CMD_DOWNLOAD_FW    = 0x11,
--    NVME_ADM_CMD_FORMAT_NVM     = 0x80,
--    NVME_ADM_CMD_SECURITY_SEND  = 0x81,
--    NVME_ADM_CMD_SECURITY_RECV  = 0x82,
--};
--
--enum NvmeIoCommands {
--    NVME_CMD_FLUSH              = 0x00,
--    NVME_CMD_WRITE              = 0x01,
--    NVME_CMD_READ               = 0x02,
--    NVME_CMD_WRITE_UNCOR        = 0x04,
--    NVME_CMD_COMPARE            = 0x05,
--    NVME_CMD_WRITE_ZEROS        = 0x08,
--    NVME_CMD_DSM                = 0x09,
--};
--
--typedef struct NvmeDeleteQ {
--    uint8_t     opcode;
--    uint8_t     flags;
--    uint16_t    cid;
--    uint32_t    rsvd1[9];
--    uint16_t    qid;
--    uint16_t    rsvd10;
--    uint32_t    rsvd11[5];
--} NvmeDeleteQ;
--
--typedef struct NvmeCreateCq {
--    uint8_t     opcode;
--    uint8_t     flags;
--    uint16_t    cid;
--    uint32_t    rsvd1[5];
--    uint64_t    prp1;
--    uint64_t    rsvd8;
--    uint16_t    cqid;
--    uint16_t    qsize;
--    uint16_t    cq_flags;
--    uint16_t    irq_vector;
--    uint32_t    rsvd12[4];
--} NvmeCreateCq;
--
--#define NVME_CQ_FLAGS_PC(cq_flags)  (cq_flags & 0x1)
--#define NVME_CQ_FLAGS_IEN(cq_flags) ((cq_flags >> 1) & 0x1)
--
--typedef struct NvmeCreateSq {
--    uint8_t     opcode;
--    uint8_t     flags;
--    uint16_t    cid;
--    uint32_t    rsvd1[5];
--    uint64_t    prp1;
--    uint64_t    rsvd8;
--    uint16_t    sqid;
--    uint16_t    qsize;
--    uint16_t    sq_flags;
--    uint16_t    cqid;
--    uint32_t    rsvd12[4];
--} NvmeCreateSq;
--
--#define NVME_SQ_FLAGS_PC(sq_flags)      (sq_flags & 0x1)
--#define NVME_SQ_FLAGS_QPRIO(sq_flags)   ((sq_flags >> 1) & 0x3)
--
--enum NvmeQueueFlags {
--    NVME_Q_PC           = 1,
--    NVME_Q_PRIO_URGENT  = 0,
--    NVME_Q_PRIO_HIGH    = 1,
--    NVME_Q_PRIO_NORMAL  = 2,
--    NVME_Q_PRIO_LOW     = 3,
--};
--
--typedef struct NvmeIdentify {
--    uint8_t     opcode;
--    uint8_t     flags;
--    uint16_t    cid;
--    uint32_t    nsid;
--    uint64_t    rsvd2[2];
--    uint64_t    prp1;
--    uint64_t    prp2;
--    uint32_t    cns;
--    uint32_t    rsvd11[5];
--} NvmeIdentify;
--
--typedef struct NvmeRwCmd {
--    uint8_t     opcode;
--    uint8_t     flags;
--    uint16_t    cid;
--    uint32_t    nsid;
--    uint64_t    rsvd2;
--    uint64_t    mptr;
--    uint64_t    prp1;
--    uint64_t    prp2;
--    uint64_t    slba;
--    uint16_t    nlb;
--    uint16_t    control;
--    uint32_t    dsmgmt;
--    uint32_t    reftag;
--    uint16_t    apptag;
--    uint16_t    appmask;
--} NvmeRwCmd;
--
--enum {
--    NVME_RW_LR                  = 1 << 15,
--    NVME_RW_FUA                 = 1 << 14,
--    NVME_RW_DSM_FREQ_UNSPEC     = 0,
--    NVME_RW_DSM_FREQ_TYPICAL    = 1,
--    NVME_RW_DSM_FREQ_RARE       = 2,
--    NVME_RW_DSM_FREQ_READS      = 3,
--    NVME_RW_DSM_FREQ_WRITES     = 4,
--    NVME_RW_DSM_FREQ_RW         = 5,
--    NVME_RW_DSM_FREQ_ONCE       = 6,
--    NVME_RW_DSM_FREQ_PREFETCH   = 7,
--    NVME_RW_DSM_FREQ_TEMP       = 8,
--    NVME_RW_DSM_LATENCY_NONE    = 0 << 4,
--    NVME_RW_DSM_LATENCY_IDLE    = 1 << 4,
--    NVME_RW_DSM_LATENCY_NORM    = 2 << 4,
--    NVME_RW_DSM_LATENCY_LOW     = 3 << 4,
--    NVME_RW_DSM_SEQ_REQ         = 1 << 6,
--    NVME_RW_DSM_COMPRESSED      = 1 << 7,
--    NVME_RW_PRINFO_PRACT        = 1 << 13,
--    NVME_RW_PRINFO_PRCHK_GUARD  = 1 << 12,
--    NVME_RW_PRINFO_PRCHK_APP    = 1 << 11,
--    NVME_RW_PRINFO_PRCHK_REF    = 1 << 10,
--};
--
--typedef struct NvmeDsmCmd {
--    uint8_t     opcode;
--    uint8_t     flags;
--    uint16_t    cid;
--    uint32_t    nsid;
--    uint64_t    rsvd2[2];
--    uint64_t    prp1;
--    uint64_t    prp2;
--    uint32_t    nr;
--    uint32_t    attributes;
--    uint32_t    rsvd12[4];
--} NvmeDsmCmd;
--
--enum {
--    NVME_DSMGMT_IDR = 1 << 0,
--    NVME_DSMGMT_IDW = 1 << 1,
--    NVME_DSMGMT_AD  = 1 << 2,
--};
--
--typedef struct NvmeDsmRange {
--    uint32_t    cattr;
--    uint32_t    nlb;
--    uint64_t    slba;
--} NvmeDsmRange;
--
--enum NvmeAsyncEventRequest {
--    NVME_AER_TYPE_ERROR                     = 0,
--    NVME_AER_TYPE_SMART                     = 1,
--    NVME_AER_TYPE_IO_SPECIFIC               = 6,
--    NVME_AER_TYPE_VENDOR_SPECIFIC           = 7,
--    NVME_AER_INFO_ERR_INVALID_SQ            = 0,
--    NVME_AER_INFO_ERR_INVALID_DB            = 1,
--    NVME_AER_INFO_ERR_DIAG_FAIL             = 2,
--    NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     = 3,
--    NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    = 4,
--    NVME_AER_INFO_ERR_FW_IMG_LOAD_ERR       = 5,
--    NVME_AER_INFO_SMART_RELIABILITY         = 0,
--    NVME_AER_INFO_SMART_TEMP_THRESH         = 1,
--    NVME_AER_INFO_SMART_SPARE_THRESH        = 2,
--};
--
--typedef struct NvmeAerResult {
--    uint8_t event_type;
--    uint8_t event_info;
--    uint8_t log_page;
--    uint8_t resv;
--} NvmeAerResult;
--
--typedef struct NvmeCqe {
--    uint32_t    result;
--    uint32_t    rsvd;
--    uint16_t    sq_head;
--    uint16_t    sq_id;
--    uint16_t    cid;
--    uint16_t    status;
--} NvmeCqe;
--
--enum NvmeStatusCodes {
--    NVME_SUCCESS                = 0x0000,
--    NVME_INVALID_OPCODE         = 0x0001,
--    NVME_INVALID_FIELD          = 0x0002,
--    NVME_CID_CONFLICT           = 0x0003,
--    NVME_DATA_TRAS_ERROR        = 0x0004,
--    NVME_POWER_LOSS_ABORT       = 0x0005,
--    NVME_INTERNAL_DEV_ERROR     = 0x0006,
--    NVME_CMD_ABORT_REQ          = 0x0007,
--    NVME_CMD_ABORT_SQ_DEL       = 0x0008,
--    NVME_CMD_ABORT_FAILED_FUSE  = 0x0009,
--    NVME_CMD_ABORT_MISSING_FUSE = 0x000a,
--    NVME_INVALID_NSID           = 0x000b,
--    NVME_CMD_SEQ_ERROR          = 0x000c,
--    NVME_LBA_RANGE              = 0x0080,
--    NVME_CAP_EXCEEDED           = 0x0081,
--    NVME_NS_NOT_READY           = 0x0082,
--    NVME_NS_RESV_CONFLICT       = 0x0083,
--    NVME_INVALID_CQID           = 0x0100,
--    NVME_INVALID_QID            = 0x0101,
--    NVME_MAX_QSIZE_EXCEEDED     = 0x0102,
--    NVME_ACL_EXCEEDED           = 0x0103,
--    NVME_RESERVED               = 0x0104,
--    NVME_AER_LIMIT_EXCEEDED     = 0x0105,
--    NVME_INVALID_FW_SLOT        = 0x0106,
--    NVME_INVALID_FW_IMAGE       = 0x0107,
--    NVME_INVALID_IRQ_VECTOR     = 0x0108,
--    NVME_INVALID_LOG_ID         = 0x0109,
--    NVME_INVALID_FORMAT         = 0x010a,
--    NVME_FW_REQ_RESET           = 0x010b,
--    NVME_INVALID_QUEUE_DEL      = 0x010c,
--    NVME_FID_NOT_SAVEABLE       = 0x010d,
--    NVME_FID_NOT_NSID_SPEC      = 0x010f,
--    NVME_FW_REQ_SUSYSTEM_RESET  = 0x0110,
--    NVME_CONFLICTING_ATTRS      = 0x0180,
--    NVME_INVALID_PROT_INFO      = 0x0181,
--    NVME_WRITE_TO_RO            = 0x0182,
--    NVME_WRITE_FAULT            = 0x0280,
--    NVME_UNRECOVERED_READ       = 0x0281,
--    NVME_E2E_GUARD_ERROR        = 0x0282,
--    NVME_E2E_APP_ERROR          = 0x0283,
--    NVME_E2E_REF_ERROR          = 0x0284,
--    NVME_CMP_FAILURE            = 0x0285,
--    NVME_ACCESS_DENIED          = 0x0286,
--    NVME_MORE                   = 0x2000,
--    NVME_DNR                    = 0x4000,
--    NVME_NO_COMPLETE            = 0xffff,
--};
--
--typedef struct NvmeFwSlotInfoLog {
--    uint8_t     afi;
--    uint8_t     reserved1[7];
--    uint8_t     frs1[8];
--    uint8_t     frs2[8];
--    uint8_t     frs3[8];
--    uint8_t     frs4[8];
--    uint8_t     frs5[8];
--    uint8_t     frs6[8];
--    uint8_t     frs7[8];
--    uint8_t     reserved2[448];
--} NvmeFwSlotInfoLog;
--
--typedef struct NvmeErrorLog {
--    uint64_t    error_count;
--    uint16_t    sqid;
--    uint16_t    cid;
--    uint16_t    status_field;
--    uint16_t    param_error_location;
--    uint64_t    lba;
--    uint32_t    nsid;
--    uint8_t     vs;
--    uint8_t     resv[35];
--} NvmeErrorLog;
--
--typedef struct NvmeSmartLog {
--    uint8_t     critical_warning;
--    uint8_t     temperature[2];
--    uint8_t     available_spare;
--    uint8_t     available_spare_threshold;
--    uint8_t     percentage_used;
--    uint8_t     reserved1[26];
--    uint64_t    data_units_read[2];
--    uint64_t    data_units_written[2];
--    uint64_t    host_read_commands[2];
--    uint64_t    host_write_commands[2];
--    uint64_t    controller_busy_time[2];
--    uint64_t    power_cycles[2];
--    uint64_t    power_on_hours[2];
--    uint64_t    unsafe_shutdowns[2];
--    uint64_t    media_errors[2];
--    uint64_t    number_of_error_log_entries[2];
--    uint8_t     reserved2[320];
--} NvmeSmartLog;
--
--enum NvmeSmartWarn {
--    NVME_SMART_SPARE                  = 1 << 0,
--    NVME_SMART_TEMPERATURE            = 1 << 1,
--    NVME_SMART_RELIABILITY            = 1 << 2,
--    NVME_SMART_MEDIA_READ_ONLY        = 1 << 3,
--    NVME_SMART_FAILED_VOLATILE_MEDIA  = 1 << 4,
--};
--
--enum LogIdentifier {
--    NVME_LOG_ERROR_INFO     = 0x01,
--    NVME_LOG_SMART_INFO     = 0x02,
--    NVME_LOG_FW_SLOT_INFO   = 0x03,
--};
--
--typedef struct NvmePSD {
--    uint16_t    mp;
--    uint16_t    reserved;
--    uint32_t    enlat;
--    uint32_t    exlat;
--    uint8_t     rrt;
--    uint8_t     rrl;
--    uint8_t     rwt;
--    uint8_t     rwl;
--    uint8_t     resv[16];
--} NvmePSD;
--
--typedef struct NvmeIdCtrl {
--    uint16_t    vid;
--    uint16_t    ssvid;
--    uint8_t     sn[20];
--    uint8_t     mn[40];
--    uint8_t     fr[8];
--    uint8_t     rab;
--    uint8_t     ieee[3];
--    uint8_t     cmic;
--    uint8_t     mdts;
--    uint8_t     rsvd255[178];
--    uint16_t    oacs;
--    uint8_t     acl;
--    uint8_t     aerl;
--    uint8_t     frmw;
--    uint8_t     lpa;
--    uint8_t     elpe;
--    uint8_t     npss;
--    uint8_t     rsvd511[248];
--    uint8_t     sqes;
--    uint8_t     cqes;
--    uint16_t    rsvd515;
--    uint32_t    nn;
--    uint16_t    oncs;
--    uint16_t    fuses;
--    uint8_t     fna;
--    uint8_t     vwc;
--    uint16_t    awun;
--    uint16_t    awupf;
--    uint8_t     rsvd703[174];
--    uint8_t     rsvd2047[1344];
--    NvmePSD     psd[32];
--    uint8_t     vs[1024];
--} NvmeIdCtrl;
--
--enum NvmeIdCtrlOacs {
--    NVME_OACS_SECURITY  = 1 << 0,
--    NVME_OACS_FORMAT    = 1 << 1,
--    NVME_OACS_FW        = 1 << 2,
--};
--
--enum NvmeIdCtrlOncs {
--    NVME_ONCS_COMPARE       = 1 << 0,
--    NVME_ONCS_WRITE_UNCORR  = 1 << 1,
--    NVME_ONCS_DSM           = 1 << 2,
--    NVME_ONCS_WRITE_ZEROS   = 1 << 3,
--    NVME_ONCS_FEATURES      = 1 << 4,
--    NVME_ONCS_RESRVATIONS   = 1 << 5,
--};
--
--#define NVME_CTRL_SQES_MIN(sqes) ((sqes) & 0xf)
--#define NVME_CTRL_SQES_MAX(sqes) (((sqes) >> 4) & 0xf)
--#define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
--#define NVME_CTRL_CQES_MAX(cqes) (((cqes) >> 4) & 0xf)
--
--typedef struct NvmeFeatureVal {
--    uint32_t    arbitration;
--    uint32_t    power_mgmt;
--    uint32_t    temp_thresh;
--    uint32_t    err_rec;
--    uint32_t    volatile_wc;
--    uint32_t    num_queues;
--    uint32_t    int_coalescing;
--    uint32_t    *int_vector_config;
--    uint32_t    write_atomicity;
--    uint32_t    async_config;
--    uint32_t    sw_prog_marker;
--} NvmeFeatureVal;
--
--#define NVME_ARB_AB(arb)    (arb & 0x7)
--#define NVME_ARB_LPW(arb)   ((arb >> 8) & 0xff)
--#define NVME_ARB_MPW(arb)   ((arb >> 16) & 0xff)
--#define NVME_ARB_HPW(arb)   ((arb >> 24) & 0xff)
--
--#define NVME_INTC_THR(intc)     (intc & 0xff)
--#define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
--
--enum NvmeFeatureIds {
--    NVME_ARBITRATION                = 0x1,
--    NVME_POWER_MANAGEMENT           = 0x2,
--    NVME_LBA_RANGE_TYPE             = 0x3,
--    NVME_TEMPERATURE_THRESHOLD      = 0x4,
--    NVME_ERROR_RECOVERY             = 0x5,
--    NVME_VOLATILE_WRITE_CACHE       = 0x6,
--    NVME_NUMBER_OF_QUEUES           = 0x7,
--    NVME_INTERRUPT_COALESCING       = 0x8,
--    NVME_INTERRUPT_VECTOR_CONF      = 0x9,
--    NVME_WRITE_ATOMICITY            = 0xa,
--    NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
--    NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
--};
--
--typedef struct NvmeRangeType {
--    uint8_t     type;
--    uint8_t     attributes;
--    uint8_t     rsvd2[14];
--    uint64_t    slba;
--    uint64_t    nlb;
--    uint8_t     guid[16];
--    uint8_t     rsvd48[16];
--} NvmeRangeType;
--
--typedef struct NvmeLBAF {
--    uint16_t    ms;
--    uint8_t     ds;
--    uint8_t     rp;
--} NvmeLBAF;
--
--typedef struct NvmeIdNs {
--    uint64_t    nsze;
--    uint64_t    ncap;
--    uint64_t    nuse;
--    uint8_t     nsfeat;
--    uint8_t     nlbaf;
--    uint8_t     flbas;
--    uint8_t     mc;
--    uint8_t     dpc;
--    uint8_t     dps;
--    uint8_t     res30[98];
--    NvmeLBAF    lbaf[16];
--    uint8_t     res192[192];
--    uint8_t     vs[3712];
--} NvmeIdNs;
--
--#define NVME_ID_NS_NSFEAT_THIN(nsfeat)      ((nsfeat & 0x1))
--#define NVME_ID_NS_FLBAS_EXTENDED(flbas)    ((flbas >> 4) & 0x1)
--#define NVME_ID_NS_FLBAS_INDEX(flbas)       ((flbas & 0xf))
--#define NVME_ID_NS_MC_SEPARATE(mc)          ((mc >> 1) & 0x1)
--#define NVME_ID_NS_MC_EXTENDED(mc)          ((mc & 0x1))
--#define NVME_ID_NS_DPC_LAST_EIGHT(dpc)      ((dpc >> 4) & 0x1)
--#define NVME_ID_NS_DPC_FIRST_EIGHT(dpc)     ((dpc >> 3) & 0x1)
--#define NVME_ID_NS_DPC_TYPE_3(dpc)          ((dpc >> 2) & 0x1)
--#define NVME_ID_NS_DPC_TYPE_2(dpc)          ((dpc >> 1) & 0x1)
--#define NVME_ID_NS_DPC_TYPE_1(dpc)          ((dpc & 0x1))
--#define NVME_ID_NS_DPC_TYPE_MASK            0x7
--
--enum NvmeIdNsDps {
--    DPS_TYPE_NONE   = 0,
--    DPS_TYPE_1      = 1,
--    DPS_TYPE_2      = 2,
--    DPS_TYPE_3      = 3,
--    DPS_TYPE_MASK   = 0x7,
--    DPS_FIRST_EIGHT = 8,
--};
--
--static inline void _nvme_check_size(void)
--{
--    QEMU_BUILD_BUG_ON(sizeof(NvmeAerResult) != 4);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeDsmRange) != 16);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeCmd) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeDeleteQ) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeCreateCq) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeCreateSq) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeIdentify) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeRwCmd) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeDsmCmd) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeRangeType) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeErrorLog) != 64);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeFwSlotInfoLog) != 512);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
--    QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
--}
-+#include "block/nvme.h"
- 
- typedef struct NvmeAsyncEvent {
-     QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
-diff --git a/include/block/nvme.h b/include/block/nvme.h
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
 new file mode 100644
-index 0000000000..849a6f3fa3
+index 0000000000..0ca1a2d4b5
 --- /dev/null
-+++ b/include/block/nvme.h
-@@ -0,0 +1,700 @@
-+#ifndef BLOCK_NVME_H
-+#define BLOCK_NVME_H
++++ b/docs/devel/testing.rst
+@@ -0,0 +1,486 @@
++===============
++Testing in QEMU
++===============
 +
-+typedef struct NvmeBar {
-+    uint64_t    cap;
-+    uint32_t    vs;
-+    uint32_t    intms;
-+    uint32_t    intmc;
-+    uint32_t    cc;
-+    uint32_t    rsvd1;
-+    uint32_t    csts;
-+    uint32_t    nssrc;
-+    uint32_t    aqa;
-+    uint64_t    asq;
-+    uint64_t    acq;
-+    uint32_t    cmbloc;
-+    uint32_t    cmbsz;
-+} NvmeBar;
++This document describes the testing infrastructure in QEMU.
 +
-+enum NvmeCapShift {
-+    CAP_MQES_SHIFT     = 0,
-+    CAP_CQR_SHIFT      = 16,
-+    CAP_AMS_SHIFT      = 17,
-+    CAP_TO_SHIFT       = 24,
-+    CAP_DSTRD_SHIFT    = 32,
-+    CAP_NSSRS_SHIFT    = 33,
-+    CAP_CSS_SHIFT      = 37,
-+    CAP_MPSMIN_SHIFT   = 48,
-+    CAP_MPSMAX_SHIFT   = 52,
-+};
++Testing with "make check"
++=========================
 +
-+enum NvmeCapMask {
-+    CAP_MQES_MASK      = 0xffff,
-+    CAP_CQR_MASK       = 0x1,
-+    CAP_AMS_MASK       = 0x3,
-+    CAP_TO_MASK        = 0xff,
-+    CAP_DSTRD_MASK     = 0xf,
-+    CAP_NSSRS_MASK     = 0x1,
-+    CAP_CSS_MASK       = 0xff,
-+    CAP_MPSMIN_MASK    = 0xf,
-+    CAP_MPSMAX_MASK    = 0xf,
-+};
++The "make check" testing family includes most of the C based tests in QEMU. For
++a quick help, run ``make check-help`` from the source tree.
 +
-+#define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
-+#define NVME_CAP_CQR(cap)   (((cap) >> CAP_CQR_SHIFT)    & CAP_CQR_MASK)
-+#define NVME_CAP_AMS(cap)   (((cap) >> CAP_AMS_SHIFT)    & CAP_AMS_MASK)
-+#define NVME_CAP_TO(cap)    (((cap) >> CAP_TO_SHIFT)     & CAP_TO_MASK)
-+#define NVME_CAP_DSTRD(cap) (((cap) >> CAP_DSTRD_SHIFT)  & CAP_DSTRD_MASK)
-+#define NVME_CAP_NSSRS(cap) (((cap) >> CAP_NSSRS_SHIFT)  & CAP_NSSRS_MASK)
-+#define NVME_CAP_CSS(cap)   (((cap) >> CAP_CSS_SHIFT)    & CAP_CSS_MASK)
-+#define NVME_CAP_MPSMIN(cap)(((cap) >> CAP_MPSMIN_SHIFT) & CAP_MPSMIN_MASK)
-+#define NVME_CAP_MPSMAX(cap)(((cap) >> CAP_MPSMAX_SHIFT) & CAP_MPSMAX_MASK)
++The usual way to run these tests is:
 +
-+#define NVME_CAP_SET_MQES(cap, val)   (cap |= (uint64_t)(val & CAP_MQES_MASK)  \
-+                                                           << CAP_MQES_SHIFT)
-+#define NVME_CAP_SET_CQR(cap, val)    (cap |= (uint64_t)(val & CAP_CQR_MASK)   \
-+                                                           << CAP_CQR_SHIFT)
-+#define NVME_CAP_SET_AMS(cap, val)    (cap |= (uint64_t)(val & CAP_AMS_MASK)   \
-+                                                           << CAP_AMS_SHIFT)
-+#define NVME_CAP_SET_TO(cap, val)     (cap |= (uint64_t)(val & CAP_TO_MASK)    \
-+                                                           << CAP_TO_SHIFT)
-+#define NVME_CAP_SET_DSTRD(cap, val)  (cap |= (uint64_t)(val & CAP_DSTRD_MASK) \
-+                                                           << CAP_DSTRD_SHIFT)
-+#define NVME_CAP_SET_NSSRS(cap, val)  (cap |= (uint64_t)(val & CAP_NSSRS_MASK) \
-+                                                           << CAP_NSSRS_SHIFT)
-+#define NVME_CAP_SET_CSS(cap, val)    (cap |= (uint64_t)(val & CAP_CSS_MASK)   \
-+                                                           << CAP_CSS_SHIFT)
-+#define NVME_CAP_SET_MPSMIN(cap, val) (cap |= (uint64_t)(val & CAP_MPSMIN_MASK)\
-+                                                           << CAP_MPSMIN_SHIFT)
-+#define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
-+                                                            << CAP_MPSMAX_SHIFT)
++.. code::
 +
-+enum NvmeCcShift {
-+    CC_EN_SHIFT     = 0,
-+    CC_CSS_SHIFT    = 4,
-+    CC_MPS_SHIFT    = 7,
-+    CC_AMS_SHIFT    = 11,
-+    CC_SHN_SHIFT    = 14,
-+    CC_IOSQES_SHIFT = 16,
-+    CC_IOCQES_SHIFT = 20,
-+};
++  make check
 +
-+enum NvmeCcMask {
-+    CC_EN_MASK      = 0x1,
-+    CC_CSS_MASK     = 0x7,
-+    CC_MPS_MASK     = 0xf,
-+    CC_AMS_MASK     = 0x7,
-+    CC_SHN_MASK     = 0x3,
-+    CC_IOSQES_MASK  = 0xf,
-+    CC_IOCQES_MASK  = 0xf,
-+};
++which includes QAPI schema tests, unit tests, and QTests. Different sub-types
++of "make check" tests will be explained below.
 +
-+#define NVME_CC_EN(cc)     ((cc >> CC_EN_SHIFT)     & CC_EN_MASK)
-+#define NVME_CC_CSS(cc)    ((cc >> CC_CSS_SHIFT)    & CC_CSS_MASK)
-+#define NVME_CC_MPS(cc)    ((cc >> CC_MPS_SHIFT)    & CC_MPS_MASK)
-+#define NVME_CC_AMS(cc)    ((cc >> CC_AMS_SHIFT)    & CC_AMS_MASK)
-+#define NVME_CC_SHN(cc)    ((cc >> CC_SHN_SHIFT)    & CC_SHN_MASK)
-+#define NVME_CC_IOSQES(cc) ((cc >> CC_IOSQES_SHIFT) & CC_IOSQES_MASK)
-+#define NVME_CC_IOCQES(cc) ((cc >> CC_IOCQES_SHIFT) & CC_IOCQES_MASK)
++Before running tests, it is best to build QEMU programs first. Some tests
++expect the executables to exist and will fail with obscure messages if they
++cannot find them.
 +
-+enum NvmeCstsShift {
-+    CSTS_RDY_SHIFT      = 0,
-+    CSTS_CFS_SHIFT      = 1,
-+    CSTS_SHST_SHIFT     = 2,
-+    CSTS_NSSRO_SHIFT    = 4,
-+};
++Unit tests
++----------
 +
-+enum NvmeCstsMask {
-+    CSTS_RDY_MASK   = 0x1,
-+    CSTS_CFS_MASK   = 0x1,
-+    CSTS_SHST_MASK  = 0x3,
-+    CSTS_NSSRO_MASK = 0x1,
-+};
++Unit tests, which can be invoked with ``make check-unit``, are simple C tests
++that typically link to individual QEMU object files and exercise them by
++calling exported functions.
 +
-+enum NvmeCsts {
-+    NVME_CSTS_READY         = 1 << CSTS_RDY_SHIFT,
-+    NVME_CSTS_FAILED        = 1 << CSTS_CFS_SHIFT,
-+    NVME_CSTS_SHST_NORMAL   = 0 << CSTS_SHST_SHIFT,
-+    NVME_CSTS_SHST_PROGRESS = 1 << CSTS_SHST_SHIFT,
-+    NVME_CSTS_SHST_COMPLETE = 2 << CSTS_SHST_SHIFT,
-+    NVME_CSTS_NSSRO         = 1 << CSTS_NSSRO_SHIFT,
-+};
++If you are writing new code in QEMU, consider adding a unit test, especially
++for utility modules that are relatively stateless or have few dependencies. To
++add a new unit test:
 +
-+#define NVME_CSTS_RDY(csts)     ((csts >> CSTS_RDY_SHIFT)   & CSTS_RDY_MASK)
-+#define NVME_CSTS_CFS(csts)     ((csts >> CSTS_CFS_SHIFT)   & CSTS_CFS_MASK)
-+#define NVME_CSTS_SHST(csts)    ((csts >> CSTS_SHST_SHIFT)  & CSTS_SHST_MASK)
-+#define NVME_CSTS_NSSRO(csts)   ((csts >> CSTS_NSSRO_SHIFT) & CSTS_NSSRO_MASK)
++1. Create a new source file. For example, ``tests/foo-test.c``.
 +
-+enum NvmeAqaShift {
-+    AQA_ASQS_SHIFT  = 0,
-+    AQA_ACQS_SHIFT  = 16,
-+};
++2. Write the test. Normally you would include the header file which exports
++   the module API, then verify the interface behaves as expected from your
++   test. The test code should be organized with the glib testing framework.
++   Copying and modifying an existing test is usually a good idea.
 +
-+enum NvmeAqaMask {
-+    AQA_ASQS_MASK   = 0xfff,
-+    AQA_ACQS_MASK   = 0xfff,
-+};
++3. Add the test to ``tests/Makefile.include``. First, name the unit test
++   program and add it to ``$(check-unit-y)``; then add a rule to build the
++   executable. Optionally, you can add a magical variable to support ``gcov``.
++   For example:
 +
-+#define NVME_AQA_ASQS(aqa) ((aqa >> AQA_ASQS_SHIFT) & AQA_ASQS_MASK)
-+#define NVME_AQA_ACQS(aqa) ((aqa >> AQA_ACQS_SHIFT) & AQA_ACQS_MASK)
++.. code::
 +
-+enum NvmeCmblocShift {
-+    CMBLOC_BIR_SHIFT  = 0,
-+    CMBLOC_OFST_SHIFT = 12,
-+};
++  check-unit-y += tests/foo-test$(EXESUF)
++  tests/foo-test$(EXESUF): tests/foo-test.o $(test-util-obj-y)
++  ...
++  gcov-files-foo-test-y = util/foo.c
 +
-+enum NvmeCmblocMask {
-+    CMBLOC_BIR_MASK  = 0x7,
-+    CMBLOC_OFST_MASK = 0xfffff,
-+};
++Since unit tests don't require environment variables, the simplest way to debug
++a unit test failure is often directly invoking it or even running it under
++``gdb``. However there can still be differences in behavior between ``make``
++invocations and your manual run, due to ``$MALLOC_PERTURB_`` environment
++variable (which affects memory reclamation and catches invalid pointers better)
++and gtester options. If necessary, you can run
 +
-+#define NVME_CMBLOC_BIR(cmbloc) ((cmbloc >> CMBLOC_BIR_SHIFT)  & \
-+                                 CMBLOC_BIR_MASK)
-+#define NVME_CMBLOC_OFST(cmbloc)((cmbloc >> CMBLOC_OFST_SHIFT) & \
-+                                 CMBLOC_OFST_MASK)
++.. code::
++  make check-unit V=1
 +
-+#define NVME_CMBLOC_SET_BIR(cmbloc, val)  \
-+    (cmbloc |= (uint64_t)(val & CMBLOC_BIR_MASK) << CMBLOC_BIR_SHIFT)
-+#define NVME_CMBLOC_SET_OFST(cmbloc, val) \
-+    (cmbloc |= (uint64_t)(val & CMBLOC_OFST_MASK) << CMBLOC_OFST_SHIFT)
++and copy the actual command line which executes the unit test, then run
++it from the command line.
 +
-+enum NvmeCmbszShift {
-+    CMBSZ_SQS_SHIFT   = 0,
-+    CMBSZ_CQS_SHIFT   = 1,
-+    CMBSZ_LISTS_SHIFT = 2,
-+    CMBSZ_RDS_SHIFT   = 3,
-+    CMBSZ_WDS_SHIFT   = 4,
-+    CMBSZ_SZU_SHIFT   = 8,
-+    CMBSZ_SZ_SHIFT    = 12,
-+};
++QTest
++-----
 +
-+enum NvmeCmbszMask {
-+    CMBSZ_SQS_MASK   = 0x1,
-+    CMBSZ_CQS_MASK   = 0x1,
-+    CMBSZ_LISTS_MASK = 0x1,
-+    CMBSZ_RDS_MASK   = 0x1,
-+    CMBSZ_WDS_MASK   = 0x1,
-+    CMBSZ_SZU_MASK   = 0xf,
-+    CMBSZ_SZ_MASK    = 0xfffff,
-+};
++QTest is a device emulation testing framework.  It can be very useful to test
++device models; it could also control certain aspects of QEMU (such as virtual
++clock stepping), with a special purpose "qtest" protocol.  Refer to the
++documentation in ``qtest.c`` for more details of the protocol.
 +
-+#define NVME_CMBSZ_SQS(cmbsz)  ((cmbsz >> CMBSZ_SQS_SHIFT)   & CMBSZ_SQS_MASK)
-+#define NVME_CMBSZ_CQS(cmbsz)  ((cmbsz >> CMBSZ_CQS_SHIFT)   & CMBSZ_CQS_MASK)
-+#define NVME_CMBSZ_LISTS(cmbsz)((cmbsz >> CMBSZ_LISTS_SHIFT) & CMBSZ_LISTS_MASK)
-+#define NVME_CMBSZ_RDS(cmbsz)  ((cmbsz >> CMBSZ_RDS_SHIFT)   & CMBSZ_RDS_MASK)
-+#define NVME_CMBSZ_WDS(cmbsz)  ((cmbsz >> CMBSZ_WDS_SHIFT)   & CMBSZ_WDS_MASK)
-+#define NVME_CMBSZ_SZU(cmbsz)  ((cmbsz >> CMBSZ_SZU_SHIFT)   & CMBSZ_SZU_MASK)
-+#define NVME_CMBSZ_SZ(cmbsz)   ((cmbsz >> CMBSZ_SZ_SHIFT)    & CMBSZ_SZ_MASK)
++QTest cases can be executed with
 +
-+#define NVME_CMBSZ_SET_SQS(cmbsz, val)   \
-+    (cmbsz |= (uint64_t)(val &  CMBSZ_SQS_MASK)  << CMBSZ_SQS_SHIFT)
-+#define NVME_CMBSZ_SET_CQS(cmbsz, val)   \
-+    (cmbsz |= (uint64_t)(val & CMBSZ_CQS_MASK) << CMBSZ_CQS_SHIFT)
-+#define NVME_CMBSZ_SET_LISTS(cmbsz, val) \
-+    (cmbsz |= (uint64_t)(val & CMBSZ_LISTS_MASK) << CMBSZ_LISTS_SHIFT)
-+#define NVME_CMBSZ_SET_RDS(cmbsz, val)   \
-+    (cmbsz |= (uint64_t)(val & CMBSZ_RDS_MASK) << CMBSZ_RDS_SHIFT)
-+#define NVME_CMBSZ_SET_WDS(cmbsz, val)   \
-+    (cmbsz |= (uint64_t)(val & CMBSZ_WDS_MASK) << CMBSZ_WDS_SHIFT)
-+#define NVME_CMBSZ_SET_SZU(cmbsz, val)   \
-+    (cmbsz |= (uint64_t)(val & CMBSZ_SZU_MASK) << CMBSZ_SZU_SHIFT)
-+#define NVME_CMBSZ_SET_SZ(cmbsz, val)    \
-+    (cmbsz |= (uint64_t)(val & CMBSZ_SZ_MASK) << CMBSZ_SZ_SHIFT)
++.. code::
 +
-+#define NVME_CMBSZ_GETSIZE(cmbsz) \
-+    (NVME_CMBSZ_SZ(cmbsz) * (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz))))
++   make check-qtest
 +
-+typedef struct NvmeCmd {
-+    uint8_t     opcode;
-+    uint8_t     fuse;
-+    uint16_t    cid;
-+    uint32_t    nsid;
-+    uint64_t    res1;
-+    uint64_t    mptr;
-+    uint64_t    prp1;
-+    uint64_t    prp2;
-+    uint32_t    cdw10;
-+    uint32_t    cdw11;
-+    uint32_t    cdw12;
-+    uint32_t    cdw13;
-+    uint32_t    cdw14;
-+    uint32_t    cdw15;
-+} NvmeCmd;
++The QTest library is implemented by ``tests/libqtest.c`` and the API is defined
++in ``tests/libqtest.h``.
 +
-+enum NvmeAdminCommands {
-+    NVME_ADM_CMD_DELETE_SQ      = 0x00,
-+    NVME_ADM_CMD_CREATE_SQ      = 0x01,
-+    NVME_ADM_CMD_GET_LOG_PAGE   = 0x02,
-+    NVME_ADM_CMD_DELETE_CQ      = 0x04,
-+    NVME_ADM_CMD_CREATE_CQ      = 0x05,
-+    NVME_ADM_CMD_IDENTIFY       = 0x06,
-+    NVME_ADM_CMD_ABORT          = 0x08,
-+    NVME_ADM_CMD_SET_FEATURES   = 0x09,
-+    NVME_ADM_CMD_GET_FEATURES   = 0x0a,
-+    NVME_ADM_CMD_ASYNC_EV_REQ   = 0x0c,
-+    NVME_ADM_CMD_ACTIVATE_FW    = 0x10,
-+    NVME_ADM_CMD_DOWNLOAD_FW    = 0x11,
-+    NVME_ADM_CMD_FORMAT_NVM     = 0x80,
-+    NVME_ADM_CMD_SECURITY_SEND  = 0x81,
-+    NVME_ADM_CMD_SECURITY_RECV  = 0x82,
-+};
++Consider adding a new QTest case when you are introducing a new virtual
++hardware, or extending one if you are adding functionalities to an existing
++virtual device.
 +
-+enum NvmeIoCommands {
-+    NVME_CMD_FLUSH              = 0x00,
-+    NVME_CMD_WRITE              = 0x01,
-+    NVME_CMD_READ               = 0x02,
-+    NVME_CMD_WRITE_UNCOR        = 0x04,
-+    NVME_CMD_COMPARE            = 0x05,
-+    NVME_CMD_WRITE_ZEROS        = 0x08,
-+    NVME_CMD_DSM                = 0x09,
-+};
++On top of libqtest, a higher level library, ``libqos``, was created to
++encapsulate common tasks of device drivers, such as memory management and
++communicating with system buses or devices. Many virtual device tests use
++libqos instead of directly calling into libqtest.
 +
-+typedef struct NvmeDeleteQ {
-+    uint8_t     opcode;
-+    uint8_t     flags;
-+    uint16_t    cid;
-+    uint32_t    rsvd1[9];
-+    uint16_t    qid;
-+    uint16_t    rsvd10;
-+    uint32_t    rsvd11[5];
-+} NvmeDeleteQ;
++Steps to add a new QTest case are:
 +
-+typedef struct NvmeCreateCq {
-+    uint8_t     opcode;
-+    uint8_t     flags;
-+    uint16_t    cid;
-+    uint32_t    rsvd1[5];
-+    uint64_t    prp1;
-+    uint64_t    rsvd8;
-+    uint16_t    cqid;
-+    uint16_t    qsize;
-+    uint16_t    cq_flags;
-+    uint16_t    irq_vector;
-+    uint32_t    rsvd12[4];
-+} NvmeCreateCq;
++1. Create a new source file for the test. (More than one file can be added as
++   necessary.) For example, ``tests/test-foo-device.c``.
 +
-+#define NVME_CQ_FLAGS_PC(cq_flags)  (cq_flags & 0x1)
-+#define NVME_CQ_FLAGS_IEN(cq_flags) ((cq_flags >> 1) & 0x1)
++2. Write the test code with the glib and libqtest/libqos API. See also existing
++   tests and the library headers for reference.
 +
-+typedef struct NvmeCreateSq {
-+    uint8_t     opcode;
-+    uint8_t     flags;
-+    uint16_t    cid;
-+    uint32_t    rsvd1[5];
-+    uint64_t    prp1;
-+    uint64_t    rsvd8;
-+    uint16_t    sqid;
-+    uint16_t    qsize;
-+    uint16_t    sq_flags;
-+    uint16_t    cqid;
-+    uint32_t    rsvd12[4];
-+} NvmeCreateSq;
++3. Register the new test in ``tests/Makefile.include``. Add the test executable
++   name to an appropriate ``check-qtest-*-y`` variable. For example:
 +
-+#define NVME_SQ_FLAGS_PC(sq_flags)      (sq_flags & 0x1)
-+#define NVME_SQ_FLAGS_QPRIO(sq_flags)   ((sq_flags >> 1) & 0x3)
++   ``check-qtest-generic-y = tests/test-foo-device$(EXESUF)``
 +
-+enum NvmeQueueFlags {
-+    NVME_Q_PC           = 1,
-+    NVME_Q_PRIO_URGENT  = 0,
-+    NVME_Q_PRIO_HIGH    = 1,
-+    NVME_Q_PRIO_NORMAL  = 2,
-+    NVME_Q_PRIO_LOW     = 3,
-+};
++4. Add object dependencies of the executable in the Makefile, including the
++   test source file(s) and other interesting objects. For example:
 +
-+typedef struct NvmeIdentify {
-+    uint8_t     opcode;
-+    uint8_t     flags;
-+    uint16_t    cid;
-+    uint32_t    nsid;
-+    uint64_t    rsvd2[2];
-+    uint64_t    prp1;
-+    uint64_t    prp2;
-+    uint32_t    cns;
-+    uint32_t    rsvd11[5];
-+} NvmeIdentify;
++   ``tests/test-foo-device$(EXESUF): tests/test-foo-device.o $(libqos-obj-y)``
 +
-+typedef struct NvmeRwCmd {
-+    uint8_t     opcode;
-+    uint8_t     flags;
-+    uint16_t    cid;
-+    uint32_t    nsid;
-+    uint64_t    rsvd2;
-+    uint64_t    mptr;
-+    uint64_t    prp1;
-+    uint64_t    prp2;
-+    uint64_t    slba;
-+    uint16_t    nlb;
-+    uint16_t    control;
-+    uint32_t    dsmgmt;
-+    uint32_t    reftag;
-+    uint16_t    apptag;
-+    uint16_t    appmask;
-+} NvmeRwCmd;
++Debugging a QTest failure is slightly harder than the unit test because the
++tests look up QEMU program names in the environment variables, such as
++``QTEST_QEMU_BINARY`` and ``QTEST_QEMU_IMG``, and also because it is not easy
++to attach gdb to the QEMU process spawned from the test. But manual invoking
++and using gdb on the test is still simple to do: find out the actual command
++from the output of
 +
-+enum {
-+    NVME_RW_LR                  = 1 << 15,
-+    NVME_RW_FUA                 = 1 << 14,
-+    NVME_RW_DSM_FREQ_UNSPEC     = 0,
-+    NVME_RW_DSM_FREQ_TYPICAL    = 1,
-+    NVME_RW_DSM_FREQ_RARE       = 2,
-+    NVME_RW_DSM_FREQ_READS      = 3,
-+    NVME_RW_DSM_FREQ_WRITES     = 4,
-+    NVME_RW_DSM_FREQ_RW         = 5,
-+    NVME_RW_DSM_FREQ_ONCE       = 6,
-+    NVME_RW_DSM_FREQ_PREFETCH   = 7,
-+    NVME_RW_DSM_FREQ_TEMP       = 8,
-+    NVME_RW_DSM_LATENCY_NONE    = 0 << 4,
-+    NVME_RW_DSM_LATENCY_IDLE    = 1 << 4,
-+    NVME_RW_DSM_LATENCY_NORM    = 2 << 4,
-+    NVME_RW_DSM_LATENCY_LOW     = 3 << 4,
-+    NVME_RW_DSM_SEQ_REQ         = 1 << 6,
-+    NVME_RW_DSM_COMPRESSED      = 1 << 7,
-+    NVME_RW_PRINFO_PRACT        = 1 << 13,
-+    NVME_RW_PRINFO_PRCHK_GUARD  = 1 << 12,
-+    NVME_RW_PRINFO_PRCHK_APP    = 1 << 11,
-+    NVME_RW_PRINFO_PRCHK_REF    = 1 << 10,
-+};
++.. code::
++  make check-qtest V=1
 +
-+typedef struct NvmeDsmCmd {
-+    uint8_t     opcode;
-+    uint8_t     flags;
-+    uint16_t    cid;
-+    uint32_t    nsid;
-+    uint64_t    rsvd2[2];
-+    uint64_t    prp1;
-+    uint64_t    prp2;
-+    uint32_t    nr;
-+    uint32_t    attributes;
-+    uint32_t    rsvd12[4];
-+} NvmeDsmCmd;
++which you can run manually.
 +
-+enum {
-+    NVME_DSMGMT_IDR = 1 << 0,
-+    NVME_DSMGMT_IDW = 1 << 1,
-+    NVME_DSMGMT_AD  = 1 << 2,
-+};
++QAPI schema tests
++-----------------
 +
-+typedef struct NvmeDsmRange {
-+    uint32_t    cattr;
-+    uint32_t    nlb;
-+    uint64_t    slba;
-+} NvmeDsmRange;
++The QAPI schema tests validate the QAPI parser used by QMP, by feeding
++predefined input to the parser and comparing the result with the reference
++output.
 +
-+enum NvmeAsyncEventRequest {
-+    NVME_AER_TYPE_ERROR                     = 0,
-+    NVME_AER_TYPE_SMART                     = 1,
-+    NVME_AER_TYPE_IO_SPECIFIC               = 6,
-+    NVME_AER_TYPE_VENDOR_SPECIFIC           = 7,
-+    NVME_AER_INFO_ERR_INVALID_SQ            = 0,
-+    NVME_AER_INFO_ERR_INVALID_DB            = 1,
-+    NVME_AER_INFO_ERR_DIAG_FAIL             = 2,
-+    NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     = 3,
-+    NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    = 4,
-+    NVME_AER_INFO_ERR_FW_IMG_LOAD_ERR       = 5,
-+    NVME_AER_INFO_SMART_RELIABILITY         = 0,
-+    NVME_AER_INFO_SMART_TEMP_THRESH         = 1,
-+    NVME_AER_INFO_SMART_SPARE_THRESH        = 2,
-+};
++The input/output data is managed under the ``tests/qapi-schema`` directory.
++Each test case includes four files that have a common base name:
 +
-+typedef struct NvmeAerResult {
-+    uint8_t event_type;
-+    uint8_t event_info;
-+    uint8_t log_page;
-+    uint8_t resv;
-+} NvmeAerResult;
++  * ``${casename}.json`` - the file contains the JSON input for feeding the
++    parser
++  * ``${casename}.out`` - the file contains the expected stdout from the parser
++  * ``${casename}.err`` - the file contains the expected stderr from the parser
++  * ``${casename}.exit`` - the expected error code
 +
-+typedef struct NvmeCqe {
-+    uint32_t    result;
-+    uint32_t    rsvd;
-+    uint16_t    sq_head;
-+    uint16_t    sq_id;
-+    uint16_t    cid;
-+    uint16_t    status;
-+} NvmeCqe;
++Consider adding a new QAPI schema test when you are making a change on the QAPI
++parser (either fixing a bug or extending/modifying the syntax). To do this:
 +
-+enum NvmeStatusCodes {
-+    NVME_SUCCESS                = 0x0000,
-+    NVME_INVALID_OPCODE         = 0x0001,
-+    NVME_INVALID_FIELD          = 0x0002,
-+    NVME_CID_CONFLICT           = 0x0003,
-+    NVME_DATA_TRAS_ERROR        = 0x0004,
-+    NVME_POWER_LOSS_ABORT       = 0x0005,
-+    NVME_INTERNAL_DEV_ERROR     = 0x0006,
-+    NVME_CMD_ABORT_REQ          = 0x0007,
-+    NVME_CMD_ABORT_SQ_DEL       = 0x0008,
-+    NVME_CMD_ABORT_FAILED_FUSE  = 0x0009,
-+    NVME_CMD_ABORT_MISSING_FUSE = 0x000a,
-+    NVME_INVALID_NSID           = 0x000b,
-+    NVME_CMD_SEQ_ERROR          = 0x000c,
-+    NVME_LBA_RANGE              = 0x0080,
-+    NVME_CAP_EXCEEDED           = 0x0081,
-+    NVME_NS_NOT_READY           = 0x0082,
-+    NVME_NS_RESV_CONFLICT       = 0x0083,
-+    NVME_INVALID_CQID           = 0x0100,
-+    NVME_INVALID_QID            = 0x0101,
-+    NVME_MAX_QSIZE_EXCEEDED     = 0x0102,
-+    NVME_ACL_EXCEEDED           = 0x0103,
-+    NVME_RESERVED               = 0x0104,
-+    NVME_AER_LIMIT_EXCEEDED     = 0x0105,
-+    NVME_INVALID_FW_SLOT        = 0x0106,
-+    NVME_INVALID_FW_IMAGE       = 0x0107,
-+    NVME_INVALID_IRQ_VECTOR     = 0x0108,
-+    NVME_INVALID_LOG_ID         = 0x0109,
-+    NVME_INVALID_FORMAT         = 0x010a,
-+    NVME_FW_REQ_RESET           = 0x010b,
-+    NVME_INVALID_QUEUE_DEL      = 0x010c,
-+    NVME_FID_NOT_SAVEABLE       = 0x010d,
-+    NVME_FID_NOT_NSID_SPEC      = 0x010f,
-+    NVME_FW_REQ_SUSYSTEM_RESET  = 0x0110,
-+    NVME_CONFLICTING_ATTRS      = 0x0180,
-+    NVME_INVALID_PROT_INFO      = 0x0181,
-+    NVME_WRITE_TO_RO            = 0x0182,
-+    NVME_WRITE_FAULT            = 0x0280,
-+    NVME_UNRECOVERED_READ       = 0x0281,
-+    NVME_E2E_GUARD_ERROR        = 0x0282,
-+    NVME_E2E_APP_ERROR          = 0x0283,
-+    NVME_E2E_REF_ERROR          = 0x0284,
-+    NVME_CMP_FAILURE            = 0x0285,
-+    NVME_ACCESS_DENIED          = 0x0286,
-+    NVME_MORE                   = 0x2000,
-+    NVME_DNR                    = 0x4000,
-+    NVME_NO_COMPLETE            = 0xffff,
-+};
++1. Add four files for the new case as explained above. For example:
 +
-+typedef struct NvmeFwSlotInfoLog {
-+    uint8_t     afi;
-+    uint8_t     reserved1[7];
-+    uint8_t     frs1[8];
-+    uint8_t     frs2[8];
-+    uint8_t     frs3[8];
-+    uint8_t     frs4[8];
-+    uint8_t     frs5[8];
-+    uint8_t     frs6[8];
-+    uint8_t     frs7[8];
-+    uint8_t     reserved2[448];
-+} NvmeFwSlotInfoLog;
++  ``$EDITOR tests/qapi-schema/foo.{json,out,err,exit}``.
 +
-+typedef struct NvmeErrorLog {
-+    uint64_t    error_count;
-+    uint16_t    sqid;
-+    uint16_t    cid;
-+    uint16_t    status_field;
-+    uint16_t    param_error_location;
-+    uint64_t    lba;
-+    uint32_t    nsid;
-+    uint8_t     vs;
-+    uint8_t     resv[35];
-+} NvmeErrorLog;
++2. Add the new test in ``tests/Makefile.include``. For example:
 +
-+typedef struct NvmeSmartLog {
-+    uint8_t     critical_warning;
-+    uint8_t     temperature[2];
-+    uint8_t     available_spare;
-+    uint8_t     available_spare_threshold;
-+    uint8_t     percentage_used;
-+    uint8_t     reserved1[26];
-+    uint64_t    data_units_read[2];
-+    uint64_t    data_units_written[2];
-+    uint64_t    host_read_commands[2];
-+    uint64_t    host_write_commands[2];
-+    uint64_t    controller_busy_time[2];
-+    uint64_t    power_cycles[2];
-+    uint64_t    power_on_hours[2];
-+    uint64_t    unsafe_shutdowns[2];
-+    uint64_t    media_errors[2];
-+    uint64_t    number_of_error_log_entries[2];
-+    uint8_t     reserved2[320];
-+} NvmeSmartLog;
++  ``qapi-schema += foo.json``
 +
-+enum NvmeSmartWarn {
-+    NVME_SMART_SPARE                  = 1 << 0,
-+    NVME_SMART_TEMPERATURE            = 1 << 1,
-+    NVME_SMART_RELIABILITY            = 1 << 2,
-+    NVME_SMART_MEDIA_READ_ONLY        = 1 << 3,
-+    NVME_SMART_FAILED_VOLATILE_MEDIA  = 1 << 4,
-+};
++check-block
++-----------
 +
-+enum LogIdentifier {
-+    NVME_LOG_ERROR_INFO     = 0x01,
-+    NVME_LOG_SMART_INFO     = 0x02,
-+    NVME_LOG_FW_SLOT_INFO   = 0x03,
-+};
++``make check-block`` is a legacy command to invoke block layer iotests and is
++rarely used. See "QEMU iotests" section below for more information.
 +
-+typedef struct NvmePSD {
-+    uint16_t    mp;
-+    uint16_t    reserved;
-+    uint32_t    enlat;
-+    uint32_t    exlat;
-+    uint8_t     rrt;
-+    uint8_t     rrl;
-+    uint8_t     rwt;
-+    uint8_t     rwl;
-+    uint8_t     resv[16];
-+} NvmePSD;
++GCC gcov support
++----------------
 +
-+typedef struct NvmeIdCtrl {
-+    uint16_t    vid;
-+    uint16_t    ssvid;
-+    uint8_t     sn[20];
-+    uint8_t     mn[40];
-+    uint8_t     fr[8];
-+    uint8_t     rab;
-+    uint8_t     ieee[3];
-+    uint8_t     cmic;
-+    uint8_t     mdts;
-+    uint8_t     rsvd255[178];
-+    uint16_t    oacs;
-+    uint8_t     acl;
-+    uint8_t     aerl;
-+    uint8_t     frmw;
-+    uint8_t     lpa;
-+    uint8_t     elpe;
-+    uint8_t     npss;
-+    uint8_t     rsvd511[248];
-+    uint8_t     sqes;
-+    uint8_t     cqes;
-+    uint16_t    rsvd515;
-+    uint32_t    nn;
-+    uint16_t    oncs;
-+    uint16_t    fuses;
-+    uint8_t     fna;
-+    uint8_t     vwc;
-+    uint16_t    awun;
-+    uint16_t    awupf;
-+    uint8_t     rsvd703[174];
-+    uint8_t     rsvd2047[1344];
-+    NvmePSD     psd[32];
-+    uint8_t     vs[1024];
-+} NvmeIdCtrl;
++``gcov`` is a GCC tool to analyze the testing coverage by instrumenting the
++tested code. To use it, configure QEMU with ``--enable-gcov`` option and build.
++Then run ``make check`` as usual. There will be additional ``gcov`` output as
++the testing goes on, showing the test coverage percentage numbers per analyzed
++source file. More detailed reports can be obtained by running ``gcov`` command
++on the output files under ``$build_dir/tests/``, please read the ``gcov``
++documentation for more information.
 +
-+enum NvmeIdCtrlOacs {
-+    NVME_OACS_SECURITY  = 1 << 0,
-+    NVME_OACS_FORMAT    = 1 << 1,
-+    NVME_OACS_FW        = 1 << 2,
-+};
++QEMU iotests
++============
 +
-+enum NvmeIdCtrlOncs {
-+    NVME_ONCS_COMPARE       = 1 << 0,
-+    NVME_ONCS_WRITE_UNCORR  = 1 << 1,
-+    NVME_ONCS_DSM           = 1 << 2,
-+    NVME_ONCS_WRITE_ZEROS   = 1 << 3,
-+    NVME_ONCS_FEATURES      = 1 << 4,
-+    NVME_ONCS_RESRVATIONS   = 1 << 5,
-+};
++QEMU iotests, under the directory ``tests/qemu-iotests``, is the testing
++framework widely used to test block layer related features. It is higher level
++than "make check" tests and 99% of the code is written in bash or Python
++scripts.  The testing success criteria is golden output comparison, and the
++test files are named with numbers.
 +
-+#define NVME_CTRL_SQES_MIN(sqes) ((sqes) & 0xf)
-+#define NVME_CTRL_SQES_MAX(sqes) (((sqes) >> 4) & 0xf)
-+#define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
-+#define NVME_CTRL_CQES_MAX(cqes) (((cqes) >> 4) & 0xf)
++To run iotests, make sure QEMU is built successfully, then switch to the
++``tests/qemu-iotests`` directory under the build directory, and run ``./check``
++with desired arguments from there.
 +
-+typedef struct NvmeFeatureVal {
-+    uint32_t    arbitration;
-+    uint32_t    power_mgmt;
-+    uint32_t    temp_thresh;
-+    uint32_t    err_rec;
-+    uint32_t    volatile_wc;
-+    uint32_t    num_queues;
-+    uint32_t    int_coalescing;
-+    uint32_t    *int_vector_config;
-+    uint32_t    write_atomicity;
-+    uint32_t    async_config;
-+    uint32_t    sw_prog_marker;
-+} NvmeFeatureVal;
++By default, "raw" format and "file" protocol is used; all tests will be
++executed, except the unsupported ones. You can override the format and protocol
++with arguments:
 +
-+#define NVME_ARB_AB(arb)    (arb & 0x7)
-+#define NVME_ARB_LPW(arb)   ((arb >> 8) & 0xff)
-+#define NVME_ARB_MPW(arb)   ((arb >> 16) & 0xff)
-+#define NVME_ARB_HPW(arb)   ((arb >> 24) & 0xff)
++.. code::
 +
-+#define NVME_INTC_THR(intc)     (intc & 0xff)
-+#define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
++  # test with qcow2 format
++  ./check -qcow2
++  # or test a different protocol
++  ./check -nbd
 +
-+enum NvmeFeatureIds {
-+    NVME_ARBITRATION                = 0x1,
-+    NVME_POWER_MANAGEMENT           = 0x2,
-+    NVME_LBA_RANGE_TYPE             = 0x3,
-+    NVME_TEMPERATURE_THRESHOLD      = 0x4,
-+    NVME_ERROR_RECOVERY             = 0x5,
-+    NVME_VOLATILE_WRITE_CACHE       = 0x6,
-+    NVME_NUMBER_OF_QUEUES           = 0x7,
-+    NVME_INTERRUPT_COALESCING       = 0x8,
-+    NVME_INTERRUPT_VECTOR_CONF      = 0x9,
-+    NVME_WRITE_ATOMICITY            = 0xa,
-+    NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
-+    NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
-+};
++It's also possible to list test numbers explicitly:
 +
-+typedef struct NvmeRangeType {
-+    uint8_t     type;
-+    uint8_t     attributes;
-+    uint8_t     rsvd2[14];
-+    uint64_t    slba;
-+    uint64_t    nlb;
-+    uint8_t     guid[16];
-+    uint8_t     rsvd48[16];
-+} NvmeRangeType;
++.. code::
 +
-+typedef struct NvmeLBAF {
-+    uint16_t    ms;
-+    uint8_t     ds;
-+    uint8_t     rp;
-+} NvmeLBAF;
++  # run selected cases with qcow2 format
++  ./check -qcow2 001 030 153
 +
-+typedef struct NvmeIdNs {
-+    uint64_t    nsze;
-+    uint64_t    ncap;
-+    uint64_t    nuse;
-+    uint8_t     nsfeat;
-+    uint8_t     nlbaf;
-+    uint8_t     flbas;
-+    uint8_t     mc;
-+    uint8_t     dpc;
-+    uint8_t     dps;
-+    uint8_t     res30[98];
-+    NvmeLBAF    lbaf[16];
-+    uint8_t     res192[192];
-+    uint8_t     vs[3712];
-+} NvmeIdNs;
++Cache mode can be selected with the "-c" option, which may help reveal bugs
++that are specific to certain cache mode.
 +
-+#define NVME_ID_NS_NSFEAT_THIN(nsfeat)      ((nsfeat & 0x1))
-+#define NVME_ID_NS_FLBAS_EXTENDED(flbas)    ((flbas >> 4) & 0x1)
-+#define NVME_ID_NS_FLBAS_INDEX(flbas)       ((flbas & 0xf))
-+#define NVME_ID_NS_MC_SEPARATE(mc)          ((mc >> 1) & 0x1)
-+#define NVME_ID_NS_MC_EXTENDED(mc)          ((mc & 0x1))
-+#define NVME_ID_NS_DPC_LAST_EIGHT(dpc)      ((dpc >> 4) & 0x1)
-+#define NVME_ID_NS_DPC_FIRST_EIGHT(dpc)     ((dpc >> 3) & 0x1)
-+#define NVME_ID_NS_DPC_TYPE_3(dpc)          ((dpc >> 2) & 0x1)
-+#define NVME_ID_NS_DPC_TYPE_2(dpc)          ((dpc >> 1) & 0x1)
-+#define NVME_ID_NS_DPC_TYPE_1(dpc)          ((dpc & 0x1))
-+#define NVME_ID_NS_DPC_TYPE_MASK            0x7
++More options are supported by the ``./check`` script, run ``./check -h`` for
++help.
 +
-+enum NvmeIdNsDps {
-+    DPS_TYPE_NONE   = 0,
-+    DPS_TYPE_1      = 1,
-+    DPS_TYPE_2      = 2,
-+    DPS_TYPE_3      = 3,
-+    DPS_TYPE_MASK   = 0x7,
-+    DPS_FIRST_EIGHT = 8,
-+};
++Writing a new test case
++-----------------------
 +
-+static inline void _nvme_check_size(void)
-+{
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeAerResult) != 4);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeDsmRange) != 16);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeCmd) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeDeleteQ) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeCreateCq) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeCreateSq) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeIdentify) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeRwCmd) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeDsmCmd) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeRangeType) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeErrorLog) != 64);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeFwSlotInfoLog) != 512);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
-+}
-+#endif
++Consider writing a tests case when you are making any changes to the block
++layer. An iotest case is usually the choice for that. There are already many
++test cases, so it is possible that extending one of them may achieve the goal
++and save the boilerplate to create one.  (Unfortunately, there isn't a 100%
++reliable way to find a related one out of hundreds of tests.  One approach is
++using ``git grep``.)
++
++Usually an iotest case consists of two files. One is an executable that
++produces output to stdout and stderr, the other is the expected reference
++output. They are given the same number in file names. E.g. Test script ``055``
++and reference output ``055.out``.
++
++In rare cases, when outputs differ between cache mode ``none`` and others, a
++``.out.nocache`` file is added. In other cases, when outputs differ between
++image formats, more than one ``.out`` files are created ending with the
++respective format names, e.g. ``178.out.qcow2`` and ``178.out.raw``.
++
++There isn't a hard rule about how to write a test script, but a new test is
++usually a (copy and) modification of an existing case.  There are a few
++commonly used ways to create a test:
++
++* A Bash script. It will make use of several environmental variables related
++  to the testing procedure, and could source a group of ``common.*`` libraries
++  for some common helper routines.
++
++* A Python unittest script. Import ``iotests`` and create a subclass of
++  ``iotests.QMPTestCase``, then call ``iotests.main`` method. The downside of
++  this approach is that the output is too scarce, and the script is considered
++  harder to debug.
++
++* A simple Python script without using unittest module. This could also import
++  ``iotests`` for launching QEMU and utilities etc, but it doesn't inherit
++  from ``iotests.QMPTestCase`` therefore doesn't use the Python unittest
++  execution. This is a combination of 1 and 2.
++
++Pick the language per your preference since both Bash and Python have
++comparable library support for invoking and interacting with QEMU programs. If
++you opt for Python, it is strongly recommended to write Python 3 compatible
++code.
++
++Docker based tests
++==================
++
++Introduction
++------------
++
++The Docker testing framework in QEMU utilizes public Docker images to build and
++test QEMU in predefined and widely accessible Linux environments.  This makes
++it possible to expand the test coverage across distros, toolchain flavors and
++library versions.
++
++Prerequisites
++-------------
++
++Install "docker" with the system package manager and start the Docker service
++on your development machine, then make sure you have the privilege to run
++Docker commands. Typically it means setting up passwordless ``sudo docker``
++command or login as root. For example:
++
++.. code::
++
++  $ sudo yum install docker
++  $ # or `apt-get install docker` for Ubuntu, etc.
++  $ sudo systemctl start docker
++  $ sudo docker ps
++
++The last command should print an empty table, to verify the system is ready.
++
++An alternative method to set up permissions is by adding the current user to
++"docker" group and making the docker daemon socket file (by default
++``/var/run/docker.sock``) accessible to the group:
++
++.. code::
++
++  $ sudo groupadd docker
++  $ sudo usermod $USER -G docker
++  $ sudo chown :docker /var/run/docker.sock
++
++Note that any one of above configurations makes it possible for the user to
++exploit the whole host with Docker bind mounting or other privileged
++operations.  So only do it on development machines.
++
++Quickstart
++----------
++
++From source tree, type ``make docker`` to see the help. Testing can be started
++without configuring or building QEMU (``configure`` and ``make`` are done in
++the container, with parameters defined by the make target):
++
++.. code::
++
++  make docker-test-build@min-glib
++
++This will create a container instance using the ``min-glib`` image (the image
++is downloaded and initialized automatically), in which the ``test-build`` job
++is executed.
++
++Images
++------
++
++Along with many other images, the ``min-glib`` image is defined in a Dockerfile
++in ``tests/docker/dockefiles/``, called ``min-glib.docker``. ``make docker``
++command will list all the available images.
++
++To add a new image, simply create a new ``.docker`` file under the
++``tests/docker/dockerfiles/`` directory.
++
++A ``.pre`` script can be added beside the ``.docker`` file, which will be
++executed before building the image under the build context directory. This is
++mainly used to do necessary host side setup. One such setup is ``binfmt_misc``,
++for example, to make qemu-user powered cross build containers work.
++
++Tests
++-----
++
++Different tests are added to cover various configurations to build and test
++QEMU.  Docker tests are the executables under ``tests/docker`` named
++``test-*``. They are typically shell scripts and are built on top of a shell
++library, ``tests/docker/common.rc``, which provides helpers to find the QEMU
++source and build it.
++
++The full list of tests is printed in the ``make docker`` help.
++
++Tools
++-----
++
++There are executables that are created to run in a specific Docker environment.
++This makes it easy to write scripts that have heavy or special dependencies,
++but are still very easy to use.
++
++Currently the only tool is ``travis``, which mimics the Travis-CI tests in a
++container. It runs in the ``travis`` image:
++
++.. code::
++
++  make docker-travis@travis
++
++Debugging a Docker test failure
++-------------------------------
++
++When CI tasks, maintainers or yourself report a Docker test failure, follow the
++below steps to debug it:
++
++1. Locally reproduce the failure with the reported command line. E.g. run
++   ``make docker-test-mingw@fedora J=8``.
++2. Add "V=1" to the command line, try again, to see the verbose output.
++3. Further add "DEBUG=1" to the command line. This will pause in a shell prompt
++   in the container right before testing starts. You could either manually
++   build QEMU and run tests from there, or press Ctrl-D to let the Docker
++   testing continue.
++4. If you press Ctrl-D, the same building and testing procedure will begin, and
++   will hopefully run into the error again. After that, you will be dropped to
++   the prompt for debug.
++
++Options
++-------
++
++Various options can be used to affect how Docker tests are done. The full
++list is in the ``make docker`` help text. The frequently used ones are:
++
++* ``V=1``: the same as in top level ``make``. It will be propagated to the
++  container and enable verbose output.
++* ``J=$N``: the number of parallel tasks in make commands in the container,
++  similar to the ``-j $N`` option in top level ``make``. (The ``-j`` option in
++  top level ``make`` will not be propagated into the container.)
++* ``DEBUG=1``: enables debug. See the previous "Debugging a Docker test
++  failure" section.
++
++VM testing
++==========
++
++This test suite contains scripts that bootstrap various guest images that have
++necessary packages to build QEMU. The basic usage is documented in ``Makefile``
++help which is displayed with ``make vm-test``.
++
++Quickstart
++----------
++
++Run ``make vm-test`` to list available make targets. Invoke a specific make
++command to run build test in an image. For example, ``make vm-build-freebsd``
++will build the source tree in the FreeBSD image. The command can be executed
++from either the source tree or the build dir; if the former, ``./configure`` is
++not needed. The command will then generate the test image in ``./tests/vm/``
++under the working directory.
++
++Note: images created by the scripts accept a well-known RSA key pair for SSH
++access, so they SHOULD NOT be exposed to external interfaces if you are
++concerned about attackers taking control of the guest and potentially
++exploiting a QEMU security bug to compromise the host.
++
++QEMU binary
++-----------
++
++By default, qemu-system-x86_64 is searched in $PATH to run the guest. If there
++isn't one, or if it is older than 2.10, the test won't work. In this case,
++provide the QEMU binary in env var: ``QEMU=/path/to/qemu-2.10+``.
++
++Make jobs
++---------
++
++The ``-j$X`` option in the make command line is not propagated into the VM,
++specify ``J=$X`` to control the make jobs in the guest.
++
++Debugging
++---------
++
++Add ``DEBUG=1`` and/or ``V=1`` to the make command to allow interactive
++debugging and verbose output. If this is not enough, see the next section.
++
++Manual invocation
++-----------------
++
++Each guest script is an executable script with the same command line options.
++For example to work with the netbsd guest, use ``$QEMU_SRC/tests/vm/netbsd``:
++
++.. code::
++
++    $ cd $QEMU_SRC/tests/vm
++
++    # To bootstrap the image
++    $ ./netbsd --build-image --image /var/tmp/netbsd.img
++    <...>
++
++    # To run an arbitrary command in guest (the output will not be echoed unless
++    # --debug is added)
++    $ ./netbsd --debug --image /var/tmp/netbsd.img uname -a
++
++    # To build QEMU in guest
++    $ ./netbsd --debug --image /var/tmp/netbsd.img --build-qemu $QEMU_SRC
++
++    # To get to an interactive shell
++    $ ./netbsd --interactive --image /var/tmp/netbsd.img sh
++
++Adding new guests
++-----------------
++
++Please look at existing guest scripts for how to add new guests.
++
++Most importantly, create a subclass of BaseVM and implement ``build_image()``
++method and define ``BUILD_SCRIPT``, then finally call ``basevm.main()`` from
++the script's ``main()``.
++
++* Usually in ``build_image()``, a template image is downloaded from a
++  predefined URL. ``BaseVM._download_with_cache()`` takes care of the cache and
++  the checksum, so consider using it.
++
++* Once the image is downloaded, users, SSH server and QEMU build deps should
++  be set up:
++
++  - Root password set to ``BaseVM.ROOT_PASS``
++  - User ``BaseVM.GUEST_USER`` is created, and password set to
++    ``BaseVM.GUEST_PASS``
++  - SSH service is enabled and started on boot,
++    ``$QEMU_SRC/tests/keys/id_rsa.pub`` is added to ssh's ``authorized_keys``
++    file of both root and the normal user
++  - DHCP client service is enabled and started on boot, so that it can
++    automatically configure the virtio-net-pci NIC and communicate with QEMU
++    user net (10.0.2.2)
++  - Necessary packages are installed to untar the source tarball and build
++    QEMU
++
++* Write a proper ``BUILD_SCRIPT`` template, which should be a shell script that
++  untars a raw virtio-blk block device, which is the tarball data blob of the
++  QEMU source tree, then configure/build it. Running "make check" is also
++  recommended.
++
++Image fuzzer testing
++====================
++
++An image fuzzer was added to exercise format drivers. Currently only qcow2 is
++supported. To start the fuzzer, run
++
++.. code::
++
++  tests/image-fuzzer/runner.py -c '[["qemu-img", "info", "$test_img"]]' /tmp/test qcow2
++
++Alternatively, some command different from "qemu-img info" can be tested, by
++changing the ``-c`` option.
+diff --git a/tests/vm/README b/tests/vm/README
+index ae53dce6ee..f9c04cc0e7 100644
+--- a/tests/vm/README
++++ b/tests/vm/README
+@@ -1,89 +1 @@
+-=== VM test suite to run build in guests ===
+-
+-== Intro ==
+-
+-This test suite contains scripts that bootstrap various guest images that have
+-necessary packages to build QEMU. The basic usage is documented in Makefile
+-help which is displayed with "make vm-test".
+-
+-== Quick start ==
+-
+-Run "make vm-test" to list available make targets. Invoke a specific make
+-command to run build test in an image. For example, "make vm-build-freebsd"
+-will build the source tree in the FreeBSD image. The command can be executed
+-from either the source tree or the build dir; if the former, ./configure is not
+-needed. The command will then generate the test image in ./tests/vm/ under the
+-working directory.
+-
+-Note: images created by the scripts accept a well-known RSA key pair for SSH
+-access, so they SHOULD NOT be exposed to external interfaces if you are
+-concerned about attackers taking control of the guest and potentially
+-exploiting a QEMU security bug to compromise the host.
+-
+-== QEMU binary ==
+-
+-By default, qemu-system-x86_64 is searched in $PATH to run the guest. If there
+-isn't one, or if it is older than 2.10, the test won't work. In this case,
+-provide the QEMU binary in env var: QEMU=/path/to/qemu-2.10+.
+-
+-== Make jobs ==
+-
+-The "-j$X" option in the make command line is not propagated into the VM,
+-specify "J=$X" to control the make jobs in the guest.
+-
+-== Debugging ==
+-
+-Add "DEBUG=1" and/or "V=1" to the make command to allow interactive debugging
+-and verbose output. If this is not enough, see the next section.
+-
+-== Manual invocation ==
+-
+-Each guest script is an executable script with the same command line options.
+-For example to work with the netbsd guest, use $QEMU_SRC/tests/vm/netbsd:
+-
+-    $ cd $QEMU_SRC/tests/vm
+-
+-    # To bootstrap the image
+-    $ ./netbsd --build-image --image /var/tmp/netbsd.img
+-    <...>
+-
+-    # To run an arbitrary command in guest (the output will not be echoed unless
+-    # --debug is added)
+-    $ ./netbsd --debug --image /var/tmp/netbsd.img uname -a
+-
+-    # To build QEMU in guest
+-    $ ./netbsd --debug --image /var/tmp/netbsd.img --build-qemu $QEMU_SRC
+-
+-    # To get to an interactive shell
+-    $ ./netbsd --interactive --image /var/tmp/netbsd.img sh
+-
+-== Adding new guests ==
+-
+-Please look at existing guest scripts for how to add new guests.
+-
+-Most importantly, create a subclass of BaseVM and implement build_image()
+-method and define BUILD_SCRIPT, then finally call basevm.main() from the
+-script's main().
+-
+-  - Usually in build_image(), a template image is downloaded from a predefined
+-    URL. BaseVM._download_with_cache() takes care of the cache and the
+-    checksum, so consider using it.
+-
+-  - Once the image is downloaded, users, SSH server and QEMU build deps should
+-    be set up:
+-
+-    * Root password set to BaseVM.ROOT_PASS
+-    * User BaseVM.GUEST_USER is created, and password set to BaseVM.GUEST_PASS
+-    * SSH service is enabled and started on boot,
+-      $QEMU_SRC/tests/keys/id_rsa.pub is added to ssh's "authorized_keys" file
+-      of both root and the normal user
+-    * DHCP client service is enabled and started on boot, so that it can
+-      automatically configure the virtio-net-pci NIC and communicate with QEMU
+-      user net (10.0.2.2)
+-    * Necessary packages are installed to untar the source tarball and build
+-      QEMU
+-
+-  - Write a proper BUILD_SCRIPT template, which should be a shell script that
+-    untars a raw virtio-blk block device, which is the tarball data blob of the
+-    QEMU source tree, then configure/build it. Running "make check" is also
+-    recommended.
++See docs/devel/testing.rst for help.
 -- 
 2.14.3
