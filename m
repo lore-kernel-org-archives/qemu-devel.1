@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjUs-0006VC-TI
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:11 -0500
+	(envelope-from <peterx@redhat.com>) id 1ejjUy-0006bC-NQ
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjUq-0005WY-UB
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:06 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41314 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ejjUu-0005Yz-Ip
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:12 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42930 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjUq-0005WK-Oz
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:04 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjUu-0005Xr-Dn
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:08 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Thu,  8 Feb 2018 18:31:13 +0800
-Message-Id: <20180208103132.28452-10-peterx@redhat.com>
+Date: Thu,  8 Feb 2018 18:31:14 +0800
+Message-Id: <20180208103132.28452-11-peterx@redhat.com>
 In-Reply-To: <20180208103132.28452-1-peterx@redhat.com>
 References: <20180208103132.28452-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 09/28] migration: allow fault thread to pause
+Subject: [Qemu-devel] [PATCH v6 10/28] qmp: hmp: add migrate "resume" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,157 +26,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Allows the fault thread to stop handling page faults temporarily. When
-network failure happened (and if we expect a recovery afterwards), we
-should not allow the fault thread to continue sending things to source,
-instead, it should halt for a while until the connection is rebuilt.
-
-When the dest main thread noticed the failure, it kicks the fault thread
-to switch to pause state.
+It will be used when we want to resume one paused migration.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c    |  1 +
- migration/migration.h    |  1 +
- migration/postcopy-ram.c | 50 ++++++++++++++++++++++++++++++++++++++++++++----
- migration/savevm.c       |  3 +++
- migration/trace-events   |  2 ++
- 5 files changed, 53 insertions(+), 4 deletions(-)
+ hmp-commands.hx       | 7 ++++---
+ hmp.c                 | 4 +++-
+ migration/migration.c | 2 +-
+ qapi/migration.json   | 5 ++++-
+ 4 files changed, 12 insertions(+), 6 deletions(-)
 
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 15620c94d3..28ed5a7a13 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -895,13 +895,14 @@ ETEXI
+ 
+     {
+         .name       = "migrate",
+-        .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
+-        .params     = "[-d] [-b] [-i] uri",
++        .args_type  = "detach:-d,blk:-b,inc:-i,resume:-r,uri:s",
++        .params     = "[-d] [-b] [-i] [-r] uri",
+         .help       = "migrate to URI (using -d to not wait for completion)"
+ 		      "\n\t\t\t -b for migration without shared storage with"
+ 		      " full copy of disk\n\t\t\t -i for migration without "
+ 		      "shared storage with incremental copy of disk "
+-		      "(base image shared between src and destination)",
++		      "(base image shared between src and destination)"
++                      "\n\t\t\t -r to resume a paused migration",
+         .cmd        = hmp_migrate,
+     },
+ 
+diff --git a/hmp.c b/hmp.c
+index b3de32d219..6f8eec8365 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1921,10 +1921,12 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
+     bool detach = qdict_get_try_bool(qdict, "detach", false);
+     bool blk = qdict_get_try_bool(qdict, "blk", false);
+     bool inc = qdict_get_try_bool(qdict, "inc", false);
++    bool resume = qdict_get_try_bool(qdict, "resume", false);
+     const char *uri = qdict_get_str(qdict, "uri");
+     Error *err = NULL;
+ 
+-    qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
++    qmp_migrate(uri, !!blk, blk, !!inc, inc,
++                false, false, true, resume, &err);
+     if (err) {
+         hmp_handle_error(mon, &err);
+         return;
 diff --git a/migration/migration.c b/migration/migration.c
-index b3899c2b6e..4a8c873b52 100644
+index 4a8c873b52..dbcc3f6296 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -156,6 +156,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
-         qemu_mutex_init(&mis_current.rp_mutex);
-         qemu_event_init(&mis_current.main_thread_load_event, false);
-         qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
-+        qemu_sem_init(&mis_current.postcopy_pause_sem_fault, 0);
-         once = true;
-     }
-     return &mis_current;
-diff --git a/migration/migration.h b/migration/migration.h
-index ecdb38ee53..c39e325615 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -64,6 +64,7 @@ struct MigrationIncomingState {
+@@ -1362,7 +1362,7 @@ bool migration_is_blocked(Error **errp)
  
-     /* notify PAUSED postcopy incoming migrations to try to continue */
-     QemuSemaphore postcopy_pause_sem_dst;
-+    QemuSemaphore postcopy_pause_sem_fault;
- };
+ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+                  bool has_inc, bool inc, bool has_detach, bool detach,
+-                 Error **errp)
++                 bool has_resume, bool resume, Error **errp)
+ {
+     Error *local_err = NULL;
+     MigrationState *s = migrate_get_current();
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 49d27f3b29..9d6ccfec6b 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1012,6 +1012,8 @@
+ # @detach: this argument exists only for compatibility reasons and
+ #          is ignored by QEMU
+ #
++# @resume: resume one paused migration, default "off". (since 2.12)
++#
+ # Returns: nothing on success
+ #
+ # Since: 0.14.0
+@@ -1033,7 +1035,8 @@
+ #
+ ##
+ { 'command': 'migrate',
+-  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
++  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool',
++           '*detach': 'bool', '*resume': 'bool' } }
  
- MigrationIncomingState *migration_incoming_get_current(void);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 032abfbf1a..31c290c884 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -485,6 +485,17 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
-     return 0;
- }
- 
-+static bool postcopy_pause_fault_thread(MigrationIncomingState *mis)
-+{
-+    trace_postcopy_pause_fault_thread();
-+
-+    qemu_sem_wait(&mis->postcopy_pause_sem_fault);
-+
-+    trace_postcopy_pause_fault_thread_continued();
-+
-+    return true;
-+}
-+
- /*
-  * Handle faults detected by the USERFAULT markings
-  */
-@@ -535,6 +546,22 @@ static void *postcopy_ram_fault_thread(void *opaque)
-             }
-         }
- 
-+        if (!mis->to_src_file) {
-+            /*
-+             * Possibly someone tells us that the return path is
-+             * broken already using the event. We should hold until
-+             * the channel is rebuilt.
-+             */
-+            if (postcopy_pause_fault_thread(mis)) {
-+                last_rb = NULL;
-+                /* Continue to read the userfaultfd */
-+            } else {
-+                error_report("%s: paused but don't allow to continue",
-+                             __func__);
-+                break;
-+            }
-+        }
-+
-         ret = read(mis->userfault_fd, &msg, sizeof(msg));
-         if (ret != sizeof(msg)) {
-             if (errno == EAGAIN) {
-@@ -574,18 +601,33 @@ static void *postcopy_ram_fault_thread(void *opaque)
-                                                 qemu_ram_get_idstr(rb),
-                                                 rb_offset);
- 
-+retry:
-         /*
-          * Send the request to the source - we want to request one
-          * of our host page sizes (which is >= TPS)
-          */
-         if (rb != last_rb) {
-             last_rb = rb;
--            migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
--                                     rb_offset, qemu_ram_pagesize(rb));
-+            ret = migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-+                                            rb_offset, qemu_ram_pagesize(rb));
-         } else {
-             /* Save some space */
--            migrate_send_rp_req_pages(mis, NULL,
--                                     rb_offset, qemu_ram_pagesize(rb));
-+            ret = migrate_send_rp_req_pages(mis, NULL,
-+                                            rb_offset, qemu_ram_pagesize(rb));
-+        }
-+
-+        if (ret) {
-+            /* May be network failure, try to wait for recovery */
-+            if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
-+                /* We got reconnected somehow, try to continue */
-+                last_rb = NULL;
-+                goto retry;
-+            } else {
-+                /* This is a unavoidable fault */
-+                error_report("%s: migrate_send_rp_req_pages() get %d",
-+                             __func__, ret);
-+                break;
-+            }
-         }
-     }
-     trace_postcopy_ram_fault_thread_exit();
-diff --git a/migration/savevm.c b/migration/savevm.c
-index d83c1e846a..5b1a0a7fe1 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2054,6 +2054,9 @@ static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-     mis->to_src_file = NULL;
-     qemu_mutex_unlock(&mis->rp_mutex);
- 
-+    /* Notify the fault thread for the invalidated file handle */
-+    postcopy_fault_thread_notify(mis);
-+
-     error_report("Detected IO failure for postcopy. "
-                  "Migration paused.");
- 
-diff --git a/migration/trace-events b/migration/trace-events
-index ca17a70222..06a919a6e3 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -101,6 +101,8 @@ open_return_path_on_source_continue(void) ""
- postcopy_start(void) ""
- postcopy_pause_return_path(void) ""
- postcopy_pause_return_path_continued(void) ""
-+postcopy_pause_fault_thread(void) ""
-+postcopy_pause_fault_thread_continued(void) ""
- postcopy_pause_continued(void) ""
- postcopy_pause_incoming(void) ""
- postcopy_pause_incoming_continued(void) ""
+ ##
+ # @migrate-incoming:
 -- 
 2.14.3
