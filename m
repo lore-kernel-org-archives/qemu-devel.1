@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejroh-0003iW-Qh
+	(envelope-from <kwolf@redhat.com>) id 1ejroh-0003hw-Gp
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:25:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ejrog-0001v4-Ab
+	(envelope-from <kwolf@redhat.com>) id 1ejrog-0001vA-C2
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:25:07 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  8 Feb 2018 20:23:22 +0100
-Message-Id: <20180208192328.16550-22-kwolf@redhat.com>
+Date: Thu,  8 Feb 2018 20:23:23 +0100
+Message-Id: <20180208192328.16550-23-kwolf@redhat.com>
 In-Reply-To: <20180208192328.16550-1-kwolf@redhat.com>
 References: <20180208192328.16550-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 21/27] ssh: QAPIfy host-key-check option
+Subject: [Qemu-devel] [PATCH 22/27] ssh: Pass BlockdevOptionsSsh to
+ connect_to_ssh()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,249 +23,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This makes the host-key-check option available in blockdev-add.
+Move the parsing of the QDict options up to the callers, in preparation
+for the .bdrv_co_create implementation that directly gets a QAPI type.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 63 +++++++++++++++++++++++++++++++++++--
- block/ssh.c          | 88 +++++++++++++++++++++++++++++++++-------------------
- 2 files changed, 117 insertions(+), 34 deletions(-)
+ block/ssh.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 08217e3e38..7ad25ce372 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2533,6 +2533,63 @@
-             '*encrypt': 'BlockdevQcow2Encryption' } }
- 
- ##
-+# @SshHostKeyCheckMode:
-+#
-+# @none             Don't check the host key at all
-+# @hash             Compare the host key with a given hash
-+# @known_hosts      Check the host key against the known_hosts file
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'SshHostKeyCheckMode',
-+  'data': [ 'none', 'hash', 'known_hosts' ] }
-+
-+##
-+# @SshHostKeyCheckHashType:
-+#
-+# @md5              The given hash is an md5 hash
-+# @sha1             The given hash is an sha1 hash
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'SshHostKeyCheckHashType',
-+  'data': [ 'md5', 'sha1' ] }
-+
-+##
-+# @SshHostKeyHash:
-+#
-+# @type             The hash algorithm used for the hash
-+# @hash             The expected hash value
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SshHostKeyHash',
-+  'data': { 'type': 'SshHostKeyCheckHashType',
-+            'hash': 'str' }}
-+
-+##
-+# @SshHostKeyDummy:
-+#
-+# For those union branches that don't need additional fields.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SshHostKeyDummy',
-+  'data': {} }
-+
-+##
-+# @SshHostKeyCheck:
-+#
-+# Since: 2.12
-+##
-+{ 'union': 'SshHostKeyCheck',
-+  'base': { 'mode': 'SshHostKeyCheckMode' },
-+  'discriminator': 'mode',
-+  'data': { 'none': 'SshHostKeyDummy',
-+            'hash': 'SshHostKeyHash',
-+            'known_hosts': 'SshHostKeyDummy' } }
-+
-+##
- # @BlockdevOptionsSsh:
- #
- # @server:              host address
-@@ -2542,14 +2599,16 @@
- # @user:                user as which to connect, defaults to current
- #                       local user name
- #
--# TODO: Expose the host_key_check option in QMP
-+# @host-key-check:      Defines how and what to check the host key against
-+#                       (default: known_hosts)
- #
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsSsh',
-   'data': { 'server': 'InetSocketAddress',
-             'path': 'str',
--            '*user': 'str' } }
-+            '*user': 'str',
-+            '*host-key-check': 'SshHostKeyCheck' } }
- 
- 
- ##
 diff --git a/block/ssh.c b/block/ssh.c
-index 691080b560..d565d876d3 100644
+index d565d876d3..776d722353 100644
 --- a/block/ssh.c
 +++ b/block/ssh.c
-@@ -428,31 +428,35 @@ check_host_key_hash(BDRVSSHState *s, const char *hash,
+@@ -652,19 +652,13 @@ fail:
+     return result;
  }
  
- static int check_host_key(BDRVSSHState *s, const char *host, int port,
--                          const char *host_key_check, Error **errp)
-+                          SshHostKeyCheck *hkc, Error **errp)
+-static int connect_to_ssh(BDRVSSHState *s, QDict *options,
++static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
+                           int ssh_flags, int creat_mode, Error **errp)
  {
--    /* host_key_check=no */
--    if (strcmp(host_key_check, "no") == 0) {
--        return 0;
--    }
-+    SshHostKeyCheckMode mode;
- 
--    /* host_key_check=md5:xx:yy:zz:... */
--    if (strncmp(host_key_check, "md5:", 4) == 0) {
--        return check_host_key_hash(s, &host_key_check[4],
--                                   LIBSSH2_HOSTKEY_HASH_MD5, 16, errp);
--    }
--
--    /* host_key_check=sha1:xx:yy:zz:... */
--    if (strncmp(host_key_check, "sha1:", 5) == 0) {
--        return check_host_key_hash(s, &host_key_check[5],
--                                   LIBSSH2_HOSTKEY_HASH_SHA1, 20, errp);
-+    if (hkc) {
-+        mode = hkc->mode;
-+    } else {
-+        mode = SSH_HOST_KEY_CHECK_MODE_KNOWN_HOSTS;
-     }
- 
--    /* host_key_check=yes */
--    if (strcmp(host_key_check, "yes") == 0) {
-+    switch (mode) {
-+    case SSH_HOST_KEY_CHECK_MODE_NONE:
-+        return 0;
-+    case SSH_HOST_KEY_CHECK_MODE_HASH:
-+        if (hkc->u.hash.type == SSH_HOST_KEY_CHECK_HASH_TYPE_MD5) {
-+            return check_host_key_hash(s, hkc->u.hash.hash,
-+                                       LIBSSH2_HOSTKEY_HASH_MD5, 16, errp);
-+        } else if (hkc->u.hash.type == SSH_HOST_KEY_CHECK_HASH_TYPE_SHA1) {
-+            return check_host_key_hash(s, hkc->u.hash.hash,
-+                                       LIBSSH2_HOSTKEY_HASH_SHA1, 20, errp);
-+        }
-+        g_assert_not_reached();
-+        break;
-+    case SSH_HOST_KEY_CHECK_MODE_KNOWN_HOSTS:
-         return check_host_key_knownhosts(s, host, port, errp);
-+    default:
-+        g_assert_not_reached();
-     }
- 
--    error_setg(errp, "unknown host_key_check setting (%s)", host_key_check);
-     return -EINVAL;
- }
- 
-@@ -541,15 +545,21 @@ static QemuOptsList ssh_runtime_opts = {
-             .type = QEMU_OPT_NUMBER,
-             .help = "Port to connect to",
-         },
-+        {
-+            .name = "host_key_check",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Defines how and what to check the host key against",
-+        },
-     },
- };
- 
--static bool ssh_process_legacy_socket_options(QDict *output_opts,
--                                              QemuOpts *legacy_opts,
--                                              Error **errp)
-+static bool ssh_process_legacy_options(QDict *output_opts,
-+                                       QemuOpts *legacy_opts,
-+                                       Error **errp)
- {
-     const char *host = qemu_opt_get(legacy_opts, "host");
-     const char *port = qemu_opt_get(legacy_opts, "port");
-+    const char *host_key_check = qemu_opt_get(legacy_opts, "host_key_check");
- 
-     if (!host && port) {
-         error_setg(errp, "port may not be used without host");
-@@ -561,6 +571,28 @@ static bool ssh_process_legacy_socket_options(QDict *output_opts,
-         qdict_put_str(output_opts, "server.port", port ?: stringify(22));
-     }
- 
-+    if (host_key_check) {
-+        if (strcmp(host_key_check, "no") == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "none");
-+        } else if (strncmp(host_key_check, "md5:", 4) == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "hash");
-+            qdict_put_str(output_opts, "host-key-check.type", "md5");
-+            qdict_put_str(output_opts, "host-key-check.hash",
-+                          &host_key_check[4]);
-+        } else if (strncmp(host_key_check, "sha1:", 5) == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "hash");
-+            qdict_put_str(output_opts, "host-key-check.type", "sha1");
-+            qdict_put_str(output_opts, "host-key-check.hash",
-+                          &host_key_check[5]);
-+        } else if (strcmp(host_key_check, "yes") == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "known_hosts");
-+        } else {
-+            error_setg(errp, "unknown host_key_check setting (%s)",
-+                       host_key_check);
-+            return false;
-+        }
-+    }
-+
-     return true;
- }
- 
-@@ -581,7 +613,7 @@ static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
-         goto fail;
-     }
- 
--    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
-+    if (!ssh_process_legacy_options(options, opts, errp)) {
-         goto fail;
-     }
- 
-@@ -625,16 +657,9 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
- {
-     BlockdevOptionsSsh *opts;
+-    BlockdevOptionsSsh *opts;
      int r, ret;
--    const char *user, *host_key_check;
-+    const char *user;
+     const char *user;
      long port = 0;
  
--    host_key_check = qdict_get_try_str(options, "host_key_check");
--    if (!host_key_check) {
--        host_key_check = "yes";
--    } else {
--        qdict_del(options, "host_key_check");
+-    opts = ssh_parse_options(options, errp);
+-    if (opts == NULL) {
+-        return -EINVAL;
 -    }
 -
-     opts = ssh_parse_options(options, errp);
-     if (opts == NULL) {
-         return -EINVAL;
-@@ -688,8 +713,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+     if (opts->has_user) {
+         user = opts->user;
+     } else {
+@@ -744,8 +738,6 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+         goto err;
      }
  
-     /* Check the remote host's key against known_hosts. */
--    ret = check_host_key(s, s->inet->host, port, host_key_check,
--                         errp);
-+    ret = check_host_key(s, s->inet->host, port, opts->host_key_check, errp);
+-    qapi_free_BlockdevOptionsSsh(opts);
+-
+     r = libssh2_sftp_fstat(s->sftp_handle, &s->attrs);
+     if (r < 0) {
+         sftp_error_setg(errp, s, "failed to read file attributes");
+@@ -771,8 +763,6 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+     }
+     s->session = NULL;
+ 
+-    qapi_free_BlockdevOptionsSsh(opts);
+-
+     return ret;
+ }
+ 
+@@ -780,6 +770,7 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+                          Error **errp)
+ {
+     BDRVSSHState *s = bs->opaque;
++    BlockdevOptionsSsh *opts;
+     int ret;
+     int ssh_flags;
+ 
+@@ -790,8 +781,13 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+         ssh_flags |= LIBSSH2_FXF_WRITE;
+     }
+ 
++    opts = ssh_parse_options(options, errp);
++    if (opts == NULL) {
++        return -EINVAL;
++    }
++
+     /* Start up SSH. */
+-    ret = connect_to_ssh(s, options, ssh_flags, 0, errp);
++    ret = connect_to_ssh(s, opts, ssh_flags, 0, errp);
      if (ret < 0) {
          goto err;
      }
+@@ -799,6 +795,8 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+     /* Go non-blocking. */
+     libssh2_session_set_blocking(s->session, 0);
+ 
++    qapi_free_BlockdevOptionsSsh(opts);
++
+     return 0;
+ 
+  err:
+@@ -807,6 +805,8 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+     }
+     s->sock = -1;
+ 
++    qapi_free_BlockdevOptionsSsh(opts);
++
+     return ret;
+ }
+ 
+@@ -828,6 +828,7 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
+     int r, ret;
+     int64_t total_size = 0;
+     QDict *uri_options = NULL;
++    BlockdevOptionsSsh *ssh_opts = NULL;
+     BDRVSSHState s;
+     ssize_t r2;
+     char c[1] = { '\0' };
+@@ -846,7 +847,13 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
+         goto out;
+     }
+ 
+-    r = connect_to_ssh(&s, uri_options,
++    ssh_opts = ssh_parse_options(uri_options, errp);
++    if (ssh_opts == NULL) {
++        ret = -EINVAL;
++        goto out;
++    }
++
++    r = connect_to_ssh(&s, ssh_opts,
+                        LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
+                        LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
+                        0644, errp);
+@@ -873,6 +880,7 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
+     if (uri_options != NULL) {
+         QDECREF(uri_options);
+     }
++    qapi_free_BlockdevOptionsSsh(ssh_opts);
+     return ret;
+ }
+ 
 -- 
 2.13.6
