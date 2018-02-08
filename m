@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejmCm-0003D5-2a
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:25:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ejmDX-0003vC-Ml
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:26:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejmCk-00049N-MT
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:25:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38598)
+	(envelope-from <peter.maydell@linaro.org>) id 1ejmDW-0004Ml-Nn
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:26:23 -0500
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:36704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejmCk-00048u-G0
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:25:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejmCi-0005Jd-9n
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 13:25:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 41BB82E80D7
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 13:25:32 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ejmDW-0004MJ-JD
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 08:26:22 -0500
+Received: by mail-ot0-x231.google.com with SMTP id m20so4297265otf.3
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:26:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Feb 2018 13:14:14 -0000
-From: ChristianEhrhardt <1350435@bugs.launchpad.net>
-Reply-To: Bug 1350435 <1350435@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140730162025.27276.9650.malonedeb@soybean.canonical.com>
-Message-Id: <151809565455.2927.17882468207595492364.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1350435] Re: tcg.c:1693: tcg fatal error
+In-Reply-To: <20180207042438.15422-13-andrew.smirnov@gmail.com>
+References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
+	<20180207042438.15422-13-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Feb 2018 13:26:01 +0000
+Message-ID: <CAFEAcA8Hjsb+KW4A0ks696+zXOeDErndeQDFvOqshyONpyaSSg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 12/14] i.MX: Add i.MX7 SOC
+ implementation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-per former comments, in context qemu 2.11 is in proposed
+On 7 February 2018 at 04:24, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+> The following interfaces are partially or fully emulated:
 
-** Changed in: qemu (Ubuntu)
-       Status: Confirmed =3D> Fix Committed
+Hi Andrey. I was just going through this series to apply to
+target-arm.next, and I noticed that fsl-imx7.c is GPL-2-or-later,
+but fsl-imx7.h is GPL-2-only. Is that intentional?
 
--- =
+If this is just an accidental error, and you send an email to
+say you meant 2-or-later, then I can fix this in my target-arm
+tree by copying the license paragraphs from fsl-imx7.c to fsl-imx7.h.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1350435
+> --- /dev/null
+> +++ b/hw/arm/fsl-imx7.c
+> @@ -0,0 +1,580 @@
+> +/*
+> + * Copyright (c) 2018, Impinj, Inc.
+> + *
+> + * i.MX7 SoC definitions
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * Based on hw/arm/fsl-imx6.c
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> + * GNU General Public License for more details.
+> + */
+> +
 
-Title:
-  tcg.c:1693: tcg fatal error
+> --- /dev/null
+> +++ b/include/hw/arm/fsl-imx7.h
+> @@ -0,0 +1,221 @@
+> +/*
+> + * Copyright (c) 2017, Impinj, Inc.
+> + *
+> + * i.MX7 SoC definitions
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; version 2 of the License.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> + * GNU General Public License for more details.
+> + */
+> +
 
-Status in launchpad-buildd:
-  Won't Fix
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Committed
-
-Bug description:
-  this started happening after the launchpad buildd trusty deploy
-  https://code.launchpad.net/~costamagnagianfranco/+archive/ubuntu/firefox/=
-+build/6224439
-
-  =
-
-  debconf-updatepo
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  Segmentation fault (core dumped)
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  Segmentation fault (core dumped)
-  /build/buildd/qemu-2.0.0+dfsg/tcg/tcg.c:1693: tcg fatal error
-  /build/buildd/qemu-2.0.0+dfsg/tcg/tcg.c:1693: tcg fatal error
-
-  this seems to be the patch needed
-  https://patches.linaro.org/32473/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/launchpad-buildd/+bug/1350435/+subscriptions
+thanks
+-- PMM
