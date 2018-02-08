@@ -1,33 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejkPY-0003ei-EH
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:30:42 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ejkPY-0003en-FD
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:30:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejkPU-0002CU-6L
+	(envelope-from <borntraeger@de.ibm.com>) id 1ejkPU-0002Cc-7F
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:30:40 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42526 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ejkPU-0002C7-0B
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ejkPT-0002C6-WC
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:30:36 -0500
-Date: Thu, 8 Feb 2018 12:30:18 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180208123018.5b3c9da7@redhat.com>
-In-Reply-To: <53186984-2111-ed5e-0d47-65db12f22ea3@intel.com>
-References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
-	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
-	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
-	<502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
-	<20180205181521.47232aa4@redhat.com>
-	<5155622d-cc49-d24c-7a7d-24ebb9ca2331@redhat.com>
-	<ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
-	<20180207130635.4033f8b8@redhat.com>
-	<8474af94-7bff-a7b5-e316-b8a0e332467e@intel.com>
-	<20180208105111.7a776513@redhat.com>
-	<53186984-2111-ed5e-0d47-65db12f22ea3@intel.com>
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w18BU88n054399
+	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 06:30:35 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g0nk9gd0c-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 06:30:34 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 8 Feb 2018 11:30:31 -0000
+References: <20180202094241.59537-1-borntraeger@de.ibm.com>
+	<8d3af693-3dd8-20b7-c7c1-38d7c6cce65d@de.ibm.com>
+	<20180202113301.0522c7bc.cohuck@redhat.com>
+	<20180202113513.15c37b32.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 8 Feb 2018 12:30:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180202113513.15c37b32.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
+Message-Id: <47ffc4f7-a66b-0328-d0bf-2d06ad0f7c30@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling -->
+ stable 2.11.1?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +45,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tan, Jianfeng" <jianfeng.tan@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, 8 Feb 2018 18:18:20 +0800
-"Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
 
-> On 2/8/2018 5:51 PM, Igor Mammedov wrote:
-> > On Thu, 8 Feb 2018 09:20:45 +0800
-> > "Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
-> >  
-> >> On 2/7/2018 8:06 PM, Igor Mammedov wrote:  
-> >>> On Wed, 7 Feb 2018 07:49:58 +0000
-> >>> "Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
-> >>>     
-> >>>>> -----Original Message-----
-> >>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >>>>> Sent: Tuesday, February 6, 2018 1:32 AM
-> >>>>> To: Igor Mammedov
-> >>>>> Cc: Tan, Jianfeng; qemu-devel@nongnu.org; Jason Wang; Maxime Coquelin;
-> >>>>> Michael S . Tsirkin
-> >>>>> Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
-> >>>>> migration
-> >>>>>
-> >>>>> On 05/02/2018 18:15, Igor Mammedov wrote:  
-> >>>>>>>> Then we would have both ram block named pc.ram:
-> >>>>>>>>                 Block Name    PSize
-> >>>>>>>>                         pc.ram     4 KiB
-> >>>>>>>>         /objects/pc.ram    2 MiB
-> >>>>>>>>
-> >>>>>>>> But I assume it's a corner case which not really happen.  
-> >>>>>>> Yeah, you're right. :/  I hadn't thought of hotplug.  It can happen indeed.  
-> >>>>>> perhaps we should fail object_add memory-backend-foo if it resulted
-> >>>>>> in creating ramblock with duplicate id  
-> >>>>> Note that it would only be duplicated with Jianfeng's patch.  So I'm
-> >>>>> worried that his patch is worse than what we have now, because it may
-> >>>>> create conflicts with system RAMBlock names are not necessarily
-> >>>>> predictable.  Right now, -object creates RAMBlock names that are nicely
-> >>>>> constrained within /object/.  
-> >>>> So we are trading off between the benefit it takes and the bad effect it brings.
-> >>>>
-> >>>> I'm wondering if the above example is the only failed case this patch leads to, i.e, only there is a ram named "pc.ram" and "/object/pc.ram" in the src VM?
-> >>>>
-> >>>> Please also consider the second option, that adding an alias name for RAMBlock; I'm not a big fan for that one, as it just pushes the problem to OpenStack/Libvirt.  
-> >>> looking at provided CLI examples it's configuration issue on src and dst,
-> >>> one shall not mix numa and non numa variants.  
-> >> Aha, that's another thing we also want to change. We now add numa at dst
-> >> node, only because without -numa, we cannot set up the file-baked memory
-> >> with share=on.  
-> > then shouldn't you start src with the same -numa to begin with,
-> > changing such things on the fly is not supported.  
-> 
-> Yes, you are describing the best practice. But we are originally trying 
-> to migrate without any changes to QEMU.
-> 
-> > General rule is that machine on dst has to be the same as on src.  
-> 
-> OK.
-> 
-> > (with backend not visible to guest it possible might be changed
-> > but it's hard to tell if something would break due to that
-> > or would continue working in future since doesn't go along with above rule)
-> >  
-> >> For example, "-m xG -mem-path xxx" can set up a file-baked memory, but
-> >> the file is not share-able.  
-> > It could be solved by adding memdev option to machine,
-> > which would allow to specify backend object. And then on
-> > top make -mem-path alias new option to clean thing up.  
-> 
-> Do you mean?
-> 
-> src vm: -m xG
-> dst vm: -m xG,memdev=pc.ram -object 
-> memory-backend-file,id=pc.ram,size=xG,mem-path=xxx,share=on ...
-Yep, I've meant something like it
 
-src vm: -m xG,memdev=SHARED_RAM -object memory-backend-file,id=SHARED_RAM,size=xG,mem-path=xxx,share=on
-dst vm: -m xG,memdev=SHARED_RAM -object memory-backend-file,id=SHARED_RAM,size=xG,mem-path=xxx,share=on
+On 02/02/2018 11:35 AM, Cornelia Huck wrote:
+> On Fri, 2 Feb 2018 11:33:01 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+>> On Fri, 2 Feb 2018 10:43:18 +0100
+>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>
+>>> On 02/02/2018 10:42 AM, Christian Borntraeger wrote:  
+>>>> commit 67915de9f038 ("s390x/event-facility: variable-length event
+>>>> masks") switches the sclp receive/send mask. This broke the sclp
+>>>> lm console.  
+>>
+>> Hum. Probably should add sclp-lm to my test setup.
+>>
+>>>>
+>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>> Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
+>>>> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>    
+>>>
+>>> opps. Please fixup yourself Conny :-)  
+>>
+>> Well, you did cc: the original author :)
+>>
+>>>   
+>>>> Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+>>>> Cc: qemu-stable@nongnu.org
+>>>> ---
+>>>>  hw/s390x/event-facility.c | 4 ++--
+>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+>>>> index b0f71f4554..155a69467b 100644
+>>>> --- a/hw/s390x/event-facility.c
+>>>> +++ b/hw/s390x/event-facility.c
+>>>> @@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+>>>>      ef->receive_mask = be32_to_cpu(tmp_mask);
+>>>>
+>>>>      /* return the SCLP's capability masks to the guest */
+>>>> -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
+>>>> +    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
+>>>>      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+>>>>                mask_length, sizeof(tmp_mask));
+>>>> -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
+>>>> +    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
+>>>>      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+>>>>                mask_length, sizeof(tmp_mask));
+>>>>     
+>>>   
+>>
+>> Thanks, applied.
+> 
+> Oh, and as always, I still take R-bs until I prepare a pull req.
+> 
 
-or it could be -machine FOO,inital_ram_memdev=...
-maybe making -M optional in this case as size is specified by backend
-
-PS:
-it's not a good idea to use QEMU's internal id 'pc.ram'
-for user specified objects as it might cause problems.
+Would be good to have that in 2.11.1 stable as well I think
