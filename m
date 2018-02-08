@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ejvXi-0006b7-EO
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:23:51 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ejvc6-0000Cr-0G
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:28:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ejvXf-0005uH-6X
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:23:50 -0500
-Date: Fri, 9 Feb 2018 10:08:48 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ejvc2-0000it-PE
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 18:28:21 -0500
+Date: Fri, 9 Feb 2018 10:28:10 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180208230848.GB11634@umbus.fritz.box>
-References: <20180208094241.13839-1-lvivier@redhat.com>
+Message-ID: <20180208232810.GC11634@umbus.fritz.box>
+References: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="v9Ux+11Zm5mwPlX6"
+	protocol="application/pgp-signature"; boundary="ncSAzJYg3Aa9+CRW"
 Content-Disposition: inline
-In-Reply-To: <20180208094241.13839-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] spapr: check smp_threads <= vsmt
+In-Reply-To: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr: add missing break in
+ h_get_cpu_characteristics()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
---v9Ux+11Zm5mwPlX6
+--ncSAzJYg3Aa9+CRW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 08, 2018 at 10:42:41AM +0100, Laurent Vivier wrote:
-> We ignore silently the value of smp_threads when we set
-> the default VSMT value, and if smp_threads is greater than VSMT
-> kernel is going into trouble later.
+On Thu, Feb 01, 2018 at 08:47:41PM +0100, Greg Kurz wrote:
+> Detected by Coverity (CID 1385702). This fixes the recently added hyperca=
+ll
+> to let guests properly apply Spectre and Meltdown workarounds.
 >=20
-> Fixes: 8904e5a750
-> ("spapr: Adjust default VSMT value for better migration compatibility")
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Fixes: c59704b25473 "target/ppc/spapr: Add H-Call H_GET_CPU_CHARACTERISTI=
+CS"
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-I don't think this is quite the rigth appoach.  Instead, I think we
-want:
-
-	spapr->vsmt =3D MAX(8, smp_threads);
-
-The real point of 8904e5a750 was to replace the host-derived kvm_smt
-with a fixed value (8).  I only removed the MAX, because I mistakenly
-thought that checks elsewhere would prevent smp_threads > 8.
+Applied to ppc-for-2.12, thanks.
 
 > ---
+>  hw/ppc/spapr_hcall.c |    1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> Notes:
->     v2: display a specific error message when the default VSMT is used
->         fix subject
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 4d0e6eb0cf1d..596f58378a40 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1697,6 +1697,7 @@ static target_ulong h_get_cpu_characteristics(Power=
+PCCPU *cpu,
+>      switch (safe_indirect_branch) {
+>      case SPAPR_CAP_FIXED:
+>          characteristics |=3D H_CPU_CHAR_BCCTRL_SERIALISED;
+> +        break;
+>      default: /* broken */
+>          assert(safe_indirect_branch =3D=3D SPAPR_CAP_BROKEN);
+>          break;
 >=20
->  hw/ppc/spapr.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 32a876be56..11de276cd5 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2311,6 +2311,12 @@ static void spapr_set_vsmt_mode(sPAPRMachineState =
-*spapr, Error **errp)
->           * overwhelmingly common case in production systems.
->           */
->          spapr->vsmt =3D 8;
-> +        if (spapr->vsmt < smp_threads) {
-> +            error_setg(&local_err, "Cannot support %d threads/core"
-> +                         " because it must be <=3D to default VSMT mode =
-(%d)",
-> +                         smp_threads, spapr->vsmt);
-> +            goto out;
-> +        }
->      }
-> =20
->      /* KVM: If necessary, set the SMT mode: */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -86,24 +69,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---v9Ux+11Zm5mwPlX6
+--ncSAzJYg3Aa9+CRW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp82H0ACgkQbDjKyiDZ
-s5KRjhAAoNcctoIp+G/2mzChS8nNCIP0ABIVwTXPdqv3QwFFoNFRh3YNMS/rdQPc
-u/H/FgxKy8WS9ZBrenz4pfBDV2taSUH4An5PkfP/kRvdT2yefLFuZq6KxWcjniEF
-Jmo3rG6MkkINPbm7bikvpbZkOY2ATUXGWjm4P7K0tkHsVPLyMhHr+o/YXySQgwCW
-DdaeWN5b+LyzFwdkj1z2CtTexL5lxU0MFmBqXCbYdqYQhHXDxKbFJC+GZI+nXEOA
-Syz2t3bAcW+KL2Ef1KTUFUgGJ4rKvzlfsWjKAWKxeP3jeLkJvmlc2YxPrhmLQ3da
-5P9VtqqH/okYsxZ+tPP4V/Jm02LKhmQpRcpYDFYX0nBikKjHmhyeg2ma3smARNZ+
-LeQUVU6elj3Y6n80GcGXd2oq8LtFHgaPKPF6HgKrzPVhJZd/edcv6NFCVFqklml6
-123K/PQsViTPX2q6BUz93eMHXwMQ6t3nmgo4hUOlOe+MYTqKKVeDUNMKR1keyULZ
-p+d3qnka3FPdhwOdQWmPKc1+IQnWA3O81nYEo2RwELKV4o5fR32nvVi9cBJXtJiU
-Arst+xp16iocpJgrPo+d50bKHhGcptLbvkRJvd2zTCLpWwRWbv3y0vJBoo6JM48V
-eds7R5ODI5FC3Hrk8bq1++8sPyfOIDTjNroAV1A8n9F/w9LGTYY=
-=+cRV
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp83QgACgkQbDjKyiDZ
+s5LWQhAAkUmluj3q60Ys1bKqxBc/8T5DrBw653Ija1UyouGvuXJQsTI4ME4lCH5S
+0HYXMiq7myMV8roEGY0l0nNFsfX4tQZOEZX4pMYVWLsDkC8ttZXpNoTj8tuOWnGH
+wLCPCPk3nbjGFGXpoG2m2Q6wUT2l43jeBgnjm495kSpnzy6l4aNtI6OO3JOSBFuc
+ruy/VKk7/X1s8mYBE4TMDT0E3nbDwRBTPZ7D8y6nAR0vmNQkhL6knCQBUrvQiwcA
++A+V6CbZM7OidVvyR9Nb6Hb0yzvJC9icihO7IeUQCWTtp63SZVk5HMh/XRRZLkSz
+WIPo47fTF8nuo05AAQZfoXeWNyvn/TosADavszdf1aHzUdnbOhb+M46p9AMbZUso
+vfJD2RmTMabK8t3wIvcJjG4TWxBqhA8ireMQFomGId06bDyKlyCViZU73t8X2Vpk
+4MSpwAV6sLVnq9S0I43D+QPnLoFKGD/t5EuFXfSoUL8LSqI1gFb8RV4D9UfxpWSG
+415vHSpv52FuuQNKmahsLI6HiObyS4dpaR+vtUP4QOBzLlZi9Q9Vb0bBbzh2nRqS
+8qQC0cuBFiOHysrvROpno+ruWQoiggCyAxKV1bebu0QIcgU2luoy/2HxXjxLSC/4
++nnXt8aXiFwCBAsX6Ynq+T/UxwqeU/a5iwfajhAgOv1OPBFJXxc=
+=OsDv
 -----END PGP SIGNATURE-----
 
---v9Ux+11Zm5mwPlX6--
+--ncSAzJYg3Aa9+CRW--
