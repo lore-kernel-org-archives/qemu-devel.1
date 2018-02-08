@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ejpPF-00014T-1L
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:50:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ejpRi-0003I3-GO
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:53:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ejpPE-0004rh-Ei
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:50:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ejpRh-0005ip-GV
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:53:14 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:32824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ejpRh-0005i8-Az
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:53:13 -0500
+Received: by mail-ot0-x242.google.com with SMTP id q9so4955367oti.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:53:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8ERQQadvAdqhWbK+6hbLtvFMrA=X8R7UBcQpAKifDpOA@mail.gmail.com>
-References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
-	<CAFEAcA8ERQQadvAdqhWbK+6hbLtvFMrA=X8R7UBcQpAKifDpOA@mail.gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 8 Feb 2018 08:50:36 -0800
-Message-ID: <CAHQ1cqETa2Osx0Tc1EJJ4TiGfg1tMf3fG2AUyGKr6cj25N7F_w@mail.gmail.com>
+In-Reply-To: <20180208162447.10851-1-marcandre.lureau@redhat.com>
+References: <20180208162447.10851-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Feb 2018 16:52:51 +0000
+Message-ID: <CAFEAcA_WixzeBt-pJtgpqptd47nAq40GYPxqH4r0VpH8V6qENQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 00/14] Initial i.MX7 support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] misc: fix spelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,30 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, Feb 8, 2018 at 5:49 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 7 February 2018 at 04:24, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->> Hi everyone,
->>
->> This v5 of the patch series containing the work that I've done in
->> order to enable support for i.MX7 emulation in QEMU.
+On 8 February 2018 at 16:24, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> s/pupulate/populate
 >
-> Thanks; I'm applying this to target-arm.next. There are a few minor
-> tweaks I'm going to make in the process, but I think that's better
-> than making you do yet another respin. Those changes are:
->  * dropped stray blank-line-at-end-of-file from a few patches
->  * fixed a couple of over-80-columnns lines
->  * added a ESDHC_UNDOCUMENTED_REG27 define as suggested by Philippe
->    (I didn't reorder the switches to put 'default' last though, as
->    that didn't seem necessary to me)
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  util/qemu-coroutine-lock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> If you get back to me today about the GPL-2-vs-2-or-later question
-> for patch 13 I'll make that change too. Otherwise I'll drop 13
-> and 14 for the moment.
+> diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+> index 846ff9167f..3d0152ebec 100644
+> --- a/util/qemu-coroutine-lock.c
+> +++ b/util/qemu-coroutine-lock.c
+> @@ -87,7 +87,7 @@ void qemu_co_queue_run_restart(Coroutine *co)
+>       * invalid memory.  Therefore, use a temporary queue and do not touc=
+h
+>       * the "co" coroutine as soon as you enter another one.
+>       *
+> -     * In its turn resumed "co" can pupulate "co_queue_wakeup" queue wit=
+h
+> +     * In its turn resumed "co" can populate "co_queue_wakeup" queue wit=
+h
+>       * new coroutines to be woken up.  The caller, who has resumed "co",
+>       * will be responsible for traversing the same queue, which may caus=
+e
+>       * a different wakeup order but not any missing wakeups.
+> --
+> 2.16.1.73.g5832b7e9f2
 >
 
-Awesome, thanks!
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Andrey Smirnov
+thanks
+-- PMM
