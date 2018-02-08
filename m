@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejqGZ-0007rh-W4
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:45:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ejqqK-0006ak-Fi
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejqGW-000437-P8
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:45:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37330)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejqGW-00042Z-J0
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:45:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejqGT-00050W-W0
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 17:45:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AA89C2E80CF
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 17:45:40 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1ejqqG-0007mr-Gt
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:22:44 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40998 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejqqG-0007mX-CZ
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 13:22:40 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  8 Feb 2018 19:22:23 +0100
+Message-Id: <20180208182223.2562-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Feb 2018 17:32:07 -0000
-From: Toomas Soome <tsoome@me.com>
-Reply-To: Bug 1747393 <1747393@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151782642980.10198.17726074601611845094.malonedeb@wampee.canonical.com>
-Message-Id: <151811112806.27805.4234071796130648960.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1747393] Re: nvme is missing support for
- NVME_ADM_CMD_ASYNC_EV_REQ
+Subject: [Qemu-devel] [PATCH] g364fb: switch to using DirtyBitmapSnapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,42 +25,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-** Description changed:
+This removes the last user of memory_region_test_and_clear_dirty
+outside memory.c.
 
-  NVME_ADM_CMD_ASYNC_EV_REQ is required by specification but apparently we
-  will be responded by error when this command is used.
-+ =
+Cc: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+        Untested... not sure where to get mips_bios.bin, or a kernel
+        that works with -M magnum.  Can anybody help?  I'd like to
+        get rid of memory_region_test_and_clear_dirty.
 
-+ The Asynchronous Event Request is a mandatory opcode required by
-+ specification (Figure 40, Section 5 in NVMe 1.2; Figure 41, Section 5 in
-+ NVMe 1.3). A simple way to deal with this in an emulator that doesn't
-+ really want to use async events is to queue up the requests and not do
-+ anything with them, and only complete them when the driver aborts the
-+ command.
+ hw/display/g364fb.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1747393
-
-Title:
-  nvme is missing support for NVME_ADM_CMD_ASYNC_EV_REQ
-
-Status in QEMU:
-  New
-
-Bug description:
-  NVME_ADM_CMD_ASYNC_EV_REQ is required by specification but apparently
-  we will be responded by error when this command is used.
-
-  The Asynchronous Event Request is a mandatory opcode required by
-  specification (Figure 40, Section 5 in NVMe 1.2; Figure 41, Section 5
-  in NVMe 1.3). A simple way to deal with this in an emulator that
-  doesn't really want to use async events is to queue up the requests
-  and not do anything with them, and only complete them when the driver
-  aborts the command.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1747393/+subscriptions
+diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
+index 86557d14a9..86452de780 100644
+--- a/hw/display/g364fb.c
++++ b/hw/display/g364fb.c
+@@ -62,15 +62,15 @@ typedef struct G364State {
+=20
+ #define G364_PAGE_SIZE 4096
+=20
+-static inline int check_dirty(G364State *s, ram_addr_t page)
++static inline int check_dirty(G364State *s, DirtyBitmapSnapshot *snap, r=
+am_addr_t page)
+ {
+-    return memory_region_test_and_clear_dirty(&s->mem_vram, page, G364_P=
+AGE_SIZE,
+-                                              DIRTY_MEMORY_VGA);
++    return memory_region_snapshot_get_dirty(&s->mem_vram, snap, page, G3=
+64_PAGE_SIZE);
+ }
+=20
+ static void g364fb_draw_graphic8(G364State *s)
+ {
+     DisplaySurface *surface =3D qemu_console_surface(s->con);
++    DirtyBitmapSnapshot *snap;
+     int i, w;
+     uint8_t *vram;
+     uint8_t *data_display, *dd;
+@@ -122,8 +122,10 @@ static void g364fb_draw_graphic8(G364State *s)
+     vram =3D s->vram + s->top_of_screen;
+     /* XXX: out of range in vram? */
+     data_display =3D dd =3D surface_data(surface);
++    snap =3D memory_region_snapshot_and_clear_dirty(&s->mem_vram, 0, s->=
+vram_size,
++                                                  DIRTY_MEMORY_VGA);
+     while (y < s->height) {
+-        if (check_dirty(s, page)) {
++        if (check_dirty(s, snap, page)) {
+             if (y < ymin)
+                 ymin =3D ymax =3D y;
+             if (x < xmin)
+--=20
+2.14.3
