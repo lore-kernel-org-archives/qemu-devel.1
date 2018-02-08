@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejjvV-0005bX-MM
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:59:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ejjwP-0006Nj-5c
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:00:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejjvQ-00078q-2m
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:59:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42064 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ejjvP-00078Z-UL
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:59:32 -0500
-Date: Thu, 8 Feb 2018 11:59:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180208115914.7df7bf87@redhat.com>
-In-Reply-To: <CAF6HrYx6fKVAACMN1TFV_9xKU42RP1yULQpwjvV9jtDExZq8JA@mail.gmail.com>
-References: <CAF6HrYx6fKVAACMN1TFV_9xKU42RP1yULQpwjvV9jtDExZq8JA@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ejjwJ-0007jX-7d
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:00:33 -0500
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:34233)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ejjwJ-0007jH-0l
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:00:27 -0500
+Received: by mail-oi0-x230.google.com with SMTP id k15so3169343oib.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 03:00:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Questions regarding how QEMU initializes virtual
- peripherals
+In-Reply-To: <20180202075009.11653-3-kraxel@redhat.com>
+References: <20180202075009.11653-1-kraxel@redhat.com>
+	<20180202075009.11653-3-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Feb 2018 11:00:05 +0000
+Message-ID: <CAFEAcA-ALKDhxTmwTYewzqKL8A098W3ZgUvTnrYE3=26MuY=Kg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 2/2] hw/audio/sb16.c: change dolog() to
+ qemu_log_mask()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ramy Sameh <ramysameh26@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mona Safar <Mona.Safar@eng.asu.edu.eg>, Watheq <watheq@gmail.com>, Ahmed Aly <ahmedaly50@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, John Arbuckle <programmingkidx@gmail.com>
 
-On Thu, 8 Feb 2018 12:06:44 +0200
-Ramy Sameh <ramysameh26@gmail.com> wrote:
+On 2 February 2018 at 07:50, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> From: John Arbuckle <programmingkidx@gmail.com>
+>
+> Changes all the occurrances of dolog() to qemu_log_mask().
+>
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> Message-id: 20180201172744.7504-1-programmingkidx@gmail.com
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
 
-> Hello all,
-> 
-> I am working with QEMU to simulate VersatilePB board.
-> 
-> I am trying to understand how QEMU initialize the virtual peripherals (e.g.
-> UART, vectored Interrupt controller .. etc).
-> 
-> When I traced the code, I found a function called "object_init_with_type"
-> in object.c, in which the function pointer "ti->instance_init(obj)" seems
-> to call the peripherals initialization functions.
-> 
-> *I have couple of questions here:*
-> 1.) Some peripheral initialization functions are called multiple times such
-> as pl011_init, why is that ?
-function is called once for each instance of pl011 object.
+> @@ -735,9 +742,8 @@ static void complete (SB16State *s)
+>              break;
+>
+>          case 0x42:              /* FT2 sets output freq with this, go figure */
+> -#if 0
+> -            dolog ("cmd 0x42 might not do what it think it should\n");
+> -#endif
+> +            qemu_log_mask(LOG_UNIMP, "cmd 0x42 might not do what it think it"
+> +                          " should\n");
+>          case 0x41:
+>              s->freq = dsp_get_hilo (s);
+>              ldebug ("set freq %d\n", s->freq);
 
-QEMU uses custom OOM framework (dubbed QOM), good point to start with it
-is probably to read doc comment in the beginning of include/qom/object.h
+Hi. The removal of the #if 0 here means that Coverity reports a
+new warning (CID 1385841) about a potential missing break.
 
-Device objects are typically inherited from TYPE_DEVICE or its derivatives.
-Device init sequence typically looks like:
-   foo = object_new(TYPE_FOO);
-   // set_properties on foo, see object_property_set_...
+The case 0x42 should end either with a "break;" or with a comment
+"/* fall through */".
 
-   // and set special property 'realize' which would call 'realize' method
-   object_property_set_bool(foo, true, "realized");
+http://homepages.cae.wisc.edu/~brodskye/sb16doc/sb16doc.html#SamplingRate
+suggests that "/* fall through */" is correct, since 0x42 is 'set
+input sample rate', 0x41 is 'set output sample rate', and supposedly
+the two are equivalent on the hardware.
 
-See qdev_device_add() for details
+I suspect that may also mean that this log should be a LOG_GUEST_ERROR
+rather than LOG_UNIMP (or perhaps not a warning at all, since we
+can't tell if the guest really was trying to program the input
+frequency).
 
-> 2.) Where is the entry point for the whole initialization functionalities
-> (that will eventually call "object_init_with_type")
-
-object_new() & co + object_initialize_with_type()
-
-> Thank you.
-> 
+thanks
+-- PMM
