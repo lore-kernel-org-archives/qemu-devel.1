@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejsW4-0002MN-UC
+	(envelope-from <thuth@redhat.com>) id 1ejsW4-0002MK-Dv
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejsW3-0002MD-Cg
+	(envelope-from <thuth@redhat.com>) id 1ejsW2-0002Lh-7b
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53828 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60196 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejsW3-0002M4-7D
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:55 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejsW2-0002LR-0B
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:54 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DE536404084A
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 20:09:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A790E9BA56
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 20:09:53 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  8 Feb 2018 21:09:35 +0100
-Message-Id: <1518120582-26647-8-git-send-email-thuth@redhat.com>
+Date: Thu,  8 Feb 2018 21:09:34 +0100
+Message-Id: <1518120582-26647-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1518120582-26647-1-git-send-email-thuth@redhat.com>
 References: <1518120582-26647-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/14] libqos: Use explicit QTestState for ahci
+Subject: [Qemu-devel] [PATCH 06/14] libqos: Use explicit QTestState for i2c
  operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,191 +34,400 @@ To: qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-Drop one more client of global_qtest by teaching all ahci test
-functionality to pass in an explicit QTestState.  The state was
-already available, so no callers had to be adjusted.
+Drop one more client of global_qtest by teaching all i2c test
+functionality to pass in an explicit QTestState, adjusting all
+callers.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/libqos/ahci.c | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
+ tests/ds1338-test.c     |  6 ++---
+ tests/libqos/i2c-imx.c  | 67 +++++++++++++++++++++++++------------------------
+ tests/libqos/i2c-omap.c | 45 +++++++++++++++++----------------
+ tests/libqos/i2c.h      |  7 ++++--
+ tests/tmp105-test.c     |  6 ++---
+ 5 files changed, 66 insertions(+), 65 deletions(-)
 
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 40c532e..bc201d7 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -283,7 +283,8 @@ void ahci_hba_enable(AHCIQState *ahci)
-         /* Allocate Memory for the Command List Buffer & FIS Buffer */
-         /* PxCLB space ... 0x20 per command, as in 4.2.2 p 36 */
-         ahci->port[i].clb = ahci_alloc(ahci, num_cmd_slots * 0x20);
--        qmemset(ahci->port[i].clb, 0x00, num_cmd_slots * 0x20);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].clb, 0x00,
-+                     num_cmd_slots * 0x20);
-         g_test_message("CLB: 0x%08" PRIx64, ahci->port[i].clb);
-         ahci_px_wreg(ahci, i, AHCI_PX_CLB, ahci->port[i].clb);
-         g_assert_cmphex(ahci->port[i].clb, ==,
-@@ -291,7 +292,7 @@ void ahci_hba_enable(AHCIQState *ahci)
+diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
+index 26968bc..742dad9 100644
+--- a/tests/ds1338-test.c
++++ b/tests/ds1338-test.c
+@@ -61,16 +61,14 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
  
-         /* PxFB space ... 0x100, as in 4.2.1 p 35 */
-         ahci->port[i].fb = ahci_alloc(ahci, 0x100);
--        qmemset(ahci->port[i].fb, 0x00, 0x100);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].fb, 0x00, 0x100);
-         g_test_message("FB: 0x%08" PRIx64, ahci->port[i].fb);
-         ahci_px_wreg(ahci, i, AHCI_PX_FB, ahci->port[i].fb);
-         g_assert_cmphex(ahci->port[i].fb, ==,
-@@ -397,7 +398,7 @@ void ahci_port_clear(AHCIQState *ahci, uint8_t port)
-     g_assert_cmphex(ahci_px_rreg(ahci, port, AHCI_PX_IS), ==, 0);
+     s = qtest_start("-display none -machine imx25-pdk");
+-    i2c = imx_i2c_create(IMX25_I2C_0_BASE);
++    i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
+     addr = DS1338_ADDR;
  
-     /* Wipe the FIS-Receive Buffer */
--    qmemset(ahci->port[port].fb, 0x00, 0x100);
-+    qtest_memset(ahci->parent->qts, ahci->port[port].fb, 0x00, 0x100);
- }
+     qtest_add_func("/ds1338/tx-rx", send_and_receive);
  
- /**
-@@ -466,7 +467,7 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_t slot)
-     RegD2HFIS *d2h = g_malloc0(0x20);
-     uint32_t reg;
+     ret = g_test_run();
  
--    memread(ahci->port[port].fb + 0x40, d2h, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x40, d2h, 0x20);
-     g_assert_cmphex(d2h->fis_type, ==, 0x34);
+-    if (s) {
+-        qtest_quit(s);
+-    }
++    qtest_quit(s);
+     g_free(i2c);
  
-     reg = ahci_px_rreg(ahci, port, AHCI_PX_TFD);
-@@ -484,7 +485,7 @@ void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
-     /* We cannot check the Status or E_Status registers, because
-      * the status may have again changed between the PIO Setup FIS
-      * and the conclusion of the command with the D2H Register FIS. */
--    memread(ahci->port[port].fb + 0x20, pio, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, 0x20);
-     g_assert_cmphex(pio->fis_type, ==, 0x5f);
- 
-     /* BUG: PIO Setup FIS as utilized by QEMU tries to fit the entire
-@@ -516,7 +517,7 @@ void ahci_get_command_header(AHCIQState *ahci, uint8_t port,
+     return ret;
+diff --git a/tests/libqos/i2c-imx.c b/tests/libqos/i2c-imx.c
+index 1c4b431..0945f2e 100644
+--- a/tests/libqos/i2c-imx.c
++++ b/tests/libqos/i2c-imx.c
+@@ -40,8 +40,8 @@ typedef struct IMXI2C {
+ static void imx_i2c_set_slave_addr(IMXI2C *s, uint8_t addr,
+                                    enum IMXI2CDirection direction)
  {
-     uint64_t ba = ahci->port[port].clb;
-     ba += slot * sizeof(AHCICommandHeader);
--    memread(ba, cmd, sizeof(AHCICommandHeader));
-+    qtest_memread(ahci->parent->qts, ba, cmd, sizeof(AHCICommandHeader));
- 
-     cmd->flags = le16_to_cpu(cmd->flags);
-     cmd->prdtl = le16_to_cpu(cmd->prdtl);
-@@ -537,7 +538,7 @@ void ahci_set_command_header(AHCIQState *ahci, uint8_t port,
-     tmp.prdbc = cpu_to_le32(cmd->prdbc);
-     tmp.ctba = cpu_to_le64(cmd->ctba);
- 
--    memwrite(ba, &tmp, sizeof(AHCICommandHeader));
-+    qtest_memwrite(ahci->parent->qts, ba, &tmp, sizeof(AHCICommandHeader));
+-    writeb(s->addr + I2DR_ADDR, (addr << 1) |
+-           (direction == IMX_I2C_READ ? 1 : 0));
++    qtest_writeb(s->parent.qts, s->addr + I2DR_ADDR,
++                 (addr << 1) | (direction == IMX_I2C_READ ? 1 : 0));
  }
  
- void ahci_destroy_command(AHCIQState *ahci, uint8_t port, uint8_t slot)
-@@ -575,7 +576,7 @@ void ahci_write_fis(AHCIQState *ahci, AHCICommand *cmd)
-         tmp.count = cpu_to_le16(tmp.count);
-     }
+ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
+@@ -63,35 +63,35 @@ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
+            I2CR_MTX |
+            I2CR_TXAK;
  
--    memwrite(addr, &tmp, sizeof(tmp));
-+    qtest_memwrite(ahci->parent->qts, addr, &tmp, sizeof(tmp));
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) != 0);
+ 
+     /* set the slave address */
+     imx_i2c_set_slave_addr(s, addr, IMX_I2C_WRITE);
+-    status = readb(s->addr + I2SR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) != 0);
+     g_assert((status & I2SR_RXAK) == 0);
+ 
+     /* ack the interrupt */
+-    writeb(s->addr + I2SR_ADDR, 0);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) == 0);
+ 
+     while (size < len) {
+         /* check we are still busy */
+-        status = readb(s->addr + I2SR_ADDR);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IBB) != 0);
+ 
+         /* write the data */
+-        writeb(s->addr + I2DR_ADDR, buf[size]);
+-        status = readb(s->addr + I2SR_ADDR);
++        qtest_writeb(i2c->qts, s->addr + I2DR_ADDR, buf[size]);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IIF) != 0);
+         g_assert((status & I2SR_RXAK) == 0);
+ 
+         /* ack the interrupt */
+-        writeb(s->addr + I2SR_ADDR, 0);
+-        status = readb(s->addr + I2SR_ADDR);
++        qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IIF) == 0);
+ 
+         size++;
+@@ -99,8 +99,8 @@ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
+ 
+     /* release the bus */
+     data &= ~(I2CR_MSTA | I2CR_MTX);
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) == 0);
  }
  
- unsigned ahci_pick_cmd(AHCIQState *ahci, uint8_t port)
-@@ -636,7 +637,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     if (opts->size && !opts->buffer) {
-         opts->buffer = ahci_alloc(ahci, opts->size);
-         g_assert(opts->buffer);
--        qmemset(opts->buffer, 0x00, opts->size);
-+        qtest_memset(ahci->parent->qts, opts->buffer, 0x00, opts->size);
+@@ -123,19 +123,19 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+            I2CR_MTX |
+            I2CR_TXAK;
+ 
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) != 0);
+ 
+     /* set the slave address */
+     imx_i2c_set_slave_addr(s, addr, IMX_I2C_READ);
+-    status = readb(s->addr + I2SR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) != 0);
+     g_assert((status & I2SR_RXAK) == 0);
+ 
+     /* ack the interrupt */
+-    writeb(s->addr + I2SR_ADDR, 0);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) == 0);
+ 
+     /* set the bus for read */
+@@ -144,23 +144,23 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+     if (len != 1) {
+         data &= ~I2CR_TXAK;
+     }
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) != 0);
+ 
+     /* dummy read */
+-    readb(s->addr + I2DR_ADDR);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_readb(i2c->qts, s->addr + I2DR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) != 0);
+ 
+     /* ack the interrupt */
+-    writeb(s->addr + I2SR_ADDR, 0);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) == 0);
+ 
+     while (size < len) {
+         /* check we are still busy */
+-        status = readb(s->addr + I2SR_ADDR);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IBB) != 0);
+ 
+         if (size == (len - 1)) {
+@@ -170,30 +170,30 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+             /* ack the data read */
+             data |= I2CR_TXAK;
+         }
+-        writeb(s->addr + I2CR_ADDR, data);
++        qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
+ 
+         /* read the data */
+-        buf[size] = readb(s->addr + I2DR_ADDR);
++        buf[size] = qtest_readb(i2c->qts, s->addr + I2DR_ADDR);
+ 
+         if (size != (len - 1)) {
+-            status = readb(s->addr + I2SR_ADDR);
++            status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+             g_assert((status & I2SR_IIF) != 0);
+ 
+             /* ack the interrupt */
+-            writeb(s->addr + I2SR_ADDR, 0);
++            qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
+         }
+ 
+-        status = readb(s->addr + I2SR_ADDR);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IIF) == 0);
+ 
+         size++;
      }
  
-     /* Command creation */
-@@ -661,15 +662,15 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
-     if (opts->error) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(ahci->parent->qts, "STOP");
-     }
-     if (opts->mid_cb) {
-         rc = opts->mid_cb(ahci, cmd, opts);
-         g_assert_cmpint(rc, ==, 0);
-     }
-     if (opts->error) {
--        qmp_async("{'execute':'cont' }");
--        qmp_eventwait("RESUME");
-+        qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+        qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     }
- 
-     /* Wait for command to complete and verify sanity */
-@@ -697,7 +698,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
-     ahci_command_adjust(cmd, sector, buffer, bufsize, 0);
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
--    qmp_eventwait("STOP");
-+    qtest_qmp_eventwait(ahci->parent->qts, "STOP");
- 
-     return cmd;
+-    status = readb(s->addr + I2SR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) == 0);
  }
-@@ -706,8 +707,8 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
- void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
+ 
+-I2CAdapter *imx_i2c_create(uint64_t addr)
++I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr)
  {
-     /* Complete the command */
--    qmp_async("{'execute':'cont' }");
--    qmp_eventwait("RESUME");
-+    qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+    qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     ahci_command_wait(ahci, cmd);
-     ahci_command_verify(ahci, cmd);
-     ahci_command_free(cmd);
-@@ -754,16 +755,16 @@ void ahci_io(AHCIQState *ahci, uint8_t port, uint8_t ide_cmd,
-     g_assert(props);
-     ptr = ahci_alloc(ahci, bufsize);
-     g_assert(!bufsize || ptr);
--    qmemset(ptr, 0x00, bufsize);
-+    qtest_memset(ahci->parent->qts, ptr, 0x00, bufsize);
+     IMXI2C *s = g_malloc0(sizeof(*s));
+     I2CAdapter *i2c = (I2CAdapter *)s;
+@@ -202,6 +202,7 @@ I2CAdapter *imx_i2c_create(uint64_t addr)
  
-     if (bufsize && props->write) {
--        bufwrite(ptr, buffer, bufsize);
-+        qtest_bufwrite(ahci->parent->qts, ptr, buffer, bufsize);
-     }
+     i2c->send = imx_i2c_send;
+     i2c->recv = imx_i2c_recv;
++    i2c->qts = qts;
  
-     ahci_guest_io(ahci, port, ide_cmd, ptr, bufsize, sector);
- 
-     if (bufsize && props->read) {
--        bufread(ptr, buffer, bufsize);
-+        qtest_bufread(ahci->parent->qts, ptr, buffer, bufsize);
-     }
- 
-     ahci_free(ahci, ptr);
-@@ -901,7 +902,7 @@ static int copy_buffer(AHCIQState *ahci, AHCICommand *cmd,
-                         const AHCIOpts *opts)
+     return i2c;
+ }
+diff --git a/tests/libqos/i2c-omap.c b/tests/libqos/i2c-omap.c
+index f603fdf..1ef6e7b 100644
+--- a/tests/libqos/i2c-omap.c
++++ b/tests/libqos/i2c-omap.c
+@@ -51,8 +51,8 @@ static void omap_i2c_set_slave_addr(OMAPI2C *s, uint8_t addr)
  {
-     unsigned char *rx = opts->opaque;
--    bufread(opts->buffer, rx, opts->size);
-+    qtest_bufread(ahci->parent->qts, opts->buffer, rx, opts->size);
-     return 0;
+     uint16_t data = addr;
+ 
+-    writew(s->addr + OMAP_I2C_SA, data);
+-    data = readw(s->addr + OMAP_I2C_SA);
++    qtest_writew(s->parent.qts, s->addr + OMAP_I2C_SA, data);
++    data = qtest_readw(s->parent.qts, s->addr + OMAP_I2C_SA);
+     g_assert_cmphex(data, ==, addr);
  }
  
-@@ -1141,7 +1142,7 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-     ahci_write_fis(ahci, cmd);
-     /* Then ATAPI CMD, if needed */
-     if (cmd->props->atapi) {
--        memwrite(table_ptr + 0x40, cmd->atapi_cmd, 16);
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x40, cmd->atapi_cmd, 16);
+@@ -65,38 +65,38 @@ static void omap_i2c_send(I2CAdapter *i2c, uint8_t addr,
+     omap_i2c_set_slave_addr(s, addr);
+ 
+     data = len;
+-    writew(s->addr + OMAP_I2C_CNT, data);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CNT, data);
+ 
+     data = OMAP_I2C_CON_I2C_EN |
+            OMAP_I2C_CON_TRX |
+            OMAP_I2C_CON_MST |
+            OMAP_I2C_CON_STT |
+            OMAP_I2C_CON_STP;
+-    writew(s->addr + OMAP_I2C_CON, data);
+-    data = readw(s->addr + OMAP_I2C_CON);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CON, data);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) != 0);
+ 
+-    data = readw(s->addr + OMAP_I2C_STAT);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+     g_assert((data & OMAP_I2C_STAT_NACK) == 0);
+ 
+     while (len > 1) {
+-        data = readw(s->addr + OMAP_I2C_STAT);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+         g_assert((data & OMAP_I2C_STAT_XRDY) != 0);
+ 
+         data = buf[0] | ((uint16_t)buf[1] << 8);
+-        writew(s->addr + OMAP_I2C_DATA, data);
++        qtest_writew(i2c->qts, s->addr + OMAP_I2C_DATA, data);
+         buf = (uint8_t *)buf + 2;
+         len -= 2;
+     }
+     if (len == 1) {
+-        data = readw(s->addr + OMAP_I2C_STAT);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+         g_assert((data & OMAP_I2C_STAT_XRDY) != 0);
+ 
+         data = buf[0];
+-        writew(s->addr + OMAP_I2C_DATA, data);
++        qtest_writew(i2c->qts, s->addr + OMAP_I2C_DATA, data);
      }
  
-     /* Construct and write the PRDs to the command table */
-@@ -1162,8 +1163,8 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-         prd.dbc |= cpu_to_le32(0x80000000); /* Request DPS Interrupt */
+-    data = readw(s->addr + OMAP_I2C_CON);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) == 0);
+ }
  
-         /* Commit the PRD entry to the Command Table */
--        memwrite(table_ptr + 0x80 + (i * sizeof(PRD)),
--                 &prd, sizeof(PRD));
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x80 + (i * sizeof(PRD)),
-+                       &prd, sizeof(PRD));
+@@ -109,30 +109,30 @@ static void omap_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+     omap_i2c_set_slave_addr(s, addr);
+ 
+     data = len;
+-    writew(s->addr + OMAP_I2C_CNT, data);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CNT, data);
+ 
+     data = OMAP_I2C_CON_I2C_EN |
+            OMAP_I2C_CON_MST |
+            OMAP_I2C_CON_STT |
+            OMAP_I2C_CON_STP;
+-    writew(s->addr + OMAP_I2C_CON, data);
+-    data = readw(s->addr + OMAP_I2C_CON);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CON, data);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) == 0);
+ 
+-    data = readw(s->addr + OMAP_I2C_STAT);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+     g_assert((data & OMAP_I2C_STAT_NACK) == 0);
+ 
+-    data = readw(s->addr + OMAP_I2C_CNT);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CNT);
+     g_assert_cmpuint(data, ==, len);
+ 
+     while (len > 0) {
+-        data = readw(s->addr + OMAP_I2C_STAT);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+         g_assert((data & OMAP_I2C_STAT_RRDY) != 0);
+         g_assert((data & OMAP_I2C_STAT_ROVR) == 0);
+ 
+-        data = readw(s->addr + OMAP_I2C_DATA);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_DATA);
+ 
+-        stat = readw(s->addr + OMAP_I2C_STAT);
++        stat = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+ 
+         if (unlikely(len == 1)) {
+             g_assert((stat & OMAP_I2C_STAT_SBD) != 0);
+@@ -148,11 +148,11 @@ static void omap_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+         }
      }
  
-     /* Bookmark the PRDTL and CTBA values */
+-    data = readw(s->addr + OMAP_I2C_CON);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) == 0);
+ }
+ 
+-I2CAdapter *omap_i2c_create(uint64_t addr)
++I2CAdapter *omap_i2c_create(QTestState *qts, uint64_t addr)
+ {
+     OMAPI2C *s = g_malloc0(sizeof(*s));
+     I2CAdapter *i2c = (I2CAdapter *)s;
+@@ -162,9 +162,10 @@ I2CAdapter *omap_i2c_create(uint64_t addr)
+ 
+     i2c->send = omap_i2c_send;
+     i2c->recv = omap_i2c_recv;
++    i2c->qts = qts;
+ 
+     /* verify the mmio address by looking for a known signature */
+-    data = readw(addr + OMAP_I2C_REV);
++    data = qtest_readw(qts, addr + OMAP_I2C_REV);
+     g_assert_cmphex(data, ==, 0x34);
+ 
+     return i2c;
+diff --git a/tests/libqos/i2c.h b/tests/libqos/i2c.h
+index 6e648f9..eb40b80 100644
+--- a/tests/libqos/i2c.h
++++ b/tests/libqos/i2c.h
+@@ -9,6 +9,7 @@
+ #ifndef LIBQOS_I2C_H
+ #define LIBQOS_I2C_H
+ 
++#include "libqtest.h"
+ 
+ typedef struct I2CAdapter I2CAdapter;
+ struct I2CAdapter {
+@@ -16,6 +17,8 @@ struct I2CAdapter {
+                  const uint8_t *buf, uint16_t len);
+     void (*recv)(I2CAdapter *adapter, uint8_t addr,
+                  uint8_t *buf, uint16_t len);
++
++    QTestState *qts;
+ };
+ 
+ void i2c_send(I2CAdapter *i2c, uint8_t addr,
+@@ -24,9 +27,9 @@ void i2c_recv(I2CAdapter *i2c, uint8_t addr,
+               uint8_t *buf, uint16_t len);
+ 
+ /* libi2c-omap.c */
+-I2CAdapter *omap_i2c_create(uint64_t addr);
++I2CAdapter *omap_i2c_create(QTestState *qts, uint64_t addr);
+ 
+ /* libi2c-imx.c */
+-I2CAdapter *imx_i2c_create(uint64_t addr);
++I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr);
+ 
+ #endif
+diff --git a/tests/tmp105-test.c b/tests/tmp105-test.c
+index a7940a4..382f88b 100644
+--- a/tests/tmp105-test.c
++++ b/tests/tmp105-test.c
+@@ -154,15 +154,13 @@ int main(int argc, char **argv)
+     s = qtest_start("-machine n800 "
+                     "-device tmp105,bus=i2c-bus.0,id=" TMP105_TEST_ID
+                     ",address=0x49");
+-    i2c = omap_i2c_create(OMAP2_I2C_1_BASE);
++    i2c = omap_i2c_create(s, OMAP2_I2C_1_BASE);
+ 
+     qtest_add_func("/tmp105/tx-rx", send_and_receive);
+ 
+     ret = g_test_run();
+ 
+-    if (s) {
+-        qtest_quit(s);
+-    }
++    qtest_quit(s);
+     g_free(i2c);
+ 
+     return ret;
 -- 
 1.8.3.1
