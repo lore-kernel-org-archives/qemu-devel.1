@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3a-0003Wq-Lm
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:23 -0500
+	(envelope-from <mst@redhat.com>) id 1ejq5s-0005o4-2s
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3X-00070f-57
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:22 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:52159)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejq3W-0006z9-R4
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:19 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r71so10969722wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:18 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:44 +0000
-Message-Id: <20180208173157.24705-20-alex.bennee@linaro.org>
-In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1ejq5q-0003g2-Tl
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:34:44 -0500
+Date: Thu, 8 Feb 2018 19:34:20 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180208193033-mutt-send-email-mst@kernel.org>
+References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
+	<20180207042438.15422-10-andrew.smirnov@gmail.com>
+	<CAFEAcA-=-+1A6toXM-ddP+iKBgHKh28Xq3VeGXfSLJ08xMRijA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 19/32] arm/translate-a64: add FCVTxx to
- simd_two_reg_misc_fp16
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-=-+1A6toXM-ddP+iKBgHKh28Xq3VeGXfSLJ08xMRijA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 09/14] pci: Use pci_config_size in
+ pci_data_* accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,177 +26,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-This covers all the floating point convert operations.
+On Thu, Feb 08, 2018 at 05:20:53PM +0000, Peter Maydell wrote:
+> On 7 February 2018 at 04:24, Andrey Smirnov <andrew.smirnov@gmail.com> =
+wrote:
+> > Use pci_config_size (as opposed to PCI_CONFIG_SPACE_SIZE) in
+> > pci_data_read() and pci_data_write(), so this function would work for
+> > both classic PCI and PCIe use-cases.
+> >
+> > Cc: Peter Maydell <peter.maydell@linaro.org>
+> > Cc: Jason Wang <jasowang@redhat.com>
+> > Cc: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
+> > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > Cc: qemu-devel@nongnu.org
+> > Cc: qemu-arm@nongnu.org
+> > Cc: yurovsky@gmail.com
+> > Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> > ---
+> >  hw/pci/pci_host.c | 13 +++++++++----
+> >  1 file changed, 9 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+> > index 5eaa935cb5..ea52ea07cd 100644
+> > --- a/hw/pci/pci_host.c
+> > +++ b/hw/pci/pci_host.c
+> > @@ -89,30 +89,35 @@ uint32_t pci_host_config_read_common(PCIDevice *p=
+ci_dev, uint32_t addr,
+> >  void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, int len)
+> >  {
+> >      PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
+> > -    uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
+> > +    uint32_t config_addr;
+> >
+> >      if (!pci_dev) {
+> >          return;
+> >      }
+> >
+> > +    config_addr =3D addr & (pci_config_size(pci_dev) - 1);
+> > +
+> >      PCI_DPRINTF("%s: %s: addr=3D%02" PRIx32 " val=3D%08" PRIx32 " le=
+n=3D%d\n",
+> >                  __func__, pci_dev->name, config_addr, val, len);
+> > -    pci_host_config_write_common(pci_dev, config_addr, PCI_CONFIG_SP=
+ACE_SIZE,
+> > +    pci_host_config_write_common(pci_dev, config_addr,
+> > +                                 pci_config_size(pci_dev),
+> >                                   val, len);
+> >  }
+> >
+> >  uint32_t pci_data_read(PCIBus *s, uint32_t addr, int len)
+> >  {
+> >      PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
+> > -    uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
+> > +    uint32_t config_addr;
+> >      uint32_t val;
+> >
+> >      if (!pci_dev) {
+> >          return ~0x0;
+> >      }
+> >
+> > +    config_addr =3D addr & (pci_config_size(pci_dev) - 1);
+> > +
+> >      val =3D pci_host_config_read_common(pci_dev, config_addr,
+> > -                                      PCI_CONFIG_SPACE_SIZE, len);
+> > +                                      pci_config_size(pci_dev), len)=
+;
+> >      PCI_DPRINTF("%s: %s: addr=3D%02"PRIx32" val=3D%08"PRIx32" len=3D=
+%d\n",
+> >                  __func__, pci_dev->name, config_addr, val, len);
+> >
+>=20
+> I've just discovered that this breaks the e1000e-test:
+>=20
+> $ (cd build/clang; QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_6=
+4
+> ./tests/e1000e-test)
+> /x86_64/e1000e/init: **
+> ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/tests/e1000e-test.c:1=
+18:e1000e_device_find:
+> 'e1000e_dev' should not be NULL
+>=20
+> Any idea what's going on here?
+>=20
+> thanks
+> -- PMM
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/helper-a64.c    | 32 +++++++++++++++++
- target/arm/helper-a64.h    |  2 ++
- target/arm/translate-a64.c | 85 +++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 118 insertions(+), 1 deletion(-)
+I'm yet to review these patches, but IIRC pci_data_read and friends
+aren't designed with pcie in mind - they implement the classic pci
+config space.
 
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 919b073635..76f3289e37 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -772,3 +772,35 @@ float16 HELPER(advsimd_rinth)(float16 x, void *fp_status)
- 
-     return ret;
- }
-+
-+/*
-+ * Half-precision floating point conversion functions
-+ *
-+ * There are a multitude of conversion functions with various
-+ * different rounding modes. This is dealt with by the calling code
-+ * setting the mode appropriately before calling the helper.
-+ */
-+
-+uint32_t HELPER(advsimd_f16tosinth)(float16 a, void *fpstp)
-+{
-+    float_status *fpst = fpstp;
-+
-+    /* Invalid if we are passed a NaN */
-+    if (float16_is_any_nan(a)) {
-+        float_raise(float_flag_invalid, fpst);
-+        return 0;
-+    }
-+    return float16_to_int16(a, fpst);
-+}
-+
-+uint32_t HELPER(advsimd_f16touinth)(float16 a, void *fpstp)
-+{
-+    float_status *fpst = fpstp;
-+
-+    /* Invalid if we are passed a NaN */
-+    if (float16_is_any_nan(a)) {
-+        float_raise(float_flag_invalid, fpst);
-+        return 0;
-+    }
-+    return float16_to_uint16(a, fpst);
-+}
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index b583bc0dd8..453753f4e7 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -78,3 +78,5 @@ DEF_HELPER_3(advsimd_acge_f16, i32, f16, f16, ptr)
- DEF_HELPER_3(advsimd_acgt_f16, i32, f16, f16, ptr)
- DEF_HELPER_2(advsimd_rinth_exact, f16, f16, ptr)
- DEF_HELPER_2(advsimd_rinth, f16, f16, ptr)
-+DEF_HELPER_2(advsimd_f16tosinth, i32, f16, ptr)
-+DEF_HELPER_2(advsimd_f16touinth, i32, f16, ptr)
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index a0506f094f..0049111e6d 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -10797,6 +10797,46 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-         only_in_vector = true;
-         /* current rounding mode */
-         break;
-+    case 0x1a: /* FCVTNS */
-+        need_rmode = true;
-+        rmode = FPROUNDING_TIEEVEN;
-+        break;
-+    case 0x1b: /* FCVTMS */
-+        need_rmode = true;
-+        rmode = FPROUNDING_NEGINF;
-+        break;
-+    case 0x1c: /* FCVTAS */
-+        need_rmode = true;
-+        rmode = FPROUNDING_TIEAWAY;
-+        break;
-+    case 0x3a: /* FCVTPS */
-+        need_rmode = true;
-+        rmode = FPROUNDING_POSINF;
-+        break;
-+    case 0x3b: /* FCVTZS */
-+        need_rmode = true;
-+        rmode = FPROUNDING_ZERO;
-+        break;
-+    case 0x5a: /* FCVTNU */
-+        need_rmode = true;
-+        rmode = FPROUNDING_TIEEVEN;
-+        break;
-+    case 0x5b: /* FCVTMU */
-+        need_rmode = true;
-+        rmode = FPROUNDING_NEGINF;
-+        break;
-+    case 0x5c: /* FCVTAU */
-+        need_rmode = true;
-+        rmode = FPROUNDING_TIEAWAY;
-+        break;
-+    case 0x7a: /* FCVTPU */
-+        need_rmode = true;
-+        rmode = FPROUNDING_POSINF;
-+        break;
-+    case 0x7b: /* FCVTZU */
-+        need_rmode = true;
-+        rmode = FPROUNDING_ZERO;
-+        break;
-     default:
-         fprintf(stderr, "%s: insn %#04x fpop %#2x\n", __func__, insn, fpop);
-         g_assert_not_reached();
-@@ -10830,7 +10870,36 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-     }
- 
-     if (is_scalar) {
--        /* no operations yet */
-+        TCGv_i32 tcg_op = tcg_temp_new_i32();
-+        TCGv_i32 tcg_res = tcg_temp_new_i32();
-+
-+        read_vec_element_i32(s, tcg_op, rn, 0, MO_16);
-+
-+        switch (fpop) {
-+        case 0x1a: /* FCVTNS */
-+        case 0x1b: /* FCVTMS */
-+        case 0x1c: /* FCVTAS */
-+        case 0x3a: /* FCVTPS */
-+        case 0x3b: /* FCVTZS */
-+            gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
-+            break;
-+        case 0x5a: /* FCVTNU */
-+        case 0x5b: /* FCVTMU */
-+        case 0x5c: /* FCVTAU */
-+        case 0x7a: /* FCVTPU */
-+        case 0x7b: /* FCVTZU */
-+            gen_helper_advsimd_f16touinth(tcg_res, tcg_op, tcg_fpstatus);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+
-+        /* limit any sign extension going on */
-+        tcg_gen_andi_i32(tcg_res, tcg_res, 0xffff);
-+        write_fp_sreg(s, rd, tcg_res);
-+
-+        tcg_temp_free_i32(tcg_res);
-+        tcg_temp_free_i32(tcg_op);
-     } else {
-         for (pass = 0; pass < (is_q ? 8 : 4); pass++) {
-             TCGv_i32 tcg_op = tcg_temp_new_i32();
-@@ -10839,6 +10908,20 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-             read_vec_element_i32(s, tcg_op, rn, pass, MO_16);
- 
-             switch (fpop) {
-+            case 0x1a: /* FCVTNS */
-+            case 0x1b: /* FCVTMS */
-+            case 0x1c: /* FCVTAS */
-+            case 0x3a: /* FCVTPS */
-+            case 0x3b: /* FCVTZS */
-+                gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
-+                break;
-+            case 0x5a: /* FCVTNU */
-+            case 0x5b: /* FCVTMU */
-+            case 0x5c: /* FCVTAU */
-+            case 0x7a: /* FCVTPU */
-+            case 0x7b: /* FCVTZU */
-+                gen_helper_advsimd_f16touinth(tcg_res, tcg_op, tcg_fpstatus);
-+                break;
-             case 0x18: /* FRINTN */
-             case 0x19: /* FRINTM */
-             case 0x38: /* FRINTP */
--- 
-2.15.1
+I'd like to see more justification about how these are now going
+to be used.
+
+--=20
+MST
