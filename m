@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjVT-00070W-0X
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:48 -0500
+	(envelope-from <peterx@redhat.com>) id 1ejjVa-00078F-8d
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ejjVS-0005lp-44
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:43 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37330 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ejjVY-0005oG-5j
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37334 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjVS-0005lU-0C
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:42 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjVY-0005o0-0t
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:32:48 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Thu,  8 Feb 2018 18:31:25 +0800
-Message-Id: <20180208103132.28452-22-peterx@redhat.com>
+Date: Thu,  8 Feb 2018 18:31:27 +0800
+Message-Id: <20180208103132.28452-24-peterx@redhat.com>
 In-Reply-To: <20180208103132.28452-1-peterx@redhat.com>
 References: <20180208103132.28452-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 21/28] migration: setup ramstate for resume
+Subject: [Qemu-devel] [PATCH v6 23/28] migration: init dst in
+ migration_object_init too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +27,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-After we updated the dirty bitmaps of ramblocks, we also need to update
-the critical fields in RAMState to make sure it is ready for a resume.
+Though we may not need it, now we init both the src/dst migration
+objects in migration_object_init() so that even incoming migration
+object would be thread safe (it was not).
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c        | 40 +++++++++++++++++++++++++++++++++++++++-
- migration/trace-events |  1 +
- 2 files changed, 40 insertions(+), 1 deletion(-)
+ migration/migration.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index a2a4b05d5c..d275875f54 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2250,6 +2250,36 @@ static int ram_init_all(RAMState **rsp)
-     return 0;
- }
+diff --git a/migration/migration.c b/migration/migration.c
+index 19cb95fa0e..cf3a3f416c 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -104,6 +104,7 @@ enum mig_rp_message_type {
+    dynamic creation of migration */
  
-+static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
-+{
-+    RAMBlock *block;
-+    long pages = 0;
-+
+ static MigrationState *current_migration;
++static MigrationIncomingState *current_incoming;
+ 
+ static bool migration_object_check(MigrationState *ms, Error **errp);
+ static int migration_maybe_pause(MigrationState *s,
+@@ -119,6 +120,18 @@ void migration_object_init(void)
+     assert(!current_migration);
+     current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
+ 
 +    /*
-+     * Postcopy is not using xbzrle/compression, so no need for that.
-+     * Also, since source are already halted, we don't need to care
-+     * about dirty page logging as well.
++     * Init the migrate incoming object as well no matter whether
++     * we'll use it or not.
 +     */
++    assert(!current_incoming);
++    current_incoming = g_new0(MigrationIncomingState, 1);
++    current_incoming->state = MIGRATION_STATUS_NONE;
++    qemu_mutex_init(&current_incoming->rp_mutex);
++    qemu_event_init(&current_incoming->main_thread_load_event, false);
++    qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
++    qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
 +
-+    RAMBLOCK_FOREACH(block) {
-+        pages += bitmap_count_one(block->bmap,
-+                                  block->used_length >> TARGET_PAGE_BITS);
-+    }
-+
-+    /* This may not be aligned with current bitmaps. Recalculate. */
-+    rs->migration_dirty_pages = pages;
-+
-+    rs->last_seen_block = NULL;
-+    rs->last_sent_block = NULL;
-+    rs->last_page = 0;
-+    rs->last_version = ram_list.version;
-+
-+    /* Update RAMState cache of output QEMUFile */
-+    rs->f = out;
-+
-+    trace_ram_state_resume_prepare(pages);
-+}
-+
- /*
-  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
-  * long-running RCU critical section.  When rcu-reclaims in the code
-@@ -3178,8 +3208,16 @@ out:
- static int ram_resume_prepare(MigrationState *s, void *opaque)
- {
-     RAMState *rs = *(RAMState **)opaque;
-+    int ret;
+     if (!migration_object_check(current_migration, &err)) {
+         error_report_err(err);
+         exit(1);
+@@ -149,19 +162,8 @@ MigrationState *migrate_get_current(void)
  
--    return ram_dirty_bitmap_sync_all(s, rs);
-+    ret = ram_dirty_bitmap_sync_all(s, rs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ram_state_resume_prepare(rs, s->to_dst_file);
-+
-+    return 0;
+ MigrationIncomingState *migration_incoming_get_current(void)
+ {
+-    static bool once;
+-    static MigrationIncomingState mis_current;
+-
+-    if (!once) {
+-        mis_current.state = MIGRATION_STATUS_NONE;
+-        memset(&mis_current, 0, sizeof(MigrationIncomingState));
+-        qemu_mutex_init(&mis_current.rp_mutex);
+-        qemu_event_init(&mis_current.main_thread_load_event, false);
+-        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+-        qemu_sem_init(&mis_current.postcopy_pause_sem_fault, 0);
+-        once = true;
+-    }
+-    return &mis_current;
++    assert(current_incoming);
++    return current_incoming;
  }
  
- static SaveVMHandlers savevm_ram_handlers = {
-diff --git a/migration/trace-events b/migration/trace-events
-index 45b1d89217..f5913ff51c 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -88,6 +88,7 @@ ram_dirty_bitmap_reload_complete(char *str) "%s"
- ram_dirty_bitmap_sync_start(void) ""
- ram_dirty_bitmap_sync_wait(void) ""
- ram_dirty_bitmap_sync_complete(void) ""
-+ram_state_resume_prepare(long v) "%ld"
- 
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
+ void migration_incoming_state_destroy(void)
 -- 
 2.14.3
