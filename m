@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejsW4-0002MK-Dv
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1ejsW6-0002NC-B4
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:10:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ejsW2-0002Lh-7b
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60196 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1ejsW4-0002Mj-KV
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:58 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43662 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejsW2-0002LR-0B
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:54 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ejsW4-0002MT-E3
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:09:56 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A790E9BA56
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 20:09:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17A7640FB62E
+	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 20:09:56 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  8 Feb 2018 21:09:34 +0100
-Message-Id: <1518120582-26647-7-git-send-email-thuth@redhat.com>
+Date: Thu,  8 Feb 2018 21:09:36 +0100
+Message-Id: <1518120582-26647-9-git-send-email-thuth@redhat.com>
 In-Reply-To: <1518120582-26647-1-git-send-email-thuth@redhat.com>
 References: <1518120582-26647-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/14] libqos: Use explicit QTestState for i2c
- operations
+Subject: [Qemu-devel] [PATCH 08/14] libqos: Use explicit QTestState for
+ remaining libqos operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,400 +34,289 @@ To: qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-Drop one more client of global_qtest by teaching all i2c test
-functionality to pass in an explicit QTestState, adjusting all
-callers.
+Drop one more client of global_qtest by teaching all remaining
+libqos stragglers to pass in an explicit QTestState.  Change the
+setting of global_qtest from being implicit in libqos' call to
+qtest_start() to instead be explicit in all clients that are
+still relying on global_qtest.
+
+Note that qmp_execute() can be greatly simplified in the process,
+and that we also get rid of interpolation of a JSON string into a
+temporary variable when qtest_qmp() can do it more reliably.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/ds1338-test.c     |  6 ++---
- tests/libqos/i2c-imx.c  | 67 +++++++++++++++++++++++++------------------------
- tests/libqos/i2c-omap.c | 45 +++++++++++++++++----------------
- tests/libqos/i2c.h      |  7 ++++--
- tests/tmp105-test.c     |  6 ++---
- 5 files changed, 66 insertions(+), 65 deletions(-)
+ tests/ahci-test.c         |  1 +
+ tests/ivshmem-test.c      |  1 +
+ tests/libqos/libqos-pc.c  |  2 +-
+ tests/libqos/libqos.c     | 30 ++++++++++--------------------
+ tests/megasas-test.c      |  5 ++++-
+ tests/rtas-test.c         |  1 +
+ tests/usb-hcd-uhci-test.c |  1 +
+ tests/virtio-9p-test.c    |  1 +
+ tests/virtio-blk-test.c   |  1 +
+ tests/virtio-net-test.c   | 15 +++++++++------
+ tests/virtio-scsi-test.c  | 16 +++++++++-------
+ 11 files changed, 39 insertions(+), 35 deletions(-)
 
-diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
-index 26968bc..742dad9 100644
---- a/tests/ds1338-test.c
-+++ b/tests/ds1338-test.c
-@@ -61,16 +61,14 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index d9c99b7..f2a3926 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -157,6 +157,7 @@ static AHCIQState *ahci_vboot(const char *cli, va_list ap)
  
-     s = qtest_start("-display none -machine imx25-pdk");
--    i2c = imx_i2c_create(IMX25_I2C_0_BASE);
-+    i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
-     addr = DS1338_ADDR;
+     s = g_new0(AHCIQState, 1);
+     s->parent = qtest_pc_vboot(cli, ap);
++    global_qtest = s->parent->qts;
+     alloc_set_flags(s->parent->alloc, ALLOC_LEAK_ASSERT);
  
-     qtest_add_func("/ds1338/tx-rx", send_and_receive);
+     /* Verify that we have an AHCI device present. */
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 3776342..8af16ee 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -131,6 +131,7 @@ static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
+         g_printerr("ivshmem-test tests are only available on x86 or ppc64\n");
+         exit(EXIT_FAILURE);
+     }
++    global_qtest = s->qs->qts;
+     s->dev = get_device(s->qs->pcibus);
  
+     s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
+diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
+index b554758..a9c1ace 100644
+--- a/tests/libqos/libqos-pc.c
++++ b/tests/libqos/libqos-pc.c
+@@ -25,7 +25,7 @@ QOSState *qtest_pc_boot(const char *cmdline_fmt, ...)
+     qs = qtest_vboot(&qos_ops, cmdline_fmt, ap);
+     va_end(ap);
+ 
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    qtest_irq_intercept_in(qs->qts, "ioapic");
+ 
+     return qs;
+ }
+diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+index 40018b9..9798e1d 100644
+--- a/tests/libqos/libqos.c
++++ b/tests/libqos/libqos.c
+@@ -20,7 +20,7 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
+     QOSState *qs = g_new0(QOSState, 1);
+ 
+     cmdline = g_strdup_vprintf(cmdline_fmt, ap);
+-    qs->qts = qtest_start(cmdline);
++    qs->qts = qtest_init(cmdline);
+     qs->ops = ops;
+     if (ops) {
+         qs->alloc = ops->init_allocator(qs->qts, ALLOC_NO_FLAGS);
+@@ -80,29 +80,21 @@ void set_context(QOSState *s)
+     global_qtest = s->qts;
+ }
+ 
+-static QDict *qmp_execute(const char *command)
++static QDict *qmp_execute(QTestState *qts, const char *command)
+ {
+-    char *fmt;
+-    QDict *rsp;
+-
+-    fmt = g_strdup_printf("{ 'execute': '%s' }", command);
+-    rsp = qmp(fmt);
+-    g_free(fmt);
+-
+-    return rsp;
++    return qtest_qmp(qts, "{ 'execute': %s }", command);
+ }
+ 
+ void migrate(QOSState *from, QOSState *to, const char *uri)
+ {
+     const char *st;
+-    char *s;
+     QDict *rsp, *sub;
+     bool running;
+ 
+     set_context(from);
+ 
+     /* Is the machine currently running? */
+-    rsp = qmp_execute("query-status");
++    rsp = qmp_execute(from->qts, "query-status");
+     g_assert(qdict_haskey(rsp, "return"));
+     sub = qdict_get_qdict(rsp, "return");
+     g_assert(qdict_haskey(sub, "running"));
+@@ -110,30 +102,28 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
+     QDECREF(rsp);
+ 
+     /* Issue the migrate command. */
+-    s = g_strdup_printf("{ 'execute': 'migrate',"
+-                        "'arguments': { 'uri': '%s' } }",
+-                        uri);
+-    rsp = qmp(s);
+-    g_free(s);
++    rsp = qtest_qmp(from->qts,
++                    "{ 'execute': 'migrate', 'arguments': { 'uri': %s }}",
++                    uri);
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+ 
+     /* Wait for STOP event, but only if we were running: */
+     if (running) {
+-        qmp_eventwait("STOP");
++        qtest_qmp_eventwait(from->qts, "STOP");
+     }
+ 
+     /* If we were running, we can wait for an event. */
+     if (running) {
+         migrate_allocator(from->alloc, to->alloc);
+         set_context(to);
+-        qmp_eventwait("RESUME");
++        qtest_qmp_eventwait(to->qts, "RESUME");
+         return;
+     }
+ 
+     /* Otherwise, we need to wait: poll until migration is completed. */
+     while (1) {
+-        rsp = qmp_execute("query-migrate");
++        rsp = qmp_execute(from->qts, "query-migrate");
+         g_assert(qdict_haskey(rsp, "return"));
+         sub = qdict_get_qdict(rsp, "return");
+         g_assert(qdict_haskey(sub, "status"));
+diff --git a/tests/megasas-test.c b/tests/megasas-test.c
+index ce960e7..81837e1 100644
+--- a/tests/megasas-test.c
++++ b/tests/megasas-test.c
+@@ -15,13 +15,16 @@
+ 
+ static QOSState *qmegasas_start(const char *extra_opts)
+ {
++    QOSState *qs;
+     const char *arch = qtest_get_arch();
+     const char *cmd = "-drive id=hd0,if=none,file=null-co://,format=raw "
+                       "-device megasas,id=scsi0,addr=04.0 "
+                       "-device scsi-hd,bus=scsi0.0,drive=hd0 %s";
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        return qtest_pc_boot(cmd, extra_opts ? : "");
++        qs = qtest_pc_boot(cmd, extra_opts ? : "");
++        global_qtest = qs->qts;
++        return qs;
+     }
+ 
+     g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
+diff --git a/tests/rtas-test.c b/tests/rtas-test.c
+index 34a6921..009bda6 100644
+--- a/tests/rtas-test.c
++++ b/tests/rtas-test.c
+@@ -14,6 +14,7 @@ static void test_rtas_get_time_of_day(void)
+     time_t t1, t2;
+ 
+     qs = qtest_spapr_boot("-machine pseries");
++    global_qtest = qs->qts;
+ 
+     t1 = time(NULL);
+     ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index 62e0c78..6a7e5a2 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -77,6 +77,7 @@ int main(int argc, char **argv)
+                    "available on x86 or ppc64\n");
+         exit(EXIT_FAILURE);
+     }
++    global_qtest = qs->qts;
      ret = g_test_run();
+     qtest_shutdown(qs);
  
--    if (s) {
--        qtest_quit(s);
+diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+index 54edcb9..a2b3108 100644
+--- a/tests/virtio-9p-test.c
++++ b/tests/virtio-9p-test.c
+@@ -44,6 +44,7 @@ static QVirtIO9P *qvirtio_9p_start(const char *driver)
+         g_printerr("virtio-9p tests are only available on x86 or ppc64\n");
+         exit(EXIT_FAILURE);
+     }
++    global_qtest = v9p->qs->qts;
+ 
+     return v9p;
+ }
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 2ac64e5..9be9ffb 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -77,6 +77,7 @@ static QOSState *pci_test_start(void)
+         g_printerr("virtio-blk tests are only available on x86 or ppc64\n");
+         exit(EXIT_FAILURE);
+     }
++    global_qtest = qs->qts;
+     unlink(tmp_path);
+     g_free(tmp_path);
+     return qs;
+diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
+index ea634dc..e15bc48 100644
+--- a/tests/virtio-net-test.c
++++ b/tests/virtio-net-test.c
+@@ -53,18 +53,21 @@ static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
+ 
+ static QOSState *pci_test_start(int socket)
+ {
++    QOSState *qs;
+     const char *arch = qtest_get_arch();
+     const char *cmd = "-netdev socket,fd=%d,id=hs0 -device "
+                       "virtio-net-pci,netdev=hs0";
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        return qtest_pc_boot(cmd, socket);
 -    }
-+    qtest_quit(s);
-     g_free(i2c);
+-    if (strcmp(arch, "ppc64") == 0) {
+-        return qtest_spapr_boot(cmd, socket);
++        qs = qtest_pc_boot(cmd, socket);
++    } else if (strcmp(arch, "ppc64") == 0) {
++        qs = qtest_spapr_boot(cmd, socket);
++    } else {
++        g_printerr("virtio-net tests are only available on x86 or ppc64\n");
++        exit(EXIT_FAILURE);
+     }
+-    g_printerr("virtio-net tests are only available on x86 or ppc64\n");
+-    exit(EXIT_FAILURE);
++    global_qtest = qs->qts;
++    return qs;
+ }
  
-     return ret;
-diff --git a/tests/libqos/i2c-imx.c b/tests/libqos/i2c-imx.c
-index 1c4b431..0945f2e 100644
---- a/tests/libqos/i2c-imx.c
-+++ b/tests/libqos/i2c-imx.c
-@@ -40,8 +40,8 @@ typedef struct IMXI2C {
- static void imx_i2c_set_slave_addr(IMXI2C *s, uint8_t addr,
-                                    enum IMXI2CDirection direction)
+ static void driver_init(QVirtioDevice *dev)
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index bcf408f..7393d69 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -34,20 +34,22 @@ typedef struct {
+ 
+ static QOSState *qvirtio_scsi_start(const char *extra_opts)
  {
--    writeb(s->addr + I2DR_ADDR, (addr << 1) |
--           (direction == IMX_I2C_READ ? 1 : 0));
-+    qtest_writeb(s->parent.qts, s->addr + I2DR_ADDR,
-+                 (addr << 1) | (direction == IMX_I2C_READ ? 1 : 0));
- }
++    QOSState *qs;
+     const char *arch = qtest_get_arch();
+     const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
+                       "-device virtio-scsi-pci,id=vs0 "
+                       "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
  
- static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
-@@ -63,35 +63,35 @@ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
-            I2CR_MTX |
-            I2CR_TXAK;
- 
--    writeb(s->addr + I2CR_ADDR, data);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IBB) != 0);
- 
-     /* set the slave address */
-     imx_i2c_set_slave_addr(s, addr, IMX_I2C_WRITE);
--    status = readb(s->addr + I2SR_ADDR);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IIF) != 0);
-     g_assert((status & I2SR_RXAK) == 0);
- 
-     /* ack the interrupt */
--    writeb(s->addr + I2SR_ADDR, 0);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IIF) == 0);
- 
-     while (size < len) {
-         /* check we are still busy */
--        status = readb(s->addr + I2SR_ADDR);
-+        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-         g_assert((status & I2SR_IBB) != 0);
- 
-         /* write the data */
--        writeb(s->addr + I2DR_ADDR, buf[size]);
--        status = readb(s->addr + I2SR_ADDR);
-+        qtest_writeb(i2c->qts, s->addr + I2DR_ADDR, buf[size]);
-+        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-         g_assert((status & I2SR_IIF) != 0);
-         g_assert((status & I2SR_RXAK) == 0);
- 
-         /* ack the interrupt */
--        writeb(s->addr + I2SR_ADDR, 0);
--        status = readb(s->addr + I2SR_ADDR);
-+        qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
-+        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-         g_assert((status & I2SR_IIF) == 0);
- 
-         size++;
-@@ -99,8 +99,8 @@ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
- 
-     /* release the bus */
-     data &= ~(I2CR_MSTA | I2CR_MTX);
--    writeb(s->addr + I2CR_ADDR, data);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IBB) == 0);
- }
- 
-@@ -123,19 +123,19 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
-            I2CR_MTX |
-            I2CR_TXAK;
- 
--    writeb(s->addr + I2CR_ADDR, data);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IBB) != 0);
- 
-     /* set the slave address */
-     imx_i2c_set_slave_addr(s, addr, IMX_I2C_READ);
--    status = readb(s->addr + I2SR_ADDR);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IIF) != 0);
-     g_assert((status & I2SR_RXAK) == 0);
- 
-     /* ack the interrupt */
--    writeb(s->addr + I2SR_ADDR, 0);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IIF) == 0);
- 
-     /* set the bus for read */
-@@ -144,23 +144,23 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
-     if (len != 1) {
-         data &= ~I2CR_TXAK;
-     }
--    writeb(s->addr + I2CR_ADDR, data);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IBB) != 0);
- 
-     /* dummy read */
--    readb(s->addr + I2DR_ADDR);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_readb(i2c->qts, s->addr + I2DR_ADDR);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IIF) != 0);
- 
-     /* ack the interrupt */
--    writeb(s->addr + I2SR_ADDR, 0);
--    status = readb(s->addr + I2SR_ADDR);
-+    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IIF) == 0);
- 
-     while (size < len) {
-         /* check we are still busy */
--        status = readb(s->addr + I2SR_ADDR);
-+        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-         g_assert((status & I2SR_IBB) != 0);
- 
-         if (size == (len - 1)) {
-@@ -170,30 +170,30 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
-             /* ack the data read */
-             data |= I2CR_TXAK;
-         }
--        writeb(s->addr + I2CR_ADDR, data);
-+        qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
- 
-         /* read the data */
--        buf[size] = readb(s->addr + I2DR_ADDR);
-+        buf[size] = qtest_readb(i2c->qts, s->addr + I2DR_ADDR);
- 
-         if (size != (len - 1)) {
--            status = readb(s->addr + I2SR_ADDR);
-+            status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-             g_assert((status & I2SR_IIF) != 0);
- 
-             /* ack the interrupt */
--            writeb(s->addr + I2SR_ADDR, 0);
-+            qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
-         }
- 
--        status = readb(s->addr + I2SR_ADDR);
-+        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-         g_assert((status & I2SR_IIF) == 0);
- 
-         size++;
-     }
- 
--    status = readb(s->addr + I2SR_ADDR);
-+    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
-     g_assert((status & I2SR_IBB) == 0);
- }
- 
--I2CAdapter *imx_i2c_create(uint64_t addr)
-+I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr)
- {
-     IMXI2C *s = g_malloc0(sizeof(*s));
-     I2CAdapter *i2c = (I2CAdapter *)s;
-@@ -202,6 +202,7 @@ I2CAdapter *imx_i2c_create(uint64_t addr)
- 
-     i2c->send = imx_i2c_send;
-     i2c->recv = imx_i2c_recv;
-+    i2c->qts = qts;
- 
-     return i2c;
- }
-diff --git a/tests/libqos/i2c-omap.c b/tests/libqos/i2c-omap.c
-index f603fdf..1ef6e7b 100644
---- a/tests/libqos/i2c-omap.c
-+++ b/tests/libqos/i2c-omap.c
-@@ -51,8 +51,8 @@ static void omap_i2c_set_slave_addr(OMAPI2C *s, uint8_t addr)
- {
-     uint16_t data = addr;
- 
--    writew(s->addr + OMAP_I2C_SA, data);
--    data = readw(s->addr + OMAP_I2C_SA);
-+    qtest_writew(s->parent.qts, s->addr + OMAP_I2C_SA, data);
-+    data = qtest_readw(s->parent.qts, s->addr + OMAP_I2C_SA);
-     g_assert_cmphex(data, ==, addr);
- }
- 
-@@ -65,38 +65,38 @@ static void omap_i2c_send(I2CAdapter *i2c, uint8_t addr,
-     omap_i2c_set_slave_addr(s, addr);
- 
-     data = len;
--    writew(s->addr + OMAP_I2C_CNT, data);
-+    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CNT, data);
- 
-     data = OMAP_I2C_CON_I2C_EN |
-            OMAP_I2C_CON_TRX |
-            OMAP_I2C_CON_MST |
-            OMAP_I2C_CON_STT |
-            OMAP_I2C_CON_STP;
--    writew(s->addr + OMAP_I2C_CON, data);
--    data = readw(s->addr + OMAP_I2C_CON);
-+    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CON, data);
-+    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
-     g_assert((data & OMAP_I2C_CON_STP) != 0);
- 
--    data = readw(s->addr + OMAP_I2C_STAT);
-+    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
-     g_assert((data & OMAP_I2C_STAT_NACK) == 0);
- 
-     while (len > 1) {
--        data = readw(s->addr + OMAP_I2C_STAT);
-+        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
-         g_assert((data & OMAP_I2C_STAT_XRDY) != 0);
- 
-         data = buf[0] | ((uint16_t)buf[1] << 8);
--        writew(s->addr + OMAP_I2C_DATA, data);
-+        qtest_writew(i2c->qts, s->addr + OMAP_I2C_DATA, data);
-         buf = (uint8_t *)buf + 2;
-         len -= 2;
-     }
-     if (len == 1) {
--        data = readw(s->addr + OMAP_I2C_STAT);
-+        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
-         g_assert((data & OMAP_I2C_STAT_XRDY) != 0);
- 
-         data = buf[0];
--        writew(s->addr + OMAP_I2C_DATA, data);
-+        qtest_writew(i2c->qts, s->addr + OMAP_I2C_DATA, data);
-     }
- 
--    data = readw(s->addr + OMAP_I2C_CON);
-+    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
-     g_assert((data & OMAP_I2C_CON_STP) == 0);
- }
- 
-@@ -109,30 +109,30 @@ static void omap_i2c_recv(I2CAdapter *i2c, uint8_t addr,
-     omap_i2c_set_slave_addr(s, addr);
- 
-     data = len;
--    writew(s->addr + OMAP_I2C_CNT, data);
-+    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CNT, data);
- 
-     data = OMAP_I2C_CON_I2C_EN |
-            OMAP_I2C_CON_MST |
-            OMAP_I2C_CON_STT |
-            OMAP_I2C_CON_STP;
--    writew(s->addr + OMAP_I2C_CON, data);
--    data = readw(s->addr + OMAP_I2C_CON);
-+    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CON, data);
-+    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
-     g_assert((data & OMAP_I2C_CON_STP) == 0);
- 
--    data = readw(s->addr + OMAP_I2C_STAT);
-+    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
-     g_assert((data & OMAP_I2C_STAT_NACK) == 0);
- 
--    data = readw(s->addr + OMAP_I2C_CNT);
-+    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CNT);
-     g_assert_cmpuint(data, ==, len);
- 
-     while (len > 0) {
--        data = readw(s->addr + OMAP_I2C_STAT);
-+        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
-         g_assert((data & OMAP_I2C_STAT_RRDY) != 0);
-         g_assert((data & OMAP_I2C_STAT_ROVR) == 0);
- 
--        data = readw(s->addr + OMAP_I2C_DATA);
-+        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_DATA);
- 
--        stat = readw(s->addr + OMAP_I2C_STAT);
-+        stat = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
- 
-         if (unlikely(len == 1)) {
-             g_assert((stat & OMAP_I2C_STAT_SBD) != 0);
-@@ -148,11 +148,11 @@ static void omap_i2c_recv(I2CAdapter *i2c, uint8_t addr,
-         }
-     }
- 
--    data = readw(s->addr + OMAP_I2C_CON);
-+    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
-     g_assert((data & OMAP_I2C_CON_STP) == 0);
- }
- 
--I2CAdapter *omap_i2c_create(uint64_t addr)
-+I2CAdapter *omap_i2c_create(QTestState *qts, uint64_t addr)
- {
-     OMAPI2C *s = g_malloc0(sizeof(*s));
-     I2CAdapter *i2c = (I2CAdapter *)s;
-@@ -162,9 +162,10 @@ I2CAdapter *omap_i2c_create(uint64_t addr)
- 
-     i2c->send = omap_i2c_send;
-     i2c->recv = omap_i2c_recv;
-+    i2c->qts = qts;
- 
-     /* verify the mmio address by looking for a known signature */
--    data = readw(addr + OMAP_I2C_REV);
-+    data = qtest_readw(qts, addr + OMAP_I2C_REV);
-     g_assert_cmphex(data, ==, 0x34);
- 
-     return i2c;
-diff --git a/tests/libqos/i2c.h b/tests/libqos/i2c.h
-index 6e648f9..eb40b80 100644
---- a/tests/libqos/i2c.h
-+++ b/tests/libqos/i2c.h
-@@ -9,6 +9,7 @@
- #ifndef LIBQOS_I2C_H
- #define LIBQOS_I2C_H
- 
-+#include "libqtest.h"
- 
- typedef struct I2CAdapter I2CAdapter;
- struct I2CAdapter {
-@@ -16,6 +17,8 @@ struct I2CAdapter {
-                  const uint8_t *buf, uint16_t len);
-     void (*recv)(I2CAdapter *adapter, uint8_t addr,
-                  uint8_t *buf, uint16_t len);
-+
-+    QTestState *qts;
- };
- 
- void i2c_send(I2CAdapter *i2c, uint8_t addr,
-@@ -24,9 +27,9 @@ void i2c_recv(I2CAdapter *i2c, uint8_t addr,
-               uint8_t *buf, uint16_t len);
- 
- /* libi2c-omap.c */
--I2CAdapter *omap_i2c_create(uint64_t addr);
-+I2CAdapter *omap_i2c_create(QTestState *qts, uint64_t addr);
- 
- /* libi2c-imx.c */
--I2CAdapter *imx_i2c_create(uint64_t addr);
-+I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr);
- 
- #endif
-diff --git a/tests/tmp105-test.c b/tests/tmp105-test.c
-index a7940a4..382f88b 100644
---- a/tests/tmp105-test.c
-+++ b/tests/tmp105-test.c
-@@ -154,15 +154,13 @@ int main(int argc, char **argv)
-     s = qtest_start("-machine n800 "
-                     "-device tmp105,bus=i2c-bus.0,id=" TMP105_TEST_ID
-                     ",address=0x49");
--    i2c = omap_i2c_create(OMAP2_I2C_1_BASE);
-+    i2c = omap_i2c_create(s, OMAP2_I2C_1_BASE);
- 
-     qtest_add_func("/tmp105/tx-rx", send_and_receive);
- 
-     ret = g_test_run();
- 
--    if (s) {
--        qtest_quit(s);
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        return qtest_pc_boot(cmd, extra_opts ? : "");
 -    }
-+    qtest_quit(s);
-     g_free(i2c);
+-    if (strcmp(arch, "ppc64") == 0) {
+-        return qtest_spapr_boot(cmd, extra_opts ? : "");
++        qs = qtest_pc_boot(cmd, extra_opts ? : "");
++    } else if (strcmp(arch, "ppc64") == 0) {
++        qs = qtest_spapr_boot(cmd, extra_opts ? : "");
++    } else {
++        g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
++        exit(EXIT_FAILURE);
+     }
+-
+-    g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
+-    exit(EXIT_FAILURE);
++    global_qtest = qs->qts;
++    return qs;
+ }
  
-     return ret;
+ static void qvirtio_scsi_stop(QOSState *qs)
 -- 
 1.8.3.1
