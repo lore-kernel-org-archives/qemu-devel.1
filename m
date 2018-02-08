@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ejjO3-00028H-CM
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:25:08 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ejjRl-0004bX-No
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:28:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ejjNx-0001RO-6J
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:25:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55114
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ejjNw-0001R8-VP
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:24:57 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w18AOIAB087595
-	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 05:24:55 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g0gmu9vw7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:24:54 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 8 Feb 2018 10:24:52 -0000
-References: <1518083288-20410-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<20180208111633.0e8a6237.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 8 Feb 2018 11:24:48 +0100
+	(envelope-from <imammedo@redhat.com>) id 1ejjRi-0004Ex-HK
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:28:53 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37252 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ejjRi-0004EJ-BU
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:28:50 -0500
+Date: Thu, 8 Feb 2018 11:28:33 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180208112833.34ad3b3d@redhat.com>
+In-Reply-To: <CAHNT7NuH1NYdKKau1GgADUGPq29TDxczJPh0GgQ+su5rxo5Lhg@mail.gmail.com>
+References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
+	<1517811767-75958-3-git-send-email-mjc@sifive.com>
+	<20180205160418.34544e1f@redhat.com>
+	<CAHNT7NsBQvruhfUpH2aP2BLfiASDU=b7Bsncqpih1ADohxo7cQ@mail.gmail.com>
+	<20180206160300.17cab7fb@redhat.com>
+	<CAHNT7NuH1NYdKKau1GgADUGPq29TDxczJPh0GgQ+su5rxo5Lhg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180208111633.0e8a6237.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <ef7d8fbd-42b0-2d28-c3c2-ab96a8e52e5f@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] S390: Expose s390-specific CPU info
+Subject: Re: [Qemu-devel] [PATCH v4 03/22] RISC-V CPU Core Definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,102 +31,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
+On Thu, 8 Feb 2018 15:19:13 +1300
+Michael Clark <mjc@sifive.com> wrote:
 
-
-On 02/08/2018 11:16 AM, Cornelia Huck wrote:
-> On Thu,  8 Feb 2018 10:48:08 +0100
-> Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+> On Wed, Feb 7, 2018 at 4:03 AM, Igor Mammedov <imammedo@redhat.com> wrote:
 > 
-> [added some cc:s]
-> 
->> Presently s390x is the only architecture not exposing specific
->> CPU information via QMP query-cpus. Upstream discussion has shown
->> that it could make sense to report the architecture specific CPU
->> state, e.g. to detect that a CPU has been stopped.
->>
->> With this change the output of query-cpus will look like this on
->> s390:
->>
->>     [{"arch": "s390", "current": true,
->>       "props": {"core-id": 0}, "cpu_state": "operating", "CPU": 0,
->>       "qom_path": "/machine/unattached/device[0]",
->>       "halted": false, "thread_id": 63115},
->>      {"arch": "s390", "current": false,
->>       "props": {"core-id": 1}, "cpu_state": "stopped", "CPU": 1,
->>       "qom_path": "/machine/unattached/device[1]",
->>       "halted": true, "thread_id": 63116}]
->>
->> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
->> ---
->>  cpus.c                     |  6 ++++++
->>  hmp.c                      |  4 ++++
->>  hw/s390x/s390-virtio-ccw.c |  2 +-
->>  qapi-schema.json           | 25 ++++++++++++++++++++++++-
->>  target/s390x/cpu.c         | 24 ++++++++++++------------
->>  target/s390x/cpu.h         |  7 ++-----
->>  target/s390x/kvm.c         |  8 ++++----
->>  target/s390x/sigp.c        | 38 +++++++++++++++++++-------------------
->>  8 files changed, 72 insertions(+), 42 deletions(-)
->>
->> diff --git a/cpus.c b/cpus.c
->> index 2cb0af9..39e46dd 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -2033,6 +2033,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
->>  #elif defined(TARGET_TRICORE)
->>          TriCoreCPU *tricore_cpu = TRICORE_CPU(cpu);
->>          CPUTriCoreState *env = &tricore_cpu->env;
->> +#elif defined(TARGET_S390X)
->> +        S390CPU *s390_cpu = S390_CPU(cpu);
->> +        CPUS390XState *env = &s390_cpu->env;
->>  #endif
->>  
->>          cpu_synchronize_state(cpu);
->> @@ -2060,6 +2063,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
->>  #elif defined(TARGET_TRICORE)
->>          info->value->arch = CPU_INFO_ARCH_TRICORE;
->>          info->value->u.tricore.PC = env->PC;
->> +#elif defined(TARGET_S390X)
->> +        info->value->arch = CPU_INFO_ARCH_S390;
->> +        info->value->u.s390.cpu_state = env->cpu_state;
->>  #else
->>          info->value->arch = CPU_INFO_ARCH_OTHER;
->>  #endif
->> diff --git a/hmp.c b/hmp.c
->> index b3de32d..37e04c3 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -390,6 +390,10 @@ void hmp_info_cpus(Monitor *mon, const QDict *qdict)
->>          case CPU_INFO_ARCH_TRICORE:
->>              monitor_printf(mon, " PC=0x%016" PRIx64, cpu->value->u.tricore.PC);
->>              break;
->> +        case CPU_INFO_ARCH_S390:
->> +            monitor_printf(mon, " state=%s",
->> +                           CpuInfoS390State_str(cpu->value->u.s390.cpu_state));
->> +            break;
->>          default:
->>              break;
->>          }
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 3807dcb..3e6360e 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -373,7 +373,7 @@ static void s390_machine_reset(void)
->>  
->>      /* all cpus are stopped - configure and start the ipl cpu only */
->>      s390_ipl_prepare_cpu(ipl_cpu);
->> -    s390_cpu_set_state(CPU_STATE_OPERATING, ipl_cpu);
->> +    s390_cpu_set_state(CPU_INFOS390_STATE_OPERATING, ipl_cpu);
-> 
-> Exposing the state as a QAPI enum has the unfortunate side effect of
-> that new name. It feels slightly awkward to me, as it is a state for
-> real decisions and not just for info statements...
+> > On Tue, 6 Feb 2018 11:09:56 +1300
+> > Michael Clark <mjc@sifive.com> wrote:
+> >  
+> > > On Tue, Feb 6, 2018 at 4:04 AM, Igor Mammedov <imammedo@redhat.com>  
+> > wrote:  
+> > >  
+> > > > On Mon,  5 Feb 2018 19:22:28 +1300
+> > > > Michael Clark <mjc@sifive.com> wrote:
+> > > >  
+> > > > > Add CPU state header, CPU definitions and initialization routines
+> > > > >
+> > > > > Signed-off-by: Michael Clark <mjc@sifive.com>
+> > > > > ---
+> > > > >  target/riscv/cpu.c      | 385 ++++++++++++++++++++++++++++++  
+> > > > ++++++++++++++  
+> > > > >  target/riscv/cpu.h      | 256 +++++++++++++++++++++++++++++
+> > > > >  target/riscv/cpu_bits.h | 417 ++++++++++++++++++++++++++++++  
+> > > > ++++++++++++++++++  
+> > > > >  3 files changed, 1058 insertions(+)
+> > > > >  create mode 100644 target/riscv/cpu.c
+> > > > >  create mode 100644 target/riscv/cpu.h
+> > > > >  create mode 100644 target/riscv/cpu_bits.h
+> > > > >
+> > > > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > > > > new file mode 100644
+> > > > > index 0000000..684b78b
+> > > > > --- /dev/null
+> > > > > +++ b/target/riscv/cpu.c  
+> > > > [...]  
+> > > > > +
+> > > > > +static const RISCVCPUInfo riscv_cpus[] = {
+> > > > > +#ifdef CONFIG_USER_ONLY
+> > > > > +    { TYPE_RISCV_CPU_ANY,                riscv_any_cpu_init },
+> > > > > +#else
+> > > > > +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09,  
+> > riscv_imafdcsu_priv1_9_cpu_init  
+> > > > },  
+> > > > > +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,  
+> > riscv_imafdcsu_priv1_10_cpu_init  
+> > > > },  
+> > > > > +    { TYPE_RISCV_CPU_IMACU_PRIV_1_10,  
+> > riscv_imacu_priv1_10_cpu_init  
+> > > > },  
+> > > > > +    { TYPE_RISCV_CPU_IMAC_PRIV_1_10,  
+> >  riscv_imac_priv1_10_cpu_init },  
+> > > > > +#endif
+> > > > > +    { NULL, NULL }
+> > > > > +};
+> > > > > +  
+> > > > [...]  
+> > > > > +static void cpu_register(const RISCVCPUInfo *info)
+> > > > > +{
+> > > > > +    TypeInfo type_info = {
+> > > > > +        .name = info->name,
+> > > > > +        .parent = TYPE_RISCV_CPU,
+> > > > > +        .instance_size = sizeof(RISCVCPU),
+> > > > > +        .instance_init = info->initfn,
+> > > > > +    };
+> > > > > +
+> > > > > +    type_register(&type_info);
+> > > > > +}
+> > > > > +
+> > > > > +static const TypeInfo riscv_cpu_type_info = {
+> > > > > +    .name = TYPE_RISCV_CPU,
+> > > > > +    .parent = TYPE_CPU,
+> > > > > +    .instance_size = sizeof(RISCVCPU),
+> > > > > +    .instance_init = riscv_cpu_init,
+> > > > > +    .abstract = false,
+> > > > > +    .class_size = sizeof(RISCVCPUClass),
+> > > > > +    .class_init = riscv_cpu_class_init,
+> > > > > +};  
+> > > > [...]
+> > > >  
+> > > > > +static void riscv_cpu_register_types(void)
+> > > > > +{
+> > > > > +    const RISCVCPUInfo *info = riscv_cpus;
+> > > > > +
+> > > > > +    type_register_static(&riscv_cpu_type_info);
+> > > > > +
+> > > > > +    while (info->name) {
+> > > > > +        cpu_register(info);
+> > > > > +        info++;
+> > > > > +    }
+> > > > > +}
+> > > > > +
+> > > > > +type_init(riscv_cpu_register_types)  
+> > > > For simplistic type definitions like that,
+> > > > above parts should use DEFINE_TYPES(), see c6678108 for reference.
+> > > >
+> > > >  
+> > > > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> > > > > new file mode 100644
+> > > > > index 0000000..8b816ae
+> > > > > --- /dev/null
+> > > > > +++ b/target/riscv/cpu.h  
+> > > > [...]  
+> > > > > +#define TYPE_RISCV_CPU                    "riscv"
+> > > > > +#define TYPE_RISCV_CPU_ANY                "riscv-any"
+> > > > > +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09 "riscv-imafdcsu-priv1.9"
+> > > > > +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10 "riscv-imafdcsu-priv1.10"
+> > > > > +#define TYPE_RISCV_CPU_IMACU_PRIV_1_10    "riscv-imacu-priv1.10"
+> > > > > +#define TYPE_RISCV_CPU_IMAC_PRIV_1_10     "riscv-imac-priv1.10"
+Also you can use RISCV_CPU_TYPE_NAME() from blow to form above names,
+like:
 
-I asked Viktor to use the qapi enum instead of having two sets of defines that
-we need to keep in sync. (in fact 3, as the kernel kvm mpstate definition is also
-there).
+#define TYPE_RISCV_CPU                    "riscv-cpu"
+#define TYPE_RISCV_CPU_ANY                RISCV_CPU_TYPE_NAME("any")
+...
 
-But yes, the INFO in that name is somewhat strange. No good idea though.
+then whatever naming format is required, you'd be able to
+change it just in RISCV_CPU_TYPE_NAME() without touching
+the rest.
+
+> > > > > +
+> > > > > +#define RISCV_CPU_TYPE_PREFIX TYPE_RISCV_CPU "-"
+> > > > > +#define RISCV_CPU_TYPE_NAME(name) (RISCV_CPU_TYPE_PREFIX name)  
+> > > > it still uses prefix notation versus commonly used suffix in form of
+> > > >  "targetFOO-cpu"
+> > > > this prefix approach would get in the way if we try to generalize
+> > > > naming <-> type conversion later[*].
+> > > > So it would better to be consistent with approach qemu uses for cpu  
+> > types  
+> > > > (I believe power had prefix based pnv types but it has been fixed
+> > > > to common suffix based pattern later).
+> > > >
+> > > > * discussion on thread "[PATCH v5 0/6]  Add a valid_cpu_types property"
+> > > >  
+> > >
+> > > I can reverse them if needed, just it seems a little odd to have riscv on
+> > > the right-hand side of the extensions. I can do this in the v5 spin...  
+> > pls, do so + -cpu suffix.
+> >  
+> > > It may make more sense once we have actual CPU models. Currently, we have
+> > > sets of extensions and privilege ISA versions. I guess these will become
+> > > implicit properties of a specific CPU model and the extensions will be
+> > > visible in the initialization function.  
+> > That's what we have in x86 land, code names + _suffix corresponding to
+> > real cpus (mostly) with implicit feature set per each.
+> > Features could be properties so user would be able to enumerate/query/set
+> > them.
+> >  
+> 
+> I just realized I neglected the change in the current patch-set to use the
+> suffix scheme i.e. "<extension>-<version>-riscv-cpu" versus the
+> "riscv-<extension>-<version>" scheme that we have presently.
+Yep, just saw v5 still has old variant,
+You also forgot about comment:
+"
+> +type_init(riscv_cpu_register_types)  
+For simplistic type definitions like that,
+above parts should use DEFINE_TYPES(), see c6678108 for reference.
+"
+ 
+> I would like to discuss with RISC-V folk as how we should name these
+> "generic" CPUs and how we should handle extensions and versioning. This is
+> certainly going to be an area that is going to be worked on in the future
+> so whether we evolve this in-tree or out-of-tree is up for discussion. We
+> also have to decide whether we will add CPU models for all typical
+> combinations of extensions or if this is handled some other way. There will
+> also be actual CPU modules now silicon is becoming more widely available.
+> The version number we have currently is essentially the supervisor
+> specification version. That won't be necessary once we have real cpu models.
+> 
+> There is also a future patch that will allow 'misa' extensions to be
+> changed on the fly, which will require the extensions to be exposed in
+> cpu_get_tb_cpu_state flags.
+> 
+> One thing is for certain, is that there is no direct comparison to x86 land
+> as the RISC-V extension scheme is presently quite different.
+See, following thread which might be of interest to you:
+  "how to handle QOM 'container' objects whose contents depend on QOM properties?"
