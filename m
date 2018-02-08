@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3X-0003VU-9t
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:22 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3a-0003Wq-Lm
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3W-0006yp-4e
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:19 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52159)
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3X-00070f-57
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:22 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:52159)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejq3V-0006xH-SQ
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:18 -0500
-Received: by mail-wm0-x242.google.com with SMTP id r71so10969631wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:17 -0800 (PST)
+	id 1ejq3W-0006z9-R4
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:19 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r71so10969722wmd.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:18 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:49 +0000
-Message-Id: <20180208173157.24705-25-alex.bennee@linaro.org>
+Date: Thu,  8 Feb 2018 17:31:44 +0000
+Message-Id: <20180208173157.24705-20-alex.bennee@linaro.org>
 In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
 References: <20180208173157.24705-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 24/32] arm/translate-a64: add FP16 FRECPE
+Subject: [Qemu-devel] [PATCH v2 19/32] arm/translate-a64: add FCVTxx to
+ simd_two_reg_misc_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +33,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Now we have added f16 during the re-factoring we can simply call the
-helper.
+This covers all the floating point convert operations.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/translate-a64.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/arm/helper-a64.c    | 32 +++++++++++++++++
+ target/arm/helper-a64.h    |  2 ++
+ target/arm/translate-a64.c | 85 +++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 118 insertions(+), 1 deletion(-)
 
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 919b073635..76f3289e37 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -772,3 +772,35 @@ float16 HELPER(advsimd_rinth)(float16 x, void *fp_status)
+ 
+     return ret;
+ }
++
++/*
++ * Half-precision floating point conversion functions
++ *
++ * There are a multitude of conversion functions with various
++ * different rounding modes. This is dealt with by the calling code
++ * setting the mode appropriately before calling the helper.
++ */
++
++uint32_t HELPER(advsimd_f16tosinth)(float16 a, void *fpstp)
++{
++    float_status *fpst = fpstp;
++
++    /* Invalid if we are passed a NaN */
++    if (float16_is_any_nan(a)) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_int16(a, fpst);
++}
++
++uint32_t HELPER(advsimd_f16touinth)(float16 a, void *fpstp)
++{
++    float_status *fpst = fpstp;
++
++    /* Invalid if we are passed a NaN */
++    if (float16_is_any_nan(a)) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_uint16(a, fpst);
++}
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index b583bc0dd8..453753f4e7 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -78,3 +78,5 @@ DEF_HELPER_3(advsimd_acge_f16, i32, f16, f16, ptr)
+ DEF_HELPER_3(advsimd_acgt_f16, i32, f16, f16, ptr)
+ DEF_HELPER_2(advsimd_rinth_exact, f16, f16, ptr)
+ DEF_HELPER_2(advsimd_rinth, f16, f16, ptr)
++DEF_HELPER_2(advsimd_f16tosinth, i32, f16, ptr)
++DEF_HELPER_2(advsimd_f16touinth, i32, f16, ptr)
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index da3c7bfa85..4ad5e97f56 100644
+index a0506f094f..0049111e6d 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -10848,6 +10848,8 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-         handle_2misc_fcmp_zero(s, fpop, is_scalar, 0, is_q, MO_16, rn, rd);
-         return;
-         break;
-+    case 0x3d: /* FRECPE */
-+        break;
-     case 0x18: /* FRINTN */
-         need_rmode = true;
+@@ -10797,6 +10797,46 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
          only_in_vector = true;
-@@ -10968,6 +10970,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-         case 0x3b: /* FCVTZS */
-             gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
-             break;
-+        case 0x3d: /* FRECPE */
-+            gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
+         /* current rounding mode */
+         break;
++    case 0x1a: /* FCVTNS */
++        need_rmode = true;
++        rmode = FPROUNDING_TIEEVEN;
++        break;
++    case 0x1b: /* FCVTMS */
++        need_rmode = true;
++        rmode = FPROUNDING_NEGINF;
++        break;
++    case 0x1c: /* FCVTAS */
++        need_rmode = true;
++        rmode = FPROUNDING_TIEAWAY;
++        break;
++    case 0x3a: /* FCVTPS */
++        need_rmode = true;
++        rmode = FPROUNDING_POSINF;
++        break;
++    case 0x3b: /* FCVTZS */
++        need_rmode = true;
++        rmode = FPROUNDING_ZERO;
++        break;
++    case 0x5a: /* FCVTNU */
++        need_rmode = true;
++        rmode = FPROUNDING_TIEEVEN;
++        break;
++    case 0x5b: /* FCVTMU */
++        need_rmode = true;
++        rmode = FPROUNDING_NEGINF;
++        break;
++    case 0x5c: /* FCVTAU */
++        need_rmode = true;
++        rmode = FPROUNDING_TIEAWAY;
++        break;
++    case 0x7a: /* FCVTPU */
++        need_rmode = true;
++        rmode = FPROUNDING_POSINF;
++        break;
++    case 0x7b: /* FCVTZU */
++        need_rmode = true;
++        rmode = FPROUNDING_ZERO;
++        break;
+     default:
+         fprintf(stderr, "%s: insn %#04x fpop %#2x\n", __func__, insn, fpop);
+         g_assert_not_reached();
+@@ -10830,7 +10870,36 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+     }
+ 
+     if (is_scalar) {
+-        /* no operations yet */
++        TCGv_i32 tcg_op = tcg_temp_new_i32();
++        TCGv_i32 tcg_res = tcg_temp_new_i32();
++
++        read_vec_element_i32(s, tcg_op, rn, 0, MO_16);
++
++        switch (fpop) {
++        case 0x1a: /* FCVTNS */
++        case 0x1b: /* FCVTMS */
++        case 0x1c: /* FCVTAS */
++        case 0x3a: /* FCVTPS */
++        case 0x3b: /* FCVTZS */
++            gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
 +            break;
-         case 0x5a: /* FCVTNU */
-         case 0x5b: /* FCVTMU */
-         case 0x5c: /* FCVTAU */
-@@ -11003,6 +11008,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-             case 0x3b: /* FCVTZS */
-                 gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
-                 break;
-+            case 0x3d: /* FRECPE */
-+                gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
++        case 0x5a: /* FCVTNU */
++        case 0x5b: /* FCVTMU */
++        case 0x5c: /* FCVTAU */
++        case 0x7a: /* FCVTPU */
++        case 0x7b: /* FCVTZU */
++            gen_helper_advsimd_f16touinth(tcg_res, tcg_op, tcg_fpstatus);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++
++        /* limit any sign extension going on */
++        tcg_gen_andi_i32(tcg_res, tcg_res, 0xffff);
++        write_fp_sreg(s, rd, tcg_res);
++
++        tcg_temp_free_i32(tcg_res);
++        tcg_temp_free_i32(tcg_op);
+     } else {
+         for (pass = 0; pass < (is_q ? 8 : 4); pass++) {
+             TCGv_i32 tcg_op = tcg_temp_new_i32();
+@@ -10839,6 +10908,20 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+             read_vec_element_i32(s, tcg_op, rn, pass, MO_16);
+ 
+             switch (fpop) {
++            case 0x1a: /* FCVTNS */
++            case 0x1b: /* FCVTMS */
++            case 0x1c: /* FCVTAS */
++            case 0x3a: /* FCVTPS */
++            case 0x3b: /* FCVTZS */
++                gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
 +                break;
-             case 0x5a: /* FCVTNU */
-             case 0x5b: /* FCVTMU */
-             case 0x5c: /* FCVTAU */
++            case 0x5a: /* FCVTNU */
++            case 0x5b: /* FCVTMU */
++            case 0x5c: /* FCVTAU */
++            case 0x7a: /* FCVTPU */
++            case 0x7b: /* FCVTZU */
++                gen_helper_advsimd_f16touinth(tcg_res, tcg_op, tcg_fpstatus);
++                break;
+             case 0x18: /* FRINTN */
+             case 0x19: /* FRINTM */
+             case 0x38: /* FRINTP */
 -- 
 2.15.1
