@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejjb8-0003rd-1X
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:38:39 -0500
+	(envelope-from <peterx@redhat.com>) id 1ejjbD-0003wi-5b
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:38:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejjb4-00020n-7W
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:38:34 -0500
-References: <20180207162920.28386-1-pbonzini@redhat.com>
-	<w514lmrrdun.fsf@maestria.local.igalia.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5d3ce16f-9831-7960-53a4-24c08295a5f9@redhat.com>
-Date: Thu, 8 Feb 2018 11:38:24 +0100
+	(envelope-from <peterx@redhat.com>) id 1ejjb9-00025l-TG
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:38:39 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35220 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjb9-00025Q-Oo
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:38:35 -0500
+Date: Thu, 8 Feb 2018 18:38:30 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180208103830.GA23592@xz-mi>
+References: <20180208103132.28452-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <w514lmrrdun.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: early check for
- blockers on drive-mirror
+Content-Disposition: inline
+In-Reply-To: <20180208103132.28452-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 00/28] Migration: postcopy failure
+ recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 08/02/2018 11:10, Alberto Garcia wrote:
-> On Wed 07 Feb 2018 05:29:20 PM CET, Paolo Bonzini wrote:
->> Even if an op blocker is present for BLOCK_OP_TYPE_MIRROR_SOURCE,
->> it is checked a bit late and the result is that the target is
->> created even if drive-mirror subsequently fails.  Add an early
->> check to avoid this.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  blockdev.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/blockdev.c b/blockdev.c
->> index 8e977eef11..c7e2e0a00e 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -3565,6 +3565,11 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
->>          return;
->>      }
->>  
->> +    /* Early check to avoid creating target */
->> +    if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_MIRROR_SOURCE, errp)) {
->> +        return;
->> +    }
->> +
->>      aio_context = bdrv_get_aio_context(bs);
->>      aio_context_acquire(aio_context);
+On Thu, Feb 08, 2018 at 06:31:04PM +0800, Peter Xu wrote:
+
+[...]
+
+> 6. On source, manually trigger a "fake network down" using
+>    "migrate-cancel" command:
 > 
-> Do we need to hold the AioContext in order to check for op blockers?
+>   {"execute": "migrate_cancel"}
+>   {"return": {}}
+> 
+>   During postcopy, it'll not really cancel the migration, but pause
+>   it.  On both sides, we should see this on stderr:
+> 
+>   qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
+> 
+>   It means now both sides are in postcopy-pause state.
 
-In include/block/block_int.h, they are not in the "Protected by
-AioContext lock" section.
+Sorry I forgot to update this part.  We need to use migrate-pause in
+this version to explicitly pause the migration.  If on source:
 
-Paolo
+  { "execute": "migrate-pause" }
+
+If on destination, don't forget to run with OOB:
+
+  { "execute": "migrate-pause", "id": "pause-cmd",
+    "control": { "run-oob": true } }
+
+-- 
+Peter Xu
