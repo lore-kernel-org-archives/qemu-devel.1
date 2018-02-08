@@ -1,40 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ejnkK-0003XO-Bs
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:04:21 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ejnkq-000401-D9
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ejnkE-0003Ws-Ly
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:04:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47114)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ejnkE-0003UA-F9
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:04:14 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w18F3rkO066295
-	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 10:04:13 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g0r2bjkhx-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 10:04:09 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 8 Feb 2018 15:03:31 -0000
-References: <20180208095752.23960-1-borntraeger@de.ibm.com>
-	<f889c2c4-aae1-a7c1-7024-db0ace96b36a@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 8 Feb 2018 16:03:28 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1ejnkl-0003la-1m
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:04:52 -0500
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:53140)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejnkk-0003lF-RH
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:04:46 -0500
+Received: by mail-wm0-f68.google.com with SMTP id g1so10023533wmg.2
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 07:04:46 -0800 (PST)
+References: <20180206203048.11096-1-rkagan@virtuozzo.com>
+	<20180206203048.11096-22-rkagan@virtuozzo.com>
+	<f7e37a67-b1fc-c4cf-a7d1-a958b3b84f5c@redhat.com>
+	<20180207192823.GF18247@rkaganb.sw.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9697e678-91d1-7426-d648-5c0c68f6db81@redhat.com>
+Date: Thu, 8 Feb 2018 16:04:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <f889c2c4-aae1-a7c1-7024-db0ace96b36a@redhat.com>
+In-Reply-To: <20180207192823.GF18247@rkaganb.sw.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <3b858269-8de8-7c95-e24f-640a7e4bbfa6@de.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v7] s390x/cpu: expose the
- guest crash information
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 21/34] vmbus: build configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,85 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>
-Cc: Thomas Huth <thuth@redhat.com>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
 
-
-
-On 02/08/2018 03:20 PM, Eric Blake wrote:
-> On 02/08/2018 03:57 AM, Christian Borntraeger wrote:
->> This patch is the s390 implementation of guest crash information,
->> similar to commit d187e08dc4 ("i386/cpu: add crash-information QOM
->> property") and the related commits. We will detect several crash
->> reasons, with the "disabled wait" being the most important one, since
->> this is used by all s390 guests as a "panic like" notification.
+On 07/02/2018 20:30, Roman Kagan wrote:
+> On Wed, Feb 07, 2018 at 12:04:01PM +0100, Paolo Bonzini wrote:
+>> On 06/02/2018 21:30, Roman Kagan wrote:
+>>> From: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+>>>
+>>> Add option to configure and makefiles to enable building vmbus support
+>>> (default to "on" on Linux and "off" otherwise).
 >>
->=20
->> Co-authored-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->=20
->> +##
->> +# @GuestPanicInformationS390:
->> +#
->> +# S390 specific guest panic information (PSW)
->> +#
->> +# @core: core id of the CPU that crashed
->> +# @psw-mask: control fields of guest PSW
->> +# @psw-addr: guest instruction address
->> +# @reason: guest crash reason in human readable form
->> +#
->> +# Since: 2.12
->> +##
->> +{'struct': 'GuestPanicInformationS390',
->> + 'data': { 'core': 'uint32',
->=20
-> Should core be optional,...
->=20
->=20
->> +static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
->> +{
->> +=C2=A0=C2=A0=C2=A0 GuestPanicInformation *panic_info;
->> +=C2=A0=C2=A0=C2=A0 S390CPU *cpu =3D S390_CPU(cs);
->> +
->> +=C2=A0=C2=A0=C2=A0 cpu_synchronize_state(cs);
->> +=C2=A0=C2=A0=C2=A0 panic_info =3D g_malloc0(sizeof(GuestPanicInformat=
-ion));
->> +
->> +=C2=A0=C2=A0=C2=A0 panic_info->type =3D GUEST_PANIC_INFORMATION_TYPE_=
-S390;
->> +#if !defined(CONFIG_USER_ONLY)
->> +=C2=A0=C2=A0=C2=A0 panic_info->u.s390.core =3D cpu->env.core_id;
->> +#endif
->=20
-> ...given that it is only conditionally assigned?=C2=A0 If so, you'd als=
-o need to set panic_info->u.s390.has_core when you have a core id to expo=
-se.
+>> Maybe default to on if KVM is supported?  Could it just be
+>>
+>> CONFIG_VMBUS=$(CONFIG_KVM)
+>>
+>> in default-configs/ instead of having a configure option?
+> 
+> Then there won't be an obvious way to turn it off, will there be?
 
-Can we simply set it to 0 here and keep it mandatory? After all for
-linux-user the qapi interface really makes not a lot of sense.
+Distros can and do patch default-configs/.  It's not very obvious, I
+agree, but then it's what we suggest to do in order to turn off all
+those old, hardly maintained ISA devices.  So to some extent it's a
+documentation problem.
 
-
->=20
->=20
->> +
->> +static void s390_cpu_get_crash_info_qom(Object *obj, Visitor *v,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 const char *name, void *opaque,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 Error **errp)
->> +{
->> +=C2=A0=C2=A0=C2=A0 CPUState *cs =3D CPU(obj);
->> +=C2=A0=C2=A0=C2=A0 GuestPanicInformation *panic_info;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (!cs->crash_occurred) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "No crash=
- occured");
->=20
-> s/occured/occurred/
->=20
-yes
+Paolo
