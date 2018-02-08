@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejrZA-00062Z-AD
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:09:05 -0500
+	(envelope-from <mst@redhat.com>) id 1ejrZA-000636-MB
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejrZ9-0008G0-11
+	(envelope-from <mst@redhat.com>) id 1ejrZ9-0008GL-EZ
 	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:09:04 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50872 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52390 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejrZ8-0008FX-RO
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:09:02 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejrZ9-0008Fv-7k
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:09:03 -0500
 Date: Thu, 8 Feb 2018 21:09:02 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1518116908-10852-6-git-send-email-mst@redhat.com>
+Message-ID: <1518116908-10852-7-git-send-email-mst@redhat.com>
 References: <1518116908-10852-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1518116908-10852-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 05/26] vhost: Simplify ring verification checks
+Subject: [Qemu-devel] [PULL 06/26] vhost: Merge sections added to temporary
+ list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,166 +32,138 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-vhost_verify_ring_mappings() were used to verify that
-rings are still accessible and related memory hasn't
-been moved after flatview is updated.
+As sections are reported by the listener to the _nop and _add
+methods, add them to the temporary section list but now merge them
+with the previous section if the new one abuts and the backend allows.
 
-It was doing checks by mapping ring's GPA+len and
-checking that HVA hadn't changed with new memory map.
-To avoid maybe expensive mapping call, we were
-identifying address range that changed and were doing
-mapping only if ring was in changed range.
-
-However it's not neccessary to perform ring's GPA
-mapping as we already have its current HVA and all
-we need is to verify that ring's GPA translates to
-the same HVA in updated flatview.
-
-This will allow the following patches to simplify the range
-comparison that was previously needed to avoid expensive
-verify_ring_mapping calls.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-with modifications by:
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/vhost.c | 79 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 42 insertions(+), 37 deletions(-)
+ hw/virtio/vhost.c      | 76 ++++++++++++++++++++++++++++++++++++++++++++------
+ hw/virtio/trace-events |  4 +++
+ 2 files changed, 71 insertions(+), 9 deletions(-)
 
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 92c9500..91cab51 100644
+index 91cab51..351c691 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -455,35 +455,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
-     }
+@@ -709,14 +709,71 @@ out:
+     return;
  }
  
--static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
--                                          void *part,
--                                          uint64_t part_addr,
--                                          uint64_t part_size,
--                                          uint64_t start_addr,
--                                          uint64_t size)
--{
--    hwaddr l;
--    void *p;
--    int r = 0;
--
--    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
-+static int vhost_verify_ring_part_mapping(void *ring_hva,
-+                                          uint64_t ring_gpa,
-+                                          uint64_t ring_size,
-+                                          void *reg_hva,
-+                                          uint64_t reg_gpa,
-+                                          uint64_t reg_size)
-+{
-+    uint64_t hva_ring_offset;
-+    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
-+    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
-+
-+    if (ring_last < reg_gpa || ring_gpa > reg_last) {
-         return 0;
-     }
--    l = part_size;
--    p = vhost_memory_map(dev, part_addr, &l, 1);
--    if (!p || l != part_size) {
--        r = -ENOMEM;
-+    /* check that whole ring's is mapped */
-+    if (ring_last > reg_last) {
-+        return -ENOMEM;
-     }
--    if (p != part) {
--        r = -EBUSY;
-+    /* check that ring's MemoryRegion wasn't replaced */
-+    hva_ring_offset = ring_gpa - reg_gpa;
-+    if (ring_hva != reg_hva + hva_ring_offset) {
-+        return -EBUSY;
-     }
--    vhost_memory_unmap(dev, p, l, 0, 0);
--    return r;
-+
-+    return 0;
- }
- 
- static int vhost_verify_ring_mappings(struct vhost_dev *dev,
--                                      uint64_t start_addr,
--                                      uint64_t size)
-+                                      void *reg_hva,
-+                                      uint64_t reg_gpa,
-+                                      uint64_t reg_size)
+-static void vhost_add_section(struct vhost_dev *dev,
+-                              MemoryRegionSection *section)
++/* Adds the section data to the tmp_section structure.
++ * It relies on the listener calling us in memory address order
++ * and for each region (via the _add and _nop methods) to
++ * join neighbours.
++ */
++static void vhost_region_add_section(struct vhost_dev *dev,
++                                     MemoryRegionSection *section)
  {
-     int i, j;
-     int r = 0;
-@@ -497,22 +499,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-         struct vhost_virtqueue *vq = dev->vqs + i;
- 
-         j = 0;
--        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
--                                           vq->desc_size, start_addr, size);
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
--                                           vq->avail_size, start_addr, size);
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
--                                           vq->used_size, start_addr, size);
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
-         }
-@@ -635,13 +640,11 @@ static void vhost_commit(MemoryListener *listener)
- {
-     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-                                          memory_listener);
--    hwaddr start_addr = 0;
--    ram_addr_t size = 0;
-     MemoryRegionSection *old_sections;
-     int n_old_sections;
--
-     uint64_t log_size;
-     int r;
-+    int i;
- 
-     old_sections = dev->mem_sections;
-     n_old_sections = dev->n_mem_sections;
-@@ -658,12 +661,14 @@ static void vhost_commit(MemoryListener *listener)
-         goto out;
-     }
- 
--    if (dev->started) {
--        start_addr = dev->mem_changed_start_addr;
--        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
--
--        r = vhost_verify_ring_mappings(dev, start_addr, size);
--        assert(r >= 0);
-+    for (i = 0; i < dev->mem->nregions; i++) {
-+        if (vhost_verify_ring_mappings(dev,
-+                       (void *)(uintptr_t)dev->mem->regions[i].userspace_addr,
-+                       dev->mem->regions[i].guest_phys_addr,
-+                       dev->mem->regions[i].memory_size)) {
-+            error_report("Verify ring failure on region %d", i);
-+            abort();
+-    ++dev->n_tmp_sections;
+-    dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
+-                                dev->n_tmp_sections);
+-    dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
+-    memory_region_ref(section->mr);
++    bool need_add = true;
++    uint64_t mrs_size = int128_get64(section->size);
++    uint64_t mrs_gpa = section->offset_within_address_space;
++    uintptr_t mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
++                         section->offset_within_region;
++
++    trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
++                                   mrs_host);
++
++    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
++                        ~(1 << DIRTY_MEMORY_MIGRATION);
++    if (log_dirty) {
++        return;
++    }
++
++    if (dev->n_tmp_sections) {
++        /* Since we already have at least one section, lets see if
++         * this extends it; since we're scanning in order, we only
++         * have to look at the last one, and the FlatView that calls
++         * us shouldn't have overlaps.
++         */
++        MemoryRegionSection *prev_sec = dev->tmp_sections +
++                                               (dev->n_tmp_sections - 1);
++        uint64_t prev_gpa_start = prev_sec->offset_within_address_space;
++        uint64_t prev_size = int128_get64(prev_sec->size);
++        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start, prev_size);
++        uint64_t prev_host_start =
++                        (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
++                        prev_sec->offset_within_region;
++        uint64_t prev_host_end   = range_get_last(prev_host_start, prev_size);
++
++        if (prev_gpa_end + 1 == mrs_gpa &&
++            prev_host_end + 1 == mrs_host &&
++            section->mr == prev_sec->mr &&
++            (!dev->vhost_ops->vhost_backend_can_merge ||
++                dev->vhost_ops->vhost_backend_can_merge(dev,
++                    mrs_host, mrs_size,
++                    prev_host_start, prev_size))) {
++            /* The two sections abut */
++            need_add = false;
++            prev_sec->size = int128_add(prev_sec->size, section->size);
++            trace_vhost_region_add_section_abut(section->mr->name,
++                                                mrs_size + prev_size);
 +        }
++    }
++
++    if (need_add) {
++        ++dev->n_tmp_sections;
++        dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
++                                    dev->n_tmp_sections);
++        dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
++        /* The flatview isn't stable and we don't use it, making it NULL
++         * means we can memcmp the list.
++         */
++        dev->tmp_sections[dev->n_tmp_sections - 1].fv = NULL;
++        memory_region_ref(section->mr);
++    }
+ }
+ 
+ static void vhost_region_add(MemoryListener *listener,
+@@ -728,11 +785,12 @@ static void vhost_region_add(MemoryListener *listener,
+     if (!vhost_section(section)) {
+         return;
+     }
++    vhost_region_add_section(dev, section);
+ 
+-    vhost_add_section(dev, section);
+     vhost_set_memory(listener, section, true);
+ }
+ 
++/* Called on regions that have not changed */
+ static void vhost_region_nop(MemoryListener *listener,
+                              MemoryRegionSection *section)
+ {
+@@ -743,7 +801,7 @@ static void vhost_region_nop(MemoryListener *listener,
+         return;
      }
  
-     if (!dev->log_enabled) {
+-    vhost_add_section(dev, section);
++    vhost_region_add_section(dev, section);
+ }
+ 
+ static void vhost_region_del(MemoryListener *listener,
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 775461a..ab9da06 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -1,5 +1,9 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
++# hw/virtio/vhost.c
++vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
++vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
++
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+ virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
 -- 
 MST
