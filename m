@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbrK-00007z-K5
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:22:47 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1ejdFv-0003iD-OS
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 22:52:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbrJ-0005Km-OQ
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:22:46 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60086 helo=mx1.redhat.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1ejdFs-00080x-Ki
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 22:52:15 -0500
+Received: from mga06.intel.com ([134.134.136.31]:45052)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ejbrJ-0005KQ-Jf
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:22:45 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3B10C40363AD
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 02:22:45 +0000 (UTC)
-Date: Thu, 8 Feb 2018 10:22:43 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180208022243.GD24289@lemon.usersys.redhat.com>
-References: <20180201022046.9425-1-famz@redhat.com>
-	<76a404cb-7163-e3f8-a97a-d75c3fda3b29@redhat.com>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1ejdFs-0007wi-AZ
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 22:52:12 -0500
+Message-ID: <5A7BCA07.2000704@intel.com>
+Date: Thu, 08 Feb 2018 11:54:47 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <76a404cb-7163-e3f8-a97a-d75c3fda3b29@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] docs: Add docs/devel/testing.rst
+References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
+	<1517915299-15349-3-git-send-email-wei.w.wang@intel.com>
+	<20180207014345-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180207014345-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: use the free page
+ reporting feature from balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Wed, 02/07 15:31, Paolo Bonzini wrote:
-> On 01/02/2018 03:20, Fam Zheng wrote:
-> > To make our efforts on QEMU testing easier to consume by contributors,
-> > let's add a document. For example, Patchew reports build errors on
-> > patches that should be relatively easy to reproduce with a few steps, and
-> > it is much nicer if there is such a documentation that it can refer to.
-> > 
-> > This focuses on how to run existing tests and how to write new test
-> > cases, without going into the frameworks themselves.
-> > 
-> > The VM based testing section is moved from tests/vm/README which now
-> > is a single line pointing to the new doc.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> 
-> Queued, thanks.
+On 02/07/2018 07:57 AM, Michael S. Tsirkin wrote:
+> On Tue, Feb 06, 2018 at 07:08:18PM +0800, Wei Wang wrote:
+>> Use the free page reporting feature from the balloon device to clear the
+>> bits corresponding to guest free pages from the dirty bitmap, so that the
+>> free memory are not sent.
+>>
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> CC: Michael S. Tsirkin <mst@redhat.com>
+>> CC: Juan Quintela <quintela@redhat.com>
+> What the patch seems to do is stop migration
+> completely - blocking until guest completes the reporting.
+>
+> Which makes no sense to me, since it's just an optimization.
+> Why not proceed with the migration? What do we have to loose?
 
-Thank you, I've included this in the pull request I just sent. :)
+If we want the optimization to run in parallel with the migration 
+thread, we will need to create another polling thread, like 
+multithreading compression. In that way, we will waste some host CPU. 
+For example, the migration thread may proceed to send pages to the 
+destination while the optimization thread is in progress, but those 
+pages may turn out to be free pages (this is likely in the bulk stage) 
+which don't need to be sent. In that case, why not let the migration 
+thread wait a little bit (i.e. put the optimization into the migration 
+thread) and proceed to do some useful things, instead of pretending to 
+proceed but doing useless things?
 
-Fam
+The current plan of this patch is to skip free pages for the bulk stage 
+only. I'm not sure if it would be useful for the 2nd stage onward, which 
+basically relies on the dirty logging to send pages that have been 
+written by the guest. For example, if the guest is not so active while 
+live migration happens, there will be very few dirty bits. This 
+optimization would be mostly clearing "0" bits from the dirty bitmap.
+
+
+> I imagine some people might want to defer migration until reporting
+> completes to reduce the load on the network. Fair enough,
+> but it does not look like you actually measured the reduction
+> in traffic. So I suggest you work on that as a separate feature.
+>
+
+I have the traffic data actually. Tested with 8G idle guest, Legacy v.s. 
+Optimization: ~390MB v.s. ~337MB.
+The legacy case has the zero page checking optimization, so the traffic 
+reduction is not very obvious. But zero checking has much more overhead, 
+which is demonstrated by the migration time (this optimization takes 
+~14% of the legacy migration time).
+
+
+Best,
+Wei
