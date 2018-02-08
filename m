@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ejnuL-0005Hr-UF
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:14:42 -0500
+	(envelope-from <el13635@mail.ntua.gr>) id 1ejnxp-00089l-Gs
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:18:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ejnuG-0001tn-TJ
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:14:41 -0500
-Date: Thu, 8 Feb 2018 16:14:14 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180208161414.073ac2c2.cohuck@redhat.com>
-In-Reply-To: <20180207155531.28446-1-cohuck@redhat.com>
-References: <20180207155531.28446-1-cohuck@redhat.com>
+	(envelope-from <el13635@mail.ntua.gr>) id 1ejnxl-0003lv-H2
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:18:17 -0500
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:32550)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1ejnxl-0003eD-4K
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 10:18:13 -0500
+Date: Thu, 8 Feb 2018 17:17:22 +0200
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20180208151722.5wrjrbi6dy7akdai@postretch>
+References: <CAJSP0QUpUG11mDRvyN1OWQ2m7Pn_btG2D27C_h=EnpcqEyXLZQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] s390x: maintainership reorg
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="n6dl3yfq7cej2524"
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QUpUG11mDRvyN1OWQ2m7Pn_btG2D27C_h=EnpcqEyXLZQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Throttling filter node status?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, thuth@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Wed,  7 Feb 2018 16:55:28 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Hi,
-> 
-> s390x maintainership is currently a bit like a huge pile of stuff routed
-> through one person who is not even listed as the maintainer for some
-> of the areas. Let's try to clean this up a bit.
-> 
-> Patch 1 is basically making official what I actually have been doing in
-> the last months; that is, acting as the overall s390x maintainer. There
-> does not seem to be the concept of "overall arch maintainer" in MAINTAINERS
-> so far, so I added it.
-> 
-> Where I want to go is basically a submaintainership model for s390x,
-> i.e. that I integrate the work in various areas and send it on. Patch 2
-> serves as a step in that direction, as Thomas has volunteered to look
-> after the s390-ccw bios (thanks!)
-> 
-> If that works out well, I plan to split out other parts as well. That
-> would make a lot of sense for those parts which I lack documentation
-> for, and also for parts where other folks could do a good job as well.
-> 
-> Speaking of other people: Patch 3 adds David as an additional maintainer
-> for tcg (thanks!).
-> 
-> Cornelia Huck (3):
->   MAINTAINERS: add myself as overall s390x maintainer
->   MAINTAINERS: reorganize s390-ccw bios maintainership
->   MAINTAINERS: add David as additional tcg/s390 maintainer
-> 
->  MAINTAINERS | 35 +++++++++++++++++++++++++++++++++--
->  1 file changed, 33 insertions(+), 2 deletions(-)
-> 
+--n6dl3yfq7cej2524
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Queued to s390-next.
+On Wed, Feb 07, 2018 at 06:35:20PM +0000, Stefan Hajnoczi wrote:
+>Hi Manos,
+>I hope you're doing well and that you've had a good time at university
+>after Google Summer of Code.
+>
+>Do you have time to work on getting the remainder of your GSoC work
+>merged over the coming weeks?
+>
+>If not, don't feel bad but please let us know so someone can take over
+>the patches.
+>
+>Stefan
+
+Hi Stefan, thanks for the reminder. I will try to catch up in the=20
+following days.
+
+--n6dl3yfq7cej2524
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlp8af4ACgkQc2J8L2kN
+9xAugg/9Gs4Ms7d5GNwODlDLaypZEGaH3Ak/pkoAkCNucrpTF05X5yvXPVRtCrif
+/6Zrf6xW1VYwobWoCq662VuvR/9xfL2vpy9QfFOzU5esl4psDhh5WalX6kJehP1L
+Pa+8PEj2ZB/Ta6FZdgmDVcFJCrs6rt6XqfF7erdrlaBKguxf+AOK7XKT8MCuOTag
+Q5Od3WsHYN47i0z73ocaeonuBGlEYgRBLCnmN2UwrFijcoCnuQF2c+8FwnQsBC2Y
+rHeOlXrWMvl4hyMJq75Yej/ZRojTgGjY7Tv2vpXPt8InR/b07R6sXRgT5iEd5Mxc
+vedPk3kMJ/fXQt0Ig+Fju2o0BexB5b3mzD8azDOTfEtdQobsw1cLqBkM8+tZ/boV
+f4YunYEDsVtSSSzgJETDQx1UzCIeCFUtbEWMf8JlTYxlk9eOVaCcA/9UWvjMOX15
+01JvfIMaebU+y/0qU8cD3NaefUR/fmob7+w1FiCk1cykjBU5cjgwCmg8KErXTSf4
+WXekqEgm3KaCdmHpnYKc4TCI9jojZrYk+VQBcQPTOcRscxnmdDx7xXN4ubxO7g9Q
+mAhQvplVC/8pycsecDiEBT4SEQG0H3ZHut4PJh/7ECU30uIhcxoS/EDA5/o7T2ur
+pe3m6MM9QqB2X5TH67er2KLMygrletPA8DDTg0+fJqwAZt/9Qzo=
+=+DUl
+-----END PGP SIGNATURE-----
+
+--n6dl3yfq7cej2524--
