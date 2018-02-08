@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejrW8-000362-4x
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:06:01 -0500
+	(envelope-from <mst@redhat.com>) id 1ejrZ6-0005vx-4F
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejrW4-0006P4-1n
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:05:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52248 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ejrZ2-00084K-0v
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:09:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52384 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejrW3-0006OC-Si
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:05:51 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A328404008D
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 19:05:40 +0000 (UTC)
-Date: Thu, 8 Feb 2018 21:05:36 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ejrZ1-000835-Rq
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 14:08:55 -0500
+Date: Thu, 8 Feb 2018 21:08:55 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180208210346-mutt-send-email-mst@kernel.org>
-References: <1517235657-22547-1-git-send-email-ghammer@redhat.com>
-	<1517235657-22547-3-git-send-email-ghammer@redhat.com>
+Message-ID: <1518116908-10852-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1517235657-22547-3-git-send-email-ghammer@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] virtio: improve virtio devices
- initialization time
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
+ fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,100 +26,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gal Hammer <ghammer@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Jan 29, 2018 at 04:20:57PM +0200, Gal Hammer wrote:
-> The loading time of a VM is quite significant when its virtio
-> devices use a large amount of virt-queues (e.g. a virtio-serial
-> device with max_ports=511). Most of the time is spend in the
-> creation of all the required event notifiers (ioeventfd and memory
-> regions).
-> 
-> This patch pack all the changes to the memory regions in a
-> single memory transaction.
-> 
-> Reported-by: Sitong Liu <address@hidden>
-> Reported-by: Xiaoling Gao <address@hidden>
+The following changes since commit 008a51bbb343972dd8cf09126da8c3b87f4e1c=
+96:
 
-Just a small note: the way to hide the address is not to put it in:
+  Merge remote-tracking branch 'remotes/famz/tags/staging-pull-request' i=
+nto staging (2018-02-08 14:31:51 +0000)
 
-Reported-by: Sitong Liu
-Reported-by: Xiaoling Gao
+are available in the git repository at:
 
-a stub email isn't needed, it merely confuses tools.
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-I've fixed this up for now, no need to worry.
+for you to fetch changes up to f4ac9b2e04e8d98854a97bc473353207765aa9e7:
 
-> Signed-off-by: Gal Hammer <ghammer@redhat.com>
-> ---
->  hw/virtio/virtio.c | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 3667cd6..006d3d1 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2572,8 +2572,9 @@ static Property virtio_properties[] = {
->  static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
->  {
->      VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
-> -    int n, r, err;
-> +    int i, n, r, err;
->  
-> +    memory_region_transaction_begin();
->      for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
->          VirtQueue *vq = &vdev->vq[n];
->          if (!virtio_queue_get_num(vdev, n)) {
-> @@ -2596,9 +2597,11 @@ static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
->          }
->          event_notifier_set(&vq->host_notifier);
->      }
-> +    memory_region_transaction_commit();
->      return 0;
->  
->  assign_error:
-> +    i = n; /* save n for a second iteration after transaction is committed. */
->      while (--n >= 0) {
->          VirtQueue *vq = &vdev->vq[n];
->          if (!virtio_queue_get_num(vdev, n)) {
-> @@ -2608,7 +2611,14 @@ assign_error:
->          event_notifier_set_handler(&vq->host_notifier, NULL);
->          r = virtio_bus_set_host_notifier(qbus, n, false);
->          assert(r >= 0);
-> -        virtio_bus_cleanup_host_notifier(qbus, n);
-> +    }
-> +    memory_region_transaction_commit();
-> +
-> +    while (--i >= 0) {
-> +        if (!virtio_queue_get_num(vdev, i)) {
-> +            continue;
-> +        }
-> +        virtio_bus_cleanup_host_notifier(qbus, i);
->      }
->      return err;
->  }
-> @@ -2626,6 +2636,7 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
->      VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
->      int n, r;
->  
-> +    memory_region_transaction_begin();
->      for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
->          VirtQueue *vq = &vdev->vq[n];
->  
-> @@ -2635,6 +2646,13 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
->          event_notifier_set_handler(&vq->host_notifier, NULL);
->          r = virtio_bus_set_host_notifier(qbus, n, false);
->          assert(r >= 0);
-> +    }
-> +    memory_region_transaction_commit();
-> +
-> +    for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
-> +        if (!virtio_queue_get_num(vdev, n)) {
-> +            continue;
-> +        }
->          virtio_bus_cleanup_host_notifier(qbus, n);
->      }
->  }
-> -- 
-> 2.7.5
+  virtio-balloon: include statistics of disk/file caches (2018-02-08 21:0=
+6:42 +0200)
+
+----------------------------------------------------------------
+virtio,vhost,pci,pc: features, fixes and cleanups
+
+- a new vhost crypto device
+- new stats in virtio balloon
+- virtio eventfd rework for boot speedup
+- vhost memory rework for boot speedup
+- fixes and cleanups all over the place
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Changpeng Liu (1):
+      virtio-blk: enable multiple vectors when using multiple I/O queues
+
+Dr. David Alan Gilbert (7):
+      vhost: Build temporary section list and deref after commit
+      vhost: Simplify ring verification checks
+      vhost: Merge sections added to temporary list
+      vhost: Regenerate region list from changed sections list
+      vhost: Clean out old vhost_set_memory and friends
+      vhost: Merge and delete unused callbacks
+      vhost: Move log_dirty check
+
+Gal Hammer (2):
+      virtio: remove event notifier cleanup call on de-assign
+      virtio: improve virtio devices initialization time
+
+Gonglei (4):
+      cryptodev: add vhost-user as a new cryptodev backend
+      cryptodev: add vhost support
+      cryptodev-vhost-user: add crypto session handler
+      cryptodev-vhost-user: set the key length
+
+Igor Mammedov (1):
+      tests: acpi: fix FADT not being compared to reference table
+
+Laszlo Ersek (1):
+      pci-bridge/i82801b11: clear bridge registers on platform reset
+
+Marcel Apfelbaum (1):
+      hw/pci-bridge: fix pcie root port's IO hints capability
+
+Michael S. Tsirkin (3):
+      Revert "vhost: add traces for memory listeners"
+      lpc: drop pcie host dependency
+      acpi-test: update FADT
+
+Peter Xu (1):
+      pci/bus: let it has higher migration priority
+
+Tiwei Bie (1):
+      virtio-balloon: unref the memory region before continuing
+
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (1):
+      virtio-balloon: include statistics of disk/file caches
+
+Yongji Xie (2):
+      libvhost-user: Fix resource leak
+      libvhost-user: Support across-memory-boundary access
+
+Yoni Bettan (1):
+      pci: removed the is_express field since a uniform interface was ins=
+erted
+
+ docs/interop/vhost-user.txt                     |  26 ++
+ docs/pcie_pci_bridge.txt                        |   2 +-
+ configure                                       |  15 +
+ contrib/libvhost-user/libvhost-user.h           |   3 +-
+ include/hw/compat.h                             |   8 +
+ include/hw/pci/pci.h                            |   3 -
+ include/hw/pci/pci_bridge.h                     |   4 +-
+ include/hw/virtio/vhost-backend.h               |   8 +
+ include/hw/virtio/vhost.h                       |   5 +-
+ include/hw/virtio/virtio-bus.h                  |   2 +
+ include/hw/virtio/virtio-crypto.h               |   1 +
+ include/migration/vmstate.h                     |   1 +
+ include/standard-headers/linux/virtio_balloon.h |   3 +-
+ include/sysemu/cryptodev-vhost-user.h           |  47 +++
+ include/sysemu/cryptodev-vhost.h                | 154 ++++++++
+ include/sysemu/cryptodev.h                      |   8 +
+ backends/cryptodev-builtin.c                    |   1 +
+ backends/cryptodev-vhost-user.c                 | 379 ++++++++++++++++++
+ backends/cryptodev-vhost.c                      | 347 ++++++++++++++++
+ contrib/libvhost-user/libvhost-user.c           | 147 ++++++-
+ hw/block/dataplane/virtio-blk.c                 |   2 +
+ hw/block/nvme.c                                 |   1 -
+ hw/isa/lpc_ich9.c                               |   1 -
+ hw/net/e1000e.c                                 |   1 -
+ hw/pci-bridge/gen_pcie_root_port.c              |   1 +
+ hw/pci-bridge/i82801b11.c                       |   2 +
+ hw/pci-bridge/ioh3420.c                         |   1 +
+ hw/pci-bridge/pci_bridge_dev.c                  |   1 +
+ hw/pci-bridge/pcie_pci_bridge.c                 |   3 +-
+ hw/pci-bridge/pcie_root_port.c                  |   1 -
+ hw/pci-bridge/xio3130_downstream.c              |   2 +-
+ hw/pci-bridge/xio3130_upstream.c                |   2 +-
+ hw/pci-host/xilinx-pcie.c                       |   1 -
+ hw/pci/pci.c                                    |   8 +-
+ hw/pci/pci_bridge.c                             |  24 +-
+ hw/scsi/megasas.c                               |   4 -
+ hw/scsi/virtio-scsi-dataplane.c                 |   2 +
+ hw/usb/hcd-xhci.c                               |   9 +-
+ hw/vfio/pci.c                                   |   5 +-
+ hw/virtio/vhost-user.c                          | 104 +++++
+ hw/virtio/vhost.c                               | 504 ++++++++----------=
+------
+ hw/virtio/virtio-balloon.c                      |   2 +
+ hw/virtio/virtio-bus.c                          |  14 +-
+ hw/virtio/virtio-crypto.c                       |  70 ++++
+ hw/virtio/virtio-pci.c                          |  14 +-
+ hw/virtio/virtio.c                              |  22 +-
+ hw/xen/xen_pt.c                                 |   9 +-
+ tests/bios-tables-test.c                        |  35 +-
+ vl.c                                            |   6 +
+ backends/Makefile.objs                          |   6 +
+ hw/virtio/Makefile.objs                         |   2 +-
+ hw/virtio/trace-events                          |  12 +-
+ qemu-options.hx                                 |  21 +
+ tests/acpi-test-data/pc/FACP                    | Bin 116 -> 116 bytes
+ tests/acpi-test-data/q35/FACP                   | Bin 116 -> 244 bytes
+ 55 files changed, 1662 insertions(+), 394 deletions(-)
+ create mode 100644 include/sysemu/cryptodev-vhost-user.h
+ create mode 100644 include/sysemu/cryptodev-vhost.h
+ create mode 100644 backends/cryptodev-vhost-user.c
+ create mode 100644 backends/cryptodev-vhost.c
