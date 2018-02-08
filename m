@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41833)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpNO-0007fx-Bi
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:48:48 -0500
+	id 1ejpNR-0007gz-5u
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:48:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpNN-0003cm-JG
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:48:46 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:42933)
+	id 1ejpNQ-0003di-FH
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:48:49 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35399)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ejpNN-0003cX-El
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:48:45 -0500
-Received: by mail-qt0-x243.google.com with SMTP id i8so6976352qtj.9
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:48:45 -0800 (PST)
+	id 1ejpNQ-0003dY-AH
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:48:48 -0500
+Received: by mail-qt0-x242.google.com with SMTP id g14so6982934qti.2
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:48:48 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Feb 2018 13:47:52 -0300
-Message-Id: <20180208164818.7961-5-f4bug@amsat.org>
+Date: Thu,  8 Feb 2018 13:47:53 -0300
+Message-Id: <20180208164818.7961-6-f4bug@amsat.org>
 In-Reply-To: <20180208164818.7961-1-f4bug@amsat.org>
 References: <20180208164818.7961-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 04/30] sdhci: add a check_capab_baseclock()
- qtest
+Subject: [Qemu-devel] [PATCH v11 05/30] sdhci: add a check_capab_sdma() qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,47 +39,44 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/sdhci-test.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ tests/sdhci-test.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index e961f2b997..45caf66455 100644
+index 45caf66455..4b901b6cf1 100644
 --- a/tests/sdhci-test.c
 +++ b/tests/sdhci-test.c
-@@ -14,6 +14,7 @@
- #include "hw/pci/pci.h"
+@@ -15,6 +15,7 @@
  
  #define SDHC_CAPAB                      0x40
-+FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
+ FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
++FIELD(SDHC_CAPAB, SDMA,                     22, 1);
  #define SDHC_HCVER                      0xFE
  
  static const struct sdhci_t {
-@@ -93,6 +94,18 @@ static void check_capab_readonly(QSDHCI *s, uintptr_t addr)
-     g_assert_cmpuint(capab1, ==, capab0);
+@@ -106,6 +107,15 @@ static void check_capab_baseclock(QSDHCI *s, uintptr_t addr, uint8_t expec_freq)
+     g_assert_cmpuint(capab_freq, ==, expec_freq);
  }
  
-+static void check_capab_baseclock(QSDHCI *s, uintptr_t addr, uint8_t expec_freq)
++static void check_capab_sdma(QSDHCI *s, uintptr_t addr, bool supported)
 +{
-+    uint64_t capab, capab_freq;
++    uint64_t capab, capab_sdma;
 +
-+    if (!expec_freq) {
-+        return;
-+    }
 +    capab = sdhci_readq(s, addr, SDHC_CAPAB);
-+    capab_freq = FIELD_EX64(capab, SDHC_CAPAB, BASECLKFREQ);
-+    g_assert_cmpuint(capab_freq, ==, expec_freq);
++    capab_sdma = FIELD_EX64(capab, SDHC_CAPAB, SDMA);
++    g_assert_cmpuint(capab_sdma, ==, supported);
 +}
 +
  static QSDHCI *machine_start(const struct sdhci_t *test)
  {
      QSDHCI *s = g_new0(QSDHCI, 1);
-@@ -139,6 +152,7 @@ static void test_machine(const void *data)
+@@ -152,6 +162,7 @@ static void test_machine(const void *data)
  
      check_capab_capareg(s, test->sdhci.addr, test->sdhci.capab.reg);
      check_capab_readonly(s, test->sdhci.addr);
-+    check_capab_baseclock(s, test->sdhci.addr, test->sdhci.baseclock);
++    check_capab_sdma(s, test->sdhci.addr, test->sdhci.capab.sdma);
+     check_capab_baseclock(s, test->sdhci.addr, test->sdhci.baseclock);
  
      machine_stop(s);
- }
 -- 
 2.16.1
