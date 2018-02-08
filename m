@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejjfs-0008Fc-UY
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:43:30 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ejjuE-0004VA-Ab
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejjfn-0004tA-Ug
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:43:28 -0500
-References: <20180207163622.29935-1-pbonzini@redhat.com>
-	<20180207163622.29935-3-pbonzini@redhat.com>
-	<20180208013517.GB24289@lemon.usersys.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5ac0b76e-213a-60c3-c010-87512d3a564a@redhat.com>
-Date: Thu, 8 Feb 2018 11:42:56 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180208013517.GB24289@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: add block job opblockers for
- scsi-block
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ejjuA-0005hl-CH
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:58:18 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52080
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1ejjuA-0005ex-7A
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:58:14 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w18AuSHD170781
+	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 05:58:10 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g0jg6019e-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:58:09 -0500
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Thu, 8 Feb 2018 03:58:09 -0700
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Thu,  8 Feb 2018 08:57:54 -0200
+Message-Id: <20180208105754.19924-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] hw/audio/sb16.c: missing break statement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, John Arbuckle <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 08/02/2018 02:35, Fam Zheng wrote:
-> On Wed, 02/07 17:36, Paolo Bonzini wrote:
->> @@ -2626,6 +2656,36 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
->>  
->>      scsi_realize(&s->qdev, errp);
->>      scsi_generic_read_device_identification(&s->qdev);
->> +
->> +    /* For op blockers, due to lack of support for dirty bitmaps.  */
->> +    error_setg(&sb->mirror_source,
->> +               "scsi-block does not support acting as a mirroring source");
->> +    error_setg(&sb->commit_source,
->> +               "scsi-block does not support acting as an active commit source");
-> 
-> An alternative way would be adding BLOCK_OP_TYPE_DIRTY_BITMAP. The error message
-> will not be as nice but it can be useful for another (blockjob) operation that
-> requires dirty bitmap support, or another device that doesn't support dirty
-> bitmaps. Though there isn't one for now.
+This patch adds a break in the switch() statement of complete(),
+value 0x42:
 
-Yeah, I thought about it.  Another possibility is make BLOCK_OP_TYPE_* a
-bitmask.  Then you can easily add a single Error * for multiple
-blockers, and BLOCK_OP_TYPE_DIRTY_BITMAP can be defined as
-BLOCK_OP_TYPE_MIRROR_SOURCE|BLOCK_OP_TYPE_COMMIT_SOURCE; likewise for
-notifiers below.
+    case 0x42:              /* FT2 sets output freq with this, go figure */
+        qemu_log_mask(LOG_UNIMP, "cmd 0x42 might not do what it think it"
+                      " should\n");
+        break; <-------
+    case 0x41:
 
-Paolo
+The issue was found by Coverity (#1385841):
 
->> +
->> +    /* For op blockers, due to lack of support for write notifiers.  */
->> +    error_setg(&sb->backup_source,
->> +               "scsi-block does not support acting as a backup source");
->> +
->> +    sb->insert_bs.notify = scsi_block_insert_bs;
->> +    blk_add_insert_bs_notifier(s->qdev.conf.blk, &sb->insert_bs);
->> +    sb->remove_bs.notify = scsi_block_remove_bs;
->> +    blk_add_remove_bs_notifier(s->qdev.conf.blk, &sb->remove_bs);
->> +
->> +    scsi_block_insert_bs(&sb->insert_bs, s->qdev.conf.blk);
->> +}
->> +
->> +static void scsi_block_unrealize(SCSIDevice *dev, Error **errp)
->> +{
->> +    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
->> +    SCSIBlockState *sb = DO_UPCAST(SCSIBlockState, sd, s);
->> +
->> +    notifier_remove(&sb->insert_bs);
->> +    notifier_remove(&sb->remove_bs);
->> +    scsi_block_remove_bs(&sb->insert_bs, s->qdev.conf.blk);
->> +    error_free(sb->mirror_source);
->> +    error_free(sb->commit_source);
->> +    error_free(sb->backup_source);
->>  }
->>  
->>  typedef struct SCSIBlockReq {
->> @@ -3017,6 +3077,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
->>      SCSIDiskClass *sdc = SCSI_DISK_BASE_CLASS(klass);
->>  
->>      sc->realize      = scsi_block_realize;
->> +    sc->unrealize    = scsi_block_unrealize;
->>      sc->alloc_req    = scsi_block_new_request;
->>      sc->parse_cdb    = scsi_block_parse_cdb;
->>      sdc->dma_readv   = scsi_block_dma_readv;
->> @@ -3031,6 +3092,7 @@ static const TypeInfo scsi_block_info = {
->>      .name          = "scsi-block",
->>      .parent        = TYPE_SCSI_DISK_BASE,
->>      .class_init    = scsi_block_class_initfn,
->> +    .instance_size = sizeof(SCSIBlockState),
->>  };
->>  #endif
->>  
->> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
->> index c4e52a5fa3..a48a49ca79 100644
->> --- a/include/sysemu/block-backend.h
->> +++ b/include/sysemu/block-backend.h
->> @@ -182,6 +182,7 @@ void blk_set_guest_block_size(BlockBackend *blk, int align);
->>  void *blk_try_blockalign(BlockBackend *blk, size_t size);
->>  void *blk_blockalign(BlockBackend *blk, size_t size);
->>  bool blk_op_is_blocked(BlockBackend *blk, BlockOpType op, Error **errp);
->> +void blk_op_block(BlockBackend *blk, BlockOpType op, Error *reason);
->>  void blk_op_unblock(BlockBackend *blk, BlockOpType op, Error *reason);
->>  void blk_op_block_all(BlockBackend *blk, Error *reason);
->>  void blk_op_unblock_all(BlockBackend *blk, Error *reason);
->> -- 
->> 2.14.3
->>
->>
-> 
-> Fam
-> 
+    CID 1385841:  Control flow issues  (MISSING_BREAK)
+    The case for value "66" is not terminated by a 'break' statement.
+
+Fixes: 8ec660b80e ("hw/audio/sb16.c: change dolog() to qemu_log_mask()")
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+CC: John Arbuckle <programmingkidx@gmail.com>
+CC: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/audio/sb16.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
+index 31de264ab7..b2fdcd8437 100644
+--- a/hw/audio/sb16.c
++++ b/hw/audio/sb16.c
+@@ -744,6 +744,7 @@ static void complete (SB16State *s)
+         case 0x42:              /* FT2 sets output freq with this, go figure */
+             qemu_log_mask(LOG_UNIMP, "cmd 0x42 might not do what it think it"
+                           " should\n");
++            break;
+         case 0x41:
+             s->freq = dsp_get_hilo (s);
+             ldebug ("set freq %d\n", s->freq);
+-- 
+2.14.3
