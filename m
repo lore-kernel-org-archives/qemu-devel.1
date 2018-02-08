@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ejkPY-0003en-FD
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:30:41 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ejkSS-0005eK-Qp
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ejkPU-0002Cc-7F
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:30:40 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37044)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ejkPT-0002C6-WC
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:30:36 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w18BU88n054399
-	for <qemu-devel@nongnu.org>; Thu, 8 Feb 2018 06:30:35 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g0nk9gd0c-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 06:30:34 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 8 Feb 2018 11:30:31 -0000
-References: <20180202094241.59537-1-borntraeger@de.ibm.com>
-	<8d3af693-3dd8-20b7-c7c1-38d7c6cce65d@de.ibm.com>
-	<20180202113301.0522c7bc.cohuck@redhat.com>
-	<20180202113513.15c37b32.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 8 Feb 2018 12:30:28 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1ejkSO-00040p-Lr
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:33:40 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37886 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1ejkSO-00040Y-EX
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 06:33:36 -0500
+References: <20180207001615.1156.10547.stgit@gimli.home>
+	<20180207002632.1156.53770.stgit@gimli.home>
+	<983af1c6-a57a-43d8-2237-88e0d736905f@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <604f4a4d-6ea8-6ff2-c05a-3018f5910c0a@redhat.com>
+Date: Thu, 8 Feb 2018 12:33:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180202113513.15c37b32.cohuck@redhat.com>
+In-Reply-To: <983af1c6-a57a-43d8-2237-88e0d736905f@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <47ffc4f7-a66b-0328-d0bf-2d06ad0f7c30@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling -->
- stable 2.11.1?
+Subject: Re: [Qemu-devel] [RFC PATCH 3/5] vfio/quirks: Automatic ioeventfd
+ enabling for NVIDIA BAR0 quirks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,63 +30,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org
 
+Hi Alex,
 
-
-On 02/02/2018 11:35 AM, Cornelia Huck wrote:
-> On Fri, 2 Feb 2018 11:33:01 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
+On 08/02/18 12:10, Auger Eric wrote:
+> Hi Alex,
 > 
->> On Fri, 2 Feb 2018 10:43:18 +0100
->> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> On 07/02/18 01:26, Alex Williamson wrote:
+>> Record data writes that come through the NVIDIA BAR0 quirk, if we get
+>> enough in a row that we're only passing through, automatically enable
+>> an ioeventfd for it.  The primary target for this is the MSI-ACK
+>> that NVIDIA uses to allow the MSI interrupt to re-trigger, which is a
+>> 4-byte write, data value 0x0 to offset 0x704 into the quirk, 0x88704
+>> into BAR0 MMIO space.  For an interrupt latency sensitive micro-
+>> benchmark, this takes us from 83% of performance versus disabling the
+>> quirk entirely (which GeForce cannot do), to to almost 90%.
 >>
->>> On 02/02/2018 10:42 AM, Christian Borntraeger wrote:  
->>>> commit 67915de9f038 ("s390x/event-facility: variable-length event
->>>> masks") switches the sclp receive/send mask. This broke the sclp
->>>> lm console.  
+>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>> ---
+>>  hw/vfio/pci-quirks.c |   89 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  hw/vfio/pci.h        |    2 +
+>>  2 files changed, 89 insertions(+), 2 deletions(-)
 >>
->> Hum. Probably should add sclp-lm to my test setup.
->>
->>>>
->>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>> Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
->>>> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>    
->>>
->>> opps. Please fixup yourself Conny :-)  
->>
->> Well, you did cc: the original author :)
->>
->>>   
->>>> Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
->>>> Cc: qemu-stable@nongnu.org
->>>> ---
->>>>  hw/s390x/event-facility.c | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
->>>> index b0f71f4554..155a69467b 100644
->>>> --- a/hw/s390x/event-facility.c
->>>> +++ b/hw/s390x/event-facility.c
->>>> @@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
->>>>      ef->receive_mask = be32_to_cpu(tmp_mask);
->>>>
->>>>      /* return the SCLP's capability masks to the guest */
->>>> -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
->>>> +    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
->>>>      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
->>>>                mask_length, sizeof(tmp_mask));
->>>> -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
->>>> +    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
->>>>      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
->>>>                mask_length, sizeof(tmp_mask));
->>>>     
->>>   
->>
->> Thanks, applied.
+>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+>> index e4cf4ea2dd9c..e739efe601b1 100644lg
 > 
-> Oh, and as always, I still take R-bs until I prepare a pull req.
-> 
+>> --- a/hw/vfio/pci-quirks.c
+>> +++ b/hw/vfio/pci-quirks.c
+>> @@ -203,6 +203,7 @@ typedef struct VFIOConfigMirrorQuirk {
+>>      uint32_t offset;
+>>      uint8_t bar;
+>>      MemoryRegion *mem;
+>> +    uint8_t data[];
+> Do you foresee other usages of data besides the LastDataSet?
+>>  } VFIOConfigMirrorQuirk;
+>>  
+>>  static uint64_t vfio_generic_quirk_mirror_read(void *opaque,
+>> @@ -297,6 +298,50 @@ static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
+>>      g_free(ioeventfd);
+>>  }
+>>  
+> add a comment? user handler in case kvm ioeventfd setup failed?
+Forget that. I got confused. At this point you set an ioeventfd which
+must be handled on user space. In last patch you plug the kernel vfio
+handler through the new iotcl and only in case this fails you use the
+userspace handler. Hope I got it right.
 
-Would be good to have that in 2.11.1 stable as well I think
+Eric
+
+
+>> +static void vfio_ioeventfd_handler(void *opaque)
+>> +{
+>> +    VFIOIOEventFD *ioeventfd = opaque;
+>> +
+>> +    if (event_notifier_test_and_clear(&ioeventfd->e)) {
+>> +        vfio_region_write(ioeventfd->region, ioeventfd->region_addr,
+>> +                          ioeventfd->data, ioeventfd->size);
+>> +    }
+>> +}
+>> +
+>> +static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
+>> +                                          MemoryRegion *mr, hwaddr addr,
+>> +                                          unsigned size, uint64_t data,
+>> +                                          VFIORegion *region,
+>> +                                          hwaddr region_addr)
+>> +{
+>> +    VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
+>> +
+>> +    if (event_notifier_init(&ioeventfd->e, 0)) {
+>> +        g_free(ioeventfd);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    ioeventfd->mr = mr;
+>> +    ioeventfd->addr = addr;
+>> +    ioeventfd->size = size;
+>> +    ioeventfd->match_data = true;
+>> +    ioeventfd->data = data;
+>> +    ioeventfd->region = region;
+>> +    ioeventfd->region_addr = region_addr;
+> I found difficult to follow the different addr semantic.
+> I understand region_add is the offset % bar and addr is the offset %
+> mirror region. Maybe more explicit names would help (region = bar_region
+> and region_addr = bar_offset)
+>> +
+>> +    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
+>> +                        vfio_ioeventfd_handler, NULL, ioeventfd);
+>> +    memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr,
+>> +                              ioeventfd->size, ioeventfd->match_data,
+>> +                              ioeventfd->data, &ioeventfd->e);
+>> +
+>> +    info_report("Enabled automatic ioeventfd acceleration for %s region %d, "
+>> +                "offset 0x%"HWADDR_PRIx", data 0x%"PRIx64", size %u",
+>> +                vdev->vbasedev.name, region->nr, region_addr, data, size);
+>> +
+>> +    return ioeventfd;
+>> +}
+>> +
+>>  static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
+>>  {
+>>      VFIOQuirk *quirk;
+>> @@ -732,6 +777,13 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
+>>      trace_vfio_quirk_nvidia_bar5_probe(vdev->vbasedev.name);
+>>  }
+>>  
+>> +typedef struct LastDataSet {
+>> +    hwaddr addr;
+>> +    uint64_t data;
+>> +    unsigned size;
+>> +    int count;
+>> +} LastDataSet;
+>> +
+>>  /*
+>>   * Finally, BAR0 itself.  We want to redirect any accesses to either
+>>   * 0x1800 or 0x88000 through the PCI config space access functions.
+>> @@ -742,6 +794,7 @@ static void vfio_nvidia_quirk_mirror_write(void *opaque, hwaddr addr,
+>>      VFIOConfigMirrorQuirk *mirror = opaque;
+>>      VFIOPCIDevice *vdev = mirror->vdev;
+>>      PCIDevice *pdev = &vdev->pdev;
+>> +    LastDataSet *last = (LastDataSet *)&mirror->data;
+>>  
+>>      vfio_generic_quirk_mirror_write(opaque, addr, data, size);
+>>  
+>> @@ -756,6 +809,38 @@ static void vfio_nvidia_quirk_mirror_write(void *opaque, hwaddr addr,
+>>                            addr + mirror->offset, data, size);
+>>          trace_vfio_quirk_nvidia_bar0_msi_ack(vdev->vbasedev.name);
+>>      }
+>> +
+>> +    /*
+>> +     * Automatically add an ioeventfd to handle any repeated write with the
+>> +     * same data and size above the standard PCI config space header.  This is
+>> +     * primarily expected to accelerate the MSI-ACK behavior, such as noted
+>> +     * above.  Current hardware/drivers should trigger an ioeventfd at config
+>> +     * offset 0x704 (region offset 0x88704), with data 0x0, size 4.
+>> +     */
+>> +    if (addr > PCI_STD_HEADER_SIZEOF) {
+>> +        if (addr != last->addr || data != last->data || size != last->size) {
+>> +            last->addr = addr;
+>> +            last->data = data;
+>> +            last->size = size;
+>> +            last->count = 1;
+>> +        } else if (++last->count > 10) {
+> So here is the naive question about the "10" choice and also the fact
+> this needs to be consecutive accesses. I guess you observed this works
+> but at first sight this is not obvious to me.
+> 
+> Does anyone check potential overlaps between ioeventfd's [addr, addr +
+> size -1]?
+>> +            VFIOIOEventFD *ioeventfd;
+>> +
+>> +            ioeventfd = vfio_ioeventfd_init(vdev, mirror->mem, addr, size, data,
+>> +                                            &vdev->bars[mirror->bar].region,
+>> +                                            mirror->offset + addr);
+>> +            if (ioeventfd) {
+>> +                VFIOQuirk *quirk;
+>> +
+>> +                QLIST_FOREACH(quirk, &vdev->bars[mirror->bar].quirks, next) {
+>> +                    if (quirk->data == mirror) {
+>> +                        QLIST_INSERT_HEAD(&quirk->ioeventfds, ioeventfd, next);
+>> +                        break;
+>> +                    }
+>> +                }
+>> +            }
+>> +        }
+>> +    }
+> 
+> Thanks
+> 
+> Eric
+>>  }
+>>  
+>>  static const MemoryRegionOps vfio_nvidia_mirror_quirk = {
+>> @@ -776,7 +861,7 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
+>>      }
+>>  
+>>      quirk = vfio_quirk_alloc(1);
+>> -    mirror = quirk->data = g_malloc0(sizeof(*mirror));
+>> +    mirror = quirk->data = g_malloc0(sizeof(*mirror) + sizeof(LastDataSet));
+>>      mirror->mem = quirk->mem;
+>>      mirror->vdev = vdev;
+>>      mirror->offset = 0x88000;
+>> @@ -794,7 +879,7 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
+>>      /* The 0x1800 offset mirror only seems to get used by legacy VGA */
+>>      if (vdev->vga) {
+>>          quirk = vfio_quirk_alloc(1);
+>> -        mirror = quirk->data = g_malloc0(sizeof(*mirror));
+>> +        mirror = quirk->data = g_malloc0(sizeof(*mirror) + sizeof(LastDataSet));
+>>          mirror->mem = quirk->mem;
+>>          mirror->vdev = vdev;
+>>          mirror->offset = 0x1800;
+>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+>> index 146065c2f715..ec53b9935725 100644
+>> --- a/hw/vfio/pci.h
+>> +++ b/hw/vfio/pci.h
+>> @@ -32,6 +32,8 @@ typedef struct VFIOIOEventFD {
+>>      bool match_data;
+>>      uint64_t data;
+>>      EventNotifier e;
+>> +    VFIORegion *region;
+>> +    hwaddr region_addr;
+>>  } VFIOIOEventFD;
+>>  
+>>  typedef struct VFIOQuirk {
+>>
+> 
