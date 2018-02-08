@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3U-0003Qu-2C
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:17 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3V-0003Sv-C5
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejq3S-0006tA-O7
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:16 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36812)
+	(envelope-from <alex.bennee@linaro.org>) id 1ejq3T-0006v2-VJ
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:17 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34332)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejq3S-0006s4-FE
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:14 -0500
-Received: by mail-wm0-x242.google.com with SMTP id f3so11493305wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:14 -0800 (PST)
+	id 1ejq3T-0006tZ-K1
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:32:15 -0500
+Received: by mail-wm0-x242.google.com with SMTP id j21so408025wmh.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:32:15 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:45 +0000
-Message-Id: <20180208173157.24705-21-alex.bennee@linaro.org>
+Date: Thu,  8 Feb 2018 17:31:38 +0000
+Message-Id: <20180208173157.24705-14-alex.bennee@linaro.org>
 In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
 References: <20180208173157.24705-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 20/32] arm/translate-a64: add FP16 FCMxx
- (zero) to simd_two_reg_misc_fp16
+Subject: [Qemu-devel] [PATCH v2 13/32] arm/translate-a64: add FP16
+ FR[ECP/SQRT]S to simd_three_reg_same_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +33,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-I re-use the existing handle_2misc_fcmp_zero handler and tweak it
-slightly to deal with the half-precision case.
-
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/translate-a64.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ target/arm/helper-a64.c    | 34 ++++++++++++++++++++++++++++++++++
+ target/arm/helper-a64.h    |  2 ++
+ target/arm/translate-a64.c |  6 ++++++
+ 3 files changed, 42 insertions(+)
 
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index bdfcac111f..6358b42472 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -192,6 +192,10 @@ uint64_t HELPER(neon_cgt_f64)(float64 a, float64 b, void *fpstp)
+  * versions, these do a fully fused multiply-add or
+  * multiply-add-and-halve.
+  */
++#define float16_two make_float16(0x4000)
++#define float16_three make_float16(0x4200)
++#define float16_one_point_five make_float16(0x3e00)
++
+ #define float32_two make_float32(0x40000000)
+ #define float32_three make_float32(0x40400000)
+ #define float32_one_point_five make_float32(0x3fc00000)
+@@ -200,6 +204,21 @@ uint64_t HELPER(neon_cgt_f64)(float64 a, float64 b, void *fpstp)
+ #define float64_three make_float64(0x4008000000000000ULL)
+ #define float64_one_point_five make_float64(0x3FF8000000000000ULL)
+ 
++float16 HELPER(recpsf_f16)(float16 a, float16 b, void *fpstp)
++{
++    float_status *fpst = fpstp;
++
++    a = float16_squash_input_denormal(a, fpst);
++    b = float16_squash_input_denormal(b, fpst);
++
++    a = float16_chs(a);
++    if ((float16_is_infinity(a) && float16_is_zero(b)) ||
++        (float16_is_infinity(b) && float16_is_zero(a))) {
++        return float16_two;
++    }
++    return float16_muladd(a, b, float16_two, 0, fpst);
++}
++
+ float32 HELPER(recpsf_f32)(float32 a, float32 b, void *fpstp)
+ {
+     float_status *fpst = fpstp;
+@@ -230,6 +249,21 @@ float64 HELPER(recpsf_f64)(float64 a, float64 b, void *fpstp)
+     return float64_muladd(a, b, float64_two, 0, fpst);
+ }
+ 
++float16 HELPER(rsqrtsf_f16)(float16 a, float16 b, void *fpstp)
++{
++    float_status *fpst = fpstp;
++
++    a = float16_squash_input_denormal(a, fpst);
++    b = float16_squash_input_denormal(b, fpst);
++
++    a = float16_chs(a);
++    if ((float16_is_infinity(a) && float16_is_zero(b)) ||
++        (float16_is_infinity(b) && float16_is_zero(a))) {
++        return float16_one_point_five;
++    }
++    return float16_muladd(a, b, float16_three, float_muladd_halve_result, fpst);
++}
++
+ float32 HELPER(rsqrtsf_f32)(float32 a, float32 b, void *fpstp)
+ {
+     float_status *fpst = fpstp;
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 7900299efd..d347f473d4 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -29,8 +29,10 @@ DEF_HELPER_FLAGS_3(vfp_mulxd, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
+ DEF_HELPER_FLAGS_3(neon_ceq_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
+ DEF_HELPER_FLAGS_3(neon_cge_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
+ DEF_HELPER_FLAGS_3(neon_cgt_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
++DEF_HELPER_FLAGS_3(recpsf_f16, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
+ DEF_HELPER_FLAGS_3(recpsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
+ DEF_HELPER_FLAGS_3(recpsf_f64, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
++DEF_HELPER_FLAGS_3(rsqrtsf_f16, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
+ DEF_HELPER_FLAGS_3(rsqrtsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
+ DEF_HELPER_FLAGS_3(rsqrtsf_f64, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
+ DEF_HELPER_FLAGS_1(neon_addlp_s8, TCG_CALL_NO_RWG_SE, i64, i64)
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 0049111e6d..0efe9ae2fc 100644
+index 3eec52eb34..06fbf9df24 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -7769,14 +7769,14 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-                                    bool is_scalar, bool is_u, bool is_q,
-                                    int size, int rn, int rd)
- {
--    bool is_double = (size == 3);
-+    bool is_double = (size == MO_64);
-     TCGv_ptr fpst;
- 
-     if (!fp_access_check(s)) {
-         return;
-     }
- 
--    fpst = get_fpstatus_ptr(false);
-+    fpst = get_fpstatus_ptr(size == MO_16);
- 
-     if (is_double) {
-         TCGv_i64 tcg_op = tcg_temp_new_i64();
-@@ -7828,6 +7828,7 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-         TCGv_i32 tcg_res = tcg_temp_new_i32();
-         NeonGenTwoSingleOPFn *genfn;
-         bool swap = false;
-+        bool hp = (size == MO_16 ? true : false);
-         int pass, maxpasses;
- 
-         switch (opcode) {
-@@ -7835,16 +7836,16 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-             swap = true;
-             /* fall through */
-         case 0x2c: /* FCMGT (zero) */
--            genfn = gen_helper_neon_cgt_f32;
-+            genfn = hp ? gen_helper_advsimd_cgt_f16 : gen_helper_neon_cgt_f32;
+@@ -9869,6 +9869,9 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+         case 0x6: /* FMAX */
+             gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
              break;
-         case 0x2d: /* FCMEQ (zero) */
--            genfn = gen_helper_neon_ceq_f32;
-+            genfn = hp ? gen_helper_advsimd_ceq_f16 : gen_helper_neon_ceq_f32;
++        case 0x7: /* FRECPS */
++            gen_helper_recpsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         case 0x8: /* FMINNM */
+             gen_helper_advsimd_minnumh(tcg_res, tcg_op1, tcg_op2, fpst);
              break;
-         case 0x6d: /* FCMLE (zero) */
-             swap = true;
-             /* fall through */
-         case 0x6c: /* FCMGE (zero) */
--            genfn = gen_helper_neon_cge_f32;
-+            genfn = hp ? gen_helper_advsimd_cge_f16 : gen_helper_neon_cge_f32;
+@@ -9885,6 +9888,9 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+         case 0xe: /* FMIN */
+             gen_helper_advsimd_minh(tcg_res, tcg_op1, tcg_op2, fpst);
              break;
-         default:
-             g_assert_not_reached();
-@@ -7853,11 +7854,11 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-         if (is_scalar) {
-             maxpasses = 1;
-         } else {
--            maxpasses = is_q ? 4 : 2;
-+            maxpasses = hp ? (is_q ? 8 : 4) : (is_q ? 4 : 2);
-         }
- 
-         for (pass = 0; pass < maxpasses; pass++) {
--            read_vec_element_i32(s, tcg_op, rn, pass, MO_32);
-+            read_vec_element_i32(s, tcg_op, rn, pass, hp ? MO_16 : MO_32);
-             if (swap) {
-                 genfn(tcg_res, tcg_zero, tcg_op, fpst);
-             } else {
-@@ -7866,7 +7867,7 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-             if (is_scalar) {
-                 write_fp_sreg(s, rd, tcg_res);
-             } else {
--                write_vec_element_i32(s, tcg_res, rd, pass, MO_32);
-+                write_vec_element_i32(s, tcg_res, rd, pass, hp ? MO_16 : MO_32);
-             }
-         }
-         tcg_temp_free_i32(tcg_res);
-@@ -10766,7 +10767,19 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-     fpop = deposit32(opcode, 5, 1, a);
-     fpop = deposit32(fpop, 6, 1, u);
- 
-+    rd = extract32(insn, 0, 5);
-+    rn = extract32(insn, 5, 5);
-+
-     switch (fpop) {
-+    break;
-+    case 0x2c: /* FCMGT (zero) */
-+    case 0x2d: /* FCMEQ (zero) */
-+    case 0x2e: /* FCMLT (zero) */
-+    case 0x6c: /* FCMGE (zero) */
-+    case 0x6d: /* FCMLE (zero) */
-+        handle_2misc_fcmp_zero(s, fpop, is_scalar, 0, is_q, MO_16, rn, rd);
-+        return;
-+        break;
-     case 0x18: /* FRINTN */
-         need_rmode = true;
-         only_in_vector = true;
++        case 0xf: /* FRSQRTS */
++            gen_helper_rsqrtsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         case 0x13: /* FMUL */
+             gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
 -- 
 2.15.1
