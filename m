@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejpsq-00027V-5r
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:21:17 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ejpt8-0002Nx-Gt
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:21:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ejpsp-00065e-5U
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:21:16 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40191)
+	(envelope-from <alistair23@gmail.com>) id 1ejpt7-0006Kq-HE
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:21:34 -0500
+Received: from mail-lf0-x22f.google.com ([2a00:1450:4010:c07::22f]:46874)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ejpsp-00064L-0S
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:21:15 -0500
-Received: by mail-oi0-x242.google.com with SMTP id 8so4031913oix.7
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:21:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ejpt7-0006KP-8k
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:21:33 -0500
+Received: by mail-lf0-x22f.google.com with SMTP id q194so7443256lfe.13
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:21:33 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180207042438.15422-10-andrew.smirnov@gmail.com>
-References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
-	<20180207042438.15422-10-andrew.smirnov@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Feb 2018 17:20:53 +0000
-Message-ID: <CAFEAcA-=-+1A6toXM-ddP+iKBgHKh28Xq3VeGXfSLJ08xMRijA@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <CAFEAcA8Fo5gVsjVB5PdU6sKWZAZ2ZscUzEhiDMwZY-LiDGtqOA@mail.gmail.com>
+References: <cover.1516746211.git.alistair.francis@xilinx.com>
+	<29c39a6f9ce3734bf693581348ed78f4bff3e0ef.1516746211.git.alistair.francis@xilinx.com>
+	<CAFEAcA-eOMvYYv--wjs+i1wGG3AN1VueqZjtnE5vpBH=UavkfQ@mail.gmail.com>
+	<CAKmqyKPAmzwFkY5MAiPA-epY-HCbBfBpHGWdanvEef2keaSXew@mail.gmail.com>
+	<CAFEAcA8Fo5gVsjVB5PdU6sKWZAZ2ZscUzEhiDMwZY-LiDGtqOA@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 8 Feb 2018 09:21:01 -0800
+Message-ID: <CAKmqyKM7bO2dwPVkUSz5Mc=CrBWvFFAYY1vD4Q4bMht4=dVoww@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 09/14] pci: Use pci_config_size in
- pci_data_* accessors
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] xlnx-zynqmp-rtc: Add basic time
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 7 February 2018 at 04:24, Andrey Smirnov <andrew.smirnov@gmail.com> wrot=
-e:
-> Use pci_config_size (as opposed to PCI_CONFIG_SPACE_SIZE) in
-> pci_data_read() and pci_data_write(), so this function would work for
-> both classic PCI and PCIe use-cases.
+On Thu, Feb 8, 2018 at 7:42 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 26 January 2018 at 01:09, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> On Thu, Jan 25, 2018 at 3:36 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> I'm still not sure about having the current_tm struct fields
+>>> here rather than whatever the hardware's natural representation
+>>> of the current time is. Can you explain why you think this
+>>> is the best approach?
+>>
+>> This means that the only thing we have to track is the time that the
+>> user set, either through the QEMU command line arguments as an
+>> override or the original starting time. Then from there we can always
+>> calculate the correct offset based on our current time.
+>>
+>> I don't see a nicer way, otherwise we need to recalculate the natural
+>> representation before and after migration using something more
+>> complex. This way it's always the same logic, we just run it at init
+>> and after migration.
 >
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> ---
->  hw/pci/pci_host.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
-> index 5eaa935cb5..ea52ea07cd 100644
-> --- a/hw/pci/pci_host.c
-> +++ b/hw/pci/pci_host.c
-> @@ -89,30 +89,35 @@ uint32_t pci_host_config_read_common(PCIDevice *pci_d=
-ev, uint32_t addr,
->  void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, int len)
->  {
->      PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
-> -    uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
-> +    uint32_t config_addr;
->
->      if (!pci_dev) {
->          return;
->      }
->
-> +    config_addr =3D addr & (pci_config_size(pci_dev) - 1);
-> +
->      PCI_DPRINTF("%s: %s: addr=3D%02" PRIx32 " val=3D%08" PRIx32 " len=3D=
-%d\n",
->                  __func__, pci_dev->name, config_addr, val, len);
-> -    pci_host_config_write_common(pci_dev, config_addr, PCI_CONFIG_SPACE_=
-SIZE,
-> +    pci_host_config_write_common(pci_dev, config_addr,
-> +                                 pci_config_size(pci_dev),
->                                   val, len);
->  }
->
->  uint32_t pci_data_read(PCIBus *s, uint32_t addr, int len)
->  {
->      PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
-> -    uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
-> +    uint32_t config_addr;
->      uint32_t val;
->
->      if (!pci_dev) {
->          return ~0x0;
->      }
->
-> +    config_addr =3D addr & (pci_config_size(pci_dev) - 1);
-> +
->      val =3D pci_host_config_read_common(pci_dev, config_addr,
-> -                                      PCI_CONFIG_SPACE_SIZE, len);
-> +                                      pci_config_size(pci_dev), len);
->      PCI_DPRINTF("%s: %s: addr=3D%02"PRIx32" val=3D%08"PRIx32" len=3D%d\n=
-",
->                  __func__, pci_dev->name, config_addr, val, len);
->
+> Doing it this way round means that it gets complicated when the
+> guest writes to the RTC, though. At the moment I can't see anywhere
+> that sets the current_tm fields except for reset and post-migration.
+> Isn't something missing here? I'm wondering if this choice of
+> migration state is going to paint us into a corner for handling
+> guest-writes-to-rtc.
 
-I've just discovered that this breaks the e1000e-test:
+I don't have guest write support. The main focus was just allowing
+users to set the time when they boot QEMU. We haven't seen any request
+to allow guests to set the time, so I didn't bother.
 
-$ (cd build/clang; QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
-./tests/e1000e-test)
-/x86_64/e1000e/init: **
-ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/tests/e1000e-test.c:118:e=
-1000e_device_find:
-'e1000e_dev' should not be NULL
+Wouldn't adding guest write support just be as simple as converting
+the value written to a current_tm field?
 
-Any idea what's going on here?
+Alistair
 
-thanks
--- PMM
+>
+> thanks
+> -- PMM
+>
