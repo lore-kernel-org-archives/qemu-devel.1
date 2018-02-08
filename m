@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ejouh-0003Ef-6H
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:19:09 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ejowF-0004Pp-GD
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ejoug-0001OH-AD
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:19:07 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:44721)
+	(envelope-from <richard.henderson@linaro.org>) id 1ejowA-0002oT-Ih
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:20:43 -0500
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:39694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ejoug-0001Nx-3h
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:19:06 -0500
-Received: by mail-wr0-x236.google.com with SMTP id v31so5279163wrc.11
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:19:06 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ejowA-0002nw-C6
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:20:38 -0500
+Received: by mail-pg0-x22d.google.com with SMTP id w17so1766998pgv.6
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:20:38 -0800 (PST)
+References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
+	<1518053328-34687-12-git-send-email-mjc@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b1d5d225-7a48-160b-2d24-3f2fb601a09a@linaro.org>
+Date: Thu, 8 Feb 2018 08:20:34 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180208151722.5wrjrbi6dy7akdai@postretch>
-References: <CAJSP0QUpUG11mDRvyN1OWQ2m7Pn_btG2D27C_h=EnpcqEyXLZQ@mail.gmail.com>
-	<20180208151722.5wrjrbi6dy7akdai@postretch>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 8 Feb 2018 16:19:04 +0000
-Message-ID: <CAJSP0QW-QY9Ytbcb_QmsYy4VTCKZpo5+JjoHg0LaZW=kOHNBHA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Throttling filter node status?
+In-Reply-To: <1518053328-34687-12-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 11/23] RISC-V Linux User Emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On Thu, Feb 8, 2018 at 3:17 PM, Manos Pitsidianakis
-<el13635@mail.ntua.gr> wrote:
-> On Wed, Feb 07, 2018 at 06:35:20PM +0000, Stefan Hajnoczi wrote:
->>
->> Hi Manos,
->> I hope you're doing well and that you've had a good time at university
->> after Google Summer of Code.
->>
->> Do you have time to work on getting the remainder of your GSoC work
->> merged over the coming weeks?
->>
->> If not, don't feel bad but please let us know so someone can take over
->> the patches.
->>
->> Stefan
->
->
-> Hi Stefan, thanks for the reminder. I will try to catch up in the following
-> days.
+On 02/07/2018 05:28 PM, Michael Clark wrote:
+> +/* not RISC-V exception codes - this is for qemu user-mode */
+> +#define QEMU_USER_EXCP_FAULT               0xd
 
-Excellent, thanks!
+Any reason to define this instead of using RISCV_EXCP_LOAD_ADDR_MIS/ACCESS_FAULT?
 
-Stefan
+Otherwise this looks fine.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
