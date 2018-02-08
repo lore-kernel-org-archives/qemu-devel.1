@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejg33-0008Nw-1V
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 01:51:10 -0500
+	(envelope-from <ciro.santilli@gmail.com>) id 1ejgjw-0001VP-HW
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 02:35:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejg2y-0003X6-5Z
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 01:51:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45928)
+	(envelope-from <ciro.santilli@gmail.com>) id 1ejgju-0002l0-W9
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 02:35:28 -0500
+Received: from mail-io0-x234.google.com ([2607:f8b0:4001:c06::234]:45501)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejg2x-0003W3-Uo
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 01:51:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejg2v-00071F-Ns
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 06:51:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 67BCD2E80DD
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 06:51:01 +0000 (UTC)
+	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
+	id 1ejgju-0002km-Op
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 02:35:26 -0500
+Received: by mail-io0-x234.google.com with SMTP id p188so4818389ioe.12
+	for <qemu-devel@nongnu.org>; Wed, 07 Feb 2018 23:35:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Feb 2018 06:43:36 -0000
-From: Thomas Huth <1739378@bugs.launchpad.net>
-Reply-To: Bug 1739378 <1739378@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
-Message-Id: <151807221687.3056.18201094557189832608.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739378] Re: migration state save/load of sdcard
- device is broken
+In-Reply-To: <002401d3a010$8d551280$a7ff3780$@ru>
+References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
+	<002401d3a010$8d551280$a7ff3780$@ru>
+From: Ciro Santilli <ciro.santilli@gmail.com>
+Date: Thu, 8 Feb 2018 07:35:05 +0000
+Message-ID: <CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,84 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>, war2jordan@live.com, Igor R <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, kraxel@redhat.com, Thomas Dullien <thomas.dullien@googlemail.com>, pbonzini@redhat.com, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-The patch has been merged here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D0cb57cc701839e7358918
+On Wed, Feb 7, 2018 at 12:38 PM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+> > From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
+> > Can you provide a test branch somewhere so I can easily test it out?
+>
+> Here it is: https://github.com/ispras/qemu/tree/rr-180207
+>
+> Pavel Dovgalyuk
+>
+> Awesome! This worked with my test procedure described at:
+https://stackoverflow.com/questions/46970215/how-to-use-qemus-deterministic-record-and-replay-feature-for-a-linux-kernel-boo
 
--- =
+While we are a it, can we clarify the following points the docs?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739378
+1) Usage of the record/replay: mentions that `-net none` is required,
+unless a network patch is applied.
 
-Title:
-  migration state save/load of sdcard device is broken
+But the network section that follows explains how to record network
+requests, and I've tested it, so I think the `-net none` / patch
+requirement is just outdated and should be removed.
 
-Status in QEMU:
-  Fix Committed
+2) There are mentions of "reverse execution" and "reverse debugging" on the
+"Record/replay" section.
 
-Bug description:
-  I'm having different issues trying to have QEMU snapshots working
-  using qemu-system-arm with vexpress-a15 board.
+Are those supported? If yes, explain there how to use them. Otherwise,
+remove the mentions.
 
-  In this opportunity, I'm trying the git master head version:
-  # git rev-parse HEAD
-  af352675efb7e92a1f5f6461a042a12015ab3d12
+I would love to see that feature!
 
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb
-  audio: Could not init `oss' audio driver
+3) Is the snapshot feature mentioned in the "Snapshotting" section
+something specific to record and replay?
 
-  Later on, when the machine finishes booting I savevm ss and quit.
-  However, when I try to restore it, I have that Missing section footer
-  error:
+If yes, can we detail further how to use it besides passing
+`rrsnapshot=snapshot_name`? How to create and restore the snapshots?
 
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm ss
-  audio: Could not init `oss' audio driver
-  qemu-system-arm: Missing section footer for sd-card
-  qemu-system-arm: Error -22 while loading VM state
+If not, why does the `rrsnapshot=snapshot_name` option exist?
 
-  OS: Ubuntu 16.04.3 LTS (xenial)
+4) Maybe give the required disk and network commands under "Usage of the
+record/replay:"
 
-  $ gcc --version
-  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
+ -drive file=disk.qcow,if=none,id=img-direct
+ -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
+ -device ide-hd,drive=img-blkreplay
 
-  How have I built it?
-  # git clone git://git.qemu.org/qemu.git
-  # cd qemu
-  # git submodule update --init --checkout
-  # make clean && ./configure --target-list=3Darm-softmmu && make -j8
-  # sudo make install
+ -netdev user,id=net1 -device rtl8139,netdev=net1
+ -object filter-replay,id=replay,netdev=net1
 
-  I've also tried a different ./configure line, explicitly enabling some
-  of the features, i.e. smartcard, with the same results:
-
-  ./configure '--disable-user' '--enable-system' '--enable-linux-user'
-  '--enable-modules' '--enable-linux-aio' '--audio-drv-list=3Dpa'
-  '--enable-attr' '--enable-brlapi' '--enable-virtfs' '--enable-cap-ng'
-  '--enable-curl' '--enable-fdt' '--enable-gnutls' '--disable-gtk'
-  '--disable-vte' '--enable-libiscsi' '--enable-curses' '--enable-
-  smartcard' '--enable-rbd' '--enable-vnc-sasl' '--enable-seccomp'
-  '--enable-spice' '--enable-libusb' '--enable-usb-redir' '--enable-
-  xfsctl' '--enable-vnc' '--enable-vnc-jpeg' '--enable-vnc-png'
-  '--enable-kvm' '--enable-vhost-net'
-
-  As a reference, and just in case these may be in some way related,
-  I've just submitted another ticket for a different issue with
-  snapshots using Ubuntu Qemu version
-  (https://bugs.launchpad.net/qemu/+bug/1739371)
-
-  Cheers,
-  Gus
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739378/+subscriptions
+People likely always want those, but it currently requires reading through
+the whole doc file to put everything together.
