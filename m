@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbor-00060u-7Z
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:14 -0500
+	(envelope-from <famz@redhat.com>) id 1ejbos-00063d-HU
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ejbon-0004JK-9K
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:13 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49838 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1ejbor-0004Oe-9o
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:14 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53800 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ejbon-0004IR-3B
-	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:09 -0500
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ejboq-0004Nw-Oh
+	for qemu-devel@nongnu.org; Wed, 07 Feb 2018 21:20:13 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Thu,  8 Feb 2018 10:19:39 +0800
-Message-Id: <20180208021953.7354-3-famz@redhat.com>
+Date: Thu,  8 Feb 2018 10:19:41 +0800
+Message-Id: <20180208021953.7354-5-famz@redhat.com>
 In-Reply-To: <20180208021953.7354-1-famz@redhat.com>
 References: <20180208021953.7354-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 02/16] test-coroutine: add simple CoMutex test
+Subject: [Qemu-devel] [PULL 04/16] coroutine-lock: convert CoQueue to use
+ QemuLockable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +29,78 @@ Cc: Peter Maydell <peter.maydell@linaro.org>
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-In preparation for adding a similar test using QemuLockable, add a very
-simple testcase that has two interleaved calls to lock and unlock.
+There are cases in which a queued coroutine must be restarted from
+non-coroutine context (with qemu_co_enter_next).  In this cases,
+qemu_co_enter_next also needs to be thread-safe, but it cannot use
+a CoMutex and so cannot qemu_co_queue_wait.  Use QemuLockable so
+that the CoQueue can interchangeably use CoMutex or QemuMutex.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20180203153935.8056-2-pbonzini@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180203153935.8056-4-pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/test-coroutine.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 48 insertions(+), 2 deletions(-)
+ include/qemu/coroutine.h   |  6 +++++-
+ util/qemu-coroutine-lock.c | 12 +++++++-----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/tests/test-coroutine.c b/tests/test-coroutine.c
-index 76c646107e..ab8fdf701e 100644
---- a/tests/test-coroutine.c
-+++ b/tests/test-coroutine.c
-@@ -175,7 +175,7 @@ static void coroutine_fn c1_fn(void *opaque)
-     qemu_coroutine_enter(c2);
- }
- 
--static void test_co_queue(void)
-+static void test_no_dangling_access(void)
- {
-     Coroutine *c1;
-     Coroutine *c2;
-@@ -195,6 +195,51 @@ static void test_co_queue(void)
-     *c1 = tmp;
- }
- 
-+static bool locked;
-+static int done;
-+
-+static void coroutine_fn mutex_fn(void *opaque)
-+{
-+    CoMutex *m = opaque;
-+    qemu_co_mutex_lock(m);
-+    assert(!locked);
-+    locked = true;
-+    qemu_coroutine_yield();
-+    locked = false;
-+    qemu_co_mutex_unlock(m);
-+    done++;
-+}
-+
-+static void do_test_co_mutex(CoroutineEntry *entry, void *opaque)
-+{
-+    Coroutine *c1 = qemu_coroutine_create(entry, opaque);
-+    Coroutine *c2 = qemu_coroutine_create(entry, opaque);
-+
-+    done = 0;
-+    qemu_coroutine_enter(c1);
-+    g_assert(locked);
-+    qemu_coroutine_enter(c2);
-+
-+    /* Unlock queues c2.  It is then started automatically when c1 yields or
-+     * terminates.
-+     */
-+    qemu_coroutine_enter(c1);
-+    g_assert_cmpint(done, ==, 1);
-+    g_assert(locked);
-+
-+    qemu_coroutine_enter(c2);
-+    g_assert_cmpint(done, ==, 2);
-+    g_assert(!locked);
-+}
-+
-+static void test_co_mutex(void)
-+{
-+    CoMutex m;
-+
-+    qemu_co_mutex_init(&m);
-+    do_test_co_mutex(mutex_fn, &m);
-+}
-+
- /*
-  * Check that creation, enter, and return work
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index 8a5129741c..1e5f0957e6 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -183,7 +183,9 @@ void qemu_co_queue_init(CoQueue *queue);
+  * caller of the coroutine.  The mutex is unlocked during the wait and
+  * locked again afterwards.
   */
-@@ -422,7 +467,7 @@ int main(int argc, char **argv)
-      * crash, so skip it.
-      */
-     if (CONFIG_COROUTINE_POOL) {
--        g_test_add_func("/basic/co_queue", test_co_queue);
-+        g_test_add_func("/basic/no-dangling-access", test_no_dangling_access);
+-void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex);
++#define qemu_co_queue_wait(queue, lock) \
++    qemu_co_queue_wait_impl(queue, QEMU_MAKE_LOCKABLE(lock))
++void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock);
+ 
+ /**
+  * Restarts the next coroutine in the CoQueue and removes it from the queue.
+@@ -271,4 +273,6 @@ void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
+  */
+ void coroutine_fn yield_until_fd_readable(int fd);
+ 
++#include "qemu/lockable.h"
++
+ #endif /* QEMU_COROUTINE_H */
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index 846ff9167f..2a66fc1467 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -40,13 +40,13 @@ void qemu_co_queue_init(CoQueue *queue)
+     QSIMPLEQ_INIT(&queue->entries);
+ }
+ 
+-void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
++void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock)
+ {
+     Coroutine *self = qemu_coroutine_self();
+     QSIMPLEQ_INSERT_TAIL(&queue->entries, self, co_queue_next);
+ 
+-    if (mutex) {
+-        qemu_co_mutex_unlock(mutex);
++    if (lock) {
++        qemu_lockable_unlock(lock);
      }
  
-     g_test_add_func("/basic/lifecycle", test_lifecycle);
-@@ -432,6 +477,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/basic/entered", test_entered);
-     g_test_add_func("/basic/in_coroutine", test_in_coroutine);
-     g_test_add_func("/basic/order", test_order);
-+    g_test_add_func("/locking/co-mutex", test_co_mutex);
-     if (g_test_perf()) {
-         g_test_add_func("/perf/lifecycle", perf_lifecycle);
-         g_test_add_func("/perf/nesting", perf_nesting);
+     /* There is no race condition here.  Other threads will call
+@@ -60,9 +60,11 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
+     /* TODO: OSv implements wait morphing here, where the wakeup
+      * primitive automatically places the woken coroutine on the
+      * mutex's queue.  This avoids the thundering herd effect.
++     * This could be implemented for CoMutexes, but not really for
++     * other cases of QemuLockable.
+      */
+-    if (mutex) {
+-        qemu_co_mutex_lock(mutex);
++    if (lock) {
++        qemu_lockable_lock(lock);
+     }
+ }
+ 
 -- 
 2.14.3
