@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejjRl-0004bX-No
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:28:55 -0500
+	(envelope-from <peterx@redhat.com>) id 1ejjUT-0006Cl-Cs
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ejjRi-0004Ex-HK
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:28:53 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37252 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ejjUP-0005MC-8z
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:41 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35990 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ejjRi-0004EJ-BU
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:28:50 -0500
-Date: Thu, 8 Feb 2018 11:28:33 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180208112833.34ad3b3d@redhat.com>
-In-Reply-To: <CAHNT7NuH1NYdKKau1GgADUGPq29TDxczJPh0GgQ+su5rxo5Lhg@mail.gmail.com>
-References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
-	<1517811767-75958-3-git-send-email-mjc@sifive.com>
-	<20180205160418.34544e1f@redhat.com>
-	<CAHNT7NsBQvruhfUpH2aP2BLfiASDU=b7Bsncqpih1ADohxo7cQ@mail.gmail.com>
-	<20180206160300.17cab7fb@redhat.com>
-	<CAHNT7NuH1NYdKKau1GgADUGPq29TDxczJPh0GgQ+su5rxo5Lhg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 03/22] RISC-V CPU Core Definition
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ejjUP-0005M4-30
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 05:31:37 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Thu,  8 Feb 2018 18:31:04 +0800
+Message-Id: <20180208103132.28452-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 00/28] Migration: postcopy failure recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,182 +21,420 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On Thu, 8 Feb 2018 15:19:13 +1300
-Michael Clark <mjc@sifive.com> wrote:
+Tree is pushed here for better reference and testing (online tree
+includes monitor OOB series):
 
-> On Wed, Feb 7, 2018 at 4:03 AM, Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > On Tue, 6 Feb 2018 11:09:56 +1300
-> > Michael Clark <mjc@sifive.com> wrote:
-> >  
-> > > On Tue, Feb 6, 2018 at 4:04 AM, Igor Mammedov <imammedo@redhat.com>  
-> > wrote:  
-> > >  
-> > > > On Mon,  5 Feb 2018 19:22:28 +1300
-> > > > Michael Clark <mjc@sifive.com> wrote:
-> > > >  
-> > > > > Add CPU state header, CPU definitions and initialization routines
-> > > > >
-> > > > > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > > > > ---
-> > > > >  target/riscv/cpu.c      | 385 ++++++++++++++++++++++++++++++  
-> > > > ++++++++++++++  
-> > > > >  target/riscv/cpu.h      | 256 +++++++++++++++++++++++++++++
-> > > > >  target/riscv/cpu_bits.h | 417 ++++++++++++++++++++++++++++++  
-> > > > ++++++++++++++++++  
-> > > > >  3 files changed, 1058 insertions(+)
-> > > > >  create mode 100644 target/riscv/cpu.c
-> > > > >  create mode 100644 target/riscv/cpu.h
-> > > > >  create mode 100644 target/riscv/cpu_bits.h
-> > > > >
-> > > > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> > > > > new file mode 100644
-> > > > > index 0000000..684b78b
-> > > > > --- /dev/null
-> > > > > +++ b/target/riscv/cpu.c  
-> > > > [...]  
-> > > > > +
-> > > > > +static const RISCVCPUInfo riscv_cpus[] = {
-> > > > > +#ifdef CONFIG_USER_ONLY
-> > > > > +    { TYPE_RISCV_CPU_ANY,                riscv_any_cpu_init },
-> > > > > +#else
-> > > > > +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09,  
-> > riscv_imafdcsu_priv1_9_cpu_init  
-> > > > },  
-> > > > > +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,  
-> > riscv_imafdcsu_priv1_10_cpu_init  
-> > > > },  
-> > > > > +    { TYPE_RISCV_CPU_IMACU_PRIV_1_10,  
-> > riscv_imacu_priv1_10_cpu_init  
-> > > > },  
-> > > > > +    { TYPE_RISCV_CPU_IMAC_PRIV_1_10,  
-> >  riscv_imac_priv1_10_cpu_init },  
-> > > > > +#endif
-> > > > > +    { NULL, NULL }
-> > > > > +};
-> > > > > +  
-> > > > [...]  
-> > > > > +static void cpu_register(const RISCVCPUInfo *info)
-> > > > > +{
-> > > > > +    TypeInfo type_info = {
-> > > > > +        .name = info->name,
-> > > > > +        .parent = TYPE_RISCV_CPU,
-> > > > > +        .instance_size = sizeof(RISCVCPU),
-> > > > > +        .instance_init = info->initfn,
-> > > > > +    };
-> > > > > +
-> > > > > +    type_register(&type_info);
-> > > > > +}
-> > > > > +
-> > > > > +static const TypeInfo riscv_cpu_type_info = {
-> > > > > +    .name = TYPE_RISCV_CPU,
-> > > > > +    .parent = TYPE_CPU,
-> > > > > +    .instance_size = sizeof(RISCVCPU),
-> > > > > +    .instance_init = riscv_cpu_init,
-> > > > > +    .abstract = false,
-> > > > > +    .class_size = sizeof(RISCVCPUClass),
-> > > > > +    .class_init = riscv_cpu_class_init,
-> > > > > +};  
-> > > > [...]
-> > > >  
-> > > > > +static void riscv_cpu_register_types(void)
-> > > > > +{
-> > > > > +    const RISCVCPUInfo *info = riscv_cpus;
-> > > > > +
-> > > > > +    type_register_static(&riscv_cpu_type_info);
-> > > > > +
-> > > > > +    while (info->name) {
-> > > > > +        cpu_register(info);
-> > > > > +        info++;
-> > > > > +    }
-> > > > > +}
-> > > > > +
-> > > > > +type_init(riscv_cpu_register_types)  
-> > > > For simplistic type definitions like that,
-> > > > above parts should use DEFINE_TYPES(), see c6678108 for reference.
-> > > >
-> > > >  
-> > > > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> > > > > new file mode 100644
-> > > > > index 0000000..8b816ae
-> > > > > --- /dev/null
-> > > > > +++ b/target/riscv/cpu.h  
-> > > > [...]  
-> > > > > +#define TYPE_RISCV_CPU                    "riscv"
-> > > > > +#define TYPE_RISCV_CPU_ANY                "riscv-any"
-> > > > > +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09 "riscv-imafdcsu-priv1.9"
-> > > > > +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10 "riscv-imafdcsu-priv1.10"
-> > > > > +#define TYPE_RISCV_CPU_IMACU_PRIV_1_10    "riscv-imacu-priv1.10"
-> > > > > +#define TYPE_RISCV_CPU_IMAC_PRIV_1_10     "riscv-imac-priv1.10"
-Also you can use RISCV_CPU_TYPE_NAME() from blow to form above names,
+  https://github.com/xzpeter/qemu/tree/postcopy-recovery-support
+
+This version added back the migrate-pause command, and let it to be
+run on either side of migration.  Meanwhile, fixed a tricky error on
+source that RAMState.f is not setup correctly after resume.
+
+>From this version, testing is carried out using the mig_mon tool with
+command during migration:
+
+  $ mig_mon mm_dirty 512
+
+It means dirtying 512MB memory using maximum dirty rate, which will
+also verify the memory during dirtying.  The tool can be found at:
+
+  https://github.com/xzpeter/clibs/blob/master/bsd/mig_mon/mig_mon.c
+
+To test this two series altogether, please checkout above tree and
+build.  Note: to test on small and single host, one need to disable
+full bandwidth postcopy migration otherwise it'll complete very fast.
+Basically a simple patch like this would help:
+
+diff --git a/migration/migration.c b/migration/migration.c
+index 4de3b551fe..c0206023d7 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1904,7 +1904,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+      * will notice we're in POSTCOPY_ACTIVE and not actually
+      * wrap their state up here
+      */
+-    qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
++    // qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
+     if (migrate_postcopy_ram()) {
+         /* Ping just for debugging, helps line traces up */
+         qemu_savevm_send_ping(ms->to_dst_file, 2);
+
+This patch is included already in above github tree.  Please feel free
+to drop this patch when want to test on big machines and between real
+hosts.
+
+Detailed Test Procedures (QMP only)
+===================================
+
+1. start source QEMU.
+
+$qemu -M q35,kernel-irqchip=split -enable-kvm -snapshot \
+     -smp 4 -m 1G -qmp stdio \
+     -name peter-vm,debug-threads=on \
+     -netdev user,id=net0 \
+     -device e1000,netdev=net0 \
+     -global migration.x-max-bandwidth=4096 \
+     -global migration.x-postcopy-ram=on \
+     /images/fedora-25.qcow2
+
+2. start destination QEMU.
+
+$qemu -M q35,kernel-irqchip=split -enable-kvm -snapshot \
+     -smp 4 -m 1G -qmp stdio \
+     -name peter-vm,debug-threads=on \
+     -netdev user,id=net0 \
+     -device e1000,netdev=net0 \
+     -global migration.x-max-bandwidth=4096 \
+     -global migration.x-postcopy-ram=on \
+     -incoming tcp:0.0.0.0:5555 \
+     /images/fedora-25.qcow2
+
+3. On source, do QMP handshake as normal:
+
+  {"execute": "qmp_capabilities"}
+  {"return": {}}
+
+4. On destination, do QMP handshake to enable OOB:
+
+  {"execute": "qmp_capabilities", "arguments": { "enable": [ "oob" ] } }
+  {"return": {}}
+
+5. On source, trigger initial migrate command, switch to postcopy:
+
+  {"execute": "migrate", "arguments": { "uri": "tcp:localhost:5555" } }
+  {"return": {}}
+  {"execute": "query-migrate"}
+  {"return": {"expected-downtime": 300, "status": "active", ...}}
+  {"execute": "migrate-start-postcopy"}
+  {"return": {}}
+  {"timestamp": {"seconds": 1512454728, "microseconds": 768096}, "event": "STOP"}
+  {"execute": "query-migrate"}
+  {"return": {"expected-downtime": 44472, "status": "postcopy-active", ...}}
+
+6. On source, manually trigger a "fake network down" using
+   "migrate-cancel" command:
+
+  {"execute": "migrate_cancel"}
+  {"return": {}}
+
+  During postcopy, it'll not really cancel the migration, but pause
+  it.  On both sides, we should see this on stderr:
+
+  qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
+
+  It means now both sides are in postcopy-pause state.
+
+7. (Optional) On destination side, let's try to hang the main thread
+   using the new x-oob-test command, providing a "lock=true" param:
+
+   {"execute": "x-oob-test", "id": "lock-dispatcher-cmd",
+    "arguments": { "lock": true } }
+
+   After sending this command, we should not see any "return", because
+   main thread is blocked already.  But we can still use the monitor
+   since the monitor now has dedicated IOThread.
+
+8. On destination side, provide a new incoming port using the new
+   command "migrate-recover" (note that if step 7 is carried out, we
+   _must_ use OOB form, otherwise the command will hang.  With OOB,
+   this command will return immediately):
+
+  {"execute": "migrate-recover", "id": "recover-cmd",
+   "arguments": { "uri": "tcp:localhost:5556" },
+   "control": { "run-oob": true } }
+  {"timestamp": {"seconds": 1512454976, "microseconds": 186053},
+   "event": "MIGRATION", "data": {"status": "setup"}}
+  {"return": {}, "id": "recover-cmd"}
+
+   We can see that the command will success even if main thread is
+   locked up.
+
+9. (Optional) This step is only needed if step 7 is carried out. On
+   destination, let's unlock the main thread before resuming the
+   migration, this time with "lock=false" to unlock the main thread
+   (since system running needs the main thread). Note that we _must_
+   use OOB command here too:
+
+  {"execute": "x-oob-test", "id": "unlock-dispatcher",
+   "arguments": { "lock": false }, "control": { "run-oob": true } }
+  {"return": {}, "id": "unlock-dispatcher"}
+  {"return": {}, "id": "lock-dispatcher-cmd"}
+
+  Here the first "return" is the reply to the unlock command, the
+  second "return" is the reply to the lock command.  After this
+  command, main thread is released.
+
+10. On source, resume the postcopy migration:
+
+  {"execute": "migrate", "arguments": { "uri": "tcp:localhost:5556", "resume": true }}
+  {"return": {}}
+  {"execute": "query-migrate"}
+  {"return": {"status": "completed", ...}}
+
+Here's the change log:
+
+v6
+- more r-bs
+- rebase to latest master/monitor-oob
+- add back migrate-pause command, allow it to run on either src/dst
+  side [Dave]
+- setup RAMState.f during resume_prepare
+
+v5:
+- add some more r-bs
+- fix error path in ram_load_postcopy to always check on "ret" [Dave]
+- move init/destroy of three new sems into migration object
+  init/finalize functions
+- dropped patch "migration: delay the postcopy-active state switch",
+  meanwhile touch up patch 6 to check against
+  POSTCOPY_INCOMING_RUNNING state when trying to switch to
+  postcopy-pause state. [Dave]
+- drop two patches that introduce qmp/hmp of migrate-pause, instead
+  re-use migrate-cancel to do manual trigger of postcopy recovery.
+- add a new patch to let migrate_cancel to pause migration if it's
+  already in postcopy phase.
+- add a new command "migrate-recover" to re-assign the incoming port,
+  instead of reusing migrate-incoming.
+- since now I used migrate-recover command instead of migrate-incoming
+  itself, I dropped quite a few patches that are not really relevant
+  now, so the series got smaller:
+        migration: return incoming task tag for sockets
+        migration: return incoming task tag for exec
+        migration: return incoming task tag for fd
+        migration: store listen task tag
+        migration: allow migrate_incoming for paused VM
+
+v4:
+- fix two compile errors that patchew reported
+- for QMP: do s/2.11/2.12/g
+- fix migrate-incoming logic to be more strict
+
+v3:
+- add r-bs correspondingly
+- in ram_load_postcopy() capture error if postcopy_place_page() failed
+  [Dave]
+- remove "break" if there is a "goto" before that [Dave]
+- ram_dirty_bitmap_reload(): use PRIx64 where needed, add some more
+  print sizes [Dave]
+- remove RAMState.ramblock_to_sync, instead use local counter [Dave]
+- init tag in tcp_start_incoming_migration() [Dave]
+- more traces when transmiting the recv bitmap [Dave]
+- postcopy_pause_incoming(): do shutdown before taking rp lock [Dave]
+- add one more patch to postpone the state switch of postcopy-active [Dave]
+- refactor the migrate_incoming handling according to the email
+  discussion [Dave]
+- add manual trigger to pause postcopy (two new patches added to
+  introduce "migrate-pause" command for QMP/HMP). [Dave]
+
+v2:
+- rebased to alexey's received bitmap v9
+- add Dave's r-bs for patches: 2/5/6/8/9/13/14/15/16/20/21
+- patch 1: use target page size to calc bitmap [Dave]
+- patch 3: move trace_*() after EINTR check [Dave]
+- patch 4: dropped since I can use bitmap_complement() [Dave]
+- patch 7: check file error right after data is read in both
+  qemu_loadvm_section_start_full() and qemu_loadvm_section_part_end(),
+  meanwhile also check in check_section_footer() [Dave]
+- patch 8/9: fix error_report/commit message in both patches [Dave]
+- patch 10: dropped (new parameter "x-postcopy-fast")
+- patch 11: split the "postcopy-paused" patch into two, one to
+  introduce the new state, the other to implement the logic. Also,
+  print something when paused [Dave]
+- patch 17: removed do_resume label, introduced migration_prepare()
+  [Dave]
+- patch 18: removed do_pause label using a new loop [Dave]
+- patch 20: removed incorrect comment [Dave]
+- patch 21: use 256B buffer in qemu_savevm_send_recv_bitmap(), add
+  trace in loadvm_handle_recv_bitmap() [Dave]
+- patch 22: fix MIG_RP_MSG_RECV_BITMAP for (1) endianess (2) 32/64bit
+  machines. More info in the commit message update.
+- patch 23: add one check on migration state [Dave]
+- patch 24: use macro instead of magic 1 [Dave]
+- patch 26: use more trace_*() instead of one, and use one sem to
+  replace mutex+cond. [Dave]
+- move sem init/destroy into migration_instance_init() and
+  migration_instance_finalize (new function after rebase).
+- patch 29: squashed this patch most into:
+  "migration: implement "postcopy-pause" src logic" [Dave]
+- split the two fix patches out of the series
+- fixed two places where I misused "wake/woke/woken". [Dave]
+- add new patch "bitmap: provide to_le/from_le helpers" to solve the
+  bitmap endianess issue [Dave]
+- appended migrate_incoming series to this series, since that one is
+  depending on the paused state.  Using explicit g_source_remove() for
+  listening ports [Dan]
+
+FUTURE TODO LIST
+- support migrate_cancel during PAUSED/RECOVER state
+- when anything wrong happens during PAUSED/RECOVER, switching back to
+  PAUSED state on both sides
+
+As we all know that postcopy migration has a potential risk to lost
+the VM if the network is broken during the migration. This series
+tries to solve the problem by allowing the migration to pause at the
+failure point, and do recovery after the link is reconnected.
+
+There was existing work on this issue from Md Haris Iqbal:
+
+https://lists.nongnu.org/archive/html/qemu-devel/2016-08/msg03468.html
+
+This series is a totally re-work of the issue, based on Alexey
+Perevalov's recved bitmap v8 series:
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06401.html
+
+Two new status are added to support the migration (used on both
+sides):
+
+  MIGRATION_STATUS_POSTCOPY_PAUSED
+  MIGRATION_STATUS_POSTCOPY_RECOVER
+
+The MIGRATION_STATUS_POSTCOPY_PAUSED state will be set when the
+network failure is detected. It is a phase that we'll be in for a long
+time as long as the failure is detected, and we'll be there until a
+recovery is triggered.  In this state, all the threads (on source:
+send thread, return-path thread; destination: ram-load thread,
+page-fault thread) will be halted.
+
+The MIGRATION_STATUS_POSTCOPY_RECOVER state is short. If we triggered
+a recovery, both source/destination VM will jump into this stage, do
+whatever it needs to prepare the recovery (e.g., currently the most
+important thing is to synchronize the dirty bitmap, please see commit
+messages for more information). After the preparation is ready, the
+source will do the final handshake with destination, then both sides
+will switch back to MIGRATION_STATUS_POSTCOPY_ACTIVE again.
+
+New commands/messages are defined as well to satisfy the need:
+
+MIG_CMD_RECV_BITMAP & MIG_RP_MSG_RECV_BITMAP are introduced for
+delivering received bitmaps
+
+MIG_CMD_RESUME & MIG_RP_MSG_RESUME_ACK are introduced to do the final
+handshake of postcopy recovery.
+
+Here's some more details on how the whole failure/recovery routine is
+happened:
+
+- start migration
+- ... (switch from precopy to postcopy)
+- both sides are in "postcopy-active" state
+- ... (failure happened, e.g., network unplugged)
+- both sides switch to "postcopy-paused" state
+  - all the migration threads are stopped on both sides
+- ... (both VMs hanged)
+- ... (user triggers recovery using "migrate -r -d tcp:HOST:PORT" on
+  source side, "-r" means "recover")
+- both sides switch to "postcopy-recover" state
+  - on source: send-thread, return-path-thread will be waked up
+  - on dest: ram-load-thread waked up, fault-thread still paused
+- source calls new savevmhandler hook resume_prepare() (currently,
+  only ram is providing the hook):
+  - ram_resume_prepare(): for each ramblock, fetch recved bitmap by:
+    - src sends MIG_CMD_RECV_BITMAP to dst
+    - dst replies MIG_RP_MSG_RECV_BITMAP to src, with bitmap data
+      - src uses the recved bitmap to rebuild dirty bitmap
+- source do final handshake with destination
+  - src sends MIG_CMD_RESUME to dst, telling "src is ready"
+    - when dst receives the command, fault thread will be waked up,
+      meanwhile, dst switch back to "postcopy-active"
+  - dst sends MIG_RP_MSG_RESUME_ACK to src, telling "dst is ready"
+    - when src receives the ack, state switch to "postcopy-active"
+- postcopy migration continued
+
+Testing:
+
+As I said, it's still an extremely simple test. I used socat to create
+a socket bridge:
+
+  socat tcp-listen:6666 tcp-connect:localhost:5555 &
+
+Then do the migration via the bridge. I emulated the network failure
+by killing the socat process (bridge down), then tries to recover the
+migration using the other channel (default dst channel). It looks
 like:
 
-#define TYPE_RISCV_CPU                    "riscv-cpu"
-#define TYPE_RISCV_CPU_ANY                RISCV_CPU_TYPE_NAME("any")
-...
+        port:6666    +------------------+
+        +----------> | socat bridge [1] |-------+
+        |            +------------------+       |
+        |         (Original channel)            |
+        |                                       | port: 5555
+     +---------+  (Recovery channel)            +--->+---------+
+     | src VM  |------------------------------------>| dst VM  |
+     +---------+                                     +---------+
 
-then whatever naming format is required, you'd be able to
-change it just in RISCV_CPU_TYPE_NAME() without touching
-the rest.
+Known issues/notes:
 
-> > > > > +
-> > > > > +#define RISCV_CPU_TYPE_PREFIX TYPE_RISCV_CPU "-"
-> > > > > +#define RISCV_CPU_TYPE_NAME(name) (RISCV_CPU_TYPE_PREFIX name)  
-> > > > it still uses prefix notation versus commonly used suffix in form of
-> > > >  "targetFOO-cpu"
-> > > > this prefix approach would get in the way if we try to generalize
-> > > > naming <-> type conversion later[*].
-> > > > So it would better to be consistent with approach qemu uses for cpu  
-> > types  
-> > > > (I believe power had prefix based pnv types but it has been fixed
-> > > > to common suffix based pattern later).
-> > > >
-> > > > * discussion on thread "[PATCH v5 0/6]  Add a valid_cpu_types property"
-> > > >  
-> > >
-> > > I can reverse them if needed, just it seems a little odd to have riscv on
-> > > the right-hand side of the extensions. I can do this in the v5 spin...  
-> > pls, do so + -cpu suffix.
-> >  
-> > > It may make more sense once we have actual CPU models. Currently, we have
-> > > sets of extensions and privilege ISA versions. I guess these will become
-> > > implicit properties of a specific CPU model and the extensions will be
-> > > visible in the initialization function.  
-> > That's what we have in x86 land, code names + _suffix corresponding to
-> > real cpus (mostly) with implicit feature set per each.
-> > Features could be properties so user would be able to enumerate/query/set
-> > them.
-> >  
-> 
-> I just realized I neglected the change in the current patch-set to use the
-> suffix scheme i.e. "<extension>-<version>-riscv-cpu" versus the
-> "riscv-<extension>-<version>" scheme that we have presently.
-Yep, just saw v5 still has old variant,
-You also forgot about comment:
-"
-> +type_init(riscv_cpu_register_types)  
-For simplistic type definitions like that,
-above parts should use DEFINE_TYPES(), see c6678108 for reference.
-"
- 
-> I would like to discuss with RISC-V folk as how we should name these
-> "generic" CPUs and how we should handle extensions and versioning. This is
-> certainly going to be an area that is going to be worked on in the future
-> so whether we evolve this in-tree or out-of-tree is up for discussion. We
-> also have to decide whether we will add CPU models for all typical
-> combinations of extensions or if this is handled some other way. There will
-> also be actual CPU modules now silicon is becoming more widely available.
-> The version number we have currently is essentially the supervisor
-> specification version. That won't be necessary once we have real cpu models.
-> 
-> There is also a future patch that will allow 'misa' extensions to be
-> changed on the fly, which will require the extensions to be exposed in
-> cpu_get_tb_cpu_state flags.
-> 
-> One thing is for certain, is that there is no direct comparison to x86 land
-> as the RISC-V extension scheme is presently quite different.
-See, following thread which might be of interest to you:
-  "how to handle QOM 'container' objects whose contents depend on QOM properties?"
+- currently destination listening port still cannot change. E.g., the
+  recovery should be using the same port on destination for
+  simplicity. (on source, we can specify new URL)
+
+- the patch: "migration: let dst listen on port always" is still
+  hacky, it just kept the incoming accept open forever for now...
+
+- some migration numbers might still be inaccurate, like total
+  migration time, etc. (But I don't really think that matters much
+  now)
+
+- the patches are very lightly tested.
+
+- Dave reported one problem that may hang destination main loop thread
+  (one vcpu thread holds the BQL) and the rest. I haven't encountered
+  it yet, but it does not mean this series can survive with it.
+
+- other potential issues that I may have forgotten or unnoticed...
+
+Anyway, the work is still in preliminary stage. Any suggestions and
+comments are greatly welcomed.  Thanks.
+
+Peter Xu (28):
+  migration: better error handling with QEMUFile
+  migration: reuse mis->userfault_quit_fd
+  migration: provide postcopy_fault_thread_notify()
+  migration: new postcopy-pause state
+  migration: implement "postcopy-pause" src logic
+  migration: allow dst vm pause on postcopy
+  migration: allow src return path to pause
+  migration: allow send_rq to fail
+  migration: allow fault thread to pause
+  qmp: hmp: add migrate "resume" option
+  migration: pass MigrationState to migrate_init()
+  migration: rebuild channel on source
+  migration: new state "postcopy-recover"
+  migration: wakeup dst ram-load-thread for recover
+  migration: new cmd MIG_CMD_RECV_BITMAP
+  migration: new message MIG_RP_MSG_RECV_BITMAP
+  migration: new cmd MIG_CMD_POSTCOPY_RESUME
+  migration: new message MIG_RP_MSG_RESUME_ACK
+  migration: introduce SaveVMHandlers.resume_prepare
+  migration: synchronize dirty bitmap for resume
+  migration: setup ramstate for resume
+  migration: final handshake for the resume
+  migration: init dst in migration_object_init too
+  io: let watcher of the channel run in same ctx
+  qmp/migration: new command migrate-recover
+  hmp/migration: add migrate_recover command
+  migration/qmp: add command migrate-pause
+  migration/hmp: add migrate_pause command
+
+ hmp-commands.hx              |  34 ++-
+ hmp.c                        |  23 +-
+ hmp.h                        |   2 +
+ include/migration/register.h |   2 +
+ io/channel.c                 |   2 +-
+ migration/migration.c        | 566 ++++++++++++++++++++++++++++++++++++++-----
+ migration/migration.h        |  25 +-
+ migration/postcopy-ram.c     | 110 +++++++--
+ migration/postcopy-ram.h     |   2 +
+ migration/ram.c              | 250 ++++++++++++++++++-
+ migration/ram.h              |   3 +
+ migration/savevm.c           | 236 +++++++++++++++++-
+ migration/savevm.h           |   3 +
+ migration/trace-events       |  21 ++
+ qapi/migration.json          |  48 +++-
+ 15 files changed, 1227 insertions(+), 100 deletions(-)
+
+-- 
+2.14.3
