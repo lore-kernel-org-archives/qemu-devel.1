@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejedh-0008JQ-OX
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:20:54 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1ejesE-0005oe-0s
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:35:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ejede-000635-JU
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:20:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ejede-00062f-Cq
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:20:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ejedc-0000Zo-Jq
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 05:20:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5EA852E80CC
-	for <qemu-devel@nongnu.org>; Thu,  8 Feb 2018 05:20:48 +0000 (UTC)
+	(envelope-from <wei.w.wang@intel.com>) id 1ejes9-0007F3-3v
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:35:54 -0500
+Received: from mga11.intel.com ([192.55.52.93]:2795)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1ejes8-0007EX-P3
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:35:49 -0500
+Message-ID: <5A7BE253.8050306@intel.com>
+Date: Thu, 08 Feb 2018 13:38:27 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Feb 2018 05:06:07 -0000
-From: Gustavo Moreira <gmoreira@gmail.com>
-Reply-To: Bug 1739378 <1739378@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
-Message-Id: <151806636719.3233.4667831632453020526.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739378] Re: migration state save/load of sdcard
- device is broken
+References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
+	<20180207015803-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180207015803-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] virtio-balloon: free page hint
+ reporting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Finally I could test it. Yeah man, awesome, that did the trick. It is worki=
-ng like a charm.
-You can close the ticket.
-Thanks
+On 02/07/2018 08:02 AM, Michael S. Tsirkin wrote:
+> On Tue, Feb 06, 2018 at 07:08:16PM +0800, Wei Wang wrote:
+>> This is the deivce part implementation to add a new feature,
+>> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
+>> receives the guest free page hints from the driver and clears the
+>> corresponding bits in the dirty bitmap, so that those free pages are
+>> not transferred by the migration thread to the destination.
+>>
+>> Please see the driver patch link for test results:
+>> https://lkml.org/lkml/2018/2/4/60
+>>
+>> ChangeLog:
+>> v1->v2:
+>>      1) virtio-balloon
+>>          - use subsections to save free_page_report_cmd_id;
+>>          - poll the free page vq after sending a cmd id to the driver;
+>>          - change the free page vq size to VIRTQUEUE_MAX_SIZE;
+>>          - virtio_balloon_poll_free_page_hints: handle the corner case
+>>            that the free page block reported from the driver may cross
+>>            the RAMBlock boundary.
+>>      2) migration/ram.c
+>>          - use balloon_free_page_poll to start the optimization
+>>
+>> Wei Wang (3):
+>>    virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
+>>    migration: use the free page reporting feature from balloon
+>>    virtio-balloon: add a timer to limit the free page report waiting time
+> This feature needs in-tree documentation about possible ways to use it,
+> tradeoffs involved etc.
 
--- =
+OK. I plan to add the documentation in later versions after we mostly 
+finalize the QEMU part design.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739378
-
-Title:
-  migration state save/load of sdcard device is broken
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm having different issues trying to have QEMU snapshots working
-  using qemu-system-arm with vexpress-a15 board.
-
-  In this opportunity, I'm trying the git master head version:
-  # git rev-parse HEAD
-  af352675efb7e92a1f5f6461a042a12015ab3d12
-
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb
-  audio: Could not init `oss' audio driver
-
-  Later on, when the machine finishes booting I savevm ss and quit.
-  However, when I try to restore it, I have that Missing section footer
-  error:
-
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm ss
-  audio: Could not init `oss' audio driver
-  qemu-system-arm: Missing section footer for sd-card
-  qemu-system-arm: Error -22 while loading VM state
-
-  OS: Ubuntu 16.04.3 LTS (xenial)
-
-  $ gcc --version
-  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
-
-  How have I built it?
-  # git clone git://git.qemu.org/qemu.git
-  # cd qemu
-  # git submodule update --init --checkout
-  # make clean && ./configure --target-list=3Darm-softmmu && make -j8
-  # sudo make install
-
-  I've also tried a different ./configure line, explicitly enabling some
-  of the features, i.e. smartcard, with the same results:
-
-  ./configure '--disable-user' '--enable-system' '--enable-linux-user'
-  '--enable-modules' '--enable-linux-aio' '--audio-drv-list=3Dpa'
-  '--enable-attr' '--enable-brlapi' '--enable-virtfs' '--enable-cap-ng'
-  '--enable-curl' '--enable-fdt' '--enable-gnutls' '--disable-gtk'
-  '--disable-vte' '--enable-libiscsi' '--enable-curses' '--enable-
-  smartcard' '--enable-rbd' '--enable-vnc-sasl' '--enable-seccomp'
-  '--enable-spice' '--enable-libusb' '--enable-usb-redir' '--enable-
-  xfsctl' '--enable-vnc' '--enable-vnc-jpeg' '--enable-vnc-png'
-  '--enable-kvm' '--enable-vhost-net'
-
-  As a reference, and just in case these may be in some way related,
-  I've just submitted another ticket for a different issue with
-  snapshots using Ubuntu Qemu version
-  (https://bugs.launchpad.net/qemu/+bug/1739371)
-
-  Cheers,
-  Gus
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739378/+subscriptions
+Best,
+Wei
