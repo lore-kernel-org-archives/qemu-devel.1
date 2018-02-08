@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejqBd-00039v-4C
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:40:42 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejqEp-00069I-4W
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:44:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ejqBb-0000bG-F0
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:40:41 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ejqBb-0000aS-4S
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:40:39 -0500
-Received: by mail-wr0-x241.google.com with SMTP id w50so5600748wrc.2
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 09:40:38 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  8 Feb 2018 17:31:50 +0000
-Message-Id: <20180208173157.24705-26-alex.bennee@linaro.org>
-In-Reply-To: <20180208173157.24705-1-alex.bennee@linaro.org>
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ejqEo-0002nB-3U
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 12:43:59 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 25/32] arm/translate-a64: add FP16 FRCPX to
- simd_two_reg_misc_fp16
+In-Reply-To: <20180208193033-mutt-send-email-mst@kernel.org>
+References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
+	<20180207042438.15422-10-andrew.smirnov@gmail.com>
+	<CAFEAcA-=-+1A6toXM-ddP+iKBgHKh28Xq3VeGXfSLJ08xMRijA@mail.gmail.com>
+	<20180208193033-mutt-send-email-mst@kernel.org>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Thu, 8 Feb 2018 09:43:53 -0800
+Message-ID: <CAHQ1cqGr2e8vjQUUypkoyUc=QGQDNVkjydmOadfsSCzm78nkJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 09/14] pci: Use pci_config_size in
+ pci_data_* accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +26,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-We go with the localised helper.
+On Thu, Feb 8, 2018 at 9:34 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Thu, Feb 08, 2018 at 05:20:53PM +0000, Peter Maydell wrote:
+>> On 7 February 2018 at 04:24, Andrey Smirnov <andrew.smirnov@gmail.com> w=
+rote:
+>> > Use pci_config_size (as opposed to PCI_CONFIG_SPACE_SIZE) in
+>> > pci_data_read() and pci_data_write(), so this function would work for
+>> > both classic PCI and PCIe use-cases.
+>> >
+>> > Cc: Peter Maydell <peter.maydell@linaro.org>
+>> > Cc: Jason Wang <jasowang@redhat.com>
+>> > Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> > Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
+>> > Cc: Michael S. Tsirkin <mst@redhat.com>
+>> > Cc: qemu-devel@nongnu.org
+>> > Cc: qemu-arm@nongnu.org
+>> > Cc: yurovsky@gmail.com
+>> > Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>> > ---
+>> >  hw/pci/pci_host.c | 13 +++++++++----
+>> >  1 file changed, 9 insertions(+), 4 deletions(-)
+>> >
+>> > diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+>> > index 5eaa935cb5..ea52ea07cd 100644
+>> > --- a/hw/pci/pci_host.c
+>> > +++ b/hw/pci/pci_host.c
+>> > @@ -89,30 +89,35 @@ uint32_t pci_host_config_read_common(PCIDevice *pc=
+i_dev, uint32_t addr,
+>> >  void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, int len)
+>> >  {
+>> >      PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
+>> > -    uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
+>> > +    uint32_t config_addr;
+>> >
+>> >      if (!pci_dev) {
+>> >          return;
+>> >      }
+>> >
+>> > +    config_addr =3D addr & (pci_config_size(pci_dev) - 1);
+>> > +
+>> >      PCI_DPRINTF("%s: %s: addr=3D%02" PRIx32 " val=3D%08" PRIx32 " len=
+=3D%d\n",
+>> >                  __func__, pci_dev->name, config_addr, val, len);
+>> > -    pci_host_config_write_common(pci_dev, config_addr, PCI_CONFIG_SPA=
+CE_SIZE,
+>> > +    pci_host_config_write_common(pci_dev, config_addr,
+>> > +                                 pci_config_size(pci_dev),
+>> >                                   val, len);
+>> >  }
+>> >
+>> >  uint32_t pci_data_read(PCIBus *s, uint32_t addr, int len)
+>> >  {
+>> >      PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
+>> > -    uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
+>> > +    uint32_t config_addr;
+>> >      uint32_t val;
+>> >
+>> >      if (!pci_dev) {
+>> >          return ~0x0;
+>> >      }
+>> >
+>> > +    config_addr =3D addr & (pci_config_size(pci_dev) - 1);
+>> > +
+>> >      val =3D pci_host_config_read_common(pci_dev, config_addr,
+>> > -                                      PCI_CONFIG_SPACE_SIZE, len);
+>> > +                                      pci_config_size(pci_dev), len);
+>> >      PCI_DPRINTF("%s: %s: addr=3D%02"PRIx32" val=3D%08"PRIx32" len=3D%=
+d\n",
+>> >                  __func__, pci_dev->name, config_addr, val, len);
+>> >
+>>
+>> I've just discovered that this breaks the e1000e-test:
+>>
+>> $ (cd build/clang; QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+>> ./tests/e1000e-test)
+>> /x86_64/e1000e/init: **
+>> ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/tests/e1000e-test.c:11=
+8:e1000e_device_find:
+>> 'e1000e_dev' should not be NULL
+>>
+>> Any idea what's going on here?
+>>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/helper-a64.c    | 29 +++++++++++++++++++++++++++++
- target/arm/helper-a64.h    |  1 +
- target/arm/translate-a64.c |  4 ++++
- 3 files changed, 34 insertions(+)
+Peter:
 
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 76f3289e37..38cdc13b3e 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -356,6 +356,35 @@ uint64_t HELPER(neon_addlp_u16)(uint64_t a)
- }
- 
- /* Floating-point reciprocal exponent - see FPRecpX in ARM ARM */
-+float16 HELPER(frecpx_f16)(float16 a, void *fpstp)
-+{
-+    float_status *fpst = fpstp;
-+    uint16_t val16, sbit;
-+    int16_t exp;
-+
-+    if (float16_is_any_nan(a)) {
-+        float16 nan = a;
-+        if (float16_is_signaling_nan(a, fpst)) {
-+            float_raise(float_flag_invalid, fpst);
-+            nan = float16_maybe_silence_nan(a, fpst);
-+        }
-+        if (fpst->default_nan_mode) {
-+            nan = float16_default_nan(fpst);
-+        }
-+        return nan;
-+    }
-+
-+    val16 = float16_val(a);
-+    sbit = 0x8000 & val16;
-+    exp = extract32(val16, 10, 5);
-+
-+    if (exp == 0) {
-+        return make_float16(deposit32(sbit, 10, 5, 0x1e));
-+    } else {
-+        return make_float16(deposit32(sbit, 10, 5, ~exp));
-+    }
-+}
-+
- float32 HELPER(frecpx_f32)(float32 a, void *fpstp)
- {
-     float_status *fpst = fpstp;
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 453753f4e7..d8a55142b5 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -41,6 +41,7 @@ DEF_HELPER_FLAGS_1(neon_addlp_s16, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_FLAGS_1(neon_addlp_u16, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_FLAGS_2(frecpx_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
- DEF_HELPER_FLAGS_2(frecpx_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
-+DEF_HELPER_FLAGS_2(frecpx_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
- DEF_HELPER_FLAGS_2(fcvtx_f64_to_f32, TCG_CALL_NO_RWG, f32, f64, env)
- DEF_HELPER_FLAGS_3(crc32_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
- DEF_HELPER_FLAGS_3(crc32c_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 4ad5e97f56..b6cd4dd8f2 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -10849,6 +10849,7 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-         return;
-         break;
-     case 0x3d: /* FRECPE */
-+    case 0x3f: /* FRECPX */
-         break;
-     case 0x18: /* FRINTN */
-         need_rmode = true;
-@@ -10973,6 +10974,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-         case 0x3d: /* FRECPE */
-             gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
-             break;
-+        case 0x3f: /* FRECPX */
-+            gen_helper_frecpx_f16(tcg_res, tcg_op, tcg_fpstatus);
-+            break;
-         case 0x5a: /* FCVTNU */
-         case 0x5b: /* FCVTMU */
-         case 0x5c: /* FCVTAU */
--- 
-2.15.1
+Don't really have a good idea what's going on, but I am guessing this
+change broke affected pci_host_data_* methods in negative way.
+
+>> thanks
+>> -- PMM
+>
+> I'm yet to review these patches, but IIRC pci_data_read and friends
+> aren't designed with pcie in mind - they implement the classic pci
+> config space.
+>
+> I'd like to see more justification about how these are now going
+> to be used.
+>
+
+Michael:
+
+My only justification for this change was suggestion from Marcel to
+use pci_data_* functions, instead of calling pci_host_config_*_common
+explicitly in designware.c introduced in next patch in the series. My
+v4 patches incorrectly limited config space size to 256, so such
+replacement didn't require this patch, but switching pci_data_* to use
+pci_config_size() seemed harmless enough. I am more than happy to got
+back to using pci_host_config_*_common in designware.c and dropping
+this patch.
+
+Thanks,
+Andrey Smirnov
