@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ejoyW-000656-4G
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:23:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ejoyb-000667-CN
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:23:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ejoyS-0004Ak-3n
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:23:04 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46392 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ejoyR-0004AY-Vl
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:23:00 -0500
-Date: Thu, 8 Feb 2018 16:22:33 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180208162233.GN20703@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
-	<20180129174132.108925-19-brijesh.singh@amd.com>
-	<20180130200838.GB2319@work-vm>
-	<0abe3fee-a970-dc82-fd92-ad923bfa863a@amd.com>
-	<20180201172709.GJ2457@work-vm>
-	<07d86670-e960-db04-52a9-5e6ecee18bc3@amd.com>
-	<20180202151616.GM15403@redhat.com>
-	<CA+HCGMYbZ9ATosB29Oy9kELc78yQ0jGX7YrFDG2SzT2_Py-xAQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ejoya-0004CQ-4U
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:23:09 -0500
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:34651)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ejoyZ-0004Bj-UM
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 11:23:08 -0500
+Received: by mail-oi0-x22c.google.com with SMTP id k15so3895025oib.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 08:23:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CA+HCGMYbZ9ATosB29Oy9kELc78yQ0jGX7YrFDG2SzT2_Py-xAQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 18/23] sev: emit the SEV_MEASUREMENT
- event
+In-Reply-To: <20180208051601.12800-1-armbru@redhat.com>
+References: <20180208051601.12800-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Feb 2018 16:22:46 +0000
+Message-ID: <CAFEAcA9L8HK-9Gi5Ug4xHNYtfj1E3E4ttgzFSU7LVESZDnwa6w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/20] Miscellaneous patches for
+ 2018-02-07
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +30,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.ksingh@gmail.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Tom Lendacky <Thomas.Lendacky@amd.com>, "Chen, Xiaogang" <Xiaogang.Chen@amd.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Feb 08, 2018 at 10:17:28AM -0600, Brijesh Singh wrote:
-> 
-> Anyway, the main issue is event emitted before "qmp_capabilities" are
-> dropped silently , see [1] . In our case, the measurement event is emitted
-> during the machine creation time, libvirt was still waiting to reconnect
-> the monitor when event was emitted hence libvirt never gets the event.
-> Because of this, I am not able to see any strong reason to emit the event.
-> Do you see any issue with libvirt issuing a  'query-sev-launch-measure' to
-> get the measurement on reconnect ?
+2018-02-08 5:16 GMT+00:00 Markus Armbruster <armbru@redhat.com>:
+> The following changes since commit 20e0d439a6ded635ec89f6135c08cd5541c689=
+62:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20180204' into=
+ staging (2018-02-06 14:21:41 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2018-02-07-v2
+>
+> for you to fetch changes up to 2416be0431db85663d69d58824b26618470786dc:
+>
+>   Move include qemu/option.h from qemu-common.h to actual users (2018-02-=
+08 06:12:45 +0100)
+>
+> ----------------------------------------------------------------
+> Miscellaneous patches for 2018-02-07
 
-Hmm, yes, I see so there can be a race between SEV emitting the event and
-libvirtd making the initial monitor connection. In that case, we definitely
-to have a QMP command to let libvirt explicitly query it. 
+Build failures everywhere in nvme.c:
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+/home/pm215/qemu/block/nvme.c:118:1: error: variable =E2=80=98runtime_opts=
+=E2=80=99
+has initializer but incomplete type
+ static QemuOptsList runtime_opts =3D {
+ ^
+/home/pm215/qemu/block/nvme.c:119:5: error: unknown field =E2=80=98name=E2=
+=80=99
+specified in initializer
+     .name =3D "nvme",
+     ^
+/home/pm215/qemu/block/nvme.c:119:5: error: excess elements in struct
+initializer [-Werror]
+/home/pm215/qemu/block/nvme.c:119:5: error: (near initialization for
+=E2=80=98runtime_opts=E2=80=99) [-Werror]
+/home/pm215/qemu/block/nvme.c:120:5: error: unknown field =E2=80=98head=E2=
+=80=99
+specified in initializer
+     .head =3D QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+     ^
+/home/pm215/qemu/block/nvme.c:120:5: error: extra brace group at end
+of initializer
+[snip huge pile of other probably run-on warnings]
+
+and also on OSX:
+
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:256:49: error: implicit
+declaration of function 'error_get_pretty' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+        QEMU_Alert([NSString stringWithCString: error_get_pretty(err)
+                                                ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:256:49: error:
+incompatible integer to pointer conversion sending 'int' to parameter
+of type 'const char * _Nonnull' [-Werror,-Wint-conversion]
+        QEMU_Alert([NSString stringWithCString: error_get_pretty(err)
+                                                ^~~~~~~~~~~~~~~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Develo=
+per/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Foundation.framework/Hea=
+ders/NSString.h:350:58:
+note: passing argument to parameter 'cString' here
++ (nullable instancetype)stringWithCString:(const char *)cString
+encoding:(NSStringEncoding)enc;
+                                                         ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:258:9: error: implicit
+declaration of function 'error_free' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+        error_free(err);
+        ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:258:9: note: did you mean
+'g_error_free'?
+/sw/include/glib-2.0/glib/gerror.h:56:10: note: 'g_error_free' declared her=
+e
+void     g_error_free          (GError        *error);
+         ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1134:5: error: implicit
+declaration of function 'qmp_stop' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+    qmp_stop(NULL);
+    ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1134:5: note: did you mean
+'vm_stop'?
+/Users/pm215/src/qemu-for-merges/include/sysemu/sysemu.h:56:5: note:
+'vm_stop' declared here
+int vm_stop(RunState state);
+    ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1143:5: error: implicit
+declaration of function 'qmp_cont' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+    qmp_cont(NULL);
+    ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1171:5: error: implicit
+declaration of function 'qmp_system_reset' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+    qmp_system_reset(NULL);
+    ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1171:5: note: did you mean
+'qemu_system_reset'?
+/Users/pm215/src/qemu-for-merges/include/sysemu/sysemu.h:83:6: note:
+'qemu_system_reset' declared here
+void qemu_system_reset(ShutdownCause reason);
+     ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1177:5: error: implicit
+declaration of function 'qmp_system_powerdown' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+    qmp_system_powerdown(NULL);
+    ^
+  CC      ui/vnc-jobs.o
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1194:5: error: implicit
+declaration of function 'qmp_eject' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+    qmp_eject(true, [drive cStringUsingEncoding: NSASCIIStringEncoding],
+    ^
+  CC      chardev/char.o
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1228:9: error: implicit
+declaration of function 'qmp_blockdev_change_medium' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+        qmp_blockdev_change_medium(true,
+        ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1628:21: error: implicit
+declaration of function 'qmp_query_block' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+    currentDevice =3D qmp_query_block(NULL);
+                    ^
+/Users/pm215/src/qemu-for-merges/ui/cocoa.m:1628:19: error:
+incompatible integer to pointer conversion assigning to 'BlockInfoList
+*' (aka 'struct BlockInfoList *') from 'int'
+[-Werror,-Wint-conversion]
+    currentDevice =3D qmp_query_block(NULL);
+
+
+thanks
+-- PMM
