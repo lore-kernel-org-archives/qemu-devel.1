@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejtDQ-000255-U5
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:54:45 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ejtEp-0003KQ-Ep
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:56:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejtDM-0000PH-9S
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:54:45 -0500
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:39742)
+	(envelope-from <richard.henderson@linaro.org>) id 1ejtEo-0001fv-8D
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:56:11 -0500
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:34077)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ejtDM-0000P3-4W
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:54:40 -0500
-Received: by mail-it0-x244.google.com with SMTP id c80so8041541itb.4
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 12:54:39 -0800 (PST)
+	id 1ejtEo-0001fD-3V
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:56:10 -0500
+Received: by mail-io0-x241.google.com with SMTP id x188so724833iod.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 12:56:09 -0800 (PST)
 References: <20180208173157.24705-1-alex.bennee@linaro.org>
-	<20180208173157.24705-12-alex.bennee@linaro.org>
+	<20180208173157.24705-13-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <da2bc012-1693-3335-eb5a-921d94e6015e@linaro.org>
-Date: Thu, 8 Feb 2018 12:54:36 -0800
+Message-ID: <bc79bcf4-249a-0ae1-5099-7aeb78e97e04@linaro.org>
+Date: Thu, 8 Feb 2018 12:56:05 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180208173157.24705-12-alex.bennee@linaro.org>
+In-Reply-To: <20180208173157.24705-13-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/32] arm/translate-a64: add FP16
- F[A]C[EQ/GE/GT] to simd_three_reg_same_fp16
+Subject: Re: [Qemu-devel] [PATCH v2 12/32] arm/translate-a64: add FP16
+ FMULA/X/S to simd_three_reg_same_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,46 +38,35 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 On 02/08/2018 09:31 AM, Alex Bennée wrote:
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  target/arm/helper-a64.c    | 49 ++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/helper-a64.h    |  5 +++++
->  target/arm/translate-a64.c | 15 ++++++++++++++
->  3 files changed, 69 insertions(+)
+>  target/arm/helper-a64.c    | 24 ++++++++++++++++++++++++
+>  target/arm/helper-a64.h    |  2 ++
+>  target/arm/translate-a64.c | 15 +++++++++++++++
+>  3 files changed, 41 insertions(+)
 > 
 > diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-> index 25e45121af..78eeda31d1 100644
+> index 78eeda31d1..bdfcac111f 100644
 > --- a/target/arm/helper-a64.c
 > +++ b/target/arm/helper-a64.c
-> @@ -599,3 +599,52 @@ ADVSIMD_HALFOP(min)
->  ADVSIMD_HALFOP(max)
+> @@ -600,6 +600,30 @@ ADVSIMD_HALFOP(max)
 >  ADVSIMD_HALFOP(minnum)
 >  ADVSIMD_HALFOP(maxnum)
-> +
-> +/*
-> + * Floating point comparisons produce an integer result. Softfloat
-> + * routines return float_relation types which we convert to the 0/-1
-> + * Neon requires.
-> + */
-> +
-> +#define ADVSIMD_CMPRES(test) (test) ? 0xffff : 0
-> +
-> +uint32_t HELPER(advsimd_ceq_f16)(float16 a, float16 b, void *fpstp)
+>  
+> +/* Data processing - scalar floating-point and advanced SIMD */
+> +float16 HELPER(advsimd_mulxh)(float16 a, float16 b, void *fpstp)
 > +{
 > +    float_status *fpst = fpstp;
-> +    int compare = float16_compare_quiet(a, b, fpst);
-> +    return ADVSIMD_CMPRES(compare == float_relation_equal);
-
-Not using float16_eq etc?
-
-> +}
 > +
-> +uint32_t HELPER(advsimd_cge_f16)(float16 a, float16 b, void *fpstp)
-> +{
-> +    float_status *fpst = fpstp;
-> +    int compare = float16_compare(a, b, fpst);
-> +    return ADVSIMD_CMPRES(compare == float_relation_greater ||
-> +                          compare == float_relation_equal);
+> +    a = float16_squash_input_denormal(a, fpst);
+> +    b = float16_squash_input_denormal(b, fpst);
+> +
+> +    if ((float16_is_zero(a) && float16_is_infinity(b)) ||
+> +        (float16_is_infinity(a) && float16_is_zero(b))) {
+> +        /* 2.0 with the sign bit set to sign(A) XOR sign(B) */
+> +        return make_float16((1U << 14) |
+> +                            ((float16_val(a) ^ float16_val(b)) & (1U << 15)));
 
-Especially float16_le(b, a, fpst).
+Since you diced all of the structures, are you going to dice all of the (now
+pointless) make/val calls?
 
 Otherwise,
 
