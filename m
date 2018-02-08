@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ejesE-0005oe-0s
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:35:55 -0500
+	(envelope-from <penberg@gmail.com>) id 1ejf7E-0001si-G1
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:51:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ejes9-0007F3-3v
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:35:54 -0500
-Received: from mga11.intel.com ([192.55.52.93]:2795)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ejes8-0007EX-P3
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:35:49 -0500
-Message-ID: <5A7BE253.8050306@intel.com>
-Date: Thu, 08 Feb 2018 13:38:27 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
-	<20180207015803-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180207015803-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] virtio-balloon: free page hint
- reporting support
+	(envelope-from <penberg@gmail.com>) id 1ejf7D-0000Qd-Lk
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 00:51:24 -0500
+Sender: Pekka Enberg <penberg@gmail.com>
+From: Pekka Enberg <penberg@iki.fi>
+Date: Thu,  8 Feb 2018 07:50:39 +0200
+Message-Id: <20180208055039.24666-4-penberg@iki.fi>
+In-Reply-To: <20180208055039.24666-1-penberg@iki.fi>
+References: <20180208055039.24666-1-penberg@iki.fi>
+Subject: [Qemu-devel] [PATCH v1 3/3] raspi: Add "raspi3" machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +20,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, Pekka Enberg <penberg@iki.fi>
 
-On 02/07/2018 08:02 AM, Michael S. Tsirkin wrote:
-> On Tue, Feb 06, 2018 at 07:08:16PM +0800, Wei Wang wrote:
->> This is the deivce part implementation to add a new feature,
->> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
->> receives the guest free page hints from the driver and clears the
->> corresponding bits in the dirty bitmap, so that those free pages are
->> not transferred by the migration thread to the destination.
->>
->> Please see the driver patch link for test results:
->> https://lkml.org/lkml/2018/2/4/60
->>
->> ChangeLog:
->> v1->v2:
->>      1) virtio-balloon
->>          - use subsections to save free_page_report_cmd_id;
->>          - poll the free page vq after sending a cmd id to the driver;
->>          - change the free page vq size to VIRTQUEUE_MAX_SIZE;
->>          - virtio_balloon_poll_free_page_hints: handle the corner case
->>            that the free page block reported from the driver may cross
->>            the RAMBlock boundary.
->>      2) migration/ram.c
->>          - use balloon_free_page_poll to start the optimization
->>
->> Wei Wang (3):
->>    virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
->>    migration: use the free page reporting feature from balloon
->>    virtio-balloon: add a timer to limit the free page report waiting time
-> This feature needs in-tree documentation about possible ways to use it,
-> tradeoffs involved etc.
+This patch adds a "raspi3" machine type, which can now be selected as
+the machine to run on by users via the "-M" command line option to QEMU.
 
-OK. I plan to add the documentation in later versions after we mostly 
-finalize the QEMU part design.
+The machine type does *not* ignore memory transaction failures so we
+likely need to add some dummy devices later when people run something
+more complicated than what I'm using for testing.
 
-Best,
-Wei
+Signed-off-by: Pekka Enberg <penberg@iki.fi>
+---
+ hw/arm/raspi.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index 66fe10e376..048ff23a51 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -187,3 +187,24 @@ static void raspi2_machine_init(MachineClass *mc)
+     mc->ignore_memory_transaction_failures = true;
+ };
+ DEFINE_MACHINE("raspi2", raspi2_machine_init)
++
++static void raspi3_init(MachineState *machine)
++{
++    raspi_init(machine, 3);
++}
++
++static void raspi3_machine_init(MachineClass *mc)
++{
++    mc->desc = "Raspberry Pi 3";
++    mc->init = raspi3_init;
++    mc->block_default_type = IF_SD;
++    mc->no_parallel = 1;
++    mc->no_floppy = 1;
++    mc->no_cdrom = 1;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a53");
++    mc->max_cpus = BCM2836_NCPUS;
++    mc->min_cpus = BCM2836_NCPUS;
++    mc->default_cpus = BCM2836_NCPUS;
++    mc->default_ram_size = 1024 * 1024 * 1024;
++}
++DEFINE_MACHINE("raspi3", raspi3_machine_init)
+-- 
+2.14.3
