@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejtEp-0003KQ-Ep
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:56:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1ejtI2-0006HW-0z
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ejtEo-0001fv-8D
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:56:11 -0500
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:34077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ejtEo-0001fD-3V
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:56:10 -0500
-Received: by mail-io0-x241.google.com with SMTP id x188so724833iod.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 12:56:09 -0800 (PST)
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
-	<20180208173157.24705-13-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bc79bcf4-249a-0ae1-5099-7aeb78e97e04@linaro.org>
-Date: Thu, 8 Feb 2018 12:56:05 -0800
+	(envelope-from <eblake@redhat.com>) id 1ejtHx-0003yW-Gd
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:59:30 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54952 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ejtHx-0003yH-Bq
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 15:59:25 -0500
+References: <20180207175014.11157-1-lcapitulino@redhat.com>
+	<20180207175014.11157-2-lcapitulino@redhat.com>
+	<20180208195939.GJ13301@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dab9dcff-619f-9c0f-0c8c-f6542b73ca88@redhat.com>
+Date: Thu, 8 Feb 2018 14:59:17 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180208173157.24705-13-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180208195939.GJ13301@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/32] arm/translate-a64: add FP16
- FMULA/X/S to simd_three_reg_same_fp16
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, mihajlov@linux.vnet.ibm.com
 
-On 02/08/2018 09:31 AM, Alex Bennée wrote:
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  target/arm/helper-a64.c    | 24 ++++++++++++++++++++++++
->  target/arm/helper-a64.h    |  2 ++
->  target/arm/translate-a64.c | 15 +++++++++++++++
->  3 files changed, 41 insertions(+)
+On 02/08/2018 01:59 PM, Eduardo Habkost wrote:
+> On Wed, Feb 07, 2018 at 12:50:13PM -0500, Luiz Capitulino wrote:
+>> The query-cpus command has an extremely serious side effect:
+>> it always interrupt all running vCPUs so that they can run
+>> ioctl calls. This can cause a huge performance degradation for
+>> some workloads. And most of the information retrieved by the
+>> ioctl calls are not even used by query-cpus.
+>>
+>> This commit introduces a replacement for query-cpus called
+>> query-cpus-fast, which has the following features:
+>>
+
+>> +# Notes: @halted is a transient state that changes frequently.  By the time the
+>> +#        data is sent to the client, the guest may no longer be halted.
+>> +##
+>> +{ 'struct': 'CpuInfo2',
+>> +  'data': {'cpu-index': 'int', '*halted': 'bool', 'qom-path': 'str',
+>> +           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
 > 
-> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-> index 78eeda31d1..bdfcac111f 100644
-> --- a/target/arm/helper-a64.c
-> +++ b/target/arm/helper-a64.c
-> @@ -600,6 +600,30 @@ ADVSIMD_HALFOP(max)
->  ADVSIMD_HALFOP(minnum)
->  ADVSIMD_HALFOP(maxnum)
->  
-> +/* Data processing - scalar floating-point and advanced SIMD */
-> +float16 HELPER(advsimd_mulxh)(float16 a, float16 b, void *fpstp)
-> +{
-> +    float_status *fpst = fpstp;
-> +
-> +    a = float16_squash_input_denormal(a, fpst);
-> +    b = float16_squash_input_denormal(b, fpst);
-> +
-> +    if ((float16_is_zero(a) && float16_is_infinity(b)) ||
-> +        (float16_is_infinity(a) && float16_is_zero(b))) {
-> +        /* 2.0 with the sign bit set to sign(A) XOR sign(B) */
-> +        return make_float16((1U << 14) |
-> +                            ((float16_val(a) ^ float16_val(b)) & (1U << 15)));
+> This will require duplicating struct fields every time we add a
+> new field to query-cpus-fast (e.g. how would VIktor's
+> CpuInfoS390State patch[1] look like if rebased on top of yours?).
+> 
+> One way to avoid that is to use CpuInfo for both, and make all
+> "slow"  fields optional.  Another option is to use QAPI
+> inheritance, but it could be a little complicated if unions are
+> involved?
 
-Since you diced all of the structures, are you going to dice all of the (now
-pointless) make/val calls?
+Inheritance is better than optional fields for the sake of introspection 
+learning which fields to expect.
 
-Otherwise,
+Put the common fields to both interfaces in the base class, then have 
+the slower (older) CpuInfo class extend the base class to add the 
+additional fields.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Unions should be able to inherit just fine from structs (after all, a 
+flat union requires a struct base); but if we need two layers of unions, 
+we'll need to enhance QAPI code generation first.
 
-
-r~
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
