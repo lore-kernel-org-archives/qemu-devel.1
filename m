@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejnak-0003z2-N2
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:54:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1ejnbi-0004qc-9i
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:55:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ejnah-0003y0-Jp
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:54:26 -0500
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:39526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ejnah-0003wi-Co
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:54:23 -0500
-Received: by mail-wm0-f43.google.com with SMTP id b21so10483145wme.4
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 06:54:23 -0800 (PST)
-References: <20180206203048.11096-1-rkagan@virtuozzo.com>
-	<20180206203048.11096-9-rkagan@virtuozzo.com>
-	<5b5586d3-649d-272c-c63d-b0ae2bdb466d@redhat.com>
-	<20180207183751.GA18247@rkaganb.sw.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <50b290a9-43ba-d45f-2343-281338aa6def@redhat.com>
-Date: Thu, 8 Feb 2018 15:54:19 +0100
+	(envelope-from <eblake@redhat.com>) id 1ejnbc-0004z1-Go
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 09:55:26 -0500
+References: <20180208132336.6519-1-edgar.kaziakhmedov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <60f2b126-21f2-c46b-d4c9-143b28b1f613@redhat.com>
+Date: Thu, 8 Feb 2018 08:54:57 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180207183751.GA18247@rkaganb.sw.ru>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180208132336.6519-1-edgar.kaziakhmedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 08/34] hyperv: qom-ify SynIC
+Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: increase maximum size of the
+ PWRITE_ZERO request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Krish Sadhukhan <krish.sadhukhan@oracle.com>, "Marcos E. Matsunaga" <Marcos.Matsunaga@oracle.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Vadim Rozenfeld <vrozenfe@redhat.com>, "Denis V. Lunev" <den@openvz.org>, si-wei liu <si-wei.liu@oracle.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Cathy Avery <cavery@redhat.com>
+To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
 
-On 07/02/2018 19:37, Roman Kagan wrote:
-> On Wed, Feb 07, 2018 at 11:45:28AM +0100, Paolo Bonzini wrote:
->> On 06/02/2018 21:30, Roman Kagan wrote:
->>> +static SynICState *get_synic(X86CPU *cpu)
->>> +{
->>> +    SynICState *synic =
->>> +        SYNIC(object_resolve_path_component(OBJECT(cpu), "synic"));
->>> +    assert(synic);
->>> +    return synic;
->>> +}
->>> +
->>
->> This is somewhat slow, maybe add the pointer to X86CPU?
+On 02/08/2018 07:23 AM, Edgar Kaziakhmedov wrote:
+> Upstream NBD protocol implementation supports an efficient zero out
+> mechanism over the wire, along with the ability to check whether a
+> client allows using a hole.
 > 
-> It is, but it's only used on slow paths.  I was reluctant to clutter
-> X86CPU with this stuff.
+> Accordingly, since PWRITE_ZERO doesn't involve any payload on the wire,
+> increase a maximum size of the PWRITE_ZERO request up to 1Gb (aligned).
+> Moreover, such change will decrease the number of PWRITE_ZERO NBD commands
+> in comparison with the current 32M limit. The benefits of
+> the larger constraint can be examined in a block mirroring over NBD.
 
-Sounds good then.  Maybe add a comment.
+We've got a potential problem.  Unless you have out-of-band 
+communication of the maximum NBD_CMD_WRITE_ZEROES sizing (or if the NBD 
+protocol is enhanced to advertise that as an additional piece of block 
+size information during NBD_OPT_GO), then a client CANNOT assume that 
+the server will accept a request this large.  We MIGHT get lucky if all 
+existing servers that accept WRITE_ZEROES requests either act on large 
+requests or reply with EINVAL but do not outright drop the connection 
+(which is different from servers that DO outright drop the connection 
+for an NBD_CMD_WRITE larger than 32M).  But I don't know if that's how 
+all servers behave, so sending a too-large WRITE_ZEROES request may have 
+the unintended consequence of killing the connection.
 
-Paolo
+I'm adding the NBD list; perhaps before accepting this into qemu, I 
+should revive my earlier attempt at codifying an NBD_OPT_GO info 
+advertisement for maximum trim/zero sizing, which would let clients have 
+a guarantee that their choice of sizing won't cause unexpected failures.
 
->>> +void hyperv_synic_add(X86CPU *cpu)
->>> +{
->>> +    Object *obj;
->>> +
->>> +    obj = object_new(TYPE_SYNIC);
->>> +    object_property_add_child(OBJECT(cpu), "synic", obj, &error_abort);
->>> +    object_unref(obj);
->>> +    object_property_set_bool(obj, true, "realized", &error_abort);
->>> +}
->>> +
->>> +void hyperv_synic_reset(X86CPU *cpu)
->>> +{
->>> +    device_reset(DEVICE(get_synic(cpu)));
->>> +}
->>> +
->>> +void hyperv_synic_update(X86CPU *cpu)
->>> +{
->>> +    synic_update(get_synic(cpu));
->>> +}
->>> +
->>
->> Maybe rename to x86_cpu_hyperv_{add,get,reset,update}_synic?
 > 
-> I don't mind, can do.
+> Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+> ---
+>   block/nbd.c         | 2 +-
+>   include/block/nbd.h | 3 +++
+>   2 files changed, 4 insertions(+), 1 deletion(-)
 > 
-> Thanks,
-> Roman.
+> diff --git a/block/nbd.c b/block/nbd.c
+> index 94220f6d14..3641d9244e 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
+> @@ -477,7 +477,7 @@ static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
+>       uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
 > 
+>       bs->bl.max_pdiscard = max;
+> -    bs->bl.max_pwrite_zeroes = max;
+> +    bs->bl.max_pwrite_zeroes = NBD_MAX_PWRITE_ZERO_SIZE;
+
+max_discard should get the same treatment, whatever we decide (yes, it 
+is feasible that a server may have different limits for NBD_CMD_TRIM 
+than for NBD_CMD_WRITE_ZEROES, but in general, it's probably easier if 
+both commands share theh same limit as both have very similar 
+implementations).
+
+>       bs->bl.max_transfer = max;
+> 
+>       if (s->info.opt_block &&
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index ee74ec391a..e2f18e2332 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -182,6 +182,9 @@ enum {
+>   /* Maximum size of a single READ/WRITE data buffer */
+>   #define NBD_MAX_BUFFER_SIZE (32 * 1024 * 1024)
+> 
+> +/* Maximum size of a single PWRITE_ZERO request 1Gb */
+> +#define NBD_MAX_PWRITE_ZERO_SIZE (1024 * 1024 * 1024)
+> +
+>   /* Maximum size of an export name. The NBD spec requires 256 and
+>    * suggests that servers support up to 4096, but we stick to only the
+>    * required size so that we can stack-allocate the names, and because
+> --
+> 2.11.0
+> 
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
