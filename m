@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ekAtI-0005Bk-P5
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:47:09 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ekAuP-0006Eq-CY
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:48:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ekAtH-0004hD-TN
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:47:08 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:32960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ekAtH-0004h3-OD
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:47:07 -0500
-Received: by mail-oi0-x243.google.com with SMTP id l8so6419227oig.0
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 07:47:07 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ekAuO-000573-Fs
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:48:17 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180209152412.23626-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1b0c7678-21b1-562e-5315-f6a761f21237@amsat.org>
+Date: Fri, 9 Feb 2018 12:48:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdX07rESnzAko-Tjp6xvdmPEKsX0djp3sP5HZqzv6jvWMw@mail.gmail.com>
-References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
-	<1518189456-2873-4-git-send-email-geert+renesas@glider.be>
-	<CAFEAcA_Z1JH6RXp19g2N3rV3TGOTa7LzFctEScrENBYB8eAf3w@mail.gmail.com>
-	<CAMuHMdX07rESnzAko-Tjp6xvdmPEKsX0djp3sP5HZqzv6jvWMw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Feb 2018 15:46:46 +0000
-Message-ID: <CAFEAcA9nUXjORak2TB-RGmLeEax0DZ11FsoPDy09V4w7nAXByw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH/RFC 3/5] hw/arm/virt: Allow dynamic sysbus
- devices again
+In-Reply-To: <20180209152412.23626-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] block/nvme: fix Coverity reports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Alex Williamson <alex.williamson@redhat.com>, Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: famz@redhat.com
 
-On 9 February 2018 at 15:37, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> Hi Peter,
->
-> On Fri, Feb 9, 2018 at 4:27 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 9 February 2018 at 15:17, Geert Uytterhoeven <geert+renesas@glider.be> wrote:
->>> Allow the instantation of generic dynamic sysbus devices again, without
->>> the need to create a new device-specific vfio type.
->>>
->>> This is a partial revert of commit  6f2062b9758ebc64 ("hw/arm/virt:
->>> Allow only supported dynamic sysbus devices").
->>>
->>> Not-Yet-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
->>> ---
->>>  hw/arm/virt.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>> index b334c82edae9fb1f..fa83784fc08ed076 100644
->>> --- a/hw/arm/virt.c
->>> +++ b/hw/arm/virt.c
->>> @@ -1596,6 +1596,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->>>      mc->max_cpus = 255;
->>>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
->>>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
->>> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
->>>      mc->block_default_type = IF_VIRTIO;
->>>      mc->no_cdrom = 1;
->>>      mc->pci_allow_0_address = true;
->>
->> This needs a lot of justification. Dynamic sysbus is not supposed
->> to be for plugging any random sysbus device in, it's for vfio,
->> which needs special casing anyway to work right. (Overall it's
->
-> Sure. Is there a way to limit this to vfio devices?
+On 02/09/2018 12:24 PM, Paolo Bonzini wrote:
+> 1) string not null terminated in sysfs_find_group_file
 
-That would be the code here which implements the whitelist of
-"only allow this for the vfio devices which we have
-support for mangling the device tree for and know will work".
+CID 1385854
 
->> a terrible hack -- in an ideal world all vfio would use pci
->> or another probeable bus.)
->
-> What about vfio-platform, which is my use case?
-> On DT-based systems, platform devices are described very well in DT (even
-> better than what's provided by probing PCI IDs and BARs ;-)
+> 
+> 2) NULL pointer dereference and dead local variable in nvme_init.
 
-The TYPE_VFIO_* devices in the whitelist all use DT, yes:
-the code to handle creating/mangling the dt nodes for the
-passed-through device is in hw/arm/sysbus-fdt.c.
+CID 1385855
 
-thanks
--- PMM
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/nvme.c        | 14 ++++++--------
+>  util/vfio-helpers.c |  2 +-
+>  2 files changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index e9d0e218fc..ce217ffc81 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -553,7 +553,6 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>      uint64_t cap;
+>      uint64_t timeout_ms;
+>      uint64_t deadline, now;
+> -    Error *local_err = NULL;
+>  
+>      qemu_co_mutex_init(&s->dma_map_lock);
+>      qemu_co_queue_init(&s->dma_flush_queue);
+> @@ -645,11 +644,6 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>                             false, nvme_handle_event, nvme_poll_cb);
+>  
+>      nvme_identify(bs, namespace, errp);
+
+The problem seems local_err is not used as nvme_identify() argument;
+however this big function uses both errp and local_err so maybe clean it
+to keep one style is better.
+
+Isn't local_err + error_propagate() the cleaner way?
+
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        ret = -EIO;
+> -        goto fail_handler;
+> -    }
+>  
+>      /* Set up command queues. */
+>      if (!nvme_add_io_queue(bs, errp)) {
+> @@ -665,8 +659,12 @@ fail_queue:
+>      nvme_free_queue_pair(bs, s->queues[0]);
+>  fail:
+>      g_free(s->queues);
+> -    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+> -    qemu_vfio_close(s->vfio);
+> +    if (s->regs) {
+> +        qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+> +    }
+> +    if (s->vfio) {
+> +        qemu_vfio_close(s->vfio);
+> +    }
+>      event_notifier_cleanup(&s->irq_notifier);
+>      return ret;
+>  }
+> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+> index f478b68400..006674c916 100644
+> --- a/util/vfio-helpers.c
+> +++ b/util/vfio-helpers.c
+> @@ -104,7 +104,7 @@ static char *sysfs_find_group_file(const char *device, Error **errp)
+>      char *path = NULL;
+>  
+>      sysfs_link = g_strdup_printf("/sys/bus/pci/devices/%s/iommu_group", device);
+> -    sysfs_group = g_malloc(PATH_MAX);
+> +    sysfs_group = g_malloc0(PATH_MAX);
+
+This looks odd... When can sysfs_group not be null-terminated?
+Since we have strlen(sysfs_link) > 0, readlink() can not return 0.
+
+Maybe this is enough to silent coverity:
+
+    if (readlink(sysfs_link, sysfs_group, PATH_MAX - 1) <= 0) {
+
+>      if (readlink(sysfs_link, sysfs_group, PATH_MAX - 1) == -1) {
+>          error_setg_errno(errp, errno, "Failed to find iommu group sysfs path");
+>          goto out;
+> 
