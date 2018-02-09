@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sk-0000x3-K4
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:28 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sm-0000z1-Pv
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sj-0001tT-8U
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:26 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46250)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sl-0001vS-Gb
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:28 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46254)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6Sj-0001oy-0d
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:25 -0500
+	id 1ek6Sl-0001td-95
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:27 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sg-0002Zg-Fa
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:22 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Se-0002Z0-CE
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:20 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:02:54 +0000
-Message-Id: <20180209110314.11766-11-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:02:51 +0000
+Message-Id: <20180209110314.11766-8-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 10/30] target/arm: implement SM3 instructions
+Subject: [Qemu-devel] [PULL 07/30] target/arm: Handle exceptions during
+ exception stack pop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,280 +30,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Handle possible MPU faults, SAU faults or bus errors when
+popping register state off the stack during exception return.
 
-This implements emulation of the new SM3 instructions that have
-been added as an optional extension to the ARMv8 Crypto Extensions
-in ARM v8.2.
-
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Message-id: 20180207111729.15737-4-ard.biesheuvel@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1517324542-6607-8-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.h           |  1 +
- target/arm/helper.h        |  4 ++
- target/arm/crypto_helper.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 88 ++++++++++++++++++++++++++++++++++++++++--
- 4 files changed, 186 insertions(+), 3 deletions(-)
+ target/arm/helper.c | 115 ++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 94 insertions(+), 21 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 86411320aa..f63b6e174a 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1343,6 +1343,7 @@ enum arm_features {
-     ARM_FEATURE_SVE, /* has Scalable Vector Extension */
-     ARM_FEATURE_V8_SHA512, /* implements SHA512 part of v8 Crypto Extensions */
-     ARM_FEATURE_V8_SHA3, /* implements SHA3 part of v8 Crypto Extensions */
-+    ARM_FEATURE_V8_SM3, /* implements SM3 part of v8 Crypto Extensions */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 81d4607028..9d9f42cc89 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -539,6 +539,10 @@ DEF_HELPER_FLAGS_3(crypto_sha512h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
- DEF_HELPER_FLAGS_2(crypto_sha512su0, TCG_CALL_NO_RWG, void, ptr, ptr)
- DEF_HELPER_FLAGS_3(crypto_sha512su1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
- 
-+DEF_HELPER_FLAGS_5(crypto_sm3tt, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32, i32)
-+DEF_HELPER_FLAGS_3(crypto_sm3partw1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
-+DEF_HELPER_FLAGS_3(crypto_sm3partw2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
-+
- DEF_HELPER_FLAGS_3(crc32, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
- DEF_HELPER_FLAGS_3(crc32c, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
- DEF_HELPER_2(dc_zva, void, env, i64)
-diff --git a/target/arm/crypto_helper.c b/target/arm/crypto_helper.c
-index 3d8d1fb5e7..2f6744edb0 100644
---- a/target/arm/crypto_helper.c
-+++ b/target/arm/crypto_helper.c
-@@ -507,3 +507,99 @@ void HELPER(crypto_sha512su1)(void *vd, void *vn, void *vm)
-     rd[0] += s1_512(rn[0]) + rm[0];
-     rd[1] += s1_512(rn[1]) + rm[1];
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c74f076d9d..c6e3b3913e 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6223,6 +6223,67 @@ pend_fault:
+     return false;
  }
-+
-+void HELPER(crypto_sm3partw1)(void *vd, void *vn, void *vm)
+ 
++static bool v7m_stack_read(ARMCPU *cpu, uint32_t *dest, uint32_t addr,
++                           ARMMMUIdx mmu_idx)
 +{
-+    uint64_t *rd = vd;
-+    uint64_t *rn = vn;
-+    uint64_t *rm = vm;
-+    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
-+    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
-+    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
-+    uint32_t t;
++    CPUState *cs = CPU(cpu);
++    CPUARMState *env = &cpu->env;
++    MemTxAttrs attrs = {};
++    MemTxResult txres;
++    target_ulong page_size;
++    hwaddr physaddr;
++    int prot;
++    ARMMMUFaultInfo fi;
++    bool secure = mmu_idx & ARM_MMU_IDX_M_S;
++    int exc;
++    bool exc_secure;
++    uint32_t value;
 +
-+    t = CR_ST_WORD(d, 0) ^ CR_ST_WORD(n, 0) ^ ror32(CR_ST_WORD(m, 1), 17);
-+    CR_ST_WORD(d, 0) = t ^ ror32(t, 17) ^ ror32(t, 9);
-+
-+    t = CR_ST_WORD(d, 1) ^ CR_ST_WORD(n, 1) ^ ror32(CR_ST_WORD(m, 2), 17);
-+    CR_ST_WORD(d, 1) = t ^ ror32(t, 17) ^ ror32(t, 9);
-+
-+    t = CR_ST_WORD(d, 2) ^ CR_ST_WORD(n, 2) ^ ror32(CR_ST_WORD(m, 3), 17);
-+    CR_ST_WORD(d, 2) = t ^ ror32(t, 17) ^ ror32(t, 9);
-+
-+    t = CR_ST_WORD(d, 3) ^ CR_ST_WORD(n, 3) ^ ror32(CR_ST_WORD(d, 0), 17);
-+    CR_ST_WORD(d, 3) = t ^ ror32(t, 17) ^ ror32(t, 9);
-+
-+    rd[0] = d.l[0];
-+    rd[1] = d.l[1];
-+}
-+
-+void HELPER(crypto_sm3partw2)(void *vd, void *vn, void *vm)
-+{
-+    uint64_t *rd = vd;
-+    uint64_t *rn = vn;
-+    uint64_t *rm = vm;
-+    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
-+    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
-+    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
-+    uint32_t t = CR_ST_WORD(n, 0) ^ ror32(CR_ST_WORD(m, 0), 25);
-+
-+    CR_ST_WORD(d, 0) ^= t;
-+    CR_ST_WORD(d, 1) ^= CR_ST_WORD(n, 1) ^ ror32(CR_ST_WORD(m, 1), 25);
-+    CR_ST_WORD(d, 2) ^= CR_ST_WORD(n, 2) ^ ror32(CR_ST_WORD(m, 2), 25);
-+    CR_ST_WORD(d, 3) ^= CR_ST_WORD(n, 3) ^ ror32(CR_ST_WORD(m, 3), 25) ^
-+                        ror32(t, 17) ^ ror32(t, 2) ^ ror32(t, 26);
-+
-+    rd[0] = d.l[0];
-+    rd[1] = d.l[1];
-+}
-+
-+void HELPER(crypto_sm3tt)(void *vd, void *vn, void *vm, uint32_t imm2,
-+                          uint32_t opcode)
-+{
-+    uint64_t *rd = vd;
-+    uint64_t *rn = vn;
-+    uint64_t *rm = vm;
-+    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
-+    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
-+    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
-+    uint32_t t;
-+
-+    assert(imm2 < 4);
-+
-+    if (opcode == 0 || opcode == 2) {
-+        /* SM3TT1A, SM3TT2A */
-+        t = par(CR_ST_WORD(d, 3), CR_ST_WORD(d, 2), CR_ST_WORD(d, 1));
-+    } else if (opcode == 1) {
-+        /* SM3TT1B */
-+        t = maj(CR_ST_WORD(d, 3), CR_ST_WORD(d, 2), CR_ST_WORD(d, 1));
-+    } else if (opcode == 3) {
-+        /* SM3TT2B */
-+        t = cho(CR_ST_WORD(d, 3), CR_ST_WORD(d, 2), CR_ST_WORD(d, 1));
-+    } else {
-+        g_assert_not_reached();
++    if (get_phys_addr(env, addr, MMU_DATA_LOAD, mmu_idx, &physaddr,
++                      &attrs, &prot, &page_size, &fi, NULL)) {
++        /* MPU/SAU lookup failed */
++        if (fi.type == ARMFault_QEMU_SFault) {
++            qemu_log_mask(CPU_LOG_INT,
++                          "...SecureFault with SFSR.AUVIOL during unstack\n");
++            env->v7m.sfsr |= R_V7M_SFSR_AUVIOL_MASK | R_V7M_SFSR_SFARVALID_MASK;
++            env->v7m.sfar = addr;
++            exc = ARMV7M_EXCP_SECURE;
++            exc_secure = false;
++        } else {
++            qemu_log_mask(CPU_LOG_INT,
++                          "...MemManageFault with CFSR.MUNSTKERR\n");
++            env->v7m.cfsr[secure] |= R_V7M_CFSR_MUNSTKERR_MASK;
++            exc = ARMV7M_EXCP_MEM;
++            exc_secure = secure;
++        }
++        goto pend_fault;
 +    }
 +
-+    t += CR_ST_WORD(d, 0) + CR_ST_WORD(m, imm2);
-+
-+    CR_ST_WORD(d, 0) = CR_ST_WORD(d, 1);
-+
-+    if (opcode < 2) {
-+        /* SM3TT1A, SM3TT1B */
-+        t += CR_ST_WORD(n, 3) ^ ror32(CR_ST_WORD(d, 3), 20);
-+
-+        CR_ST_WORD(d, 1) = ror32(CR_ST_WORD(d, 2), 23);
-+    } else {
-+        /* SM3TT2A, SM3TT2B */
-+        t += CR_ST_WORD(n, 3);
-+        t ^= rol32(t, 9) ^ rol32(t, 17);
-+
-+        CR_ST_WORD(d, 1) = ror32(CR_ST_WORD(d, 2), 13);
++    value = address_space_ldl(arm_addressspace(cs, attrs), physaddr,
++                              attrs, &txres);
++    if (txres != MEMTX_OK) {
++        /* BusFault trying to read the data */
++        qemu_log_mask(CPU_LOG_INT, "...BusFault with BFSR.UNSTKERR\n");
++        env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_UNSTKERR_MASK;
++        exc = ARMV7M_EXCP_BUS;
++        exc_secure = false;
++        goto pend_fault;
 +    }
 +
-+    CR_ST_WORD(d, 2) = CR_ST_WORD(d, 3);
-+    CR_ST_WORD(d, 3) = t;
++    *dest = value;
++    return true;
 +
-+    rd[0] = d.l[0];
-+    rd[1] = d.l[1];
++pend_fault:
++    /* By pending the exception at this point we are making
++     * the IMPDEF choice "overridden exceptions pended" (see the
++     * MergeExcInfo() pseudocode). The other choice would be to not
++     * pend them now and then make a choice about which to throw away
++     * later if we have two derived exceptions.
++     */
++    armv7m_nvic_set_pending(env->nvic, exc, exc_secure);
++    return false;
 +}
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 19804fd110..2f8b4e6150 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11623,8 +11623,19 @@ static void disas_crypto_three_reg_sha512(DisasContext *s, uint32_t insn)
-             break;
++
+ /* Return true if we're using the process stack pointer (not the MSP) */
+ static bool v7m_using_psp(CPUARMState *env)
+ {
+@@ -6912,6 +6973,11 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+                                               !return_to_handler,
+                                               return_to_sp_process);
+         uint32_t frameptr = *frame_sp_p;
++        bool pop_ok = true;
++        ARMMMUIdx mmu_idx;
++
++        mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, return_to_secure,
++                                                        !return_to_handler);
+ 
+         if (!QEMU_IS_ALIGNED(frameptr, 8) &&
+             arm_feature(env, ARM_FEATURE_V8)) {
+@@ -6938,29 +7004,38 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+                 return;
+             }
+ 
+-            env->regs[4] = ldl_phys(cs->as, frameptr + 0x8);
+-            env->regs[5] = ldl_phys(cs->as, frameptr + 0xc);
+-            env->regs[6] = ldl_phys(cs->as, frameptr + 0x10);
+-            env->regs[7] = ldl_phys(cs->as, frameptr + 0x14);
+-            env->regs[8] = ldl_phys(cs->as, frameptr + 0x18);
+-            env->regs[9] = ldl_phys(cs->as, frameptr + 0x1c);
+-            env->regs[10] = ldl_phys(cs->as, frameptr + 0x20);
+-            env->regs[11] = ldl_phys(cs->as, frameptr + 0x24);
++            pop_ok =
++                v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[5], frameptr + 0xc, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[6], frameptr + 0x10, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[7], frameptr + 0x14, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[8], frameptr + 0x18, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[9], frameptr + 0x1c, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[10], frameptr + 0x20, mmu_idx) &&
++                v7m_stack_read(cpu, &env->regs[11], frameptr + 0x24, mmu_idx);
+ 
+             frameptr += 0x28;
          }
-     } else {
--        unallocated_encoding(s);
--        return;
-+        switch (opcode) {
-+        case 0: /* SM3PARTW1 */
-+            feature = ARM_FEATURE_V8_SM3;
-+            genfn = gen_helper_crypto_sm3partw1;
-+            break;
-+        case 1: /* SM3PARTW2 */
-+            feature = ARM_FEATURE_V8_SM3;
-+            genfn = gen_helper_crypto_sm3partw2;
-+            break;
-+        default:
-+            unallocated_encoding(s);
+ 
+-        /* Pop registers. TODO: make these accesses use the correct
+-         * attributes and address space (S/NS, priv/unpriv) and handle
+-         * memory transaction failures.
+-         */
+-        env->regs[0] = ldl_phys(cs->as, frameptr);
+-        env->regs[1] = ldl_phys(cs->as, frameptr + 0x4);
+-        env->regs[2] = ldl_phys(cs->as, frameptr + 0x8);
+-        env->regs[3] = ldl_phys(cs->as, frameptr + 0xc);
+-        env->regs[12] = ldl_phys(cs->as, frameptr + 0x10);
+-        env->regs[14] = ldl_phys(cs->as, frameptr + 0x14);
+-        env->regs[15] = ldl_phys(cs->as, frameptr + 0x18);
++        /* Pop registers */
++        pop_ok = pop_ok &&
++            v7m_stack_read(cpu, &env->regs[0], frameptr, mmu_idx) &&
++            v7m_stack_read(cpu, &env->regs[1], frameptr + 0x4, mmu_idx) &&
++            v7m_stack_read(cpu, &env->regs[2], frameptr + 0x8, mmu_idx) &&
++            v7m_stack_read(cpu, &env->regs[3], frameptr + 0xc, mmu_idx) &&
++            v7m_stack_read(cpu, &env->regs[12], frameptr + 0x10, mmu_idx) &&
++            v7m_stack_read(cpu, &env->regs[14], frameptr + 0x14, mmu_idx) &&
++            v7m_stack_read(cpu, &env->regs[15], frameptr + 0x18, mmu_idx) &&
++            v7m_stack_read(cpu, &xpsr, frameptr + 0x1c, mmu_idx);
++
++        if (!pop_ok) {
++            /* v7m_stack_read() pended a fault, so take it (as a tail
++             * chained exception on the same stack frame)
++             */
++            v7m_exception_taken(cpu, excret, true, false);
 +            return;
 +        }
-     }
  
-     if (!arm_dc_feature(s, feature)) {
-@@ -11737,6 +11748,9 @@ static void disas_crypto_four_reg(DisasContext *s, uint32_t insn)
-     case 1: /* BCAX */
-         feature = ARM_FEATURE_V8_SHA3;
-         break;
-+    case 2: /* SM3SS1 */
-+        feature = ARM_FEATURE_V8_SM3;
-+        break;
-     default:
-         unallocated_encoding(s);
-         return;
-@@ -11784,7 +11798,33 @@ static void disas_crypto_four_reg(DisasContext *s, uint32_t insn)
-         tcg_temp_free_i64(tcg_res[0]);
-         tcg_temp_free_i64(tcg_res[1]);
-     } else {
--        g_assert_not_reached();
-+        TCGv_i32 tcg_op1, tcg_op2, tcg_op3, tcg_res, tcg_zero;
-+
-+        tcg_op1 = tcg_temp_new_i32();
-+        tcg_op2 = tcg_temp_new_i32();
-+        tcg_op3 = tcg_temp_new_i32();
-+        tcg_res = tcg_temp_new_i32();
-+        tcg_zero = tcg_const_i32(0);
-+
-+        read_vec_element_i32(s, tcg_op1, rn, 3, MO_32);
-+        read_vec_element_i32(s, tcg_op2, rm, 3, MO_32);
-+        read_vec_element_i32(s, tcg_op3, ra, 3, MO_32);
-+
-+        tcg_gen_rotri_i32(tcg_res, tcg_op1, 20);
-+        tcg_gen_add_i32(tcg_res, tcg_res, tcg_op2);
-+        tcg_gen_add_i32(tcg_res, tcg_res, tcg_op3);
-+        tcg_gen_rotri_i32(tcg_res, tcg_res, 25);
-+
-+        write_vec_element_i32(s, tcg_zero, rd, 0, MO_32);
-+        write_vec_element_i32(s, tcg_zero, rd, 1, MO_32);
-+        write_vec_element_i32(s, tcg_zero, rd, 2, MO_32);
-+        write_vec_element_i32(s, tcg_res, rd, 3, MO_32);
-+
-+        tcg_temp_free_i32(tcg_op1);
-+        tcg_temp_free_i32(tcg_op2);
-+        tcg_temp_free_i32(tcg_op3);
-+        tcg_temp_free_i32(tcg_res);
-+        tcg_temp_free_i32(tcg_zero);
-     }
- }
+         /* Returning from an exception with a PC with bit 0 set is defined
+          * behaviour on v8M (bit 0 is ignored), but for v7M it was specified
+@@ -6979,8 +7054,6 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+             }
+         }
  
-@@ -11833,6 +11873,47 @@ static void disas_crypto_xar(DisasContext *s, uint32_t insn)
-     tcg_temp_free_i64(tcg_res[1]);
- }
- 
-+/* Crypto three-reg imm2
-+ *  31                   21 20  16 15  14 13 12  11  10  9    5 4    0
-+ * +-----------------------+------+-----+------+--------+------+------+
-+ * | 1 1 0 0 1 1 1 0 0 1 0 |  Rm  | 1 0 | imm2 | opcode |  Rn  |  Rd  |
-+ * +-----------------------+------+-----+------+--------+------+------+
-+ */
-+static void disas_crypto_three_reg_imm2(DisasContext *s, uint32_t insn)
-+{
-+    int opcode = extract32(insn, 10, 2);
-+    int imm2 = extract32(insn, 12, 2);
-+    int rm = extract32(insn, 16, 5);
-+    int rn = extract32(insn, 5, 5);
-+    int rd = extract32(insn, 0, 5);
-+    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr;
-+    TCGv_i32 tcg_imm2, tcg_opcode;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8_SM3)) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+
-+    if (!fp_access_check(s)) {
-+        return;
-+    }
-+
-+    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
-+    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
-+    tcg_rm_ptr = vec_full_reg_ptr(s, rm);
-+    tcg_imm2   = tcg_const_i32(imm2);
-+    tcg_opcode = tcg_const_i32(opcode);
-+
-+    gen_helper_crypto_sm3tt(tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr, tcg_imm2,
-+                            tcg_opcode);
-+
-+    tcg_temp_free_ptr(tcg_rd_ptr);
-+    tcg_temp_free_ptr(tcg_rn_ptr);
-+    tcg_temp_free_ptr(tcg_rm_ptr);
-+    tcg_temp_free_i32(tcg_imm2);
-+    tcg_temp_free_i32(tcg_opcode);
-+}
-+
- /* C3.6 Data processing - SIMD, inc Crypto
-  *
-  * As the decode gets a little complex we are using a table based
-@@ -11866,6 +11947,7 @@ static const AArch64DecodeTable data_proc_simd[] = {
-     { 0xcec08000, 0xfffff000, disas_crypto_two_reg_sha512 },
-     { 0xce000000, 0xff808000, disas_crypto_four_reg },
-     { 0xce800000, 0xffe00000, disas_crypto_xar },
-+    { 0xce408000, 0xffe0c000, disas_crypto_three_reg_imm2 },
-     { 0x00000000, 0x00000000, NULL }
- };
- 
+-        xpsr = ldl_phys(cs->as, frameptr + 0x1c);
+-
+         if (arm_feature(env, ARM_FEATURE_V8)) {
+             /* For v8M we have to check whether the xPSR exception field
+              * matches the EXCRET value for return to handler/thread
 -- 
 2.16.1
