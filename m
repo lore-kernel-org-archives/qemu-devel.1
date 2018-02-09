@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek4wK-0001ze-Kq
+	(envelope-from <cohuck@redhat.com>) id 1ek4wK-0001zd-K3
 	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:25:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek4wH-000615-Ek
+	(envelope-from <cohuck@redhat.com>) id 1ek4wF-0005zx-V5
 	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:25:52 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  9 Feb 2018 10:25:03 +0100
-Message-Id: <20180209092524.31348-9-cohuck@redhat.com>
+Date: Fri,  9 Feb 2018 10:25:02 +0100
+Message-Id: <20180209092524.31348-8-cohuck@redhat.com>
 In-Reply-To: <20180209092524.31348-1-cohuck@redhat.com>
 References: <20180209092524.31348-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 08/29] s390x/tcg: tolerate wrong wakeups due to
- floating interrupts
+Subject: [Qemu-devel] [PULL 07/29] s390x/flic: no need to call
+ s390_io_interrupt() from flic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +25,36 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: David Hildenbrand <david@redhat.com>
 
-This is a preparation for floating interrupt support and only applies to
-MTTCG, single threaded TCG works just fine. If a floating interrupt wakes
-up a VCPU and the CPU thinks it can run (clearing cs->halted), at
-the point where the interrupt would be delivered, already another VCPU
-might have picked up the interrupt, resulting in a wakeup without an
-interrupt (executing wrong code).
+We can directly call the right function.
 
-It is wrong to let the VCPU continue to execute (the WAIT PSW). Instead,
-we have to put the VCPU back to sleep.
-
+Suggested-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180129125623.21729-8-david@redhat.com>
+Message-Id: <20180129125623.21729-7-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/excp_helper.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/intc/s390_flic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 0cbc4051d1..23447af942 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -503,6 +503,11 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-             s390_cpu_do_interrupt(cs);
-             return true;
-         }
-+        if (env->psw.mask & PSW_MASK_WAIT) {
-+            /* Woken up because of a floating interrupt but it has already
-+             * been delivered. Go back to sleep. */
-+            cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
-+        }
+diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+index bdc8ec7607..d6ed1d7380 100644
+--- a/hw/intc/s390_flic.c
++++ b/hw/intc/s390_flic.c
+@@ -108,6 +108,7 @@ static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
+                                  uint8_t isc, uint8_t flags)
+ {
+     QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
++    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
+     bool flag = flags & S390_ADAPTER_SUPPRESSIBLE;
+     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
+ 
+@@ -116,7 +117,7 @@ static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
+         return 0;
      }
-     return false;
- }
+ 
+-    s390_io_interrupt(0, 0, 0, io_int_word);
++    fsc->inject_io(fs, 0, 0, 0, io_int_word);
+ 
+     if (flag && (flic->simm & AIS_MODE_MASK(isc))) {
+         flic->nimm |= AIS_MODE_MASK(isc);
 -- 
 2.13.6
