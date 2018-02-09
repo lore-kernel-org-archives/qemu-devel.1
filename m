@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekBBj-0005fk-Es
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:06:12 -0500
+	(envelope-from <geert.uytterhoeven@gmail.com>) id 1ekBCF-00063i-P2
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:06:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekBBg-0000Ns-A2
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:06:11 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39022 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ekBBg-0000NQ-58
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:06:08 -0500
-References: <20180208180019.13683-1-antonios.motakis@huawei.com>
-	<20180208180019.13683-4-antonios.motakis@huawei.com>
-	<20180209161326.653f3468@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3c73d37f-36f6-e487-7add-34c18310bda7@redhat.com>
-Date: Fri, 9 Feb 2018 10:06:05 -0600
+	(envelope-from <geert.uytterhoeven@gmail.com>) id 1ekBCE-0000e1-Oi
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:06:43 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180209161326.653f3468@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] 9pfs: stat_to_qid: use device as input
- to qid.path
+Sender: geert.uytterhoeven@gmail.com
+In-Reply-To: <20180209085024.004b6f9e@w520.home>
+References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
+	<1518189456-2873-5-git-send-email-geert+renesas@glider.be>
+	<20180209085024.004b6f9e@w520.home>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 9 Feb 2018 17:06:34 +0100
+Message-ID: <CAMuHMdWaoutP+oFL0Vtw+Z-986_=3wLAu+58N9ZT7t+uZb1ycA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH/RFC 4/5] vfio: No-IOMMU mode support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, antonios.motakis@huawei.com
-Cc: qemu-devel@nongnu.org, veaceslav.falico@huawei.com, Eduard.Shishkin@huawei.com, andy.wangguoli@huawei.com, Jani.Kokkonen@huawei.com, cota@braap.org, berrange@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 
-On 02/09/2018 09:13 AM, Greg Kurz wrote:
-> On Thu, 8 Feb 2018 19:00:18 +0100
-> <antonios.motakis@huawei.com> wrote:
-> 
->> From: Antonios Motakis <antonios.motakis@huawei.com>
+Hi Alex,
+
+On Fri, Feb 9, 2018 at 4:50 PM, Alex Williamson
+<alex.williamson@redhat.com> wrote:
+> On Fri,  9 Feb 2018 16:17:35 +0100
+> Geert Uytterhoeven <geert+renesas@glider.be> wrote:
+>> From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 >>
->> To support multiple devices on the 9p share, and avoid
->> qid path collisions we take the device id as input
->> to generate a unique QID path. The lowest 48 bits of
->> the path will be set equal to the file inode, and the
->> top bits will be uniquely assigned based on the top
->> 16 bits of the inode and the device id.
+>> Add qemu support for the newly introduced VFIO No-IOMMU driver.
+>>
+>> We need to add special handling for:
+>> - Group character device is /dev/vfio/noiommu-$GROUP.
+>> - No-IOMMU does not rely on a memory listener.
+>> - No IOMMU will be set for its group, so no need to call
+>>   vfio_kvm_device_add_group.
+>>
+>> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+>> [geert: Rebase]
+>> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+>> ---
+>>  hw/vfio/common.c              | 61 ++++++++++++++++++++++++++++++++++---------
+>>  include/hw/vfio/vfio-common.h |  2 ++
+>>  2 files changed, 50 insertions(+), 13 deletions(-)
+>
+> NAK.  I'm opposed to no-iommu support in QEMU in general, but accepting
+> vfio devices with no-iommu (which provide no DMA translation!!!)
+> transparently as if they might actually work like a regular vfio device
+> is absolutely unacceptable.  Without DMA translation and isolation, you
+> might want to think about another interface, I'm not keen on the idea
 
->> +/* stat_to_qid needs to map inode number (64 bits) and device id (32 bits)
->> + * to a unique QID path (64 bits). To avoid having to map and keep track
->> + * of up to 2^64 objects, we map only the 16 highest bits of the inode plus
->> + * the device id to the 16 highest bits of the QID path. The 48 lowest bits
->> + * of the QID path equal to the lowest bits of the inode number.
->> + *
->> + * This takes advantage of the fact that inode number are usually not
->> + * random but allocated sequentially, so we have fewer items to keep
->> + * track of.
->> + */
->> +static int qid_path_prefixmap(V9fsPDU *pdu, const struct stat *stbuf,
->> +                                uint64_t *path)
->> +{
->> +    QppEntry lookup = {
->> +        .dev = stbuf->st_dev,
->> +        .ino_prefix = (uint16_t) (stbuf->st_ino >> 48)
->> +    }, *val;
->> +    uint32_t hash = qpp_hash(lookup);
->> +
->> +    val = qht_lookup(&pdu->s->qpp_table, qpp_lookup_func, &lookup, hash);
->> +
->> +    if (!val) {
->> +        if (pdu->s->qp_prefix_next == 0) {
->> +            /* we ran out of prefixes */
->> +            return -ENFILE;
-> 
-> Not sure this errno would make sense for guest syscalls that don't open
-> file descriptors... Maybe ENOENT ?
-> 
-> Cc'ing Eric for insights.
+What if the device cannot do DMA?
 
-Actually, it makes sense to me:
+There are other devices that cannot do DMA, but that can be useful to
+access from a guest in an embedded system.
+E.g. smart ADC monitor blocks that monitor and average several ADCs in an
+automotive environment (drivers/iio/adc/rcar-gyroadc.c).
 
-ENFILE 23 Too many open files in system
+Should all such devices be paravirtualized?
 
-You only get here if the hash table filled up, which means there are 
-indeed too many open files (even if this syscall wasn't opening a file). 
-  In fact, ENFILE is usually associated with running into ulimit 
-restrictions, and come to think of it, you are more likely to hit your 
-ulimit than you are to run into a hash collision (so this code may be 
-very hard to reach in practice, but if you do reach it, it behaves 
-similarly to what you were more likely to hit in the first place).
+> of corrupting vfio support in order to blink some LEDs.  Thanks,
 
-ENOENT implies the file doesn't exist - but here, the file exists but we 
-can't open it because we're out of resources for tracking it.
+This GPIO+LED prototype is just a proof-of-concept. There's no plan to
+upstream it.
 
-Also, POSIX permits returning specific errno codes that aren't otherwise 
-listed for a syscall if the usual semantics of that errno code are 
-indeed the reason for the failure (you should prefer to fail with errno 
-codes documented by POSIX where possible, but POSIX does not limit you 
-to just that set).
+Thanks!
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
