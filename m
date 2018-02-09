@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejwEk-0000oI-JH
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 19:08:19 -0500
+	(envelope-from <andrew@aj.id.au>) id 1ejwkf-00079Z-Kx
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 19:41:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ejwEj-0004Wa-BM
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 19:08:18 -0500
-Date: Fri, 9 Feb 2018 02:08:03 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180209020556-mutt-send-email-mst@kernel.org>
-References: <20180207042438.15422-1-andrew.smirnov@gmail.com>
-	<20180207042438.15422-11-andrew.smirnov@gmail.com>
-	<20180208194226-mutt-send-email-mst@kernel.org>
-	<CAHQ1cqGZHie0sYudPGr-15LOEjMRT05=0+tsViKfCJBnN96Nag@mail.gmail.com>
-	<20180208221121-mutt-send-email-mst@kernel.org>
-	<CAHQ1cqHGfTYyKuMEDGPWnHBbWYV2sMrqfHU6oJV3NQSv0Xi0Qg@mail.gmail.com>
-	<20180208223323-mutt-send-email-mst@kernel.org>
-	<CAHQ1cqHxUZTFiXpzdKWk1MA9QuqHC0Ljs0-uBkWZbYsNn6ix8Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHQ1cqHxUZTFiXpzdKWk1MA9QuqHC0Ljs0-uBkWZbYsNn6ix8Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 10/14] pci: Add support for Designware
- IP block
+	(envelope-from <andrew@aj.id.au>) id 1ejwke-0005Cs-MF
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 19:41:17 -0500
+Message-ID: <1518136859.14456.14.camel@aj.id.au>
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Fri, 09 Feb 2018 11:10:59 +1030
+In-Reply-To: <5562bd02-5399-b1af-f183-d9a16b0a1c62@amsat.org>
+References: <20180208172202.9984-1-f4bug@amsat.org>
+	<20180208172202.9984-2-f4bug@amsat.org>
+	<CAFEAcA_0rt7cCJs43BjW3OcQh=oeby+4j2dtFPSzgCn9tqW1qQ@mail.gmail.com>
+	<5562bd02-5399-b1af-f183-d9a16b0a1c62@amsat.org>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-g/Ze0FZMha2DgFY+D60N"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/arm/aspeed: directly map the serial
+ device to the system address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +26,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Feb 08, 2018 at 12:43:03PM -0800, Andrey Smirnov wrote:
-> On Thu, Feb 8, 2018 at 12:33 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Thu, Feb 08, 2018 at 12:22:53PM -0800, Andrey Smirnov wrote:
-> >> On Thu, Feb 8, 2018 at 12:11 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >> > On Thu, Feb 08, 2018 at 12:03:04PM -0800, Andrey Smirnov wrote:
-> >> >> >> +#define PCIE_PORT_LINK_CONTROL          0x710
-> >> >> >> +
-> >> >> >> +#define PCIE_PHY_DEBUG_R1               0x72C
-> >> >> >> +#define PCIE_PHY_DEBUG_R1_XMLH_LINK_UP  BIT(4)
-> >> >> >> +
-> >> >> >> +#define PCIE_LINK_WIDTH_SPEED_CONTROL   0x80C
-> >> >> >> +#define PORT_LOGIC_SPEED_CHANGE         (0x1 << 17)
-> >> >> >> +
-> >> >> >> +#define PCIE_MSI_ADDR_LO                0x820
-> >> >> >> +#define PCIE_MSI_ADDR_HI                0x824
-> >> >> >> +#define PCIE_MSI_INTR0_ENABLE           0x828
-> >> >> >> +#define PCIE_MSI_INTR0_MASK             0x82C
-> >> >> >> +#define PCIE_MSI_INTR0_STATUS           0x830
-> >> >> >> +
-> >> >> >> +#define PCIE_ATU_VIEWPORT               0x900
-> >> >> >> +#define PCIE_ATU_REGION_INBOUND         (0x1 << 31)
-> >> >> >> +#define PCIE_ATU_REGION_OUTBOUND        (0x0 << 31)
-> >> >> >> +#define PCIE_ATU_REGION_INDEX2          (0x2 << 0)
-> >> >> >> +#define PCIE_ATU_REGION_INDEX1          (0x1 << 0)
-> >> >> >> +#define PCIE_ATU_REGION_INDEX0          (0x0 << 0)
-> >> >> >> +#define PCIE_ATU_CR1                    0x904
-> >> >> >> +#define PCIE_ATU_TYPE_MEM               (0x0 << 0)
-> >> >> >> +#define PCIE_ATU_TYPE_IO                (0x2 << 0)
-> >> >> >> +#define PCIE_ATU_TYPE_CFG0              (0x4 << 0)
-> >> >> >> +#define PCIE_ATU_TYPE_CFG1              (0x5 << 0)
-> >> >> >> +#define PCIE_ATU_CR2                    0x908
-> >> >> >> +#define PCIE_ATU_ENABLE                 (0x1 << 31)
-> >> >> >> +#define PCIE_ATU_BAR_MODE_ENABLE        (0x1 << 30)
-> >> >> >> +#define PCIE_ATU_LOWER_BASE             0x90C
-> >> >> >> +#define PCIE_ATU_UPPER_BASE             0x910
-> >> >> >> +#define PCIE_ATU_LIMIT                  0x914
-> >> >> >> +#define PCIE_ATU_LOWER_TARGET           0x918
-> >> >> >> +#define PCIE_ATU_BUS(x)                 (((x) >> 24) & 0xff)
-> >> >> >> +#define PCIE_ATU_DEVFN(x)               (((x) >> 16) & 0xff)
-> >> >> >> +#define PCIE_ATU_UPPER_TARGET           0x91C
-> >> >
-> >> > Can you avoid a PCIE prefix for this btw?
-> >> >
-> >>
-> >> That's how those constants were named in Linux kernel, but yeah, I'll
-> >> add a prefix to them.
-> >>
-> >> Thanks,
-> >> Andrey Smirnov
-> >
-> > In that case you should not copy it into your file.
-> > Stuff from linux kernel should be imported into standard-headers.
-> >
-> 
-> Just to be sure we are on the same page, this is the file I am talking about:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/pci/dwc/pcie-designware.h?h=v4.15
-> 
-> you want me to put it in standard-headers/linux and get those
-> constants from there?
-> 
-> Thanks,
-> Andrey Smirnov
 
-Oh it's from a source file. I see. standard-headers/linux is for
-files exported from include/uapi.
+--=-g/Ze0FZMha2DgFY+D60N
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I take it back then but pls rename appropriately - and I guess
-you should only copy what you actually use.
+On Thu, 2018-02-08 at 14:40 -0300, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 02/08/2018 02:30 PM, Peter Maydell wrote:
+> > On 8 February 2018 at 17:22, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> > > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > > ---
+> > >  hw/arm/aspeed_soc.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> > > index c83b7e207b..a786750e14 100644
+> > > --- a/hw/arm/aspeed_soc.c
+> > > +++ b/hw/arm/aspeed_soc.c
+> > > @@ -257,7 +257,7 @@ static void aspeed_soc_realize(DeviceState *dev, =
+Error **errp)
+> > >      /* UART - attach an 8250 to the IO space as our UART5 */
+> > >      if (serial_hds[0]) {
+> > >          qemu_irq uart5 =3D qdev_get_gpio_in(DEVICE(&s->vic), uart_ir=
+qs[4]);
+> > > -        serial_mm_init(&s->iomem, ASPEED_SOC_UART_5_BASE, 2,
+> > > +        serial_mm_init(get_system_memory(), ASPEED_SOC_UART_5_BASE, =
+2,
+> > >                         uart5, 38400, serial_hds[0], DEVICE_LITTLE_EN=
+DIAN);
+> > >      }
+> >=20
+> > Is this a bug fix? It certainly changes behaviour, which
+> > suggests that a fuller commit message would be useful.
+>=20
+> This patch is buggy indeed, using system_memory the serial address
+> should be ASPEED_SOC_IOMEM_BASE + ASPEED_SOC_UART_5_BASE.
+>=20
 
--- 
-MST
+If you'd like to test, you can grab images from here:
+
+https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,target=3Dromulus/
+
+For example (without the patch):
+
+    $ wget     https://openpower.xyz/job/openbmc-build/1240/distro=3Dubuntu=
+,target=3Dromulus/artifact/deploy/images/romulus/image-bmc
+...
+$ qemu-system-arm -M romulus-bmc -m 512 -drive file=3Dimage-bmc,if=3Dmtd,fo=
+rmat=3Draw -nographic
+
+
+U-Boot 2016.07 (Jan 25 2018 - 16:31:27 +0000)  =20
+
+       Watchdog enabled                        =20
+DRAM:  496 MiB                                 =20
+Flash: 32 MiB                                  =20
+*** Warning - bad CRC, using default environment
+
+In:    serial                                  =20
+Out:   serial                                  =20
+Err:   serial                                  =20
+Net:   aspeednic#0                             =20
+Error: aspeednic#0 address not set.            =20
+
+Hit any key to stop autoboot:  0               =20
+## Loading kernel from FIT Image at 20080000 ...
+...
+
+And yeah, this patch breaks output.
+
+Thanks for the cleanup though.
+
+Andrew
+--=-g/Ze0FZMha2DgFY+D60N
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAABCgAGBQJafO4bAAoJEJ0dnzgO5LT5txkP/2KVWKHTkbbw2Xlr1A8iu/05
+zhY7E/oF+qorK2j2XArDxUQ0mkcfjU3/RT4fdSDawcXvwSSOMO6PrVfyauBvUmT0
+ucM9bb73E4MQYpO6iG28p5/b7zkydoszgB2wQOy9nU+Iy0cNATXRczudfEAO0RII
+7qtxdsAoqZTCUAa0U6bGXcwc5TEqgUhoQbq71Nbrx0/ncmK5kx+Vtkh7CW2Ly6Nw
+YtSml/O4GINXLms7NXB7XRh19BoifOfyJ65I0WFmeV++71GVuEYctV+DgsblkmMG
+GnVsdSplOE4cnGuRlhSraAV9L+xGTA454jJ/Akx27c231R6mcYou7z1pYLJsvZ0O
+QguK6kAtdp7ciU0NORUnrbboXjV3J4wMeCSGEvMRNtB/zaplz0I/fpCgZzIRGRng
+moipr7JoHutE3+uPahhnWVX/ZEiWPY63kpTNyuSNb/eOeZ14Tj/5oMawGlcLo54r
+OVR6WYue/yAlv5dnyke3Mjx/hY2daQBncKfp183eBKKjO7lHK7nUHoi2veEwpn3e
+NMUjFI5xRqj5FBAikVc0wJXgTvbllkTqRujHZoro31zEQYdRrTz76x1vHoQVv818
+p1utCaxdumQypBqYmQ2Yn+IbO8hEXZw5bdx/ro4WblnQt1nG8gZQawnMG3CbjlJt
+l1eKn8DCyiYkXXSb75Pg
+=pl4p
+-----END PGP SIGNATURE-----
+
+--=-g/Ze0FZMha2DgFY+D60N--
