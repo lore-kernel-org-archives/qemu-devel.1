@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1ekAQO-0003tB-JA
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:17:19 -0500
+	(envelope-from <geert@linux-m68k.org>) id 1ekAyP-0001XP-7t
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:52:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1ekAQK-0003Fd-SE
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:17:16 -0500
-Received: from xavier.telenet-ops.be ([2a02:1800:120:4::f00:14]:55188)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(envelope-from <geert@linux-m68k.org>) id 1ekAyM-0007hp-9J
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:52:25 -0500
+Received: from newton.telenet-ops.be ([195.130.132.45]:48754)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <geert@linux-m68k.org>)
-	id 1ekAQK-0003El-D4
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:17:12 -0500
+	id 1ekAyL-0007gu-Tt
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:52:22 -0500
+Received: from laurent.telenet-ops.be (laurent.telenet-ops.be
+	[IPv6:2a02:1800:110:4::f00:19])
+	by newton.telenet-ops.be (Postfix) with ESMTPS id 3zdJwl25VZzMqw9F
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 16:32:55 +0100 (CET)
 From: Geert Uytterhoeven <geert+renesas@glider.be>
-Date: Fri,  9 Feb 2018 16:16:53 +0100
-Message-Id: <1518189413-2761-7-git-send-email-geert+renesas@glider.be>
-In-Reply-To: <1518189413-2761-1-git-send-email-geert+renesas@glider.be>
-References: <1518189413-2761-1-git-send-email-geert+renesas@glider.be>
-Subject: [Qemu-devel] [PATCH/RFC 6/6] arm64: Add virt_defconfig
+Date: Fri,  9 Feb 2018 16:17:35 +0100
+Message-Id: <1518189456-2873-5-git-send-email-geert+renesas@glider.be>
+In-Reply-To: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
+References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
+Subject: [Qemu-devel] [PATCH/RFC 4/5] vfio: No-IOMMU mode support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,750 +28,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Baptiste Reynal <b.reynal@virtualopensystems.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, kvm@vger.kernel.org, linux-renesas-soc@vger.kernel.org, qemu-devel@nongnu.org, Geert Uytterhoeven <geert+renesas@glider.be>
+To: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
 
-Add a simple defconfig for virtualized arm64 machines, based on an
-OpenWRT config.  This expects "initramfs.cpio" to exist, which can be
-extracted from e.g. an OpenWRT image using binwalk.
+From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 
-CONFIG_GPIO_RCAR is enabled for testing GPIO pass-through on R-Car Gen3.
+Add qemu support for the newly introduced VFIO No-IOMMU driver.
 
-Not-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+We need to add special handling for:
+- Group character device is /dev/vfio/noiommu-$GROUP.
+- No-IOMMU does not rely on a memory listener.
+- No IOMMU will be set for its group, so no need to call
+  vfio_kvm_device_add_group.
+
+Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+[geert: Rebase]
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
-Not intended for upstream merge.
----
- arch/arm64/configs/virt_defconfig | 722 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 722 insertions(+)
- create mode 100644 arch/arm64/configs/virt_defconfig
+ hw/vfio/common.c              | 61 ++++++++++++++++++++++++++++++++++---------
+ include/hw/vfio/vfio-common.h |  2 ++
+ 2 files changed, 50 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/configs/virt_defconfig b/arch/arm64/configs/virt_defconfig
-new file mode 100644
-index 0000000000000000..4477d75d8e982b37
---- /dev/null
-+++ b/arch/arm64/configs/virt_defconfig
-@@ -0,0 +1,722 @@
-+CONFIG_LOCALVERSION="-arm64-virt"
-+CONFIG_SYSVIPC=y
-+CONFIG_POSIX_MQUEUE=y
-+# CONFIG_CROSS_MEMORY_ATTACH is not set
-+CONFIG_NO_HZ=y
-+CONFIG_HIGH_RES_TIMERS=y
-+CONFIG_BSD_PROCESS_ACCT=y
-+CONFIG_BSD_PROCESS_ACCT_V3=y
-+CONFIG_RCU_EXPERT=y
-+CONFIG_RCU_FANOUT=32
-+CONFIG_IKCONFIG=y
-+CONFIG_IKCONFIG_PROC=y
-+CONFIG_RELAY=y
-+CONFIG_BLK_DEV_INITRD=y
-+CONFIG_INITRAMFS_SOURCE="initramfs.cpio"
-+# CONFIG_RD_GZIP is not set
-+# CONFIG_RD_BZIP2 is not set
-+# CONFIG_RD_LZMA is not set
-+# CONFIG_RD_XZ is not set
-+# CONFIG_RD_LZO is not set
-+# CONFIG_RD_LZ4 is not set
-+CONFIG_CC_OPTIMIZE_FOR_SIZE=y
-+# CONFIG_SYSFS_SYSCALL is not set
-+# CONFIG_FHANDLE is not set
-+# CONFIG_AIO is not set
-+# CONFIG_ADVISE_SYSCALLS is not set
-+CONFIG_BPF_SYSCALL=y
-+CONFIG_EMBEDDED=y
-+# CONFIG_VM_EVENT_COUNTERS is not set
-+# CONFIG_SLUB_DEBUG is not set
-+# CONFIG_COMPAT_BRK is not set
-+CONFIG_CC_STACKPROTECTOR_REGULAR=y
-+CONFIG_MODULES=y
-+CONFIG_MODULE_UNLOAD=y
-+# CONFIG_BLK_DEV_BSG is not set
-+CONFIG_PARTITION_ADVANCED=y
-+# CONFIG_IOSCHED_DEADLINE is not set
-+# CONFIG_IOSCHED_CFQ is not set
-+CONFIG_ARCH_VEXPRESS=y
-+CONFIG_PCI=y
-+# CONFIG_CAVIUM_ERRATUM_22375 is not set
-+# CONFIG_CAVIUM_ERRATUM_23154 is not set
-+CONFIG_NR_CPUS=4
-+CONFIG_PREEMPT_VOLUNTARY=y
-+CONFIG_HZ_100=y
-+# CONFIG_COMPACTION is not set
-+CONFIG_ZSMALLOC=m
-+CONFIG_CMDLINE="console=ttyAMA0"
-+# CONFIG_EFI is not set
-+# CONFIG_CORE_DUMP_DEFAULT_ELF_HEADERS is not set
-+CONFIG_COMPAT=y
-+# CONFIG_SUSPEND is not set
-+CONFIG_NET=y
-+CONFIG_PACKET=y
-+CONFIG_UNIX=y
-+CONFIG_XFRM_USER=m
-+CONFIG_NET_KEY=m
-+CONFIG_INET=y
-+CONFIG_IP_MULTICAST=y
-+CONFIG_IP_ADVANCED_ROUTER=y
-+CONFIG_IP_MULTIPLE_TABLES=y
-+CONFIG_IP_ROUTE_MULTIPATH=y
-+CONFIG_IP_ROUTE_VERBOSE=y
-+CONFIG_NET_IPIP=m
-+CONFIG_NET_IPGRE_DEMUX=m
-+CONFIG_NET_IPGRE=m
-+CONFIG_NET_IPGRE_BROADCAST=y
-+CONFIG_IP_MROUTE=y
-+CONFIG_IP_MROUTE_MULTIPLE_TABLES=y
-+CONFIG_SYN_COOKIES=y
-+CONFIG_NET_IPVTI=m
-+CONFIG_INET_AH=m
-+CONFIG_INET_ESP=m
-+CONFIG_INET_IPCOMP=m
-+CONFIG_INET_XFRM_MODE_TRANSPORT=m
-+CONFIG_INET_XFRM_MODE_TUNNEL=m
-+CONFIG_INET_XFRM_MODE_BEET=m
-+# CONFIG_INET_DIAG is not set
-+CONFIG_TCP_CONG_ADVANCED=y
-+# CONFIG_TCP_CONG_BIC is not set
-+# CONFIG_TCP_CONG_WESTWOOD is not set
-+# CONFIG_TCP_CONG_HTCP is not set
-+CONFIG_INET6_AH=m
-+CONFIG_INET6_ESP=m
-+CONFIG_INET6_IPCOMP=m
-+CONFIG_INET6_XFRM_MODE_TRANSPORT=m
-+CONFIG_INET6_XFRM_MODE_TUNNEL=m
-+CONFIG_INET6_XFRM_MODE_BEET=m
-+CONFIG_IPV6_VTI=m
-+CONFIG_IPV6_SIT=m
-+CONFIG_IPV6_SIT_6RD=y
-+CONFIG_IPV6_GRE=m
-+CONFIG_IPV6_MULTIPLE_TABLES=y
-+CONFIG_IPV6_SUBTREES=y
-+CONFIG_IPV6_MROUTE=y
-+CONFIG_NETFILTER=y
-+CONFIG_BRIDGE_NETFILTER=y
-+# CONFIG_NETFILTER_INGRESS is not set
-+CONFIG_NF_CONNTRACK=m
-+CONFIG_NF_CONNTRACK_ZONES=y
-+CONFIG_NF_CONNTRACK_EVENTS=y
-+# CONFIG_NF_CT_PROTO_DCCP is not set
-+# CONFIG_NF_CT_PROTO_SCTP is not set
-+# CONFIG_NF_CT_PROTO_UDPLITE is not set
-+CONFIG_NF_CONNTRACK_AMANDA=m
-+CONFIG_NF_CONNTRACK_FTP=m
-+CONFIG_NF_CONNTRACK_H323=m
-+CONFIG_NF_CONNTRACK_IRC=m
-+CONFIG_NF_CONNTRACK_SNMP=m
-+CONFIG_NF_CONNTRACK_PPTP=m
-+CONFIG_NF_CONNTRACK_SIP=m
-+CONFIG_NF_CONNTRACK_TFTP=m
-+CONFIG_NF_CT_NETLINK=m
-+CONFIG_NF_TABLES=m
-+CONFIG_NF_TABLES_INET=m
-+CONFIG_NFT_EXTHDR=m
-+CONFIG_NFT_META=m
-+CONFIG_NFT_CT=m
-+CONFIG_NFT_COUNTER=m
-+CONFIG_NFT_LOG=m
-+CONFIG_NFT_LIMIT=m
-+CONFIG_NFT_MASQ=m
-+CONFIG_NFT_REDIR=m
-+CONFIG_NFT_NAT=m
-+CONFIG_NFT_REJECT=m
-+CONFIG_NFT_HASH=m
-+CONFIG_NETFILTER_XT_MARK=m
-+CONFIG_NETFILTER_XT_CONNMARK=m
-+CONFIG_NETFILTER_XT_SET=m
-+CONFIG_NETFILTER_XT_TARGET_CHECKSUM=m
-+CONFIG_NETFILTER_XT_TARGET_CLASSIFY=m
-+CONFIG_NETFILTER_XT_TARGET_CT=m
-+CONFIG_NETFILTER_XT_TARGET_DSCP=m
-+CONFIG_NETFILTER_XT_TARGET_HL=m
-+CONFIG_NETFILTER_XT_TARGET_LED=m
-+CONFIG_NETFILTER_XT_TARGET_LOG=m
-+CONFIG_NETFILTER_XT_TARGET_NFLOG=m
-+CONFIG_NETFILTER_XT_TARGET_NFQUEUE=m
-+CONFIG_NETFILTER_XT_TARGET_TPROXY=m
-+CONFIG_NETFILTER_XT_TARGET_TCPMSS=m
-+CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=m
-+CONFIG_NETFILTER_XT_MATCH_CLUSTER=m
-+CONFIG_NETFILTER_XT_MATCH_COMMENT=m
-+CONFIG_NETFILTER_XT_MATCH_CONNBYTES=m
-+CONFIG_NETFILTER_XT_MATCH_CONNLIMIT=m
-+CONFIG_NETFILTER_XT_MATCH_CONNTRACK=m
-+CONFIG_NETFILTER_XT_MATCH_DSCP=m
-+CONFIG_NETFILTER_XT_MATCH_ECN=m
-+CONFIG_NETFILTER_XT_MATCH_ESP=m
-+CONFIG_NETFILTER_XT_MATCH_HASHLIMIT=m
-+CONFIG_NETFILTER_XT_MATCH_HELPER=m
-+CONFIG_NETFILTER_XT_MATCH_HL=m
-+CONFIG_NETFILTER_XT_MATCH_IPRANGE=m
-+# CONFIG_NETFILTER_XT_MATCH_L2TP is not set
-+CONFIG_NETFILTER_XT_MATCH_LENGTH=m
-+CONFIG_NETFILTER_XT_MATCH_LIMIT=m
-+CONFIG_NETFILTER_XT_MATCH_MAC=m
-+CONFIG_NETFILTER_XT_MATCH_MULTIPORT=m
-+CONFIG_NETFILTER_XT_MATCH_OWNER=m
-+CONFIG_NETFILTER_XT_MATCH_POLICY=m
-+CONFIG_NETFILTER_XT_MATCH_PHYSDEV=m
-+CONFIG_NETFILTER_XT_MATCH_PKTTYPE=m
-+CONFIG_NETFILTER_XT_MATCH_QUOTA=m
-+CONFIG_NETFILTER_XT_MATCH_RECENT=m
-+# CONFIG_NETFILTER_XT_MATCH_SCTP is not set
-+CONFIG_NETFILTER_XT_MATCH_STATE=m
-+CONFIG_NETFILTER_XT_MATCH_STATISTIC=m
-+CONFIG_NETFILTER_XT_MATCH_STRING=m
-+CONFIG_NETFILTER_XT_MATCH_TCPMSS=m
-+CONFIG_NETFILTER_XT_MATCH_TIME=m
-+CONFIG_NETFILTER_XT_MATCH_U32=m
-+CONFIG_IP_SET=m
-+CONFIG_IP_SET_BITMAP_IP=m
-+CONFIG_IP_SET_BITMAP_IPMAC=m
-+CONFIG_IP_SET_BITMAP_PORT=m
-+CONFIG_IP_SET_HASH_IP=m
-+CONFIG_IP_SET_HASH_IPMARK=m
-+CONFIG_IP_SET_HASH_IPPORT=m
-+CONFIG_IP_SET_HASH_IPPORTIP=m
-+CONFIG_IP_SET_HASH_IPPORTNET=m
-+CONFIG_IP_SET_HASH_MAC=m
-+CONFIG_IP_SET_HASH_NETPORTNET=m
-+CONFIG_IP_SET_HASH_NET=m
-+CONFIG_IP_SET_HASH_NETNET=m
-+CONFIG_IP_SET_HASH_NETPORT=m
-+CONFIG_IP_SET_HASH_NETIFACE=m
-+CONFIG_IP_SET_LIST_SET=m
-+CONFIG_NF_CONNTRACK_IPV4=m
-+CONFIG_NFT_CHAIN_ROUTE_IPV4=m
-+CONFIG_NFT_CHAIN_NAT_IPV4=m
-+CONFIG_NFT_MASQ_IPV4=m
-+CONFIG_NFT_REDIR_IPV4=m
-+CONFIG_IP_NF_IPTABLES=m
-+CONFIG_IP_NF_MATCH_AH=m
-+CONFIG_IP_NF_FILTER=m
-+CONFIG_IP_NF_TARGET_REJECT=m
-+CONFIG_IP_NF_NAT=m
-+CONFIG_IP_NF_TARGET_MASQUERADE=m
-+CONFIG_IP_NF_TARGET_NETMAP=m
-+CONFIG_IP_NF_TARGET_REDIRECT=m
-+CONFIG_IP_NF_MANGLE=m
-+CONFIG_IP_NF_TARGET_CLUSTERIP=m
-+CONFIG_IP_NF_TARGET_ECN=m
-+CONFIG_IP_NF_RAW=m
-+CONFIG_IP_NF_ARPTABLES=m
-+CONFIG_IP_NF_ARPFILTER=m
-+CONFIG_IP_NF_ARP_MANGLE=m
-+CONFIG_NF_CONNTRACK_IPV6=m
-+CONFIG_NFT_CHAIN_ROUTE_IPV6=m
-+CONFIG_NFT_CHAIN_NAT_IPV6=m
-+CONFIG_NFT_MASQ_IPV6=m
-+CONFIG_NFT_REDIR_IPV6=m
-+CONFIG_IP6_NF_IPTABLES=m
-+CONFIG_IP6_NF_MATCH_AH=m
-+CONFIG_IP6_NF_MATCH_EUI64=m
-+CONFIG_IP6_NF_MATCH_FRAG=m
-+CONFIG_IP6_NF_MATCH_OPTS=m
-+CONFIG_IP6_NF_MATCH_IPV6HEADER=m
-+CONFIG_IP6_NF_MATCH_MH=m
-+CONFIG_IP6_NF_MATCH_RT=m
-+CONFIG_IP6_NF_FILTER=m
-+CONFIG_IP6_NF_TARGET_REJECT=m
-+CONFIG_IP6_NF_MANGLE=m
-+CONFIG_IP6_NF_RAW=m
-+CONFIG_IP6_NF_NAT=m
-+CONFIG_IP6_NF_TARGET_MASQUERADE=m
-+CONFIG_IP6_NF_TARGET_NPT=m
-+CONFIG_BRIDGE_NF_EBTABLES=m
-+CONFIG_BRIDGE_EBT_BROUTE=m
-+CONFIG_BRIDGE_EBT_T_FILTER=m
-+CONFIG_BRIDGE_EBT_T_NAT=m
-+CONFIG_BRIDGE_EBT_802_3=m
-+CONFIG_BRIDGE_EBT_AMONG=m
-+CONFIG_BRIDGE_EBT_ARP=m
-+CONFIG_BRIDGE_EBT_IP=m
-+CONFIG_BRIDGE_EBT_IP6=m
-+CONFIG_BRIDGE_EBT_LIMIT=m
-+CONFIG_BRIDGE_EBT_MARK=m
-+CONFIG_BRIDGE_EBT_PKTTYPE=m
-+CONFIG_BRIDGE_EBT_STP=m
-+CONFIG_BRIDGE_EBT_VLAN=m
-+CONFIG_BRIDGE_EBT_ARPREPLY=m
-+CONFIG_BRIDGE_EBT_DNAT=m
-+CONFIG_BRIDGE_EBT_MARK_T=m
-+CONFIG_BRIDGE_EBT_REDIRECT=m
-+CONFIG_BRIDGE_EBT_SNAT=m
-+CONFIG_BRIDGE_EBT_LOG=m
-+CONFIG_BRIDGE_EBT_NFLOG=m
-+CONFIG_IP_SCTP=m
-+CONFIG_ATM=m
-+CONFIG_ATM_CLIP=m
-+CONFIG_ATM_CLIP_NO_ICMP=y
-+CONFIG_ATM_BR2684=m
-+CONFIG_ATM_BR2684_IPFILTER=y
-+CONFIG_L2TP=m
-+CONFIG_L2TP_V3=y
-+CONFIG_L2TP_IP=m
-+CONFIG_L2TP_ETH=m
-+CONFIG_BRIDGE=y
-+CONFIG_NET_DSA=m
-+CONFIG_VLAN_8021Q=y
-+CONFIG_ATALK=m
-+CONFIG_DEV_APPLETALK=m
-+CONFIG_IPDDP=m
-+CONFIG_IPDDP_ENCAP=y
-+CONFIG_6LOWPAN=m
-+# CONFIG_6LOWPAN_NHC is not set
-+CONFIG_IEEE802154=m
-+CONFIG_IEEE802154_6LOWPAN=m
-+CONFIG_MAC802154=m
-+CONFIG_NET_SCHED=y
-+CONFIG_NET_SCH_HTB=m
-+CONFIG_NET_SCH_HFSC=m
-+CONFIG_NET_SCH_PRIO=m
-+CONFIG_NET_SCH_RED=m
-+CONFIG_NET_SCH_SFQ=m
-+CONFIG_NET_SCH_TEQL=m
-+CONFIG_NET_SCH_TBF=m
-+CONFIG_NET_SCH_GRED=m
-+CONFIG_NET_SCH_DSMARK=m
-+CONFIG_NET_SCH_NETEM=m
-+CONFIG_NET_SCH_CODEL=m
-+CONFIG_NET_SCH_FQ_CODEL=y
-+CONFIG_NET_SCH_FQ=m
-+CONFIG_NET_SCH_PIE=m
-+CONFIG_NET_SCH_INGRESS=m
-+CONFIG_NET_CLS_BASIC=m
-+CONFIG_NET_CLS_TCINDEX=m
-+CONFIG_NET_CLS_ROUTE4=m
-+CONFIG_NET_CLS_FW=m
-+CONFIG_NET_CLS_U32=m
-+CONFIG_CLS_U32_MARK=y
-+CONFIG_NET_CLS_FLOW=m
-+CONFIG_NET_EMATCH=y
-+CONFIG_NET_EMATCH_CMP=m
-+CONFIG_NET_EMATCH_NBYTE=m
-+CONFIG_NET_EMATCH_U32=m
-+CONFIG_NET_EMATCH_META=m
-+CONFIG_NET_EMATCH_TEXT=m
-+CONFIG_NET_CLS_ACT=y
-+CONFIG_NET_ACT_POLICE=m
-+CONFIG_NET_ACT_MIRRED=m
-+CONFIG_NET_ACT_IPT=m
-+CONFIG_NET_ACT_SKBEDIT=m
-+CONFIG_NET_ACT_CONNMARK=m
-+CONFIG_NET_CLS_IND=y
-+CONFIG_OPENVSWITCH=m
-+# CONFIG_OPENVSWITCH_GRE is not set
-+# CONFIG_OPENVSWITCH_VXLAN is not set
-+CONFIG_MPLS_ROUTING=m
-+CONFIG_MPLS_IPTUNNEL=m
-+CONFIG_NET_PKTGEN=m
-+CONFIG_HAMRADIO=y
-+CONFIG_AX25=m
-+# CONFIG_AX25_DAMA_SLAVE is not set
-+CONFIG_MKISS=m
-+CONFIG_CAN=m
-+CONFIG_CAN_VCAN=m
-+CONFIG_CAN_SLCAN=m
-+CONFIG_CAN_LEDS=y
-+CONFIG_CAN_C_CAN=m
-+CONFIG_CAN_C_CAN_PLATFORM=m
-+CONFIG_CAN_C_CAN_PCI=m
-+CONFIG_NET_9P=m
-+CONFIG_NET_9P_VIRTIO=m
-+CONFIG_LWTUNNEL=y
-+CONFIG_UEVENT_HELPER_PATH="/sbin/hotplug"
-+# CONFIG_FIRMWARE_IN_KERNEL is not set
-+CONFIG_FW_LOADER_USER_HELPER_FALLBACK=y
-+CONFIG_MTD=y
-+CONFIG_MTD_TESTS=m
-+CONFIG_MTD_BLOCK=y
-+CONFIG_MTD_CFI=y
-+CONFIG_MTD_CFI_INTELEXT=y
-+CONFIG_MTD_CFI_AMDSTD=y
-+CONFIG_MTD_COMPLEX_MAPPINGS=y
-+CONFIG_MTD_BLOCK2MTD=m
-+CONFIG_PARPORT=m
-+CONFIG_ZRAM=m
-+CONFIG_BLK_DEV_LOOP=m
-+CONFIG_BLK_DEV_NBD=m
-+CONFIG_ATA_OVER_ETH=m
-+CONFIG_VIRTIO_BLK=y
-+CONFIG_EEPROM_AT24=m
-+CONFIG_EEPROM_AT25=m
-+CONFIG_EEPROM_93CX6=m
-+CONFIG_ECHO=m
-+CONFIG_SCSI=y
-+# CONFIG_SCSI_PROC_FS is not set
-+CONFIG_BLK_DEV_SD=y
-+CONFIG_CHR_DEV_ST=m
-+CONFIG_BLK_DEV_SR=m
-+CONFIG_CHR_DEV_SG=m
-+# CONFIG_SCSI_LOWLEVEL is not set
-+CONFIG_ATA=m
-+# CONFIG_ATA_VERBOSE_ERROR is not set
-+# CONFIG_ATA_ACPI is not set
-+# CONFIG_SATA_PMP is not set
-+CONFIG_SATA_AHCI=m
-+CONFIG_SATA_SIL24=m
-+CONFIG_ATA_PIIX=m
-+CONFIG_SATA_MV=m
-+CONFIG_SATA_NV=m
-+CONFIG_SATA_SIL=m
-+CONFIG_SATA_VIA=m
-+CONFIG_PATA_ARTOP=m
-+CONFIG_PATA_PDC_OLD=m
-+CONFIG_MD=y
-+CONFIG_BLK_DEV_MD=m
-+CONFIG_MD_LINEAR=m
-+CONFIG_MD_RAID0=m
-+CONFIG_MD_RAID1=m
-+CONFIG_MD_RAID10=m
-+CONFIG_MD_RAID456=m
-+CONFIG_MD_MULTIPATH=m
-+CONFIG_BLK_DEV_DM=m
-+CONFIG_DM_CRYPT=m
-+CONFIG_DM_MIRROR=m
-+CONFIG_FIREWIRE=m
-+CONFIG_FIREWIRE_OHCI=m
-+CONFIG_FIREWIRE_SBP2=m
-+CONFIG_FIREWIRE_NET=m
-+CONFIG_NETDEVICES=y
-+CONFIG_BONDING=m
-+CONFIG_DUMMY=m
-+CONFIG_IFB=m
-+CONFIG_MACVLAN=m
-+CONFIG_VXLAN=m
-+CONFIG_TUN=m
-+CONFIG_VETH=m
-+CONFIG_VIRTIO_NET=y
-+CONFIG_ATM_TCP=m
-+CONFIG_ATM_SOLOS=m
-+CONFIG_NET_DSA_MV88E6060=m
-+CONFIG_NET_DSA_MV88E6XXX=m
-+CONFIG_VORTEX=m
-+CONFIG_ET131X=m
-+CONFIG_PCNET32=m
-+CONFIG_ATL2=m
-+CONFIG_ATL1=m
-+CONFIG_ATL1E=m
-+CONFIG_ATL1C=m
-+CONFIG_NET_VENDOR_AURORA=y
-+CONFIG_B44=m
-+CONFIG_TIGON3=m
-+CONFIG_NET_TULIP=y
-+CONFIG_DE2104X=m
-+CONFIG_TULIP=m
-+CONFIG_TULIP_MWI=y
-+CONFIG_TULIP_MMIO=y
-+CONFIG_TULIP_NAPI=y
-+CONFIG_TULIP_NAPI_HW_MITIGATION=y
-+CONFIG_WINBOND_840=m
-+CONFIG_DM9102=m
-+CONFIG_ULI526X=m
-+CONFIG_E100=m
-+CONFIG_E1000=m
-+CONFIG_IGB=m
-+# CONFIG_IGB_HWMON is not set
-+CONFIG_IGBVF=m
-+CONFIG_IXGBE=m
-+# CONFIG_IXGBE_HWMON is not set
-+CONFIG_SKGE=m
-+CONFIG_SKY2=m
-+CONFIG_NATSEMI=m
-+CONFIG_NE2K_PCI=m
-+CONFIG_FORCEDETH=m
-+# CONFIG_NET_PACKET_ENGINE is not set
-+CONFIG_8139CP=m
-+CONFIG_8139TOO=m
-+CONFIG_R8169=m
-+CONFIG_R6040=m
-+CONFIG_SIS900=m
-+CONFIG_SIS190=m
-+CONFIG_SMC91X=y
-+CONFIG_VIA_RHINE=m
-+CONFIG_VIA_RHINE_MMIO=y
-+CONFIG_VIA_VELOCITY=m
-+CONFIG_BROADCOM_PHY=m
-+CONFIG_MICREL_KS8995MA=m
-+CONFIG_PPP=m
-+CONFIG_PPP_FILTER=y
-+CONFIG_PPP_MPPE=m
-+CONFIG_PPP_MULTILINK=y
-+CONFIG_PPPOATM=m
-+CONFIG_PPPOE=m
-+CONFIG_PPTP=m
-+CONFIG_PPPOL2TP=m
-+CONFIG_PPP_ASYNC=m
-+CONFIG_PPP_SYNC_TTY=m
-+CONFIG_SLIP=m
-+CONFIG_SLIP_COMPRESSED=y
-+CONFIG_SLIP_SMART=y
-+CONFIG_SLIP_MODE_SLIP6=y
-+CONFIG_HOSTAP=m
-+CONFIG_HOSTAP_FIRMWARE=y
-+CONFIG_HOSTAP_FIRMWARE_NVRAM=y
-+CONFIG_HOSTAP_PLX=m
-+CONFIG_HOSTAP_PCI=m
-+CONFIG_PRISM54=m
-+CONFIG_IEEE802154_FAKELB=m
-+CONFIG_IEEE802154_AT86RF230=m
-+CONFIG_IEEE802154_MRF24J40=m
-+CONFIG_IEEE802154_CC2520=m
-+CONFIG_VMXNET3=m
-+CONFIG_ISDN=y
-+CONFIG_ISDN_I4L=m
-+CONFIG_ISDN_PPP=y
-+CONFIG_ISDN_PPP_VJ=y
-+CONFIG_ISDN_MPP=y
-+CONFIG_IPPP_FILTER=y
-+CONFIG_ISDN_PPP_BSDCOMP=m
-+CONFIG_ISDN_AUDIO=y
-+CONFIG_ISDN_TTY_FAX=y
-+CONFIG_ISDN_DIVERSION=m
-+CONFIG_ISDN_CAPI=m
-+# CONFIG_CAPI_TRACE is not set
-+CONFIG_ISDN_CAPI_CAPI20=m
-+CONFIG_ISDN_CAPI_MIDDLEWARE=y
-+CONFIG_MISDN=m
-+CONFIG_MISDN_DSP=m
-+CONFIG_MISDN_L1OIP=m
-+CONFIG_MISDN_HFCPCI=m
-+CONFIG_MISDN_HFCMULTI=m
-+# CONFIG_INPUT_LEDS is not set
-+CONFIG_INPUT_MATRIXKMAP=m
-+CONFIG_INPUT_JOYDEV=m
-+CONFIG_INPUT_EVDEV=m
-+# CONFIG_KEYBOARD_ATKBD is not set
-+CONFIG_KEYBOARD_GPIO=m
-+CONFIG_KEYBOARD_GPIO_POLLED=m
-+# CONFIG_INPUT_MOUSE is not set
-+CONFIG_INPUT_MISC=y
-+CONFIG_INPUT_GPIO_BEEPER=m
-+CONFIG_INPUT_UINPUT=m
-+CONFIG_INPUT_GPIO_ROTARY_ENCODER=m
-+# CONFIG_SERIO is not set
-+CONFIG_VT_HW_CONSOLE_BINDING=y
-+# CONFIG_LEGACY_PTYS is not set
-+# CONFIG_DEVMEM is not set
-+CONFIG_SERIAL_8250=y
-+# CONFIG_SERIAL_8250_DEPRECATED_OPTIONS is not set
-+CONFIG_SERIAL_8250_CONSOLE=y
-+# CONFIG_SERIAL_8250_PCI is not set
-+CONFIG_SERIAL_8250_NR_UARTS=16
-+CONFIG_SERIAL_8250_RUNTIME_UARTS=16
-+CONFIG_SERIAL_8250_EXTENDED=y
-+CONFIG_SERIAL_8250_MANY_PORTS=y
-+CONFIG_SERIAL_8250_SHARE_IRQ=y
-+CONFIG_SERIAL_AMBA_PL011=y
-+CONFIG_SERIAL_AMBA_PL011_CONSOLE=y
-+CONFIG_PRINTER=m
-+CONFIG_PPDEV=m
-+CONFIG_HW_RANDOM=y
-+CONFIG_TCG_TPM=y
-+CONFIG_TCG_TIS_I2C_INFINEON=m
-+# CONFIG_I2C_COMPAT is not set
-+CONFIG_I2C_CHARDEV=m
-+CONFIG_I2C_MUX=m
-+CONFIG_I2C_MUX_GPIO=m
-+CONFIG_I2C_MUX_PCA9541=m
-+CONFIG_I2C_MUX_PCA954x=m
-+# CONFIG_I2C_HELPER_AUTO is not set
-+CONFIG_I2C_ALGOPCF=m
-+CONFIG_I2C_ALGOPCA=m
-+CONFIG_I2C_GPIO=m
-+CONFIG_SPI=y
-+CONFIG_SPI_GPIO=m
-+CONFIG_SPI_SPIDEV=m
-+CONFIG_PPS_CLIENT_GPIO=m
-+CONFIG_GPIO_SYSFS=y
-+CONFIG_GPIO_RCAR=y
-+CONFIG_GPIO_PCA953X=m
-+CONFIG_GPIO_PCF857X=m
-+CONFIG_W1=m
-+CONFIG_W1_MASTER_DS2482=m
-+CONFIG_W1_MASTER_GPIO=m
-+CONFIG_W1_SLAVE_THERM=m
-+CONFIG_W1_SLAVE_SMEM=m
-+CONFIG_W1_SLAVE_DS2413=m
-+CONFIG_W1_SLAVE_DS2431=m
-+CONFIG_W1_SLAVE_DS2433=m
-+CONFIG_W1_SLAVE_DS2760=m
-+CONFIG_HWMON=m
-+CONFIG_SENSORS_ADT7410=m
-+CONFIG_SENSORS_ADT7475=m
-+CONFIG_SENSORS_GPIO_FAN=m
-+CONFIG_SENSORS_IT87=m
-+CONFIG_SENSORS_LM63=m
-+CONFIG_SENSORS_LM75=m
-+CONFIG_SENSORS_LM77=m
-+CONFIG_SENSORS_LM85=m
-+CONFIG_SENSORS_LM90=m
-+CONFIG_SENSORS_LM92=m
-+CONFIG_SENSORS_LM95241=m
-+CONFIG_SENSORS_SHT21=m
-+CONFIG_SENSORS_INA2XX=m
-+CONFIG_SENSORS_TMP421=m
-+CONFIG_WATCHDOG=y
-+CONFIG_SOFT_WATCHDOG=m
-+CONFIG_SSB_SILENT=y
-+CONFIG_BCMA=m
-+CONFIG_MEDIA_SUPPORT=m
-+CONFIG_MEDIA_CAMERA_SUPPORT=y
-+CONFIG_V4L_PLATFORM_DRIVERS=y
-+# CONFIG_MEDIA_SUBDRV_AUTOSELECT is not set
-+# CONFIG_VGA_ARB is not set
-+CONFIG_FB=y
-+CONFIG_FB_ARMCLCD=y
-+# CONFIG_LCD_CLASS_DEVICE is not set
-+# CONFIG_BACKLIGHT_GENERIC is not set
-+CONFIG_LOGO=y
-+# CONFIG_LOGO_LINUX_MONO is not set
-+# CONFIG_LOGO_LINUX_VGA16 is not set
-+CONFIG_SOUND=m
-+CONFIG_SND=m
-+CONFIG_SND_OSSEMUL=y
-+CONFIG_SND_MIXER_OSS=m
-+CONFIG_SND_PCM_OSS=m
-+# CONFIG_SND_PCM_TIMER is not set
-+# CONFIG_SND_SUPPORT_OLD_API is not set
-+# CONFIG_SND_PROC_FS is not set
-+CONFIG_SND_SEQUENCER=m
-+CONFIG_SND_SEQ_DUMMY=m
-+CONFIG_SND_SEQUENCER_OSS=m
-+CONFIG_SND_DUMMY=m
-+CONFIG_SND_VIRMIDI=m
-+CONFIG_SND_INTEL8X0=m
-+CONFIG_SND_VIA82XX=m
-+# CONFIG_SND_SPI is not set
-+# CONFIG_SND_FIREWIRE is not set
-+CONFIG_SND_SOC=m
-+CONFIG_SND_SOC_AC97_CODEC=m
-+CONFIG_HID=m
-+CONFIG_HID_BATTERY_STRENGTH=y
-+CONFIG_HIDRAW=y
-+# CONFIG_USB_SUPPORT is not set
-+CONFIG_MMC=y
-+CONFIG_MMC_BLOCK=m
-+CONFIG_MMC_ARMMMCI=y
-+CONFIG_MMC_SDHCI=m
-+CONFIG_MMC_SDHCI_PLTFM=m
-+CONFIG_MMC_SPI=m
-+CONFIG_NEW_LEDS=y
-+CONFIG_LEDS_CLASS=y
-+CONFIG_LEDS_GPIO=m
-+CONFIG_LEDS_PCA963X=m
-+CONFIG_LEDS_TRIGGER_TIMER=y
-+CONFIG_LEDS_TRIGGER_ONESHOT=m
-+CONFIG_LEDS_TRIGGER_HEARTBEAT=m
-+CONFIG_LEDS_TRIGGER_GPIO=m
-+CONFIG_LEDS_TRIGGER_DEFAULT_ON=y
-+CONFIG_LEDS_TRIGGER_TRANSIENT=m
-+CONFIG_VIRTIO_PCI=m
-+# CONFIG_VIRTIO_PCI_LEGACY is not set
-+CONFIG_VIRTIO_MMIO=y
-+CONFIG_STAGING=y
-+# CONFIG_IOMMU_SUPPORT is not set
-+CONFIG_IIO=m
-+CONFIG_AD799X=m
-+CONFIG_DHT11=m
-+CONFIG_ACPI=y
-+# CONFIG_ACPI_BUTTON is not set
-+CONFIG_EXT4_FS=y
-+CONFIG_REISERFS_FS=m
-+CONFIG_REISERFS_FS_XATTR=y
-+CONFIG_JFS_FS=m
-+CONFIG_XFS_FS=m
-+CONFIG_BTRFS_FS=m
-+CONFIG_F2FS_FS=m
-+# CONFIG_F2FS_FS_POSIX_ACL is not set
-+# CONFIG_DNOTIFY is not set
-+CONFIG_AUTOFS4_FS=m
-+CONFIG_FUSE_FS=y
-+CONFIG_CUSE=y
-+CONFIG_OVERLAY_FS=y
-+CONFIG_FSCACHE=m
-+CONFIG_FSCACHE_STATS=y
-+CONFIG_CACHEFILES=m
-+CONFIG_ISO9660_FS=m
-+CONFIG_JOLIET=y
-+CONFIG_UDF_FS=m
-+CONFIG_MSDOS_FS=m
-+CONFIG_VFAT_FS=y
-+CONFIG_NTFS_FS=m
-+# CONFIG_PROC_PAGE_MONITOR is not set
-+CONFIG_TMPFS=y
-+CONFIG_TMPFS_XATTR=y
-+CONFIG_CONFIGFS_FS=m
-+# CONFIG_MISC_FILESYSTEMS is not set
-+CONFIG_NFS_FS=y
-+# CONFIG_NFS_V2 is not set
-+CONFIG_NFSD=m
-+CONFIG_NFSD_V3=y
-+CONFIG_CIFS=m
-+CONFIG_CIFS_STATS=y
-+CONFIG_CIFS_XATTR=y
-+CONFIG_CIFS_POSIX=y
-+# CONFIG_CIFS_DEBUG is not set
-+CONFIG_NLS_CODEPAGE_437=y
-+CONFIG_NLS_CODEPAGE_775=m
-+CONFIG_NLS_CODEPAGE_850=m
-+CONFIG_NLS_CODEPAGE_852=m
-+CONFIG_NLS_CODEPAGE_862=m
-+CONFIG_NLS_CODEPAGE_864=m
-+CONFIG_NLS_CODEPAGE_866=m
-+CONFIG_NLS_CODEPAGE_932=m
-+CONFIG_NLS_ISO8859_8=m
-+CONFIG_NLS_CODEPAGE_1250=m
-+CONFIG_NLS_CODEPAGE_1251=m
-+CONFIG_NLS_ISO8859_1=y
-+CONFIG_NLS_ISO8859_2=m
-+CONFIG_NLS_ISO8859_6=m
-+CONFIG_NLS_ISO8859_13=m
-+CONFIG_NLS_ISO8859_15=m
-+CONFIG_NLS_KOI8_R=m
-+CONFIG_NLS_UTF8=m
-+CONFIG_PRINTK_TIME=y
-+CONFIG_DEBUG_INFO=y
-+CONFIG_DEBUG_INFO_REDUCED=y
-+# CONFIG_ENABLE_MUST_CHECK is not set
-+CONFIG_FRAME_WARN=1024
-+CONFIG_STRIP_ASM_SYMS=y
-+CONFIG_DEBUG_FS=y
-+CONFIG_MAGIC_SYSRQ=y
-+# CONFIG_SCHED_DEBUG is not set
-+# CONFIG_DEBUG_BUGVERBOSE is not set
-+CONFIG_RCU_CPU_STALL_TIMEOUT=60
-+# CONFIG_RCU_TRACE is not set
-+# CONFIG_FTRACE is not set
-+CONFIG_ATOMIC64_SELFTEST=y
-+CONFIG_CRYPTO_TEST=m
-+CONFIG_CRYPTO_GCM=m
-+CONFIG_CRYPTO_PCBC=m
-+CONFIG_CRYPTO_XTS=m
-+CONFIG_CRYPTO_SHA512=m
-+CONFIG_CRYPTO_TGR192=m
-+CONFIG_CRYPTO_WP512=m
-+CONFIG_CRYPTO_ANUBIS=m
-+CONFIG_CRYPTO_ARC4=y
-+CONFIG_CRYPTO_BLOWFISH=m
-+CONFIG_CRYPTO_CAMELLIA=m
-+CONFIG_CRYPTO_CAST5=m
-+CONFIG_CRYPTO_CAST6=m
-+CONFIG_CRYPTO_FCRYPT=m
-+CONFIG_CRYPTO_KHAZAD=m
-+CONFIG_CRYPTO_SERPENT=m
-+CONFIG_CRYPTO_TEA=m
-+CONFIG_CRYPTO_TWOFISH=m
-+CONFIG_CRYPTO_USER_API_HASH=m
-+CONFIG_CRYPTO_USER_API_SKCIPHER=m
-+CONFIG_CRYPTO_DEV_CCP=y
-+CONFIG_CRC32_SARWATE=y
-+CONFIG_CRC8=m
-+CONFIG_XZ_DEC=y
-+# CONFIG_XZ_DEC_X86 is not set
-+# CONFIG_XZ_DEC_POWERPC is not set
-+# CONFIG_XZ_DEC_IA64 is not set
-+# CONFIG_XZ_DEC_ARM is not set
-+# CONFIG_XZ_DEC_ARMTHUMB is not set
-+# CONFIG_XZ_DEC_SPARC is not set
-+CONFIG_CORDIC=m
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index f895e3c3359af779..2ee94a3304202a74 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1019,6 +1019,33 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     container->fd = fd;
+     QLIST_INIT(&container->giommu_list);
+     QLIST_INIT(&container->hostwin_list);
++    container->noiommu = group->noiommu;
++
++    if (container->noiommu) {
++        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
++        if (ret) {
++            error_report("vfio: failed to set group container: %m");
++            ret = -errno;
++            goto free_container_exit;
++        }
++
++        ret = ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_NOIOMMU_IOMMU);
++        if (!ret) {
++            error_report("vfio: No available IOMMU models");
++            ret = -EINVAL;
++            goto free_container_exit;
++        }
++
++        ret = ioctl(fd, VFIO_SET_IOMMU, VFIO_NOIOMMU_IOMMU);
++        if (ret) {
++            error_report("vfio: failed to set iommu for container: %m");
++            ret = -errno;
++            goto free_container_exit;
++        }
++
++        goto listener_register;
++    }
++
+     if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+         ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+         bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
+@@ -1151,15 +1178,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     group->container = container;
+     QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+ 
+-    container->listener = vfio_memory_listener;
+-
+-    memory_listener_register(&container->listener, container->space->as);
+-
+-    if (container->error) {
+-        ret = container->error;
+-        error_setg_errno(errp, -ret,
+-                         "memory listener initialization failed for container");
+-        goto listener_release_exit;
++listener_register:
++    if (!container->noiommu) {
++        container->listener = vfio_memory_listener;
++        memory_listener_register(&container->listener, container->space->as);
++        if (container->error) {
++            ret = container->error;
++            error_setg_errno(errp, -ret,
++                    "memory listener initialization failed for container");
++            goto listener_release_exit;
++        }
+     }
+ 
+     container->initialized = true;
+@@ -1169,7 +1197,9 @@ listener_release_exit:
+     QLIST_REMOVE(group, container_next);
+     QLIST_REMOVE(container, next);
+     vfio_kvm_device_del_group(group);
+-    vfio_listener_release(container);
++    if (!container->noiommu) {
++        vfio_listener_release(container);
++    }
+ 
+ free_container_exit:
+     g_free(container);
+@@ -1195,7 +1225,7 @@ static void vfio_disconnect_container(VFIOGroup *group)
+      * since unset may destroy the backend container if it's the last
+      * group.
+      */
+-    if (QLIST_EMPTY(&container->group_list)) {
++    if (QLIST_EMPTY(&container->group_list) && !container->noiommu) {
+         vfio_listener_release(container);
+     }
+ 
+@@ -1249,8 +1279,13 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+     snprintf(path, sizeof(path), "/dev/vfio/%d", groupid);
+     group->fd = qemu_open(path, O_RDWR);
+     if (group->fd < 0) {
+-        error_setg_errno(errp, errno, "failed to open %s", path);
+-        goto free_group_exit;
++        snprintf(path, sizeof(path), "/dev/vfio/noiommu-%d", groupid);
++        group->fd = qemu_open(path, O_RDWR);
++        if (group->fd < 0) {
++            error_setg_errno(errp, errno, "failed to open %s", path);
++            goto free_group_exit;
++        }
++        group->noiommu = 1;
+     }
+ 
+     if (ioctl(group->fd, VFIO_GROUP_GET_STATUS, &status)) {
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index f3a2ac9fee02066f..aca2e33efb9b118c 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -77,6 +77,7 @@ struct VFIOGroup;
+ typedef struct VFIOContainer {
+     VFIOAddressSpace *space;
+     int fd; /* /dev/vfio/vfio, empowered by the attached groups */
++    bool noiommu;
+     MemoryListener listener;
+     MemoryListener prereg_listener;
+     unsigned iommu_type;
+@@ -136,6 +137,7 @@ struct VFIODeviceOps {
+ typedef struct VFIOGroup {
+     int fd;
+     int groupid;
++    bool noiommu;
+     VFIOContainer *container;
+     QLIST_HEAD(, VFIODevice) device_list;
+     QLIST_ENTRY(VFIOGroup) next;
 -- 
 2.7.4
