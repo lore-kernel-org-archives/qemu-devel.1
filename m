@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ek6Jb-0004Pv-Tx
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:54:03 -0500
+	(envelope-from <clg@kaod.org>) id 1ek6NU-0006db-E8
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:58:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ek6JX-0003VG-JL
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:53:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58294 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1ek6NP-0006Pf-JW
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:58:00 -0500
+Received: from 20.mo7.mail-out.ovh.net ([46.105.49.208]:45544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ek6JX-0003Uq-BQ
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:53:55 -0500
-Date: Fri, 9 Feb 2018 10:53:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180209105335.GA2428@work-vm>
-References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
-	<20180208201523.GE2326@work-vm> <5A7D1121.6030903@intel.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ek6NP-0006Os-Cl
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:57:55 -0500
+Received: from player697.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id AF8018F67A
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 11:57:53 +0100 (CET)
+References: <20180209085755.30414-1-f4bug@amsat.org>
+	<20180209085755.30414-2-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6b80dc31-c710-e4cb-4d0d-ac74cfd3e874@kaod.org>
+Date: Fri, 9 Feb 2018 11:57:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A7D1121.6030903@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] virtio-balloon: free page hint
- reporting support
+In-Reply-To: <20180209085755.30414-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/arm/aspeed: directly map the
+ serial device to the system address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> On 02/09/2018 04:15 AM, Dr. David Alan Gilbert wrote:
-> > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > This is the deivce part implementation to add a new feature,
-> > > VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
-> > > receives the guest free page hints from the driver and clears the
-> > > corresponding bits in the dirty bitmap, so that those free pages are
-> > > not transferred by the migration thread to the destination.
-> > > 
-> > > Please see the driver patch link for test results:
-> > > https://lkml.org/lkml/2018/2/4/60
-> > Hi Wei,
-> >     I'll look at the code a bit more - but first some more basic
-> > questions on that lkml post:
-> > 
-> >      a) The idle guest time thing is a nice result; can you just state
-> >         what the host was, speed of connection, and what other options
-> >         you were using?
-> > 
-> >      b) The workload test, the one with the kernel compile; you list
-> >         the kernel compile time but don't mention any changes in the
-> >         migration times of the ping-pong; can you give those times as
-> >         well?
-> > 
-> >      c) What's your real workload that this is aimed at?
-> >         Is it really for people migrating idle VMs - or do you have some
-> >         NFV application in mind, if so why not include a figure for
-> >         those?
-> > 
-> 
-> Hi Dave,
-> 
-> Thanks for joining the review. Please see below info.
-> 
-> a) Environment info
->     - Host:
->         - Physical CPU: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
->         - kernel: 3.10.0
-> 
->     - Guest:
->         - kernel: 4.15.0
->         - QEMU setup: -cpu host -M pc -smp 4,threads=1,sockets=1 -m 8G
-> --mem-prealloc -realtime mlock=on -balloon virtio,free-page-hint=true
-> 
->     - Migration setup:
->         - migrate_set_speed 0
->         - migrate_set_downtime 0.01  (10ms)
+On 02/09/2018 09:57 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> (qemu) info mtree
+>  address-space: cpu-memory-0
+>    0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>      0000000000000000-0000000007ffffff (prio 0, rom): aspeed.boot_rom
+>      000000001e600000-000000001e7fffff (prio -1, i/o): aspeed_soc.io
+> -      000000001e784000-000000001e78401f (prio 0, i/o): serial
+>      000000001e620000-000000001e6200ff (prio 0, i/o): aspeed.smc.ast250=
+0-fmc
+>      000000001e630000-000000001e6300ff (prio 0, i/o): aspeed.smc.ast250=
+0-spi1
+>      [...]
+>      000000001e720000-000000001e728fff (prio 0, ram): aspeed.sram
+>      000000001e782000-000000001e782fff (prio 0, i/o): aspeed.timer
+> +    000000001e784000-000000001e78401f (prio 0, i/o): serial
+>      000000001e785000-000000001e78501f (prio 0, i/o): aspeed.wdt
+>      000000001e785020-000000001e78503f (prio 0, i/o): aspeed.wdt
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-That's an unusually low downtime (and I'm not sure what setting the
-speed to 0 does!).
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-> b) Michael asked the same question on the kernel patches, I'll reply there
-> with you cc-ed, so that kernel maintainers can also see it. Btw, do you have
-> any other workloads you would suggest to have a try?
+Thanks,
 
-No, not really; I guess it's best for VMs that are either idle or have
-lots of spare RAM.
+C.=20
 
-> c) This feature is requested by many customers (e.g. general cloud vendors).
-> It's for general use cases. As long as the guest has free memory, it will
-> benefit from this optimization when doing migration. It's not specific for
-> NFV usages, but for sure NFV will also benefit from this feature if we think
-> about service chaining, where multiple VMs need to co-work with each other.
-> In that case, migrating one VM will just break the working model, which
-> means we will need to migrate all the VMs. A shorter migration time will be
-> very helpful.
-
-I thought of NFV because their VMs tend to have lots of extra RAM but
-most seems unused most of the time.
-
-Dave
-
-> 
-> Best,
-> Wei
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> ---
+>  hw/arm/aspeed_soc.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index c83b7e207b..2a5d041b3b 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -257,7 +257,8 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
+ror **errp)
+>      /* UART - attach an 8250 to the IO space as our UART5 */
+>      if (serial_hds[0]) {
+>          qemu_irq uart5 =3D qdev_get_gpio_in(DEVICE(&s->vic), uart_irqs=
+[4]);
+> -        serial_mm_init(&s->iomem, ASPEED_SOC_UART_5_BASE, 2,
+> +        serial_mm_init(get_system_memory(),
+> +                       ASPEED_SOC_IOMEM_BASE + ASPEED_SOC_UART_5_BASE,=
+ 2,
+>                         uart5, 38400, serial_hds[0], DEVICE_LITTLE_ENDI=
+AN);
+>      }
+> =20
+>=20
