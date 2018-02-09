@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lcapitulino@redhat.com>) id 1ek93r-0000is-Pw
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:49:56 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ek968-0002RZ-QO
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lcapitulino@redhat.com>) id 1ek93o-0003QE-NX
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:49:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46014 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lcapitulino@redhat.com>)
-	id 1ek93o-0003Pi-II
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:49:52 -0500
-Date: Fri, 9 Feb 2018 08:49:49 -0500
-From: Luiz Capitulino <lcapitulino@redhat.com>
-Message-ID: <20180209084949.569007d7@redhat.com>
-In-Reply-To: <f8157f02-4c16-6811-7857-e1ec4d55d49c@linux.vnet.ibm.com>
-References: <20180208111732.09869f84@redhat.com>
-	<20180208203342.GE13981@localhost.localdomain>
-	<f8157f02-4c16-6811-7857-e1ec4d55d49c@linux.vnet.ibm.com>
+	(envelope-from <stefanha@redhat.com>) id 1ek965-0005NE-Om
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:52:16 -0500
+Date: Fri, 9 Feb 2018 10:16:30 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180209101630.GB30827@stefanha-x1.localdomain>
+References: <20180208162447.10851-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] qmp: add query-cpus-fast
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="eJnRUKwClWJh1Khz"
+Content-Disposition: inline
+In-Reply-To: <20180208162447.10851-1-marcandre.lureau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] misc: fix spelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, berrange@redhat.com
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Fri, 9 Feb 2018 08:56:19 +0100
-Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
 
-> On 08.02.2018 21:33, Eduardo Habkost wrote:
-> > On Thu, Feb 08, 2018 at 11:17:32AM -0500, Luiz Capitulino wrote:
-> > [...]  
-> >> The "halted" field is somewhat controversial. On the one hand,
-> >> it offers a convenient way to know if a guest CPU is idle or
-> >> running. On the other hand, it's a field that can change many
-> >> times a second. In fact, the halted state can change even
-> >> before query-cpus-fast has returned. This makes one wonder if
-> >> this field should be dropped all together. Having the "halted"
-> >> field as optional gives a better option for dropping it in
-> >> the future, since we can just stop returning it.  
-> > 
-> > I'd just drop it, unless we find a use case where it's really
-> > useful.
+--eJnRUKwClWJh1Khz
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I don't think there's any, unless for debugging purposes.
+On Thu, Feb 08, 2018 at 05:24:47PM +0100, Marc-Andr=E9 Lureau wrote:
+> s/pupulate/populate
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  util/qemu-coroutine-lock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm keeping it mainly for s390. Viktor, libvirt is still using
-this field in s390, no?
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-Dropping halted and having management software still using query-cpus
-because of halted would be a total failure of query-cpus-fast.
+Stefan
 
-> > Also, the code that sets/clears cpu->halted is target-specific,
-> > so I wouldn't be so sure that simply checking for
-> > !kvm_irqchip_in_kernel() is enough on all targets.
+--eJnRUKwClWJh1Khz
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I checked the code and had the impression it was enough, but
-I don't have experience with other archs. So, would be nice
-if other archs maintainers could review this. I'll try to ping them.
+-----BEGIN PGP SIGNATURE-----
 
-> Right, the present patch effectively disables halted anyway (including
-> s390). 
+iQEcBAEBAgAGBQJafXT+AAoJEJykq7OBq3PIIocH/jkdS/XpdqTzQaQFgaW0MBET
+wIMLchHdZAWbia50ZAZK6O/s+OqxE24tKG05jQJwPZocARM9aF63ODPbzaMSEE+p
+1FfRcv03Xe5HwUL0kNrgO7UxZ8zwzEBu+nRIAbcUBnq3F6BNJyW0lH29/9DkTt5v
+vwKDklqlWuptTHVLmQnMYcC4KE2EOrNsP1dpFipfIo7jSGHFSrYw7LJNjLHscnjd
+8s+G6wC/8i93D3uk2z5kmdmVwz3KRcKxYR2w/eTP7BE1TheaELUCj4di2/TsFRL9
+eVBpwFO7e5FSdxHKj/ZVsfoMPaPBtzPRxJumQDTonq7U3Q99a7j4ppzEYP8w1f8=
+=z0qL
+-----END PGP SIGNATURE-----
 
-No, it doesn't. It only disables halted for archs that require going
-to the kernel to get it.
-
-> So it may be cleaner to just drop it right now.
-> Assuming the presence of architecure-specific data, libvirt can derive a
-> halted state (or an equivalent thereof) from query-cpus-fast returned
-> information.
-
-This is a different proposal. You're proposing moving the halted state
-to a CPU-specific field. This is doable if that's what we want.
+--eJnRUKwClWJh1Khz--
