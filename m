@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek8pt-0000M7-9s
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:35:30 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ek8rX-0001jq-Ei
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:37:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek8po-0000sA-D8
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:35:29 -0500
-Date: Fri, 9 Feb 2018 14:35:04 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180209143504.2e676850.cohuck@redhat.com>
-In-Reply-To: <47ffc4f7-a66b-0328-d0bf-2d06ad0f7c30@de.ibm.com>
-References: <20180202094241.59537-1-borntraeger@de.ibm.com>
-	<8d3af693-3dd8-20b7-c7c1-38d7c6cce65d@de.ibm.com>
-	<20180202113301.0522c7bc.cohuck@redhat.com>
-	<20180202113513.15c37b32.cohuck@redhat.com>
-	<47ffc4f7-a66b-0328-d0bf-2d06ad0f7c30@de.ibm.com>
+	(envelope-from <mreitz@redhat.com>) id 1ek8rT-0002DW-0C
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:37:11 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d8530726-8177-c63d-ffb5-6b4e86068412@redhat.com>
+Date: Fri, 9 Feb 2018 14:36:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling -->
- stable 2.11.1?
+In-Reply-To: <20180208192328.16550-3-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eDVozDC7nFHcRekX4PglQI50O1ilyqZkv"
+Subject: Re: [Qemu-devel] [PATCH 02/27] block/qapi: Add qcow2 create options
+ to schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On Thu, 8 Feb 2018 12:30:28 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eDVozDC7nFHcRekX4PglQI50O1ilyqZkv
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <d8530726-8177-c63d-ffb5-6b4e86068412@redhat.com>
+Subject: Re: [PATCH 02/27] block/qapi: Add qcow2 create options to schema
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-3-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 02/02/2018 11:35 AM, Cornelia Huck wrote:
-> > On Fri, 2 Feb 2018 11:33:01 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> On Fri, 2 Feb 2018 10:43:18 +0100
-> >> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >>  
-> >>> On 02/02/2018 10:42 AM, Christian Borntraeger wrote:    
-> >>>> commit 67915de9f038 ("s390x/event-facility: variable-length event
-> >>>> masks") switches the sclp receive/send mask. This broke the sclp
-> >>>> lm console.    
-> >>
-> >> Hum. Probably should add sclp-lm to my test setup.
-> >>  
-> >>>>
-> >>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>>> Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
-> >>>> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>      
-> >>>
-> >>> opps. Please fixup yourself Conny :-)    
-> >>
-> >> Well, you did cc: the original author :)
-> >>  
-> >>>     
-> >>>> Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> >>>> Cc: qemu-stable@nongnu.org
-> >>>> ---
-> >>>>  hw/s390x/event-facility.c | 4 ++--
-> >>>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> >>>> index b0f71f4554..155a69467b 100644
-> >>>> --- a/hw/s390x/event-facility.c
-> >>>> +++ b/hw/s390x/event-facility.c
-> >>>> @@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
-> >>>>      ef->receive_mask = be32_to_cpu(tmp_mask);
-> >>>>
-> >>>>      /* return the SCLP's capability masks to the guest */
-> >>>> -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-> >>>> +    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-> >>>>      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-> >>>>                mask_length, sizeof(tmp_mask));
-> >>>> -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-> >>>> +    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-> >>>>      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-> >>>>                mask_length, sizeof(tmp_mask));
-> >>>>       
-> >>>     
-> >>
-> >> Thanks, applied.  
-> > 
-> > Oh, and as always, I still take R-bs until I prepare a pull req.
-> >   
-> 
-> Would be good to have that in 2.11.1 stable as well I think
-> 
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json | 45 ++++++++++++++++++++++++++++++++++++++++++++=
+-
+>  1 file changed, 44 insertions(+), 1 deletion(-)
 
-FYI, this is now in master as commit 869e676ae7c7ef678292652be8995a525e642bee
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--eDVozDC7nFHcRekX4PglQI50O1ilyqZkv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp9o/kSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AH34H/jz3kwPO4zRe9HqtrXnvi0QadRaqryUO
+uBipyMEK0GqbOZKEfewnnnH6UNQ10BmSHSCODpVA9tH6DybQdCOLaTWNBJT9RC1b
+w3tAJaX9Dgd8jfi7Pl6Zpgcv+ejPBKRt8q5iZLTwZUYxB5UBBMJFduI9gskhAtUM
+8FX6vjeqv/fV8DTcHaqLGev9TOQrMA3vOt5ZouWLFK8ocaJL6dCGH5fQOg3arw9X
+UTM7pb90yK3np8iINQJTjz/lcpeSK5fURi3TkiKYpsUsLyXXAaJsWstP2OyFofyq
+R1KfLGi8MoA9vUJOkQzVe8kVajGPxXFb0Dkdum0EVtsG0+621be0po4=
+=iLhv
+-----END PGP SIGNATURE-----
+
+--eDVozDC7nFHcRekX4PglQI50O1ilyqZkv--
