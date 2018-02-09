@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1ekGgq-0007Et-3S
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:58:41 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ekGrY-0003rl-EH
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 17:09:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1ekGgl-0006Pf-Np
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:58:40 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:33265)
+	(envelope-from <alex.williamson@redhat.com>) id 1ekGrU-0004d3-Dy
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 17:09:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33632)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1ekGgl-0006PN-IP
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:58:35 -0500
-Date: Fri, 9 Feb 2018 16:58:34 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180209215834.GB3684@flamenco>
-References: <20180208180019.13683-1-antonios.motakis@huawei.com>
-	<20180208180019.13683-4-antonios.motakis@huawei.com>
-	<20180209161326.653f3468@bahia.lan>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ekGrU-0004ce-60
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 17:09:40 -0500
+Date: Fri, 9 Feb 2018 15:09:33 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180209150933.658881ed@w520.home>
+In-Reply-To: <20180209071145.GE2783@xz-mi>
+References: <20180207001615.1156.10547.stgit@gimli.home>
+	<20180207002646.1156.37051.stgit@gimli.home>
+	<20180209071145.GE2783@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180209161326.653f3468@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 3/4] 9pfs: stat_to_qid: use device as input
- to qid.path
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 5/5] vfio/quirks: Enable ioeventfd
+ quirks to be handled by vfio directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: antonios.motakis@huawei.com, qemu-devel@nongnu.org, veaceslav.falico@huawei.com, Eduard.Shishkin@huawei.com, andy.wangguoli@huawei.com, Jani.Kokkonen@huawei.com, berrange@redhat.com, Eric Blake <eblake@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Fri, Feb 09, 2018 at 16:13:26 +0100, Greg Kurz wrote:
-> On Thu, 8 Feb 2018 19:00:18 +0100
-> <antonios.motakis@huawei.com> wrote:
-(snip)
-> > +/* creative abuse of tb_hash_func7, which is based on xxhash */
-> > +static uint32_t qpp_hash(QppEntry e)
-> > +{
-> > +    return tb_hash_func7(e.ino_prefix, e.dev, 0, 0, 0);
+On Fri, 9 Feb 2018 15:11:45 +0800
+Peter Xu <peterx@redhat.com> wrote:
+
+> On Tue, Feb 06, 2018 at 05:26:46PM -0700, Alex Williamson wrote:
+> > With vfio ioeventfd support, we can program vfio-pci to perform a
+> > specified BAR write when an eventfd is triggered.  This allows the
+> > KVM ioeventfd to be wired directly to vfio-pci, entirely avoiding
+> > userspace handling for these events.  On the same micro-benchmark
+> > where the ioeventfd got us to almost 90% of performance versus
+> > disabling the GeForce quirks, this gets us to within 95%.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >  hw/vfio/pci-quirks.c |   42 ++++++++++++++++++++++++++++++++++++------
+> >  1 file changed, 36 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> > index e739efe601b1..35a4d5197e2d 100644
+> > --- a/hw/vfio/pci-quirks.c
+> > +++ b/hw/vfio/pci-quirks.c
+> > @@ -16,6 +16,7 @@
+> >  #include "qemu/range.h"
+> >  #include "qapi/error.h"
+> >  #include "qapi/visitor.h"
+> > +#include <sys/ioctl.h>
+> >  #include "hw/nvram/fw_cfg.h"
+> >  #include "pci.h"
+> >  #include "trace.h"
+> > @@ -287,13 +288,27 @@ static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
+> >      return quirk;
+> >  }
+> >  
+> > -static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
+> > +static void vfio_ioeventfd_exit(VFIOPCIDevice *vdev, VFIOIOEventFD *ioeventfd)
+> >  {
+> > +    struct vfio_device_ioeventfd vfio_ioeventfd;
+> > +
+> >      QLIST_REMOVE(ioeventfd, next);
+> > +
+> >      memory_region_del_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
+> >                                ioeventfd->match_data, ioeventfd->data,
+> >                                &ioeventfd->e);
+> > +
+> >      qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e), NULL, NULL, NULL);
+> > +
+> > +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
+> > +    vfio_ioeventfd.flags = ioeventfd->size;
+> > +    vfio_ioeventfd.data = ioeventfd->data;
+> > +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
+> > +                            ioeventfd->region_addr;
+> > +    vfio_ioeventfd.fd = -1;
+> > +
+> > +    ioctl(vdev->vbasedev.fd, VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
+> > +
+> >      event_notifier_cleanup(&ioeventfd->e);
+> >      g_free(ioeventfd);
+> >  }
+> > @@ -315,6 +330,8 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
+> >                                            hwaddr region_addr)
+> >  {
+> >      VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
+> > +    struct vfio_device_ioeventfd vfio_ioeventfd;
+> > +    char vfio_enabled = '+';
+> >  
+> >      if (event_notifier_init(&ioeventfd->e, 0)) {
+> >          g_free(ioeventfd);
+> > @@ -329,15 +346,28 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
+> >      ioeventfd->region = region;
+> >      ioeventfd->region_addr = region_addr;
+> >  
+> > -    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
+> > -                        vfio_ioeventfd_handler, NULL, ioeventfd);
+> > +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
+> > +    vfio_ioeventfd.flags = ioeventfd->size;
+> > +    vfio_ioeventfd.data = ioeventfd->data;
+> > +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
+> > +                            ioeventfd->region_addr;
+> > +    vfio_ioeventfd.fd = event_notifier_get_fd(&ioeventfd->e);
+> > +
+> > +    if (ioctl(vdev->vbasedev.fd,
+> > +              VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd) != 0) {
+> > +        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
+> > +                            vfio_ioeventfd_handler, NULL, ioeventfd);
+> > +        vfio_enabled = '-';  
 > 
-> Hmm... Looking at git log include/exec/tb-hash-xx.h, I see that this hash
-> function signature evolved according to TCG needs. It started with 3
-> arguments, then 4 and we have 5 today.
-> 
-> So I don't think we should add another unrelated user. Probably best to
-> have our own version. Also it seems it could be simpler since you always
-> pass 0 for the third and later arguments.
+> Would the performance be even slower if a new QEMU runs on a old
+> kernel due to these ioeventfds (MMIO -> eventfd -> same MMIO again)?
+> If so, shall we only enable this ioeventfd enhancement only if we
+> detected that the kernel supports this new feature (assuming this
+> feature bit won't change after VM starts)?
 
-It's fine to use it; the compiler will do the right thing
-with those '0' arguments, because the function is always inlined.
+No, it's actually still a significant improvement to enable the KVM
+ioeventfd even if we can't enable vfio.  My testing shows that the KVM
+ioeventfd alone accounts for slightly more than half of the total
+improvement, so I don't see any reason to restrict this to depending on
+both ends being available.  Thanks,
 
-That said, I have some cleanup patches to export this as xxhash and make
-tb_hash a user of it. The patches also remove most of the ugly 0's from
-callers. Those patches will have to wait for a bit though, so for now
-just use tb_hash_func7.
-
-(snip)
-> > +        val = g_malloc0(sizeof(QppEntry));
-> > +        if (!val) {
-> > +            return -ENOMEM;
-> > +        }
-
-g_malloc0 and all other glib memory allocation functions only
-return NULL if the size argument is 0.
-If out of memory, the application is terminated, which is why
-this check is not needed.
-Reference:
-  https://developer.gnome.org/glib/stable/glib-Memory-Allocation.html#glib-Memory-Allocation.description
-
-Thanks,
-
-		Emilio
+Alex
