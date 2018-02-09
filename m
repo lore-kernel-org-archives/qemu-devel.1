@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33887)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekA4q-0001lF-77
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:55:01 -0500
+	id 1ekA4x-0001uR-1b
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:55:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekA4o-00055N-TH
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:55:00 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33610)
+	id 1ekA4r-00058M-BN
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:55:07 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:46968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekA4o-00054c-MS
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:54:58 -0500
-Received: by mail-qk0-x241.google.com with SMTP id c82so10272953qka.0
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:54:58 -0800 (PST)
+	id 1ekA4r-00057s-77
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:55:01 -0500
+Received: by mail-qk0-x243.google.com with SMTP id d144so3447094qkg.13
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:55:01 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  9 Feb 2018 11:54:07 -0300
-Message-Id: <20180209145430.26007-8-f4bug@amsat.org>
+Date: Fri,  9 Feb 2018 11:54:08 -0300
+Message-Id: <20180209145430.26007-9-f4bug@amsat.org>
 In-Reply-To: <20180209145430.26007-1-f4bug@amsat.org>
 References: <20180209145430.26007-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v12 07/30] sdhci: add a 'spec_version property'
- (default to v2)
+Subject: [Qemu-devel] [PATCH v12 08/30] sdhci: use a numeric value for the
+ default CAPAB register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,111 +37,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
 
+using many #defines is not portable when scaling to different HCI.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/sd/sdhci-internal.h |  4 ++--
- include/hw/sd/sdhci.h  |  2 ++
- hw/sd/sdhci.c          | 27 +++++++++++++++++++++++----
- 3 files changed, 27 insertions(+), 6 deletions(-)
+ hw/sd/sdhci.c | 74 +++++++++++++----------------------------------------------
+ 1 file changed, 16 insertions(+), 58 deletions(-)
 
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index 0991acd724..64556480a9 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -216,9 +216,9 @@
- /* Slot interrupt status */
- #define SDHC_SLOT_INT_STATUS            0xFC
- 
--/* HWInit Host Controller Version Register 0x0401 */
-+/* HWInit Host Controller Version Register */
- #define SDHC_HCVER                      0xFE
--#define SD_HOST_SPECv2_VERS             0x2401
-+#define SDHC_HCVER_VENDOR               0x24
- 
- #define SDHC_REGISTERS_MAP_SIZE         0x100
- #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index f8d1ba3538..2a26b46f05 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -78,6 +78,7 @@ typedef struct SDHCIState {
-     /* Read-only registers */
-     uint64_t capareg;      /* Capabilities Register */
-     uint64_t maxcurr;      /* Maximum Current Capabilities Register */
-+    uint16_t version;      /* Host Controller Version Register */
- 
-     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
-     uint32_t buf_maxsz;
-@@ -93,6 +94,7 @@ typedef struct SDHCIState {
-     /* Configurable properties */
-     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
-     uint32_t quirks;
-+    uint8_t sd_spec_version;
- } SDHCIState;
- 
- /*
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index f20a58068b..48924feb07 100644
+index 48924feb07..39eeccc4d5 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -174,7 +174,8 @@ static void sdhci_reset(SDHCIState *s)
+@@ -39,67 +39,25 @@
+ #define TYPE_SDHCI_BUS "sdhci-bus"
+ #define SDHCI_BUS(obj) OBJECT_CHECK(SDBus, (obj), TYPE_SDHCI_BUS)
  
-     timer_del(s->insert_timer);
-     timer_del(s->transfer_timer);
--    /* Set all registers to 0. Capabilities registers are not cleared
++#define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
 +
-+    /* Set all registers to 0. Capabilities/Version registers are not cleared
-      * and assumed to always preserve their value, given to them during
-      * initialization */
-     memset(&s->sdmasysad, 0, (uintptr_t)&s->capareg - (uintptr_t)&s->sdmasysad);
-@@ -919,7 +920,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
-         ret = (uint32_t)(s->admasysaddr >> 32);
-         break;
-     case SDHC_SLOT_INT_STATUS:
--        ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
-+        ret = (s->version << 16) | sdhci_slotint(s);
-         break;
-     default:
-         qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
-@@ -1175,11 +1176,22 @@ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
-     }
- }
+ /* Default SD/MMC host controller features information, which will be
+  * presented in CAPABILITIES register of generic SD host controller at reset.
+- * If not stated otherwise:
+- * 0 - not supported, 1 - supported, other - prohibited.
++ *
++ * support:
++ * - 3.3v and 1.8v voltages
++ * - SDMA/ADMA1/ADMA2
++ * - high-speed
++ * max host controller R/W buffers size: 512B
++ * max clock frequency for SDclock: 52 MHz
++ * timeout clock frequency: 52 MHz
++ *
++ * does not support:
++ * - 3.0v voltage
++ * - 64-bit system bus
++ * - suspend/resume
+  */
+-#define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Support */
+-#define SDHC_CAPAB_18V            1ul        /* Voltage support 1.8v */
+-#define SDHC_CAPAB_30V            0ul        /* Voltage support 3.0v */
+-#define SDHC_CAPAB_33V            1ul        /* Voltage support 3.3v */
+-#define SDHC_CAPAB_SUSPRESUME     0ul        /* Suspend/resume support */
+-#define SDHC_CAPAB_SDMA           1ul        /* SDMA support */
+-#define SDHC_CAPAB_HIGHSPEED      1ul        /* High speed support */
+-#define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
+-#define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
+-/* Maximum host controller R/W buffers size
+- * Possible values: 512, 1024, 2048 bytes */
+-#define SDHC_CAPAB_MAXBLOCKLENGTH 512ul
+-/* Maximum clock frequency for SDclock in MHz
+- * value in range 10-63 MHz, 0 - not defined */
+-#define SDHC_CAPAB_BASECLKFREQ    52ul
+-#define SDHC_CAPAB_TOUNIT         1ul  /* Timeout clock unit 0 - kHz, 1 - MHz */
+-/* Timeout clock frequency 1-63, 0 - not defined */
+-#define SDHC_CAPAB_TOCLKFREQ      52ul
+-
+-/* Now check all parameters and calculate CAPABILITIES REGISTER value */
+-#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_18V > 1 || SDHC_CAPAB_30V > 1 ||     \
+-    SDHC_CAPAB_33V > 1 || SDHC_CAPAB_SUSPRESUME > 1 || SDHC_CAPAB_SDMA > 1 ||  \
+-    SDHC_CAPAB_HIGHSPEED > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 > 1 ||\
+-    SDHC_CAPAB_TOUNIT > 1
+-#error Capabilities features can have value 0 or 1 only!
+-#endif
+-
+-#if SDHC_CAPAB_MAXBLOCKLENGTH == 512
+-#define MAX_BLOCK_LENGTH 0ul
+-#elif SDHC_CAPAB_MAXBLOCKLENGTH == 1024
+-#define MAX_BLOCK_LENGTH 1ul
+-#elif SDHC_CAPAB_MAXBLOCKLENGTH == 2048
+-#define MAX_BLOCK_LENGTH 2ul
+-#else
+-#error Max host controller block size can have value 512, 1024 or 2048 only!
+-#endif
+-
+-#if (SDHC_CAPAB_BASECLKFREQ > 0 && SDHC_CAPAB_BASECLKFREQ < 10) || \
+-    SDHC_CAPAB_BASECLKFREQ > 63
+-#error SDclock frequency can have value in range 0, 10-63 only!
+-#endif
+-
+-#if SDHC_CAPAB_TOCLKFREQ > 63
+-#error Timeout clock frequency can have value in range 0-63 only!
+-#endif
+-
+-#define SDHC_CAPAB_REG_DEFAULT                                 \
+-   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_18V << 26) |     \
+-    (SDHC_CAPAB_30V << 25) | (SDHC_CAPAB_33V << 24) |          \
+-    (SDHC_CAPAB_SUSPRESUME << 23) | (SDHC_CAPAB_SDMA << 22) |  \
+-    (SDHC_CAPAB_HIGHSPEED << 21) | (SDHC_CAPAB_ADMA1 << 20) |  \
+-    (SDHC_CAPAB_ADMA2 << 19) | (MAX_BLOCK_LENGTH << 16) |      \
+-    (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
+-    (SDHC_CAPAB_TOCLKFREQ))
+-
+-#define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
++#define SDHC_CAPAB_REG_DEFAULT 0x057834b4
  
-+static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
-+{
-+    if (s->sd_spec_version != 2) {
-+        error_setg(errp, "Only Spec v2 is supported");
-+        return;
-+    }
-+    s->version = (SDHC_HCVER_VENDOR << 8) | (s->sd_spec_version - 1);
-+}
-+
- /* --- qdev common --- */
- 
- #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
--    /* Capabilities registers provide information on supported features
--     * of this specific host controller implementation */ \
-+    DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
-+    \
-+    /* Capabilities registers provide information on supported
-+     * features of this specific host controller implementation */ \
-     DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEFAULT), \
-     DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
- 
-@@ -1207,6 +1219,13 @@ static void sdhci_uninitfn(SDHCIState *s)
- 
- static void sdhci_common_realize(SDHCIState *s, Error **errp)
+ static uint8_t sdhci_slotint(SDHCIState *s)
  {
-+    Error *local_err = NULL;
-+
-+    sdhci_init_readonly_registers(s, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-     s->buf_maxsz = sdhci_get_fifolen(s);
-     s->fifo_buffer = g_malloc0(s->buf_maxsz);
- 
 -- 
 2.16.1
