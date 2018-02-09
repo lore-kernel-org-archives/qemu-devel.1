@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sarna@skytechnology.pl>) id 1ek63F-000312-K2
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:37:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ek6Br-0006Sw-VS
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sarna@skytechnology.pl>) id 1ek63C-0006yE-Fk
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:37:05 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:37911)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sarna@skytechnology.pl>)
-	id 1ek63C-0006xO-42
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:37:02 -0500
-Received: by mail-lf0-x242.google.com with SMTP id g72so10576476lfg.5
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 02:37:01 -0800 (PST)
-From: Piotr Sarna <sarna@skytechnology.pl>
-Date: Fri,  9 Feb 2018 11:36:55 +0100
-Message-Id: <1518172615-1260-1-git-send-email-sarna@skytechnology.pl>
-Subject: [Qemu-devel] [PATCH v3] block: unify blocksize types
+	(envelope-from <pbonzini@redhat.com>) id 1ek6Bo-0006Hz-SE
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:45:59 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35668 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ek6Bo-0006HW-Nu
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:45:56 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4C35784256
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 10:45:52 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  9 Feb 2018 11:45:42 +0100
+Message-Id: <20180209104546.29401-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] tcg: fix dirty bitmap race with MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +28,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, Piotr Sarna <sarna@skytechnology.pl>
+Cc: dgilbert@redhat.com
 
-BlockSizes structure used in block size probing has uint32_t types
-for logical and physical sizes. These fields are wrongfully assigned
-to uint16_t in BlockConf, which results, among other errors,
-in assigning 0 instead of 65536 (which will be the case in at least
-future LizardFS block device driver among other things).
+This is a race that can happen when migrating TCG guests under load.
+It was introduced by the change to run vCPUs outside the big QEMU lock.
 
-This commit makes BlockConf's physical_block_size and logical_block_size
-fields uint32_t to avoid inconsistencies.
+Paolo Bonzini (4):
+  memory: remove memory_region_test_and_clear_dirty
+  memory: hide memory_region_sync_dirty_bitmap behind
+    DirtyBitmapSnapshot
+  memory: introduce memory_global_after_dirty_log_sync
+  memory: unify loops to sync dirty log bitmap
 
-Signed-off-by: Piotr Sarna <sarna@skytechnology.pl>
----
- hw/core/qdev-properties.c    | 12 ++++++------
- include/hw/block/block.h     |  4 ++--
- include/hw/qdev-properties.h |  2 +-
- 3 files changed, 9 insertions(+), 9 deletions(-)
+ exec.c                       | 31 ++++++++++++++++++
+ hw/display/cg3.c             |  1 -
+ hw/display/exynos4210_fimd.c |  1 -
+ hw/display/framebuffer.c     |  1 -
+ hw/display/g364fb.c          |  1 -
+ hw/display/sm501.c           |  1 -
+ hw/display/tcx.c             |  2 --
+ hw/display/vga.c             |  6 ----
+ include/exec/memory.h        | 47 +++++++++------------------
+ memory.c                     | 76 +++++++++++++++++---------------------------
+ migration/ram.c              |  1 +
+ 11 files changed, 76 insertions(+), 92 deletions(-)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 5bbc2d9..c4a1b8f 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -728,17 +728,17 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
- {
-     DeviceState *dev = DEVICE(obj);
-     Property *prop = opaque;
--    uint16_t value, *ptr = qdev_get_prop_ptr(dev, prop);
-+    uint32_t value, *ptr = qdev_get_prop_ptr(dev, prop);
-     Error *local_err = NULL;
-     const int64_t min = 512;
--    const int64_t max = 32768;
-+    const int64_t max = 2147483648;
- 
-     if (dev->realized) {
-         qdev_prop_set_after_realize(dev, name, errp);
-         return;
-     }
- 
--    visit_type_uint16(v, name, &value, &local_err);
-+    visit_type_uint32(v, name, &value, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -762,9 +762,9 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
- }
- 
- const PropertyInfo qdev_prop_blocksize = {
--    .name  = "uint16",
--    .description = "A power of two between 512 and 32768",
--    .get   = get_uint16,
-+    .name  = "uint32",
-+    .description = "A power of two between 512 and 2147483648",
-+    .get   = get_uint32,
-     .set   = set_blocksize,
-     .set_default_value = set_default_value_uint,
- };
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index 64b9298..c9e6e27 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -17,8 +17,8 @@
- 
- typedef struct BlockConf {
-     BlockBackend *blk;
--    uint16_t physical_block_size;
--    uint16_t logical_block_size;
-+    uint32_t physical_block_size;
-+    uint32_t logical_block_size;
-     uint16_t min_io_size;
-     uint32_t opt_io_size;
-     int32_t bootindex;
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 1d61a35..c68d7bf 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -210,7 +210,7 @@ extern const PropertyInfo qdev_prop_off_auto_pcibar;
- #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
- #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
--    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint32_t)
- #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAddress)
- #define DEFINE_PROP_MEMORY_REGION(_n, _s, _f)             \
 -- 
-2.7.4
+2.14.3
