@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ek7jC-0007mI-5v
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:24:31 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ek7kZ-0000B5-KF
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ek7jA-0003OY-SC
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:24:30 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1ek7jA-0003Ku-Mo
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:24:28 -0500
-Received: by mail-oi0-x243.google.com with SMTP id t78so5987871oih.4
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 04:24:27 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180209114615.GG13981@localhost.localdomain>
-References: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
-	<20180208181207.GB13981@localhost.localdomain>
-	<fcb084ce-1615-f100-4137-e0fa46098d7b@redhat.com>
-	<20180209114615.GG13981@localhost.localdomain>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Fri, 9 Feb 2018 20:24:26 +0800
-Message-ID: <CANRm+CyJi0r-Gm=ivJDwBhsW1dM5tAhBBx84G+miOQDaF+nLUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_DEDICATED hint CPUID
- feature bit
+	(envelope-from <borntraeger@de.ibm.com>) id 1ek7kW-00043M-Db
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:25:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35588)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ek7kW-000430-5F
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:25:52 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w19CNwuE126224
+	for <qemu-devel@nongnu.org>; Fri, 9 Feb 2018 07:25:51 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g1bjt05en-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 07:25:50 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 9 Feb 2018 12:25:46 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri,  9 Feb 2018 12:25:43 +0000
+Message-Id: <20180209122543.25755-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v8] s390x/cpu: expose the guest crash
+ information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +36,349 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-2018-02-09 19:46 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
-> On Fri, Feb 09, 2018 at 09:41:41AM +0100, Paolo Bonzini wrote:
->> On 08/02/2018 19:12, Eduardo Habkost wrote:
->> > On Thu, Feb 08, 2018 at 05:44:20PM +0800, Wanpeng Li wrote:
->> >> From: Wanpeng Li <wanpengli@tencent.com>
->> >>
->> >> Add PV_DEDICATED hint cpuid feature bit.
->> >>
->> > [...]
->> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> >> index d70954b..cf48931 100644
->> >> --- a/target/i386/cpu.c
->> >> +++ b/target/i386/cpu.c
->> >> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
->> >>              x86_cpu_get_supported_feature_word(w, false);
->> >>          uint32_t requested_features = env->features[w];
->> >>          env->features[w] &= host_feat;
->> >> +        if (cpu->pv_dedicated && (w == FEAT_KVM)) {
->> >> +            env->features[w] |= CPUID_PV_DEDICATED;
->> >> +        }
->> >
->> > Why do this trick here instead of just adding "pv-dedicated" to
->> > feature_word_info[FEAT_KVM].feat_names?
->>
->> I think because it can be added independent of KVM_GET_SUPPORTED_CPUID.
->
-> If QEMU knows it can be enabled if outside GET_SUPPORTED_CPUID,
-> kvm_arch_get_supported_cpuid() can return it as supported.
+This patch is the s390 implementation of guest crash information,
+similar to commit d187e08dc4 ("i386/cpu: add crash-information QOM
+property") and the related commits. We will detect several crash
+reasons, with the "disabled wait" being the most important one, since
+this is used by all s390 guests as a "panic like" notification.
 
-The guest fails to detect the new cpuid this time.
+Demonstrate these ways with examples as follows.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d70954b..e2974ad 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EAX,
-         .tcg_features = TCG_KVM_FEATURES,
-     },
-+    [FEAT_KVM_HINTS] = {
-+        .feat_names = {
-+            "hint-dedicated", NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EDX,
-+        .tcg_features = TCG_KVM_FEATURES,
-+    },
-     [FEAT_HYPERV_EAX] = {
-         .feat_names = {
-             NULL /* hv_msr_vp_runtime_access */, NULL /*
-hv_msr_time_refcount_access */,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f91e37d..9f73692 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -475,6 +475,7 @@ typedef enum FeatureWord {
-     FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
-     FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
-     FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
-+    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
-     FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
-     FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
-     FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
-@@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply
-Accumulation Single Precision */
- #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+  1. crash-information QOM property;
 
-+#define KVM_HINTS_DEDICATED (1U << 0)
+  Run qemu with -qmp unix:qmp-sock,server, then use utility "qmp-shell"
+  to execute "qom-get" command, and might get the result like,
+
+  (QEMU) (QEMU) qom-get path=/machine/unattached/device[0] \
+      property=crash-information
+  {"return": {"core": 0, "reason": "disabled-wait", "psw-mask": 562956395872256, \
+      "type": "s390", "psw-addr": 1102832}}
+
+  2. GUEST_PANICKED event reporting;
+
+  Run qemu with a socket option, and telnet or nc to that,
+  -chardev socket,id=qmp,port=4444,host=localhost,server \
+  -mon chardev=qmp,mode=control,pretty=on \
+  Negotiating the mode by { "execute": "qmp_capabilities" }, and the crash
+  information will be reported on a guest crash event like,
+
+  {
+    "timestamp": {
+        "seconds": 1518004739,
+        "microseconds": 552563
+    },
+    "event": "GUEST_PANICKED",
+    "data": {
+        "action": "pause",
+        "info": {
+            "core": 0,
+            "psw-addr": 1102832,
+            "reason": "disabled-wait",
+            "psw-mask": 562956395872256,
+            "type": "s390"
+        }
+    }
+  }
+
+  3. log;
+
+  Run qemu with the parameters: -D <logfile> -d guest_errors, to
+  specify the logfile and log item. The results might be,
+
+  Guest crashed on cpu 0: disabled-wait
+  PSW: 0x0002000180000000 0x000000000010d3f0
+
+Co-authored-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ qapi/run-state.json   | 55 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ target/s390x/cpu.c    | 45 +++++++++++++++++++++++++++++++++++++++++
+ target/s390x/cpu.h    |  2 ++
+ target/s390x/helper.c |  5 ++++-
+ target/s390x/kvm.c    | 15 +++++++-------
+ vl.c                  | 11 +++++++++--
+ 6 files changed, 120 insertions(+), 13 deletions(-)
+
+diff --git a/qapi/run-state.json b/qapi/run-state.json
+index bca46a8785..4bd15ae54f 100644
+--- a/qapi/run-state.json
++++ b/qapi/run-state.json
+@@ -320,22 +320,29 @@
+ #
+ # An enumeration of the guest panic information types
+ #
++# @hyper-v: hyper-v guest panic information type
++#
++# @s390: s390 guest panic information type (Since: 2.12)
++#
+ # Since: 2.9
+ ##
+ { 'enum': 'GuestPanicInformationType',
+-  'data': [ 'hyper-v'] }
++  'data': [ 'hyper-v', 's390' ] }
+ 
+ ##
+ # @GuestPanicInformation:
+ #
+ # Information about a guest panic
+ #
++# @type: Crash type that defines the hypervisor specific information
++#
+ # Since: 2.9
+ ##
+ {'union': 'GuestPanicInformation',
+  'base': {'type': 'GuestPanicInformationType'},
+  'discriminator': 'type',
+- 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
++ 'data': { 'hyper-v': 'GuestPanicInformationHyperV',
++           's390': 'GuestPanicInformationS390' } }
+ 
+ ##
+ # @GuestPanicInformationHyperV:
+@@ -350,3 +357,47 @@
+            'arg3': 'uint64',
+            'arg4': 'uint64',
+            'arg5': 'uint64' } }
 +
- #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch
-Prediction Barrier */
-
- #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ad4b159..a0aad80 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s,
-uint32_t function,
-         if (!kvm_irqchip_in_kernel()) {
-             ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
++##
++# @S390CrashReason:
++#
++# Reason why the CPU is in a crashed state.
++#
++# @unknown: no crash reason was set
++#
++# @disabled-wait: the CPU has entered a disabled wait state
++#
++# @extint-loop: clock comparator or cpu timer interrupt with new PSW enabled
++#              for external interrupts
++#
++# @pgmint-loop: program interrupt with BAD new PSW
++#
++# @opint-loop: operation exception interrupt with invalid code at the program
++#             interrupt new PSW
++#
++# Since: 2.12
++##
++{ 'enum': 'S390CrashReason',
++  'data': [ 'unknown',
++            'disabled-wait',
++            'extint-loop',
++            'pgmint-loop',
++            'opint-loop' ] }
++
++##
++# @GuestPanicInformationS390:
++#
++# S390 specific guest panic information (PSW)
++#
++# @core: core id of the CPU that crashed
++# @psw-mask: control fields of guest PSW
++# @psw-addr: guest instruction address
++# @reason: guest crash reason in human readable form
++#
++# Since: 2.12
++##
++{'struct': 'GuestPanicInformationS390',
++ 'data': { 'core': 'uint32',
++           'psw-mask': 'uint64',
++           'psw-addr': 'uint64',
++           'reason': 'S390CrashReason' } }
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 979469dc3c..2a6df4e4bd 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -35,6 +35,8 @@
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ #include "qapi/visitor.h"
++#include "qapi-visit.h"
++#include "sysemu/hw_accel.h"
+ #include "exec/exec-all.h"
+ #include "hw/qdev-properties.h"
+ #ifndef CONFIG_USER_ONLY
+@@ -237,6 +239,46 @@ out:
+     error_propagate(errp, err);
+ }
+ 
++static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
++{
++    GuestPanicInformation *panic_info;
++    S390CPU *cpu = S390_CPU(cs);
++
++    cpu_synchronize_state(cs);
++    panic_info = g_malloc0(sizeof(GuestPanicInformation));
++
++    panic_info->type = GUEST_PANIC_INFORMATION_TYPE_S390;
++#if !defined(CONFIG_USER_ONLY)
++    panic_info->u.s390.core = cpu->env.core_id;
++#else
++    panic_info->u.s390.core = 0; /* sane default for non system emulation */
++#endif
++    panic_info->u.s390.psw_mask = cpu->env.psw.mask;
++    panic_info->u.s390.psw_addr = cpu->env.psw.addr;
++    panic_info->u.s390.reason = cpu->env.crash_reason;
++
++    return panic_info;
++}
++
++static void s390_cpu_get_crash_info_qom(Object *obj, Visitor *v,
++                                        const char *name, void *opaque,
++                                        Error **errp)
++{
++    CPUState *cs = CPU(obj);
++    GuestPanicInformation *panic_info;
++
++    if (!cs->crash_occurred) {
++        error_setg(errp, "No crash occurred");
++        return;
++    }
++
++    panic_info = s390_cpu_get_crash_info(cs);
++
++    visit_type_GuestPanicInformation(v, "crash-information", &panic_info,
++                                     errp);
++    qapi_free_GuestPanicInformation(panic_info);
++}
++
+ static void s390_cpu_initfn(Object *obj)
+ {
+     CPUState *cs = CPU(obj);
+@@ -249,6 +291,8 @@ static void s390_cpu_initfn(Object *obj)
+     cs->env_ptr = env;
+     cs->halted = 1;
+     cs->exception_index = EXCP_HLT;
++    object_property_add(obj, "crash-information", "GuestPanicInformation",
++                        s390_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
+     s390_cpu_model_register_props(obj);
+ #if !defined(CONFIG_USER_ONLY)
+     qemu_get_timedate(&tm, 0);
+@@ -482,6 +526,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     cc->do_interrupt = s390_cpu_do_interrupt;
+ #endif
+     cc->dump_state = s390_cpu_dump_state;
++    cc->get_crash_info = s390_cpu_get_crash_info;
+     cc->set_pc = s390_cpu_set_pc;
+     cc->gdb_read_register = s390_cpu_gdb_read_register;
+     cc->gdb_write_register = s390_cpu_gdb_write_register;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index a1123ad621..a0feed6781 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -102,6 +102,8 @@ struct CPUS390XState {
+ 
+     PSW psw;
+ 
++    S390CrashReason crash_reason;
++
+     uint64_t cc_src;
+     uint64_t cc_dst;
+     uint64_t cc_vr;
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 35d9741918..6d297716b1 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -84,12 +84,15 @@ static inline bool is_special_wait_psw(uint64_t psw_addr)
+ 
+ void s390_handle_wait(S390CPU *cpu)
+ {
++    CPUState *cs = CPU(cpu);
++
+     if (s390_cpu_halt(cpu) == 0) {
+ #ifndef CONFIG_USER_ONLY
+         if (is_special_wait_psw(cpu->env.psw.addr)) {
+             qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+         } else {
+-            qemu_system_guest_panicked(NULL);
++            cpu->env.crash_reason = S390_CRASH_REASON_DISABLED_WAIT;
++            qemu_system_guest_panicked(cpu_get_crash_info(cs));
          }
-+    } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
-+        ret |= KVM_HINTS_DEDICATED;
-+        found = 1;
+ #endif
      }
-
-     /* fallback for older kernels */
-
-
-Regards,
-Wanpeng Li
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 8736001156..a67b92774a 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1568,15 +1568,14 @@ static int handle_instruction(S390CPU *cpu, struct kvm_run *run)
+     return r;
+ }
+ 
+-static void unmanageable_intercept(S390CPU *cpu, const char *str, int pswoffset)
++static void unmanageable_intercept(S390CPU *cpu, S390CrashReason reason,
++                                   int pswoffset)
+ {
+     CPUState *cs = CPU(cpu);
+ 
+-    error_report("Unmanageable %s! CPU%i new PSW: 0x%016lx:%016lx",
+-                 str, cs->cpu_index, ldq_phys(cs->as, cpu->env.psa + pswoffset),
+-                 ldq_phys(cs->as, cpu->env.psa + pswoffset + 8));
+     s390_cpu_halt(cpu);
+-    qemu_system_guest_panicked(NULL);
++    cpu->env.crash_reason = reason;
++    qemu_system_guest_panicked(cpu_get_crash_info(cs));
+ }
+ 
+ /* try to detect pgm check loops */
+@@ -1606,7 +1605,7 @@ static int handle_oper_loop(S390CPU *cpu, struct kvm_run *run)
+         !(oldpsw.mask & PSW_MASK_PSTATE) &&
+         (newpsw.mask & PSW_MASK_ASC) == (oldpsw.mask & PSW_MASK_ASC) &&
+         (newpsw.mask & PSW_MASK_DAT) == (oldpsw.mask & PSW_MASK_DAT)) {
+-        unmanageable_intercept(cpu, "operation exception loop",
++        unmanageable_intercept(cpu, S390_CRASH_REASON_OPINT_LOOP,
+                                offsetof(LowCore, program_new_psw));
+         return EXCP_HALTED;
+     }
+@@ -1627,12 +1626,12 @@ static int handle_intercept(S390CPU *cpu)
+             r = handle_instruction(cpu, run);
+             break;
+         case ICPT_PROGRAM:
+-            unmanageable_intercept(cpu, "program interrupt",
++            unmanageable_intercept(cpu, S390_CRASH_REASON_PGMINT_LOOP,
+                                    offsetof(LowCore, program_new_psw));
+             r = EXCP_HALTED;
+             break;
+         case ICPT_EXT_INT:
+-            unmanageable_intercept(cpu, "external interrupt",
++            unmanageable_intercept(cpu, S390_CRASH_REASON_EXTINT_LOOP,
+                                    offsetof(LowCore, external_new_psw));
+             r = EXCP_HALTED;
+             break;
+diff --git a/vl.c b/vl.c
+index 32db91da1e..316d815901 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1738,7 +1738,7 @@ void qemu_system_reset(ShutdownCause reason)
+ 
+ void qemu_system_guest_panicked(GuestPanicInformation *info)
+ {
+-    qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed\n");
++    qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed");
+ 
+     if (current_cpu) {
+         current_cpu->crash_occurred = true;
+@@ -1754,13 +1754,20 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
+ 
+     if (info) {
+         if (info->type == GUEST_PANIC_INFORMATION_TYPE_HYPER_V) {
+-            qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx64
++            qemu_log_mask(LOG_GUEST_ERROR, "\nHV crash parameters: (%#"PRIx64
+                           " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n",
+                           info->u.hyper_v.arg1,
+                           info->u.hyper_v.arg2,
+                           info->u.hyper_v.arg3,
+                           info->u.hyper_v.arg4,
+                           info->u.hyper_v.arg5);
++        } else if (info->type == GUEST_PANIC_INFORMATION_TYPE_S390) {
++            qemu_log_mask(LOG_GUEST_ERROR, " on cpu %d: %s\n"
++                          "PSW: 0x%016" PRIx64 " 0x%016" PRIx64"\n",
++                          info->u.s390.core,
++                          S390CrashReason_str(info->u.s390.reason),
++                          info->u.s390.psw_mask,
++                          info->u.s390.psw_addr);
+         }
+         qapi_free_GuestPanicInformation(info);
+     }
+-- 
+2.14.3
