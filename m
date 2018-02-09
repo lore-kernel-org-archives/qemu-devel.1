@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sp-00011m-Tn
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:33 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sm-0000z4-Tk
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6So-0001yL-R0
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:31 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46254)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sl-0001vj-RC
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:28 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46252)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6So-0001td-G9
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:30 -0500
+	id 1ek6Sl-0001sW-Kg
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:27 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sn-0002cP-Dm
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:29 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sd-0002Ym-Kj
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:19 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:03:03 +0000
-Message-Id: <20180209110314.11766-20-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:02:50 +0000
+Message-Id: <20180209110314.11766-7-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/30] i.MX: Add i.MX7 GPT variant
+Subject: [Qemu-devel] [PULL 06/30] target/arm: Make exception vector loads
+ honour the SAU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +30,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Make the load of the exception vector from the vector table honour
+the SAU and any bus error on the load (possibly provoking a derived
+exception), rather than simply aborting if the load fails.
 
-Add minimal code needed to allow upstream Linux guest to boot.
-
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Cc: yurovsky@gmail.com
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1517324542-6607-7-git-send-email-peter.maydell@linaro.org
 ---
- include/hw/timer/imx_gpt.h |  1 +
- hw/timer/imx_gpt.c         | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ target/arm/helper.c | 71 +++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 55 insertions(+), 16 deletions(-)
 
-diff --git a/include/hw/timer/imx_gpt.h b/include/hw/timer/imx_gpt.h
-index eac59b2a70..20ccb327c4 100644
---- a/include/hw/timer/imx_gpt.h
-+++ b/include/hw/timer/imx_gpt.h
-@@ -77,6 +77,7 @@
- #define TYPE_IMX25_GPT "imx25.gpt"
- #define TYPE_IMX31_GPT "imx31.gpt"
- #define TYPE_IMX6_GPT "imx6.gpt"
-+#define TYPE_IMX7_GPT "imx7.gpt"
- 
- #define TYPE_IMX_GPT TYPE_IMX25_GPT
- 
-diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
-index 4b9b54bf2e..65e4ee6bcf 100644
---- a/hw/timer/imx_gpt.c
-+++ b/hw/timer/imx_gpt.c
-@@ -113,6 +113,17 @@ static const IMXClk imx6_gpt_clocks[] = {
-     CLK_HIGH,      /* 111 reference clock */
- };
- 
-+static const IMXClk imx7_gpt_clocks[] = {
-+    CLK_NONE,      /* 000 No clock source */
-+    CLK_IPG,       /* 001 ipg_clk, 532MHz*/
-+    CLK_IPG_HIGH,  /* 010 ipg_clk_highfreq */
-+    CLK_EXT,       /* 011 External clock */
-+    CLK_32k,       /* 100 ipg_clk_32k */
-+    CLK_HIGH,      /* 101 reference clock */
-+    CLK_NONE,      /* 110 not defined */
-+    CLK_NONE,      /* 111 not defined */
-+};
-+
- static void imx_gpt_set_freq(IMXGPTState *s)
- {
-     uint32_t clksrc = extract32(s->cr, GPT_CR_CLKSRC_SHIFT, 3);
-@@ -512,6 +523,13 @@ static void imx6_gpt_init(Object *obj)
-     s->clocks = imx6_gpt_clocks;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 614162dd1e..c74f076d9d 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6449,28 +6449,63 @@ static uint32_t *get_v7m_sp_ptr(CPUARMState *env, bool secure, bool threadmode,
+     }
  }
  
-+static void imx7_gpt_init(Object *obj)
-+{
-+    IMXGPTState *s = IMX_GPT(obj);
-+
-+    s->clocks = imx7_gpt_clocks;
-+}
-+
- static const TypeInfo imx25_gpt_info = {
-     .name = TYPE_IMX25_GPT,
-     .parent = TYPE_SYS_BUS_DEVICE,
-@@ -532,11 +550,18 @@ static const TypeInfo imx6_gpt_info = {
-     .instance_init = imx6_gpt_init,
- };
- 
-+static const TypeInfo imx7_gpt_info = {
-+    .name = TYPE_IMX7_GPT,
-+    .parent = TYPE_IMX25_GPT,
-+    .instance_init = imx7_gpt_init,
-+};
-+
- static void imx_gpt_register_types(void)
+-static uint32_t arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure)
++static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
++                                uint32_t *pvec)
  {
-     type_register_static(&imx25_gpt_info);
-     type_register_static(&imx31_gpt_info);
-     type_register_static(&imx6_gpt_info);
-+    type_register_static(&imx7_gpt_info);
+     CPUState *cs = CPU(cpu);
+     CPUARMState *env = &cpu->env;
+     MemTxResult result;
+-    hwaddr vec = env->v7m.vecbase[targets_secure] + exc * 4;
+-    uint32_t addr;
++    uint32_t addr = env->v7m.vecbase[targets_secure] + exc * 4;
++    uint32_t vector_entry;
++    MemTxAttrs attrs = {};
++    ARMMMUIdx mmu_idx;
++    bool exc_secure;
++
++    mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, targets_secure, true);
+ 
+-    addr = address_space_ldl(cs->as, vec,
+-                             MEMTXATTRS_UNSPECIFIED, &result);
++    /* We don't do a get_phys_addr() here because the rules for vector
++     * loads are special: they always use the default memory map, and
++     * the default memory map permits reads from all addresses.
++     * Since there's no easy way to pass through to pmsav8_mpu_lookup()
++     * that we want this special case which would always say "yes",
++     * we just do the SAU lookup here followed by a direct physical load.
++     */
++    attrs.secure = targets_secure;
++    attrs.user = false;
++
++    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
++        V8M_SAttributes sattrs = {};
++
++        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, &sattrs);
++        if (sattrs.ns) {
++            attrs.secure = false;
++        } else if (!targets_secure) {
++            /* NS access to S memory */
++            goto load_fail;
++        }
++    }
++
++    vector_entry = address_space_ldl(arm_addressspace(cs, attrs), addr,
++                                     attrs, &result);
+     if (result != MEMTX_OK) {
+-        /* Architecturally this should cause a HardFault setting HSFR.VECTTBL,
+-         * which would then be immediately followed by our failing to load
+-         * the entry vector for that HardFault, which is a Lockup case.
+-         * Since we don't model Lockup, we just report this guest error
+-         * via cpu_abort().
+-         */
+-        cpu_abort(cs, "Failed to read from %s exception vector table "
+-                  "entry %08x\n", targets_secure ? "secure" : "nonsecure",
+-                  (unsigned)vec);
++        goto load_fail;
+     }
+-    return addr;
++    *pvec = vector_entry;
++    return true;
++
++load_fail:
++    /* All vector table fetch fails are reported as HardFault, with
++     * HFSR.VECTTBL and .FORCED set. (FORCED is set because
++     * technically the underlying exception is a MemManage or BusFault
++     * that is escalated to HardFault.) This is a terminal exception,
++     * so we will either take the HardFault immediately or else enter
++     * lockup (the latter case is handled in armv7m_nvic_set_pending_derived()).
++     */
++    exc_secure = targets_secure ||
++        !(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK);
++    env->v7m.hfsr |= R_V7M_HFSR_VECTTBL_MASK | R_V7M_HFSR_FORCED_MASK;
++    armv7m_nvic_set_pending_derived(env->nvic, ARMV7M_EXCP_HARD, exc_secure);
++    return false;
  }
  
- type_init(imx_gpt_register_types)
+ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+@@ -6623,7 +6658,11 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+         return;
+     }
+ 
+-    addr = arm_v7m_load_vector(cpu, exc, targets_secure);
++    if (!arm_v7m_load_vector(cpu, exc, targets_secure, &addr)) {
++        /* Vector load failed: derived exception */
++        v7m_exception_taken(cpu, lr, true, true);
++        return;
++    }
+ 
+     /* Now we've done everything that might cause a derived exception
+      * we can go ahead and activate whichever exception we're going to
 -- 
 2.16.1
