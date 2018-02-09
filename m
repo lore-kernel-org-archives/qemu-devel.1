@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ek70z-0007Df-9B
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:38:50 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ek78I-000338-60
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ek70w-0005RE-5i
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:38:49 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri,  9 Feb 2018 13:37:44 +0200
-Message-Id: <20180209113744.11842-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH] qcow2: Check the L1 table parameters from all
- internal snapshots
+	(envelope-from <ehabkost@redhat.com>) id 1ek78F-0002Ie-4D
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:46:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ek78E-0002IK-T7
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:46:19 -0500
+Date: Fri, 9 Feb 2018 09:46:15 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180209114615.GG13981@localhost.localdomain>
+References: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
+	<20180208181207.GB13981@localhost.localdomain>
+	<fcb084ce-1615-f100-4137-e0fa46098d7b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcb084ce-1615-f100-4137-e0fa46098d7b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_DEDICATED hint CPUID
+ feature bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,104 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-The code that reads the qcow2 snapshot table takes the offset and size
-of all snapshots' L1 table without doing any kind of checks.
+On Fri, Feb 09, 2018 at 09:41:41AM +0100, Paolo Bonzini wrote:
+> On 08/02/2018 19:12, Eduardo Habkost wrote:
+> > On Thu, Feb 08, 2018 at 05:44:20PM +0800, Wanpeng Li wrote:
+> >> From: Wanpeng Li <wanpengli@tencent.com>
+> >>
+> >> Add PV_DEDICATED hint cpuid feature bit.
+> >>
+> > [...]
+> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> >> index d70954b..cf48931 100644
+> >> --- a/target/i386/cpu.c
+> >> +++ b/target/i386/cpu.c
+> >> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+> >>              x86_cpu_get_supported_feature_word(w, false);
+> >>          uint32_t requested_features = env->features[w];
+> >>          env->features[w] &= host_feat;
+> >> +        if (cpu->pv_dedicated && (w == FEAT_KVM)) {
+> >> +            env->features[w] |= CPUID_PV_DEDICATED;
+> >> +        }
+> > 
+> > Why do this trick here instead of just adding "pv-dedicated" to
+> > feature_word_info[FEAT_KVM].feat_names?
+> 
+> I think because it can be added independent of KVM_GET_SUPPORTED_CPUID.
 
-Although qcow2_snapshot_load_tmp() does verify that the table size is
-valid, the table offset is not checked at all. On top of that there
-are several other code paths that deal with internal snapshots that
-don't use that function or do any other check.
+If QEMU knows it can be enabled if outside GET_SUPPORTED_CPUID,
+kvm_arch_get_supported_cpuid() can return it as supported.
 
-This patch verifies that all L1 tables are correctly aligned and the
-size does not exceed the maximum allowed valued.
-
-The check from qcow2_snapshot_load_tmp() is removed since it's now
-useless (opening an image will fail before that).
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-snapshot.c     | 14 ++++++++++----
- tests/qemu-iotests/080     | 10 +++++++++-
- tests/qemu-iotests/080.out | 10 ++++++++--
- 3 files changed, 27 insertions(+), 7 deletions(-)
-
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 44243e0e95..b9d46d95fa 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -121,6 +121,16 @@ int qcow2_read_snapshots(BlockDriverState *bs)
-         offset += name_size;
-         sn->name[name_size] = '\0';
- 
-+        if (offset_into_cluster(s, sn->l1_table_offset)) {
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+
-+        if (sn->l1_size > QCOW_MAX_L1_SIZE / sizeof(uint64_t)) {
-+            ret = -EFBIG;
-+            goto fail;
-+        }
-+
-         if (offset - s->snapshots_offset > QCOW_MAX_SNAPSHOTS_SIZE) {
-             ret = -EFBIG;
-             goto fail;
-@@ -704,10 +714,6 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
-     sn = &s->snapshots[snapshot_index];
- 
-     /* Allocate and read in the snapshot's L1 table */
--    if (sn->l1_size > QCOW_MAX_L1_SIZE / sizeof(uint64_t)) {
--        error_setg(errp, "Snapshot L1 table too large");
--        return -EFBIG;
--    }
-     new_l1_bytes = sn->l1_size * sizeof(uint64_t);
-     new_l1_table = qemu_try_blockalign(bs->file->bs,
-                                        align_offset(new_l1_bytes, 512));
-diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 1c2bd85742..dec6749908 100755
---- a/tests/qemu-iotests/080
-+++ b/tests/qemu-iotests/080
-@@ -171,7 +171,15 @@ poke_file "$TEST_IMG" "$offset_l2_table_0" "\x80\x00\x00\xff\xff\xff\x00\x00"
- { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
- 
- echo
--echo "== Invalid snapshot L1 table =="
-+echo "== Invalid snapshot L1 table offset =="
-+_make_test_img 64M
-+{ $QEMU_IO -c "write 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
-+{ $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
-+poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x00"
-+{ $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
-+
-+echo
-+echo "== Invalid snapshot L1 table size =="
- _make_test_img 64M
- { $QEMU_IO -c "write 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
- { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
-diff --git a/tests/qemu-iotests/080.out b/tests/qemu-iotests/080.out
-index 6a7fda1356..86ed9567b7 100644
---- a/tests/qemu-iotests/080.out
-+++ b/tests/qemu-iotests/080.out
-@@ -59,9 +59,15 @@ wrote 512/512 bytes at offset 0
- qemu-img: Could not create snapshot 'test': -27 (File too large)
- qemu-img: Could not create snapshot 'test': -11 (Resource temporarily unavailable)
- 
--== Invalid snapshot L1 table ==
-+== Invalid snapshot L1 table offset ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qemu-img: Failed to load snapshot: Snapshot L1 table too large
-+qemu-img: Could not open 'TEST_DIR/t.qcow2': Could not read snapshots: Invalid argument
-+
-+== Invalid snapshot L1 table size ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+wrote 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-img: Could not open 'TEST_DIR/t.qcow2': Could not read snapshots: File too large
- *** done
 -- 
-2.11.0
+Eduardo
