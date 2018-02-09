@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekFRy-0002H5-VQ
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:39:15 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ekFc2-0008Jd-60
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:49:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekFRu-0007jD-Fw
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:39:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39574 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ekFRu-0007id-AQ
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:39:10 -0500
-References: <1518096522-31141-1-git-send-email-sarna@skytechnology.pl>
-	<20180209021950.GK24289@lemon.usersys.redhat.com>
-	<2a381250-2cf9-c70c-4805-fc5f0ec4823c@skytechnology.pl>
-	<20180209151107.GH3998@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <be54533f-9b3b-9699-7aaa-4c5dd03ca0ca@redhat.com>
-Date: Fri, 9 Feb 2018 14:38:52 -0600
+	(envelope-from <brijesh.singh@amd.com>) id 1ekFbx-0000Ju-Cf
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:49:38 -0500
+Received: from mail-co1nam03on0079.outbound.protection.outlook.com
+	([104.47.40.79]:10080
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ekFbx-0000Hr-0v
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:49:33 -0500
+References: <20180207160638.98872-17-brijesh.singh@amd.com>
+	<20180209182819.GH2428@work-vm>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <cf5a167e-cb68-f7c9-d351-2b6ddbfb7c9e@amd.com>
+Date: Fri, 9 Feb 2018 14:49:17 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180209151107.GH3998@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180209182819.GH2428@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block: unify blocksize types
+Subject: Re: [Qemu-devel] [PATCH v7 17/26] target/i386: encrypt bios rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Piotr Sarna <sarna@skytechnology.pl>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 02/09/2018 09:11 AM, Kevin Wolf wrote:
 
->> Yes, I do, thanks - I'll prepare patch v2 today. Also, I haven't found any
->> hidden dependencies on blocksize being <= 32768, so I assume changing the
->> new max value to 2^31 is safe. Could somebody more familiar with qemu code
->> confirm(or invalidate) my assumption?
-> 
-> The IDE code has the following line in the emulation of the IDENTIFY
-> DEVICE command:
-> 
->      put_le16(p + 106, 0x6000 | get_physical_block_exp(&dev->conf));
-> 
-> That is, the result of get_physical_block_exp() is just blindly ORed to
-> the word. The IDE spec says that bits 0-3 contain the exponent. Four
-> bits mean a maximum of 15 (and 2^15 = 32768). After that, we don't
-> actually expose a larger block size, but start modifying reserved bits.
-> 
-> I haven't checked other device models, but I wouldn't rule out that they
-> make similar assumptions.
 
-NBD documents that:
+On 2/9/18 12:28 PM, Dr. David Alan Gilbert wrote:
+> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+>> SEV requires that guest bios must be encrypted before booting the guest.
+> I'm curious; is it just the main BIOS that needs encryption - what about
+> things like device/PXE rom images?
 
-The minimum block size represents the smallest addressable length and 
-alignment within the export, although writing to an area that small may 
-require the server to use a less-efficient read-modify-write action. If 
-advertised, this value MUST be a power of 2, MUST NOT be larger than 
-2^16 (65,536), and MAY be as small as 1 for an export backed by a 
-regular file, although the values of 2^9 (512) or 2^12 (4,096) are more 
-typical for an export backed by a block device. If a server advertises a 
-minimum block size, the advertised export size SHOULD be an integer 
-multiple of that block size, since otherwise, the client would be unable 
-to access the final few bytes of the export.
 
-We probably need to get that enlarged to a bigger minimum block size, if 
-there really are devices that require more than a 64k minimum access 
-size.  But you do NOT want 2^31 as a permitted block size; that implies 
-that any action smaller than the block size will be performed as a 
-read-modify-write; and reading 2G just to modify a subset then write 
-back 2G is painfully slow.  1M might be a much more reasonable maximum 
-block size (if 64k is indeed too small in practice for existing hardware).
+SEV feature is available in OVMF BIOS only. EDKII core contains UEFI
+firmware driver for several things including PXE and most of time we
+don't need ROMs. If we do, I think typically ROMs from which the guest
+firmware reads the binaries are not guest RAM, they are MMIO. Guest
+BIOSes copies the ROM from MMIO to guest RAM -- it will get encrypted
+during copy (because MMIO is mapped with C=3D0 and guest RAM is mapped
+with C=3D1).=C2=A0 In other words, I don't see any need for encrypting the =
+ROM
+images during the launch flow. But passing an arbitrary option ROM can
+be security concerns hence I believe a guest owner wanting to pass a
+option ROM will use secure boot, then option roms can be verified before
+executing.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+> Dave
+>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Richard Henderson <rth@twiddle.net>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>  hw/i386/pc_sysfw.c | 13 +++++++++++++
+>>  1 file changed, 13 insertions(+)
+>>
+>> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+>> index 6b183747fcea..8ddbbf74d330 100644
+>> --- a/hw/i386/pc_sysfw.c
+>> +++ b/hw/i386/pc_sysfw.c
+>> @@ -112,6 +112,8 @@ static void pc_system_flash_init(MemoryRegion *rom_m=
+emory)
+>>      pflash_t *system_flash;
+>>      MemoryRegion *flash_mem;
+>>      char name[64];
+>> +    void *flash_ptr;
+>> +    int ret, flash_size;
+>> =20
+>>      sector_bits =3D 12;
+>>      sector_size =3D 1 << sector_bits;
+>> @@ -168,6 +170,17 @@ static void pc_system_flash_init(MemoryRegion *rom_=
+memory)
+>>          if (unit =3D=3D 0) {
+>>              flash_mem =3D pflash_cfi01_get_memory(system_flash);
+>>              pc_isa_bios_init(rom_memory, flash_mem, size);
+>> +
+>> +            /* Encrypt the pflash boot ROM */
+>> +            if (kvm_memcrypt_enabled()) {
+>> +                flash_ptr =3D memory_region_get_ram_ptr(flash_mem);
+>> +                flash_size =3D memory_region_size(flash_mem);
+>> +                ret =3D kvm_memcrypt_encrypt_data(flash_ptr, flash_size=
+);
+>> +                if (ret) {
+>> +                    error_report("failed to encrypt pflash rom");
+>> +                    exit(1);
+>> +                }
+>> +            }
+>>          }
+>>      }
+>>  }
+>> --=20
+>> 2.14.3
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
