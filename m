@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ekADa-000168-3X
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:04:09 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ekAKn-0007VT-SP
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:11:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ekADU-0003Uq-EP
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:04:02 -0500
-Date: Fri, 9 Feb 2018 16:03:31 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ekAKj-0008TN-SN
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:11:29 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36930 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ekAKj-0008T3-LZ
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:11:25 -0500
+Date: Fri, 9 Feb 2018 16:11:07 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180209150331.GG3998@localhost.localdomain>
-References: <20180209113744.11842-1-berto@igalia.com>
-	<66ffb17c-6238-db0e-5a50-16d83ee12482@redhat.com>
+Message-ID: <20180209151107.GH3998@localhost.localdomain>
+References: <1518096522-31141-1-git-send-email-sarna@skytechnology.pl>
+	<20180209021950.GK24289@lemon.usersys.redhat.com>
+	<2a381250-2cf9-c70c-4805-fc5f0ec4823c@skytechnology.pl>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <66ffb17c-6238-db0e-5a50-16d83ee12482@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Check the L1 table parameters from
- all internal snapshots
+In-Reply-To: <2a381250-2cf9-c70c-4805-fc5f0ec4823c@skytechnology.pl>
+Subject: Re: [Qemu-devel] [PATCH] block: unify blocksize types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Piotr Sarna <sarna@skytechnology.pl>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com
 
+Am 09.02.2018 um 10:44 hat Piotr Sarna geschrieben:
+> On 09.02.2018 03:19, Fam Zheng wrote:
+> > On Thu, 02/08 14:28, Piotr Sarna wrote:
+> > > BlockSizes structure used in block size probing has uint32_t types
+> > > for logical and physical sizes. These fields are wrongfully assigned
+> > > to uint16_t in BlockConf, which results, among other errors,
+> > > in assigning 0 instead of 65536 (which will be the case in at least
+> > > future LizardFS block device driver among other things).
+> > > > This commit makes BlockConf's physical_block_size and logical_block_size > fields uint32_t to avoid inconsistencies.
+> > > Signed-off-by: Piotr Sarna <sarna@skytechnology.pl>
+> > > ---
+> > >   include/hw/block/block.h     | 4 ++--
+> > >   include/hw/qdev-properties.h | 2 +-
+> > >   2 files changed, 3 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+> > > index 64b9298..c9e6e27 100644
+> > > --- a/include/hw/block/block.h
+> > > +++ b/include/hw/block/block.h
+> > > @@ -17,8 +17,8 @@
+> > >   typedef struct BlockConf {
+> > >       BlockBackend *blk;
+> > > -    uint16_t physical_block_size;
+> > > -    uint16_t logical_block_size;
+> > > +    uint32_t physical_block_size;
+> > > +    uint32_t logical_block_size;
+> > >       uint16_t min_io_size;
+> > >       uint32_t opt_io_size;
+> > >       int32_t bootindex;
+> > > diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> > > index 1d61a35..c68d7bf 100644
+> > > --- a/include/hw/qdev-properties.h
+> > > +++ b/include/hw/qdev-properties.h
+> > > @@ -210,7 +210,7 @@ extern const PropertyInfo qdev_prop_off_auto_pcibar;
+> > >   #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
+> > >       DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
+> > >   #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
+> > > -    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+> > > +    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint32_t)
+> > >   #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
+> > >       DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAddress)
+> > >   #define DEFINE_PROP_MEMORY_REGION(_n, _s, _f)             \
+> > Do you need to update qdev_prop_blocksize and set_blocksize as well?
+> > 
+> >      const PropertyInfo qdev_prop_blocksize = {
+> >          .name  = "uint16",
+> >          .description = "A power of two between 512 and 32768",
+> >          .get   = get_uint16,
+> >          .set   = set_blocksize,
+> >          .set_default_value = set_default_value_uint,
+> >      };
+> > 
+> > Fam
+> Yes, I do, thanks - I'll prepare patch v2 today. Also, I haven't found any
+> hidden dependencies on blocksize being <= 32768, so I assume changing the
+> new max value to 2^31 is safe. Could somebody more familiar with qemu code
+> confirm(or invalidate) my assumption?
 
---d6Gm4EdcadzBjdND
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The IDE code has the following line in the emulation of the IDENTIFY
+DEVICE command:
 
-Am 09.02.2018 um 14:04 hat Max Reitz geschrieben:
-> On 2018-02-09 12:37, Alberto Garcia wrote:
-> > The code that reads the qcow2 snapshot table takes the offset and size
-> > of all snapshots' L1 table without doing any kind of checks.
-> >=20
-> > Although qcow2_snapshot_load_tmp() does verify that the table size is
-> > valid, the table offset is not checked at all. On top of that there
-> > are several other code paths that deal with internal snapshots that
-> > don't use that function or do any other check.
-> >=20
-> > This patch verifies that all L1 tables are correctly aligned and the
-> > size does not exceed the maximum allowed valued.
-> >=20
-> > The check from qcow2_snapshot_load_tmp() is removed since it's now
-> > useless (opening an image will fail before that).
-> >=20
-> > Signed-off-by: Alberto Garcia <berto@igalia.com>
-> > ---
-> >  block/qcow2-snapshot.c     | 14 ++++++++++----
-> >  tests/qemu-iotests/080     | 10 +++++++++-
-> >  tests/qemu-iotests/080.out | 10 ++++++++--
-> >  3 files changed, 27 insertions(+), 7 deletions(-)
->=20
-> I don't like completely refusing to open a qcow2 image if one of the
-> snapshots is invalid, without giving the user any way of fixing it.
->=20
-> With this patch, the final two images created in 080 cannot be opened at
-> all (not even with qemu-img info).  Without it, you can, you just can't
-> load the snapshots.  (Well, in one case.  In the other, you can even do
-> that, but that's a bug, as you correctly claim.)
->=20
-> More importantly, though, without this patch, you can delete the
-> snapshots.  qemu-img will complain a bit, and you'll have leaks
-> afterwards, but that's nothing qemu-img check can't fix.  With this
-> patch, you can't, because the image cannot be opened at all so it's
-> basically gone for good (unless you get a hex editor).
+    put_le16(p + 106, 0x6000 | get_physical_block_exp(&dev->conf));
 
-How about we move the check to bdrv_open() as proposed, but make it
-conditional so that it's skipped with BDRV_O_CHECK and then add a way to
-fix the situation with qemu-img check -r?
+That is, the result of get_physical_block_exp() is just blindly ORed to
+the word. The IDE spec says that bits 0-3 contain the exponent. Four
+bits mean a maximum of 15 (and 2^15 = 32768). After that, we don't
+actually expose a larger block size, but start modifying reserved bits.
+
+I haven't checked other device models, but I wouldn't rule out that they
+make similar assumptions.
 
 Kevin
-
---d6Gm4EdcadzBjdND
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJafbhDAAoJEH8JsnLIjy/WWTEP/iwhF9zt35buW4wIRz+sjUd8
-UsWnJwVqgz8bXuIVAVGZi85xtXMwJHxXNZZpwAsnOD3qFncFUWQhQ0EXq2UvctHH
-hmyFulBs0tDDV+9yDXt+rmX0Xc96hdph9f55MXWxH69K0E9Pn0FyagGKfkKiCgkQ
-6cICe6BLxGO0Avy57kyxkPnUvVCGsHbcNgrla6HNt7m6VDOoKS2gSEjuq7KTjyIN
-fw2Wm4Sdok/0DL1Uhqd7gxl0M5uRoXShBC1fcuDEZA9Tunn+JpQE4AGCHzg/eHrl
-UnQfXUhii/0A2DXycm3Nw+taoccpbQNdH321YwtKYOq7POSCsgzkhjr3dWTvtk6o
-eEYYqW/JlsVu7ihjvmH2KEiwAHpKDPcWVxbN07jW8JITF9nAkfzYwidju6eMBhRN
-gM+nFE9CHs3W6XWVjSlhiDEer2S/SIMCcX8k04OMI75C5yYqNvcel1LpPqFA13y+
-FGrHs2rLdD/23hxh0Rb+sTKKR4GqHZKyBto7QaRdLeOrpN6wbu/yh4A7XjlaowgP
-gC5nsXDKoDDGMPeNbM3WE1lUu7hRMwqkDo43lhvrxovyNZ4PCAxfvqDHcoOEQE0J
-HbglXdJt77Lby/O2q1/F7ssihFYJtE0adVtAsO9Nf3iUhsvMjlCjXpRhJojsR5xm
-IISZCsc48nFHuMi+Ezum
-=UTQG
------END PGP SIGNATURE-----
-
---d6Gm4EdcadzBjdND--
