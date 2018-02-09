@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sk-0000we-0h
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:36 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sr-00013t-PX
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Si-0001tM-Vs
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:26 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46252)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sq-0001zg-Cx
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:33 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6Si-0001sW-Oq
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:24 -0500
+	id 1ek6Sq-0001y8-3I
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:32 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sh-0002aB-Po
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:23 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6So-0002cu-Qj
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:30 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:02:56 +0000
-Message-Id: <20180209110314.11766-13-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:03:05 +0000
+Message-Id: <20180209110314.11766-22-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 12/30] target/arm: enable user-mode SHA-3, SM3,
- SM4 and SHA-512 instruction support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 21/30] usb: Add basic code to emulate Chipidea
+ USB IP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +33,248 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
 
-Add support for the new ARMv8.2 SHA-3, SM3, SM4 and SHA-512 instructions to
-AArch64 user mode emulation.
+Add code to emulate Chipidea USB IP (used in i.MX SoCs). Tested to
+work against:
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Message-id: 20180207111729.15737-6-ard.biesheuvel@linaro.org
+-usb -drive if=none,id=stick,file=usb.img,format=raw -device \
+ usb-storage,bus=usb-bus.0,drive=stick
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Cc: yurovsky@gmail.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- linux-user/elfload.c | 19 +++++++++++++++++++
- target/arm/cpu64.c   |  4 ++++
- 2 files changed, 23 insertions(+)
+ hw/usb/Makefile.objs      |   1 +
+ include/hw/usb/chipidea.h |  16 +++++
+ hw/usb/chipidea.c         | 176 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 193 insertions(+)
+ create mode 100644 include/hw/usb/chipidea.h
+ create mode 100644 hw/usb/chipidea.c
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 32a47674e6..8bb9a2c3e8 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -512,6 +512,21 @@ enum {
-     ARM_HWCAP_A64_SHA1          = 1 << 5,
-     ARM_HWCAP_A64_SHA2          = 1 << 6,
-     ARM_HWCAP_A64_CRC32         = 1 << 7,
-+    ARM_HWCAP_A64_ATOMICS       = 1 << 8,
-+    ARM_HWCAP_A64_FPHP          = 1 << 9,
-+    ARM_HWCAP_A64_ASIMDHP       = 1 << 10,
-+    ARM_HWCAP_A64_CPUID         = 1 << 11,
-+    ARM_HWCAP_A64_ASIMDRDM      = 1 << 12,
-+    ARM_HWCAP_A64_JSCVT         = 1 << 13,
-+    ARM_HWCAP_A64_FCMA          = 1 << 14,
-+    ARM_HWCAP_A64_LRCPC         = 1 << 15,
-+    ARM_HWCAP_A64_DCPOP         = 1 << 16,
-+    ARM_HWCAP_A64_SHA3          = 1 << 17,
-+    ARM_HWCAP_A64_SM3           = 1 << 18,
-+    ARM_HWCAP_A64_SM4           = 1 << 19,
-+    ARM_HWCAP_A64_ASIMDDP       = 1 << 20,
-+    ARM_HWCAP_A64_SHA512        = 1 << 21,
-+    ARM_HWCAP_A64_SVE           = 1 << 22,
- };
+diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+index fbcd498c59..41be700812 100644
+--- a/hw/usb/Makefile.objs
++++ b/hw/usb/Makefile.objs
+@@ -12,6 +12,7 @@ common-obj-$(CONFIG_USB_XHCI_NEC) += hcd-xhci-nec.o
+ common-obj-$(CONFIG_USB_MUSB) += hcd-musb.o
  
- #define ELF_HWCAP get_elf_hwcap()
-@@ -532,6 +547,10 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE(ARM_FEATURE_V8_SHA1, ARM_HWCAP_A64_SHA1);
-     GET_FEATURE(ARM_FEATURE_V8_SHA256, ARM_HWCAP_A64_SHA2);
-     GET_FEATURE(ARM_FEATURE_CRC, ARM_HWCAP_A64_CRC32);
-+    GET_FEATURE(ARM_FEATURE_V8_SHA3, ARM_HWCAP_A64_SHA3);
-+    GET_FEATURE(ARM_FEATURE_V8_SM3, ARM_HWCAP_A64_SM3);
-+    GET_FEATURE(ARM_FEATURE_V8_SM4, ARM_HWCAP_A64_SM4);
-+    GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
- #undef GET_FEATURE
+ obj-$(CONFIG_TUSB6010) += tusb6010.o
++obj-$(CONFIG_IMX)      += chipidea.o
  
-     return hwcaps;
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 670c07ab6e..1c330adc28 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -224,6 +224,10 @@ static void aarch64_any_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-+    set_feature(&cpu->env, ARM_FEATURE_V8_SHA512);
-+    set_feature(&cpu->env, ARM_FEATURE_V8_SHA3);
-+    set_feature(&cpu->env, ARM_FEATURE_V8_SM3);
-+    set_feature(&cpu->env, ARM_FEATURE_V8_SM4);
-     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-     set_feature(&cpu->env, ARM_FEATURE_CRC);
-     cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
+ # emulated usb devices
+ common-obj-$(CONFIG_USB) += dev-hub.o
+diff --git a/include/hw/usb/chipidea.h b/include/hw/usb/chipidea.h
+new file mode 100644
+index 0000000000..1ec2e9dbda
+--- /dev/null
++++ b/include/hw/usb/chipidea.h
+@@ -0,0 +1,16 @@
++#ifndef CHIPIDEA_H
++#define CHIPIDEA_H
++
++#include "hw/usb/hcd-ehci.h"
++
++typedef struct ChipideaState {
++    /*< private >*/
++    EHCISysBusState parent_obj;
++
++    MemoryRegion iomem[3];
++} ChipideaState;
++
++#define TYPE_CHIPIDEA "usb-chipidea"
++#define CHIPIDEA(obj) OBJECT_CHECK(ChipideaState, (obj), TYPE_CHIPIDEA)
++
++#endif /* CHIPIDEA_H */
+diff --git a/hw/usb/chipidea.c b/hw/usb/chipidea.c
+new file mode 100644
+index 0000000000..60d67f88b8
+--- /dev/null
++++ b/hw/usb/chipidea.c
+@@ -0,0 +1,176 @@
++/*
++ * Copyright (c) 2018, Impinj, Inc.
++ *
++ * Chipidea USB block emulation code
++ *
++ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/usb/hcd-ehci.h"
++#include "hw/usb/chipidea.h"
++#include "qemu/log.h"
++
++enum {
++    CHIPIDEA_USBx_DCIVERSION   = 0x000,
++    CHIPIDEA_USBx_DCCPARAMS    = 0x004,
++    CHIPIDEA_USBx_DCCPARAMS_HC = BIT(8),
++};
++
++static uint64_t chipidea_read(void *opaque, hwaddr offset,
++                               unsigned size)
++{
++    return 0;
++}
++
++static void chipidea_write(void *opaque, hwaddr offset,
++                            uint64_t value, unsigned size)
++{
++}
++
++static const struct MemoryRegionOps chipidea_ops = {
++    .read = chipidea_read,
++    .write = chipidea_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        /*
++         * Our device would not work correctly if the guest was doing
++         * unaligned access. This might not be a limitation on the
++         * real device but in practice there is no reason for a guest
++         * to access this device unaligned.
++         */
++        .min_access_size = 4,
++        .max_access_size = 4,
++        .unaligned = false,
++    },
++};
++
++static uint64_t chipidea_dc_read(void *opaque, hwaddr offset,
++                                 unsigned size)
++{
++    switch (offset) {
++    case CHIPIDEA_USBx_DCIVERSION:
++        return 0x1;
++    case CHIPIDEA_USBx_DCCPARAMS:
++        /*
++         * Real hardware (at least i.MX7) will also report the
++         * controller as "Device Capable" (and 8 supported endpoints),
++         * but there doesn't seem to be much point in doing so, since
++         * we don't emulate that part.
++         */
++        return CHIPIDEA_USBx_DCCPARAMS_HC;
++    }
++
++    return 0;
++}
++
++static void chipidea_dc_write(void *opaque, hwaddr offset,
++                              uint64_t value, unsigned size)
++{
++}
++
++static const struct MemoryRegionOps chipidea_dc_ops = {
++    .read = chipidea_dc_read,
++    .write = chipidea_dc_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        /*
++         * Our device would not work correctly if the guest was doing
++         * unaligned access. This might not be a limitation on the real
++         * device but in practice there is no reason for a guest to access
++         * this device unaligned.
++         */
++        .min_access_size = 4,
++        .max_access_size = 4,
++        .unaligned = false,
++    },
++};
++
++static void chipidea_init(Object *obj)
++{
++    EHCIState *ehci = &SYS_BUS_EHCI(obj)->ehci;
++    ChipideaState *ci = CHIPIDEA(obj);
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(ci->iomem); i++) {
++        const struct {
++            const char *name;
++            hwaddr offset;
++            uint64_t size;
++            const struct MemoryRegionOps *ops;
++        } regions[ARRAY_SIZE(ci->iomem)] = {
++            /*
++             * Registers located between offsets 0x000 and 0xFC
++             */
++            {
++                .name   = TYPE_CHIPIDEA ".misc",
++                .offset = 0x000,
++                .size   = 0x100,
++                .ops    = &chipidea_ops,
++            },
++            /*
++             * Registers located between offsets 0x1A4 and 0x1DC
++             */
++            {
++                .name   = TYPE_CHIPIDEA ".endpoints",
++                .offset = 0x1A4,
++                .size   = 0x1DC - 0x1A4 + 4,
++                .ops    = &chipidea_ops,
++            },
++            /*
++             * USB_x_DCIVERSION and USB_x_DCCPARAMS
++             */
++            {
++                .name   = TYPE_CHIPIDEA ".dc",
++                .offset = 0x120,
++                .size   = 8,
++                .ops    = &chipidea_dc_ops,
++            },
++        };
++
++        memory_region_init_io(&ci->iomem[i],
++                              obj,
++                              regions[i].ops,
++                              ci,
++                              regions[i].name,
++                              regions[i].size);
++
++        memory_region_add_subregion(&ehci->mem,
++                                    regions[i].offset,
++                                    &ci->iomem[i]);
++    }
++}
++
++static void chipidea_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(klass);
++
++    /*
++     * Offsets used were taken from i.MX7Dual Applications Processor
++     * Reference Manual, Rev 0.1, p. 3177, Table 11-59
++     */
++    sec->capsbase   = 0x100;
++    sec->opregbase  = 0x140;
++    sec->portnr     = 1;
++
++    set_bit(DEVICE_CATEGORY_USB, dc->categories);
++    dc->desc = "Chipidea USB Module";
++}
++
++static const TypeInfo chipidea_info = {
++    .name          = TYPE_CHIPIDEA,
++    .parent        = TYPE_SYS_BUS_EHCI,
++    .instance_size = sizeof(ChipideaState),
++    .instance_init = chipidea_init,
++    .class_init    = chipidea_class_init,
++};
++
++static void chipidea_register_type(void)
++{
++    type_register_static(&chipidea_info);
++}
++type_init(chipidea_register_type)
 -- 
 2.16.1
