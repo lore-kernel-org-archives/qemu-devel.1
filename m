@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekEhK-0008P4-CW
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:51:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1ekEhO-0008Ql-GS
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:51:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekEhF-0002Cr-FO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:51:02 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:37458)
+	(envelope-from <bounces@canonical.com>) id 1ekEhJ-0002GC-Og
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:51:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42562)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekEhF-0002Bs-BQ
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:50:57 -0500
-Received: by mail-qt0-x241.google.com with SMTP id s27so12004657qts.4
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 11:50:57 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180209190340.19516-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6d79c36b-84a8-abc8-78bb-77db8eeb33bd@amsat.org>
-Date: Fri, 9 Feb 2018 16:50:52 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ekEhJ-0002Ft-JW
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:51:01 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ekEhH-0003N7-N7
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 19:50:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4D5F42E80D0
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 19:50:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180209190340.19516-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] net: fix misaligned member access
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 09 Feb 2018 19:43:30 -0000
+From: Brian Rak <brak@vultr.com>
+Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
+Message-Id: <151820541102.10457.4398345756578602266.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
+ and 'pipe' (|) can't be typed via VNC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+To: qemu-devel@nongnu.org
 
-Hi Marc-André,
+We ran into this as well, using qemu 2.11.0.  We're not using the "-k
+en-us" command line flag, and we're using noVNC as a client (which
+supports the QEMUExtendedKeyEvent encoding)
 
-On 02/09/2018 04:03 PM, Marc-André Lureau wrote:
-> Fixes the following ASAN warnings:
-> 
-> /home/elmarco/src/qemu/hw/net/net_tx_pkt.c:201:27: runtime error: member access within misaligned address 0x631000028846 for type 'struct ip_header', which requires 4 byte alignment
-> 0x631000028846: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff  ff ff 00 00 00 00 00 00  00 00
->              ^
-> /home/elmarco/src/qemu/hw/net/net_tx_pkt.c:208:63: runtime error: member access within misaligned address 0x631000028846 for type 'struct ip_header', which requires 4 byte alignment
-> 0x631000028846: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff  ff ff 00 00 00 00 00 00  00 00
->              ^
-> /home/elmarco/src/qemu/hw/net/net_tx_pkt.c:210:13: runtime error: member access within misaligned address 0x631000028846 for type 'struct ip_header', which requires 4 byte alignment
-> 0x631000028846: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff  ff ff 00 00 00 00 00 00  00 00
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/net/eth.h   | 4 +++-
->  hw/net/net_tx_pkt.c | 2 +-
->  2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/eth.h b/include/net/eth.h
-> index 09054a506d..e6dc8a7ba0 100644
-> --- a/include/net/eth.h
-> +++ b/include/net/eth.h
-> @@ -194,7 +194,9 @@ struct tcp_hdr {
->  #define PKT_GET_IP_HDR(p)         \
->      ((struct ip_header *)(((uint8_t *)(p)) + eth_get_l2_hdr_length(p)))
->  #define IP_HDR_GET_LEN(p)         \
-> -    ((((struct ip_header *)(p))->ip_ver_len & 0x0F) << 2)
-> +    ((ldub_p(p + offsetof(struct ip_header, ip_ver_len)) & 0x0F) << 2)
+-- =
 
-I like the idea of using the ldst API and offsetof() macro,
-however I think it would be cleaner to use inlined static functions.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738283
 
-> +#define IP_HDR_GET_P(p)                                           \
-> +    (ldub_p(p + offsetof(struct ip_header, ip_p)))
->  #define PKT_GET_IP_HDR_LEN(p)     \
->      (IP_HDR_GET_LEN(PKT_GET_IP_HDR(p)))
->  #define PKT_GET_IP6_HDR(p)        \
-> diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
-> index e29c881bc2..162f802dd7 100644
-> --- a/hw/net/net_tx_pkt.c
-> +++ b/hw/net/net_tx_pkt.c
-> @@ -205,7 +205,7 @@ static bool net_tx_pkt_parse_headers(struct NetTxPkt *pkt)
->              return false;
->          }
->  
-> -        pkt->l4proto = ((struct ip_header *) l3_hdr->iov_base)->ip_p;
-> +        pkt->l4proto = IP_HDR_GET_P(l3_hdr->iov_base);
->  
->          if (IP_HDR_GET_LEN(l3_hdr->iov_base) != sizeof(struct ip_header)) {
->              /* copy optional IPv4 header data if any*/
-> 
+Title:
+  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
+  VNC
+
+Status in QEMU:
+  New
+
+Bug description:
+  If I start QEMU 2.11 (from
+  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
+  VNC, I am unable to type following three characters: 'less than' (<),
+  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
+  characters work fine. QEMu version 2.10.1 worked fine.
+
+  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
+  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
+  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
+  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
+  kvm -vnc :91,share=3Dforce-shared
+
+  The ISO can be downloaded here: https://www.openindiana.org/download/
+
+  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
+  situation.
+
+  If I run the same command without '-vnc :91,share=3Dforce-shared',
+  everything works just fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
