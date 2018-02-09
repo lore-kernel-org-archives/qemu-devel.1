@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ejzCe-0008Kd-BB
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 22:18:21 -0500
+	(envelope-from <famz@redhat.com>) id 1ejzNe-0004ax-51
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 22:29:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ejzCd-000377-AH
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 22:18:20 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40853)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1ejzCd-00036d-5P
-	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 22:18:19 -0500
-Received: by mail-oi0-x243.google.com with SMTP id 8so5068558oix.7
-	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 19:18:19 -0800 (PST)
+	(envelope-from <famz@redhat.com>) id 1ejzNc-0000gh-Gq
+	for qemu-devel@nongnu.org; Thu, 08 Feb 2018 22:29:42 -0500
+Date: Fri, 9 Feb 2018 11:29:20 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180209032739.GM24289@lemon.usersys.redhat.com>
+References: <20180130063433.11605-1-famz@redhat.com>
+	<20180130063433.11605-3-famz@redhat.com>
+	<b552c5fb-f79a-98f1-bac7-26cf6e106f06@redhat.com>
+	<20180130163820.GC4503@localhost.localdomain>
+	<20180131141247.GC23336@stefanha-x1.localdomain>
+	<20180131142249.GB3598@localhost.localdomain>
+	<20180201114425.GD5783@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180208181207.GB13981@localhost.localdomain>
-References: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
-	<20180208181207.GB13981@localhost.localdomain>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Fri, 9 Feb 2018 11:18:18 +0800
-Message-ID: <CANRm+CwbM2u42bPz9C5fw0Lum5qsLZqg=0u2GXbLTwc0P7E76g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_DEDICATED hint CPUID
- feature bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180201114425.GD5783@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] qemu-img: Document --force-share /
+ -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, kchamart@redhat.com, Max Reitz <mreitz@redhat.com>
 
-2018-02-09 2:12 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
-> On Thu, Feb 08, 2018 at 05:44:20PM +0800, Wanpeng Li wrote:
->> From: Wanpeng Li <wanpengli@tencent.com>
->>
->> Add PV_DEDICATED hint cpuid feature bit.
->>
-> [...]
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index d70954b..cf48931 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
->>              x86_cpu_get_supported_feature_word(w, false);
->>          uint32_t requested_features = env->features[w];
->>          env->features[w] &= host_feat;
->> +        if (cpu->pv_dedicated && (w == FEAT_KVM)) {
->> +            env->features[w] |= CPUID_PV_DEDICATED;
->> +        }
->
-> Why do this trick here instead of just adding "pv-dedicated" to
-> feature_word_info[FEAT_KVM].feat_names?
+On Thu, 02/01 11:44, Stefan Hajnoczi wrote:
+> On Wed, Jan 31, 2018 at 03:22:49PM +0100, Kevin Wolf wrote:
+> > Am 31.01.2018 um 15:12 hat Stefan Hajnoczi geschrieben:
+> > > There should be a separate paragraph in docs/qemu-block-drivers.texi
+> > > explaining that share-rw=on can be used safely with format=raw if the
+> > > guests are configured to safely access a shared disk.  It should also
+> > > mention that share-rw=on is unsafe for image formats.
+> > 
+> > share-rw=on is a -device option and only about the guest, not about the
+> > backend. It is never unsafe if the guest can cope with external writers.
+> > It just doesn't prevent qemu from locking the image file for image
+> > formats.
+> 
+> Thanks for the explanation.  Documentation on share-rw=on|off would be
+> nice.
+> 
+> Maybe something like:
+> 
+>   By default the guest has exclusive write access to its disk image.
+>   This is enforced by QEMU via file locking.  If the guest can safely
+>   share the disk image with other writers the -device ...,share-rw=on
+>   parameter can be used.  This is only safe if the guest is running
+>   software, such as a cluster file system, that coordinates disk
+>   accesses to avoid corruption.
+> 
+>   Note that share-rw=on only declares the guest's ability to share the
+>   disk.  Some QEMU features, such as image file formats, require
+>   exclusive write access to the disk image and this is unaffected by the
+>   share-rw=on option.
 
-Actually this hint doesn't depend on KVM, just qemu command-line gives
-a hint and then guest kernel can recognize it. Is there a nicer
-proposal in qemu? Paolo?
+I will add these paragraphs to the "image locking" seciton in
+docs/qemu-block-drivers.texi.
 
-Regards,
-Wanpeng Li
+Fam
