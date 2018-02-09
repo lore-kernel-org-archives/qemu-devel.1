@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33186)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ek4VR-0001KT-D3
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:58:06 -0500
+	id 1ek4VT-0001Mr-Tv
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ek4VQ-0006Cp-AK
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:58:05 -0500
+	id 1ek4VT-0006Ei-2a
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:58:07 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  9 Feb 2018 05:57:54 -0300
-Message-Id: <20180209085755.30414-2-f4bug@amsat.org>
+Date: Fri,  9 Feb 2018 05:57:55 -0300
+Message-Id: <20180209085755.30414-3-f4bug@amsat.org>
 In-Reply-To: <20180209085755.30414-1-f4bug@amsat.org>
 References: <20180209085755.30414-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/2] hw/arm/aspeed: directly map the serial
- device to the system address space
+Subject: [Qemu-devel] [PATCH v2 2/2] hw/arm/aspeed: simplify using the
+ 'unimplemented device' for aspeed_soc.io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +34,87 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
  address-space: cpu-memory-0
    0000000000000000-ffffffffffffffff (prio 0, i/o): system
      0000000000000000-0000000007ffffff (prio 0, rom): aspeed.boot_rom
-     000000001e600000-000000001e7fffff (prio -1, i/o): aspeed_soc.io
--      000000001e784000-000000001e78401f (prio 0, i/o): serial
+-    000000001e600000-000000001e7fffff (prio -1, i/o): aspeed_soc.io
++    000000001e600000-000000001e7fffff (prio -1000, i/o): aspeed_soc.io
      000000001e620000-000000001e6200ff (prio 0, i/o): aspeed.smc.ast2500-fmc
      000000001e630000-000000001e6300ff (prio 0, i/o): aspeed.smc.ast2500-spi1
-     [...]
-     000000001e720000-000000001e728fff (prio 0, ram): aspeed.sram
-     000000001e782000-000000001e782fff (prio 0, i/o): aspeed.timer
-+    000000001e784000-000000001e78401f (prio 0, i/o): serial
-     000000001e785000-000000001e78501f (prio 0, i/o): aspeed.wdt
-     000000001e785020-000000001e78503f (prio 0, i/o): aspeed.wdt
+     000000001e631000-000000001e6310ff (prio 0, i/o): aspeed.smc.ast2500-spi2
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/arm/aspeed_soc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/hw/arm/aspeed_soc.h |  1 -
+ hw/arm/aspeed_soc.c         | 32 +++-----------------------------
+ 2 files changed, 3 insertions(+), 30 deletions(-)
 
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index f26914a2b9..11ec0179db 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -31,7 +31,6 @@ typedef struct AspeedSoCState {
+ 
+     /*< public >*/
+     ARMCPU cpu;
+-    MemoryRegion iomem;
+     MemoryRegion sram;
+     AspeedVICState vic;
+     AspeedTimerCtrlState timerctrl;
 diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index c83b7e207b..2a5d041b3b 100644
+index 2a5d041b3b..30d25f8b06 100644
 --- a/hw/arm/aspeed_soc.c
 +++ b/hw/arm/aspeed_soc.c
-@@ -257,7 +257,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     /* UART - attach an 8250 to the IO space as our UART5 */
-     if (serial_hds[0]) {
-         qemu_irq uart5 = qdev_get_gpio_in(DEVICE(&s->vic), uart_irqs[4]);
--        serial_mm_init(&s->iomem, ASPEED_SOC_UART_5_BASE, 2,
-+        serial_mm_init(get_system_memory(),
-+                       ASPEED_SOC_IOMEM_BASE + ASPEED_SOC_UART_5_BASE, 2,
-                        uart5, 38400, serial_hds[0], DEVICE_LITTLE_ENDIAN);
-     }
+@@ -15,6 +15,7 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "exec/address-spaces.h"
++#include "hw/misc/unimp.h"
+ #include "hw/arm/aspeed_soc.h"
+ #include "hw/char/serial.h"
+ #include "qemu/log.h"
+@@ -99,31 +100,6 @@ static const AspeedSoCInfo aspeed_socs[] = {
+     },
+ };
  
+-/*
+- * IO handlers: simply catch any reads/writes to IO addresses that aren't
+- * handled by a device mapping.
+- */
+-
+-static uint64_t aspeed_soc_io_read(void *p, hwaddr offset, unsigned size)
+-{
+-    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
+-                  __func__, offset, size);
+-    return 0;
+-}
+-
+-static void aspeed_soc_io_write(void *opaque, hwaddr offset, uint64_t value,
+-                unsigned size)
+-{
+-    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%u]\n",
+-                  __func__, offset, value, size);
+-}
+-
+-static const MemoryRegionOps aspeed_soc_io_ops = {
+-    .read = aspeed_soc_io_read,
+-    .write = aspeed_soc_io_write,
+-    .endianness = DEVICE_LITTLE_ENDIAN,
+-};
+-
+ static void aspeed_soc_init(Object *obj)
+ {
+     AspeedSoCState *s = ASPEED_SOC(obj);
+@@ -199,10 +175,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     Error *err = NULL, *local_err = NULL;
+ 
+     /* IO space */
+-    memory_region_init_io(&s->iomem, NULL, &aspeed_soc_io_ops, NULL,
+-            "aspeed_soc.io", ASPEED_SOC_IOMEM_SIZE);
+-    memory_region_add_subregion_overlap(get_system_memory(),
+-                                        ASPEED_SOC_IOMEM_BASE, &s->iomem, -1);
++    create_unimplemented_device("aspeed_soc.io",
++                                ASPEED_SOC_IOMEM_BASE, ASPEED_SOC_IOMEM_SIZE);
+ 
+     /* CPU */
+     object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
 -- 
 2.16.1
