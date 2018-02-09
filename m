@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ekFc2-0008Jd-60
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:49:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1ekFfd-0002wF-D6
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:53:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ekFbx-0000Ju-Cf
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:49:38 -0500
-Received: from mail-co1nam03on0079.outbound.protection.outlook.com
-	([104.47.40.79]:10080
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1ekFbx-0000Hr-0v
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:49:33 -0500
-References: <20180207160638.98872-17-brijesh.singh@amd.com>
-	<20180209182819.GH2428@work-vm>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <cf5a167e-cb68-f7c9-d351-2b6ddbfb7c9e@amd.com>
-Date: Fri, 9 Feb 2018 14:49:17 -0600
+	(envelope-from <eblake@redhat.com>) id 1ekFfZ-00033f-Ck
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:53:21 -0500
+References: <20180209193138.97198-1-yasmins@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c8cf6861-042a-4c6e-0163-b49b38b577d3@redhat.com>
+Date: Fri, 9 Feb 2018 14:52:59 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180209182819.GH2428@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180209193138.97198-1-yasmins@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v7 17/26] target/i386: encrypt bios rom
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] dump: Show custom message for ENOSPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-trivial@nongnu.org, joserz@linux.vnet.ibm.com
 
+On 02/09/2018 01:31 PM, Yasmin Beatriz wrote:
+> This patch intends to make a more specific message for when
+> the system has not enough space to save guest memory.
+> 
+> Reported-by: yilzhang@redhat.com
+> Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> Signed-off-by: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
+> ---
+>   dump.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/dump.c b/dump.c
+> index e9dfed060a..eb56ff53f6 100644
+> --- a/dump.c
+> +++ b/dump.c
+> @@ -106,6 +106,9 @@ static int fd_write_vmcore(const void *buf, size_t size, void *opaque)
+>   
+>       written_size = qemu_write_full(s->fd, buf, size);
+>       if (written_size != size) {
+> +        if (errno == ENOSPC) {
+> +            return -ENOSPC;
+> +        }
+>           return -1;
 
+Mixing a return of -1 and negative errno is ugly (as -1 is 
+indistinguishable from -EPERM on many, but not all, operating systems). 
+If you need to distinguish between different error types, then return 
+negative errno in all places.
 
-On 2/9/18 12:28 PM, Dr. David Alan Gilbert wrote:
-> * Brijesh Singh (brijesh.singh@amd.com) wrote:
->> SEV requires that guest bios must be encrypted before booting the guest.
-> I'm curious; is it just the main BIOS that needs encryption - what about
-> things like device/PXE rom images?
+>       }
+>   
+> @@ -364,7 +367,11 @@ static void write_data(DumpState *s, void *buf, int length, Error **errp)
+>   
+>       ret = fd_write_vmcore(buf, length, s);
+>       if (ret < 0) {
+> -        error_setg(errp, "dump: failed to save memory");
 
+Or, if you really want better error messages, it might make sense to 
+push errp setting down into fd_write_vmcore() (all callers have to be 
+updated).
 
-SEV feature is available in OVMF BIOS only. EDKII core contains UEFI
-firmware driver for several things including PXE and most of time we
-don't need ROMs. If we do, I think typically ROMs from which the guest
-firmware reads the binaries are not guest RAM, they are MMIO. Guest
-BIOSes copies the ROM from MMIO to guest RAM -- it will get encrypted
-during copy (because MMIO is mapped with C=3D0 and guest RAM is mapped
-with C=3D1).=C2=A0 In other words, I don't see any need for encrypting the =
-ROM
-images during the launch flow. But passing an arbitrary option ROM can
-be security concerns hence I believe a guest owner wanting to pass a
-option ROM will use secure boot, then option roms can be verified before
-executing.
-
-
-> Dave
->
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  hw/i386/pc_sysfw.c | 13 +++++++++++++
->>  1 file changed, 13 insertions(+)
->>
->> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->> index 6b183747fcea..8ddbbf74d330 100644
->> --- a/hw/i386/pc_sysfw.c
->> +++ b/hw/i386/pc_sysfw.c
->> @@ -112,6 +112,8 @@ static void pc_system_flash_init(MemoryRegion *rom_m=
-emory)
->>      pflash_t *system_flash;
->>      MemoryRegion *flash_mem;
->>      char name[64];
->> +    void *flash_ptr;
->> +    int ret, flash_size;
->> =20
->>      sector_bits =3D 12;
->>      sector_size =3D 1 << sector_bits;
->> @@ -168,6 +170,17 @@ static void pc_system_flash_init(MemoryRegion *rom_=
-memory)
->>          if (unit =3D=3D 0) {
->>              flash_mem =3D pflash_cfi01_get_memory(system_flash);
->>              pc_isa_bios_init(rom_memory, flash_mem, size);
->> +
->> +            /* Encrypt the pflash boot ROM */
->> +            if (kvm_memcrypt_enabled()) {
->> +                flash_ptr =3D memory_region_get_ram_ptr(flash_mem);
->> +                flash_size =3D memory_region_size(flash_mem);
->> +                ret =3D kvm_memcrypt_encrypt_data(flash_ptr, flash_size=
-);
->> +                if (ret) {
->> +                    error_report("failed to encrypt pflash rom");
->> +                    exit(1);
->> +                }
->> +            }
->>          }
->>      }
->>  }
->> --=20
->> 2.14.3
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
