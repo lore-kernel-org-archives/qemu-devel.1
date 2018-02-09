@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1ekAyP-0001XP-7t
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:52:26 -0500
+	(envelope-from <geert@linux-m68k.org>) id 1ekBDa-0007M5-7J
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1ekAyM-0007hp-9J
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:52:25 -0500
-Received: from newton.telenet-ops.be ([195.130.132.45]:48754)
+	(envelope-from <geert@linux-m68k.org>) id 1ekBDW-0001Ee-Vf
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:08:06 -0500
+Received: from leibniz.telenet-ops.be ([2a02:1800:110:4::f00:d]:33980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <geert@linux-m68k.org>)
-	id 1ekAyL-0007gu-Tt
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:52:22 -0500
-Received: from laurent.telenet-ops.be (laurent.telenet-ops.be
-	[IPv6:2a02:1800:110:4::f00:19])
-	by newton.telenet-ops.be (Postfix) with ESMTPS id 3zdJwl25VZzMqw9F
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 16:32:55 +0100 (CET)
+	id 1ekBDW-0001DH-K3
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:08:02 -0500
+Received: from albert.telenet-ops.be (albert.telenet-ops.be
+	[IPv6:2a02:1800:110:4::f00:1a])
+	by leibniz.telenet-ops.be (Postfix) with ESMTPS id 3zdJvz3csyzMqc1P
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 16:32:15 +0100 (CET)
 From: Geert Uytterhoeven <geert+renesas@glider.be>
-Date: Fri,  9 Feb 2018 16:17:35 +0100
-Message-Id: <1518189456-2873-5-git-send-email-geert+renesas@glider.be>
-In-Reply-To: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
-References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
-Subject: [Qemu-devel] [PATCH/RFC 4/5] vfio: No-IOMMU mode support
+Date: Fri,  9 Feb 2018 16:16:52 +0100
+Message-Id: <1518189413-2761-6-git-send-email-geert+renesas@glider.be>
+In-Reply-To: <1518189413-2761-1-git-send-email-geert+renesas@glider.be>
+References: <1518189413-2761-1-git-send-email-geert+renesas@glider.be>
+Subject: [Qemu-devel] [PATCH/RFC 5/6] gpio: rcar: Add virtualization
+ workarounds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
-Cc: Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
+To: Baptiste Reynal <b.reynal@virtualopensystems.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, kvm@vger.kernel.org, linux-renesas-soc@vger.kernel.org, qemu-devel@nongnu.org, Geert Uytterhoeven <geert+renesas@glider.be>
 
-From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+Allow to enable the driver if virtualization is enabled.
 
-Add qemu support for the newly introduced VFIO No-IOMMU driver.
+Handle the absence of clocks and interrupts, to support guests that
+don't provide these yet.
 
-We need to add special handling for:
-- Group character device is /dev/vfio/noiommu-$GROUP.
-- No-IOMMU does not rely on a memory listener.
-- No IOMMU will be set for its group, so no need to call
-  vfio_kvm_device_add_group.
-
-Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-[geert: Rebase]
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Not-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- hw/vfio/common.c              | 61 ++++++++++++++++++++++++++++++++++---------
- include/hw/vfio/vfio-common.h |  2 ++
- 2 files changed, 50 insertions(+), 13 deletions(-)
+To be dropped once clocks and interrupts are supported on the guest.
+---
+ drivers/gpio/Kconfig     |  2 +-
+ drivers/gpio/gpio-rcar.c | 28 ++++++++++++----------------
+ 2 files changed, 13 insertions(+), 17 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index f895e3c3359af779..2ee94a3304202a74 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1019,6 +1019,33 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     container->fd = fd;
-     QLIST_INIT(&container->giommu_list);
-     QLIST_INIT(&container->hostwin_list);
-+    container->noiommu = group->noiommu;
-+
-+    if (container->noiommu) {
-+        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
-+        if (ret) {
-+            error_report("vfio: failed to set group container: %m");
-+            ret = -errno;
-+            goto free_container_exit;
-+        }
-+
-+        ret = ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_NOIOMMU_IOMMU);
-+        if (!ret) {
-+            error_report("vfio: No available IOMMU models");
-+            ret = -EINVAL;
-+            goto free_container_exit;
-+        }
-+
-+        ret = ioctl(fd, VFIO_SET_IOMMU, VFIO_NOIOMMU_IOMMU);
-+        if (ret) {
-+            error_report("vfio: failed to set iommu for container: %m");
-+            ret = -errno;
-+            goto free_container_exit;
-+        }
-+
-+        goto listener_register;
-+    }
-+
-     if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
-         ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
-         bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
-@@ -1151,15 +1178,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     group->container = container;
-     QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+index d6a8e851ad13b8e6..50eeaa3bb0749b84 100644
+--- a/drivers/gpio/Kconfig
++++ b/drivers/gpio/Kconfig
+@@ -386,7 +386,7 @@ config GPIO_PXA
  
--    container->listener = vfio_memory_listener;
--
--    memory_listener_register(&container->listener, container->space->as);
--
--    if (container->error) {
--        ret = container->error;
--        error_setg_errno(errp, -ret,
--                         "memory listener initialization failed for container");
--        goto listener_release_exit;
-+listener_register:
-+    if (!container->noiommu) {
-+        container->listener = vfio_memory_listener;
-+        memory_listener_register(&container->listener, container->space->as);
-+        if (container->error) {
-+            ret = container->error;
-+            error_setg_errno(errp, -ret,
-+                    "memory listener initialization failed for container");
-+            goto listener_release_exit;
-+        }
-     }
+ config GPIO_RCAR
+ 	tristate "Renesas R-Car GPIO"
+-	depends on ARCH_RENESAS || COMPILE_TEST
++	depends on ARCH_RENESAS || VIRTIO_MMIO || COMPILE_TEST
+ 	select GPIOLIB_IRQCHIP
+ 	help
+ 	  Say yes here to support GPIO on Renesas R-Car SoCs.
+diff --git a/drivers/gpio/gpio-rcar.c b/drivers/gpio/gpio-rcar.c
+index e76de57dd617d7e2..bc205b7fbb30e892 100644
+--- a/drivers/gpio/gpio-rcar.c
++++ b/drivers/gpio/gpio-rcar.c
+@@ -442,22 +442,16 @@ static int gpio_rcar_probe(struct platform_device *pdev)
  
-     container->initialized = true;
-@@ -1169,7 +1197,9 @@ listener_release_exit:
-     QLIST_REMOVE(group, container_next);
-     QLIST_REMOVE(container, next);
-     vfio_kvm_device_del_group(group);
--    vfio_listener_release(container);
-+    if (!container->noiommu) {
-+        vfio_listener_release(container);
-+    }
+ 	p->clk = devm_clk_get(dev, NULL);
+ 	if (IS_ERR(p->clk)) {
+-		if (p->needs_clk) {
+-			dev_err(dev, "unable to get clock\n");
+-			ret = PTR_ERR(p->clk);
+-			goto err0;
+-		}
++		if (p->needs_clk)
++			dev_warn(dev, "missing clock, ignoring\n");
+ 		p->clk = NULL;
+ 	}
  
- free_container_exit:
-     g_free(container);
-@@ -1195,7 +1225,7 @@ static void vfio_disconnect_container(VFIOGroup *group)
-      * since unset may destroy the backend container if it's the last
-      * group.
-      */
--    if (QLIST_EMPTY(&container->group_list)) {
-+    if (QLIST_EMPTY(&container->group_list) && !container->noiommu) {
-         vfio_listener_release(container);
-     }
+ 	pm_runtime_enable(dev);
  
-@@ -1249,8 +1279,13 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
-     snprintf(path, sizeof(path), "/dev/vfio/%d", groupid);
-     group->fd = qemu_open(path, O_RDWR);
-     if (group->fd < 0) {
--        error_setg_errno(errp, errno, "failed to open %s", path);
--        goto free_group_exit;
-+        snprintf(path, sizeof(path), "/dev/vfio/noiommu-%d", groupid);
-+        group->fd = qemu_open(path, O_RDWR);
-+        if (group->fd < 0) {
-+            error_setg_errno(errp, errno, "failed to open %s", path);
-+            goto free_group_exit;
-+        }
-+        group->noiommu = 1;
-     }
+ 	irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+-	if (!irq) {
+-		dev_err(dev, "missing IRQ\n");
+-		ret = -EINVAL;
+-		goto err0;
+-	}
++	if (!irq)
++		dev_warn(dev, "missing IRQ, ignoring\n");
  
-     if (ioctl(group->fd, VFIO_GROUP_GET_STATUS, &status)) {
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9fee02066f..aca2e33efb9b118c 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -77,6 +77,7 @@ struct VFIOGroup;
- typedef struct VFIOContainer {
-     VFIOAddressSpace *space;
-     int fd; /* /dev/vfio/vfio, empowered by the attached groups */
-+    bool noiommu;
-     MemoryListener listener;
-     MemoryListener prereg_listener;
-     unsigned iommu_type;
-@@ -136,6 +137,7 @@ struct VFIODeviceOps {
- typedef struct VFIOGroup {
-     int fd;
-     int groupid;
-+    bool noiommu;
-     VFIOContainer *container;
-     QLIST_HEAD(, VFIODevice) device_list;
-     QLIST_ENTRY(VFIOGroup) next;
+ 	io = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	p->base = devm_ioremap_resource(dev, io);
+@@ -502,12 +496,14 @@ static int gpio_rcar_probe(struct platform_device *pdev)
+ 		goto err1;
+ 	}
+ 
+-	p->irq_parent = irq->start;
+-	if (devm_request_irq(dev, irq->start, gpio_rcar_irq_handler,
+-			     IRQF_SHARED, name, p)) {
+-		dev_err(dev, "failed to request IRQ\n");
+-		ret = -ENOENT;
+-		goto err1;
++	if (irq) {
++		p->irq_parent = irq->start;
++		if (devm_request_irq(dev, irq->start, gpio_rcar_irq_handler,
++				     IRQF_SHARED, name, p)) {
++			dev_err(dev, "failed to request IRQ\n");
++			ret = -ENOENT;
++			goto err1;
++		}
+ 	}
+ 
+ 	dev_info(dev, "driving %d GPIOs\n", npins);
 -- 
 2.7.4
