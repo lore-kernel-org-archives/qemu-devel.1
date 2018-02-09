@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ekAwi-00005t-CI
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:50:41 -0500
+	(envelope-from <thuth@redhat.com>) id 1ekB93-0002Vy-Hl
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ekAwh-00076s-8i
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:50:40 -0500
-Date: Fri, 9 Feb 2018 08:50:24 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180209085024.004b6f9e@w520.home>
-In-Reply-To: <1518189456-2873-5-git-send-email-geert+renesas@glider.be>
-References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
-	<1518189456-2873-5-git-send-email-geert+renesas@glider.be>
+	(envelope-from <thuth@redhat.com>) id 1ekB8z-0005q0-K9
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:24 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52024 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ekB8z-0005pk-EV
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:21 -0500
+References: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
+	<bb1b8270-e924-3d41-a172-38ba79db9bf7@redhat.com>
+	<fd22674c-059e-8d37-338c-5d2d4d96eb20@redhat.com>
+	<8d1183ed-c7ab-e130-c983-e5e116d80fa3@virtuozzo.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <edaa67ca-b118-961a-c8aa-bcde1e148d88@redhat.com>
+Date: Fri, 9 Feb 2018 17:03:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <8d1183ed-c7ab-e130-c983-e5e116d80fa3@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH/RFC 4/5] vfio: No-IOMMU mode support
+Subject: Re: [Qemu-devel] "make check -j4" hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,156 +30,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org
+To: Klim Kireev <klim.kireev@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri,  9 Feb 2018 16:17:35 +0100
-Geert Uytterhoeven <geert+renesas@glider.be> wrote:
-
-> From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+On 09.02.2018 13:47, Klim Kireev wrote:
 > 
-> Add qemu support for the newly introduced VFIO No-IOMMU driver.
+> On 02/08/2018 10:13 PM, Thomas Huth wrote:
+>> On 30.01.2018 20:49, Paolo Bonzini wrote:
+>>> On 25/01/2018 08:51, Klim Kireev wrote:
+>>>> The following behavior was observed for QEMU configured by libvirt
+>>>> to use guest agent as usual for the guests without virtio-serial
+>>>> driver (Windows or the guest remaining in BIOS stage).
+>>>>
+>>>> In QEMU on first connect to listen character device socket
+>>>> the listen socket is removed from poll just after the accept().
+>>>> virtio_serial_guest_ready() returns 0 and the descriptor
+>>>> of the connected Unix socket is removed from poll and it will
+>>>> not be present in poll() until the guest will initialize the driver
+>>>> and change the state of the serial to "guest connected".
+>>>>
+>>>> In libvirt connect() to guest agent is performed on restart and
+>>>> is run under VM state lock. Connect() is blocking and can
+>>>> wait forever.
+>>>> In this case libvirt can not perform ANY operation on that VM.
+>>>>
+>>>> The bug can be easily reproduced this way:
+>>>>
+>>>> Terminal 1:
+>>>> qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
+>>>> (virtio-serial and isa-serial also fit)
+>>>>
+>>>> Terminal 2:
+>>>> minicom -D unix\#/tmp/console.sock
+>>>> (type something and press enter)
+>>>> C-a x (to exit)
+>>>>
+>>>> Do 3 times:
+>>>> minicom -D unix\#/tmp/console.sock
+>>>> C-a x
+>>>>
+>>>> It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
+>>>> the kernel, and the 4th blocks.
+>>>>
+>>>> The problem is that QEMU doesn't add a read watcher after succesful read
+>>>> until the guest device wants to acquire recieved data, so
+>>>> I propose to install a separate pullhup watcher regardless of
+>>>> whether the device waits for data or not.
+>>>>
+>>>> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+>>>> ---
+>>>> Changelog:
+>>>> v2: Remove timer as a redundant feature
+>>>>
+>>>> v3: Remove read call and return G_SOURCE_REMOVE
+>>>>
+>>>> v4: Move to GSource API
+>>>>
+>>>> v5: Fix git typos 
+>>>>
+>>>>  chardev/char-socket.c | 22 ++++++++++++++++++++++
+>>>>  1 file changed, 22 insertions(+)
+>>>>
+>>>> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>>>> index 77cdf487eb..a340af6cd3 100644
+>>>> --- a/chardev/char-socket.c
+>>>> +++ b/chardev/char-socket.c
+>>>> @@ -42,6 +42,7 @@ typedef struct {
+>>>>      QIOChannel *ioc; /* Client I/O channel */
+>>>>      QIOChannelSocket *sioc; /* Client master channel */
+>>>>      QIONetListener *listener;
+>>>> +    GSource *hup_source;
+>>>>      QCryptoTLSCreds *tls_creds;
+>>>>      int connected;
+>>>>      int max_size;
+>>>> @@ -352,6 +353,12 @@ static void tcp_chr_free_connection(Chardev *chr)
+>>>>          s->read_msgfds_num = 0;
+>>>>      }
+>>>>  
+>>>> +    if (s->hup_source != NULL) {
+>>>> +        g_source_destroy(s->hup_source);
+>>>> +        g_source_unref(s->hup_source);
+>>>> +        s->hup_source = NULL;
+>>>> +    }
+>>>> +
+>>>>      tcp_set_msgfds(chr, NULL, 0);
+>>>>      remove_fd_in_watch(chr);
+>>>>      object_unref(OBJECT(s->sioc));
+>>>> @@ -455,6 +462,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
+>>>>      return TRUE;
+>>>>  }
+>>>>  
+>>>> +static gboolean tcp_chr_hup(QIOChannel *channel,
+>>>> +                               GIOCondition cond,
+>>>> +                               void *opaque)
+>>>> +{
+>>>> +    Chardev *chr = CHARDEV(opaque);
+>>>> +    tcp_chr_disconnect(chr);
+>>>> +    return G_SOURCE_REMOVE;
+>>>> +}
+>>>> +
+>>>>  static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+>>>>  {
+>>>>      SocketChardev *s = SOCKET_CHARDEV(chr);
+>>>> @@ -528,6 +544,12 @@ static void tcp_chr_connect(void *opaque)
+>>>>                                             tcp_chr_read,
+>>>>                                             chr, chr->gcontext);
+>>>>      }
+>>>> +
+>>>> +    s->hup_source = qio_channel_create_watch(s->ioc, G_IO_HUP);
+>>>> +    g_source_set_callback(s->hup_source, (GSourceFunc)tcp_chr_hup,
+>>>> +                          chr, NULL);
+>>>> +    g_source_attach(s->hup_source, chr->gcontext);
+>>>> +
+>>>>      qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+>>>>  }
+>>>>  
+>>>>
+>>> Queued, thanks.
+>>  Hi!
+>>
+>> I'm currently facing some issues with "make check -j4" (i.e. running the
+>> tests in parallel). Git bisect blames this commit - though I'm not sure
+>> whether this is really the right one ... Starting with this commit, I
+>> saw hangs in test-filter-redirector, 
 > 
-> We need to add special handling for:
-> - Group character device is /dev/vfio/noiommu-$GROUP.
-> - No-IOMMU does not rely on a memory listener.
-> - No IOMMU will be set for its group, so no need to call
->   vfio_kvm_device_add_group.
-> 
-> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> [geert: Rebase]
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  hw/vfio/common.c              | 61 ++++++++++++++++++++++++++++++++++---------
->  include/hw/vfio/vfio-common.h |  2 ++
->  2 files changed, 50 insertions(+), 13 deletions(-)
+> Commit 8f6d701044bc87197aac8aa2a627d70ce8471726 fixes it
+> Have you tried to apply it?
 
-NAK.  I'm opposed to no-iommu support in QEMU in general, but accepting
-vfio devices with no-iommu (which provide no DMA translation!!!)
-transparently as if they might actually work like a regular vfio device
-is absolutely unacceptable.  Without DMA translation and isolation, you
-might want to think about another interface, I'm not keen on the idea
-of corrupting vfio support in order to blink some LEDs.  Thanks,
+That seems to be the one that fixes test-filter-redirector, but after
+that, it still fails with vhost-user-test instead.
 
-Alex
-
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index f895e3c3359af779..2ee94a3304202a74 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1019,6 +1019,33 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->      container->fd = fd;
->      QLIST_INIT(&container->giommu_list);
->      QLIST_INIT(&container->hostwin_list);
-> +    container->noiommu = group->noiommu;
-> +
-> +    if (container->noiommu) {
-> +        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
-> +        if (ret) {
-> +            error_report("vfio: failed to set group container: %m");
-> +            ret = -errno;
-> +            goto free_container_exit;
-> +        }
-> +
-> +        ret = ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_NOIOMMU_IOMMU);
-> +        if (!ret) {
-> +            error_report("vfio: No available IOMMU models");
-> +            ret = -EINVAL;
-> +            goto free_container_exit;
-> +        }
-> +
-> +        ret = ioctl(fd, VFIO_SET_IOMMU, VFIO_NOIOMMU_IOMMU);
-> +        if (ret) {
-> +            error_report("vfio: failed to set iommu for container: %m");
-> +            ret = -errno;
-> +            goto free_container_exit;
-> +        }
-> +
-> +        goto listener_register;
-> +    }
-> +
->      if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
->          ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
->          bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
-> @@ -1151,15 +1178,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->      group->container = container;
->      QLIST_INSERT_HEAD(&container->group_list, group, container_next);
->  
-> -    container->listener = vfio_memory_listener;
-> -
-> -    memory_listener_register(&container->listener, container->space->as);
-> -
-> -    if (container->error) {
-> -        ret = container->error;
-> -        error_setg_errno(errp, -ret,
-> -                         "memory listener initialization failed for container");
-> -        goto listener_release_exit;
-> +listener_register:
-> +    if (!container->noiommu) {
-> +        container->listener = vfio_memory_listener;
-> +        memory_listener_register(&container->listener, container->space->as);
-> +        if (container->error) {
-> +            ret = container->error;
-> +            error_setg_errno(errp, -ret,
-> +                    "memory listener initialization failed for container");
-> +            goto listener_release_exit;
-> +        }
->      }
->  
->      container->initialized = true;
-> @@ -1169,7 +1197,9 @@ listener_release_exit:
->      QLIST_REMOVE(group, container_next);
->      QLIST_REMOVE(container, next);
->      vfio_kvm_device_del_group(group);
-> -    vfio_listener_release(container);
-> +    if (!container->noiommu) {
-> +        vfio_listener_release(container);
-> +    }
->  
->  free_container_exit:
->      g_free(container);
-> @@ -1195,7 +1225,7 @@ static void vfio_disconnect_container(VFIOGroup *group)
->       * since unset may destroy the backend container if it's the last
->       * group.
->       */
-> -    if (QLIST_EMPTY(&container->group_list)) {
-> +    if (QLIST_EMPTY(&container->group_list) && !container->noiommu) {
->          vfio_listener_release(container);
->      }
->  
-> @@ -1249,8 +1279,13 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
->      snprintf(path, sizeof(path), "/dev/vfio/%d", groupid);
->      group->fd = qemu_open(path, O_RDWR);
->      if (group->fd < 0) {
-> -        error_setg_errno(errp, errno, "failed to open %s", path);
-> -        goto free_group_exit;
-> +        snprintf(path, sizeof(path), "/dev/vfio/noiommu-%d", groupid);
-> +        group->fd = qemu_open(path, O_RDWR);
-> +        if (group->fd < 0) {
-> +            error_setg_errno(errp, errno, "failed to open %s", path);
-> +            goto free_group_exit;
-> +        }
-> +        group->noiommu = 1;
->      }
->  
->      if (ioctl(group->fd, VFIO_GROUP_GET_STATUS, &status)) {
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index f3a2ac9fee02066f..aca2e33efb9b118c 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -77,6 +77,7 @@ struct VFIOGroup;
->  typedef struct VFIOContainer {
->      VFIOAddressSpace *space;
->      int fd; /* /dev/vfio/vfio, empowered by the attached groups */
-> +    bool noiommu;
->      MemoryListener listener;
->      MemoryListener prereg_listener;
->      unsigned iommu_type;
-> @@ -136,6 +137,7 @@ struct VFIODeviceOps {
->  typedef struct VFIOGroup {
->      int fd;
->      int groupid;
-> +    bool noiommu;
->      VFIOContainer *container;
->      QLIST_HEAD(, VFIODevice) device_list;
->      QLIST_ENTRY(VFIOGroup) next;
+ Thomas
