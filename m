@@ -1,27 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ek9ST-0000M2-VO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:15:26 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ek9U8-0001i6-W6
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:17:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ek9SP-0007t0-L5
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:15:21 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:46708)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ek9SP-0007qp-ED
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:15:17 -0500
-Received: by mail-wr0-x241.google.com with SMTP id 111so5506216wrb.13
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:15:17 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  9 Feb 2018 14:15:14 +0000
-Message-Id: <20180209141514.18840-2-alex.bennee@linaro.org>
-In-Reply-To: <20180209141514.18840-1-alex.bennee@linaro.org>
-References: <20180209141514.18840-1-alex.bennee@linaro.org>
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ek9U4-0000hg-0q
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:17:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50090
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1ek9U3-0000hF-Qe
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:16:59 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w19E9PN9166858
+	for <qemu-devel@nongnu.org>; Fri, 9 Feb 2018 09:16:59 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g1bdxn18e-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 09:16:58 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Fri, 9 Feb 2018 14:16:57 -0000
+References: <20180208111732.09869f84@redhat.com>
+	<20180208203342.GE13981@localhost.localdomain>
+	<f8157f02-4c16-6811-7857-e1ec4d55d49c@linux.vnet.ibm.com>
+	<20180209084949.569007d7@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Fri, 9 Feb 2018 15:16:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/1] .travis.yml: add --disable-linux-user for
- some jobs
+In-Reply-To: <20180209084949.569007d7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <c588a9df-1e72-b592-774b-614dedaacd2e@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +45,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Luiz Capitulino <lcapitulino@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, berrange@redhat.com
 
-The modules and co-routine builds are only really relevant to softmmu
-builds and regularly timeout on Travis. Let's disable linux-user
-builds here for more headroom.
+On 09.02.2018 14:49, Luiz Capitulino wrote:
+> On Fri, 9 Feb 2018 08:56:19 +0100
+> Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+> 
+>> On 08.02.2018 21:33, Eduardo Habkost wrote:
+>>> On Thu, Feb 08, 2018 at 11:17:32AM -0500, Luiz Capitulino wrote:
+>>> [...]  
+>>>> The "halted" field is somewhat controversial. On the one hand,
+>>>> it offers a convenient way to know if a guest CPU is idle or
+>>>> running. On the other hand, it's a field that can change many
+>>>> times a second. In fact, the halted state can change even
+>>>> before query-cpus-fast has returned. This makes one wonder if
+>>>> this field should be dropped all together. Having the "halted"
+>>>> field as optional gives a better option for dropping it in
+>>>> the future, since we can just stop returning it.  
+>>>
+>>> I'd just drop it, unless we find a use case where it's really
+>>> useful.
+> 
+> I don't think there's any, unless for debugging purposes.
+> 
+> I'm keeping it mainly for s390. Viktor, libvirt is still using
+> this field in s390, no?
+see below
+> 
+> Dropping halted and having management software still using query-cpus
+> because of halted would be a total failure of query-cpus-fast.
+> 
+>>> Also, the code that sets/clears cpu->halted is target-specific,
+>>> so I wouldn't be so sure that simply checking for
+>>> !kvm_irqchip_in_kernel() is enough on all targets.
+> 
+> I checked the code and had the impression it was enough, but
+> I don't have experience with other archs. So, would be nice
+> if other archs maintainers could review this. I'll try to ping them.
+> 
+>> Right, the present patch effectively disables halted anyway (including
+>> s390). 
+> 
+> No, it doesn't. It only disables halted for archs that require going
+> to the kernel to get it.>
+>> So it may be cleaner to just drop it right now.
+>> Assuming the presence of architecure-specific data, libvirt can derive a
+>> halted state (or an equivalent thereof) from query-cpus-fast returned
+>> information.
+> 
+> This is a different proposal. You're proposing moving the halted state
+> to a CPU-specific field. This is doable if that's what we want.
+> 
+In order to use query-cpus-fast, libvirt has to change code anyway.
+Since libvirt is only providing cpu.n.halted for s390, and this value
+can be derived from the cpu-state, there's no need for QEMU to return
+halted in query-cpus-fast any more.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-diff --git a/.travis.yml b/.travis.yml
-index 01a57399b5..0dd5020552 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -52,9 +52,9 @@ env:
-     - CONFIG=""
-     - CONFIG="--enable-debug --enable-debug-tcg --enable-trace-backends=log"
-     - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-uuid --disable-libusb"
--    - CONFIG="--enable-modules"
--    - CONFIG="--with-coroutine=ucontext"
--    - CONFIG="--with-coroutine=sigaltstack"
-+    - CONFIG="--enable-modules --disable-linux-user"
-+    - CONFIG="--with-coroutine=ucontext --disable-linux-user"
-+    - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
- git:
-   # we want to do this ourselves
-   submodules: false
 -- 
-2.15.1
+Regards,
+ Viktor Mihajlovski
