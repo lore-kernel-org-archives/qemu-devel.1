@@ -1,41 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ek4Du-0000WW-6f
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:39:59 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ek4FB-0001YE-QU
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:41:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ek4Dp-00010N-97
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:39:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41418
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ek4Dp-000105-37
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:39:53 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w198dFDv043427
-	for <qemu-devel@nongnu.org>; Fri, 9 Feb 2018 03:39:52 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g16tq3n3q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 03:39:51 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 9 Feb 2018 08:39:50 -0000
-References: <20180208095752.23960-1-borntraeger@de.ibm.com>
-	<f889c2c4-aae1-a7c1-7024-db0ace96b36a@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 9 Feb 2018 09:39:46 +0100
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ek4F6-0001Rm-VO
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:41:17 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45565)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1ek4F6-0001RZ-PQ
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:41:12 -0500
+Received: by mail-wr0-x244.google.com with SMTP id h9so7360902wre.12
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 00:41:12 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
+From: Paolo Bonzini <bonzini@gnu.org>
+Message-ID: <5100a4b2-0fe4-b6be-5d6f-4b61a23dc870@gnu.org>
+Date: Fri, 9 Feb 2018 09:41:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <f889c2c4-aae1-a7c1-7024-db0ace96b36a@redhat.com>
+In-Reply-To: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <1598c244-d2ae-e78d-c0c6-9a575290313b@de.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7] s390x/cpu: expose the guest crash
- information
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_DEDICATED hint CPUID
+ feature bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,69 +32,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+On 08/02/2018 10:44, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> Add PV_DEDICATED hint cpuid feature bit.
 
+Please add a new feature word, since this is not a PV feature but more
+like a performance hint.
 
-On 02/08/2018 03:20 PM, Eric Blake wrote:
-> On 02/08/2018 03:57 AM, Christian Borntraeger wrote:
->> This patch is the s390 implementation of guest crash information,
->> similar to commit d187e08dc4 ("i386/cpu: add crash-information QOM
->> property") and the related commits. We will detect several crash
->> reasons, with the "disabled wait" being the most important one, since
->> this is used by all s390 guests as a "panic like" notification.
->>
->=20
->> Co-authored-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->=20
->> +##
->> +# @GuestPanicInformationS390:
->> +#
->> +# S390 specific guest panic information (PSW)
->> +#
->> +# @core: core id of the CPU that crashed
->> +# @psw-mask: control fields of guest PSW
->> +# @psw-addr: guest instruction address
->> +# @reason: guest crash reason in human readable form
->> +#
->> +# Since: 2.12
->> +##
->> +{'struct': 'GuestPanicInformationS390',
->> + 'data': { 'core': 'uint32',
->=20
-> Should core be optional,...
->=20
->=20
->> +static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
->> +{
->> +=C2=A0=C2=A0=C2=A0 GuestPanicInformation *panic_info;
->> +=C2=A0=C2=A0=C2=A0 S390CPU *cpu =3D S390_CPU(cs);
->> +
->> +=C2=A0=C2=A0=C2=A0 cpu_synchronize_state(cs);
->> +=C2=A0=C2=A0=C2=A0 panic_info =3D g_malloc0(sizeof(GuestPanicInformat=
-ion));
->> +
->> +=C2=A0=C2=A0=C2=A0 panic_info->type =3D GUEST_PANIC_INFORMATION_TYPE_=
-S390;
->> +#if !defined(CONFIG_USER_ONLY)
->> +=C2=A0=C2=A0=C2=A0 panic_info->u.s390.core =3D cpu->env.core_id;
->> +#endif
->=20
-> ...given that it is only conditionally assigned?=C2=A0 If so, you'd als=
-o need to set panic_info->u.s390.has_core when you have a core id to expo=
-se.
+Thanks,
 
-So after some irc discussion with Daniel and Erik, I plan to add
+Paolo
 
-#else
-    panic_info->u.s390.core =3D 0;
-
-for two reasons
-- this interface is likely never used for linux-user
-- linux-user does not know about CPU numbers, so using 0 is a good defaul=
-t
-
-an optional item seems like overkill interface-wise.
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  target/i386/cpu.c | 4 ++++
+>  target/i386/cpu.h | 3 +++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index d70954b..cf48931 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+>              x86_cpu_get_supported_feature_word(w, false);
+>          uint32_t requested_features = env->features[w];
+>          env->features[w] &= host_feat;
+> +        if (cpu->pv_dedicated && (w == FEAT_KVM)) {
+> +            env->features[w] |= CPUID_PV_DEDICATED;
+> +        }
+>          cpu->filtered_features[w] = requested_features & ~env->features[w];
+>          if (cpu->filtered_features[w]) {
+>              rv = 1;
+> @@ -4682,6 +4685,7 @@ static Property x86_cpu_properties[] = {
+>                       false),
+>      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+>      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+> +    DEFINE_PROP_BOOL("pv-dedicated", X86CPU, pv_dedicated, false),
+>  
+>      /*
+>       * From "Requirements for Implementing the Microsoft
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index f91e37d..8000da5 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -672,6 +672,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  
+>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+>  
+> +#define CPUID_PV_DEDICATED     (1U << 8)
+> +
+>  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+>  #define CPUID_XSAVE_XSAVEC     (1U << 1)
+>  #define CPUID_XSAVE_XGETBV1    (1U << 2)
+> @@ -1276,6 +1278,7 @@ struct X86CPU {
+>      bool expose_kvm;
+>      bool expose_tcg;
+>      bool migratable;
+> +    bool pv_dedicated;
+>      bool max_features; /* Enable all supported features automatically */
+>      uint32_t apic_id;
+>  
+> 
