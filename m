@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ekE6R-0002Db-RM
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:12:59 -0500
+	(envelope-from <shaun.reitan@ndchost.com>) id 1ekE7G-00030K-Fc
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:13:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ekE6Q-00026V-L8
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:12:55 -0500
-Resent-Message-Id: <E1ekE6Q-00026V-L8@eggs.gnu.org>
-In-Reply-To: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151820354708.363.17461195274790908336@bdbb90650ae5>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 9 Feb 2018 11:12:28 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCHv2 00/12] cuda: various fixes, tidy-ups,
- and move 6522 to separate device
+	(envelope-from <shaun.reitan@ndchost.com>) id 1ekE7B-0002wb-HJ
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:13:46 -0500
+Received: from jade.ndchost.com ([204.10.36.36]:43294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shaun.reitan@ndchost.com>)
+	id 1ekE7B-00027t-AG
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:13:41 -0500
+From: "Shaun Reitan" <shaun.reitan@ndchost.com>
+Date: Fri, 09 Feb 2018 19:12:59 +0000
+Message-Id: <embe7de3dd-331d-44fe-9c32-75916c902fb6@ndc-wkst-2>
+Reply-To: "Shaun Reitan" <shaun.reitan@ndchost.com>
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] QEMU leaves pidfile behind on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjA5MTg1MTQyLjE3MTUxLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
-Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSHYyIDAwLzEyXSBjdWRhOiB2YXJpb3Vz
-IGZpeGVzLCB0aWR5LXVwcywgYW5kIG1vdmUgNjUyMiB0byBzZXBhcmF0ZSBkZXZpY2UKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
-aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
-LzIwMTgwMjA5MTg1MTQyLjE3MTUxLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsgLT4g
-cGF0Y2hldy8yMDE4MDIwOTE4NTE0Mi4xNzE1MS0xLW1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNv
-LnVrClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOGZmYzA5ZGUwNyBjdWRhOiBjb252
-ZXJ0IHRvIHRyYWNlLWV2ZW50cwplMmU2ODE3YmYzIHBwYzogbW92ZSBDVURBU3RhdGUgYW5kIG90
-aGVyIENVREEtcmVsYXRlZCBkZWZpbml0aW9ucyBpbnRvIHNlcGFyYXRlIGN1ZGEuaCBmaWxlCmE0
-OWQyODAwYWEgY3VkYTogY29udmVydCB0byB1c2UgdGhlIHNoYXJlZCBtb3M2NTIyIGRldmljZQo3
-ODNkMjk5MTE1IG1pc2M6IGludHJvZHVjZSBuZXcgbW9zNjUyMiBWSUEgZGV2aWNlIGFuZCBlbmFi
-bGUgaXQgZm9yIHBwYyBidWlsZHMKNDY3YjA3ZTIyZCBjdWRhOiBmYWN0b3Igb3V0IHRpbWViYXNl
-LWRlcml2ZWQgY291bnRlciB2YWx1ZSBhbmQgbG9hZCB0aW1lCjFiZjI5NGM1YTQgY3VkYTogc2V0
-IHRpbWVyIDEgZnJlcXVlbmN5IHByb3BlcnR5IHRvIENVREFfVElNRVJfRlJFUQpmZGQyODk5Yzg4
-IGN1ZGE6IG1pbm9yIGNvc21ldGljIHRpZHktdXBzIHRvIGdldF9uZXh0X2lycV90aW1lKCkKMWI5
-YTcwZWNmOCBjdWRhOiByZW5hbWUgZnJlcXVlbmN5IHByb3BlcnR5IHRvIHRiX2ZyZXF1ZW5jeQpm
-ODBhMGVkOGVlIGN1ZGE6IGludHJvZHVjZSBDVURBU3RhdGUgcGFyYW1ldGVyIHRvIGdldF9jb3Vu
-dGVyKCkKMWQ4MTRhMTVkYSBjdWRhOiBkb24ndCBjYWxsIGN1ZGFfdXBkYXRlKCkgd2hlbiB3cml0
-aW5nIHRvIEFDUiByZWdpc3RlcgpjMzdmMTY1NTM4IGN1ZGE6IGRvbid0IGFsbG93IHdyaXRlcyB0
-byBwb3J0IG91dHB1dCBwaW5zCjE2N2I2ZDUwZjggY3VkYTogZG8gbm90IHVzZSBvbGRfbW1pbyBh
-Y2Nlc3NlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMjogY3VkYTog
-ZG8gbm90IHVzZSBvbGRfbW1pbyBhY2Nlc3Nlcy4uLgpDaGVja2luZyBQQVRDSCAyLzEyOiBjdWRh
-OiBkb24ndCBhbGxvdyB3cml0ZXMgdG8gcG9ydCBvdXRwdXQgcGlucy4uLgpDaGVja2luZyBQQVRD
-SCAzLzEyOiBjdWRhOiBkb24ndCBjYWxsIGN1ZGFfdXBkYXRlKCkgd2hlbiB3cml0aW5nIHRvIEFD
-UiByZWdpc3Rlci4uLgpDaGVja2luZyBQQVRDSCA0LzEyOiBjdWRhOiBpbnRyb2R1Y2UgQ1VEQVN0
-YXRlIHBhcmFtZXRlciB0byBnZXRfY291bnRlcigpLi4uCkNoZWNraW5nIFBBVENIIDUvMTI6IGN1
-ZGE6IHJlbmFtZSBmcmVxdWVuY3kgcHJvcGVydHkgdG8gdGJfZnJlcXVlbmN5Li4uCkNoZWNraW5n
-IFBBVENIIDYvMTI6IGN1ZGE6IG1pbm9yIGNvc21ldGljIHRpZHktdXBzIHRvIGdldF9uZXh0X2ly
-cV90aW1lKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMjogY3VkYTogc2V0IHRpbWVyIDEgZnJlcXVl
-bmN5IHByb3BlcnR5IHRvIENVREFfVElNRVJfRlJFUS4uLgpDaGVja2luZyBQQVRDSCA4LzEyOiBj
-dWRhOiBmYWN0b3Igb3V0IHRpbWViYXNlLWRlcml2ZWQgY291bnRlciB2YWx1ZSBhbmQgbG9hZCB0
-aW1lLi4uCkNoZWNraW5nIFBBVENIIDkvMTI6IG1pc2M6IGludHJvZHVjZSBuZXcgbW9zNjUyMiBW
-SUEgZGV2aWNlIGFuZCBlbmFibGUgaXQgZm9yIHBwYyBidWlsZHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTAvMTI6IGN1ZGE6IGNvbnZlcnQgdG8gdXNlIHRoZSBzaGFyZWQgbW9zNjUyMiBkZXZpY2UuLi4K
-RVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMzMTogRklMRTogaHcvbWlzYy9tYWNp
-by9jdWRhLmM6MzY6CisvLyNkZWZpbmUgREVCVUdfQ1VEQV9QQUNLRVQKCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgODk3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDExLzEyOiBwcGM6IG1vdmUgQ1VEQVN0YXRl
-IGFuZCBvdGhlciBDVURBLXJlbGF0ZWQgZGVmaW5pdGlvbnMgaW50byBzZXBhcmF0ZSBjdWRhLmgg
-ZmlsZS4uLgpDaGVja2luZyBQQVRDSCAxMi8xMjogY3VkYTogY29udmVydCB0byB0cmFjZS1ldmVu
-dHMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QGZyZWVsaXN0cy5vcmc=
+QEMU leaves the pidfile behind on a clean exit when using the option=20
+-pidfile /var/run/qemu.pid.
+
+Should QEMU leave it behind or should it clean up after itself?
+
+I'm willing to take a crack at a patch to fix the issue, but before I=20
+do, I want to make sure that leaving the pidfile behind was not=20
+intentional?
+
+--
+Shaun Reitan
+NDCHost.com
