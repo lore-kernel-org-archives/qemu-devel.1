@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ek968-0002RZ-QO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:52:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1ek9B8-0005VQ-HA
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:57:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ek965-0005NE-Om
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:52:16 -0500
-Date: Fri, 9 Feb 2018 10:16:30 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180209101630.GB30827@stefanha-x1.localdomain>
-References: <20180208162447.10851-1-marcandre.lureau@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ek9B7-0001jN-Ju
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 08:57:26 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-6-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f42167b0-1e63-da16-b007-9b96d70c6c85@redhat.com>
+Date: Fri, 9 Feb 2018 07:57:03 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="eJnRUKwClWJh1Khz"
-Content-Disposition: inline
-In-Reply-To: <20180208162447.10851-1-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] misc: fix spelling
+In-Reply-To: <20180208192328.16550-6-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/27] qcow2: Use BlockdevRef in
+ qcow2_create2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-
---eJnRUKwClWJh1Khz
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 08, 2018 at 05:24:47PM +0100, Marc-Andr=E9 Lureau wrote:
-> s/pupulate/populate
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On 02/08/2018 01:23 PM, Kevin Wolf wrote:
+> Instead of passing a separate BlockDriverState* into qcow2_create2(),
+> make use of the BlockdevRef that is included in BlockdevCreateOptions.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  util/qemu-coroutine-lock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   include/block/block.h |  1 +
+>   block.c               | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>   block/qcow2.c         | 38 ++++++++++++++++++++++++--------------
+>   3 files changed, 72 insertions(+), 14 deletions(-)
+> 
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+> +BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
+> +{
+> +    BlockDriverState *bs = NULL;
+> +    Error *local_err = NULL;
+> +    QObject *obj = NULL;
+> +    QDict *qdict = NULL;
+> +    const char *reference = NULL;
+> +    Visitor *v = NULL;
+> +
+> +    if (ref->type == QTYPE_QSTRING) {
+> +        reference = ref->u.reference;
+> +    } else {
+> +        BlockdevOptions *options = &ref->u.definition;
+> +        assert(ref->type == QTYPE_QDICT);
+> +
+> +        v = qobject_output_visitor_new(&obj);
+> +        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            goto fail;
 
-Stefan
+I like calling the label 'done' or 'out'...
 
---eJnRUKwClWJh1Khz
-Content-Type: application/pgp-signature; name="signature.asc"
+> +        }
+> +        visit_complete(v, &obj);
+> +
+> +        qdict = qobject_to_qdict(obj);
+> +        qdict_flatten(qdict);
+> +
+> +        /* bdrv_open_inherit() defaults to the values in bdrv_flags (for
+> +         * compatibility with other callers) rather than what we want as the
+> +         * real defaults. Apply the defaults here instead. */
+> +        qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
+> +        qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
+> +        qdict_set_default_str(qdict, BDRV_OPT_READ_ONLY, "off");
+> +    }
+> +
+> +    bs = bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, errp);
+> +    obj = NULL;
+> +
+> +fail:
 
------BEGIN PGP SIGNATURE-----
+...since it is also reached as intentional fallthrough on the success 
+path, making 'fail' a misnomer.
 
-iQEcBAEBAgAGBQJafXT+AAoJEJykq7OBq3PIIocH/jkdS/XpdqTzQaQFgaW0MBET
-wIMLchHdZAWbia50ZAZK6O/s+OqxE24tKG05jQJwPZocARM9aF63ODPbzaMSEE+p
-1FfRcv03Xe5HwUL0kNrgO7UxZ8zwzEBu+nRIAbcUBnq3F6BNJyW0lH29/9DkTt5v
-vwKDklqlWuptTHVLmQnMYcC4KE2EOrNsP1dpFipfIo7jSGHFSrYw7LJNjLHscnjd
-8s+G6wC/8i93D3uk2z5kmdmVwz3KRcKxYR2w/eTP7BE1TheaELUCj4di2/TsFRL9
-eVBpwFO7e5FSdxHKj/ZVsfoMPaPBtzPRxJumQDTonq7U3Q99a7j4ppzEYP8w1f8=
-=z0qL
------END PGP SIGNATURE-----
+> +    qobject_decref(obj);
+> +    visit_free(v);
+> +    return bs;
+> +}
+> +
 
---eJnRUKwClWJh1Khz--
+Otherwise,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
