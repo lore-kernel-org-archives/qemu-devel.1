@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ek2kV-00058X-VJ
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:05:33 -0500
+	(envelope-from <fzheng@redhat.com>) id 1ek2lE-0005YZ-Da
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:06:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ek2kQ-0008N9-QY
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:05:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49652 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ek2kQ-0008Kj-Ky
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:05:26 -0500
-Date: Fri, 9 Feb 2018 15:05:11 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180209070511.GD2783@xz-mi>
-References: <20180207000731.32764.95992.stgit@gimli.home>
+	(envelope-from <fzheng@redhat.com>) id 1ek2l9-0000DA-C3
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:06:16 -0500
+Received: from mail-vk0-f41.google.com ([209.85.213.41]:40272)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1ek2l9-0000Cx-7e
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:06:11 -0500
+Received: by mail-vk0-f41.google.com with SMTP id h69so4287685vke.7
+	for <qemu-devel@nongnu.org>; Thu, 08 Feb 2018 23:06:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180207000731.32764.95992.stgit@gimli.home>
-Subject: Re: [Qemu-devel] [RFC PATCH] vfio/pci: Add ioeventfd support
+In-Reply-To: <CALAZnb1PU2gFG7gsewNvqZJsPXS=qyzZsT63eMsEG+2BdqU0fA@mail.gmail.com>
+References: <7e30d2cc-6c42-15e9-78ef-1085e081a386@redhat.com>
+	<CAKmqyKOgFg09RAQQVfxHr2OfaNmYouhH=2nu+NT1uD87qZXzUg@mail.gmail.com>
+	<b4b9f8f0-38f3-adc5-6dbb-13d5cc7cb41f@redhat.com>
+	<CALAZnb1PU2gFG7gsewNvqZJsPXS=qyzZsT63eMsEG+2BdqU0fA@mail.gmail.com>
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 9 Feb 2018 15:05:40 +0800
+Message-ID: <CAK1Eb9kqgXyG0zRautcUkB9nBV6+wbbZg5fuL7v4DTJKfiR5iA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Functional tests (AKA Avocado-based tests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +30,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
+To: Amador Pahim <apahim@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Jeff Nelson <jen@redhat.com>
 
-On Tue, Feb 06, 2018 at 05:08:14PM -0700, Alex Williamson wrote:
+On Thu, Jan 18, 2018 at 5:07 PM, Amador Pahim <apahim@redhat.com> wrote:
+> Expanding on that, the vmimage lib downloads and caches the so called
+> "cloud images" from distros own repositories. Here's[1] some
+> documentation with usage examples, including one example on how to add
+> your own image provider.
 
-[...]
-
-> +long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
-> +			uint64_t data, int count, int fd)
-> +{
-> +	struct pci_dev *pdev = vdev->pdev;
-> +	loff_t pos = offset & VFIO_PCI_OFFSET_MASK;
-> +	int ret, bar = VFIO_PCI_OFFSET_TO_INDEX(offset);
-> +	struct vfio_pci_ioeventfd *ioeventfd;
-> +	int (*handler)(void *, void *);
-> +	unsigned long val;
-> +
-> +	/* Only support ioeventfds into BARs */
-> +	if (bar > VFIO_PCI_BAR5_REGION_INDEX)
-> +		return -EINVAL;
-> +
-> +	if (pos + count > pci_resource_len(pdev, bar))
-> +		return -EINVAL;
-> +
-> +	/* Disallow ioeventfds working around MSI-X table writes */
-> +	if (bar == vdev->msix_bar &&
-> +	    !(pos + count <= vdev->msix_offset ||
-> +	      pos >= vdev->msix_offset + vdev->msix_size))
-> +		return -EINVAL;
-> +
-> +	switch (count) {
-> +	case 1:
-> +		handler = &vfio_pci_ioeventfd_handler8;
-> +		val = data;
-> +		break;
-> +	case 2:
-> +		handler = &vfio_pci_ioeventfd_handler16;
-> +		val = le16_to_cpu(data);
-> +		break;
-> +	case 4:
-> +		handler = &vfio_pci_ioeventfd_handler32;
-> +		val = le32_to_cpu(data);
-> +		break;
-> +#ifdef iowrite64
-> +	case 8:
-> +		handler = &vfio_pci_ioeventfd_handler64;
-> +		val = le64_to_cpu(data);
-> +		break;
-> +#endif
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret = vfio_pci_setup_barmap(vdev, bar);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mutex_lock(&vdev->ioeventfds_lock);
-> +
-> +	list_for_each_entry(ioeventfd, &vdev->ioeventfds_list, next) {
-> +		if (ioeventfd->pos == pos && ioeventfd->bar == bar &&
-> +		    ioeventfd->data == data && ioeventfd->count == count) {
-> +			if (fd == -1) {
-> +				vfio_virqfd_disable(&ioeventfd->virqfd);
-> +				list_del(&ioeventfd->next);
-> +				kfree(ioeventfd);
-> +				ret = 0;
-> +			} else
-> +				ret = -EEXIST;
-> +
-> +			goto out_unlock;
-> +		}
-> +	}
-> +
-> +	if (fd < 0) {
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ioeventfd = kzalloc(sizeof(*ioeventfd), GFP_KERNEL);
-> +	if (!ioeventfd) {
-> +		ret = -ENOMEM;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ioeventfd->pos = pos;
-> +	ioeventfd->bar = bar;
-> +	ioeventfd->data = data;
-> +	ioeventfd->count = count;
-> +
-> +	ret = vfio_virqfd_enable(vdev->barmap[ioeventfd->bar] + ioeventfd->pos,
-> +				 handler, NULL, (void *)val,
-> +				 &ioeventfd->virqfd, fd);
-> +	if (ret) {
-> +		kfree(ioeventfd);
-> +		goto out_unlock;
-> +	}
-> +
-> +	list_add(&ioeventfd->next, &vdev->ioeventfds_list);
-
-Is there a limit on how many ioeventfds that can be created?
-
-IIUC we'll create this eventfd "automatically" if a MMIO addr/data
-triggered continuously for N=10 times, then would it be safer we have
-a limitation on maximum eventfds?  Or not sure whether a malicious
-guest can consume the host memory by sending:
-
-- addr1/data1, 10 times
-- addr2/data2, 10 times
-- ...
-
-To create unlimited ioeventfds?  Thanks,
-
--- 
-Peter Xu
+Linux distributions are easy anyway, and sometimes even Docker is
+simpler and good enough ($QEMU/tests/docker). Other architectures and
+OS families, such as non-x86_64, BSD, Windows, macOS are all difficult
+topics. $QEMU/tests/vm tried to attack that but is still not complete.
+What are your thoughts on that subject?
