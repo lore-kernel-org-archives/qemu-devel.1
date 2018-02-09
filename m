@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ek9dP-0007zI-1a
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:26:40 -0500
+	(envelope-from <kernellwp@gmail.com>) id 1ek9eB-00009s-Ii
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:27:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ek9dN-0007yt-FS
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:26:39 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33834)
+	(envelope-from <kernellwp@gmail.com>) id 1ek9eA-00008W-Eb
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:27:27 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:39616)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1ek9dN-0007y3-85
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:26:37 -0500
-Received: by mail-oi0-x244.google.com with SMTP id k15so6234317oib.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:26:37 -0800 (PST)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1ek9eA-000081-7o
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:27:26 -0500
+Received: by mail-ot0-x241.google.com with SMTP id f18so7870441otf.6
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:27:26 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180209124638.GH13981@localhost.localdomain>
+In-Reply-To: <5100a4b2-0fe4-b6be-5d6f-4b61a23dc870@gnu.org>
 References: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
-	<20180208181207.GB13981@localhost.localdomain>
-	<fcb084ce-1615-f100-4137-e0fa46098d7b@redhat.com>
-	<20180209114615.GG13981@localhost.localdomain>
-	<CANRm+CyJi0r-Gm=ivJDwBhsW1dM5tAhBBx84G+miOQDaF+nLUw@mail.gmail.com>
-	<20180209124638.GH13981@localhost.localdomain>
+	<5100a4b2-0fe4-b6be-5d6f-4b61a23dc870@gnu.org>
 From: Wanpeng Li <kernellwp@gmail.com>
-Date: Fri, 9 Feb 2018 22:26:36 +0800
-Message-ID: <CANRm+Cwby0RmP7W_fzsWc2Qd9k4QjBRT=jQoXXNHfpavQ44nWw@mail.gmail.com>
+Date: Fri, 9 Feb 2018 22:27:25 +0800
+Message-ID: <CANRm+CyNRXfvb0G4Bwo0mVwJryEJp=gYWGWejwGo6jm4t2bahg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_DEDICATED hint CPUID
  feature bit
 List-Id: <qemu-devel.nongnu.org>
@@ -33,132 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Paolo Bonzini <bonzini@gnu.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-2018-02-09 20:46 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
-> On Fri, Feb 09, 2018 at 08:24:26PM +0800, Wanpeng Li wrote:
->> 2018-02-09 19:46 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
->> > On Fri, Feb 09, 2018 at 09:41:41AM +0100, Paolo Bonzini wrote:
->> >> On 08/02/2018 19:12, Eduardo Habkost wrote:
->> >> > On Thu, Feb 08, 2018 at 05:44:20PM +0800, Wanpeng Li wrote:
->> >> >> From: Wanpeng Li <wanpengli@tencent.com>
->> >> >>
->> >> >> Add PV_DEDICATED hint cpuid feature bit.
->> >> >>
->> >> > [...]
->> >> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> >> >> index d70954b..cf48931 100644
->> >> >> --- a/target/i386/cpu.c
->> >> >> +++ b/target/i386/cpu.c
->> >> >> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
->> >> >>              x86_cpu_get_supported_feature_word(w, false);
->> >> >>          uint32_t requested_features = env->features[w];
->> >> >>          env->features[w] &= host_feat;
->> >> >> +        if (cpu->pv_dedicated && (w == FEAT_KVM)) {
->> >> >> +            env->features[w] |= CPUID_PV_DEDICATED;
->> >> >> +        }
->> >> >
->> >> > Why do this trick here instead of just adding "pv-dedicated" to
->> >> > feature_word_info[FEAT_KVM].feat_names?
->> >>
->> >> I think because it can be added independent of KVM_GET_SUPPORTED_CPUID.
->> >
->> > If QEMU knows it can be enabled if outside GET_SUPPORTED_CPUID,
->> > kvm_arch_get_supported_cpuid() can return it as supported.
+2018-02-09 16:41 GMT+08:00 Paolo Bonzini <bonzini@gnu.org>:
+> On 08/02/2018 10:44, Wanpeng Li wrote:
+>> From: Wanpeng Li <wanpengli@tencent.com>
 >>
->> The guest fails to detect the new cpuid this time.
+>> Add PV_DEDICATED hint cpuid feature bit.
 >
-> This should fix it:
->
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index a0aad808bd..44ee524188 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -804,6 +804,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          c = &cpuid_data.entries[cpuid_i++];
->          c->function = KVM_CPUID_FEATURES | kvm_base;
->          c->eax = env->features[FEAT_KVM];
-> +        c->edx = env->features[FEAT_KVM_HINTS];
->      }
->
->      cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
->
+> Please add a new feature word, since this is not a PV feature but more
+> like a performance hint.
 
-Yeah, thanks, fold this in v2.
+Do it in v2.
 
 Regards,
 Wanpeng Li
 
+>
+> Thanks,
+>
+> Paolo
+>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>> ---
+>>  target/i386/cpu.c | 4 ++++
+>>  target/i386/cpu.h | 3 +++
+>>  2 files changed, 7 insertions(+)
 >>
 >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index d70954b..e2974ad 100644
+>> index d70954b..cf48931 100644
 >> --- a/target/i386/cpu.c
 >> +++ b/target/i386/cpu.c
->> @@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->>          .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EAX,
->>          .tcg_features = TCG_KVM_FEATURES,
->>      },
->> +    [FEAT_KVM_HINTS] = {
->> +        .feat_names = {
->> +            "hint-dedicated", NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +        },
->> +        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EDX,
->> +        .tcg_features = TCG_KVM_FEATURES,
->> +    },
->>      [FEAT_HYPERV_EAX] = {
->>          .feat_names = {
->>              NULL /* hv_msr_vp_runtime_access */, NULL /*
->> hv_msr_time_refcount_access */,
+>> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+>>              x86_cpu_get_supported_feature_word(w, false);
+>>          uint32_t requested_features =3D env->features[w];
+>>          env->features[w] &=3D host_feat;
+>> +        if (cpu->pv_dedicated && (w =3D=3D FEAT_KVM)) {
+>> +            env->features[w] |=3D CPUID_PV_DEDICATED;
+>> +        }
+>>          cpu->filtered_features[w] =3D requested_features & ~env->featur=
+es[w];
+>>          if (cpu->filtered_features[w]) {
+>>              rv =3D 1;
+>> @@ -4682,6 +4685,7 @@ static Property x86_cpu_properties[] =3D {
+>>                       false),
+>>      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, tr=
+ue),
+>>      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+>> +    DEFINE_PROP_BOOL("pv-dedicated", X86CPU, pv_dedicated, false),
+>>
+>>      /*
+>>       * From "Requirements for Implementing the Microsoft
 >> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index f91e37d..9f73692 100644
+>> index f91e37d..8000da5 100644
 >> --- a/target/i386/cpu.h
 >> +++ b/target/i386/cpu.h
->> @@ -475,6 +475,7 @@ typedef enum FeatureWord {
->>      FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
->>      FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
->>      FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
->> +    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
->>      FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
->>      FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
->>      FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
->> @@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply
->> Accumulation Single Precision */
->>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+>> @@ -672,6 +672,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
 >>
->> +#define KVM_HINTS_DEDICATED (1U << 0)
+>>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Predi=
+ction Barrier */
+>>
+>> +#define CPUID_PV_DEDICATED     (1U << 8)
 >> +
->>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch
->> Prediction Barrier */
->>
 >>  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index ad4b159..a0aad80 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s,
->> uint32_t function,
->>          if (!kvm_irqchip_in_kernel()) {
->>              ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
->>          }
->> +    } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
->> +        ret |= KVM_HINTS_DEDICATED;
->> +        found = 1;
->>      }
->>
->>      /* fallback for older kernels */
+>>  #define CPUID_XSAVE_XSAVEC     (1U << 1)
+>>  #define CPUID_XSAVE_XGETBV1    (1U << 2)
+>> @@ -1276,6 +1278,7 @@ struct X86CPU {
+>>      bool expose_kvm;
+>>      bool expose_tcg;
+>>      bool migratable;
+>> +    bool pv_dedicated;
+>>      bool max_features; /* Enable all supported features automatically *=
+/
+>>      uint32_t apic_id;
 >>
 >>
->> Regards,
->> Wanpeng Li
 >
-> --
-> Eduardo
