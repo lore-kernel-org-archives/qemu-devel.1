@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmF-0001Kk-S5
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmG-0001Kn-2v
 	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmC-0004cn-Q4
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:03 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmF-0004e3-5b
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:04 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  9 Feb 2018 18:51:32 +0000
-Message-Id: <20180209185142.17151-3-mark.cave-ayland@ilande.co.uk>
+Date: Fri,  9 Feb 2018 18:51:37 +0000
+Message-Id: <20180209185142.17151-8-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
 References: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCHv2 02/12] cuda: don't allow writes to port
- output pins
+Subject: [Qemu-devel] [PATCHv2 07/12] cuda: set timer 1 frequency property
+ to CUDA_TIMER_FREQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +22,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
 
-Use the direction registers as a mask to ensure that only input pins are
-updated upon write.
+Now that we have successfully decoupled the timebase frequency and the hardware
+timer frequency, set the timer 1 frequency property to CUDA_TIMER_FREQ and alter
+get_next_irq_time() to use it rather than the hard-coded constant.
+
+In addition to this we must now switch the tb_diff calculation over to use the
+timebase frequency now that the hardware clock frequency and the timebase
+frequency are different.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/macio/cuda.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/misc/macio/cuda.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index 6631017ca2..eaa8924f49 100644
+index 408858e688..e00df4a21a 100644
 --- a/hw/misc/macio/cuda.c
 +++ b/hw/misc/macio/cuda.c
-@@ -359,11 +359,11 @@ static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+@@ -158,8 +158,8 @@ static unsigned int get_counter(CUDAState *s, CUDATimer *ti)
+     uint64_t current_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
  
-     switch(addr) {
-     case CUDA_REG_B:
--        s->b = val;
-+        s->b = (s->b & ~s->dirb) | (val & s->dirb);
-         cuda_update(s);
-         break;
-     case CUDA_REG_A:
--        s->a = val;
-+        s->a = (s->a & ~s->dira) | (val & s->dira);
-         break;
-     case CUDA_REG_DIRB:
-         s->dirb = val;
+     /* Reverse of the tb calculation algorithm that Mac OS X uses on bootup. */
+-    tb_diff = get_tb(current_time, ti->tb_frequency) - ti->load_time;
+-    d = (tb_diff * 0xBF401675E5DULL) / (ti->tb_frequency << 24);
++    tb_diff = get_tb(current_time, s->tb_frequency) - ti->load_time;
++    d = (tb_diff * 0xBF401675E5DULL) / (s->tb_frequency << 24);
+ 
+     if (ti->index == 0) {
+         /* the timer goes down from latch to -1 (period of latch + 2) */
+@@ -191,7 +191,7 @@ static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
+ 
+     /* current counter value */
+     d = muldiv64(current_time - ti->load_time,
+-                 CUDA_TIMER_FREQ, NANOSECONDS_PER_SECOND);
++                 ti->frequency, NANOSECONDS_PER_SECOND);
+     /* the timer goes down from latch to -1 (period of latch + 2) */
+     if (d <= (ti->counter_value + 1)) {
+         counter = (ti->counter_value - d) & 0xffff;
+@@ -210,7 +210,7 @@ static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
+     }
+     CUDA_DPRINTF("latch=%d counter=%" PRId64 " delta_next=%" PRId64 "\n",
+                  ti->latch, d, next_time - d);
+-    next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, CUDA_TIMER_FREQ) +
++    next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, ti->frequency) +
+                          ti->load_time;
+     if (next_time <= current_time) {
+         next_time = current_time + 1;
+@@ -879,7 +879,7 @@ static void cuda_realizefn(DeviceState *dev, Error **errp)
+     struct tm tm;
+ 
+     s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer1, s);
+-    s->timers[0].frequency = s->tb_frequency;
++    s->timers[0].frequency = CUDA_TIMER_FREQ;
+     s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer2, s);
+     s->timers[1].frequency = (SCALE_US * 6000) / 4700;
+ 
 -- 
 2.11.0
