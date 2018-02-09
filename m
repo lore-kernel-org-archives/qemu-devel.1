@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6So-000102-Gq
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:32 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sp-00011m-Tn
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sm-0001we-T4
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:30 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46252)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6So-0001yL-R0
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:31 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46254)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6Sm-0001sW-K4
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:28 -0500
+	id 1ek6So-0001td-G9
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:30 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sb-0002Y4-Kr
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:17 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sn-0002cP-Dm
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:29 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:02:47 +0000
-Message-Id: <20180209110314.11766-4-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:03:03 +0000
+Message-Id: <20180209110314.11766-20-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 03/30] target/arm: Add ignore_stackfaults
- argument to v7m_exception_taken()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 19/30] i.MX: Add i.MX7 GPT variant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,165 +32,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In the v8M architecture, if the process of taking an exception
-results in a further exception this is called a derived exception
-(for example, an MPU exception when writing the exception frame to
-memory). If the derived exception happens while pushing the initial
-stack frame, we must ignore any subsequent possible exception
-pushing the callee-saves registers.
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
 
-In preparation for making the stack writes check for exceptions,
-add a return value from v7m_push_stack() and a new parameter to
-v7m_exception_taken(), so that the former can tell the latter that
-it needs to ignore failures to write to the stack. We also plumb
-the argument through to v7m_push_callee_stack(), which is where
-the code to ignore the failures will be.
+Add minimal code needed to allow upstream Linux guest to boot.
 
-(Note that the v8M ARM pseudocode structures this slightly differently:
-derived exceptions cause the attempt to process the original
-exception to be abandoned; then at the top level it calls
-DerivedLateArrival to prioritize the derived exception and call
-TakeException from there. We choose to let the NVIC do the prioritization
-and continue forward with a call to TakeException which will then
-take either the original or the derived exception. The effect is
-the same, but this structure works better for QEMU because we don't
-have a convenient top level place to do the abandon-and-retry logic.)
-
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Cc: yurovsky@gmail.com
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1517324542-6607-4-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 35 +++++++++++++++++++++++------------
- 1 file changed, 23 insertions(+), 12 deletions(-)
+ include/hw/timer/imx_gpt.h |  1 +
+ hw/timer/imx_gpt.c         | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 6062f380d4..c713eea424 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6419,7 +6419,8 @@ static uint32_t arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure)
-     return addr;
- }
+diff --git a/include/hw/timer/imx_gpt.h b/include/hw/timer/imx_gpt.h
+index eac59b2a70..20ccb327c4 100644
+--- a/include/hw/timer/imx_gpt.h
++++ b/include/hw/timer/imx_gpt.h
+@@ -77,6 +77,7 @@
+ #define TYPE_IMX25_GPT "imx25.gpt"
+ #define TYPE_IMX31_GPT "imx31.gpt"
+ #define TYPE_IMX6_GPT "imx6.gpt"
++#define TYPE_IMX7_GPT "imx7.gpt"
  
--static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain)
-+static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-+                                  bool ignore_faults)
- {
-     /* For v8M, push the callee-saves register part of the stack frame.
-      * Compare the v8M pseudocode PushCalleeStack().
-@@ -6453,7 +6454,8 @@ static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain)
-     *frame_sp_p = frameptr;
- }
+ #define TYPE_IMX_GPT TYPE_IMX25_GPT
  
--static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
-+static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-+                                bool ignore_stackfaults)
- {
-     /* Do the "take the exception" parts of exception entry,
-      * but not the pushing of state to the stack. This is
-@@ -6490,7 +6492,8 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
-                  */
-                 if (lr & R_V7M_EXCRET_DCRS_MASK &&
-                     !(dotailchain && (lr & R_V7M_EXCRET_ES_MASK))) {
--                    v7m_push_callee_stack(cpu, lr, dotailchain);
-+                    v7m_push_callee_stack(cpu, lr, dotailchain,
-+                                          ignore_stackfaults);
-                 }
-                 lr |= R_V7M_EXCRET_DCRS_MASK;
-             }
-@@ -6551,10 +6554,13 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
-     env->thumb = addr & 1;
- }
+diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
+index 4b9b54bf2e..65e4ee6bcf 100644
+--- a/hw/timer/imx_gpt.c
++++ b/hw/timer/imx_gpt.c
+@@ -113,6 +113,17 @@ static const IMXClk imx6_gpt_clocks[] = {
+     CLK_HIGH,      /* 111 reference clock */
+ };
  
--static void v7m_push_stack(ARMCPU *cpu)
-+static bool v7m_push_stack(ARMCPU *cpu)
- {
-     /* Do the "set up stack frame" part of exception entry,
-      * similar to pseudocode PushStack().
-+     * Return true if we generate a derived exception (and so
-+     * should ignore further stack faults trying to process
-+     * that derived exception.)
-      */
-     CPUARMState *env = &cpu->env;
-     uint32_t xpsr = xpsr_read(env);
-@@ -6574,6 +6580,8 @@ static void v7m_push_stack(ARMCPU *cpu)
-     v7m_push(env, env->regs[2]);
-     v7m_push(env, env->regs[1]);
-     v7m_push(env, env->regs[0]);
++static const IMXClk imx7_gpt_clocks[] = {
++    CLK_NONE,      /* 000 No clock source */
++    CLK_IPG,       /* 001 ipg_clk, 532MHz*/
++    CLK_IPG_HIGH,  /* 010 ipg_clk_highfreq */
++    CLK_EXT,       /* 011 External clock */
++    CLK_32k,       /* 100 ipg_clk_32k */
++    CLK_HIGH,      /* 101 reference clock */
++    CLK_NONE,      /* 110 not defined */
++    CLK_NONE,      /* 111 not defined */
++};
 +
-+    return false;
+ static void imx_gpt_set_freq(IMXGPTState *s)
+ {
+     uint32_t clksrc = extract32(s->cr, GPT_CR_CLKSRC_SHIFT, 3);
+@@ -512,6 +523,13 @@ static void imx6_gpt_init(Object *obj)
+     s->clocks = imx6_gpt_clocks;
  }
  
- static void do_v7m_exception_exit(ARMCPU *cpu)
-@@ -6719,7 +6727,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     if (sfault) {
-         env->v7m.sfsr |= R_V7M_SFSR_INVER_MASK;
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
--        v7m_exception_taken(cpu, excret, true);
-+        v7m_exception_taken(cpu, excret, true, false);
-         qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
-                       "stackframe: failed EXC_RETURN.ES validity check\n");
-         return;
-@@ -6731,7 +6739,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-          */
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
--        v7m_exception_taken(cpu, excret, true);
-+        v7m_exception_taken(cpu, excret, true, false);
-         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
-                       "stackframe: failed exception return integrity check\n");
-         return;
-@@ -6779,7 +6787,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-                 /* Take a SecureFault on the current stack */
-                 env->v7m.sfsr |= R_V7M_SFSR_INVIS_MASK;
-                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
--                v7m_exception_taken(cpu, excret, true);
-+                v7m_exception_taken(cpu, excret, true, false);
-                 qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
-                               "stackframe: failed exception return integrity "
-                               "signature check\n");
-@@ -6844,7 +6852,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
-                                         env->v7m.secure);
-                 env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
--                v7m_exception_taken(cpu, excret, true);
-+                v7m_exception_taken(cpu, excret, true, false);
-                 qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
-                               "stackframe: failed exception return integrity "
-                               "check\n");
-@@ -6877,11 +6885,13 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-         /* Take an INVPC UsageFault by pushing the stack again;
-          * we know we're v7M so this is never a Secure UsageFault.
-          */
-+        bool ignore_stackfaults;
++static void imx7_gpt_init(Object *obj)
++{
++    IMXGPTState *s = IMX_GPT(obj);
 +
-         assert(!arm_feature(env, ARM_FEATURE_V8));
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, false);
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
--        v7m_push_stack(cpu);
--        v7m_exception_taken(cpu, excret, false);
-+        ignore_stackfaults = v7m_push_stack(cpu);
-+        v7m_exception_taken(cpu, excret, false, ignore_stackfaults);
-         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
-                       "failed exception return integrity check\n");
-         return;
-@@ -7122,6 +7132,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-     ARMCPU *cpu = ARM_CPU(cs);
-     CPUARMState *env = &cpu->env;
-     uint32_t lr;
-+    bool ignore_stackfaults;
++    s->clocks = imx7_gpt_clocks;
++}
++
+ static const TypeInfo imx25_gpt_info = {
+     .name = TYPE_IMX25_GPT,
+     .parent = TYPE_SYS_BUS_DEVICE,
+@@ -532,11 +550,18 @@ static const TypeInfo imx6_gpt_info = {
+     .instance_init = imx6_gpt_init,
+ };
  
-     arm_log_exception(cs->exception_index);
- 
-@@ -7296,8 +7307,8 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         lr |= R_V7M_EXCRET_MODE_MASK;
-     }
- 
--    v7m_push_stack(cpu);
--    v7m_exception_taken(cpu, lr, false);
-+    ignore_stackfaults = v7m_push_stack(cpu);
-+    v7m_exception_taken(cpu, lr, false, ignore_stackfaults);
-     qemu_log_mask(CPU_LOG_INT, "... as %d\n", env->v7m.exception);
++static const TypeInfo imx7_gpt_info = {
++    .name = TYPE_IMX7_GPT,
++    .parent = TYPE_IMX25_GPT,
++    .instance_init = imx7_gpt_init,
++};
++
+ static void imx_gpt_register_types(void)
+ {
+     type_register_static(&imx25_gpt_info);
+     type_register_static(&imx31_gpt_info);
+     type_register_static(&imx6_gpt_info);
++    type_register_static(&imx7_gpt_info);
  }
  
+ type_init(imx_gpt_register_types)
 -- 
 2.16.1
