@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek4wj-0002Pt-Ev
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:26:18 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ek4wg-0002Mc-9D
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:26:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek4wh-0006OW-Ub
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:26:17 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ek4wb-0006Hm-Uo
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:26:14 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  9 Feb 2018 10:25:18 +0100
-Message-Id: <20180209092524.31348-24-cohuck@redhat.com>
+Date: Fri,  9 Feb 2018 10:25:14 +0100
+Message-Id: <20180209092524.31348-20-cohuck@redhat.com>
 In-Reply-To: <20180209092524.31348-1-cohuck@redhat.com>
 References: <20180209092524.31348-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 23/29] s390x/cpumodel: model PTFF subfunctions
- for Multiple-epoch facility
+Subject: [Qemu-devel] [PULL 19/29] s390x/flic: cache the common flic class
+ in a central function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +25,163 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: David Hildenbrand <david@redhat.com>
 
-For now, the kernel does not properly indicate configured CPU subfunctions
-to the guest, but simply uses the host values (as support in KVM is still
-missing). That's why we missed to model the PTFF subfunctions that come
-with Multiple-epoch facility.
-
-Let's properly add these, along with a new feature group.
+This avoids tons of conversions when handling interrupts.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180205102935.14736-1-david@redhat.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20180129125623.21729-19-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu_features.c     |  5 +++++
- target/s390x/cpu_features_def.h |  4 ++++
- target/s390x/gen-features.c     | 11 +++++++++++
- target/s390x/kvm.c              |  8 ++++++++
- 4 files changed, 28 insertions(+)
+ hw/intc/s390_flic.c          | 13 ++++++++++++-
+ hw/s390x/css.c               | 10 +++++-----
+ hw/s390x/virtio-ccw.c        |  4 ++--
+ include/hw/s390x/s390_flic.h |  1 +
+ target/s390x/interrupt.c     |  6 +++---
+ 5 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 85d10b5710..a5619f2893 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -156,8 +156,12 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("ptff-qpc", S390_FEAT_TYPE_PTFF, 3, "PTFF Query Physical Clock"),
-     FEAT_INIT("ptff-qui", S390_FEAT_TYPE_PTFF, 4, "PTFF Query UTC Information"),
-     FEAT_INIT("ptff-qtou", S390_FEAT_TYPE_PTFF, 5, "PTFF Query TOD Offset User"),
-+    FEAT_INIT("ptff-qsie", S390_FEAT_TYPE_PTFF, 10, "PTFF Query Steering Information Extended"),
-+    FEAT_INIT("ptff-qtoue", S390_FEAT_TYPE_PTFF, 13, "PTFF Query TOD Offset User Extended"),
-     FEAT_INIT("ptff-sto", S390_FEAT_TYPE_PTFF, 65, "PTFF Set TOD Offset"),
-     FEAT_INIT("ptff-stou", S390_FEAT_TYPE_PTFF, 69, "PTFF Set TOD Offset User"),
-+    FEAT_INIT("ptff-stoe", S390_FEAT_TYPE_PTFF, 73, "PTFF Set TOD Offset Extended"),
-+    FEAT_INIT("ptff-stoue", S390_FEAT_TYPE_PTFF, 77, "PTFF Set TOD Offset User Extended"),
+diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+index b46c0f1bb4..a85a149c6d 100644
+--- a/hw/intc/s390_flic.c
++++ b/hw/intc/s390_flic.c
+@@ -22,6 +22,17 @@
+ #include "qapi/error.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
  
-     FEAT_INIT("kmac-dea", S390_FEAT_TYPE_KMAC, 1, "KMAC DEA"),
-     FEAT_INIT("kmac-tdea-128", S390_FEAT_TYPE_KMAC, 2, "KMAC TDEA-128"),
-@@ -445,6 +449,7 @@ static S390FeatGroupDef s390_feature_groups[] = {
-     FEAT_GROUP_INIT("plo", PLO, "Perform-locked-operation facility"),
-     FEAT_GROUP_INIT("tods", TOD_CLOCK_STEERING, "Tod-clock-steering facility"),
-     FEAT_GROUP_INIT("gen13ptff", GEN13_PTFF, "PTFF enhancements introduced with z13"),
-+    FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
-     FEAT_GROUP_INIT("msa", MSA, "Message-security-assist facility"),
-     FEAT_GROUP_INIT("msa1", MSA_EXT_1, "Message-security-assist-extension 1 facility"),
-     FEAT_GROUP_INIT("msa2", MSA_EXT_2, "Message-security-assist-extension 2 facility"),
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index 4d930871b4..7c5915c7b2 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -151,8 +151,12 @@ typedef enum {
-     S390_FEAT_PTFF_QPT,
-     S390_FEAT_PTFF_QUI,
-     S390_FEAT_PTFF_QTOU,
-+    S390_FEAT_PTFF_QSIE,
-+    S390_FEAT_PTFF_QTOUE,
-     S390_FEAT_PTFF_STO,
-     S390_FEAT_PTFF_STOU,
-+    S390_FEAT_PTFF_STOE,
-+    S390_FEAT_PTFF_STOUE,
- 
-     /* KMAC */
-     S390_FEAT_KMAC_DEA,
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 89a140c9a7..f6211b4e6b 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -59,6 +59,12 @@
-     S390_FEAT_PTFF_QTOU, \
-     S390_FEAT_PTFF_STOU
- 
-+#define S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF \
-+    S390_FEAT_PTFF_QSIE, \
-+    S390_FEAT_PTFF_QTOUE, \
-+    S390_FEAT_PTFF_STOE, \
-+    S390_FEAT_PTFF_STOUE
++S390FLICStateClass *s390_get_flic_class(S390FLICState *fs)
++{
++    static S390FLICStateClass *class;
 +
- #define S390_FEAT_GROUP_MSA \
-     S390_FEAT_MSA, \
-     S390_FEAT_KMAC_DEA, \
-@@ -219,6 +225,9 @@ static uint16_t group_TOD_CLOCK_STEERING[] = {
- static uint16_t group_GEN13_PTFF[] = {
-     S390_FEAT_GROUP_GEN13_PTFF,
- };
-+static uint16_t group_MULTIPLE_EPOCH_PTFF[] = {
-+    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
-+};
- static uint16_t group_MSA[] = {
-     S390_FEAT_GROUP_MSA,
- };
-@@ -466,6 +475,7 @@ static uint16_t full_GEN14_GA1[] = {
-     S390_FEAT_CMM_NT,
-     S390_FEAT_HPMA2,
-     S390_FEAT_SIE_KSS,
-+    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
- };
- 
- /* Default features (in order of release)
-@@ -668,6 +678,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
-     FEAT_GROUP_INITIALIZER(PLO),
-     FEAT_GROUP_INITIALIZER(TOD_CLOCK_STEERING),
-     FEAT_GROUP_INITIALIZER(GEN13_PTFF),
-+    FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
-     FEAT_GROUP_INITIALIZER(MSA),
-     FEAT_GROUP_INITIALIZER(MSA_EXT_1),
-     FEAT_GROUP_INITIALIZER(MSA_EXT_2),
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index bfd14723f1..deb870921b 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2221,6 +2221,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         return;
-     }
- 
-+    /* PTFF subfunctions might be indicated although kernel support missing */
-+    if (!test_bit(S390_FEAT_MULTIPLE_EPOCH, model->features)) {
-+        clear_bit(S390_FEAT_PTFF_QSIE, model->features);
-+        clear_bit(S390_FEAT_PTFF_QTOUE, model->features);
-+        clear_bit(S390_FEAT_PTFF_STOE, model->features);
-+        clear_bit(S390_FEAT_PTFF_STOUE, model->features);
++    if (!class) {
++        /* we only have one flic device, so this is fine to cache */
++        class = S390_FLIC_COMMON_GET_CLASS(fs);
 +    }
++    return class;
++}
 +
-     /* with cpu model support, CMM is only indicated if really available */
-     if (kvm_s390_cmma_available()) {
-         set_bit(S390_FEAT_CMM, model->features);
+ QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs)
+ {
+     static QEMUS390FLICState *flic;
+@@ -146,7 +157,7 @@ static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
+                                  uint8_t isc, uint8_t flags)
+ {
+     QEMUS390FLICState *flic = s390_get_qemu_flic(fs);
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+     bool flag = flags & S390_ADAPTER_SUPPRESSIBLE;
+     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
+ 
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 1c526fd7e2..301bf1772f 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -439,7 +439,7 @@ static int s390_io_adapter_map(AdapterInfo *adapter, uint64_t map_addr,
+                                bool do_map)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     return fsc->io_adapter_map(fs, adapter->adapter_id, map_addr, do_map);
+ }
+@@ -520,7 +520,7 @@ void css_register_io_adapters(CssIoAdapterType type, bool swap, bool maskable,
+     int ret, isc;
+     IoAdapter *adapter;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     /*
+      * Disallow multiple registrations for the same device type.
+@@ -566,7 +566,7 @@ static void css_clear_io_interrupt(uint16_t subchannel_id,
+     Error *err = NULL;
+     static bool no_clear_irq;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+     int r;
+ 
+     if (unlikely(no_clear_irq)) {
+@@ -640,7 +640,7 @@ void css_conditional_io_interrupt(SubchDev *sch)
+ int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+     int r;
+ 
+     if (env->psw.mask & PSW_MASK_PSTATE) {
+@@ -666,7 +666,7 @@ out:
+ void css_adapter_interrupt(CssIoAdapterType type, uint8_t isc)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
+     IoAdapter *adapter = channel_subsys.io_adapters[type][isc];
+ 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 3d8f26949b..8f7fbc2ab7 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1111,7 +1111,7 @@ static int virtio_ccw_setup_irqroutes(VirtioCcwDevice *dev, int nvqs)
+     VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+     int ret;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     ret = virtio_ccw_get_mappings(dev);
+     if (ret) {
+@@ -1129,7 +1129,7 @@ static int virtio_ccw_setup_irqroutes(VirtioCcwDevice *dev, int nvqs)
+ static void virtio_ccw_release_irqroutes(VirtioCcwDevice *dev, int nvqs)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     fsc->release_adapter_routes(fs, &dev->routes);
+ }
+diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+index a636afce42..4687ecfe83 100644
+--- a/include/hw/s390x/s390_flic.h
++++ b/include/hw/s390x/s390_flic.h
+@@ -136,6 +136,7 @@ void s390_flic_init(void);
+ 
+ S390FLICState *s390_get_flic(void);
+ QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs);
++S390FLICStateClass *s390_get_flic_class(S390FLICState *fs);
+ bool ais_needed(void *opaque);
+ 
+ #endif /* HW_S390_FLIC_H */
+diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
+index 1947012b25..25cfb3eef8 100644
+--- a/target/s390x/interrupt.c
++++ b/target/s390x/interrupt.c
+@@ -134,7 +134,7 @@ void cpu_inject_stop(S390CPU *cpu)
+ void s390_sclp_extint(uint32_t parm)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     fsc->inject_service(fs, parm);
+ }
+@@ -143,7 +143,7 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+                        uint32_t io_int_parm, uint32_t io_int_word)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     fsc->inject_io(fs, subchannel_id, subchannel_nr, io_int_parm, io_int_word);
+ }
+@@ -151,7 +151,7 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+ void s390_crw_mchk(void)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     fsc->inject_crw_mchk(fs);
+ }
 -- 
 2.13.6
