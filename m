@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ekCRl-0003ta-SI
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 12:26:50 -0500
+	(envelope-from <geert@linux-m68k.org>) id 1ekBCv-0006jT-KD
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:07:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ekCRg-0004hx-Ut
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 12:26:49 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53906 helo=mx1.redhat.com)
+	(envelope-from <geert@linux-m68k.org>) id 1ekBCs-0000sk-Eu
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:07:25 -0500
+Received: from newton.telenet-ops.be ([2a02:1800:120:4::f00:d]:53568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ekCRg-0004hJ-Pj
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 12:26:44 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 652E540FB635
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 17:26:44 +0000 (UTC)
-References: <20180208171807.24267-1-stefanha@redhat.com>
-	<20180208171807.24267-2-stefanha@redhat.com>
-	<ea22850e-f1b3-bcdd-db48-b6060e468296@redhat.com>
-	<20180209172314.GA3129@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <94eef553-a2d6-cfac-9e5a-006ceee74519@redhat.com>
-Date: Fri, 9 Feb 2018 18:26:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180209172314.GA3129@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] block: add BlockBackend->in_flight
- counter
+	(Exim 4.71) (envelope-from <geert@linux-m68k.org>)
+	id 1ekBCs-0000rp-89
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:07:22 -0500
+Received: from xavier.telenet-ops.be (xavier.telenet-ops.be
+	[IPv6:2a02:1800:120:4::f00:14])
+	by newton.telenet-ops.be (Postfix) with ESMTPS id 3zdJvz3FGLzMr19P
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 16:32:15 +0100 (CET)
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+Date: Fri,  9 Feb 2018 16:16:51 +0100
+Message-Id: <1518189413-2761-5-git-send-email-geert+renesas@glider.be>
+In-Reply-To: <1518189413-2761-1-git-send-email-geert+renesas@glider.be>
+References: <1518189413-2761-1-git-send-email-geert+renesas@glider.be>
+Subject: [Qemu-devel] [PATCH/RFC 4/6] arm64: renesas_defconfig: Enable
+ VFIO_PLATFORM and VFIO_NOIOMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: Baptiste Reynal <b.reynal@virtualopensystems.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, kvm@vger.kernel.org, linux-renesas-soc@vger.kernel.org, qemu-devel@nongnu.org, Geert Uytterhoeven <geert+renesas@glider.be>
 
-On 09/02/2018 18:23, Kevin Wolf wrote:
-> Am 09.02.2018 um 17:28 hat Paolo Bonzini geschrieben:
->> On 08/02/2018 18:18, Stefan Hajnoczi wrote:
->>> +    BlockDriverState *bs = blk_bs(blk);
->>> +
->>> +    if (bs) {
->>> +        bdrv_drained_begin(bs);
->>> +    }
->>> +
->>> +    /* We may have aio requests like -ENOMEDIUM in flight */
->>> +    while (atomic_mb_read(&blk->in_flight) > 0) {
->>> +        aio_poll(blk_get_aio_context(blk), true);
->>> +    }
->>> +
->>> +    if (bs) {
->>> +        bdrv_drained_end(bs);
->>
->> This only works if you are in the default AioContext, otherwise you can
->> run handlers for one AioContexts in two threads.
-> 
-> Should aio_poll() assert that it's called in the right thread to make
-> sure we obey the rules?
-> 
->> bdrv_dec_in_flight uses bdrv_wakeup and BDRV_POLL_WHILE to ensure that
->> this doesn't happen, so there would be more code that you have to copy
->> into block-backend.c.
-> 
-> Instead of copying, can't we generalise it into a POLL_WHILE(ctx,
-> wakeup, cond) and make BDRV_POLL_WHILE() a wrapper for that?
+Enable VFIO_PLATFORM for platform device pass-through.
+Enable VFIO_NOIOMMU for devices not part of an IOMMU group.
 
-Yes, or even move bdrv_wakeup to AioContext would do.  We already have
-block layer-specific fields such as the linux-aio state(*).
+Not-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+Not intended for upstream merge.
+---
+ arch/arm64/configs/renesas_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-	(*) though now that linux-aio has been improved to do something
-	    like epoll, there may be a better reason to place linux-aio
-	    state in AioContext.
-
-Paolo
+diff --git a/arch/arm64/configs/renesas_defconfig b/arch/arm64/configs/renesas_defconfig
+index 386211464efa4885..959aa9de8792ae2d 100644
+--- a/arch/arm64/configs/renesas_defconfig
++++ b/arch/arm64/configs/renesas_defconfig
+@@ -259,7 +259,9 @@ CONFIG_DMADEVICES=y
+ CONFIG_RCAR_DMAC=y
+ CONFIG_RENESAS_USB_DMAC=y
+ CONFIG_VFIO=y
++CONFIG_VFIO_NOIOMMU=y
+ CONFIG_VFIO_PCI=y
++CONFIG_VFIO_PLATFORM=y
+ CONFIG_VIRTIO_PCI=y
+ CONFIG_VIRTIO_BALLOON=y
+ CONFIG_VIRTIO_MMIO=y
+-- 
+2.7.4
