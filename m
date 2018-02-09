@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ek9La-0003c9-L6
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:08:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1ek9PK-0006AL-Hk
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:12:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ek9LV-000130-Nz
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:08:14 -0500
-Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:58320)
+	(envelope-from <eblake@redhat.com>) id 1ek9PF-0003zl-R0
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:12:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ek9LV-00010r-HL
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:08:09 -0500
-Received: from player758.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id D1D99195C8E
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 15:08:07 +0100 (CET)
-Date: Fri, 9 Feb 2018 15:06:49 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180209150649.7f557ff9@bahia.lan>
-In-Reply-To: <20180209081858.27013-1-lvivier@redhat.com>
-References: <20180209081858.27013-1-lvivier@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ek9PF-0003zG-IP
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:12:01 -0500
+References: <20180124053957.29145-1-peterx@redhat.com>
+	<20180124053957.29145-2-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5df6f309-c865-7b7f-3a3e-afd23bc17694@redhat.com>
+Date: Fri, 9 Feb 2018 08:10:53 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180124053957.29145-2-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: set vsmt to MAX(8, smp_threads)
+Subject: Re: [Qemu-devel] [PATCH v7 01/23] docs: update QMP documents for
+ OOB commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +29,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Fri,  9 Feb 2018 09:18:58 +0100
-Laurent Vivier <lvivier@redhat.com> wrote:
-
-> We ignore silently the value of smp_threads when we set
-> the default VSMT value, and if smp_threads is greater than VSMT
-> kernel is going into trouble later.
+On 01/23/2018 11:39 PM, Peter Xu wrote:
+> Update both the developer and spec for the new QMP OOB (Out-Of-Band)
+> command.
 > 
-
-Hi Laurent,
-
-I've looked a bit more and I'm not sure what kernel troubles you're referring to,
-but several places in QEMU where we use kvm_ppc_smt() later on do assume that
-smp_threads > kvm_ppc_smt(). Basically, everywhere we compute a vCPU id:
-
-In spapr_init_cpus() when creating DRC connectors:
-
-        int core_id = i * smp_threads;
-
-        if (mc->has_hotpluggable_cpus) {
-            spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
-                                   (core_id / smp_threads) * smt);
-        }
-
-or in spapr_cpu_core_realize() when creating vCPUs:
-
-        cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
-
-It is visible by adding some printfs in the current code base. This is what
-happens when passing -smp cores=2,threads=16 without your patch:
-
-DRC connector to vcpu_id 0
-CPU vcpu_id 0
-CPU vcpu_id 1
-CPU vcpu_id 2
-CPU vcpu_id 3
-CPU vcpu_id 4
-CPU vcpu_id 5
-CPU vcpu_id 6
-CPU vcpu_id 7
-CPU vcpu_id 8
-CPU vcpu_id 9
-CPU vcpu_id 10
-CPU vcpu_id 11
-CPU vcpu_id 12
-CPU vcpu_id 13
-CPU vcpu_id 14
-CPU vcpu_id 15
-DRC connector to vcpu_id 8
-                        ^^^
-                     should be 16
-CPU vcpu_id 8
-           ^^^
-   should start numbering at 16
-CPU vcpu_id 9
-CPU vcpu_id 10
-CPU vcpu_id 11
-CPU vcpu_id 12
-CPU vcpu_id 13
-CPU vcpu_id 14
-CPU vcpu_id 15
-CPU vcpu_id 16
-CPU vcpu_id 17
-CPU vcpu_id 18
-CPU vcpu_id 19
-CPU vcpu_id 20
-CPU vcpu_id 21
-CPU vcpu_id 22
-CPU vcpu_id 23
-qemu-system-ppc64: kvm_init_vcpu failed: File exists
-                                              ^^^^
-                                 CPU 8 already created by the first core
-
-I'm not feeling comfortable with the rest of the code silently depending on
-the fact that spapr_set_vsmt_mode() terminates QEMU if it cannot enforce
-smp_threads <= kvm_ppc_smt().
-
-Anyway, with your patch, the same command line as above gives:
-
-qemu-system-ppc64: Failed to set KVM's VSMT mode to 16 (errno -22)
-On PPC, a VM with 16 threads/core on a host with 8 threads/core requires
- the use of VSMT mode 16.
-This KVM seems to be too old to support VSMT.
-
-This hammer is big enough to fix the vCPU ids miscalculations, so:
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> Fixes: 8904e5a750
-> ("spapr: Adjust default VSMT value for better migration compatibility")
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
+>   docs/devel/qapi-code-gen.txt | 68 ++++++++++++++++++++++++++++++++++++++++----
+>   docs/interop/qmp-spec.txt    | 30 ++++++++++++++++---
+>   2 files changed, 89 insertions(+), 9 deletions(-)
 > 
-> Notes:
->     v3: use MAX(8, smp_threads) and let KVM to return an error
->         if nb_threads is too big
->         update subject to reflect the change
->     
->     v2: display a specific error message when the default VSMT is used
->         fix subject
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 06ab699066..4d3db0ad39 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -554,9 +554,12 @@ following example objects:
+>   
+>   === Commands ===
+>   
+> +--- General Command Layout ---
+> +
+>   Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+>            '*returns': TYPE-NAME, '*boxed': true,
+> -         '*gen': false, '*success-response': false }
+> +         '*gen': false, '*success-response': false,
+> +         '*allow-oob': false }
+>   
+
+Shouldn't this be '*allow-oob': true, as the only time you add the field 
+is if you turn oob on (as it already defaults to off)?
+
+>   Commands are defined by using a dictionary containing several members,
+>   where three members are most common.  The 'command' member is a
+> @@ -636,6 +639,59 @@ possible, the command expression should include the optional key
+>   'success-response' with boolean value false.  So far, only QGA makes
+>   use of this member.
+>   
+> +A command can be declared to support Out-Of-Band (OOB) execution.  By
+> +default, commands do not support OOB.  To declare a command to support
+
+s/to support/that supports/
+
+> +it, we need an extra 'allow-oob' field.  For example:
+> +
+> + { 'command': 'migrate_recover',
+> +   'data': { 'uri': 'str' }, 'allow-oob': true }
+> +
+> +To execute a command in Out-Of-Band way, we need to specify the
+> +"control" field in the request, with "run-oob" set to true. Example:
+> +
+> + => { "execute": "command-support-oob",
+> +      "arguments": { ... },
+> +      "control": { "run-oob": true } }
+> + <= { "return": { } }
+
+This talks more about the QMP user protocol, while the rest of the 
+document is about QAPI constructs.  But we do have an example of 
+'my-first-command' in the document, so I guess this is okay.
+
+> +
+> +Without it, even the commands that support out-of-band execution will
+> +still be run In-Band.
+> +
+> +Please read the "Out-Of-Band Command Execution" section below for more
+> +information on how OOB execution works.
+> +
+> +--- About Out-Of-Band (OOB) Command Execution ---
+
+Do we really need the paragraph mentioning a forward reference, when the 
+very next thing is the item that was referenced?
+
+> +
+> +Out-Of-Band does not mean a special kind of command. Instead, it's a
+> +special way to execute the command.  One normal command can be
+> +declared to support Out-Of-Band execution when 'allow-oob' field is
+> +set to true when defining the command.  With that, it can be run in an
+> +Out-Of-Band way if 'run-oob' is specified in 'control' field of
+> +command request.
+> +
+> +When we say normal QMP command executions, it means basically the
+> +following:
+
+
+Under normal QMP command execution, the following apply to each command:
+
+> +
+> +- They are executed in order,
+> +- They run only in main thread of QEMU,
+> +- They have the BQL taken during execution.
+> +
+> +For OOB command executions, they differ in the following:
+
+When a command is executed with OOB, the following changes occur:
+
+> +
+> +- They can be executed before an existing command,
+
+They can be completed before a pending in-band command,
+
+> +- They run in a monitor dedicated thread,
+> +- They do not take the BQL during execution.
+> +
+> +OOB command handlers must satisfy the following conditions:
+> +
+> +- It executes extremely fast,
+> +- It does not take any lock, or, it can take very small locks if all
+> +  critical regions also follow the rules for OOB command handler code,
+> +- It does not invoke system calls that may block,
+> +- It does not access guest RAM that may block when userfaultfd is
+> +  enabled for postcopy live migration.
+> +
+> +If in doubt, do not implement OOB execution support.
+>   
+>   === Events ===
+>   
+> @@ -739,10 +795,12 @@ references by name.
+>   QAPI schema definitions not reachable that way are omitted.
+>   
+>   The SchemaInfo for a command has meta-type "command", and variant
+> -members "arg-type" and "ret-type".  On the wire, the "arguments"
+> -member of a client's "execute" command must conform to the object type
+> -named by "arg-type".  The "return" member that the server passes in a
+> -success response conforms to the type named by "ret-type".
+> +members "arg-type", "ret-type" and "allow-oob".  On the wire, the
+> +"arguments" member of a client's "execute" command must conform to the
+> +object type named by "arg-type".  The "return" member that the server
+> +passes in a success response conforms to the type named by
+> +"ret-type".  When "allow-oob" is set, it means the command supports
+> +out-of-band execution.
+>   
+>   If the command takes no arguments, "arg-type" names an object type
+>   without members.  Likewise, if the command returns nothing, "ret-type"
+> diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
+> index f8b5356015..e20163c138 100644
+> --- a/docs/interop/qmp-spec.txt
+> +++ b/docs/interop/qmp-spec.txt
+> @@ -83,16 +83,27 @@ The greeting message format is:
+>   2.2.1 Capabilities
+>   ------------------
+>   
+> -As of the date this document was last revised, no server or client
+> -capability strings have been defined.
+> +Currently supported capabilities are:
+>   
+> +- "oob": it means the QMP server supports "Out-Of-Band" command
+> +  execution.  For more detail, please see "run-oob" parameter in
+
+s/detail/details/
+
+> +  "Issuing Commands" section below.  Not all commands allow this "oob"
+> +  execution.  One can know whether one command supports "oob" by
+> +  "query-qmp-schema" command.
+
+The "query-qmp-schema" command can be used to inspect which commands 
+support "oob" execution.
+
+> +
+> +QMP clients can get a list of supported QMP capabilities of the QMP
+> +server in the greeting message mentioned above.  By default, all the
+> +capabilities are off.  To enable a specific or multiple of QMP
+
+s/specific or multiple of/any/
+
+> +capabilities, QMP client needs to send "qmp_capabilities" command with
+
+s/QMP/the QMP
+s/send/send the/
+s/with/with an/
+
+> +extra parameter for the capabilities.
+
+s/the/the requested/
+
+>   
+>   2.3 Issuing Commands
+>   --------------------
+>   
+>   The format for command execution is:
+>   
+> -{ "execute": json-string, "arguments": json-object, "id": json-value }
+> +{ "execute": json-string, "arguments": json-object, "id": json-value,
+> +  "control": json-dict }
+>   
+>    Where,
+>   
+> @@ -102,10 +113,16 @@ The format for command execution is:
+>     required. Each command documents what contents will be considered
+>     valid when handling the json-argument
+>   - The "id" member is a transaction identification associated with the
+> -  command execution, it is optional and will be part of the response if
+> +  command execution.  It is required if OOB is enabled, and optional
+> +  if not.  The same "id" field will be part of the response if
+>     provided. The "id" member can be any json-value, although most
+>     clients merely use a json-number incremented for each successive
+>     command
+> +- The "control" member is optional, and currently only used for
+> +  "out-of-band" execution ("oob" as shortcut). The handling or
+> +  response of an "oob" command can overtake prior in-band commands.
+> +  To enable "oob" feature, just provide a control field with: {
+
+To enable "oob" handling of a particular command,
+
+> +  "control": { "run-oob": true } }
+>   
+>   2.4 Commands Responses
+>   ----------------------
+> @@ -113,6 +130,11 @@ The format for command execution is:
+>   There are two possible responses which the Server will issue as the result
+>   of a command execution: success or error.
+>   
+> +As long as the commands were issued with a proper "id" field, then the
+> +same "id" field will be attached in the corresponding response message
+> +so that requests and responses can match.  Clients should drop all the
+> +responses that are with unknown "id" field.
+> +
+>   2.4.1 success
+>   -------------
+>   
 > 
->  hw/ppc/spapr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 32a876be56..c8a1eefa17 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2310,7 +2310,7 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
->           * the value that we'd get with KVM on POWER8, the
->           * overwhelmingly common case in production systems.
->           */
-> -        spapr->vsmt = 8;
-> +        spapr->vsmt = MAX(8, smp_threads);
->      }
->  
->      /* KVM: If necessary, set the SMT mode: */
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
