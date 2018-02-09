@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekFy1-0005jC-DU
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:12:22 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ekFz7-0006Xo-Gj
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:13:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekFxy-0007wJ-9N
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:12:21 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:46185)
+	(envelope-from <richard.henderson@linaro.org>) id 1ekFz6-0000Es-D0
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:13:29 -0500
+Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:39779)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ekFxy-0007vl-4C
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:12:18 -0500
-Received: by mail-io0-x244.google.com with SMTP id f34so11102751ioi.13
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 13:12:18 -0800 (PST)
+	id 1ekFz6-0000ES-7e
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 16:13:28 -0500
+Received: by mail-it0-x22b.google.com with SMTP id c80so12295312itb.4
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 13:13:28 -0800 (PST)
 References: <20180209165810.6668-1-peter.maydell@linaro.org>
-	<20180209165810.6668-10-peter.maydell@linaro.org>
+	<20180209165810.6668-11-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f4c92c93-286d-567d-8a4e-b247bb634f31@linaro.org>
-Date: Fri, 9 Feb 2018 13:12:14 -0800
+Message-ID: <6c4531a2-7e80-b808-011a-dc0c8db3a640@linaro.org>
+Date: Fri, 9 Feb 2018 13:13:24 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180209165810.6668-10-peter.maydell@linaro.org>
+In-Reply-To: <20180209165810.6668-11-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] target/arm: Add AIRCR to vmstate
- struct
+Subject: Re: [Qemu-devel] [PATCH v2 10/11] target/arm: Migrate v7m.other_sp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,15 +35,21 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 02/09/2018 08:58 AM, Peter Maydell wrote:
-> In commit commit 3b2e934463121 we added support for the AIRCR
-> register holding state, but forgot to add it to the vmstate
-> structs. Since it only holds r/w state if the security extension
-> is implemented, we can just add it to vmstate_m_security.
+> In commit abc24d86cc0364f we accidentally broke migration of
+> the stack pointer value for the mode (process, handler) the CPU
+> is not currently running as. (The commit correctly removed the
+> no-longer-used v7m.current_sp flag from the VMState but also
+> deleted the still very much in use v7m.other_sp SP value field.)
+> 
+> Add a subsection to migrate it again. (We don't need to care
+> about trying to retain compatibility with pre-abc24d86cc0364f
+> versions of QEMU, because that commit bumped the version_id
+> and we've since bumped it again a couple of times.)
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/machine.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  target/arm/machine.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
