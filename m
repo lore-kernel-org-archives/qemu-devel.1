@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sr-00013t-PX
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:35 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6St-000148-KY
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sq-0001zg-Cx
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:33 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46260)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sn-0001xC-DX
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:35 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6Sq-0001y8-3I
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:32 -0500
+	id 1ek6Sn-0001v6-2Y
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:29 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6So-0002cu-Qj
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:30 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sl-0002bh-Oj
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:27 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:03:05 +0000
-Message-Id: <20180209110314.11766-22-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:03:01 +0000
+Message-Id: <20180209110314.11766-18-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 21/30] usb: Add basic code to emulate Chipidea
- USB IP
+Subject: [Qemu-devel] [PULL 17/30] i.MX: Add code to emulate i.MX7 SNVS
+ IP-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,11 +35,8 @@ To: qemu-devel@nongnu.org
 
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
 
-Add code to emulate Chipidea USB IP (used in i.MX SoCs). Tested to
-work against:
-
--usb -drive if=none,id=stick,file=usb.img,format=raw -device \
- usb-storage,bus=usb-bus.0,drive=stick
+Add code to emulate SNVS IP-block. Currently only the bits needed to
+be able to emulate machine shutdown are implemented.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -53,57 +50,35 @@ Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/usb/Makefile.objs      |   1 +
- include/hw/usb/chipidea.h |  16 +++++
- hw/usb/chipidea.c         | 176 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 193 insertions(+)
- create mode 100644 include/hw/usb/chipidea.h
- create mode 100644 hw/usb/chipidea.c
+ hw/misc/Makefile.objs       |  1 +
+ include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
+ hw/misc/imx7_snvs.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 119 insertions(+)
+ create mode 100644 include/hw/misc/imx7_snvs.h
+ create mode 100644 hw/misc/imx7_snvs.c
 
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index fbcd498c59..41be700812 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -12,6 +12,7 @@ common-obj-$(CONFIG_USB_XHCI_NEC) += hcd-xhci-nec.o
- common-obj-$(CONFIG_USB_MUSB) += hcd-musb.o
- 
- obj-$(CONFIG_TUSB6010) += tusb6010.o
-+obj-$(CONFIG_IMX)      += chipidea.o
- 
- # emulated usb devices
- common-obj-$(CONFIG_USB) += dev-hub.o
-diff --git a/include/hw/usb/chipidea.h b/include/hw/usb/chipidea.h
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 4b2b705a6c..019886912c 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx6_ccm.o
+ obj-$(CONFIG_IMX) += imx6_src.o
+ obj-$(CONFIG_IMX) += imx7_ccm.o
+ obj-$(CONFIG_IMX) += imx2_wdt.o
++obj-$(CONFIG_IMX) += imx7_snvs.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+ obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
 new file mode 100644
-index 0000000000..1ec2e9dbda
+index 0000000000..255f8f26f9
 --- /dev/null
-+++ b/include/hw/usb/chipidea.h
-@@ -0,0 +1,16 @@
-+#ifndef CHIPIDEA_H
-+#define CHIPIDEA_H
-+
-+#include "hw/usb/hcd-ehci.h"
-+
-+typedef struct ChipideaState {
-+    /*< private >*/
-+    EHCISysBusState parent_obj;
-+
-+    MemoryRegion iomem[3];
-+} ChipideaState;
-+
-+#define TYPE_CHIPIDEA "usb-chipidea"
-+#define CHIPIDEA(obj) OBJECT_CHECK(ChipideaState, (obj), TYPE_CHIPIDEA)
-+
-+#endif /* CHIPIDEA_H */
-diff --git a/hw/usb/chipidea.c b/hw/usb/chipidea.c
-new file mode 100644
-index 0000000000..60d67f88b8
---- /dev/null
-+++ b/hw/usb/chipidea.c
-@@ -0,0 +1,176 @@
++++ b/include/hw/misc/imx7_snvs.h
+@@ -0,0 +1,35 @@
 +/*
-+ * Copyright (c) 2018, Impinj, Inc.
++ * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * Chipidea USB block emulation code
++ * i.MX7 SNVS block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
@@ -111,72 +86,74 @@ index 0000000000..60d67f88b8
 + * See the COPYING file in the top-level directory.
 + */
 +
++#ifndef IMX7_SNVS_H
++#define IMX7_SNVS_H
++
++#include "qemu/bitops.h"
++#include "hw/sysbus.h"
++
++
++enum IMX7SNVSRegisters {
++    SNVS_LPCR = 0x38,
++    SNVS_LPCR_TOP   = BIT(6),
++    SNVS_LPCR_DP_EN = BIT(5)
++};
++
++#define TYPE_IMX7_SNVS "imx7.snvs"
++#define IMX7_SNVS(obj) OBJECT_CHECK(IMX7SNVSState, (obj), TYPE_IMX7_SNVS)
++
++typedef struct IMX7SNVSState {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    MemoryRegion mmio;
++} IMX7SNVSState;
++
++#endif /* IMX7_SNVS_H */
+diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
+new file mode 100644
+index 0000000000..4df482b282
+--- /dev/null
++++ b/hw/misc/imx7_snvs.c
+@@ -0,0 +1,83 @@
++/*
++ * IMX7 Secure Non-Volatile Storage
++ *
++ * Copyright (c) 2018, Impinj, Inc.
++ *
++ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ * Bare minimum emulation code needed to support being able to shut
++ * down linux guest gracefully.
++ */
++
 +#include "qemu/osdep.h"
-+#include "hw/usb/hcd-ehci.h"
-+#include "hw/usb/chipidea.h"
++#include "hw/misc/imx7_snvs.h"
 +#include "qemu/log.h"
++#include "sysemu/sysemu.h"
 +
-+enum {
-+    CHIPIDEA_USBx_DCIVERSION   = 0x000,
-+    CHIPIDEA_USBx_DCCPARAMS    = 0x004,
-+    CHIPIDEA_USBx_DCCPARAMS_HC = BIT(8),
-+};
-+
-+static uint64_t chipidea_read(void *opaque, hwaddr offset,
-+                               unsigned size)
++static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
 +{
 +    return 0;
 +}
 +
-+static void chipidea_write(void *opaque, hwaddr offset,
-+                            uint64_t value, unsigned size)
++static void imx7_snvs_write(void *opaque, hwaddr offset,
++                            uint64_t v, unsigned size)
 +{
-+}
++    const uint32_t value = v;
++    const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
 +
-+static const struct MemoryRegionOps chipidea_ops = {
-+    .read = chipidea_read,
-+    .write = chipidea_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        /*
-+         * Our device would not work correctly if the guest was doing
-+         * unaligned access. This might not be a limitation on the
-+         * real device but in practice there is no reason for a guest
-+         * to access this device unaligned.
-+         */
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false,
-+    },
-+};
-+
-+static uint64_t chipidea_dc_read(void *opaque, hwaddr offset,
-+                                 unsigned size)
-+{
-+    switch (offset) {
-+    case CHIPIDEA_USBx_DCIVERSION:
-+        return 0x1;
-+    case CHIPIDEA_USBx_DCCPARAMS:
-+        /*
-+         * Real hardware (at least i.MX7) will also report the
-+         * controller as "Device Capable" (and 8 supported endpoints),
-+         * but there doesn't seem to be much point in doing so, since
-+         * we don't emulate that part.
-+         */
-+        return CHIPIDEA_USBx_DCCPARAMS_HC;
++    if (offset == SNVS_LPCR && ((value & mask) == mask)) {
++        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
 +    }
-+
-+    return 0;
 +}
 +
-+static void chipidea_dc_write(void *opaque, hwaddr offset,
-+                              uint64_t value, unsigned size)
-+{
-+}
-+
-+static const struct MemoryRegionOps chipidea_dc_ops = {
-+    .read = chipidea_dc_read,
-+    .write = chipidea_dc_write,
++static const struct MemoryRegionOps imx7_snvs_ops = {
++    .read = imx7_snvs_read,
++    .write = imx7_snvs_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
@@ -191,90 +168,36 @@ index 0000000000..60d67f88b8
 +    },
 +};
 +
-+static void chipidea_init(Object *obj)
++static void imx7_snvs_init(Object *obj)
 +{
-+    EHCIState *ehci = &SYS_BUS_EHCI(obj)->ehci;
-+    ChipideaState *ci = CHIPIDEA(obj);
-+    int i;
++    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
++    IMX7SNVSState *s = IMX7_SNVS(obj);
 +
-+    for (i = 0; i < ARRAY_SIZE(ci->iomem); i++) {
-+        const struct {
-+            const char *name;
-+            hwaddr offset;
-+            uint64_t size;
-+            const struct MemoryRegionOps *ops;
-+        } regions[ARRAY_SIZE(ci->iomem)] = {
-+            /*
-+             * Registers located between offsets 0x000 and 0xFC
-+             */
-+            {
-+                .name   = TYPE_CHIPIDEA ".misc",
-+                .offset = 0x000,
-+                .size   = 0x100,
-+                .ops    = &chipidea_ops,
-+            },
-+            /*
-+             * Registers located between offsets 0x1A4 and 0x1DC
-+             */
-+            {
-+                .name   = TYPE_CHIPIDEA ".endpoints",
-+                .offset = 0x1A4,
-+                .size   = 0x1DC - 0x1A4 + 4,
-+                .ops    = &chipidea_ops,
-+            },
-+            /*
-+             * USB_x_DCIVERSION and USB_x_DCCPARAMS
-+             */
-+            {
-+                .name   = TYPE_CHIPIDEA ".dc",
-+                .offset = 0x120,
-+                .size   = 8,
-+                .ops    = &chipidea_dc_ops,
-+            },
-+        };
++    memory_region_init_io(&s->mmio, obj, &imx7_snvs_ops, s,
++                          TYPE_IMX7_SNVS, 0x1000);
 +
-+        memory_region_init_io(&ci->iomem[i],
-+                              obj,
-+                              regions[i].ops,
-+                              ci,
-+                              regions[i].name,
-+                              regions[i].size);
-+
-+        memory_region_add_subregion(&ehci->mem,
-+                                    regions[i].offset,
-+                                    &ci->iomem[i]);
-+    }
++    sysbus_init_mmio(sd, &s->mmio);
 +}
 +
-+static void chipidea_class_init(ObjectClass *klass, void *data)
++static void imx7_snvs_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+    SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(klass);
 +
-+    /*
-+     * Offsets used were taken from i.MX7Dual Applications Processor
-+     * Reference Manual, Rev 0.1, p. 3177, Table 11-59
-+     */
-+    sec->capsbase   = 0x100;
-+    sec->opregbase  = 0x140;
-+    sec->portnr     = 1;
-+
-+    set_bit(DEVICE_CATEGORY_USB, dc->categories);
-+    dc->desc = "Chipidea USB Module";
++    dc->desc  = "i.MX7 Secure Non-Volatile Storage Module";
 +}
 +
-+static const TypeInfo chipidea_info = {
-+    .name          = TYPE_CHIPIDEA,
-+    .parent        = TYPE_SYS_BUS_EHCI,
-+    .instance_size = sizeof(ChipideaState),
-+    .instance_init = chipidea_init,
-+    .class_init    = chipidea_class_init,
++static const TypeInfo imx7_snvs_info = {
++    .name          = TYPE_IMX7_SNVS,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(IMX7SNVSState),
++    .instance_init = imx7_snvs_init,
++    .class_init    = imx7_snvs_class_init,
 +};
 +
-+static void chipidea_register_type(void)
++static void imx7_snvs_register_type(void)
 +{
-+    type_register_static(&chipidea_info);
++    type_register_static(&imx7_snvs_info);
 +}
-+type_init(chipidea_register_type)
++type_init(imx7_snvs_register_type)
 -- 
 2.16.1
