@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekDVO-00073d-DB
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:34:40 -0500
+	(envelope-from <lcapitulino@redhat.com>) id 1ekDWC-0007kT-Rm
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:35:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekDVJ-0002em-23
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:34:38 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:36132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ekDVI-0002bt-TP
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:34:32 -0500
-Received: by mail-pl0-x243.google.com with SMTP id v3so1838415plg.3
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 10:34:32 -0800 (PST)
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
-	<20180208173157.24705-32-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <669dcbee-8a38-f123-fc2d-d54926ecb270@linaro.org>
-Date: Fri, 9 Feb 2018 10:34:28 -0800
+	(envelope-from <lcapitulino@redhat.com>) id 1ekDW8-00046j-8A
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:35:28 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55420 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lcapitulino@redhat.com>)
+	id 1ekDW8-00046S-2y
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:35:24 -0500
+Date: Fri, 9 Feb 2018 13:35:06 -0500
+From: Luiz Capitulino <lcapitulino@redhat.com>
+Message-ID: <20180209133506.3f5dcc1a@redhat.com>
+In-Reply-To: <48b8aa8e-36f8-1d2c-ee53-d8006cde77bc@linux.vnet.ibm.com>
+References: <20180208111732.09869f84@redhat.com>
+	<20180208203342.GE13981@localhost.localdomain>
+	<f8157f02-4c16-6811-7857-e1ec4d55d49c@linux.vnet.ibm.com>
+	<20180209084949.569007d7@redhat.com>
+	<20180209142735.GK13981@localhost.localdomain>
+	<48b8aa8e-36f8-1d2c-ee53-d8006cde77bc@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180208173157.24705-32-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 31/32] arm/translate-a64: implement
- simd_scalar_three_reg_same_fp16
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, berrange@redhat.com
 
-On 02/08/2018 09:31 AM, Alex Bennée wrote:
-> This covers the encoding group:
-> 
->   Advanced SIMD scalar three same FP16
-> 
-> As all the helpers are already there it is simply a case of calling the
-> existing helpers in the scalar context.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> ---
-> v2
->   - checkpatch fixes
-> ---
->  target/arm/translate-a64.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 96 insertions(+)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index b094399fb4..92adf43a89 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -7764,6 +7764,99 @@ static void disas_simd_scalar_three_reg_same(DisasContext *s, uint32_t insn)
->      tcg_temp_free_i64(tcg_rd);
->  }
->  
-> +/* AdvSIMD scalar three same FP16
-> + *  31 30  29 28       24 23  22 21 20  16 15 14 13    11 10  9  5 4  0
-> + * +-----+---+-----------+---+-----+------+-----+--------+---+----+----+
-> + * | 0 1 | U | 1 1 1 1 0 | a | 1 0 |  Rm  | 0 0 | opcode | 1 | Rn | Rd |
-> + * +-----+---+-----------+---+-----+------+-----+--------+---+----+----+
-> + * v: 0101 1110 0100 0000 0000 0100 0000 0000 => 5e400400
-> + * m: 1101 1111 0110 0000 1100 0100 0000 0000 => df60c400
-> + */
-> +static void disas_simd_scalar_three_reg_same_fp16(DisasContext *s, uint32_t insn)
-> +{
-> +    int rd = extract32(insn, 0, 5);
-> +    int rn = extract32(insn, 5, 5);
-> +    int opcode = extract32(insn, 11, 3);
-> +    int rm = extract32(insn, 16, 5);
-> +    bool u = extract32(insn, 29, 1);
-> +    bool a = extract32(insn, 23, 1);
-> +    int fpopcode = opcode | (a << 3) |  (u << 4);
-> +    TCGv_ptr fpst;
-> +    TCGv_i32 tcg_op1;
-> +    TCGv_i32 tcg_op2;
-> +    TCGv_i32 tcg_res;
-> +
-> +    switch (fpopcode) {
-> +    case 0x03: /* FMULX */
-> +    case 0x04: /* FCMEQ (reg) */
-> +    case 0x07: /* FRECPS */
-> +    case 0x0f: /* FRSQRTS */
-> +    case 0x14: /* FCMGE (reg) */
-> +    case 0x15: /* FACGE */
-> +    case 0x1a: /* FABD */
-> +    case 0x1c: /* FCMGT (reg) */
-> +    case 0x1d: /* FACGT */
-> +        break;
-> +    default:
-> +        unallocated_encoding(s);
-> +        return;
-> +    }
-> +
-> +    if (!fp_access_check(s)) {
-> +        return;
-> +    }
+On Fri, 9 Feb 2018 15:50:00 +0100
+Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
 
-Missing test for fp16 enabled.
+> On 09.02.2018 15:27, Eduardo Habkost wrote:
+> [...]
+> >> I'm keeping it mainly for s390. Viktor, libvirt is still using
+> >> this field in s390, no?
+> >>
+> >> Dropping halted and having management software still using query-cpus
+> >> because of halted would be a total failure of query-cpus-fast.  
+> > 
+> > If I understood correctly, the CpuInfoS390::cpu_state field added
+> > by Viktor in another patch[1] would replace "halted" for the s390
+> > case.  
+> Right, CPUState.halted is derived from CPUS390XState.cpu_state on s390:
+> A cpu_state of CPU_STATE_STOPPED or CPU_STATE_CHECK_STOPPED results in
+> halted = true. This derivation can be done by libvirt for s390.
+> > 
+> > I'm assuming QEMU will be able to return that field without
+> > interrupting the VCPUs.  Viktor, is that correct?
+> > 
+> > [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02032.html
+> >   
+> That's correct.
+> >>  
+> >>>> Also, the code that sets/clears cpu->halted is target-specific,
+> >>>> so I wouldn't be so sure that simply checking for
+> >>>> !kvm_irqchip_in_kernel() is enough on all targets.  
+> >>
+> >> I checked the code and had the impression it was enough, but
+> >> I don't have experience with other archs. So, would be nice
+> >> if other archs maintainers could review this. I'll try to ping them.  
+> > 
+> > I think we need to take a step back and rethink:
+> > 
+> > 1) What the field is supposed to mean?  The semantics of "halted"
+> >    are completely unclear.  What exactly we want to communicate
+> >    to libvirt/management?
+> > 2) On which cases the information (whatever it means) is really
+> >    useful/important?  If you are excluding cases with in-kernel
+> >    irqchip, you are already excluding most users.
+> > 
+> >   
+> Given that nobody (including myself) sees a need for halted we can
+> remove it for the fast version of query-cpus without surprising anyone.
+> [...]
 
-> @@ -9991,6 +10084,8 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
->                  gen_helper_advsimd_minh(tcg_res[pass], tcg_op1, tcg_op2, fpst);
->                  break;
->              default:
-> +                fprintf(stderr, "%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
-> +                        __func__, insn, fpopcode, s->pc);
-
-Leftover debug.
-
-
-r~
+My conclusion too, I'll drop it.
