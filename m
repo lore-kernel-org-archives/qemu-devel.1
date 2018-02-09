@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yasmins@linux.vnet.ibm.com>) id 1ekEPi-0007EC-1O
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:32:51 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ekEUw-0001q8-3T
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yasmins@linux.vnet.ibm.com>) id 1ekEPe-0006ex-3L
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:32:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43560)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yasmins@linux.vnet.ibm.com>)
-	id 1ekEPd-0006ej-Qz
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:32:46 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w19JVVUw146425
-	for <qemu-devel@nongnu.org>; Fri, 9 Feb 2018 14:32:44 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g1fgf5kc1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 14:32:41 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <yasmins@linux.vnet.ibm.com>;
-	Fri, 9 Feb 2018 12:32:40 -0700
-From: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
-Date: Fri,  9 Feb 2018 13:31:38 -0600
-Message-Id: <20180209193138.97198-1-yasmins@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] dump: Show custom message for ENOSPC
+	(envelope-from <richard.henderson@linaro.org>) id 1ekEUt-0001cT-0o
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:38:14 -0500
+Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:35570)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ekEUs-0001bJ-R8
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:38:10 -0500
+Received: by mail-io0-x230.google.com with SMTP id m11so10835292iob.2
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 11:38:10 -0800 (PST)
+References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
+	<1518053328-34687-13-git-send-email-mjc@sifive.com>
+	<82554ae4-5348-f30b-3b77-64754046198b@linaro.org>
+	<CAHNT7NsYT_bPpiOx2oUqsYCCAU1TOhx3ytAoU-a6pTbkkA_pnA@mail.gmail.com>
+	<CAHNT7NubFsYQ+0A=iURqTbQDpA=L+mgr7P+qDzZEyXacJcfyig@mail.gmail.com>
+	<CAHNT7Nsw9-7G34fuUW1aBeiR_ouh1sZJdWYiw1w1ws6M0CY5Zg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <22c65f8e-ca99-8da7-c6df-c16212ad36ab@linaro.org>
+Date: Fri, 9 Feb 2018 11:38:06 -0800
+MIME-Version: 1.0
+In-Reply-To: <CAHNT7Nsw9-7G34fuUW1aBeiR_ouh1sZJdWYiw1w1ws6M0CY5Zg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 12/23] RISC-V HTIF Console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +35,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-trivial@nongnu.org, joserz@linux.vnet.ibm.com
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-This patch intends to make a more specific message for when
-the system has not enough space to save guest memory.
+On 02/09/2018 01:08 AM, Michael Clark wrote:
+> https://github.com/michaeljclark/riscv-qemu/commit/17272f5c66adf8532f196d660d2a593c2178ac95
+> 
+>  hw/core/loader.c     |   18 ++++++++++++++++--
+>  include/hw/elf_ops.h |   28 ++++++++++++++++------------
+>  include/hw/loader.h  |   17 ++++++++++++++++-
+>  3 files changed, 48 insertions(+), 15 deletions(-)
 
-Reported-by: yilzhang@redhat.com
-Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Signed-off-by: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
----
- dump.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/dump.c b/dump.c
-index e9dfed060a..eb56ff53f6 100644
---- a/dump.c
-+++ b/dump.c
-@@ -106,6 +106,9 @@ static int fd_write_vmcore(const void *buf, size_t size, void *opaque)
- 
-     written_size = qemu_write_full(s->fd, buf, size);
-     if (written_size != size) {
-+        if (errno == ENOSPC) {
-+            return -ENOSPC;
-+        }
-         return -1;
-     }
- 
-@@ -364,7 +367,11 @@ static void write_data(DumpState *s, void *buf, int length, Error **errp)
- 
-     ret = fd_write_vmcore(buf, length, s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to save memory");
-+        if (ret == -ENOSPC) {
-+            error_setg(errp, "dump: not enough space to save memory");
-+        } else {
-+            error_setg(errp, "dump: failed to save memory");
-+        }
-     } else {
-         s->written_size += length;
-     }
--- 
-2.14.1
+Much better, thanks.  Please fix the formatting though
+(braces around if blocks).
+
+
+r~
