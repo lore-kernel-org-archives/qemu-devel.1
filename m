@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1ek85z-0004dw-Sb
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:48:05 -0500
+	(envelope-from <ramysameh26@gmail.com>) id 1ek8Dx-0001fS-A4
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1ek85u-0000NS-Vk
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:48:03 -0500
-Received: from mail-eopbgr50136.outbound.protection.outlook.com
-	([40.107.5.136]:24242
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <klim.kireev@virtuozzo.com>)
-	id 1ek85u-0000Ml-9x
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:47:58 -0500
-References: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
-	<bb1b8270-e924-3d41-a172-38ba79db9bf7@redhat.com>
-	<fd22674c-059e-8d37-338c-5d2d4d96eb20@redhat.com>
-From: Klim Kireev <klim.kireev@virtuozzo.com>
-Message-ID: <8d1183ed-c7ab-e130-c983-e5e116d80fa3@virtuozzo.com>
-Date: Fri, 9 Feb 2018 15:47:42 +0300
+	(envelope-from <ramysameh26@gmail.com>) id 1ek8Dw-0007LH-CL
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:56:17 -0500
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:33137)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
+	id 1ek8Dw-0007Kl-4y
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:56:16 -0500
+Received: by mail-oi0-x234.google.com with SMTP id l8so6050254oig.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 04:56:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <fd22674c-059e-8d37-338c-5d2d4d96eb20@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] "make check -j4" hangs
+In-Reply-To: <20180208115914.7df7bf87@redhat.com>
+References: <CAF6HrYx6fKVAACMN1TFV_9xKU42RP1yULQpwjvV9jtDExZq8JA@mail.gmail.com>
+	<20180208115914.7df7bf87@redhat.com>
+From: Ramy Sameh <ramysameh26@gmail.com>
+Date: Fri, 9 Feb 2018 14:56:14 +0200
+Message-ID: <CAF6HrYxD6GU6PkYVt-weQPzdASRPe_myG3ANZ_4E0hNTQhAj=A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Questions regarding how QEMU initializes virtual
+ peripherals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,136 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mona Safar <Mona.Safar@eng.asu.edu.eg>, Watheq <watheq@gmail.com>, Ahmed Aly <ahmedaly50@gmail.com>
 
+Many thanks Igor for this valuable info.
 
-On 02/08/2018 10:13 PM, Thomas Huth wrote:
-> On 30.01.2018 20:49, Paolo Bonzini wrote:
->> On 25/01/2018 08:51, Klim Kireev wrote:
->>> The following behavior was observed for QEMU configured by libvirt
->>> to use guest agent as usual for the guests without virtio-serial
->>> driver (Windows or the guest remaining in BIOS stage).
->>>
->>> In QEMU on first connect to listen character device socket
->>> the listen socket is removed from poll just after the accept().
->>> virtio_serial_guest_ready() returns 0 and the descriptor
->>> of the connected Unix socket is removed from poll and it will
->>> not be present in poll() until the guest will initialize the driver
->>> and change the state of the serial to "guest connected".
->>>
->>> In libvirt connect() to guest agent is performed on restart and
->>> is run under VM state lock. Connect() is blocking and can
->>> wait forever.
->>> In this case libvirt can not perform ANY operation on that VM.
->>>
->>> The bug can be easily reproduced this way:
->>>
->>> Terminal 1:
->>> qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
->>> (virtio-serial and isa-serial also fit)
->>>
->>> Terminal 2:
->>> minicom -D unix\#/tmp/console.sock
->>> (type something and press enter)
->>> C-a x (to exit)
->>>
->>> Do 3 times:
->>> minicom -D unix\#/tmp/console.sock
->>> C-a x
->>>
->>> It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
->>> the kernel, and the 4th blocks.
->>>
->>> The problem is that QEMU doesn't add a read watcher after succesful read
->>> until the guest device wants to acquire recieved data, so
->>> I propose to install a separate pullhup watcher regardless of
->>> whether the device waits for data or not.
->>>
->>> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
->>> ---
->>> Changelog:
->>> v2: Remove timer as a redundant feature
->>>
->>> v3: Remove read call and return G_SOURCE_REMOVE
->>>
->>> v4: Move to GSource API
->>>
->>> v5: Fix git typos 
->>>
->>>  chardev/char-socket.c | 22 ++++++++++++++++++++++
->>>  1 file changed, 22 insertions(+)
->>>
->>> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
->>> index 77cdf487eb..a340af6cd3 100644
->>> --- a/chardev/char-socket.c
->>> +++ b/chardev/char-socket.c
->>> @@ -42,6 +42,7 @@ typedef struct {
->>>      QIOChannel *ioc; /* Client I/O channel */
->>>      QIOChannelSocket *sioc; /* Client master channel */
->>>      QIONetListener *listener;
->>> +    GSource *hup_source;
->>>      QCryptoTLSCreds *tls_creds;
->>>      int connected;
->>>      int max_size;
->>> @@ -352,6 +353,12 @@ static void tcp_chr_free_connection(Chardev *chr)
->>>          s->read_msgfds_num = 0;
->>>      }
->>>  
->>> +    if (s->hup_source != NULL) {
->>> +        g_source_destroy(s->hup_source);
->>> +        g_source_unref(s->hup_source);
->>> +        s->hup_source = NULL;
->>> +    }
->>> +
->>>      tcp_set_msgfds(chr, NULL, 0);
->>>      remove_fd_in_watch(chr);
->>>      object_unref(OBJECT(s->sioc));
->>> @@ -455,6 +462,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
->>>      return TRUE;
->>>  }
->>>  
->>> +static gboolean tcp_chr_hup(QIOChannel *channel,
->>> +                               GIOCondition cond,
->>> +                               void *opaque)
->>> +{
->>> +    Chardev *chr = CHARDEV(opaque);
->>> +    tcp_chr_disconnect(chr);
->>> +    return G_SOURCE_REMOVE;
->>> +}
->>> +
->>>  static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
->>>  {
->>>      SocketChardev *s = SOCKET_CHARDEV(chr);
->>> @@ -528,6 +544,12 @@ static void tcp_chr_connect(void *opaque)
->>>                                             tcp_chr_read,
->>>                                             chr, chr->gcontext);
->>>      }
->>> +
->>> +    s->hup_source = qio_channel_create_watch(s->ioc, G_IO_HUP);
->>> +    g_source_set_callback(s->hup_source, (GSourceFunc)tcp_chr_hup,
->>> +                          chr, NULL);
->>> +    g_source_attach(s->hup_source, chr->gcontext);
->>> +
->>>      qemu_chr_be_event(chr, CHR_EVENT_OPENED);
->>>  }
->>>  
->>>
->> Queued, thanks.
->  Hi!
+On Thu, Feb 8, 2018 at 12:59 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Thu, 8 Feb 2018 12:06:44 +0200
+> Ramy Sameh <ramysameh26@gmail.com> wrote:
 >
-> I'm currently facing some issues with "make check -j4" (i.e. running the
-> tests in parallel). Git bisect blames this commit - though I'm not sure
-> whether this is really the right one ... Starting with this commit, I
-> saw hangs in test-filter-redirector, 
-
-Commit 8f6d701044bc87197aac8aa2a627d70ce8471726 fixes it
-Have you tried to apply it?
-
-> but git master rather seems to hang
-> with vhost-user-test instead.
-> Stefan also had issues with "make check -j4" today, so it's apparently
-> not only me ... can somebody else reproduce the problem with the git
-> master branch?
+> > Hello all,
+> >
+> > I am working with QEMU to simulate VersatilePB board.
+> >
+> > I am trying to understand how QEMU initialize the virtual peripherals
+> (e.g.
+> > UART, vectored Interrupt controller .. etc).
+> >
+> > When I traced the code, I found a function called "object_init_with_type"
+> > in object.c, in which the function pointer "ti->instance_init(obj)" seems
+> > to call the peripherals initialization functions.
+> >
+> > *I have couple of questions here:*
+> > 1.) Some peripheral initialization functions are called multiple times
+> such
+> > as pl011_init, why is that ?
+> function is called once for each instance of pl011 object.
 >
->  Thomas
+> QEMU uses custom OOM framework (dubbed QOM), good point to start with it
+> is probably to read doc comment in the beginning of include/qom/object.h
+>
+> Device objects are typically inherited from TYPE_DEVICE or its derivatives.
+> Device init sequence typically looks like:
+>    foo = object_new(TYPE_FOO);
+>    // set_properties on foo, see object_property_set_...
+>
+>    // and set special property 'realize' which would call 'realize' method
+>    object_property_set_bool(foo, true, "realized");
+>
+> See qdev_device_add() for details
+>
+> > 2.) Where is the entry point for the whole initialization functionalities
+> > (that will eventually call "object_init_with_type")
+>
+> object_new() & co + object_initialize_with_type()
+>
+> > Thank you.
+> >
+>
+>
+
+
+-- 
+Best Regards,
+Ramy Sameh
+Embedded Software Engineer
++2-010-172-777-14
