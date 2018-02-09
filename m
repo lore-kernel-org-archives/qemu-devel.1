@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekEl8-0003MH-M4
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:55:02 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ekEms-0004zf-Ak
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:56:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekEl6-0004W0-OO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:54:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42828 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ekEl6-0004Vl-If
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:54:56 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 182D1402314E
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 19:54:56 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Fri,  9 Feb 2018 13:54:36 -0600
-Message-Id: <20180209195436.975-1-eblake@redhat.com>
-Subject: [Qemu-devel] [qemu-web PATCH] Add "Understanding QEMU devices" blog
- post
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ekEmr-0005Rc-Ao
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:56:46 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
+	<20180209185142.17151-13-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3e51940a-4538-9464-10fb-13377e73d0e2@amsat.org>
+Date: Fri, 9 Feb 2018 16:56:31 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180209185142.17151-13-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv2 12/12] cuda: convert to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,217 +28,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, pbonzini@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-Last July, Eric Blake wrote a nice summary for newcomers about what
-QEMU has to do to emulate devices for the guests. So far, we missed
-integratating this somewhere into the QEM web site or wiki, so let's
-publish this now as a nice blog post for the users.
+On 02/09/2018 03:51 PM, Mark Cave-Ayland wrote:
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  Makefile.objs              |  1 +
+>  hw/misc/macio/cuda.c       | 50 ++++++++++++++++------------------------------
+>  hw/misc/macio/trace-events | 11 ++++++++++
+>  3 files changed, 29 insertions(+), 33 deletions(-)
+>  create mode 100644 hw/misc/macio/trace-events
+> 
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 2efba6d768..3f1a1b674d 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -133,6 +133,7 @@ trace-events-subdirs += hw/net
+>  trace-events-subdirs += hw/virtio
+>  trace-events-subdirs += hw/audio
+>  trace-events-subdirs += hw/misc
+> +trace-events-subdirs += hw/misc/macio
+>  trace-events-subdirs += hw/usb
+>  trace-events-subdirs += hw/scsi
+>  trace-events-subdirs += hw/nvram
+> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+> index 377b91d266..bd9b862034 100644
+> --- a/hw/misc/macio/cuda.c
+> +++ b/hw/misc/macio/cuda.c
+> @@ -32,19 +32,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/log.h"
+> -
+> -/* debug CUDA packets */
+> -//#define DEBUG_CUDA_PACKET
+> -
+> -/* debug CUDA packets */
+> -//#define DEBUG_CUDA_PACKET
+> -
+> -#ifdef DEBUG_CUDA
+> -#define CUDA_DPRINTF(fmt, ...)                                  \
+> -    do { printf("CUDA: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define CUDA_DPRINTF(fmt, ...)
+> -#endif
+> +#include "trace.h"
+>  
+>  /* Bits in B data register: all active low */
+>  #define TREQ            0x08    /* Transfer request (input) */
+> @@ -120,7 +108,7 @@ static void cuda_delay_set_sr_int(CUDAState *s)
+>          return;
+>      }
+>  
+> -    CUDA_DPRINTF("CUDA: %s:%d\n", __func__, __LINE__);
+> +    trace_cuda_delay_set_sr_int();
+>  
+>      expire = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->sr_delay_ns;
+>      timer_mod(s->sr_delay_timer, expire);
+> @@ -141,7 +129,7 @@ static void cuda_update(CUDAState *s)
+>              /* data output */
+>              if ((ms->b & (TACK | TIP)) != (s->last_b & (TACK | TIP))) {
+>                  if (s->data_out_index < sizeof(s->data_out)) {
+> -                    CUDA_DPRINTF("send: %02x\n", ms->sr);
+> +                    trace_cuda_data_send(ms->sr);
+>                      s->data_out[s->data_out_index++] = ms->sr;
+>                      cuda_delay_set_sr_int(s);
+>                  }
+> @@ -151,7 +139,7 @@ static void cuda_update(CUDAState *s)
+>                  /* data input */
+>                  if ((ms->b & (TACK | TIP)) != (s->last_b & (TACK | TIP))) {
+>                      ms->sr = s->data_in[s->data_in_index++];
+> -                    CUDA_DPRINTF("recv: %02x\n", ms->sr);
+> +                    trace_cuda_data_recv(ms->sr);
+>                      /* indicate end of transfer */
+>                      if (s->data_in_index >= s->data_in_size) {
+>                          ms->b = (ms->b | TREQ);
+> @@ -199,15 +187,13 @@ static void cuda_update(CUDAState *s)
+>  static void cuda_send_packet_to_host(CUDAState *s,
+>                                       const uint8_t *data, int len)
+>  {
+> -#ifdef DEBUG_CUDA_PACKET
+> -    {
+> -        int i;
+> -        printf("cuda_send_packet_to_host:\n");
+> -        for(i = 0; i < len; i++)
+> -            printf(" %02x", data[i]);
+> -        printf("\n");
+> +    int i;
+> +
+> +    trace_cuda_packet_send(len);
+> +    for (i = 0; i < len; i++) {
+> +        trace_cuda_packet_send_data(i, data[i]);
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1516958370-3955-1-git-send-email-thuth@redhat.com>
+Stefan said the trace framework is not meant to dump packet,
+but I'm fine with your patch, so:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Incorporate editing suggestions made by others on the list,
-particularly from Paolo Bonzini.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
-
-I finally took the time to make the edits suggested when Thomas
-first proposed adding my email to the blog.
-
-Thanks again for helping this text improve and reach a broader
-audience!
-
- _posts/2018-02-09-understanding-qemu-devices.md | 179 ++++++++++++++++++++++++
- 1 file changed, 179 insertions(+)
- create mode 100644 _posts/2018-02-09-understanding-qemu-devices.md
-
-diff --git a/_posts/2018-02-09-understanding-qemu-devices.md b/_posts/2018-02-09-understanding-qemu-devices.md
-new file mode 100644
-index 0000000..25130b7
---- /dev/null
-+++ b/_posts/2018-02-09-understanding-qemu-devices.md
-@@ -0,0 +1,179 @@
-+---
-+layout: post
-+title:  "Understanding QEMU devices"
-+date:   2018-02-09 13:30:00 -0600
-+author: Eric Blake
-+categories: blog
-+---
-+Here are some notes that may help newcomers understand what is
-+actually happening with QEMU devices:
-+
-+With QEMU, one thing to remember is that we are trying to emulate what
-+an Operating System (OS) would see on bare-metal hardware.  Most
-+bare-metal machines are basically giant memory maps, where software
-+poking at a particular address will have a particular side effect (the
-+most common side effect is, of course, accessing memory; but other
-+common regions in memory include the register banks for controlling
-+particular pieces of hardware, like the hard drive or a network card,
-+or even the CPU itself).  The end-goal of emulation is to allow a
-+user-space program, using only normal memory accesses, to manage all
-+of the side-effects that a guest OS is expecting.
-+
-+As an implementation detail, some hardware, like x86, actually has two
-+memory spaces, where I/O space uses different assembly codes than
-+normal; QEMU has to emulate these alternative accesses.  Similarly,
-+many modern CPUs provide themselves a bank of CPU-local registers
-+within the memory map, such as for an interrupt controller.
-+
-+With certain hardware, we have virtualization hooks where the CPU
-+itself makes it easy to trap on just the problematic assembly
-+instructions (those that access I/O space or CPU internal registers,
-+and therefore require side effects different than a normal memory
-+access), so that the guest just executes the same assembly sequence as
-+on bare metal, but that execution then causes a trap to let user-space
-+QEMU then react to the instructions using just its normal user-space
-+memory accesses before returning control to the guest.  This is
-+supported in QEMU through "accelerators".
-+
-+Virtualizing accelerators, such as KVM, can let a guest run nearly
-+as fast as bare metal, where the slowdowns are caused by each trap
-+from guest back to QEMU (a vmexit) to handle a difficult assembly
-+instruction or memory address.  QEMU also supports other virtualizing
-+accelerators (such as
-+[HAXM](https://www.qemu.org/2017/11/22/haxm-usage-windows/) or macOS's
-+Hypervisor.framework).
-+
-+QEMU also has a TCG accelerator, which takes the guest assembly
-+instructions and compiles it on the fly into comparable host
-+instructions or calls to host helper routines; while not as fast as
-+hardware acceleration, it allows cross-hardware emulation, such as
-+running ARM code on x86.
-+
-+The next thing to realize is what is happening when an OS is accessing
-+various hardware resources.  For example, most operating systems ship
-+with a driver that knows how to manage an IDE disk - the driver is
-+merely software that is programmed to make specific I/O requests to a
-+specific subset of the memory map (wherever the IDE bus lives, which
-+is specific to the the hardware board).  When the IDE controller
-+hardware receives those I/O requests it then performs the appropriate
-+actions (via DMA transfers or other hardware action) to copy data from
-+memory to persistent storage (writing to disk) or from persistent
-+storage to memory (reading from the disk).
-+
-+When you first buy bare-metal hardware, your disk is uninitialized; you
-+install the OS that uses the driver to make enough bare-metal accesses
-+to the IDE hardware portion of the memory map to then turn the disk into
-+a set of partitions and filesystems on top of those partitions.
-+
-+So, how does QEMU emulate this? In the big memory map it provides to
-+the guest, it emulates an IDE disk at the same address as bare-metal
-+would.  When the guest OS driver issues particular memory writes to
-+the IDE control registers in order to copy data from memory to
-+persistent storage, the QEMU accelerator traps accesses to that memory
-+region, and passes the request on to the QEMU IDE controller device
-+model.  The device model then parses the I/O requests, and emulates
-+them by issuing host system calls.  The result is that guest memory is
-+copied into host storage.
-+
-+On the host side, the easiest way to emulate persistent storage is via
-+treating a file in the host filesystem as raw data (a 1:1 mapping of
-+offsets in the host file to disk offsets being accessed by the guest
-+driver), but QEMU actually has the ability to glue together a lot of
-+different host formats (raw,
-+[qcow2](https://git.qemu.org/?p=qemu.git;a=blob;f=docs/interop/qcow2.txt),
-+qed,
-+[vhdx](https://www.microsoft.com/en-us/download/details.aspx?id=34750),
-+...) and protocols (file system, block device,
-+[NBD](https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md),
-+[Ceph](https://ceph.com/), [gluster](https://www.gluster.org/), ...)
-+where any combination of host format and protocol can serve as the
-+backend that is then tied to the QEMU emulation providing the guest
-+device.
-+
-+Thus, when you tell QEMU to use a host qcow2 file, the guest does not
-+have to know qcow2, but merely has its normal driver make the same
-+register reads and writes as it would on bare metal, which cause vmexits
-+into QEMU code, then QEMU maps those accesses into reads and writes in
-+the appropriate offsets of the qcow2 file.  When you first install the
-+guest, all the guest sees is a blank uninitialized linear disk
-+(regardless of whether that disk is linear in the host, as in raw
-+format, or optimized for random access, as in the qcow2 format); it is
-+up to the guest OS to decide how to partition its view of the hardware
-+and install filesystems on top of that, and QEMU does not care what
-+filesystems the guest is using, only what pattern of raw disk I/O
-+register control sequences are issued.
-+
-+The next thing to realize is that emulating IDE is not always the most
-+efficient.  Every time the guest writes to the control registers, it
-+has to go through special handling, and vmexits slow down
-+emulation. Of course, different hardware models have different
-+performance characteristics when virtualized.  In general, however,
-+what works best for real hardware does not necessarily work best for
-+virtualization, and until recently, hardware was not designed to
-+operate fast when emulated by software such as QEMU.  Therefore, QEMU
-+includes paravirtualized devices that are designed specifically for
-+this purpose.
-+
-+The meaning of "paravirtualization" here is slightly different from
-+the original one of "virtualization through cooperation between the
-+guest and host".  The QEMU developers have produced a specification
-+for a set of hardware registers and the behavior for those registers
-+which are designed to result in the minimum number of vmexits possible
-+while still accomplishing what a hard disk must do, namely,
-+transferring data between normal guest memory and persistent storage.
-+This specification is called virtio; using it requires installation of
-+a virtio driver in the guest.  While no physical device exists that
-+follows the same register layout as virtio, the concept is the same: a
-+virtio disk behaves like a memory-mapped register bank, where the
-+guest OS driver then knows what sequence of register commands to write
-+into that bank to cause data to be copied in and out of other guest
-+memory.  Much of the speedups in virtio come by its design - the guest
-+sets aside a portion of regular memory for the bulk of its command
-+queue, and only has to kick a single register to then tell QEMU to
-+read the command queue (fewer mapped register accesses mean fewer
-+vmexits), coupled with handshaking guarantees that the guest driver
-+won't be changing the normal memory while QEMU is acting on it.
-+
-+As an aside, just like recent hardware is fairly efficient to emulate,
-+virtio is evolving to be more efficient to implement in hardware, of
-+course without sacrificing performance for emulation or
-+virtualization.  Therefore, in the future, you could stumble upon
-+physical virtio devices as well.
-+
-+In a similar vein, many operating systems have support for a number of
-+network cards, a common example being the e1000 card on the PCI bus.
-+On bare metal, an OS will probe PCI space, see that a bank of
-+registers with the signature for e1000 is populated, and load the
-+driver that then knows what register sequences to write in order to
-+let the hardware card transfer network traffic in and out of the
-+guest.  So QEMU has, as one of its many network card emulations, an
-+e1000 device, which is mapped to the same guest memory region as a
-+real one would live on bare metal.
-+
-+And once again, the e1000 register layout tends to require a lot of
-+register writes (and thus vmexits) for the amount of work the hardware
-+performs, so the QEMU developers have added the virtio-net card (a PCI
-+hardware specification, although no bare-metal hardware exists yet
-+that actually implements it), such that installing a virtio-net driver
-+in the guest OS can then minimize the number of vmexits while still
-+getting the same side-effects of sending network traffic.  If you tell
-+QEMU to start a guest with a virtio-net card, then the guest OS will
-+probe PCI space and see a bank of registers with the virtio-net
-+signature, and load the appropriate driver like it would for any other
-+PCI hardware.
-+
-+In summary, even though QEMU was first written as a way of emulating
-+hardware memory maps in order to virtualize a guest OS, it turns out
-+that the fastest virtualization also depends on virtual hardware: a
-+memory map of registers with particular documented side effects that has
-+no bare-metal counterpart.  And at the end of the day, all
-+virtualization really means is running a particular set of assembly
-+instructions (the guest OS) to manipulate locations within a giant
-+memory map for causing a particular set of side effects, where QEMU is
-+just a user-space application providing a memory map and mimicking the
-+same side effects you would get when executing those guest instructions
-+on the appropriate bare metal hardware.
-+
-+(This post is a slight update on an
-+[email](https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg05939.html)
-+originally posted to the qemu-devel list back in July 2017).
--- 
-2.14.3
+>      }
+> -#endif
+> +
+>      memcpy(s->data_in, data, len);
+>      s->data_in_size = len;
+>      s->data_in_index = 0;
+> @@ -411,7 +397,7 @@ static void cuda_receive_packet(CUDAState *s,
+>      for (i = 0; i < ARRAY_SIZE(handlers); i++) {
+>          const CudaCommand *desc = &handlers[i];
+>          if (desc->command == data[0]) {
+> -            CUDA_DPRINTF("handling command %s\n", desc->name);
+> +            trace_cuda_receive_packet_cmd(desc->name);
+>              out_len = 0;
+>              if (desc->handler(s, data + 1, len - 1, obuf + 3, &out_len)) {
+>                  cuda_send_packet_to_host(s, obuf, 3 + out_len);
+> @@ -440,15 +426,13 @@ static void cuda_receive_packet(CUDAState *s,
+>  static void cuda_receive_packet_from_host(CUDAState *s,
+>                                            const uint8_t *data, int len)
+>  {
+> -#ifdef DEBUG_CUDA_PACKET
+> -    {
+> -        int i;
+> -        printf("cuda_receive_packet_from_host:\n");
+> -        for(i = 0; i < len; i++)
+> -            printf(" %02x", data[i]);
+> -        printf("\n");
+> +    int i;
+> +
+> +    trace_cuda_packet_receive(len);
+> +    for (i = 0; i < len; i++) {
+> +        trace_cuda_packet_receive_data(i, data[i]);
+>      }
+> -#endif
+> +
+>      switch(data[0]) {
+>      case ADB_PACKET:
+>          {
+> diff --git a/hw/misc/macio/trace-events b/hw/misc/macio/trace-events
+> new file mode 100644
+> index 0000000000..24c0a36824
+> --- /dev/null
+> +++ b/hw/misc/macio/trace-events
+> @@ -0,0 +1,11 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# hw/misc/macio/cuda.c
+> +cuda_delay_set_sr_int(void) ""
+> +cuda_data_send(uint8_t data) "send: 0x%02x"
+> +cuda_data_recv(uint8_t data) "recv: 0x%02x"
+> +cuda_receive_packet_cmd(const char *cmd) "handling command %s"
+> +cuda_packet_receive(int len) "length %d"
+> +cuda_packet_receive_data(int i, const uint8_t data) "[%d] 0x%02x"
+> +cuda_packet_send(int len) "length %d"
+> +cuda_packet_send_data(int i, const uint8_t data) "[%d] 0x%02x"
+> 
