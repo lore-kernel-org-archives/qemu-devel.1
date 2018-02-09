@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmF-0001Kj-Rb
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:05 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmJ-0001NW-KG
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmD-0004dG-OO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:03 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmE-0004db-3H
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:07 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  9 Feb 2018 18:51:36 +0000
-Message-Id: <20180209185142.17151-7-mark.cave-ayland@ilande.co.uk>
+Date: Fri,  9 Feb 2018 18:51:31 +0000
+Message-Id: <20180209185142.17151-2-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
 References: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCHv2 06/12] cuda: minor cosmetic tidy-ups to
- get_next_irq_time()
+Subject: [Qemu-devel] [PATCHv2 01/12] cuda: do not use old_mmio accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +22,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/macio/cuda.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ hw/misc/macio/cuda.c | 40 ++++++++--------------------------------
+ 1 file changed, 8 insertions(+), 32 deletions(-)
 
 diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index 232b7f61aa..408858e688 100644
+index 008d8bd4d5..6631017ca2 100644
 --- a/hw/misc/macio/cuda.c
 +++ b/hw/misc/macio/cuda.c
-@@ -184,36 +184,37 @@ static void set_counter(CUDAState *s, CUDATimer *ti, unsigned int val)
-     cuda_timer_update(s, ti, ti->load_time);
+@@ -275,7 +275,7 @@ static void cuda_delay_set_sr_int(CUDAState *s)
+     timer_mod(s->sr_delay_timer, expire);
  }
  
--static int64_t get_next_irq_time(CUDATimer *s, int64_t current_time)
-+static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
+-static uint32_t cuda_readb(void *opaque, hwaddr addr)
++static uint64_t cuda_read(void *opaque, hwaddr addr, unsigned size)
  {
-     int64_t d, next_time;
-     unsigned int counter;
- 
-     /* current counter value */
--    d = muldiv64(current_time - s->load_time,
-+    d = muldiv64(current_time - ti->load_time,
-                  CUDA_TIMER_FREQ, NANOSECONDS_PER_SECOND);
-     /* the timer goes down from latch to -1 (period of latch + 2) */
--    if (d <= (s->counter_value + 1)) {
--        counter = (s->counter_value - d) & 0xffff;
-+    if (d <= (ti->counter_value + 1)) {
-+        counter = (ti->counter_value - d) & 0xffff;
-     } else {
--        counter = (d - (s->counter_value + 1)) % (s->latch + 2);
--        counter = (s->latch - counter) & 0xffff;
-+        counter = (d - (ti->counter_value + 1)) % (ti->latch + 2);
-+        counter = (ti->latch - counter) & 0xffff;
-     }
- 
-     /* Note: we consider the irq is raised on 0 */
-     if (counter == 0xffff) {
--        next_time = d + s->latch + 1;
-+        next_time = d + ti->latch + 1;
-     } else if (counter == 0) {
--        next_time = d + s->latch + 2;
-+        next_time = d + ti->latch + 2;
-     } else {
-         next_time = d + counter;
-     }
-     CUDA_DPRINTF("latch=%d counter=%" PRId64 " delta_next=%" PRId64 "\n",
--                 s->latch, d, next_time - d);
-+                 ti->latch, d, next_time - d);
-     next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, CUDA_TIMER_FREQ) +
--        s->load_time;
--    if (next_time <= current_time)
-+                         ti->load_time;
-+    if (next_time <= current_time) {
-         next_time = current_time + 1;
-+    }
-     return next_time;
+     CUDAState *s = opaque;
+     uint32_t val;
+@@ -350,7 +350,7 @@ static uint32_t cuda_readb(void *opaque, hwaddr addr)
+     return val;
  }
  
+-static void cuda_writeb(void *opaque, hwaddr addr, uint32_t val)
++static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+ {
+     CUDAState *s = opaque;
+ 
+@@ -780,38 +780,14 @@ static void cuda_receive_packet_from_host(CUDAState *s,
+     }
+ }
+ 
+-static void cuda_writew (void *opaque, hwaddr addr, uint32_t value)
+-{
+-}
+-
+-static void cuda_writel (void *opaque, hwaddr addr, uint32_t value)
+-{
+-}
+-
+-static uint32_t cuda_readw (void *opaque, hwaddr addr)
+-{
+-    return 0;
+-}
+-
+-static uint32_t cuda_readl (void *opaque, hwaddr addr)
+-{
+-    return 0;
+-}
+-
+ static const MemoryRegionOps cuda_ops = {
+-    .old_mmio = {
+-        .write = {
+-            cuda_writeb,
+-            cuda_writew,
+-            cuda_writel,
+-        },
+-        .read = {
+-            cuda_readb,
+-            cuda_readw,
+-            cuda_readl,
+-        },
++    .read = cuda_read,
++    .write = cuda_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
+ static bool cuda_timer_exist(void *opaque, int version_id)
 -- 
 2.11.0
