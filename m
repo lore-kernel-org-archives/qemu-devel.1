@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekEUw-0001q8-3T
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:38:15 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ekEYt-0003z0-Fj
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:42:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekEUt-0001cT-0o
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:38:14 -0500
-Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:35570)
+	(envelope-from <richard.henderson@linaro.org>) id 1ekEYq-0004Eg-DJ
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:42:19 -0500
+Received: from mail-pl0-x22f.google.com ([2607:f8b0:400e:c01::22f]:38129)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ekEUs-0001bJ-R8
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:38:10 -0500
-Received: by mail-io0-x230.google.com with SMTP id m11so10835292iob.2
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 11:38:10 -0800 (PST)
+	id 1ekEYq-0004EI-5N
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:42:16 -0500
+Received: by mail-pl0-x22f.google.com with SMTP id 13so1919319plb.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 11:42:16 -0800 (PST)
 References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
-	<1518053328-34687-13-git-send-email-mjc@sifive.com>
-	<82554ae4-5348-f30b-3b77-64754046198b@linaro.org>
-	<CAHNT7NsYT_bPpiOx2oUqsYCCAU1TOhx3ytAoU-a6pTbkkA_pnA@mail.gmail.com>
-	<CAHNT7NubFsYQ+0A=iURqTbQDpA=L+mgr7P+qDzZEyXacJcfyig@mail.gmail.com>
-	<CAHNT7Nsw9-7G34fuUW1aBeiR_ouh1sZJdWYiw1w1ws6M0CY5Zg@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <22c65f8e-ca99-8da7-c6df-c16212ad36ab@linaro.org>
-Date: Fri, 9 Feb 2018 11:38:06 -0800
+Message-ID: <2832ff22-e0c8-85b9-c0ce-15b0cc3cdc72@linaro.org>
+Date: Fri, 9 Feb 2018 11:42:11 -0800
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7Nsw9-7G34fuUW1aBeiR_ouh1sZJdWYiw1w1ws6M0CY5Zg@mail.gmail.com>
+In-Reply-To: <1518053328-34687-1-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 12/23] RISC-V HTIF Console
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/23] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,20 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On 02/09/2018 01:08 AM, Michael Clark wrote:
-> https://github.com/michaeljclark/riscv-qemu/commit/17272f5c66adf8532f196d660d2a593c2178ac95
-> 
->  hw/core/loader.c     |   18 ++++++++++++++++--
->  include/hw/elf_ops.h |   28 ++++++++++++++++------------
->  include/hw/loader.h  |   17 ++++++++++++++++-
->  3 files changed, 48 insertions(+), 15 deletions(-)
+On 02/07/2018 05:28 PM, Michael Clark wrote:
+>  create mode 100644 hw/riscv/Makefile.objs
+>  create mode 100644 hw/riscv/riscv_elf.c
+>  create mode 100644 hw/riscv/riscv_hart.c
+>  create mode 100644 hw/riscv/riscv_htif.c
+>  create mode 100644 hw/riscv/sifive_clint.c
+>  create mode 100644 hw/riscv/sifive_e300.c
+>  create mode 100644 hw/riscv/sifive_plic.c
+>  create mode 100644 hw/riscv/sifive_prci.c
+>  create mode 100644 hw/riscv/sifive_test.c
+>  create mode 100644 hw/riscv/sifive_u500.c
+>  create mode 100644 hw/riscv/sifive_uart.c
+>  create mode 100644 hw/riscv/spike_v1_09.c
+>  create mode 100644 hw/riscv/spike_v1_10.c
+>  create mode 100644 hw/riscv/virt.c
 
-
-Much better, thanks.  Please fix the formatting though
-(braces around if blocks).
+I have no plans to review these last 9 patches.
+They all look plausible to me, but I'm not so
+up-to-date on best practices within hw/.
 
 
 r~
