@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ekA2Y-00005z-Em
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:52:39 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ekA4b-0001YP-7X
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:54:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1ekA2X-0001GQ-Au
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:52:38 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:46030)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ekA4W-0004uY-C3
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:54:45 -0500
+Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:42897)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1ekA2X-0001Fg-56
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:52:37 -0500
-Received: by mail-oi0-x243.google.com with SMTP id c189so6275140oib.12
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:52:36 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ekA4W-0004u5-6U
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:54:40 -0500
+Received: by mail-qt0-x232.google.com with SMTP id i8so10827359qtj.9
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:54:39 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri,  9 Feb 2018 11:54:00 -0300
+Message-Id: <20180209145430.26007-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180209143117.GL13981@localhost.localdomain>
-References: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
-	<20180209143117.GL13981@localhost.localdomain>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Fri, 9 Feb 2018 22:52:36 +0800
-Message-ID: <CANRm+Cw1RcLyU5Lh_NmaPo=wTqYeifAHdM9_53xZwbUp1E2vFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] target-i386: add KVM_HINTS_DEDICATED
- performance hint
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v12 00/30] SDHCI: clean v1/2 Specs,
+ UHS-I cards tuning sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +32,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
 
-2018-02-09 22:31 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
-> On Fri, Feb 09, 2018 at 06:15:25AM -0800, Wanpeng Li wrote:
->> From: Wanpeng Li <wanpengli@tencent.com>
->>
->> Add KVM_HINTS_DEDICATED performance hint, guest checks this feature bit
->> to determine if they run on dedicated vCPUs, allowing optimizations such
->> as usage of qspinlocks.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> [...]
->> +    [FEAT_KVM_HINTS] =3D {
->> +        .feat_names =3D {
->> +            "hint-dedicated", NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +        },
->> +        .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EDX,
->> +        .tcg_features =3D TCG_KVM_FEATURES,
->> +    },
->
-> Do you have a pointer to the KVM patch that adds this bit to
-> Documentation/virtual/kvm/cpuid.txt?  I would like to wait until
-> the KVM CPUID docs are updated before applying the patch to QEMU.
+This series is expected to be taken by Paolo.
 
-Yeah, please refer to https://lkml.org/lkml/2018/2/9/476
+It includes the last versions of both series:
+- SDHCI: clean v1/v2 Specs (part 2)
+- SDHCI: add tuning sequence for UHS-I cards (part 3)
 
-Regards,
-Wanpeng Li
+Since v11:
+- rebased due to conflict (IMX_USDHC fd1e5c817964)
+- QSDHCI uses union (Paolo)
+- do not enable UNIMP logging when running qtests
+
+Since v10:
+- rebased
+- add Paolo's R-b in patch 2
+- rename patch 11 subject (Alistair)
+- add Alistair's R-b in "UHS-I cards tuning sequence" patches
+
+Thanks Paolo :)
+
+Phil.
+
+$ git backport-diff with v11
+001/30:[----] [--] 'sdhci: use error_propagate(local_err) in realize()'
+002/30:[0028] [FC] 'sdhci: add qtest to check the SD capabilities register'
+003/30:[0016] [FC] 'sdhci: add check_capab_readonly() qtest'
+004/30:[0010] [FC] 'sdhci: add a check_capab_baseclock() qtest'
+005/30:[0006] [FC] 'sdhci: add a check_capab_sdma() qtest'
+006/30:[0012] [FC] 'sdhci: add qtest to check the SD Spec version'
+007/30:[----] [-C] 'sdhci: add a 'spec_version property' (default to v2)'
+008/30:[----] [--] 'sdhci: use a numeric value for the default CAPAB register'
+009/30:[----] [--] 'sdhci: simplify sdhci_get_fifolen()'
+010/30:[0029] [FC] 'sdhci: check the Spec v1 capabilities correctness'
+011/30:[----] [--] 'sdhci: replace DMA magic value by BLOCK_SIZE_MASK'
+012/30:[----] [--] 'sdhci: Fix 64-bit ADMA2'
+013/30:[0006] [FC] 'sdhci: check Spec v2 capabilities (DMA and 64-bit bus)'
+014/30:[----] [--] 'hw/arm/exynos4210: access the 64-bit capareg with qdev_prop_set_uint64()'
+015/30:[----] [--] 'hw/arm/exynos4210: add a comment about a very similar SDHCI (Spec. v2)'
+016/30:[----] [--] 'hw/arm/xilinx_zynq: fix the capabilities register to match the datasheet'
+017/30:[----] [-C] 'sdhci: add support for v3 capabilities'
+018/30:[0006] [FC] 'sdhci: rename the hostctl1 register'
+019/30:[----] [--] 'sdhci: implement the Host Control 2 register (tuning sequence)'
+020/30:[----] [--] 'sdbus: add trace events'
+021/30:[----] [-C] 'sdhci: implement UHS-I voltage switch'
+022/30:[----] [--] 'sdhci: implement CMD/DAT[] fields in the Present State register'
+023/30:[----] [--] 'hw/arm/bcm2835_peripherals: implement SDHCI Spec v3'
+024/30:[----] [--] 'hw/arm/bcm2835_peripherals: change maximum block size to 1kB'
+025/30:[----] [--] 'hw/arm/fsl-imx6: implement SDHCI Spec. v3'
+026/30:[----] [--] 'hw/arm/xilinx_zynqmp: fix the capabilities/spec version to match the datasheet'
+027/30:[----] [--] 'hw/arm/xilinx_zynqmp: enable the UHS-I mode'
+028/30:[----] [--] 'sdhci: check Spec v3 capabilities qtest'
+029/30:[0006] [FC] 'sdhci: add a check_capab_v3() qtest'
+030/30:[0008] [FC] 'sdhci: add Spec v4.2 register definitions'
+
+Philippe Mathieu-Daudé (29):
+  sdhci: use error_propagate(local_err) in realize()
+  sdhci: add qtest to check the SD capabilities register
+  sdhci: add check_capab_readonly() qtest
+  sdhci: add a check_capab_baseclock() qtest
+  sdhci: add a check_capab_sdma() qtest
+  sdhci: add qtest to check the SD Spec version
+  sdhci: add a 'spec_version property' (default to v2)
+  sdhci: use a numeric value for the default CAPAB register
+  sdhci: simplify sdhci_get_fifolen()
+  sdhci: check the Spec v1 capabilities correctness
+  sdhci: replace DMA magic value by BLOCK_SIZE_MASK
+  sdhci: check Spec v2 capabilities (DMA and 64-bit bus)
+  hw/arm/exynos4210: access the 64-bit capareg with
+    qdev_prop_set_uint64()
+  hw/arm/exynos4210: add a comment about a very similar SDHCI (Spec. v2)
+  hw/arm/xilinx_zynq: fix the capabilities register to match the
+    datasheet
+  sdhci: add support for v3 capabilities
+  sdhci: rename the hostctl1 register
+  sdhci: implement the Host Control 2 register (tuning sequence)
+  sdbus: add trace events
+  sdhci: implement UHS-I voltage switch
+  sdhci: implement CMD/DAT[] fields in the Present State register
+  hw/arm/bcm2835_peripherals: implement SDHCI Spec v3
+  hw/arm/bcm2835_peripherals: change maximum block size to 1kB
+  hw/arm/fsl-imx6: implement SDHCI Spec. v3
+  hw/arm/xilinx_zynqmp: fix the capabilities/spec version to match the
+    datasheet
+  hw/arm/xilinx_zynqmp: enable the UHS-I mode
+  sdhci: check Spec v3 capabilities qtest
+  sdhci: add a check_capab_v3() qtest
+  sdhci: add Spec v4.2 register definitions
+
+Sai Pavan Boddu (1):
+  sdhci: Fix 64-bit ADMA2
+
+ hw/sd/sdhci-internal.h       |  78 +++++++--
+ include/hw/sd/sd.h           |  20 +++
+ include/hw/sd/sdhci.h        |   6 +-
+ hw/arm/bcm2835_peripherals.c |  23 +--
+ hw/arm/exynos4210.c          |  14 +-
+ hw/arm/fsl-imx6.c            |   7 +
+ hw/arm/xilinx_zynq.c         |  53 +++---
+ hw/arm/xlnx-zynqmp.c         |  30 ++--
+ hw/sd/core.c                 |  61 ++++++-
+ hw/sd/sd.c                   |  29 ++++
+ hw/sd/sdhci.c                | 375 +++++++++++++++++++++++++++++++------------
+ tests/sdhci-test.c           | 252 +++++++++++++++++++++++++++++
+ hw/sd/trace-events           |   9 ++
+ tests/Makefile.include       |   4 +
+ 14 files changed, 800 insertions(+), 161 deletions(-)
+ create mode 100644 tests/sdhci-test.c
+
+-- 
+2.16.1
