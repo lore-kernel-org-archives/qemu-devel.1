@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ekHs8-0006IA-EG
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 18:14:25 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ekHz0-0001g9-I7
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 18:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ekHs7-0002lO-Kj
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 18:14:24 -0500
-References: <20180119205847.7141-1-jsnow@redhat.com>
-	<20180119205847.7141-12-jsnow@redhat.com>
-	<98b08bf5-6ac1-a1df-e92d-046b7975e3de@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1ekHyz-0006M7-Qd
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 18:21:30 -0500
+References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <e1fb385a-de76-8634-6f0d-16aea7118e48@redhat.com>
-Date: Fri, 9 Feb 2018 18:13:59 -0500
+Message-ID: <48dd9ce6-f78d-9e82-8a64-0f086bab5c1c@redhat.com>
+Date: Fri, 9 Feb 2018 18:21:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <98b08bf5-6ac1-a1df-e92d-046b7975e3de@redhat.com>
+In-Reply-To: <20180202160752.143796-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/13] block/mirror: remove
- block_job_sleep_ns calls
+Subject: Re: [Qemu-devel] [PATCH v3] block: maintain persistent disabled
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,19 +24,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
 
 
-On 02/07/2018 05:46 PM, Max Reitz wrote:
-> Errr.  Are you sure about that?
-> 
-> Now every mirror job in the qeny process will share this single
-> variable.  Was that your intention?
-> 
+On 02/02/2018 11:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+>     add info into qemu-doc.texi
+>     rm John's r-b (sorry=(
 
-Duh, no.
+haha :)
 
-Thanks for the review, also. I'm currently sidetracked on something
-else, so I'll get back to this soon.
+It's good to get many eyes on these things.
+
+Thanks, Max!
