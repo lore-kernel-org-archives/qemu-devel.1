@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ek84k-0003gB-86
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:46:47 -0500
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1ek85z-0004dw-Sb
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:48:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ek84f-000884-Mz
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:46:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ek84f-00087Y-Dl
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:46:41 -0500
-Date: Fri, 9 Feb 2018 10:46:38 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180209124638.GH13981@localhost.localdomain>
-References: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
-	<20180208181207.GB13981@localhost.localdomain>
-	<fcb084ce-1615-f100-4137-e0fa46098d7b@redhat.com>
-	<20180209114615.GG13981@localhost.localdomain>
-	<CANRm+CyJi0r-Gm=ivJDwBhsW1dM5tAhBBx84G+miOQDaF+nLUw@mail.gmail.com>
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1ek85u-0000NS-Vk
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:48:03 -0500
+Received: from mail-eopbgr50136.outbound.protection.outlook.com
+	([40.107.5.136]:24242
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <klim.kireev@virtuozzo.com>)
+	id 1ek85u-0000Ml-9x
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:47:58 -0500
+References: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
+	<bb1b8270-e924-3d41-a172-38ba79db9bf7@redhat.com>
+	<fd22674c-059e-8d37-338c-5d2d4d96eb20@redhat.com>
+From: Klim Kireev <klim.kireev@virtuozzo.com>
+Message-ID: <8d1183ed-c7ab-e130-c983-e5e116d80fa3@virtuozzo.com>
+Date: Fri, 9 Feb 2018 15:47:42 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+CyJi0r-Gm=ivJDwBhsW1dM5tAhBBx84G+miOQDaF+nLUw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_DEDICATED hint CPUID
- feature bit
+In-Reply-To: <fd22674c-059e-8d37-338c-5d2d4d96eb20@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] "make check -j4" hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +32,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Feb 09, 2018 at 08:24:26PM +0800, Wanpeng Li wrote:
-> 2018-02-09 19:46 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
-> > On Fri, Feb 09, 2018 at 09:41:41AM +0100, Paolo Bonzini wrote:
-> >> On 08/02/2018 19:12, Eduardo Habkost wrote:
-> >> > On Thu, Feb 08, 2018 at 05:44:20PM +0800, Wanpeng Li wrote:
-> >> >> From: Wanpeng Li <wanpengli@tencent.com>
-> >> >>
-> >> >> Add PV_DEDICATED hint cpuid feature bit.
-> >> >>
-> >> > [...]
-> >> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> >> >> index d70954b..cf48931 100644
-> >> >> --- a/target/i386/cpu.c
-> >> >> +++ b/target/i386/cpu.c
-> >> >> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
-> >> >>              x86_cpu_get_supported_feature_word(w, false);
-> >> >>          uint32_t requested_features = env->features[w];
-> >> >>          env->features[w] &= host_feat;
-> >> >> +        if (cpu->pv_dedicated && (w == FEAT_KVM)) {
-> >> >> +            env->features[w] |= CPUID_PV_DEDICATED;
-> >> >> +        }
-> >> >
-> >> > Why do this trick here instead of just adding "pv-dedicated" to
-> >> > feature_word_info[FEAT_KVM].feat_names?
-> >>
-> >> I think because it can be added independent of KVM_GET_SUPPORTED_CPUID.
-> >
-> > If QEMU knows it can be enabled if outside GET_SUPPORTED_CPUID,
-> > kvm_arch_get_supported_cpuid() can return it as supported.
-> 
-> The guest fails to detect the new cpuid this time.
 
-This should fix it:
+On 02/08/2018 10:13 PM, Thomas Huth wrote:
+> On 30.01.2018 20:49, Paolo Bonzini wrote:
+>> On 25/01/2018 08:51, Klim Kireev wrote:
+>>> The following behavior was observed for QEMU configured by libvirt
+>>> to use guest agent as usual for the guests without virtio-serial
+>>> driver (Windows or the guest remaining in BIOS stage).
+>>>
+>>> In QEMU on first connect to listen character device socket
+>>> the listen socket is removed from poll just after the accept().
+>>> virtio_serial_guest_ready() returns 0 and the descriptor
+>>> of the connected Unix socket is removed from poll and it will
+>>> not be present in poll() until the guest will initialize the driver
+>>> and change the state of the serial to "guest connected".
+>>>
+>>> In libvirt connect() to guest agent is performed on restart and
+>>> is run under VM state lock. Connect() is blocking and can
+>>> wait forever.
+>>> In this case libvirt can not perform ANY operation on that VM.
+>>>
+>>> The bug can be easily reproduced this way:
+>>>
+>>> Terminal 1:
+>>> qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
+>>> (virtio-serial and isa-serial also fit)
+>>>
+>>> Terminal 2:
+>>> minicom -D unix\#/tmp/console.sock
+>>> (type something and press enter)
+>>> C-a x (to exit)
+>>>
+>>> Do 3 times:
+>>> minicom -D unix\#/tmp/console.sock
+>>> C-a x
+>>>
+>>> It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
+>>> the kernel, and the 4th blocks.
+>>>
+>>> The problem is that QEMU doesn't add a read watcher after succesful read
+>>> until the guest device wants to acquire recieved data, so
+>>> I propose to install a separate pullhup watcher regardless of
+>>> whether the device waits for data or not.
+>>>
+>>> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+>>> ---
+>>> Changelog:
+>>> v2: Remove timer as a redundant feature
+>>>
+>>> v3: Remove read call and return G_SOURCE_REMOVE
+>>>
+>>> v4: Move to GSource API
+>>>
+>>> v5: Fix git typos 
+>>>
+>>>  chardev/char-socket.c | 22 ++++++++++++++++++++++
+>>>  1 file changed, 22 insertions(+)
+>>>
+>>> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>>> index 77cdf487eb..a340af6cd3 100644
+>>> --- a/chardev/char-socket.c
+>>> +++ b/chardev/char-socket.c
+>>> @@ -42,6 +42,7 @@ typedef struct {
+>>>      QIOChannel *ioc; /* Client I/O channel */
+>>>      QIOChannelSocket *sioc; /* Client master channel */
+>>>      QIONetListener *listener;
+>>> +    GSource *hup_source;
+>>>      QCryptoTLSCreds *tls_creds;
+>>>      int connected;
+>>>      int max_size;
+>>> @@ -352,6 +353,12 @@ static void tcp_chr_free_connection(Chardev *chr)
+>>>          s->read_msgfds_num = 0;
+>>>      }
+>>>  
+>>> +    if (s->hup_source != NULL) {
+>>> +        g_source_destroy(s->hup_source);
+>>> +        g_source_unref(s->hup_source);
+>>> +        s->hup_source = NULL;
+>>> +    }
+>>> +
+>>>      tcp_set_msgfds(chr, NULL, 0);
+>>>      remove_fd_in_watch(chr);
+>>>      object_unref(OBJECT(s->sioc));
+>>> @@ -455,6 +462,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
+>>>      return TRUE;
+>>>  }
+>>>  
+>>> +static gboolean tcp_chr_hup(QIOChannel *channel,
+>>> +                               GIOCondition cond,
+>>> +                               void *opaque)
+>>> +{
+>>> +    Chardev *chr = CHARDEV(opaque);
+>>> +    tcp_chr_disconnect(chr);
+>>> +    return G_SOURCE_REMOVE;
+>>> +}
+>>> +
+>>>  static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+>>>  {
+>>>      SocketChardev *s = SOCKET_CHARDEV(chr);
+>>> @@ -528,6 +544,12 @@ static void tcp_chr_connect(void *opaque)
+>>>                                             tcp_chr_read,
+>>>                                             chr, chr->gcontext);
+>>>      }
+>>> +
+>>> +    s->hup_source = qio_channel_create_watch(s->ioc, G_IO_HUP);
+>>> +    g_source_set_callback(s->hup_source, (GSourceFunc)tcp_chr_hup,
+>>> +                          chr, NULL);
+>>> +    g_source_attach(s->hup_source, chr->gcontext);
+>>> +
+>>>      qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+>>>  }
+>>>  
+>>>
+>> Queued, thanks.
+>  Hi!
+>
+> I'm currently facing some issues with "make check -j4" (i.e. running the
+> tests in parallel). Git bisect blames this commit - though I'm not sure
+> whether this is really the right one ... Starting with this commit, I
+> saw hangs in test-filter-redirector, 
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index a0aad808bd..44ee524188 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -804,6 +804,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         c = &cpuid_data.entries[cpuid_i++];
-         c->function = KVM_CPUID_FEATURES | kvm_base;
-         c->eax = env->features[FEAT_KVM];
-+        c->edx = env->features[FEAT_KVM_HINTS];
-     }
- 
-     cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
+Commit 8f6d701044bc87197aac8aa2a627d70ce8471726 fixes it
+Have you tried to apply it?
 
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index d70954b..e2974ad 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->          .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EAX,
->          .tcg_features = TCG_KVM_FEATURES,
->      },
-> +    [FEAT_KVM_HINTS] = {
-> +        .feat_names = {
-> +            "hint-dedicated", NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +        },
-> +        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EDX,
-> +        .tcg_features = TCG_KVM_FEATURES,
-> +    },
->      [FEAT_HYPERV_EAX] = {
->          .feat_names = {
->              NULL /* hv_msr_vp_runtime_access */, NULL /*
-> hv_msr_time_refcount_access */,
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index f91e37d..9f73692 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -475,6 +475,7 @@ typedef enum FeatureWord {
->      FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
->      FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
->      FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
-> +    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
->      FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
->      FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
->      FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
-> @@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply
-> Accumulation Single Precision */
->  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
-> 
-> +#define KVM_HINTS_DEDICATED (1U << 0)
-> +
->  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch
-> Prediction Barrier */
-> 
->  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index ad4b159..a0aad80 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s,
-> uint32_t function,
->          if (!kvm_irqchip_in_kernel()) {
->              ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
->          }
-> +    } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
-> +        ret |= KVM_HINTS_DEDICATED;
-> +        found = 1;
->      }
-> 
->      /* fallback for older kernels */
-> 
-> 
-> Regards,
-> Wanpeng Li
-
--- 
-Eduardo
+> but git master rather seems to hang
+> with vhost-user-test instead.
+> Stefan also had issues with "make check -j4" today, so it's apparently
+> not only me ... can somebody else reproduce the problem with the git
+> master branch?
+>
+>  Thomas
