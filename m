@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ekC0H-00041T-IS
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:58:29 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ekC8L-00027s-IE
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 12:06:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ekC0G-0007vW-Cb
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:58:25 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 16:58:05 +0000
-Message-Id: <20180209165810.6668-7-peter.maydell@linaro.org>
-In-Reply-To: <20180209165810.6668-1-peter.maydell@linaro.org>
-References: <20180209165810.6668-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 06/11] hw/intc/armv7m_nvic: Implement SCR
+	(envelope-from <alex.williamson@redhat.com>) id 1ekC8K-00075b-FT
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 12:06:45 -0500
+Date: Fri, 9 Feb 2018 10:06:34 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180209100634.7a908eb9@w520.home>
+In-Reply-To: <CAMuHMdWaoutP+oFL0Vtw+Z-986_=3wLAu+58N9ZT7t+uZb1ycA@mail.gmail.com>
+References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
+	<1518189456-2873-5-git-send-email-geert+renesas@glider.be>
+	<20180209085024.004b6f9e@w520.home>
+	<CAMuHMdWaoutP+oFL0Vtw+Z-986_=3wLAu+58N9ZT7t+uZb1ycA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/RFC 4/5] vfio: No-IOMMU mode support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,112 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 
-We were previously making the system control register (SCR)
-just RAZ/WI. Although we don't implement the functionality
-this register controls, we should at least provide the state,
-including the banked state for v8M.
+On Fri, 9 Feb 2018 17:06:34 +0100
+Geert Uytterhoeven <geert@linux-m68k.org> wrote:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h      |  7 +++++++
- hw/intc/armv7m_nvic.c | 12 ++++++++----
- target/arm/machine.c  | 12 ++++++++++++
- 3 files changed, 27 insertions(+), 4 deletions(-)
+> Hi Alex,
+> 
+> On Fri, Feb 9, 2018 at 4:50 PM, Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+> > On Fri,  9 Feb 2018 16:17:35 +0100
+> > Geert Uytterhoeven <geert+renesas@glider.be> wrote:  
+> >> From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> >>
+> >> Add qemu support for the newly introduced VFIO No-IOMMU driver.
+> >>
+> >> We need to add special handling for:
+> >> - Group character device is /dev/vfio/noiommu-$GROUP.
+> >> - No-IOMMU does not rely on a memory listener.
+> >> - No IOMMU will be set for its group, so no need to call
+> >>   vfio_kvm_device_add_group.
+> >>
+> >> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> >> [geert: Rebase]
+> >> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> >> ---
+> >>  hw/vfio/common.c              | 61 ++++++++++++++++++++++++++++++++++---------
+> >>  include/hw/vfio/vfio-common.h |  2 ++
+> >>  2 files changed, 50 insertions(+), 13 deletions(-)  
+> >
+> > NAK.  I'm opposed to no-iommu support in QEMU in general, but accepting
+> > vfio devices with no-iommu (which provide no DMA translation!!!)
+> > transparently as if they might actually work like a regular vfio device
+> > is absolutely unacceptable.  Without DMA translation and isolation, you
+> > might want to think about another interface, I'm not keen on the idea  
+> 
+> What if the device cannot do DMA?
+> 
+> There are other devices that cannot do DMA, but that can be useful to
+> access from a guest in an embedded system.
+> E.g. smart ADC monitor blocks that monitor and average several ADCs in an
+> automotive environment (drivers/iio/adc/rcar-gyroadc.c).
+> 
+> Should all such devices be paravirtualized?
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 4c1b9e9814..cfa92c477b 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -497,6 +497,7 @@ typedef struct CPUARMState {
-         uint32_t aircr; /* only holds r/w state if security extn implemented */
-         uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
-         uint32_t csselr[M_REG_NUM_BANKS];
-+        uint32_t scr[M_REG_NUM_BANKS];
-     } v7m;
- 
-     /* Information associated with an exception about to be taken:
-@@ -1258,6 +1259,12 @@ FIELD(V7M_CCR, STKALIGN, 9, 1)
- FIELD(V7M_CCR, DC, 16, 1)
- FIELD(V7M_CCR, IC, 17, 1)
- 
-+/* V7M SCR bits */
-+FIELD(V7M_SCR, SLEEPONEXIT, 1, 1)
-+FIELD(V7M_SCR, SLEEPDEEP, 2, 1)
-+FIELD(V7M_SCR, SLEEPDEEPS, 3, 1)
-+FIELD(V7M_SCR, SEVONPEND, 4, 1)
-+
- /* V7M AIRCR bits */
- FIELD(V7M_AIRCR, VECTRESET, 0, 1)
- FIELD(V7M_AIRCR, VECTCLRACTIVE, 1, 1)
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 040f3380ec..ea3b7cce14 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -863,8 +863,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         }
-         return val;
-     case 0xd10: /* System Control.  */
--        /* TODO: Implement SLEEPONEXIT.  */
--        return 0;
-+        return cpu->env.v7m.scr[attrs.secure];
-     case 0xd14: /* Configuration Control.  */
-         /* The BFHFNMIGN bit is the only non-banked bit; we
-          * keep it in the non-secure copy of the register.
-@@ -1285,8 +1284,13 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         }
-         break;
-     case 0xd10: /* System Control.  */
--        /* TODO: Implement control registers.  */
--        qemu_log_mask(LOG_UNIMP, "NVIC: SCR unimplemented\n");
-+        /* We don't implement deep-sleep so these bits are RAZ/WI.
-+         * The other bits in the register are banked.
-+         * QEMU's implementation ignores SEVONPEND and SLEEPONEXIT, which
-+         * is architecturally permitted.
-+         */
-+        value &= ~(R_V7M_SCR_SLEEPDEEP_MASK | R_V7M_SCR_SLEEPDEEPS_MASK);
-+        cpu->env.v7m.scr[attrs.secure] = value;
-         break;
-     case 0xd14: /* Configuration Control.  */
-         /* Enforce RAZ/WI on reserved and must-RAZ/WI bits */
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index cae63c2f98..30fb1454a6 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -226,6 +226,16 @@ static const VMStateDescription vmstate_m_csselr = {
-     }
- };
- 
-+static const VMStateDescription vmstate_m_scr = {
-+    .name = "cpu/m/scr",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.v7m.scr[M_REG_NS], ARMCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_m = {
-     .name = "cpu/m",
-     .version_id = 4,
-@@ -248,6 +258,7 @@ static const VMStateDescription vmstate_m = {
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_m_faultmask_primask,
-         &vmstate_m_csselr,
-+        &vmstate_m_scr,
-         NULL
-     }
- };
-@@ -411,6 +422,7 @@ static const VMStateDescription vmstate_m_security = {
-         VMSTATE_UINT32(env.sau.rnr, ARMCPU),
-         VMSTATE_VALIDATE("SAU_RNR is valid", sau_rnr_vmstate_validate),
-         VMSTATE_UINT32(env.sau.ctrl, ARMCPU),
-+        VMSTATE_UINT32(env.v7m.scr[M_REG_S], ARMCPU),
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.16.1
+How do we know that a device is not capable of DMA?  The moment we add
+no-iommu support generically to QEMU, I get to deal with a swarm of
+people trying to use it to assign DMA capable PCI devices to VMs and
+failing miserably.  We added no-iommu support because the UIO PCI driver
+was under pressure to add support for MSI/X interrupts and we figured
+we could at least taint the kernel an give people a path to a more
+secure setup with an IOMMU by allowing use of the vfio device
+interface.  For PCI, this makes some sense because PCI has architected
+interrupts and config space and standard layouts.  What's the value of
+vfio over UIO for ad-hoc, non-DMA platform devices?  UIO is intended for
+non-DMA devices.  vfio is intended for IOMMU protected, DMA capable
+devices.  vfio no-IOMMU is a band-aide that hopefully goes away
+eventually.
+
+> > of corrupting vfio support in order to blink some LEDs.  Thanks,  
+> 
+> This GPIO+LED prototype is just a proof-of-concept. There's no plan to
+> upstream it.
+
+If vfio with no-IOMMU is to be used, it must not enable users to
+casually assign DMA capable devices.  Certainly any PCI/e device needs
+to be assumed to be DMA capable.  I don't know how you tell with
+platform devices since there's no standard interface.  Thanks,
+
+Alex
