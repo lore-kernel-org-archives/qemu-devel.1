@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ek7Rm-0006g8-0R
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:06:31 -0500
+	(envelope-from <bounces@canonical.com>) id 1ek7ac-0002Yj-Lh
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ek7Rh-0006su-6r
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:06:29 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56008 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ek7Rh-0006sT-2A
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:06:25 -0500
-Date: Fri, 9 Feb 2018 12:06:07 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180209120607.GC2428@work-vm>
-References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
-	<1517915299-15349-2-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1ek7aX-0005Q9-Mb
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:15:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60272)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ek7aX-0005PK-Gk
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:15:33 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ek7aW-0000sx-31
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 12:15:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1484E2E80C7
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 12:15:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1517915299-15349-2-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 09 Feb 2018 12:08:25 -0000
+From: Robert Pasz <1748434@bugs.launchpad.net>
+Reply-To: Bug 1748434 <1748434@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151817810596.29573.3248344286701751294.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1748434] [NEW] Possibly wrong GICv3 behavior when
+ secure enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
+Public bug reported:
 
-<snip>
+I an tried arm-aarch64 interrupt routing to EL3, by SCR_EL3.FIQ=3D1. First =
+I am started QEMU with secure=3Don and GICv3 support.
+I programmed secure and non-secure timers and set-up appropriate interrupts=
+.Secure timer to be GRP1_Secure and non-secure timer to be GRP1_NonSecure. =
+ICC_PMR =3D 0xff. Then I switched CPU to EL1. =
 
-> @@ -374,6 +459,7 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
->      VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
->      f |= dev->host_features;
->      virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
-> +    virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
+With that setup no interrupt was delivered to PE. GIC interface showed that=
+ non secure IRQ is pending. ICC_PMR read at EL1 returns 0 (shall return val=
+ue ((PMR_(el3) << 1) & 0xff) according to GIC specification.
+Than I tried to increase interrupt priority mask  - so I set ICC_PMR =3D 0x=
+7f (at EL3). Then I read at EL1 ICC_PMR=3D0xfe - (is shall be 0). With this=
+ setup IRQ of secure timer was taken at EL3, non secure timer didn't rise I=
+RQ (as it is masked by PMR). =
 
-I agree with Michael that has to be tied to a compatibility flag
-somewhere; otherwise we'd hit problems with migration to older QEMUs of
-newer guests.
+I dig to qemu code and see wrong condition in file arm_gicv3_cpuif.c in fun=
+ction  icc_pmr_read(). This behavior is opposite of ARM specification.
 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index cb1950f..d6f462c 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2186,6 +2186,16 @@ static int ram_init_all(RAMState **rsp)
->      return 0;
->  }
->  
-> +void skip_free_pages_from_dirty_bitmap(RAMBlock *block, ram_addr_t offset,
-> +                                       size_t len)
-> +{
-> +    long start = offset >> TARGET_PAGE_BITS,
-> +         nr = len >> TARGET_PAGE_BITS;
-> +
-> +    bitmap_clear(block->bmap, start, nr);
-> +    ram_state->migration_dirty_pages -= nr;
-> +}
-> +
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-I don't think this will work for postcopy; just not sending a page will
-mean that the guest will block in userfault waiting for the page
-(then it will request it but it wont be sent because the source already
-thinks it's clean).
+-- =
 
-I think you're going to need to make the 'unused' pages be sent as zero
-pages; probably by modifying save_zero_page to check a bitmap.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1748434
 
-(I'm not sure how that will interact with hugepages)
+Title:
+  Possibly wrong GICv3 behavior when secure enabled
 
-Dave
+Status in QEMU:
+  New
 
->  /*
->   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
->   * long-running RCU critical section.  When rcu-reclaims in the code
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Bug description:
+  I an tried arm-aarch64 interrupt routing to EL3, by SCR_EL3.FIQ=3D1. Firs=
+t I am started QEMU with secure=3Don and GICv3 support.
+  I programmed secure and non-secure timers and set-up appropriate interrup=
+ts.Secure timer to be GRP1_Secure and non-secure timer to be GRP1_NonSecure=
+. ICC_PMR =3D 0xff. Then I switched CPU to EL1. =
+
+  With that setup no interrupt was delivered to PE. GIC interface showed th=
+at non secure IRQ is pending. ICC_PMR read at EL1 returns 0 (shall return v=
+alue ((PMR_(el3) << 1) & 0xff) according to GIC specification.
+  Than I tried to increase interrupt priority mask  - so I set ICC_PMR =3D =
+0x7f (at EL3). Then I read at EL1 ICC_PMR=3D0xfe - (is shall be 0). With th=
+is setup IRQ of secure timer was taken at EL3, non secure timer didn't rise=
+ IRQ (as it is masked by PMR). =
+
+  I dig to qemu code and see wrong condition in file arm_gicv3_cpuif.c in f=
+unction  icc_pmr_read(). This behavior is opposite of ARM specification.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1748434/+subscriptions
