@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ek7CT-0006FZ-NV
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:50:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ek7H2-0000sn-CG
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:55:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ek7CQ-00064u-Jb
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:50:41 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37976 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1ek7Gx-0000yH-HU
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:55:22 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45892 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ek7CQ-00064Y-De
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:50:38 -0500
-Date: Fri, 9 Feb 2018 11:50:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180209115021.GB2428@work-vm>
-References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
-	<1517915299-15349-3-git-send-email-wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ek7Gx-0000xw-AL
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:55:19 -0500
+References: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
+	<bb1b8270-e924-3d41-a172-38ba79db9bf7@redhat.com>
+	<fd22674c-059e-8d37-338c-5d2d4d96eb20@redhat.com>
+	<CAFEAcA9eKZNznjgnRy_vuKvcQZ2e=0XD0b9reGBFBBFoBTREQg@mail.gmail.com>
+	<CAKmqyKNN_ysFP0pwDaccc1T+znoMfNtTXPzhLE-nsB7pCqmctg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4b726592-1078-1ac8-37b1-9227122d2429@redhat.com>
+Date: Fri, 9 Feb 2018 12:55:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1517915299-15349-3-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: use the free page
- reporting feature from balloon
+In-Reply-To: <CAKmqyKNN_ysFP0pwDaccc1T+znoMfNtTXPzhLE-nsB7pCqmctg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] "make check -j4" hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com
+To: Alistair Francis <alistair23@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Klim Kireev <klim.kireev@virtuozzo.com>
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> Use the free page reporting feature from the balloon device to clear the
-> bits corresponding to guest free pages from the dirty bitmap, so that the
-> free memory are not sent.
+On 08/02/2018 22:54, Alistair Francis wrote:
+> On Thu, Feb 8, 2018 at 1:12 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 8 February 2018 at 19:13, Thomas Huth <thuth@redhat.com> wrote:
+>>> I'm currently facing some issues with "make check -j4" (i.e. running the
+>>> tests in parallel). Git bisect blames this commit - though I'm not sure
+>>> whether this is really the right one ... Starting with this commit, I
+>>> saw hangs in test-filter-redirector, but git master rather seems to hang
+>>> with vhost-user-test instead.
+>>> Stefan also had issues with "make check -j4" today, so it's apparently
+>>> not only me ... can somebody else reproduce the problem with the git
+>>> master branch?
+>>
+>> Yeah, I was seeing odd make check hangs with parallelization enabled
+>> too, on vhost-user-test... (my builds for merge tests are almost
+>> all non-parallelized I think).
 > 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 24 ++++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
+> I don't only see hangs I also am seeing this:
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index d6f462c..4fe16d2 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -49,6 +49,7 @@
->  #include "qemu/rcu_queue.h"
->  #include "migration/colo.h"
->  #include "migration/block.h"
-> +#include "sysemu/balloon.h"
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -206,6 +207,10 @@ struct RAMState {
->      uint32_t last_version;
->      /* We are in the first round */
->      bool ram_bulk_stage;
-> +    /* The feature, skipping the transfer of free pages, is supported */
-> +    bool free_page_support;
-> +    /* Skip the transfer of free pages in the bulk stage */
-> +    bool free_page_done;
->      /* How many times we have dirty too many pages */
->      int dirty_rate_high_cnt;
->      /* these variables are used for bitmap sync */
-> @@ -773,7 +778,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->      unsigned long *bitmap = rb->bmap;
->      unsigned long next;
->  
-> -    if (rs->ram_bulk_stage && start > 0) {
-> +    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
->          next = start + 1;
->      } else {
->          next = find_next_bit(bitmap, size, start);
-> @@ -1653,6 +1658,8 @@ static void ram_state_reset(RAMState *rs)
->      rs->last_page = 0;
->      rs->last_version = ram_list.version;
->      rs->ram_bulk_stage = true;
-> +    rs->free_page_support = balloon_free_page_support();
-> +    rs->free_page_done = false;
->  }
->  
->  #define MAX_WAIT 50 /* ms, half buffered_file limit */
-> @@ -2135,7 +2142,7 @@ static int ram_state_init(RAMState **rsp)
->      return 0;
->  }
->  
-> -static void ram_list_init_bitmaps(void)
-> +static void ram_list_init_bitmaps(RAMState *rs)
->  {
->      RAMBlock *block;
->      unsigned long pages;
-> @@ -2145,7 +2152,11 @@ static void ram_list_init_bitmaps(void)
->          QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->              pages = block->max_length >> TARGET_PAGE_BITS;
->              block->bmap = bitmap_new(pages);
-> -            bitmap_set(block->bmap, 0, pages);
-> +            if (rs->free_page_support) {
-> +                bitmap_set(block->bmap, 1, pages);
-
-I don't understand how it makes sense to do that here;
-ignoring anything ese it means that migration_dirty_pages is wrong
-which could end up with migration finishing before all real pages are
-sent.
-
-Dave
-
-> +            } else {
-> +                bitmap_set(block->bmap, 0, pages);
-> +            }
->              if (migrate_postcopy_ram()) {
->                  block->unsentmap = bitmap_new(pages);
->                  bitmap_set(block->unsentmap, 0, pages);
-> @@ -2161,7 +2172,7 @@ static void ram_init_bitmaps(RAMState *rs)
->      qemu_mutex_lock_ramlist();
->      rcu_read_lock();
->  
-> -    ram_list_init_bitmaps();
-> +    ram_list_init_bitmaps(rs);
->      memory_global_dirty_log_start();
->      migration_bitmap_sync(rs);
->  
-> @@ -2275,6 +2286,11 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->  
->      ram_control_before_iterate(f, RAM_CONTROL_ROUND);
->  
-> +    if (rs->free_page_support && !rs->free_page_done) {
-> +        balloon_free_page_poll();
-> +        rs->free_page_done = true;
-> +    }
-> +
->      t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->      i = 0;
->      while ((ret = qemu_file_rate_limit(f)) == 0) {
-> -- 
-> 1.8.3.1
+> qemu-system-i386: -chardev
+> socket,id=chr-test,path=/tmp/vhost-test-wxuOIX/test.sock: Failed to
+> connect socket /tmp/vhost-test-wxuOIX/test.sock: No such file or
+> directory
+> socket_accept failed: Resource temporarily unavailable
+> **
+> ERROR:tests/libqtest.c:218:qtest_init_without_qmp_handshake: assertion
+> failed: (s->fd >= 0 && s->qmp_fd >= 0)
+> GTester: last random seed: R02Sa67ba85090274c01deb9c2d15b044c10
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> It isn't 100% reproducible though.
+
+It may be something like commit 8f6d701044bc87197aac8aa2a627d70ce8471726.
+
+In the meanwhile we should revert it.
+
+Paolo
