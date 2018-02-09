@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ekAXo-000211-CU
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:24:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ekAaN-0004Er-Bf
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ekAXl-0007ti-5O
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:24:56 -0500
-Received: from 11.mo3.mail-out.ovh.net ([87.98.184.158]:40637)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ekAXk-0007rq-Qs
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:24:53 -0500
-Received: from player758.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id B4252195505
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 16:24:49 +0100 (CET)
-Date: Fri, 9 Feb 2018 16:22:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180209162233.1d191ace@bahia.lan>
-In-Reply-To: <20180208180019.13683-5-antonios.motakis@huawei.com>
-References: <20180208180019.13683-1-antonios.motakis@huawei.com>
-	<20180208180019.13683-5-antonios.motakis@huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ekAaM-0000p5-C9
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:35 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ekAaM-0000oO-5z
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:34 -0500
+Received: by mail-oi0-x244.google.com with SMTP id j188so6361194oib.6
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 07:27:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] 9pfs: stat_to_qid: implement slow path
+In-Reply-To: <1518189456-2873-4-git-send-email-geert+renesas@glider.be>
+References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
+	<1518189456-2873-4-git-send-email-geert+renesas@glider.be>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Feb 2018 15:27:13 +0000
+Message-ID: <CAFEAcA_Z1JH6RXp19g2N3rV3TGOTa7LzFctEScrENBYB8eAf3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH/RFC 3/5] hw/arm/virt: Allow dynamic sysbus
+ devices again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,189 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: antonios.motakis@huawei.com
-Cc: qemu-devel@nongnu.org, veaceslav.falico@huawei.com, Eduard.Shishkin@huawei.com, andy.wangguoli@huawei.com, Jani.Kokkonen@huawei.com, cota@braap.org, berrange@redhat.com
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, linux-renesas-soc@vger.kernel.org
 
-On Thu, 8 Feb 2018 19:00:19 +0100
-<antonios.motakis@huawei.com> wrote:
-
-> From: Antonios Motakis <antonios.motakis@huawei.com>
-> 
-> stat_to_qid attempts via qid_path_prefixmap to map unique files
-> (which are identified by 64bt inode nr and 32 bit device id)
-> to a 64 QID path value. However this implementation makes some
-> assumptions about inode number generation on the host.
-> 
-> If qid_path_prefixmap fails, we still have 48bits available in
-> the QID path to fall back to a less memory efficient full mapping.
-> 
-> Signed-off-by: Antonios Motakis <antonios.motakis@huawei.com>
+On 9 February 2018 at 15:17, Geert Uytterhoeven <geert+renesas@glider.be> wrote:
+> Allow the instantation of generic dynamic sysbus devices again, without
+> the need to create a new device-specific vfio type.
+>
+> This is a partial revert of commit  6f2062b9758ebc64 ("hw/arm/virt:
+> Allow only supported dynamic sysbus devices").
+>
+> Not-Yet-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > ---
->  hw/9pfs/9p.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
->  hw/9pfs/9p.h |  9 +++++++++
->  2 files changed, 70 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index f434f05..ae7845d 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -581,23 +581,72 @@ static uint32_t qpp_hash(QppEntry e)
->      return tb_hash_func7(e.ino_prefix, e.dev, 0, 0, 0);
->  }
->  
-> +static uint32_t qpf_hash(QpfEntry e)
-> +{
-> +    return tb_hash_func7(e.ino, e.dev, 0, 0, 0);
+>  hw/arm/virt.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index b334c82edae9fb1f..fa83784fc08ed076 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1596,6 +1596,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      mc->max_cpus = 255;
+>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
+>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+>      mc->block_default_type = IF_VIRTIO;
+>      mc->no_cdrom = 1;
+>      mc->pci_allow_0_address = true;
 
-Same remark as with previous patch, obviously :)
+This needs a lot of justification. Dynamic sysbus is not supposed
+to be for plugging any random sysbus device in, it's for vfio,
+which needs special casing anyway to work right. (Overall it's
+a terrible hack -- in an ideal world all vfio would use pci
+or another probeable bus.)
 
-> +}
-> +
->  static bool qpp_lookup_func(const void *obj, const void *userp)
->  {
->      const QppEntry *e1 = obj, *e2 = userp;
->      return (e1->dev == e2->dev) && (e1->ino_prefix == e2->ino_prefix);
-
-Parenthesitis ? ;)
-
->  }
->  
-> -static void qpp_table_remove(struct qht *ht, void *p, uint32_t h, void *up)
-> +static bool qpf_lookup_func(const void *obj, const void *userp)
-> +{
-> +    const QpfEntry *e1 = obj, *e2 = userp;
-> +    return (e1->dev == e2->dev) && (e1->ino == e2->ino);
-
-Parenthesitis ? ;)
-
-> +}
-> +
-> +static void qp_table_remove(struct qht *ht, void *p, uint32_t h, void *up)
->  {
->      g_free(p);
->  }
->  
-> -static void qpp_table_destroy(struct qht *ht)
-> +static void qp_table_destroy(struct qht *ht)
->  {
-> -    qht_iter(ht, qpp_table_remove, NULL);
-> +    qht_iter(ht, qp_table_remove, NULL);
->      qht_destroy(ht);
->  }
->  
-> +static int qid_path_fullmap(V9fsPDU *pdu, const struct stat *stbuf,
-> +                            uint64_t *path)
-> +{
-> +    QpfEntry lookup = {
-> +        .dev = stbuf->st_dev,
-> +        .ino = stbuf->st_ino
-> +    }, *val;
-> +    uint32_t hash = qpf_hash(lookup);
-> +
-> +    /* most users won't need the fullmap, so init the table lazily */
-> +    if (!pdu->s->qpf_table.map) {
-> +        qht_init(&pdu->s->qpf_table, 1 << 16, QHT_MODE_AUTO_RESIZE);
-> +    }
-> +
-> +    val = qht_lookup(&pdu->s->qpf_table, qpf_lookup_func, &lookup, hash);
-> +
-> +    if (!val) {
-> +        if (pdu->s->qp_fullpath_next == 0) {
-> +            /* no more files can be mapped :'( */
-> +            return -ENFILE;
-> +        }
-> +
-> +        val = g_malloc0(sizeof(QppEntry));
-> +        if (!val) {
-> +            return -ENOMEM;
-> +        }
-> +        *val = lookup;
-> +
-> +        /* new unique inode and device combo */
-> +        val->path = pdu->s->qp_fullpath_next++;
-> +        pdu->s->qp_fullpath_next &= QPATH_INO_MASK;
-> +        qht_insert(&pdu->s->qpf_table, val, hash);
-> +    }
-> +
-> +    *path = val->path;
-> +    return 0;
-> +}
-> +
->  /* stat_to_qid needs to map inode number (64 bits) and device id (32 bits)
->   * to a unique QID path (64 bits). To avoid having to map and keep track
->   * of up to 2^64 objects, we map only the 16 highest bits of the inode plus
-> @@ -646,6 +695,10 @@ static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID *qidp)
->  
->      /* map inode+device to qid path (fast path) */
->      err = qid_path_prefixmap(pdu, stbuf, &qidp->path);
-> +    if (err == -ENFILE) {
-> +        /* fast path didn't work, fal back to full map */
-> +        err = qid_path_fullmap(pdu, stbuf, &qidp->path);
-
-Hmm... if we have already generate QIDs with fast path, how
-can we be sure we won't collide with the ones from the full
-map ?
-
-IIRC, Emilio had suggested to use bit 63 to distinguish between
-fast and slow path.
-
-> +    }
->      if (err) {
->          return err;
->      }
-> @@ -3693,6 +3746,7 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
->      /* QID path hash table. 1 entry ought to be enough for anybody ;) */
->      qht_init(&s->qpp_table, 1, QHT_MODE_AUTO_RESIZE);
->      s->qp_prefix_next = 1; /* reserve 0 to detect overflow */
-> +    s->qp_fullpath_next = 1;
->  
->      s->ctx.fst = &fse->fst;
->      fsdev_throttle_init(s->ctx.fst);
-> @@ -3707,7 +3761,8 @@ out:
->          }
->          g_free(s->tag);
->          g_free(s->ctx.fs_root);
-> -        qpp_table_destroy(&s->qpp_table);
-> +        qp_table_destroy(&s->qpp_table);
-> +        qp_table_destroy(&s->qpf_table);
->          v9fs_path_free(&path);
->      }
->      return rc;
-> @@ -3720,7 +3775,8 @@ void v9fs_device_unrealize_common(V9fsState *s, Error **errp)
->      }
->      fsdev_throttle_cleanup(s->ctx.fst);
->      g_free(s->tag);
-> -    qpp_table_destroy(&s->qpp_table);
-> +    qp_table_destroy(&s->qpp_table);
-> +    qp_table_destroy(&s->qpf_table);
->      g_free(s->ctx.fs_root);
->  }
->  
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index 80428f7..b561f4a 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -241,6 +241,13 @@ typedef struct {
->      uint16_t qp_prefix;
->  } QppEntry;
->  
-> +/* QID path full entry, as above */
-> +typedef struct {
-> +    dev_t dev;
-> +    ino_t ino;
-> +    uint64_t path;
-> +} QpfEntry;
-> +
->  struct V9fsState
->  {
->      QLIST_HEAD(, V9fsPDU) free_list;
-> @@ -263,7 +270,9 @@ struct V9fsState
->      V9fsConf fsconf;
->      V9fsQID root_qid;
->      struct qht qpp_table;
-> +    struct qht qpf_table;
->      uint16_t qp_prefix_next;
-> +    uint64_t qp_fullpath_next;
->  };
->  
->  /* 9p2000.L open flags */
+thanks
+-- PMM
