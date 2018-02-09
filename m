@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ek9PK-0006AL-Hk
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:12:08 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ek9QP-0006wv-R7
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:13:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ek9PF-0003zl-R0
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:12:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ek9PF-0003zG-IP
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:12:01 -0500
-References: <20180124053957.29145-1-peterx@redhat.com>
-	<20180124053957.29145-2-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5df6f309-c865-7b7f-3a3e-afd23bc17694@redhat.com>
-Date: Fri, 9 Feb 2018 08:10:53 -0600
+	(envelope-from <mreitz@redhat.com>) id 1ek9QO-00056o-Uy
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:13:13 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-5-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5641b890-bb30-a253-634b-13e0e28d0110@redhat.com>
+Date: Fri, 9 Feb 2018 15:12:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180124053957.29145-2-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 01/23] docs: update QMP documents for
- OOB commands
+In-Reply-To: <20180208192328.16550-5-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ngfhkrzotH0lTFlJM5Z3g3r7SEL8txXtR"
+Subject: Re: [Qemu-devel] [PATCH 04/27] qcow2: Pass BlockdevCreateOptions to
+ qcow2_create2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,229 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On 01/23/2018 11:39 PM, Peter Xu wrote:
-> Update both the developer and spec for the new QMP OOB (Out-Of-Band)
-> command.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ngfhkrzotH0lTFlJM5Z3g3r7SEL8txXtR
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <5641b890-bb30-a253-634b-13e0e28d0110@redhat.com>
+Subject: Re: [PATCH 04/27] qcow2: Pass BlockdevCreateOptions to
+ qcow2_create2()
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-5-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-5-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> All of the simple options are now passed to qcow2_create2() in a
+> BlockdevCreateOptions object. Still missing: node-name and the
+> encryption options.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->   docs/devel/qapi-code-gen.txt | 68 ++++++++++++++++++++++++++++++++++++++++----
->   docs/interop/qmp-spec.txt    | 30 ++++++++++++++++---
->   2 files changed, 89 insertions(+), 9 deletions(-)
-> 
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index 06ab699066..4d3db0ad39 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -554,9 +554,12 @@ following example objects:
->   
->   === Commands ===
->   
-> +--- General Command Layout ---
-> +
->   Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
->            '*returns': TYPE-NAME, '*boxed': true,
-> -         '*gen': false, '*success-response': false }
-> +         '*gen': false, '*success-response': false,
-> +         '*allow-oob': false }
->   
+>  block/qcow2.c | 190 ++++++++++++++++++++++++++++++++++++++++++++++----=
+--------
+>  1 file changed, 152 insertions(+), 38 deletions(-)
 
-Shouldn't this be '*allow-oob': true, as the only time you add the field 
-is if you turn oob on (as it already defaults to off)?
-
->   Commands are defined by using a dictionary containing several members,
->   where three members are most common.  The 'command' member is a
-> @@ -636,6 +639,59 @@ possible, the command expression should include the optional key
->   'success-response' with boolean value false.  So far, only QGA makes
->   use of this member.
->   
-> +A command can be declared to support Out-Of-Band (OOB) execution.  By
-> +default, commands do not support OOB.  To declare a command to support
-
-s/to support/that supports/
-
-> +it, we need an extra 'allow-oob' field.  For example:
-> +
-> + { 'command': 'migrate_recover',
-> +   'data': { 'uri': 'str' }, 'allow-oob': true }
-> +
-> +To execute a command in Out-Of-Band way, we need to specify the
-> +"control" field in the request, with "run-oob" set to true. Example:
-> +
-> + => { "execute": "command-support-oob",
-> +      "arguments": { ... },
-> +      "control": { "run-oob": true } }
-> + <= { "return": { } }
-
-This talks more about the QMP user protocol, while the rest of the 
-document is about QAPI constructs.  But we do have an example of 
-'my-first-command' in the document, so I guess this is okay.
-
-> +
-> +Without it, even the commands that support out-of-band execution will
-> +still be run In-Band.
-> +
-> +Please read the "Out-Of-Band Command Execution" section below for more
-> +information on how OOB execution works.
-> +
-> +--- About Out-Of-Band (OOB) Command Execution ---
-
-Do we really need the paragraph mentioning a forward reference, when the 
-very next thing is the item that was referenced?
-
-> +
-> +Out-Of-Band does not mean a special kind of command. Instead, it's a
-> +special way to execute the command.  One normal command can be
-> +declared to support Out-Of-Band execution when 'allow-oob' field is
-> +set to true when defining the command.  With that, it can be run in an
-> +Out-Of-Band way if 'run-oob' is specified in 'control' field of
-> +command request.
-> +
-> +When we say normal QMP command executions, it means basically the
-> +following:
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-Under normal QMP command execution, the following apply to each command:
+--ngfhkrzotH0lTFlJM5Z3g3r7SEL8txXtR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> +
-> +- They are executed in order,
-> +- They run only in main thread of QEMU,
-> +- They have the BQL taken during execution.
-> +
-> +For OOB command executions, they differ in the following:
+-----BEGIN PGP SIGNATURE-----
 
-When a command is executed with OOB, the following changes occur:
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp9rGASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Afx8H/iZjgOCk6hYmN0up+raOitciD+zz7zeo
+ju1qwl7m+QjL04L+5XQK2y2yTE4+rV94IDgg1jBR39fRRdzGMX0Z6aBnAHhrhgKr
+IzvYmhMlLga9TolJl3AmN7vK963i7jf/kZFg3qkJJ+WG+qTzgNwxe4Xh5dWQm2eX
+/NNaJtvRcx6Id0x69F4nbeQr3bbhgpIWdPir36K0E6cZupnAjO5zYOrn7Mx3ULXN
+am7xNoYEa1TP7c1GkKFtzV/Y7sJCQbGlD9Hn5lWFwLhEpoDpBuT3Rb0/hdkKFfEu
+7shEyZ45sJhrJ5ykDMCav77BAisZbuvZKJgqPnnCXmCHK/2C3wiCBqA=
+=4SUa
+-----END PGP SIGNATURE-----
 
-> +
-> +- They can be executed before an existing command,
-
-They can be completed before a pending in-band command,
-
-> +- They run in a monitor dedicated thread,
-> +- They do not take the BQL during execution.
-> +
-> +OOB command handlers must satisfy the following conditions:
-> +
-> +- It executes extremely fast,
-> +- It does not take any lock, or, it can take very small locks if all
-> +  critical regions also follow the rules for OOB command handler code,
-> +- It does not invoke system calls that may block,
-> +- It does not access guest RAM that may block when userfaultfd is
-> +  enabled for postcopy live migration.
-> +
-> +If in doubt, do not implement OOB execution support.
->   
->   === Events ===
->   
-> @@ -739,10 +795,12 @@ references by name.
->   QAPI schema definitions not reachable that way are omitted.
->   
->   The SchemaInfo for a command has meta-type "command", and variant
-> -members "arg-type" and "ret-type".  On the wire, the "arguments"
-> -member of a client's "execute" command must conform to the object type
-> -named by "arg-type".  The "return" member that the server passes in a
-> -success response conforms to the type named by "ret-type".
-> +members "arg-type", "ret-type" and "allow-oob".  On the wire, the
-> +"arguments" member of a client's "execute" command must conform to the
-> +object type named by "arg-type".  The "return" member that the server
-> +passes in a success response conforms to the type named by
-> +"ret-type".  When "allow-oob" is set, it means the command supports
-> +out-of-band execution.
->   
->   If the command takes no arguments, "arg-type" names an object type
->   without members.  Likewise, if the command returns nothing, "ret-type"
-> diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-> index f8b5356015..e20163c138 100644
-> --- a/docs/interop/qmp-spec.txt
-> +++ b/docs/interop/qmp-spec.txt
-> @@ -83,16 +83,27 @@ The greeting message format is:
->   2.2.1 Capabilities
->   ------------------
->   
-> -As of the date this document was last revised, no server or client
-> -capability strings have been defined.
-> +Currently supported capabilities are:
->   
-> +- "oob": it means the QMP server supports "Out-Of-Band" command
-> +  execution.  For more detail, please see "run-oob" parameter in
-
-s/detail/details/
-
-> +  "Issuing Commands" section below.  Not all commands allow this "oob"
-> +  execution.  One can know whether one command supports "oob" by
-> +  "query-qmp-schema" command.
-
-The "query-qmp-schema" command can be used to inspect which commands 
-support "oob" execution.
-
-> +
-> +QMP clients can get a list of supported QMP capabilities of the QMP
-> +server in the greeting message mentioned above.  By default, all the
-> +capabilities are off.  To enable a specific or multiple of QMP
-
-s/specific or multiple of/any/
-
-> +capabilities, QMP client needs to send "qmp_capabilities" command with
-
-s/QMP/the QMP
-s/send/send the/
-s/with/with an/
-
-> +extra parameter for the capabilities.
-
-s/the/the requested/
-
->   
->   2.3 Issuing Commands
->   --------------------
->   
->   The format for command execution is:
->   
-> -{ "execute": json-string, "arguments": json-object, "id": json-value }
-> +{ "execute": json-string, "arguments": json-object, "id": json-value,
-> +  "control": json-dict }
->   
->    Where,
->   
-> @@ -102,10 +113,16 @@ The format for command execution is:
->     required. Each command documents what contents will be considered
->     valid when handling the json-argument
->   - The "id" member is a transaction identification associated with the
-> -  command execution, it is optional and will be part of the response if
-> +  command execution.  It is required if OOB is enabled, and optional
-> +  if not.  The same "id" field will be part of the response if
->     provided. The "id" member can be any json-value, although most
->     clients merely use a json-number incremented for each successive
->     command
-> +- The "control" member is optional, and currently only used for
-> +  "out-of-band" execution ("oob" as shortcut). The handling or
-> +  response of an "oob" command can overtake prior in-band commands.
-> +  To enable "oob" feature, just provide a control field with: {
-
-To enable "oob" handling of a particular command,
-
-> +  "control": { "run-oob": true } }
->   
->   2.4 Commands Responses
->   ----------------------
-> @@ -113,6 +130,11 @@ The format for command execution is:
->   There are two possible responses which the Server will issue as the result
->   of a command execution: success or error.
->   
-> +As long as the commands were issued with a proper "id" field, then the
-> +same "id" field will be attached in the corresponding response message
-> +so that requests and responses can match.  Clients should drop all the
-> +responses that are with unknown "id" field.
-> +
->   2.4.1 success
->   -------------
->   
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--ngfhkrzotH0lTFlJM5Z3g3r7SEL8txXtR--
