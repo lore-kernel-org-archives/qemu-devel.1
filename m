@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ek7H2-0000sn-CG
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:55:25 -0500
+	(envelope-from <groug@kaod.org>) id 1ek7Hr-0001R2-WE
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:56:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ek7Gx-0000yH-HU
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:55:22 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45892 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1ek7Hn-0001H9-AJ
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:56:16 -0500
+Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:41706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ek7Gx-0000xw-AL
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:55:19 -0500
-References: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
-	<bb1b8270-e924-3d41-a172-38ba79db9bf7@redhat.com>
-	<fd22674c-059e-8d37-338c-5d2d4d96eb20@redhat.com>
-	<CAFEAcA9eKZNznjgnRy_vuKvcQZ2e=0XD0b9reGBFBBFoBTREQg@mail.gmail.com>
-	<CAKmqyKNN_ysFP0pwDaccc1T+znoMfNtTXPzhLE-nsB7pCqmctg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4b726592-1078-1ac8-37b1-9227122d2429@redhat.com>
-Date: Fri, 9 Feb 2018 12:55:15 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ek7Hn-0001Gp-2G
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:56:11 -0500
+Received: from player758.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 5CF97195B4E
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 12:56:09 +0100 (CET)
+Date: Fri, 9 Feb 2018 12:49:22 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180209124922.3a215c34@bahia.lan>
+In-Reply-To: <a1ef7be5-d368-fe31-4386-1d40762b5849@huawei.com>
+References: <5A7D4976.6060407@huawei.com>
+	<a1ef7be5-d368-fe31-4386-1d40762b5849@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKNN_ysFP0pwDaccc1T+znoMfNtTXPzhLE-nsB7pCqmctg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] "make check -j4" hangs
+Subject: Re: [Qemu-devel] [V9fs-developer] [RFC] we should solve
+ create-unlink-getattr idiom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Klim Kireev <klim.kireev@virtuozzo.com>
+To: Veaceslav Falico <veaceslav.falico@huawei.com>
+Cc: jiangyiwen <jiangyiwen@huawei.com>, Eric Van Hensbergen <ericvh@gmail.com>, v9fs-developer@lists.sourceforge.net, qemu-devel@nongnu.org, aneesh.kumar@linux.vnet.ibm.com, Ron Minnich <rminnich@sandia.gov>, Latchesar Ionkov <lucho@ionkov.net>, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-On 08/02/2018 22:54, Alistair Francis wrote:
-> On Thu, Feb 8, 2018 at 1:12 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 8 February 2018 at 19:13, Thomas Huth <thuth@redhat.com> wrote:
->>> I'm currently facing some issues with "make check -j4" (i.e. running the
->>> tests in parallel). Git bisect blames this commit - though I'm not sure
->>> whether this is really the right one ... Starting with this commit, I
->>> saw hangs in test-filter-redirector, but git master rather seems to hang
->>> with vhost-user-test instead.
->>> Stefan also had issues with "make check -j4" today, so it's apparently
->>> not only me ... can somebody else reproduce the problem with the git
->>> master branch?
->>
->> Yeah, I was seeing odd make check hangs with parallelization enabled
->> too, on vhost-user-test... (my builds for merge tests are almost
->> all non-parallelized I think).
+On Fri, 9 Feb 2018 08:21:52 +0100
+Veaceslav Falico <veaceslav.falico@huawei.com> wrote:
+
+> Hi Yiwen, all,
 > 
-> I don't only see hangs I also am seeing this:
+> On 2/9/2018 8:10 AM, jiangyiwen wrote:
+> > Hi Eric and Greg,
+> > 
+> > I encountered the similar problem with create-unlink-getattr idiom.
+> > I use the testcase that create-unlink-setattr idiom, and I see the
+> > bug is reported at https://bugs.launchpad.net/qemu/+bug/1336794.
+> > Then I also see you already fix the issue and push the patch to upstream.
+> > https://github.com/ericvh/linux/commit/eaf70223eac094291169f5a6de580351890162a2
+> > http://patchwork.ozlabs.org/patch/626194/
+> > 
+> > Unfortunately, the two patches are not merged into master, I don't know
+> > the reason, so I suggest if the patche can be merged into master, and
+> > it will solve the create-unlink-getattr idiom.  
 > 
-> qemu-system-i386: -chardev
-> socket,id=chr-test,path=/tmp/vhost-test-wxuOIX/test.sock: Failed to
-> connect socket /tmp/vhost-test-wxuOIX/test.sock: No such file or
-> directory
-> socket_accept failed: Resource temporarily unavailable
-> **
-> ERROR:tests/libqtest.c:218:qtest_init_without_qmp_handshake: assertion
-> failed: (s->fd >= 0 && s->qmp_fd >= 0)
-> GTester: last random seed: R02Sa67ba85090274c01deb9c2d15b044c10
+> As a follow up - the create-unlink-setattr (mainly ftruncate and anything
+> else which works on fd instead of path) isn't fixed by these patches, but
+> I'm currently working on a new patch, obviously on top of those two, to
+> make the setattr work too.
 > 
-> It isn't 100% reproducible though.
+> It's based on the same logic as the above patches though - use FIDs with
+> open fd's guest side and use open fd's host side if possible with f*
+> functions, otherwise path with l* functions.
+> 
+> It's bigger than the QEMU getattr patch, as there are no f* functions
+> available for ftruncate case, for example.
+> 
 
-It may be something like commit 8f6d701044bc87197aac8aa2a627d70ce8471726.
+As I was saying to Yiwen, maybe have a look at:
 
-In the meanwhile we should revert it.
+https://github.com/gkurz/qemu/commits/9p-attr-fixes
 
-Paolo
+It is probably too old to rebase cleanly on current master, but it gives
+the general idea.
+
+IIRC, the cause for this not moving forward was because of an issue
+unveiled/introduced by patch 3/3 in the linux 9p driver:
+
+https://sourceforge.net/p/v9fs/mailman/v9fs-developer/thread/20160704141655.GA5799%40u-isr-cdi-08/#msg35199720
+
+and a general lack of care for the 9p code at the time... but it seems
+you guys are willing to go forward, and that's cool ! :)
+
+Cheers,
+
+--
+Greg
+
+> So if those two patches could be merged it'd be a lot easier to then
+> go forward with the setattr fix.
+> 
+> Thank you!
+> 
+> > 
+> > Thanks,
+> > Yiwen
+> > 
+> > .
+> >   
+> 
+> 
