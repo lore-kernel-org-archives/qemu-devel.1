@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekDYl-0001ah-QK
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:38:08 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ekDe6-000580-FB
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekDYi-0005Tz-3B
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:38:07 -0500
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:42621)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ekDYh-0005TW-Ui
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:38:04 -0500
-Received: by mail-io0-x242.google.com with SMTP id g14so4471078iob.9
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 10:38:03 -0800 (PST)
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
-	<20180208173157.24705-33-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7ec2273c-a81a-eaa6-ef10-d229ae06e0cf@linaro.org>
-Date: Fri, 9 Feb 2018 10:37:59 -0800
+	(envelope-from <mreitz@redhat.com>) id 1ekDe5-0000T0-OL
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:43:38 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-11-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <214df803-bcee-c93e-239e-f7c9fb37f89d@redhat.com>
+Date: Fri, 9 Feb 2018 19:43:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180208173157.24705-33-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 32/32] arm/translate-a64: add all single
- op FP16 to handle_fp_1src_half
+In-Reply-To: <20180208192328.16550-11-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CTRuQd3XSqzatcb9l0tRM8BKlVdL2zm2v"
+Subject: Re: [Qemu-devel] [PATCH 10/27] qcow2: Use visitor for options in
+ qcow2_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On 02/08/2018 09:31 AM, Alex Bennée wrote:
-> This includes FMOV, FABS, FNEG, FSQRT and  FRINT[NPMZAXI]. We re-use
-> existing helpers to achieve this.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CTRuQd3XSqzatcb9l0tRM8BKlVdL2zm2v
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <214df803-bcee-c93e-239e-f7c9fb37f89d@redhat.com>
+Subject: Re: [PATCH 10/27] qcow2: Use visitor for options in qcow2_create()
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-11-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-11-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  target/arm/translate-a64.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 72 insertions(+)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 92adf43a89..265bfb14d0 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -4508,6 +4508,66 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
->      tcg_temp_free_i64(t_true);
->  }
->  
-> +/* Floating-point data-processing (1 source) - half precision */
-> +static void handle_fp_1src_half(DisasContext *s, int opcode, int rd, int rn)
-> +{
-> +    TCGv_ptr fpst = NULL;
-> +    TCGv_i32 tcg_op;
-> +    TCGv_i32 tcg_res;
-> +
-> +    tcg_op = read_fp_sreg(s, rn);
-> +    tcg_res = tcg_temp_new_i32();
-> +
-> +    switch (opcode) {
-> +    case 0x0: /* FMOV */
-> +        tcg_gen_mov_i32(tcg_res, tcg_op);
-> +        break;
-> +    case 0x1: /* FABS */
-> +        gen_helper_advsimd_absh(tcg_res, tcg_op);
-> +        break;
-> +    case 0x2: /* FNEG */
-> +        tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
-> +        break;
-> +    case 0x3: /* FSQRT */
-> +        gen_helper_sqrt_f16(tcg_res, tcg_op, cpu_env);
-> +        break;
-> +    case 0x8: /* FRINTN */
-> +    case 0x9: /* FRINTP */
-> +    case 0xa: /* FRINTM */
-> +    case 0xb: /* FRINTZ */
-> +    case 0xc: /* FRINTA */
-> +    {
-> +        TCGv_i32 tcg_rmode = tcg_const_i32(arm_rmode_to_sf(opcode & 7));
-> +        fpst = get_fpstatus_ptr(true);
-> +
-> +        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-> +        gen_helper_advsimd_rinth(tcg_res, tcg_op, fpst);
-> +
-> +        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-> +        tcg_temp_free_i32(tcg_rmode);
-> +        break;
-> +    }
-> +    case 0xe: /* FRINTX */
-> +        fpst = get_fpstatus_ptr(true);
-> +        gen_helper_advsimd_rinth_exact(tcg_res, tcg_op, fpst);
-> +        break;
-> +    case 0xf: /* FRINTI */
-> +        fpst = get_fpstatus_ptr(true);
-> +        gen_helper_advsimd_rinth(tcg_res, tcg_op, fpst);
-> +        break;
-> +    default:
-> +        abort();
-> +    }
-> +
-> +    write_fp_sreg(s, rd, tcg_res);
+>  block/qcow2.c              | 219 ++++++++++++++++---------------------=
+--------
+>  tests/qemu-iotests/049.out |   8 +-
+>  tests/qemu-iotests/112.out |   4 +-
+>  3 files changed, 84 insertions(+), 147 deletions(-)
 
-Some of these helpers will zero-extend from 16 bits, but at least a few won't
--- notably fmov and fneg.  I wonder if it wouldn't be best to have a write_fp_hreg.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-r~
+--CTRuQd3XSqzatcb9l0tRM8BKlVdL2zm2v
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp968ISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AyTUH+gIa6ftb/sgwFaq18VSnkB3ZVnuwvxj0
+jThFX13sCqn20tXWe4oEhwOC5CPGuI4Y5FzmTCPxGfaPB7SNQm0hrNvdu9sSBn0x
+Y+r4jPt99UtLsDL8myHC7zIJvT1Gi33ZZsTFsizBaR//RPGQBQwoJ8DUXZIsHupN
+Gh3VKj42pl0JLYHuuRD6woyj0FmdxaTURTZs/jm/fkZdBds5+01XyU3qOTz7RhN3
+Kh7O2mFQyJ46zrf1HzX2W/uMQTO+7jJfZWXoJa71N9sWR9JCIK/Egj/a2meF66SY
+62y7Tu5ml2dmuURJtntYNl4eZ9ossSPpmPtg9S84rlFYOxuL0vgSEtY=
+=4GKM
+-----END PGP SIGNATURE-----
+
+--CTRuQd3XSqzatcb9l0tRM8BKlVdL2zm2v--
