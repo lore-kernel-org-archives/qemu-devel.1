@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ekC0H-00041G-A7
+	(envelope-from <pm215@archaic.org.uk>) id 1ekC0H-00041f-N5
 	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ekC0G-0007uy-73
+	(envelope-from <pm215@archaic.org.uk>) id 1ekC0G-0007vI-BV
 	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:58:25 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 16:58:07 +0000
-Message-Id: <20180209165810.6668-9-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 16:58:00 +0000
+Message-Id: <20180209165810.6668-2-peter.maydell@linaro.org>
 In-Reply-To: <20180209165810.6668-1-peter.maydell@linaro.org>
 References: <20180209165810.6668-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 08/11] hw/intc/armv7m_nvic: Fix
- byte-to-interrupt number conversions
+Subject: [Qemu-devel] [PATCH v2 01/11] hw/intc/armv7m_nvic: Don't hardcode M
+ profile ID registers in NVIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +26,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-In many of the NVIC registers relating to interrupts, we
-have to convert from a byte offset within a register set
-into the number of the first interrupt which is affected.
-We were getting this wrong for:
- * reads of NVIC_ISPR<n>, NVIC_ISER<n>, NVIC_ICPR<n>, NVIC_ICER<n>,
-   NVIC_IABR<n> -- in all these cases we were missing the "* 8"
-   needed to convert from the byte offset to the interrupt number
-   (since all these registers use one bit per interrupt)
- * writes of NVIC_IPR<n> had the opposite problem of a spurious
-   "* 8" (since these registers use one byte per interrupt)
+Instead of hardcoding the values of M profile ID registers in the
+NVIC, use the fields in the CPU struct. This will allow us to
+give different M profile CPU types different ID register values.
+
+This commit includes the addition of the missing ID_ISAR5,
+which exists as RES0 in both v7M and v8M.
+
+(The values of the ID registers might be wrong for the M4 --
+this commit leaves the behaviour there unchanged.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/intc/armv7m_nvic.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/intc/armv7m_nvic.c | 30 ++++++++++++++++--------------
+ target/arm/cpu.c      | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+), 14 deletions(-)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index ea3b7cce14..c51151fa8a 100644
+index 360889d30b..63da0fee34 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -1724,7 +1724,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         /* fall through */
-     case 0x180 ... 0x1bf: /* NVIC Clear enable */
-         val = 0;
--        startvec = offset - 0x180 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x180) + NVIC_FIRST_IRQ; /* vector # */
+@@ -990,31 +990,33 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+                       "Aux Fault status registers unimplemented\n");
+         return 0;
+     case 0xd40: /* PFR0.  */
+-        return 0x00000030;
+-    case 0xd44: /* PRF1.  */
+-        return 0x00000200;
++        return cpu->id_pfr0;
++    case 0xd44: /* PFR1.  */
++        return cpu->id_pfr1;
+     case 0xd48: /* DFR0.  */
+-        return 0x00100000;
++        return cpu->id_dfr0;
+     case 0xd4c: /* AFR0.  */
+-        return 0x00000000;
++        return cpu->id_afr0;
+     case 0xd50: /* MMFR0.  */
+-        return 0x00000030;
++        return cpu->id_mmfr0;
+     case 0xd54: /* MMFR1.  */
+-        return 0x00000000;
++        return cpu->id_mmfr1;
+     case 0xd58: /* MMFR2.  */
+-        return 0x00000000;
++        return cpu->id_mmfr2;
+     case 0xd5c: /* MMFR3.  */
+-        return 0x00000000;
++        return cpu->id_mmfr3;
+     case 0xd60: /* ISAR0.  */
+-        return 0x01141110;
++        return cpu->id_isar0;
+     case 0xd64: /* ISAR1.  */
+-        return 0x02111000;
++        return cpu->id_isar1;
+     case 0xd68: /* ISAR2.  */
+-        return 0x21112231;
++        return cpu->id_isar2;
+     case 0xd6c: /* ISAR3.  */
+-        return 0x01111110;
++        return cpu->id_isar3;
+     case 0xd70: /* ISAR4.  */
+-        return 0x01310102;
++        return cpu->id_isar4;
++    case 0xd74: /* ISAR5.  */
++        return cpu->id_isar5;
+     /* TODO: Implement debug registers.  */
+     case 0xd90: /* MPU_TYPE */
+         /* Unified MPU; if the MPU is not present this value is zero */
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 89ccdeae12..d796085be9 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1146,6 +1146,20 @@ static void cortex_m3_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_M);
+     cpu->midr = 0x410fc231;
+     cpu->pmsav7_dregion = 8;
++    cpu->id_pfr0 = 0x00000030;
++    cpu->id_pfr1 = 0x00000200;
++    cpu->id_dfr0 = 0x00100000;
++    cpu->id_afr0 = 0x00000000;
++    cpu->id_mmfr0 = 0x00000030;
++    cpu->id_mmfr1 = 0x00000000;
++    cpu->id_mmfr2 = 0x00000000;
++    cpu->id_mmfr3 = 0x00000000;
++    cpu->id_isar0 = 0x01141110;
++    cpu->id_isar1 = 0x02111000;
++    cpu->id_isar2 = 0x21112231;
++    cpu->id_isar3 = 0x01111110;
++    cpu->id_isar4 = 0x01310102;
++    cpu->id_isar5 = 0x00000000;
+ }
  
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].enabled &&
-@@ -1738,7 +1738,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         /* fall through */
-     case 0x280 ... 0x2bf: /* NVIC Clear pend */
-         val = 0;
--        startvec = offset - 0x280 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x280) + NVIC_FIRST_IRQ; /* vector # */
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].pending &&
-                 (attrs.secure || s->itns[startvec + i])) {
-@@ -1748,7 +1748,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         break;
-     case 0x300 ... 0x33f: /* NVIC Active */
-         val = 0;
--        startvec = offset - 0x300 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x300) + NVIC_FIRST_IRQ; /* vector # */
+ static void cortex_m4_initfn(Object *obj)
+@@ -1157,6 +1171,20 @@ static void cortex_m4_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_THUMB_DSP);
+     cpu->midr = 0x410fc240; /* r0p0 */
+     cpu->pmsav7_dregion = 8;
++    cpu->id_pfr0 = 0x00000030;
++    cpu->id_pfr1 = 0x00000200;
++    cpu->id_dfr0 = 0x00100000;
++    cpu->id_afr0 = 0x00000000;
++    cpu->id_mmfr0 = 0x00000030;
++    cpu->id_mmfr1 = 0x00000000;
++    cpu->id_mmfr2 = 0x00000000;
++    cpu->id_mmfr3 = 0x00000000;
++    cpu->id_isar0 = 0x01141110;
++    cpu->id_isar1 = 0x02111000;
++    cpu->id_isar2 = 0x21112231;
++    cpu->id_isar3 = 0x01111110;
++    cpu->id_isar4 = 0x01310102;
++    cpu->id_isar5 = 0x00000000;
+ }
  
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].active &&
-@@ -1863,7 +1863,7 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-     case 0x300 ... 0x33f: /* NVIC Active */
-         return MEMTX_OK; /* R/O */
-     case 0x400 ... 0x5ef: /* NVIC Priority */
--        startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0; i < size && startvec + i < s->num_irq; i++) {
-             if (attrs.secure || s->itns[startvec + i]) {
+ static void arm_v7m_class_init(ObjectClass *oc, void *data)
 -- 
 2.16.1
