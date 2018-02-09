@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek4wQ-00026D-Ku
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:26:03 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ek4wV-0002CY-4W
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:26:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ek4wJ-000622-8d
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:25:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ek4wQ-00067l-L8
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 04:26:03 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  9 Feb 2018 10:25:04 +0100
-Message-Id: <20180209092524.31348-10-cohuck@redhat.com>
+Date: Fri,  9 Feb 2018 10:25:09 +0100
+Message-Id: <20180209092524.31348-15-cohuck@redhat.com>
 In-Reply-To: <20180209092524.31348-1-cohuck@redhat.com>
 References: <20180209092524.31348-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 09/29] s390x/flic: make floating interrupts on
- TCG actually floating
+Subject: [Qemu-devel] [PULL 14/29] s390x/tcg: STSI overhaul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,658 +24,348 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: David Hildenbrand <david@redhat.com>
 
-Move floating interrupt handling into the flic. Floating interrupts
-will now be considered by all CPUs, not just CPU #0. While at it, convert
-I/O interrupts to use a list and make sure we properly consider I/O
-sub-classes in s390_cpu_has_io_int().
+Current STSI implementation is a mess, so let's rewrite it.
+
+Problems fixed by this patch:
+1) The order of exceptions/when recognized is wrong.
+2) We have to store to virtual address space, not absolute.
+3) Alignment check of the block is missing.
+3) The SMP information is not indicated.
+
+While at it:
+a) Make the code look nicer
+    - get rid of nesting levels
+    - use struct initialization instead of initializing to zero
+    - rename a misspelled field and rename function code defines
+    - use a union and have only one write statement
+    - use cpu_to_beX()
+b) Indicate the VM name/extended name + UUID just like KVM does
+c) Indicate that all LPAR CPUs we fake are dedicated
+d) Add a comment why we fake being a KVM guest
+e) Give our guest as default the name "TCGguest"
+f) Fake the same CPU information we have in our Guest for all layers
+
+While at it, get rid of "potential_page_fault()" by forwarding the
+retaddr properly.
+
+The result is best verified by looking at "/proc/sysinfo" in the guest
+when specifying on the qemu command line
+    -uuid "74738ff5-5367-5958-9aee-98fffdcd1876" \
+    -name "extra long guest name"
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180129125623.21729-9-david@redhat.com>
+Message-Id: <20180129125623.21729-14-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/intc/s390_flic.c          | 144 ++++++++++++++++++++++++++++++++++++++++---
- include/hw/s390x/s390_flic.h |  41 ++++++++++++
- target/s390x/cpu.c           |   8 ---
- target/s390x/cpu.h           |  22 -------
- target/s390x/excp_helper.c   |  97 ++++++++++-------------------
- target/s390x/interrupt.c     |  52 ++--------------
- 6 files changed, 212 insertions(+), 152 deletions(-)
+ target/s390x/cpu.h         |  22 +++--
+ target/s390x/misc_helper.c | 212 ++++++++++++++++++++++++---------------------
+ 2 files changed, 131 insertions(+), 103 deletions(-)
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index d6ed1d7380..928bdc3037 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -128,40 +128,153 @@ static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
-     return 0;
- }
- 
-+static void qemu_s390_flic_notify(uint32_t type)
-+{
-+    CPUState *cs;
-+
-+    /*
-+     * We have to make all CPUs see CPU_INTERRUPT_HARD, so they might
-+     * consider it. TODO: don't kick/wakeup all VCPUs but try to be
-+     * smarter (using the interrupt type).
-+     */
-+    CPU_FOREACH(cs) {
-+        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+    }
-+}
-+
-+uint32_t qemu_s390_flic_dequeue_service(QEMUS390FLICState *flic)
-+{
-+    uint32_t tmp;
-+
-+    g_assert(qemu_mutex_iothread_locked());
-+    g_assert(flic->pending & FLIC_PENDING_SERVICE);
-+    tmp = flic->service_param;
-+    flic->service_param = 0;
-+    flic->pending &= ~FLIC_PENDING_SERVICE;
-+
-+    return tmp;
-+}
-+
-+/* caller has to free the returned object */
-+QEMUS390FlicIO *qemu_s390_flic_dequeue_io(QEMUS390FLICState *flic, uint64_t cr6)
-+{
-+    QEMUS390FlicIO *io;
-+    uint8_t isc;
-+
-+    g_assert(qemu_mutex_iothread_locked());
-+    if (!(flic->pending & CR6_TO_PENDING_IO(cr6))) {
-+        return NULL;
-+    }
-+
-+    for (isc = 0; isc < 8; isc++) {
-+        if (QLIST_EMPTY(&flic->io[isc]) || !(cr6 & ISC_TO_ISC_BITS(isc))) {
-+            continue;
-+        }
-+        io = QLIST_FIRST(&flic->io[isc]);
-+        QLIST_REMOVE(io, next);
-+
-+        /* update our indicator bit */
-+        if (QLIST_EMPTY(&flic->io[isc])) {
-+            flic->pending &= ~ISC_TO_PENDING_IO(isc);
-+        }
-+        return io;
-+    }
-+
-+    return NULL;
-+}
-+
-+void qemu_s390_flic_dequeue_crw_mchk(QEMUS390FLICState *flic)
-+{
-+    g_assert(qemu_mutex_iothread_locked());
-+    g_assert(flic->pending & FLIC_PENDING_MCHK_CR);
-+    flic->pending &= ~FLIC_PENDING_MCHK_CR;
-+}
-+
- static void qemu_s390_inject_service(S390FLICState *fs, uint32_t parm)
- {
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
- 
--    S390CPU *dummy_cpu = s390_cpu_addr2state(0);
-+    g_assert(qemu_mutex_iothread_locked());
-+    /* multiplexing is good enough for sclp - kvm does it internally as well */
-+    flic->service_param |= parm;
-+    flic->pending |= FLIC_PENDING_SERVICE;
- 
--    /* FIXME: don't inject into dummy CPU */
--    cpu_inject_service(dummy_cpu, parm);
-+    qemu_s390_flic_notify(FLIC_PENDING_SERVICE);
- }
- 
- static void qemu_s390_inject_io(S390FLICState *fs, uint16_t subchannel_id,
-                                 uint16_t subchannel_nr, uint32_t io_int_parm,
-                                 uint32_t io_int_word)
- {
--    S390CPU *dummy_cpu = s390_cpu_addr2state(0);
-+    const uint8_t isc = IO_INT_WORD_ISC(io_int_word);
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
-+    QEMUS390FlicIO *io;
- 
--    /* FIXME: don't inject into dummy CPU */
--    cpu_inject_io(dummy_cpu, subchannel_id, subchannel_nr, io_int_parm,
--                  io_int_word);
-+    g_assert(qemu_mutex_iothread_locked());
-+    io = g_new0(QEMUS390FlicIO, 1);
-+    io->id = subchannel_id;
-+    io->nr = subchannel_nr;
-+    io->parm = io_int_parm;
-+    io->word = io_int_word;
-+
-+    QLIST_INSERT_HEAD(&flic->io[isc], io, next);
-+    flic->pending |= ISC_TO_PENDING_IO(isc);
-+
-+    qemu_s390_flic_notify(ISC_TO_PENDING_IO(isc));
- }
- 
- static void qemu_s390_inject_crw_mchk(S390FLICState *fs)
- {
--    S390CPU *dummy_cpu = s390_cpu_addr2state(0);
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
-+
-+    g_assert(qemu_mutex_iothread_locked());
-+    flic->pending |= FLIC_PENDING_MCHK_CR;
-+
-+    qemu_s390_flic_notify(FLIC_PENDING_MCHK_CR);
-+}
-+
-+bool qemu_s390_flic_has_service(QEMUS390FLICState *flic)
-+{
-+    /* called without lock via cc->has_work, will be validated under lock */
-+    return !!(flic->pending & FLIC_PENDING_SERVICE);
-+}
-+
-+bool qemu_s390_flic_has_io(QEMUS390FLICState *flic, uint64_t cr6)
-+{
-+    /* called without lock via cc->has_work, will be validated under lock */
-+    return !!(flic->pending & CR6_TO_PENDING_IO(cr6));
-+}
-+
-+bool qemu_s390_flic_has_crw_mchk(QEMUS390FLICState *flic)
-+{
-+    /* called without lock via cc->has_work, will be validated under lock */
-+    return !!(flic->pending & FLIC_PENDING_MCHK_CR);
-+}
- 
--    /* FIXME: don't inject into dummy CPU */
--    cpu_inject_crw_mchk(dummy_cpu);
-+bool qemu_s390_flic_has_any(QEMUS390FLICState *flic)
-+{
-+    g_assert(qemu_mutex_iothread_locked());
-+    return !!flic->pending;
- }
- 
- static void qemu_s390_flic_reset(DeviceState *dev)
- {
-     QEMUS390FLICState *flic = QEMU_S390_FLIC(dev);
-+    QEMUS390FlicIO *cur, *next;
-+    int isc;
- 
-+    g_assert(qemu_mutex_iothread_locked());
-     flic->simm = 0;
-     flic->nimm = 0;
-+    flic->pending = 0;
-+
-+    /* remove all pending io interrupts */
-+    for (isc = 0; isc < 8; isc++) {
-+        QLIST_FOREACH_SAFE(cur, &flic->io[isc], next, next) {
-+            QLIST_REMOVE(cur, next);
-+            g_free(cur);
-+        }
-+    }
- }
- 
- bool ais_needed(void *opaque)
-@@ -183,6 +296,16 @@ static const VMStateDescription qemu_s390_flic_vmstate = {
-     }
- };
- 
-+static void qemu_s390_flic_instance_init(Object *obj)
-+{
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(obj);
-+    int isc;
-+
-+    for (isc = 0; isc < 8; isc++) {
-+        QLIST_INIT(&flic->io[isc]);
-+    }
-+}
-+
- static void qemu_s390_flic_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-@@ -234,6 +357,7 @@ static const TypeInfo qemu_s390_flic_info = {
-     .name          = TYPE_QEMU_S390_FLIC,
-     .parent        = TYPE_S390_FLIC_COMMON,
-     .instance_size = sizeof(QEMUS390FLICState),
-+    .instance_init = qemu_s390_flic_instance_init,
-     .class_init    = qemu_s390_flic_class_init,
- };
- 
-diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-index d0538134b7..566d153371 100644
---- a/include/hw/s390x/s390_flic.h
-+++ b/include/hw/s390x/s390_flic.h
-@@ -16,6 +16,7 @@
- #include "hw/sysbus.h"
- #include "hw/s390x/adapter.h"
- #include "hw/virtio/virtio.h"
-+#include "qemu/queue.h"
- 
- /*
-  * Reserve enough gsis to accommodate all virtio devices.
-@@ -85,12 +86,52 @@ typedef struct S390FLICStateClass {
- #define SIC_IRQ_MODE_SINGLE 1
- #define AIS_MODE_MASK(isc) (0x80 >> isc)
- 
-+#define ISC_TO_PENDING_IO(_isc) (0x80 >> (_isc))
-+#define CR6_TO_PENDING_IO(_cr6) (((_cr6) >> 24) & 0xff)
-+
-+/* organize the ISC bits so that the macros above work */
-+#define FLIC_PENDING_IO_ISC7            (1 << 0)
-+#define FLIC_PENDING_IO_ISC6            (1 << 1)
-+#define FLIC_PENDING_IO_ISC5            (1 << 2)
-+#define FLIC_PENDING_IO_ISC4            (1 << 3)
-+#define FLIC_PENDING_IO_ISC3            (1 << 4)
-+#define FLIC_PENDING_IO_ISC2            (1 << 5)
-+#define FLIC_PENDING_IO_ISC1            (1 << 6)
-+#define FLIC_PENDING_IO_ISC0            (1 << 7)
-+#define FLIC_PENDING_SERVICE            (1 << 8)
-+#define FLIC_PENDING_MCHK_CR            (1 << 9)
-+
-+#define FLIC_PENDING_IO (FLIC_PENDING_IO_ISC0 | FLIC_PENDING_IO_ISC1 | \
-+                         FLIC_PENDING_IO_ISC2 | FLIC_PENDING_IO_ISC3 | \
-+                         FLIC_PENDING_IO_ISC4 | FLIC_PENDING_IO_ISC5 | \
-+                         FLIC_PENDING_IO_ISC6 | FLIC_PENDING_IO_ISC7)
-+
-+typedef struct QEMUS390FlicIO {
-+    uint16_t id;
-+    uint16_t nr;
-+    uint32_t parm;
-+    uint32_t word;
-+    QLIST_ENTRY(QEMUS390FlicIO) next;
-+} QEMUS390FlicIO;
-+
- typedef struct QEMUS390FLICState {
-     S390FLICState parent_obj;
-+    uint32_t pending;
-+    uint32_t service_param;
-     uint8_t simm;
-     uint8_t nimm;
-+    QLIST_HEAD(, QEMUS390FlicIO) io[8];
- } QEMUS390FLICState;
- 
-+uint32_t qemu_s390_flic_dequeue_service(QEMUS390FLICState *flic);
-+QEMUS390FlicIO *qemu_s390_flic_dequeue_io(QEMUS390FLICState *flic,
-+                                          uint64_t cr6);
-+void qemu_s390_flic_dequeue_crw_mchk(QEMUS390FLICState *flic);
-+bool qemu_s390_flic_has_service(QEMUS390FLICState *flic);
-+bool qemu_s390_flic_has_io(QEMUS390FLICState *fs, uint64_t cr6);
-+bool qemu_s390_flic_has_crw_mchk(QEMUS390FLICState *flic);
-+bool qemu_s390_flic_has_any(QEMUS390FLICState *flic);
-+
- void s390_flic_init(void);
- 
- S390FLICState *s390_get_flic(void);
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 243804fbfc..da7cb9c278 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -100,7 +100,6 @@ static void s390_cpu_initial_reset(CPUState *s)
- {
-     S390CPU *cpu = S390_CPU(s);
-     CPUS390XState *env = &cpu->env;
--    int i;
- 
-     s390_cpu_reset(s);
-     /* initial reset does not clear everything! */
-@@ -116,9 +115,6 @@ static void s390_cpu_initial_reset(CPUState *s)
-     env->gbea = 1;
- 
-     env->pfault_token = -1UL;
--    for (i = 0; i < ARRAY_SIZE(env->io_index); i++) {
--        env->io_index[i] = -1;
--    }
- 
-     /* tininess for underflow is detected before rounding */
-     set_float_detect_tininess(float_tininess_before_rounding,
-@@ -136,7 +132,6 @@ static void s390_cpu_full_reset(CPUState *s)
-     S390CPU *cpu = S390_CPU(s);
-     S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
-     CPUS390XState *env = &cpu->env;
--    int i;
- 
-     scc->parent_reset(s);
-     cpu->env.sigp_order = 0;
-@@ -152,9 +147,6 @@ static void s390_cpu_full_reset(CPUState *s)
-     env->gbea = 1;
- 
-     env->pfault_token = -1UL;
--    for (i = 0; i < ARRAY_SIZE(env->io_index); i++) {
--        env->io_index[i] = -1;
--    }
- 
-     /* tininess for underflow is detected before rounding */
-     set_float_detect_tininess(float_tininess_before_rounding,
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 9d3aa05a47..ba6cf0cda5 100644
+index 1475d705a4..21ce40d5b6 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -53,8 +53,6 @@
+@@ -426,11 +426,11 @@ static inline void setcc(S390CPU *cpu, uint64_t cc)
+ }
  
- #define MMU_USER_IDX 0
+ /* STSI */
+-#define STSI_LEVEL_MASK         0x00000000f0000000ULL
+-#define STSI_LEVEL_CURRENT      0x0000000000000000ULL
+-#define STSI_LEVEL_1            0x0000000010000000ULL
+-#define STSI_LEVEL_2            0x0000000020000000ULL
+-#define STSI_LEVEL_3            0x0000000030000000ULL
++#define STSI_R0_FC_MASK         0x00000000f0000000ULL
++#define STSI_R0_FC_CURRENT      0x0000000000000000ULL
++#define STSI_R0_FC_LEVEL_1      0x0000000010000000ULL
++#define STSI_R0_FC_LEVEL_2      0x0000000020000000ULL
++#define STSI_R0_FC_LEVEL_3      0x0000000030000000ULL
+ #define STSI_R0_RESERVED_MASK   0x000000000fffff00ULL
+ #define STSI_R0_SEL1_MASK       0x00000000000000ffULL
+ #define STSI_R1_RESERVED_MASK   0x00000000ffff0000ULL
+@@ -465,7 +465,7 @@ typedef struct SysIB_122 {
+     uint8_t res1[32];
+     uint32_t capability;
+     uint16_t total_cpus;
+-    uint16_t active_cpus;
++    uint16_t conf_cpus;
+     uint16_t standby_cpus;
+     uint16_t reserved_cpus;
+     uint16_t adjustments[2026];
+@@ -525,6 +525,16 @@ typedef struct SysIB_322 {
+ } SysIB_322;
+ QEMU_BUILD_BUG_ON(sizeof(SysIB_322) != 4096);
  
--#define MAX_IO_QUEUE 16
--
- #define S390_MAX_CPUS 248
- 
- typedef struct PSW {
-@@ -62,13 +60,6 @@ typedef struct PSW {
-     uint64_t addr;
- } PSW;
- 
--typedef struct IOIntQueue {
--    uint16_t id;
--    uint16_t nr;
--    uint32_t parm;
--    uint32_t word;
--} IOIntQueue;
--
- struct CPUS390XState {
-     uint64_t regs[16];     /* GP registers */
-     /*
-@@ -114,13 +105,9 @@ struct CPUS390XState {
- 
-     uint64_t cregs[16]; /* control registers */
- 
--    IOIntQueue io_queue[MAX_IO_QUEUE][8];
--
-     int pending_int;
--    uint32_t service_param;
-     uint16_t external_call_addr;
-     DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
--    int io_index[8];
- 
-     uint64_t ckc;
-     uint64_t cputm;
-@@ -399,9 +386,6 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
- #define EXCP_IO  7 /* I/O interrupt */
- #define EXCP_MCHK 8 /* machine check */
- 
--#define INTERRUPT_IO                     (1 << 0)
--#define INTERRUPT_MCHK                   (1 << 1)
--#define INTERRUPT_EXT_SERVICE            (1 << 2)
- #define INTERRUPT_EXT_CPU_TIMER          (1 << 3)
- #define INTERRUPT_EXT_CLOCK_COMPARATOR   (1 << 4)
- #define INTERRUPT_EXTERNAL_CALL          (1 << 5)
-@@ -741,12 +725,6 @@ void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
-                             uintptr_t ra);
- /* service interrupts are floating therefore we must not pass an cpustate */
- void s390_sclp_extint(uint32_t parm);
--/* FIXME: remove once we have proper floating interrupts in TCG */
--void cpu_inject_service(S390CPU *cpu, uint32_t param);
--void cpu_inject_crw_mchk(S390CPU *cpu);
--void cpu_inject_io(S390CPU *cpu, uint16_t subchannel_id,
--                   uint16_t subchannel_number, uint32_t io_int_parm,
--                   uint32_t io_int_word);
- 
- /* mmu_helper.c */
- int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 23447af942..86ec9e63f0 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -29,6 +29,7 @@
- #include "exec/address-spaces.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
-+#include "hw/s390x/s390_flic.h"
++typedef union SysIB {
++    SysIB_111 sysib_111;
++    SysIB_121 sysib_121;
++    SysIB_122 sysib_122;
++    SysIB_221 sysib_221;
++    SysIB_222 sysib_222;
++    SysIB_322 sysib_322;
++} SysIB;
++QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
++
+ /* MMU defines */
+ #define _ASCE_ORIGIN            ~0xfffULL /* segment table origin             */
+ #define _ASCE_SUBSPACE          0x200     /* subspace group control           */
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 466231de0b..c1ff152571 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -37,6 +37,8 @@
+ #include "hw/s390x/s390-virtio-hcall.h"
+ #include "hw/s390x/sclp.h"
+ #include "hw/s390x/s390_flic.h"
++#include "hw/s390x/ioinst.h"
++#include "hw/boards.h"
  #endif
  
- /* #define DEBUG_S390 */
-@@ -237,6 +238,7 @@ static void do_svc_interrupt(CPUS390XState *env)
+ /* #define DEBUG_HELPER */
+@@ -195,132 +197,148 @@ void HELPER(spt)(CPUS390XState *env, uint64_t time)
+ }
  
- static void do_ext_interrupt(CPUS390XState *env)
+ /* Store System Information */
+-uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0,
+-                      uint64_t r0, uint64_t r1)
++uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0, uint64_t r0, uint64_t r1)
  {
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
++    const uintptr_t ra = GETPC();
++    const uint32_t sel1 = r0 & STSI_R0_SEL1_MASK;
++    const uint32_t sel2 = r1 & STSI_R1_SEL2_MASK;
++    const MachineState *ms = MACHINE(qdev_get_machine());
++    uint16_t total_cpus = 0, conf_cpus = 0, reserved_cpus = 0;
      S390CPU *cpu = s390_env_get_cpu(env);
-     uint64_t mask, addr;
-     uint16_t cpu_addr;
-@@ -273,17 +275,14 @@ static void do_ext_interrupt(CPUS390XState *env)
-         lowcore->ext_int_code = cpu_to_be16(EXT_CPU_TIMER);
-         lowcore->cpu_addr = 0;
-         env->pending_int &= ~INTERRUPT_EXT_CPU_TIMER;
--    } else if ((env->pending_int & INTERRUPT_EXT_SERVICE) &&
-+    } else if (qemu_s390_flic_has_service(flic) &&
-                (env->cregs[0] & CR0_SERVICE_SC)) {
--        /*
--         * FIXME: floating IRQs should be considered by all CPUs and
--         *        shuld not get cleared by CPU reset.
--         */
-+        uint32_t param;
+-    int cc = 0;
+-    int sel1, sel2;
++    SysIB sysib = { 0 };
++    int i, cc = 0;
 +
-+        param = qemu_s390_flic_dequeue_service(flic);
-         lowcore->ext_int_code = cpu_to_be16(EXT_SERVICE);
--        lowcore->ext_params = cpu_to_be32(env->service_param);
-+        lowcore->ext_params = cpu_to_be32(param);
-         lowcore->cpu_addr = 0;
--        env->service_param = 0;
--        env->pending_int &= ~INTERRUPT_EXT_SERVICE;
-     } else {
-         g_assert_not_reached();
++    if ((r0 & STSI_R0_FC_MASK) > STSI_R0_FC_LEVEL_3) {
++        /* invalid function code: no other checks are performed */
++        return 3;
++    }
+ 
+-    if ((r0 & STSI_LEVEL_MASK) <= STSI_LEVEL_3 &&
+-        ((r0 & STSI_R0_RESERVED_MASK) || (r1 & STSI_R1_RESERVED_MASK))) {
+-        /* valid function code, invalid reserved bits */
+-        s390_program_interrupt(env, PGM_SPECIFICATION, 4, GETPC());
++    if ((r0 & STSI_R0_RESERVED_MASK) || (r1 & STSI_R1_RESERVED_MASK)) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
      }
-@@ -303,71 +302,37 @@ static void do_ext_interrupt(CPUS390XState *env)
  
- static void do_io_interrupt(CPUS390XState *env)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-+    uint64_t mask, addr;
-+    QEMUS390FlicIO *io;
-     LowCore *lowcore;
--    IOIntQueue *q;
--    uint8_t isc;
--    int disable = 1;
--    int found = 0;
--
--    if (!(env->psw.mask & PSW_MASK_IO)) {
--        cpu_abort(CPU(cpu), "I/O int w/o I/O mask\n");
--    }
--
--    for (isc = 0; isc < ARRAY_SIZE(env->io_index); isc++) {
--        uint64_t isc_bits;
--
--        if (env->io_index[isc] < 0) {
--            continue;
--        }
--        if (env->io_index[isc] >= MAX_IO_QUEUE) {
--            cpu_abort(CPU(cpu), "I/O queue overrun for isc %d: %d\n",
--                      isc, env->io_index[isc]);
--        }
--
--        q = &env->io_queue[env->io_index[isc]][isc];
--        isc_bits = ISC_TO_ISC_BITS(IO_INT_WORD_ISC(q->word));
--        if (!(env->cregs[6] & isc_bits)) {
--            disable = 0;
--            continue;
--        }
--        if (!found) {
--            uint64_t mask, addr;
+-    sel1 = r0 & STSI_R0_SEL1_MASK;
+-    sel2 = r1 & STSI_R1_SEL2_MASK;
++    if ((r0 & STSI_R0_FC_MASK) == STSI_R0_FC_CURRENT) {
++        /* query the current level: no further checks are performed */
++        env->regs[0] = STSI_R0_FC_LEVEL_3;
++        return 0;
++    }
  
--            found = 1;
--            lowcore = cpu_map_lowcore(env);
-+    g_assert(env->psw.mask & PSW_MASK_IO);
-+    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
-+    g_assert(io);
+-    /* XXX: spec exception if sysib is not 4k-aligned */
++    if (a0 & ~TARGET_PAGE_MASK) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
  
--            lowcore->subchannel_id = cpu_to_be16(q->id);
--            lowcore->subchannel_nr = cpu_to_be16(q->nr);
--            lowcore->io_int_parm = cpu_to_be32(q->parm);
--            lowcore->io_int_word = cpu_to_be32(q->word);
--            lowcore->io_old_psw.mask = cpu_to_be64(get_psw_mask(env));
--            lowcore->io_old_psw.addr = cpu_to_be64(env->psw.addr);
--            mask = be64_to_cpu(lowcore->io_new_psw.mask);
--            addr = be64_to_cpu(lowcore->io_new_psw.addr);
+-    switch (r0 & STSI_LEVEL_MASK) {
+-    case STSI_LEVEL_1:
++    /* count the cpus and split them into configured and reserved ones */
++    for (i = 0; i < ms->possible_cpus->len; i++) {
++        total_cpus++;
++        if (ms->possible_cpus->cpus[i].cpu) {
++            conf_cpus++;
++        } else {
++            reserved_cpus++;
++        }
++    }
++
++    /*
++     * In theory, we could report Level 1 / Level 2 as current. However,
++     * the Linux kernel will detect this as running under LPAR and assume
++     * that we have a sclp linemode console (which is always present on
++     * LPAR, but not the default for QEMU), therefore not displaying boot
++     * messages and making booting a Linux kernel under TCG harder.
++     *
++     * For now we fake the same SMP configuration on all levels.
++     *
++     * TODO: We could later make the level configurable via the machine
++     *       and change defaults (linemode console) based on machine type
++     *       and accelerator.
++     */
++    switch (r0 & STSI_R0_FC_MASK) {
++    case STSI_R0_FC_LEVEL_1:
+         if ((sel1 == 1) && (sel2 == 1)) {
+             /* Basic Machine Configuration */
+-            SysIB_111 sysib;
+             char type[5] = {};
+ 
+-            memset(&sysib, 0, sizeof(sysib));
+-            ebcdic_put(sysib.manuf, "QEMU            ", 16);
++            ebcdic_put(sysib.sysib_111.manuf, "QEMU            ", 16);
+             /* same as machine type number in STORE CPU ID, but in EBCDIC */
+             snprintf(type, ARRAY_SIZE(type), "%X", cpu->model->def->type);
+-            ebcdic_put(sysib.type, type, 4);
++            ebcdic_put(sysib.sysib_111.type, type, 4);
+             /* model number (not stored in STORE CPU ID for z/Architecure) */
+-            ebcdic_put(sysib.model, "QEMU            ", 16);
+-            ebcdic_put(sysib.sequence, "QEMU            ", 16);
+-            ebcdic_put(sysib.plant, "QEMU", 4);
+-            cpu_physical_memory_write(a0, &sysib, sizeof(sysib));
++            ebcdic_put(sysib.sysib_111.model, "QEMU            ", 16);
++            ebcdic_put(sysib.sysib_111.sequence, "QEMU            ", 16);
++            ebcdic_put(sysib.sysib_111.plant, "QEMU", 4);
+         } else if ((sel1 == 2) && (sel2 == 1)) {
+             /* Basic Machine CPU */
+-            SysIB_121 sysib;
 -
--            cpu_unmap_lowcore(lowcore);
+-            memset(&sysib, 0, sizeof(sysib));
+-            /* XXX make different for different CPUs? */
+-            ebcdic_put(sysib.sequence, "QEMUQEMUQEMUQEMU", 16);
+-            ebcdic_put(sysib.plant, "QEMU", 4);
+-            stw_p(&sysib.cpu_addr, env->core_id);
+-            cpu_physical_memory_write(a0, &sysib, sizeof(sysib));
++            ebcdic_put(sysib.sysib_121.sequence, "QEMUQEMUQEMUQEMU", 16);
++            ebcdic_put(sysib.sysib_121.plant, "QEMU", 4);
++            sysib.sysib_121.cpu_addr = cpu_to_be16(env->core_id);
+         } else if ((sel1 == 2) && (sel2 == 2)) {
+             /* Basic Machine CPUs */
+-            SysIB_122 sysib;
 -
--            env->io_index[isc]--;
-+    lowcore = cpu_map_lowcore(env);
+-            memset(&sysib, 0, sizeof(sysib));
+-            stl_p(&sysib.capability, 0x443afc29);
+-            /* XXX change when SMP comes */
+-            stw_p(&sysib.total_cpus, 1);
+-            stw_p(&sysib.active_cpus, 1);
+-            stw_p(&sysib.standby_cpus, 0);
+-            stw_p(&sysib.reserved_cpus, 0);
+-            cpu_physical_memory_write(a0, &sysib, sizeof(sysib));
++            sysib.sysib_122.capability = cpu_to_be32(0x443afc29);
++            sysib.sysib_122.total_cpus = cpu_to_be16(total_cpus);
++            sysib.sysib_122.conf_cpus = cpu_to_be16(conf_cpus);
++            sysib.sysib_122.reserved_cpus = cpu_to_be16(reserved_cpus);
+         } else {
+             cc = 3;
+         }
+         break;
+-    case STSI_LEVEL_2:
+-        {
+-            if ((sel1 == 2) && (sel2 == 1)) {
+-                /* LPAR CPU */
+-                SysIB_221 sysib;
+-
+-                memset(&sysib, 0, sizeof(sysib));
+-                /* XXX make different for different CPUs? */
+-                ebcdic_put(sysib.sequence, "QEMUQEMUQEMUQEMU", 16);
+-                ebcdic_put(sysib.plant, "QEMU", 4);
+-                stw_p(&sysib.cpu_addr, env->core_id);
+-                stw_p(&sysib.cpu_id, 0);
+-                cpu_physical_memory_write(a0, &sysib, sizeof(sysib));
+-            } else if ((sel1 == 2) && (sel2 == 2)) {
+-                /* LPAR CPUs */
+-                SysIB_222 sysib;
+-
+-                memset(&sysib, 0, sizeof(sysib));
+-                stw_p(&sysib.lpar_num, 0);
+-                sysib.lcpuc = 0;
+-                /* XXX change when SMP comes */
+-                stw_p(&sysib.total_cpus, 1);
+-                stw_p(&sysib.conf_cpus, 1);
+-                stw_p(&sysib.standby_cpus, 0);
+-                stw_p(&sysib.reserved_cpus, 0);
+-                ebcdic_put(sysib.name, "QEMU    ", 8);
+-                stl_p(&sysib.caf, 1000);
+-                stw_p(&sysib.dedicated_cpus, 0);
+-                stw_p(&sysib.shared_cpus, 0);
+-                cpu_physical_memory_write(a0, &sysib, sizeof(sysib));
+-            } else {
+-                cc = 3;
+-            }
+-            break;
++    case STSI_R0_FC_LEVEL_2:
++        if ((sel1 == 2) && (sel2 == 1)) {
++            /* LPAR CPU */
++            ebcdic_put(sysib.sysib_221.sequence, "QEMUQEMUQEMUQEMU", 16);
++            ebcdic_put(sysib.sysib_221.plant, "QEMU", 4);
++            sysib.sysib_221.cpu_addr = cpu_to_be16(env->core_id);
++        } else if ((sel1 == 2) && (sel2 == 2)) {
++            /* LPAR CPUs */
++            sysib.sysib_222.lcpuc = 0x80; /* dedicated */
++            sysib.sysib_222.total_cpus = cpu_to_be16(total_cpus);
++            sysib.sysib_222.conf_cpus = cpu_to_be16(conf_cpus);
++            sysib.sysib_222.reserved_cpus = cpu_to_be16(reserved_cpus);
++            ebcdic_put(sysib.sysib_222.name, "QEMU    ", 8);
++            sysib.sysib_222.caf = cpu_to_be32(1000);
++            sysib.sysib_222.dedicated_cpus = cpu_to_be16(conf_cpus);
++        } else {
++            cc = 3;
+         }
+-    case STSI_LEVEL_3:
+-        {
+-            if ((sel1 == 2) && (sel2 == 2)) {
+-                /* VM CPUs */
+-                SysIB_322 sysib;
+-
+-                memset(&sysib, 0, sizeof(sysib));
+-                sysib.count = 1;
+-                /* XXX change when SMP comes */
+-                stw_p(&sysib.vm[0].total_cpus, 1);
+-                stw_p(&sysib.vm[0].conf_cpus, 1);
+-                stw_p(&sysib.vm[0].standby_cpus, 0);
+-                stw_p(&sysib.vm[0].reserved_cpus, 0);
+-                ebcdic_put(sysib.vm[0].name, "KVMguest", 8);
+-                stl_p(&sysib.vm[0].caf, 1000);
+-                ebcdic_put(sysib.vm[0].cpi, "KVM/Linux       ", 16);
+-                cpu_physical_memory_write(a0, &sysib, sizeof(sysib));
++        break;
++    case STSI_R0_FC_LEVEL_3:
++        if ((sel1 == 2) && (sel2 == 2)) {
++            /* VM CPUs */
++            sysib.sysib_322.count = 1;
++            sysib.sysib_322.vm[0].total_cpus = cpu_to_be16(total_cpus);
++            sysib.sysib_322.vm[0].conf_cpus = cpu_to_be16(conf_cpus);
++            sysib.sysib_322.vm[0].reserved_cpus = cpu_to_be16(reserved_cpus);
++            sysib.sysib_322.vm[0].caf = cpu_to_be32(1000);
++            /* Linux kernel uses this to distinguish us from z/VM */
++            ebcdic_put(sysib.sysib_322.vm[0].cpi, "KVM/Linux       ", 16);
++            sysib.sysib_322.vm[0].ext_name_encoding = 2; /* UTF-8 */
++
++            /* If our VM has a name, use the real name */
++            if (qemu_name) {
++                memset(sysib.sysib_322.vm[0].name, 0x40,
++                       sizeof(sysib.sysib_322.vm[0].name));
++                ebcdic_put(sysib.sysib_322.vm[0].name, qemu_name,
++                           MIN(sizeof(sysib.sysib_322.vm[0].name),
++                               strlen(qemu_name)));
++                strncpy((char *)sysib.sysib_322.ext_names[0], qemu_name,
++                        sizeof(sysib.sysib_322.ext_names[0]));
+             } else {
+-                cc = 3;
++                ebcdic_put(sysib.sysib_322.vm[0].name, "TCGguest", 8);
++                strcpy((char *)sysib.sysib_322.ext_names[0], "TCGguest");
+             }
+-            break;
++
++            /* add the uuid */
++            memcpy(sysib.sysib_322.vm[0].uuid, &qemu_uuid,
++                   sizeof(sysib.sysib_322.vm[0].uuid));
++        } else {
++            cc = 3;
+         }
+-    case STSI_LEVEL_CURRENT:
+-        env->regs[0] = STSI_LEVEL_3;
+-        break;
+-    default:
+-        cc = 3;
+         break;
+     }
  
--            DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__,
--                    env->psw.mask, env->psw.addr);
--            load_psw(env, mask, addr);
--        }
--        if (env->io_index[isc] >= 0) {
--            disable = 0;
--        }
--        continue;
--    }
-+    lowcore->subchannel_id = cpu_to_be16(io->id);
-+    lowcore->subchannel_nr = cpu_to_be16(io->nr);
-+    lowcore->io_int_parm = cpu_to_be32(io->parm);
-+    lowcore->io_int_word = cpu_to_be32(io->word);
-+    lowcore->io_old_psw.mask = cpu_to_be64(get_psw_mask(env));
-+    lowcore->io_old_psw.addr = cpu_to_be64(env->psw.addr);
-+    mask = be64_to_cpu(lowcore->io_new_psw.mask);
-+    addr = be64_to_cpu(lowcore->io_new_psw.addr);
- 
--    if (disable) {
--        env->pending_int &= ~INTERRUPT_IO;
--    }
-+    cpu_unmap_lowcore(lowcore);
-+    g_free(io);
- 
-+    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__, env->psw.mask,
-+            env->psw.addr);
-+    load_psw(env, mask, addr);
++    if (cc == 0) {
++        if (s390_cpu_virt_mem_write(cpu, a0, 0, &sysib, sizeof(sysib))) {
++            s390_cpu_virt_mem_handle_exc(cpu, ra);
++        }
++    }
++
+     return cc;
  }
  
- static void do_mchk_interrupt(CPUS390XState *env)
- {
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-     uint64_t mask, addr;
-     LowCore *lowcore;
-     int i;
-@@ -376,8 +341,7 @@ static void do_mchk_interrupt(CPUS390XState *env)
-     g_assert(env->psw.mask & PSW_MASK_MCHECK);
-     g_assert(env->cregs[14] & CR14_CHANNEL_REPORT_SC);
- 
--    g_assert(env->pending_int & INTERRUPT_MCHK);
--    env->pending_int &= ~INTERRUPT_MCHK;
-+    qemu_s390_flic_dequeue_crw_mchk(flic);
- 
-     lowcore = cpu_map_lowcore(env);
- 
-@@ -412,6 +376,7 @@ static void do_mchk_interrupt(CPUS390XState *env)
- 
- void s390_cpu_do_interrupt(CPUState *cs)
- {
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-     S390CPU *cpu = S390_CPU(cs);
-     CPUS390XState *env = &cpu->env;
-     bool stopped = false;
-@@ -474,7 +439,7 @@ try_deliver:
-     cs->exception_index = -1;
- 
-     /* we might still have pending interrupts, but not deliverable */
--    if (!env->pending_int) {
-+    if (!env->pending_int && !qemu_s390_flic_has_any(flic)) {
-         cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
-     }
- 
-diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index 8229572f7d..61691aa3a4 100644
---- a/target/s390x/interrupt.c
-+++ b/target/s390x/interrupt.c
-@@ -58,17 +58,6 @@ void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
- }
- 
- #if !defined(CONFIG_USER_ONLY)
--void cpu_inject_service(S390CPU *cpu, uint32_t param)
--{
--    CPUS390XState *env = &cpu->env;
--
--    /* multiplexing is good enough for sclp - kvm does it internally as well*/
--    env->service_param |= param;
--
--    env->pending_int |= INTERRUPT_EXT_SERVICE;
--    cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
--}
--
- void cpu_inject_clock_comparator(S390CPU *cpu)
- {
-     CPUS390XState *env = &cpu->env;
-@@ -137,38 +126,6 @@ void cpu_inject_stop(S390CPU *cpu)
-     cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
- }
- 
--void cpu_inject_io(S390CPU *cpu, uint16_t subchannel_id,
--                   uint16_t subchannel_number, uint32_t io_int_parm,
--                   uint32_t io_int_word)
--{
--    CPUS390XState *env = &cpu->env;
--    int isc = IO_INT_WORD_ISC(io_int_word);
--
--    if (env->io_index[isc] == MAX_IO_QUEUE - 1) {
--        /* ugh - can't queue anymore. Let's drop. */
--        return;
--    }
--
--    env->io_index[isc]++;
--    assert(env->io_index[isc] < MAX_IO_QUEUE);
--
--    env->io_queue[env->io_index[isc]][isc].id = subchannel_id;
--    env->io_queue[env->io_index[isc]][isc].nr = subchannel_number;
--    env->io_queue[env->io_index[isc]][isc].parm = io_int_parm;
--    env->io_queue[env->io_index[isc]][isc].word = io_int_word;
--
--    env->pending_int |= INTERRUPT_IO;
--    cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
--}
--
--void cpu_inject_crw_mchk(S390CPU *cpu)
--{
--    CPUS390XState *env = &cpu->env;
--
--    env->pending_int |= INTERRUPT_MCHK;
--    cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
--}
--
- /*
-  * All of the following interrupts are floating, i.e. not per-vcpu.
-  * We just need a dummy cpustate in order to be able to inject in the
-@@ -201,6 +158,7 @@ void s390_crw_mchk(void)
- 
- bool s390_cpu_has_mcck_int(S390CPU *cpu)
- {
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-     CPUS390XState *env = &cpu->env;
- 
-     if (!(env->psw.mask & PSW_MASK_MCHECK)) {
-@@ -208,7 +166,7 @@ bool s390_cpu_has_mcck_int(S390CPU *cpu)
-     }
- 
-     /* for now we only support channel report machine checks (floating) */
--    if ((env->pending_int & INTERRUPT_MCHK) &&
-+    if (qemu_s390_flic_has_crw_mchk(flic) &&
-         (env->cregs[14] & CR14_CHANNEL_REPORT_SC)) {
-         return true;
-     }
-@@ -218,6 +176,7 @@ bool s390_cpu_has_mcck_int(S390CPU *cpu)
- 
- bool s390_cpu_has_ext_int(S390CPU *cpu)
- {
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-     CPUS390XState *env = &cpu->env;
- 
-     if (!(env->psw.mask & PSW_MASK_EXT)) {
-@@ -249,7 +208,7 @@ bool s390_cpu_has_ext_int(S390CPU *cpu)
-         return true;
-     }
- 
--    if ((env->pending_int & INTERRUPT_EXT_SERVICE) &&
-+    if (qemu_s390_flic_has_service(flic) &&
-         (env->cregs[0] & CR0_SERVICE_SC)) {
-         return true;
-     }
-@@ -259,13 +218,14 @@ bool s390_cpu_has_ext_int(S390CPU *cpu)
- 
- bool s390_cpu_has_io_int(S390CPU *cpu)
- {
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-     CPUS390XState *env = &cpu->env;
- 
-     if (!(env->psw.mask & PSW_MASK_IO)) {
-         return false;
-     }
- 
--    return env->pending_int & INTERRUPT_IO;
-+    return qemu_s390_flic_has_io(flic, env->cregs[6]);
- }
- 
- bool s390_cpu_has_restart_int(S390CPU *cpu)
 -- 
 2.13.6
