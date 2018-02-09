@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ek5YX-000465-9w
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:05:27 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ek5aC-0005AY-NN
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:07:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ek5YU-00028g-F9
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:05:21 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2255 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1ek5YT-00022M-Fl
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:05:18 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 9 Feb 2018 10:05:03 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA54C112@DGGEMA505-MBX.china.huawei.com>
-References: <1517926039-86416-1-git-send-email-arei.gonglei@huawei.com>
-	<CAFEAcA9eNYTOBrQ8f9VXodp+qMgQpBDfC58iC5OK+bpif7f=5A@mail.gmail.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1ek5aB-0003EP-S4
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:07:04 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38891)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ek5aB-0003E8-Lw
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 05:07:03 -0500
+Received: by mail-oi0-x241.google.com with SMTP id j15so5739698oii.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 02:07:03 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] rtc: placing RTC memory region outside
- BQL
+In-Reply-To: <1518116908-10852-1-git-send-email-mst@redhat.com>
+References: <1518116908-10852-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Feb 2018 10:06:42 +0000
+Message-ID: <CAFEAcA8kvkfoxnQbqZ4Y44uWtbsirCKdmTcnZJzu=ege9YRfTg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
+ fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Pg0KPiA+ID4NCj4gPiA+ICQgY2F0IHN0cmFjZV9jLnNoDQo+ID4gPiBzdHJhY2UgLXR0IC1wICQx
-IC1jIC1vIHJlc3VsdF8kMS5sb2cgJg0KPiA+ID4gc2xlZXAgJDINCj4gPiA+IHBpZD0kKHBpZG9m
-IHN0cmFjZSkNCj4gPiA+IGtpbGwgJHBpZA0KPiA+ID4gY2F0IHJlc3VsdF8kMS5sb2cNCj4gPiA+
-DQo+ID4gPiBCZWZvcmUgYXBwbGluZyB0aGlzIGNoYW5nZToNCj4gPiA+ICQgLi9zdHJhY2VfYy5z
-aCAxMDUyOCAzMA0KPiA+ID4gJSB0aW1lICAgICBzZWNvbmRzICB1c2Vjcy9jYWxsICAgICBjYWxs
-cyAgICBlcnJvcnMgc3lzY2FsbA0KPiA+ID4gLS0tLS0tIC0tLS0tLS0tLS0tIC0tLS0tLS0tLS0t
-IC0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tLS0tLS0tLQ0KPiA+ID4gIDkzLjg3ICAgIDAu
-MTE5MDcwICAgICAgICAgIDMwICAgICAgNDAwMCAgICAgICAgICAgcHBvbGwNCj4gPiA+ICAgMy4y
-NyAgICAwLjAwNDE0OCAgICAgICAgICAgMiAgICAgIDIwMzggICAgICAgICAgIGlvY3RsDQo+ID4g
-PiAgIDIuNjYgICAgMC4wMDMzNzAgICAgICAgICAgIDIgICAgICAyMDE0ICAgICAgICAgICBmdXRl
-eA0KPiA+ID4gICAwLjA5ICAgIDAuMDAwMTEzICAgICAgICAgICAxICAgICAgIDEwNiAgICAgICAg
-ICAgcmVhZA0KPiA+ID4gICAwLjA5ICAgIDAuMDAwMTA5ICAgICAgICAgICAxICAgICAgIDEwNCAg
-ICAgICAgICAgaW9fZ2V0ZXZlbnRzDQo+ID4gPiAgIDAuMDIgICAgMC4wMDAwMjkgICAgICAgICAg
-IDEgICAgICAgIDMwICAgICAgICAgICBwb2xsDQo+ID4gPiAgIDAuMDAgICAgMC4wMDAwMDAgICAg
-ICAgICAgIDAgICAgICAgICAxICAgICAgICAgICB3cml0ZQ0KPiA+ID4gLS0tLS0tIC0tLS0tLS0t
-LS0tIC0tLS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tLS0tLS0tLQ0KPiA+
-ID4gMTAwLjAwICAgIDAuMTI2ODM5ICAgICAgICAgICAgICAgICAgODI5MyAgICAgICAgICAgdG90
-YWwNCj4gPiA+DQo+ID4gPiBBZnRlciBhcHBsaW5nIHRoZSBjaGFuZ2U6DQo+ID4gPiAkIC4vc3Ry
-YWNlX2Muc2ggMjM4MjkgMzANCj4gPiA+ICUgdGltZSAgICAgc2Vjb25kcyAgdXNlY3MvY2FsbCAg
-ICAgY2FsbHMgICAgZXJyb3JzIHN5c2NhbGwNCj4gPiA+IC0tLS0tLSAtLS0tLS0tLS0tLSAtLS0t
-LS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0tLS0tLS0NCj4gPiA+ICA5Mi44
-NiAgICAwLjA2NzQ0MSAgICAgICAgICAxNiAgICAgIDQwOTQgICAgICAgICAgIHBwb2xsDQo+ID4g
-PiAgIDQuODUgICAgMC4wMDM1MjIgICAgICAgICAgIDIgICAgICAyMTM2ICAgICAgICAgICBpb2N0
-bA0KPiA+ID4gICAxLjE3ICAgIDAuMDAwODUwICAgICAgICAgICA0ICAgICAgIDE4OSAgICAgICAg
-ICAgZnV0ZXgNCj4gPiA+ICAgMC41NCAgICAwLjAwMDM5NSAgICAgICAgICAgMiAgICAgICAyMDIg
-ICAgICAgICAgIHJlYWQNCj4gPiA+ICAgMC41MiAgICAwLjAwMDM3OSAgICAgICAgICAgMiAgICAg
-ICAyMDIgICAgICAgICAgIGlvX2dldGV2ZW50cw0KPiA+ID4gICAwLjA1ICAgIDAuMDAwMDM3ICAg
-ICAgICAgICAxICAgICAgICAzMCAgICAgICAgICAgcG9sbA0KPiA+ID4gLS0tLS0tIC0tLS0tLS0t
-LS0tIC0tLS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tLS0tLS0tLQ0KPiA+
-ID4gMTAwLjAwICAgIDAuMDcyNjI0ICAgICAgICAgICAgICAgICAgNjg1MyAgICAgICAgICAgdG90
-YWwNCj4gPiA+DQo+ID4gPiBUaGUgZnV0ZXggY2FsbCBudW1iZXIgZGVjcmVhc2VzIH45MC42JSBv
-biBhbiBpZGxlIHdpbmRvd3MgNyBndWVzdC4NCj4gPg0KPiA+IFRoZXNlIGFyZSB0aGUgc2FtZSBm
-aWd1cmVzIGFzIGZyb20gdjEgLS0gaXQgd291bGQgYmUgaW50ZXJlc3RpbmcNCj4gPiB0byBjaGVj
-ayB3aGV0aGVyIHRoZSBhZGRpdGlvbmFsIGxvY2tpbmcgdGhhdCB2MiBhZGRzIGhhcyBhZmZlY3Rl
-ZA0KPiA+IHRoZSByZXN1bHRzLg0KPiA+DQo+IE9oLCB5ZXMuIHRoZSBmdXRleCBudW1iZXIgb2Yg
-djIgZG9uJ3QgZGVjbGluZSBjb21wYXJlZCB0b28gbXVjaCB0byB2MSBiZWNhdXNlDQo+IGl0DQo+
-IHRha2VzIHRoZSBCUUwgYmVmb3JlIHJhaXNpbmcgdGhlIG91dGJvdW5kIElSUSBsaW5lIG5vdy4N
-Cj4gDQo+IEJlZm9yZSBhcHBseWluZyB2MjoNCj4gIyAuL3N0cmFjZV9jLnNoIDg3NzYgMzANCj4g
-JSB0aW1lICAgICBzZWNvbmRzICB1c2Vjcy9jYWxsICAgICBjYWxscyAgICBlcnJvcnMgc3lzY2Fs
-bA0KPiAtLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLSAt
-LS0tLS0tLS0tLS0tLS0tDQo+ICA3OC4wMSAgICAwLjE2NDE4OCAgICAgICAgICAyNiAgICAgIDY0
-MzYgICAgICAgICAgIHBwb2xsDQo+ICAgOC4zOSAgICAwLjAxNzY1MCAgICAgICAgICAgNSAgICAg
-IDM3MDAgICAgICAgIDM5IGZ1dGV4DQo+ICAgNy42OCAgICAwLjAxNjE1NyAgICAgICAgICAgNiAg
-ICAgIDI3NTggICAgICAgICAgIGlvY3RsDQo+ICAgNS40OCAgICAwLjAxMTUzMCAgICAgICAgICAg
-MyAgICAgIDQ1ODYgICAgICAxMTEzIHJlYWQNCj4gICAwLjMwICAgIDAuMDAwNjQwICAgICAgICAg
-IDIwICAgICAgICAzMiAgICAgICAgICAgaW9fc3VibWl0DQo+ICAgMC4xNSAgICAwLjAwMDMxNyAg
-ICAgICAgICAgNCAgICAgICAgODkgICAgICAgICAgIHdyaXRlDQo+IC0tLS0tLSAtLS0tLS0tLS0t
-LSAtLS0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0tLS0tLS0NCj4gMTAw
-LjAwICAgIDAuMjEwNDgyICAgICAgICAgICAgICAgICAxNzYwMSAgICAgIDExNTIgdG90YWwNCj4g
-DQo+IEFmdGVyIGFwcGx5aW5nIHYyOg0KPiAjIC4vc3RyYWNlX2Muc2ggMTU5NjggMzANCj4gJSB0
-aW1lICAgICBzZWNvbmRzICB1c2Vjcy9jYWxsICAgICBjYWxscyAgICBlcnJvcnMgc3lzY2FsbA0K
-PiAtLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0t
-LS0tLS0tLS0tLS0tDQo+ICA3OC4yOCAgICAwLjE3MTExNyAgICAgICAgICAyNyAgICAgIDYyNzIg
-ICAgICAgICAgIHBwb2xsDQo+ICAgOC41MCAgICAwLjAxODU3MSAgICAgICAgICAgNSAgICAgIDM2
-NjMgICAgICAgIDIxIGZ1dGV4DQo+ICAgNy43NiAgICAwLjAxNjk3MyAgICAgICAgICAgNiAgICAg
-IDI3MzIgICAgICAgICAgIGlvY3RsDQo+ICAgNC44NSAgICAwLjAxMDU5NyAgICAgICAgICAgMyAg
-ICAgIDQxMTUgICAgICAgODUzIHJlYWQNCj4gICAwLjMxICAgIDAuMDAwNjcyICAgICAgICAgIDEx
-ICAgICAgICA2MyAgICAgICAgICAgaW9fc3VibWl0DQo+ICAgMC4zMCAgICAwLjAwMDY1OSAgICAg
-ICAgICAgNCAgICAgICAxODAgICAgICAgICAgIHdyaXRlDQo+IC0tLS0tLSAtLS0tLS0tLS0tLSAt
-LS0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0tLS0tLS0NCj4gMTAwLjAw
-ICAgIDAuMjE4NTg5ICAgICAgICAgICAgICAgICAxNzAyNSAgICAgICA4NzQgdG90YWwNCj4gDQo+
-ID4gRG9lcyB0aGUgcGF0Y2ggaW1wcm92ZSBwZXJmb3JtYW5jZSBpbiBhIG1vcmUgaW50ZXJlc3Rp
-bmcgdXNlDQo+ID4gY2FzZSB0aGFuICJ0aGUgZ3Vlc3QgaXMganVzdCBpZGxlIiA/DQo+ID4NCj4g
-SSB0aGluayBzbywgYWZ0ZXIgYWxsLCB0aGUgc2NvcGUgb2YgdGhlIGxvY2tpbmcgaXMgcmVkdWNl
-ZCAuDQo+IEJlc2lkZXMgdGhpcywgY2FuIHdlIG9wdGltaXplIHRoZSBydGMgdGltZXIgdG8gYXZv
-aWQgdG8gaG9sZCBCUUwNCj4gYnkgc2VwYXJhdGUgdGhyZWFkcz8NCj4gDQpIaSBQZXRlciwgUGFv
-bG8NCg0KSSB0ZXN0ZWQgUENNYXJrIDggKGh0dHBzOi8vd3d3LmZ1dHVyZW1hcmsuY29tL2JlbmNo
-bWFya3MvcGNtYXJrKSANCmluIHdpbjcgZ3Vlc3QgYW5kIGdvdCB0aGUgYmVsb3cgcmVzdWx0czoN
-Cg0KR3Vlc3Q6IDJVMkcNCg0KQmVmb3JlIGFwcGx5aW5nIHYyOg0KDQpZb3VyIFdvcmsgMi4wIHNj
-b3JlOiAgICAgICAyMDAwDQpXZWIgQnJvd3NpbmcgLSBKdW5nbGVQaW4gICAgMC4zMzRzDQpXZWIg
-QnJvd3NpbmcgLSBBbWF6b25pYSAgICAwLjEzMnMNCldyaXRpbmcgICAgICAgIDMuNTlzDQpTcHJl
-YWRzaGVldCAgICA3MC4xM3MNClZpZGVvIENoYXQgdjIvVmlkZW8gQ2hhdCBwbGF5YmFjayAxIHYy
-ICAgMjIuOCBmcHMNClZpZGVvIENoYXQgdjIvVmlkZW8gQ2hhdCBlbmNvZGluZyB2MiAgIDMwNy4w
-IG1zDQpCZW5jaG1hcmsgZHVyYXRpb24gICAgMWggMzVtaW4gNDZzDQoNCkFmdGVyIGFwcGx5aW5n
-IHYyOg0KDQpZb3VyIFdvcmsgMi4wIHNjb3JlOiAgICAgICAyMDQwDQpXZWIgQnJvd3NpbmcgLSBK
-dW5nbGVQaW4gICAgMC4zNDVzDQpXZWIgQnJvd3NpbmcgLSBBbWF6b25pYSAgICAwLjEzMnMNCldy
-aXRpbmcgICAgICAgIDMuNTZzDQpTcHJlYWRzaGVldCAgICA2Ny44M3MNClZpZGVvIENoYXQgdjIv
-VmlkZW8gQ2hhdCBwbGF5YmFjayAxIHYyICAgMjguNyBmcHMNClZpZGVvIENoYXQgdjIvVmlkZW8g
-Q2hhdCBlbmNvZGluZyB2MiAgIDMyNC43IG1zDQpCZW5jaG1hcmsgZHVyYXRpb24gICAgMWggMzJt
-aW4gNXMNCg0KVGVzdCByZXN1bHRzIHNob3cgdGhhdCBvcHRpbWl6YXRpb24gaXMgdmVyeSBlZmZl
-Y3RpdmUgaW4gc3RyZXNzZnVsIHNpdHVhdGlvbnMuDQoNClRoYW5rcywNCi1Hb25nbGVpDQoNCg==
+On 8 February 2018 at 19:08, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit 008a51bbb343972dd8cf09126da8c3b87f4e1c96:
+>
+>   Merge remote-tracking branch 'remotes/famz/tags/staging-pull-request' into staging (2018-02-08 14:31:51 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to f4ac9b2e04e8d98854a97bc473353207765aa9e7:
+>
+>   virtio-balloon: include statistics of disk/file caches (2018-02-08 21:06:42 +0200)
+>
+> ----------------------------------------------------------------
+> virtio,vhost,pci,pc: features, fixes and cleanups
+>
+> - a new vhost crypto device
+> - new stats in virtio balloon
+> - virtio eventfd rework for boot speedup
+> - vhost memory rework for boot speedup
+> - fixes and cleanups all over the place
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+
+Hi. This has some format-string issues:
+
+/home/peter.maydell/qemu/backends/cryptodev-vhost-user.c: In function
+'cryptodev_vhost_user_start':
+/home/peter.maydell/qemu/backends/cryptodev-vhost-user.c:112:26:
+error: format '%lu' expects argument of type 'long unsigned int', but
+argument 2 has type 'size_t {aka unsigned int}' [-Werror=format=]
+             error_report("failed to init vhost_crypto for queue %lu", i);
+                          ^
+/home/peter.maydell/qemu/backends/cryptodev-vhost-user.c: In function
+'cryptodev_vhost_user_init':
+/home/peter.maydell/qemu/backends/cryptodev-vhost-user.c:205:40:
+error: format '%lu' expects argument of type 'long unsigned int', but
+argument 2 has type 'size_t {aka unsigned int}' [-Werror=format=]
+         cc->info_str = g_strdup_printf("cryptodev-vhost-user%lu to %s ",
+                                        ^
+
+thanks
+-- PMM
