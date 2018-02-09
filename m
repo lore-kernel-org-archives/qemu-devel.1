@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59247)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekEpG-0007AH-3h
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:59:15 -0500
+	id 1ekEvQ-0002yb-VI
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekEpE-0006VY-NO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 14:59:14 -0500
+	id 1ekEvP-0003G6-NQ
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 15:05:36 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
-	<20180209185142.17151-12-mark.cave-ayland@ilande.co.uk>
+	<20180209185142.17151-2-mark.cave-ayland@ilande.co.uk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <23848428-fe5a-4e00-f7a6-88ecc991204d@amsat.org>
-Date: Fri, 9 Feb 2018 16:58:58 -0300
+Message-ID: <bb007cd9-8733-f8ee-2529-438a27c5b973@amsat.org>
+Date: Fri, 9 Feb 2018 17:05:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180209185142.17151-12-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180209185142.17151-2-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv2 11/12] ppc: move CUDAState and other
- CUDA-related definitions into separate cuda.h file
+Subject: Re: [Qemu-devel] [PATCHv2 01/12] cuda: do not use old_mmio accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,242 +30,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
 
+Hi Mark,
+
 On 02/09/2018 03:51 PM, Mark Cave-Ayland wrote:
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->  hw/misc/macio/cuda.c         |   1 +
->  hw/misc/macio/macio.c        |   1 +
->  hw/ppc/mac.h                 |  77 -------------------------------
->  include/hw/misc/macio/cuda.h | 107 +++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 109 insertions(+), 77 deletions(-)
->  create mode 100644 include/hw/misc/macio/cuda.h
+>  hw/misc/macio/cuda.c | 40 ++++++++--------------------------------
+>  1 file changed, 8 insertions(+), 32 deletions(-)
 > 
 > diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-> index 54c02aeffb..377b91d266 100644
+> index 008d8bd4d5..6631017ca2 100644
 > --- a/hw/misc/macio/cuda.c
 > +++ b/hw/misc/macio/cuda.c
-> @@ -27,6 +27,7 @@
->  #include "hw/ppc/mac.h"
->  #include "hw/input/adb.h"
->  #include "hw/misc/mos6522.h"
-> +#include "hw/misc/macio/cuda.h"
->  #include "qemu/timer.h"
->  #include "sysemu/sysemu.h"
->  #include "qemu/cutils.h"
-> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index a639b09e00..024f8557ab 100644
-> --- a/hw/misc/macio/macio.c
-> +++ b/hw/misc/macio/macio.c
-> @@ -26,6 +26,7 @@
->  #include "qapi/error.h"
->  #include "hw/hw.h"
->  #include "hw/ppc/mac.h"
-> +#include "hw/misc/macio/cuda.h"
->  #include "hw/pci/pci.h"
->  #include "hw/ppc/mac_dbdma.h"
->  #include "hw/char/escc.h"
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index 3e9f13d9b4..4702194f3f 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -45,83 +45,6 @@
+> @@ -275,7 +275,7 @@ static void cuda_delay_set_sr_int(CUDAState *s)
+>      timer_mod(s->sr_delay_timer, expire);
+>  }
 >  
->  #define ESCC_CLOCK 3686400
+> -static uint32_t cuda_readb(void *opaque, hwaddr addr)
+> +static uint64_t cuda_read(void *opaque, hwaddr addr, unsigned size)
+>  {
+>      CUDAState *s = opaque;
+>      uint32_t val;
+> @@ -350,7 +350,7 @@ static uint32_t cuda_readb(void *opaque, hwaddr addr)
+>      return val;
+>  }
 >  
-> -/* CUDA commands (2nd byte) */
-> -#define CUDA_WARM_START                0x0
-> -#define CUDA_AUTOPOLL                  0x1
-> -#define CUDA_GET_6805_ADDR             0x2
-> -#define CUDA_GET_TIME                  0x3
-> -#define CUDA_GET_PRAM                  0x7
-> -#define CUDA_SET_6805_ADDR             0x8
-> -#define CUDA_SET_TIME                  0x9
-> -#define CUDA_POWERDOWN                 0xa
-> -#define CUDA_POWERUP_TIME              0xb
-> -#define CUDA_SET_PRAM                  0xc
-> -#define CUDA_MS_RESET                  0xd
-> -#define CUDA_SEND_DFAC                 0xe
-> -#define CUDA_BATTERY_SWAP_SENSE        0x10
-> -#define CUDA_RESET_SYSTEM              0x11
-> -#define CUDA_SET_IPL                   0x12
-> -#define CUDA_FILE_SERVER_FLAG          0x13
-> -#define CUDA_SET_AUTO_RATE             0x14
-> -#define CUDA_GET_AUTO_RATE             0x16
-> -#define CUDA_SET_DEVICE_LIST           0x19
-> -#define CUDA_GET_DEVICE_LIST           0x1a
-> -#define CUDA_SET_ONE_SECOND_MODE       0x1b
-> -#define CUDA_SET_POWER_MESSAGES        0x21
-> -#define CUDA_GET_SET_IIC               0x22
-> -#define CUDA_WAKEUP                    0x23
-> -#define CUDA_TIMER_TICKLE              0x24
-> -#define CUDA_COMBINED_FORMAT_IIC       0x25
-> -
-> -/* Cuda */
-> -#define TYPE_CUDA "cuda"
-> -#define CUDA(obj) OBJECT_CHECK(CUDAState, (obj), TYPE_CUDA)
-> -
-> -typedef struct MOS6522CUDAState MOS6522CUDAState;
-> -
-> -typedef struct CUDAState {
-> -    /*< private >*/
-> -    SysBusDevice parent_obj;
-> -    /*< public >*/
-> -    MemoryRegion mem;
-> -
-> -    ADBBusState adb_bus;
-> -    MOS6522CUDAState *mos6522_cuda;
-> -
-> -    uint32_t tick_offset;
-> -    uint64_t tb_frequency;
-> -
-> -    uint8_t last_b;
-> -    uint8_t last_acr;
-> -
-> -    /* MacOS 9 is racy and requires a delay upon setting the SR_INT bit */
-> -    uint64_t sr_delay_ns;
-> -    QEMUTimer *sr_delay_timer;
-> -
-> -    int data_in_size;
-> -    int data_in_index;
-> -    int data_out_index;
-> -
-> -    qemu_irq irq;
-> -    uint16_t adb_poll_mask;
-> -    uint8_t autopoll_rate_ms;
-> -    uint8_t autopoll;
-> -    uint8_t data_in[128];
-> -    uint8_t data_out[16];
-> -    QEMUTimer *adb_poll_timer;
-> -} CUDAState;
-> -
-> -/* MOS6522 CUDA */
-> -typedef struct MOS6522CUDAState {
-> -    /*< private >*/
-> -    MOS6522State parent_obj;
-> -
-> -    CUDAState *cuda;
-> -} MOS6522CUDAState;
-> -
-> -#define TYPE_MOS6522_CUDA "mos6522-cuda"
-> -#define MOS6522_CUDA(obj) OBJECT_CHECK(MOS6522CUDAState, (obj), \
-> -                                       TYPE_MOS6522_CUDA)
+> -static void cuda_writeb(void *opaque, hwaddr addr, uint32_t val)
+> +static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+>  {
+>      CUDAState *s = opaque;
 >  
->  /* MacIO */
->  #define TYPE_OLDWORLD_MACIO "macio-oldworld"
-> diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
-> new file mode 100644
-> index 0000000000..6afbdd13ee
-> --- /dev/null
-> +++ b/include/hw/misc/macio/cuda.h
-> @@ -0,0 +1,107 @@
-> +/*
-> + * QEMU PowerMac CUDA device support
-> + *
-> + * Copyright (c) 2004-2007 Fabrice Bellard
-> + * Copyright (c) 2007 Jocelyn Mayer
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef CUDA_H
-> +#define CUDA_H
-> +
-> +/* CUDA commands (2nd byte) */
-> +#define CUDA_WARM_START                0x0
-> +#define CUDA_AUTOPOLL                  0x1
-> +#define CUDA_GET_6805_ADDR             0x2
-> +#define CUDA_GET_TIME                  0x3
-> +#define CUDA_GET_PRAM                  0x7
-> +#define CUDA_SET_6805_ADDR             0x8
-> +#define CUDA_SET_TIME                  0x9
-> +#define CUDA_POWERDOWN                 0xa
-> +#define CUDA_POWERUP_TIME              0xb
-> +#define CUDA_SET_PRAM                  0xc
-> +#define CUDA_MS_RESET                  0xd
-> +#define CUDA_SEND_DFAC                 0xe
-> +#define CUDA_BATTERY_SWAP_SENSE        0x10
-> +#define CUDA_RESET_SYSTEM              0x11
-> +#define CUDA_SET_IPL                   0x12
-> +#define CUDA_FILE_SERVER_FLAG          0x13
-> +#define CUDA_SET_AUTO_RATE             0x14
-> +#define CUDA_GET_AUTO_RATE             0x16
-> +#define CUDA_SET_DEVICE_LIST           0x19
-> +#define CUDA_GET_DEVICE_LIST           0x1a
-> +#define CUDA_SET_ONE_SECOND_MODE       0x1b
-> +#define CUDA_SET_POWER_MESSAGES        0x21
-> +#define CUDA_GET_SET_IIC               0x22
-> +#define CUDA_WAKEUP                    0x23
-> +#define CUDA_TIMER_TICKLE              0x24
-> +#define CUDA_COMBINED_FORMAT_IIC       0x25
-> +
-> +/* Cuda */
-> +#define TYPE_CUDA "cuda"
-> +#define CUDA(obj) OBJECT_CHECK(CUDAState, (obj), TYPE_CUDA)
-> +
-> +typedef struct MOS6522CUDAState MOS6522CUDAState;
-> +
-> +typedef struct CUDAState {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +    /*< public >*/
-> +    MemoryRegion mem;
-> +
-> +    ADBBusState adb_bus;
-> +    MOS6522CUDAState *mos6522_cuda;
-> +
-> +    uint32_t tick_offset;
-> +    uint64_t tb_frequency;
-> +
-> +    uint8_t last_b;
-> +    uint8_t last_acr;
-> +
-> +    /* MacOS 9 is racy and requires a delay upon setting the SR_INT bit */
-> +    uint64_t sr_delay_ns;
-> +    QEMUTimer *sr_delay_timer;
-> +
-> +    int data_in_size;
-> +    int data_in_index;
-> +    int data_out_index;
-> +
-> +    qemu_irq irq;
-> +    uint16_t adb_poll_mask;
-> +    uint8_t autopoll_rate_ms;
-> +    uint8_t autopoll;
-> +    uint8_t data_in[128];
-> +    uint8_t data_out[16];
-> +    QEMUTimer *adb_poll_timer;
-> +} CUDAState;
-> +
-> +/* MOS6522 CUDA */
-> +typedef struct MOS6522CUDAState {
-> +    /*< private >*/
-> +    MOS6522State parent_obj;
-> +
-> +    CUDAState *cuda;
-> +} MOS6522CUDAState;
-> +
-> +#define TYPE_MOS6522_CUDA "mos6522-cuda"
-> +#define MOS6522_CUDA(obj) OBJECT_CHECK(MOS6522CUDAState, (obj), \
-> +                                       TYPE_MOS6522_CUDA)
-> +
-> +#endif /* CUDA_H */
+> @@ -780,38 +780,14 @@ static void cuda_receive_packet_from_host(CUDAState *s,
+>      }
+>  }
+>  
+> -static void cuda_writew (void *opaque, hwaddr addr, uint32_t value)
+> -{
+> -}
+> -
+> -static void cuda_writel (void *opaque, hwaddr addr, uint32_t value)
+> -{
+> -}
+> -
+> -static uint32_t cuda_readw (void *opaque, hwaddr addr)
+> -{
+> -    return 0;
+> -}
+> -
+> -static uint32_t cuda_readl (void *opaque, hwaddr addr)
+> -{
+> -    return 0;
+> -}
+> -
+>  static const MemoryRegionOps cuda_ops = {
+> -    .old_mmio = {
+> -        .write = {
+> -            cuda_writeb,
+> -            cuda_writew,
+> -            cuda_writel,
+> -        },
+> -        .read = {
+> -            cuda_readb,
+> -            cuda_readw,
+> -            cuda_readl,
+> -        },
+> +    .read = cuda_read,
+> +    .write = cuda_write,
+> +    .endianness = DEVICE_BIG_ENDIAN,
+> +    .valid = {
+
+This change the device behavior, previously 16/32bit access were
+ignored, now they are illegal.
+
+Using ".impl" instead also change the behavior, since 16/32bits access
+would be processed (as 2x or 4x 8bit access).
+
+A comment "this change is safe because ..." would reassure me ;)
+
+> +        .min_access_size = 1,
+> +        .max_access_size = 1,
+>      },
+> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+>  
+>  static bool cuda_timer_exist(void *opaque, int version_id)
 > 
