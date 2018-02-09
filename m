@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sm-0000z1-Pv
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sl-0000yC-Ph
 	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sl-0001vS-Gb
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:28 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46254)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sk-0001u9-0Q
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:27 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46252)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6Sl-0001td-95
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:27 -0500
+	id 1ek6Sj-0001sW-LV
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:25 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Se-0002Z0-CE
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:20 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Si-0002aP-FD
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:24 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:02:51 +0000
-Message-Id: <20180209110314.11766-8-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:02:57 +0000
+Message-Id: <20180209110314.11766-14-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 07/30] target/arm: Handle exceptions during
- exception stack pop
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 13/30] sdhci: Add i.MX specific subtype of SDHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,166 +32,382 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Handle possible MPU faults, SAU faults or bus errors when
-popping register state off the stack during exception return.
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
 
+IP block found on several generations of i.MX family does not use
+vanilla SDHCI implementation and it comes with a number of quirks.
+
+Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
+support unmodified Linux guest driver.
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Cc: yurovsky@gmail.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[PMM: define and use ESDHC_UNDOCUMENTED_REG27]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1517324542-6607-8-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 115 ++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 94 insertions(+), 21 deletions(-)
+ hw/sd/sdhci-internal.h |  23 +++++
+ include/hw/sd/sdhci.h  |  13 +++
+ hw/sd/sdhci.c          | 230 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 265 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c74f076d9d..c6e3b3913e 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6223,6 +6223,67 @@ pend_fault:
-     return false;
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index fc807f08f3..0991acd724 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -84,12 +84,18 @@
+ 
+ /* R/W Host control Register 0x0 */
+ #define SDHC_HOSTCTL                   0x28
++#define SDHC_CTRL_LED                  0x01
+ #define SDHC_CTRL_DMA_CHECK_MASK       0x18
+ #define SDHC_CTRL_SDMA                 0x00
+ #define SDHC_CTRL_ADMA1_32             0x08
+ #define SDHC_CTRL_ADMA2_32             0x10
+ #define SDHC_CTRL_ADMA2_64             0x18
+ #define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
++#define SDHC_CTRL_4BITBUS              0x02
++#define SDHC_CTRL_8BITBUS              0x20
++#define SDHC_CTRL_CDTEST_INS           0x40
++#define SDHC_CTRL_CDTEST_EN            0x80
++
+ 
+ /* R/W Power Control Register 0x0 */
+ #define SDHC_PWRCON                    0x29
+@@ -226,4 +232,21 @@ enum {
+     sdhc_gap_write  = 2   /* SDHC stopped at block gap during write operation */
+ };
+ 
++extern const VMStateDescription sdhci_vmstate;
++
++
++#define ESDHC_MIX_CTRL                  0x48
++#define ESDHC_VENDOR_SPEC               0xc0
++#define ESDHC_DLL_CTRL                  0x60
++
++#define ESDHC_TUNING_CTRL               0xcc
++#define ESDHC_TUNE_CTRL_STATUS          0x68
++#define ESDHC_WTMK_LVL                  0x44
++
++/* Undocumented register used by guests working around erratum ERR004536 */
++#define ESDHC_UNDOCUMENTED_REG27        0x6c
++
++#define ESDHC_CTRL_4BITBUS              (0x1 << 1)
++#define ESDHC_CTRL_8BITBUS              (0x2 << 1)
++
+ #endif
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index 1cf70f8c23..f8d1ba3538 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -44,6 +44,7 @@ typedef struct SDHCIState {
+     AddressSpace sysbus_dma_as;
+     AddressSpace *dma_as;
+     MemoryRegion *dma_mr;
++    const MemoryRegionOps *io_ops;
+ 
+     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
+     QEMUTimer *transfer_timer;
+@@ -91,8 +92,18 @@ typedef struct SDHCIState {
+ 
+     /* Configurable properties */
+     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
++    uint32_t quirks;
+ } SDHCIState;
+ 
++/*
++ * Controller does not provide transfer-complete interrupt when not
++ * busy.
++ *
++ * NOTE: This definition is taken out of Linux kernel and so the
++ * original bit number is preserved
++ */
++#define SDHCI_QUIRK_NO_BUSY_IRQ    BIT(14)
++
+ #define TYPE_PCI_SDHCI "sdhci-pci"
+ #define PCI_SDHCI(obj) OBJECT_CHECK(SDHCIState, (obj), TYPE_PCI_SDHCI)
+ 
+@@ -100,4 +111,6 @@ typedef struct SDHCIState {
+ #define SYSBUS_SDHCI(obj)                               \
+      OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
+ 
++#define TYPE_IMX_USDHC "imx-usdhc"
++
+ #endif /* SDHCI_H */
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index fac7fa5c72..b395ac577d 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -244,7 +244,8 @@ static void sdhci_send_command(SDHCIState *s)
+             }
+         }
+ 
+-        if ((s->norintstsen & SDHC_NISEN_TRSCMP) &&
++        if (!(s->quirks & SDHCI_QUIRK_NO_BUSY_IRQ) &&
++            (s->norintstsen & SDHC_NISEN_TRSCMP) &&
+             (s->cmdreg & SDHC_CMD_RESPONSE) == SDHC_CMD_RSP_WITH_BUSY) {
+             s->norintsts |= SDHC_NIS_TRSCMP;
+         }
+@@ -1189,6 +1190,8 @@ static void sdhci_initfn(SDHCIState *s)
+ 
+     s->insert_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_insertion_irq, s);
+     s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
++
++    s->io_ops = &sdhci_mmio_ops;
  }
  
-+static bool v7m_stack_read(ARMCPU *cpu, uint32_t *dest, uint32_t addr,
-+                           ARMMMUIdx mmu_idx)
+ static void sdhci_uninitfn(SDHCIState *s)
+@@ -1396,6 +1399,10 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
+     }
+ 
+     sysbus_init_irq(sbd, &s->irq);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
++            SDHC_REGISTERS_MAP_SIZE);
++
+     sysbus_init_mmio(sbd, &s->iomem);
+ }
+ 
+@@ -1447,11 +1454,232 @@ static const TypeInfo sdhci_bus_info = {
+     .class_init = sdhci_bus_class_init,
+ };
+ 
++static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
 +{
-+    CPUState *cs = CPU(cpu);
-+    CPUARMState *env = &cpu->env;
-+    MemTxAttrs attrs = {};
-+    MemTxResult txres;
-+    target_ulong page_size;
-+    hwaddr physaddr;
-+    int prot;
-+    ARMMMUFaultInfo fi;
-+    bool secure = mmu_idx & ARM_MMU_IDX_M_S;
-+    int exc;
-+    bool exc_secure;
-+    uint32_t value;
++    SDHCIState *s = SYSBUS_SDHCI(opaque);
++    uint32_t ret;
++    uint16_t hostctl;
 +
-+    if (get_phys_addr(env, addr, MMU_DATA_LOAD, mmu_idx, &physaddr,
-+                      &attrs, &prot, &page_size, &fi, NULL)) {
-+        /* MPU/SAU lookup failed */
-+        if (fi.type == ARMFault_QEMU_SFault) {
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...SecureFault with SFSR.AUVIOL during unstack\n");
-+            env->v7m.sfsr |= R_V7M_SFSR_AUVIOL_MASK | R_V7M_SFSR_SFARVALID_MASK;
-+            env->v7m.sfar = addr;
-+            exc = ARMV7M_EXCP_SECURE;
-+            exc_secure = false;
-+        } else {
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...MemManageFault with CFSR.MUNSTKERR\n");
-+            env->v7m.cfsr[secure] |= R_V7M_CFSR_MUNSTKERR_MASK;
-+            exc = ARMV7M_EXCP_MEM;
-+            exc_secure = secure;
++    switch (offset) {
++    default:
++        return sdhci_read(opaque, offset, size);
++
++    case SDHC_HOSTCTL:
++        /*
++         * For a detailed explanation on the following bit
++         * manipulation code see comments in a similar part of
++         * usdhc_write()
++         */
++        hostctl = SDHC_DMA_TYPE(s->hostctl) << (8 - 3);
++
++        if (s->hostctl & SDHC_CTRL_8BITBUS) {
++            hostctl |= ESDHC_CTRL_8BITBUS;
 +        }
-+        goto pend_fault;
++
++        if (s->hostctl & SDHC_CTRL_4BITBUS) {
++            hostctl |= ESDHC_CTRL_4BITBUS;
++        }
++
++        ret  = hostctl;
++        ret |= (uint32_t)s->blkgap << 16;
++        ret |= (uint32_t)s->wakcon << 24;
++
++        break;
++
++    case ESDHC_DLL_CTRL:
++    case ESDHC_TUNE_CTRL_STATUS:
++    case ESDHC_UNDOCUMENTED_REG27:
++    case ESDHC_TUNING_CTRL:
++    case ESDHC_VENDOR_SPEC:
++    case ESDHC_MIX_CTRL:
++    case ESDHC_WTMK_LVL:
++        ret = 0;
++        break;
 +    }
 +
-+    value = address_space_ldl(arm_addressspace(cs, attrs), physaddr,
-+                              attrs, &txres);
-+    if (txres != MEMTX_OK) {
-+        /* BusFault trying to read the data */
-+        qemu_log_mask(CPU_LOG_INT, "...BusFault with BFSR.UNSTKERR\n");
-+        env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_UNSTKERR_MASK;
-+        exc = ARMV7M_EXCP_BUS;
-+        exc_secure = false;
-+        goto pend_fault;
-+    }
-+
-+    *dest = value;
-+    return true;
-+
-+pend_fault:
-+    /* By pending the exception at this point we are making
-+     * the IMPDEF choice "overridden exceptions pended" (see the
-+     * MergeExcInfo() pseudocode). The other choice would be to not
-+     * pend them now and then make a choice about which to throw away
-+     * later if we have two derived exceptions.
-+     */
-+    armv7m_nvic_set_pending(env->nvic, exc, exc_secure);
-+    return false;
++    return ret;
 +}
 +
- /* Return true if we're using the process stack pointer (not the MSP) */
- static bool v7m_using_psp(CPUARMState *env)
- {
-@@ -6912,6 +6973,11 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-                                               !return_to_handler,
-                                               return_to_sp_process);
-         uint32_t frameptr = *frame_sp_p;
-+        bool pop_ok = true;
-+        ARMMMUIdx mmu_idx;
++static void
++usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
++{
++    SDHCIState *s = SYSBUS_SDHCI(opaque);
++    uint8_t hostctl;
++    uint32_t value = (uint32_t)val;
 +
-+        mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, return_to_secure,
-+                                                        !return_to_handler);
- 
-         if (!QEMU_IS_ALIGNED(frameptr, 8) &&
-             arm_feature(env, ARM_FEATURE_V8)) {
-@@ -6938,29 +7004,38 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-                 return;
-             }
- 
--            env->regs[4] = ldl_phys(cs->as, frameptr + 0x8);
--            env->regs[5] = ldl_phys(cs->as, frameptr + 0xc);
--            env->regs[6] = ldl_phys(cs->as, frameptr + 0x10);
--            env->regs[7] = ldl_phys(cs->as, frameptr + 0x14);
--            env->regs[8] = ldl_phys(cs->as, frameptr + 0x18);
--            env->regs[9] = ldl_phys(cs->as, frameptr + 0x1c);
--            env->regs[10] = ldl_phys(cs->as, frameptr + 0x20);
--            env->regs[11] = ldl_phys(cs->as, frameptr + 0x24);
-+            pop_ok =
-+                v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[5], frameptr + 0xc, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[6], frameptr + 0x10, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[7], frameptr + 0x14, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[8], frameptr + 0x18, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[9], frameptr + 0x1c, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[10], frameptr + 0x20, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[11], frameptr + 0x24, mmu_idx);
- 
-             frameptr += 0x28;
-         }
- 
--        /* Pop registers. TODO: make these accesses use the correct
--         * attributes and address space (S/NS, priv/unpriv) and handle
--         * memory transaction failures.
--         */
--        env->regs[0] = ldl_phys(cs->as, frameptr);
--        env->regs[1] = ldl_phys(cs->as, frameptr + 0x4);
--        env->regs[2] = ldl_phys(cs->as, frameptr + 0x8);
--        env->regs[3] = ldl_phys(cs->as, frameptr + 0xc);
--        env->regs[12] = ldl_phys(cs->as, frameptr + 0x10);
--        env->regs[14] = ldl_phys(cs->as, frameptr + 0x14);
--        env->regs[15] = ldl_phys(cs->as, frameptr + 0x18);
-+        /* Pop registers */
-+        pop_ok = pop_ok &&
-+            v7m_stack_read(cpu, &env->regs[0], frameptr, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[1], frameptr + 0x4, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[2], frameptr + 0x8, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[3], frameptr + 0xc, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[12], frameptr + 0x10, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[14], frameptr + 0x14, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[15], frameptr + 0x18, mmu_idx) &&
-+            v7m_stack_read(cpu, &xpsr, frameptr + 0x1c, mmu_idx);
++    switch (offset) {
++    case ESDHC_DLL_CTRL:
++    case ESDHC_TUNE_CTRL_STATUS:
++    case ESDHC_UNDOCUMENTED_REG27:
++    case ESDHC_TUNING_CTRL:
++    case ESDHC_WTMK_LVL:
++    case ESDHC_VENDOR_SPEC:
++        break;
 +
-+        if (!pop_ok) {
-+            /* v7m_stack_read() pended a fault, so take it (as a tail
-+             * chained exception on the same stack frame)
-+             */
-+            v7m_exception_taken(cpu, excret, true, false);
-+            return;
++    case SDHC_HOSTCTL:
++        /*
++         * Here's What ESDHCI has at offset 0x28 (SDHC_HOSTCTL)
++         *
++         *       7         6     5      4      3      2        1      0
++         * |-----------+--------+--------+-----------+----------+---------|
++         * | Card      | Card   | Endian | DATA3     | Data     | Led     |
++         * | Detect    | Detect | Mode   | as Card   | Transfer | Control |
++         * | Signal    | Test   |        | Detection | Width    |         |
++         * | Selection | Level  |        | Pin       |          |         |
++         * |-----------+--------+--------+-----------+----------+---------|
++         *
++         * and 0x29
++         *
++         *  15      10 9    8
++         * |----------+------|
++         * | Reserved | DMA  |
++         * |          | Sel. |
++         * |          |      |
++         * |----------+------|
++         *
++         * and here's what SDCHI spec expects those offsets to be:
++         *
++         * 0x28 (Host Control Register)
++         *
++         *     7        6         5       4  3      2         1        0
++         * |--------+--------+----------+------+--------+----------+---------|
++         * | Card   | Card   | Extended | DMA  | High   | Data     | LED     |
++         * | Detect | Detect | Data     | Sel. | Speed  | Transfer | Control |
++         * | Signal | Test   | Transfer |      | Enable | Width    |         |
++         * | Sel.   | Level  | Width    |      |        |          |         |
++         * |--------+--------+----------+------+--------+----------+---------|
++         *
++         * and 0x29 (Power Control Register)
++         *
++         * |----------------------------------|
++         * | Power Control Register           |
++         * |                                  |
++         * | Description omitted,             |
++         * | since it has no analog in ESDHCI |
++         * |                                  |
++         * |----------------------------------|
++         *
++         * Since offsets 0x2A and 0x2B should be compatible between
++         * both IP specs we only need to reconcile least 16-bit of the
++         * word we've been given.
++         */
++
++        /*
++         * First, save bits 7 6 and 0 since they are identical
++         */
++        hostctl = value & (SDHC_CTRL_LED |
++                           SDHC_CTRL_CDTEST_INS |
++                           SDHC_CTRL_CDTEST_EN);
++        /*
++         * Second, split "Data Transfer Width" from bits 2 and 1 in to
++         * bits 5 and 1
++         */
++        if (value & ESDHC_CTRL_8BITBUS) {
++            hostctl |= SDHC_CTRL_8BITBUS;
 +        }
++
++        if (value & ESDHC_CTRL_4BITBUS) {
++            hostctl |= ESDHC_CTRL_4BITBUS;
++        }
++
++        /*
++         * Third, move DMA select from bits 9 and 8 to bits 4 and 3
++         */
++        hostctl |= SDHC_DMA_TYPE(value >> (8 - 3));
++
++        /*
++         * Now place the corrected value into low 16-bit of the value
++         * we are going to give standard SDHCI write function
++         *
++         * NOTE: This transformation should be the inverse of what can
++         * be found in drivers/mmc/host/sdhci-esdhc-imx.c in Linux
++         * kernel
++         */
++        value &= ~UINT16_MAX;
++        value |= hostctl;
++        value |= (uint16_t)s->pwrcon << 8;
++
++        sdhci_write(opaque, offset, value, size);
++        break;
++
++    case ESDHC_MIX_CTRL:
++        /*
++         * So, when SD/MMC stack in Linux tries to write to "Transfer
++         * Mode Register", ESDHC i.MX quirk code will translate it
++         * into a write to ESDHC_MIX_CTRL, so we do the opposite in
++         * order to get where we started
++         *
++         * Note that Auto CMD23 Enable bit is located in a wrong place
++         * on i.MX, but since it is not used by QEMU we do not care.
++         *
++         * We don't want to call sdhci_write(.., SDHC_TRNMOD, ...)
++         * here becuase it will result in a call to
++         * sdhci_send_command(s) which we don't want.
++         *
++         */
++        s->trnmod = value & UINT16_MAX;
++        break;
++    case SDHC_TRNMOD:
++        /*
++         * Similar to above, but this time a write to "Command
++         * Register" will be translated into a 4-byte write to
++         * "Transfer Mode register" where lower 16-bit of value would
++         * be set to zero. So what we do is fill those bits with
++         * cached value from s->trnmod and let the SDHCI
++         * infrastructure handle the rest
++         */
++        sdhci_write(opaque, offset, val | s->trnmod, size);
++        break;
++    case SDHC_BLKSIZE:
++        /*
++         * ESDHCI does not implement "Host SDMA Buffer Boundary", and
++         * Linux driver will try to zero this field out which will
++         * break the rest of SDHCI emulation.
++         *
++         * Linux defaults to maximum possible setting (512K boundary)
++         * and it seems to be the only option that i.MX IP implements,
++         * so we artificially set it to that value.
++         */
++        val |= 0x7 << 12;
++        /* FALLTHROUGH */
++    default:
++        sdhci_write(opaque, offset, val, size);
++        break;
++    }
++}
++
++
++static const MemoryRegionOps usdhc_mmio_ops = {
++    .read = usdhc_read,
++    .write = usdhc_write,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 4,
++        .unaligned = false
++    },
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
++
++static void imx_usdhc_init(Object *obj)
++{
++    SDHCIState *s = SYSBUS_SDHCI(obj);
++
++    s->io_ops = &usdhc_mmio_ops;
++    s->quirks = SDHCI_QUIRK_NO_BUSY_IRQ;
++}
++
++static const TypeInfo imx_usdhc_info = {
++    .name = TYPE_IMX_USDHC,
++    .parent = TYPE_SYSBUS_SDHCI,
++    .instance_init = imx_usdhc_init,
++};
++
+ static void sdhci_register_types(void)
+ {
+     type_register_static(&sdhci_pci_info);
+     type_register_static(&sdhci_sysbus_info);
+     type_register_static(&sdhci_bus_info);
++    type_register_static(&imx_usdhc_info);
+ }
  
-         /* Returning from an exception with a PC with bit 0 set is defined
-          * behaviour on v8M (bit 0 is ignored), but for v7M it was specified
-@@ -6979,8 +7054,6 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-             }
-         }
- 
--        xpsr = ldl_phys(cs->as, frameptr + 0x1c);
--
-         if (arm_feature(env, ARM_FEATURE_V8)) {
-             /* For v8M we have to check whether the xPSR exception field
-              * matches the EXCRET value for return to handler/thread
+ type_init(sdhci_register_types)
 -- 
 2.16.1
