@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ekGrY-0003rl-EH
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 17:09:45 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ekHm8-0003Ko-AI
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 18:08:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ekGrU-0004d3-Dy
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 17:09:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33632)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ekGrU-0004ce-60
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 17:09:40 -0500
-Date: Fri, 9 Feb 2018 15:09:33 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180209150933.658881ed@w520.home>
-In-Reply-To: <20180209071145.GE2783@xz-mi>
-References: <20180207001615.1156.10547.stgit@gimli.home>
-	<20180207002646.1156.37051.stgit@gimli.home>
-	<20180209071145.GE2783@xz-mi>
+	(envelope-from <jsnow@redhat.com>) id 1ekHm7-00079A-EH
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 18:08:12 -0500
+References: <20180207162920.28386-1-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <84467de4-5563-8293-9838-a5d48878597f@redhat.com>
+Date: Fri, 9 Feb 2018 18:07:49 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180207162920.28386-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 5/5] vfio/quirks: Enable ioeventfd
- quirks to be handled by vfio directly
+Subject: Re: [Qemu-devel] [PATCH] block: early check for blockers on
+ drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-On Fri, 9 Feb 2018 15:11:45 +0800
-Peter Xu <peterx@redhat.com> wrote:
 
-> On Tue, Feb 06, 2018 at 05:26:46PM -0700, Alex Williamson wrote:
-> > With vfio ioeventfd support, we can program vfio-pci to perform a
-> > specified BAR write when an eventfd is triggered.  This allows the
-> > KVM ioeventfd to be wired directly to vfio-pci, entirely avoiding
-> > userspace handling for these events.  On the same micro-benchmark
-> > where the ioeventfd got us to almost 90% of performance versus
-> > disabling the GeForce quirks, this gets us to within 95%.
-> > 
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >  hw/vfio/pci-quirks.c |   42 ++++++++++++++++++++++++++++++++++++------
-> >  1 file changed, 36 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> > index e739efe601b1..35a4d5197e2d 100644
-> > --- a/hw/vfio/pci-quirks.c
-> > +++ b/hw/vfio/pci-quirks.c
-> > @@ -16,6 +16,7 @@
-> >  #include "qemu/range.h"
-> >  #include "qapi/error.h"
-> >  #include "qapi/visitor.h"
-> > +#include <sys/ioctl.h>
-> >  #include "hw/nvram/fw_cfg.h"
-> >  #include "pci.h"
-> >  #include "trace.h"
-> > @@ -287,13 +288,27 @@ static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
-> >      return quirk;
-> >  }
-> >  
-> > -static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
-> > +static void vfio_ioeventfd_exit(VFIOPCIDevice *vdev, VFIOIOEventFD *ioeventfd)
-> >  {
-> > +    struct vfio_device_ioeventfd vfio_ioeventfd;
-> > +
-> >      QLIST_REMOVE(ioeventfd, next);
-> > +
-> >      memory_region_del_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
-> >                                ioeventfd->match_data, ioeventfd->data,
-> >                                &ioeventfd->e);
-> > +
-> >      qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e), NULL, NULL, NULL);
-> > +
-> > +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-> > +    vfio_ioeventfd.flags = ioeventfd->size;
-> > +    vfio_ioeventfd.data = ioeventfd->data;
-> > +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-> > +                            ioeventfd->region_addr;
-> > +    vfio_ioeventfd.fd = -1;
-> > +
-> > +    ioctl(vdev->vbasedev.fd, VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
-> > +
-> >      event_notifier_cleanup(&ioeventfd->e);
-> >      g_free(ioeventfd);
-> >  }
-> > @@ -315,6 +330,8 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
-> >                                            hwaddr region_addr)
-> >  {
-> >      VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
-> > +    struct vfio_device_ioeventfd vfio_ioeventfd;
-> > +    char vfio_enabled = '+';
-> >  
-> >      if (event_notifier_init(&ioeventfd->e, 0)) {
-> >          g_free(ioeventfd);
-> > @@ -329,15 +346,28 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
-> >      ioeventfd->region = region;
-> >      ioeventfd->region_addr = region_addr;
-> >  
-> > -    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> > -                        vfio_ioeventfd_handler, NULL, ioeventfd);
-> > +    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-> > +    vfio_ioeventfd.flags = ioeventfd->size;
-> > +    vfio_ioeventfd.data = ioeventfd->data;
-> > +    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-> > +                            ioeventfd->region_addr;
-> > +    vfio_ioeventfd.fd = event_notifier_get_fd(&ioeventfd->e);
-> > +
-> > +    if (ioctl(vdev->vbasedev.fd,
-> > +              VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd) != 0) {
-> > +        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> > +                            vfio_ioeventfd_handler, NULL, ioeventfd);
-> > +        vfio_enabled = '-';  
+
+On 02/07/2018 11:29 AM, Paolo Bonzini wrote:
+> Even if an op blocker is present for BLOCK_OP_TYPE_MIRROR_SOURCE,
+> it is checked a bit late and the result is that the target is
+> created even if drive-mirror subsequently fails.  Add an early
+> check to avoid this.
 > 
-> Would the performance be even slower if a new QEMU runs on a old
-> kernel due to these ioeventfds (MMIO -> eventfd -> same MMIO again)?
-> If so, shall we only enable this ioeventfd enhancement only if we
-> detected that the kernel supports this new feature (assuming this
-> feature bit won't change after VM starts)?
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockdev.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index 8e977eef11..c7e2e0a00e 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3565,6 +3565,11 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+>          return;
+>      }
+>  
+> +    /* Early check to avoid creating target */
+> +    if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_MIRROR_SOURCE, errp)) {
+> +        return;
+> +    }
+> +
+>      aio_context = bdrv_get_aio_context(bs);
+>      aio_context_acquire(aio_context);
+>  
+> 
 
-No, it's actually still a significant improvement to enable the KVM
-ioeventfd even if we can't enable vfio.  My testing shows that the KVM
-ioeventfd alone accounts for slightly more than half of the total
-improvement, so I don't see any reason to restrict this to depending on
-both ends being available.  Thanks,
-
-Alex
+What's the implication of the temporarily-extant target node that it
+needs to be avoided so strictly?
