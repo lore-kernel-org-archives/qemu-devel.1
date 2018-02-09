@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sl-0000yC-Ph
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:30 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sn-0000z8-SN
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sk-0001u9-0Q
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:27 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46252)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sm-0001w8-86
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:29 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6Sj-0001sW-LV
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:25 -0500
+	id 1ek6Sm-0001oy-0P
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:28 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Si-0002aP-FD
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:24 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sc-0002YX-Vd
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:18 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:02:57 +0000
-Message-Id: <20180209110314.11766-14-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:02:49 +0000
+Message-Id: <20180209110314.11766-6-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/30] sdhci: Add i.MX specific subtype of SDHCI
+Subject: [Qemu-devel] [PULL 05/30] target/arm: Make v7m_push_callee_stack()
+ honour MPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,382 +33,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Make v7m_push_callee_stack() honour the MPU by using the
+new v7m_stack_write() function. We return a flag to indicate
+whether the pushes failed, which we can then use in
+v7m_exception_taken() to cause us to handle the derived
+exception correctly.
 
-IP block found on several generations of i.MX family does not use
-vanilla SDHCI implementation and it comes with a number of quirks.
-
-Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
-support unmodified Linux guest driver.
-
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Cc: yurovsky@gmail.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMM: define and use ESDHC_UNDOCUMENTED_REG27]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 1517324542-6607-6-git-send-email-peter.maydell@linaro.org
 ---
- hw/sd/sdhci-internal.h |  23 +++++
- include/hw/sd/sdhci.h  |  13 +++
- hw/sd/sdhci.c          | 230 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 265 insertions(+), 1 deletion(-)
+ target/arm/helper.c | 64 ++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 49 insertions(+), 15 deletions(-)
 
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index fc807f08f3..0991acd724 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -84,12 +84,18 @@
- 
- /* R/W Host control Register 0x0 */
- #define SDHC_HOSTCTL                   0x28
-+#define SDHC_CTRL_LED                  0x01
- #define SDHC_CTRL_DMA_CHECK_MASK       0x18
- #define SDHC_CTRL_SDMA                 0x00
- #define SDHC_CTRL_ADMA1_32             0x08
- #define SDHC_CTRL_ADMA2_32             0x10
- #define SDHC_CTRL_ADMA2_64             0x18
- #define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
-+#define SDHC_CTRL_4BITBUS              0x02
-+#define SDHC_CTRL_8BITBUS              0x20
-+#define SDHC_CTRL_CDTEST_INS           0x40
-+#define SDHC_CTRL_CDTEST_EN            0x80
-+
- 
- /* R/W Power Control Register 0x0 */
- #define SDHC_PWRCON                    0x29
-@@ -226,4 +232,21 @@ enum {
-     sdhc_gap_write  = 2   /* SDHC stopped at block gap during write operation */
- };
- 
-+extern const VMStateDescription sdhci_vmstate;
-+
-+
-+#define ESDHC_MIX_CTRL                  0x48
-+#define ESDHC_VENDOR_SPEC               0xc0
-+#define ESDHC_DLL_CTRL                  0x60
-+
-+#define ESDHC_TUNING_CTRL               0xcc
-+#define ESDHC_TUNE_CTRL_STATUS          0x68
-+#define ESDHC_WTMK_LVL                  0x44
-+
-+/* Undocumented register used by guests working around erratum ERR004536 */
-+#define ESDHC_UNDOCUMENTED_REG27        0x6c
-+
-+#define ESDHC_CTRL_4BITBUS              (0x1 << 1)
-+#define ESDHC_CTRL_8BITBUS              (0x2 << 1)
-+
- #endif
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 1cf70f8c23..f8d1ba3538 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -44,6 +44,7 @@ typedef struct SDHCIState {
-     AddressSpace sysbus_dma_as;
-     AddressSpace *dma_as;
-     MemoryRegion *dma_mr;
-+    const MemoryRegionOps *io_ops;
- 
-     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
-     QEMUTimer *transfer_timer;
-@@ -91,8 +92,18 @@ typedef struct SDHCIState {
- 
-     /* Configurable properties */
-     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
-+    uint32_t quirks;
- } SDHCIState;
- 
-+/*
-+ * Controller does not provide transfer-complete interrupt when not
-+ * busy.
-+ *
-+ * NOTE: This definition is taken out of Linux kernel and so the
-+ * original bit number is preserved
-+ */
-+#define SDHCI_QUIRK_NO_BUSY_IRQ    BIT(14)
-+
- #define TYPE_PCI_SDHCI "sdhci-pci"
- #define PCI_SDHCI(obj) OBJECT_CHECK(SDHCIState, (obj), TYPE_PCI_SDHCI)
- 
-@@ -100,4 +111,6 @@ typedef struct SDHCIState {
- #define SYSBUS_SDHCI(obj)                               \
-      OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
- 
-+#define TYPE_IMX_USDHC "imx-usdhc"
-+
- #endif /* SDHCI_H */
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index fac7fa5c72..b395ac577d 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -244,7 +244,8 @@ static void sdhci_send_command(SDHCIState *s)
-             }
-         }
- 
--        if ((s->norintstsen & SDHC_NISEN_TRSCMP) &&
-+        if (!(s->quirks & SDHCI_QUIRK_NO_BUSY_IRQ) &&
-+            (s->norintstsen & SDHC_NISEN_TRSCMP) &&
-             (s->cmdreg & SDHC_CMD_RESPONSE) == SDHC_CMD_RSP_WITH_BUSY) {
-             s->norintsts |= SDHC_NIS_TRSCMP;
-         }
-@@ -1189,6 +1190,8 @@ static void sdhci_initfn(SDHCIState *s)
- 
-     s->insert_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_insertion_irq, s);
-     s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
-+
-+    s->io_ops = &sdhci_mmio_ops;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f31472a044..614162dd1e 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6473,7 +6473,7 @@ static uint32_t arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure)
+     return addr;
  }
  
- static void sdhci_uninitfn(SDHCIState *s)
-@@ -1396,6 +1399,10 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
+-static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
++static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+                                   bool ignore_faults)
+ {
+     /* For v8M, push the callee-saves register part of the stack frame.
+@@ -6481,31 +6481,55 @@ static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+      * In the tailchaining case this may not be the current stack.
+      */
+     CPUARMState *env = &cpu->env;
+-    CPUState *cs = CPU(cpu);
+     uint32_t *frame_sp_p;
+     uint32_t frameptr;
++    ARMMMUIdx mmu_idx;
++    bool stacked_ok;
+ 
+     if (dotailchain) {
+-        frame_sp_p = get_v7m_sp_ptr(env, true,
+-                                    lr & R_V7M_EXCRET_MODE_MASK,
++        bool mode = lr & R_V7M_EXCRET_MODE_MASK;
++        bool priv = !(env->v7m.control[M_REG_S] & R_V7M_CONTROL_NPRIV_MASK) ||
++            !mode;
++
++        mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, M_REG_S, priv);
++        frame_sp_p = get_v7m_sp_ptr(env, M_REG_S, mode,
+                                     lr & R_V7M_EXCRET_SPSEL_MASK);
+     } else {
++        mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
+         frame_sp_p = &env->regs[13];
      }
  
-     sysbus_init_irq(sbd, &s->irq);
+     frameptr = *frame_sp_p - 0x28;
+ 
+-    stl_phys(cs->as, frameptr, 0xfefa125b);
+-    stl_phys(cs->as, frameptr + 0x8, env->regs[4]);
+-    stl_phys(cs->as, frameptr + 0xc, env->regs[5]);
+-    stl_phys(cs->as, frameptr + 0x10, env->regs[6]);
+-    stl_phys(cs->as, frameptr + 0x14, env->regs[7]);
+-    stl_phys(cs->as, frameptr + 0x18, env->regs[8]);
+-    stl_phys(cs->as, frameptr + 0x1c, env->regs[9]);
+-    stl_phys(cs->as, frameptr + 0x20, env->regs[10]);
+-    stl_phys(cs->as, frameptr + 0x24, env->regs[11]);
++    /* Write as much of the stack frame as we can. A write failure may
++     * cause us to pend a derived exception.
++     */
++    stacked_ok =
++        v7m_stack_write(cpu, frameptr, 0xfefa125b, mmu_idx, ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0x8, env->regs[4], mmu_idx,
++                        ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0xc, env->regs[5], mmu_idx,
++                        ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0x10, env->regs[6], mmu_idx,
++                        ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0x14, env->regs[7], mmu_idx,
++                        ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0x18, env->regs[8], mmu_idx,
++                        ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0x1c, env->regs[9], mmu_idx,
++                        ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0x20, env->regs[10], mmu_idx,
++                        ignore_faults) &&
++        v7m_stack_write(cpu, frameptr + 0x24, env->regs[11], mmu_idx,
++                        ignore_faults);
+ 
++    /* Update SP regardless of whether any of the stack accesses failed.
++     * When we implement v8M stack limit checking then this attempt to
++     * update SP might also fail and result in a derived exception.
++     */
+     *frame_sp_p = frameptr;
 +
-+    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
-+            SDHC_REGISTERS_MAP_SIZE);
-+
-     sysbus_init_mmio(sbd, &s->iomem);
++    return !stacked_ok;
  }
  
-@@ -1447,11 +1454,232 @@ static const TypeInfo sdhci_bus_info = {
-     .class_init = sdhci_bus_class_init,
- };
+ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+@@ -6519,6 +6543,7 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+     uint32_t addr;
+     bool targets_secure;
+     int exc;
++    bool push_failed = false;
  
-+static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(opaque);
-+    uint32_t ret;
-+    uint16_t hostctl;
-+
-+    switch (offset) {
-+    default:
-+        return sdhci_read(opaque, offset, size);
-+
-+    case SDHC_HOSTCTL:
-+        /*
-+         * For a detailed explanation on the following bit
-+         * manipulation code see comments in a similar part of
-+         * usdhc_write()
+     armv7m_nvic_get_pending_irq_info(env->nvic, &exc, &targets_secure);
+ 
+@@ -6546,8 +6571,8 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+                  */
+                 if (lr & R_V7M_EXCRET_DCRS_MASK &&
+                     !(dotailchain && (lr & R_V7M_EXCRET_ES_MASK))) {
+-                    v7m_push_callee_stack(cpu, lr, dotailchain,
+-                                          ignore_stackfaults);
++                    push_failed = v7m_push_callee_stack(cpu, lr, dotailchain,
++                                                        ignore_stackfaults);
+                 }
+                 lr |= R_V7M_EXCRET_DCRS_MASK;
+             }
+@@ -6589,6 +6614,15 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+         }
+     }
+ 
++    if (push_failed && !ignore_stackfaults) {
++        /* Derived exception on callee-saves register stacking:
++         * we might now want to take a different exception which
++         * targets a different security state, so try again from the top.
 +         */
-+        hostctl = SDHC_DMA_TYPE(s->hostctl) << (8 - 3);
-+
-+        if (s->hostctl & SDHC_CTRL_8BITBUS) {
-+            hostctl |= ESDHC_CTRL_8BITBUS;
-+        }
-+
-+        if (s->hostctl & SDHC_CTRL_4BITBUS) {
-+            hostctl |= ESDHC_CTRL_4BITBUS;
-+        }
-+
-+        ret  = hostctl;
-+        ret |= (uint32_t)s->blkgap << 16;
-+        ret |= (uint32_t)s->wakcon << 24;
-+
-+        break;
-+
-+    case ESDHC_DLL_CTRL:
-+    case ESDHC_TUNE_CTRL_STATUS:
-+    case ESDHC_UNDOCUMENTED_REG27:
-+    case ESDHC_TUNING_CTRL:
-+    case ESDHC_VENDOR_SPEC:
-+    case ESDHC_MIX_CTRL:
-+    case ESDHC_WTMK_LVL:
-+        ret = 0;
-+        break;
++        v7m_exception_taken(cpu, lr, true, true);
++        return;
 +    }
 +
-+    return ret;
-+}
-+
-+static void
-+usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(opaque);
-+    uint8_t hostctl;
-+    uint32_t value = (uint32_t)val;
-+
-+    switch (offset) {
-+    case ESDHC_DLL_CTRL:
-+    case ESDHC_TUNE_CTRL_STATUS:
-+    case ESDHC_UNDOCUMENTED_REG27:
-+    case ESDHC_TUNING_CTRL:
-+    case ESDHC_WTMK_LVL:
-+    case ESDHC_VENDOR_SPEC:
-+        break;
-+
-+    case SDHC_HOSTCTL:
-+        /*
-+         * Here's What ESDHCI has at offset 0x28 (SDHC_HOSTCTL)
-+         *
-+         *       7         6     5      4      3      2        1      0
-+         * |-----------+--------+--------+-----------+----------+---------|
-+         * | Card      | Card   | Endian | DATA3     | Data     | Led     |
-+         * | Detect    | Detect | Mode   | as Card   | Transfer | Control |
-+         * | Signal    | Test   |        | Detection | Width    |         |
-+         * | Selection | Level  |        | Pin       |          |         |
-+         * |-----------+--------+--------+-----------+----------+---------|
-+         *
-+         * and 0x29
-+         *
-+         *  15      10 9    8
-+         * |----------+------|
-+         * | Reserved | DMA  |
-+         * |          | Sel. |
-+         * |          |      |
-+         * |----------+------|
-+         *
-+         * and here's what SDCHI spec expects those offsets to be:
-+         *
-+         * 0x28 (Host Control Register)
-+         *
-+         *     7        6         5       4  3      2         1        0
-+         * |--------+--------+----------+------+--------+----------+---------|
-+         * | Card   | Card   | Extended | DMA  | High   | Data     | LED     |
-+         * | Detect | Detect | Data     | Sel. | Speed  | Transfer | Control |
-+         * | Signal | Test   | Transfer |      | Enable | Width    |         |
-+         * | Sel.   | Level  | Width    |      |        |          |         |
-+         * |--------+--------+----------+------+--------+----------+---------|
-+         *
-+         * and 0x29 (Power Control Register)
-+         *
-+         * |----------------------------------|
-+         * | Power Control Register           |
-+         * |                                  |
-+         * | Description omitted,             |
-+         * | since it has no analog in ESDHCI |
-+         * |                                  |
-+         * |----------------------------------|
-+         *
-+         * Since offsets 0x2A and 0x2B should be compatible between
-+         * both IP specs we only need to reconcile least 16-bit of the
-+         * word we've been given.
-+         */
-+
-+        /*
-+         * First, save bits 7 6 and 0 since they are identical
-+         */
-+        hostctl = value & (SDHC_CTRL_LED |
-+                           SDHC_CTRL_CDTEST_INS |
-+                           SDHC_CTRL_CDTEST_EN);
-+        /*
-+         * Second, split "Data Transfer Width" from bits 2 and 1 in to
-+         * bits 5 and 1
-+         */
-+        if (value & ESDHC_CTRL_8BITBUS) {
-+            hostctl |= SDHC_CTRL_8BITBUS;
-+        }
-+
-+        if (value & ESDHC_CTRL_4BITBUS) {
-+            hostctl |= ESDHC_CTRL_4BITBUS;
-+        }
-+
-+        /*
-+         * Third, move DMA select from bits 9 and 8 to bits 4 and 3
-+         */
-+        hostctl |= SDHC_DMA_TYPE(value >> (8 - 3));
-+
-+        /*
-+         * Now place the corrected value into low 16-bit of the value
-+         * we are going to give standard SDHCI write function
-+         *
-+         * NOTE: This transformation should be the inverse of what can
-+         * be found in drivers/mmc/host/sdhci-esdhc-imx.c in Linux
-+         * kernel
-+         */
-+        value &= ~UINT16_MAX;
-+        value |= hostctl;
-+        value |= (uint16_t)s->pwrcon << 8;
-+
-+        sdhci_write(opaque, offset, value, size);
-+        break;
-+
-+    case ESDHC_MIX_CTRL:
-+        /*
-+         * So, when SD/MMC stack in Linux tries to write to "Transfer
-+         * Mode Register", ESDHC i.MX quirk code will translate it
-+         * into a write to ESDHC_MIX_CTRL, so we do the opposite in
-+         * order to get where we started
-+         *
-+         * Note that Auto CMD23 Enable bit is located in a wrong place
-+         * on i.MX, but since it is not used by QEMU we do not care.
-+         *
-+         * We don't want to call sdhci_write(.., SDHC_TRNMOD, ...)
-+         * here becuase it will result in a call to
-+         * sdhci_send_command(s) which we don't want.
-+         *
-+         */
-+        s->trnmod = value & UINT16_MAX;
-+        break;
-+    case SDHC_TRNMOD:
-+        /*
-+         * Similar to above, but this time a write to "Command
-+         * Register" will be translated into a 4-byte write to
-+         * "Transfer Mode register" where lower 16-bit of value would
-+         * be set to zero. So what we do is fill those bits with
-+         * cached value from s->trnmod and let the SDHCI
-+         * infrastructure handle the rest
-+         */
-+        sdhci_write(opaque, offset, val | s->trnmod, size);
-+        break;
-+    case SDHC_BLKSIZE:
-+        /*
-+         * ESDHCI does not implement "Host SDMA Buffer Boundary", and
-+         * Linux driver will try to zero this field out which will
-+         * break the rest of SDHCI emulation.
-+         *
-+         * Linux defaults to maximum possible setting (512K boundary)
-+         * and it seems to be the only option that i.MX IP implements,
-+         * so we artificially set it to that value.
-+         */
-+        val |= 0x7 << 12;
-+        /* FALLTHROUGH */
-+    default:
-+        sdhci_write(opaque, offset, val, size);
-+        break;
-+    }
-+}
-+
-+
-+static const MemoryRegionOps usdhc_mmio_ops = {
-+    .read = usdhc_read,
-+    .write = usdhc_write,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4,
-+        .unaligned = false
-+    },
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void imx_usdhc_init(Object *obj)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(obj);
-+
-+    s->io_ops = &usdhc_mmio_ops;
-+    s->quirks = SDHCI_QUIRK_NO_BUSY_IRQ;
-+}
-+
-+static const TypeInfo imx_usdhc_info = {
-+    .name = TYPE_IMX_USDHC,
-+    .parent = TYPE_SYSBUS_SDHCI,
-+    .instance_init = imx_usdhc_init,
-+};
-+
- static void sdhci_register_types(void)
- {
-     type_register_static(&sdhci_pci_info);
-     type_register_static(&sdhci_sysbus_info);
-     type_register_static(&sdhci_bus_info);
-+    type_register_static(&imx_usdhc_info);
- }
+     addr = arm_v7m_load_vector(cpu, exc, targets_secure);
  
- type_init(sdhci_register_types)
+     /* Now we've done everything that might cause a derived exception
 -- 
 2.16.1
