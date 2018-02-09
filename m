@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ek3HI-00051u-Bw
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:39:25 -0500
+	(envelope-from <david.engraf@sysgo.com>) id 1ek3RO-00089k-H8
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:49:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ek3HF-0001aM-A5
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:39:24 -0500
-Resent-Message-Id: <E1ek3HF-0001aM-A5@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21125)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ek3HF-0001Zv-26
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:39:21 -0500
-In-Reply-To: <1518046997-22714-1-git-send-email-mjc@sifive.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151804753284.267.1961024641475204958@bdbb90650ae5>
+	(envelope-from <david.engraf@sysgo.com>) id 1ek3RL-0002F1-DI
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 02:49:50 -0500
+From: David Engraf <david.engraf@sysgo.com>
+References: <20180130075847.6023-1-david.engraf@sysgo.com>
+	<20180208083621.24435-1-david.engraf@sysgo.com>
+	<20180209053349.GH11634@umbus.fritz.box>
+Message-ID: <78c633d2-d693-2879-5431-e3991bbb4026@sysgo.com>
+Date: Fri, 9 Feb 2018 08:49:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 7 Feb 2018 15:52:13 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v1] Implement support for IEEE 754-201x
- minimumNumber/maximumNumber
+In-Reply-To: <20180209053349.GH11634@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RESEND PATCH] PPC: e500: Fix duplicate kernel
+ load and device tree overlap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +26,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mjc@sifive.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, peter.maydell@linaro.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MTgwNDY5OTctMjI3MTQtMS1naXQtc2VuZC1lbWFpbC1tamNAc2lmaXZlLmNv
-bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxXSBJbXBsZW1lbnQgc3VwcG9ydCBmb3Ig
-SUVFRSA3NTQtMjAxeCBtaW5pbXVtTnVtYmVyL21heGltdW1OdW1iZXIKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
-b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29t
-bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
-JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
-ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
-ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
-ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
-JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CjFkYmU3ODA5MmMgSW1wbGVtZW50IHN1cHBvcnQgZm9yIElFRUUgNzU0LTIwMXggbWluaW11bU51
-bWJlci9tYXhpbXVtTnVtYmVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
-LzE6IEltcGxlbWVudCBzdXBwb3J0IGZvciBJRUVFIDc1NC0yMDF4IG1pbmltdW1OdW1iZXIvbWF4
-aW11bU51bWJlci4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4
-Old4VikKIzg1OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6Nzc3MzoKKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIGZsb2F0X3N0YXR1cyAqc3RhdHVzKSAgICAgICAgICAgICAgICAgIFwK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
-c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzkxOiBGSUxFOiBmcHUv
-c29mdGZsb2F0LmM6Nzc3OToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZsb2F0
-X3N0YXR1cyAqc3RhdHVzKSAgICAgICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDk0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
-bGlzdHMub3Jn
+Hello David,
+
+Am 09.02.2018 um 06:33 schrieb David Gibson:
+> On Thu, Feb 08, 2018 at 09:36:21AM +0100, David Engraf wrote:
+>> This patch fixes an incorrect behavior when the -kernel argument has been
+>> specified without -bios. In this case the kernel was loaded twice. At address
+>> 32M as a raw image and afterwards by load_elf/load_uimage at the
+>> corresponding load address. In this case the region for the device tree and
+>> the raw kernel image may overlap.
+>>
+>> The patch fixes the behavior by loading the kernel image once with
+>> load_elf/load_uimage and skips loading the raw image. It also ensures that
+>> the device tree is generated behind bios/kernel/initrd.
+>>
+>> Signed-off-by: David Engraf <david.engraf@sysgo.com>
+> 
+> Sorry I've taken so long to respond to this.  I've been busy, then
+> away, then busy, then recovering from surgery, then...
+> 
+> I think this looks good overall, just a couple of details I'd like to
+> check, see below.
+> 
+>> ---
+>>   hw/ppc/e500.c | 89 ++++++++++++++++++++++++++++++++---------------------------
+>>   1 file changed, 48 insertions(+), 41 deletions(-)
+>>
+>> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+>> index c4fe06ea2a..0321bd66a8 100644
+>> --- a/hw/ppc/e500.c
+>> +++ b/hw/ppc/e500.c
+>> @@ -776,7 +776,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+>>       MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>       PCIBus *pci_bus;
+>>       CPUPPCState *env = NULL;
+>> -    uint64_t loadaddr;
+>>       hwaddr kernel_base = -1LL;
+>>       int kernel_size = 0;
+>>       hwaddr dt_base = 0;
+>> @@ -913,11 +912,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+>>       /* Register spinning region */
+>>       sysbus_create_simple("e500-spin", params->spin_base, NULL);
+>>   
+>> -    if (cur_base < (32 * 1024 * 1024)) {
+>> -        /* u-boot occupies memory up to 32MB, so load blobs above */
+>> -        cur_base = (32 * 1024 * 1024);
+>> -    }
+>> -
+>>       if (params->has_mpc8xxx_gpio) {
+>>           qemu_irq poweroff_irq;
+>>   
+>> @@ -952,36 +946,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+>>                                       sysbus_mmio_get_region(s, 0));
+>>       }
+>>   
+>> -    /* Load kernel. */
+>> -    if (machine->kernel_filename) {
+>> -        kernel_base = cur_base;
+>> -        kernel_size = load_image_targphys(machine->kernel_filename,
+>> -                                          cur_base,
+>> -                                          ram_size - cur_base);
+>> -        if (kernel_size < 0) {
+>> -            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+>> -                    machine->kernel_filename);
+>> -            exit(1);
+>> -        }
+>> -
+>> -        cur_base += kernel_size;
+>> -    }
+>> -
+>> -    /* Load initrd. */
+>> -    if (machine->initrd_filename) {
+>> -        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+>> -        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
+>> -                                          ram_size - initrd_base);
+>> -
+>> -        if (initrd_size < 0) {
+>> -            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
+>> -                    machine->initrd_filename);
+>> -            exit(1);
+>> -        }
+>> -
+>> -        cur_base = initrd_base + initrd_size;
+>> -    }
+>> -
+>>       /*
+>>        * Smart firmware defaults ahead!
+>>        *
+>> @@ -1006,24 +970,67 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+>>       }
+>>       filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>>   
+>> -    bios_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
+>> +    bios_size = load_elf(filename, NULL, NULL, &bios_entry, &cur_base, NULL,
+>>                            1, PPC_ELF_MACHINE, 0, 0);
+>>       if (bios_size < 0) {
+>>           /*
+>>            * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
+>>            * ePAPR compliant kernel
+>>            */
+>> -        kernel_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
+>> -                                  NULL, NULL);
+>> -        if (kernel_size < 0) {
+>> +        bios_size = load_uimage(filename, &bios_entry, &cur_base, NULL,
+>> +                                NULL, NULL);
+>> +        if (bios_size < 0) {
+>>               fprintf(stderr, "qemu: could not load firmware '%s'\n", filename);
+>>               exit(1);
+>>           }
+>>       }
+>> +    cur_base += bios_size;
+>>       g_free(filename);
+>>   
+>> +    /* Load bare kernel only if no bios/u-boot has been provided */
+>> +    if (machine->kernel_filename != bios_name) {
+> 
+> This condition seems weird.  Why would the kernel and bios images be
+> the same.  I guess this because of the logic setting bios_name above,
+> which also seems kind of weird.  Can you clarify what's going on here,
+> changing that bios_name setting logic, if necessary?
+
+Basically I didn't change the logic to store the kernel name into 
+bios_name when the -bios options was not provided. In this case the 
+kernel will be used as payload. Indeed the name is a bit weird. What do 
+you think about changing the names from bios to payload?
+
+>> +        kernel_base = cur_base;
+>> +        kernel_size = load_image_targphys(machine->kernel_filename,
+>> +                                          cur_base,
+>> +                                          ram_size - cur_base);
+>> +        if (kernel_size < 0) {
+>> +            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+>> +                    machine->kernel_filename);
+>> +            exit(1);
+>> +        }
+>> +
+>> +        cur_base += kernel_size;
+>> +    } else {
+>> +        kernel_base = cur_base;
+>> +        kernel_size = bios_size;
+> 
+> Is this right?  You've already advanced cur_base by bios_size from
+> where you loaded the bios image, so kernel_base here will point
+> *after* the bios, not into it, but kernel_size is set to bios_size.
+> This seems strange.
+
+Right, kernel_base should point to the start of the kernel.
+
+Best regards
+- David
+
+
+>> +    }
+>> +
+>> +    if (cur_base < (32 * 1024 * 1024)) {
+>> +        /* u-boot occupies memory up to 32MB, so load blobs above */
+>> +        cur_base = (32 * 1024 * 1024);
+>> +    }
+>> +
+>> +    /* Load initrd. */
+>> +    if (machine->initrd_filename) {
+>> +        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+>> +        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
+>> +                                          ram_size - initrd_base);
+>> +
+>> +        if (initrd_size < 0) {
+>> +            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
+>> +                    machine->initrd_filename);
+>> +            exit(1);
+>> +        }
+>> +
+>> +        cur_base = initrd_base + initrd_size;
+>> +    }
+>> +
+>>       /* Reserve space for dtb */
+>> -    dt_base = (loadaddr + bios_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
+>> +    dt_base = (cur_base + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
+>> +    if (dt_base + DTB_MAX_SIZE > ram_size) {
+>> +            fprintf(stderr, "qemu: not enough memory for device tree\n");
+>> +            exit(1);
+>> +    }
+>>   
+>>       dt_size = ppce500_prep_device_tree(machine, params, dt_base,
+>>                                          initrd_base, initrd_size,
+> 
