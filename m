@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekAWr-0001EU-PO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:23:58 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ekAXI-0001bf-GT
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:24:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ekAWo-0007Hu-K4
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:23:57 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37292 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ekAWo-0007He-EY
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:23:54 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D151A8182D05
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 15:23:53 +0000 (UTC)
-References: <20180208171807.24267-1-stefanha@redhat.com>
-	<20180208171807.24267-3-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <012d5365-3c70-daff-4037-0253996abf98@redhat.com>
-Date: Fri, 9 Feb 2018 09:23:53 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180208171807.24267-3-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] block: test blk_aio_flush() with
- blk->root == NULL
+	(envelope-from <pbonzini@redhat.com>) id 1ekAXH-0007Zn-Ht
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:24:24 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  9 Feb 2018 16:24:12 +0100
+Message-Id: <20180209152412.23626-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] block/nvme: fix Coverity reports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +17,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: famz@redhat.com
 
-On 02/08/2018 11:18 AM, Stefan Hajnoczi wrote:
-> From: Kevin Wolf <kwolf@redhat.com>
-> 
-> This patch adds test cases for the scenario where blk_aio_flush() is
-> called on a BlockBackend with no root.  Calling drain afterwards should
-> complete the requests with -ENOMEDIUM.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   tests/Makefile.include     |  2 ++
->   tests/test-block-backend.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 84 insertions(+)
->   create mode 100644 tests/test-block-backend.c
-> 
+1) string not null terminated in sysfs_find_group_file
 
-> +++ b/tests/test-block-backend.c
-> @@ -0,0 +1,82 @@
-> +/*
-> + * BlockBackend tests
-> + *
-> + * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
+2) NULL pointer dereference and dead local variable in nvme_init.
 
-Want to include 2018?  Using a redhat.com address but a personal 
-copyright?  (Then again, Red Hat has some pretty cool policies on what 
-it permits for code written on an employee's own time).
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/nvme.c        | 14 ++++++--------
+ util/vfio-helpers.c |  2 +-
+ 2 files changed, 7 insertions(+), 9 deletions(-)
 
-As long as Kevin is happy with the final copyright line that goes into 
-the commit:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+diff --git a/block/nvme.c b/block/nvme.c
+index e9d0e218fc..ce217ffc81 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -553,7 +553,6 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     uint64_t cap;
+     uint64_t timeout_ms;
+     uint64_t deadline, now;
+-    Error *local_err = NULL;
+ 
+     qemu_co_mutex_init(&s->dma_map_lock);
+     qemu_co_queue_init(&s->dma_flush_queue);
+@@ -645,11 +644,6 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+                            false, nvme_handle_event, nvme_poll_cb);
+ 
+     nvme_identify(bs, namespace, errp);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EIO;
+-        goto fail_handler;
+-    }
+ 
+     /* Set up command queues. */
+     if (!nvme_add_io_queue(bs, errp)) {
+@@ -665,8 +659,12 @@ fail_queue:
+     nvme_free_queue_pair(bs, s->queues[0]);
+ fail:
+     g_free(s->queues);
+-    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+-    qemu_vfio_close(s->vfio);
++    if (s->regs) {
++        qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
++    }
++    if (s->vfio) {
++        qemu_vfio_close(s->vfio);
++    }
+     event_notifier_cleanup(&s->irq_notifier);
+     return ret;
+ }
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index f478b68400..006674c916 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -104,7 +104,7 @@ static char *sysfs_find_group_file(const char *device, Error **errp)
+     char *path = NULL;
+ 
+     sysfs_link = g_strdup_printf("/sys/bus/pci/devices/%s/iommu_group", device);
+-    sysfs_group = g_malloc(PATH_MAX);
++    sysfs_group = g_malloc0(PATH_MAX);
+     if (readlink(sysfs_link, sysfs_group, PATH_MAX - 1) == -1) {
+         error_setg_errno(errp, errno, "Failed to find iommu group sysfs path");
+         goto out;
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
