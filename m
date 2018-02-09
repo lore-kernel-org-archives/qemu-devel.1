@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ek9Xi-0004q6-Qg
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:20:47 -0500
+	(envelope-from <kernellwp@gmail.com>) id 1ek9dP-0007zI-1a
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ek9Xe-0003xz-PM
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:20:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35126)
+	(envelope-from <kernellwp@gmail.com>) id 1ek9dN-0007yt-FS
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:26:39 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33834)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ek9Xe-0003xR-IN
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:20:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ek9Xc-0003JI-6v
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 14:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EC5582E80D7
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 14:20:39 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1ek9dN-0007y3-85
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 09:26:37 -0500
+Received: by mail-oi0-x244.google.com with SMTP id k15so6234317oib.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 06:26:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Feb 2018 14:08:03 -0000
-From: Robert Pasz <1748434@bugs.launchpad.net>
-Reply-To: Bug 1748434 <1748434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151817810596.29573.3248344286701751294.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151818528339.10033.6168915766198422064.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1748434] Re: Possibly wrong GICv3 behavior when
- secure enabled
+In-Reply-To: <20180209124638.GH13981@localhost.localdomain>
+References: <1518083060-5881-1-git-send-email-wanpengli@tencent.com>
+	<20180208181207.GB13981@localhost.localdomain>
+	<fcb084ce-1615-f100-4137-e0fa46098d7b@redhat.com>
+	<20180209114615.GG13981@localhost.localdomain>
+	<CANRm+CyJi0r-Gm=ivJDwBhsW1dM5tAhBBx84G+miOQDaF+nLUw@mail.gmail.com>
+	<20180209124638.GH13981@localhost.localdomain>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Fri, 9 Feb 2018 22:26:36 +0800
+Message-ID: <CANRm+Cwby0RmP7W_fzsWc2Qd9k4QjBRT=jQoXXNHfpavQ44nWw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_DEDICATED hint CPUID
+ feature bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +33,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-see possible solution, in #if 0 is original code in #else see possible
-fix
+2018-02-09 20:46 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
+> On Fri, Feb 09, 2018 at 08:24:26PM +0800, Wanpeng Li wrote:
+>> 2018-02-09 19:46 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
+>> > On Fri, Feb 09, 2018 at 09:41:41AM +0100, Paolo Bonzini wrote:
+>> >> On 08/02/2018 19:12, Eduardo Habkost wrote:
+>> >> > On Thu, Feb 08, 2018 at 05:44:20PM +0800, Wanpeng Li wrote:
+>> >> >> From: Wanpeng Li <wanpengli@tencent.com>
+>> >> >>
+>> >> >> Add PV_DEDICATED hint cpuid feature bit.
+>> >> >>
+>> >> > [...]
+>> >> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> >> >> index d70954b..cf48931 100644
+>> >> >> --- a/target/i386/cpu.c
+>> >> >> +++ b/target/i386/cpu.c
+>> >> >> @@ -4076,6 +4076,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+>> >> >>              x86_cpu_get_supported_feature_word(w, false);
+>> >> >>          uint32_t requested_features = env->features[w];
+>> >> >>          env->features[w] &= host_feat;
+>> >> >> +        if (cpu->pv_dedicated && (w == FEAT_KVM)) {
+>> >> >> +            env->features[w] |= CPUID_PV_DEDICATED;
+>> >> >> +        }
+>> >> >
+>> >> > Why do this trick here instead of just adding "pv-dedicated" to
+>> >> > feature_word_info[FEAT_KVM].feat_names?
+>> >>
+>> >> I think because it can be added independent of KVM_GET_SUPPORTED_CPUID.
+>> >
+>> > If QEMU knows it can be enabled if outside GET_SUPPORTED_CPUID,
+>> > kvm_arch_get_supported_cpuid() can return it as supported.
+>>
+>> The guest fails to detect the new cpuid this time.
+>
+> This should fix it:
+>
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index a0aad808bd..44ee524188 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -804,6 +804,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          c = &cpuid_data.entries[cpuid_i++];
+>          c->function = KVM_CPUID_FEATURES | kvm_base;
+>          c->eax = env->features[FEAT_KVM];
+> +        c->edx = env->features[FEAT_KVM_HINTS];
+>      }
+>
+>      cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
+>
 
-static uint64_t icc_pmr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-....
-#if 0 // KIURCHER: bug - shall be opposite; see ARM specification
-        if (value & 0x80) {
-            /* Secure priorities not visible to NS */
-            value =3D 0;
-        } else if (value !=3D 0xff) {
-            value =3D (value << 1) & 0xff;
-        }
-#else
+Yeah, thanks, fold this in v2.
 
-        if (value & 0x80) {
-            value =3D (value << 1) & 0xff;
-        } else {
-            value =3D 0;
-        }
-#endif
-....
+Regards,
+Wanpeng Li
 
-
-static void icc_pmr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                          uint64_t value)
-....
-#if 0 //KIURCHER: bug
-    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_is_secure(env) &&
-        (env->cp15.scr_el3 & SCR_FIQ)) {
-        /* NS access and Group 0 is inaccessible to NS: return the
-         * NS view of the current priority
-         */
-        if (!(cs->icc_pmr_el1 & 0x80)) {
-            /* Current PMR in the secure range, don't allow NS to change it=
- */
-            return;
-        }
-        value =3D (value >> 1) & 0x80;
-    }
-#else
-    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_is_secure(env) &&
-        (env->cp15.scr_el3 & SCR_FIQ)) {
-        /* NS access and Group 0 is inaccessible to NS: return the
-         * NS view of the current priority
-         */
-        if (!(cs->icc_pmr_el1 & 0x80)) {
-            /* Current PMR in the secure range, don't allow NS to change it=
- */
-            return;
-        }
-        value =3D (value >> 1) | 0x80;
-    }
-#endif
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1748434
-
-Title:
-  Possibly wrong GICv3 behavior when secure enabled
-
-Status in QEMU:
-  New
-
-Bug description:
-  I an tried arm-aarch64 interrupt routing to EL3, by SCR_EL3.FIQ=3D1. Firs=
-t I am started QEMU with secure=3Don and GICv3 support.
-  I programmed secure and non-secure timers and set-up appropriate interrup=
-ts.Secure timer to be GRP1_Secure and non-secure timer to be GRP1_NonSecure=
-. ICC_PMR =3D 0xff. Then I switched CPU to EL1. =
-
-  With that setup no interrupt was delivered to PE. GIC interface showed th=
-at non secure IRQ is pending. ICC_PMR read at EL1 returns 0 (shall return v=
-alue ((PMR_(el3) << 1) & 0xff) according to GIC specification.
-  Than I tried to increase interrupt priority mask  - so I set ICC_PMR =3D =
-0x7f (at EL3). Then I read at EL1 ICC_PMR=3D0xfe - (is shall be 0). With th=
-is setup IRQ of secure timer was taken at EL3, non secure timer didn't rise=
- IRQ (as it is masked by PMR). =
-
-  I dig to qemu code and see wrong condition in file arm_gicv3_cpuif.c in f=
-unction  icc_pmr_read(). This behavior is opposite of ARM specification.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1748434/+subscriptions
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index d70954b..e2974ad 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>>          .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EAX,
+>>          .tcg_features = TCG_KVM_FEATURES,
+>>      },
+>> +    [FEAT_KVM_HINTS] = {
+>> +        .feat_names = {
+>> +            "hint-dedicated", NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +        },
+>> +        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EDX,
+>> +        .tcg_features = TCG_KVM_FEATURES,
+>> +    },
+>>      [FEAT_HYPERV_EAX] = {
+>>          .feat_names = {
+>>              NULL /* hv_msr_vp_runtime_access */, NULL /*
+>> hv_msr_time_refcount_access */,
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index f91e37d..9f73692 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -475,6 +475,7 @@ typedef enum FeatureWord {
+>>      FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
+>>      FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
+>>      FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
+>> +    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
+>>      FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
+>>      FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
+>>      FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
+>> @@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply
+>> Accumulation Single Precision */
+>>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+>>
+>> +#define KVM_HINTS_DEDICATED (1U << 0)
+>> +
+>>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch
+>> Prediction Barrier */
+>>
+>>  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index ad4b159..a0aad80 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s,
+>> uint32_t function,
+>>          if (!kvm_irqchip_in_kernel()) {
+>>              ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
+>>          }
+>> +    } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
+>> +        ret |= KVM_HINTS_DEDICATED;
+>> +        found = 1;
+>>      }
+>>
+>>      /* fallback for older kernels */
+>>
+>>
+>> Regards,
+>> Wanpeng Li
+>
+> --
+> Eduardo
