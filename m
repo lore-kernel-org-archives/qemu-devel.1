@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ekAaN-0004Er-Bf
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1ekAae-0004WJ-5T
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ekAaM-0000p5-C9
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:35 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ekAaM-0000oO-5z
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:34 -0500
-Received: by mail-oi0-x244.google.com with SMTP id j188so6361194oib.6
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 07:27:34 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ekAaa-00011K-Bq
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45380 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ekAaa-00010l-6l
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 10:27:48 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 05BAF7D845
+	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 15:27:44 +0000 (UTC)
+References: <20180208171807.24267-1-stefanha@redhat.com>
+	<20180208171807.24267-4-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4f3ce4c9-7d76-c06d-8c03-229bf308e1e4@redhat.com>
+Date: Fri, 9 Feb 2018 09:27:39 -0600
 MIME-Version: 1.0
-In-Reply-To: <1518189456-2873-4-git-send-email-geert+renesas@glider.be>
-References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
-	<1518189456-2873-4-git-send-email-geert+renesas@glider.be>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Feb 2018 15:27:13 +0000
-Message-ID: <CAFEAcA_Z1JH6RXp19g2N3rV3TGOTa7LzFctEScrENBYB8eAf3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH/RFC 3/5] hw/arm/virt: Allow dynamic sysbus
- devices again
+In-Reply-To: <20180208171807.24267-4-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] Revert "IDE: Do not flush empty CDROM
+ drives"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Auger Eric <eric.auger@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, linux-renesas-soc@vger.kernel.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 9 February 2018 at 15:17, Geert Uytterhoeven <geert+renesas@glider.be> wrote:
-> Allow the instantation of generic dynamic sysbus devices again, without
-> the need to create a new device-specific vfio type.
->
-> This is a partial revert of commit  6f2062b9758ebc64 ("hw/arm/virt:
-> Allow only supported dynamic sysbus devices").
->
-> Not-Yet-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+On 02/08/2018 11:18 AM, Stefan Hajnoczi wrote:
+> This reverts commit 4da97120d51a4383aa96d741a2b837f8c4bbcd0b.
+> 
+> blk_aio_flush() now handles the blk->root == NULL case, so we no longer
+> need this workaround.
+> 
+> Cc: John Snow <jsnow@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  hw/arm/virt.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index b334c82edae9fb1f..fa83784fc08ed076 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1596,6 +1596,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      mc->max_cpus = 255;
->      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
->      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
->      mc->block_default_type = IF_VIRTIO;
->      mc->no_cdrom = 1;
->      mc->pci_allow_0_address = true;
+>   hw/ide/core.c | 10 +---------
+>   1 file changed, 1 insertion(+), 9 deletions(-)
+> 
 
-This needs a lot of justification. Dynamic sysbus is not supposed
-to be for plugging any random sysbus device in, it's for vfio,
-which needs special casing anyway to work right. (Overall it's
-a terrible hack -- in an ideal world all vfio would use pci
-or another probeable bus.)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
