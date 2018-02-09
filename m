@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ek7vh-0007p2-M0
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:37:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1ek7xb-0000YW-7h
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:39:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ek7vc-0002Fc-Pl
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:37:25 -0500
-Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:42005)
+	(envelope-from <armbru@redhat.com>) id 1ek7xW-0003X3-Te
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:39:23 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44174 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ek7vc-0002F2-Ih
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:37:20 -0500
-Received: from player758.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id BB65419550A
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 13:37:18 +0100 (CET)
-Date: Fri, 9 Feb 2018 13:37:10 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180209133710.4d2c78b4@bahia.lan>
-In-Reply-To: <20180208180019.13683-2-antonios.motakis@huawei.com>
-References: <20180208180019.13683-1-antonios.motakis@huawei.com>
-	<20180208180019.13683-2-antonios.motakis@huawei.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ek7xW-0003Wk-PH
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 07:39:18 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180209050329.15094-1-armbru@redhat.com>
+	<CAFEAcA84hpU_Abf_8dOGFTxD1iRzey2+b1HL7RZTf=LFiEcyhQ@mail.gmail.com>
+Date: Fri, 09 Feb 2018 13:39:02 +0100
+In-Reply-To: <CAFEAcA84hpU_Abf_8dOGFTxD1iRzey2+b1HL7RZTf=LFiEcyhQ@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 9 Feb 2018 11:46:07 +0000")
+Message-ID: <876076pcbd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] 9pfs: V9fsQID: set type of version and
- path to unsigned
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL v3 00/20] Miscellaneous patches for
+ 2018-02-07
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: antonios.motakis@huawei.com
-Cc: qemu-devel@nongnu.org, veaceslav.falico@huawei.com, Eduard.Shishkin@huawei.com, andy.wangguoli@huawei.com, Jani.Kokkonen@huawei.com, cota@braap.org, berrange@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 8 Feb 2018 19:00:16 +0100
-<antonios.motakis@huawei.com> wrote:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> From: Antonios Motakis <antonios.motakis@huawei.com>
-> 
-> There is no need for signedness on these QID fields for 9p.
-> 
-> Signed-off-by: Antonios Motakis <antonios.motakis@huawei.com>
-> ---
+> On 9 February 2018 at 05:03, Markus Armbruster <armbru@redhat.com> wrote:
+>> The following changes since commit 008a51bbb343972dd8cf09126da8c3b87f4e1c96:
+>>
+>>   Merge remote-tracking branch 'remotes/famz/tags/staging-pull-request' into staging (2018-02-08 14:31:51 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2018-02-07-v3
+>>
+>> for you to fetch changes up to 59a92828ad355a0194248cab9ce98dddced04363:
+>>
+>>   Move include qemu/option.h from qemu-common.h to actual users (2018-02-09 05:07:33 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Miscellaneous patches for 2018-02-07
+>>
+>
+> Hi. This seems to have the same OSX build errors as v1:
 
-I agree these should be unsigned, but you have some more places to adapt
-to this change. At least these:
-- related traces in hw/9pfs/trace-events should then expect unsigned values
-- donttouch_stat() in hw/9pfs/9p.c should stop comparing them to -1
-
->  fsdev/9p-marshal.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fsdev/9p-marshal.h b/fsdev/9p-marshal.h
-> index c8823d8..d1ad364 100644
-> --- a/fsdev/9p-marshal.h
-> +++ b/fsdev/9p-marshal.h
-> @@ -10,8 +10,8 @@ typedef struct V9fsString
->  typedef struct V9fsQID
->  {
->      int8_t type;
-
-Even if your series doesn't use it, while here, let's drop the sign from
-@type as well.
-
-> -    int32_t version;
-> -    int64_t path;
-> +    uint32_t version;
-> +    uint64_t path;
->  } V9fsQID;
->  
->  typedef struct V9fsStat
+As v2, actually.  I failed to read to the end of your report, sorry.  v4
+coming...
