@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ekBTS-0002rA-Qg
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:24:31 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ekBXU-0005ij-Pi
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:28:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ekBTL-00043v-SO
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:24:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57212)
+	(envelope-from <pbonzini@redhat.com>) id 1ekBXP-00077K-TZ
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:28:40 -0500
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:34888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ekBTL-00043V-LF
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:24:23 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ekBTK-0001gs-M5
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 16:24:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 85BBC2E80D2
-	for <qemu-devel@nongnu.org>; Fri,  9 Feb 2018 16:24:22 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ekBXP-00076x-MY
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:28:35 -0500
+Received: by mail-wm0-f41.google.com with SMTP id r78so17371493wme.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 08:28:35 -0800 (PST)
+References: <20180208171807.24267-1-stefanha@redhat.com>
+	<20180208171807.24267-2-stefanha@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea22850e-f1b3-bcdd-db48-b6060e468296@redhat.com>
+Date: Fri, 9 Feb 2018 17:28:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Feb 2018 16:12:39 -0000
-From: Thomas Huth <1379688@bugs.launchpad.net>
-Reply-To: Bug 1379688 <1379688@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141010081105.4873.97725.malonedeb@wampee.canonical.com>
-Message-Id: <151819275961.10002.4435332550182798629.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1379688] Re: qemu's monitor and parallel create
- huge window
+In-Reply-To: <20180208171807.24267-2-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: add BlockBackend->in_flight
+ counter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-Thanks for your answer! Closing now.
+On 08/02/2018 18:18, Stefan Hajnoczi wrote:
+> +    BlockDriverState *bs = blk_bs(blk);
+> +
+> +    if (bs) {
+> +        bdrv_drained_begin(bs);
+> +    }
+> +
+> +    /* We may have aio requests like -ENOMEDIUM in flight */
+> +    while (atomic_mb_read(&blk->in_flight) > 0) {
+> +        aio_poll(blk_get_aio_context(blk), true);
+> +    }
+> +
+> +    if (bs) {
+> +        bdrv_drained_end(bs);
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+This only works if you are in the default AioContext, otherwise you can
+run handlers for one AioContexts in two threads.
 
--- =
+bdrv_dec_in_flight uses bdrv_wakeup and BDRV_POLL_WHILE to ensure that
+this doesn't happen, so there would be more code that you have to copy
+into block-backend.c.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1379688
-
-Title:
-  qemu's monitor and parallel create huge window
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  I have qemu 2.1. When I try to switch to monitor or parallel0, I get
-  window which is 30 *thousand* pixels in height. It is only gray with
-  no content. This did not happen with previous versions of qemu.
-
-  Kwin crashes because it cannot handle such a huge window.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1379688/+subscriptions
+Paolo
