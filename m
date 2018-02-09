@@ -1,27 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ek3kr-0003hl-Hh
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:09:59 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ek3oU-0005eA-JR
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:13:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ek3kp-0005OJ-C5
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:09:57 -0500
-Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:36203)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ek3kp-0005Ns-3y
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:09:55 -0500
-Received: by mail-ot0-x235.google.com with SMTP id m20so6939998otf.3
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 00:09:55 -0800 (PST)
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1ek3oP-0001SO-Kl
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:13:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58596)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1ek3oP-0001QX-Aw
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 03:13:37 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w198CDQS115723
+	for <qemu-devel@nongnu.org>; Fri, 9 Feb 2018 03:13:35 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g158t6v9q-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 03:13:35 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Fri, 9 Feb 2018 08:13:32 -0000
+References: <20180207175014.11157-1-lcapitulino@redhat.com>
+	<20180207175014.11157-2-lcapitulino@redhat.com>
+	<20180208195939.GJ13301@localhost.localdomain>
+	<dab9dcff-619f-9c0f-0c8c-f6542b73ca88@redhat.com>
+	<20180208214143.GF13981@localhost.localdomain>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Fri, 9 Feb 2018 09:13:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7NsYT_bPpiOx2oUqsYCCAU1TOhx3ytAoU-a6pTbkkA_pnA@mail.gmail.com>
-References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
-	<1518053328-34687-13-git-send-email-mjc@sifive.com>
-	<82554ae4-5348-f30b-3b77-64754046198b@linaro.org>
-	<CAHNT7NsYT_bPpiOx2oUqsYCCAU1TOhx3ytAoU-a6pTbkkA_pnA@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 9 Feb 2018 21:09:53 +1300
-Message-ID: <CAHNT7NubFsYQ+0A=iURqTbQDpA=L+mgr7P+qDzZEyXacJcfyig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 12/23] RISC-V HTIF Console
+In-Reply-To: <20180208214143.GF13981@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <a794b84e-cbbc-e7f7-4e89-25224e1860aa@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,188 +45,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Luiz Capitulino <lcapitulino@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com
 
-On Fri, Feb 9, 2018 at 8:33 PM, Michael Clark <mjc@sifive.com> wrote:
-
->
->
-> On Fri, Feb 9, 2018 at 5:35 AM, Richard Henderson <
-> richard.henderson@linaro.org> wrote:
->
->> On 02/07/2018 05:28 PM, Michael Clark wrote:
->> > +++ b/hw/riscv/riscv_elf.c
->> > @@ -0,0 +1,244 @@
->> > +/*
->> > + * elf.c - A simple package for manipulating symbol tables in elf
->> binaries.
->> > + *
->> > + * Taken from
->> > + * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/
->> > + * ftrace/elf.c
->> > + *
->> > + */
->> > +#include <stdio.h>
->> > +#include <stdlib.h>
->> > +#include <unistd.h>
->> > +#include <string.h>
->> > +#include <sys/stat.h>
->> > +#include <sys/types.h>
->> > +#include <sys/mman.h>
->> > +#include <errno.h>
->> > +#include <fcntl.h>
->> > +#include <glib.h>
->> > +
->> > +#include "hw/riscv/riscv_elf.h"
->> > +
->> > +/*
->> > + * elf_open - Map a binary into the address space and extract the
->> > + * locations of the static and dynamic symbol tables and their string
->> > + * tables. Return this information in a Elf object file handle that
->> will
->> > + * be passed to all of the other elf functions.
->> > + */
->> > +Elf_obj64 *elf_open64(const char *filename)
->> > +{
->> > +    int i, fd;
->> > +    struct stat sbuf;
->> > +    Elf_obj64 *ep;
->> > +    Elf64_Shdr *shdr;
->> > +
->> > +    ep = g_new(Elf_obj64, 1);
->> > +
->> > +    /* Do some consistency checks on the binary */
->> > +    fd = open(filename, O_RDONLY);
->> > +    if (fd == -1) {
->> > +        fprintf(stderr, "Can't open \"%s\": %s\n", filename,
->> strerror(errno));
->> > +        exit(1);
->> > +    }
->> > +    if (fstat(fd, &sbuf) == -1) {
->> > +        fprintf(stderr, "Can't stat \"%s\": %s\n", filename,
->> strerror(errno));
->> > +        exit(1);
->> > +    }
->> > +    if (sbuf.st_size < sizeof(Elf64_Ehdr)) {
->> > +        fprintf(stderr, "\"%s\" is not an ELF binary object\n",
->> filename);
->> > +        exit(1);
->> > +    }
->> > +
->> > +    /* It looks OK, so map the Elf binary into our address space */
->> > +    ep->mlen = sbuf.st_size;
->> > +    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
->> > +    if (ep->maddr == (void *)-1) {
->> > +        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename,
->> strerror(errno));
->> > +        exit(1);
->> > +    }
->> > +    close(fd);
->> > +
->> > +    /* The Elf binary begins with the Elf header */
->> > +    ep->ehdr = ep->maddr;
->> > +
->> > +    /* check we have a 64-bit little-endian RISC-V ELF object */
->> > +    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
->> > +        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
->> > +        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
->> > +        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
->> > +        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS64 ||
->> > +        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
->> > +        ep->ehdr->e_machine != EM_RISCV)
->> > +    {
->> > +        fprintf(stderr, "\"%s\" is not a 64-bit RISC-V ELF object\n",
->> filename);
->> > +        exit(1);
->> > +    }
->> > +
->> > +    /*
->> > +     * Find the static and dynamic symbol tables and their string
->> > +     * tables in the the mapped binary. The sh_link field in symbol
->> > +     * table section headers gives the section index of the string
->> > +     * table for that symbol table.
->> > +     */
->> > +    shdr = (Elf64_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
+On 08.02.2018 22:41, Eduardo Habkost wrote:
+> On Thu, Feb 08, 2018 at 02:59:17PM -0600, Eric Blake wrote:
+>> On 02/08/2018 01:59 PM, Eduardo Habkost wrote:
+>>> On Wed, Feb 07, 2018 at 12:50:13PM -0500, Luiz Capitulino wrote:
+>>>> The query-cpus command has an extremely serious side effect:
+>>>> it always interrupt all running vCPUs so that they can run
+>>>> ioctl calls. This can cause a huge performance degradation for
+>>>> some workloads. And most of the information retrieved by the
+>>>> ioctl calls are not even used by query-cpus.
+>>>>
+>>>> This commit introduces a replacement for query-cpus called
+>>>> query-cpus-fast, which has the following features:
+>>>>
 >>
->> This duplicates, badly, existing code within include/hw/elf_ops.h.
+>>>> +# Notes: @halted is a transient state that changes frequently.  By the time the
+>>>> +#        data is sent to the client, the guest may no longer be halted.
+>>>> +##
+>>>> +{ 'struct': 'CpuInfo2',
+>>>> +  'data': {'cpu-index': 'int', '*halted': 'bool', 'qom-path': 'str',
+>>>> +           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
+>>>
+>>> This will require duplicating struct fields every time we add a
+>>> new field to query-cpus-fast (e.g. how would VIktor's
+>>> CpuInfoS390State patch[1] look like if rebased on top of yours?).
+>>>
+>>> One way to avoid that is to use CpuInfo for both, and make all
+>>> "slow"  fields optional.  Another option is to use QAPI
+>>> inheritance, but it could be a little complicated if unions are
+>>> involved?
 >>
->> In particular, this fails to bswap these fields.  As such, this code will
->> only
->> work on little-endian hosts.
+>> Inheritance is better than optional fields for the sake of introspection
+>> learning which fields to expect.
 >>
->
-> There is enough information in the structures held in the syminfo table
-> used by the disassembler however elf_ops.h currently throws away all
-> symbols that are not STT_FUNC, and we are after STT_OBJECT symbols. We
-> would need to add an option to load_elf to load the entire symbol table.
-> Also, it runs qsort on the table by address, so we'd need to do a linear
-> scan for the HTIF symbols by name. There are only two symbols we need:
-> 'fromhost' and 'tohost'.
->
->         /* We are only interested in function symbols.
->            Throw everything else away.  */
->         if (syms[i].st_shndx == SHN_UNDEF ||
->                 syms[i].st_shndx >= SHN_LORESERVE ||
->                 ELF_ST_TYPE(syms[i].st_info) != STT_FUNC) {
->             nsyms--;
->             if (i < nsyms) {
->                 syms[i] = syms[nsyms];
->             }
->             continue;
->         }
->
-> It would be really nice if HTIF just specified registers in device-tree;
-> alas it doesn't; and there is still quite a bit of code that depend on
-> using these magic HTIF 'fromhost' and 'tohost' symbols. riscv-tests for one
-> uses the HTIF mechanism and spike the official ISA simulator uses HTIF for
-> IO.
->
+>> Put the common fields to both interfaces in the base class, then have the
+>> slower (older) CpuInfo class extend the base class to add the additional
+>> fields.
+>>
+>> Unions should be able to inherit just fine from structs (after all, a flat
+>> union requires a struct base); but if we need two layers of unions, we'll
+>> need to enhance QAPI code generation first.
+> 
+> If we can't do union-union inheritance yet, maybe we can work around it this
+> way:
+> 
+> # fields that are always returned by both query-cpus and query-cpus-fast
+> { 'struct': 'BothCpuInfoBase',
+>   'data': {'cpu': 'int', 'qom_path': 'str', 'thread_id': 'int',
+>            '*props': 'CpuInstanceProperties' } }
+> 
+> # fields that are always returned by query-cpus
+> { 'struct': 'CpuInfoBase',
+>   'base': 'BothCpuInfoBase',
+>   'data': {'current': 'bool', 'halted': 'bool', 'arch': 'CpuInfoArch' } }
+> 
+> # query-cpus return value
+> { 'union': 'CpuInfo',
+>   'base': 'CpuInfoBase',
+>   'discriminator': 'arch',
+>   'data': { 'x86': 'CpuInfoX86',
+>             's390': 'CpuInfoS390',
+>             'sparc': 'CpuInfoSPARC',
+>             'ppc': 'CpuInfoPPC',
+>             'mips': 'CpuInfoMIPS',
+>             'tricore': 'CpuInfoTricore',
+>             'other': 'CpuInfoOther' } }
+> 
+> # fields that are always returned by query-cpus-fast
+> { 'struct': 'FastCpuInfoBase',
+>   'base': 'BothCpuInfoBase',
+>   'data': { 'arch': 'CpuInfoArch' } }
+> 
+> # return value of query-cpus-fast
+> { 'union': 'FastCpuInfo',
+>   'base': 'FastCpuInfoBase',
+>   'discriminator': 'arch',
+>   'data': { 'x86': 'CpuInfoOther',
+>             's390': 'FastCpuInfoS390',
+>             'sparc': 'CpuInfoOther',
+>             'ppc': 'CpuInfoOther',
+>             'mips': 'CpuInfoOther',
+>             'tricore': 'CpuInfoOther',
+>             'other': 'CpuInfoOther' } }
+> 
+> # fields returned by both query-cpus and query-cpus-fast on s390
+> { 'struct': 'FastCpuInfoS390',
+>   'data': { 'fast_field': 'int' } }
+> 
+> # fields returned by query-cpus on s390
+> { 'struct': 'CpuInfoS390',
+>   'base': 'FastCpuInfoS390',
+>   'data': { 'slow_field': 'int' } }
+> 
+This is not exactly pretty, but would provide the functionality (and
+flexibility) I'd expect.
 
-Luckily elf_ops.h load_elf32 and load_elf64 are wrapped by load_elf, and
-several load_elf_* variants.
-
-We need the symbol name, type, address and size to find and validate the
-HTIF symbols. The current thought is to pass a callback function pointer to
-a new load_elf_sym variant, where the new function pointer, in the common
-case, won't be called by load_elf32 and load_elf64 as it will be NULL for
-all present users. We could use uint64_t to abstract the caller from
-the elf32_sym/elf64_sym address and size types. This approach would likely
-require less code than adding a new /linear/ search by name method, along
-with a retain all symbols argument to load_symbols and associated plumbing.
-It's also inherently one pass e.g.
-
-typedef void (*symbol_fn_t)(const char *st_name, int st_info,
-uint64_t st_value, uint64_t st_size);
-
-static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int
-must_swab,
-                                  int clear_lsb, symbol_fn_t sym_cb)
-{
-
-    ....
-
-        if (sym_cb) {
-            sym_cb(strtab + syms[i].st_name, syms[i].st_info,
-syms[i].st_value, syms[i].st_size)
-        }
-
-    ...
-
-}
-
-static int glue(load_elf, SZ)(const char *name, int fd,
-                              uint64_t (*translate_fn)(void *, uint64_t),
-                              void *translate_opaque,
-                              int must_swab, uint64_t *pentry,
-                              uint64_t *lowaddr, uint64_t *highaddr,
-                              int elf_machine, int clear_lsb, int data_swab,
-                              AddressSpace *as, bool load_rom,
-                              symbol_fn_t sym_cb)
-{
-    ....
-
-    glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb, sym_cb);
-
-    ....
-}
+-- 
+Regards,
+ Viktor Mihajlovski
