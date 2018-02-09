@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekDiH-0007Zp-2M
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:47:57 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmF-0001Ki-RU
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ekDiG-00034P-6r
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:47:57 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180209181330.17371-1-danielhb@linux.vnet.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6c698bcc-707f-8c2e-704d-285b6cba12f4@amsat.org>
-Date: Fri, 9 Feb 2018 15:47:44 -0300
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ekDmD-0004dL-Og
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 13:52:03 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri,  9 Feb 2018 18:51:30 +0000
+Message-Id: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20180209181330.17371-1-danielhb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/ppc: rename functions in comments
+Subject: [Qemu-devel] [PATCHv2 00/12] cuda: various fixes, tidy-ups,
+ and move 6522 to separate device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +21,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
 
-On 02/09/2018 03:13 PM, Daniel Henrique Barboza wrote:
-> Commit bcb5ce08cf ("spapr: Rename machine init functions for clarity")
-> renamed ppc_spapr_reset to spapr_machine_reset and ppc_spapr_init
-> to spapr_machine_init. Let's also rename the references in
-> comments.
-> 
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+The Mac CUDA device (also known as via-cuda) consists of two parts: a 6522 VIA
+acting as an interface chip and the CUDA device itself.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Currently there are at least 2 other upcoming Mac devices that include their
+own 6522 VIA implementations: Ben's via-pmu device and Laurent's mac_via
+device with their own hacks based upon the existing CUDA device. So rather than
+keep duplicating this same functionality with slightly different hacks, let's
+move the 6522 into its own separate device.
 
-> ---
->  hw/ppc/spapr.c       | 3 ++-
->  hw/ppc/spapr_hcall.c | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 659be6b746..96515036e6 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -464,7 +464,8 @@ static int spapr_populate_memory(sPAPRMachineState *spapr, void *fdt)
->              }
->          }
->          if (!mem_start) {
-> -            /* ppc_spapr_init() checks for rma_size <= node0_size already */
-> +            /* spapr_machine_init() checks for rma_size <= node0_size
-> +             * already */
->              spapr_populate_memory_node(fdt, i, 0, spapr->rma_size);
->              mem_start += spapr->rma_size;
->              node_size -= spapr->rma_size;
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 4d0e6eb0cf..badf01cece 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1635,7 +1635,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->      spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
->                                                            OV1_PPC_3_00);
->      if (!spapr->cas_reboot) {
-> -        /* If ppc_spapr_reset() did not set up a HPT but one is necessary
-> +        /* If spapr_machine_reset() did not set up a HPT but one is necessary
->           * (because the guest isn't going to use radix) then set it up here. */
->          if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
->              /* legacy hash or new hash: */
-> 
+Patches 1 converts CUDA away from using old_mmio accesses, whilst patches 2-3
+came about from studying Laurent and Ben's implementations (and appear to have
+no ill effects in my testing so far).
+
+Patches 4-8 do the majority of the work which is to isolate the hacks required
+by MacOS into separate functions so that a separate 6522 device can operate in
+a standard way, yet allow a CUDA implementation to hook into the right places.
+
+Patch 9 introduces a new mos6522 device for the shared functionality with the
+relevant hook points for delayed SR interrupt delivery and MacOS timer
+calibration hacks implemented as device class methods.
+
+Patch 10 switches CUDA over from using its own 6522 implementation over
+to using an embedded mos6522 device, allowing the duplicate code to be removed.
+
+Finally patches 11-12 perform some additional tidy-up by moving the CUDA
+definitions into a new cuda.h file and converting CUDA over to use trace-events.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+v2:
+- Add R-B tags from Laurent and Philippe
+- Add David to CC as PPC maintainer and qemu-ppc for further comment
+- Use DEVICE_BIG_ENDIAN in patch 1 as suggested by Laurent
+- Rename *_INT constants in patch 9 to match those used in Ben's PMU patches
+- Add patch 11 to move CUDA definitions into a new cuda.h file
+- Add patch 12 to convert CUDA over to use trace-events
+
+
+Mark Cave-Ayland (12):
+  cuda: do not use old_mmio accesses
+  cuda: don't allow writes to port output pins
+  cuda: don't call cuda_update() when writing to ACR register
+  cuda: introduce CUDAState parameter to get_counter()
+  cuda: rename frequency property to tb_frequency
+  cuda: minor cosmetic tidy-ups to get_next_irq_time()
+  cuda: set timer 1 frequency property to CUDA_TIMER_FREQ
+  cuda: factor out timebase-derived counter value and load time
+  misc: introduce new mos6522 VIA device and enable it for ppc builds
+  cuda: convert to use the shared mos6522 device
+  ppc: move CUDAState and other CUDA-related definitions into separate
+    cuda.h file
+  cuda: convert to trace-events
+
+ Makefile.objs                   |   1 +
+ default-configs/ppc-softmmu.mak |   1 +
+ hw/misc/Makefile.objs           |   3 +
+ hw/misc/macio/cuda.c            | 666 +++++++++++-----------------------------
+ hw/misc/macio/macio.c           |   3 +-
+ hw/misc/macio/trace-events      |  11 +
+ hw/misc/mos6522.c               | 505 ++++++++++++++++++++++++++++++
+ hw/misc/trace-events            |   7 +
+ hw/ppc/mac.h                    |  76 +----
+ include/hw/misc/macio/cuda.h    | 107 +++++++
+ include/hw/misc/mos6522.h       | 152 +++++++++
+ 11 files changed, 963 insertions(+), 569 deletions(-)
+ create mode 100644 hw/misc/macio/trace-events
+ create mode 100644 hw/misc/mos6522.c
+ create mode 100644 include/hw/misc/macio/cuda.h
+ create mode 100644 include/hw/misc/mos6522.h
+
+-- 
+2.11.0
