@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sn-0000z6-EK
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:31 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sq-00012k-UX
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sl-0001vA-9O
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:29 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46250)
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sp-0001yk-Eg
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:32 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ek6Sk-0001oy-VW
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:27 -0500
+	id 1ek6Sp-0001y8-4f
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 06:03:31 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ek6Sk-0002b0-0Q
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:26 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ek6So-0002cg-5C
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 11:03:30 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Feb 2018 11:02:59 +0000
-Message-Id: <20180209110314.11766-16-peter.maydell@linaro.org>
+Date: Fri,  9 Feb 2018 11:03:04 +0000
+Message-Id: <20180209110314.11766-21-peter.maydell@linaro.org>
 In-Reply-To: <20180209110314.11766-1-peter.maydell@linaro.org>
 References: <20180209110314.11766-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/30] i.MX: Add code to emulate i.MX7 CCM,
- PMU and ANALOG IP blocks
+Subject: [Qemu-devel] [PULL 20/30] i.MX: Add implementation of i.MX7 GPR IP
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,39 +45,41 @@ Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
  hw/misc/Makefile.objs      |   1 +
- include/hw/misc/imx7_ccm.h | 139 +++++++++++++++++++++++
- hw/misc/imx7_ccm.c         | 277 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 417 insertions(+)
- create mode 100644 include/hw/misc/imx7_ccm.h
- create mode 100644 hw/misc/imx7_ccm.c
+ include/hw/misc/imx7_gpr.h |  28 ++++++++++
+ hw/misc/imx7_gpr.c         | 124 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/misc/trace-events       |   4 ++
+ 4 files changed, 157 insertions(+)
+ create mode 100644 include/hw/misc/imx7_gpr.h
+ create mode 100644 hw/misc/imx7_gpr.c
 
 diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index d517f83e81..a28e5e49b0 100644
+index 019886912c..fce426eb75 100644
 --- a/hw/misc/Makefile.objs
 +++ b/hw/misc/Makefile.objs
-@@ -33,6 +33,7 @@ obj-$(CONFIG_IMX) += imx31_ccm.o
- obj-$(CONFIG_IMX) += imx25_ccm.o
- obj-$(CONFIG_IMX) += imx6_ccm.o
- obj-$(CONFIG_IMX) += imx6_src.o
-+obj-$(CONFIG_IMX) += imx7_ccm.o
+@@ -36,6 +36,7 @@ obj-$(CONFIG_IMX) += imx6_src.o
+ obj-$(CONFIG_IMX) += imx7_ccm.o
+ obj-$(CONFIG_IMX) += imx2_wdt.o
+ obj-$(CONFIG_IMX) += imx7_snvs.o
++obj-$(CONFIG_IMX) += imx7_gpr.o
  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/include/hw/misc/imx7_ccm.h b/include/hw/misc/imx7_ccm.h
+diff --git a/include/hw/misc/imx7_gpr.h b/include/hw/misc/imx7_gpr.h
 new file mode 100644
-index 0000000000..9538f37d98
+index 0000000000..e19373d274
 --- /dev/null
-+++ b/include/hw/misc/imx7_ccm.h
-@@ -0,0 +1,139 @@
++++ b/include/hw/misc/imx7_gpr.h
+@@ -0,0 +1,28 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * i.MX7 CCM, PMU and ANALOG IP blocks emulation code
++ * i.MX7 GPR IP block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
@@ -85,264 +87,116 @@ index 0000000000..9538f37d98
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef IMX7_CCM_H
-+#define IMX7_CCM_H
++#ifndef IMX7_GPR_H
++#define IMX7_GPR_H
 +
-+#include "hw/misc/imx_ccm.h"
 +#include "qemu/bitops.h"
++#include "hw/sysbus.h"
 +
-+enum IMX7AnalogRegisters {
-+    ANALOG_PLL_ARM,
-+    ANALOG_PLL_ARM_SET,
-+    ANALOG_PLL_ARM_CLR,
-+    ANALOG_PLL_ARM_TOG,
-+    ANALOG_PLL_DDR,
-+    ANALOG_PLL_DDR_SET,
-+    ANALOG_PLL_DDR_CLR,
-+    ANALOG_PLL_DDR_TOG,
-+    ANALOG_PLL_DDR_SS,
-+    ANALOG_PLL_DDR_SS_SET,
-+    ANALOG_PLL_DDR_SS_CLR,
-+    ANALOG_PLL_DDR_SS_TOG,
-+    ANALOG_PLL_DDR_NUM,
-+    ANALOG_PLL_DDR_NUM_SET,
-+    ANALOG_PLL_DDR_NUM_CLR,
-+    ANALOG_PLL_DDR_NUM_TOG,
-+    ANALOG_PLL_DDR_DENOM,
-+    ANALOG_PLL_DDR_DENOM_SET,
-+    ANALOG_PLL_DDR_DENOM_CLR,
-+    ANALOG_PLL_DDR_DENOM_TOG,
-+    ANALOG_PLL_480,
-+    ANALOG_PLL_480_SET,
-+    ANALOG_PLL_480_CLR,
-+    ANALOG_PLL_480_TOG,
-+    ANALOG_PLL_480A,
-+    ANALOG_PLL_480A_SET,
-+    ANALOG_PLL_480A_CLR,
-+    ANALOG_PLL_480A_TOG,
-+    ANALOG_PLL_480B,
-+    ANALOG_PLL_480B_SET,
-+    ANALOG_PLL_480B_CLR,
-+    ANALOG_PLL_480B_TOG,
-+    ANALOG_PLL_ENET,
-+    ANALOG_PLL_ENET_SET,
-+    ANALOG_PLL_ENET_CLR,
-+    ANALOG_PLL_ENET_TOG,
-+    ANALOG_PLL_AUDIO,
-+    ANALOG_PLL_AUDIO_SET,
-+    ANALOG_PLL_AUDIO_CLR,
-+    ANALOG_PLL_AUDIO_TOG,
-+    ANALOG_PLL_AUDIO_SS,
-+    ANALOG_PLL_AUDIO_SS_SET,
-+    ANALOG_PLL_AUDIO_SS_CLR,
-+    ANALOG_PLL_AUDIO_SS_TOG,
-+    ANALOG_PLL_AUDIO_NUM,
-+    ANALOG_PLL_AUDIO_NUM_SET,
-+    ANALOG_PLL_AUDIO_NUM_CLR,
-+    ANALOG_PLL_AUDIO_NUM_TOG,
-+    ANALOG_PLL_AUDIO_DENOM,
-+    ANALOG_PLL_AUDIO_DENOM_SET,
-+    ANALOG_PLL_AUDIO_DENOM_CLR,
-+    ANALOG_PLL_AUDIO_DENOM_TOG,
-+    ANALOG_PLL_VIDEO,
-+    ANALOG_PLL_VIDEO_SET,
-+    ANALOG_PLL_VIDEO_CLR,
-+    ANALOG_PLL_VIDEO_TOG,
-+    ANALOG_PLL_VIDEO_SS,
-+    ANALOG_PLL_VIDEO_SS_SET,
-+    ANALOG_PLL_VIDEO_SS_CLR,
-+    ANALOG_PLL_VIDEO_SS_TOG,
-+    ANALOG_PLL_VIDEO_NUM,
-+    ANALOG_PLL_VIDEO_NUM_SET,
-+    ANALOG_PLL_VIDEO_NUM_CLR,
-+    ANALOG_PLL_VIDEO_NUM_TOG,
-+    ANALOG_PLL_VIDEO_DENOM,
-+    ANALOG_PLL_VIDEO_DENOM_SET,
-+    ANALOG_PLL_VIDEO_DENOM_CLR,
-+    ANALOG_PLL_VIDEO_DENOM_TOG,
-+    ANALOG_PLL_MISC0,
-+    ANALOG_PLL_MISC0_SET,
-+    ANALOG_PLL_MISC0_CLR,
-+    ANALOG_PLL_MISC0_TOG,
++#define TYPE_IMX7_GPR "imx7.gpr"
++#define IMX7_GPR(obj) OBJECT_CHECK(IMX7GPRState, (obj), TYPE_IMX7_GPR)
 +
-+    ANALOG_DIGPROG = 0x800 / sizeof(uint32_t),
-+    ANALOG_MAX,
-+
-+    ANALOG_PLL_LOCK = BIT(31)
-+};
-+
-+enum IMX7CCMRegisters {
-+    CCM_MAX = 0xBE00 / sizeof(uint32_t) + 1,
-+};
-+
-+enum IMX7PMURegisters {
-+    PMU_MAX = 0x140 / sizeof(uint32_t),
-+};
-+
-+#define TYPE_IMX7_CCM "imx7.ccm"
-+#define IMX7_CCM(obj) OBJECT_CHECK(IMX7CCMState, (obj), TYPE_IMX7_CCM)
-+
-+typedef struct IMX7CCMState {
++typedef struct IMX7GPRState {
 +    /* <private> */
-+    IMXCCMState parent_obj;
++    SysBusDevice parent_obj;
 +
-+    /* <public> */
-+    MemoryRegion iomem;
++    MemoryRegion mmio;
++} IMX7GPRState;
 +
-+    uint32_t ccm[CCM_MAX];
-+} IMX7CCMState;
-+
-+
-+#define TYPE_IMX7_ANALOG "imx7.analog"
-+#define IMX7_ANALOG(obj) OBJECT_CHECK(IMX7AnalogState, (obj), TYPE_IMX7_ANALOG)
-+
-+typedef struct IMX7AnalogState {
-+    /* <private> */
-+    IMXCCMState parent_obj;
-+
-+    /* <public> */
-+    struct {
-+        MemoryRegion container;
-+        MemoryRegion analog;
-+        MemoryRegion digprog;
-+        MemoryRegion pmu;
-+    } mmio;
-+
-+    uint32_t analog[ANALOG_MAX];
-+    uint32_t pmu[PMU_MAX];
-+} IMX7AnalogState;
-+
-+#endif /* IMX7_CCM_H */
-diff --git a/hw/misc/imx7_ccm.c b/hw/misc/imx7_ccm.c
++#endif /* IMX7_GPR_H */
+diff --git a/hw/misc/imx7_gpr.c b/hw/misc/imx7_gpr.c
 new file mode 100644
-index 0000000000..d90c48bfec
+index 0000000000..c2a9df29c6
 --- /dev/null
-+++ b/hw/misc/imx7_ccm.c
-@@ -0,0 +1,277 @@
++++ b/hw/misc/imx7_gpr.c
+@@ -0,0 +1,124 @@
 +/*
 + * Copyright (c) 2018, Impinj, Inc.
 + *
-+ * i.MX7 CCM, PMU and ANALOG IP blocks emulation code
++ * i.MX7 GPR IP block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
++ *
++ * Bare minimum emulation code needed to support being able to shut
++ * down linux guest gracefully.
 + */
 +
 +#include "qemu/osdep.h"
++#include "hw/misc/imx7_gpr.h"
 +#include "qemu/log.h"
++#include "sysemu/sysemu.h"
 +
-+#include "hw/misc/imx7_ccm.h"
++#include "trace.h"
 +
-+static void imx7_analog_reset(DeviceState *dev)
-+{
-+    IMX7AnalogState *s = IMX7_ANALOG(dev);
-+
-+    memset(s->pmu, 0, sizeof(s->pmu));
-+    memset(s->analog, 0, sizeof(s->analog));
-+
-+    s->analog[ANALOG_PLL_ARM]         = 0x00002042;
-+    s->analog[ANALOG_PLL_DDR]         = 0x0060302c;
-+    s->analog[ANALOG_PLL_DDR_SS]      = 0x00000000;
-+    s->analog[ANALOG_PLL_DDR_NUM]     = 0x06aaac4d;
-+    s->analog[ANALOG_PLL_DDR_DENOM]   = 0x100003ec;
-+    s->analog[ANALOG_PLL_480]         = 0x00002000;
-+    s->analog[ANALOG_PLL_480A]        = 0x52605a56;
-+    s->analog[ANALOG_PLL_480B]        = 0x52525216;
-+    s->analog[ANALOG_PLL_ENET]        = 0x00001fc0;
-+    s->analog[ANALOG_PLL_AUDIO]       = 0x0001301b;
-+    s->analog[ANALOG_PLL_AUDIO_SS]    = 0x00000000;
-+    s->analog[ANALOG_PLL_AUDIO_NUM]   = 0x05f5e100;
-+    s->analog[ANALOG_PLL_AUDIO_DENOM] = 0x2964619c;
-+    s->analog[ANALOG_PLL_VIDEO]       = 0x0008201b;
-+    s->analog[ANALOG_PLL_VIDEO_SS]    = 0x00000000;
-+    s->analog[ANALOG_PLL_VIDEO_NUM]   = 0x0000f699;
-+    s->analog[ANALOG_PLL_VIDEO_DENOM] = 0x000f4240;
-+    s->analog[ANALOG_PLL_MISC0]       = 0x00000000;
-+
-+    /* all PLLs need to be locked */
-+    s->analog[ANALOG_PLL_ARM]   |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_DDR]   |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_480]   |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_480A]  |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_480B]  |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_ENET]  |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_AUDIO] |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_VIDEO] |= ANALOG_PLL_LOCK;
-+    s->analog[ANALOG_PLL_MISC0] |= ANALOG_PLL_LOCK;
-+
-+    /*
-+     * Since I couldn't find any info about this in the reference
-+     * manual the value of this register is based strictly on matching
-+     * what Linux kernel expects it to be.
-+     */
-+    s->analog[ANALOG_DIGPROG]  = 0x720000;
-+    /*
-+     * Set revision to be 1.0 (Arbitrary choice, no particular
-+     * reason).
-+     */
-+    s->analog[ANALOG_DIGPROG] |= 0x000010;
-+}
-+
-+static void imx7_ccm_reset(DeviceState *dev)
-+{
-+    IMX7CCMState *s = IMX7_CCM(dev);
-+
-+    memset(s->ccm, 0, sizeof(s->ccm));
-+}
-+
-+#define CCM_INDEX(offset)   (((offset) & ~(hwaddr)0xF) / sizeof(uint32_t))
-+#define CCM_BITOP(offset)   ((offset) & (hwaddr)0xF)
-+
-+enum {
-+    CCM_BITOP_NONE = 0x00,
-+    CCM_BITOP_SET  = 0x04,
-+    CCM_BITOP_CLR  = 0x08,
-+    CCM_BITOP_TOG  = 0x0C,
++enum IMX7GPRRegisters {
++    IOMUXC_GPR0  = 0x00,
++    IOMUXC_GPR1  = 0x04,
++    IOMUXC_GPR2  = 0x08,
++    IOMUXC_GPR3  = 0x0c,
++    IOMUXC_GPR4  = 0x10,
++    IOMUXC_GPR5  = 0x14,
++    IOMUXC_GPR6  = 0x18,
++    IOMUXC_GPR7  = 0x1c,
++    IOMUXC_GPR8  = 0x20,
++    IOMUXC_GPR9  = 0x24,
++    IOMUXC_GPR10 = 0x28,
++    IOMUXC_GPR11 = 0x2c,
++    IOMUXC_GPR12 = 0x30,
++    IOMUXC_GPR13 = 0x34,
++    IOMUXC_GPR14 = 0x38,
++    IOMUXC_GPR15 = 0x3c,
++    IOMUXC_GPR16 = 0x40,
++    IOMUXC_GPR17 = 0x44,
++    IOMUXC_GPR18 = 0x48,
++    IOMUXC_GPR19 = 0x4c,
++    IOMUXC_GPR20 = 0x50,
++    IOMUXC_GPR21 = 0x54,
++    IOMUXC_GPR22 = 0x58,
 +};
 +
-+static uint64_t imx7_set_clr_tog_read(void *opaque, hwaddr offset,
-+                                      unsigned size)
-+{
-+    const uint32_t *mmio = opaque;
++#define IMX7D_GPR1_IRQ_MASK                 BIT(12)
++#define IMX7D_GPR1_ENET1_TX_CLK_SEL_MASK    BIT(13)
++#define IMX7D_GPR1_ENET2_TX_CLK_SEL_MASK    BIT(14)
++#define IMX7D_GPR1_ENET_TX_CLK_SEL_MASK     (0x3 << 13)
++#define IMX7D_GPR1_ENET1_CLK_DIR_MASK       BIT(17)
++#define IMX7D_GPR1_ENET2_CLK_DIR_MASK       BIT(18)
++#define IMX7D_GPR1_ENET_CLK_DIR_MASK        (0x3 << 17)
 +
-+    return mmio[CCM_INDEX(offset)];
++#define IMX7D_GPR5_CSI_MUX_CONTROL_MIPI     BIT(4)
++#define IMX7D_GPR12_PCIE_PHY_REFCLK_SEL     BIT(5)
++#define IMX7D_GPR22_PCIE_PHY_PLL_LOCKED     BIT(31)
++
++
++static uint64_t imx7_gpr_read(void *opaque, hwaddr offset, unsigned size)
++{
++    trace_imx7_gpr_read(offset);
++
++    if (offset == IOMUXC_GPR22) {
++        return IMX7D_GPR22_PCIE_PHY_PLL_LOCKED;
++    }
++
++    return 0;
 +}
 +
-+static void imx7_set_clr_tog_write(void *opaque, hwaddr offset,
-+                                   uint64_t value, unsigned size)
++static void imx7_gpr_write(void *opaque, hwaddr offset,
++                           uint64_t v, unsigned size)
 +{
-+    const uint8_t  bitop = CCM_BITOP(offset);
-+    const uint32_t index = CCM_INDEX(offset);
-+    uint32_t *mmio = opaque;
-+
-+    switch (bitop) {
-+    case CCM_BITOP_NONE:
-+        mmio[index]  = value;
-+        break;
-+    case CCM_BITOP_SET:
-+        mmio[index] |= value;
-+        break;
-+    case CCM_BITOP_CLR:
-+        mmio[index] &= ~value;
-+        break;
-+    case CCM_BITOP_TOG:
-+        mmio[index] ^= value;
-+        break;
-+    };
++    trace_imx7_gpr_write(offset, v);
 +}
 +
-+static const struct MemoryRegionOps imx7_set_clr_tog_ops = {
-+    .read = imx7_set_clr_tog_read,
-+    .write = imx7_set_clr_tog_write,
++static const struct MemoryRegionOps imx7_gpr_ops = {
++    .read = imx7_gpr_read,
++    .write = imx7_gpr_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
 +         * Our device would not work correctly if the guest was doing
-+         * unaligned access. This might not be a limitation on the real
-+         * device but in practice there is no reason for a guest to access
-+         * this device unaligned.
++         * unaligned access. This might not be a limitation on the
++         * real device but in practice there is no reason for a guest
++         * to access this device unaligned.
 +         */
 +        .min_access_size = 4,
 +        .max_access_size = 4,
@@ -350,151 +204,47 @@ index 0000000000..d90c48bfec
 +    },
 +};
 +
-+static const struct MemoryRegionOps imx7_digprog_ops = {
-+    .read = imx7_set_clr_tog_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false,
-+    },
-+};
-+
-+static void imx7_ccm_init(Object *obj)
++static void imx7_gpr_init(Object *obj)
 +{
 +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7CCMState *s = IMX7_CCM(obj);
++    IMX7GPRState *s = IMX7_GPR(obj);
 +
-+    memory_region_init_io(&s->iomem,
-+                          obj,
-+                          &imx7_set_clr_tog_ops,
-+                          s->ccm,
-+                          TYPE_IMX7_CCM ".ccm",
-+                          sizeof(s->ccm));
-+
-+    sysbus_init_mmio(sd, &s->iomem);
++    memory_region_init_io(&s->mmio, obj, &imx7_gpr_ops, s,
++                          TYPE_IMX7_GPR, 64 * 1024);
++    sysbus_init_mmio(sd, &s->mmio);
 +}
 +
-+static void imx7_analog_init(Object *obj)
-+{
-+    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7AnalogState *s = IMX7_ANALOG(obj);
-+
-+    memory_region_init(&s->mmio.container, obj, TYPE_IMX7_ANALOG,
-+                       0x10000);
-+
-+    memory_region_init_io(&s->mmio.analog,
-+                          obj,
-+                          &imx7_set_clr_tog_ops,
-+                          s->analog,
-+                          TYPE_IMX7_ANALOG,
-+                          sizeof(s->analog));
-+
-+    memory_region_add_subregion(&s->mmio.container,
-+                                0x60, &s->mmio.analog);
-+
-+    memory_region_init_io(&s->mmio.pmu,
-+                          obj,
-+                          &imx7_set_clr_tog_ops,
-+                          s->pmu,
-+                          TYPE_IMX7_ANALOG ".pmu",
-+                          sizeof(s->pmu));
-+
-+    memory_region_add_subregion(&s->mmio.container,
-+                                0x200, &s->mmio.pmu);
-+
-+    memory_region_init_io(&s->mmio.digprog,
-+                          obj,
-+                          &imx7_digprog_ops,
-+                          &s->analog[ANALOG_DIGPROG],
-+                          TYPE_IMX7_ANALOG ".digprog",
-+                          sizeof(uint32_t));
-+
-+    memory_region_add_subregion_overlap(&s->mmio.container,
-+                                        0x800, &s->mmio.digprog, 10);
-+
-+
-+    sysbus_init_mmio(sd, &s->mmio.container);
-+}
-+
-+static const VMStateDescription vmstate_imx7_ccm = {
-+    .name = TYPE_IMX7_CCM,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(ccm, IMX7CCMState, CCM_MAX),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static uint32_t imx7_ccm_get_clock_frequency(IMXCCMState *dev, IMXClk clock)
-+{
-+    /*
-+     * This function is "consumed" by GPT emulation code, however on
-+     * i.MX7 each GPT block can have their own clock root. This means
-+     * that this functions needs somehow to know requester's identity
-+     * and the way to pass it: be it via additional IMXClk constants
-+     * or by adding another argument to this method needs to be
-+     * figured out
-+     */
-+    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Not implemented\n",
-+                  TYPE_IMX7_CCM, __func__);
-+    return 0;
-+}
-+
-+static void imx7_ccm_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    IMXCCMClass *ccm = IMX_CCM_CLASS(klass);
-+
-+    dc->reset = imx7_ccm_reset;
-+    dc->vmsd  = &vmstate_imx7_ccm;
-+    dc->desc  = "i.MX7 Clock Control Module";
-+
-+    ccm->get_clock_frequency = imx7_ccm_get_clock_frequency;
-+}
-+
-+static const TypeInfo imx7_ccm_info = {
-+    .name          = TYPE_IMX7_CCM,
-+    .parent        = TYPE_IMX_CCM,
-+    .instance_size = sizeof(IMX7CCMState),
-+    .instance_init = imx7_ccm_init,
-+    .class_init    = imx7_ccm_class_init,
-+};
-+
-+static const VMStateDescription vmstate_imx7_analog = {
-+    .name = TYPE_IMX7_ANALOG,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(analog, IMX7AnalogState, ANALOG_MAX),
-+        VMSTATE_UINT32_ARRAY(pmu,    IMX7AnalogState, PMU_MAX),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static void imx7_analog_class_init(ObjectClass *klass, void *data)
++static void imx7_gpr_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = imx7_analog_reset;
-+    dc->vmsd  = &vmstate_imx7_analog;
-+    dc->desc  = "i.MX7 Analog Module";
++    dc->desc  = "i.MX7 General Purpose Registers Module";
 +}
 +
-+static const TypeInfo imx7_analog_info = {
-+    .name          = TYPE_IMX7_ANALOG,
++static const TypeInfo imx7_gpr_info = {
++    .name          = TYPE_IMX7_GPR,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMX7AnalogState),
-+    .instance_init = imx7_analog_init,
-+    .class_init    = imx7_analog_class_init,
++    .instance_size = sizeof(IMX7GPRState),
++    .instance_init = imx7_gpr_init,
++    .class_init    = imx7_gpr_class_init,
 +};
 +
-+static void imx7_ccm_register_type(void)
++static void imx7_gpr_register_type(void)
 +{
-+    type_register_static(&imx7_ccm_info);
-+    type_register_static(&imx7_analog_info);
++    type_register_static(&imx7_gpr_info);
 +}
-+type_init(imx7_ccm_register_type)
++type_init(imx7_gpr_register_type)
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 616579a403..e6070f280d 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -66,3 +66,7 @@ mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC
+ msf2_sysreg_write(uint64_t offset, uint32_t val, uint32_t prev) "msf2-sysreg write: addr 0x%08" HWADDR_PRIx " data 0x%" PRIx32 " prev 0x%" PRIx32
+ msf2_sysreg_read(uint64_t offset, uint32_t val) "msf2-sysreg read: addr 0x%08" HWADDR_PRIx " data 0x%08" PRIx32
+ msf2_sysreg_write_pll_status(void) "Invalid write to read only PLL status register"
++
++#hw/misc/imx7_gpr.c
++imx7_gpr_read(uint64_t offset) "addr 0x%08" HWADDR_PRIx
++imx7_gpr_write(uint64_t offset, uint64_t value) "addr 0x%08" HWADDR_PRIx "value 0x%08" HWADDR_PRIx
 -- 
 2.16.1
