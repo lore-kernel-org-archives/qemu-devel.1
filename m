@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ekRNQ-0004tV-CL
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 04:23:21 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1ekTIr-0007Vj-CP
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 06:26:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ekRNM-0000Rs-AD
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 04:23:20 -0500
-Date: Sat, 10 Feb 2018 20:23:07 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180210092307.GQ11634@umbus.fritz.box>
-References: <20180209081858.27013-1-lvivier@redhat.com>
-	<20180209150649.7f557ff9@bahia.lan>
+	(envelope-from <arei.gonglei@huawei.com>) id 1ekTIo-0008LL-Fu
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 06:26:45 -0500
+Received: from [45.249.212.255] (port=49434 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1ekTIo-0008By-1l
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 06:26:42 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Sat, 10 Feb 2018 11:26:30 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA54D0B8@DGGEMA505-MBX.china.huawei.com>
+References: <1518116908-10852-1-git-send-email-mst@redhat.com>
+	<CAFEAcA8kvkfoxnQbqZ4Y44uWtbsirCKdmTcnZJzu=ege9YRfTg@mail.gmail.com>
+In-Reply-To: <CAFEAcA8kvkfoxnQbqZ4Y44uWtbsirCKdmTcnZJzu=ege9YRfTg@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FmdPcZLZZW6lDAYm"
-Content-Disposition: inline
-In-Reply-To: <20180209150649.7f557ff9@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: set vsmt to MAX(8, smp_threads)
+Subject: Re: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
+ fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,167 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
---FmdPcZLZZW6lDAYm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 09, 2018 at 03:06:49PM +0100, Greg Kurz wrote:
-> On Fri,  9 Feb 2018 09:18:58 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
->=20
-> > We ignore silently the value of smp_threads when we set
-> > the default VSMT value, and if smp_threads is greater than VSMT
-> > kernel is going into trouble later.
-> >=20
->=20
-> Hi Laurent,
->=20
-> I've looked a bit more and I'm not sure what kernel troubles you're refer=
-ring to,
-> but several places in QEMU where we use kvm_ppc_smt() later on do assume =
-that
-> smp_threads > kvm_ppc_smt(). Basically, everywhere we compute a vCPU id:
->=20
-> In spapr_init_cpus() when creating DRC connectors:
->=20
->         int core_id =3D i * smp_threads;
->=20
->         if (mc->has_hotpluggable_cpus) {
->             spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
->                                    (core_id / smp_threads) * smt);
->         }
->=20
-> or in spapr_cpu_core_realize() when creating vCPUs:
->=20
->         cpu->vcpu_id =3D (cc->core_id * spapr->vsmt / smp_threads) + i;
->=20
-> It is visible by adding some printfs in the current code base. This is wh=
-at
-> happens when passing -smp cores=3D2,threads=3D16 without your patch:
->=20
-> DRC connector to vcpu_id 0
-> CPU vcpu_id 0
-> CPU vcpu_id 1
-> CPU vcpu_id 2
-> CPU vcpu_id 3
-> CPU vcpu_id 4
-> CPU vcpu_id 5
-> CPU vcpu_id 6
-> CPU vcpu_id 7
-> CPU vcpu_id 8
-> CPU vcpu_id 9
-> CPU vcpu_id 10
-> CPU vcpu_id 11
-> CPU vcpu_id 12
-> CPU vcpu_id 13
-> CPU vcpu_id 14
-> CPU vcpu_id 15
-> DRC connector to vcpu_id 8
->                         ^^^
->                      should be 16
-> CPU vcpu_id 8
->            ^^^
->    should start numbering at 16
-> CPU vcpu_id 9
-> CPU vcpu_id 10
-> CPU vcpu_id 11
-> CPU vcpu_id 12
-> CPU vcpu_id 13
-> CPU vcpu_id 14
-> CPU vcpu_id 15
-> CPU vcpu_id 16
-> CPU vcpu_id 17
-> CPU vcpu_id 18
-> CPU vcpu_id 19
-> CPU vcpu_id 20
-> CPU vcpu_id 21
-> CPU vcpu_id 22
-> CPU vcpu_id 23
-> qemu-system-ppc64: kvm_init_vcpu failed: File exists
->                                               ^^^^
->                                  CPU 8 already created by the first core
->=20
-> I'm not feeling comfortable with the rest of the code silently depending =
-on
-> the fact that spapr_set_vsmt_mode() terminates QEMU if it cannot enforce
-> smp_threads <=3D kvm_ppc_smt().
-
-I'm not quite sure what you're suggesting as an alternative, though.
-
->=20
-> Anyway, with your patch, the same command line as above gives:
->=20
-> qemu-system-ppc64: Failed to set KVM's VSMT mode to 16 (errno -22)
-> On PPC, a VM with 16 threads/core on a host with 8 threads/core requires
->  the use of VSMT mode 16.
-> This KVM seems to be too old to support VSMT.
->=20
-> This hammer is big enough to fix the vCPU ids miscalculations, so:
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> > Fixes: 8904e5a750
-> > ("spapr: Adjust default VSMT value for better migration compatibility")
-> >=20
-> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> > ---
-> >=20
-> > Notes:
-> >     v3: use MAX(8, smp_threads) and let KVM to return an error
-> >         if nb_threads is too big
-> >         update subject to reflect the change
-> >    =20
-> >     v2: display a specific error message when the default VSMT is used
-> >         fix subject
-> >=20
-> >  hw/ppc/spapr.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 32a876be56..c8a1eefa17 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2310,7 +2310,7 @@ static void spapr_set_vsmt_mode(sPAPRMachineState=
- *spapr, Error **errp)
-> >           * the value that we'd get with KVM on POWER8, the
-> >           * overwhelmingly common case in production systems.
-> >           */
-> > -        spapr->vsmt =3D 8;
-> > +        spapr->vsmt =3D MAX(8, smp_threads);
-> >      }
-> > =20
-> >      /* KVM: If necessary, set the SMT mode: */
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---FmdPcZLZZW6lDAYm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp+ufsACgkQbDjKyiDZ
-s5IXng/+LJop6d1o3nv4OD17mqF3CGrpLyXsLZeWE1Jx6fy6NteemgghWRziL1Mr
-6aNk3jZv9myuEOtLl+jyGTrRMstT/Cx4hiv/uupyPrM8l7DWYBKpvXZAzry2Xj0U
-yQBK2lrW68j3XaF7L8qckIKGeyHr94E2oKA6tGfH0hYue2Bk6h1X7p3702jMNB5L
-2rPsDOd5pr683sXYat1qkaGBScR0kqs9XXIeknZGrdxJAaRS/NPOl1Jj9/IoRYtD
-8sRmCZzAL/NL0lpq4sS1YvPMZGVSaFkxNXY8hk8EooUKve+Mr53YYyMVX1cjryHL
-R6/38HhU+Aijghzohj5gfLAcYV4x5WKYyWEijj0VUf3bwFe7lZS8mA7TsltJPTGL
-zG9DOVkb4/v5+PqIlNsKWtc90WxQThaBH008MNyITZjJAAG4hlKJ3c64Dfr9cDFl
-oGdyV7WhBDpiDc1kGwkQI6rCbq42b3RwQqtnch3eHQvvMii1TkD/hXYVOY4hFa3m
-whsphA8qqJ36dl6rYHJVtJ3FKi1E1Dofj4+E8vBIfyEZysmLaINhGf8JYGo34odT
-ViscEo2O2JiFXOI36zvoyor1N/qeg7XhgxhQlZPSkA7rxnKGMzSy2zUUEpVYA7JY
-m564oCgs++MJK999Eo/SFiPobz58zffM/XvxuM6YhPqrHelpv2E=
-=onq1
------END PGP SIGNATURE-----
-
---FmdPcZLZZW6lDAYm--
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsDQo+IFttYWls
+dG86cWVtdS1kZXZlbC1ib3VuY2VzK2FyZWkuZ29uZ2xlaT1odWF3ZWkuY29tQG5vbmdudS5vcmdd
+IE9uDQo+IEJlaGFsZiBPZiBQZXRlciBNYXlkZWxsDQo+IFNlbnQ6IEZyaWRheSwgRmVicnVhcnkg
+MDksIDIwMTggNjowNyBQTQ0KPiBUbzogTWljaGFlbCBTLiBUc2lya2luDQo+IENjOiBRRU1VIERl
+dmVsb3BlcnMNCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yNl0gdmlydGlv
+LCB2aG9zdCwgcGNpLCBwYzogZmVhdHVyZXMsIGZpeGVzIGFuZA0KPiBjbGVhbnVwcw0KPiANCj4g
+T24gOCBGZWJydWFyeSAyMDE4IGF0IDE5OjA4LCBNaWNoYWVsIFMuIFRzaXJraW4gPG1zdEByZWRo
+YXQuY29tPiB3cm90ZToNCj4gPiBUaGUgZm9sbG93aW5nIGNoYW5nZXMgc2luY2UgY29tbWl0DQo+
+IDAwOGE1MWJiYjM0Mzk3MmRkOGNmMDkxMjZkYThjM2I4N2Y0ZTFjOTY6DQo+ID4NCj4gPiAgIE1l
+cmdlIHJlbW90ZS10cmFja2luZyBicmFuY2ggJ3JlbW90ZXMvZmFtei90YWdzL3N0YWdpbmctcHVs
+bC1yZXF1ZXN0Jw0KPiBpbnRvIHN0YWdpbmcgKDIwMTgtMDItMDggMTQ6MzE6NTEgKzAwMDApDQo+
+ID4NCj4gPiBhcmUgYXZhaWxhYmxlIGluIHRoZSBnaXQgcmVwb3NpdG9yeSBhdDoNCj4gPg0KPiA+
+ICAgZ2l0Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS92aXJ0L2t2bS9tc3QvcWVtdS5naXQgdGFn
+cy9mb3JfdXBzdHJlYW0NCj4gPg0KPiA+IGZvciB5b3UgdG8gZmV0Y2ggY2hhbmdlcyB1cCB0bw0K
+PiBmNGFjOWIyZTA0ZThkOTg4NTRhOTdiYzQ3MzM1MzIwNzc2NWFhOWU3Og0KPiA+DQo+ID4gICB2
+aXJ0aW8tYmFsbG9vbjogaW5jbHVkZSBzdGF0aXN0aWNzIG9mIGRpc2svZmlsZSBjYWNoZXMgKDIw
+MTgtMDItMDggMjE6MDY6NDINCj4gKzAyMDApDQo+ID4NCj4gPiAtLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4gdmlydGlv
+LHZob3N0LHBjaSxwYzogZmVhdHVyZXMsIGZpeGVzIGFuZCBjbGVhbnVwcw0KPiA+DQo+ID4gLSBh
+IG5ldyB2aG9zdCBjcnlwdG8gZGV2aWNlDQo+ID4gLSBuZXcgc3RhdHMgaW4gdmlydGlvIGJhbGxv
+b24NCj4gPiAtIHZpcnRpbyBldmVudGZkIHJld29yayBmb3IgYm9vdCBzcGVlZHVwDQo+ID4gLSB2
+aG9zdCBtZW1vcnkgcmV3b3JrIGZvciBib290IHNwZWVkdXANCj4gPiAtIGZpeGVzIGFuZCBjbGVh
+bnVwcyBhbGwgb3ZlciB0aGUgcGxhY2UNCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IE1pY2hhZWwg
+Uy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+DQo+ID4NCj4gDQo+IEhpLiBUaGlzIGhhcyBzb21l
+IGZvcm1hdC1zdHJpbmcgaXNzdWVzOg0KPiANCj4gL2hvbWUvcGV0ZXIubWF5ZGVsbC9xZW11L2Jh
+Y2tlbmRzL2NyeXB0b2Rldi12aG9zdC11c2VyLmM6IEluIGZ1bmN0aW9uDQo+ICdjcnlwdG9kZXZf
+dmhvc3RfdXNlcl9zdGFydCc6DQo+IC9ob21lL3BldGVyLm1heWRlbGwvcWVtdS9iYWNrZW5kcy9j
+cnlwdG9kZXYtdmhvc3QtdXNlci5jOjExMjoyNjoNCj4gZXJyb3I6IGZvcm1hdCAnJWx1JyBleHBl
+Y3RzIGFyZ3VtZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0DQo+IGFyZ3VtZW50
+IDIgaGFzIHR5cGUgJ3NpemVfdCB7YWthIHVuc2lnbmVkIGludH0nIFstV2Vycm9yPWZvcm1hdD1d
+DQo+ICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoImZhaWxlZCB0byBpbml0IHZob3N0X2NyeXB0
+byBmb3IgcXVldWUgJWx1IiwgaSk7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KPiAv
+aG9tZS9wZXRlci5tYXlkZWxsL3FlbXUvYmFja2VuZHMvY3J5cHRvZGV2LXZob3N0LXVzZXIuYzog
+SW4gZnVuY3Rpb24NCj4gJ2NyeXB0b2Rldl92aG9zdF91c2VyX2luaXQnOg0KPiAvaG9tZS9wZXRl
+ci5tYXlkZWxsL3FlbXUvYmFja2VuZHMvY3J5cHRvZGV2LXZob3N0LXVzZXIuYzoyMDU6NDA6DQo+
+IGVycm9yOiBmb3JtYXQgJyVsdScgZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2ln
+bmVkIGludCcsIGJ1dA0KPiBhcmd1bWVudCAyIGhhcyB0eXBlICdzaXplX3Qge2FrYSB1bnNpZ25l
+ZCBpbnR9JyBbLVdlcnJvcj1mb3JtYXQ9XQ0KPiAgICAgICAgICBjYy0+aW5mb19zdHIgPSBnX3N0
+cmR1cF9wcmludGYoImNyeXB0b2Rldi12aG9zdC11c2VyJWx1IHRvICVzICIsDQo+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeDQo+IA0KVXNpbmcgJXp1IGluc3RlYWQg
+b2YgJWx1IHdpbGwgYmUgY29ycmVjdC4gTWljaGFlbCwgY291bGQgeW91IHBscyBmaXggaXQgZGly
+ZWN0bHk/DQoNClZlcnkgc29ycnkgZm9yIHRoZSBpbmNvbnZlbmllbmNlLiA6KA0KDQpUaGFua3Ms
+DQotR29uZ2xlaQ0KDQo=
