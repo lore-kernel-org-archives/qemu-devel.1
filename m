@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ciro.santilli@gmail.com>) id 1ekIjl-0004Og-II
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:09:50 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ekJ91-0006QU-Tv
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:35:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ciro.santilli@gmail.com>) id 1ekIjk-0007AL-NA
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:09:49 -0500
-Received: from mail-io0-x234.google.com ([2607:f8b0:4001:c06::234]:33671)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
-	id 1ekIjk-00079r-Hv
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:09:48 -0500
-Received: by mail-io0-x234.google.com with SMTP id n7so11547874iob.0
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 16:09:47 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1ekJ90-0000s8-Uw
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:35:55 -0500
+Date: Sat, 10 Feb 2018 11:16:47 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180210001647.GJ11634@umbus.fritz.box>
+References: <20180209181330.17371-1-danielhb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
-References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
-	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
-	<002401d3a010$8d551280$a7ff3780$@ru>
-	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
-From: Ciro Santilli <ciro.santilli@gmail.com>
-Date: Sat, 10 Feb 2018 00:09:26 +0000
-Message-ID: <CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="AXxEqdD4tcVTjWte"
+Content-Disposition: inline
+In-Reply-To: <20180209181330.17371-1-danielhb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/ppc: rename functions in comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +23,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>, war2jordan@live.com, Igor R <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, kraxel@redhat.com, Thomas Dullien <thomas.dullien@googlemail.com>, pbonzini@redhat.com, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Also, what command do you use to test on ARM? I'm a bit stuck to get the
-drive part right, e.g.:
 
--drive
-file=./buildroot/output.arm~/images/rootfs.ext2,if=scsi,id=img-direct,format=raw
-\
--drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
--device scsi-hd,drive=img-blkreplay \
+--AXxEqdD4tcVTjWte
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-fails with: qemu-system-arm: -device scsi-hd,drive=img-blkreplay: Conflicts
-with use by img-direct as 'root', which does not allow 'write' on #block968
+On Fri, Feb 09, 2018 at 04:13:30PM -0200, Daniel Henrique Barboza wrote:
+> Commit bcb5ce08cf ("spapr: Rename machine init functions for clarity")
+> renamed ppc_spapr_reset to spapr_machine_reset and ppc_spapr_init
+> to spapr_machine_init. Let's also rename the references in
+> comments.
+>=20
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+
+Nice catch, applied.
+
+
+> ---
+>  hw/ppc/spapr.c       | 3 ++-
+>  hw/ppc/spapr_hcall.c | 2 +-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 659be6b746..96515036e6 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -464,7 +464,8 @@ static int spapr_populate_memory(sPAPRMachineState *s=
+papr, void *fdt)
+>              }
+>          }
+>          if (!mem_start) {
+> -            /* ppc_spapr_init() checks for rma_size <=3D node0_size alre=
+ady */
+> +            /* spapr_machine_init() checks for rma_size <=3D node0_size
+> +             * already */
+>              spapr_populate_memory_node(fdt, i, 0, spapr->rma_size);
+>              mem_start +=3D spapr->rma_size;
+>              node_size -=3D spapr->rma_size;
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 4d0e6eb0cf..badf01cece 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1635,7 +1635,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+>      spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
+>                                                            OV1_PPC_3_00);
+>      if (!spapr->cas_reboot) {
+> -        /* If ppc_spapr_reset() did not set up a HPT but one is necessary
+> +        /* If spapr_machine_reset() did not set up a HPT but one is nece=
+ssary
+>           * (because the guest isn't going to use radix) then set it up h=
+ere. */
+>          if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
+>              /* legacy hash or new hash: */
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--AXxEqdD4tcVTjWte
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp+OewACgkQbDjKyiDZ
+s5JdsRAAppaEV55PUVLYUmxn6fdvgtUv61QAK6BXwHSpIoML+MMsybVpG6NXFODB
+f7q6dNrB9c033eEg0ChC8R4NXaIFda/E5iv//dHG1A7XVWZLxBqJ4+F4uxgZ61Hw
+xMLDBtmbjj5VI34lsbEfd6JxJeXaYFGzCUSXP/XVV7AfYejLcQKqQvE1Nkq44TJr
+F5oxZFL44xeQXPPsSW5Vc5npZQeh2VYD94LEXEo2qeomfrwIRKZCraijF7VqxiGU
+X1sGnETnbvO3E7dH+sd+9bUQq76vEntIZI6tcKMVemcOnVC9Uh1UsZkiZ+UJ11yC
+Nqd9rd0TCd5nP73Gn8DRzYt1ZyRxcRd7r6FxkK7H3VphMGyrfJb6r5NPzicjABnf
+JVOdhsYFeCeQ0A6LR7QJYEfGKfg4UeFGow4YewNsHA3RduPE2vg70JzfQg9vfDJz
+u7if67tFGpXD/7hFtCFUMRTz+m2cE2FchHQhy7xl4GlkRghmWgeaVlZP3f34y/2P
+c2oC9DQSSMCH9x2Z+P+3ZK4kBPlh0vyTOSbbaq5OiVzOo5SGv982/PDTEFfee/k1
+KGqIafcVEPJvrwD1DPqxvgebrev0/jLh5+ieCenKtzHpZ1ULO0dfqb8F0G5vLyjP
+2lbnN4yJUuOJH1V5x/MQztoW3hyVoIdNwhsKbaWoiYIafCkeX4g=
+=jg3b
+-----END PGP SIGNATURE-----
+
+--AXxEqdD4tcVTjWte--
