@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1ekQ7o-00006I-DS
+	(envelope-from <mjt@tls.msk.ru>) id 1ekQ7o-00006F-C7
 	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 03:03:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1ekQ7l-0000Wj-Cq
+	(envelope-from <mjt@tls.msk.ru>) id 1ekQ7k-0000Vd-DJ
 	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 03:03:08 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sat, 10 Feb 2018 10:55:12 +0300
-Message-Id: <d40d74a645feea0ad01482da2358804f6574dce0.1518249254.git.mjt@msgid.tls.msk.ru>
+Date: Sat, 10 Feb 2018 10:55:05 +0300
+Message-Id: <a348f64d4652d68212886019ca74825aa1667969.1518249254.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
 References: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
 References: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/17] tests/qapi: use ARRAY_SIZE macro
+Subject: [Qemu-devel] [PULL 10/17] maint: Mention web site maintenance in
+ README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +23,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
 
-Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.=
-cocci
+Now that we have a website that accepts patches on the list, the
+main project should make it easier to find information about that
+process.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- tests/test-string-output-visitor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ README | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tests/test-string-output-visitor.c b/tests/test-string-outpu=
-t-visitor.c
-index fa4b4ca288..02766c0f65 100644
---- a/tests/test-string-output-visitor.c
-+++ b/tests/test-string-output-visitor.c
-@@ -95,7 +95,7 @@ static void test_visitor_out_intList(TestOutputVisitorD=
-ata *data,
-     Error *err =3D NULL;
-     char *str;
-=20
--    for (i =3D 0; i < sizeof(value) / sizeof(value[0]); i++) {
-+    for (i =3D 0; i < ARRAY_SIZE(value); i++) {
-         *tmp =3D g_malloc0(sizeof(**tmp));
-         (*tmp)->value =3D value[i];
-         tmp =3D &(*tmp)->next;
---=20
+diff --git a/README b/README
+index b92a07a61a..2c8e1c8cc4 100644
+--- a/README
++++ b/README
+@@ -68,6 +68,10 @@ the QEMU website
+   https://qemu.org/Contribute/SubmitAPatch
+   https://qemu.org/Contribute/TrivialPatches
+ 
++The QEMU website is also maintained under source control.
++
++  git clone git://git.qemu.org/qemu-web.git
++  https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
+ 
+ Bug reporting
+ =============
+-- 
 2.11.0
