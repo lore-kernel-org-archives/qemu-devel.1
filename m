@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1ekQHT-0007JV-La
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 03:13:10 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ekRJf-0002io-Rq
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 04:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1ekQHQ-0003Gj-6y
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 03:13:07 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sat, 10 Feb 2018 10:55:02 +0300
-Message-Id: <d0081e8f260d012d050405d1e549b445948d1451.1518249254.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
-References: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
-References: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 07/17] scripts/make-release: Don't archive .git
- files
+	(envelope-from <dgibson@ozlabs.org>) id 1ekRJd-0004as-70
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 04:19:27 -0500
+Date: Sat, 10 Feb 2018 18:34:39 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180210073439.GO11634@umbus.fritz.box>
+References: <20180209075503.16996-1-aik@ozlabs.ru>
+	<20180209075503.16996-2-aik@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="rQ7Ovc9/RBrrr0/1"
+Content-Disposition: inline
+In-Reply-To: <20180209075503.16996-2-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v7 1/4] linux-headers: update to
+ f1517df8701c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Cole Robinson <crobinso@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-From: Cole Robinson <crobinso@redhat.com>
 
-As was last done in 379e21c25, we don't want .git files for
-submodules here, which we aren't presently doing for capstone and
-keycodemapdb.
+--rQ7Ovc9/RBrrr0/1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Rather than delete the offending files before archiving, ask tar
-to --exclude=.git
+On Fri, Feb 09, 2018 at 06:55:00PM +1100, Alexey Kardashevskiy wrote:
+> Update headers against f1517df8701c.
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
+/?id=3Df1517df8701c
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Signed-off-by: Cole Robinson <crobinso@redhat.com>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- scripts/make-release | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Might be worth mentioning that a32295c612c57 is the specific kernel
+commit you want to include here, but in any case
 
-diff --git a/scripts/make-release b/scripts/make-release
-index 3917df7142..04fa9defdc 100755
---- a/scripts/make-release
-+++ b/scripts/make-release
-@@ -19,11 +19,10 @@ pushd ${destination}
- git checkout "v${version}"
- git submodule update --init
- (cd roms/seabios && git describe --tags --long --dirty > .version)
--rm -rf .git roms/*/.git dtc/.git pixman/.git
- # FIXME: The following line is a workaround for avoiding filename collisions
- # when unpacking u-boot sources on case-insensitive filesystems. Once we
- # update to something with u-boot commit 610eec7f0 we can drop this line.
--tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
-+tar --exclude=.git -cjf roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
- popd
--tar cfj ${destination}.tar.bz2 ${destination}
-+tar --exclude=.git -cjf ${destination}.tar.bz2 ${destination}
- rm -rf ${destination}
--- 
-2.11.0
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--rQ7Ovc9/RBrrr0/1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp+oIwACgkQbDjKyiDZ
+s5JuHRAAnr7I88EPkczBWyAWob7QP+y4LCpKgJFF9vE78rDN4x2dOtTlhcSvQZIt
+4/nmOnYJXrnVYr6MmIbWc1z3kh4CDaerzy4TqkCqy/GVSNtoiGqxxFUrp22tArOo
+ecRHi43lYUy3NPnp1CuMPnam6BtBCzM9wJRpe5T2dhZs9TTLHKpCQ8a06k5UaVCk
+yFWGZ+3cYQpVPpXI+hmVk1KlKA6cys5b1HaV60INKJGV/42vBE3IXz3//5+XKgJl
+WGNk6EVKsoPdYd3f9MtkOEeijDc+aXONrKa+q7EZfdGYzzk8KXDqFqvSFeIgR4Br
+iVnQOw2A4WTVOnjNyvXZl9j0qbTj7aXrsHI82OwhaMqDUPvHRXSvQhoKPkoB6wKm
+03iIRFZcCvsQlQieaBBTZSZ8nKgwZZ1Hs08nf0v1oTpwh62NN1uDEORHHZES6lcL
+CxCXf4lnjKqq82wlIRU8G8W+9t77gvRwDVZLJa563uIgOpKifiYK0H6UM1kmPaY3
+KLQglDW6o3hzPnFSvcQmo63Z7pZfFAnfs8WM84MBUslYudxsYUORjsajuxJOPrp/
+u+VtcXwEaVHroyHivEw4F79IpXSozw0dl5VJe4ApEIC7MkGw/25HXimmKtfSvQBI
+4by3GlWHAS6fHvfLtUsCIxNcpmsXOyPTRWLQmhRC5OOcgCfObQ0=
+=JHf+
+-----END PGP SIGNATURE-----
+
+--rQ7Ovc9/RBrrr0/1--
