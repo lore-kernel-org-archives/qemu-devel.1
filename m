@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ekPXM-0006hA-2v
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 02:25:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ekPXN-0006iC-VA
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 02:25:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ekPXK-0001E1-Sv
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 02:25:28 -0500
-Date: Sat, 10 Feb 2018 18:22:08 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ekPXK-0001Dj-Qy
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 02:25:29 -0500
+Date: Sat, 10 Feb 2018 18:23:19 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180210072208.GM11634@umbus.fritz.box>
+Message-ID: <20180210072319.GN11634@umbus.fritz.box>
 References: <20180209185142.17151-1-mark.cave-ayland@ilande.co.uk>
-	<20180209185142.17151-2-mark.cave-ayland@ilande.co.uk>
+	<20180209185142.17151-3-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="L/bWm/e7/ricERqM"
+	protocol="application/pgp-signature"; boundary="jdM5ZcN/ZcXXVwZs"
 Content-Disposition: inline
-In-Reply-To: <20180209185142.17151-2-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv2 01/12] cuda: do not use old_mmio accesses
+In-Reply-To: <20180209185142.17151-3-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCHv2 02/12] cuda: don't allow writes to port
+ output pins
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +29,44 @@ To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com
 
 
---L/bWm/e7/ricERqM
-Content-Type: text/plain; charset=us-ascii
+--jdM5ZcN/ZcXXVwZs
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 09, 2018 at 06:51:31PM +0000, Mark Cave-Ayland wrote:
+On Fri, Feb 09, 2018 at 06:51:32PM +0000, Mark Cave-Ayland wrote:
+> Use the direction registers as a mask to ensure that only input pins are
+> updated upon write.
+>=20
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
 Applied, thanks.
 
 > ---
->  hw/misc/macio/cuda.c | 40 ++++++++--------------------------------
->  1 file changed, 8 insertions(+), 32 deletions(-)
+>  hw/misc/macio/cuda.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
 > diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-> index 008d8bd4d5..6631017ca2 100644
+> index 6631017ca2..eaa8924f49 100644
 > --- a/hw/misc/macio/cuda.c
 > +++ b/hw/misc/macio/cuda.c
-> @@ -275,7 +275,7 @@ static void cuda_delay_set_sr_int(CUDAState *s)
->      timer_mod(s->sr_delay_timer, expire);
->  }
+> @@ -359,11 +359,11 @@ static void cuda_write(void *opaque, hwaddr addr, u=
+int64_t val, unsigned size)
 > =20
-> -static uint32_t cuda_readb(void *opaque, hwaddr addr)
-> +static uint64_t cuda_read(void *opaque, hwaddr addr, unsigned size)
->  {
->      CUDAState *s =3D opaque;
->      uint32_t val;
-> @@ -350,7 +350,7 @@ static uint32_t cuda_readb(void *opaque, hwaddr addr)
->      return val;
->  }
-> =20
-> -static void cuda_writeb(void *opaque, hwaddr addr, uint32_t val)
-> +static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned=
- size)
->  {
->      CUDAState *s =3D opaque;
-> =20
-> @@ -780,38 +780,14 @@ static void cuda_receive_packet_from_host(CUDAState=
- *s,
->      }
->  }
-> =20
-> -static void cuda_writew (void *opaque, hwaddr addr, uint32_t value)
-> -{
-> -}
-> -
-> -static void cuda_writel (void *opaque, hwaddr addr, uint32_t value)
-> -{
-> -}
-> -
-> -static uint32_t cuda_readw (void *opaque, hwaddr addr)
-> -{
-> -    return 0;
-> -}
-> -
-> -static uint32_t cuda_readl (void *opaque, hwaddr addr)
-> -{
-> -    return 0;
-> -}
-> -
->  static const MemoryRegionOps cuda_ops =3D {
-> -    .old_mmio =3D {
-> -        .write =3D {
-> -            cuda_writeb,
-> -            cuda_writew,
-> -            cuda_writel,
-> -        },
-> -        .read =3D {
-> -            cuda_readb,
-> -            cuda_readw,
-> -            cuda_readl,
-> -        },
-> +    .read =3D cuda_read,
-> +    .write =3D cuda_write,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 1,
->      },
-> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
->  };
-> =20
->  static bool cuda_timer_exist(void *opaque, int version_id)
+>      switch(addr) {
+>      case CUDA_REG_B:
+> -        s->b =3D val;
+> +        s->b =3D (s->b & ~s->dirb) | (val & s->dirb);
+>          cuda_update(s);
+>          break;
+>      case CUDA_REG_A:
+> -        s->a =3D val;
+> +        s->a =3D (s->a & ~s->dira) | (val & s->dira);
+>          break;
+>      case CUDA_REG_DIRB:
+>          s->dirb =3D val;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -118,24 +74,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---L/bWm/e7/ricERqM
+--jdM5ZcN/ZcXXVwZs
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp+naAACgkQbDjKyiDZ
-s5JqWA//awzaqqC232TxFKPkFIBwUkw9XBtBhLQ9yNjW6Alw6g3fmOrFI7l9E8uc
-/nTfT6pa1GoLIVL0v9ZCZPnrXh7PuIqdeQKnS7EJpI2RdX/U3aWnGo+jE6d1ufQs
-YO+r8LvM/RgItuEw1T6Jn+6lSWCKL9nxjsL8GzNUVxDenBNV7WlcqjvfhAfk0Npn
-Z8oSBVUH10phuHIi4NycUoFPpUTYMHSJmatuKZazN96ffWAaqjJ7VNNeaprI17uE
-pP2q3C0gUfuf1FIkSKS+rHJ7bt3fCI8z2gx2w2G0Dt68DXZeUHdIUy4IHULNZz/Z
-zV/O0fYL8btpw3NjcCkC/uUXJwCO0cEvqqZ4yAZv9exdXGqt85L4pr3xvS1TrMze
-bdWg0EepX25/Q5K9jYKhhxZrF1meWhJQjYVVfMoL90+ExFuLMix7mZGLokCe1BY3
-lvR17dPhqOLZcnG6jTO9YAncVJtKwakiiXjeCg7UcFIoWgYhnXkB7Q0oIjHmTGPL
-UXf4bJt0P4yp0/4tQyJF6uAKaWNgRMMTS/+PRhwQjyxC+0Ws7Q67jDdAsnJzxb6W
-aJcMxEY/t/SVbaTV57C0uwXXhHTWYmNP3kMsSXj/nQm0ANEJuKwTH4MqMOsjL5Xu
-ybkKEiwIgB5Vca1t4fX/ZOomvBxWrYVLgPcpihFN/P+WCWiyAZY=
-=WrPW
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp+necACgkQbDjKyiDZ
+s5KUwhAAlnyZTv9GfvHBKeCB1kP/6miVvRyxXhchG7CXZFk0qZkVsZ2fmppLO+HV
+QWEQYxsXQIb5d/cYr8Dfc05Qamca9TqCoE4jrqvSnxaWK2QLMNvo0fYa8s5KcB8m
+KHoE/cLdGfEfYw13aL6fJxIZxQWCIhyIeqw/MpdouhxOroKQUGPoy86vRbYiOWSm
+kkJl4OPd39v2qETVMimLD6r2g9vLLBPuY+v2bCwGtV+1BknpBaVemJmxSrhzz0Ra
+mDyOwP5ON25fvDF7x6ZWvBUvj3uyHLv7CE/O1/9VTbhH8Q33sn8L3osRil9zUtND
+/JyHzWdu5DyhC1GtyOthuIOgTy4lvRXXt9xufcm2yv2GfhNw7tP9R5RdqEvSPxfL
+wsha/rVL0KsJGxCZt15jXeax+HGrvNpDXObEuYGvY/UObXGKcgPDAOGpWeygmNJr
+wPfBpK2xOinwvVLtgmEsRV7sHoxy6ll0jczQm9karXrHfqbA7vg6UFZo+XIz6tt0
+tpMcUJcMxxh/d0/QsvTcjledKyDw5x5I9sp4690sB8JgwiSV0k0CnkxKPubBpIXq
+1TOe6c1O1fHjegxfhmszwRV4o5OQIcKWN1ysq8DNtVHywD0nPe+wqxeH3jxbzR6Y
+bhLZeEjQc2emVDirzEhjr+ts9OVPxTd1fLeA4ym/6SiQ5d5R1lQ=
+=D8WI
 -----END PGP SIGNATURE-----
 
---L/bWm/e7/ricERqM--
+--jdM5ZcN/ZcXXVwZs--
