@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1ekZDu-0001PU-BR
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 12:46:03 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ekeDC-0006Tc-Ef
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1ekZDt-0006Sj-Me
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 12:46:02 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <B7504AC7-F974-4C7A-8FAA-C4D803C941E4@alex.org.uk>
-Date: Sat, 10 Feb 2018 18:45:55 +0100
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <10CE70C1-D812-485C-A498-8D5057D4F5A0@alex.org.uk>
-References: <20180208132336.6519-1-edgar.kaziakhmedov@virtuozzo.com>
-	<8eb7f38c-ff46-df7d-1d43-d5c98bfd4ff2@redhat.com>
-	<B7504AC7-F974-4C7A-8FAA-C4D803C941E4@alex.org.uk>
-Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: increase maximum size of the
- PWRITE_ZERO request
+	(envelope-from <richard.henderson@linaro.org>) id 1ekeD9-00080X-E2
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:38 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36770)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ekeD9-0007yn-2p
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:35 -0500
+Received: by mail-pf0-x244.google.com with SMTP id p8so572050pff.3
+	for <qemu-devel@nongnu.org>; Sat, 10 Feb 2018 15:05:34 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Sat, 10 Feb 2018 15:05:25 -0800
+Message-Id: <20180210230530.8421-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/5] target/arm: More SVE prep work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,18 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alex Bligh <alex@alex.org.uk>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, nbd list <nbd@other.debian.org>, vsementsov@virtuozzo.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, mreitz@redhat.com, den@openvz.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+
+First, we had noted that ARM_CP_64BIT needed to be removed from
+the ZCR_EL registers, but the patch set was applied without
+actually fixing that.
+
+Second, there's an existing bug by which the FPCR/FPSR registers
+are not properly trapped when FP is disabled.  Fix that with a
+translation-time check.
+
+Third, my attempt at using .accessfn for ZCR_EL fails to take
+into account the two different exception syndromes that must be
+raised.  Although they probably aren't as important as FPCR/FPSR,
+handle them at translation time too.
+
+Fourth, when writing to an AdvSIMD register, zero the rest of
+the SVE register.
 
 
-> On 10 Feb 2018, at 18:43, Alex Bligh <alex@alex.org.uk> wrote:
->=20
-> So I think a reasonable logic for Qemu would be to try NBD_CMD_INFO =
-and find the maximum write size, and if that's unsupported use =
-0xffffffff (capping at export size, or export size minus write offset).
+r~
 
-Ur actually capping it at (2^16 - blocksize) would be the right thing to =
-do (writes should be multiples of the block size).
 
---=20
-Alex Bligh
+Richard Henderson (5):
+  target/arm: Remove ARM_CP_64BIT from ZCR_EL registers
+  target/arm: Enforce FP access to FPCR/FPSR
+  target/arm: Suppress TB end for FPCR/FPSR
+  target/arm: Enforce access to ZCR_EL at translation
+  target/arm: Handle SVE registers when using clear_vec_high
+
+ target/arm/cpu.h           |  36 ++++-----
+ target/arm/internals.h     |   6 ++
+ target/arm/helper.c        |  28 ++-----
+ target/arm/translate-a64.c | 181 ++++++++++++++++++++-------------------------
+ 4 files changed, 114 insertions(+), 137 deletions(-)
+
+-- 
+2.14.3
