@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1ekQHT-0007JS-L9
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 03:13:08 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1ekQHT-0007JV-La
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 03:13:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1ekQHQ-0003Gt-C2
+	(envelope-from <mjt@tls.msk.ru>) id 1ekQHQ-0003Gj-6y
 	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 03:13:07 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sat, 10 Feb 2018 10:55:09 +0300
-Message-Id: <8f801baf3a6835a27ea7d0d807041f8916c60fb5.1518249254.git.mjt@msgid.tls.msk.ru>
+Date: Sat, 10 Feb 2018 10:55:02 +0300
+Message-Id: <d0081e8f260d012d050405d1e549b445948d1451.1518249254.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
 References: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
 References: <cover.1518249254.git.mjt@msgid.tls.msk.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/17] async: use ARRAY_SIZE macro
+Subject: [Qemu-devel] [PULL 07/17] scripts/make-release: Don't archive .git
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +23,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Cole Robinson <crobinso@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Cole Robinson <crobinso@redhat.com>
 
-Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.=
-cocci
+As was last done in 379e21c25, we don't want .git files for
+submodules here, which we aren't presently doing for capstone and
+keycodemapdb.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Rather than delete the offending files before archiving, ask tar
+to --exclude=.git
+
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- util/aio-posix.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/make-release | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 1427f49b4a..d8f0cb4af8 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -119,7 +119,7 @@ static int aio_epoll(AioContext *ctx, GPollFD *pfds,
-     }
-     if (timeout <=3D 0 || ret > 0) {
-         ret =3D epoll_wait(ctx->epollfd, events,
--                         sizeof(events) / sizeof(events[0]),
-+                         ARRAY_SIZE(events),
-                          timeout);
-         if (ret <=3D 0) {
-             goto out;
---=20
+diff --git a/scripts/make-release b/scripts/make-release
+index 3917df7142..04fa9defdc 100755
+--- a/scripts/make-release
++++ b/scripts/make-release
+@@ -19,11 +19,10 @@ pushd ${destination}
+ git checkout "v${version}"
+ git submodule update --init
+ (cd roms/seabios && git describe --tags --long --dirty > .version)
+-rm -rf .git roms/*/.git dtc/.git pixman/.git
+ # FIXME: The following line is a workaround for avoiding filename collisions
+ # when unpacking u-boot sources on case-insensitive filesystems. Once we
+ # update to something with u-boot commit 610eec7f0 we can drop this line.
+-tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
++tar --exclude=.git -cjf roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
+ popd
+-tar cfj ${destination}.tar.bz2 ${destination}
++tar --exclude=.git -cjf ${destination}.tar.bz2 ${destination}
+ rm -rf ${destination}
+-- 
 2.11.0
