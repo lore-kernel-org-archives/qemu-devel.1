@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ekIeU-0001y3-Ac
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:04:23 -0500
+	(envelope-from <ciro.santilli@gmail.com>) id 1ekIjl-0004Og-II
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ekIeT-0002vn-1X
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:04:22 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:45232)
+	(envelope-from <ciro.santilli@gmail.com>) id 1ekIjk-0007AL-NA
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:09:49 -0500
+Received: from mail-io0-x234.google.com ([2607:f8b0:4001:c06::234]:33671)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ekIeS-0002vc-QH
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:04:20 -0500
-Received: by mail-ot0-x242.google.com with SMTP id 73so9290820oti.12
-	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 16:04:20 -0800 (PST)
+	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
+	id 1ekIjk-00079r-Hv
+	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:09:48 -0500
+Received: by mail-io0-x234.google.com with SMTP id n7so11547874iob.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Feb 2018 16:09:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <2832ff22-e0c8-85b9-c0ce-15b0cc3cdc72@linaro.org>
-References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
-	<2832ff22-e0c8-85b9-c0ce-15b0cc3cdc72@linaro.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Sat, 10 Feb 2018 13:04:19 +1300
-Message-ID: <CAHNT7NsMqbQfXCKGh7t7OU=fXeOCWk4e94XiQ=k0n9c7db+1_A@mail.gmail.com>
+In-Reply-To: <CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
+References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
+	<002401d3a010$8d551280$a7ff3780$@ru>
+	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
+From: Ciro Santilli <ciro.santilli@gmail.com>
+Date: Sat, 10 Feb 2018 00:09:26 +0000
+Message-ID: <CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 00/23] RISC-V QEMU Port Submission
+Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>, war2jordan@live.com, Igor R <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, kraxel@redhat.com, Thomas Dullien <thomas.dullien@googlemail.com>, pbonzini@redhat.com, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Sat, Feb 10, 2018 at 8:42 AM, Richard Henderson <
-richard.henderson@linaro.org> wrote:
+Also, what command do you use to test on ARM? I'm a bit stuck to get the
+drive part right, e.g.:
 
-> On 02/07/2018 05:28 PM, Michael Clark wrote:
-> >  create mode 100644 hw/riscv/Makefile.objs
-> >  create mode 100644 hw/riscv/riscv_elf.c
-> >  create mode 100644 hw/riscv/riscv_hart.c
-> >  create mode 100644 hw/riscv/riscv_htif.c
-> >  create mode 100644 hw/riscv/sifive_clint.c
-> >  create mode 100644 hw/riscv/sifive_e300.c
-> >  create mode 100644 hw/riscv/sifive_plic.c
-> >  create mode 100644 hw/riscv/sifive_prci.c
-> >  create mode 100644 hw/riscv/sifive_test.c
-> >  create mode 100644 hw/riscv/sifive_u500.c
-> >  create mode 100644 hw/riscv/sifive_uart.c
-> >  create mode 100644 hw/riscv/spike_v1_09.c
-> >  create mode 100644 hw/riscv/spike_v1_10.c
-> >  create mode 100644 hw/riscv/virt.c
->
-> I have no plans to review these last 9 patches.
-> They all look plausible to me, but I'm not so
-> up-to-date on best practices within hw/.
->
+-drive
+file=./buildroot/output.arm~/images/rootfs.ext2,if=scsi,id=img-direct,format=raw
+\
+-drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
+-device scsi-hd,drive=img-blkreplay \
 
-No problem. Thanks a lot for your help with reviewing disas, target/riscv
-and linux-user. The code is now in much much better shape than it was
-before. The patches that have been reviewed represent the bulk of the port
-(over ~10K LOC of the ~14K LOC in total). The remaining 11 or so patches
-are relatively small in comparison.
-
-We could submit the core of the port which would give us linux-user however
-it would be nice to get the spike machines and virt machine upstream. The
-spike v1.10 machine is required to run riscv-tests and the virt machine is
-being used by linux porters.
-
-BTW Let us know when the softfloat changes have landed. We could
-potentially point fmin/fmax at minnum/maxnum in the interim.
-
-In any case, we still have a reasonable amount of time left if we want to
-get in to the 2.12 release... I see that March 13th is the soft feature
-freeze:
-
-- https://wiki.qemu.org/Planning/2.12
+fails with: qemu-system-arm: -device scsi-hd,drive=img-blkreplay: Conflicts
+with use by img-direct as 'root', which does not allow 'write' on #block968
