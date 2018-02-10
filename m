@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ekJ91-0006QU-Tv
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:35:57 -0500
+	(envelope-from <armbru@redhat.com>) id 1ekOdE-0000px-4g
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 01:27:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ekJ90-0000s8-Uw
-	for qemu-devel@nongnu.org; Fri, 09 Feb 2018 19:35:55 -0500
-Date: Sat, 10 Feb 2018 11:16:47 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180210001647.GJ11634@umbus.fritz.box>
-References: <20180209181330.17371-1-danielhb@linux.vnet.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1ekOd8-0005Xt-TR
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 01:27:27 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46996 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ekOd8-0005W4-Q2
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 01:27:22 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180116134217.8725-1-berrange@redhat.com>
+	<20180116134217.8725-7-berrange@redhat.com>
+	<46fa1e33-70e7-559e-11b9-0ec53bfb8782@redhat.com>
+Date: Sat, 10 Feb 2018 07:27:11 +0100
+In-Reply-To: <46fa1e33-70e7-559e-11b9-0ec53bfb8782@redhat.com> (Eric Blake's
+	message of "Fri, 9 Feb 2018 17:39:58 -0600")
+Message-ID: <877erll5q8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AXxEqdD4tcVTjWte"
-Content-Disposition: inline
-In-Reply-To: <20180209181330.17371-1-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/ppc: rename functions in comments
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 06/14] qapi: remove '-q' arg to diff
+ when comparing QAPI output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,88 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+Eric Blake <eblake@redhat.com> writes:
 
---AXxEqdD4tcVTjWte
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 01/16/2018 07:42 AM, Daniel P. Berrange wrote:
+>> When the qapi schema tests fail they merely print that the expected
+>> output didn't match the actual output. This is largely useless when
+>> trying diagnose what went wrong. Removing the '-q' arg to diff
+>> means that it is still silent on successful tests, but when it
+>> fails we'll see details of the incorrect output.
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>   tests/Makefile.include | 6 +++---
+>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 39a4b5359d..d65fb4e1b3 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -908,10 +908,10 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
+>>   		$^ >$*.test.out 2>$*.test.err; \
+>>   		echo $$? >$*.test.exit, \
+>>   		"TEST","$*.out")
+>> -	@diff -q $(SRC_PATH)/$*.out $*.test.out
+>> +	@diff $(SRC_PATH)/$*.out $*.test.out
+>
+> And just now I'm noticing that this produces an ed-script diff (which
+> is useless), instead of a context diff.  We want -c.  I guess I'll be
+> submitting the obvious followup patch.
 
-On Fri, Feb 09, 2018 at 04:13:30PM -0200, Daniel Henrique Barboza wrote:
-> Commit bcb5ce08cf ("spapr: Rename machine init functions for clarity")
-> renamed ppc_spapr_reset to spapr_machine_reset and ppc_spapr_init
-> to spapr_machine_init. Let's also rename the references in
-> comments.
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+I'd very much prefer -u.
 
-Nice catch, applied.
-
-
-> ---
->  hw/ppc/spapr.c       | 3 ++-
->  hw/ppc/spapr_hcall.c | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 659be6b746..96515036e6 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -464,7 +464,8 @@ static int spapr_populate_memory(sPAPRMachineState *s=
-papr, void *fdt)
->              }
->          }
->          if (!mem_start) {
-> -            /* ppc_spapr_init() checks for rma_size <=3D node0_size alre=
-ady */
-> +            /* spapr_machine_init() checks for rma_size <=3D node0_size
-> +             * already */
->              spapr_populate_memory_node(fdt, i, 0, spapr->rma_size);
->              mem_start +=3D spapr->rma_size;
->              node_size -=3D spapr->rma_size;
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 4d0e6eb0cf..badf01cece 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1635,7 +1635,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
->      spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
->                                                            OV1_PPC_3_00);
->      if (!spapr->cas_reboot) {
-> -        /* If ppc_spapr_reset() did not set up a HPT but one is necessary
-> +        /* If spapr_machine_reset() did not set up a HPT but one is nece=
-ssary
->           * (because the guest isn't going to use radix) then set it up h=
-ere. */
->          if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
->              /* legacy hash or new hash: */
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---AXxEqdD4tcVTjWte
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp+OewACgkQbDjKyiDZ
-s5JdsRAAppaEV55PUVLYUmxn6fdvgtUv61QAK6BXwHSpIoML+MMsybVpG6NXFODB
-f7q6dNrB9c033eEg0ChC8R4NXaIFda/E5iv//dHG1A7XVWZLxBqJ4+F4uxgZ61Hw
-xMLDBtmbjj5VI34lsbEfd6JxJeXaYFGzCUSXP/XVV7AfYejLcQKqQvE1Nkq44TJr
-F5oxZFL44xeQXPPsSW5Vc5npZQeh2VYD94LEXEo2qeomfrwIRKZCraijF7VqxiGU
-X1sGnETnbvO3E7dH+sd+9bUQq76vEntIZI6tcKMVemcOnVC9Uh1UsZkiZ+UJ11yC
-Nqd9rd0TCd5nP73Gn8DRzYt1ZyRxcRd7r6FxkK7H3VphMGyrfJb6r5NPzicjABnf
-JVOdhsYFeCeQ0A6LR7QJYEfGKfg4UeFGow4YewNsHA3RduPE2vg70JzfQg9vfDJz
-u7if67tFGpXD/7hFtCFUMRTz+m2cE2FchHQhy7xl4GlkRghmWgeaVlZP3f34y/2P
-c2oC9DQSSMCH9x2Z+P+3ZK4kBPlh0vyTOSbbaq5OiVzOo5SGv982/PDTEFfee/k1
-KGqIafcVEPJvrwD1DPqxvgebrev0/jLh5+ieCenKtzHpZ1ULO0dfqb8F0G5vLyjP
-2lbnN4yJUuOJH1V5x/MQztoW3hyVoIdNwhsKbaWoiYIafCkeX4g=
-=jg3b
------END PGP SIGNATURE-----
-
---AXxEqdD4tcVTjWte--
+There's a diff -q left a few lines down.
