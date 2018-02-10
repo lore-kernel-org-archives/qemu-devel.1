@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekeDE-0006VW-Ba
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:43 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ekeDH-0006a8-Oq
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekeDB-00083y-QS
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:40 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:40696)
+	(envelope-from <richard.henderson@linaro.org>) id 1ekeDE-00088k-K3
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:43 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:46488)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ekeDB-000833-Jv
-	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:37 -0500
-Received: by mail-pg0-x244.google.com with SMTP id g2so5473717pgn.7
-	for <qemu-devel@nongnu.org>; Sat, 10 Feb 2018 15:05:37 -0800 (PST)
+	id 1ekeDE-000874-7R
+	for qemu-devel@nongnu.org; Sat, 10 Feb 2018 18:05:40 -0500
+Received: by mail-pf0-x244.google.com with SMTP id z79so2675404pff.13
+	for <qemu-devel@nongnu.org>; Sat, 10 Feb 2018 15:05:40 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 10 Feb 2018 15:05:27 -0800
-Message-Id: <20180210230530.8421-3-richard.henderson@linaro.org>
+Date: Sat, 10 Feb 2018 15:05:29 -0800
+Message-Id: <20180210230530.8421-5-richard.henderson@linaro.org>
 In-Reply-To: <20180210230530.8421-1-richard.henderson@linaro.org>
 References: <20180210230530.8421-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/5] target/arm: Enforce FP access to FPCR/FPSR
+Subject: [Qemu-devel] [PATCH 4/5] target/arm: Enforce access to ZCR_EL at
+ translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +30,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
+This also makes sure that we get the correct ordering of
+SVE vs FP exceptions.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h           | 35 ++++++++++++++++++-----------------
- target/arm/helper.c        |  6 ++++--
- target/arm/translate-a64.c |  3 +++
- 3 files changed, 25 insertions(+), 19 deletions(-)
+ target/arm/cpu.h           |  3 ++-
+ target/arm/internals.h     |  6 ++++++
+ target/arm/helper.c        | 22 ++++------------------
+ target/arm/translate-a64.c | 16 ++++++++++++++++
+ 4 files changed, 28 insertions(+), 19 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 521444a5a1..e966a57f8a 100644
+index e966a57f8a..51a3e16275 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1714,7 +1714,7 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
- }
- 
- /* ARMCPRegInfo type field bits. If the SPECIAL bit is set this is a
-- * special-behaviour cp reg and bits [15..8] indicate what behaviour
-+ * special-behaviour cp reg and bits [11..8] indicate what behaviour
-  * it has. Otherwise it is a simple cp reg, where CONST indicates that
-  * TCG can assume the value to be constant (ie load at translate time)
-  * and 64BIT indicates a 64 bit wide coprocessor register. SUPPRESS_TB_END
-@@ -1735,24 +1735,25 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
-  * need to be surrounded by gen_io_start()/gen_io_end(). In particular,
-  * registers which implement clocks or timers require this.
-  */
--#define ARM_CP_SPECIAL 1
--#define ARM_CP_CONST 2
--#define ARM_CP_64BIT 4
--#define ARM_CP_SUPPRESS_TB_END 8
--#define ARM_CP_OVERRIDE 16
--#define ARM_CP_ALIAS 32
--#define ARM_CP_IO 64
--#define ARM_CP_NO_RAW 128
--#define ARM_CP_NOP (ARM_CP_SPECIAL | (1 << 8))
--#define ARM_CP_WFI (ARM_CP_SPECIAL | (2 << 8))
--#define ARM_CP_NZCV (ARM_CP_SPECIAL | (3 << 8))
--#define ARM_CP_CURRENTEL (ARM_CP_SPECIAL | (4 << 8))
--#define ARM_CP_DC_ZVA (ARM_CP_SPECIAL | (5 << 8))
--#define ARM_LAST_SPECIAL ARM_CP_DC_ZVA
-+#define ARM_CP_SPECIAL           0x0001
-+#define ARM_CP_CONST             0x0002
-+#define ARM_CP_64BIT             0x0004
-+#define ARM_CP_SUPPRESS_TB_END   0x0008
-+#define ARM_CP_OVERRIDE          0x0010
-+#define ARM_CP_ALIAS             0x0020
-+#define ARM_CP_IO                0x0040
-+#define ARM_CP_NO_RAW            0x0080
-+#define ARM_CP_NOP               (ARM_CP_SPECIAL | 0x0100)
-+#define ARM_CP_WFI               (ARM_CP_SPECIAL | 0x0200)
-+#define ARM_CP_NZCV              (ARM_CP_SPECIAL | 0x0300)
-+#define ARM_CP_CURRENTEL         (ARM_CP_SPECIAL | 0x0400)
-+#define ARM_CP_DC_ZVA            (ARM_CP_SPECIAL | 0x0500)
-+#define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
-+#define ARM_CP_FPU               0x1000
+@@ -1750,10 +1750,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
+ #define ARM_CP_DC_ZVA            (ARM_CP_SPECIAL | 0x0500)
+ #define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
+ #define ARM_CP_FPU               0x1000
++#define ARM_CP_SVE               0x2000
  /* Used only as a terminator for ARMCPRegInfo lists */
--#define ARM_CP_SENTINEL 0xffff
-+#define ARM_CP_SENTINEL          0xffff
+ #define ARM_CP_SENTINEL          0xffff
  /* Mask of only the flag bits in a type field */
--#define ARM_CP_FLAG_MASK 0xff
-+#define ARM_CP_FLAG_MASK         0x10ff
+-#define ARM_CP_FLAG_MASK         0x10ff
++#define ARM_CP_FLAG_MASK         0x30ff
  
  /* Valid values for ARMCPRegInfo state field, indicating which of
   * the AArch32 and AArch64 execution states this register is visible in.
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 89f5d2fe12..47cc224a46 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -243,6 +243,7 @@ enum arm_exception_class {
+     EC_AA64_HVC               = 0x16,
+     EC_AA64_SMC               = 0x17,
+     EC_SYSTEMREGISTERTRAP     = 0x18,
++    EC_SVEACCESSTRAP          = 0x19,
+     EC_INSNABORT              = 0x20,
+     EC_INSNABORT_SAME_EL      = 0x21,
+     EC_PCALIGNMENT            = 0x22,
+@@ -381,6 +382,11 @@ static inline uint32_t syn_fp_access_trap(int cv, int cond, bool is_16bit)
+         | (cv << 24) | (cond << 20);
+ }
+ 
++static inline uint32_t syn_sve_access_trap(void)
++{
++    return EC_SVEACCESSTRAP << ARM_EL_EC_SHIFT;
++}
++
+ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
+ {
+     return (EC_INSNABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 4b102ec356..d41fb8371f 100644
+index e0184c7162..550dc3d290 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -3356,10 +3356,12 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .writefn = aa64_daif_write, .resetfn = arm_cp_reset_ignore },
-     { .name = "FPCR", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .opc2 = 0, .crn = 4, .crm = 4,
--      .access = PL0_RW, .readfn = aa64_fpcr_read, .writefn = aa64_fpcr_write },
-+      .access = PL0_RW, .type = ARM_CP_FPU,
-+      .readfn = aa64_fpcr_read, .writefn = aa64_fpcr_write },
-     { .name = "FPSR", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .opc2 = 1, .crn = 4, .crm = 4,
--      .access = PL0_RW, .readfn = aa64_fpsr_read, .writefn = aa64_fpsr_write },
-+      .access = PL0_RW, .type = ARM_CP_FPU,
-+      .readfn = aa64_fpsr_read, .writefn = aa64_fpsr_write },
-     { .name = "DCZID_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .opc2 = 7, .crn = 0, .crm = 0,
-       .access = PL0_R, .type = ARM_CP_NO_RAW,
+@@ -4335,20 +4335,6 @@ static int sve_exception_el(CPUARMState *env)
+     return 0;
+ }
+ 
+-static CPAccessResult zcr_access(CPUARMState *env, const ARMCPRegInfo *ri,
+-                                 bool isread)
+-{
+-    switch (sve_exception_el(env)) {
+-    case 3:
+-        return CP_ACCESS_TRAP_EL3;
+-    case 2:
+-        return CP_ACCESS_TRAP_EL2;
+-    case 1:
+-        return CP_ACCESS_TRAP;
+-    }
+-    return CP_ACCESS_OK;
+-}
+-
+ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                       uint64_t value)
+ {
+@@ -4359,7 +4345,7 @@ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static const ARMCPRegInfo zcr_el1_reginfo = {
+     .name = "ZCR_EL1", .state = ARM_CP_STATE_AA64,
+     .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 2, .opc2 = 0,
+-    .access = PL1_RW, .accessfn = zcr_access,
++    .access = PL1_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
+     .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[1]),
+     .writefn = zcr_write, .raw_writefn = raw_write
+ };
+@@ -4367,7 +4353,7 @@ static const ARMCPRegInfo zcr_el1_reginfo = {
+ static const ARMCPRegInfo zcr_el2_reginfo = {
+     .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
+     .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
+-    .access = PL2_RW, .accessfn = zcr_access,
++    .access = PL2_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
+     .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[2]),
+     .writefn = zcr_write, .raw_writefn = raw_write
+ };
+@@ -4375,14 +4361,14 @@ static const ARMCPRegInfo zcr_el2_reginfo = {
+ static const ARMCPRegInfo zcr_no_el2_reginfo = {
+     .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
+     .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
+-    .access = PL2_RW,
++    .access = PL2_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
+     .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore
+ };
+ 
+ static const ARMCPRegInfo zcr_el3_reginfo = {
+     .name = "ZCR_EL3", .state = ARM_CP_STATE_AA64,
+     .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 2, .opc2 = 0,
+-    .access = PL3_RW, .accessfn = zcr_access,
++    .access = PL3_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
+     .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[3]),
+     .writefn = zcr_write, .raw_writefn = raw_write
+ };
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index fb1a4cb532..89f50558a7 100644
+index 89f50558a7..e3881d4999 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -1631,6 +1631,9 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
+@@ -1182,6 +1182,19 @@ static inline bool fp_access_check(DisasContext *s)
+     return false;
+ }
+ 
++/* Check that SVE access is enabled.  If it is, return true.
++ * If not, emit code to generate an appropriate exception and return false.
++ */
++static inline bool sve_access_check(DisasContext *s)
++{
++    if (s->sve_excp_el) {
++        gen_exception_insn(s, 4, EXCP_UDEF, syn_sve_access_trap(),
++                           s->sve_excp_el);
++        return false;
++    }
++    return true;
++}
++
+ /*
+  * This utility function is for doing register extension with an
+  * optional shift. You will likely want to pass a temporary for the
+@@ -1631,6 +1644,9 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
      default:
          break;
      }
-+    if ((ri->type & ARM_CP_FPU) && !fp_access_check(s)) {
++    if ((ri->type & ARM_CP_SVE) && !sve_access_check(s)) {
 +        return;
 +    }
- 
-     if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_CP_IO)) {
-         gen_io_start();
+     if ((ri->type & ARM_CP_FPU) && !fp_access_check(s)) {
+         return;
+     }
 -- 
 2.14.3
