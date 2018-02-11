@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekyiG-0006uy-HG
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 15:59:06 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1el0Oo-0003yI-0D
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:47:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ekyiE-0004O8-Ax
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 15:59:04 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37686)
+	(envelope-from <richard.henderson@linaro.org>) id 1el0Oj-0000iZ-Eq
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:47:06 -0500
+Received: from mail-pl0-x22b.google.com ([2607:f8b0:400e:c01::22b]:47027)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ekyiD-0004MX-Ph
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 15:59:02 -0500
-Received: by mail-pg0-x242.google.com with SMTP id o1so6150600pgn.4
-	for <qemu-devel@nongnu.org>; Sun, 11 Feb 2018 12:59:01 -0800 (PST)
+	id 1el0Oj-0000i5-2f
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:47:01 -0500
+Received: by mail-pl0-x22b.google.com with SMTP id x2so165719plr.13
+	for <qemu-devel@nongnu.org>; Sun, 11 Feb 2018 14:47:00 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 11 Feb 2018 12:58:47 -0800
-Message-Id: <20180211205848.4568-7-richard.henderson@linaro.org>
-In-Reply-To: <20180211205848.4568-1-richard.henderson@linaro.org>
-References: <20180211205848.4568-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 6/7] linux-user: Support SVE in aarch64
- signal frames
+Date: Sun, 11 Feb 2018 14:46:56 -0800
+Message-Id: <20180211224656.12767-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2] scripts: Add decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,458 +25,1285 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org
+
+To be used to decode ARM SVE, but could be used for any fixed-width ISA.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/signal.c | 348 ++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 283 insertions(+), 65 deletions(-)
 
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 9a380b9e31..af953175db 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -1443,35 +1443,61 @@ struct target_fpsimd_context {
-     uint64_t vregs[32 * 2]; /* really uint128_t vregs[32] */
- };
+Changes since v1:
+  * Pass pycodestyle-{2,3}.
+  * Support 16-bit and 32-bit insns (I have a def file for thumb1).
+  * Testsuite (only negative tests so far).
+  * Called translate functions default to static.
+  * Notice duplicate assignments and missing assignments to fields.
+  * Use '-' to indicate a non-decoded bit, as opposed to '.' which
+    must be filled in elsewhere by a format or a field.
+
+---
+ scripts/decodetree.py         | 1026 +++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include        |    9 +-
+ tests/decode/check.sh         |   16 +
+ tests/decode/err_argset1.def  |    1 +
+ tests/decode/err_argset2.def  |    1 +
+ tests/decode/err_field1.def   |    1 +
+ tests/decode/err_field2.def   |    1 +
+ tests/decode/err_field3.def   |    1 +
+ tests/decode/err_field4.def   |    2 +
+ tests/decode/err_field5.def   |    1 +
+ tests/decode/err_init1.def    |    2 +
+ tests/decode/err_init2.def    |    2 +
+ tests/decode/err_init3.def    |    3 +
+ tests/decode/err_init4.def    |    3 +
+ tests/decode/err_overlap1.def |    2 +
+ tests/decode/err_overlap2.def |    2 +
+ tests/decode/err_overlap3.def |    2 +
+ tests/decode/err_overlap4.def |    2 +
+ tests/decode/err_overlap5.def |    1 +
+ tests/decode/err_overlap6.def |    2 +
+ tests/decode/err_overlap7.def |    2 +
+ 21 files changed, 1081 insertions(+), 1 deletion(-)
+ create mode 100755 scripts/decodetree.py
+ create mode 100755 tests/decode/check.sh
+ create mode 100644 tests/decode/err_argset1.def
+ create mode 100644 tests/decode/err_argset2.def
+ create mode 100644 tests/decode/err_field1.def
+ create mode 100644 tests/decode/err_field2.def
+ create mode 100644 tests/decode/err_field3.def
+ create mode 100644 tests/decode/err_field4.def
+ create mode 100644 tests/decode/err_field5.def
+ create mode 100644 tests/decode/err_init1.def
+ create mode 100644 tests/decode/err_init2.def
+ create mode 100644 tests/decode/err_init3.def
+ create mode 100644 tests/decode/err_init4.def
+ create mode 100644 tests/decode/err_overlap1.def
+ create mode 100644 tests/decode/err_overlap2.def
+ create mode 100644 tests/decode/err_overlap3.def
+ create mode 100644 tests/decode/err_overlap4.def
+ create mode 100644 tests/decode/err_overlap5.def
+ create mode 100644 tests/decode/err_overlap6.def
+ create mode 100644 tests/decode/err_overlap7.def
+
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+new file mode 100755
+index 0000000000..3c20acf700
+--- /dev/null
++++ b/scripts/decodetree.py
+@@ -0,0 +1,1026 @@
++#!/usr/bin/env python
++#
++# Generate a decoding tree from a specification file.
++#
++# The tree is built from instruction "patterns".  A pattern may represent
++# a single architectural instruction or a group of same, depending on what
++# is convenient for further processing.
++#
++# Each pattern has "fixedbits" & "fixedmask", the combination of which
++# describes the condition under which the pattern is matched:
++#
++#   (insn & fixedmask) == fixedbits
++#
++# Each pattern may have "fields", which are extracted from the insn and
++# passed along to the translator.  Examples of such are registers,
++# immediates, and sub-opcodes.
++#
++# In support of patterns, one may declare fields, argument sets, and
++# formats, each of which may be re-used to simplify further definitions.
++#
++# *** Field syntax:
++#
++# field_def     := '%' identifier ( unnamed_field )+ ( !function=identifier )?
++# unnamed_field := number ':' ( 's' ) number
++#
++# For unnamed_field, the first number is the least-significant bit position of
++# the field and the second number is the length of the field.  If the 's' is
++# present, the field is considered signed.  If multiple unnamed_fields are
++# present, they are concatenated.  In this way one can define disjoint fields.
++#
++# If !function is specified, the concatenated result is passed through the
++# named function, taking and returning an integral value.
++#
++# FIXME: the fields of the structure into which this result will be stored
++# is restricted to "int".  Which means that we cannot expand 64-bit items.
++#
++# Field examples:
++#
++#   %disp   0:s16          -- sextract(i, 0, 16)
++#   %imm9   16:6 10:3      -- extract(i, 16, 6) << 3 | extract(i, 10, 3)
++#   %disp12 0:s1 1:1 2:10  -- sextract(i, 0, 1) << 11
++#                             | extract(i, 1, 1) << 10
++#                             | extract(i, 2, 10)
++#   %shimm8 5:s8 13:1 !function=expand_shimm8
++#                          -- expand_shimm8(sextract(i, 5, 8) << 1
++#                                           | extract(i, 13, 1))
++#
++# *** Argument set syntax:
++#
++# args_def    := '&' identifier ( args_elt )+
++# args_elt    := identifier
++#
++# Each args_elt defines an argument within the argument set.
++# Each argument set will be rendered as a C structure "arg_$name"
++# with each of the fields being one of the member arguments.
++#
++# Argument set examples:
++#
++#   &reg3       ra rb rc
++#   &loadstore  reg base offset
++#
++# *** Format syntax:
++#
++# fmt_def      := '@' identifier ( fmt_elt )+
++# fmt_elt      := fixedbit_elt | field_elt | field_ref | args_ref
++# fixedbit_elt := [01.-]+
++# field_elt    := identifier ':' 's'? number
++# field_ref    := '%' identifier | identifier '=' '%' identifier
++# args_ref     := '&' identifier
++#
++# Defining a format is a handy way to avoid replicating groups of fields
++# across many instruction patterns.
++#
++# A fixedbit_elt describes a contiguous sequence of bits that must
++# be 1, 0, [.-] for don't care.  The difference between '.' and '-'
++# is that '.' means that the bit will be covered with a field and
++# '-' means that the bit is really ignored by the cpu and will not
++# be covered by a field.
++#
++# A field_elt describes a simple field only given a width; the position of
++# the field is implied by its position with respect to other fixedbit_elt
++# and field_elt.
++#
++# If any fixedbit_elt or field_elt appear then all bits must be defined.
++# Padding with a fixedbit_elt of all '.' is an easy way to accomplish that.
++#
++# A field_ref incorporates a field by reference.  This is the only way to
++# add a complex field to a format.  A field may be renamed in the process
++# via assignment to another identifier.  This is intended to allow the
++# same argument set be used with disjoint named fields.
++#
++# A single args_ref may specify an argument set to use for the format.
++# The set of fields in the format must be a subset of the arguments in
++# the argument set.  If an argument set is not specified, one will be
++# inferred from the set of fields.
++#
++# It is recommended, but not required, that all field_ref and args_ref
++# appear at the end of the line, not interleaving with fixedbit_elf or
++# field_elt.
++#
++# Format examples:
++#
++#   @opr    ...... ra:5 rb:5 ... 0 ....... rc:5
++#   @opi    ...... ra:5 lit:8    1 ....... rc:5
++#
++# *** Pattern syntax:
++#
++# pat_def      := identifier ( pat_elt )+
++# pat_elt      := fixedbit_elt | field_elt | field_ref
++#               | args_ref | fmt_ref | const_elt
++# fmt_ref      := '@' identifier
++# const_elt    := identifier '=' number
++#
++# The fixedbit_elt and field_elt specifiers are unchanged from formats.
++# A pattern that does not specify a named format will have one inferred
++# from a referenced argument set (if present) and the set of fields.
++#
++# A const_elt allows a argument to be set to a constant value.  This may
++# come in handy when fields overlap between patterns and one has to
++# include the values in the fixedbit_elt instead.
++#
++# The decoder will call a translator function for each pattern matched.
++#
++# Pattern examples:
++#
++#   addl_r   010000 ..... ..... .... 0000000 ..... @opr
++#   addl_i   010000 ..... ..... .... 0000000 ..... @opi
++#
++# which will, in part, invoke
++#
++#   trans_addl_r(ctx, &arg_opr, insn)
++# and
++#   trans_addl_i(ctx, &arg_opi, insn)
++#
++
++import io
++import re
++import sys
++import getopt
++import pdb
++
++insnwidth = 32
++fields = {}
++arguments = {}
++formats = {}
++patterns = []
++
++translate_prefix = 'trans'
++translate_scope = 'static '
++output_file = sys.stdout
++input_file = ''
++insntype = 'uint32_t'
++
++re_ident = '[a-zA-Z][a-zA-Z0-9_]*'
++
++
++def error(lineno, *args):
++    """Print an error message from file:line and args and exit."""
++    if lineno:
++        r = '{0}:{1}: error:'.format(input_file, lineno)
++    elif input_file:
++        r = '{0}: error:'.format(input_file)
++    else:
++        r = 'error:'
++    for a in args:
++        r += ' ' + str(a)
++    r += '\n'
++    sys.stderr.write(r)
++    exit(1)
++
++
++def output(*args):
++    global output_file
++    for a in args:
++        output_file.write(a)
++
++
++if sys.version_info >= (3, 0):
++    re_fullmatch = re.fullmatch
++else:
++    def re_fullmatch(pat, str):
++        return re.match('^' + pat + '$', str)
++
++
++def output_autogen():
++    output('/* This file is autogenerated by scripts/decodetree.py.  */\n\n')
++
++
++def str_indent(c):
++    """Return a string with C spaces"""
++    return ' ' * c
++
++
++def str_fields(fields):
++    """Return a string uniquely identifing FIELDS"""
++    r = ''
++    for n in sorted(fields.keys()):
++        r += '_' + n
++    return r[1:]
++
++
++def str_match_bits(bits, mask):
++    """Return a string pretty-printing BITS/MASK"""
++    global insnwidth
++
++    i = 1 << (insnwidth - 1)
++    space = 0x01010100
++    r = ''
++    while i != 0:
++        if i & mask:
++            if i & bits:
++                r += '1'
++            else:
++                r += '0'
++        else:
++            r += '.'
++        if i & space:
++            r += ' '
++        i >>= 1
++    return r
++
++
++def is_pow2(x):
++    """Return true iff X is equal to a power of 2."""
++    return (x & (x - 1)) == 0
++
++
++def ctz(x):
++    """Return the number of times 2 factors into X."""
++    r = 0
++    while ((x >> r) & 1) == 0:
++        r += 1
++    return r
++
++
++def is_contiguous(bits):
++    shift = ctz(bits)
++    if is_pow2((bits >> shift) + 1):
++        return shift
++    else:
++        return -1
++
++
++def eq_fields_for_args(flds_a, flds_b):
++    if len(flds_a) != len(flds_b):
++        return False
++    for k, a in flds_a.items():
++        if k not in flds_b:
++            return False
++    return True
++
++
++def eq_fields_for_fmts(flds_a, flds_b):
++    if len(flds_a) != len(flds_b):
++        return False
++    for k, a in flds_a.items():
++        if k not in flds_b:
++            return False
++        b = flds_b[k]
++        if a.__class__ != b.__class__ or a != b:
++            return False
++    return True
++
++
++class Field:
++    """Class representing a simple instruction field"""
++    def __init__(self, sign, pos, len):
++        self.sign = sign
++        self.pos = pos
++        self.len = len
++        self.mask = ((1 << len) - 1) << pos
++
++    def __str__(self):
++        if self.sign:
++            s = 's'
++        else:
++            s = ''
++        return str(pos) + ':' + s + str(len)
++
++    def str_extract(self):
++        if self.sign:
++            extr = 'sextract32'
++        else:
++            extr = 'extract32'
++        return '{0}(insn, {1}, {2})'.format(extr, self.pos, self.len)
++
++    def __eq__(self, other):
++        return self.sign == other.sign and self.sign == other.sign
++
++    def __ne__(self, other):
++        return not self.__eq__(other)
++# end Field
++
++
++class MultiField:
++    """Class representing a compound instruction field"""
++    def __init__(self, subs, mask):
++        self.subs = subs
++        self.sign = subs[0].sign
++        self.mask = mask
++
++    def __str__(self):
++        return str(self.subs)
++
++    def str_extract(self):
++        ret = '0'
++        pos = 0
++        for f in reversed(self.subs):
++            if pos == 0:
++                ret = f.str_extract()
++            else:
++                ret = 'deposit32({0}, {1}, {2}, {3})' \
++                      .format(ret, pos, 32 - pos, f.str_extract())
++            pos += f.len
++        return ret
++
++    def __ne__(self, other):
++        if len(self.subs) != len(other.subs):
++            return True
++        for a, b in zip(self.subs, other.subs):
++            if a.__class__ != b.__class__ or a != b:
++                return True
++        return False
++
++    def __eq__(self, other):
++        return not self.__ne__(other)
++# end MultiField
++
++
++class ConstField:
++    """Class representing an argument field with constant value"""
++    def __init__(self, value):
++        self.value = value
++        self.mask = 0
++        self.sign = value < 0
++
++    def __str__(self):
++        return str(self.value)
++
++    def str_extract(self):
++        return str(self.value)
++
++    def __cmp__(self, other):
++        return self.value - other.value
++# end ConstField
++
++
++class FunctionField:
++    """Class representing a field passed through an expander"""
++    def __init__(self, func, base):
++        self.mask = base.mask
++        self.sign = base.sign
++        self.base = base
++        self.func = func
++
++    def __str__(self):
++        return self.func + '(' + str(self.base) + ')'
++
++    def str_extract(self):
++        return self.func + '(' + self.base.str_extract() + ')'
++
++    def __eq__(self, other):
++        return self.func == other.func and self.base == other.base
++
++    def __ne__(self, other):
++        return not self.__eq__(other)
++# end FunctionField
++
++
++class Arguments:
++    """Class representing the extracted fields of a format"""
++    def __init__(self, nm, flds):
++        self.name = nm
++        self.fields = sorted(flds)
++
++    def __str__(self):
++        return self.name + ' ' + str(self.fields)
++
++    def struct_name(self):
++        return 'arg_' + self.name
++
++    def output_def(self):
++        output('typedef struct {\n')
++        for n in self.fields:
++            output('    int ', n, ';\n')
++        output('} ', self.struct_name(), ';\n\n')
++# end Arguments
++
++
++class General:
++    """Common code between instruction formats and instruction patterns"""
++    def __init__(self, name, lineno, base, fixb, fixm, udfm, fldm, flds):
++        self.name = name
++        self.lineno = lineno
++        self.base = base
++        self.fixedbits = fixb
++        self.fixedmask = fixm
++        self.undefmask = udfm
++        self.fieldmask = fldm
++        self.fields = flds
++
++    def __str__(self):
++        r = self.name
++        if self.base:
++            r = r + ' ' + self.base.name
++        else:
++            r = r + ' ' + str(self.fields)
++        r = r + ' ' + str_match_bits(self.fixedbits, self.fixedmask)
++        return r
++
++    def str1(self, i):
++        return str_indent(i) + self.__str__()
++# end General
++
++
++class Format(General):
++    """Class representing an instruction format"""
++
++    def extract_name(self):
++        return 'extract_' + self.name
++
++    def output_extract(self):
++        output('static void ', self.extract_name(), '(',
++               self.base.struct_name(), ' *a, ', insntype, ' insn)\n{\n')
++        for n, f in self.fields.items():
++            output('    a->', n, ' = ', f.str_extract(), ';\n')
++        output('}\n\n')
++# end Format
++
++
++class Pattern(General):
++    """Class representing an instruction pattern"""
++
++    def output_decl(self):
++        global translate_scope
++        global translate_prefix
++        output('typedef ', self.base.base.struct_name(),
++               ' arg_', self.name, ';\n')
++        output(translate_scope, 'void ', translate_prefix, '_', self.name,
++               '(DisasContext *ctx, arg_', self.name,
++               ' *a, ', insntype, ' insn);\n')
++
++    def output_code(self, i, extracted, outerbits, outermask):
++        global translate_prefix
++        ind = str_indent(i)
++        arg = self.base.base.name
++        output(ind, '/* line ', str(self.lineno), ' */\n')
++        if not extracted:
++            output(ind, self.base.extract_name(), '(&u.f_', arg, ', insn);\n')
++        for n, f in self.fields.items():
++            output(ind, 'u.f_', arg, '.', n, ' = ', f.str_extract(), ';\n')
++        output(ind, translate_prefix, '_', self.name,
++               '(ctx, &u.f_', arg, ', insn);\n')
++        output(ind, 'return true;\n')
++# end Pattern
++
++
++def parse_field(lineno, name, toks):
++    """Parse one instruction field from TOKS at LINENO"""
++    global fields
++    global re_ident
++    global insnwidth
++
++    # A "simple" field will have only one entry;
++    # a "multifield" will have several.
++    subs = []
++    width = 0
++    func = None
++    for t in toks:
++        if re_fullmatch('!function=' + re_ident, t):
++            if func:
++                error(lineno, 'duplicate function')
++            func = t.split('=')
++            func = func[1]
++            continue
++
++        if re_fullmatch('[0-9]+:s[0-9]+', t):
++            # Signed field extract
++            subtoks = t.split(':s')
++            sign = True
++        elif re_fullmatch('[0-9]+:[0-9]+', t):
++            # Unsigned field extract
++            subtoks = t.split(':')
++            sign = False
++        else:
++            error(lineno, 'invalid field token "{0}"'.format(t))
++        po = int(subtoks[0])
++        le = int(subtoks[1])
++        if po + le > insnwidth:
++            error(lineno, 'field {0} too large'.format(t))
++        f = Field(sign, po, le)
++        subs.append(f)
++        width += le
++
++    if width > insnwidth:
++        error(lineno, 'field too large')
++    if len(subs) == 1:
++        f = subs[0]
++    else:
++        mask = 0
++        for s in subs:
++            if mask & s.mask:
++                error(lineno, 'field components overlap')
++            mask |= s.mask
++        f = MultiField(subs, mask)
++    if func:
++        f = FunctionField(func, f)
++
++    if name in fields:
++        error(lineno, 'duplicate field', name)
++    fields[name] = f
++# end parse_field
++
++
++def parse_arguments(lineno, name, toks):
++    """Parse one argument set from TOKS at LINENO"""
++    global arguments
++    global re_ident
++
++    flds = []
++    for t in toks:
++        if not re_fullmatch(re_ident, t):
++            error(lineno, 'invalid argument set token "{0}"'.format(t))
++        if t in flds:
++            error(lineno, 'duplicate argument "{0}"'.format(t))
++        flds.append(t)
++
++    if name in arguments:
++        error(lineno, 'duplicate argument set', name)
++    arguments[name] = Arguments(name, flds)
++# end parse_arguments
++
++
++def lookup_field(lineno, name):
++    global fields
++    if name in fields:
++        return fields[name]
++    error(lineno, 'undefined field', name)
++
++
++def add_field(lineno, flds, new_name, f):
++    if new_name in flds:
++        error(lineno, 'duplicate field', new_name)
++    flds[new_name] = f
++    return flds
++
++
++def add_field_byname(lineno, flds, new_name, old_name):
++    return add_field(lineno, flds, new_name, lookup_field(lineno, old_name))
++
++
++def infer_argument_set(flds):
++    global arguments
++
++    for arg in arguments.values():
++        if eq_fields_for_args(flds, arg.fields):
++            return arg
++
++    name = str(len(arguments))
++    arg = Arguments(name, flds.keys())
++    arguments[name] = arg
++    return arg
++
++
++def infer_format(arg, fieldmask, flds):
++    global arguments
++    global formats
++
++    const_flds = {}
++    var_flds = {}
++    for n, c in flds.items():
++        if c is ConstField:
++            const_flds[n] = c
++        else:
++            var_flds[n] = c
++
++    # Look for an existing format with the same argument set and fields
++    for fmt in formats.values():
++        if arg and fmt.base != arg:
++            continue
++        if fieldmask != fmt.fieldmask:
++            continue
++        if not eq_fields_for_fmts(flds, fmt.fields):
++            continue
++        return (fmt, const_flds)
++
++    name = 'Fmt_' + str(len(formats))
++    if not arg:
++        arg = infer_argument_set(flds)
++
++    fmt = Format(name, 0, arg, 0, 0, 0, fieldmask, var_flds)
++    formats[name] = fmt
++
++    return (fmt, const_flds)
++# end infer_format
++
++
++def parse_generic(lineno, is_format, name, toks):
++    """Parse one instruction format from TOKS at LINENO"""
++    global fields
++    global arguments
++    global formats
++    global patterns
++    global re_ident
++    global insnwidth
++
++    fixedmask = 0
++    fixedbits = 0
++    undefmask = 0
++    width = 0
++    flds = {}
++    arg = None
++    fmt = None
++    for t in toks:
++        # '&Foo' gives a format an explcit argument set.
++        if t[0] == '&':
++            tt = t[1:]
++            if arg:
++                error(lineno, 'multiple argument sets')
++            if tt in arguments:
++                arg = arguments[tt]
++            else:
++                error(lineno, 'undefined argument set', t)
++            continue
++
++        # '@Foo' gives a pattern an explicit format.
++        if t[0] == '@':
++            tt = t[1:]
++            if fmt:
++                error(lineno, 'multiple formats')
++            if tt in formats:
++                fmt = formats[tt]
++            else:
++                error(lineno, 'undefined format', t)
++            continue
++
++        # '%Foo' imports a field.
++        if t[0] == '%':
++            tt = t[1:]
++            flds = add_field_byname(lineno, flds, tt, tt)
++            continue
++
++        # 'Foo=%Bar' imports a field with a different name.
++        if re_fullmatch(re_ident + '=%' + re_ident, t):
++            (fname, iname) = t.split('=%')
++            flds = add_field_byname(lineno, flds, fname, iname)
++            continue
++
++        # 'Foo=number' sets an argument field to a constant value
++        if re_fullmatch(re_ident + '=[0-9]+', t):
++            (fname, value) = t.split('=')
++            value = int(value)
++            flds = add_field(lineno, flds, fname, ConstField(value))
++            continue
++
++        # Pattern of 0s, 1s, dots and dashes indicate required zeros,
++        # required ones, or dont-cares.
++        if re_fullmatch('[01.-]+', t):
++            shift = len(t)
++            fms = t.replace('0', '1')
++            fms = fms.replace('.', '0')
++            fms = fms.replace('-', '0')
++            fbs = t.replace('.', '0')
++            fbs = fbs.replace('-', '0')
++            ubm = t.replace('1', '0')
++            ubm = ubm.replace('.', '0')
++            ubm = ubm.replace('-', '1')
++            fms = int(fms, 2)
++            fbs = int(fbs, 2)
++            ubm = int(ubm, 2)
++            fixedbits = (fixedbits << shift) | fbs
++            fixedmask = (fixedmask << shift) | fms
++            undefmask = (undefmask << shift) | ubm
++        # Otherwise, fieldname:fieldwidth
++        elif re_fullmatch(re_ident + ':s?[0-9]+', t):
++            (fname, flen) = t.split(':')
++            sign = False
++            if flen[0] == 's':
++                sign = True
++                flen = flen[1:]
++            shift = int(flen, 10)
++            f = Field(sign, insnwidth - width - shift, shift)
++            flds = add_field(lineno, flds, fname, f)
++            fixedbits <<= shift
++            fixedmask <<= shift
++            undefmask <<= shift
++        else:
++            error(lineno, 'invalid token "{0}"'.format(t))
++        width += shift
++
++    # We should have filled in all of the bits of the instruction.
++    if not (is_format and width == 0) and width != insnwidth:
++        error(lineno, 'definition has {0} bits'.format(width))
++
++    # Do not check for fields overlaping fields; one valid usage
++    # is to be able to duplicate fields via import.
++    fieldmask = 0
++    for f in flds.values():
++        fieldmask |= f.mask
++
++    # Fix up what we've parsed to match either a format or a pattern.
++    if is_format:
++        # Formats cannot reference formats.
++        if fmt:
++            error(lineno, 'format referencing format')
++        # If an argument set is given, then there should be no fields
++        # without a place to store it.
++        if arg:
++            for f in flds.keys():
++                if f not in arg.fields:
++                    error(lineno, 'field {0} not in argument set {1}'
++                                  .format(f, arg.name))
++        else:
++            arg = infer_argument_set(flds)
++        if name in formats:
++            error(lineno, 'duplicate format name', name)
++        fmt = Format(name, lineno, arg, fixedbits, fixedmask,
++                     undefmask, fieldmask, flds)
++        formats[name] = fmt
++    else:
++        # Patterns can reference a format ...
++        if fmt:
++            # ... but not an argument simultaneously
++            if arg:
++                error(lineno, 'pattern specifies both format and argument set')
++            if fixedmask & fmt.fixedmask:
++                error(lineno, 'pattern fixed bits overlap format fixed bits')
++            fieldmask |= fmt.fieldmask
++            fixedbits |= fmt.fixedbits
++            fixedmask |= fmt.fixedmask
++            undefmask |= fmt.undefmask
++        else:
++            (fmt, flds) = infer_format(arg, fieldmask, flds)
++        arg = fmt.base
++        for f in flds.keys():
++            if f not in arg.fields:
++                error(lineno, 'field {0} not in argument set {1}'
++                              .format(f, arg.name))
++        for f in arg.fields:
++            if f not in flds.keys() and f not in fmt.fields.keys():
++                error(lineno, 'field {0} not initialized'.format(f))
++        pat = Pattern(name, lineno, fmt, fixedbits, fixedmask,
++                      undefmask, fieldmask, flds)
++        patterns.append(pat)
++
++    # Validate the masks that we have assembled.
++    if fieldmask & fixedmask:
++        error(lineno, 'fieldmask overlaps fixedmask (0x{0:08x} & 0x{1:08x})'
++                      .format(fieldmask, fixedmask))
++    if fieldmask & undefmask:
++        error(lineno, 'fieldmask overlaps undefmask (0x{0:08x} & 0x{1:08x})'
++                      .format(fieldmask, undefmask))
++    if fixedmask & undefmask:
++        error(lineno, 'fixedmask overlaps undefmask (0x{0:08x} & 0x{1:08x})'
++                      .format(fixedmask, undefmask))
++# end parse_general
++
++
++def parse_file(f):
++    """Parse all of the patterns within a file"""
++
++    # Read all of the lines of the file.  Concatenate lines
++    # ending in backslash; discard empty lines and comments.
++    toks = []
++    lineno = 0
++    for line in f:
++        lineno += 1
++
++        # Discard comments
++        end = line.find('#')
++        if end >= 0:
++            line = line[:end]
++
++        t = line.split()
++        if len(toks) != 0:
++            # Next line after continuation
++            toks.extend(t)
++        elif len(t) == 0:
++            # Empty line
++            continue
++        else:
++            toks = t
++
++        # Continuation?
++        if toks[-1] == '\\':
++            toks.pop()
++            continue
++
++        if len(toks) < 2:
++            error(lineno, 'short line')
++
++        name = toks[0]
++        del toks[0]
++
++        # Determine the type of object needing to be parsed.
++        if name[0] == '%':
++            parse_field(lineno, name[1:], toks)
++        elif name[0] == '&':
++            parse_arguments(lineno, name[1:], toks)
++        elif name[0] == '@':
++            parse_generic(lineno, True, name[1:], toks)
++        else:
++            parse_generic(lineno, False, name, toks)
++        toks = []
++# end parse_file
++
++
++class Tree:
++    """Class representing a node in a decode tree"""
++
++    def __init__(self, fm, tm):
++        self.fixedmask = fm
++        self.thismask = tm
++        self.subs = []
++        self.base = None
++
++    def str1(self, i):
++        ind = str_indent(i)
++        r = '{0}{1:08x}'.format(ind, self.fixedmask)
++        if self.format:
++            r += ' ' + self.format.name
++        r += ' [\n'
++        for (b, s) in self.subs:
++            r += '{0}  {1:08x}:\n'.format(ind, b)
++            r += s.str1(i + 4) + '\n'
++        r += ind + ']'
++        return r
++
++    def __str__(self):
++        return self.str1(0)
++
++    def output_code(self, i, extracted, outerbits, outermask):
++        ind = str_indent(i)
++
++        # If we identified all nodes below have the same format,
++        # extract the fields now.
++        if not extracted and self.base:
++            output(ind, self.base.extract_name(),
++                   '(&u.f_', self.base.base.name, ', insn);\n')
++            extracted = True
++
++        # Attempt to aid the compiler in producing compact switch statements.
++        # If the bits in the mask are contiguous, extract them.
++        sh = is_contiguous(self.thismask)
++        if sh > 0:
++            # Propagate SH down into the local functions.
++            def str_switch(b, sh=sh):
++                return '(insn >> {0}) & 0x{1:x}'.format(sh, b >> sh)
++
++            def str_case(b, sh=sh):
++                return '0x{0:x}'.format(b >> sh)
++        else:
++            def str_switch(b):
++                return 'insn & 0x{0:08x}'.format(b)
++
++            def str_case(b):
++                return '0x{0:08x}'.format(b)
++
++        output(ind, 'switch (', str_switch(self.thismask), ') {\n')
++        for b, s in sorted(self.subs):
++            assert (self.thismask & ~s.fixedmask) == 0
++            innermask = outermask | self.thismask
++            innerbits = outerbits | b
++            output(ind, 'case ', str_case(b), ':\n')
++            output(ind, '    /* ',
++                   str_match_bits(innerbits, innermask), ' */\n')
++            s.output_code(i + 4, extracted, innerbits, innermask)
++        output(ind, '}\n')
++        output(ind, 'return false;\n')
++# end Tree
++
++
++def build_tree(pats, outerbits, outermask):
++    # Find the intersection of all remaining fixedmask.
++    innermask = ~outermask
++    for i in pats:
++        innermask &= i.fixedmask
++
++    if innermask == 0:
++        pnames = []
++        for p in pats:
++            pnames.append(p.name + ':' + str(p.lineno))
++        error(pats[0].lineno, 'overlapping patterns:', pnames)
++
++    fullmask = outermask | innermask
++
++    # Sort each element of pats into the bin selected by the mask.
++    bins = {}
++    for i in pats:
++        fb = i.fixedbits & innermask
++        if fb in bins:
++            bins[fb].append(i)
++        else:
++            bins[fb] = [i]
++
++    # We must recurse if any bin has more than one element or if
++    # the single element in the bin has not been fully matched.
++    t = Tree(fullmask, innermask)
++
++    for b, l in bins.items():
++        s = l[0]
++        if len(l) > 1 or s.fixedmask & ~fullmask != 0:
++            s = build_tree(l, b | outerbits, fullmask)
++        t.subs.append((b, s))
++
++    return t
++# end build_tree
++
++
++def prop_format(tree):
++    """Propagate Format objects into the decode tree"""
++
++    # Depth first search.
++    for (b, s) in tree.subs:
++        if isinstance(s, Tree):
++            prop_format(s)
++
++    # If all entries in SUBS have the same format, then
++    # propagate that into the tree.
++    f = None
++    for (b, s) in tree.subs:
++        if f is None:
++            f = s.base
++            if f is None:
++                return
++        if f is not s.base:
++            return
++    tree.base = f
++# end prop_format
++
++
++def main():
++    global arguments
++    global formats
++    global patterns
++    global translate_scope
++    global translate_prefix
++    global output_file
++    global input_file
++    global insnwidth
++    global insntype
++
++    c_file = None
++    decode_function = 'decode'
++
++    long_opts = ['decode=', 'translate=', 'output=', 'insnwidth=']
++    try:
++        (opts, args) = getopt.getopt(sys.argv[1:], 'o:w:', long_opts)
++    except getopt.GetoptError as err:
++        error(0, err)
++    for o, a in opts:
++        if o in ('-o', '--output'):
++            c_file = a
++        elif o == '--decode':
++            decode_function = a
++        elif o == '--translate':
++            translate_prefix = a
++            translate_scope = ''
++        elif o in ('-w', '--insnwidth'):
++            insnwidth = int(a)
++            if insnwidth == 16:
++                insntype = 'uint16_t'
++            elif insnwidth != 32:
++                error(0, 'cannot handle insns of width', insnwidth)
++        else:
++            assert False, 'unhandled option'
++
++    if len(args) < 1:
++        error(0, 'missing input file')
++    input_file = args[0]
++    f = open(input_file, 'r')
++    parse_file(f)
++    f.close()
++
++    t = build_tree(patterns, 0, 0)
++    prop_format(t)
++
++    if c_file:
++        output_file = open(c_file, 'w')
++    else:
++        output_file = sys.stdout
++
++    output_autogen()
++    for n in sorted(arguments.keys()):
++        f = arguments[n]
++        f.output_def()
++
++    # A single translate function can be invoked for different patterns.
++    # Make sure that the argument sets are the same, and declare the
++    # function only once.
++    out_pats = {}
++    for i in patterns:
++        if i.name in out_pats:
++            p = out_pats[i.name]
++            if i.base.base != p.base.base:
++                error(0, i.name, ' has conflicting argument sets')
++        else:
++            i.output_decl()
++            out_pats[i.name] = i
++    output('\n')
++
++    for n in sorted(formats.keys()):
++        f = formats[n]
++        f.output_extract()
++
++    output('bool ', decode_function,
++           '(DisasContext *ctx, ', insntype, ' insn)\n{\n')
++
++    i4 = str_indent(4)
++    output(i4, 'union {\n')
++    for n in sorted(arguments.keys()):
++        f = arguments[n]
++        output(i4, i4, f.struct_name(), ' f_', f.name, ';\n')
++    output(i4, '} u;\n\n')
++
++    t.output_code(4, False, 0, 0)
++
++    output('}\n')
++
++    if c_file:
++        output_file.close()
++# end main
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f41da235ae..8cc7d56e97 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -928,6 +928,13 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
+ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
+ 	@diff -q $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
  
--/*
-- * Auxiliary context saved in the sigcontext.__reserved array. Not exported to
-- * user space as it will change with the addition of new context. User space
-- * should check the magic/size information.
-- */
--struct target_aux_context {
--    struct target_fpsimd_context fpsimd;
--    /* additional context to be added before "end" */
--    struct target_aarch64_ctx end;
-+#define TARGET_EXTRA_MAGIC  0x45585401
++.PHONY: check-decodetree
++check-decodetree:
++	$(call quiet-command, \
++	  cd $(SRC_PATH)/tests/decode && \
++          ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
++          TEST, decodetree.py)
 +
-+struct target_extra_context {
-+    struct target_aarch64_ctx head;
-+    uint64_t datap; /* 16-byte aligned pointer to extra space cast to __u64 */
-+    uint32_t size; /* size in bytes of the extra space */
-+    uint32_t reserved[3];
-+};
-+
-+#define TARGET_SVE_MAGIC    0x53564501
-+
-+struct target_sve_context {
-+    struct target_aarch64_ctx head;
-+    uint16_t vl;
-+    uint16_t reserved[3];
- };
+ # Consolidated targets
  
-+#define TARGET_SVE_VQ_BYTES  16
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+@@ -936,7 +943,7 @@ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-unit: $(patsubst %,check-%, $(check-unit-y))
+ check-speed: $(patsubst %,check-%, $(check-speed-y))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+-check: check-qapi-schema check-unit check-qtest
++check: check-qapi-schema check-unit check-qtest check-decodetree
+ check-clean:
+ 	$(MAKE) -C tests/tcg clean
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+diff --git a/tests/decode/check.sh b/tests/decode/check.sh
+new file mode 100755
+index 0000000000..6eb1392593
+--- /dev/null
++++ b/tests/decode/check.sh
+@@ -0,0 +1,16 @@
++#!/bin/sh
 +
-+#define TARGET_SVE_SIG_ZREG_SIZE(VQ)  ((VQ) * TARGET_SVE_VQ_BYTES)
-+#define TARGET_SVE_SIG_PREG_SIZE(VQ)  ((VQ) * (TARGET_SVE_VQ_BYTES / 8))
++PYTHON=$1
++DECODETREE=$2
++E=0
 +
-+#define TARGET_SVE_SIG_REGS_OFFSET \
-+    QEMU_ALIGN_UP(sizeof(struct target_sve_context), TARGET_SVE_VQ_BYTES)
-+#define TARGET_SVE_SIG_ZREG_OFFSET(VQ, N) \
-+    (TARGET_SVE_SIG_REGS_OFFSET + TARGET_SVE_SIG_ZREG_SIZE(VQ) * (N))
-+#define TARGET_SVE_SIG_PREG_OFFSET(VQ, N) \
-+    (TARGET_SVE_SIG_ZREG_OFFSET(VQ, 32) + TARGET_SVE_SIG_PREG_SIZE(VQ) * (N))
-+#define TARGET_SVE_SIG_FFR_OFFSET(VQ) \
-+    (TARGET_SVE_SIG_PREG_OFFSET(VQ, 16))
-+#define TARGET_SVE_SIG_CONTEXT_SIZE(VQ) \
-+    (TARGET_SVE_SIG_PREG_OFFSET(VQ, 17))
++# All of these tests should produce errors
++for i in err_*.def; do
++    if $PYTHON $DECODETREE $i > /dev/null 2> /dev/null; then
++        # Pass, aka failed to fail.
++        echo FAIL: $i 1>&2
++        E=1
++    fi
++done
 +
- struct target_rt_sigframe {
-     struct target_siginfo info;
-     struct target_ucontext uc;
-+};
-+
-+struct target_rt_frame_record {
-     uint64_t fp;
-     uint64_t lr;
-     uint32_t tramp[2];
- };
- 
--static int target_setup_sigframe(struct target_rt_sigframe *sf,
--                                 CPUARMState *env, target_sigset_t *set)
-+static void target_setup_general_frame(struct target_rt_sigframe *sf,
-+                                       CPUARMState *env, target_sigset_t *set)
- {
-     int i;
--    struct target_aux_context *aux =
--        (struct target_aux_context *)sf->uc.tuc_mcontext.__reserved;
- 
--    /* set up the stack frame for unwinding */
--    __put_user(env->xregs[29], &sf->fp);
--    __put_user(env->xregs[30], &sf->lr);
-+    __put_user(0, &sf->uc.tuc_flags);
-+    __put_user(0, &sf->uc.tuc_link);
-+
-+    __put_user(target_sigaltstack_used.ss_sp, &sf->uc.tuc_stack.ss_sp);
-+    __put_user(sas_ss_flags(env->xregs[31]), &sf->uc.tuc_stack.ss_flags);
-+    __put_user(target_sigaltstack_used.ss_size, &sf->uc.tuc_stack.ss_size);
- 
-     for (i = 0; i < 31; i++) {
-         __put_user(env->xregs[i], &sf->uc.tuc_mcontext.regs[i]);
-@@ -1485,39 +1511,79 @@ static int target_setup_sigframe(struct target_rt_sigframe *sf,
-     for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-         __put_user(set->sig[i], &sf->uc.tuc_sigmask.sig[i]);
-     }
-+}
-+
-+static void target_setup_end_record(struct target_aarch64_ctx *end)
-+{
-+    __put_user(0, &end->magic);
-+    __put_user(0, &end->size);
-+}
-+
-+static void target_setup_fpsimd_record(struct target_fpsimd_context *fpsimd,
-+                                       CPUARMState *env)
-+{
-+    int i;
-+
-+    __put_user(TARGET_FPSIMD_MAGIC, &fpsimd->head.magic);
-+    __put_user(sizeof(struct target_fpsimd_context), &fpsimd->head.size);
-+    __put_user(vfp_get_fpsr(env), &fpsimd->fpsr);
-+    __put_user(vfp_get_fpcr(env), &fpsimd->fpcr);
- 
-     for (i = 0; i < 32; i++) {
-         uint64_t *q = aa64_vfp_qreg(env, i);
- #ifdef TARGET_WORDS_BIGENDIAN
--        __put_user(q[0], &aux->fpsimd.vregs[i * 2 + 1]);
--        __put_user(q[1], &aux->fpsimd.vregs[i * 2]);
-+        __put_user(q[0], &fpsimd->vregs[i * 2 + 1]);
-+        __put_user(q[1], &fpsimd->vregs[i * 2]);
- #else
--        __put_user(q[0], &aux->fpsimd.vregs[i * 2]);
--        __put_user(q[1], &aux->fpsimd.vregs[i * 2 + 1]);
-+        __put_user(q[0], &fpsimd->vregs[i * 2]);
-+        __put_user(q[1], &fpsimd->vregs[i * 2 + 1]);
- #endif
-     }
--    __put_user(vfp_get_fpsr(env), &aux->fpsimd.fpsr);
--    __put_user(vfp_get_fpcr(env), &aux->fpsimd.fpcr);
--    __put_user(TARGET_FPSIMD_MAGIC, &aux->fpsimd.head.magic);
--    __put_user(sizeof(struct target_fpsimd_context),
--            &aux->fpsimd.head.size);
-+}
- 
--    /* set the "end" magic */
--    __put_user(0, &aux->end.magic);
--    __put_user(0, &aux->end.size);
-+static void target_setup_extra_record(struct target_extra_context *extra,
-+                                      uint64_t datap, uint32_t extra_size)
-+{
-+    __put_user(TARGET_EXTRA_MAGIC, &extra->head.magic);
-+    __put_user(sizeof(struct target_extra_context), &extra->head.size);
-+    __put_user(datap, &extra->datap);
-+    __put_user(extra_size, &extra->size);
-+}
- 
--    return 0;
-+static void target_setup_sve_record(struct target_sve_context *sve,
-+                                    CPUARMState *env, int vq, int size)
-+{
-+    int i, j;
-+
-+    __put_user(TARGET_SVE_MAGIC, &sve->head.magic);
-+    __put_user(size, &sve->head.size);
-+    __put_user(vq * TARGET_SVE_VQ_BYTES, &sve->vl);
-+
-+    /* Note that SVE regs are stored as a byte stream, with each byte element
-+     * at a subsequent address.  This corresponds to a little-endian store
-+     * of our 64-bit hunks.
-+     */
-+    for (i = 0; i < 32; ++i) {
-+        uint64_t *z = (void *)sve + TARGET_SVE_SIG_ZREG_OFFSET(vq, i);
-+        for (j = 0; j < vq * 2; ++j) {
-+            __put_user_e(env->vfp.zregs[i].d[j], z + j, le);
-+        }
-+    }
-+    for (i = 0; i <= 16; ++i) {
-+        uint16_t *p = (void *)sve + TARGET_SVE_SIG_PREG_OFFSET(vq, i);
-+        for (j = 0; j < vq; ++j) {
-+            uint64_t r = env->vfp.pregs[i].p[j >> 2];
-+            __put_user_e(r >> ((j & 3) * 16), p + j, le);
-+        }
-+    }
- }
- 
--static int target_restore_sigframe(CPUARMState *env,
--                                   struct target_rt_sigframe *sf)
-+static void target_restore_general_frame(CPUARMState *env,
-+                                         struct target_rt_sigframe *sf)
- {
-     sigset_t set;
--    int i;
--    struct target_aux_context *aux =
--        (struct target_aux_context *)sf->uc.tuc_mcontext.__reserved;
--    uint32_t magic, size, fpsr, fpcr;
-     uint64_t pstate;
-+    int i;
- 
-     target_to_host_sigset(&set, &sf->uc.tuc_sigmask);
-     set_sigmask(&set);
-@@ -1530,34 +1596,134 @@ static int target_restore_sigframe(CPUARMState *env,
-     __get_user(env->pc, &sf->uc.tuc_mcontext.pc);
-     __get_user(pstate, &sf->uc.tuc_mcontext.pstate);
-     pstate_write(env, pstate);
-+}
- 
--    __get_user(magic, &aux->fpsimd.head.magic);
--    __get_user(size, &aux->fpsimd.head.size);
-+static void target_restore_fpsimd_record(CPUARMState *env,
-+                                         struct target_fpsimd_context *fpsimd)
-+{
-+    uint32_t fpsr, fpcr;
-+    int i;
- 
--    if (magic != TARGET_FPSIMD_MAGIC
--        || size != sizeof(struct target_fpsimd_context)) {
--        return 1;
--    }
-+    __get_user(fpsr, &fpsimd->fpsr);
-+    vfp_set_fpsr(env, fpsr);
-+    __get_user(fpcr, &fpsimd->fpcr);
-+    vfp_set_fpcr(env, fpcr);
- 
-     for (i = 0; i < 32; i++) {
-         uint64_t *q = aa64_vfp_qreg(env, i);
- #ifdef TARGET_WORDS_BIGENDIAN
--        __get_user(q[0], &aux->fpsimd.vregs[i * 2 + 1]);
--        __get_user(q[1], &aux->fpsimd.vregs[i * 2]);
-+        __get_user(q[0], &fpsimd->vregs[i * 2 + 1]);
-+        __get_user(q[1], &fpsimd->vregs[i * 2]);
- #else
--        __get_user(q[0], &aux->fpsimd.vregs[i * 2]);
--        __get_user(q[1], &aux->fpsimd.vregs[i * 2 + 1]);
-+        __get_user(q[0], &fpsimd->vregs[i * 2]);
-+        __get_user(q[1], &fpsimd->vregs[i * 2 + 1]);
- #endif
-     }
--    __get_user(fpsr, &aux->fpsimd.fpsr);
--    vfp_set_fpsr(env, fpsr);
--    __get_user(fpcr, &aux->fpsimd.fpcr);
--    vfp_set_fpcr(env, fpcr);
-+}
-+
-+static void target_restore_sve_record(CPUARMState *env,
-+                                      struct target_sve_context *sve, int vq)
-+{
-+    int i, j;
-+
-+    /* Note that SVE regs are stored as a byte stream, with each byte element
-+     * at a subsequent address.  This corresponds to a little-endian store
-+     * of our 64-bit hunks.
-+     */
-+    for (i = 0; i < 32; ++i) {
-+        uint64_t *z = (void *)sve + TARGET_SVE_SIG_ZREG_OFFSET(vq, i);
-+        for (j = 0; j < vq * 2; ++j) {
-+            __get_user_e(env->vfp.zregs[i].d[j], z + j, le);
-+        }
-+    }
-+    for (i = 0; i <= 16; ++i) {
-+        uint16_t *p = (void *)sve + TARGET_SVE_SIG_PREG_OFFSET(vq, i);
-+        for (j = 0; j < vq; ++j) {
-+            uint16_t r;
-+            __get_user_e(r, p + j, le);
-+            if (j & 3) {
-+                env->vfp.pregs[i].p[j >> 2] |= (uint64_t)r << ((j & 3) * 16);
-+            } else {
-+                env->vfp.pregs[i].p[j >> 2] = r;
-+            }
-+        }
-+    }
-+}
-+
-+static int target_restore_sigframe(CPUARMState *env,
-+                                   struct target_rt_sigframe *sf)
-+{
-+    struct target_aarch64_ctx *ctx, *extra = NULL;
-+    struct target_fpsimd_context *fpsimd = NULL;
-+    struct target_sve_context *sve = NULL;
-+    int vq = 0, sve_size = 0;
-+
-+    target_restore_general_frame(env, sf);
-+
-+    ctx = (struct target_aarch64_ctx *)sf->uc.tuc_mcontext.__reserved;
-+    while (ctx) {
-+        uint32_t magic, size;
-+
-+        __get_user(magic, &ctx->magic);
-+        __get_user(size, &ctx->size);
-+        switch (magic) {
-+        case TARGET_FPSIMD_MAGIC:
-+            if (fpsimd || size != sizeof(struct target_fpsimd_context)) {
-+                return 1;
-+            }
-+            fpsimd = (struct target_fpsimd_context *)ctx;
-+            break;
-+
-+        case TARGET_SVE_MAGIC:
-+            if (arm_feature(env, ARM_FEATURE_SVE)) {
-+                vq = (env->vfp.zcr_el[1] & 0xf) + 1;
-+                sve_size = QEMU_ALIGN_UP(TARGET_SVE_SIG_CONTEXT_SIZE(vq), 16);
-+                if (!sve && size == sve_size) {
-+                    sve = (struct target_sve_context *)ctx;
-+                    break;
-+                }
-+            }
-+            return 1;
-+
-+        case TARGET_EXTRA_MAGIC:
-+            if (size != sizeof(struct target_extra_context)) {
-+                return 1;
-+            }
-+            extra = (void *)((struct target_extra_context *)ctx)->datap;
-+            break;
-+
-+        default:
-+            /* Unknown record -- we certainly didn't generate it.
-+               Did we in fact get out of sync?  */
-+            return 1;
-+
-+        case 0:
-+            if (size != 0) {
-+                return 1;
-+            }
-+            ctx = extra;
-+            extra = NULL;
-+            continue;
-+        }
-+        ctx = (void *)ctx + size;
-+    }
-+
-+    /* Require FPSIMD always, since we always restore FPSR/FPCR from there.  */
-+    if (!fpsimd) {
-+        return 1;
-+    }
-+    target_restore_fpsimd_record(env, fpsimd);
-+
-+    /* SVE data, if present, overwrites FPSIMD data.  */
-+    if (sve) {
-+        target_restore_sve_record(env, sve, vq);
-+    }
- 
-     return 0;
- }
- 
--static abi_ulong get_sigframe(struct target_sigaction *ka, CPUARMState *env)
-+static abi_ulong get_sigframe(struct target_sigaction *ka,
-+                              CPUARMState *env, int size)
- {
-     abi_ulong sp;
- 
-@@ -1570,7 +1736,7 @@ static abi_ulong get_sigframe(struct target_sigaction *ka, CPUARMState *env)
-         sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-     }
- 
--    sp = (sp - sizeof(struct target_rt_sigframe)) & ~15;
-+    sp = (sp - size) & ~15;
- 
-     return sp;
- }
-@@ -1579,25 +1745,76 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
-                                target_siginfo_t *info, target_sigset_t *set,
-                                CPUARMState *env)
- {
-+    int std_size = sizeof(struct target_rt_sigframe);
-+    int size = offsetof(struct target_rt_sigframe, uc.tuc_mcontext.__reserved);
-+    int fpsimd_ofs, end1_ofs, fr_ofs;
-+    int sve_ofs = 0, extra_ofs = 0, end2_ofs = 0;
-+    int vq = 0, sve_size = 0, extra_size = 0;
-     struct target_rt_sigframe *frame;
-+    struct target_rt_frame_record *fr;
-     abi_ulong frame_addr, return_addr;
- 
--    frame_addr = get_sigframe(ka, env);
-+    /* Reserve space for standard exit marker.  */
-+    std_size -= sizeof(struct target_aarch64_ctx);
-+
-+    /* FPSIMD record is always in the standard space.  */
-+    fpsimd_ofs = size;
-+    size += sizeof(struct target_fpsimd_context);
-+    end1_ofs = size;
-+
-+    /* SVE state needs saving only if it exists.  */
-+    if (arm_feature(env, ARM_FEATURE_SVE)) {
-+        vq = (env->vfp.zcr_el[1] & 0xf) + 1;
-+        sve_size = QEMU_ALIGN_UP(TARGET_SVE_SIG_CONTEXT_SIZE(vq), 16);
-+
-+        /* For VQ <= 6, there is room in the standard space.  */
-+        if (sve_size <= std_size) {
-+            sve_ofs = size;
-+            size += sve_size;
-+            end1_ofs = size;
-+        } else {
-+            /* Otherwise we need to allocate extra space.  */
-+            extra_ofs = size;
-+            size += sizeof(struct target_extra_context);
-+            end1_ofs = size;
-+            size += QEMU_ALIGN_UP(sizeof(struct target_aarch64_ctx), 16);
-+
-+            extra_size = sve_size + sizeof(struct target_aarch64_ctx);
-+            sve_ofs = size;
-+            size += sve_size;
-+            end2_ofs = size;
-+        }
-+    }
-+    size += sizeof(struct target_aarch64_ctx);
-+
-+    fr_ofs = size;
-+    size += sizeof(struct target_rt_frame_record);
-+
-+    frame_addr = get_sigframe(ka, env, size);
-     trace_user_setup_frame(env, frame_addr);
-     if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
-         goto give_sigsegv;
-     }
- 
--    __put_user(0, &frame->uc.tuc_flags);
--    __put_user(0, &frame->uc.tuc_link);
-+    target_setup_general_frame(frame, env, set);
-+    target_setup_fpsimd_record((void *)frame + fpsimd_ofs, env);
-+    if (extra_ofs) {
-+        target_setup_extra_record((void *)frame + extra_ofs,
-+                                  frame_addr + sve_ofs, extra_size);
-+    }
-+    target_setup_end_record((void *)frame + end1_ofs);
-+    if (sve_ofs) {
-+        target_setup_sve_record((void *)frame + sve_ofs, env, vq, sve_size);
-+    }
-+    if (end2_ofs) {
-+        target_setup_end_record((void *)frame + end2_ofs);
-+    }
-+
-+    /* set up the stack frame for unwinding */
-+    fr = (void *)frame + fr_ofs;
-+    __put_user(env->xregs[29], &fr->fp);
-+    __put_user(env->xregs[30], &fr->lr);
- 
--    __put_user(target_sigaltstack_used.ss_sp,
--                      &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->xregs[31]),
--                      &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--                      &frame->uc.tuc_stack.ss_size);
--    target_setup_sigframe(frame, env, set);
-     if (ka->sa_flags & TARGET_SA_RESTORER) {
-         return_addr = ka->sa_restorer;
-     } else {
-@@ -1606,13 +1823,14 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
-          * Since these are instructions they need to be put as little-endian
-          * regardless of target default or current CPU endianness.
-          */
--        __put_user_e(0xd2801168, &frame->tramp[0], le);
--        __put_user_e(0xd4000001, &frame->tramp[1], le);
--        return_addr = frame_addr + offsetof(struct target_rt_sigframe, tramp);
-+        __put_user_e(0xd2801168, &fr->tramp[0], le);
-+        __put_user_e(0xd4000001, &fr->tramp[1], le);
-+        return_addr = frame_addr + fr_ofs
-+            + offsetof(struct target_rt_frame_record, tramp);
-     }
-     env->xregs[0] = usig;
-     env->xregs[31] = frame_addr;
--    env->xregs[29] = env->xregs[31] + offsetof(struct target_rt_sigframe, fp);
-+    env->xregs[29] = frame_addr + fr_ofs;
-     env->pc = ka->_sa_handler;
-     env->xregs[30] = return_addr;
-     if (info) {
++exit $E
+diff --git a/tests/decode/err_argset1.def b/tests/decode/err_argset1.def
+new file mode 100644
+index 0000000000..65d089d582
+--- /dev/null
++++ b/tests/decode/err_argset1.def
+@@ -0,0 +1 @@
++&args	a a
+diff --git a/tests/decode/err_argset2.def b/tests/decode/err_argset2.def
+new file mode 100644
+index 0000000000..16a812cf0d
+--- /dev/null
++++ b/tests/decode/err_argset2.def
+@@ -0,0 +1 @@
++&args	a b c d0 0e
+diff --git a/tests/decode/err_field1.def b/tests/decode/err_field1.def
+new file mode 100644
+index 0000000000..075404ced1
+--- /dev/null
++++ b/tests/decode/err_field1.def
+@@ -0,0 +1 @@
++%field	asdf
+diff --git a/tests/decode/err_field2.def b/tests/decode/err_field2.def
+new file mode 100644
+index 0000000000..08933bf8c9
+--- /dev/null
++++ b/tests/decode/err_field2.def
+@@ -0,0 +1 @@
++%field	0:33
+diff --git a/tests/decode/err_field3.def b/tests/decode/err_field3.def
+new file mode 100644
+index 0000000000..ecb6427a40
+--- /dev/null
++++ b/tests/decode/err_field3.def
+@@ -0,0 +1 @@
++%field	31:2
+diff --git a/tests/decode/err_field4.def b/tests/decode/err_field4.def
+new file mode 100644
+index 0000000000..2844afc24a
+--- /dev/null
++++ b/tests/decode/err_field4.def
+@@ -0,0 +1,2 @@
++%field	0:1
++%field	0:1
+diff --git a/tests/decode/err_field5.def b/tests/decode/err_field5.def
+new file mode 100644
+index 0000000000..cc3ea844ae
+--- /dev/null
++++ b/tests/decode/err_field5.def
+@@ -0,0 +1 @@
++%field	0:1	!function=a !function=a
+diff --git a/tests/decode/err_init1.def b/tests/decode/err_init1.def
+new file mode 100644
+index 0000000000..2c986cf627
+--- /dev/null
++++ b/tests/decode/err_init1.def
+@@ -0,0 +1,2 @@
++&args	a b
++insn	00000000 00000000 00000000 b:8	&args
+diff --git a/tests/decode/err_init2.def b/tests/decode/err_init2.def
+new file mode 100644
+index 0000000000..7c80854ea5
+--- /dev/null
++++ b/tests/decode/err_init2.def
+@@ -0,0 +1,2 @@
++&args	a b
++insn	00000000 00000000 a:8 b:8	&args a=1
+diff --git a/tests/decode/err_init3.def b/tests/decode/err_init3.def
+new file mode 100644
+index 0000000000..15a3060c61
+--- /dev/null
++++ b/tests/decode/err_init3.def
+@@ -0,0 +1,3 @@
++&args	a
++@format	........ ........ a:16	&args
++insn	00000000 00000000 a:16	@format
+diff --git a/tests/decode/err_init4.def b/tests/decode/err_init4.def
+new file mode 100644
+index 0000000000..b84d968acd
+--- /dev/null
++++ b/tests/decode/err_init4.def
+@@ -0,0 +1,3 @@
++&args	a b
++@format	........ ........ a:16			&args
++insn	00000000 00000000 ........ ........	@format
+diff --git a/tests/decode/err_overlap1.def b/tests/decode/err_overlap1.def
+new file mode 100644
+index 0000000000..5d39c2ddad
+--- /dev/null
++++ b/tests/decode/err_overlap1.def
+@@ -0,0 +1,2 @@
++%field	0:1
++insn	00000000 00000000 00000000 00000000 	%field
+diff --git a/tests/decode/err_overlap2.def b/tests/decode/err_overlap2.def
+new file mode 100644
+index 0000000000..38e4f8ae31
+--- /dev/null
++++ b/tests/decode/err_overlap2.def
+@@ -0,0 +1,2 @@
++@format		........ ........ ........ ....... fld:1
++insn		00000000 00000000 00000000 00000000		@format
+diff --git a/tests/decode/err_overlap3.def b/tests/decode/err_overlap3.def
+new file mode 100644
+index 0000000000..90c73f4f30
+--- /dev/null
++++ b/tests/decode/err_overlap3.def
+@@ -0,0 +1,2 @@
++%field	0:1
++insn	00000000 00000000 00000000 --------	%field
+diff --git a/tests/decode/err_overlap4.def b/tests/decode/err_overlap4.def
+new file mode 100644
+index 0000000000..d83f8e3153
+--- /dev/null
++++ b/tests/decode/err_overlap4.def
+@@ -0,0 +1,2 @@
++@format		........ ........ ........ .......-
++insn		00000000 00000000 00000000 00000000	@format
+diff --git a/tests/decode/err_overlap5.def b/tests/decode/err_overlap5.def
+new file mode 100644
+index 0000000000..2f4359bb9b
+--- /dev/null
++++ b/tests/decode/err_overlap5.def
+@@ -0,0 +1 @@
++%field	3:5 0:5
+diff --git a/tests/decode/err_overlap6.def b/tests/decode/err_overlap6.def
+new file mode 100644
+index 0000000000..bf446a3092
+--- /dev/null
++++ b/tests/decode/err_overlap6.def
+@@ -0,0 +1,2 @@
++@format		........ ........ ........ .......1
++insn		00000000 00000000 00000000 00000000	@format
+diff --git a/tests/decode/err_overlap7.def b/tests/decode/err_overlap7.def
+new file mode 100644
+index 0000000000..44d914163b
+--- /dev/null
++++ b/tests/decode/err_overlap7.def
+@@ -0,0 +1,2 @@
++insn1		00000000 00000000 00000000 00000000
++insn2		00000000 00000000 00000000 00000000
 -- 
 2.14.3
