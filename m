@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3g-00075r-V6
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:37 -0500
+	(envelope-from <armbru@redhat.com>) id 1eko3l-0007Bu-Pj
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006NB-LR
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:28 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44356 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1eko3d-0006RY-OW
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:33 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36023 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3Y-0006Ld-7Y
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:20 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3d-0006Pm-0i
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:25 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 11 Feb 2018 10:35:55 +0100
-Message-Id: <20180211093607.27351-18-armbru@redhat.com>
+Date: Sun, 11 Feb 2018 10:35:56 +0100
+Message-Id: <20180211093607.27351-19-armbru@redhat.com>
 In-Reply-To: <20180211093607.27351-1-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 17/29] qapi: Record 'include' directives in
- intermediate representation
+Subject: [Qemu-devel] [PATCH v2 18/29] qapi: Rename generated qmp-marshal.c
+ to qmp-commands.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,327 +27,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
-The include directive permits modular QAPI schemata, but the generated
-code is monolithic all the same.  To permit generating modular code,
-the front end needs to pass more information on inclusions to the back
-ends.  The commit before last added the necessary information to the
-parse tree.  This commit adds it to the intermediate representation
-and its QAPISchemaVisitor.  A later commit will use this to to
-generate modular code.
+All generated .c are named like their .h, except for qmp-marshal.c and
+qmp-commands.h.  To add to the confusion, tests-qmp-commands.c falsely
+matches generated test-qmp-commands.h.
 
-New entity QAPISchemaInclude represents inclusions.  Call new visitor
-method visit_include() for it, so visitors can see the sub-modules a
-module includes.
-
-Note that unlike other entities, QAPISchemaInclude has no name, and is
-therefore not added to entity_dict.
-
-New QAPISchemaEntity attribute @module names the entity's source file.
-Call new visitor method visit_module() when it changes during a visit,
-so visitors can keep track of the module being visited.
+Get rid of this unnecessary complication.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/common.py                   | 44 ++++++++++++++++++++++++++=
-++----
- tests/qapi-schema/comments.out           |  1 +
- tests/qapi-schema/doc-bad-section.out    |  1 +
- tests/qapi-schema/doc-good.out           |  1 +
- tests/qapi-schema/event-case.out         |  1 +
- tests/qapi-schema/ident-with-escape.out  |  1 +
- tests/qapi-schema/include-relpath.out    |  5 ++++
- tests/qapi-schema/include-repetition.out | 10 ++++++++
- tests/qapi-schema/include-simple.out     |  3 +++
- tests/qapi-schema/indented-expr.out      |  1 +
- tests/qapi-schema/qapi-schema-test.out   |  1 +
- tests/qapi-schema/test-qapi.py           |  7 +++++
- 12 files changed, 71 insertions(+), 5 deletions(-)
+ .gitignore                                     |  3 +--
+ Makefile                                       |  6 +++---
+ Makefile.objs                                  |  2 +-
+ docs/devel/qapi-code-gen.txt                   |  6 +++---
+ qga/Makefile.objs                              |  2 +-
+ scripts/qapi/commands.py                       |  2 +-
+ tests/.gitignore                               |  5 ++---
+ tests/Makefile.include                         | 10 +++++-----
+ tests/{test-qmp-commands.c => test-qmp-cmds.c} |  0
+ 9 files changed, 17 insertions(+), 19 deletions(-)
+ rename tests/{test-qmp-commands.c => test-qmp-cmds.c} (100%)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index b531ab519f..29d98ca934 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -985,8 +985,9 @@ def check_exprs(exprs):
-=20
- class QAPISchemaEntity(object):
-     def __init__(self, name, info, doc):
--        assert isinstance(name, str)
-+        assert name is None or isinstance(name, str)
-         self.name =3D name
-+        self.module =3D None
-         # For explicitly defined entities, info points to the (explicit)
-         # definition.  For builtins (and their arrays), info is None.
-         # For implicitly defined entities, info points to a place that
-@@ -1015,10 +1016,16 @@ class QAPISchemaVisitor(object):
-     def visit_end(self):
-         pass
-=20
-+    def visit_module(self, fname):
-+        pass
-+
-     def visit_needed(self, entity):
-         # Default to visiting everything
-         return True
-=20
-+    def visit_include(self, fname, info):
-+        pass
-+
-     def visit_builtin_type(self, name, info, json_type):
-         pass
-=20
-@@ -1045,6 +1052,16 @@ class QAPISchemaVisitor(object):
-         pass
-=20
-=20
-+class QAPISchemaInclude(QAPISchemaEntity):
-+
-+    def __init__(self, fname, info):
-+        QAPISchemaEntity.__init__(self, None, info, None)
-+        self.fname =3D fname
-+
-+    def visit(self, visitor):
-+        visitor.visit_include(self.fname, self.info)
-+
-+
- class QAPISchemaType(QAPISchemaEntity):
-     # Return the C type for common use.
-     # For the types we commonly box, this is a pointer type.
-@@ -1472,6 +1489,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
-=20
- class QAPISchema(object):
-     def __init__(self, fname):
-+        self._fname =3D fname
-         parser =3D QAPISchemaParser(open(fname, 'r'))
-         exprs =3D check_exprs(parser.exprs)
-         self.docs =3D parser.docs
-@@ -1479,16 +1497,19 @@ class QAPISchema(object):
-         self._entity_dict =3D {}
-         self._predefining =3D True
-         self._def_predefineds()
--        self._predefining =3D False
-         self._def_exprs(exprs)
-         self.check()
-=20
-     def _def_entity(self, ent):
-         # Only the predefined types are allowed to not have info
-         assert ent.info or self._predefining
--        assert ent.name not in self._entity_dict
-+        assert ent.name is None or ent.name not in self._entity_dict
-         self._entity_list.append(ent)
--        self._entity_dict[ent.name] =3D ent
-+        if ent.name is not None:
-+            self._entity_dict[ent.name] =3D ent
-+        if ent.info:
-+            ent.module =3D os.path.relpath(ent.info['file'],
-+                                         os.path.dirname(self._fname))
-=20
-     def lookup_entity(self, name, typ=3DNone):
-         ent =3D self._entity_dict.get(name)
-@@ -1499,6 +1520,15 @@ class QAPISchema(object):
-     def lookup_type(self, name):
-         return self.lookup_entity(name, QAPISchemaType)
-=20
-+    def _def_include(self, expr, info, doc):
-+        include =3D expr['include']
-+        assert doc is None
-+        main_info =3D info
-+        while main_info['parent']:
-+            main_info =3D main_info['parent']
-+        fname =3D os.path.relpath(include, os.path.dirname(main_info['fi=
-le']))
-+        self._def_entity(QAPISchemaInclude(fname, info))
-+
-     def _def_builtin_type(self, name, json_type, c_type):
-         self._def_entity(QAPISchemaBuiltinType(name, json_type, c_type))
-         # TODO As long as we have QAPI_TYPES_BUILTIN to share multiple
-@@ -1681,7 +1711,7 @@ class QAPISchema(object):
-             elif 'event' in expr:
-                 self._def_event(expr, info, doc)
-             elif 'include' in expr:
--                pass
-+                self._def_include(expr, info, doc)
-             else:
-                 assert False
-=20
-@@ -1691,8 +1721,12 @@ class QAPISchema(object):
-=20
-     def visit(self, visitor):
-         visitor.visit_begin(self)
-+        module =3D None
-         for entity in self._entity_list:
-             if visitor.visit_needed(entity):
-+                if entity.module !=3D module:
-+                    module =3D entity.module
-+                    visitor.visit_module(module)
-                 entity.visit(visitor)
-         visitor.visit_end()
-=20
-diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.=
-out
-index 0261ddf202..8d2f1ce8a2 100644
---- a/tests/qapi-schema/comments.out
-+++ b/tests/qapi-schema/comments.out
-@@ -1,4 +1,5 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module comments.json
- enum Status ['good', 'bad', 'ugly']
-diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
-c-bad-section.out
-index 23bf8c71ab..cd28721568 100644
---- a/tests/qapi-schema/doc-bad-section.out
-+++ b/tests/qapi-schema/doc-bad-section.out
-@@ -1,6 +1,7 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module doc-bad-section.json
- enum Enum ['one', 'two']
- doc symbol=3DEnum
-     body=3D
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
-out
-index 0c07301f07..430b5a87db 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -1,6 +1,7 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module doc-good.json
- enum Enum ['one', 'two']
- object Base
-     member base1: Enum optional=3DFalse
-diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-c=
-ase.out
-index 110571b793..88c0964917 100644
---- a/tests/qapi-schema/event-case.out
-+++ b/tests/qapi-schema/event-case.out
-@@ -1,5 +1,6 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module event-case.json
- event oops None
-    boxed=3DFalse
-diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/=
-ident-with-escape.out
-index 8336aa7629..ee3b34e623 100644
---- a/tests/qapi-schema/ident-with-escape.out
-+++ b/tests/qapi-schema/ident-with-escape.out
-@@ -1,6 +1,7 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module ident-with-escape.json
- object q_obj_fooA-arg
-     member bar1: str optional=3DFalse
- command fooA q_obj_fooA-arg -> None
-diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/in=
-clude-relpath.out
-index 0261ddf202..ebbabd7a18 100644
---- a/tests/qapi-schema/include-relpath.out
-+++ b/tests/qapi-schema/include-relpath.out
-@@ -1,4 +1,9 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module include-relpath.json
-+include include/relpath.json
-+module include/relpath.json
-+include include-relpath-sub.json
-+module include-relpath-sub.json
- enum Status ['good', 'bad', 'ugly']
-diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema=
-/include-repetition.out
-index 0261ddf202..7235e055bc 100644
---- a/tests/qapi-schema/include-repetition.out
-+++ b/tests/qapi-schema/include-repetition.out
-@@ -1,4 +1,14 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module include-repetition.json
-+include comments.json
-+module comments.json
- enum Status ['good', 'bad', 'ugly']
-+module include-repetition.json
-+include include-repetition-sub.json
-+module include-repetition-sub.json
-+include comments.json
-+include comments.json
-+module include-repetition.json
-+include comments.json
-diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/inc=
-lude-simple.out
-index 0261ddf202..006f723eeb 100644
---- a/tests/qapi-schema/include-simple.out
-+++ b/tests/qapi-schema/include-simple.out
-@@ -1,4 +1,7 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module include-simple.json
-+include include-simple-sub.json
-+module include-simple-sub.json
- enum Status ['good', 'bad', 'ugly']
-diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/inde=
-nted-expr.out
-index 34de8be426..a79935e8c3 100644
---- a/tests/qapi-schema/indented-expr.out
-+++ b/tests/qapi-schema/indented-expr.out
-@@ -1,6 +1,7 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module indented-expr.json
- command eins None -> None
-    gen=3DTrue success_response=3DTrue boxed=3DFalse
- command zwei None -> None
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 50706b0136..012e7fc06a 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -1,6 +1,7 @@
- object q_empty
- enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-     prefix QTYPE
-+module qapi-schema-test.json
- object TestStruct
-     member integer: int optional=3DFalse
-     member boolean: bool optional=3DFalse
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index 4da14b43af..67e417e298 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -16,6 +16,13 @@ from qapi.common import QAPIError, QAPISchema, QAPISch=
-emaVisitor
-=20
-=20
- class QAPISchemaTestVisitor(QAPISchemaVisitor):
-+
-+    def visit_module(self, name):
-+        print('module %s' % name)
-+
-+    def visit_include(self, name, info):
-+        print('include %s' % name)
-+
-     def visit_enum_type(self, name, info, values, prefix):
-         print('enum %s %s' % (name, values))
-         if prefix:
---=20
+diff --git a/.gitignore b/.gitignore
+index 2f9a92f6cc..7d783e6e66 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -33,9 +33,8 @@
+ /qapi-visit.[ch]
+ /qapi-event.[ch]
+ /qapi-doc.texi
+-/qmp-commands.h
++/qmp-commands.[ch]
+ /qmp-introspect.[ch]
+-/qmp-marshal.c
+ /qemu-doc.html
+ /qemu-doc.info
+ /qemu-doc.txt
+diff --git a/Makefile b/Makefile
+index bd781c6aad..164a38578e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -91,7 +91,7 @@ include $(SRC_PATH)/rules.mak
+ 
+ GENERATED_FILES = qemu-version.h config-host.h qemu-options.def
+ GENERATED_FILES += qmp-commands.h qapi-types.h qapi-visit.h qapi-event.h
+-GENERATED_FILES += qmp-marshal.c qapi-types.c qapi-visit.c qapi-event.c
++GENERATED_FILES += qmp-commands.c qapi-types.c qapi-visit.c qapi-event.c
+ GENERATED_FILES += qmp-introspect.h
+ GENERATED_FILES += qmp-introspect.c
+ GENERATED_FILES += qapi-doc.texi
+@@ -496,7 +496,7 @@ $(SRC_PATH)/scripts/qapi-gen.py
+ 
+ qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
+ qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h \
+-qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal.c \
++qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-commands.c \
+ qga/qapi-generated/qga-qapi-doc.texi: \
+ qga/qapi-generated/qapi-gen-timestamp ;
+ qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
+@@ -522,7 +522,7 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+ 
+ qapi-types.c qapi-types.h \
+ qapi-visit.c qapi-visit.h \
+-qmp-commands.h qmp-marshal.c \
++qmp-commands.h qmp-commands.c \
+ qapi-event.c qapi-event.h \
+ qmp-introspect.h qmp-introspect.c \
+ qapi-doc.texi: \
+diff --git a/Makefile.objs b/Makefile.objs
+index 2efba6d768..d255aaf194 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -78,7 +78,7 @@ common-obj-$(CONFIG_FDT) += device_tree.o
+ ######################################################################
+ # qapi
+ 
+-common-obj-y += qmp-marshal.o
++common-obj-y += qmp-commands.o
+ common-obj-y += qmp-introspect.o
+ common-obj-y += qmp.o hmp.o
+ endif
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 1a1cbaea7b..ba1dc73298 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -1147,8 +1147,8 @@ declares qmp_COMMAND() that the user must implement.
+ 
+ The following files are generated:
+ 
+-$(prefix)qmp-marshal.c: Command marshal/dispatch functions for each
+-                        QMP command defined in the schema
++$(prefix)qmp-commands.c: Command marshal/dispatch functions for each
++                         QMP command defined in the schema
+ 
+ $(prefix)qmp-commands.h: Function prototypes for the QMP commands
+                          specified in the schema
+@@ -1170,7 +1170,7 @@ Example:
+     void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp);
+ 
+     #endif
+-    $ cat qapi-generated/example-qmp-marshal.c
++    $ cat qapi-generated/example-qmp-commands.c
+ [Uninteresting stuff omitted...]
+ 
+     static void qmp_marshal_output_UserDefOne(UserDefOne *ret_in, QObject **ret_out, Error **errp)
+diff --git a/qga/Makefile.objs b/qga/Makefile.objs
+index 1c5986c0bb..6151378ae4 100644
+--- a/qga/Makefile.objs
++++ b/qga/Makefile.objs
+@@ -3,6 +3,6 @@ qga-obj-$(CONFIG_POSIX) += commands-posix.o channel-posix.o
+ qga-obj-$(CONFIG_WIN32) += commands-win32.o channel-win32.o service-win32.o
+ qga-obj-$(CONFIG_WIN32) += vss-win32.o
+ qga-obj-y += qapi-generated/qga-qapi-types.o qapi-generated/qga-qapi-visit.o
+-qga-obj-y += qapi-generated/qga-qmp-marshal.o
++qga-obj-y += qapi-generated/qga-qmp-commands.o
+ 
+ qga-vss-dll-obj-$(CONFIG_QGA_VSS) += vss-win32/
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index a744611d58..05fe33a03b 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -289,5 +289,5 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+     schema.visit(vis)
+     genc.add(vis.defn)
+     genh.add(vis.decl)
+-    genc.write(output_dir, prefix + 'qmp-marshal.c')
++    genc.write(output_dir, prefix + 'qmp-commands.c')
+     genh.write(output_dir, prefix + 'qmp-commands.h')
+diff --git a/tests/.gitignore b/tests/.gitignore
+index e5c744b7ed..2629cfc2f9 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -70,13 +70,12 @@ test-qdist
+ test-qga
+ test-qht
+ test-qht-par
+-test-qmp-commands
+-test-qmp-commands.h
++test-qmp-cmds
++test-qmp-commands.[ch]
+ test-qmp-event
+ test-qobject-input-strict
+ test-qobject-input-visitor
+ test-qmp-introspect.[ch]
+-test-qmp-marshal.c
+ test-qobject-output-visitor
+ test-rcu-list
+ test-replication
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b406531b34..9a21ed7ee9 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -61,8 +61,8 @@ check-unit-y += tests/test-clone-visitor$(EXESUF)
+ gcov-files-test-clone-visitor-y = qapi/qapi-clone-visitor.c
+ check-unit-y += tests/test-qobject-input-visitor$(EXESUF)
+ gcov-files-test-qobject-input-visitor-y = qapi/qobject-input-visitor.c
+-check-unit-y += tests/test-qmp-commands$(EXESUF)
+-gcov-files-test-qmp-commands-y = qapi/qmp-dispatch.c
++check-unit-y += tests/test-qmp-cmds$(EXESUF)
++gcov-files-test-qmp-cmds-y = qapi/qmp-dispatch.c
+ check-unit-y += tests/test-string-input-visitor$(EXESUF)
+ gcov-files-test-string-input-visitor-y = qapi/string-input-visitor.c
+ check-unit-y += tests/test-string-output-visitor$(EXESUF)
+@@ -576,7 +576,7 @@ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+ 	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.o \
+ 	tests/test-clone-visitor.o \
+ 	tests/test-qobject-input-visitor.o \
+-	tests/test-qmp-commands.o tests/test-visitor-serialization.o \
++	tests/test-qmp-cmds.o tests/test-visitor-serialization.o \
+ 	tests/test-x86-cpuid.o tests/test-mul64.o tests/test-int128.o \
+ 	tests/test-opts-visitor.o tests/test-qmp-event.o \
+ 	tests/rcutorture.o tests/test-rcu-list.o \
+@@ -656,7 +656,7 @@ tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-obj-y) \
+ 
+ tests/test-qapi-types.c tests/test-qapi-types.h \
+ tests/test-qapi-visit.c tests/test-qapi-visit.h \
+-tests/test-qmp-commands.h tests/test-qmp-marshal.c \
++tests/test-qmp-commands.h tests/test-qmp-commands.c \
+ tests/test-qapi-event.c tests/test-qapi-event.h \
+ tests/test-qmp-introspect.c tests/test-qmp-introspect.h: \
+ tests/test-qapi-gen-timestamp ;
+@@ -679,7 +679,7 @@ tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-obj-y)
+ tests/test-qobject-output-visitor$(EXESUF): tests/test-qobject-output-visitor.o $(test-qapi-obj-y)
+ tests/test-clone-visitor$(EXESUF): tests/test-clone-visitor.o $(test-qapi-obj-y)
+ tests/test-qobject-input-visitor$(EXESUF): tests/test-qobject-input-visitor.o $(test-qapi-obj-y)
+-tests/test-qmp-commands$(EXESUF): tests/test-qmp-commands.o tests/test-qmp-marshal.o $(test-qapi-obj-y)
++tests/test-qmp-cmds$(EXESUF): tests/test-qmp-cmds.o tests/test-qmp-commands.o $(test-qapi-obj-y)
+ tests/test-visitor-serialization$(EXESUF): tests/test-visitor-serialization.o $(test-qapi-obj-y)
+ tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
+ 
+diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-cmds.c
+similarity index 100%
+rename from tests/test-qmp-commands.c
+rename to tests/test-qmp-cmds.c
+-- 
 2.13.6
