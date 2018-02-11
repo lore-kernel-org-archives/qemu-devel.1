@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3b-00070o-92
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1eko3d-00071a-9K
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006M2-48
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36016 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006Mv-HS
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:25 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44358 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3X-0006I1-H8
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:19 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3Y-0006Lc-6E
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:20 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 11 Feb 2018 10:36:06 +0100
-Message-Id: <20180211093607.27351-29-armbru@redhat.com>
+Date: Sun, 11 Feb 2018 10:36:07 +0100
+Message-Id: <20180211093607.27351-30-armbru@redhat.com>
 In-Reply-To: <20180211093607.27351-1-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 28/29] Fix up dangling references to
- qmp-commands.* in comment and doc
+Subject: [Qemu-devel] [PATCH v2 29/29] qapi: Don't create useless directory
+ qapi-generated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +27,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
-Fix up the reference to qmp-commands.hx in qmp.c.  Missed in commit
-5032a16d1d.
-
-Fix up the reference to qmp-commands.txt in
-docs/xen-save-devices-state.txt.  Missed in commit 4d8bb958fa.
+We used to generate first test and later QGA QAPI code into
+qapi-generated/.  Commit b93b63f574 moved the test code to tests/.
+Commit 54c2e50205 moved the QGA code to qga/qapi-generated/.  The
+directory has been unused since.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/xen-save-devices-state.txt |  3 +--
- qmp.c                           | 14 +++++++-------
- 2 files changed, 8 insertions(+), 9 deletions(-)
+ .gitignore | 1 -
+ Makefile   | 1 -
+ configure  | 1 -
+ 3 files changed, 3 deletions(-)
 
-diff --git a/docs/xen-save-devices-state.txt b/docs/xen-save-devices-state.txt
-index a72ecc8081..1912ecad25 100644
---- a/docs/xen-save-devices-state.txt
-+++ b/docs/xen-save-devices-state.txt
-@@ -8,8 +8,7 @@ These operations are normally used with migration (see migration.txt),
- however it is also possible to save the state of all devices to file,
- without saving the RAM or the block devices of the VM.
- 
--This operation is called "xen-save-devices-state" (see
--qmp-commands.txt)
-+The save operation is available as QMP command xen-save-devices-state.
- 
- 
- The binary format used in the file is the following:
-diff --git a/qmp.c b/qmp.c
-index a8d4eba973..ba82e1df9f 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -147,13 +147,13 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
- 
- #ifndef CONFIG_SPICE
- /*
-- * qmp-commands.hx ensures that QMP command query-spice exists only
-- * #ifdef CONFIG_SPICE.  Necessary for an accurate query-commands
-- * result.  However, the QAPI schema is blissfully unaware of that,
-- * and the QAPI code generator happily generates a dead
-- * qmp_marshal_query_spice() that calls qmp_query_spice().  Provide it
-- * one, or else linking fails.  FIXME Educate the QAPI schema on
-- * CONFIG_SPICE.
-+ * qmp_unregister_commands_hack() ensures that QMP command query-spice
-+ * exists only #ifdef CONFIG_SPICE.  Necessary for an accurate
-+ * query-commands result.  However, the QAPI schema is blissfully
-+ * unaware of that, and the QAPI code generator happily generates a
-+ * dead qmp_marshal_query_spice() that calls qmp_query_spice().
-+ * Provide it one, or else linking fails.  FIXME Educate the QAPI
-+ * schema on CONFIG_SPICE.
-  */
- SpiceInfo *qmp_query_spice(Error **errp)
- {
+diff --git a/.gitignore b/.gitignore
+index dabfe6bea8..4055e12ee8 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -27,7 +27,6 @@
+ /libuser
+ /linux-headers/asm
+ /qga/qapi-generated
+-/qapi-generated
+ /qapi-gen-timestamp
+ /qapi/qapi-builtin-types.[ch]
+ /qapi/qapi-builtin-visit.[ch]
+diff --git a/Makefile b/Makefile
+index 84411ee6ab..7eb1ede6f4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -726,7 +726,6 @@ clean:
+ 	rm -f trace/generated-tracers-dtrace.h*
+ 	rm -f $(foreach f,$(GENERATED_FILES),$(f) $(f)-timestamp)
+ 	rm -f qapi-gen-timestamp
+-	rm -rf qapi-generated
+ 	rm -rf qga/qapi-generated
+ 	for d in $(ALL_SUBDIRS); do \
+ 	if test -d $$d; then $(MAKE) -C $$d $@ || exit 1; fi; \
+diff --git a/configure b/configure
+index 62562f08cf..f564a1639e 100755
+--- a/configure
++++ b/configure
+@@ -7015,7 +7015,6 @@ DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-sche
+ DIRS="$DIRS docs docs/interop fsdev scsi"
+ DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
+ DIRS="$DIRS roms/seabios roms/vgabios"
+-DIRS="$DIRS qapi-generated"
+ FILES="Makefile tests/tcg/Makefile qdict-test-data.txt"
+ FILES="$FILES tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
+ FILES="$FILES tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
 -- 
 2.13.6
