@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3f-000745-Ob
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:35 -0500
+	(envelope-from <armbru@redhat.com>) id 1eko3g-00075r-V6
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006MG-8X
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:27 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53994 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006NB-LR
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:28 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44356 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3X-0006HX-I9
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:19 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3Y-0006Ld-7Y
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:20 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 11 Feb 2018 10:35:43 +0100
-Message-Id: <20180211093607.27351-6-armbru@redhat.com>
+Date: Sun, 11 Feb 2018 10:35:55 +0100
+Message-Id: <20180211093607.27351-18-armbru@redhat.com>
 In-Reply-To: <20180211093607.27351-1-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 05/29] qapi: New classes QAPIGenC, QAPIGenH,
- QAPIGenDoc
+Subject: [Qemu-devel] [PATCH v2 17/29] qapi: Record 'include' directives in
+ intermediate representation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,424 +30,327 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
-These classes encapsulate accumulating and writing output.
+The include directive permits modular QAPI schemata, but the generated
+code is monolithic all the same.  To permit generating modular code,
+the front end needs to pass more information on inclusions to the back
+ends.  The commit before last added the necessary information to the
+parse tree.  This commit adds it to the intermediate representation
+and its QAPISchemaVisitor.  A later commit will use this to to
+generate modular code.
 
-Convert C code generation to QAPIGenC and QAPIGenH.  The conversion is
-rather shallow: most of the output accumulation is not converted.
-Left for later.
+New entity QAPISchemaInclude represents inclusions.  Call new visitor
+method visit_include() for it, so visitors can see the sub-modules a
+module includes.
 
-The indentation machinery uses a single global variable indent_level,
-even though we generally interleave creation of a .c and its .h.  It
-should become instance variable of QAPIGenC.  Also left for later.
+Note that unlike other entities, QAPISchemaInclude has no name, and is
+therefore not added to entity_dict.
 
-Documentation generation isn't converted, and QAPIGenDoc isn't used.
-This will change shortly.
+New QAPISchemaEntity attribute @module names the entity's source file.
+Call new visitor method visit_module() when it changes during a visit,
+so visitors can keep track of the module being visited.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi-commands.py   | 23 +++++------
- scripts/qapi-event.py      | 22 ++++++-----
- scripts/qapi-introspect.py | 18 +++++----
- scripts/qapi-types.py      | 22 ++++++-----
- scripts/qapi-visit.py      | 22 ++++++-----
- scripts/qapi.py            | 99 +++++++++++++++++++++++++---------------=
-------
- 6 files changed, 112 insertions(+), 94 deletions(-)
+ scripts/qapi/common.py                   | 44 ++++++++++++++++++++++++++=
+++----
+ tests/qapi-schema/comments.out           |  1 +
+ tests/qapi-schema/doc-bad-section.out    |  1 +
+ tests/qapi-schema/doc-good.out           |  1 +
+ tests/qapi-schema/event-case.out         |  1 +
+ tests/qapi-schema/ident-with-escape.out  |  1 +
+ tests/qapi-schema/include-relpath.out    |  5 ++++
+ tests/qapi-schema/include-repetition.out | 10 ++++++++
+ tests/qapi-schema/include-simple.out     |  3 +++
+ tests/qapi-schema/indented-expr.out      |  1 +
+ tests/qapi-schema/qapi-schema-test.out   |  1 +
+ tests/qapi-schema/test-qapi.py           |  7 +++++
+ 12 files changed, 71 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index c3aa52fce1..8d38ade076 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -260,12 +260,10 @@ blurb =3D '''
-  * Schema-defined QAPI/QMP commands
- '''
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index b531ab519f..29d98ca934 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -985,8 +985,9 @@ def check_exprs(exprs):
 =20
--(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
--                            'qmp-marshal.c', 'qmp-commands.h',
--                            blurb, __doc__)
--
--fdef.write(mcgen('''
-+genc =3D QAPIGenC(blurb, __doc__)
-+genh =3D QAPIGenH(blurb, __doc__)
-=20
-+genc.add(mcgen('''
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qemu/module.h"
-@@ -280,20 +278,23 @@ fdef.write(mcgen('''
- #include "%(prefix)sqmp-commands.h"
-=20
- ''',
--                 prefix=3Dprefix))
-+               prefix=3Dprefix))
-=20
--fdecl.write(mcgen('''
-+genh.add(mcgen('''
- #include "%(prefix)sqapi-types.h"
- #include "qapi/qmp/dispatch.h"
-=20
- void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
- ''',
--                  prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3DF=
-alse)))
-+               prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3DFals=
-e)))
-=20
- schema =3D QAPISchema(input_file)
- vis =3D QAPISchemaGenCommandVisitor()
- schema.visit(vis)
--fdef.write(vis.defn)
--fdecl.write(vis.decl)
-+genc.add(vis.defn)
-+genh.add(vis.decl)
-=20
--close_output(fdef, fdecl)
-+if do_c:
-+    genc.write(output_dir, prefix + 'qmp-marshal.c')
-+if do_h:
-+    genh.write(output_dir, prefix + 'qmp-commands.h')
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index edb9ddb650..bd7a9be3dc 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -176,11 +176,10 @@ blurb =3D '''
-  * Schema-defined QAPI/QMP events
- '''
-=20
--(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
--                            'qapi-event.c', 'qapi-event.h',
--                            blurb, __doc__)
-+genc =3D QAPIGenC(blurb, __doc__)
-+genh =3D QAPIGenH(blurb, __doc__)
-=20
--fdef.write(mcgen('''
-+genc.add(mcgen('''
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "%(prefix)sqapi-event.h"
-@@ -191,21 +190,24 @@ fdef.write(mcgen('''
- #include "qapi/qmp-event.h"
-=20
- ''',
--                 prefix=3Dprefix))
-+               prefix=3Dprefix))
-=20
--fdecl.write(mcgen('''
-+genh.add(mcgen('''
- #include "qapi/util.h"
- #include "%(prefix)sqapi-types.h"
-=20
- ''',
--                  prefix=3Dprefix))
-+               prefix=3Dprefix))
-=20
- event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DFalse)
-=20
- schema =3D QAPISchema(input_file)
- vis =3D QAPISchemaGenEventVisitor()
- schema.visit(vis)
--fdef.write(vis.defn)
--fdecl.write(vis.decl)
-+genc.add(vis.defn)
-+genh.add(vis.decl)
-=20
--close_output(fdef, fdecl)
-+if do_c:
-+    genc.write(output_dir, prefix + 'qapi-event.c')
-+if do_h:
-+    genh.write(output_dir, prefix + 'qapi-event.h')
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index ebe8706f41..3d65690fe3 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -181,21 +181,23 @@ blurb =3D '''
-  * QAPI/QMP schema introspection
- '''
-=20
--(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
--                            'qmp-introspect.c', 'qmp-introspect.h',
--                            blurb, __doc__)
-+genc =3D QAPIGenC(blurb, __doc__)
-+genh =3D QAPIGenH(blurb, __doc__)
-=20
--fdef.write(mcgen('''
-+genc.add(mcgen('''
- #include "qemu/osdep.h"
- #include "%(prefix)sqmp-introspect.h"
-=20
- ''',
--                 prefix=3Dprefix))
-+               prefix=3Dprefix))
-=20
- schema =3D QAPISchema(input_file)
- vis =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
- schema.visit(vis)
--fdef.write(vis.defn)
--fdecl.write(vis.decl)
-+genc.add(vis.defn)
-+genh.add(vis.decl)
-=20
--close_output(fdef, fdecl)
-+if do_c:
-+    genc.write(output_dir, prefix + 'qmp-introspect.c')
-+if do_h:
-+    genh.write(output_dir, prefix + 'qmp-introspect.h')
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index 4db8424da1..c0ac879beb 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -180,7 +180,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-         self.decl =3D ''
-         self.defn =3D ''
-         self._fwdecl =3D ''
--        self._btin =3D guardstart('QAPI_TYPES_BUILTIN')
-+        self._btin =3D '\n' + guardstart('QAPI_TYPES_BUILTIN')
-=20
+ class QAPISchemaEntity(object):
+     def __init__(self, name, info, doc):
+-        assert isinstance(name, str)
++        assert name is None or isinstance(name, str)
+         self.name =3D name
++        self.module =3D None
+         # For explicitly defined entities, info points to the (explicit)
+         # definition.  For builtins (and their arrays), info is None.
+         # For implicitly defined entities, info points to a place that
+@@ -1015,10 +1016,16 @@ class QAPISchemaVisitor(object):
      def visit_end(self):
-         self.decl =3D self._fwdecl + self.decl
-@@ -256,26 +256,28 @@ blurb =3D '''
-  * Schema-defined QAPI types
- '''
+         pass
 =20
--(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
--                            'qapi-types.c', 'qapi-types.h',
--                            blurb, __doc__)
-+genc =3D QAPIGenC(blurb, __doc__)
-+genh =3D QAPIGenH(blurb, __doc__)
-=20
--fdef.write(mcgen('''
-+genc.add(mcgen('''
- #include "qemu/osdep.h"
- #include "qapi/dealloc-visitor.h"
- #include "%(prefix)sqapi-types.h"
- #include "%(prefix)sqapi-visit.h"
- ''',
--                 prefix=3Dprefix))
-+               prefix=3Dprefix))
-=20
--fdecl.write(mcgen('''
-+genh.add(mcgen('''
- #include "qapi/util.h"
- '''))
-=20
- schema =3D QAPISchema(input_file)
- vis =3D QAPISchemaGenTypeVisitor()
- schema.visit(vis)
--fdef.write(vis.defn)
--fdecl.write(vis.decl)
-+genc.add(vis.defn)
-+genh.add(vis.decl)
-=20
--close_output(fdef, fdecl)
-+if do_c:
-+    genc.write(output_dir, prefix + 'qapi-types.c')
-+if do_h:
-+    genh.write(output_dir, prefix + 'qapi-types.h')
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 3c1a0e2544..888c686303 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -339,30 +339,32 @@ blurb =3D '''
-  * Schema-defined QAPI visitors
- '''
-=20
--(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
--                            'qapi-visit.c', 'qapi-visit.h',
--                            blurb, __doc__)
-+genc =3D QAPIGenC(blurb, __doc__)
-+genh =3D QAPIGenH(blurb, __doc__)
-=20
--fdef.write(mcgen('''
-+genc.add(mcgen('''
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
- #include "%(prefix)sqapi-visit.h"
- ''',
--                 prefix=3Dprefix))
-+               prefix=3Dprefix))
-=20
--fdecl.write(mcgen('''
-+genh.add(mcgen('''
- #include "qapi/visitor.h"
- #include "%(prefix)sqapi-types.h"
-=20
- ''',
--                  prefix=3Dprefix))
-+               prefix=3Dprefix))
-=20
- schema =3D QAPISchema(input_file)
- vis =3D QAPISchemaGenVisitVisitor()
- schema.visit(vis)
--fdef.write(vis.defn)
--fdecl.write(vis.decl)
-+genc.add(vis.defn)
-+genh.add(vis.decl)
-=20
--close_output(fdef, fdecl)
-+if do_c:
-+    genc.write(output_dir, prefix + 'qapi-visit.c')
-+if do_h:
-+    genh.write(output_dir, prefix + 'qapi-visit.h')
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 26c45cee34..9693fd1851 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -2,7 +2,7 @@
- # QAPI helper library
- #
- # Copyright IBM, Corp. 2011
--# Copyright (c) 2013-2016 Red Hat Inc.
-+# Copyright (c) 2013-2018 Red Hat Inc.
- #
- # Authors:
- #  Anthony Liguori <aliguori@us.ibm.com>
-@@ -22,10 +22,6 @@ try:
-     from collections import OrderedDict
- except:
-     from ordereddict import OrderedDict
--try:
--    from StringIO import StringIO
--except ImportError:
--    from io import StringIO
-=20
- builtin_types =3D {
-     'null':     'QTYPE_QNULL',
-@@ -1831,7 +1827,6 @@ def guardname(filename):
-=20
- def guardstart(name):
-     return mcgen('''
--
- #ifndef %(name)s
- #define %(name)s
-=20
-@@ -1843,7 +1838,6 @@ def guardend(name):
-     return mcgen('''
-=20
- #endif /* %(name)s */
--
- ''',
-                  name=3Dguardname(name))
-=20
-@@ -1980,17 +1974,53 @@ def parse_command_line(extra_options=3D'', extra_=
-long_options=3D[]):
-=20
-     return (fname, output_dir, do_c, do_h, prefix, extra_opts)
-=20
++    def visit_module(self, fname):
++        pass
 +
- #
--# Generate output files with boilerplate
-+# Accumulate and write output
- #
+     def visit_needed(self, entity):
+         # Default to visiting everything
+         return True
 =20
-+class QAPIGen(object):
++    def visit_include(self, fname, info):
++        pass
 +
-+    def __init__(self):
-+        self._preamble =3D ''
-+        self._body =3D ''
+     def visit_builtin_type(self, name, info, json_type):
+         pass
+=20
+@@ -1045,6 +1052,16 @@ class QAPISchemaVisitor(object):
+         pass
+=20
+=20
++class QAPISchemaInclude(QAPISchemaEntity):
 +
-+    def preamble_add(self, text):
-+        self._preamble +=3D text
++    def __init__(self, fname, info):
++        QAPISchemaEntity.__init__(self, None, info, None)
++        self.fname =3D fname
 +
-+    def add(self, text):
-+        self._body +=3D text
-+
-+    def _top(self, fname):
-+        return ''
-+
-+    def _bottom(self, fname):
-+        return ''
-+
-+    def write(self, output_dir, fname):
-+        if output_dir:
-+            try:
-+                os.makedirs(output_dir)
-+            except os.error as e:
-+                if e.errno !=3D errno.EEXIST:
-+                    raise
-+        f =3D open(os.path.join(output_dir, fname), 'w')
-+        f.write(self._top(fname) + self._preamble + self._body
-+                + self._bottom(fname))
-+        f.close()
++    def visit(self, visitor):
++        visitor.visit_include(self.fname, self.info)
 +
 +
-+class QAPIGenC(QAPIGen):
+ class QAPISchemaType(QAPISchemaEntity):
+     # Return the C type for common use.
+     # For the types we commonly box, this is a pointer type.
+@@ -1472,6 +1489,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+=20
+ class QAPISchema(object):
+     def __init__(self, fname):
++        self._fname =3D fname
+         parser =3D QAPISchemaParser(open(fname, 'r'))
+         exprs =3D check_exprs(parser.exprs)
+         self.docs =3D parser.docs
+@@ -1479,16 +1497,19 @@ class QAPISchema(object):
+         self._entity_dict =3D {}
+         self._predefining =3D True
+         self._def_predefineds()
+-        self._predefining =3D False
+         self._def_exprs(exprs)
+         self.check()
+=20
+     def _def_entity(self, ent):
+         # Only the predefined types are allowed to not have info
+         assert ent.info or self._predefining
+-        assert ent.name not in self._entity_dict
++        assert ent.name is None or ent.name not in self._entity_dict
+         self._entity_list.append(ent)
+-        self._entity_dict[ent.name] =3D ent
++        if ent.name is not None:
++            self._entity_dict[ent.name] =3D ent
++        if ent.info:
++            ent.module =3D os.path.relpath(ent.info['file'],
++                                         os.path.dirname(self._fname))
+=20
+     def lookup_entity(self, name, typ=3DNone):
+         ent =3D self._entity_dict.get(name)
+@@ -1499,6 +1520,15 @@ class QAPISchema(object):
+     def lookup_type(self, name):
+         return self.lookup_entity(name, QAPISchemaType)
+=20
++    def _def_include(self, expr, info, doc):
++        include =3D expr['include']
++        assert doc is None
++        main_info =3D info
++        while main_info['parent']:
++            main_info =3D main_info['parent']
++        fname =3D os.path.relpath(include, os.path.dirname(main_info['fi=
+le']))
++        self._def_entity(QAPISchemaInclude(fname, info))
 +
-+    def __init__(self, blurb, pydoc):
-+        QAPIGen.__init__(self)
-+        self._blurb =3D blurb.strip('\n')
-+        self._copyright =3D '\n * '.join(re.findall(r'^Copyright .*', py=
-doc,
-+                                                  re.MULTILINE))
+     def _def_builtin_type(self, name, json_type, c_type):
+         self._def_entity(QAPISchemaBuiltinType(name, json_type, c_type))
+         # TODO As long as we have QAPI_TYPES_BUILTIN to share multiple
+@@ -1681,7 +1711,7 @@ class QAPISchema(object):
+             elif 'event' in expr:
+                 self._def_event(expr, info, doc)
+             elif 'include' in expr:
+-                pass
++                self._def_include(expr, info, doc)
+             else:
+                 assert False
 =20
--def open_output(output_dir, do_c, do_h, prefix, c_file, h_file, blurb, d=
-oc):
--    guard =3D guardname(prefix + h_file)
--    c_file =3D output_dir + prefix + c_file
--    h_file =3D output_dir + prefix + h_file
--    copyright =3D '\n * '.join(re.findall(r'^Copyright .*', doc, re.MULT=
-ILINE))
--    comment =3D mcgen('''/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
-+    def _top(self, fname):
-+        return mcgen('''
-+/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
+@@ -1691,8 +1721,12 @@ class QAPISchema(object):
 =20
- /*
- %(blurb)s
-@@ -2002,40 +2032,19 @@ def open_output(output_dir, do_c, do_h, prefix, c=
-_file, h_file, blurb, doc):
-  */
+     def visit(self, visitor):
+         visitor.visit_begin(self)
++        module =3D None
+         for entity in self._entity_list:
+             if visitor.visit_needed(entity):
++                if entity.module !=3D module:
++                    module =3D entity.module
++                    visitor.visit_module(module)
+                 entity.visit(visitor)
+         visitor.visit_end()
 =20
- ''',
--                    blurb=3Dblurb.strip('\n'), copyright=3Dcopyright)
-+                     blurb=3Dself._blurb, copyright=3Dself._copyright)
+diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.=
+out
+index 0261ddf202..8d2f1ce8a2 100644
+--- a/tests/qapi-schema/comments.out
++++ b/tests/qapi-schema/comments.out
+@@ -1,4 +1,5 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module comments.json
+ enum Status ['good', 'bad', 'ugly']
+diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
+c-bad-section.out
+index 23bf8c71ab..cd28721568 100644
+--- a/tests/qapi-schema/doc-bad-section.out
++++ b/tests/qapi-schema/doc-bad-section.out
+@@ -1,6 +1,7 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module doc-bad-section.json
+ enum Enum ['one', 'two']
+ doc symbol=3DEnum
+     body=3D
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
+out
+index 0c07301f07..430b5a87db 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -1,6 +1,7 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module doc-good.json
+ enum Enum ['one', 'two']
+ object Base
+     member base1: Enum optional=3DFalse
+diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-c=
+ase.out
+index 110571b793..88c0964917 100644
+--- a/tests/qapi-schema/event-case.out
++++ b/tests/qapi-schema/event-case.out
+@@ -1,5 +1,6 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module event-case.json
+ event oops None
+    boxed=3DFalse
+diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/=
+ident-with-escape.out
+index 8336aa7629..ee3b34e623 100644
+--- a/tests/qapi-schema/ident-with-escape.out
++++ b/tests/qapi-schema/ident-with-escape.out
+@@ -1,6 +1,7 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module ident-with-escape.json
+ object q_obj_fooA-arg
+     member bar1: str optional=3DFalse
+ command fooA q_obj_fooA-arg -> None
+diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/in=
+clude-relpath.out
+index 0261ddf202..ebbabd7a18 100644
+--- a/tests/qapi-schema/include-relpath.out
++++ b/tests/qapi-schema/include-relpath.out
+@@ -1,4 +1,9 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module include-relpath.json
++include include/relpath.json
++module include/relpath.json
++include include-relpath-sub.json
++module include-relpath-sub.json
+ enum Status ['good', 'bad', 'ugly']
+diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema=
+/include-repetition.out
+index 0261ddf202..7235e055bc 100644
+--- a/tests/qapi-schema/include-repetition.out
++++ b/tests/qapi-schema/include-repetition.out
+@@ -1,4 +1,14 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module include-repetition.json
++include comments.json
++module comments.json
+ enum Status ['good', 'bad', 'ugly']
++module include-repetition.json
++include include-repetition-sub.json
++module include-repetition-sub.json
++include comments.json
++include comments.json
++module include-repetition.json
++include comments.json
+diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/inc=
+lude-simple.out
+index 0261ddf202..006f723eeb 100644
+--- a/tests/qapi-schema/include-simple.out
++++ b/tests/qapi-schema/include-simple.out
+@@ -1,4 +1,7 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module include-simple.json
++include include-simple-sub.json
++module include-simple-sub.json
+ enum Status ['good', 'bad', 'ugly']
+diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/inde=
+nted-expr.out
+index 34de8be426..a79935e8c3 100644
+--- a/tests/qapi-schema/indented-expr.out
++++ b/tests/qapi-schema/indented-expr.out
+@@ -1,6 +1,7 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module indented-expr.json
+ command eins None -> None
+    gen=3DTrue success_response=3DTrue boxed=3DFalse
+ command zwei None -> None
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 50706b0136..012e7fc06a 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -1,6 +1,7 @@
+ object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
+     prefix QTYPE
++module qapi-schema-test.json
+ object TestStruct
+     member integer: int optional=3DFalse
+     member boolean: bool optional=3DFalse
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index 4da14b43af..67e417e298 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -16,6 +16,13 @@ from qapi.common import QAPIError, QAPISchema, QAPISch=
+emaVisitor
 =20
--    if output_dir:
--        try:
--            os.makedirs(output_dir)
--        except os.error as e:
--            if e.errno !=3D errno.EEXIST:
--                raise
 =20
--    def maybe_open(really, name, opt):
--        if really:
--            return open(name, opt)
--        else:
--            return StringIO()
-+class QAPIGenH(QAPIGenC):
-=20
--    fdef =3D maybe_open(do_c, c_file, 'w')
--    fdecl =3D maybe_open(do_h, h_file, 'w')
-+    def _top(self, fname):
-+        return QAPIGenC._top(self, fname) + guardstart(fname)
-=20
--    fdef.write(comment)
--    fdecl.write(comment)
--    fdecl.write(mcgen('''
--#ifndef %(guard)s
--#define %(guard)s
-+    def _bottom(self, fname):
-+        return guardend(fname)
-=20
--''',
--                      guard=3Dguard))
-=20
--    return (fdef, fdecl)
--
--
--def close_output(fdef, fdecl):
--    fdecl.write(mcgen('''
--
--#endif
--'''))
--    fdecl.close()
--    fdef.close()
-+class QAPIGenDoc(QAPIGen):
-+    def _top(self, fname):
-+        return (QAPIGen._top(self, fname)
-+                + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
+ class QAPISchemaTestVisitor(QAPISchemaVisitor):
++
++    def visit_module(self, name):
++        print('module %s' % name)
++
++    def visit_include(self, name, info):
++        print('include %s' % name)
++
+     def visit_enum_type(self, name, info, values, prefix):
+         print('enum %s %s' % (name, values))
+         if prefix:
 --=20
 2.13.6
