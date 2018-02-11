@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3b-00070i-24
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1eko3a-00070f-RN
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006Lo-3z
+	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006Ln-3e
 	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:22 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39184 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39186 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3X-0006HR-GX
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3X-0006HS-GP
 	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:19 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 11 Feb 2018 10:35:39 +0100
-Message-Id: <20180211093607.27351-2-armbru@redhat.com>
+Date: Sun, 11 Feb 2018 10:35:48 +0100
+Message-Id: <20180211093607.27351-11-armbru@redhat.com>
 In-Reply-To: <20180211093607.27351-1-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/29] Include qapi/qmp/qerror.h exactly
- where needed
+Subject: [Qemu-devel] [PATCH v2 10/29] qapi: Touch generated files only when
+ they change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +27,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- block.c                 | 1 -
- block/qcow2.c           | 1 -
- chardev/char-fe.c       | 1 +
- chardev/char.c          | 1 +
- qom/object_interfaces.c | 1 +
- scripts/qapi-visit.py   | 2 +-
- 6 files changed, 4 insertions(+), 3 deletions(-)
+A massive number of objects depends on QAPI-generated headers.  In my
+"build everything" tree, it's roughly 4800 out of 5100.  This is
+particularly annoying when only some of the generated files change,
+say for a doc fix.
 
-diff --git a/block.c b/block.c
-index f94585b230..05a484b4b8 100644
---- a/block.c
-+++ b/block.c
-@@ -32,7 +32,6 @@
- #include "qemu/module.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
--#include "qapi/qmp/qerror.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qstring.h"
- #include "sysemu/block-backend.h"
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a64a572785..9245deac19 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -30,7 +30,6 @@
- #include "block/qcow2.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
--#include "qapi/qmp/qerror.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi-event.h"
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index c611b3fa3e..e5f870e4d2 100644
---- a/chardev/char-fe.c
-+++ b/chardev/char-fe.c
-@@ -24,6 +24,7 @@
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
- #include "qapi-visit.h"
- #include "sysemu/replay.h"
+Improve qapi-gen.py to touch its output files only if they actually
+change.  Rebuild time for a QAPI doc fix drops from many minutes to a
+few seconds.  Rebuilds get faster for certain code changes, too.  For
+instance, adding a simple QMP event now recompiles less than 200
+instead of 4800 objects.  But adding a QAPI type is as bad as ever;
+we've clearly got more work to do.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ scripts/qapi/common.py | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 8290795dc1..2e58573a39 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1951,9 +1951,16 @@ class QAPIGen(object):
+             except os.error as e:
+                 if e.errno != errno.EEXIST:
+                     raise
+-        f = open(os.path.join(output_dir, fname), 'w')
+-        f.write(self._top(fname) + self._preamble + self._body
++        fd = os.open(os.path.join(output_dir, fname),
++                     os.O_RDWR | os.O_CREAT, 0666)
++        f = os.fdopen(fd, 'r+')
++        text = (self._top(fname) + self._preamble + self._body
+                 + self._bottom(fname))
++        oldtext = f.read(len(text) + 1)
++        if text != oldtext:
++            f.seek(0)
++            f.truncate(0)
++            f.write(text)
+         f.close()
  
-diff --git a/chardev/char.c b/chardev/char.c
-index 01d979a1da..c9a4da5516 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -32,6 +32,7 @@
- #include "qmp-commands.h"
- #include "qapi-visit.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
- #include "sysemu/replay.h"
- #include "qemu/help_option.h"
- #include "qemu/option.h"
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 80d09139be..43d9aa0946 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -1,6 +1,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qerror.h"
- #include "qom/object_interfaces.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 7e1cfc13f0..bc2b8b581a 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -371,13 +371,13 @@ fdef.write(mcgen('''
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
- #include "%(prefix)sqapi-visit.h"
- ''',
-                  prefix=prefix))
  
- fdecl.write(mcgen('''
- #include "qapi/visitor.h"
--#include "qapi/qmp/qerror.h"
- #include "%(prefix)sqapi-types.h"
- 
- ''',
 -- 
 2.13.6
