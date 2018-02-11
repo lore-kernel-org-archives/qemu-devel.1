@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3e-00072i-Mr
+	(envelope-from <armbru@redhat.com>) id 1eko3i-00077i-GS
 	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eko3Y-0006Lv-44
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44346 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1eko3d-0006Qf-Ac
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:30 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44360 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3X-0006Ha-GP
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:19 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eko3c-0006Pl-Rm
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 04:36:25 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 11 Feb 2018 10:35:40 +0100
-Message-Id: <20180211093607.27351-3-armbru@redhat.com>
+Date: Sun, 11 Feb 2018 10:35:49 +0100
+Message-Id: <20180211093607.27351-12-armbru@redhat.com>
 In-Reply-To: <20180211093607.27351-1-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 02/29] qapi: Streamline boilerplate comment
- generation
+Subject: [Qemu-devel] [PATCH v2 11/29] qapi: Improve include file name
+ reporting in error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,363 +30,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
-Every generator has separate boilerplate for .h and .c, and their
-differences are boring.  All of them repeat the license note.
+Error messages print absolute file names of included files even if the
+user gave a relative one on the command line:
 
-Reduce the repetition as follows.  Move common text like the license
-note to common open_output(), next to the existing common text there.
-For each generator, replace the two separate descriptions by a single
-one.
+    $ PYTHONPATH=3Dscripts python -B tests/qapi-schema/test-qapi.py tests=
+/qapi-schema/include-cycle.json
+    In file included from tests/qapi-schema/include-cycle.json:1:
+    In file included from /work/armbru/qemu/tests/qapi-schema/include-cyc=
+le-b.json:1:
+    /work/armbru/qemu/tests/qapi-schema/include-cycle-c.json:1: Inclusion=
+ loop for include-cycle.json
 
-While there, emit an "automatically generated" note into generated
-documentation, too.
+Improve this to
+
+    In file included from tests/qapi-schema/include-cycle.json:1:
+    In file included from tests/qapi-schema/include-cycle-b.json:1:
+    tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for include-=
+cycle.json
+
+The error message when an include file can't be opened prints the
+include directive's file name, which is relative to the including
+file.  Change this to print the file name relative to the working
+directory.  Visible in tests/qapi-schema/include-no-file.err.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi-commands.py        | 26 +++-----------------------
- scripts/qapi-event.py           | 26 +++-----------------------
- scripts/qapi-introspect.py      | 21 ++-------------------
- scripts/qapi-types.py           | 26 +++-----------------------
- scripts/qapi-visit.py           | 26 +++-----------------------
- scripts/qapi.py                 | 31 ++++++++++++++++++-------------
- scripts/qapi2texi.py            |  3 ++-
- tests/qapi-schema/doc-good.texi |  3 ++-
- 8 files changed, 36 insertions(+), 126 deletions(-)
+ scripts/qapi/common.py                | 12 ++++++------
+ tests/qapi-schema/include-no-file.err |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index f89d748ba4..8e8da7c796 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -255,38 +255,18 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor=
-):
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 2e58573a39..3e92b38ade 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -259,9 +259,8 @@ class QAPIDoc(object):
+ class QAPISchemaParser(object):
 =20
- (input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command_lin=
-e()
+     def __init__(self, fp, previously_included=3D[], incl_info=3DNone):
+-        abs_fname =3D os.path.abspath(fp.name)
+         self.fname =3D fp.name
+-        previously_included.append(abs_fname)
++        previously_included.append(os.path.abspath(fp.name))
+         self.incl_info =3D incl_info
+         self.src =3D fp.read()
+         if self.src =3D=3D '' or self.src[-1] !=3D '\n':
+@@ -292,7 +291,7 @@ class QAPISchemaParser(object):
+                 if not isinstance(include, str):
+                     raise QAPISemError(info,
+                                        "Value of 'include' must be a str=
+ing")
+-                self._include(include, info, os.path.dirname(abs_fname),
++                self._include(include, info, os.path.dirname(self.fname)=
+,
+                               previously_included)
+             elif "pragma" in expr:
+                 self.reject_expr_doc(cur_doc)
+@@ -325,7 +324,8 @@ class QAPISchemaParser(object):
+                 % doc.symbol)
 =20
--c_comment =3D '''
--/*
-- * schema-defined QMP->QAPI command dispatch
-+blurb =3D '''
-+ * Schema-defined QAPI/QMP commands
-  *
-  * Copyright IBM, Corp. 2011
-  *
-  * Authors:
-  *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment =3D '''
--/*
-- * schema-defined QAPI function prototypes
-- *
-- * Copyright IBM, Corp. 2011
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
-=20
- (fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
-                             'qmp-marshal.c', 'qmp-commands.h',
--                            c_comment, h_comment)
-+                            blurb)
-=20
- fdef.write(mcgen('''
-=20
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index c710968dc2..2b7d720c08 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -171,38 +171,18 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
-=20
- (input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_command_li=
-ne()
-=20
--c_comment =3D '''
--/*
-- * schema-defined QAPI event functions
-+blurb =3D '''
-+ * Schema-defined QAPI/QMP events
-  *
-  * Copyright (c) 2014 Wenchao Xia
-  *
-  * Authors:
-  *  Wenchao Xia   <wenchaoqemu@gmail.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment =3D '''
--/*
-- * schema-defined QAPI event functions
-- *
-- * Copyright (c) 2014 Wenchao Xia
-- *
-- * Authors:
-- *  Wenchao Xia  <wenchaoqemu@gmail.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
-=20
- (fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
-                             'qapi-event.c', 'qapi-event.h',
--                            c_comment, h_comment)
-+                            blurb)
-=20
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index 032bcea491..83da2bdb94 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -176,32 +176,15 @@ for o, a in opts:
-     if o in ('-u', '--unmask-non-abi-names'):
-         opt_unmask =3D True
-=20
--c_comment =3D '''
--/*
-+blurb =3D '''
-  * QAPI/QMP schema introspection
-  *
-  * Copyright (C) 2015 Red Hat, Inc.
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment =3D '''
--/*
-- * QAPI/QMP schema introspection
-- *
-- * Copyright (C) 2015 Red Hat, Inc.
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
-=20
- (fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
-                             'qmp-introspect.c', 'qmp-introspect.h',
--                            c_comment, h_comment)
-+                            blurb)
-=20
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index 7e3051dbb9..86afc57f92 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -250,39 +250,19 @@ for o, a in opts:
-     if o in ('-b', '--builtins'):
-         do_builtins =3D True
-=20
--c_comment =3D '''
--/*
-- * deallocation functions for schema-defined QAPI types
-+blurb =3D '''
-+ * Schema-defined QAPI types
-  *
-  * Copyright IBM, Corp. 2011
-  *
-  * Authors:
-  *  Anthony Liguori   <aliguori@us.ibm.com>
-  *  Michael Roth      <mdroth@linux.vnet.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment =3D '''
--/*
-- * schema-defined QAPI types
-- *
-- * Copyright IBM, Corp. 2011
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
-=20
- (fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
-                             'qapi-types.c', 'qapi-types.h',
--                            c_comment, h_comment)
-+                            blurb)
-=20
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index bc2b8b581a..0a367072fb 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -334,38 +334,18 @@ for o, a in opts:
-     if o in ('-b', '--builtins'):
-         do_builtins =3D True
-=20
--c_comment =3D '''
--/*
-- * schema-defined QAPI visitor functions
-+blurb =3D '''
-+ * Schema-defined QAPI visitors
-  *
-  * Copyright IBM, Corp. 2011
-  *
-  * Authors:
-  *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment =3D '''
--/*
-- * schema-defined QAPI visitor functions
-- *
-- * Copyright IBM, Corp. 2011
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
-=20
- (fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
-                             'qapi-visit.c', 'qapi-visit.h',
--                            c_comment, h_comment)
-+                            blurb)
-=20
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 58f995b07f..2e5a1ce6a8 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1985,11 +1985,21 @@ def parse_command_line(extra_options=3D'', extra_=
-long_options=3D[]):
- #
-=20
-=20
--def open_output(output_dir, do_c, do_h, prefix, c_file, h_file,
--                c_comment, h_comment):
-+def open_output(output_dir, do_c, do_h, prefix, c_file, h_file, blurb):
-     guard =3D guardname(prefix + h_file)
-     c_file =3D output_dir + prefix + c_file
-     h_file =3D output_dir + prefix + h_file
-+    comment =3D mcgen('''/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
-+
-+/*
-+%(blurb)s
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ */
-+
-+''',
-+                    blurb=3Dblurb.strip('\n'))
-=20
-     if output_dir:
+     def _include(self, include, info, base_dir, previously_included):
+-        incl_abs_fname =3D os.path.join(base_dir, include)
++        incl_fname =3D os.path.join(base_dir, include)
++        incl_abs_fname =3D os.path.abspath(incl_fname)
+         # catch inclusion cycle
+         inf =3D info
+         while inf:
+@@ -337,9 +337,9 @@ class QAPISchemaParser(object):
+         if incl_abs_fname in previously_included:
+             return
          try:
-@@ -2007,27 +2017,22 @@ def open_output(output_dir, do_c, do_h, prefix, c=
-_file, h_file,
-     fdef =3D maybe_open(do_c, c_file, 'w')
-     fdecl =3D maybe_open(do_h, h_file, 'w')
-=20
--    fdef.write(mcgen('''
--/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
--%(comment)s
--''',
--                     comment=3Dc_comment))
--
-+    fdef.write(comment)
-+    fdecl.write(comment)
-     fdecl.write(mcgen('''
--/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
--%(comment)s
- #ifndef %(guard)s
- #define %(guard)s
-=20
- ''',
--                      comment=3Dh_comment, guard=3Dguard))
-+                      guard=3Dguard))
-=20
-     return (fdef, fdecl)
-=20
-=20
- def close_output(fdef, fdecl):
--    fdecl.write('''
-+    fdecl.write(mcgen('''
-+
- #endif
--''')
-+'''))
-     fdecl.close()
-     fdef.close()
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index bf1c57b2e2..8a604d86a6 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -283,7 +283,8 @@ def main(argv):
-         print("%s: need pragma 'doc-required' "
-                "to generate documentation" % argv[0], file=3Dsys.stderr)
-         sys.exit(1)
--    print(texi_schema(schema))
-+    print('@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n')
-+    print(texi_schema(schema), end=3D'')
-=20
-=20
- if __name__ =3D=3D '__main__':
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
-.texi
-index 1778312581..0aed2300a5 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -1,3 +1,5 @@
-+@c AUTOMATICALLY GENERATED, DO NOT MODIFY
-+
- @section Section
-=20
- @subsection Subsection
-@@ -231,4 +233,3 @@ If you're bored enough to read this, go see a video o=
-f boxed cats
-=20
- @end deftypefn
-=20
--
+-            fobj =3D open(incl_abs_fname, 'r')
++            fobj =3D open(incl_fname, 'r')
+         except IOError as e:
+-            raise QAPISemError(info, '%s: %s' % (e.strerror, include))
++            raise QAPISemError(info, '%s: %s' % (e.strerror, incl_fname)=
+)
+         exprs_include =3D QAPISchemaParser(fobj, previously_included, in=
+fo)
+         self.exprs.extend(exprs_include.exprs)
+         self.docs.extend(exprs_include.docs)
+diff --git a/tests/qapi-schema/include-no-file.err b/tests/qapi-schema/in=
+clude-no-file.err
+index d5b9b22d85..e42bcf4bc1 100644
+--- a/tests/qapi-schema/include-no-file.err
++++ b/tests/qapi-schema/include-no-file.err
+@@ -1 +1 @@
+-tests/qapi-schema/include-no-file.json:1: No such file or directory: inc=
+lude-no-file-sub.json
++tests/qapi-schema/include-no-file.json:1: No such file or directory: tes=
+ts/qapi-schema/include-no-file-sub.json
 --=20
 2.13.6
