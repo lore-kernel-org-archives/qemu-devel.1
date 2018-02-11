@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ekkHR-0003c2-Aj
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 00:34:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ekmhE-0002Gp-An
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 03:09:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ekkHO-0004ig-D1
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 00:34:25 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37090 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ekkHO-0004hs-74
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 00:34:22 -0500
-Date: Sun, 11 Feb 2018 13:34:08 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180211053408.GB31261@xz-mi>
-References: <20180124053957.29145-1-peterx@redhat.com>
-	<20180124053957.29145-2-peterx@redhat.com>
-	<5df6f309-c865-7b7f-3a3e-afd23bc17694@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1ekmhD-00005i-0t
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 03:09:12 -0500
+Date: Sun, 11 Feb 2018 19:08:31 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180211080831.GC11634@umbus.fritz.box>
+References: <20171209084338.29395-1-clg@kaod.org>
+	<20171209084338.29395-3-clg@kaod.org>
+	<20171220050947.GC5981@umbus.fritz.box>
+	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+	<1516187433.31850.189.camel@kernel.crashing.org>
+	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+	<1516224472.31850.193.camel@kernel.crashing.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="uLm21ivgZj9Xvi41"
 Content-Disposition: inline
-In-Reply-To: <5df6f309-c865-7b7f-3a3e-afd23bc17694@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 01/23] docs: update QMP documents for
- OOB commands
+In-Reply-To: <1516224472.31850.193.camel@kernel.crashing.org>
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +33,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On Fri, Feb 09, 2018 at 08:10:53AM -0600, Eric Blake wrote:
-> On 01/23/2018 11:39 PM, Peter Xu wrote:
-> > Update both the developer and spec for the new QMP OOB (Out-Of-Band)
-> > command.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >   docs/devel/qapi-code-gen.txt | 68 ++++++++++++++++++++++++++++++++++++++++----
-> >   docs/interop/qmp-spec.txt    | 30 ++++++++++++++++---
-> >   2 files changed, 89 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> > index 06ab699066..4d3db0ad39 100644
-> > --- a/docs/devel/qapi-code-gen.txt
-> > +++ b/docs/devel/qapi-code-gen.txt
-> > @@ -554,9 +554,12 @@ following example objects:
-> >   === Commands ===
-> > +--- General Command Layout ---
-> > +
-> >   Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
-> >            '*returns': TYPE-NAME, '*boxed': true,
-> > -         '*gen': false, '*success-response': false }
-> > +         '*gen': false, '*success-response': false,
-> > +         '*allow-oob': false }
-> 
-> Shouldn't this be '*allow-oob': true, as the only time you add the field is
-> if you turn oob on (as it already defaults to off)?
-> 
-> >   Commands are defined by using a dictionary containing several members,
-> >   where three members are most common.  The 'command' member is a
-> > @@ -636,6 +639,59 @@ possible, the command expression should include the optional key
-> >   'success-response' with boolean value false.  So far, only QGA makes
-> >   use of this member.
-> > +A command can be declared to support Out-Of-Band (OOB) execution.  By
-> > +default, commands do not support OOB.  To declare a command to support
-> 
-> s/to support/that supports/
-> 
-> > +it, we need an extra 'allow-oob' field.  For example:
-> > +
-> > + { 'command': 'migrate_recover',
-> > +   'data': { 'uri': 'str' }, 'allow-oob': true }
-> > +
-> > +To execute a command in Out-Of-Band way, we need to specify the
-> > +"control" field in the request, with "run-oob" set to true. Example:
-> > +
-> > + => { "execute": "command-support-oob",
-> > +      "arguments": { ... },
-> > +      "control": { "run-oob": true } }
-> > + <= { "return": { } }
-> 
-> This talks more about the QMP user protocol, while the rest of the document
-> is about QAPI constructs.  But we do have an example of 'my-first-command'
-> in the document, so I guess this is okay.
-> 
-> > +
-> > +Without it, even the commands that support out-of-band execution will
-> > +still be run In-Band.
-> > +
-> > +Please read the "Out-Of-Band Command Execution" section below for more
-> > +information on how OOB execution works.
-> > +
-> > +--- About Out-Of-Band (OOB) Command Execution ---
-> 
-> Do we really need the paragraph mentioning a forward reference, when the
-> very next thing is the item that was referenced?
 
-Yeah, I can remove that paragraph.
+--uLm21ivgZj9Xvi41
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-For all the rest of comments (above or below, which I omitted), all of
-them make sense, and I'll fix accordingly.  Thanks for reviewing.
+On Thu, Jan 18, 2018 at 08:27:52AM +1100, Benjamin Herrenschmidt wrote:
+> On Wed, 2018-01-17 at 15:39 +0100, C=E9dric Le Goater wrote:
+> > Migration is a problem. We will need both backend QEMU objects to be=20
+> > available anyhow if we want to migrate. So we are back to the current=
+=20
+> > solution creating both QEMU objects but we can try to defer some of the=
+=20
+> > KVM inits and create the KVM device on demand at CAS time.
+>=20
+> Do we have a way to migrate a piece of info from the machine *first*
+> that indicate what type of XICS/XIVE to instanciate ?
 
--- 
-Peter Xu
+Nope.  qemu migration doesn't work like that.  Yes, it should, and
+everyone knows it, but changing it is a really long term project.
+
+>=20
+> > The next problem is the ICP object that currently needs the KVM device=
+=20
+> > fd to connect the vcpus ... So, we will need to change that also.=20
+> > That is probably the biggest problem today. We need a way to disconnect=
+=20
+> > the vpcu from the KVM device and see how we can defer the connection.
+> > I need to make sure this is possible, I can check that without XIVE
+>=20
+> Ben.
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--uLm21ivgZj9Xvi41
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlp/+f0ACgkQbDjKyiDZ
+s5JN0RAAvBVPVQ32F/jPri/yYkOGR4otkDkIu1YxdISio2MEzla2Ptae5CvJMWMn
+MbsfqkY4+A29iGqi+vhcWPlMdJsMXZiK4DQ5tDMeA2HtCe7uI1Y8XEOowFBHlNRp
+HE+h2qKPnf4t4itl7cx/USlatTUcy5ZJxLqdiO3U4GET7EoaQjPc1j78UmX2g31r
+AWMHQGVxdEs1tg9PGHMaA6kvi+cIbdG9SdXSG7DAtmJDF3M/f7Q+PkqkxwTDcgUX
+drDlXYpR9c5V8Bd3aDrhd1BdGX+b+OuSaWilUbu3VNRZ5YnL/R5GWM1nZujhd/5k
+IvEGozYAj+qlF7vWjgK82KMmuNESQ0ALVhC7ryd5qVyQ7Fme4vE39fYUeZLuS7Rc
+yLNzKeYrrcNmiE9QjaWdY1i+5bGjJR9S2Vwfozbyz5bCaqQF0UzV1YLQPKjMBpsR
+1Qa1D7z4XILFVHEQQSEix9fcvdVmqk463Awe+9w2m8YzBY6A76ZGDRM6jkOOOzsZ
+myDYo5cYpIXnfAo6KsP26gRwOW67lC0Gkh4hhZYsWRMlhpPCMo2jJOgq4z3HjHaX
+oi6pEL+bp6QssA/pz5uIltcuFAagT/UvB50x6Hrk1p7tA+1EFM2Y4ZQcN1eKqDvm
+krcD3bQ20hfpcSVcAiSGrpbPeOhdK4FeCgZKsJsRqu4nNVA6/YM=
+=gPIe
+-----END PGP SIGNATURE-----
+
+--uLm21ivgZj9Xvi41--
