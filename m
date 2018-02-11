@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1el0Xd-0008Oz-3p
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:56:46 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1el0Yc-0000Oz-Fw
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1el0X7-0002ta-7a
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:56:12 -0500
-Message-ID: <1518389717.2312.245.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Mon, 12 Feb 2018 09:55:17 +1100
-In-Reply-To: <20180211080831.GC11634@umbus.fritz.box>
-References: <20171209084338.29395-1-clg@kaod.org>
-	<20171209084338.29395-3-clg@kaod.org>
-	<20171220050947.GC5981@umbus.fritz.box>
-	<1513815126.2743.34.camel@kernel.crashing.org>
-	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
-	<1513896817.2743.63.camel@kernel.crashing.org>
-	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
-	<1516187433.31850.189.camel@kernel.crashing.org>
-	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
-	<1516224472.31850.193.camel@kernel.crashing.org>
-	<20180211080831.GC11634@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
- the XIVE interrupt controller
+	(envelope-from <richard.henderson@linaro.org>) id 1el0YE-00044A-9b
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:57:14 -0500
+Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:45592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1el0YD-00042l-G3
+	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 17:56:49 -0500
+Received: by mail-pl0-x22a.google.com with SMTP id p5so4152751plo.12
+	for <qemu-devel@nongnu.org>; Sun, 11 Feb 2018 14:56:49 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+References: <20180211224656.12767-1-richard.henderson@linaro.org>
+Message-ID: <e7fdc469-7e37-4361-03eb-b892a1d3df50@linaro.org>
+Date: Sun, 11 Feb 2018 14:56:45 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180211224656.12767-1-richard.henderson@linaro.org>
+Content-Type: multipart/mixed; boundary="------------C9E8FA375570066AFDFFDAD2"
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2] scripts: Add decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Sun, 2018-02-11 at 19:08 +1100, David Gibson wrote:
-> On Thu, Jan 18, 2018 at 08:27:52AM +1100, Benjamin Herrenschmidt wrote:
-> > On Wed, 2018-01-17 at 15:39 +0100, C=C3=A9dric Le Goater wrote:
-> > > Migration is a problem. We will need both backend QEMU objects to b=
-e=20
-> > > available anyhow if we want to migrate. So we are back to the curre=
-nt=20
-> > > solution creating both QEMU objects but we can try to defer some of=
- the=20
-> > > KVM inits and create the KVM device on demand at CAS time.
-> >=20
-> > Do we have a way to migrate a piece of info from the machine *first*
-> > that indicate what type of XICS/XIVE to instanciate ?
->=20
-> Nope.  qemu migration doesn't work like that.  Yes, it should, and
-> everyone knows it, but changing it is a really long term project.
+This is a multi-part message in MIME format.
+--------------C9E8FA375570066AFDFFDAD2
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Well, we have a problem then. It looks like Qemu broken migration is
-fundamentally incompatible with PAPR and CAS design...
+> Changes since v1:
+>   * Pass pycodestyle-{2,3}.
+>   * Support 16-bit and 32-bit insns (I have a def file for thumb1).
 
-I know we don't migrate the configuration, that's not exactly what I
-had in mind tho... Can we have some piece of *data* from the machine be
-migrated first, and use it on the target to reconfigure the interrupt
-controller before the stream arrives ?
+For the record, here's the thumb1 definition.
 
-Otherwise, we have indeed no much choice but the horrible wart of
-creating both interrupt controllers with only one "active".
+./scripts/decodetree.py -w16 thumb1.def
 
-> >=20
-> > > The next problem is the ICP object that currently needs the KVM dev=
-ice=20
-> > > fd to connect the vcpus ... So, we will need to change that also.=20
-> > > That is probably the biggest problem today. We need a way to discon=
-nect=20
-> > > the vpcu from the KVM device and see how we can defer the connectio=
-n.
-> > > I need to make sure this is possible, I can check that without XIVE
-> >=20
-> > Ben.
-> >=20
->=20
->=20
+
+r~
+
+--------------C9E8FA375570066AFDFFDAD2
+Content-Type: text/plain; charset=UTF-8;
+ name="thumb1.def"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="thumb1.def"
+
+JXJlZ18wXzcJNzoxIDA6MwoKQHJkX3JzCQkuLi4uLi4gLi4uLiByczozIHJkOjMKQHJ0X3Ju
+X3JtCS4uLi4gLi4uIHJtOjMgcm46MyBydDozCkByZF9ybl9ybQkuLi4uIC4uLiBybTozIHJu
+OjMgcmQ6MwpAcmRfcm5faTMJLi4uLiAuLi4gaW1tOjMgcm46MyByZDozCkBydF9ybl9pNQku
+Li4uLiBpbW06NSBybjozIHJ0OjMKQHJkX2k4CQkuLi4uLiByZDozIGltbTo4CkBybl9yZWds
+aXN0CS4uLi4uIHJuOjMgcmVnbGlzdDo4CgojIyMjIERhdGEgUHJvY2Vzc2luZyAodHdvIGxv
+dyByZWdpc3RlcnMpCgpBTkQJCTAxMDAwMCAwMDAwIC4uLiAuLi4JQHJkX3JzCkVPUgkJMDEw
+MDAwIDAwMDEgLi4uIC4uLglAcmRfcnMKTU9WX2xzbAkJMDEwMDAwIDAwMTAgLi4uIC4uLglA
+cmRfcnMKTU9WX2xzcgkJMDEwMDAwIDAwMTEgLi4uIC4uLglAcmRfcnMKTU9WX2FzcgkJMDEw
+MDAwIDAxMDAgLi4uIC4uLglAcmRfcnMKQURDCQkwMTAwMDAgMDEwMSAuLi4gLi4uCUByZF9y
+cwpTQkMJCTAxMDAwMCAwMTEwIC4uLiAuLi4JQHJkX3JzCk1PVl9yb3IJCTAxMDAwMCAwMTEx
+IC4uLiAuLi4JQHJkX3JzClRTVAkJMDEwMDAwIDEwMDAgLi4uIC4uLglAcmRfcnMKUlNCCQkw
+MTAwMDAgMTAwMSAuLi4gLi4uCUByZF9ycwpDTVBfcnIJCTAxMDAwMCAxMDEwIC4uLiAuLi4J
+QHJkX3JzCkNNTgkJMDEwMDAwIDEwMTEgLi4uIC4uLglAcmRfcnMKT1JSCQkwMTAwMDAgMTEw
+MCAuLi4gLi4uCUByZF9ycwpNVUwJCTAxMDAwMCAxMTAxIC4uLiAuLi4JQHJkX3JzCkJJQwkJ
+MDEwMDAwIDExMTAgLi4uIC4uLglAcmRfcnMKTVZOCQkwMTAwMDAgMTExMSAuLi4gLi4uCUBy
+ZF9ycwoKIyMjIyBMb2FkL3N0b3JlIChyZWdpc3RlciBvZmZzZXQpCgpTVFJfcnIJCTAxMDEg
+MDAwIC4uLiAuLi4gLi4uCUBydF9ybl9ybQpTVFJIX3JyCQkwMTAxIDAwMSAuLi4gLi4uIC4u
+LglAcnRfcm5fcm0KU1RSQl9ycgkJMDEwMSAwMTAgLi4uIC4uLiAuLi4JQHJ0X3JuX3JtCkxE
+UlNCX3JyCTAxMDEgMDExIC4uLiAuLi4gLi4uCUBydF9ybl9ybQpMRFJfcnIJCTAxMDEgMTAw
+IC4uLiAuLi4gLi4uCUBydF9ybl9ybQpMRFJIX3JyCQkwMTAxIDEwMSAuLi4gLi4uIC4uLglA
+cnRfcm5fcm0KTERSQl9ycgkJMDEwMSAxMTAgLi4uIC4uLiAuLi4JQHJ0X3JuX3JtCkxEUlNI
+X3JyCTAxMDEgMTExIC4uLiAuLi4gLi4uCUBydF9ybl9ybQoKIyMjIyBMb2FkL3N0b3JlIHdv
+cmQvYnl0ZSAoaW1tZWRpYXRlIG9mZnNldCkKClNUUl9yaQkJMDExMDAgLi4uLi4gLi4uIC4u
+LglAcnRfcm5faTUKTERSX3JpCQkwMTEwMSAuLi4uLiAuLi4gLi4uCUBydF9ybl9pNQpTVFJC
+X3JpCQkwMTExMCAuLi4uLiAuLi4gLi4uCUBydF9ybl9pNQpMRFJCX3JpCQkwMTExMSAuLi4u
+LiAuLi4gLi4uCUBydF9ybl9pNQoKIyMjIyBMb2FkL3N0b3JlIGhhbGZ3b3JkIChpbW1lZGlh
+dGUgb2Zmc2V0KQoKU1RSSF9yaQkJMTAwMDAgLi4uLi4gLi4uIC4uLglAcnRfcm5faTUKTERS
+SF9yaQkJMTAwMDEgLi4uLi4gLi4uIC4uLglAcnRfcm5faTUKCiMjIyMgQWRkIFBDL1NQIChp
+bW1lZGlhdGUpCgpBRFIJCTEwMTAwIC4uLiAuLi4uLi4uLglAcmRfaTgKQUREX3NwCQkxMDEw
+MSAuLi4gLi4uLi4uLi4JQHJkX2k4CgojIyMjIExvYWQvc3RvcmUgbXVsdGlwbGUKClNUTQkJ
+MTEwMDAgLi4uIC4uLi4uLi4uCUBybl9yZWdsaXN0CkxETQkJMTEwMDEgLi4uIC4uLi4uLi4u
+CUBybl9yZWdsaXN0CgojIyMjIEFkZC9zdWJ0cmFjdCAodGhyZWUgbG93IHJlZ2lzdGVycykK
+CkFERF9ycnIJCTAwMDExMDAgLi4uIC4uLiAuLi4JQHJkX3JuX3JtClNVQl9ycnIJCTAwMDEx
+MDEgLi4uIC4uLiAuLi4JQHJkX3JuX3JtCgojIyMjIEFkZC9zdWJ0cmFjdCAodHdvIGxvdyBy
+ZWdpc3RlcnMgYW5kIGltbWVkaWF0ZSkKCkFERF9ycmkJCTAwMDEgMTEwIC4uLiAuLi4gLi4u
+CUByZF9ybl9pMwpTVUJfcnJpCQkwMDAxIDExMSAuLi4gLi4uIC4uLglAcmRfcm5faTMKCiMj
+IyMgQWRkLCBzdWJ0cmFjdCwgY29tcGFyZSwgbW92ZSAob25lIGxvdyByZWdpc3RlciBhbmQg
+aW1tZWRpYXRlKQoKTU9WX3JpCQkwMDEwMCAuLi4gLi4uLi4uLi4JQHJkX2k4CkNNUF9yaQkJ
+MDAxMDEgLi4uIC4uLi4uLi4uCUByZF9pOApBRERfcmkJCTAwMTEwIC4uLiAuLi4uLi4uLglA
+cmRfaTgKU1VCX3JpCQkwMDExMSAuLi4gLi4uLi4uLi4JQHJkX2k4CgojIyMjIEJyYW5jaCBh
+bmQgZXhjaGFuZ2UKCkJYCQkwMTAwIDAxMTEgMCBybTo0IDAwMApCTFgJCTAxMDAgMDExMSAx
+IHJtOjQgMDAwCgojIyMjIEFkZCwgc3VidHJhY3QsIGNvbXBhcmUsIG1vdmUgKHR3byBoaWdo
+IHJlZ2lzdGVycykKCkFERF9ycnIJCTAxMDAgMDEwMCAuIHJtOjQgLi4uCXJkPSVyZWdfMF83
+IHJuPSVyZWdfMF83CkNNUF9ycgkJMDEwMCAwMTAxIC4gcnM6NCAuLi4JcmQ9JXJlZ18wXzcK
+TU9WX3JyCQkwMTAwIDAxMTAgLiByczo0IC4uLglyZD0lcmVnXzBfNwoKIyMjIyBBZGp1c3Qg
+U1AgKGltbWVkaWF0ZSkKCkFERF9ycmkJCTEwMTEgMDAwMCAwIGltbTo3CXJkPTEzIHJuPTEz
+ClNVQl9ycmkJCTEwMTEgMDAwMCAxIGltbTo3CXJkPTEzIHJuPTEzCgojIyMjIEV4dGVuZAoK
+U1hUSAkJMTAxMSAwMDEwIDAwIC4uLiAuLi4JQHJkX3JzClNYVEIJCTEwMTEgMDAxMCAwMSAu
+Li4gLi4uCUByZF9ycwpVWFRICQkxMDExIDAwMTAgMTAgLi4uIC4uLglAcmRfcnMKVVhUQgkJ
+MTAxMSAwMDEwIDExIC4uLiAuLi4JQHJkX3JzCgojIyMjIENoYW5nZSBwcm9jZXNzb3Igc3Rh
+dGUKClNFVEVORAkJMTAxMSAwMTEwIDAxMCBmbGFnczo1CkNQUwkJMTAxMSAwMTEwIDAxMSBm
+bGFnczo1CgojIyMjIFJldmVyc2UgYnl0ZXMKClJFVgkJMTAxMSAxMDEwIDAwIC4uLiAuLi4J
+QHJkX3JzClJFVjE2CQkxMDExIDEwMTAgMDEgLi4uIC4uLglAcmRfcnMKUkVWU0gJCTEwMTEg
+MTAxMCAxMSAuLi4gLi4uCUByZF9ycwoKIyMjIyBIaW50cwoKTk9QCQkxMDExIDExMTEgMDAw
+MCAwMDAwCllJRUxECQkxMDExIDExMTEgMDAwMSAwMDAwCldGRQkJMTAxMSAxMTExIDAwMTAg
+MDAwMApXRkkJCTEwMTEgMTExMSAwMDExIDAwMDAKU0VWCQkxMDExIDExMTEgMDEwMCAwMDAw
+ClNFVkwJCTEwMTEgMTExMSAwMTAxIDAwMDAKTk9QCQkxMDExIDExMTEgMDExLSAwMDAwCSMg
+UmVzZXJ2ZWQgaGludApOT1AJCTEwMTEgMTExMSAxLS0tIDAwMDAJIyBSZXNlcnZlZCBoaW50
+CgojIyMjIFB1c2ggYW5kIFBvcAoKUFVTSAkJMTAxMSAwMTAgcmVnbGlzdDo5ClBPUAkJMTAx
+MSAxMTAgcmVnbGlzdDo5CgojIyMjIENvbmRpdGlvbmFsIGJyYW5jaGVzCgpCY29uZAkJMTEw
+MSAwIGNvbmQ6MyBpbW06OApCY29uZAkJMTEwMSAxMDAwIGltbTo4CQljb25kPTgKQmNvbmQJ
+CTExMDEgMTAwMSBpbW06OAkJY29uZD05CkJjb25kCQkxMTAxIDEwMTAgaW1tOjgJCWNvbmQ9
+MTAKQmNvbmQJCTExMDEgMTAxMSBpbW06OAkJY29uZD0xMQpCY29uZAkJMTEwMSAxMTAwIGlt
+bTo4CQljb25kPTEyCkJjb25kCQkxMTAxIDExMDEgaW1tOjgJCWNvbmQ9MTMKCiMjIyMgRXhj
+ZXB0aW9uIGdlbmVyYXRpb24KClVERgkJMTEwMSAxMTEwIGltbTo4ClNWQwkJMTEwMSAxMTEx
+IGltbTo4Cg==
+--------------C9E8FA375570066AFDFFDAD2--
