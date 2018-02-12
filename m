@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elILk-0005WM-MS
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:57:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1elINQ-0006vj-J9
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:58:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elILi-0003FO-LK
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:57:08 -0500
-References: <20180208192328.16550-1-kwolf@redhat.com>
-	<20180208192328.16550-28-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1cddfaec-b493-087c-477e-023c9d5fa8a8@redhat.com>
-Date: Mon, 12 Feb 2018 18:56:40 +0100
+	(envelope-from <cohuck@redhat.com>) id 1elINN-0005D9-MN
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:58:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35366 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1elINN-0005Cn-Gl
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:58:49 -0500
+Date: Mon, 12 Feb 2018 18:58:31 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180212185831.62d1a231.cohuck@redhat.com>
+In-Reply-To: <d369e62c-3fe6-060b-9e2a-6ae948d939dd@redhat.com>
+References: <20180212124008.8960-1-cohuck@redhat.com>
+	<d369e62c-3fe6-060b-9e2a-6ae948d939dd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180208192328.16550-28-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9LoBZevgw2qbiEC4HbhMTuh2IpWmVh28o"
-Subject: Re: [Qemu-devel] [PATCH 27/27] qemu-iotests: Test ssh image
- creation over QMP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] docs: document our stable process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9LoBZevgw2qbiEC4HbhMTuh2IpWmVh28o
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
- jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
- qemu-devel@nongnu.org
-Message-ID: <1cddfaec-b493-087c-477e-023c9d5fa8a8@redhat.com>
-Subject: Re: [PATCH 27/27] qemu-iotests: Test ssh image creation over QMP
-References: <20180208192328.16550-1-kwolf@redhat.com>
- <20180208192328.16550-28-kwolf@redhat.com>
-In-Reply-To: <20180208192328.16550-28-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 12 Feb 2018 11:17:38 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-On 2018-02-08 20:23, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/207     | 261 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/207.out |  75 +++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 337 insertions(+)
->  create mode 100755 tests/qemu-iotests/207
->  create mode 100644 tests/qemu-iotests/207.out
+> On 02/12/2018 06:40 AM, Cornelia Huck wrote:
+> > Some pointers on how to get a patch into stable.
+> > 
+> > [contains some suggestions by mdroth]
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> > RFC/D->v2: added mdroth's suggestions
+> > ---
+> >   docs/stable-process.rst | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 67 insertions(+)
+> >   create mode 100644 docs/stable-process.rst
+> >   
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+> What you have is an obvious improvement over the "nothing" that was 
+> before, so whether or not you fold in my additional comments, you can add:
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-
---9LoBZevgw2qbiEC4HbhMTuh2IpWmVh28o
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqB1VgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AIHEH/jyjWgsNYqb95lth0buMGefkN9e97DC8
-6jjfpFnTQGKHa+C+M54X6NKCkexHIGTqrX5Ext1U0qIryFQMuh9cjGGgsEZP60cM
-v0pjIWKybXASAX5jr9MvLIJ4QPhcQpq3ZZP21DM8vz9Dou8Jtr69uZJpQ+w4YbyC
-h3NdHqizFw8RtOAfXZnB57t4MV4/fUyn26YmgEJf3IOK6bS3idwrYgZmucOrFP1i
-0+5iqgnULf0WRtlTeIONVP3A7Rr+sA23YfdJZX0JN3ismj/yRBkhsgU9eod8UtCx
-/MStCQ1GywD4TWx4kfwNIZ5QwItrQjbj2X2gdZm64k7jN0Jz73fqOr4=
-=I0hj
------END PGP SIGNATURE-----
-
---9LoBZevgw2qbiEC4HbhMTuh2IpWmVh28o--
+Your comments make sense, so I've folded them in. Thanks!
