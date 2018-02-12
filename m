@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1elIf5-0006pE-Iv
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:17:08 -0500
+	(envelope-from <marcel@redhat.com>) id 1elIhw-0000lm-FJ
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:20:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1elIf4-0005AV-Lc
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:17:07 -0500
-Date: Mon, 12 Feb 2018 19:17:01 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180212181701.GJ5103@localhost.localdomain>
-References: <20171208133416.28978-1-berrange@redhat.com>
+	(envelope-from <marcel@redhat.com>) id 1elIhr-0008P9-Lf
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:20:04 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36334 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1elIhr-0008Ns-Da
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:19:59 -0500
+References: <20180201205511.19198-1-marcel@redhat.com>
+	<20180201205511.19198-2-marcel@redhat.com>
+	<20180208210035.GK13301@localhost.localdomain>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <f4d83081-7d69-5023-63e2-696e6c4a7365@redhat.com>
+Date: Mon, 12 Feb 2018 20:19:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171208133416.28978-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: fix EOF Ctrl-D handling in
- qemu-io readline code
+In-Reply-To: <20180208210035.GK13301@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V9 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, cohuck@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com, dotanb75@yahoo.com
 
-Am 08.12.2017 um 14:34 hat Daniel P. Berrange geschrieben:
-> qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
-> done and thus getchar() will never return the EOF constant. Instead we have to
-> query the TTY attributes to determine the configured EOF character (usually
-> Ctrl-D / 0x4), and then explicitly check for that value. This fixes the
-> regression that prevented Ctrl-D from triggering an exit of qemu-io that has
-> existed since readline was first added in
+Hi Eduardo,
+
+[This is a re-send, I didn't see the response
+ on the mailing list, sorry for the spam]
+
+On 08/02/2018 23:00, Eduardo Habkost wrote:
+> On Thu, Feb 01, 2018 at 10:55:08PM +0200, Marcel Apfelbaum wrote:
+>> Currently only file backed memory backend can
+>> be created with a "share" flag in order to allow
+>> sharing guest RAM with other processes in the host.
+>>
+>> Add the "share" flag also to RAM Memory Backend
+>> in order to allow remapping parts of the guest RAM
+>> to different host virtual addresses. This is needed
+>> by the RDMA devices in order to remap non-contiguous
+>> QEMU virtual addresses to a contiguous virtual address range.
+>>
+>> Moved the "share" flag to the Host Memory base class,
+>> modified phys_mem_alloc to include the new parameter
+>> and a new interface memory_region_init_ram_shared_nomigrate.
+>>
+>> There are no functional changes if the new flag is not used.
+>>
+>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 > 
->   commit 0cf17e181798063c3824c8200ba46f25f54faa1a
->   Author: Stefan Hajnoczi <stefanha@redhat.com>
->   Date:   Thu Nov 14 11:54:17 2013 +0100
+> Code looks correct, so:
 > 
->     qemu-io: use readline.c
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-Thanks, applied to the block branch.
+Appreciated!
 
-It would be nice if we also printed a newline when Ctrl-D is pressed. If
-you want to send a v3 for this, I'll just update the patch in my queue.
+> But later can we please stop the explosion of memory_init_ram*()
+> functions and replace them with a single function with a flags
+> parameter?
+> 
 
-Kevin
+Sounds reasonable.
+
+
+Thanks,
+Marcel
