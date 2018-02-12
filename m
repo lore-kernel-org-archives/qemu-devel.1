@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elLzg-0007VR-C8
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 16:50:37 -0500
+	(envelope-from <eblake@redhat.com>) id 1elMFO-0006Kl-If
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:06:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elLzd-0003cX-2n
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 16:50:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1elLzc-0003bl-SC
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 16:50:32 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1elLzb-0006Xq-3X
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 21:50:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1142B2E80C3
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 21:50:31 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1elMFL-0003K4-QY
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:06:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39984 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elMFL-0003JN-L0
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:06:47 -0500
+References: <20180211093607.27351-1-armbru@redhat.com>
+	<20180211093607.27351-23-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cfdefa70-ce8c-5afd-0ddf-5fad17062171@redhat.com>
+Date: Mon, 12 Feb 2018 16:06:28 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 Feb 2018 21:44:09 -0000
-From: Michael Fruchtman <msfrucht@us.ibm.com>
-Reply-To: Bug 1749016 <1749016@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151847184922.10299.8486156753106334227.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1749016] [NEW] VHDX BAT and Metadata Region
- Header Required Bit Not Set
+In-Reply-To: <20180211093607.27351-23-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 22/29] qapi: Generate separate .h,
+ .c for each module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,115 +29,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
 
-Public bug reported:
+On 02/11/2018 03:36 AM, Markus Armbruster wrote:
+> Our qapi-schema.json is composed of modules connected by include
+> directives, but the generated code is monolithic all the same: one
+> qapi-types.h with all the types, one qapi-visit.h with all the
+> visitors, and so forth.  These monolithic headers get included all
+> over the place.  In my "build everything" tree, adding a QAPI type
+> recompiles about 4800 out of 5100 objects.
+> 
+> We wouldn't write such monolithic headers by hand.  It stands to
+> reason that we shouldn't generate them, either.
+> 
+> Split up generated qapi-types.h to mirror the schema's modular
+> structure: one header per module.  Name the main module's header
+> qapi-types.h, and sub-module D/B.json's header D/qapi-types-B.h.
+> 
+> Mirror the schema's includes in the headers, so that qapi-types.h gets
+> you everything exactly as before.  If you need less, you can include
+> one or more of the sub-module headers.  To be exploited shortly.
+> 
+> Split up qapi-types.c, qapi-visit.h, qapi-visit.c, qmp-commands.h,
+> qmp-commands.c, qapi-event.h, qapi-event.c the same way.
+> qmp-introspect.h, qmp-introspect.c and qapi.texi remain monolithic.
 
-When converting a VMDK to VHDX the resulting VHDX's Region table has a
-small error. According to the VHDX specification the BAT and Metadata
-entries for the region header required bit should be set to 1.  In a
-VHDX created by qemu-img, this bit is not set.
+Make sense.
 
-See Table 4: Known Region Properties of the VHDX specification.
+> 
+> The split of qmp-commands.c duplicates static helper function
+> qmp_marshal_output_str() in qapi-commands-char.c and
+> qapi-commands-misc.c.  This happens when commands returning the same
+> type occur in multiple modules.  Not worth avoiding.
 
-The structure format is as following from Structure 4: Region Table
-Entry:
+As long as it is static, and neither .c file includes the other, we're 
+fine (gdb may have a harder time figuring out which copy to put a 
+breakpoint on, but that's not too terrible).
 
-struct VHDX_REGION_TABLE_ENTRY {
-GUID Guid;
-UINT64 FileOffset;
-UINT32 Length;
-UINT32 Required:1;
-UINT32 Reserved:31;
-}
+> 
+> Since I'm going to rename qapi-event.[ch] to qapi-events.[ch], and
+> qmp-commands.[ch] to qapi-commands.[ch], name the shards that way
+> already, to reduce churn.  This requires temporary hacks in
+> commands.py and events.py.  They'll go away with the rename.
 
-The Required bit for VHDX specified BAT and Metadata Regions Required
-bit in the entry is not set as required in the current specification.
+The planned rename makes sense; prepping now is fine.
 
-VHDX Region Table in a valid VHDX
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   .gitignore               |  60 ++++++++++++++++++++++++
+>   Makefile                 | 120 +++++++++++++++++++++++++++++++++++++++++++++++
+>   Makefile.objs            |  65 ++++++++++++++++++++++++-
+>   scripts/qapi/commands.py |  35 +++++++++-----
+>   scripts/qapi/common.py   |  21 +++++++--
+>   scripts/qapi/events.py   |  19 ++++++--
+>   6 files changed, 300 insertions(+), 20 deletions(-)
+> 
+> diff --git a/.gitignore b/.gitignore
+> index 9477a08b6b..42c57998fd 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -31,7 +31,67 @@
+>   /qapi-gen-timestamp
+>   /qapi-builtin-types.[ch]
+>   /qapi-builtin-visit.[ch]
+> +/qapi/qapi-commands-block-core.[ch]
+> +/qapi/qapi-commands-block.[ch]
 
-Offset(h)    00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-0x00030000   72 65 67 69 AE 8C 6B C6 02 00 00 00 00 00 00 00
-0x00030010   66 77 C2 2D 23 F6 00 42 9D 64 11 5E 9B FD 4A 08
-0x00030020   00 00 30 00 00 00 00 00 00 00 10 00 01 00 00 00  =
+Is it worth using a glob instead of specific patterns, as in:
 
-0x00030030   06 A2 7C 8B 90 47 9A 4B B8 FE 57 5F 05 0F 88 6E
-0x00030040   00 00 20 00 00 00 00 00 00 00 10 00 01 00 00 00
+/qapi/qapi-commands-*.[ch]
 
-VHDX Region Table in a VHDX converted by qemu-img from VMDK
-
-Offset(h)    00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-0x00030000   72 65 67 69 AE 8C 6B C6 02 00 00 00 00 00 00 00
-0x00030010   66 77 C2 2D 23 F6 00 42 9D 64 11 5E 9B FD 4A 08
-0x00030020   00 00 30 00 00 00 00 00 00 00 10 00 00 00 00 00  =
-
-0x00030030   06 A2 7C 8B 90 47 9A 4B B8 FE 57 5F 05 0F 88 6E
-0x00030040   00 00 20 00 00 00 00 00 00 00 10 00 00 00 00 00
-
-The fist bit at 0x0003002A and 0x0003004A should be set to 1.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Maybe being precise doesn't hurt, if we aren't adding sub-modules all 
+that often; but being generous with a glob makes it less likely that a 
+future module addition will forget to update .gitignore.
 
 
-** Tags: qemu-img vhdx
+> +++ b/Makefile
+> @@ -92,10 +92,70 @@ include $(SRC_PATH)/rules.mak
+>   GENERATED_FILES = qemu-version.h config-host.h qemu-options.def
+>   GENERATED_FILES += qapi-builtin-types.h qapi-builtin-types.c
+>   GENERATED_FILES += qapi-types.h qapi-types.c
+> +GENERATED_FILES += qapi/qapi-types-block-core.h qapi/qapi-types-block-core.c
 
--- =
+For the makefile, I'd suggest using an intermediate list of module 
+names, and then using make string operations to expand it into larger 
+lists, to cut down on the repetition.  Something like (untested):
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1749016
+QAPI_MODULES = block-core block char common ...
+GENERATED_FILES += $(addprefix qapi/qapi-types-,$(addsuffix 
+.c,$(QAPI_MODULES))
+GENERATED_FILES += $(addprefix qapi/qapi-types-,$(addsuffix 
+.h,$(QAPI_MODULES))
 
-Title:
-  VHDX BAT and Metadata Region Header Required Bit Not Set
 
-Status in QEMU:
-  New
+> @@ -525,10 +585,70 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+>   
+>   qapi-builtin-types.c qapi-builtin-types.h \
+>   qapi-types.c qapi-types.h \
+> +qapi/qapi-types-block-core.c qapi/qapi-types-block-core.h \
+> +qapi/qapi-types-block.c qapi/qapi-types-block.h \
 
-Bug description:
-  When converting a VMDK to VHDX the resulting VHDX's Region table has a
-  small error. According to the VHDX specification the BAT and Metadata
-  entries for the region header required bit should be set to 1.  In a
-  VHDX created by qemu-img, this bit is not set.
+And repeating the list of filenames; again, an intermediate variable 
+would let you do:
 
-  See Table 4: Known Region Properties of the VHDX specification.
+QAPI_GENERATED_FILES = ...
+GENERATED_FILES += $(QAPI_GENERATED_FILES)
 
-  The structure format is as following from Structure 4: Region Table
-  Entry:
+$(QAPI_GENERATED_FILES): ...
 
-  struct VHDX_REGION_TABLE_ENTRY {
-  GUID Guid;
-  UINT64 FileOffset;
-  UINT32 Length;
-  UINT32 Required:1;
-  UINT32 Reserved:31;
-  }
+>   qmp-introspect.h qmp-introspect.c \
+>   qapi-doc.texi: \
+>   qapi-gen-timestamp ;
 
-  The Required bit for VHDX specified BAT and Metadata Regions Required
-  bit in the entry is not set as required in the current specification.
+Not only does it cut down on the repetition, but it will make adding a 
+future module easier.
 
-  VHDX Region Table in a valid VHDX
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 2813e984fd..7a55d45669 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -3,8 +3,56 @@
+>   stub-obj-y = stubs/ crypto/
+>   util-obj-y = util/ qobject/ qapi/
+>   util-obj-y += qapi-builtin-types.o
+> +util-obj-y += qapi-types.o
+> +util-obj-y += qapi/qapi-types-block-core.o
 
-  Offset(h)    00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-  0x00030000   72 65 67 69 AE 8C 6B C6 02 00 00 00 00 00 00 00
-  0x00030010   66 77 C2 2D 23 F6 00 42 9D 64 11 5E 9B FD 4A 08
-  0x00030020   00 00 30 00 00 00 00 00 00 00 10 00 01 00 00 00  =
+Perhaps this can also exploit make text manipulation?
 
-  0x00030030   06 A2 7C 8B 90 47 9A 4B B8 FE 57 5F 05 0F 88 6E
-  0x00030040   00 00 20 00 00 00 00 00 00 00 10 00 01 00 00 00
+Otherwise looks good.
 
-  VHDX Region Table in a VHDX converted by qemu-img from VMDK
-
-  Offset(h)    00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-  0x00030000   72 65 67 69 AE 8C 6B C6 02 00 00 00 00 00 00 00
-  0x00030010   66 77 C2 2D 23 F6 00 42 9D 64 11 5E 9B FD 4A 08
-  0x00030020   00 00 30 00 00 00 00 00 00 00 10 00 00 00 00 00  =
-
-  0x00030030   06 A2 7C 8B 90 47 9A 4B B8 FE 57 5F 05 0F 88 6E
-  0x00030040   00 00 20 00 00 00 00 00 00 00 10 00 00 00 00 00
-
-  The fist bit at 0x0003002A and 0x0003004A should be set to 1.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1749016/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
