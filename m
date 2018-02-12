@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elHx8-0000ZD-Mz
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:31:43 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elI0v-0003tV-BP
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elHx3-0003Qa-G7
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:31:42 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35564 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elHx3-0003QD-Bl
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:31:37 -0500
-References: <20180212142506.28445-1-danielhb@linux.vnet.ibm.com>
-	<20180212142506.28445-2-danielhb@linux.vnet.ibm.com>
-	<98934c2f-2210-83d7-d629-157e5a7cee8e@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b4cafa8f-efac-00e1-683a-304a91c695ca@redhat.com>
-Date: Mon, 12 Feb 2018 11:31:35 -0600
+	(envelope-from <mreitz@redhat.com>) id 1elI0u-0008Om-It
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:35:37 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-23-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9fb034c5-6064-29c2-24f0-998d9d6eef9e@redhat.com>
+Date: Mon, 12 Feb 2018 18:35:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <98934c2f-2210-83d7-d629-157e5a7cee8e@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] dump.c: allow fd_write_vmcore to
- return errno on failure
+In-Reply-To: <20180208192328.16550-23-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0wbKZsu2NdwxBy9ltJ5hBwh6HEOP6r8Oo"
+Subject: Re: [Qemu-devel] [PATCH 22/27] ssh: Pass BlockdevOptionsSsh to
+ connect_to_ssh()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On 02/12/2018 08:46 AM, Murilo Opsfelder Araujo wrote:
-> On 02/12/2018 12:25 PM, Daniel Henrique Barboza wrote:
->> From: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
->>
->> fd_write_vmcore can fail to execute for a lot of reasons that can be
->> retrieved by errno, but it only returns -1. This makes difficult for
->> the caller to know what happened and only a generic error message is
->> propagated back to the user. This is an example using dump-guest-memory:
->>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0wbKZsu2NdwxBy9ltJ5hBwh6HEOP6r8Oo
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <9fb034c5-6064-29c2-24f0-998d9d6eef9e@redhat.com>
+Subject: Re: [PATCH 22/27] ssh: Pass BlockdevOptionsSsh to connect_to_ssh()
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-23-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-23-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->> +++ b/dump.c
->> @@ -107,7 +107,7 @@ static int fd_write_vmcore(const void *buf, size_t size, void *opaque)
->>
->>       written_size = qemu_write_full(s->fd, buf, size);
->>       if (written_size != size) {
->> -        return -1;
->> +        return -errno;
->>       }
->>
->>       return 0;
->> @@ -140,7 +140,7 @@ static void write_elf64_header(DumpState *s, Error **errp)
->>
->>       ret = fd_write_vmcore(&elf_header, sizeof(elf_header), s);
->>       if (ret < 0) {
->> -        error_setg(errp, "dump: failed to write elf header");
->> +        error_setg_errno(errp, -ret, "dump: failed to write elf header");
-> 
-> Do we need -ret passed to error_setg_errno()? fd_write_vmcore() returns
-> negative errno in case of error.
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> Move the parsing of the QDict options up to the callers, in preparation=
 
-Yes, this usage is correct.  error_setg_errno() takes a positive errno 
-value (using strerror, which only decodes positive values into useful 
-strings); but we typically return negative errno values (as was 
-correctly done in fd_write_vmcore), so the extra layer of negation here 
-is needed.
+> for the .bdrv_co_create implementation that directly gets a QAPI type.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/ssh.c | 34 +++++++++++++++++++++-------------
+>  1 file changed, 21 insertions(+), 13 deletions(-)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--0wbKZsu2NdwxBy9ltJ5hBwh6HEOP6r8Oo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqB0FUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AL7kH/3ysFzcTD6dJayW2sDrbQY7xpYQt8nyX
+lPTtRjDh/0eOVGgWBUDtcZFd4lpEftIAuP8GvpGqBWgMYGA0zbEqYYbRTJOGBF1e
+0fxzrcbnd80IVJ72iiDDDLYaVTb1kWgqyzGsv6dC9lL9Yw+wdNrTUFSBPwg6yXHq
+VzIQifCifN0qzw3X+Ip0jWbL7l1t2B/gTaEcfvUFTZSGDmE5WHGWgsORsvvD6AEZ
+zYZAA/GjaBQwb3imNrSxHqHM8bbI2r9ybB8QHxGU9KLtISsPXYbD8jvFHVqOvxW3
+/rYjW4pbNZ5HnCB/bVQdXVHJQxP57nhAg9OSQL26Ck8/HrtS2PBJveo=
+=l6Zy
+-----END PGP SIGNATURE-----
+
+--0wbKZsu2NdwxBy9ltJ5hBwh6HEOP6r8Oo--
