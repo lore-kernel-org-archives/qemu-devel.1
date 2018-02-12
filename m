@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1elFN1-0003Ly-W0
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:46:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1elFPX-0005C6-5R
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:48:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1elFMy-00036m-Ig
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:46:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34688)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.vnet.ibm.com>)
-	id 1elFMy-00035J-AL
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:46:12 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1CEjApW017844
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 09:46:10 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g3ckas735-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 09:46:10 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.vnet.ibm.com>;
-	Mon, 12 Feb 2018 07:46:09 -0700
-References: <20180212142506.28445-1-danielhb@linux.vnet.ibm.com>
-	<20180212142506.28445-2-danielhb@linux.vnet.ibm.com>
-From: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
-Date: Mon, 12 Feb 2018 12:46:05 -0200
+	(envelope-from <kwolf@redhat.com>) id 1elFPW-0005zz-6c
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:48:51 -0500
+Date: Mon, 12 Feb 2018 15:48:24 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180212144824.GI5103@localhost.localdomain>
+References: <20180207163622.29935-1-pbonzini@redhat.com>
+	<20180207163622.29935-3-pbonzini@redhat.com>
+	<20180208013517.GB24289@lemon.usersys.redhat.com>
+	<5ac0b76e-213a-60c3-c010-87512d3a564a@redhat.com>
+	<20180212135206.GG5103@localhost.localdomain>
+	<81af35f9-4934-0c21-e3b1-b27c2fa7fdd9@redhat.com>
+	<20180212143040.GH5103@localhost.localdomain>
+	<3d6031b0-7d75-c3ab-e466-ce3d87d630df@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180212142506.28445-2-danielhb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <98934c2f-2210-83d7-d629-157e5a7cee8e@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] dump.c: allow fd_write_vmcore to
- return errno on failure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3d6031b0-7d75-c3ab-e466-ce3d87d630df@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: add block job opblockers for
+ scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,90 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, Yasmin Beatriz <yasmins@linux.vnet.ibm.com>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 02/12/2018 12:25 PM, Daniel Henrique Barboza wrote:
-> From: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
+Am 12.02.2018 um 15:32 hat Paolo Bonzini geschrieben:
+> On 12/02/2018 15:30, Kevin Wolf wrote:
+> >>> We shouldn't be adding new instances of BLOCK_OP_* at all. I couldn't
+> >>> find the time yet to remove the existing ones, but any new protections
+> >>> should be using the permission system.
+> >> I agree.  But does this include not fixing bugs wherever clients are
+> >> using the old op blockers?
+> > I'm not saying that we shouldn't fix the bug, just that we should fix it
+> > properly with the best infrastructure we have.
+> > 
+> > The old op blockers are "fixing" the problem at the symptom level, and
+> > you have to check for each high-level operation if it does something
+> > problematic internally. You have to repeat this analysis every time you
+> > add a new operation or modifiy an existing one (which noone ever does).
+> > The risk that this breaks sooner or later is pretty high.
+> > 
+> > The new permission system, on the other hand, directly addresses the
+> > root cause, and any new feature that uses dirty bitmaps will then
+> > automatically get the protection, too.
+> > 
+> > So in fact, I would say that the bug isn't really fixed (but at best
+> > papered over) until we add a proper fix on the permission level.
 > 
-> fd_write_vmcore can fail to execute for a lot of reasons that can be
-> retrieved by errno, but it only returns -1. This makes difficult for
-> the caller to know what happened and only a generic error message is
-> propagated back to the user. This is an example using dump-guest-memory:
-> 
-> (qemu) dump-guest-memory /home/yasmin/mnt/test.dump
-> dump: failed to save memory
-> 
-> All callers of fd_write_vmcore of dump.c does error handling via
-> error_setg(), so at first it seems feasible to add the Error pointer as
-> an argument of fd_write_vmcore. This proved to be more complex than it
-> first looked. fd_write_vmcore is used by write_elf64_notes and
-> write_elf32_notes as a WriteCoreDumpFunction prototype. WriteCoreDumpFunction
-> is declared in include/qom/cpu.h and is used all around the code. This
-> leaves us with few alternatives:
-> 
-> - change the WriteCoreDumpFunction prototype to include an error pointer.
-> This would require to change all functions that implements this prototype
-> to also receive an Error pointer;
-> 
-> - change both write_elf64_notes and write_elf32_notes to no use the
-> WriteCoreDumpFunction. These functions use not only fd_write_vmcore
-> but also buf_write_note, so this would require to change buf_write_note
-> to handle an Error pointer. Considerable easier than the alternative
-> above, but it's still a lot of code just for the benefit of the callers
-> of fd_write_vmcore.
-> 
-> This patch presents an easier solution that benefits all fd_write_vmcore
-> callers:
-> 
-> - instead of returning -1 on error, return -errno. All existing callers
-> already checks for ret < 0 so there is no need to change the caller's
-> logic too much. This also allows the retrieval of the errno.
-> 
-> - all callers were updated to use error_setg_errno instead of just
-> errno_setg. Now that fd_write_vmcore can return an errno, let's update
-> all callers so they can benefit from a more detailed error message.
-> 
-> This is the same dump-guest-memory example with this patch applied:
-> 
-> (qemu) dump-guest-memory /home/yasmin/mnt/test.dump
-> dump: failed to save memory: No space left on device
-> (qemu)
-> 
-> This example illustrates an error of fd_write_vmcore when called
-> from write_data. All other callers will benefit from better
-> error messages as well.
-> 
-> Reported-by: yilzhang@redhat.com
-> Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> Signed-off-by: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> ---
->  dump.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/dump.c b/dump.c
-> index 7b13baa413..171ff8a3b8 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -107,7 +107,7 @@ static int fd_write_vmcore(const void *buf, size_t size, void *opaque)
-> 
->      written_size = qemu_write_full(s->fd, buf, size);
->      if (written_size != size) {
-> -        return -1;
-> +        return -errno;
->      }
-> 
->      return 0;
-> @@ -140,7 +140,7 @@ static void write_elf64_header(DumpState *s, Error **errp)
-> 
->      ret = fd_write_vmcore(&elf_header, sizeof(elf_header), s);
->      if (ret < 0) {
-> -        error_setg(errp, "dump: failed to write elf header");
-> +        error_setg_errno(errp, -ret, "dump: failed to write elf header");
+> Okay, we are in agreement about this and you expressed very well why I
+> (at the gut feeling level) didn't like the old op blockers.  But you
+> bypassed the real question, which is: should I send a pull request for
+> these two patches or not? :)
 
-Do we need -ret passed to error_setg_errno()? fd_write_vmcore() returns
-negative errno in case of error.
+I didn't spell it out that explicitly, but this is essentially a NACK.
+I'd very much prefer if you could replace it with the proper solution.
+Of course, we can always make exceptions when there is a good reason,
+but with 2.12 still two months away, I doubt we have one.
 
-Cheers
-Murilo
+Kevin
