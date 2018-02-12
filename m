@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBW-0003T0-RF
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:29 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBY-0003Ti-U5
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBT-0004AQ-Bm
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:26 -0500
-Received: from mail-by2nam01on0051.outbound.protection.outlook.com
-	([104.47.34.51]:31472
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBV-0004DC-BV
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:28 -0500
+Received: from mail-by2nam01on0070.outbound.protection.outlook.com
+	([104.47.34.70]:50592
 	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1elGBT-000483-3Y
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:23 -0500
+	id 1elGBV-0004C9-2c
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:25 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 12 Feb 2018 09:36:58 -0600
-Message-Id: <20180212153715.87555-12-brijesh.singh@amd.com>
+Date: Mon, 12 Feb 2018 09:36:59 -0600
+Message-Id: <20180212153715.87555-13-brijesh.singh@amd.com>
 In-Reply-To: <20180212153715.87555-1-brijesh.singh@amd.com>
 References: <20180212153715.87555-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 11/28] sev/i386: register the guest memory
- range which may contain encrypted data
+Subject: [Qemu-devel] [PATCH v8 12/28] kvm: introduce memory encryption APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +29,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-When SEV is enabled, the hardware encryption engine uses a tweak such
-that the two identical plaintext at different location will have a
-different ciphertexts. So swapping or moving a ciphertexts of two guest
-pages will not result in plaintexts being swapped. Hence relocating
-a physical backing pages of the SEV guest will require some additional
-steps in KVM driver. The KVM_MEMORY_ENCRYPT_{UN,}REG_REGION ioctl can be
-used to register/unregister the guest memory region which may contain the
-encrypted data. KVM driver will internally handle the relocating physical
-backing pages of registered memory regions.
+Inorder to integerate the Secure Encryption Virtualization (SEV) support
+add few high-level memory encryption APIs which can be used for encrypting
+the guest memory region.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- target/i386/sev.c        | 41 +++++++++++++++++++++++++++++++++++++++++
- target/i386/trace-events |  2 ++
- 2 files changed, 43 insertions(+)
+ accel/kvm/kvm-all.c    | 30 ++++++++++++++++++++++++++++++
+ accel/stubs/kvm-stub.c | 14 ++++++++++++++
+ include/sysemu/kvm.h   | 25 +++++++++++++++++++++++++
+ 3 files changed, 69 insertions(+)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index d5fd975792b8..2c4bbba3c367 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -86,6 +86,45 @@ fw_error_to_str(int code)
-     return sev_fw_errlist[code];
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 300fc3cd44ce..4468c8fe002c 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -107,6 +107,8 @@ struct KVMState
+ 
+     /* memory encryption */
+     void *memcrypt_handle;
++    int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
++    void (*memcrypt_debug_ops)(void *handle, MemoryRegion *mr);
+ };
+ 
+ KVMState *kvm_state;
+@@ -142,6 +144,34 @@ int kvm_get_max_memslots(void)
+     return s->nr_slots;
  }
  
-+static void
-+sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
++bool kvm_memcrypt_enabled(void)
 +{
-+    int r;
-+    struct kvm_enc_region range;
++    if (kvm_state && kvm_state->memcrypt_handle) {
++        return true;
++    }
 +
-+    range.addr = (__u64)host;
-+    range.size = size;
++    return false;
++}
 +
-+    trace_kvm_memcrypt_register_region(host, size);
-+    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
-+    if (r) {
-+        error_report("%s: failed to register region (%p+%#lx)",
-+                     __func__, host, size);
++int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
++{
++    if (kvm_state->memcrypt_handle &&
++        kvm_state->memcrypt_encrypt_data) {
++        return kvm_state->memcrypt_encrypt_data(kvm_state->memcrypt_handle,
++                                              ptr, len);
++    }
++
++    return 1;
++}
++
++void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
++{
++    if (kvm_state->memcrypt_handle &&
++        kvm_state->memcrypt_debug_ops) {
++        kvm_state->memcrypt_debug_ops(kvm_state->memcrypt_handle, mr);
 +    }
 +}
 +
-+static void
-+sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
-+{
-+    int r;
-+    struct kvm_enc_region range;
-+
-+    range.addr = (__u64)host;
-+    range.size = size;
-+
-+    trace_kvm_memcrypt_unregister_region(host, size);
-+    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_UNREG_REGION, &range);
-+    if (r) {
-+        error_report("%s: failed to unregister region (%p+%#lx)",
-+                     __func__, host, size);
-+    }
-+}
-+
-+static struct RAMBlockNotifier sev_ram_notifier = {
-+    .ram_block_added = sev_ram_block_added,
-+    .ram_block_removed = sev_ram_block_removed,
-+};
-+
- static void
- qsev_guest_finalize(Object *obj)
+ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
  {
-@@ -360,6 +399,8 @@ sev_guest_init(const char *id)
-     }
+     KVMState *s = kvm_state;
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index c964af3e1c97..5739712a67e3 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -105,6 +105,20 @@ int kvm_on_sigbus(int code, void *addr)
+     return 1;
+ }
  
-     sev_active = true;
-+    ram_block_notifier_add(&sev_ram_notifier);
++bool kvm_memcrypt_enabled(void)
++{
++    return false;
++}
 +
-     return s;
- err:
-     g_free(s);
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index 797b716751b7..ffa3d2250425 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -8,3 +8,5 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
++int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
++{
++  return 1;
++}
++
++void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
++{
++}
++
+ #ifndef CONFIG_USER_ONLY
+ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+ {
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index bbf12a172339..4a5db5dde390 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -231,6 +231,31 @@ int kvm_destroy_vcpu(CPUState *cpu);
+  */
+ bool kvm_arm_supports_user_irq(void);
  
- # target/i386/sev.c
- kvm_sev_init(void) ""
-+kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
-+kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
++/**
++ * kvm_memcrypt_enabled - return boolean indicating whether memory encryption
++ *                        is enabled
++ * Returns: 1 memory encryption is enabled
++ *          0 memory encryption is disabled
++ */
++bool kvm_memcrypt_enabled(void);
++
++/**
++ * kvm_memcrypt_encrypt_data: encrypt the memory range
++ *
++ * Return: 1 failed to encrypt the range
++ *         0 succesfully encrypted memory region
++ */
++int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
++
++/**
++ * kvm_memcrypt_set_debug_ram_ops: set debug_ram_ops callback
++ *
++ * When debug_ram_ops is set, debug access to this memory region will use
++ * memory encryption APIs.
++ */
++void kvm_memcrypt_set_debug_ops(MemoryRegion *mr);
++
++
+ #ifdef NEED_CPU_H
+ #include "cpu.h"
+ 
 -- 
 2.14.3
