@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBb-0003X4-UH
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:33 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBe-0003Yi-9C
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBY-0004GT-FU
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:31 -0500
-Received: from mail-by2nam01on0074.outbound.protection.outlook.com
-	([104.47.34.74]:4096
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBa-0004JS-Nn
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:34 -0500
+Received: from mail-by2nam01on0075.outbound.protection.outlook.com
+	([104.47.34.75]:32863
 	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1elGBX-0004FY-Vn
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:28 -0500
+	id 1elGBa-0004Hp-Ba
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:30 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 12 Feb 2018 09:37:01 -0600
-Message-ID: <20180212153715.87555-15-brijesh.singh@amd.com>
+Date: Mon, 12 Feb 2018 09:37:02 -0600
+Message-Id: <20180212153715.87555-16-brijesh.singh@amd.com>
 In-Reply-To: <20180212153715.87555-1-brijesh.singh@amd.com>
 References: <20180212153715.87555-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 14/28] hmp: add 'info sev' command
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 15/28] sev/i386: add command to create
+ launch memory encryption context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,190 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-The command can be used to show the SEV information when memory
-encryption is enabled on AMD platform.
+The KVM_SEV_LAUNCH_START command creates a new VM encryption key (VEK).
+The encryption key created with the command will be used for encrypting
+the bootstrap images (such as guest bios).
 
-Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- hmp-commands-info.hx | 14 ++++++++++++++
- hmp.c                | 19 +++++++++++++++++++
- hmp.h                |  1 +
- 3 files changed, 34 insertions(+)
+ include/sysemu/sev.h     | 10 +++++
+ target/i386/sev.c        | 99 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events |  2 +
+ 3 files changed, 111 insertions(+)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index ad590a4ffb2b..236811c465d2 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -865,6 +865,20 @@ STEXI
- @findex info memory_size_summary
- Display the amount of initially allocated and present hotpluggable (if
- enabled) memory in bytes.
-+ETEXI
+diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+index 121e7e4aa44c..08014a9c94ff 100644
+--- a/include/sysemu/sev.h
++++ b/include/sysemu/sev.h
+@@ -58,6 +58,16 @@ struct QSevGuestInfoClass {
+     ObjectClass parent_class;
+ };
+ 
++typedef enum {
++    SEV_STATE_UNINIT = 0,
++    SEV_STATE_LUPDATE,
++    SEV_STATE_SECRET,
++    SEV_STATE_RUNNING,
++    SEV_STATE_SUPDATE,
++    SEV_STATE_RUPDATE,
++    SEV_STATE_MAX
++} SevGuestState;
 +
-+    {
-+        .name       =3D "sev",
-+        .args_type  =3D "",
-+        .params     =3D "",
-+        .help       =3D "show SEV information",
-+        .cmd        =3D hmp_info_sev,
-+    },
+ struct SEVState {
+     QSevGuestInfo *sev_info;
+ };
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 2c4bbba3c367..2ecc6a1d1ad3 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -29,6 +29,17 @@ static int sev_fd;
+ 
+ #define SEV_FW_MAX_ERROR      0x17
+ 
++static SevGuestState current_sev_guest_state = SEV_STATE_UNINIT;
 +
-+STEXI
-+@item info sev
-+@findex info sev
-+Show SEV information.
- ETEXI
-=20
- STEXI
-diff --git a/hmp.c b/hmp.c
-index 7870d6a3004e..138bb8243207 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2924,3 +2924,22 @@ void hmp_info_memory_size_summary(Monitor *mon, cons=
-t QDict *qdict)
-     }
-     hmp_handle_error(mon, &err);
++static const char *const sev_state_str[] = {
++    "uninit",
++    "lupdate",
++    "secret",
++    "running",
++    "supdate",
++    "rupdate",
++};
++
+ static const char *const sev_fw_errlist[] = {
+     "",
+     "Platform state is invalid",
+@@ -86,6 +97,16 @@ fw_error_to_str(int code)
+     return sev_fw_errlist[code];
  }
-+
-+void hmp_info_sev(Monitor *mon, const QDict *qdict)
+ 
++static void
++sev_set_guest_state(SevGuestState new_state)
 +{
-+    SevInfo *info;
++    assert(new_state < SEV_STATE_MAX);
 +
-+    info =3D qmp_query_sev(NULL);
-+    monitor_printf(mon, "sev support: ");
-+    monitor_printf(mon, "%s\n", info->enabled ? "enabled" : "disabled");
++    trace_kvm_sev_change_state(sev_state_str[current_sev_guest_state],
++                               sev_state_str[new_state]);
++    current_sev_guest_state = new_state;
++}
 +
-+    if (info->enabled) {
-+        monitor_printf(mon, "state: %s\n", info->state);
-+        monitor_printf(mon, "policy: 0x%x\n", info->policy);
-+        monitor_printf(mon, "build id: %u\n", info->build_id);
-+        monitor_printf(mon, "api version: %u.%u\n",
-+                       info->api_major, info->api_minor);
+ static void
+ sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
+ {
+@@ -337,6 +358,7 @@ sev_get_me_mask(void)
+ void
+ sev_get_current_state(char **state)
+ {
++    *state = g_strdup(sev_state_str[current_sev_guest_state]);
+ }
+ 
+ bool
+@@ -355,6 +377,76 @@ sev_get_policy(uint32_t *policy)
+ {
+ }
+ 
++static int
++sev_read_file_base64(const char *filename, guchar **data, gsize *len)
++{
++    gsize sz;
++    gchar *base64;
++    GError *error = NULL;
++
++    if (!g_file_get_contents(filename, &base64, &sz, &error)) {
++        error_report("failed to read '%s' (%s)", filename, error->message);
++        return -1;
 +    }
 +
-+    qapi_free_SevInfo(info);
++    *data = g_base64_decode(base64, len);
++    return 0;
 +}
-diff --git a/hmp.h b/hmp.h
-index 1143db44a760..4ca1a77b2c1f 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -146,5 +146,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict=
-);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
-+void hmp_info_sev(Monitor *mon, const QDict *qdict);
-=20
- #endif
---=20
++
++static int
++sev_launch_start(SEVState *s)
++{
++    gsize sz;
++    int ret = 1;
++    int fw_error;
++    QSevGuestInfo *sev = s->sev_info;
++    struct kvm_sev_launch_start *start;
++    guchar *session = NULL, *dh_cert = NULL;
++
++    start = g_malloc0(sizeof(*start));
++    if (!start) {
++        return 1;
++    }
++
++    start->handle = object_property_get_int(OBJECT(sev), "handle",
++                                            &error_abort);
++    start->policy = object_property_get_int(OBJECT(sev), "policy",
++                                            &error_abort);
++    if (sev->session_file) {
++        if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
++            return 1;
++        }
++        start->session_uaddr = (unsigned long)session;
++        start->session_len = sz;
++    }
++
++    if (sev->dh_cert_file) {
++        if (sev_read_file_base64(sev->dh_cert_file, &dh_cert, &sz) < 0) {
++            return 1;
++        }
++        start->dh_uaddr = (unsigned long)dh_cert;
++        start->dh_len = sz;
++    }
++
++    trace_kvm_sev_launch_start(start->policy, session, dh_cert);
++    ret = sev_ioctl(KVM_SEV_LAUNCH_START, start, &fw_error);
++    if (ret < 0) {
++        error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
++                __func__, ret, fw_error, fw_error_to_str(fw_error));
++        return 1;
++    }
++
++    object_property_set_int(OBJECT(sev), start->handle, "handle",
++                            &error_abort);
++    sev_set_guest_state(SEV_STATE_LUPDATE);
++
++    g_free(start);
++    g_free(session);
++    g_free(dh_cert);
++
++    return 0;
++}
++
+ void *
+ sev_guest_init(const char *id)
+ {
+@@ -398,6 +490,13 @@ sev_guest_init(const char *id)
+         goto err;
+     }
+ 
++    ret = sev_launch_start(s);
++    if (ret) {
++        error_report("%s: failed to create encryption context", __func__);
++        goto err;
++    }
++
++
+     sev_active = true;
+     ram_block_notifier_add(&sev_ram_notifier);
+ 
+diff --git a/target/i386/trace-events b/target/i386/trace-events
+index ffa3d2250425..9402251e9991 100644
+--- a/target/i386/trace-events
++++ b/target/i386/trace-events
+@@ -10,3 +10,5 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
+ kvm_sev_init(void) ""
+ kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
+ kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
++kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
++kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
+-- 
 2.14.3
