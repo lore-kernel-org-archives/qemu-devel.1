@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1elH7t-00063T-Lg
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:38:46 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elHDE-0002yR-8R
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:44:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1elH7s-0001xO-Jv
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:38:45 -0500
-References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
-	<b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com>
-	<87tvuyf4it.fsf@dusky.pond.sub.org>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <8639a69c-ca85-d11b-7aaa-e67ffb660991@virtuozzo.com>
-Date: Mon, 12 Feb 2018 19:38:34 +0300
+	(envelope-from <mreitz@redhat.com>) id 1elHDB-0000DL-Oe
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:44:14 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-20-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3a3134a8-19c8-0d9a-15d0-3b904998abd7@redhat.com>
+Date: Mon, 12 Feb 2018 17:43:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <87tvuyf4it.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] qapi: query-blockstat: add driver
- specific file-posix stats
+In-Reply-To: <20180208192328.16550-20-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6D6YPuCRyElNN8qsZf332pUZQ98u6WC8p"
+Subject: Re: [Qemu-devel] [PATCH 19/27] sheepdog: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +24,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6D6YPuCRyElNN8qsZf332pUZQ98u6WC8p
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <3a3134a8-19c8-0d9a-15d0-3b904998abd7@redhat.com>
+Subject: Re: [PATCH 19/27] sheepdog: Support .bdrv_co_create
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-20-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-20-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> This adds the .bdrv_co_create driver callback to sheepdog, which enable=
+s
+> image creation over QMP.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json |  24 +++++-
+>  block/sheepdog.c     | 209 ++++++++++++++++++++++++++++++++++++-------=
+--------
+>  2 files changed, 170 insertions(+), 63 deletions(-)
+>=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 7d004dddf9..08217e3e38 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3492,6 +3492,28 @@
+>              'erasure-coded': 'SheepdogRedundancyErasureCoded' } }
+> =20
+>  ##
+> +# @BlockdevCreateOptionsSheepdog:
+> +#
+> +# Driver specific image creation options for Sheepdog.
+> +#
+> +# @location         Where to store the new image file
+> +# @size             Size of the virtual disk in bytes
+> +# @backing_file     File name of a base image
+
+s/_/-/
+
+With that fixed:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> +# @preallocation    Preallocation mode (allowed values: off, full)
+> +# @redundancy       Redundancy of the image
+> +# @object-size      Object size of the image
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'BlockdevCreateOptionsSheepdog',
+> +  'data': { 'location':         'BlockdevOptionsSheepdog',
+> +            'size':             'size',
+> +            '*backing-file':    'str',
+> +            '*preallocation':   'PreallocMode',
+> +            '*redundancy':      'SheepdogRedundancy',
+> +            '*object-size':     'size' } }
+> +
+> +##
+>  # @BlockdevCreateNotSupported:
+>  #
+>  # This is used for all drivers that don't support creating images.
+
+[...]
+
+> index dc0348f120..05129dc809 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+
+[...]
+
+> @@ -2142,15 +2144,95 @@ static int sd_create(const char *filename, Qemu=
+Opts *opts,
+
+[...]
+
+> +static int sd_create(const char *filename, QemuOpts *opts,
+> +                     Error **errp)
+> +{
+
+[...]
+
+> +    v =3D qobject_input_visitor_new_keyval(crumpled);
+> +    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_=
+err);
+> +    visit_free(v);
+> +    qobject_decref(crumpled);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        ret =3D -EINVAL;
+> +        goto fail;
+> +    }
+> +
+> +    create_options->u.sheepdog.size =3D
+> +        ROUND_UP(create_options->u.sheepdog.size, BDRV_SECTOR_SIZE);
+
+I think I'd prefer an assertion that the type is indeed sheepdog before
+this.
+
+> +
+> +    if (redundancy) {
+> +        create_options->u.sheepdog.has_redundancy =3D true;
+> +        create_options->u.sheepdog.redundancy =3D
+> +            parse_redundancy_str(redundancy);
+> +        if (create_options->u.sheepdog.redundancy =3D=3D NULL) {
+> +            error_setg(errp, "Invalid redundancy mode");
+> +            ret =3D -EINVAL;
+> +            goto fail;
+> +        }
+> +    }
 
 
+--6D6YPuCRyElNN8qsZf332pUZQ98u6WC8p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 3/2/2018 6:59 PM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
->> On 01/19/2018 06:50 AM, Anton Nefedov wrote:
->>> +
->>> +##
->>> +# @BlockDriverStats:
->>> +#
->>> +# Statistics of a block driver (driver-specific)
->>> +#
->>> +# Since: 2.12
->>> +##
->>> +{ 'union': 'BlockDriverStats',
->>> +  'data': {
->>> +      'file': 'BlockDriverStatsFile'
->>> +  } }
->>
->> Markus has been adamant that we add no new "simple unions" (unions with
->> a 'discriminator' field) - because they are anything but simple in the
->> long run.
-> 
-> Indeed.  You could make this a flat union, similar to BlockdevOptions:
-> 
-> { 'union': 'BlockDriverStats':
->    'base': { 'driver': 'BlockdevDriver' },
->    'discriminator': 'driver',
->    'data': {
->        'file': 'BlockDriverStatsFile',
->        ... } }
-> 
-> However:
-> 
->>> +
->>> +##
->>>   # @BlockStats:
->>>   #
->>>   # Statistics of a virtual block device or a block backing device.
->>> @@ -785,6 +819,8 @@
->>>   #
->>>   # @stats:  A @BlockDeviceStats for the device.
->>>   #
->>> +# @driver-stats: Optional driver-specific statistics. (Since 2.12)
->>> +#
->>>   # @parent: This describes the file block device if it has one.
->>>   #          Contains recursively the statistics of the underlying
->>>   #          protocol (e.g. the host file for a qcow2 image). If there is
->>> @@ -798,6 +834,7 @@
->>>   { 'struct': 'BlockStats',
->>>     'data': {'*device': 'str', '*node-name': 'str',
->>>              'stats': 'BlockDeviceStats',
->>> +           '*driver-stats': 'BlockDriverStats',
-> 
-> You're adding a union of driver-specific stats to a struct of generic
-> stats.  That's unnecessarily complicated.  Instead, turn the struct of
-> generic stats into a flat union, like this:
-> 
-> { 'union': 'BlockStats',
->    'base': { ... the generic stats, i.e. the members of BlockStats
->              before this patch ...
->              'driver': 'BlockdevDriver' }
->    'discriminator': 'driver',
->    'data': {
->        'file': 'BlockDriverStatsFile',
->        ... } }
-> 
->> ...[1] You are using it alongside a struct that already uses '-'
->> (node-name), so you should use dashes.
->>
->> So, the difference between your proposal (a simple union) and using a
->> "flat union", on the wire, is yours:
->>
->> "return": { ..., "driver-stats": { "type": "file", "data": {
->> "discard_nb_ok: ... } } }
->>
->> vs. a flat union:
->>
->> "return": { ..., "driver-stats": { "driver": "file", "discard-nb-ok":
->> ... } }
->>
->> where you can benefit from less nesting and a saner discriminator name.
-> 
-> My proposal peels off yet another level of nesting.
-> 
+-----BEGIN PGP SIGNATURE-----
 
-The output is better indeed, thanks; a little drawback is now we need to
-pass the whole BlockStats to the driver so it fills its stats.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqBxEsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AqMgH/jI6Tk/WhK7kx5hVCA0Rp0QeErcKZeNV
+npTtqFYsCkLNJvCqW8jgNtKuxrTVvuTndD1yRFMqUl1WGSZ+8XaN9o8F2zHMy9hR
+luUJ37QuLB4T2QasGLuCNGdJVGlx8nMXzmELklax3YwWraVTOR0wowBxJE/GvYar
++0BKodvhwkj/EPSpfdkrMBKmjzscP3hFjza8cwDh1iA4FQTMAnebdqtTae8D53To
+K/n1Rp2UNcZhAkLsCuU6eyOL+RTZM5pNjQoq+UPrE8rM/qLYsSNm8qT51Kik/11H
+vbMfq9e/yqm+NauFyUgKeUY1gy5UY7wVlbSEEYTZlaYcSG2NQKIc6EY=
+=16pw
+-----END PGP SIGNATURE-----
 
-e.g. the interface:
-
-     void (*bdrv_get_stats)(BlockDriverState *bs, BlockStats *stats);
-
-And that BlockdevDriver subset type (or a generator patch) still seems
-to be needed
-
-   { 'enum' : 'BlockdevDriverWithStats',
-     'data' : [ 'file' ] }
+--6D6YPuCRyElNN8qsZf332pUZQ98u6WC8p--
