@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBY-0003Ti-U5
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBY-0003Th-Qy
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBV-0004DC-BV
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBV-0004DP-Kd
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:28 -0500
 Received: from mail-by2nam01on0070.outbound.protection.outlook.com
 	([104.47.34.70]:50592
 	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1elGBV-0004C9-2c
+	id 1elGBV-0004C9-EU
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:25 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 12 Feb 2018 09:36:59 -0600
-Message-Id: <20180212153715.87555-13-brijesh.singh@amd.com>
+Date: Mon, 12 Feb 2018 09:37:00 -0600
+Message-ID: <20180212153715.87555-14-brijesh.singh@amd.com>
 In-Reply-To: <20180212153715.87555-1-brijesh.singh@amd.com>
 References: <20180212153715.87555-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 12/28] kvm: introduce memory encryption APIs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v8 13/28] qmp: add query-sev command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,127 +32,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-Inorder to integerate the Secure Encryption Virtualization (SEV) support
-add few high-level memory encryption APIs which can be used for encrypting
-the guest memory region.
+The QMP query command can used to retrieve the SEV information when
+memory encryption is enabled on AMD platform.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
+Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- accel/kvm/kvm-all.c    | 30 ++++++++++++++++++++++++++++++
- accel/stubs/kvm-stub.c | 14 ++++++++++++++
- include/sysemu/kvm.h   | 25 +++++++++++++++++++++++++
- 3 files changed, 69 insertions(+)
+ qapi-schema.json | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ qmp.c            | 16 ++++++++++++++++
+ 2 files changed, 63 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 300fc3cd44ce..4468c8fe002c 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -107,6 +107,8 @@ struct KVMState
- 
-     /* memory encryption */
-     void *memcrypt_handle;
-+    int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
-+    void (*memcrypt_debug_ops)(void *handle, MemoryRegion *mr);
- };
- 
- KVMState *kvm_state;
-@@ -142,6 +144,34 @@ int kvm_get_max_memslots(void)
-     return s->nr_slots;
- }
- 
-+bool kvm_memcrypt_enabled(void)
-+{
-+    if (kvm_state && kvm_state->memcrypt_handle) {
-+        return true;
-+    }
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 5c06745c7927..9203e28b8aee 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3189,3 +3189,50 @@
+ # Since: 2.11
+ ##
+ { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} =
+}
 +
-+    return false;
++##
++# @SevInfo:
++#
++# Information about Secure Encrypted Virtualization (SEV) support
++#
++# @enabled: true if SEV is active
++#
++# @api-major: SEV API major version
++#
++# @api-minor: SEV API minor version
++#
++# @build-id: SEV FW build id
++#
++# @policy: SEV policy value
++#
++# @state: SEV guest state
++#
++# Since: 2.12
++##
++{ 'struct': 'SevInfo',
++    'data': { 'enabled': 'bool',
++              'api-major': 'uint8',
++              'api-minor' : 'uint8',
++              'build-id' : 'uint8',
++              'policy' : 'uint32',
++              'state' : 'str'
++            }
 +}
 +
-+int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
-+{
-+    if (kvm_state->memcrypt_handle &&
-+        kvm_state->memcrypt_encrypt_data) {
-+        return kvm_state->memcrypt_encrypt_data(kvm_state->memcrypt_handle,
-+                                              ptr, len);
-+    }
-+
-+    return 1;
-+}
-+
-+void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
-+{
-+    if (kvm_state->memcrypt_handle &&
-+        kvm_state->memcrypt_debug_ops) {
-+        kvm_state->memcrypt_debug_ops(kvm_state->memcrypt_handle, mr);
-+    }
-+}
-+
- static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
++##
++# @query-sev:
++#
++# Returns information about SEV
++#
++# Returns: @SevInfo
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev" }
++# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
++#                  "build-id" : 0, "policy" : 0, "state" : "running" } }
++#
++##
++{ 'command': 'query-sev', 'returns': 'SevInfo' }
+diff --git a/qmp.c b/qmp.c
+index 793f6f332302..7907e539c8f2 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -39,6 +39,7 @@
+ #include "qom/object_interfaces.h"
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/acpi/acpi_dev_interface.h"
++#include "sysemu/sev.h"
+=20
+ NameInfo *qmp_query_name(Error **errp)
  {
-     KVMState *s = kvm_state;
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index c964af3e1c97..5739712a67e3 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -105,6 +105,20 @@ int kvm_on_sigbus(int code, void *addr)
-     return 1;
+@@ -719,3 +720,18 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp=
+)
+=20
+     return mem_info;
  }
- 
-+bool kvm_memcrypt_enabled(void)
++
++SevInfo *qmp_query_sev(Error **errp)
 +{
-+    return false;
++    SevInfo *info =3D g_malloc0(sizeof(*info));
++
++    info->enabled =3D sev_enabled();
++    if (info->enabled) {
++        sev_get_fw_version(&info->api_major,
++                           &info->api_minor, &info->build_id);
++        sev_get_policy(&info->policy);
++        sev_get_current_state(&info->state);
++    }
++
++    return info;
 +}
-+
-+int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
-+{
-+  return 1;
-+}
-+
-+void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
-+{
-+}
-+
- #ifndef CONFIG_USER_ONLY
- int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
- {
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index bbf12a172339..4a5db5dde390 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -231,6 +231,31 @@ int kvm_destroy_vcpu(CPUState *cpu);
-  */
- bool kvm_arm_supports_user_irq(void);
- 
-+/**
-+ * kvm_memcrypt_enabled - return boolean indicating whether memory encryption
-+ *                        is enabled
-+ * Returns: 1 memory encryption is enabled
-+ *          0 memory encryption is disabled
-+ */
-+bool kvm_memcrypt_enabled(void);
-+
-+/**
-+ * kvm_memcrypt_encrypt_data: encrypt the memory range
-+ *
-+ * Return: 1 failed to encrypt the range
-+ *         0 succesfully encrypted memory region
-+ */
-+int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
-+
-+/**
-+ * kvm_memcrypt_set_debug_ram_ops: set debug_ram_ops callback
-+ *
-+ * When debug_ram_ops is set, debug access to this memory region will use
-+ * memory encryption APIs.
-+ */
-+void kvm_memcrypt_set_debug_ops(MemoryRegion *mr);
-+
-+
- #ifdef NEED_CPU_H
- #include "cpu.h"
- 
--- 
+--=20
 2.14.3
