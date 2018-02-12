@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elIDR-0005pU-SV
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:48:40 -0500
+	(envelope-from <berrange@redhat.com>) id 1elIEi-00072R-Ox
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:49:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elIDK-00005g-V1
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:48:33 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35060 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1elIDK-0008VO-AB
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:48:26 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90A9E9BA98
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 17:48:25 +0000 (UTC)
-Date: Mon, 12 Feb 2018 17:48:22 +0000
+	(envelope-from <berrange@redhat.com>) id 1elIEh-0002KJ-7H
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:49:52 -0500
+Date: Mon, 12 Feb 2018 17:49:42 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180212174822.GZ4071@redhat.com>
+Message-ID: <20180212174942.GA4071@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180125155915.3226-1-berrange@redhat.com>
+References: <20171208133416.28978-1-berrange@redhat.com>
+	<20180125170501.GA19513@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180125155915.3226-1-berrange@redhat.com>
+In-Reply-To: <20180125170501.GA19513@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: convert socket server to
- QIONetListener
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: fix EOF Ctrl-D handling in
+ qemu-io readline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,120 +27,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Ping, any thoughts on this ?
+Re-ping.
 
-NB, it will conflict with the multiple-sockets migration work I
-expect, since IIRC that assumes it can get the GSource ID of the
-migration listener, but that's not valid going forward, since
-the GSource's are private to the QIONetListener. The callers
-just register & unregister the callbacks.
-
-On Thu, Jan 25, 2018 at 03:59:15PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
+On Thu, Jan 25, 2018 at 05:05:01PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> ping, does any block maintainer want to queue this one ?
 >=20
-> Instead of creating a QIOChannelSocket directly for the migration
-> server socket, use a QIONetListener. This provides the ability
-> to listen on multiple sockets at the same time, so enables
-> full support for IPv4/IPv6 dual stack.
+> On Fri, Dec 08, 2017 at 01:34:16PM +0000, Daniel P. Berrange wrote:
+> > qemu-io puts the TTY into non-canonical mode, which means no EOF proc=
+essing is
+> > done and thus getchar() will never return the EOF constant. Instead w=
+e have to
+> > query the TTY attributes to determine the configured EOF character (u=
+sually
+> > Ctrl-D / 0x4), and then explicitly check for that value. This fixes t=
+he
+> > regression that prevented Ctrl-D from triggering an exit of qemu-io t=
+hat has
+> > existed since readline was first added in
+> >=20
+> >   commit 0cf17e181798063c3824c8200ba46f25f54faa1a
+> >   Author: Stefan Hajnoczi <stefanha@redhat.com>
+> >   Date:   Thu Nov 14 11:54:17 2013 +0100
+> >=20
+> >     qemu-io: use readline.c
+> >=20
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> > Changed in v2:
+> >=20
+> >   - Query termios settings for EOF character
+> >=20
+> >  qemu-io.c | 26 +++++++++++++++++++++++++-
+> >  1 file changed, 25 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/qemu-io.c b/qemu-io.c
+> > index c70bde3eb1..fa4972d734 100644
+> > --- a/qemu-io.c
+> > +++ b/qemu-io.c
+> > @@ -10,6 +10,9 @@
+> >  #include "qemu/osdep.h"
+> >  #include <getopt.h>
+> >  #include <libgen.h>
+> > +#ifndef _WIN32
+> > +#include <termios.h>
+> > +#endif
+> > =20
+> >  #include "qapi/error.h"
+> >  #include "qemu-io.h"
+> > @@ -41,6 +44,26 @@ static bool imageOpts;
+> > =20
+> >  static ReadLineState *readline_state;
+> > =20
+> > +static int ttyEOF;
+> > +
+> > +static int get_eof_char(void)
+> > +{
+> > +#ifdef _WIN32
+> > +    return 0x4; /* Ctrl-D */
+> > +#else
+> > +    struct termios tty;
+> > +    if (tcgetattr(STDIN_FILENO, &tty) !=3D 0) {
+> > +        if (errno =3D=3D ENOTTY) {
+> > +            return 0x0; /* just expect read() =3D=3D 0 */
+> > +        } else {
+> > +            return 0x4; /* Ctrl-D */
+> > +        }
+> > +    }
+> > +
+> > +    return tty.c_cc[VEOF];
+> > +#endif
+> > +}
+> > +
+> >  static int close_f(BlockBackend *blk, int argc, char **argv)
+> >  {
+> >      blk_unref(qemuio_blk);
+> > @@ -322,7 +345,7 @@ static char *fetchline_readline(void)
+> >      readline_start(readline_state, get_prompt(), 0, readline_func, &=
+line);
+> >      while (!line) {
+> >          int ch =3D getchar();
+> > -        if (ch =3D=3D EOF) {
+> > +        if (ttyEOF !=3D 0x0 && ch =3D=3D ttyEOF) {
+> >              break;
+> >          }
+> >          readline_handle_byte(readline_state, ch);
+> > @@ -592,6 +615,7 @@ int main(int argc, char **argv)
+> >      qemuio_add_command(&close_cmd);
+> > =20
+> >      if (isatty(STDIN_FILENO)) {
+> > +        ttyEOF =3D get_eof_char();
+> >          readline_state =3D readline_init(readline_printf_func,
+> >                                         readline_flush_func,
+> >                                         NULL,
+> > --=20
+> > 2.14.3
+> >=20
 >=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  migration/socket.c | 48 ++++++++++++++++------------------------------=
---
->  1 file changed, 16 insertions(+), 32 deletions(-)
->=20
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 3a8232dd2d..d0ef50765c 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -24,6 +24,7 @@
->  #include "migration.h"
->  #include "qemu-file.h"
->  #include "io/channel-socket.h"
-> +#include "io/net-listener.h"
->  #include "trace.h"
-> =20
-> =20
-> @@ -130,34 +131,20 @@ void unix_start_outgoing_migration(MigrationState=
- *s,
->  }
-> =20
-> =20
-> -static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-> -                                                 GIOCondition conditio=
-n,
-> -                                                 gpointer opaque)
-> +static void socket_accept_incoming_migration(QIONetListener *listener,
-> +                                             QIOChannelSocket *cioc,
-> +                                             gpointer opaque)
->  {
-> -    QIOChannelSocket *sioc;
-> -    Error *err =3D NULL;
-> -
-> -    sioc =3D qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
-> -                                     &err);
-> -    if (!sioc) {
-> -        error_report("could not accept migration connection (%s)",
-> -                     error_get_pretty(err));
-> -        goto out;
-> -    }
-> -
->      trace_migration_socket_incoming_accepted();
-> =20
-> -    qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming=
-");
-> -    migration_channel_process_incoming(QIO_CHANNEL(sioc));
-> -    object_unref(OBJECT(sioc));
-> +    qio_channel_set_name(QIO_CHANNEL(cioc), "migration-socket-incoming=
-");
-> +    migration_channel_process_incoming(QIO_CHANNEL(cioc));
-> =20
-> -out:
->      if (migration_has_all_channels()) {
->          /* Close listening socket as its no longer needed */
-> -        qio_channel_close(ioc, NULL);
-> -        return G_SOURCE_REMOVE;
-> -    } else {
-> -        return G_SOURCE_CONTINUE;
-> +        qio_net_listener_disconnect(listener);
-> +
-> +        object_unref(OBJECT(listener));
->      }
->  }
-> =20
-> @@ -165,21 +152,18 @@ out:
->  static void socket_start_incoming_migration(SocketAddress *saddr,
->                                              Error **errp)
->  {
-> -    QIOChannelSocket *listen_ioc =3D qio_channel_socket_new();
-> +    QIONetListener *listener =3D qio_net_listener_new();
-> =20
-> -    qio_channel_set_name(QIO_CHANNEL(listen_ioc),
-> -                         "migration-socket-listener");
-> +    qio_net_listener_set_name(listener, "migration-socket-listener");
-> =20
-> -    if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
-> -        object_unref(OBJECT(listen_ioc));
-> +    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
-> +        object_unref(OBJECT(listener));
->          return;
->      }
-> =20
-> -    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
-> -                          G_IO_IN,
-> -                          socket_accept_incoming_migration,
-> -                          listen_ioc,
-> -                          (GDestroyNotify)object_unref);
-> +    qio_net_listener_set_client_func(listener,
-> +                                     socket_accept_incoming_migration,
-> +                                     NULL, NULL);
->  }
-> =20
->  void tcp_start_incoming_migration(const char *host_port, Error **errp)
+> Regards,
+> Daniel
 > --=20
-> 2.14.3
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
 >=20
 
 Regards,
