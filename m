@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBr-0003lX-PF
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:50 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBt-0003nh-KQ
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBo-0004YK-A8
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:47 -0500
-Received: from mail-by2nam01on0070.outbound.protection.outlook.com
-	([104.47.34.70]:34784
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBq-0004bH-3T
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:49 -0500
+Received: from mail-by2nam01on0069.outbound.protection.outlook.com
+	([104.47.34.69]:1440
 	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1elGBn-0004X5-Sw
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:44 -0500
+	id 1elGBp-0004Yx-Pk
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:46 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 12 Feb 2018 09:37:09 -0600
-Message-Id: <20180212153715.87555-23-brijesh.singh@amd.com>
+Date: Mon, 12 Feb 2018 09:37:10 -0600
+Message-Id: <20180212153715.87555-24-brijesh.singh@amd.com>
 In-Reply-To: <20180212153715.87555-1-brijesh.singh@amd.com>
 References: <20180212153715.87555-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 22/28] target/i386: clear C-bit when walking
- SEV guest page table
+Subject: [Qemu-devel] [PATCH v8 23/28] include: add psp-sev.h header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,359 +31,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-In SEV-enabled guest the pte entry will have C-bit set, we need to
-clear the C-bit when walking the page table.
+The header file provide the ioctl command and structure to communicate
+with /dev/sev device.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- target/i386/helper.c  | 31 +++++++++++++----------
- target/i386/monitor.c | 69 +++++++++++++++++++++++++++++++++------------------
- 2 files changed, 63 insertions(+), 37 deletions(-)
+ linux-headers/linux/psp-sev.h | 142 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
+ create mode 100644 linux-headers/linux/psp-sev.h
 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 58fb6eec562a..1791c854f7cf 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/sev.h"
- #include "kvm_i386.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
-@@ -732,6 +733,9 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     int32_t a20_mask;
-     uint32_t page_offset;
-     int page_size;
-+    uint64_t me_mask;
+diff --git a/linux-headers/linux/psp-sev.h b/linux-headers/linux/psp-sev.h
+new file mode 100644
+index 000000000000..33e247471ae0
+--- /dev/null
++++ b/linux-headers/linux/psp-sev.h
+@@ -0,0 +1,142 @@
++/*
++ * Userspace interface for AMD Secure Encrypted Virtualization (SEV)
++ * platform management commands.
++ *
++ * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * SEV spec 0.14 is available at:
++ * http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
 +
-+    me_mask = sev_get_me_mask();
- 
-     a20_mask = x86_get_a20_mask(env);
-     if (!(env->cr[0] & CR0_PG_MASK)) {
-@@ -755,25 +759,25 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-             }
- 
-             if (la57) {
--                pml5e_addr = ((env->cr[3] & ~0xfff) +
-+                pml5e_addr = ((env->cr[3] & ~0xfff & me_mask) +
-                         (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
--                pml5e = ldq_phys_debug(cs, pml5e_addr);
-+                pml5e = ldq_phys_debug(cs, pml5e_addr) & me_mask;
-                 if (!(pml5e & PG_PRESENT_MASK)) {
-                     return -1;
-                 }
-             } else {
--                pml5e = env->cr[3];
-+                pml5e = env->cr[3] & me_mask;
-             }
- 
-             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
-                     (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
--            pml4e = ldq_phys_debug(cs, pml4e_addr);
-+            pml4e = ldq_phys_debug(cs, pml4e_addr) & me_mask;
-             if (!(pml4e & PG_PRESENT_MASK)) {
-                 return -1;
-             }
-             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) +
-                          (((addr >> 30) & 0x1ff) << 3)) & a20_mask;
--            pdpe = x86_ldq_phys(cs, pdpe_addr);
-+            pdpe = ldq_phys_debug(cs, pdpe_addr) & me_mask;
-             if (!(pdpe & PG_PRESENT_MASK)) {
-                 return -1;
-             }
-@@ -786,16 +790,16 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         } else
- #endif
-         {
--            pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
--                a20_mask;
--            pdpe = ldq_phys_debug(cs, pdpe_addr);
-+            pdpe_addr = ((env->cr[3] & ~0x1f & me_mask) + ((addr >> 27) & 0x18))
-+                          & a20_mask;
-+            pdpe = ldq_phys_debug(cs, pdpe_addr) & me_mask;
-             if (!(pdpe & PG_PRESENT_MASK))
-                 return -1;
-         }
- 
-         pde_addr = ((pdpe & PG_ADDRESS_MASK) +
-                     (((addr >> 21) & 0x1ff) << 3)) & a20_mask;
--        pde = ldq_phys_debug(cs, pde_addr);
-+        pde = ldq_phys_debug(cs, pde_addr) & me_mask;
-         if (!(pde & PG_PRESENT_MASK)) {
-             return -1;
-         }
-@@ -808,7 +812,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-             pte_addr = ((pde & PG_ADDRESS_MASK) +
-                         (((addr >> 12) & 0x1ff) << 3)) & a20_mask;
-             page_size = 4096;
--            pte = ldq_phys_debug(cs, pte_addr);
-+            pte = ldq_phys_debug(cs, pte_addr) & me_mask;
-         }
-         if (!(pte & PG_PRESENT_MASK)) {
-             return -1;
-@@ -817,8 +821,9 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         uint32_t pde;
- 
-         /* page directory entry */
--        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) & a20_mask;
--        pde = ldl_phys_debug(cs, pde_addr);
-+        pde_addr = ((env->cr[3] & ~0xfff & me_mask) + ((addr >> 20) & 0xffc))
-+                     & a20_mask;
-+        pde = ldl_phys_debug(cs, pde_addr) & me_mask;
-         if (!(pde & PG_PRESENT_MASK))
-             return -1;
-         if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
-@@ -827,7 +832,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         } else {
-             /* page directory entry */
-             pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) & a20_mask;
--            pte = ldl_phys_debug(cs, pte_addr);
-+            pte = ldl_phys_debug(cs, pte_addr) & me_mask;
-             if (!(pte & PG_PRESENT_MASK)) {
-                 return -1;
-             }
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 55ea10deb8ef..00b8cfcd3044 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -29,6 +29,7 @@
- #include "qapi/qmp/qdict.h"
- #include "hw/i386/pc.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/sev.h"
- #include "hmp.h"
- 
- 
-@@ -95,16 +96,20 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
-     unsigned int l1, l2, l3;
-     uint64_t pdpe, pde, pte;
-     uint64_t pdp_addr, pd_addr, pt_addr;
-+    uint64_t me_mask;
++#ifndef __PSP_SEV_USER_H__
++#define __PSP_SEV_USER_H__
 +
-+    me_mask = sev_get_me_mask();
- 
-     pdp_addr = env->cr[3] & ~0x1f;
-+    pdp_addr &= me_mask;
-     for (l1 = 0; l1 < 4; l1++) {
-         cpu_physical_memory_read_debug(pdp_addr + l1 * 8, &pdpe, 8);
--        pdpe = le64_to_cpu(pdpe);
-+        pdpe = le64_to_cpu(pdpe & me_mask);
-         if (pdpe & PG_PRESENT_MASK) {
-             pd_addr = pdpe & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pd_addr + l2 * 8, &pde, 8);
--                pde = le64_to_cpu(pde);
-+                pde = le64_to_cpu(pde & me_mask);
-                 if (pde & PG_PRESENT_MASK) {
-                     if (pde & PG_PSE_MASK) {
-                         /* 2M pages with PAE, CR4.PSE is ignored */
-@@ -115,7 +120,7 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
-                         for (l3 = 0; l3 < 512; l3++) {
-                             cpu_physical_memory_read_debug(pt_addr + l3 * 8,
-                                                            &pte, 8);
--                            pte = le64_to_cpu(pte);
-+                            pte = le64_to_cpu(pte & me_mask);
-                             if (pte & PG_PRESENT_MASK) {
-                                 print_pte(mon, env, (l1 << 30) + (l2 << 21)
-                                           + (l3 << 12),
-@@ -137,10 +142,13 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-     uint64_t l1, l2, l3, l4;
-     uint64_t pml4e, pdpe, pde, pte;
-     uint64_t pdp_addr, pd_addr, pt_addr;
-+    uint64_t me_mask;
++#include <linux/types.h>
 +
-+    me_mask = sev_get_me_mask();
- 
-     for (l1 = 0; l1 < 512; l1++) {
-         cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
--        pml4e = le64_to_cpu(pml4e);
-+        pml4e = le64_to_cpu(pml4e & me_mask);
-         if (!(pml4e & PG_PRESENT_MASK)) {
-             continue;
-         }
-@@ -148,7 +156,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-         pdp_addr = pml4e & 0x3fffffffff000ULL;
-         for (l2 = 0; l2 < 512; l2++) {
-             cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
--            pdpe = le64_to_cpu(pdpe);
-+            pdpe = le64_to_cpu(pdpe & me_mask);
-             if (!(pdpe & PG_PRESENT_MASK)) {
-                 continue;
-             }
-@@ -163,7 +171,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-             pd_addr = pdpe & 0x3fffffffff000ULL;
-             for (l3 = 0; l3 < 512; l3++) {
-                 cpu_physical_memory_read_debug(pd_addr + l3 * 8, &pde, 8);
--                pde = le64_to_cpu(pde);
-+                pde = le64_to_cpu(pde & me_mask);
-                 if (!(pde & PG_PRESENT_MASK)) {
-                     continue;
-                 }
-@@ -178,7 +186,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-                 pt_addr = pde & 0x3fffffffff000ULL;
-                 for (l4 = 0; l4 < 512; l4++) {
-                     cpu_physical_memory_read_debug(pt_addr + l4 * 8, &pte, 8);
--                    pte = le64_to_cpu(pte);
-+                    pte = le64_to_cpu(pte & me_mask);
-                     if (pte & PG_PRESENT_MASK) {
-                         print_pte(mon, env, (l0 << 48) + (l1 << 39) +
-                                 (l2 << 30) + (l3 << 21) + (l4 << 12),
-@@ -195,11 +203,14 @@ static void tlb_info_la57(Monitor *mon, CPUArchState *env)
-     uint64_t l0;
-     uint64_t pml5e;
-     uint64_t pml5_addr;
-+    uint64_t me_mask;
- 
--    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
-+    me_mask = sev_get_me_mask();
++/**
++ * SEV platform commands
++ */
++enum {
++	SEV_FACTORY_RESET = 0,
++	SEV_PLATFORM_STATUS,
++	SEV_PEK_GEN,
++	SEV_PEK_CSR,
++	SEV_PDH_GEN,
++	SEV_PDH_CERT_EXPORT,
++	SEV_PEK_CERT_IMPORT,
 +
-+    pml5_addr = env->cr[3] & 0x3fffffffff000ULL & me_mask;
-     for (l0 = 0; l0 < 512; l0++) {
-         cpu_physical_memory_read_debug(pml5_addr + l0 * 8, &pml5e, 8);
--        pml5e = le64_to_cpu(pml5e);
-+        pml5e = le64_to_cpu(pml5e & me_mask);
-         if (pml5e & PG_PRESENT_MASK) {
-             tlb_info_la48(mon, env, l0, pml5e & 0x3fffffffff000ULL);
-         }
-@@ -227,7 +238,8 @@ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
-             if (env->cr[4] & CR4_LA57_MASK) {
-                 tlb_info_la57(mon, env);
-             } else {
--                tlb_info_la48(mon, env, 0, env->cr[3] & 0x3fffffffff000ULL);
-+                tlb_info_la48(mon, env, 0, env->cr[3] & 0x3fffffffff000ULL &
-+                              sev_get_me_mask());
-             }
-         } else
- #endif
-@@ -311,19 +323,22 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
-     uint64_t pdpe, pde, pte;
-     uint64_t pdp_addr, pd_addr, pt_addr;
-     hwaddr start, end;
-+    uint64_t me_mask;
- 
--    pdp_addr = env->cr[3] & ~0x1f;
-+    me_mask = sev_get_me_mask();
++	SEV_MAX,
++};
 +
-+    pdp_addr = env->cr[3] & ~0x1f & me_mask;
-     last_prot = 0;
-     start = -1;
-     for (l1 = 0; l1 < 4; l1++) {
-         cpu_physical_memory_read_debug(pdp_addr + l1 * 8, &pdpe, 8);
--        pdpe = le64_to_cpu(pdpe);
-+        pdpe = le64_to_cpu(pdpe & me_mask);
-         end = l1 << 30;
-         if (pdpe & PG_PRESENT_MASK) {
-             pd_addr = pdpe & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pd_addr + l2 * 8, &pde, 8);
--                pde = le64_to_cpu(pde);
-+                pde = le64_to_cpu(pde & me_mask);
-                 end = (l1 << 30) + (l2 << 21);
-                 if (pde & PG_PRESENT_MASK) {
-                     if (pde & PG_PSE_MASK) {
-@@ -335,7 +350,7 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
-                         for (l3 = 0; l3 < 512; l3++) {
-                             cpu_physical_memory_read_debug(pt_addr + l3 * 8,
-                                                            &pte, 8);
--                            pte = le64_to_cpu(pte);
-+                            pte = le64_to_cpu(pte & me_mask);
-                             end = (l1 << 30) + (l2 << 21) + (l3 << 12);
-                             if (pte & PG_PRESENT_MASK) {
-                                 prot = pte & pde & (PG_USER_MASK | PG_RW_MASK |
-@@ -368,19 +383,22 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
-     uint64_t l1, l2, l3, l4;
-     uint64_t pml4e, pdpe, pde, pte;
-     uint64_t pml4_addr, pdp_addr, pd_addr, pt_addr, start, end;
-+    uint64_t me_mask;
++/**
++ * SEV Firmware status code
++ */
++typedef enum {
++	SEV_RET_SUCCESS = 0,
++	SEV_RET_INVALID_PLATFORM_STATE,
++	SEV_RET_INVALID_GUEST_STATE,
++	SEV_RET_INAVLID_CONFIG,
++	SEV_RET_INVALID_LEN,
++	SEV_RET_ALREADY_OWNED,
++	SEV_RET_INVALID_CERTIFICATE,
++	SEV_RET_POLICY_FAILURE,
++	SEV_RET_INACTIVE,
++	SEV_RET_INVALID_ADDRESS,
++	SEV_RET_BAD_SIGNATURE,
++	SEV_RET_BAD_MEASUREMENT,
++	SEV_RET_ASID_OWNED,
++	SEV_RET_INVALID_ASID,
++	SEV_RET_WBINVD_REQUIRED,
++	SEV_RET_DFFLUSH_REQUIRED,
++	SEV_RET_INVALID_GUEST,
++	SEV_RET_INVALID_COMMAND,
++	SEV_RET_ACTIVE,
++	SEV_RET_HWSEV_RET_PLATFORM,
++	SEV_RET_HWSEV_RET_UNSAFE,
++	SEV_RET_UNSUPPORTED,
++	SEV_RET_MAX,
++} sev_ret_code;
 +
-+    me_mask = sev_get_me_mask();
- 
--    pml4_addr = env->cr[3] & 0x3fffffffff000ULL;
-+    pml4_addr = env->cr[3] & 0x3fffffffff000ULL & me_mask;
-     last_prot = 0;
-     start = -1;
-     for (l1 = 0; l1 < 512; l1++) {
-         cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
--        pml4e = le64_to_cpu(pml4e);
-+        pml4e = le64_to_cpu(pml4e & me_mask);
-         end = l1 << 39;
-         if (pml4e & PG_PRESENT_MASK) {
-             pdp_addr = pml4e & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
--                pdpe = le64_to_cpu(pdpe);
-+                pdpe = le64_to_cpu(pdpe & me_mask);
-                 end = (l1 << 39) + (l2 << 30);
-                 if (pdpe & PG_PRESENT_MASK) {
-                     if (pdpe & PG_PSE_MASK) {
-@@ -393,7 +411,7 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
-                         for (l3 = 0; l3 < 512; l3++) {
-                             cpu_physical_memory_read_debug(pd_addr + l3 * 8,
-                                                            &pde, 8);
--                            pde = le64_to_cpu(pde);
-+                            pde = le64_to_cpu(pde & me_mask);
-                             end = (l1 << 39) + (l2 << 30) + (l3 << 21);
-                             if (pde & PG_PRESENT_MASK) {
-                                 if (pde & PG_PSE_MASK) {
-@@ -407,7 +425,7 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
-                                         cpu_physical_memory_read_debug(pt_addr
-                                                                   + l4 * 8,
-                                                                   &pte, 8);
--                                        pte = le64_to_cpu(pte);
-+                                        pte = le64_to_cpu(pte & me_mask);
-                                         end = (l1 << 39) + (l2 << 30) +
-                                             (l3 << 21) + (l4 << 12);
-                                         if (pte & PG_PRESENT_MASK) {
-@@ -446,13 +464,16 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-     uint64_t l0, l1, l2, l3, l4;
-     uint64_t pml5e, pml4e, pdpe, pde, pte;
-     uint64_t pml5_addr, pml4_addr, pdp_addr, pd_addr, pt_addr, start, end;
-+    uint64_t me_mask;
++/**
++ * struct sev_user_data_status - PLATFORM_STATUS command parameters
++ *
++ * @major: major API version
++ * @minor: minor API version
++ * @state: platform state
++ * @flags: platform config flags
++ * @build: firmware build id for API version
++ * @guest_count: number of active guests
++ */
++struct sev_user_data_status {
++	__u8 api_major;				/* Out */
++	__u8 api_minor;				/* Out */
++	__u8 state;				/* Out */
++	__u32 flags;				/* Out */
++	__u8 build;				/* Out */
++	__u32 guest_count;			/* Out */
++} __attribute__((packed));
 +
-+    me_mask = sev_get_me_mask();
- 
--    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
-+    pml5_addr = env->cr[3] & 0x3fffffffff000ULL & me_mask;
-     last_prot = 0;
-     start = -1;
-     for (l0 = 0; l0 < 512; l0++) {
-         cpu_physical_memory_read_debug(pml5_addr + l0 * 8, &pml5e, 8);
--        pml5e = le64_to_cpu(pml5e);
-+        pml5e = le64_to_cpu(pml5e & me_mask);
-         end = l0 << 48;
-         if (!(pml5e & PG_PRESENT_MASK)) {
-             prot = 0;
-@@ -463,7 +484,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-         pml4_addr = pml5e & 0x3fffffffff000ULL;
-         for (l1 = 0; l1 < 512; l1++) {
-             cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
--            pml4e = le64_to_cpu(pml4e);
-+            pml4e = le64_to_cpu(pml4e & me_mask);
-             end = (l0 << 48) + (l1 << 39);
-             if (!(pml4e & PG_PRESENT_MASK)) {
-                 prot = 0;
-@@ -474,7 +495,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-             pdp_addr = pml4e & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
--                pdpe = le64_to_cpu(pdpe);
-+                pdpe = le64_to_cpu(pdpe & me_mask);
-                 end = (l0 << 48) + (l1 << 39) + (l2 << 30);
-                 if (pdpe & PG_PRESENT_MASK) {
-                     prot = 0;
-@@ -493,7 +514,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-                 pd_addr = pdpe & 0x3fffffffff000ULL;
-                 for (l3 = 0; l3 < 512; l3++) {
-                     cpu_physical_memory_read_debug(pd_addr + l3 * 8, &pde, 8);
--                    pde = le64_to_cpu(pde);
-+                    pde = le64_to_cpu(pde & me_mask);
-                     end = (l0 << 48) + (l1 << 39) + (l2 << 30) + (l3 << 21);
-                     if (pde & PG_PRESENT_MASK) {
-                         prot = 0;
++/**
++ * struct sev_user_data_pek_csr - PEK_CSR command parameters
++ *
++ * @address: PEK certificate chain
++ * @length: length of certificate
++ */
++struct sev_user_data_pek_csr {
++	__u64 address;				/* In */
++	__u32 length;				/* In/Out */
++} __attribute__((packed));
++
++/**
++ * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
++ *
++ * @pek_address: PEK certificate chain
++ * @pek_len: length of PEK certificate
++ * @oca_address: OCA certificate chain
++ * @oca_len: length of OCA certificate
++ */
++struct sev_user_data_pek_cert_import {
++	__u64 pek_cert_address;			/* In */
++	__u32 pek_cert_len;			/* In */
++	__u64 oca_cert_address;			/* In */
++	__u32 oca_cert_len;			/* In */
++} __attribute__((packed));
++
++/**
++ * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
++ *
++ * @pdh_address: PDH certificate address
++ * @pdh_len: length of PDH certificate
++ * @cert_chain_address: PDH certificate chain
++ * @cert_chain_len: length of PDH certificate chain
++ */
++struct sev_user_data_pdh_cert_export {
++	__u64 pdh_cert_address;			/* In */
++	__u32 pdh_cert_len;			/* In/Out */
++	__u64 cert_chain_address;		/* In */
++	__u32 cert_chain_len;			/* In/Out */
++} __attribute__((packed));
++
++/**
++ * struct sev_issue_cmd - SEV ioctl parameters
++ *
++ * @cmd: SEV commands to execute
++ * @opaque: pointer to the command structure
++ * @error: SEV FW return code on failure
++ */
++struct sev_issue_cmd {
++	__u32 cmd;				/* In */
++	__u64 data;				/* In */
++	__u32 error;				/* Out */
++} __attribute__((packed));
++
++#define SEV_IOC_TYPE		'S'
++#define SEV_ISSUE_CMD	_IOWR(SEV_IOC_TYPE, 0x0, struct sev_issue_cmd)
++
++#endif /* __PSP_USER_SEV_H */
 -- 
 2.14.3
