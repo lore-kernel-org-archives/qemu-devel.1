@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elBha-0007bN-IH
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 05:51:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1elBrD-0003pC-33
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:01:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elBhV-0002MQ-PN
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 05:51:14 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59156)
+	(envelope-from <bounces@canonical.com>) id 1elBr9-0003cm-5x
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:01:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35024)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1elBhV-0002Jh-It
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 05:51:09 -0500
+	id 1elBr9-0003aH-0D
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:01:07 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1elBhS-000606-Te
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 10:51:07 +0000
+	id 1elBr5-0007sh-LI
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 11:01:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C639A2E80D7
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 10:51:05 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id A26912E81A1
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 11:01:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 Feb 2018 10:38:54 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Feb 2018 10:48:18 -0000
+From: mou <arnaudalies.py@gmail.com>
 Reply-To: Bug 1748612 <1748612@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151826550949.29267.10613371512725916399.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151843193508.10064.734698060394691482.malone@wampee.canonical.com>
+Message-Id: <151843249856.2927.62089060870095582.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1748612] Re: qemu-user option -strace -D <file>
  doesn't work
@@ -39,11 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-If you use -D <file> it will create a file named <file>, which will
-contain any logs created via the qemu_log subsystem (which might be
-nothing at all, depending on what the guest does). I don't know where
-the "-strace" part would come from unless you specified it as part of
-the filename.
+I will check that again, pretty sure I saw that.
+Anyway any chance there is an option/fix for that?
+Today it is impossible to differentiate strace output with program's stderr=
+ output, and it is causing trouble while used in scripts.
 
 -- =
 
