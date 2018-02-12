@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1el4zW-0007tL-Jd
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 22:41:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1el6Yz-0004HB-VJ
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 00:22:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1el4zM-0006D3-AU
-	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 22:41:18 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1el6Yw-00087v-2v
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 00:22:01 -0500
+Date: Mon, 12 Feb 2018 16:19:54 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 12 Feb 2018 14:40:54 +1100
-Message-Id: <20180212034054.23441-13-david@gibson.dropbear.id.au>
-In-Reply-To: <20180212034054.23441-1-david@gibson.dropbear.id.au>
-References: <20180212034054.23441-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/12] misc: introduce new mos6522 VIA device
- and enable it for ppc builds
+Message-ID: <20180212051954.GE11634@umbus.fritz.box>
+References: <20180209075503.16996-1-aik@ozlabs.ru>
+	<20180209075503.16996-3-aik@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="H7BnLk9CMipoMykF"
+Content-Disposition: inline
+In-Reply-To: <20180209075503.16996-3-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
+ for MMIO regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,740 +25,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: groug@kaod.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-The MOS6522 VIA forms the bridge part of several Mac devices, including the
-Mac via-cuda and via-pmu devices. Introduce a standard mos6522 device that
-can be shared amongst multiple implementations.
+--H7BnLk9CMipoMykF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This is effectively taking the 6522 parts out of cuda.c and turning them
-into a separate device whilst also applying some style tidy-ups and including
-a conversion to trace-events.
+On Fri, Feb 09, 2018 at 06:55:01PM +1100, Alexey Kardashevskiy wrote:
+> At the moment if vfio_memory_listener is registered in the system memory
+> address space, it maps/unmaps every RAM memory region for DMA.
+> It expects system page size aligned memory sections so vfio_dma_map
+> would not fail and so far this has been the case. A mapping failure
+> would be fatal. A side effect of such behavior is that some MMIO pages
+> would not be mapped silently.
+>=20
+> However we are going to change MSIX BAR handling so we will end having
+> non-aligned sections in vfio_memory_listener (more details is in
+> the next patch) and vfio_dma_map will exit QEMU.
+>=20
+> In order to avoid fatal failures on what previously was not a failure and
+> was just silently ignored, this checks the section alignment to
+> the smallest supported IOMMU page size and prints an error if not aligned;
+> it also prints an error if vfio_dma_map failed despite the page size chec=
+k.
+> Both errors are not fatal; only MMIO RAM regions are checked
+> (aka "RAM device" regions).
+>=20
+> If the amount of errors printed is overwhelming, the MSIX relocation
+> could be used to avoid excessive error output.
+>=20
+> This is unlikely to cause any behavioral change.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- default-configs/ppc-softmmu.mak |   1 +
- hw/misc/Makefile.objs           |   3 +
- hw/misc/mos6522.c               | 505 ++++++++++++++++++++++++++++++++++++++++
- hw/misc/trace-events            |   7 +
- include/hw/misc/mos6522.h       | 152 ++++++++++++
- 5 files changed, 668 insertions(+)
- create mode 100644 hw/misc/mos6522.c
- create mode 100644 include/hw/misc/mos6522.h
+There are some relatively superficial problems noted below.
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 65680d85bc..76e29cfa14 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -30,6 +30,7 @@ CONFIG_MAC=y
- CONFIG_ESCC=y
- CONFIG_MACIO=y
- CONFIG_SUNGEM=y
-+CONFIG_MOS6522=y
- CONFIG_CUDA=y
- CONFIG_ADB=y
- CONFIG_MAC_NVRAM=y
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index fce426eb75..f33b37a8e5 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -17,6 +17,9 @@ common-obj-$(CONFIG_INTEGRATOR_DEBUG) += arm_integrator_debug.o
- common-obj-$(CONFIG_A9SCU) += a9scu.o
- common-obj-$(CONFIG_ARM11SCU) += arm11scu.o
- 
-+# Mac devices
-+common-obj-$(CONFIG_MOS6522) += mos6522.o
-+
- # PKUnity SoC devices
- common-obj-$(CONFIG_PUV3) += puv3_pm.o
- 
-diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
-new file mode 100644
-index 0000000000..8ad9fc831e
---- /dev/null
-+++ b/hw/misc/mos6522.c
-@@ -0,0 +1,505 @@
-+/*
-+ * QEMU MOS6522 VIA emulation
-+ *
-+ * Copyright (c) 2004-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ * Copyright (c) 2018 Mark Cave-Ayland
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/input/adb.h"
-+#include "hw/misc/mos6522.h"
-+#include "qemu/timer.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/cutils.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+
-+/* XXX: implement all timer modes */
-+
-+static void mos6522_timer_update(MOS6522State *s, MOS6522Timer *ti,
-+                                 int64_t current_time);
-+
-+static void mos6522_update_irq(MOS6522State *s)
-+{
-+    if (s->ifr & s->ier & (SR_INT | T1_INT | T2_INT)) {
-+        qemu_irq_raise(s->irq);
-+    } else {
-+        qemu_irq_lower(s->irq);
-+    }
-+}
-+
-+static uint64_t get_counter_value(MOS6522State *s, MOS6522Timer *ti)
-+{
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    if (ti->index == 0) {
-+        return mdc->get_timer1_counter_value(s, ti);
-+    } else {
-+        return mdc->get_timer2_counter_value(s, ti);
-+    }
-+}
-+
-+static uint64_t get_load_time(MOS6522State *s, MOS6522Timer *ti)
-+{
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    if (ti->index == 0) {
-+        return mdc->get_timer1_load_time(s, ti);
-+    } else {
-+        return mdc->get_timer2_load_time(s, ti);
-+    }
-+}
-+
-+static unsigned int get_counter(MOS6522State *s, MOS6522Timer *ti)
-+{
-+    int64_t d;
-+    unsigned int counter;
-+
-+    d = get_counter_value(s, ti);
-+
-+    if (ti->index == 0) {
-+        /* the timer goes down from latch to -1 (period of latch + 2) */
-+        if (d <= (ti->counter_value + 1)) {
-+            counter = (ti->counter_value - d) & 0xffff;
-+        } else {
-+            counter = (d - (ti->counter_value + 1)) % (ti->latch + 2);
-+            counter = (ti->latch - counter) & 0xffff;
-+        }
-+    } else {
-+        counter = (ti->counter_value - d) & 0xffff;
-+    }
-+    return counter;
-+}
-+
-+static void set_counter(MOS6522State *s, MOS6522Timer *ti, unsigned int val)
-+{
-+    trace_mos6522_set_counter(1 + ti->index, val);
-+    ti->load_time = get_load_time(s, ti);
-+    ti->counter_value = val;
-+    mos6522_timer_update(s, ti, ti->load_time);
-+}
-+
-+static int64_t get_next_irq_time(MOS6522State *s, MOS6522Timer *ti,
-+                                 int64_t current_time)
-+{
-+    int64_t d, next_time;
-+    unsigned int counter;
-+
-+    /* current counter value */
-+    d = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time,
-+                 ti->frequency, NANOSECONDS_PER_SECOND);
-+
-+    /* the timer goes down from latch to -1 (period of latch + 2) */
-+    if (d <= (ti->counter_value + 1)) {
-+        counter = (ti->counter_value - d) & 0xffff;
-+    } else {
-+        counter = (d - (ti->counter_value + 1)) % (ti->latch + 2);
-+        counter = (ti->latch - counter) & 0xffff;
-+    }
-+
-+    /* Note: we consider the irq is raised on 0 */
-+    if (counter == 0xffff) {
-+        next_time = d + ti->latch + 1;
-+    } else if (counter == 0) {
-+        next_time = d + ti->latch + 2;
-+    } else {
-+        next_time = d + counter;
-+    }
-+    trace_mos6522_get_next_irq_time(ti->latch, d, next_time - d);
-+    next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, ti->frequency) +
-+                         ti->load_time;
-+    if (next_time <= current_time) {
-+        next_time = current_time + 1;
-+    }
-+    return next_time;
-+}
-+
-+static void mos6522_timer_update(MOS6522State *s, MOS6522Timer *ti,
-+                                 int64_t current_time)
-+{
-+    if (!ti->timer) {
-+        return;
-+    }
-+    if (ti->index == 0 && (s->acr & T1MODE) != T1MODE_CONT) {
-+        timer_del(ti->timer);
-+    } else {
-+        ti->next_irq_time = get_next_irq_time(s, ti, current_time);
-+        timer_mod(ti->timer, ti->next_irq_time);
-+    }
-+}
-+
-+static void mos6522_timer1(void *opaque)
-+{
-+    MOS6522State *s = opaque;
-+    MOS6522Timer *ti = &s->timers[0];
-+
-+    mos6522_timer_update(s, ti, ti->next_irq_time);
-+    s->ifr |= T1_INT;
-+    mos6522_update_irq(s);
-+}
-+
-+static void mos6522_timer2(void *opaque)
-+{
-+    MOS6522State *s = opaque;
-+    MOS6522Timer *ti = &s->timers[1];
-+
-+    mos6522_timer_update(s, ti, ti->next_irq_time);
-+    s->ifr |= T2_INT;
-+    mos6522_update_irq(s);
-+}
-+
-+static void mos6522_set_sr_int(MOS6522State *s)
-+{
-+    trace_mos6522_set_sr_int();
-+    s->ifr |= SR_INT;
-+    mos6522_update_irq(s);
-+}
-+
-+static uint64_t mos6522_get_counter_value(MOS6522State *s, MOS6522Timer *ti)
-+{
-+    uint64_t d;
-+
-+    d = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time,
-+                 ti->frequency, NANOSECONDS_PER_SECOND);
-+
-+    return d;
-+}
-+
-+static uint64_t mos6522_get_load_time(MOS6522State *s, MOS6522Timer *ti)
-+{
-+    uint64_t load_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+    return load_time;
-+}
-+
-+static void mos6522_portA_write(MOS6522State *s)
-+{
-+    qemu_log_mask(LOG_UNIMP, "portA_write unimplemented");
-+}
-+
-+static void mos6522_portB_write(MOS6522State *s)
-+{
-+    qemu_log_mask(LOG_UNIMP, "portB_write unimplemented");
-+}
-+
-+uint64_t mos6522_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MOS6522State *s = opaque;
-+    uint32_t val;
-+
-+    switch (addr) {
-+    case VIA_REG_B:
-+        val = s->b;
-+        break;
-+    case VIA_REG_A:
-+        val = s->a;
-+        break;
-+    case VIA_REG_DIRB:
-+        val = s->dirb;
-+        break;
-+    case VIA_REG_DIRA:
-+        val = s->dira;
-+        break;
-+    case VIA_REG_T1CL:
-+        val = get_counter(s, &s->timers[0]) & 0xff;
-+        s->ifr &= ~T1_INT;
-+        mos6522_update_irq(s);
-+        break;
-+    case VIA_REG_T1CH:
-+        val = get_counter(s, &s->timers[0]) >> 8;
-+        mos6522_update_irq(s);
-+        break;
-+    case VIA_REG_T1LL:
-+        val = s->timers[0].latch & 0xff;
-+        break;
-+    case VIA_REG_T1LH:
-+        /* XXX: check this */
-+        val = (s->timers[0].latch >> 8) & 0xff;
-+        break;
-+    case VIA_REG_T2CL:
-+        val = get_counter(s, &s->timers[1]) & 0xff;
-+        s->ifr &= ~T2_INT;
-+        mos6522_update_irq(s);
-+        break;
-+    case VIA_REG_T2CH:
-+        val = get_counter(s, &s->timers[1]) >> 8;
-+        break;
-+    case VIA_REG_SR:
-+        val = s->sr;
-+        s->ifr &= ~(SR_INT | CB1_INT | CB2_INT);
-+        mos6522_update_irq(s);
-+        break;
-+    case VIA_REG_ACR:
-+        val = s->acr;
-+        break;
-+    case VIA_REG_PCR:
-+        val = s->pcr;
-+        break;
-+    case VIA_REG_IFR:
-+        val = s->ifr;
-+        if (s->ifr & s->ier) {
-+            val |= 0x80;
-+        }
-+        break;
-+    case VIA_REG_IER:
-+        val = s->ier | 0x80;
-+        break;
-+    default:
-+    case VIA_REG_ANH:
-+        val = s->anh;
-+        break;
-+    }
-+
-+    if (addr != VIA_REG_IFR || val != 0) {
-+        trace_mos6522_read(addr, val);
-+    }
-+
-+    return val;
-+}
-+
-+void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    MOS6522State *s = opaque;
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    trace_mos6522_write(addr, val);
-+
-+    switch (addr) {
-+    case VIA_REG_B:
-+        s->b = (s->b & ~s->dirb) | (val & s->dirb);
-+        mdc->portB_write(s);
-+        break;
-+    case VIA_REG_A:
-+        s->a = (s->a & ~s->dira) | (val & s->dira);
-+        mdc->portA_write(s);
-+        break;
-+    case VIA_REG_DIRB:
-+        s->dirb = val;
-+        break;
-+    case VIA_REG_DIRA:
-+        s->dira = val;
-+        break;
-+    case VIA_REG_T1CL:
-+        s->timers[0].latch = (s->timers[0].latch & 0xff00) | val;
-+        mos6522_timer_update(s, &s->timers[0],
-+                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        break;
-+    case VIA_REG_T1CH:
-+        s->timers[0].latch = (s->timers[0].latch & 0xff) | (val << 8);
-+        s->ifr &= ~T1_INT;
-+        set_counter(s, &s->timers[0], s->timers[0].latch);
-+        break;
-+    case VIA_REG_T1LL:
-+        s->timers[0].latch = (s->timers[0].latch & 0xff00) | val;
-+        mos6522_timer_update(s, &s->timers[0],
-+                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        break;
-+    case VIA_REG_T1LH:
-+        s->timers[0].latch = (s->timers[0].latch & 0xff) | (val << 8);
-+        s->ifr &= ~T1_INT;
-+        mos6522_timer_update(s, &s->timers[0],
-+                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        break;
-+    case VIA_REG_T2CL:
-+        s->timers[1].latch = (s->timers[1].latch & 0xff00) | val;
-+        break;
-+    case VIA_REG_T2CH:
-+        /* To ensure T2 generates an interrupt on zero crossing with the
-+           common timer code, write the value directly from the latch to
-+           the counter */
-+        s->timers[1].latch = (s->timers[1].latch & 0xff) | (val << 8);
-+        s->ifr &= ~T2_INT;
-+        set_counter(s, &s->timers[1], s->timers[1].latch);
-+        break;
-+    case VIA_REG_SR:
-+        s->sr = val;
-+        break;
-+    case VIA_REG_ACR:
-+        s->acr = val;
-+        mos6522_timer_update(s, &s->timers[0],
-+                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        break;
-+    case VIA_REG_PCR:
-+        s->pcr = val;
-+        break;
-+    case VIA_REG_IFR:
-+        /* reset bits */
-+        s->ifr &= ~val;
-+        mos6522_update_irq(s);
-+        break;
-+    case VIA_REG_IER:
-+        if (val & IER_SET) {
-+            /* set bits */
-+            s->ier |= val & 0x7f;
-+        } else {
-+            /* reset bits */
-+            s->ier &= ~val;
-+        }
-+        mos6522_update_irq(s);
-+        break;
-+    default:
-+    case VIA_REG_ANH:
-+        s->anh = val;
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps mos6522_ops = {
-+    .read = mos6522_read,
-+    .write = mos6522_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static bool mos6522_timer_exist(void *opaque, int version_id)
-+{
-+    MOS6522Timer *s = opaque;
-+
-+    return s->timer != NULL;
-+}
-+
-+static const VMStateDescription vmstate_mos6522_timer = {
-+    .name = "mos6522_timer",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(latch, MOS6522Timer),
-+        VMSTATE_UINT16(counter_value, MOS6522Timer),
-+        VMSTATE_INT64(load_time, MOS6522Timer),
-+        VMSTATE_INT64(next_irq_time, MOS6522Timer),
-+        VMSTATE_TIMER_PTR_TEST(timer, MOS6522Timer, mos6522_timer_exist),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_mos6522 = {
-+    .name = "mos6522",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(a, MOS6522State),
-+        VMSTATE_UINT8(b, MOS6522State),
-+        VMSTATE_UINT8(dira, MOS6522State),
-+        VMSTATE_UINT8(dirb, MOS6522State),
-+        VMSTATE_UINT8(sr, MOS6522State),
-+        VMSTATE_UINT8(acr, MOS6522State),
-+        VMSTATE_UINT8(pcr, MOS6522State),
-+        VMSTATE_UINT8(ifr, MOS6522State),
-+        VMSTATE_UINT8(ier, MOS6522State),
-+        VMSTATE_UINT8(anh, MOS6522State),
-+        VMSTATE_STRUCT_ARRAY(timers, MOS6522State, 2, 1,
-+                             vmstate_mos6522_timer, MOS6522Timer),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void mos6522_reset(DeviceState *dev)
-+{
-+    MOS6522State *s = MOS6522(dev);
-+
-+    s->b = 0;
-+    s->a = 0;
-+    s->dirb = 0xff;
-+    s->dira = 0;
-+    s->sr = 0;
-+    s->acr = 0;
-+    s->pcr = 0;
-+    s->ifr = 0;
-+    s->ier = 0;
-+    /* s->ier = T1_INT | SR_INT; */
-+    s->anh = 0;
-+
-+    s->timers[0].latch = 0xffff;
-+    set_counter(s, &s->timers[0], 0xffff);
-+
-+    s->timers[1].latch = 0xffff;
-+}
-+
-+static void mos6522_realize(DeviceState *dev, Error **errp)
-+{
-+    MOS6522State *s = MOS6522(dev);
-+
-+    s->timers[0].frequency = s->frequency;
-+    s->timers[1].frequency = s->frequency;
-+}
-+
-+static void mos6522_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MOS6522State *s = MOS6522(obj);
-+    int i;
-+
-+    memory_region_init_io(&s->mem, obj, &mos6522_ops, s, "mos6522", 0x10);
-+    sysbus_init_mmio(sbd, &s->mem);
-+    sysbus_init_irq(sbd, &s->irq);
-+
-+    for (i = 0; i < ARRAY_SIZE(s->timers); i++) {
-+        s->timers[i].index = i;
-+    }
-+
-+    s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer1, s);
-+    s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer2, s);
-+}
-+
-+static Property mos6522_properties[] = {
-+    DEFINE_PROP_UINT64("frequency", MOS6522State, frequency, 0),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
-+static void mos6522_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->realize = mos6522_realize;
-+    dc->reset = mos6522_reset;
-+    dc->vmsd = &vmstate_mos6522;
-+    dc->props = mos6522_properties;
-+    mdc->parent_realize = dc->realize;
-+    mdc->set_sr_int = mos6522_set_sr_int;
-+    mdc->portB_write = mos6522_portB_write;
-+    mdc->portA_write = mos6522_portA_write;
-+    mdc->get_timer1_counter_value = mos6522_get_counter_value;
-+    mdc->get_timer2_counter_value = mos6522_get_counter_value;
-+    mdc->get_timer1_load_time = mos6522_get_load_time;
-+    mdc->get_timer2_load_time = mos6522_get_load_time;
-+}
-+
-+static const TypeInfo mos6522_type_info = {
-+    .name = TYPE_MOS6522,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MOS6522State),
-+    .instance_init = mos6522_init,
-+    .abstract = true,
-+    .class_size = sizeof(MOS6522DeviceClass),
-+    .class_init = mos6522_class_init,
-+};
-+
-+static void mos6522_register_types(void)
-+{
-+    type_register_static(&mos6522_type_info);
-+}
-+
-+type_init(mos6522_register_types)
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index e6070f280d..b340d4e81c 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -70,3 +70,10 @@ msf2_sysreg_write_pll_status(void) "Invalid write to read only PLL status regist
- #hw/misc/imx7_gpr.c
- imx7_gpr_read(uint64_t offset) "addr 0x%08" HWADDR_PRIx
- imx7_gpr_write(uint64_t offset, uint64_t value) "addr 0x%08" HWADDR_PRIx "value 0x%08" HWADDR_PRIx
-+
-+# hw/misc/mos6522.c
-+mos6522_set_counter(int index, unsigned int val) "T%d.counter=%d"
-+mos6522_get_next_irq_time(uint16_t latch, int64_t d, int64_t delta) "latch=%d counter=0x%"PRId64 " delta_next=0x%"PRId64
-+mos6522_set_sr_int(void) "set sr_int"
-+mos6522_write(uint64_t addr, uint64_t val) "reg=0x%"PRIx64 " val=0x%"PRIx64
-+mos6522_read(uint64_t addr, unsigned val) "reg=0x%"PRIx64 " val=0x%x"
-diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
-new file mode 100644
-index 0000000000..a53c161b00
---- /dev/null
-+++ b/include/hw/misc/mos6522.h
-@@ -0,0 +1,152 @@
-+/*
-+ * QEMU MOS6522 VIA emulation
-+ *
-+ * Copyright (c) 2004-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ * Copyright (c) 2018 Mark Cave-Ayland
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef MOS6522_H
-+#define MOS6522_H
-+
-+#include "exec/memory.h"
-+#include "hw/sysbus.h"
-+#include "hw/ide/internal.h"
-+#include "hw/input/adb.h"
-+
-+/* Bits in ACR */
-+#define SR_CTRL            0x1c    /* Shift register control bits */
-+#define SR_EXT             0x0c    /* Shift on external clock */
-+#define SR_OUT             0x10    /* Shift out if 1 */
-+
-+/* Bits in IFR and IER */
-+#define IER_SET            0x80    /* set bits in IER */
-+#define IER_CLR            0       /* clear bits in IER */
-+
-+#define CA2_INT            0x01
-+#define CA1_INT            0x02
-+#define SR_INT             0x04    /* Shift register full/empty */
-+#define CB2_INT            0x08
-+#define CB1_INT            0x10
-+#define T2_INT             0x20    /* Timer 2 interrupt */
-+#define T1_INT             0x40    /* Timer 1 interrupt */
-+
-+/* Bits in ACR */
-+#define T1MODE             0xc0    /* Timer 1 mode */
-+#define T1MODE_CONT        0x40    /*  continuous interrupts */
-+
-+/* VIA registers */
-+#define VIA_REG_B       0x00
-+#define VIA_REG_A       0x01
-+#define VIA_REG_DIRB    0x02
-+#define VIA_REG_DIRA    0x03
-+#define VIA_REG_T1CL    0x04
-+#define VIA_REG_T1CH    0x05
-+#define VIA_REG_T1LL    0x06
-+#define VIA_REG_T1LH    0x07
-+#define VIA_REG_T2CL    0x08
-+#define VIA_REG_T2CH    0x09
-+#define VIA_REG_SR      0x0a
-+#define VIA_REG_ACR     0x0b
-+#define VIA_REG_PCR     0x0c
-+#define VIA_REG_IFR     0x0d
-+#define VIA_REG_IER     0x0e
-+#define VIA_REG_ANH     0x0f
-+
-+/**
-+ * MOS6522Timer:
-+ * @counter_value: counter value at load time
-+ */
-+typedef struct MOS6522Timer {
-+    int index;
-+    uint16_t latch;
-+    uint16_t counter_value;
-+    int64_t load_time;
-+    int64_t next_irq_time;
-+    uint64_t frequency;
-+    QEMUTimer *timer;
-+} MOS6522Timer;
-+
-+/**
-+ * MOS6522State:
-+ * @b: B-side data
-+ * @a: A-side data
-+ * @dirb: B-side direction (1=output)
-+ * @dira: A-side direction (1=output)
-+ * @sr: Shift register
-+ * @acr: Auxiliary control register
-+ * @pcr: Peripheral control register
-+ * @ifr: Interrupt flag register
-+ * @ier: Interrupt enable register
-+ * @anh: A-side data, no handshake
-+ * @last_b: last value of B register
-+ * @last_acr: last value of ACR register
-+ */
-+typedef struct MOS6522State {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion mem;
-+    /* VIA registers */
-+    uint8_t b;
-+    uint8_t a;
-+    uint8_t dirb;
-+    uint8_t dira;
-+    uint8_t sr;
-+    uint8_t acr;
-+    uint8_t pcr;
-+    uint8_t ifr;
-+    uint8_t ier;
-+    uint8_t anh;
-+
-+    MOS6522Timer timers[2];
-+    uint64_t frequency;
-+
-+    qemu_irq irq;
-+} MOS6522State;
-+
-+#define TYPE_MOS6522 "mos6522"
-+#define MOS6522(obj) OBJECT_CHECK(MOS6522State, (obj), TYPE_MOS6522)
-+
-+typedef struct MOS6522DeviceClass {
-+    DeviceClass parent_class;
-+
-+    DeviceRealize parent_realize;
-+    void (*set_sr_int)(MOS6522State *dev);
-+    void (*portB_write)(MOS6522State *dev);
-+    void (*portA_write)(MOS6522State *dev);
-+    /* These are used to influence the CUDA MacOS timebase calibration */
-+    uint64_t (*get_timer1_counter_value)(MOS6522State *dev, MOS6522Timer *ti);
-+    uint64_t (*get_timer2_counter_value)(MOS6522State *dev, MOS6522Timer *ti);
-+    uint64_t (*get_timer1_load_time)(MOS6522State *dev, MOS6522Timer *ti);
-+    uint64_t (*get_timer2_load_time)(MOS6522State *dev, MOS6522Timer *ti);
-+} MOS6522DeviceClass;
-+
-+#define MOS6522_DEVICE_CLASS(cls) \
-+    OBJECT_CLASS_CHECK(MOS6522DeviceClass, (cls), TYPE_MOS6522)
-+#define MOS6522_DEVICE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(MOS6522DeviceClass, (obj), TYPE_MOS6522)
-+
-+uint64_t mos6522_read(void *opaque, hwaddr addr, unsigned size);
-+void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size);
-+
-+#endif /* MOS6522_H */
--- 
-2.14.3
+But more fundamentally, this feels like it's extending an existing
+hack past the point of usefulness.
+
+The explicit check for is_ram_device() here has always bothered me -
+it's not like a real bus bridge magically knows whether a target
+address maps to RAM or not.
+
+What I think is really going on is that even for systems without an
+IOMMU, it's not really true to say that the PCI address space maps
+directly onto address_space_memory.  Instead, there's a large, but
+much less than 2^64 sized, "upstream window" at address 0 on the PCI
+bus, which is identity mapped to the system bus.  Details will vary
+with the system, but in practice we expect nothing but RAM to be in
+that window.  Addresses not within that window won't be mapped to the
+system bus but will just be broadcast on the PCI bus and might be
+picked up as a p2p transaction.  Actually on classic PC, I suspect
+there may be two windows, below and above the "ISA IO hole".
+
+With PCIe it gets more complicated, of course.  I still suspect
+there's some sort of upstream window to the host, but whether things
+outside the window get reflected back down the PCIe heirarchy will
+depend on those p2p relevant configuration parameters.
+
+Maybe it's time we had a detailed look at what really happens in
+physical bridges, rather than faking it with the is_ram_device()
+check?
+
+Anyway, that said, the patch below might still be a reasonable interim
+hack, once the smaller problems are fixed.
+
+> ---
+>  hw/vfio/common.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++-=
+-----
+>  1 file changed, 49 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index f895e3c..736f271 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -544,18 +544,40 @@ static void vfio_listener_region_add(MemoryListener=
+ *listener,
+> =20
+>      llsize =3D int128_sub(llend, int128_make64(iova));
+> =20
+> +    if (memory_region_is_ram_device(section->mr)) {
+> +        hwaddr pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+> +
+> +        if ((iova & pgmask) || (llsize & pgmask)) {
+> +            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
+> +                         " is not aligned to 0x%"HWADDR_PRIx
+> +                         " and cannot be mapped for DMA",
+> +                         section->offset_within_region,
+> +                         int128_getlo(section->size),
+> +                         pgmask + 1);
+> +            return;
+> +        }
+> +    }
+> +
+>      ret =3D vfio_dma_map(container, iova, int128_get64(llsize),
+>                         vaddr, section->readonly);
+>      if (ret) {
+>          error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+>                       "0x%"HWADDR_PRIx", %p) =3D %d (%m)",
+>                       container, iova, int128_get64(llsize), vaddr, ret);
+> +        if (memory_region_is_ram_device(section->mr)) {
+> +            /* Allow unexpected mappings not to be fatal for RAM devices=
+ */
+> +            return;
+> +        }
+>          goto fail;
+>      }
+> =20
+>      return;
+> =20
+>  fail:
+> +    if (memory_region_is_ram_device(section->mr)) {
+> +        error_report("failed to vfio_dma_map. pci p2p may not work");
+
+Isn't this logic exactly backwards?  p2p will be affected when a *non
+RAM* device (itself probably a PCI MMIO window) can't be mapped in.
+
+> +        return;
+> +    }
+>      /*
+>       * On the initfn path, store the first error in the container so we
+>       * can gracefully fail.  Runtime, there's not much we can do other
+> @@ -577,6 +599,7 @@ static void vfio_listener_region_del(MemoryListener *=
+listener,
+>      hwaddr iova, end;
+>      Int128 llend, llsize;
+>      int ret;
+> +    bool try_unmap =3D true;
+> =20
+>      if (vfio_listener_skipped_section(section)) {
+>          trace_vfio_listener_region_del_skip(
+> @@ -629,13 +652,33 @@ static void vfio_listener_region_del(MemoryListener=
+ *listener,
+> =20
+>      trace_vfio_listener_region_del(iova, end);
+> =20
+> -    ret =3D vfio_dma_unmap(container, iova, int128_get64(llsize));
+> +    if (memory_region_is_ram_device(section->mr)) {
+> +        hwaddr pgmask;
+> +        VFIOHostDMAWindow *hostwin;
+> +        bool hostwin_found =3D false;
+> +
+> +        QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
+> +            if (hostwin->min_iova <=3D iova && end <=3D hostwin->max_iov=
+a) {
+> +                hostwin_found =3D true;
+> +                break;
+> +            }
+> +        }
+> +        assert(hostwin_found); /* or region_add() would have failed */
+> +
+> +        pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+> +        try_unmap =3D !((iova & pgmask) || (llsize & pgmask));
+
+Explicit page mask checks seem bogus here.  We should unmap based on
+whether we mapped, not on some other criterion which may or may not
+evaluate to the same thing.
+
+> +    }
+> +
+> +    if (try_unmap) {
+> +        ret =3D vfio_dma_unmap(container, iova, int128_get64(llsize));
+> +        if (ret) {
+> +            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> +                         "0x%"HWADDR_PRIx") =3D %d (%m)",
+> +                         container, iova, int128_get64(llsize), ret);
+> +        }
+> +    }
+> +
+>      memory_region_unref(section->mr);
+> -    if (ret) {
+> -        error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> -                     "0x%"HWADDR_PRIx") =3D %d (%m)",
+> -                     container, iova, int128_get64(llsize), ret);
+> -    }
+> =20
+>      if (container->iommu_type =3D=3D VFIO_SPAPR_TCE_v2_IOMMU) {
+>          vfio_spapr_remove_window(container,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--H7BnLk9CMipoMykF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqBI/gACgkQbDjKyiDZ
+s5JjZRAA40H45e61P8dIKC+PT4rLX/wp+Nx2h0pHzl/kDeecG5D6i8z2rq/i1vLU
+XDiN8MEnM17HpLWq97pKUEquicZaqad6s/PczWi9yzvL0FfTC8ez6MEbpywq9laU
+k04hV0+6KPKq2SLPBrKE02BUMcW1A2mGosuHvRcj9jex4PS+rVuAQDbFyhTWOUeW
+az4Our97F5Sx6+zYvpMiW6XHAybqHyFvUGHpoePEedUrfgTRdInTSgrCIcDFByhE
+Vii9sF7ATM9327wfSA8DL2D8dQ/XAd7I7BcodDVf6QQirSewM2BRVkLak57GM+23
+DX+VhnAupNkDne1Tb0iIo3ZJZquzZYVo5xf7gv+Pkptk1xPK0EHYgUaVA+MC99RQ
+i3GWI/eqCj7TjmJaFOz65AROvIkSqFIQOVG3s17OwS9FeAQ4XEXYidrEuU/ZqnZJ
+nctHxfSkuNDFZEqddKNgPm9GW6dXMtIuE6HmfseloIz30n+KotlB4+89yTUaWUJM
+HUdAuA7+qDSaXMsoJOrYjso0VM7Cq6HY93E4dbf4DStgZ4YvAdubr0RNIGoJ9rKy
+Dh7U2rdPJyWGyWUE1o3MJSWN9IDYi9LmPs+3i5QgB4vNzs4oZ5Y8lcYkCjjvL6C7
+aVlWWRi+lQCL5kWFR23v6Ge/yM8nCLrGqstpTNaa3aZR8gdfuac=
+=rRIh
+-----END PGP SIGNATURE-----
+
+--H7BnLk9CMipoMykF--
