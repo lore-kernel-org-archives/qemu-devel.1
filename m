@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elIEi-00072R-Ox
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:49:56 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elIFq-00084f-Mg
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:51:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elIEh-0002KJ-7H
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:49:52 -0500
-Date: Mon, 12 Feb 2018 17:49:42 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180212174942.GA4071@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20171208133416.28978-1-berrange@redhat.com>
-	<20180125170501.GA19513@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1elIFp-00045Q-Ra
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:51:02 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-27-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <76ccde5b-7726-58a4-1443-878a3e75d577@redhat.com>
+Date: Mon, 12 Feb 2018 18:50:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180125170501.GA19513@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: fix EOF Ctrl-D handling in
- qemu-io readline code
+In-Reply-To: <20180208192328.16550-27-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cZEYZS8DeKNRs9wSDwfixuO1sWsNZA4Qv"
+Subject: Re: [Qemu-devel] [PATCH 26/27] qemu-iotests: Test qcow2 over file
+ image creation with QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,122 +25,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Re-ping.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cZEYZS8DeKNRs9wSDwfixuO1sWsNZA4Qv
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <76ccde5b-7726-58a4-1443-878a3e75d577@redhat.com>
+Subject: Re: [PATCH 26/27] qemu-iotests: Test qcow2 over file image creation
+ with QMP
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-27-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-27-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 25, 2018 at 05:05:01PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> ping, does any block maintainer want to queue this one ?
->=20
-> On Fri, Dec 08, 2017 at 01:34:16PM +0000, Daniel P. Berrange wrote:
-> > qemu-io puts the TTY into non-canonical mode, which means no EOF proc=
-essing is
-> > done and thus getchar() will never return the EOF constant. Instead w=
-e have to
-> > query the TTY attributes to determine the configured EOF character (u=
-sually
-> > Ctrl-D / 0x4), and then explicitly check for that value. This fixes t=
-he
-> > regression that prevented Ctrl-D from triggering an exit of qemu-io t=
-hat has
-> > existed since readline was first added in
-> >=20
-> >   commit 0cf17e181798063c3824c8200ba46f25f54faa1a
-> >   Author: Stefan Hajnoczi <stefanha@redhat.com>
-> >   Date:   Thu Nov 14 11:54:17 2013 +0100
-> >=20
-> >     qemu-io: use readline.c
-> >=20
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> > Changed in v2:
-> >=20
-> >   - Query termios settings for EOF character
-> >=20
-> >  qemu-io.c | 26 +++++++++++++++++++++++++-
-> >  1 file changed, 25 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/qemu-io.c b/qemu-io.c
-> > index c70bde3eb1..fa4972d734 100644
-> > --- a/qemu-io.c
-> > +++ b/qemu-io.c
-> > @@ -10,6 +10,9 @@
-> >  #include "qemu/osdep.h"
-> >  #include <getopt.h>
-> >  #include <libgen.h>
-> > +#ifndef _WIN32
-> > +#include <termios.h>
-> > +#endif
-> > =20
-> >  #include "qapi/error.h"
-> >  #include "qemu-io.h"
-> > @@ -41,6 +44,26 @@ static bool imageOpts;
-> > =20
-> >  static ReadLineState *readline_state;
-> > =20
-> > +static int ttyEOF;
-> > +
-> > +static int get_eof_char(void)
-> > +{
-> > +#ifdef _WIN32
-> > +    return 0x4; /* Ctrl-D */
-> > +#else
-> > +    struct termios tty;
-> > +    if (tcgetattr(STDIN_FILENO, &tty) !=3D 0) {
-> > +        if (errno =3D=3D ENOTTY) {
-> > +            return 0x0; /* just expect read() =3D=3D 0 */
-> > +        } else {
-> > +            return 0x4; /* Ctrl-D */
-> > +        }
-> > +    }
-> > +
-> > +    return tty.c_cc[VEOF];
-> > +#endif
-> > +}
-> > +
-> >  static int close_f(BlockBackend *blk, int argc, char **argv)
-> >  {
-> >      blk_unref(qemuio_blk);
-> > @@ -322,7 +345,7 @@ static char *fetchline_readline(void)
-> >      readline_start(readline_state, get_prompt(), 0, readline_func, &=
-line);
-> >      while (!line) {
-> >          int ch =3D getchar();
-> > -        if (ch =3D=3D EOF) {
-> > +        if (ttyEOF !=3D 0x0 && ch =3D=3D ttyEOF) {
-> >              break;
-> >          }
-> >          readline_handle_byte(readline_state, ch);
-> > @@ -592,6 +615,7 @@ int main(int argc, char **argv)
-> >      qemuio_add_command(&close_cmd);
-> > =20
-> >      if (isatty(STDIN_FILENO)) {
-> > +        ttyEOF =3D get_eof_char();
-> >          readline_state =3D readline_init(readline_printf_func,
-> >                                         readline_flush_func,
-> >                                         NULL,
-> > --=20
-> > 2.14.3
-> >=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
->=20
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/206     | 436 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/206.out | 209 ++++++++++++++++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 646 insertions(+)
+>  create mode 100755 tests/qemu-iotests/206
+>  create mode 100644 tests/qemu-iotests/206.out
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+> new file mode 100755
+> index 0000000000..0a18b2b19a
+> --- /dev/null
+> +++ b/tests/qemu-iotests/206
+> @@ -0,0 +1,436 @@
+
+[...]
+
+> +# creator
+> +owner=3Dkwolf@redhat.com
+> +
+> +seq=3D`basename $0`
+> +echo "QA output created by $seq"
+> +
+> +here=3D`pwd`
+> +status=3D1	# failure is the default!
+
+Hmmm...  Didn't we want to remove this boilerplate at some point?
+
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +_supported_fmt qcow2
+> +_supported_proto file
+> +_supported_os Linux
+> +
+
+[...]
+
+> +echo
+> +echo "=3D=3D=3D Invalid sizes =3D=3D=3D"
+> +echo
+> +
+> +# TODO Negative image sizes aren't handled correctly, but this is a pr=
+oblem
+> +# with QAPI's implementation of the 'size' type and affects other comm=
+ands as
+> +# well. Once this is fixed, we may want to add a test case here.
+> +
+> +# 1. Misaligned image size
+> +# 2. 2^64 - 512
+> +# 3. 2^63 =3D 8 EB (qemu-img enforces image sizes less than this)
+> +# 4. 2^63 - 512 (generally valid, but qcow2 can't handle images this s=
+ize)
+> +
+> +run_qemu -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dno=
+de0 <<EOF
+> +{ "execute": "qmp_capabilities" }
+> +{ "execute": "x-blockdev-create",
+> +  "arguments": {
+> +      "driver": "$IMGFMT",
+> +      "file": "node0",
+> +      "size": 1234
+> +  }
+> +}
+> +{ "execute": "x-blockdev-create",
+> +  "arguments": {
+> +      "driver": "$IMGFMT",
+> +      "file": "node0",
+> +      "size": 18446744073709551104
+
+I was about to propose $((2**64 - 512)), but then I noticed that yields
+-512.  Nice.
+
+> +  }
+> +}
+> +{ "execute": "x-blockdev-create",
+> +  "arguments": {
+> +      "driver": "$IMGFMT",
+> +      "file": "node0",
+> +      "size": 9223372036854775808
+> +  }
+> +}
+> +{ "execute": "x-blockdev-create",
+> +  "arguments": {
+> +      "driver": "$IMGFMT",
+> +      "file": "node0",
+> +      "size": 9223372036854775296
+> +  }
+> +}
+> +{ "execute": "quit" }
+> +EOF
+
+
+--cZEYZS8DeKNRs9wSDwfixuO1sWsNZA4Qv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqB1AASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ATcUIAKzaK4munw2mIZaM4mJuWaTS7dTqMAuG
+YvkCThOYMbeD1YtRIuKDhyBUZ7NaI8nBJ0JqUUUlF7Qv2rBV3dm5suKoD7o3z4Po
+HHmUXYvfH7al1mn/qW4eAzxbEAcoFw/JHvB3HdW3O2fxXS5DUi5I5zY+WGr0hWb4
+tiayx/gY6aT90nSwJpGFdzYFxAZiQXBu9OTxiygnXiL/UYDi/HpYT6mIEl4UehTe
++g7EhhaXOHxvsCtxs7uCs9W1sq2fsPhJTwn8xE4acoALBKGXqaohedIJVSqzv4qt
+5V3ljlF4IpoCFmN1yh8XzKtsZviTGNvigchhy6YkFHHw1phY2L02+9k=
+=xyJG
+-----END PGP SIGNATURE-----
+
+--cZEYZS8DeKNRs9wSDwfixuO1sWsNZA4Qv--
