@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1elMaW-0002DP-Ub
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1elMaj-0002OI-0e
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1elMaR-0001Gl-WF
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:40 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37876 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1elMaR-0001FP-Nk
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:35 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8EA27400ADF4
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 22:28:30 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-Date: Mon, 12 Feb 2018 17:27:04 -0500
-Message-Id: <20180212222705.12718-5-bsd@redhat.com>
-In-Reply-To: <20180212222705.12718-1-bsd@redhat.com>
-References: <20180212222705.12718-1-bsd@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/5] usb-mtp: Introduce write support for
- MTP objects
+	(envelope-from <dgibson@ozlabs.org>) id 1elMaf-0001U5-3l
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:53 -0500
+Date: Tue, 13 Feb 2018 09:11:04 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180212221104.GI11634@umbus.fritz.box>
+References: <20180212034054.23441-1-david@gibson.dropbear.id.au>
+	<d54c87e3-6919-2834-82a2-aab319d94b04@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6yxL3IctpgIvrN+d"
+Content-Disposition: inline
+In-Reply-To: <d54c87e3-6919-2834-82a2-aab319d94b04@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180212
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,247 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: peter.maydell@linaro.org, groug@kaod.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Allow write operations on behalf of the initiator. The
-precursor to write is the sending of the write metadata
-that consists of the ObjectInfo dataset. This patch introduces
-a flag that is set when the responder is ready to receive
-write data based on a previous SendObjectInfo operation by
-the initiator (The SendObjectInfo implementation is in a
-later patch)
 
-Signed-off-by: Bandan Das <bsd@redhat.com>
----
- hw/usb/dev-mtp.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 157 insertions(+), 2 deletions(-)
+--6yxL3IctpgIvrN+d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 5f53f200c4..8d615cabc0 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -47,6 +47,7 @@ enum mtp_code {
-     CMD_GET_OBJECT_INFO            = 0x1008,
-     CMD_GET_OBJECT                 = 0x1009,
-     CMD_DELETE_OBJECT              = 0x100b,
-+    CMD_SEND_OBJECT                = 0x100d,
-     CMD_GET_PARTIAL_OBJECT         = 0x101b,
-     CMD_GET_OBJECT_PROPS_SUPPORTED = 0x9801,
-     CMD_GET_OBJECT_PROP_DESC       = 0x9802,
-@@ -66,7 +67,9 @@ enum mtp_code {
-     RES_STORE_READ_ONLY            = 0x200e,
-     RES_PARTIAL_DELETE             = 0x2012,
-     RES_SPEC_BY_FORMAT_UNSUPPORTED = 0x2014,
-+    RES_INVALID_OBJECTINFO         = 0x2015,
-     RES_INVALID_PARENT_OBJECT      = 0x201a,
-+    RES_STORE_FULL                 = 0x200c,
-     RES_INVALID_PARAMETER          = 0x201d,
-     RES_SESSION_ALREADY_OPEN       = 0x201e,
-     RES_INVALID_OBJECT_PROP_CODE   = 0xA801,
-@@ -182,6 +185,14 @@ struct MTPState {
-     int          inotifyfd;
-     QTAILQ_HEAD(events, MTPMonEntry) events;
- #endif
-+    /* Responder is expecting a write operation */
-+    bool write_pending;
-+    struct {
-+        uint32_t parent_handle;
-+        uint16_t format;
-+        uint32_t size;
-+        char *filename;
-+    } dataset;
- };
- 
- #define TYPE_USB_MTP "usb-mtp"
-@@ -803,6 +814,7 @@ static MTPData *usb_mtp_get_device_info(MTPState *s, MTPControl *c)
-         CMD_GET_OBJECT_HANDLES,
-         CMD_GET_OBJECT_INFO,
-         CMD_DELETE_OBJECT,
-+        CMD_SEND_OBJECT,
-         CMD_GET_OBJECT,
-         CMD_GET_PARTIAL_OBJECT,
-         CMD_GET_OBJECT_PROPS_SUPPORTED,
-@@ -1381,6 +1393,14 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         nres = 1;
-         res0 = data_in->length;
-         break;
-+    case CMD_SEND_OBJECT:
-+        if (!s->write_pending) {
-+            usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO,
-+                                 c->trans, 0, 0, 0, 0);
-+            return;
-+        }
-+        s->data_out = usb_mtp_data_alloc(c);
-+        return;
-     case CMD_GET_OBJECT_PROPS_SUPPORTED:
-         if (c->argv[0] != FMT_UNDEFINED_OBJECT &&
-             c->argv[0] != FMT_ASSOCIATION) {
-@@ -1475,12 +1495,133 @@ static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
-     fprintf(stderr, "%s\n", __func__);
- }
- 
-+mode_t getumask(void)
-+{
-+    mode_t mask = umask(0);
-+    umask(mask);
-+    return mask;
-+}
-+
-+static void usb_mtp_write_data(MTPState *s)
-+{
-+    MTPData *d = s->data_out;
-+    MTPObject *parent =
-+        usb_mtp_object_lookup(s, s->dataset.parent_handle);
-+    char *path = NULL;
-+    int rc = -1;
-+    mode_t mask = ~getumask() & 0666;
-+
-+    assert(d != NULL);
-+
-+    if (parent == NULL || !s->write_pending) {
-+        usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
-+                             0, 0, 0, 0);
-+        return;
-+    }
-+
-+    if (s->dataset.filename) {
-+        path = g_strdup_printf("%s/%s", parent->path, s->dataset.filename);
-+        if (s->dataset.format == FMT_ASSOCIATION) {
-+            d->fd = mkdir(path, mask);
-+            goto free;
-+        }
-+        if (s->dataset.size < d->length) {
-+            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
-+                                 0, 0, 0, 0);
-+            goto done;
-+        }
-+        d->fd = open(path, O_CREAT | O_WRONLY, mask);
-+        if (d->fd == -1) {
-+            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
-+                                 0, 0, 0, 0);
-+            goto done;
-+        }
-+
-+        /*
-+         * Return success if initiator sent 0 sized data
-+         */
-+        if (!s->dataset.size) {
-+            goto success;
-+        }
-+
-+        rc = write(d->fd, d->data, s->dataset.size);
-+        if (rc == -1) {
-+            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
-+                                 0, 0, 0, 0);
-+            goto done;
-+            }
-+        if (rc != s->dataset.size) {
-+            usb_mtp_queue_result(s, RES_INCOMPLETE_TRANSFER, d->trans,
-+                                 0, 0, 0, 0);
-+            goto done;
-+        }
-+    }
-+
-+success:
-+    usb_mtp_queue_result(s, RES_OK, d->trans,
-+                         0, 0, 0, 0);
-+
-+done:
-+    /*
-+     * The write dataset is kept around and freed only
-+     * on success or if another write request comes in
-+     */
-+    if (d->fd != -1) {
-+        close(d->fd);
-+    }
-+free:
-+    g_free(s->dataset.filename);
-+    g_free(path);
-+    s->write_pending = false;
-+}
-+
-+static void usb_mtp_get_data(MTPState *s, mtp_container *container,
-+                             USBPacket *p)
-+{
-+    MTPData *d = s->data_out;
-+    uint64_t dlen;
-+    uint32_t data_len = p->iov.size;
-+
-+    if (d->first) {
-+        /* Total length of incoming data */
-+        d->length = cpu_to_le32(container->length) - sizeof(mtp_container);
-+        /* Length of data in this packet */
-+        data_len -= sizeof(mtp_container);
-+        usb_mtp_realloc(d, d->length);
-+        d->offset = 0;
-+        d->first = false;
-+    }
-+
-+    if (d->length - d->offset > data_len) {
-+        dlen = data_len;
-+    } else {
-+        dlen = d->length - d->offset;
-+    }
-+
-+    switch (d->code) {
-+    case CMD_SEND_OBJECT:
-+        usb_packet_copy(p, d->data + d->offset, dlen);
-+        d->offset += dlen;
-+        if (d->offset == d->length) {
-+            usb_mtp_write_data(s);
-+            usb_mtp_data_free(s->data_out);
-+            s->data_out = NULL;
-+            return;
-+        }
-+        break;
-+    default:
-+        p->status = USB_RET_STALL;
-+        return;
-+    }
-+}
-+
- static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
- {
-     MTPState *s = USB_MTP(dev);
-     MTPControl cmd;
-     mtp_container container;
-     uint32_t params[5];
-+    uint16_t container_type;
-     int i, rc;
- 
-     switch (p->ep->nr) {
-@@ -1570,8 +1711,13 @@ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
-             p->status = USB_RET_STALL;
-             return;
-         }
--        usb_packet_copy(p, &container, sizeof(container));
--        switch (le16_to_cpu(container.type)) {
-+        if (s->data_out && !s->data_out->first) {
-+            container_type = TYPE_DATA;
-+        } else {
-+            usb_packet_copy(p, &container, sizeof(container));
-+            container_type = le16_to_cpu(container.type);
-+        }
-+        switch (container_type) {
-         case TYPE_COMMAND:
-             if (s->data_in || s->data_out || s->result) {
-                 trace_usb_mtp_stall(s->dev.addr, "transaction inflight");
-@@ -1602,6 +1748,15 @@ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
-                                   (cmd.argc > 4) ? cmd.argv[4] : 0);
-             usb_mtp_command(s, &cmd);
-             break;
-+        case TYPE_DATA:
-+            /* One of the previous transfers has already errored but the
-+             * responder is still sending data associated with it
-+             */
-+            if (s->result != NULL) {
-+                return;
-+            }
-+            usb_mtp_get_data(s, &container, p);
-+            break;
-         default:
-             /* not needed as long as the mtp device is read-only */
-             p->status = USB_RET_STALL;
--- 
-2.14.3
+On Mon, Feb 12, 2018 at 07:46:21PM +0100, Laurent Vivier wrote:
+> On 12/02/2018 04:40, David Gibson wrote:
+> > The following changes since commit c7b02d7d032d6022060e4b393827c963c93c=
+e63f:
+> >=20
+> >   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-speedu=
+p-090218-1' into staging (2018-02-09 16:12:34 +0000)
+> >=20
+> > are available in the Git repository at:
+> >=20
+> >   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180212
+> >=20
+> > for you to fetch changes up to 51f233ec92cdab7030cb7407dd7f009911c805b0:
+> >=20
+> >   misc: introduce new mos6522 VIA device and enable it for ppc builds (=
+2018-02-11 10:18:52 +1100)
+> >=20
+> > ----------------------------------------------------------------
+> > ppc patch queue 2018-02-12
+> >=20
+> > Here's the accumulatead ppc and pseries related patches for the last
+> > while.  Highlights are:
+> >     * A number of Macintosh / CUDA cleanups from Mark Cave-Ayland
+> >     * An important bug fix (missing "break;") for
+> >       H_GET_CPU_CHARACTERISTICS
+> >     * Yet another fix for SMT mode handling
+> >     * Assorted other cleanups and fixes
+> >=20
+> > ----------------------------------------------------------------
+> > Daniel Henrique Barboza (1):
+> >       hw/ppc: rename functions in comments
+> >=20
+> > Greg Kurz (1):
+> >       spapr: add missing break in h_get_cpu_characteristics()
+> >=20
+> > Laurent Vivier (1):
+> >       spapr: set vsmt to MAX(8, smp_threads)
+> >=20
+> > Mark Cave-Ayland (9):
+> >       cuda: do not use old_mmio accesses
+> >       cuda: don't allow writes to port output pins
+> >       cuda: introduce CUDAState parameter to get_counter()
+> >       cuda: rename frequency property to tb_frequency
+> >       cuda: minor cosmetic tidy-ups to get_next_irq_time()
+> >       cuda: don't call cuda_update() when writing to ACR register
+> >       cuda: set timer 1 frequency property to CUDA_TIMER_FREQ
+> >       cuda: factor out timebase-derived counter value and load time
+> >       misc: introduce new mos6522 VIA device and enable it for ppc buil=
+ds
+>=20
+> David, following patches from Mark's series are missing in your pull
+> request, is that normal?
+
+I don't know about normal, but it's expected.  I didn't get around to
+reviewing and merging those last few patches of his before preparing
+the pull request.  They'll be in the next one.
+
+>=20
+>   cuda: convert to use the shared mos6522 device
+>   ppc: move CUDAState and other CUDA-related definitions into separate
+>        cuda.h file
+>   cuda: convert to trace-events
+>=20
+> Thanks,
+> Laurent
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--6yxL3IctpgIvrN+d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqCEPYACgkQbDjKyiDZ
+s5Lj1Q/8CYNu+BQd2YASmIW1djwm8gSiFEqKWDF4wrYQkt/8HHa79i+qiClSmqV9
+AlqXXbi3nByASufEAX+nsx75rDI/VTVoRhvn7Zk0huymXwrP96GDJJTipQqURXMw
+HAY4fAdsFpb2+JlFUOP9QrZI2s2+MJ+eZgVT9l+GzW5Tg340vmyu4DJS2TFWxUsa
+UkZdsIm4TSmv7B0VMIYZLk8L+D4RXCSkzBsSB8UwGlsrS/nhL9uZ15u/4wJrT5Vr
+6peGOvAieQbcbASIg/sFP+Fft41vNzngDBHz0urXjQej3KkR+L8p0H/czMDNCLrZ
+YDfDMvAjwgVVLQ/Jqy/x1QwiKTrQLpaz8VqTQo9QGxssvigRfZfAXtusX7Vy8e+R
+kKidc/lu148atec4EtF4yc7iEF+64yWApoEhmx2LbObg4/flCHPrefkAbv/e+OO6
+KMmtreu3c6X3zlaeE7cPoTYnRywKHjsmY0f/DSZ0OUjsc+xeFeOU7WKY+TqXEDcQ
+8XryPebYrmJC3aSMuLjhb4fstsYhTmT1SjX6Yc5I2rpEDeBmbzeeiGKm7Wi2Qhof
+a+gX3c4hxg6CKvSfYqzNZ/S/eZ/dM1x4eqp4Uj/84Yz+GmnC2hQtaZrXtcnW9rqj
+ymMvicMWZ4Wodlp0Sheds5jQnNOWZpY7RAGnSpvjuwTbhpiJg60=
+=Ojo1
+-----END PGP SIGNATURE-----
+
+--6yxL3IctpgIvrN+d--
