@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1el8RN-0000jF-CZ
+	(envelope-from <armbru@redhat.com>) id 1el8RN-0000jJ-Di
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1el8RK-0005uz-Al
+	(envelope-from <armbru@redhat.com>) id 1el8RK-0005wU-Vo
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:17 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42990 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42016 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1el8RK-0005tr-3h
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1el8RK-0005vK-P3
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:14 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 12 Feb 2018 08:22:01 +0100
-Message-Id: <20180212072207.9367-9-armbru@redhat.com>
+Date: Mon, 12 Feb 2018 08:22:06 +0100
+Message-Id: <20180212072207.9367-14-armbru@redhat.com>
 In-Reply-To: <20180212072207.9367-1-armbru@redhat.com>
 References: <20180212072207.9367-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RFC 08/14] qapi: leave the ifcond attribute
- undefined until check()
+Subject: [Qemu-devel] [PATCH RFC 13/14] qapi-introspect: Add #if conditions
+ to introspection value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Generated tests/test-qapi-introspect.c changes as follows:
 
-We commonly initialize attributes to None in .init(), then set their
-real value in .check().  Accessing the attribute before .check()
-yields None.  If we're lucky, the code that accesses the attribute
-prematurely chokes on None.
+    --- test-qapi-introspect.c.old	2018-02-11 17:36:15.039696522 +0100
+    +++ tests/test-qapi-introspect.c	2018-02-11 17:36:34.455419852 +0100
+    @@ -118,6 +118,9 @@ QLIT_QDICT(((QLitDictEntry[]) {
+	     { "ret-type", QLIT_QSTR("14"), },
+	     {}
+	 })),
+    +#if defined(TEST_IF_CMD)
+    +#if defined(TEST_IF_STRUCT)
+    +
+     QLIT_QDICT(((QLitDictEntry[]) {
+	     { "arg-type", QLIT_QSTR("15"), },
+	     { "meta-type", QLIT_QSTR("command"), },
+    @@ -125,12 +128,19 @@ QLIT_QDICT(((QLitDictEntry[]) {
+	     { "ret-type", QLIT_QSTR("1"), },
+	     {}
+	 })),
+    +#endif /* defined(TEST_IF_STRUCT) */
+    +#endif /* defined(TEST_IF_CMD) */
+    +
+    +#if defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)
+    +
+     QLIT_QDICT(((QLitDictEntry[]) {
+	     { "arg-type", QLIT_QSTR("16"), },
+	     { "meta-type", QLIT_QSTR("event"), },
+	     { "name", QLIT_QSTR("TestIfEvent"), },
+	     {}
+	 })),
+    +#endif /* defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT) */
+    +
+     QLIT_QDICT(((QLitDictEntry[]) {
+	     { "members", QLIT_QLIST(((QLitObject[]) {
+		 {}
 
-It won't for .ifcond, because None is a legitimate value.
-
-Leave the ifcond attribute undefined until check().
-
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+ scripts/qapi/introspect.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 789c77f11f..78aeec785e 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1028,13 +1028,19 @@ class QAPISchemaEntity(object):
-         # such place).
-         self.info =3D info
-         self.doc =3D doc
--        self.ifcond =3D listify_cond(ifcond)
-+        self._ifcond =3D ifcond  # self.ifcond is set after check()
-=20
-     def c_name(self):
-         return c_name(self.name)
-=20
-     def check(self, schema):
--        pass
-+        if isinstance(self._ifcond, QAPISchemaType):
-+            # inherit the condition from a type
-+            typ =3D self._ifcond
-+            typ.check(schema)
-+            self.ifcond =3D typ.ifcond
-+        else:
-+            self.ifcond =3D listify_cond(self._ifcond)
-=20
-     def is_implicit(self):
-         return not self.info
-@@ -1171,6 +1177,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-         self.prefix =3D prefix
-=20
-     def check(self, schema):
-+        QAPISchemaType.check(self, schema)
-         seen =3D {}
-         for v in self.values:
-             v.check_clash(self.info, seen)
-@@ -1203,8 +1210,10 @@ class QAPISchemaArrayType(QAPISchemaType):
-         self.element_type =3D None
-=20
-     def check(self, schema):
-+        QAPISchemaType.check(self, schema)
-         self.element_type =3D schema.lookup_type(self._element_type_name=
-)
-         assert self.element_type
-+        self.element_type.check(schema)
-         self.ifcond =3D self.element_type.ifcond
-=20
-     def is_implicit(self):
-@@ -1247,6 +1256,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-         self.members =3D None
-=20
-     def check(self, schema):
-+        QAPISchemaType.check(self, schema)
-         if self.members is False:               # check for cycles
-             raise QAPISemError(self.info,
-                                "Object %s contains itself" % self.name)
-@@ -1429,6 +1439,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
-         self.variants =3D variants
-=20
-     def check(self, schema):
-+        QAPISchemaType.check(self, schema)
-         self.variants.tag_member.check(schema)
-         # Not calling self.variants.check_clash(), because there's nothi=
-ng
-         # to clash with
-@@ -1471,6 +1482,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.boxed =3D boxed
-=20
-     def check(self, schema):
-+        QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
-             assert (isinstance(self.arg_type, QAPISchemaObjectType) or
-@@ -1504,6 +1516,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
-         self.boxed =3D boxed
-=20
-     def check(self, schema):
-+        QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
-             assert (isinstance(self.arg_type, QAPISchemaObjectType) or
-@@ -1632,7 +1645,7 @@ class QAPISchema(object):
-             # But it's not tight: the disjunction need not imply it.  We
-             # may end up compiling useless wrapper types.
-             # TODO kill simple unions or implement the disjunction
--            assert ifcond =3D=3D typ.ifcond
-+            assert ifcond =3D=3D typ._ifcond
-         else:
-             self._def_entity(QAPISchemaObjectType(name, info, doc, ifcon=
-d,
-                                                   None, members, None))
-@@ -1678,7 +1691,7 @@ class QAPISchema(object):
-             assert len(typ) =3D=3D 1
-             typ =3D self._make_array_type(typ[0], info)
-         typ =3D self._make_implicit_object_type(
--            typ, info, None, self.lookup_type(typ).ifcond,
-+            typ, info, None, self.lookup_type(typ),
-             'wrapper', [self._make_member('data', typ, info)])
-         return QAPISchemaObjectTypeVariant(case, typ)
-=20
---=20
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index c02df95e72..342ae09422 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -40,6 +40,12 @@ def to_qlit(obj, level=0, suppress_first_indent=False):
+         ret = 'QLIT_QDICT(((QLitDictEntry[]) {\n'
+         ret += ',\n'.join(elts) + '\n'
+         ret += indent(level) + '}))'
++    elif isinstance(obj, tuple):
++        # Use of tuples for conditionals is a bit of a hack
++        ifcond, begin = obj
++        if begin:
++            return gen_if(ifcond)
++        return gen_endif(ifcond)
+     else:
+         assert False                # not implemented
+     if level > 0:
+@@ -101,6 +107,9 @@ extern const QLitObject %(var)s;
+         # Ignore types on first pass; visit_end() will pick up used types
+         return not isinstance(entity, QAPISchemaType)
+ 
++    def visit_ifcond(self, ifcond, begin):
++        self._qlits.append((ifcond, begin))
++
+     def _name(self, name):
+         if self._unmask:
+             return name
+-- 
 2.13.6
