@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elKbd-0002HM-8m
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:21:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1elKdT-0003ek-W6
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:23:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elKba-0003dO-2X
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:21:41 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36902 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elKbZ-0003ci-RU
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:21:38 -0500
-References: <20180212183415.5357-1-dgilbert@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1elKdT-0006Ot-93
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:23:35 -0500
+References: <20180212184849.11858-1-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0350cc68-0c9c-8ef2-0fcb-f39c90904a49@redhat.com>
-Date: Mon, 12 Feb 2018 14:21:20 -0600
+Message-ID: <d0af2741-d4b1-f655-f209-38a6958a354d@redhat.com>
+Date: Mon, 12 Feb 2018 14:23:29 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180212183415.5357-1-dgilbert@redhat.com>
+In-Reply-To: <20180212184849.11858-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] tests/migration: Add source to PC boot
- block
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] qemu-io: fix EOF Ctrl-D handling in
+ qemu-io readline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, drjones@redhat.com, wei@redhat.com
-Cc: peter.maydell@linaro.org, peterx@redhat.com
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On 02/12/2018 12:34 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> The boot block used in the migration test is currently only
-> shipped as a hex (with the source in the git commit message),
-
-Would be nice to point to commit ea0c6d62 (I assume that's the commit 
-message you're referring to).
-
-> change this to actually include the source.
-
-Yeah, GPL really wants us to ship the preferred editing form of sources ;)
-
-> 
-> A script is added to rebuild the header but the expectation is that
-> the generated hex is shipped as well as the .s, so that
-> there's no requirement to have just the right assembler etc.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 02/12/2018 12:48 PM, Daniel P. Berrang=C3=A9 wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>=20
+> qemu-io puts the TTY into non-canonical mode, which means no EOF proces=
+sing is
+> done and thus getchar() will never return the EOF constant. Instead we =
+have to
+> query the TTY attributes to determine the configured EOF character (usu=
+ally
+> Ctrl-D / 0x4), and then explicitly check for that value. This fixes the
+> regression that prevented Ctrl-D from triggering an exit of qemu-io tha=
+t has
+> existed since readline was first added in
+>=20
+>    commit 0cf17e181798063c3824c8200ba46f25f54faa1a
+>    Author: Stefan Hajnoczi <stefanha@redhat.com>
+>    Date:   Thu Nov 14 11:54:17 2013 +0100
+>=20
+>      qemu-io: use readline.c
+>=20
+> It also ensures that a newline is printed when exiting, to complete the
+> line output by the "qemu-io> " prompt.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
 
-> +++ b/tests/migration-test.c
-> @@ -80,57 +80,13 @@ static const char *tmpfs;
->   /* A simple PC boot sector that modifies memory (1-100MB) quickly
->    * outputing a 'B' every so often if it's still running.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Pre-existing, but while here,
-s/outputing/outputting/
-
-> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
-> new file mode 100755
-> index 0000000000..ee9b53ceb4
-> --- /dev/null
-> +++ b/tests/migration/rebuild-x86-bootblock.sh
-> @@ -0,0 +1,35 @@
-> +#!/bin/sh
-> +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> +# See the COPYING file in the top-level directory.
-> +#
-> +# Author: dgilbert@redhat.com
-> +
-> +ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
-> +HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
-> +
-> +if [ ! -e "$ASMFILE" ]
-> +then
-> +  echo "Couldn't find $ASMFILE" >&2
-> +  exit 1
-> +fi
-> +
-> +ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXX)
-Portable use of mktemp requires at least 6 X, not 5.
-
-> +cd $ASM_WORK_DIR &&
-
-Unsafe if $PWD contains spaces; needs to be quoted.
-
-> +as --32 -march=i486 "$ASMFILE" -o x86.o &&
-> +objcopy -O binary x86.o x86.boot &&
-> +dd if=x86.boot of=x86.bootsect \
-> +  bs=256 count=2 skip=124 &&
-> +xxd -i x86.bootsect |
-> +sed -e 's/.*int.*//' > x86.hex &&
-> +cat - x86.hex <<HERE > "$HEADER"
-> +/* This file is automatically generated from
-> + * tests/migration/x86-a-b-bootblock.s, edit that and then run
-> + * tests/migration/rebuild-x86-bootblock.sh to update,
-> + * and then remember to send both in your patch submission.
-> + */
-> +HERE
-> +
-> +rm x86.hex x86.bootsect x86.boot x86.o
-> +cd .. && rmdir $ASM_WORK_DIR
-
-Another place that needs quoting.
-
-> +++ b/tests/migration/x86-a-b-bootblock.s
-> @@ -0,0 +1,92 @@
-> +# x86 bootblock used in migration test
-> +#  repeatedly increments the first byte of each page in a 100MB
-> +#  range.
-> +#  Outputs an initial 'A' on serial followed by repeated 'B's
-> +#
-> +# run   tests/migration/rebuild-x86-bootblock.sh
-> +#   to regenerate the hex, and remember to include both the .h and .s
-> +#   in any patches.
-> +#
-> +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-
-Do you want to add 2018, since you've now modified things since the 
-original commit?
-
--- 
+--=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
