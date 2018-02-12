@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elF6D-0008CA-FV
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:28:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1elF8D-0001Y3-Jn
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elF6C-0007ps-Gi
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:28:53 -0500
-References: <20180208192328.16550-1-kwolf@redhat.com>
-	<20180208192328.16550-15-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d24da529-61c3-64f7-84d4-87e38a3280c1@redhat.com>
-Date: Mon, 12 Feb 2018 15:28:42 +0100
+	(envelope-from <kwolf@redhat.com>) id 1elF89-0002Zo-ED
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:30:57 -0500
+Date: Mon, 12 Feb 2018 15:30:40 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180212143040.GH5103@localhost.localdomain>
+References: <20180207163622.29935-1-pbonzini@redhat.com>
+	<20180207163622.29935-3-pbonzini@redhat.com>
+	<20180208013517.GB24289@lemon.usersys.redhat.com>
+	<5ac0b76e-213a-60c3-c010-87512d3a564a@redhat.com>
+	<20180212135206.GG5103@localhost.localdomain>
+	<81af35f9-4934-0c21-e3b1-b27c2fa7fdd9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180208192328.16550-15-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bZoApFPD8CLAdpyP4N17R2VWL49QxGp5H"
-Subject: Re: [Qemu-devel] [PATCH 14/27] gluster: Support .bdrv_co_create
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81af35f9-4934-0c21-e3b1-b27c2fa7fdd9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: add block job opblockers for
+ scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bZoApFPD8CLAdpyP4N17R2VWL49QxGp5H
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
- jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
- qemu-devel@nongnu.org
-Message-ID: <d24da529-61c3-64f7-84d4-87e38a3280c1@redhat.com>
-Subject: Re: [PATCH 14/27] gluster: Support .bdrv_co_create
-References: <20180208192328.16550-1-kwolf@redhat.com>
- <20180208192328.16550-15-kwolf@redhat.com>
-In-Reply-To: <20180208192328.16550-15-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Am 12.02.2018 um 15:00 hat Paolo Bonzini geschrieben:
+> On 12/02/2018 14:52, Kevin Wolf wrote:
+> > Am 08.02.2018 um 11:42 hat Paolo Bonzini geschrieben:
+> >> On 08/02/2018 02:35, Fam Zheng wrote:
+> >>> On Wed, 02/07 17:36, Paolo Bonzini wrote:
+> >>>> @@ -2626,6 +2656,36 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+> >>>>  
+> >>>>      scsi_realize(&s->qdev, errp);
+> >>>>      scsi_generic_read_device_identification(&s->qdev);
+> >>>> +
+> >>>> +    /* For op blockers, due to lack of support for dirty bitmaps.  */
+> >>>> +    error_setg(&sb->mirror_source,
+> >>>> +               "scsi-block does not support acting as a mirroring source");
+> >>>> +    error_setg(&sb->commit_source,
+> >>>> +               "scsi-block does not support acting as an active commit source");
+> >>>
+> >>> An alternative way would be adding BLOCK_OP_TYPE_DIRTY_BITMAP. The error message
+> >>> will not be as nice but it can be useful for another (blockjob) operation that
+> >>> requires dirty bitmap support, or another device that doesn't support dirty
+> >>> bitmaps. Though there isn't one for now.
+> >>
+> >> Yeah, I thought about it.  Another possibility is make BLOCK_OP_TYPE_* a
+> >> bitmask.  Then you can easily add a single Error * for multiple
+> >> blockers, and BLOCK_OP_TYPE_DIRTY_BITMAP can be defined as
+> >> BLOCK_OP_TYPE_MIRROR_SOURCE|BLOCK_OP_TYPE_COMMIT_SOURCE; likewise for
+> >> notifiers below.
+> > 
+> > We shouldn't be adding new instances of BLOCK_OP_* at all. I couldn't
+> > find the time yet to remove the existing ones, but any new protections
+> > should be using the permission system.
+> 
+> I agree.  But does this include not fixing bugs wherever clients are
+> using the old op blockers?
 
-On 2018-02-08 20:23, Kevin Wolf wrote:
-> This adds the .bdrv_co_create driver callback to gluster, which enables=
+I'm not saying that we shouldn't fix the bug, just that we should fix it
+properly with the best infrastructure we have.
 
-> image creation over QMP.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-core.json |  18 ++++++-
->  block/gluster.c      | 149 +++++++++++++++++++++++++++++++++----------=
---------
->  2 files changed, 115 insertions(+), 52 deletions(-)
+The old op blockers are "fixing" the problem at the symptom level, and
+you have to check for each high-level operation if it does something
+problematic internally. You have to repeat this analysis every time you
+add a new operation or modifiy an existing one (which noone ever does).
+The risk that this breaks sooner or later is pretty high.
 
-[...]
+The new permission system, on the other hand, directly addresses the
+root cause, and any new feature that uses dirty bitmaps will then
+automatically get the protection, too.
 
-> diff --git a/block/gluster.c b/block/gluster.c
-> index 0f4265a3a4..b7e2b7fa2b 100644
-> --- a/block/gluster.c
-> +++ b/block/gluster.c
+So in fact, I would say that the bug isn't really fixed (but at best
+papered over) until we add a proper fix on the permission level.
 
-[...]
-
-> @@ -962,64 +976,33 @@ static coroutine_fn int qemu_gluster_co_pwrite_ze=
-roes(BlockDriverState *bs,
->  }
->  #endif
-> =20
-> -static int qemu_gluster_create(const char *filename,
-> -                               QemuOpts *opts, Error **errp)
-> +static int qemu_gluster_co_create(BlockdevCreateOptions *options,
-> +                                  Error **errp)
->  {
-> -    BlockdevOptionsGluster *gconf;
-> +    BlockdevCreateOptionsGluster *opts =3D &options->u.gluster;
-
-In the other drivers so far you have asserted first that options->driver
-is as expected and then retrieved the appropriate part of the union.  I
-liked that a bit better, although of course it doesn't matter functionall=
-y.
-
-Anyway:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
->      struct glfs *glfs;
->      struct glfs_fd *fd;
->      int ret =3D 0;
-> -    PreallocMode prealloc;
-> -    int64_t total_size =3D 0;
-> -    char *tmp =3D NULL;
-> -    Error *local_err =3D NULL;
-> -
-> -    gconf =3D g_new0(BlockdevOptionsGluster, 1);
-> -    gconf->debug =3D qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
-> -                                           GLUSTER_DEBUG_DEFAULT);
-> -    if (gconf->debug < 0) {
-> -        gconf->debug =3D 0;
-> -    } else if (gconf->debug > GLUSTER_DEBUG_MAX) {
-> -        gconf->debug =3D GLUSTER_DEBUG_MAX;
-> -    }
-> -    gconf->has_debug =3D true;
-> =20
-> -    gconf->logfile =3D qemu_opt_get_del(opts, GLUSTER_OPT_LOGFILE);
-> -    if (!gconf->logfile) {
-> -        gconf->logfile =3D g_strdup(GLUSTER_LOGFILE_DEFAULT);
-> -    }
-> -    gconf->has_logfile =3D true;
-> +    assert(options->driver =3D=3D BLOCKDEV_DRIVER_GLUSTER);
-> =20
-
-
---bZoApFPD8CLAdpyP4N17R2VWL49QxGp5H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqBpJsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AhhwH/3vWTBXM88PVsRV/NTNvmwe0WtA+PlIk
-B0khd6Im/rVMnNXi7nOD4nbNqzfbHKyhuwk+wqHvIaqaRcaJ/iazq6ni8dzPvUs5
-iFnGyZeor7vvHybv39OwTb1OzDnSomQXA6Ymjle72ysQ2iuWYaPL/0AH+XjvI1tQ
-PrAhW1r6NBottK2e6s3vxdEkoH915Ks5yalhLuOA76lPggUHprHNf5P5fPBB3Ai9
-6a+h7/FF49JTvRptPv5hU98TnMm0Wlp8M2AAR+FK7FdWS2E2tlZg0HXsYtnztpD4
-iQlovhr5CvX8/tVe907mXDyYwkczQAbATPteJIDbAU1yVo4skBTqa30=
-=4X0G
------END PGP SIGNATURE-----
-
---bZoApFPD8CLAdpyP4N17R2VWL49QxGp5H--
+Kevin
