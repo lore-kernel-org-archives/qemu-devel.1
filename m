@@ -1,39 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1elHEj-0004Vl-Ox
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:45:50 -0500
+	(envelope-from <berrange@redhat.com>) id 1elHEz-0004nX-Bs
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:46:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1elHEf-0002Kl-Ao
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:45:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1elHEf-0002JI-2Q
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:45:45 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1CGighF005931
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 11:45:43 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g3ckaxbjj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 11:45:42 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Mon, 12 Feb 2018 16:45:40 -0000
-Date: Mon, 12 Feb 2018 17:45:36 +0100
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-In-Reply-To: <d95d8112-9d0b-e471-b45a-51c50850feab@redhat.com>
-References: <20180212154903.8859-1-dgilbert@redhat.com>
-	<d95d8112-9d0b-e471-b45a-51c50850feab@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1elHEv-0002YF-CU
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:46:05 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52848 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1elHEv-0002Xw-82
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:46:01 -0500
+Date: Mon, 12 Feb 2018 16:45:56 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180212164556.GW4071@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180116134217.8725-1-berrange@redhat.com>
+	<20180116134217.8725-7-berrange@redhat.com>
+	<46fa1e33-70e7-559e-11b9-0ec53bfb8782@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20180212174536.6e3a72b6@p-imbrenda.boeblingen.de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390/stattrib: Make SaveVMHandlers data
- static
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <46fa1e33-70e7-559e-11b9-0ec53bfb8782@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 06/14] qapi: remove '-q' arg to diff
+ when comparing QAPI output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,67 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, qemu-s390x <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Mon, 12 Feb 2018 16:52:08 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 12.02.2018 16:49, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri, Feb 09, 2018 at 05:39:58PM -0600, Eric Blake wrote:
+> On 01/16/2018 07:42 AM, Daniel P. Berrange wrote:
+> > When the qapi schema tests fail they merely print that the expected
+> > output didn't match the actual output. This is largely useless when
+> > trying diagnose what went wrong. Removing the '-q' arg to diff
+> > means that it is still silent on successful tests, but when it
+> > fails we'll see details of the incorrect output.
 > > 
-> > There's no need for this to be dynamic, make it static.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > > ---
-> >  hw/s390x/s390-stattrib.c | 26 +++++++++++++-------------
-> >  1 file changed, 13 insertions(+), 13 deletions(-)
+> >   tests/Makefile.include | 6 +++---
+> >   1 file changed, 3 insertions(+), 3 deletions(-)
 > > 
-> > diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-> > index a1d2135a60..adf07ef312 100644
-> > --- a/hw/s390x/s390-stattrib.c
-> > +++ b/hw/s390x/s390-stattrib.c
-> > @@ -365,22 +365,22 @@ static inline void
-> > s390_stattrib_set_migration_enabled(Object *obj, bool value,
-> > s->migration_enabled = value; }
-> >  
-> > +static SaveVMHandlers savevm_s390_stattrib_handlers = {
-> > +    .save_setup = cmma_save_setup,
-> > +    .save_live_iterate = cmma_save_iterate,
-> > +    .save_live_complete_precopy = cmma_save_complete,
-> > +    .save_live_pending = cmma_save_pending,
-> > +    .save_cleanup = cmma_save_cleanup,
-> > +    .load_state = cmma_load,
-> > +    .is_active = cmma_active,
-> > +};
-> > +
-> >  static void s390_stattrib_instance_init(Object *obj)
-> >  {
-> >      S390StAttribState *sas = S390_STATTRIB(obj);
-> > -    SaveVMHandlers *ops;
-> > -
-> > -    /* ops will always be freed by qemu when unregistering */
-> > -    ops = g_new0(SaveVMHandlers, 1);
-> > -
-> > -    ops->save_setup = cmma_save_setup;
-> > -    ops->save_live_iterate = cmma_save_iterate;
-> > -    ops->save_live_complete_precopy = cmma_save_complete;
-> > -    ops->save_live_pending = cmma_save_pending;
-> > -    ops->save_cleanup = cmma_save_cleanup;
-> > -    ops->load_state = cmma_load;
-> > -    ops->is_active = cmma_active;
-> > -    register_savevm_live(NULL, TYPE_S390_STATTRIB, 0, 0, ops, sas);
-> > +
-> > +    register_savevm_live(NULL, TYPE_S390_STATTRIB, 0, 0,
-> > +                         &savevm_s390_stattrib_handlers, sas);
-> >  
-> >      object_property_add_bool(obj, "migration-enabled",
-> >                               s390_stattrib_get_migration_enabled,
-> >   
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index 39a4b5359d..d65fb4e1b3 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -908,10 +908,10 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
+> >   		$^ >$*.test.out 2>$*.test.err; \
+> >   		echo $$? >$*.test.exit, \
+> >   		"TEST","$*.out")
+> > -	@diff -q $(SRC_PATH)/$*.out $*.test.out
+> > +	@diff $(SRC_PATH)/$*.out $*.test.out
 > 
-> Looks sane to me.
-> 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+> And just now I'm noticing that this produces an ed-script diff (which is
+> useless), instead of a context diff.  We want -c.  I guess I'll be
+> submitting the obvious followup patch.
 
+Well not entirely useless - it showed me the problems that we happening
+with the py3 port, but yeah, a saner diff format would be nice :-)
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
