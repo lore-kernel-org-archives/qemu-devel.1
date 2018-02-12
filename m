@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1elIWy-0008HE-M4
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:08:52 -0500
+	(envelope-from <marcel@redhat.com>) id 1elIX6-0008MQ-37
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:08:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1elIWs-0002X2-4t
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:08:43 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36530 helo=mx1.redhat.com)
+	(envelope-from <marcel@redhat.com>) id 1elIX1-0002gj-3V
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:08:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54846 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1elIWr-0002WW-TS
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:08:38 -0500
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1elIX0-0002fx-JV
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:08:46 -0500
 From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Mon, 12 Feb 2018 20:08:13 +0200
-Message-Id: <20180212180819.82556-4-marcel@redhat.com>
+Date: Mon, 12 Feb 2018 20:08:16 +0200
+Message-Id: <20180212180819.82556-7-marcel@redhat.com>
 In-Reply-To: <20180212180819.82556-1-marcel@redhat.com>
 References: <20180212180819.82556-1-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH V10 3/9] include/standard-headers: add pvrdma
- related headers
+Subject: [Qemu-devel] [PATCH V10 6/9] hw/rdma: Implementation of generic
+ rdma device layers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,1562 +27,1650 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, ehabkost@redhat.com, yuval.shaia@oracle.com, marcel@redhat.com, mst@redhat.com, dotanb@mellanox.com, yanjun.zhu@oracle.com
 
-Also modify update-linux-headers.sh script to manage
-the headers needed by the pvrdma device.
+From: Yuval Shaia <yuval.shaia@oracle.com>
 
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+This layer is composed of two sub-modules, backend and resource manager.
+Backend sub-module is responsible for all the interaction with IB layers
+such as ibverbs and umad (external libraries).
+Resource manager is a collection of functions and structures to manage
+RDMA resources such as QPs, CQs and MRs.
+
+Reviewed-by: Dotan Barak <dotanb@mellanox.com>
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- .../infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h      | 667 +++++++++++++++++++++
- .../drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h | 114 ++++
- .../infiniband/hw/vmw_pvrdma/pvrdma_verbs.h        | 383 ++++++++++++
- include/standard-headers/rdma/vmw_pvrdma-abi.h     | 293 +++++++++
- scripts/update-linux-headers.sh                    |  27 +
- 5 files changed, 1484 insertions(+)
- create mode 100644 include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h
- create mode 100644 include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
- create mode 100644 include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h
- create mode 100644 include/standard-headers/rdma/vmw_pvrdma-abi.h
+ Makefile.objs          |   1 +
+ configure              |   9 +-
+ hw/rdma/Makefile.objs  |   2 +-
+ hw/rdma/rdma_backend.c | 818 +++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/rdma/rdma_backend.h |  98 ++++++
+ hw/rdma/rdma_rm.c      | 544 ++++++++++++++++++++++++++++++++
+ hw/rdma/rdma_rm.h      |  69 +++++
+ hw/rdma/trace-events   |   5 +
+ 8 files changed, 1541 insertions(+), 5 deletions(-)
+ create mode 100644 hw/rdma/rdma_backend.c
+ create mode 100644 hw/rdma/rdma_backend.h
+ create mode 100644 hw/rdma/rdma_rm.c
+ create mode 100644 hw/rdma/rdma_rm.h
+ create mode 100644 hw/rdma/trace-events
 
-diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h
+diff --git a/Makefile.objs b/Makefile.objs
+index 2efba6d768..f3a3d28304 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -130,6 +130,7 @@ trace-events-subdirs += hw/block/dataplane
+ trace-events-subdirs += hw/char
+ trace-events-subdirs += hw/intc
+ trace-events-subdirs += hw/net
++trace-events-subdirs += hw/rdma
+ trace-events-subdirs += hw/virtio
+ trace-events-subdirs += hw/audio
+ trace-events-subdirs += hw/misc
+diff --git a/configure b/configure
+index 62562f08cf..c0ecd1858f 100755
+--- a/configure
++++ b/configure
+@@ -1575,7 +1575,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   hax             HAX acceleration support
+   hvf             Hypervisor.framework acceleration support
+   whpx            Windows Hypervisor Platform acceleration support
+-  rdma            RDMA-based migration support
++  rdma            Enable RDMA-based migration and PVRDMA support
+   vde             support for vde network
+   netmap          support for netmap network
+   linux-aio       Linux AIO support
+@@ -2926,15 +2926,16 @@ if test "$rdma" != "no" ; then
+ #include <rdma/rdma_cma.h>
+ int main(void) { return 0; }
+ EOF
+-  rdma_libs="-lrdmacm -libverbs"
++  rdma_libs="-lrdmacm -libverbs -libumad"
+   if compile_prog "" "$rdma_libs" ; then
+     rdma="yes"
++    libs_softmmu="$libs_softmmu $rdma_libs"
+   else
+     if test "$rdma" = "yes" ; then
+         error_exit \
+-            " OpenFabrics librdmacm/libibverbs not present." \
++            " OpenFabrics librdmacm/libibverbs/libibumad not present." \
+             " Your options:" \
+-            "  (1) Fast: Install infiniband packages from your distro." \
++            "  (1) Fast: Install infiniband packages (devel) from your distro." \
+             "  (2) Cleanest: Install libraries from www.openfabrics.org" \
+             "  (3) Also: Install softiwarp if you don't have RDMA hardware"
+     fi
+diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
+index cdffe4a9a3..6a59bf0d5b 100644
+--- a/hw/rdma/Makefile.objs
++++ b/hw/rdma/Makefile.objs
+@@ -1,3 +1,3 @@
+ ifeq ($(CONFIG_RDMA),y)
+-obj-$(CONFIG_PCI) += rdma_utils.o
++obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o
+ endif
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
 new file mode 100644
-index 0000000000..422eb3f4c1
+index 0000000000..e306fba534
 --- /dev/null
-+++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h
-@@ -0,0 +1,667 @@
++++ b/hw/rdma/rdma_backend.c
+@@ -0,0 +1,818 @@
 +/*
-+ * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
++ * QEMU paravirtual RDMA - Generic RDMA backend
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of EITHER the GNU General Public License
-+ * version 2 as published by the Free Software Foundation or the BSD
-+ * 2-Clause License. This program is distributed in the hope that it
-+ * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
-+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GNU General Public License version 2 for more details at
-+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
++ * Copyright (C) 2018 Oracle
++ * Copyright (C) 2018 Red Hat Inc
 + *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program available in the file COPYING in the main
-+ * directory of this source tree.
++ * Authors:
++ *     Yuval Shaia <yuval.shaia@oracle.com>
++ *     Marcel Apfelbaum <marcel@redhat.com>
 + *
-+ * The BSD 2-Clause License
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
-+ *     Redistribution and use in source and binary forms, with or
-+ *     without modification, are permitted provided that the following
-+ *     conditions are met:
-+ *
-+ *      - Redistributions of source code must retain the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer.
-+ *
-+ *      - Redistributions in binary form must reproduce the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer in the documentation and/or other materials
-+ *        provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#ifndef __PVRDMA_DEV_API_H__
-+#define __PVRDMA_DEV_API_H__
-+
-+#include "standard-headers/linux/types.h"
-+
-+#include "pvrdma_verbs.h"
-+
-+/*
-+ * PVRDMA version macros. Some new features require updates to PVRDMA_VERSION.
-+ * These macros allow us to check for different features if necessary.
-+ */
-+
-+#define PVRDMA_ROCEV1_VERSION		17
-+#define PVRDMA_ROCEV2_VERSION		18
-+#define PVRDMA_VERSION			PVRDMA_ROCEV2_VERSION
-+
-+#define PVRDMA_BOARD_ID			1
-+#define PVRDMA_REV_ID			1
-+
-+/*
-+ * Masks and accessors for page directory, which is a two-level lookup:
-+ * page directory -> page table -> page. Only one directory for now, but we
-+ * could expand that easily. 9 bits for tables, 9 bits for pages, gives one
-+ * gigabyte for memory regions and so forth.
-+ */
-+
-+#define PVRDMA_PDIR_SHIFT		18
-+#define PVRDMA_PTABLE_SHIFT		9
-+#define PVRDMA_PAGE_DIR_DIR(x)		(((x) >> PVRDMA_PDIR_SHIFT) & 0x1)
-+#define PVRDMA_PAGE_DIR_TABLE(x)	(((x) >> PVRDMA_PTABLE_SHIFT) & 0x1ff)
-+#define PVRDMA_PAGE_DIR_PAGE(x)		((x) & 0x1ff)
-+#define PVRDMA_PAGE_DIR_MAX_PAGES	(1 * 512 * 512)
-+#define PVRDMA_MAX_FAST_REG_PAGES	128
-+
-+/*
-+ * Max MSI-X vectors.
-+ */
-+
-+#define PVRDMA_MAX_INTERRUPTS	3
-+
-+/* Register offsets within PCI resource on BAR1. */
-+#define PVRDMA_REG_VERSION	0x00	/* R: Version of device. */
-+#define PVRDMA_REG_DSRLOW	0x04	/* W: Device shared region low PA. */
-+#define PVRDMA_REG_DSRHIGH	0x08	/* W: Device shared region high PA. */
-+#define PVRDMA_REG_CTL		0x0c	/* W: PVRDMA_DEVICE_CTL */
-+#define PVRDMA_REG_REQUEST	0x10	/* W: Indicate device request. */
-+#define PVRDMA_REG_ERR		0x14	/* R: Device error. */
-+#define PVRDMA_REG_ICR		0x18	/* R: Interrupt cause. */
-+#define PVRDMA_REG_IMR		0x1c	/* R/W: Interrupt mask. */
-+#define PVRDMA_REG_MACL		0x20	/* R/W: MAC address low. */
-+#define PVRDMA_REG_MACH		0x24	/* R/W: MAC address high. */
-+
-+/* Object flags. */
-+#define PVRDMA_CQ_FLAG_ARMED_SOL	BIT(0)	/* Armed for solicited-only. */
-+#define PVRDMA_CQ_FLAG_ARMED		BIT(1)	/* Armed. */
-+#define PVRDMA_MR_FLAG_DMA		BIT(0)	/* DMA region. */
-+#define PVRDMA_MR_FLAG_FRMR		BIT(1)	/* Fast reg memory region. */
-+
-+/*
-+ * Atomic operation capability (masked versions are extended atomic
-+ * operations.
-+ */
-+
-+#define PVRDMA_ATOMIC_OP_COMP_SWAP	BIT(0)	/* Compare and swap. */
-+#define PVRDMA_ATOMIC_OP_FETCH_ADD	BIT(1)	/* Fetch and add. */
-+#define PVRDMA_ATOMIC_OP_MASK_COMP_SWAP	BIT(2)	/* Masked compare and swap. */
-+#define PVRDMA_ATOMIC_OP_MASK_FETCH_ADD	BIT(3)	/* Masked fetch and add. */
-+
-+/*
-+ * Base Memory Management Extension flags to support Fast Reg Memory Regions
-+ * and Fast Reg Work Requests. Each flag represents a verb operation and we
-+ * must support all of them to qualify for the BMME device cap.
-+ */
-+
-+#define PVRDMA_BMME_FLAG_LOCAL_INV	BIT(0)	/* Local Invalidate. */
-+#define PVRDMA_BMME_FLAG_REMOTE_INV	BIT(1)	/* Remote Invalidate. */
-+#define PVRDMA_BMME_FLAG_FAST_REG_WR	BIT(2)	/* Fast Reg Work Request. */
-+
-+/*
-+ * GID types. The interpretation of the gid_types bit field in the device
-+ * capabilities will depend on the device mode. For now, the device only
-+ * supports RoCE as mode, so only the different GID types for RoCE are
-+ * defined.
-+ */
-+
-+#define PVRDMA_GID_TYPE_FLAG_ROCE_V1	BIT(0)
-+#define PVRDMA_GID_TYPE_FLAG_ROCE_V2	BIT(1)
-+
-+/*
-+ * Version checks. This checks whether each version supports specific
-+ * capabilities from the device.
-+ */
-+
-+#define PVRDMA_IS_VERSION17(_dev)					\
-+	(_dev->dsr_version == PVRDMA_ROCEV1_VERSION &&			\
-+	 _dev->dsr->caps.gid_types == PVRDMA_GID_TYPE_FLAG_ROCE_V1)
-+
-+#define PVRDMA_IS_VERSION18(_dev)					\
-+	(_dev->dsr_version >= PVRDMA_ROCEV2_VERSION &&			\
-+	 (_dev->dsr->caps.gid_types == PVRDMA_GID_TYPE_FLAG_ROCE_V1 ||  \
-+	  _dev->dsr->caps.gid_types == PVRDMA_GID_TYPE_FLAG_ROCE_V2))	\
-+
-+#define PVRDMA_SUPPORTED(_dev)						\
-+	((_dev->dsr->caps.mode == PVRDMA_DEVICE_MODE_ROCE) &&		\
-+	 (PVRDMA_IS_VERSION17(_dev) || PVRDMA_IS_VERSION18(_dev)))
-+
-+/*
-+ * Get capability values based on device version.
-+ */
-+
-+#define PVRDMA_GET_CAP(_dev, _old_val, _val) \
-+	((PVRDMA_IS_VERSION18(_dev)) ? _val : _old_val)
-+
-+enum pvrdma_pci_resource {
-+	PVRDMA_PCI_RESOURCE_MSIX,	/* BAR0: MSI-X, MMIO. */
-+	PVRDMA_PCI_RESOURCE_REG,	/* BAR1: Registers, MMIO. */
-+	PVRDMA_PCI_RESOURCE_UAR,	/* BAR2: UAR pages, MMIO, 64-bit. */
-+	PVRDMA_PCI_RESOURCE_LAST,	/* Last. */
-+};
-+
-+enum pvrdma_device_ctl {
-+	PVRDMA_DEVICE_CTL_ACTIVATE,	/* Activate device. */
-+	PVRDMA_DEVICE_CTL_UNQUIESCE,	/* Unquiesce device. */
-+	PVRDMA_DEVICE_CTL_RESET,	/* Reset device. */
-+};
-+
-+enum pvrdma_intr_vector {
-+	PVRDMA_INTR_VECTOR_RESPONSE,	/* Command response. */
-+	PVRDMA_INTR_VECTOR_ASYNC,	/* Async events. */
-+	PVRDMA_INTR_VECTOR_CQ,		/* CQ notification. */
-+	/* Additional CQ notification vectors. */
-+};
-+
-+enum pvrdma_intr_cause {
-+	PVRDMA_INTR_CAUSE_RESPONSE	= (1 << PVRDMA_INTR_VECTOR_RESPONSE),
-+	PVRDMA_INTR_CAUSE_ASYNC		= (1 << PVRDMA_INTR_VECTOR_ASYNC),
-+	PVRDMA_INTR_CAUSE_CQ		= (1 << PVRDMA_INTR_VECTOR_CQ),
-+};
-+
-+enum pvrdma_gos_bits {
-+	PVRDMA_GOS_BITS_UNK,		/* Unknown. */
-+	PVRDMA_GOS_BITS_32,		/* 32-bit. */
-+	PVRDMA_GOS_BITS_64,		/* 64-bit. */
-+};
-+
-+enum pvrdma_gos_type {
-+	PVRDMA_GOS_TYPE_UNK,		/* Unknown. */
-+	PVRDMA_GOS_TYPE_LINUX,		/* Linux. */
-+};
-+
-+enum pvrdma_device_mode {
-+	PVRDMA_DEVICE_MODE_ROCE,	/* RoCE. */
-+	PVRDMA_DEVICE_MODE_IWARP,	/* iWarp. */
-+	PVRDMA_DEVICE_MODE_IB,		/* InfiniBand. */
-+};
-+
-+struct pvrdma_gos_info {
-+	uint32_t gos_bits:2;			/* W: PVRDMA_GOS_BITS_ */
-+	uint32_t gos_type:4;			/* W: PVRDMA_GOS_TYPE_ */
-+	uint32_t gos_ver:16;			/* W: Guest OS version. */
-+	uint32_t gos_misc:10;		/* W: Other. */
-+	uint32_t pad;			/* Pad to 8-byte alignment. */
-+};
-+
-+struct pvrdma_device_caps {
-+	uint64_t fw_ver;				/* R: Query device. */
-+	uint64_t node_guid;
-+	uint64_t sys_image_guid;
-+	uint64_t max_mr_size;
-+	uint64_t page_size_cap;
-+	uint64_t atomic_arg_sizes;			/* EX verbs. */
-+	uint32_t ex_comp_mask;			/* EX verbs. */
-+	uint32_t device_cap_flags2;			/* EX verbs. */
-+	uint32_t max_fa_bit_boundary;		/* EX verbs. */
-+	uint32_t log_max_atomic_inline_arg;		/* EX verbs. */
-+	uint32_t vendor_id;
-+	uint32_t vendor_part_id;
-+	uint32_t hw_ver;
-+	uint32_t max_qp;
-+	uint32_t max_qp_wr;
-+	uint32_t device_cap_flags;
-+	uint32_t max_sge;
-+	uint32_t max_sge_rd;
-+	uint32_t max_cq;
-+	uint32_t max_cqe;
-+	uint32_t max_mr;
-+	uint32_t max_pd;
-+	uint32_t max_qp_rd_atom;
-+	uint32_t max_ee_rd_atom;
-+	uint32_t max_res_rd_atom;
-+	uint32_t max_qp_init_rd_atom;
-+	uint32_t max_ee_init_rd_atom;
-+	uint32_t max_ee;
-+	uint32_t max_rdd;
-+	uint32_t max_mw;
-+	uint32_t max_raw_ipv6_qp;
-+	uint32_t max_raw_ethy_qp;
-+	uint32_t max_mcast_grp;
-+	uint32_t max_mcast_qp_attach;
-+	uint32_t max_total_mcast_qp_attach;
-+	uint32_t max_ah;
-+	uint32_t max_fmr;
-+	uint32_t max_map_per_fmr;
-+	uint32_t max_srq;
-+	uint32_t max_srq_wr;
-+	uint32_t max_srq_sge;
-+	uint32_t max_uar;
-+	uint32_t gid_tbl_len;
-+	uint16_t max_pkeys;
-+	uint8_t  local_ca_ack_delay;
-+	uint8_t  phys_port_cnt;
-+	uint8_t  mode;				/* PVRDMA_DEVICE_MODE_ */
-+	uint8_t  atomic_ops;				/* PVRDMA_ATOMIC_OP_* bits */
-+	uint8_t  bmme_flags;				/* FRWR Mem Mgmt Extensions */
-+	uint8_t  gid_types;				/* PVRDMA_GID_TYPE_FLAG_ */
-+	uint32_t max_fast_reg_page_list_len;
-+};
-+
-+struct pvrdma_ring_page_info {
-+	uint32_t num_pages;				/* Num pages incl. header. */
-+	uint32_t reserved;				/* Reserved. */
-+	uint64_t pdir_dma;				/* Page directory PA. */
-+};
-+
-+#pragma pack(push, 1)
-+
-+struct pvrdma_device_shared_region {
-+	uint32_t driver_version;			/* W: Driver version. */
-+	uint32_t pad;				/* Pad to 8-byte align. */
-+	struct pvrdma_gos_info gos_info;	/* W: Guest OS information. */
-+	uint64_t cmd_slot_dma;			/* W: Command slot address. */
-+	uint64_t resp_slot_dma;			/* W: Response slot address. */
-+	struct pvrdma_ring_page_info async_ring_pages;
-+						/* W: Async ring page info. */
-+	struct pvrdma_ring_page_info cq_ring_pages;
-+						/* W: CQ ring page info. */
-+	uint32_t uar_pfn;				/* W: UAR pageframe. */
-+	uint32_t pad2;				/* Pad to 8-byte align. */
-+	struct pvrdma_device_caps caps;		/* R: Device capabilities. */
-+};
-+
-+#pragma pack(pop)
-+
-+/* Event types. Currently a 1:1 mapping with enum ib_event. */
-+enum pvrdma_eqe_type {
-+	PVRDMA_EVENT_CQ_ERR,
-+	PVRDMA_EVENT_QP_FATAL,
-+	PVRDMA_EVENT_QP_REQ_ERR,
-+	PVRDMA_EVENT_QP_ACCESS_ERR,
-+	PVRDMA_EVENT_COMM_EST,
-+	PVRDMA_EVENT_SQ_DRAINED,
-+	PVRDMA_EVENT_PATH_MIG,
-+	PVRDMA_EVENT_PATH_MIG_ERR,
-+	PVRDMA_EVENT_DEVICE_FATAL,
-+	PVRDMA_EVENT_PORT_ACTIVE,
-+	PVRDMA_EVENT_PORT_ERR,
-+	PVRDMA_EVENT_LID_CHANGE,
-+	PVRDMA_EVENT_PKEY_CHANGE,
-+	PVRDMA_EVENT_SM_CHANGE,
-+	PVRDMA_EVENT_SRQ_ERR,
-+	PVRDMA_EVENT_SRQ_LIMIT_REACHED,
-+	PVRDMA_EVENT_QP_LAST_WQE_REACHED,
-+	PVRDMA_EVENT_CLIENT_REREGISTER,
-+	PVRDMA_EVENT_GID_CHANGE,
-+};
-+
-+/* Event queue element. */
-+struct pvrdma_eqe {
-+	uint32_t type;	/* Event type. */
-+	uint32_t info;	/* Handle, other. */
-+};
-+
-+/* CQ notification queue element. */
-+struct pvrdma_cqne {
-+	uint32_t info;	/* Handle */
-+};
-+
-+enum {
-+	PVRDMA_CMD_FIRST,
-+	PVRDMA_CMD_QUERY_PORT = PVRDMA_CMD_FIRST,
-+	PVRDMA_CMD_QUERY_PKEY,
-+	PVRDMA_CMD_CREATE_PD,
-+	PVRDMA_CMD_DESTROY_PD,
-+	PVRDMA_CMD_CREATE_MR,
-+	PVRDMA_CMD_DESTROY_MR,
-+	PVRDMA_CMD_CREATE_CQ,
-+	PVRDMA_CMD_RESIZE_CQ,
-+	PVRDMA_CMD_DESTROY_CQ,
-+	PVRDMA_CMD_CREATE_QP,
-+	PVRDMA_CMD_MODIFY_QP,
-+	PVRDMA_CMD_QUERY_QP,
-+	PVRDMA_CMD_DESTROY_QP,
-+	PVRDMA_CMD_CREATE_UC,
-+	PVRDMA_CMD_DESTROY_UC,
-+	PVRDMA_CMD_CREATE_BIND,
-+	PVRDMA_CMD_DESTROY_BIND,
-+	PVRDMA_CMD_CREATE_SRQ,
-+	PVRDMA_CMD_MODIFY_SRQ,
-+	PVRDMA_CMD_QUERY_SRQ,
-+	PVRDMA_CMD_DESTROY_SRQ,
-+	PVRDMA_CMD_MAX,
-+};
-+
-+enum {
-+	PVRDMA_CMD_FIRST_RESP = (1 << 31),
-+	PVRDMA_CMD_QUERY_PORT_RESP = PVRDMA_CMD_FIRST_RESP,
-+	PVRDMA_CMD_QUERY_PKEY_RESP,
-+	PVRDMA_CMD_CREATE_PD_RESP,
-+	PVRDMA_CMD_DESTROY_PD_RESP_NOOP,
-+	PVRDMA_CMD_CREATE_MR_RESP,
-+	PVRDMA_CMD_DESTROY_MR_RESP_NOOP,
-+	PVRDMA_CMD_CREATE_CQ_RESP,
-+	PVRDMA_CMD_RESIZE_CQ_RESP,
-+	PVRDMA_CMD_DESTROY_CQ_RESP_NOOP,
-+	PVRDMA_CMD_CREATE_QP_RESP,
-+	PVRDMA_CMD_MODIFY_QP_RESP,
-+	PVRDMA_CMD_QUERY_QP_RESP,
-+	PVRDMA_CMD_DESTROY_QP_RESP,
-+	PVRDMA_CMD_CREATE_UC_RESP,
-+	PVRDMA_CMD_DESTROY_UC_RESP_NOOP,
-+	PVRDMA_CMD_CREATE_BIND_RESP_NOOP,
-+	PVRDMA_CMD_DESTROY_BIND_RESP_NOOP,
-+	PVRDMA_CMD_CREATE_SRQ_RESP,
-+	PVRDMA_CMD_MODIFY_SRQ_RESP,
-+	PVRDMA_CMD_QUERY_SRQ_RESP,
-+	PVRDMA_CMD_DESTROY_SRQ_RESP,
-+	PVRDMA_CMD_MAX_RESP,
-+};
-+
-+struct pvrdma_cmd_hdr {
-+	uint64_t response;		/* Key for response lookup. */
-+	uint32_t cmd;		/* PVRDMA_CMD_ */
-+	uint32_t reserved;		/* Reserved. */
-+};
-+
-+struct pvrdma_cmd_resp_hdr {
-+	uint64_t response;		/* From cmd hdr. */
-+	uint32_t ack;		/* PVRDMA_CMD_XXX_RESP */
-+	uint8_t err;			/* Error. */
-+	uint8_t reserved[3];		/* Reserved. */
-+};
-+
-+struct pvrdma_cmd_query_port {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint8_t port_num;
-+	uint8_t reserved[7];
-+};
-+
-+struct pvrdma_cmd_query_port_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	struct pvrdma_port_attr attrs;
-+};
-+
-+struct pvrdma_cmd_query_pkey {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint8_t port_num;
-+	uint8_t index;
-+	uint8_t reserved[6];
-+};
-+
-+struct pvrdma_cmd_query_pkey_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint16_t pkey;
-+	uint8_t reserved[6];
-+};
-+
-+struct pvrdma_cmd_create_uc {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t pfn; /* UAR page frame number */
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_uc_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t ctx_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_uc {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t ctx_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_pd {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t ctx_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_pd_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t pd_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_pd {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t pd_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_mr {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint64_t start;
-+	uint64_t length;
-+	uint64_t pdir_dma;
-+	uint32_t pd_handle;
-+	uint32_t access_flags;
-+	uint32_t flags;
-+	uint32_t nchunks;
-+};
-+
-+struct pvrdma_cmd_create_mr_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t mr_handle;
-+	uint32_t lkey;
-+	uint32_t rkey;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_mr {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t mr_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_cq {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint64_t pdir_dma;
-+	uint32_t ctx_handle;
-+	uint32_t cqe;
-+	uint32_t nchunks;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_cq_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t cq_handle;
-+	uint32_t cqe;
-+};
-+
-+struct pvrdma_cmd_resize_cq {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t cq_handle;
-+	uint32_t cqe;
-+};
-+
-+struct pvrdma_cmd_resize_cq_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t cqe;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_cq {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t cq_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_srq {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint64_t pdir_dma;
-+	uint32_t pd_handle;
-+	uint32_t nchunks;
-+	struct pvrdma_srq_attr attrs;
-+	uint8_t srq_type;
-+	uint8_t reserved[7];
-+};
-+
-+struct pvrdma_cmd_create_srq_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t srqn;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_modify_srq {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t srq_handle;
-+	uint32_t attr_mask;
-+	struct pvrdma_srq_attr attrs;
-+};
-+
-+struct pvrdma_cmd_query_srq {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t srq_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_query_srq_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	struct pvrdma_srq_attr attrs;
-+};
-+
-+struct pvrdma_cmd_destroy_srq {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t srq_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_qp {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint64_t pdir_dma;
-+	uint32_t pd_handle;
-+	uint32_t send_cq_handle;
-+	uint32_t recv_cq_handle;
-+	uint32_t srq_handle;
-+	uint32_t max_send_wr;
-+	uint32_t max_recv_wr;
-+	uint32_t max_send_sge;
-+	uint32_t max_recv_sge;
-+	uint32_t max_inline_data;
-+	uint32_t lkey;
-+	uint32_t access_flags;
-+	uint16_t total_chunks;
-+	uint16_t send_chunks;
-+	uint16_t max_atomic_arg;
-+	uint8_t sq_sig_all;
-+	uint8_t qp_type;
-+	uint8_t is_srq;
-+	uint8_t reserved[3];
-+};
-+
-+struct pvrdma_cmd_create_qp_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t qpn;
-+	uint32_t max_send_wr;
-+	uint32_t max_recv_wr;
-+	uint32_t max_send_sge;
-+	uint32_t max_recv_sge;
-+	uint32_t max_inline_data;
-+};
-+
-+struct pvrdma_cmd_modify_qp {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t qp_handle;
-+	uint32_t attr_mask;
-+	struct pvrdma_qp_attr attrs;
-+};
-+
-+struct pvrdma_cmd_query_qp {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t qp_handle;
-+	uint32_t attr_mask;
-+};
-+
-+struct pvrdma_cmd_query_qp_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	struct pvrdma_qp_attr attrs;
-+};
-+
-+struct pvrdma_cmd_destroy_qp {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t qp_handle;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_qp_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	uint32_t events_reported;
-+	uint8_t reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_bind {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t mtu;
-+	uint32_t vlan;
-+	uint32_t index;
-+	uint8_t new_gid[16];
-+	uint8_t gid_type;
-+	uint8_t reserved[3];
-+};
-+
-+struct pvrdma_cmd_destroy_bind {
-+	struct pvrdma_cmd_hdr hdr;
-+	uint32_t index;
-+	uint8_t dest_gid[16];
-+	uint8_t reserved[4];
-+};
-+
-+union pvrdma_cmd_req {
-+	struct pvrdma_cmd_hdr hdr;
-+	struct pvrdma_cmd_query_port query_port;
-+	struct pvrdma_cmd_query_pkey query_pkey;
-+	struct pvrdma_cmd_create_uc create_uc;
-+	struct pvrdma_cmd_destroy_uc destroy_uc;
-+	struct pvrdma_cmd_create_pd create_pd;
-+	struct pvrdma_cmd_destroy_pd destroy_pd;
-+	struct pvrdma_cmd_create_mr create_mr;
-+	struct pvrdma_cmd_destroy_mr destroy_mr;
-+	struct pvrdma_cmd_create_cq create_cq;
-+	struct pvrdma_cmd_resize_cq resize_cq;
-+	struct pvrdma_cmd_destroy_cq destroy_cq;
-+	struct pvrdma_cmd_create_qp create_qp;
-+	struct pvrdma_cmd_modify_qp modify_qp;
-+	struct pvrdma_cmd_query_qp query_qp;
-+	struct pvrdma_cmd_destroy_qp destroy_qp;
-+	struct pvrdma_cmd_create_bind create_bind;
-+	struct pvrdma_cmd_destroy_bind destroy_bind;
-+	struct pvrdma_cmd_create_srq create_srq;
-+	struct pvrdma_cmd_modify_srq modify_srq;
-+	struct pvrdma_cmd_query_srq query_srq;
-+	struct pvrdma_cmd_destroy_srq destroy_srq;
-+};
-+
-+union pvrdma_cmd_resp {
-+	struct pvrdma_cmd_resp_hdr hdr;
-+	struct pvrdma_cmd_query_port_resp query_port_resp;
-+	struct pvrdma_cmd_query_pkey_resp query_pkey_resp;
-+	struct pvrdma_cmd_create_uc_resp create_uc_resp;
-+	struct pvrdma_cmd_create_pd_resp create_pd_resp;
-+	struct pvrdma_cmd_create_mr_resp create_mr_resp;
-+	struct pvrdma_cmd_create_cq_resp create_cq_resp;
-+	struct pvrdma_cmd_resize_cq_resp resize_cq_resp;
-+	struct pvrdma_cmd_create_qp_resp create_qp_resp;
-+	struct pvrdma_cmd_query_qp_resp query_qp_resp;
-+	struct pvrdma_cmd_destroy_qp_resp destroy_qp_resp;
-+	struct pvrdma_cmd_create_srq_resp create_srq_resp;
-+	struct pvrdma_cmd_query_srq_resp query_srq_resp;
-+};
-+
-+#endif /* __PVRDMA_DEV_API_H__ */
-diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
++#include <qemu/osdep.h>
++#include <qemu/error-report.h>
++#include <qapi/error.h>
++
++#include <infiniband/verbs.h>
++
++#include "trace.h"
++#include "rdma_utils.h"
++#include "rdma_rm.h"
++#include "rdma_backend.h"
++
++/* Vendor Errors */
++#define VENDOR_ERR_FAIL_BACKEND     0x201
++#define VENDOR_ERR_TOO_MANY_SGES    0x202
++#define VENDOR_ERR_NOMEM            0x203
++#define VENDOR_ERR_QP0              0x204
++#define VENDOR_ERR_NO_SGE           0x205
++#define VENDOR_ERR_MAD_SEND         0x206
++#define VENDOR_ERR_INVLKEY          0x207
++#define VENDOR_ERR_MR_SMALL         0x208
++
++#define THR_NAME_LEN 16
++
++typedef struct BackendCtx {
++    uint64_t req_id;
++    void *up_ctx;
++    bool is_tx_req;
++} BackendCtx;
++
++static void (*comp_handler)(int status, unsigned int vendor_err, void *ctx);
++
++static void dummy_comp_handler(int status, unsigned int vendor_err, void *ctx)
++{
++    pr_err("No completion handler is registered\n");
++}
++
++static void poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
++{
++    int i, ne;
++    BackendCtx *bctx;
++    struct ibv_wc wc[2];
++
++    pr_dbg("Entering poll_cq loop on cq %p\n", ibcq);
++    do {
++        ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
++
++        pr_dbg("Got %d completion(s) from cq %p\n", ne, ibcq);
++
++        for (i = 0; i < ne; i++) {
++            pr_dbg("wr_id=0x%lx\n", wc[i].wr_id);
++            pr_dbg("status=%d\n", wc[i].status);
++
++            bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
++            if (unlikely(!bctx)) {
++                pr_dbg("Error: Failed to find ctx for req %ld\n", wc[i].wr_id);
++                continue;
++            }
++            pr_dbg("Processing %s CQE\n", bctx->is_tx_req ? "send" : "recv");
++
++            comp_handler(wc[i].status, wc[i].vendor_err, bctx->up_ctx);
++
++            rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
++            g_free(bctx);
++        }
++    } while (ne > 0);
++
++    if (ne < 0) {
++        pr_dbg("Got error %d from ibv_poll_cq\n", ne);
++    }
++}
++
++static void *comp_handler_thread(void *arg)
++{
++    RdmaBackendDev *backend_dev = (RdmaBackendDev *)arg;
++    int rc;
++    struct ibv_cq *ev_cq;
++    void *ev_ctx;
++
++    pr_dbg("Starting\n");
++
++    while (backend_dev->comp_thread.run) {
++        pr_dbg("Waiting for completion on channel %p\n", backend_dev->channel);
++        rc = ibv_get_cq_event(backend_dev->channel, &ev_cq, &ev_ctx);
++        pr_dbg("ibv_get_cq_event=%d\n", rc);
++        if (unlikely(rc)) {
++            pr_dbg("---> ibv_get_cq_event (%d)\n", rc);
++            continue;
++        }
++
++        rc = ibv_req_notify_cq(ev_cq, 0);
++        if (unlikely(rc)) {
++            pr_dbg("Error %d from ibv_req_notify_cq\n", rc);
++        }
++
++        poll_cq(backend_dev->rdma_dev_res, ev_cq);
++
++        ibv_ack_cq_events(ev_cq, 1);
++    }
++
++    pr_dbg("Going down\n");
++
++    /* TODO: Post cqe for all remaining buffs that were posted */
++
++    return NULL;
++}
++
++void rdma_backend_register_comp_handler(void (*handler)(int status,
++                                        unsigned int vendor_err, void *ctx))
++{
++    comp_handler = handler;
++}
++
++void rdma_backend_unregister_comp_handler(void)
++{
++    rdma_backend_register_comp_handler(dummy_comp_handler);
++}
++
++int rdma_backend_query_port(RdmaBackendDev *backend_dev,
++                            struct ibv_port_attr *port_attr)
++{
++    int rc;
++
++    rc = ibv_query_port(backend_dev->context, backend_dev->port_num, port_attr);
++    if (rc) {
++        pr_dbg("Error %d from ibv_query_port\n", rc);
++        return -EIO;
++    }
++
++    return 0;
++}
++
++void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
++{
++    poll_cq(rdma_dev_res, cq->ibcq);
++}
++
++static GHashTable *ah_hash;
++
++static struct ibv_ah *create_ah(RdmaBackendDev *backend_dev, struct ibv_pd *pd,
++                                uint8_t sgid_idx, union ibv_gid *dgid)
++{
++    GBytes *ah_key = g_bytes_new(dgid, sizeof(*dgid));
++    struct ibv_ah *ah = g_hash_table_lookup(ah_hash, ah_key);
++
++    if (ah) {
++        trace_create_ah_cache_hit(be64_to_cpu(dgid->global.subnet_prefix),
++                                  be64_to_cpu(dgid->global.interface_id));
++        g_bytes_unref(ah_key);
++    } else {
++        struct ibv_ah_attr ah_attr = {
++            .is_global     = 1,
++            .port_num      = backend_dev->port_num,
++            .grh.hop_limit = 1,
++        };
++
++        ah_attr.grh.dgid = *dgid;
++        ah_attr.grh.sgid_index = sgid_idx;
++
++        ah = ibv_create_ah(pd, &ah_attr);
++        if (ah) {
++            g_hash_table_insert(ah_hash, ah_key, ah);
++        } else {
++            g_bytes_unref(ah_key);
++            pr_dbg("ibv_create_ah failed for gid <%lx %lx>\n",
++                    be64_to_cpu(dgid->global.subnet_prefix),
++                    be64_to_cpu(dgid->global.interface_id));
++        }
++
++        trace_create_ah_cache_miss(be64_to_cpu(dgid->global.subnet_prefix),
++                                   be64_to_cpu(dgid->global.interface_id));
++    }
++
++    return ah;
++}
++
++static void destroy_ah_hash_key(gpointer data)
++{
++    g_bytes_unref(data);
++}
++
++static void destroy_ah_hast_data(gpointer data)
++{
++    struct ibv_ah *ah = data;
++
++    ibv_destroy_ah(ah);
++}
++
++static void ah_cache_init(void)
++{
++    ah_hash = g_hash_table_new_full(g_bytes_hash, g_bytes_equal,
++                                    destroy_ah_hash_key, destroy_ah_hast_data);
++}
++
++static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
++                                struct ibv_sge *dsge, struct ibv_sge *ssge,
++                                uint8_t num_sge)
++{
++    RdmaRmMR *mr;
++    int ssge_idx;
++
++    pr_dbg("num_sge=%d\n", num_sge);
++
++    for (ssge_idx = 0; ssge_idx < num_sge; ssge_idx++) {
++        mr = rdma_rm_get_mr(rdma_dev_res, ssge[ssge_idx].lkey);
++        if (unlikely(!mr)) {
++            pr_dbg("Invalid lkey 0x%x\n", ssge[ssge_idx].lkey);
++            return VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
++        }
++
++        dsge->addr = mr->user_mr.host_virt + ssge[ssge_idx].addr -
++                     mr->user_mr.guest_start;
++        dsge->length = ssge[ssge_idx].length;
++        dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
++
++        pr_dbg("ssge->addr=0x%lx\n", (uint64_t)ssge[ssge_idx].addr);
++        pr_dbg("dsge->addr=0x%lx\n", dsge->addr);
++        pr_dbg("dsge->length=%d\n", dsge->length);
++        pr_dbg("dsge->lkey=0x%x\n", dsge->lkey);
++
++        dsge++;
++    }
++
++    return 0;
++}
++
++void rdma_backend_post_send(RdmaBackendDev *backend_dev,
++                            RdmaBackendQP *qp, uint8_t qp_type,
++                            struct ibv_sge *sge, uint32_t num_sge,
++                            union ibv_gid *dgid, uint32_t dqpn,
++                            uint32_t dqkey, void *ctx)
++{
++    BackendCtx *bctx;
++    struct ibv_sge new_sge[MAX_SGE];
++    uint32_t bctx_id;
++    int rc;
++    struct ibv_send_wr wr = {0}, *bad_wr;
++
++    if (!qp->ibqp) { /* This field does not get initialized for QP0 and QP1 */
++        if (qp_type == IBV_QPT_SMI) {
++            pr_dbg("QP0 unsupported\n");
++            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
++        } else if (qp_type == IBV_QPT_GSI) {
++            pr_dbg("QP1\n");
++            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
++        }
++        pr_dbg("qp->ibqp is NULL for qp_type %d!!!\n", qp_type);
++        return;
++    }
++
++    pr_dbg("num_sge=%d\n", num_sge);
++    if (!num_sge) {
++        pr_dbg("num_sge=0\n");
++        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
++        return;
++    }
++
++    bctx = g_malloc0(sizeof(*bctx));
++    bctx->up_ctx = ctx;
++    bctx->is_tx_req = 1;
++
++    rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
++    if (unlikely(rc)) {
++        pr_dbg("Failed to allocate cqe_ctx\n");
++        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
++        goto out_free_bctx;
++    }
++
++    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge);
++    if (rc) {
++        pr_dbg("Error: Failed to build host SGE array\n");
++        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
++        goto out_dealloc_cqe_ctx;
++    }
++
++    if (qp_type == IBV_QPT_UD) {
++        wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd,
++                                backend_dev->backend_gid_idx, dgid);
++        wr.wr.ud.remote_qpn = dqpn;
++        wr.wr.ud.remote_qkey = dqkey;
++    }
++
++    wr.num_sge = num_sge;
++    wr.opcode = IBV_WR_SEND;
++    wr.send_flags = IBV_SEND_SIGNALED;
++    wr.sg_list = new_sge;
++    wr.wr_id = bctx_id;
++
++    rc = ibv_post_send(qp->ibqp, &wr, &bad_wr);
++    pr_dbg("ibv_post_send=%d\n", rc);
++    if (rc) {
++        pr_dbg("Fail (%d, %d) to post send WQE to qpn %d\n", rc, errno,
++                qp->ibqp->qp_num);
++        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
++        goto out_dealloc_cqe_ctx;
++    }
++
++    return;
++
++out_dealloc_cqe_ctx:
++    rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
++
++out_free_bctx:
++    g_free(bctx);
++}
++
++void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
++                            RdmaDeviceResources *rdma_dev_res,
++                            RdmaBackendQP *qp, uint8_t qp_type,
++                            struct ibv_sge *sge, uint32_t num_sge, void *ctx)
++{
++    BackendCtx *bctx;
++    struct ibv_sge new_sge[MAX_SGE];
++    uint32_t bctx_id;
++    int rc;
++    struct ibv_recv_wr wr = {0}, *bad_wr;
++
++    if (!qp->ibqp) { /* This field does not get initialized for QP0 and QP1 */
++        if (qp_type == IBV_QPT_SMI) {
++            pr_dbg("QP0 unsupported\n");
++            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
++        }
++        if (qp_type == IBV_QPT_GSI) {
++            pr_dbg("QP1\n");
++            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
++        }
++        return;
++    }
++
++    pr_dbg("num_sge=%d\n", num_sge);
++    if (!num_sge) {
++        pr_dbg("num_sge=0\n");
++        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
++        return;
++    }
++
++    bctx = g_malloc0(sizeof(*bctx));
++    bctx->up_ctx = ctx;
++    bctx->is_tx_req = 0;
++
++    rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
++    if (unlikely(rc)) {
++        pr_dbg("Failed to allocate cqe_ctx\n");
++        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
++        goto out_free_bctx;
++    }
++
++    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
++    if (rc) {
++        pr_dbg("Error: Failed to build host SGE array\n");
++        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
++        goto out_dealloc_cqe_ctx;
++    }
++
++    wr.num_sge = num_sge;
++    wr.sg_list = new_sge;
++    wr.wr_id = bctx_id;
++    rc = ibv_post_recv(qp->ibqp, &wr, &bad_wr);
++    pr_dbg("ibv_post_recv=%d\n", rc);
++    if (rc) {
++        pr_dbg("Fail (%d, %d) to post recv WQE to qpn %d\n", rc, errno,
++                qp->ibqp->qp_num);
++        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
++        goto out_dealloc_cqe_ctx;
++    }
++
++    return;
++
++out_dealloc_cqe_ctx:
++    rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
++
++out_free_bctx:
++    g_free(bctx);
++}
++
++int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd)
++{
++    pd->ibpd = ibv_alloc_pd(backend_dev->context);
++
++    return pd->ibpd ? 0 : -EIO;
++}
++
++void rdma_backend_destroy_pd(RdmaBackendPD *pd)
++{
++    if (pd->ibpd) {
++        ibv_dealloc_pd(pd->ibpd);
++    }
++}
++
++int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, uint64_t addr,
++                           size_t length, int access)
++{
++    pr_dbg("addr=0x%lx\n", addr);
++    pr_dbg("len=%ld\n", length);
++    mr->ibmr = ibv_reg_mr(pd->ibpd, (void *)addr, length, access);
++    if (mr->ibmr) {
++        pr_dbg("lkey=0x%x\n", mr->ibmr->lkey);
++        pr_dbg("rkey=0x%x\n", mr->ibmr->rkey);
++        mr->ibpd = pd->ibpd;
++    }
++
++    return mr->ibmr ? 0 : -EIO;
++}
++
++void rdma_backend_destroy_mr(RdmaBackendMR *mr)
++{
++    if (mr->ibmr) {
++        ibv_dereg_mr(mr->ibmr);
++    }
++}
++
++int rdma_backend_create_cq(RdmaBackendDev *backend_dev, RdmaBackendCQ *cq,
++                           int cqe)
++{
++    int rc;
++
++    pr_dbg("cqe=%d\n", cqe);
++
++    pr_dbg("dev->channel=%p\n", backend_dev->channel);
++    cq->ibcq = ibv_create_cq(backend_dev->context, cqe + 1, NULL,
++                             backend_dev->channel, 0);
++
++    if (cq->ibcq) {
++        rc = ibv_req_notify_cq(cq->ibcq, 0);
++        if (rc) {
++            pr_dbg("Error %d from ibv_req_notify_cq\n", rc);
++        }
++        cq->backend_dev = backend_dev;
++    }
++
++    return cq->ibcq ? 0 : -EIO;
++}
++
++void rdma_backend_destroy_cq(RdmaBackendCQ *cq)
++{
++    if (cq->ibcq) {
++        ibv_destroy_cq(cq->ibcq);
++    }
++}
++
++int rdma_backend_create_qp(RdmaBackendQP *qp, uint8_t qp_type,
++                           RdmaBackendPD *pd, RdmaBackendCQ *scq,
++                           RdmaBackendCQ *rcq, uint32_t max_send_wr,
++                           uint32_t max_recv_wr, uint32_t max_send_sge,
++                           uint32_t max_recv_sge)
++{
++    struct ibv_qp_init_attr attr = {0};
++
++    qp->ibqp = 0;
++    pr_dbg("qp_type=%d\n", qp_type);
++
++    switch (qp_type) {
++    case IBV_QPT_GSI:
++        pr_dbg("QP1 unsupported\n");
++        return 0;
++
++    case IBV_QPT_RC:
++        /* fall through */
++    case IBV_QPT_UD:
++        /* do nothing */
++        break;
++
++    default:
++        pr_dbg("Unsupported QP type %d\n", qp_type);
++        return -EIO;
++    }
++
++    attr.qp_type = qp_type;
++    attr.send_cq = scq->ibcq;
++    attr.recv_cq = rcq->ibcq;
++    attr.cap.max_send_wr = max_send_wr;
++    attr.cap.max_recv_wr = max_recv_wr;
++    attr.cap.max_send_sge = max_send_sge;
++    attr.cap.max_recv_sge = max_recv_sge;
++
++    pr_dbg("max_send_wr=%d\n", max_send_wr);
++    pr_dbg("max_recv_wr=%d\n", max_recv_wr);
++    pr_dbg("max_send_sge=%d\n", max_send_sge);
++    pr_dbg("max_recv_sge=%d\n", max_recv_sge);
++
++    qp->ibqp = ibv_create_qp(pd->ibpd, &attr);
++    if (likely(!qp->ibqp)) {
++        pr_dbg("Error from ibv_create_qp\n");
++        return -EIO;
++    }
++
++    qp->ibpd = pd->ibpd;
++
++    /* TODO: Query QP to get max_inline_data and save it to be used in send */
++
++    pr_dbg("qpn=0x%x\n", qp->ibqp->qp_num);
++
++    return 0;
++}
++
++int rdma_backend_qp_state_init(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
++                               uint8_t qp_type, uint32_t qkey)
++{
++    struct ibv_qp_attr attr = {0};
++    int rc, attr_mask;
++
++    pr_dbg("qpn=0x%x\n", qp->ibqp->qp_num);
++    pr_dbg("sport_num=%d\n", backend_dev->port_num);
++
++    attr_mask = IBV_QP_STATE | IBV_QP_PKEY_INDEX | IBV_QP_PORT;
++    attr.qp_state        = IBV_QPS_INIT;
++    attr.pkey_index      = 0;
++    attr.port_num        = backend_dev->port_num;
++
++    switch (qp_type) {
++    case IBV_QPT_RC:
++        attr_mask |= IBV_QP_ACCESS_FLAGS;
++        break;
++
++    case IBV_QPT_UD:
++        attr.qkey = qkey;
++        attr_mask |= IBV_QP_QKEY;
++        break;
++
++    default:
++        pr_dbg("Unsupported QP type %d\n", qp_type);
++        return -EIO;
++    }
++
++    rc = ibv_modify_qp(qp->ibqp, &attr, attr_mask);
++    if (rc) {
++        pr_dbg("Error %d from ibv_modify_qp\n", rc);
++        return -EIO;
++    }
++
++    return 0;
++}
++
++int rdma_backend_qp_state_rtr(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
++                              uint8_t qp_type, union ibv_gid *dgid,
++                              uint32_t dqpn, uint32_t rq_psn, uint32_t qkey,
++                              bool use_qkey)
++{
++    struct ibv_qp_attr attr = {0};
++    union ibv_gid ibv_gid = {
++        .global.interface_id = dgid->global.interface_id,
++        .global.subnet_prefix = dgid->global.subnet_prefix
++    };
++    int rc, attr_mask;
++
++    attr.qp_state = IBV_QPS_RTR;
++    attr_mask = IBV_QP_STATE;
++
++    switch (qp_type) {
++    case IBV_QPT_RC:
++        pr_dbg("dgid=0x%lx,%lx\n",
++               be64_to_cpu(ibv_gid.global.subnet_prefix),
++               be64_to_cpu(ibv_gid.global.interface_id));
++        pr_dbg("dqpn=0x%x\n", dqpn);
++        pr_dbg("sgid_idx=%d\n", backend_dev->backend_gid_idx);
++        pr_dbg("sport_num=%d\n", backend_dev->port_num);
++        pr_dbg("rq_psn=0x%x\n", rq_psn);
++
++        attr.path_mtu               = IBV_MTU_1024;
++        attr.dest_qp_num            = dqpn;
++        attr.max_dest_rd_atomic     = 1;
++        attr.min_rnr_timer          = 12;
++        attr.ah_attr.port_num       = backend_dev->port_num;
++        attr.ah_attr.is_global      = 1;
++        attr.ah_attr.grh.hop_limit  = 1;
++        attr.ah_attr.grh.dgid       = ibv_gid;
++        attr.ah_attr.grh.sgid_index = backend_dev->backend_gid_idx;
++        attr.rq_psn                 = rq_psn;
++
++        attr_mask |= IBV_QP_AV | IBV_QP_PATH_MTU | IBV_QP_DEST_QPN |
++                     IBV_QP_RQ_PSN | IBV_QP_MAX_DEST_RD_ATOMIC |
++                     IBV_QP_MIN_RNR_TIMER;
++        break;
++
++    case IBV_QPT_UD:
++        if (use_qkey) {
++            pr_dbg("qkey=0x%x\n", qkey);
++            attr.qkey = qkey;
++            attr_mask |= IBV_QP_QKEY;
++        }
++        break;
++    }
++
++    rc = ibv_modify_qp(qp->ibqp, &attr, attr_mask);
++    if (rc) {
++        pr_dbg("Error %d from ibv_modify_qp\n", rc);
++        return -EIO;
++    }
++
++    return 0;
++}
++
++int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
++                              uint32_t sq_psn, uint32_t qkey, bool use_qkey)
++{
++    struct ibv_qp_attr attr = {0};
++    int rc, attr_mask;
++
++    pr_dbg("qpn=0x%x\n", qp->ibqp->qp_num);
++    pr_dbg("sq_psn=0x%x\n", sq_psn);
++
++    attr.qp_state = IBV_QPS_RTS;
++    attr.sq_psn = sq_psn;
++    attr_mask = IBV_QP_STATE | IBV_QP_SQ_PSN;
++
++    switch (qp_type) {
++    case IBV_QPT_RC:
++        attr.timeout       = 14;
++        attr.retry_cnt     = 7;
++        attr.rnr_retry     = 7;
++        attr.max_rd_atomic = 1;
++
++        attr_mask |= IBV_QP_TIMEOUT | IBV_QP_RETRY_CNT | IBV_QP_RNR_RETRY |
++                     IBV_QP_MAX_QP_RD_ATOMIC;
++        break;
++
++    case IBV_QPT_UD:
++        if (use_qkey) {
++            pr_dbg("qkey=0x%x\n", qkey);
++            attr.qkey = qkey;
++            attr_mask |= IBV_QP_QKEY;
++        }
++        break;
++    }
++
++    rc = ibv_modify_qp(qp->ibqp, &attr, attr_mask);
++    if (rc) {
++        pr_dbg("Error %d from ibv_modify_qp\n", rc);
++        return -EIO;
++    }
++
++    return 0;
++}
++
++void rdma_backend_destroy_qp(RdmaBackendQP *qp)
++{
++    if (qp->ibqp) {
++        ibv_destroy_qp(qp->ibqp);
++    }
++}
++
++#define CHK_ATTR(req, dev, member, fmt) ({ \
++    pr_dbg("%s="fmt","fmt"\n", #member, dev.member, req->member); \
++    if (req->member > dev.member) { \
++        warn_report("%s = 0x%lx is higher than host device capability 0x%lx", \
++                    #member, (uint64_t)req->member, (uint64_t)dev.member); \
++        req->member = dev.member; \
++    } \
++    pr_dbg("%s="fmt"\n", #member, req->member); })
++
++static int init_device_caps(RdmaBackendDev *backend_dev,
++                            struct ibv_device_attr *dev_attr)
++{
++    if (ibv_query_device(backend_dev->context, &backend_dev->dev_attr)) {
++        return -EIO;
++    }
++
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr_size, "%ld");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_sge, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_wr, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cq, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cqe, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_pd, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_rd_atom, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_init_rd_atom, "%d");
++    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_ah, "%d");
++
++    return 0;
++}
++
++int rdma_backend_init(RdmaBackendDev *backend_dev,
++                      RdmaDeviceResources *rdma_dev_res,
++                      const char *backend_device_name, uint8_t port_num,
++                      uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
++                      Error **errp)
++{
++    int i;
++    int ret = 0;
++    int num_ibv_devices;
++    char thread_name[THR_NAME_LEN] = {0};
++    struct ibv_device **dev_list;
++    struct ibv_port_attr port_attr;
++
++    backend_dev->backend_gid_idx = backend_gid_idx;
++    backend_dev->port_num = port_num;
++    backend_dev->rdma_dev_res = rdma_dev_res;
++
++    rdma_backend_register_comp_handler(dummy_comp_handler);
++
++    dev_list = ibv_get_device_list(&num_ibv_devices);
++    if (!dev_list) {
++        error_setg(errp, "Failed to get IB devices list");
++        return -EIO;
++    }
++
++    if (num_ibv_devices == 0) {
++        error_setg(errp, "No IB devices were found");
++        ret = -ENXIO;
++        goto out_free_dev_list;
++    }
++
++    if (backend_device_name) {
++        for (i = 0; dev_list[i]; ++i) {
++            if (!strcmp(ibv_get_device_name(dev_list[i]),
++                        backend_device_name)) {
++                break;
++            }
++        }
++
++        backend_dev->ib_dev = dev_list[i];
++        if (!backend_dev->ib_dev) {
++            error_setg(errp, "Failed to find IB device %s",
++                       backend_device_name);
++            ret = -EIO;
++            goto out_free_dev_list;
++        }
++    } else {
++        backend_dev->ib_dev = *dev_list;
++    }
++
++    pr_dbg("Using backend device %s, port %d, gid_idx %d\n",
++           ibv_get_device_name(backend_dev->ib_dev),
++           backend_dev->port_num, backend_dev->backend_gid_idx);
++
++    backend_dev->context = ibv_open_device(backend_dev->ib_dev);
++    if (!backend_dev->context) {
++        error_setg(errp, "Failed to open IB device");
++        ret = -EIO;
++        goto out;
++    }
++
++    backend_dev->channel = ibv_create_comp_channel(backend_dev->context);
++    if (!backend_dev->channel) {
++        error_setg(errp, "Failed to create IB communication channel");
++        ret = -EIO;
++        goto out_close_device;
++    }
++    pr_dbg("dev->backend_dev.channel=%p\n", backend_dev->channel);
++
++    ret = ibv_query_port(backend_dev->context, backend_dev->port_num,
++                         &port_attr);
++    if (ret) {
++        error_setg(errp, "Error %d from ibv_query_port", ret);
++        ret = -EIO;
++        goto out_destroy_comm_channel;
++    }
++
++    if (backend_dev->backend_gid_idx > port_attr.gid_tbl_len) {
++        error_setg(errp, "Invalid backend_gid_idx, should be less than %d",
++                   port_attr.gid_tbl_len);
++        goto out_destroy_comm_channel;
++    }
++
++    ret = init_device_caps(backend_dev, dev_attr);
++    if (ret) {
++        error_setg(errp, "Failed to initialize device capabilities");
++        ret = -EIO;
++        goto out_destroy_comm_channel;
++    }
++
++    ret = ibv_query_gid(backend_dev->context, backend_dev->port_num,
++                         backend_dev->backend_gid_idx, &backend_dev->gid);
++    if (ret) {
++        error_setg(errp, "Failed to query gid %d",
++                   backend_dev->backend_gid_idx);
++        ret = -EIO;
++        goto out_destroy_comm_channel;
++    }
++    pr_dbg("subnet_prefix=0x%lx\n",
++           be64_to_cpu(backend_dev->gid.global.subnet_prefix));
++    pr_dbg("interface_id=0x%lx\n",
++           be64_to_cpu(backend_dev->gid.global.interface_id));
++
++    snprintf(thread_name, sizeof(thread_name), "rdma_comp_%s",
++             ibv_get_device_name(backend_dev->ib_dev));
++    backend_dev->comp_thread.run = true;
++    qemu_thread_create(&backend_dev->comp_thread.thread, thread_name,
++                       comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
++
++    ah_cache_init();
++
++    goto out_free_dev_list;
++
++out_destroy_comm_channel:
++    ibv_destroy_comp_channel(backend_dev->channel);
++
++out_close_device:
++    ibv_close_device(backend_dev->context);
++
++out_free_dev_list:
++    ibv_free_device_list(dev_list);
++
++out:
++    return ret;
++}
++
++void rdma_backend_fini(RdmaBackendDev *backend_dev)
++{
++    g_hash_table_destroy(ah_hash);
++    ibv_destroy_comp_channel(backend_dev->channel);
++    ibv_close_device(backend_dev->context);
++}
+diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
 new file mode 100644
-index 0000000000..acd4c8346d
+index 0000000000..68f2b05ca7
 --- /dev/null
-+++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
-@@ -0,0 +1,114 @@
++++ b/hw/rdma/rdma_backend.h
+@@ -0,0 +1,98 @@
 +/*
-+ * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
++ *  RDMA device: Definitions of Backend Device functions
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of EITHER the GNU General Public License
-+ * version 2 as published by the Free Software Foundation or the BSD
-+ * 2-Clause License. This program is distributed in the hope that it
-+ * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
-+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GNU General Public License version 2 for more details at
-+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
++ * Copyright (C) 2018 Oracle
++ * Copyright (C) 2018 Red Hat Inc
 + *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program available in the file COPYING in the main
-+ * directory of this source tree.
++ * Authors:
++ *     Yuval Shaia <yuval.shaia@oracle.com>
++ *     Marcel Apfelbaum <marcel@redhat.com>
 + *
-+ * The BSD 2-Clause License
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
-+ *     Redistribution and use in source and binary forms, with or
-+ *     without modification, are permitted provided that the following
-+ *     conditions are met:
-+ *
-+ *      - Redistributions of source code must retain the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer.
-+ *
-+ *      - Redistributions in binary form must reproduce the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer in the documentation and/or other materials
-+ *        provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#ifndef __PVRDMA_RING_H__
-+#define __PVRDMA_RING_H__
++#ifndef RDMA_BACKEND_H
++#define RDMA_BACKEND_H
 +
-+#include "standard-headers/linux/types.h"
++#include <qapi/error.h>
++#include "rdma_rm_defs.h"
++#include "rdma_backend_defs.h"
 +
-+#define PVRDMA_INVALID_IDX	-1	/* Invalid index. */
-+
-+struct pvrdma_ring {
-+	int prod_tail;	/* Producer tail. */
-+	int cons_head;	/* Consumer head. */
++/* Add definition for QP0 and QP1 as there is no userspace enums for them */
++enum ibv_special_qp_type {
++    IBV_QPT_SMI = 0,
++    IBV_QPT_GSI = 1,
 +};
 +
-+struct pvrdma_ring_state {
-+	struct pvrdma_ring tx;	/* Tx ring. */
-+	struct pvrdma_ring rx;	/* Rx ring. */
-+};
-+
-+static inline int pvrdma_idx_valid(uint32_t idx, uint32_t max_elems)
++static inline union ibv_gid *rdma_backend_gid(RdmaBackendDev *dev)
 +{
-+	/* Generates fewer instructions than a less-than. */
-+	return (idx & ~((max_elems << 1) - 1)) == 0;
++    return &dev->gid;
 +}
 +
-+static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
++static inline uint32_t rdma_backend_qpn(const RdmaBackendQP *qp)
 +{
-+	const unsigned int idx = atomic_read(var);
-+
-+	if (pvrdma_idx_valid(idx, max_elems))
-+		return idx & (max_elems - 1);
-+	return PVRDMA_INVALID_IDX;
++    return qp->ibqp ? qp->ibqp->qp_num : 0;
 +}
 +
-+static inline void pvrdma_idx_ring_inc(int *var, uint32_t max_elems)
++static inline uint32_t rdma_backend_mr_lkey(const RdmaBackendMR *mr)
 +{
-+	uint32_t idx = atomic_read(var) + 1;	/* Increment. */
-+
-+	idx &= (max_elems << 1) - 1;		/* Modulo size, flip gen. */
-+	atomic_set(var, idx);
++    return mr->ibmr ? mr->ibmr->lkey : 0;
 +}
 +
-+static inline int32_t pvrdma_idx_ring_has_space(const struct pvrdma_ring *r,
-+					      uint32_t max_elems, uint32_t *out_tail)
++static inline uint32_t rdma_backend_mr_rkey(const RdmaBackendMR *mr)
 +{
-+	const uint32_t tail = atomic_read(&r->prod_tail);
-+	const uint32_t head = atomic_read(&r->cons_head);
-+
-+	if (pvrdma_idx_valid(tail, max_elems) &&
-+	    pvrdma_idx_valid(head, max_elems)) {
-+		*out_tail = tail & (max_elems - 1);
-+		return tail != (head ^ max_elems);
-+	}
-+	return PVRDMA_INVALID_IDX;
++    return mr->ibmr ? mr->ibmr->rkey : 0;
 +}
 +
-+static inline int32_t pvrdma_idx_ring_has_data(const struct pvrdma_ring *r,
-+					     uint32_t max_elems, uint32_t *out_head)
-+{
-+	const uint32_t tail = atomic_read(&r->prod_tail);
-+	const uint32_t head = atomic_read(&r->cons_head);
++int rdma_backend_init(RdmaBackendDev *backend_dev,
++                      RdmaDeviceResources *rdma_dev_res,
++                      const char *backend_device_name, uint8_t port_num,
++                      uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
++                      Error **errp);
++void rdma_backend_fini(RdmaBackendDev *backend_dev);
++void rdma_backend_register_comp_handler(void (*handler)(int status,
++                                        unsigned int vendor_err, void *ctx));
++void rdma_backend_unregister_comp_handler(void);
 +
-+	if (pvrdma_idx_valid(tail, max_elems) &&
-+	    pvrdma_idx_valid(head, max_elems)) {
-+		*out_head = head & (max_elems - 1);
-+		return tail != head;
-+	}
-+	return PVRDMA_INVALID_IDX;
-+}
++int rdma_backend_query_port(RdmaBackendDev *backend_dev,
++                            struct ibv_port_attr *port_attr);
++int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd);
++void rdma_backend_destroy_pd(RdmaBackendPD *pd);
 +
-+#endif /* __PVRDMA_RING_H__ */
-diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h
++int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, uint64_t addr,
++                           size_t length, int access);
++void rdma_backend_destroy_mr(RdmaBackendMR *mr);
++
++int rdma_backend_create_cq(RdmaBackendDev *backend_dev, RdmaBackendCQ *cq,
++                           int cqe);
++void rdma_backend_destroy_cq(RdmaBackendCQ *cq);
++void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq);
++
++int rdma_backend_create_qp(RdmaBackendQP *qp, uint8_t qp_type,
++                           RdmaBackendPD *pd, RdmaBackendCQ *scq,
++                           RdmaBackendCQ *rcq, uint32_t max_send_wr,
++                           uint32_t max_recv_wr, uint32_t max_send_sge,
++                           uint32_t max_recv_sge);
++int rdma_backend_qp_state_init(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
++                               uint8_t qp_type, uint32_t qkey);
++int rdma_backend_qp_state_rtr(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
++                              uint8_t qp_type, union ibv_gid *dgid,
++                              uint32_t dqpn, uint32_t rq_psn, uint32_t qkey,
++                              bool use_qkey);
++int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
++                              uint32_t sq_psn, uint32_t qkey, bool use_qkey);
++void rdma_backend_destroy_qp(RdmaBackendQP *qp);
++
++void rdma_backend_post_send(RdmaBackendDev *backend_dev,
++                            RdmaBackendQP *qp, uint8_t qp_type,
++                            struct ibv_sge *sge, uint32_t num_sge,
++                            union ibv_gid *dgid, uint32_t dqpn, uint32_t dqkey,
++                            void *ctx);
++void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
++                            RdmaDeviceResources *rdma_dev_res,
++                            RdmaBackendQP *qp, uint8_t qp_type,
++                            struct ibv_sge *sge, uint32_t num_sge, void *ctx);
++
++#endif
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
 new file mode 100644
-index 0000000000..1677208a41
+index 0000000000..b5fc45ddab
 --- /dev/null
-+++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h
-@@ -0,0 +1,383 @@
++++ b/hw/rdma/rdma_rm.c
+@@ -0,0 +1,544 @@
 +/*
-+ * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
++ * QEMU paravirtual RDMA - Resource Manager Implementation
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of EITHER the GNU General Public License
-+ * version 2 as published by the Free Software Foundation or the BSD
-+ * 2-Clause License. This program is distributed in the hope that it
-+ * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
-+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GNU General Public License version 2 for more details at
-+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
++ * Copyright (C) 2018 Oracle
++ * Copyright (C) 2018 Red Hat Inc
 + *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program available in the file COPYING in the main
-+ * directory of this source tree.
++ * Authors:
++ *     Yuval Shaia <yuval.shaia@oracle.com>
++ *     Marcel Apfelbaum <marcel@redhat.com>
 + *
-+ * The BSD 2-Clause License
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
-+ *     Redistribution and use in source and binary forms, with or
-+ *     without modification, are permitted provided that the following
-+ *     conditions are met:
-+ *
-+ *      - Redistributions of source code must retain the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer.
-+ *
-+ *      - Redistributions in binary form must reproduce the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer in the documentation and/or other materials
-+ *        provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#ifndef __PVRDMA_VERBS_H__
-+#define __PVRDMA_VERBS_H__
++#include <qemu/osdep.h>
++#include <qapi/error.h>
++#include <cpu.h>
 +
-+#include "standard-headers/linux/types.h"
++#include "rdma_utils.h"
++#include "rdma_backend.h"
++#include "rdma_rm.h"
 +
-+union pvrdma_gid {
-+	uint8_t	raw[16];
-+	struct {
-+		uint64_t	subnet_prefix;
-+		uint64_t	interface_id;
-+	} global;
-+};
++#define MAX_RM_TBL_NAME 16
 +
-+enum pvrdma_link_layer {
-+	PVRDMA_LINK_LAYER_UNSPECIFIED,
-+	PVRDMA_LINK_LAYER_INFINIBAND,
-+	PVRDMA_LINK_LAYER_ETHERNET,
-+};
++/* Page directory and page tables */
++#define PG_DIR_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
++#define PG_TBL_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
 +
-+enum pvrdma_mtu {
-+	PVRDMA_MTU_256  = 1,
-+	PVRDMA_MTU_512  = 2,
-+	PVRDMA_MTU_1024 = 3,
-+	PVRDMA_MTU_2048 = 4,
-+	PVRDMA_MTU_4096 = 5,
-+};
-+
-+static inline int pvrdma_mtu_enum_to_int(enum pvrdma_mtu mtu)
++static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
++                                uint32_t tbl_sz, uint32_t res_sz)
 +{
-+	switch (mtu) {
-+	case PVRDMA_MTU_256:	return  256;
-+	case PVRDMA_MTU_512:	return  512;
-+	case PVRDMA_MTU_1024:	return 1024;
-+	case PVRDMA_MTU_2048:	return 2048;
-+	case PVRDMA_MTU_4096:	return 4096;
-+	default:		return   -1;
-+	}
++    tbl->tbl = g_malloc(tbl_sz * res_sz);
++
++    strncpy(tbl->name, name, MAX_RM_TBL_NAME);
++    tbl->name[MAX_RM_TBL_NAME - 1] = 0;
++
++    tbl->bitmap = bitmap_new(tbl_sz);
++    tbl->tbl_sz = tbl_sz;
++    tbl->res_sz = res_sz;
++    qemu_mutex_init(&tbl->lock);
 +}
 +
-+static inline enum pvrdma_mtu pvrdma_mtu_int_to_enum(int mtu)
++static inline void res_tbl_free(RdmaRmResTbl *tbl)
 +{
-+	switch (mtu) {
-+	case 256:	return PVRDMA_MTU_256;
-+	case 512:	return PVRDMA_MTU_512;
-+	case 1024:	return PVRDMA_MTU_1024;
-+	case 2048:	return PVRDMA_MTU_2048;
-+	case 4096:
-+	default:	return PVRDMA_MTU_4096;
-+	}
++    qemu_mutex_destroy(&tbl->lock);
++    g_free(tbl->tbl);
++    bitmap_zero_extend(tbl->bitmap, tbl->tbl_sz, 0);
 +}
 +
-+enum pvrdma_port_state {
-+	PVRDMA_PORT_NOP			= 0,
-+	PVRDMA_PORT_DOWN		= 1,
-+	PVRDMA_PORT_INIT		= 2,
-+	PVRDMA_PORT_ARMED		= 3,
-+	PVRDMA_PORT_ACTIVE		= 4,
-+	PVRDMA_PORT_ACTIVE_DEFER	= 5,
-+};
-+
-+enum pvrdma_port_cap_flags {
-+	PVRDMA_PORT_SM				= 1 <<  1,
-+	PVRDMA_PORT_NOTICE_SUP			= 1 <<  2,
-+	PVRDMA_PORT_TRAP_SUP			= 1 <<  3,
-+	PVRDMA_PORT_OPT_IPD_SUP			= 1 <<  4,
-+	PVRDMA_PORT_AUTO_MIGR_SUP		= 1 <<  5,
-+	PVRDMA_PORT_SL_MAP_SUP			= 1 <<  6,
-+	PVRDMA_PORT_MKEY_NVRAM			= 1 <<  7,
-+	PVRDMA_PORT_PKEY_NVRAM			= 1 <<  8,
-+	PVRDMA_PORT_LED_INFO_SUP		= 1 <<  9,
-+	PVRDMA_PORT_SM_DISABLED			= 1 << 10,
-+	PVRDMA_PORT_SYS_IMAGE_GUID_SUP		= 1 << 11,
-+	PVRDMA_PORT_PKEY_SW_EXT_PORT_TRAP_SUP	= 1 << 12,
-+	PVRDMA_PORT_EXTENDED_SPEEDS_SUP		= 1 << 14,
-+	PVRDMA_PORT_CM_SUP			= 1 << 16,
-+	PVRDMA_PORT_SNMP_TUNNEL_SUP		= 1 << 17,
-+	PVRDMA_PORT_REINIT_SUP			= 1 << 18,
-+	PVRDMA_PORT_DEVICE_MGMT_SUP		= 1 << 19,
-+	PVRDMA_PORT_VENDOR_CLASS_SUP		= 1 << 20,
-+	PVRDMA_PORT_DR_NOTICE_SUP		= 1 << 21,
-+	PVRDMA_PORT_CAP_MASK_NOTICE_SUP		= 1 << 22,
-+	PVRDMA_PORT_BOOT_MGMT_SUP		= 1 << 23,
-+	PVRDMA_PORT_LINK_LATENCY_SUP		= 1 << 24,
-+	PVRDMA_PORT_CLIENT_REG_SUP		= 1 << 25,
-+	PVRDMA_PORT_IP_BASED_GIDS		= 1 << 26,
-+	PVRDMA_PORT_CAP_FLAGS_MAX		= PVRDMA_PORT_IP_BASED_GIDS,
-+};
-+
-+enum pvrdma_port_width {
-+	PVRDMA_WIDTH_1X		= 1,
-+	PVRDMA_WIDTH_4X		= 2,
-+	PVRDMA_WIDTH_8X		= 4,
-+	PVRDMA_WIDTH_12X	= 8,
-+};
-+
-+static inline int pvrdma_width_enum_to_int(enum pvrdma_port_width width)
++static inline void *res_tbl_get(RdmaRmResTbl *tbl, uint32_t handle)
 +{
-+	switch (width) {
-+	case PVRDMA_WIDTH_1X:	return  1;
-+	case PVRDMA_WIDTH_4X:	return  4;
-+	case PVRDMA_WIDTH_8X:	return  8;
-+	case PVRDMA_WIDTH_12X:	return 12;
-+	default:		return -1;
-+	}
++    pr_dbg("%s, handle=%d\n", tbl->name, handle);
++
++    if ((handle < tbl->tbl_sz) && (test_bit(handle, tbl->bitmap))) {
++        return tbl->tbl + handle * tbl->res_sz;
++    } else {
++        pr_dbg("Invalid handle %d\n", handle);
++        return NULL;
++    }
 +}
 +
-+enum pvrdma_port_speed {
-+	PVRDMA_SPEED_SDR	= 1,
-+	PVRDMA_SPEED_DDR	= 2,
-+	PVRDMA_SPEED_QDR	= 4,
-+	PVRDMA_SPEED_FDR10	= 8,
-+	PVRDMA_SPEED_FDR	= 16,
-+	PVRDMA_SPEED_EDR	= 32,
-+};
++static inline void *res_tbl_alloc(RdmaRmResTbl *tbl, uint32_t *handle)
++{
++    qemu_mutex_lock(&tbl->lock);
 +
-+struct pvrdma_port_attr {
-+	enum pvrdma_port_state	state;
-+	enum pvrdma_mtu		max_mtu;
-+	enum pvrdma_mtu		active_mtu;
-+	uint32_t			gid_tbl_len;
-+	uint32_t			port_cap_flags;
-+	uint32_t			max_msg_sz;
-+	uint32_t			bad_pkey_cntr;
-+	uint32_t			qkey_viol_cntr;
-+	uint16_t			pkey_tbl_len;
-+	uint16_t			lid;
-+	uint16_t			sm_lid;
-+	uint8_t			lmc;
-+	uint8_t			max_vl_num;
-+	uint8_t			sm_sl;
-+	uint8_t			subnet_timeout;
-+	uint8_t			init_type_reply;
-+	uint8_t			active_width;
-+	uint8_t			active_speed;
-+	uint8_t			phys_state;
-+	uint8_t			reserved[2];
-+};
++    *handle = find_first_zero_bit(tbl->bitmap, tbl->tbl_sz);
++    if (*handle > tbl->tbl_sz) {
++        pr_dbg("Failed to alloc, bitmap is full\n");
++        qemu_mutex_unlock(&tbl->lock);
++        return NULL;
++    }
 +
-+struct pvrdma_global_route {
-+	union pvrdma_gid	dgid;
-+	uint32_t			flow_label;
-+	uint8_t			sgid_index;
-+	uint8_t			hop_limit;
-+	uint8_t			traffic_class;
-+	uint8_t			reserved;
-+};
++    set_bit(*handle, tbl->bitmap);
 +
-+struct pvrdma_grh {
-+	uint32_t			version_tclass_flow;
-+	uint16_t			paylen;
-+	uint8_t			next_hdr;
-+	uint8_t			hop_limit;
-+	union pvrdma_gid	sgid;
-+	union pvrdma_gid	dgid;
-+};
++    qemu_mutex_unlock(&tbl->lock);
 +
-+enum pvrdma_ah_flags {
-+	PVRDMA_AH_GRH = 1,
-+};
++    memset(tbl->tbl + *handle * tbl->res_sz, 0, tbl->res_sz);
 +
-+enum pvrdma_rate {
-+	PVRDMA_RATE_PORT_CURRENT	= 0,
-+	PVRDMA_RATE_2_5_GBPS		= 2,
-+	PVRDMA_RATE_5_GBPS		= 5,
-+	PVRDMA_RATE_10_GBPS		= 3,
-+	PVRDMA_RATE_20_GBPS		= 6,
-+	PVRDMA_RATE_30_GBPS		= 4,
-+	PVRDMA_RATE_40_GBPS		= 7,
-+	PVRDMA_RATE_60_GBPS		= 8,
-+	PVRDMA_RATE_80_GBPS		= 9,
-+	PVRDMA_RATE_120_GBPS		= 10,
-+	PVRDMA_RATE_14_GBPS		= 11,
-+	PVRDMA_RATE_56_GBPS		= 12,
-+	PVRDMA_RATE_112_GBPS		= 13,
-+	PVRDMA_RATE_168_GBPS		= 14,
-+	PVRDMA_RATE_25_GBPS		= 15,
-+	PVRDMA_RATE_100_GBPS		= 16,
-+	PVRDMA_RATE_200_GBPS		= 17,
-+	PVRDMA_RATE_300_GBPS		= 18,
-+};
++    pr_dbg("%s, handle=%d\n", tbl->name, *handle);
 +
-+struct pvrdma_ah_attr {
-+	struct pvrdma_global_route	grh;
-+	uint16_t				dlid;
-+	uint16_t				vlan_id;
-+	uint8_t				sl;
-+	uint8_t				src_path_bits;
-+	uint8_t				static_rate;
-+	uint8_t				ah_flags;
-+	uint8_t				port_num;
-+	uint8_t				dmac[6];
-+	uint8_t				reserved;
-+};
++    return tbl->tbl + *handle * tbl->res_sz;
++}
 +
-+enum pvrdma_cq_notify_flags {
-+	PVRDMA_CQ_SOLICITED		= 1 << 0,
-+	PVRDMA_CQ_NEXT_COMP		= 1 << 1,
-+	PVRDMA_CQ_SOLICITED_MASK	= PVRDMA_CQ_SOLICITED |
-+					  PVRDMA_CQ_NEXT_COMP,
-+	PVRDMA_CQ_REPORT_MISSED_EVENTS	= 1 << 2,
-+};
++static inline void res_tbl_dealloc(RdmaRmResTbl *tbl, uint32_t handle)
++{
++    pr_dbg("%s, handle=%d\n", tbl->name, handle);
 +
-+struct pvrdma_qp_cap {
-+	uint32_t	max_send_wr;
-+	uint32_t	max_recv_wr;
-+	uint32_t	max_send_sge;
-+	uint32_t	max_recv_sge;
-+	uint32_t	max_inline_data;
-+	uint32_t	reserved;
-+};
++    qemu_mutex_lock(&tbl->lock);
 +
-+enum pvrdma_sig_type {
-+	PVRDMA_SIGNAL_ALL_WR,
-+	PVRDMA_SIGNAL_REQ_WR,
-+};
++    if (handle < tbl->tbl_sz) {
++        clear_bit(handle, tbl->bitmap);
++    }
 +
-+enum pvrdma_qp_type {
-+	PVRDMA_QPT_SMI,
-+	PVRDMA_QPT_GSI,
-+	PVRDMA_QPT_RC,
-+	PVRDMA_QPT_UC,
-+	PVRDMA_QPT_UD,
-+	PVRDMA_QPT_RAW_IPV6,
-+	PVRDMA_QPT_RAW_ETHERTYPE,
-+	PVRDMA_QPT_RAW_PACKET = 8,
-+	PVRDMA_QPT_XRC_INI = 9,
-+	PVRDMA_QPT_XRC_TGT,
-+	PVRDMA_QPT_MAX,
-+};
++    qemu_mutex_unlock(&tbl->lock);
++}
 +
-+enum pvrdma_qp_create_flags {
-+	PVRDMA_QP_CREATE_IPOPVRDMA_UD_LSO		= 1 << 0,
-+	PVRDMA_QP_CREATE_BLOCK_MULTICAST_LOOPBACK	= 1 << 1,
-+};
++int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                     uint32_t *pd_handle, uint32_t ctx_handle)
++{
++    RdmaRmPD *pd;
++    int ret = -ENOMEM;
 +
-+enum pvrdma_qp_attr_mask {
-+	PVRDMA_QP_STATE			= 1 << 0,
-+	PVRDMA_QP_CUR_STATE		= 1 << 1,
-+	PVRDMA_QP_EN_SQD_ASYNC_NOTIFY	= 1 << 2,
-+	PVRDMA_QP_ACCESS_FLAGS		= 1 << 3,
-+	PVRDMA_QP_PKEY_INDEX		= 1 << 4,
-+	PVRDMA_QP_PORT			= 1 << 5,
-+	PVRDMA_QP_QKEY			= 1 << 6,
-+	PVRDMA_QP_AV			= 1 << 7,
-+	PVRDMA_QP_PATH_MTU		= 1 << 8,
-+	PVRDMA_QP_TIMEOUT		= 1 << 9,
-+	PVRDMA_QP_RETRY_CNT		= 1 << 10,
-+	PVRDMA_QP_RNR_RETRY		= 1 << 11,
-+	PVRDMA_QP_RQ_PSN		= 1 << 12,
-+	PVRDMA_QP_MAX_QP_RD_ATOMIC	= 1 << 13,
-+	PVRDMA_QP_ALT_PATH		= 1 << 14,
-+	PVRDMA_QP_MIN_RNR_TIMER		= 1 << 15,
-+	PVRDMA_QP_SQ_PSN		= 1 << 16,
-+	PVRDMA_QP_MAX_DEST_RD_ATOMIC	= 1 << 17,
-+	PVRDMA_QP_PATH_MIG_STATE	= 1 << 18,
-+	PVRDMA_QP_CAP			= 1 << 19,
-+	PVRDMA_QP_DEST_QPN		= 1 << 20,
-+	PVRDMA_QP_ATTR_MASK_MAX		= PVRDMA_QP_DEST_QPN,
-+};
++    pd = res_tbl_alloc(&dev_res->pd_tbl, pd_handle);
++    if (!pd) {
++        goto out;
++    }
 +
-+enum pvrdma_qp_state {
-+	PVRDMA_QPS_RESET,
-+	PVRDMA_QPS_INIT,
-+	PVRDMA_QPS_RTR,
-+	PVRDMA_QPS_RTS,
-+	PVRDMA_QPS_SQD,
-+	PVRDMA_QPS_SQE,
-+	PVRDMA_QPS_ERR,
-+};
++    ret = rdma_backend_create_pd(backend_dev, &pd->backend_pd);
++    if (ret) {
++        ret = -EIO;
++        goto out_tbl_dealloc;
++    }
 +
-+enum pvrdma_mig_state {
-+	PVRDMA_MIG_MIGRATED,
-+	PVRDMA_MIG_REARM,
-+	PVRDMA_MIG_ARMED,
-+};
++    pd->ctx_handle = ctx_handle;
 +
-+enum pvrdma_mw_type {
-+	PVRDMA_MW_TYPE_1 = 1,
-+	PVRDMA_MW_TYPE_2 = 2,
-+};
++    return 0;
 +
-+struct pvrdma_srq_attr {
-+	uint32_t			max_wr;
-+	uint32_t			max_sge;
-+	uint32_t			srq_limit;
-+	uint32_t			reserved;
-+};
++out_tbl_dealloc:
++    res_tbl_dealloc(&dev_res->pd_tbl, *pd_handle);
 +
-+struct pvrdma_qp_attr {
-+	enum pvrdma_qp_state	qp_state;
-+	enum pvrdma_qp_state	cur_qp_state;
-+	enum pvrdma_mtu		path_mtu;
-+	enum pvrdma_mig_state	path_mig_state;
-+	uint32_t			qkey;
-+	uint32_t			rq_psn;
-+	uint32_t			sq_psn;
-+	uint32_t			dest_qp_num;
-+	uint32_t			qp_access_flags;
-+	uint16_t			pkey_index;
-+	uint16_t			alt_pkey_index;
-+	uint8_t			en_sqd_async_notify;
-+	uint8_t			sq_draining;
-+	uint8_t			max_rd_atomic;
-+	uint8_t			max_dest_rd_atomic;
-+	uint8_t			min_rnr_timer;
-+	uint8_t			port_num;
-+	uint8_t			timeout;
-+	uint8_t			retry_cnt;
-+	uint8_t			rnr_retry;
-+	uint8_t			alt_port_num;
-+	uint8_t			alt_timeout;
-+	uint8_t			reserved[5];
-+	struct pvrdma_qp_cap	cap;
-+	struct pvrdma_ah_attr	ah_attr;
-+	struct pvrdma_ah_attr	alt_ah_attr;
-+};
++out:
++    return ret;
++}
 +
-+enum pvrdma_send_flags {
-+	PVRDMA_SEND_FENCE	= 1 << 0,
-+	PVRDMA_SEND_SIGNALED	= 1 << 1,
-+	PVRDMA_SEND_SOLICITED	= 1 << 2,
-+	PVRDMA_SEND_INLINE	= 1 << 3,
-+	PVRDMA_SEND_IP_CSUM	= 1 << 4,
-+	PVRDMA_SEND_FLAGS_MAX	= PVRDMA_SEND_IP_CSUM,
-+};
++RdmaRmPD *rdma_rm_get_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle)
++{
++    return res_tbl_get(&dev_res->pd_tbl, pd_handle);
++}
 +
-+enum pvrdma_access_flags {
-+	PVRDMA_ACCESS_LOCAL_WRITE	= 1 << 0,
-+	PVRDMA_ACCESS_REMOTE_WRITE	= 1 << 1,
-+	PVRDMA_ACCESS_REMOTE_READ	= 1 << 2,
-+	PVRDMA_ACCESS_REMOTE_ATOMIC	= 1 << 3,
-+	PVRDMA_ACCESS_MW_BIND		= 1 << 4,
-+	PVRDMA_ZERO_BASED		= 1 << 5,
-+	PVRDMA_ACCESS_ON_DEMAND		= 1 << 6,
-+	PVRDMA_ACCESS_FLAGS_MAX		= PVRDMA_ACCESS_ON_DEMAND,
-+};
++void rdma_rm_dealloc_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle)
++{
++    RdmaRmPD *pd = rdma_rm_get_pd(dev_res, pd_handle);
 +
-+#endif /* __PVRDMA_VERBS_H__ */
-diff --git a/include/standard-headers/rdma/vmw_pvrdma-abi.h b/include/standard-headers/rdma/vmw_pvrdma-abi.h
++    if (pd) {
++        rdma_backend_destroy_pd(&pd->backend_pd);
++        res_tbl_dealloc(&dev_res->pd_tbl, pd_handle);
++    }
++}
++
++int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
++                     uint64_t guest_start, size_t guest_length, void *host_virt,
++                     int access_flags, uint32_t *mr_handle, uint32_t *lkey,
++                     uint32_t *rkey)
++{
++    RdmaRmMR *mr;
++    int ret = 0;
++    RdmaRmPD *pd;
++    uint64_t addr;
++    size_t length;
++
++    pd = rdma_rm_get_pd(dev_res, pd_handle);
++    if (!pd) {
++        pr_dbg("Invalid PD\n");
++        return -EINVAL;
++    }
++
++    mr = res_tbl_alloc(&dev_res->mr_tbl, mr_handle);
++    if (!mr) {
++        pr_dbg("Failed to allocate obj in table\n");
++        return -ENOMEM;
++    }
++
++    if (!host_virt) {
++        /* TODO: This is my guess but not so sure that this needs to be
++         * done */
++        length = TARGET_PAGE_SIZE;
++        addr = (uint64_t)g_malloc(length);
++    } else {
++        mr->user_mr.host_virt = (uint64_t) host_virt;
++        pr_dbg("host_virt=0x%lx\n", mr->user_mr.host_virt);
++        mr->user_mr.length = guest_length;
++        pr_dbg("length=0x%lx\n", guest_length);
++        mr->user_mr.guest_start = guest_start;
++        pr_dbg("guest_start=0x%lx\n", mr->user_mr.guest_start);
++
++        length = mr->user_mr.length;
++        addr = mr->user_mr.host_virt;
++    }
++
++    ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, addr, length,
++                                 access_flags);
++    if (ret) {
++        pr_dbg("Fail in rdma_backend_create_mr, err=%d\n", ret);
++        ret = -EIO;
++        goto out_dealloc_mr;
++    }
++
++    if (!host_virt) {
++        *lkey = mr->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
++        *rkey = mr->rkey = rdma_backend_mr_rkey(&mr->backend_mr);
++    } else {
++        /* We keep mr_handle in lkey so send and recv get get mr ptr */
++        *lkey = *mr_handle;
++        *rkey = -1;
++    }
++
++    mr->pd_handle = pd_handle;
++
++    return 0;
++
++out_dealloc_mr:
++    res_tbl_dealloc(&dev_res->mr_tbl, *mr_handle);
++
++    return ret;
++}
++
++RdmaRmMR *rdma_rm_get_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
++{
++    return res_tbl_get(&dev_res->mr_tbl, mr_handle);
++}
++
++void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
++{
++    RdmaRmMR *mr = rdma_rm_get_mr(dev_res, mr_handle);
++
++    if (mr) {
++        rdma_backend_destroy_mr(&mr->backend_mr);
++        munmap((void *)mr->user_mr.host_virt, mr->user_mr.length);
++        res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
++    }
++}
++
++int rdma_rm_alloc_uc(RdmaDeviceResources *dev_res, uint32_t pfn,
++                     uint32_t *uc_handle)
++{
++    RdmaRmUC *uc;
++
++    /* TODO: Need to make sure pfn is between bar start address and
++     * bsd+RDMA_BAR2_UAR_SIZE
++    if (pfn > RDMA_BAR2_UAR_SIZE) {
++        pr_err("pfn out of range (%d > %d)\n", pfn, RDMA_BAR2_UAR_SIZE);
++        return -ENOMEM;
++    }
++    */
++
++    uc = res_tbl_alloc(&dev_res->uc_tbl, uc_handle);
++    if (!uc) {
++        return -ENOMEM;
++    }
++
++    return 0;
++}
++
++RdmaRmUC *rdma_rm_get_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle)
++{
++    return res_tbl_get(&dev_res->uc_tbl, uc_handle);
++}
++
++void rdma_rm_dealloc_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle)
++{
++    RdmaRmUC *uc = rdma_rm_get_uc(dev_res, uc_handle);
++
++    if (uc) {
++        res_tbl_dealloc(&dev_res->uc_tbl, uc_handle);
++    }
++}
++
++RdmaRmCQ *rdma_rm_get_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle)
++{
++    return res_tbl_get(&dev_res->cq_tbl, cq_handle);
++}
++
++int rdma_rm_alloc_cq(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                     uint32_t cqe, uint32_t *cq_handle, void *opaque)
++{
++    int rc;
++    RdmaRmCQ *cq;
++
++    cq = res_tbl_alloc(&dev_res->cq_tbl, cq_handle);
++    if (!cq) {
++        return -ENOMEM;
++    }
++
++    cq->opaque = opaque;
++    cq->notify = false;
++
++    rc = rdma_backend_create_cq(backend_dev, &cq->backend_cq, cqe);
++    if (rc) {
++        rc = -EIO;
++        goto out_dealloc_cq;
++    }
++
++    return 0;
++
++out_dealloc_cq:
++    rdma_rm_dealloc_cq(dev_res, *cq_handle);
++
++    return rc;
++}
++
++void rdma_rm_req_notify_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle,
++                           bool notify)
++{
++    RdmaRmCQ *cq;
++
++    pr_dbg("cq_handle=%d, notify=0x%x\n", cq_handle, notify);
++
++    cq = rdma_rm_get_cq(dev_res, cq_handle);
++    if (!cq) {
++        return;
++    }
++
++    cq->notify = notify;
++    pr_dbg("notify=%d\n", cq->notify);
++}
++
++void rdma_rm_dealloc_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle)
++{
++    RdmaRmCQ *cq;
++
++    cq = rdma_rm_get_cq(dev_res, cq_handle);
++    if (!cq) {
++        return;
++    }
++
++    rdma_backend_destroy_cq(&cq->backend_cq);
++
++    res_tbl_dealloc(&dev_res->cq_tbl, cq_handle);
++}
++
++RdmaRmQP *rdma_rm_get_qp(RdmaDeviceResources *dev_res, uint32_t qpn)
++{
++    GBytes *key = g_bytes_new(&qpn, sizeof(qpn));
++
++    RdmaRmQP *qp = g_hash_table_lookup(dev_res->qp_hash, key);
++
++    g_bytes_unref(key);
++
++    return qp;
++}
++
++int rdma_rm_alloc_qp(RdmaDeviceResources *dev_res, uint32_t pd_handle,
++                     uint8_t qp_type, uint32_t max_send_wr,
++                     uint32_t max_send_sge, uint32_t send_cq_handle,
++                     uint32_t max_recv_wr, uint32_t max_recv_sge,
++                     uint32_t recv_cq_handle, void *opaque, uint32_t *qpn)
++{
++    int rc;
++    RdmaRmQP *qp;
++    RdmaRmCQ *scq, *rcq;
++    RdmaRmPD *pd;
++    uint32_t rm_qpn;
++
++    pr_dbg("qp_type=%d\n", qp_type);
++
++    pd = rdma_rm_get_pd(dev_res, pd_handle);
++    if (!pd) {
++        pr_err("Invalid pd handle (%d)\n", pd_handle);
++        return -EINVAL;
++    }
++
++    scq = rdma_rm_get_cq(dev_res, send_cq_handle);
++    rcq = rdma_rm_get_cq(dev_res, recv_cq_handle);
++
++    if (!scq || !rcq) {
++        pr_err("Invalid send_cqn or recv_cqn (%d, %d)\n",
++               send_cq_handle, recv_cq_handle);
++        return -EINVAL;
++    }
++
++    qp = res_tbl_alloc(&dev_res->qp_tbl, &rm_qpn);
++    if (!qp) {
++        return -ENOMEM;
++    }
++    pr_dbg("rm_qpn=%d\n", rm_qpn);
++
++    qp->qpn = rm_qpn;
++    qp->qp_state = IBV_QPS_RESET;
++    qp->qp_type = qp_type;
++    qp->send_cq_handle = send_cq_handle;
++    qp->recv_cq_handle = recv_cq_handle;
++    qp->opaque = opaque;
++
++    rc = rdma_backend_create_qp(&qp->backend_qp, qp_type, &pd->backend_pd,
++                                &scq->backend_cq, &rcq->backend_cq, max_send_wr,
++                                max_recv_wr, max_send_sge, max_recv_sge);
++    if (rc) {
++        rc = -EIO;
++        goto out_dealloc_qp;
++    }
++
++    *qpn = rdma_backend_qpn(&qp->backend_qp);
++    pr_dbg("rm_qpn=%d, backend_qpn=0x%x\n", rm_qpn, *qpn);
++    g_hash_table_insert(dev_res->qp_hash, g_bytes_new(qpn, sizeof(*qpn)), qp);
++
++    return 0;
++
++out_dealloc_qp:
++    res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
++
++    return rc;
++}
++
++int rdma_rm_modify_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                      uint32_t qp_handle, uint32_t attr_mask,
++                      union ibv_gid *dgid, uint32_t dqpn,
++                      enum ibv_qp_state qp_state, uint32_t qkey,
++                      uint32_t rq_psn, uint32_t sq_psn)
++{
++    RdmaRmQP *qp;
++    int ret;
++
++    pr_dbg("qpn=%d\n", qp_handle);
++
++    qp = rdma_rm_get_qp(dev_res, qp_handle);
++    if (!qp) {
++        return -EINVAL;
++    }
++
++    pr_dbg("qp_type=%d\n", qp->qp_type);
++    pr_dbg("attr_mask=0x%x\n", attr_mask);
++
++    if (qp->qp_type == IBV_QPT_SMI) {
++        pr_dbg("QP0 unsupported\n");
++        return -EPERM;
++    } else if (qp->qp_type == IBV_QPT_GSI) {
++        pr_dbg("QP1\n");
++        return 0;
++    }
++
++    if (attr_mask & IBV_QP_STATE) {
++        qp->qp_state = qp_state;
++        pr_dbg("qp_state=%d\n", qp->qp_state);
++
++        if (qp->qp_state == IBV_QPS_INIT) {
++            ret = rdma_backend_qp_state_init(backend_dev, &qp->backend_qp,
++                                             qp->qp_type, qkey);
++            if (ret) {
++                return -EIO;
++            }
++        }
++
++        if (qp->qp_state == IBV_QPS_RTR) {
++            ret = rdma_backend_qp_state_rtr(backend_dev, &qp->backend_qp,
++                                            qp->qp_type, dgid, dqpn, rq_psn,
++                                            qkey, attr_mask & IBV_QP_QKEY);
++            if (ret) {
++                return -EIO;
++            }
++        }
++
++        if (qp->qp_state == IBV_QPS_RTS) {
++            ret = rdma_backend_qp_state_rts(&qp->backend_qp, qp->qp_type,
++                                            sq_psn, qkey,
++                                            attr_mask & IBV_QP_QKEY);
++            if (ret) {
++                return -EIO;
++            }
++        }
++    }
++
++    return 0;
++}
++
++void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle)
++{
++    RdmaRmQP *qp;
++    GBytes *key;
++
++    key = g_bytes_new(&qp_handle, sizeof(qp_handle));
++    qp = g_hash_table_lookup(dev_res->qp_hash, key);
++    g_hash_table_remove(dev_res->qp_hash, key);
++    g_bytes_unref(key);
++
++    if (!qp) {
++        return;
++    }
++
++    rdma_backend_destroy_qp(&qp->backend_qp);
++
++    res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
++}
++
++void *rdma_rm_get_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id)
++{
++    void **cqe_ctx;
++
++    cqe_ctx = res_tbl_get(&dev_res->cqe_ctx_tbl, cqe_ctx_id);
++    if (!cqe_ctx) {
++        return NULL;
++    }
++
++    pr_dbg("ctx=%p\n", *cqe_ctx);
++
++    return *cqe_ctx;
++}
++
++int rdma_rm_alloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t *cqe_ctx_id,
++                          void *ctx)
++{
++    void **cqe_ctx;
++
++    cqe_ctx = res_tbl_alloc(&dev_res->cqe_ctx_tbl, cqe_ctx_id);
++    if (!cqe_ctx) {
++        return -ENOMEM;
++    }
++
++    pr_dbg("ctx=%p\n", ctx);
++    *cqe_ctx = ctx;
++
++    return 0;
++}
++
++void rdma_rm_dealloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id)
++{
++    res_tbl_dealloc(&dev_res->cqe_ctx_tbl, cqe_ctx_id);
++}
++
++static void destroy_qp_hash_key(gpointer data)
++{
++    g_bytes_unref(data);
++}
++
++int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
++                 Error **errp)
++{
++    dev_res->qp_hash = g_hash_table_new_full(g_bytes_hash, g_bytes_equal,
++                                             destroy_qp_hash_key, NULL);
++    if (!dev_res->qp_hash) {
++        return -ENOMEM;
++    }
++
++    res_tbl_init("PD", &dev_res->pd_tbl, dev_attr->max_pd, sizeof(RdmaRmPD));
++    res_tbl_init("CQ", &dev_res->cq_tbl, dev_attr->max_cq, sizeof(RdmaRmCQ));
++    res_tbl_init("MR", &dev_res->mr_tbl, dev_attr->max_mr, sizeof(RdmaRmMR));
++    res_tbl_init("QP", &dev_res->qp_tbl, dev_attr->max_qp, sizeof(RdmaRmQP));
++    res_tbl_init("CQE_CTX", &dev_res->cqe_ctx_tbl, dev_attr->max_qp *
++                       dev_attr->max_qp_wr, sizeof(void *));
++    res_tbl_init("UC", &dev_res->uc_tbl, MAX_UCS, sizeof(RdmaRmUC));
++
++    return 0;
++}
++
++void rdma_rm_fini(RdmaDeviceResources *dev_res)
++{
++    res_tbl_free(&dev_res->uc_tbl);
++    res_tbl_free(&dev_res->cqe_ctx_tbl);
++    res_tbl_free(&dev_res->qp_tbl);
++    res_tbl_free(&dev_res->cq_tbl);
++    res_tbl_free(&dev_res->mr_tbl);
++    res_tbl_free(&dev_res->pd_tbl);
++    g_hash_table_destroy(dev_res->qp_hash);
++}
+diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
 new file mode 100644
-index 0000000000..0d0f7a8aca
+index 0000000000..be95c1b0f4
 --- /dev/null
-+++ b/include/standard-headers/rdma/vmw_pvrdma-abi.h
-@@ -0,0 +1,293 @@
++++ b/hw/rdma/rdma_rm.h
+@@ -0,0 +1,69 @@
 +/*
-+ * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
++ * RDMA device: Definitions of Resource Manager functions
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of EITHER the GNU General Public License
-+ * version 2 as published by the Free Software Foundation or the BSD
-+ * 2-Clause License. This program is distributed in the hope that it
-+ * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
-+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GNU General Public License version 2 for more details at
-+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
++ * Copyright (C) 2018 Oracle
++ * Copyright (C) 2018 Red Hat Inc
 + *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program available in the file COPYING in the main
-+ * directory of this source tree.
++ * Authors:
++ *     Yuval Shaia <yuval.shaia@oracle.com>
++ *     Marcel Apfelbaum <marcel@redhat.com>
 + *
-+ * The BSD 2-Clause License
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
-+ *     Redistribution and use in source and binary forms, with or
-+ *     without modification, are permitted provided that the following
-+ *     conditions are met:
-+ *
-+ *      - Redistributions of source code must retain the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer.
-+ *
-+ *      - Redistributions in binary form must reproduce the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer in the documentation and/or other materials
-+ *        provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#ifndef __VMW_PVRDMA_ABI_H__
-+#define __VMW_PVRDMA_ABI_H__
++#ifndef RDMA_RM_H
++#define RDMA_RM_H
 +
-+#include "standard-headers/linux/types.h"
++#include <qapi/error.h>
++#include "rdma_backend_defs.h"
++#include "rdma_rm_defs.h"
 +
-+#define PVRDMA_UVERBS_ABI_VERSION	3		/* ABI Version. */
-+#define PVRDMA_UAR_HANDLE_MASK		0x00FFFFFF	/* Bottom 24 bits. */
-+#define PVRDMA_UAR_QP_OFFSET		0		/* QP doorbell. */
-+#define PVRDMA_UAR_QP_SEND		BIT(30)		/* Send bit. */
-+#define PVRDMA_UAR_QP_RECV		BIT(31)		/* Recv bit. */
-+#define PVRDMA_UAR_CQ_OFFSET		4		/* CQ doorbell. */
-+#define PVRDMA_UAR_CQ_ARM_SOL		BIT(29)		/* Arm solicited bit. */
-+#define PVRDMA_UAR_CQ_ARM		BIT(30)		/* Arm bit. */
-+#define PVRDMA_UAR_CQ_POLL		BIT(31)		/* Poll bit. */
++int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
++                 Error **errp);
++void rdma_rm_fini(RdmaDeviceResources *dev_res);
 +
-+enum pvrdma_wr_opcode {
-+	PVRDMA_WR_RDMA_WRITE,
-+	PVRDMA_WR_RDMA_WRITE_WITH_IMM,
-+	PVRDMA_WR_SEND,
-+	PVRDMA_WR_SEND_WITH_IMM,
-+	PVRDMA_WR_RDMA_READ,
-+	PVRDMA_WR_ATOMIC_CMP_AND_SWP,
-+	PVRDMA_WR_ATOMIC_FETCH_AND_ADD,
-+	PVRDMA_WR_LSO,
-+	PVRDMA_WR_SEND_WITH_INV,
-+	PVRDMA_WR_RDMA_READ_WITH_INV,
-+	PVRDMA_WR_LOCAL_INV,
-+	PVRDMA_WR_FAST_REG_MR,
-+	PVRDMA_WR_MASKED_ATOMIC_CMP_AND_SWP,
-+	PVRDMA_WR_MASKED_ATOMIC_FETCH_AND_ADD,
-+	PVRDMA_WR_BIND_MW,
-+	PVRDMA_WR_REG_SIG_MR,
-+};
++int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                     uint32_t *pd_handle, uint32_t ctx_handle);
++RdmaRmPD *rdma_rm_get_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle);
++void rdma_rm_dealloc_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle);
 +
-+enum pvrdma_wc_status {
-+	PVRDMA_WC_SUCCESS,
-+	PVRDMA_WC_LOC_LEN_ERR,
-+	PVRDMA_WC_LOC_QP_OP_ERR,
-+	PVRDMA_WC_LOC_EEC_OP_ERR,
-+	PVRDMA_WC_LOC_PROT_ERR,
-+	PVRDMA_WC_WR_FLUSH_ERR,
-+	PVRDMA_WC_MW_BIND_ERR,
-+	PVRDMA_WC_BAD_RESP_ERR,
-+	PVRDMA_WC_LOC_ACCESS_ERR,
-+	PVRDMA_WC_REM_INV_REQ_ERR,
-+	PVRDMA_WC_REM_ACCESS_ERR,
-+	PVRDMA_WC_REM_OP_ERR,
-+	PVRDMA_WC_RETRY_EXC_ERR,
-+	PVRDMA_WC_RNR_RETRY_EXC_ERR,
-+	PVRDMA_WC_LOC_RDD_VIOL_ERR,
-+	PVRDMA_WC_REM_INV_RD_REQ_ERR,
-+	PVRDMA_WC_REM_ABORT_ERR,
-+	PVRDMA_WC_INV_EECN_ERR,
-+	PVRDMA_WC_INV_EEC_STATE_ERR,
-+	PVRDMA_WC_FATAL_ERR,
-+	PVRDMA_WC_RESP_TIMEOUT_ERR,
-+	PVRDMA_WC_GENERAL_ERR,
-+};
++int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
++                     uint64_t guest_start, size_t guest_length, void *host_virt,
++                     int access_flags, uint32_t *mr_handle, uint32_t *lkey,
++                     uint32_t *rkey);
++RdmaRmMR *rdma_rm_get_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle);
++void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle);
 +
-+enum pvrdma_wc_opcode {
-+	PVRDMA_WC_SEND,
-+	PVRDMA_WC_RDMA_WRITE,
-+	PVRDMA_WC_RDMA_READ,
-+	PVRDMA_WC_COMP_SWAP,
-+	PVRDMA_WC_FETCH_ADD,
-+	PVRDMA_WC_BIND_MW,
-+	PVRDMA_WC_LSO,
-+	PVRDMA_WC_LOCAL_INV,
-+	PVRDMA_WC_FAST_REG_MR,
-+	PVRDMA_WC_MASKED_COMP_SWAP,
-+	PVRDMA_WC_MASKED_FETCH_ADD,
-+	PVRDMA_WC_RECV = 1 << 7,
-+	PVRDMA_WC_RECV_RDMA_WITH_IMM,
-+};
++int rdma_rm_alloc_uc(RdmaDeviceResources *dev_res, uint32_t pfn,
++                     uint32_t *uc_handle);
++RdmaRmUC *rdma_rm_get_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle);
++void rdma_rm_dealloc_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle);
 +
-+enum pvrdma_wc_flags {
-+	PVRDMA_WC_GRH			= 1 << 0,
-+	PVRDMA_WC_WITH_IMM		= 1 << 1,
-+	PVRDMA_WC_WITH_INVALIDATE	= 1 << 2,
-+	PVRDMA_WC_IP_CSUM_OK		= 1 << 3,
-+	PVRDMA_WC_WITH_SMAC		= 1 << 4,
-+	PVRDMA_WC_WITH_VLAN		= 1 << 5,
-+	PVRDMA_WC_WITH_NETWORK_HDR_TYPE	= 1 << 6,
-+	PVRDMA_WC_FLAGS_MAX		= PVRDMA_WC_WITH_NETWORK_HDR_TYPE,
-+};
++int rdma_rm_alloc_cq(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                     uint32_t cqe, uint32_t *cq_handle, void *opaque);
++RdmaRmCQ *rdma_rm_get_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle);
++void rdma_rm_req_notify_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle,
++                           bool notify);
++void rdma_rm_dealloc_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle);
 +
-+struct pvrdma_alloc_ucontext_resp {
-+	uint32_t qp_tab_size;
-+	uint32_t reserved;
-+};
++int rdma_rm_alloc_qp(RdmaDeviceResources *dev_res, uint32_t pd_handle,
++                     uint8_t qp_type, uint32_t max_send_wr,
++                     uint32_t max_send_sge, uint32_t send_cq_handle,
++                     uint32_t max_recv_wr, uint32_t max_recv_sge,
++                     uint32_t recv_cq_handle, void *opaque, uint32_t *qpn);
++RdmaRmQP *rdma_rm_get_qp(RdmaDeviceResources *dev_res, uint32_t qpn);
++int rdma_rm_modify_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                      uint32_t qp_handle, uint32_t attr_mask,
++                      union ibv_gid *dgid, uint32_t dqpn,
++                      enum ibv_qp_state qp_state, uint32_t qkey,
++                      uint32_t rq_psn, uint32_t sq_psn);
++void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle);
 +
-+struct pvrdma_alloc_pd_resp {
-+	uint32_t pdn;
-+	uint32_t reserved;
-+};
++int rdma_rm_alloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t *cqe_ctx_id,
++                          void *ctx);
++void *rdma_rm_get_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id);
++void rdma_rm_dealloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id);
 +
-+struct pvrdma_create_cq {
-+	uint64_t buf_addr;
-+	uint32_t buf_size;
-+	uint32_t reserved;
-+};
++#endif
+diff --git a/hw/rdma/trace-events b/hw/rdma/trace-events
+new file mode 100644
+index 0000000000..c4c202e647
+--- /dev/null
++++ b/hw/rdma/trace-events
+@@ -0,0 +1,5 @@
++# See docs/tracing.txt for syntax documentation.
 +
-+struct pvrdma_create_cq_resp {
-+	uint32_t cqn;
-+	uint32_t reserved;
-+};
-+
-+struct pvrdma_resize_cq {
-+	uint64_t buf_addr;
-+	uint32_t buf_size;
-+	uint32_t reserved;
-+};
-+
-+struct pvrdma_create_srq {
-+	uint64_t buf_addr;
-+	uint32_t buf_size;
-+	uint32_t reserved;
-+};
-+
-+struct pvrdma_create_srq_resp {
-+	uint32_t srqn;
-+	uint32_t reserved;
-+};
-+
-+struct pvrdma_create_qp {
-+	uint64_t rbuf_addr;
-+	uint64_t sbuf_addr;
-+	uint32_t rbuf_size;
-+	uint32_t sbuf_size;
-+	uint64_t qp_addr;
-+};
-+
-+/* PVRDMA masked atomic compare and swap */
-+struct pvrdma_ex_cmp_swap {
-+	uint64_t swap_val;
-+	uint64_t compare_val;
-+	uint64_t swap_mask;
-+	uint64_t compare_mask;
-+};
-+
-+/* PVRDMA masked atomic fetch and add */
-+struct pvrdma_ex_fetch_add {
-+	uint64_t add_val;
-+	uint64_t field_boundary;
-+};
-+
-+/* PVRDMA address vector. */
-+struct pvrdma_av {
-+	uint32_t port_pd;
-+	uint32_t sl_tclass_flowlabel;
-+	uint8_t dgid[16];
-+	uint8_t src_path_bits;
-+	uint8_t gid_index;
-+	uint8_t stat_rate;
-+	uint8_t hop_limit;
-+	uint8_t dmac[6];
-+	uint8_t reserved[6];
-+};
-+
-+/* PVRDMA scatter/gather entry */
-+struct pvrdma_sge {
-+	uint64_t   addr;
-+	uint32_t   length;
-+	uint32_t   lkey;
-+};
-+
-+/* PVRDMA receive queue work request */
-+struct pvrdma_rq_wqe_hdr {
-+	uint64_t wr_id;		/* wr id */
-+	uint32_t num_sge;		/* size of s/g array */
-+	uint32_t total_len;	/* reserved */
-+};
-+/* Use pvrdma_sge (ib_sge) for receive queue s/g array elements. */
-+
-+/* PVRDMA send queue work request */
-+struct pvrdma_sq_wqe_hdr {
-+	uint64_t wr_id;		/* wr id */
-+	uint32_t num_sge;		/* size of s/g array */
-+	uint32_t total_len;	/* reserved */
-+	uint32_t opcode;		/* operation type */
-+	uint32_t send_flags;	/* wr flags */
-+	union {
-+		uint32_t imm_data;
-+		uint32_t invalidate_rkey;
-+	} ex;
-+	uint32_t reserved;
-+	union {
-+		struct {
-+			uint64_t remote_addr;
-+			uint32_t rkey;
-+			uint8_t reserved[4];
-+		} rdma;
-+		struct {
-+			uint64_t remote_addr;
-+			uint64_t compare_add;
-+			uint64_t swap;
-+			uint32_t rkey;
-+			uint32_t reserved;
-+		} atomic;
-+		struct {
-+			uint64_t remote_addr;
-+			uint32_t log_arg_sz;
-+			uint32_t rkey;
-+			union {
-+				struct pvrdma_ex_cmp_swap  cmp_swap;
-+				struct pvrdma_ex_fetch_add fetch_add;
-+			} wr_data;
-+		} masked_atomics;
-+		struct {
-+			uint64_t iova_start;
-+			uint64_t pl_pdir_dma;
-+			uint32_t page_shift;
-+			uint32_t page_list_len;
-+			uint32_t length;
-+			uint32_t access_flags;
-+			uint32_t rkey;
-+		} fast_reg;
-+		struct {
-+			uint32_t remote_qpn;
-+			uint32_t remote_qkey;
-+			struct pvrdma_av av;
-+		} ud;
-+	} wr;
-+};
-+/* Use pvrdma_sge (ib_sge) for send queue s/g array elements. */
-+
-+/* Completion queue element. */
-+struct pvrdma_cqe {
-+	uint64_t wr_id;
-+	uint64_t qp;
-+	uint32_t opcode;
-+	uint32_t status;
-+	uint32_t byte_len;
-+	uint32_t imm_data;
-+	uint32_t src_qp;
-+	uint32_t wc_flags;
-+	uint32_t vendor_err;
-+	uint16_t pkey_index;
-+	uint16_t slid;
-+	uint8_t sl;
-+	uint8_t dlid_path_bits;
-+	uint8_t port_num;
-+	uint8_t smac[6];
-+	uint8_t network_hdr_type;
-+	uint8_t reserved2[6]; /* Pad to next power of 2 (64). */
-+};
-+
-+#endif /* __VMW_PVRDMA_ABI_H__ */
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-index 135a10d96a..c1a7c1e99c 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -38,6 +38,7 @@ cp_portable() {
-                                      -e 'linux/if_ether' \
-                                      -e 'input-event-codes' \
-                                      -e 'sys/' \
-+                                     -e 'pvrdma_verbs' \
-                                      > /dev/null
-     then
-         echo "Unexpected #include in input file $f".
-@@ -46,6 +47,7 @@ cp_portable() {
- 
-     header=$(basename "$f");
-     sed -e 's/__u\([0-9][0-9]*\)/uint\1_t/g' \
-+        -e 's/u\([0-9][0-9]*\)/uint\1_t/g' \
-         -e 's/__s\([0-9][0-9]*\)/int\1_t/g' \
-         -e 's/__le\([0-9][0-9]*\)/uint\1_t/g' \
-         -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
-@@ -56,6 +58,7 @@ cp_portable() {
-         -e 's/__inline__/inline/' \
-         -e '/sys\/ioctl.h/d' \
-         -e 's/SW_MAX/SW_MAX_/' \
-+        -e 's/atomic_t/int/' \
-         "$f" > "$to/$header";
- }
- 
-@@ -147,6 +150,30 @@ for i in "$tmpdir"/include/linux/*virtio*.h "$tmpdir/include/linux/input.h" \
-     cp_portable "$i" "$output/include/standard-headers/linux"
- done
- 
-+rm -rf "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma"
-+mkdir -p "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma"
-+
-+# Remove the unused functions from pvrdma_verbs.h avoiding the unnecessary
-+# import of several infiniband/networking/other headers
-+tmp_pvrdma_verbs="$tmpdir/pvrdma_verbs.h"
-+sed  -e '1h;2,$H;$!d;g'  -e 's/[^};]*pvrdma[^(| ]*([^)]*);//g' \
-+    "$linux/drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h" > \
-+    "$tmp_pvrdma_verbs";
-+
-+for i in "$linux/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h" \
-+         "$linux/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h" \
-+         "$tmp_pvrdma_verbs"; do \
-+    cp_portable "$i" \
-+         "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/"
-+done
-+
-+rm -rf "$output/include/standard-headers/rdma/"
-+mkdir -p "$output/include/standard-headers/rdma/"
-+for i in "$tmpdir/include/rdma/vmw_pvrdma-abi.h"; do
-+    cp_portable "$i" \
-+         "$output/include/standard-headers/rdma/"
-+done
-+
- cat <<EOF >$output/include/standard-headers/linux/types.h
- /* For QEMU all types are already defined via osdep.h, so this
-  * header does not need to do anything.
++#hw/rdma/rdma_backend.c
++create_ah_cache_hit(uint64_t subnet, uint64_t net_id) "subnet = 0x%"PRIx64" net_id = 0x%"PRIx64
++create_ah_cache_miss(uint64_t subnet, uint64_t net_id) "subnet = 0x%"PRIx64" net_id = 0x%"PRIx64
 -- 
 2.13.5
