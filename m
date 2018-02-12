@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1elJEx-0003uW-SX
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:54:14 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1elJF0-0003xR-EB
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:54:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1elJEv-0004kH-NY
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:54:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49372)
+	(envelope-from <ehabkost@redhat.com>) id 1elJEz-0004p9-3l
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:54:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1elJEv-0004iZ-Em
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:54:09 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1elJEy-0004oC-TX
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:54:13 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 12 Feb 2018 16:53:45 -0200
-Message-Id: <20180212185347.8433-6-ehabkost@redhat.com>
+Date: Mon, 12 Feb 2018 16:53:47 -0200
+Message-Id: <20180212185347.8433-8-ehabkost@redhat.com>
 In-Reply-To: <20180212185347.8433-1-ehabkost@redhat.com>
 References: <20180212185347.8433-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 5/7] Use cpu_create(type) instead of
- cpu_init(cpu_model)
+Subject: [Qemu-devel] [PULL 7/7] cpu: drop unnecessary NULL check and
+ cpu_common_class_by_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,288 +29,77 @@ Cc: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-With all targets defining CPU_RESOLVING_TYPE, refactor
-cpu_parse_cpu_model(type, cpu_model) to parse_cpu_model(cpu_model)
-so that callers won't have to know internal resolving cpu
-type. Place it in exec.c so it could be called from both
-target independed vl.c and *-user/main.c.
+both do nothing as for the first all callers
+   parse_cpu_model() and qmp_query_cpu_model_()
+should provide non NULL value, so just abort if it's not so.
 
-That allows us to stop abusing cpu type from
-  MachineClass::default_cpu_type
-as resolver class in vl.c which were confusing part of
-cpu_parse_cpu_model().
-
-Also with new parse_cpu_model(), the last users of cpu_init()
-in null-machine.c and bsd/linux-user targets could be switched
-to cpu_create() API and cpu_init() API will be removed by
-follow up patch.
-
-With no longer users left remove MachineState::cpu_model field,
-new code should use MachineState::cpu_type instead and
-leave cpu_model parsing to generic code in vl.c.
+While at it drop cpu_common_class_by_name() which is not need
+any more as every target has CPUClass::class_by_name callback
+by now, though abort in case a new arch will forget to define one.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1518013857-4372-1-git-send-email-imammedo@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <1518000027-274608-5-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/boards.h    |  1 -
- include/qom/cpu.h      | 16 ++--------------
- bsd-user/main.c        |  4 +++-
- exec.c                 | 23 +++++++++++++++++++++++
- hw/core/null-machine.c |  6 +++---
- linux-user/main.c      |  8 ++++++--
- qom/cpu.c              | 47 ++++-------------------------------------------
- vl.c                   | 10 +++-------
- 8 files changed, 44 insertions(+), 71 deletions(-)
+ qom/cpu.c         | 14 ++------------
+ target/i386/cpu.c |  8 +-------
+ 2 files changed, 3 insertions(+), 19 deletions(-)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index efb0a9edfd..16b473a4f4 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -251,7 +251,6 @@ struct MachineState {
-     char *kernel_filename;
-     char *kernel_cmdline;
-     char *initrd_filename;
--    const char *cpu_model;
-     const char *cpu_type;
-     AccelState *accelerator;
-     CPUArchIdList *possible_cpus;
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index aff88fa16f..702be717f5 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -661,8 +661,7 @@ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
- CPUState *cpu_create(const char *typename);
- 
- /**
-- * cpu_parse_cpu_model:
-- * @typename: The CPU base type or CPU type.
-+ * parse_cpu_model:
-  * @cpu_model: The model string including optional parameters.
-  *
-  * processes optional parameters and registers them as global properties
-@@ -670,18 +669,7 @@ CPUState *cpu_create(const char *typename);
-  * Returns: type of CPU to create or prints error and terminates process
-  *          if an error occurred.
-  */
--const char *cpu_parse_cpu_model(const char *typename, const char *cpu_model);
--
--/**
-- * cpu_generic_init:
-- * @typename: The CPU base type.
-- * @cpu_model: The model string including optional parameters.
-- *
-- * Instantiates a CPU, processes optional parameters and realizes the CPU.
-- *
-- * Returns: A #CPUState or %NULL if an error occurred.
-- */
--CPUState *cpu_generic_init(const char *typename, const char *cpu_model);
-+const char *parse_cpu_model(const char *cpu_model);
- 
- /**
-  * cpu_has_work:
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index efef5ff8c5..cbc683a5f6 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -723,6 +723,7 @@ int main(int argc, char **argv)
- {
-     const char *filename;
-     const char *cpu_model;
-+    const char *cpu_type;
-     const char *log_file = NULL;
-     const char *log_mask = NULL;
-     struct target_pt_regs regs1, *regs = &regs1;
-@@ -900,7 +901,8 @@ int main(int argc, char **argv)
-     tcg_exec_init(0);
-     /* NOTE: we need to init the CPU at this stage to get
-        qemu_host_page_size */
--    cpu = cpu_init(cpu_model);
-+    cpu_type = parse_cpu_model(cpu_model);
-+    cpu = create(cpu_type);
-     env = cpu->env_ptr;
- #if defined(TARGET_SPARC) || defined(TARGET_PPC)
-     cpu_reset(cpu);
-diff --git a/exec.c b/exec.c
-index e8d7b335b6..3c986441c0 100644
---- a/exec.c
-+++ b/exec.c
-@@ -817,6 +817,29 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
- #endif
- }
- 
-+const char *parse_cpu_model(const char *cpu_model)
-+{
-+    ObjectClass *oc;
-+    CPUClass *cc;
-+    gchar **model_pieces;
-+    const char *cpu_type;
-+
-+    model_pieces = g_strsplit(cpu_model, ",", 2);
-+
-+    oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
-+    if (oc == NULL) {
-+        error_report("unable to find CPU model '%s'", model_pieces[0]);
-+        g_strfreev(model_pieces);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    cpu_type = object_class_get_name(oc);
-+    cc = CPU_CLASS(oc);
-+    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
-+    g_strfreev(model_pieces);
-+    return cpu_type;
-+}
-+
- #if defined(CONFIG_USER_ONLY)
- static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
- {
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index 864832db34..cde4d3eb57 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -24,9 +24,9 @@ static void machine_none_init(MachineState *mch)
- {
-     CPUState *cpu = NULL;
- 
--    /* Initialize CPU (if a model has been specified) */
--    if (mch->cpu_model) {
--        cpu = cpu_init(mch->cpu_model);
-+    /* Initialize CPU (if user asked for it) */
-+    if (mch->cpu_type) {
-+        cpu = cpu_create(mch->cpu_type);
-         if (!cpu) {
-             error_report("Unable to initialize CPU");
-             exit(1);
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 7de0e02487..08db4c1a54 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -44,6 +44,7 @@ static const char *argv0;
- static int gdbstub_port;
- static envlist_t *envlist;
- static const char *cpu_model;
-+static const char *cpu_type;
- unsigned long mmap_min_addr;
- unsigned long guest_base;
- int have_guest_base;
-@@ -3872,7 +3873,7 @@ void init_task_state(TaskState *ts)
- CPUArchState *cpu_copy(CPUArchState *env)
- {
-     CPUState *cpu = ENV_GET_CPU(env);
--    CPUState *new_cpu = cpu_init(cpu_model);
-+    CPUState *new_cpu = cpu_create(cpu_type);
-     CPUArchState *new_env = new_cpu->env_ptr;
-     CPUBreakpoint *bp;
-     CPUWatchpoint *wp;
-@@ -4384,10 +4385,13 @@ int main(int argc, char **argv, char **envp)
-         cpu_model = "any";
- #endif
-     }
-+    cpu_type = parse_cpu_model(cpu_model);
-+
-     tcg_exec_init(0);
-     /* NOTE: we need to init the CPU at this stage to get
-        qemu_host_page_size */
--    cpu = cpu_init(cpu_model);
-+
-+    cpu = cpu_create(cpu_type);
-     env = cpu->env_ptr;
-     cpu_reset(cpu);
- 
 diff --git a/qom/cpu.c b/qom/cpu.c
-index e42d9a7f9e..60292dfde9 100644
+index 60292dfde9..92599f3541 100644
 --- a/qom/cpu.c
 +++ b/qom/cpu.c
-@@ -67,37 +67,6 @@ CPUState *cpu_create(const char *typename)
-     return cpu;
+@@ -286,21 +286,12 @@ static bool cpu_common_has_work(CPUState *cs)
+ 
+ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model)
+ {
+-    CPUClass *cc;
+-
+-    if (!cpu_model) {
+-        return NULL;
+-    }
+-    cc = CPU_CLASS(object_class_by_name(typename));
++    CPUClass *cc = CPU_CLASS(object_class_by_name(typename));
+ 
++    assert(cpu_model && cc->class_by_name);
+     return cc->class_by_name(cpu_model);
  }
  
--const char *cpu_parse_cpu_model(const char *typename, const char *cpu_model)
+-static ObjectClass *cpu_common_class_by_name(const char *cpu_model)
 -{
--    ObjectClass *oc;
--    CPUClass *cc;
--    gchar **model_pieces;
--    const char *cpu_type;
--
--    model_pieces = g_strsplit(cpu_model, ",", 2);
--
--    oc = cpu_class_by_name(typename, model_pieces[0]);
--    if (oc == NULL) {
--        error_report("unable to find CPU model '%s'", model_pieces[0]);
--        g_strfreev(model_pieces);
--        exit(EXIT_FAILURE);
--    }
--
--    cpu_type = object_class_get_name(oc);
--    cc = CPU_CLASS(oc);
--    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
--    g_strfreev(model_pieces);
--    return cpu_type;
+-    return NULL;
 -}
 -
--CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
--{
--    /* TODO: all callers of cpu_generic_init() need to be converted to
--     * call cpu_parse_features() only once, before calling cpu_generic_init().
--     */
--    return cpu_create(cpu_parse_cpu_model(typename, cpu_model));
--}
--
- bool cpu_paging_enabled(const CPUState *cpu)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-@@ -335,23 +304,15 @@ static ObjectClass *cpu_common_class_by_name(const char *cpu_model)
  static void cpu_common_parse_features(const char *typename, char *features,
                                        Error **errp)
  {
--    char *featurestr; /* Single "key=value" string being parsed */
-     char *val;
-     static bool cpu_globals_initialized;
-+    /* Single "key=value" string being parsed */
-+    char *featurestr = features ? strtok(features, ",") : NULL;
+@@ -418,7 +409,6 @@ static void cpu_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     CPUClass *k = CPU_CLASS(klass);
  
--    /* TODO: all callers of ->parse_features() need to be changed to
--     * call it only once, so we can remove this check (or change it
--     * to assert(!cpu_globals_initialized).
--     * Current callers of ->parse_features() are:
--     * - cpu_generic_init()
--     */
--    if (cpu_globals_initialized) {
--        return;
--    }
-+    /* should be called only once, catch invalid users */
-+    assert(!cpu_globals_initialized);
-     cpu_globals_initialized = true;
- 
--    featurestr = features ? strtok(features, ",") : NULL;
+-    k->class_by_name = cpu_common_class_by_name;
+     k->parse_features = cpu_common_parse_features;
+     k->reset = cpu_common_reset;
+     k->get_arch_id = cpu_common_get_arch_id;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index b5e431e769..acc853c871 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -741,13 +741,7 @@ static char *x86_cpu_type_name(const char *model_name)
+ static ObjectClass *x86_cpu_class_by_name(const char *cpu_model)
+ {
+     ObjectClass *oc;
+-    char *typename;
 -
-     while (featurestr) {
-         val = strchr(featurestr, '=');
-         if (val) {
-diff --git a/vl.c b/vl.c
-index 21878496ec..965d9d8586 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4595,15 +4595,11 @@ int main(int argc, char **argv, char **envp)
-     current_machine->maxram_size = maxram_size;
-     current_machine->ram_slots = ram_slots;
-     current_machine->boot_order = boot_order;
--    current_machine->cpu_model = cpu_model;
- 
-     /* parse features once if machine provides default cpu_type */
--    if (machine_class->default_cpu_type) {
--        current_machine->cpu_type = machine_class->default_cpu_type;
--        if (cpu_model) {
--            current_machine->cpu_type =
--                cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model);
--        }
-+    current_machine->cpu_type = machine_class->default_cpu_type;
-+    if (cpu_model) {
-+        current_machine->cpu_type = parse_cpu_model(cpu_model);
-     }
-     parse_numa_opts(current_machine);
- 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+-    typename = x86_cpu_type_name(cpu_model);
++    char *typename = x86_cpu_type_name(cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+     return oc;
 -- 
 2.14.3
