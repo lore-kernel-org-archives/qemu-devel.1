@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1elKXc-0007nX-Ce
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:17:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1elKbd-0002HM-8m
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:21:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1elKXY-0007uI-VQ
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:17:32 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39958)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1elKXY-0007tV-JA
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:17:28 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1CKGWT4083168
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 15:17:27 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g3hgk8s7b-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 15:17:26 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 12 Feb 2018 15:17:25 -0500
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
-	<20180212194531.GA26349@morn.lan>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 12 Feb 2018 15:17:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1elKba-0003dO-2X
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:21:41 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36902 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elKbZ-0003ci-RU
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:21:38 -0500
+References: <20180212183415.5357-1-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0350cc68-0c9c-8ef2-0fcb-f39c90904a49@redhat.com>
+Date: Mon, 12 Feb 2018 14:21:20 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180212194531.GA26349@morn.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20180212183415.5357-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <5345fb74-02cf-9793-78d7-490e5e77ad27@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
- interface
+Subject: Re: [Qemu-devel] [PATCH v3] tests/migration: Add source to PC boot
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,58 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, lersek@redhat.com, mst@redhat.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, drjones@redhat.com, wei@redhat.com
+Cc: peter.maydell@linaro.org, peterx@redhat.com
 
-On 02/12/2018 02:45 PM, Kevin O'Connor wrote:
-> On Fri, Feb 09, 2018 at 03:19:31PM -0500, Stefan Berger wrote:
->> I have played around with this patch and some modifications to EDK2. Though
->> for EDK2 the question is whether to try to circumvent their current
->> implementation that uses SMM or use SMM. With this patch so far I circumvent
->> it, which is maybe not a good idea.
->>
->> The facts for EDK2's PPI:
->>
->> - from within the OS a PPI code is submitted to ACPI and ACPI enters SMM via
->> an SMI and the PPI code is written into a UEFI variable. For this ACPI uses
->> the memory are at 0xFFFF 0000 to pass parameters from the OS (via ACPI) to
->> SMM. This is declared in ACPI with an OperationRegion() at that address.
->> Once the machine is rebooted, UEFI reads the variable and finds the PPI code
->> and reacts to it.
-> I'm a bit confused by this.  The top 1M of the first 4G of ram is
-> generally mapped to the flash device on real machines.  Indeed, this
-> is part of the mechanism used to boot an X86 machine - it starts
-> execution from flash at 0xfffffff0.  This is true even on modern
-> machines.
->
-> So, it seems strange that UEFI is pushing a code through a memory
-> device at 0xffff0000.  I can't see how that would be portable.  Are
-> you sure the memory write to 0xffff0000 is not just a trigger to
-> invoke the SMI?
+On 02/12/2018 12:34 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> The boot block used in the migration test is currently only
+> shipped as a hex (with the source in the git commit message),
 
-I base this on the code here:
+Would be nice to point to commit ea0c6d62 (I assume that's the commit 
+message you're referring to).
 
-https://github.com/tianocore/edk2/blob/master/SecurityPkg/Tcg/Tcg2Smm/Tpm.asl#L81
+> change this to actually include the source.
 
-OperationRegion (TNVS, SystemMemory, 0xFFFF0000, 0xF0)
+Yeah, GPL really wants us to ship the preferred editing form of sources ;)
 
->
-> It sounds as if the ultimate TPM interface that must be supported is
-> the ACPI DSDT methods.  Since you're crafting the DSDT table yourself,
-> why does there need to be two different backends - why can't the same
-> mechanism be used for both SeaBIOS and UEFI?  Is this because you are
-> looking to reuse TPM code already in UEFI that requires a specific
-> interface?
+> 
+> A script is added to rebuild the header but the expectation is that
+> the generated hex is shipped as well as the .s, so that
+> there's no requirement to have just the right assembler etc.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
 
-UEFI uses SMM to write the PPI code into a UEFI variable that it then 
-presumably stores back to NVRAM. With SeaBIOS I would go the path of 
-having the ACPI code write the code in the OperationRegion() and leave 
-it at that, so not invoke SMM. EDK2 also reads the result of the 
-operation from a register that SMM uses to pass a return value through. 
-We wouldn't need that for SeaBIOS.
+> +++ b/tests/migration-test.c
+> @@ -80,57 +80,13 @@ static const char *tmpfs;
+>   /* A simple PC boot sector that modifies memory (1-100MB) quickly
+>    * outputing a 'B' every so often if it's still running.
 
-    Stefan
+Pre-existing, but while here,
+s/outputing/outputting/
 
->
-> -Kevin
->
+> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+> new file mode 100755
+> index 0000000000..ee9b53ceb4
+> --- /dev/null
+> +++ b/tests/migration/rebuild-x86-bootblock.sh
+> @@ -0,0 +1,35 @@
+> +#!/bin/sh
+> +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +# See the COPYING file in the top-level directory.
+> +#
+> +# Author: dgilbert@redhat.com
+> +
+> +ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+> +HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+> +
+> +if [ ! -e "$ASMFILE" ]
+> +then
+> +  echo "Couldn't find $ASMFILE" >&2
+> +  exit 1
+> +fi
+> +
+> +ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXX)
+Portable use of mktemp requires at least 6 X, not 5.
+
+> +cd $ASM_WORK_DIR &&
+
+Unsafe if $PWD contains spaces; needs to be quoted.
+
+> +as --32 -march=i486 "$ASMFILE" -o x86.o &&
+> +objcopy -O binary x86.o x86.boot &&
+> +dd if=x86.boot of=x86.bootsect \
+> +  bs=256 count=2 skip=124 &&
+> +xxd -i x86.bootsect |
+> +sed -e 's/.*int.*//' > x86.hex &&
+> +cat - x86.hex <<HERE > "$HEADER"
+> +/* This file is automatically generated from
+> + * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> + * tests/migration/rebuild-x86-bootblock.sh to update,
+> + * and then remember to send both in your patch submission.
+> + */
+> +HERE
+> +
+> +rm x86.hex x86.bootsect x86.boot x86.o
+> +cd .. && rmdir $ASM_WORK_DIR
+
+Another place that needs quoting.
+
+> +++ b/tests/migration/x86-a-b-bootblock.s
+> @@ -0,0 +1,92 @@
+> +# x86 bootblock used in migration test
+> +#  repeatedly increments the first byte of each page in a 100MB
+> +#  range.
+> +#  Outputs an initial 'A' on serial followed by repeated 'B's
+> +#
+> +# run   tests/migration/rebuild-x86-bootblock.sh
+> +#   to regenerate the hex, and remember to include both the .h and .s
+> +#   in any patches.
+> +#
+> +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+
+Do you want to add 2018, since you've now modified things since the 
+original commit?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
