@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1elJKU-0000gc-8m
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:59:55 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1elJKc-0000qE-LO
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 14:00:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1elJKT-000479-Dc
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:59:54 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1elJKX-0004EI-V0
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 14:00:02 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon, 12 Feb 2018 18:58:12 +0000
-Message-Id: <1518461904-5305-11-git-send-email-eric.auger@redhat.com>
+Date: Mon, 12 Feb 2018 18:58:13 +0000
+Message-Id: <1518461904-5305-12-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
 References: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v6 10/22] virtio-iommu: Implement attach/detach
- command
+Subject: [Qemu-devel] [RFC v6 11/22] virtio-iommu: Implement map/unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +22,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-This patch implements the endpoint attach/detach to/from
-a domain.
+This patch implements virtio_iommu_map/unmap.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/virtio/virtio-iommu.c | 39 +++++++++++++++++++++++++++++++++------
- 1 file changed, 33 insertions(+), 6 deletions(-)
 
+---
+
+v5 -> v6:
+- use new v0.6 fields
+- replace error_report by qemu_log_mask
+
+v3 -> v4:
+- implement unmap semantics as specified in v0.4
+---
+ hw/virtio/trace-events   |  3 ++
+ hw/virtio/virtio-iommu.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 95 insertions(+), 2 deletions(-)
+
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index a7743d2..7f7ea50 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -48,3 +48,6 @@ virtio_iommu_get_endpoint(uint32_t ep_id) "Alloc endpoint=%d"
+ virtio_iommu_put_endpoint(uint32_t ep_id) "Free endpoint=%d"
+ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
++virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap left [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
++virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
++virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
 diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 207b17a..69ff516 100644
+index 69ff516..1986565 100644
 --- a/hw/virtio/virtio-iommu.c
 +++ b/hw/virtio/virtio-iommu.c
-@@ -114,8 +114,8 @@ static void virtio_iommu_put_endpoint(gpointer data)
-     g_free(ep);
- }
+@@ -18,6 +18,7 @@
+  */
  
--viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s, uint32_t domain_id);
--viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s, uint32_t domain_id)
-+static viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s,
-+                                              uint32_t domain_id)
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "qemu/iov.h"
+ #include "qemu-common.h"
+ #include "hw/virtio/virtio.h"
+@@ -59,6 +60,13 @@ typedef struct viommu_interval {
+     uint64_t high;
+ } viommu_interval;
+ 
++typedef struct viommu_mapping {
++    uint64_t virt_addr;
++    uint64_t phys_addr;
++    uint64_t size;
++    uint32_t flags;
++} viommu_mapping;
++
+ static inline uint16_t virtio_iommu_get_sid(IOMMUDevice *dev)
  {
-     viommu_domain *domain;
- 
-@@ -194,6 +194,8 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-     uint32_t domain_id = le32_to_cpu(req->domain);
-     uint32_t ep_id = le32_to_cpu(req->endpoint);
-     uint32_t reserved = le32_to_cpu(req->reserved);
+     return PCI_BUILD_BDF(pci_bus_num(dev->bus), dev->devfn);
+@@ -254,10 +262,37 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
+     uint64_t virt_start = le64_to_cpu(req->virt_start);
+     uint64_t virt_end = le64_to_cpu(req->virt_end);
+     uint32_t flags = le32_to_cpu(req->flags);
 +    viommu_domain *domain;
-+    viommu_endpoint *ep;
- 
-     trace_virtio_iommu_attach(domain_id, ep_id);
- 
-@@ -201,7 +203,22 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-         return VIRTIO_IOMMU_S_INVAL;
-     }
- 
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    ep = virtio_iommu_get_endpoint(s, ep_id);
-+    if (ep->domain) {
-+        /*
-+         * the device is already attached to a domain,
-+         * detach it first
-+         */
-+        virtio_iommu_detach_endpoint_from_domain(ep);
-+    }
++    viommu_interval *interval;
++    viommu_mapping *mapping;
 +
-+    domain = virtio_iommu_get_domain(s, domain_id);
-+    QLIST_INSERT_HEAD(&domain->endpoint_list, ep, next);
++    interval = g_malloc0(sizeof(*interval));
 +
-+    ep->domain = domain;
-+    g_tree_ref(domain->mappings);
++    interval->low = virt_start;
++    interval->high = virt_end;
 +
-+    return VIRTIO_IOMMU_S_OK;
- }
- 
- static int virtio_iommu_detach(VirtIOIOMMU *s,
-@@ -209,14 +226,24 @@ static int virtio_iommu_detach(VirtIOIOMMU *s,
- {
-     uint32_t ep_id = le32_to_cpu(req->endpoint);
-     uint32_t reserved = le32_to_cpu(req->reserved);
--
--    trace_virtio_iommu_detach(ep_id);
-+    viommu_endpoint *ep;
- 
-     if (reserved) {
-         return VIRTIO_IOMMU_S_INVAL;
-     }
- 
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(ep_id));
-+    if (!ep) {
++    domain = g_tree_lookup(s->domains, GUINT_TO_POINTER(domain_id));
++    if (!domain) {
 +        return VIRTIO_IOMMU_S_NOENT;
 +    }
 +
-+    if (!ep->domain) {
++    mapping = g_tree_lookup(domain->mappings, (gpointer)interval);
++    if (mapping) {
++        g_free(interval);
 +        return VIRTIO_IOMMU_S_INVAL;
 +    }
+ 
+     trace_virtio_iommu_map(domain_id, virt_start, virt_end, phys_start, flags);
+ 
+-    return VIRTIO_IOMMU_S_UNSUPP;
++    mapping = g_malloc0(sizeof(*mapping));
++    mapping->virt_addr = virt_start;
++    mapping->phys_addr = phys_start;
++    mapping->size = virt_end - virt_start + 1;
++    mapping->flags = flags;
 +
-+    virtio_iommu_detach_endpoint_from_domain(ep);
-+    trace_virtio_iommu_detach(ep_id);
++    g_tree_insert(domain->mappings, interval, mapping);
++
 +    return VIRTIO_IOMMU_S_OK;
  }
  
- static int virtio_iommu_map(VirtIOIOMMU *s,
+ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+@@ -266,10 +301,65 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+     uint32_t domain_id = le32_to_cpu(req->domain);
+     uint64_t virt_start = le64_to_cpu(req->virt_start);
+     uint64_t virt_end = le64_to_cpu(req->virt_end);
++    uint64_t size = virt_end - virt_start + 1;
++    viommu_mapping *mapping;
++    viommu_interval interval;
++    viommu_domain *domain;
+ 
+     trace_virtio_iommu_unmap(domain_id, virt_start, virt_end);
+ 
+-    return VIRTIO_IOMMU_S_UNSUPP;
++    domain = g_tree_lookup(s->domains, GUINT_TO_POINTER(domain_id));
++    if (!domain) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: no domain\n", __func__);
++        return VIRTIO_IOMMU_S_NOENT;
++    }
++    interval.low = virt_start;
++    interval.high = virt_end;
++
++    mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
++
++    while (mapping) {
++        viommu_interval current;
++        uint64_t low  = mapping->virt_addr;
++        uint64_t high = mapping->virt_addr + mapping->size - 1;
++
++        current.low = low;
++        current.high = high;
++
++        if (low == interval.low && size >= mapping->size) {
++            g_tree_remove(domain->mappings, (gpointer)(&current));
++            interval.low = high + 1;
++            trace_virtio_iommu_unmap_left_interval(current.low, current.high,
++                interval.low, interval.high);
++        } else if (high == interval.high && size >= mapping->size) {
++            trace_virtio_iommu_unmap_right_interval(current.low, current.high,
++                interval.low, interval.high);
++            g_tree_remove(domain->mappings, (gpointer)(&current));
++            interval.high = low - 1;
++        } else if (low > interval.low && high < interval.high) {
++            trace_virtio_iommu_unmap_inc_interval(current.low, current.high);
++            g_tree_remove(domain->mappings, (gpointer)(&current));
++        } else {
++            break;
++        }
++        if (interval.low >= interval.high) {
++            return VIRTIO_IOMMU_S_OK;
++        } else {
++            mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
++        }
++    }
++
++    if (mapping) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
++                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported\n",
++                     __func__, interval.low, size,
++                     mapping->virt_addr, mapping->size);
++    } else {
++        return VIRTIO_IOMMU_S_OK;
++    }
++
++    return VIRTIO_IOMMU_S_INVAL;
+ }
+ 
+ #define get_payload_size(req) (\
 -- 
 1.9.1
