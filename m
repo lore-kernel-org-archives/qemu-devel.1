@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elEaP-0003RD-Q7
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:56:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elEcI-0004lW-E5
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elEaO-000800-SB
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:56:01 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elEcH-0001kx-PB
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:57:58 -0500
 References: <20180208192328.16550-1-kwolf@redhat.com>
-	<20180208192328.16550-13-kwolf@redhat.com>
+	<20180208192328.16550-14-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b9075460-c910-2c80-2ab9-a9c81f2119dd@redhat.com>
-Date: Mon, 12 Feb 2018 14:55:49 +0100
+Message-ID: <cdebabfe-1450-7f80-49fb-0bccd73ec542@redhat.com>
+Date: Mon, 12 Feb 2018 14:57:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180208192328.16550-13-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-14-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Rzaf2BPdDnTXWABn13xenyR89eH3NZCRE"
-Subject: Re: [Qemu-devel] [PATCH 12/27] file-posix: Support .bdrv_co_create
+	boundary="kHEntKrS4trQ89NXzNMRjeQIxsZfoY737"
+Subject: Re: [Qemu-devel] [PATCH 13/27] file-win32: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +28,47 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Rzaf2BPdDnTXWABn13xenyR89eH3NZCRE
+--kHEntKrS4trQ89NXzNMRjeQIxsZfoY737
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
  jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
  qemu-devel@nongnu.org
-Message-ID: <b9075460-c910-2c80-2ab9-a9c81f2119dd@redhat.com>
-Subject: Re: [PATCH 12/27] file-posix: Support .bdrv_co_create
+Message-ID: <cdebabfe-1450-7f80-49fb-0bccd73ec542@redhat.com>
+Subject: Re: [PATCH 13/27] file-win32: Support .bdrv_co_create
 References: <20180208192328.16550-1-kwolf@redhat.com>
- <20180208192328.16550-13-kwolf@redhat.com>
-In-Reply-To: <20180208192328.16550-13-kwolf@redhat.com>
+ <20180208192328.16550-14-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-14-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2018-02-08 20:23, Kevin Wolf wrote:
-> This adds the .bdrv_co_create driver callback to file, which enables
-> image creation over QMP.
+> This adds the .bdrv_co_create driver callback to file-win32, which
+> enables image creation over QMP.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  qapi/block-core.json | 20 +++++++++++++-
->  block/file-posix.c   | 77 +++++++++++++++++++++++++++++++++++++-------=
---------
->  2 files changed, 74 insertions(+), 23 deletions(-)
+>  block/file-win32.c | 45 +++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 37 insertions(+), 8 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---Rzaf2BPdDnTXWABn13xenyR89eH3NZCRE
+--kHEntKrS4trQ89NXzNMRjeQIxsZfoY737
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqBnOYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ARxMIALYfd/jl1yW5iT8DhPRDUZA3rukv8Ibp
-ULJHQnZkjSi66VBtHygbQ8viwt9yD1cfO5UzH9hQ+SemK4W09Sot3wyiLsRgw6fF
-XNlSQzqjywEQO7Yd8yYclndMA8TmHhtOINPY8INKNr9ykhPyuHLF55M8isoYi609
-37660quD4elBOh5V5cBxlIORQlDzSMdZ0jrPte5xGg6Yb2kzk2nrCuuuIPhNjEQI
-RD+35oYEfY2ZgM3mbm+FF4oqf3Q0GlM3Jingj146/60kU7gd9GBl0D4oWIJ229mj
-QN0Q7nB9sb3FqEH7uXUMRH8bU7bSfSQoedvQEkvvSX5AUJz/HhJM1N8=
-=qUGs
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqBnVwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AalsIAK/rDrp9GQS+2lyls55eso+cxFIUT0uC
+IL0Zb/9buwoVDG2tWqi4fmvmm8TkqdsHqcnodDwSwoOYy7GKLvBjVqN6VRzGO/H6
+e7fzcC83yZ3lNoJBarvcdtTdAAQYtsAo5/phWG3R1/E702nYm7HmPd2ywEkkK16E
+bgnziq/NWXzvPGzkrB5ucRBP7dj4LUasNQQwJL99BPqKKZAPgtADLlleJSExtab3
+xh7KPsOEJ4lIJQTg4KJA50CTFalxeYSmE4oxWumi0tEMnMbzEvLDYBSJhItf+cSB
+Qw3Ia0hJWEIAOsRYZ8rJYcHTWZDOUVZt/LGaBOECDPJAaBuiqPzsMjc=
+=rm/A
 -----END PGP SIGNATURE-----
 
---Rzaf2BPdDnTXWABn13xenyR89eH3NZCRE--
+--kHEntKrS4trQ89NXzNMRjeQIxsZfoY737--
