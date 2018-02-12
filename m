@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elJ99-0007Gr-On
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:48:12 -0500
+	(envelope-from <berrange@redhat.com>) id 1elJ9y-0007wd-15
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:49:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elJ96-0003Wz-82
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:48:11 -0500
-Received: from mail-sn1nam02on0047.outbound.protection.outlook.com
-	([104.47.36.47]:7402
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1elJ96-0003Vq-0L
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:48:08 -0500
-References: <20180212153715.87555-1-brijesh.singh@amd.com>
-	<20180212153715.87555-14-brijesh.singh@amd.com>
-	<e4672dbf-4d1f-3950-aba8-9a52903f35cb@redhat.com>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <4dca2760-df74-ca42-ca8d-3462c200a715@amd.com>
-Date: Mon, 12 Feb 2018 12:47:57 -0600
-MIME-Version: 1.0
-In-Reply-To: <e4672dbf-4d1f-3950-aba8-9a52903f35cb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 13/28] qmp: add query-sev command
+	(envelope-from <berrange@redhat.com>) id 1elJ9x-0005SW-1t
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:49:02 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 12 Feb 2018 18:48:49 +0000
+Message-Id: <20180212184849.11858-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] qemu-io: fix EOF Ctrl-D handling in qemu-io
+ readline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +18,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: brijesh.singh@amd.com, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
+qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
+done and thus getchar() will never return the EOF constant. Instead we have to
+query the TTY attributes to determine the configured EOF character (usually
+Ctrl-D / 0x4), and then explicitly check for that value. This fixes the
+regression that prevented Ctrl-D from triggering an exit of qemu-io that has
+existed since readline was first added in
 
-On 2/12/18 11:27 AM, Eric Blake wrote:
-> On 02/12/2018 09:37 AM, Brijesh Singh wrote:
->> The QMP query command can used to retrieve the SEV information when
->> memory encryption is enabled on AMD platform.
->>
->> Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
->> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->
->> +# @SevInfo:
->> +#
->> +# Information about Secure Encrypted Virtualization (SEV) support
->> +#
->> +# @enabled: true if SEV is active
->> +#
->> +# @api-major: SEV API major version
->> +#
->> +# @api-minor: SEV API minor version
->> +#
->> +# @build-id: SEV FW build id
->> +#
->> +# @policy: SEV policy value
->> +#
->> +# @state: SEV guest state
->
-> Is there a finite list of guest states?
->
+  commit 0cf17e181798063c3824c8200ba46f25f54faa1a
+  Author: Stefan Hajnoczi <stefanha@redhat.com>
+  Date:   Thu Nov 14 11:54:17 2013 +0100
 
-Yes, the list is finite.
+    qemu-io: use readline.c
 
-include/sysemu/sev.h defines the enum
+It also ensures that a newline is printed when exiting, to complete the
+line output by the "qemu-io> " prompt.
 
-typedef enum {
-=C2=A0=C2=A0=C2=A0 SEV_STATE_UNINIT =3D 0,
-=C2=A0=C2=A0=C2=A0 SEV_STATE_LUPDATE,
-=C2=A0=C2=A0=C2=A0 SEV_STATE_SECRET,
-=C2=A0=C2=A0=C2=A0 SEV_STATE_RUNNING,
-=C2=A0=C2=A0=C2=A0 SEV_STATE_SUPDATE,
-=C2=A0=C2=A0=C2=A0 SEV_STATE_RUPDATE,
-=C2=A0=C2=A0=C2=A0 SEV_STATE_MAX
-}
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
 
+Changed in v3:
 
->> +#
->> +# Since: 2.12
->> +##
->> +{ 'struct': 'SevInfo',
->> +=C2=A0=C2=A0=C2=A0 'data': { 'enabled': 'bool',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 'api-major': 'uint8',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 'api-minor' : 'uint8',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 'build-id' : 'uint8',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 'policy' : 'uint32',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 'state' : 'str'
->
-> If so, this should be an enum type listing those possible states,
-> rather than an open-coded 'str' that can hold anything.
->
+ - print newline when exiting
 
-If the preference is to return enum, then I can convert the state to
-return enum instead of string.
+ qemu-io.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/qemu-io.c b/qemu-io.c
+index f554ab614b..2c00ea068e 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -11,6 +11,9 @@
+ #include "qemu/osdep.h"
+ #include <getopt.h>
+ #include <libgen.h>
++#ifndef _WIN32
++#include <termios.h>
++#endif
+ 
+ #include "qapi/error.h"
+ #include "qemu-io.h"
+@@ -42,6 +45,26 @@ static bool imageOpts;
+ 
+ static ReadLineState *readline_state;
+ 
++static int ttyEOF;
++
++static int get_eof_char(void)
++{
++#ifdef _WIN32
++    return 0x4; /* Ctrl-D */
++#else
++    struct termios tty;
++    if (tcgetattr(STDIN_FILENO, &tty) != 0) {
++        if (errno == ENOTTY) {
++            return 0x0; /* just expect read() == 0 */
++        } else {
++            return 0x4; /* Ctrl-D */
++        }
++    }
++
++    return tty.c_cc[VEOF];
++#endif
++}
++
+ static int close_f(BlockBackend *blk, int argc, char **argv)
+ {
+     blk_unref(qemuio_blk);
+@@ -323,7 +346,8 @@ static char *fetchline_readline(void)
+     readline_start(readline_state, get_prompt(), 0, readline_func, &line);
+     while (!line) {
+         int ch = getchar();
+-        if (ch == EOF) {
++        if (ttyEOF != 0x0 && ch == ttyEOF) {
++            printf("\n");
+             break;
+         }
+         readline_handle_byte(readline_state, ch);
+@@ -593,6 +617,7 @@ int main(int argc, char **argv)
+     qemuio_add_command(&close_cmd);
+ 
+     if (isatty(STDIN_FILENO)) {
++        ttyEOF = get_eof_char();
+         readline_state = readline_init(readline_printf_func,
+                                        readline_flush_func,
+                                        NULL,
+-- 
+2.14.3
