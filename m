@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1elGkT-0000te-Ea
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:14:36 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1elGmK-0002sQ-Gz
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1elGkP-0007ca-Sb
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:14:33 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51792 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1elGkP-0007ay-Mv
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:14:29 -0500
-References: <20180205181846.29996-1-dgilbert@redhat.com>
-	<20180212133227.4lmmxomnddrb2vmt@kamzik.brq.redhat.com>
-	<20180212150703.GB2545@work-vm>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <52362fcf-44b4-ab1b-21b5-4c71fedf2241@redhat.com>
-Date: Mon, 12 Feb 2018 10:14:24 -0600
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1elGmJ-0001mN-Mm
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:16:28 -0500
+References: <1518441241-32557-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1518441241-32557-2-git-send-email-anton.nefedov@virtuozzo.com>
+	<w51po5a8aps.fsf@maestria.local.igalia.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <74ffe6ba-04e8-acda-1753-b91e4e0f83ff@virtuozzo.com>
+Date: Mon, 12 Feb 2018 19:16:14 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180212150703.GB2545@work-vm>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <w51po5a8aps.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] tests/migration: Add source to PC boot
- block
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] iotest 033: add misaligned
+ write-zeroes test via truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org, peterx@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, eblake@redhat.com
 
 
 
-On 02/12/2018 09:07 AM, Dr. David Alan Gilbert wrote:
-> * Andrew Jones (drjones@redhat.com) wrote:
->> On Mon, Feb 05, 2018 at 06:18:46PM +0000, Dr. David Alan Gilbert (git) wrote:
->>> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
->>> new file mode 100755
->>> index 0000000000..c40f025e1a
->>> --- /dev/null
->>> +++ b/tests/migration/rebuild-x86-bootblock.sh
->>> @@ -0,0 +1,37 @@
->>> +#!/bin/sh
->>> +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
->>> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
->>> +# See the COPYING file in the top-level directory.
->>> +#
->>> +# Author: dgilbert@redhat.com
->>> +
->>> +ASMFILE=tests/migration/x86-a-b-bootblock.s
->>> +HEADER=tests/migration/x86-a-b-bootblock.h
->>> +
->>> +if [ ! -e "$ASMFILE" ]
->>> +then
->>> +  echo "Couldn't find $ASMFILE" >&2
->>> +  exit 1
->>> +fi
->>> +
->>> +ASM_WORK_DIR=/tmp/X86BB$$
->>
->> mktemp?
+On 12/2/2018 6:54 PM, Alberto Garcia wrote:
+> On Mon 12 Feb 2018 02:14:00 PM CET, Anton Nefedov wrote:
+>> +# Trigger truncate that would shrink qcow2 L1 table, which is done by
+>> +#   clearing one entry (8 bytes) with bdrv_co_pwrite_zeroes()
+>> +
+>> +echo
+>> +echo "=== Test misaligned write zeroes via truncate ==="
+>> +echo
+>> +
+>> +CLUSTER_SIZE=$((64 * 1024))
+>> +L2_COVERAGE=$(($CLUSTER_SIZE * $CLUSTER_SIZE / 8))
+>> +_make_test_img $(($L2_COVERAGE * 2))
 > 
-> Yes, that's probably fair.
-
-I echo this. So we will use something like:
-
--ASM_WORK_DIR=/tmp/AARCH64BB$$
-+ASM_WORK_DIR="$(mktemp -d /tmp/AARCH64XXXXXX)"
-
--mkdir $ASM_WORK_DIR &&
-
-
+> If my numbers are correct, that's a 1GB image. For qcow2 this is not a
+> problem but I wonder if it's ok to create such large images for other
+> formats (for raw they should be sparse by default, but still).
 > 
->>> +mkdir $ASM_WORK_DIR &&
->>> +as --32 -march=i486 "$ASMFILE" -o $ASM_WORK_DIR/bb.o &&
->>> +objcopy -O binary $ASM_WORK_DIR/bb.o $ASM_WORK_DIR/bb.boot &&
->>> +dd if=$ASM_WORK_DIR/bb.boot of=$ASM_WORK_DIR/bb.bootsect \
->>> +  bs=256 count=2 skip=124 &&
->>> +xxd -i $ASM_WORK_DIR/bb.bootsect |
->>
->> Is xxd now considered a common enough tool for portable scripts? I've
->> always liked xxd for manual use, but scripted with 'od'.
+> Berto
 > 
-> This script isn't part of a normal build or make check or anything, so
-> jumping through hoops to make it portable for the mythical other person
-> who might ever run it seems OTT, especially since xxd is very common,
 
-xxd isn't installed by default (at least on my aarch64 server). But it
-is part of vim-common package; so it is fair to say xxd command is
-available on all major distros.
-
-> and I'm not sure how much I'd bet on the portability of od's output
-> format either.
-> 
-> Dave
-> 
->>> +sed -e 's/_tmp.*_bootsect/x86_bootsect/' -e 's/.*int.*//' > \
->>> +  $ASM_WORK_DIR/bb.hex &&
->>> +cat - $ASM_WORK_DIR/bb.hex <<HERE > "$HEADER"
->>> +/* This file is automatically generated from
->>> + * tests/migration/x86-a-b-bootblock.s, edit that and then run
->>> + * tests/migration/rebuild-x86-bootblock.sh to update,
->>> + * and then remember to send both in your patch submission.
->>> + */
->>> +HERE
->>> +
->>> +rm $ASM_WORK_DIR/bb.hex $ASM_WORK_DIR/bb.bootsect $ASM_WORK_DIR/bb.boot
->>> +rm $ASM_WORK_DIR/bb.o
->>> +rmdir $ASM_WORK_DIR
->>> +
->>
->> Thanks,
->> drew
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+Good point. Actually even 512 byte clusters will work here, resulting
+in a just 64k image.
