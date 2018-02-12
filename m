@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1elJLF-0001Zv-Qd
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 14:00:46 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1elJLP-0001iG-N3
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 14:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1elJLE-0005hF-KL
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 14:00:41 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1elJLL-0005wl-0R
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 14:00:51 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon, 12 Feb 2018 18:58:19 +0000
-Message-Id: <1518461904-5305-18-git-send-email-eric.auger@redhat.com>
+Date: Mon, 12 Feb 2018 18:58:20 +0000
+Message-Id: <1518461904-5305-19-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
 References: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v6 17/22] hw/arm/virt: Add virtio-iommu to the
- virt board
+Subject: [Qemu-devel] [RFC v6 18/22] hw/arm/virt-acpi-build: Add
+ virtio-iommu node in IORT table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,217 +23,217 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-The specific virtio-mmio node is inconditionally added on
-machine init while the binding between this latter and the
-PCIe host bridge is done on machine init done notifier, only
-if -device virtio-iommu-device was added to the qemu command
-line.
+This patch builds the virtio-iommu node in the ACPI IORT table.
+The dt node creation function fills the information used by
+the IORT table generation function (base address, base irq,
+type of the smmu).
+
+The RID space of the root complex, which spans 0x0-0x10000
+maps to streamid space 0x0-0x10000 in smmuv3, which in turn
+maps to deviceid space 0x0-0x10000 in the ITS group.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-v4 -> v5:
-- VirtMachineClass no_iommu added in this patch
-- Use object_resolve_path_type
+v5 -> v6:
+- use type=128
+- new gsiv and reserved2 fields
 ---
- hw/arm/virt.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++++----
- include/hw/arm/virt.h |  5 ++++
- 2 files changed, 82 insertions(+), 6 deletions(-)
+ hw/arm/virt-acpi-build.c    | 54 +++++++++++++++++++++++++++++++++++++++------
+ hw/arm/virt.c               |  5 +++++
+ include/hw/acpi/acpi-defs.h | 21 +++++++++++++++++-
+ include/hw/arm/virt.h       | 13 +++++++++++
+ 4 files changed, 85 insertions(+), 8 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 08ac411..cf81716 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -54,6 +54,7 @@
- #include "hw/arm/fdt.h"
- #include "hw/intc/arm_gic.h"
- #include "hw/intc/arm_gicv3_common.h"
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index f7fa795..24efb69 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -42,6 +42,7 @@
+ #include "hw/acpi/aml-build.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci.h"
 +#include "hw/virtio/virtio-iommu.h"
+ #include "hw/arm/virt.h"
+ #include "sysemu/numa.h"
  #include "kvm_arm.h"
- #include "hw/smbios/smbios.h"
- #include "qapi/visitor.h"
-@@ -141,6 +142,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-+    [VIRT_IOMMU] =              { 0x09050000, 0x00000200 },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -161,6 +163,7 @@ static const int a15irqmap[] = {
-     [VIRT_SECURE_UART] = 8,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-+    [VIRT_IOMMU] = 74,
-     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
- };
- 
-@@ -941,6 +944,69 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
-                            0x7           /* PCI irq */);
+@@ -393,18 +394,26 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
  }
  
-+static void virtio_iommu_notifier(Notifier *notifier, void *data)
-+{
-+    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-+                                         virtio_iommu_done);
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+    struct arm_boot_info *info = &vms->bootinfo;
-+    bool ambiguous;
-+    Object *obj = object_resolve_path_type("", TYPE_VIRTIO_IOMMU, &ambiguous);
-+    int dtb_size;
-+    void *fdt = info->get_dtb(info, &dtb_size);
-+
-+    if (!obj) {
-+        return;
-+    }
-+
-+    if (vmc->no_iommu) {
-+        error_setg(&error_fatal, "this machine version does not support iommu");
-+    }
-+
-+    if (ambiguous) {
-+        error_setg(&error_fatal, "a single virtio-iommu device is supported!");
-+    }
-+
-+    object_property_set_bool(obj, false, "msi_bypass", &error_fatal);
-+
-+    qemu_fdt_setprop_cells(fdt, vms->pcie_host_nodename, "iommu-map",
-+                           0x0, vms->iommu_phandle, 0x0, 0x10000);
-+}
-+
-+static void create_virtio_iommu(VirtMachineState *vms, qemu_irq *pic)
-+{
-+    char *node;
-+    const char compat[] = "virtio,mmio";
-+    int irq =  vms->irqmap[VIRT_IOMMU];
-+    hwaddr base = vms->memmap[VIRT_IOMMU].base;
-+    hwaddr size = vms->memmap[VIRT_IOMMU].size;
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+
-+    if (vmc->no_iommu) {
-+        return;
-+    }
-+
-+    vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
-+
-+    sysbus_create_simple("virtio-mmio", base, pic[irq]);
-+
-+    node = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
-+    qemu_fdt_add_subnode(vms->fdt, node);
-+    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg", 2, base, 2, size);
-+
-+    qemu_fdt_setprop_cells(vms->fdt, node, "interrupts",
-+            GIC_FDT_IRQ_TYPE_SPI, irq, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+
-+    qemu_fdt_setprop(vms->fdt, node, "dma-coherent", NULL, 0);
-+    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
-+    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
-+    g_free(node);
-+
-+    vms->virtio_iommu_done.notify = virtio_iommu_notifier;
-+    qemu_add_machine_init_done_notifier(&vms->virtio_iommu_done);
-+}
-+
- static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+ static void
+-build_iort(GArray *table_data, BIOSLinker *linker)
++build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  {
-     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
-@@ -1016,7 +1082,8 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-         }
+-    int iort_start = table_data->len;
++    int nb_nodes, iort_start = table_data->len;
+     AcpiIortIdMapping *idmap;
+     AcpiIortItsGroup *its;
+     AcpiIortTable *iort;
+-    size_t node_size, iort_length;
++    AcpiIortPVIommu *iommu;
++    size_t node_size, iort_length, iommu_offset = 0;
+     AcpiIortRC *rc;
+ 
+     iort = acpi_data_push(table_data, sizeof(*iort));
+ 
++    if (vms->iommu_info.type) {
++        nb_nodes = 3; /* RC, ITS, IOMMU */
++    } else {
++        nb_nodes = 2; /* RC, ITS */
++    }
++
+     iort_length = sizeof(*iort);
++    iort->node_count = cpu_to_le32(nb_nodes);
+     iort->node_count = cpu_to_le32(2); /* RC and ITS nodes */
+     iort->node_offset = cpu_to_le32(sizeof(*iort));
+ 
+@@ -418,6 +427,31 @@ build_iort(GArray *table_data, BIOSLinker *linker)
+     its->its_count = cpu_to_le32(1);
+     its->identifiers[0] = 0; /* MADT translation_id */
+ 
++    if (vms->iommu_info.type == VIRT_IOMMU_VIRTIO) {
++
++        /* Para-virtualized IOMMU node */
++        iommu_offset = cpu_to_le32(iort->node_offset + node_size);
++        node_size = sizeof(*iommu) + sizeof(*idmap);
++        iort_length += node_size;
++        iommu = acpi_data_push(table_data, node_size);
++
++        iommu->type = ACPI_IORT_NODE_PARAVIRT;
++        iommu->length = cpu_to_le16(node_size);
++        iommu->base_address = cpu_to_le64(vms->iommu_info.reg.base);
++        iommu->span = cpu_to_le64(vms->iommu_info.reg.size);
++        iommu->model = ACPI_IORT_NODE_PV_VIRTIO_IOMMU;
++        iommu->flags = ACPI_IORT_NODE_PV_CACHE_COHERENT;
++        iommu->gsiv = cpu_to_le64(vms->iommu_info.irq_base);
++
++        /* Identity RID mapping covering the whole input RID range */
++        idmap = &iommu->id_mapping_array[0];
++        idmap->input_base = 0;
++        idmap->id_count = cpu_to_le32(0xFFFF);
++        idmap->output_base = 0;
++        /* output IORT node is the ITS group node (the first node) */
++        idmap->output_reference = cpu_to_le32(iort->node_offset);
++    }
++
+     /* Root Complex Node */
+     node_size = sizeof(*rc) + sizeof(*idmap);
+     iort_length += node_size;
+@@ -438,10 +472,16 @@ build_iort(GArray *table_data, BIOSLinker *linker)
+     idmap->input_base = 0;
+     idmap->id_count = cpu_to_le32(0xFFFF);
+     idmap->output_base = 0;
+-    /* output IORT node is the ITS group node (the first node) */
+-    idmap->output_reference = cpu_to_le32(iort->node_offset);
+ 
+-    iort->length = cpu_to_le32(iort_length);
++    if (vms->iommu_info.type) {
++        /* output IORT node is the smmuv3 node */
++        idmap->output_reference = cpu_to_le32(iommu_offset);
++    } else {
++        /* output IORT node is the ITS group node (the first node) */
++        idmap->output_reference = cpu_to_le32(iort->node_offset);
++    }
++
++   iort->length = cpu_to_le32(iort_length);
+ 
+     build_header(linker, table_data, (void *)(table_data->data + iort_start),
+                  "IORT", table_data->len - iort_start, 0, NULL, NULL);
+@@ -786,7 +826,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+ 
+     if (its_class_name() && !vmc->no_its) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_iort(tables_blob, tables->linker);
++        build_iort(tables_blob, tables->linker, vms);
      }
  
--    nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    vms->pcie_host_nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    nodename = vms->pcie_host_nodename;
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-     qemu_fdt_setprop_string(vms->fdt, nodename,
-                             "compatible", "pci-host-ecam-generic");
-@@ -1055,7 +1122,6 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
-     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
+     /* XSDT is pointed to by RSDP */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index cf81716..80740ac 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -969,6 +969,11 @@ static void virtio_iommu_notifier(Notifier *notifier, void *data)
  
--    g_free(nodename);
+     object_property_set_bool(obj, false, "msi_bypass", &error_fatal);
+ 
++    vms->iommu_info.type = VIRT_IOMMU_VIRTIO;
++    vms->iommu_info.reg.base = vms->memmap[VIRT_IOMMU].base;
++    vms->iommu_info.reg.size = vms->memmap[VIRT_IOMMU].size;
++    vms->iommu_info.irq_base = vms->irqmap[VIRT_IOMMU];
++
+     qemu_fdt_setprop_cells(fdt, vms->pcie_host_nodename, "iommu-map",
+                            0x0, vms->iommu_phandle, 0x0, 0x10000);
  }
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 80c8099..57b9cf9 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -673,7 +673,8 @@ enum {
+         ACPI_IORT_NODE_NAMED_COMPONENT = 0x01,
+         ACPI_IORT_NODE_PCI_ROOT_COMPLEX = 0x02,
+         ACPI_IORT_NODE_SMMU = 0x03,
+-        ACPI_IORT_NODE_SMMU_V3 = 0x04
++        ACPI_IORT_NODE_SMMU_V3 = 0x04,
++        ACPI_IORT_NODE_PARAVIRT = 0x80
+ };
  
- static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
-@@ -1370,16 +1436,16 @@ static void machvirt_init(MachineState *machine)
+ struct AcpiIortIdMapping {
+@@ -700,6 +701,24 @@ struct AcpiIortItsGroup {
+ } QEMU_PACKED;
+ typedef struct AcpiIortItsGroup AcpiIortItsGroup;
  
-     create_rtc(vms, pic);
- 
--    create_pcie(vms, pic);
--
--    create_gpio(vms, pic);
--
-     /* Create mmio transports, so the user can create virtio backends
-      * (which will be automatically plugged in to the transports). If
-      * no backend is created the transport will just sit harmlessly idle.
-      */
-     create_virtio_devices(vms, pic);
- 
-+    create_pcie(vms, pic);
++struct AcpiIortPVIommu {
++    ACPI_IORT_NODE_HEADER_DEF
++    uint64_t base_address;
++    uint64_t span;
++    uint32_t model;
++    uint32_t flags;
++    uint64_t gsiv;
++    uint64_t reserved2;
++    AcpiIortIdMapping id_mapping_array[0];
++} QEMU_PACKED;
++typedef struct AcpiIortPVIommu AcpiIortPVIommu;
 +
-+    create_gpio(vms, pic);
++enum {
++    ACPI_IORT_NODE_PV_VIRTIO_IOMMU = 0x00,
++};
 +
-     vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
-     rom_set_fw(vms->fw_cfg);
- 
-@@ -1404,6 +1470,7 @@ static void machvirt_init(MachineState *machine)
-      * Notifiers are executed in registration reverse order.
-      */
-     create_platform_bus(vms, pic);
-+    create_virtio_iommu(vms, pic);
- }
- 
- static bool virt_get_secure(Object *obj, Error **errp)
-@@ -1645,8 +1712,12 @@ static void virt_2_11_instance_init(Object *obj)
- 
- static void virt_machine_2_11_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
++#define ACPI_IORT_NODE_PV_CACHE_COHERENT    (1 << 0)
 +
-     virt_machine_2_12_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_11);
-+
-+    vmc->no_iommu = true;
- }
- DEFINE_VIRT_MACHINE(2, 11)
- 
+ struct AcpiIortRC {
+     ACPI_IORT_NODE_HEADER_DEF
+     AcpiIortMemoryAccess memory_properties;
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 7e31e99..a13b895 100644
+index a13b895..2e1e907 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -59,6 +59,7 @@ enum {
-     VIRT_GIC_V2M,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
-+    VIRT_IOMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-     VIRT_RTC,
-@@ -84,12 +85,14 @@ typedef struct {
-     bool disallow_affinity_adjustment;
-     bool no_its;
-     bool no_pmu;
-+    bool no_iommu;
+@@ -89,6 +89,18 @@ typedef struct {
      bool claim_edge_triggered_timers;
  } VirtMachineClass;
  
++typedef enum VirtIOMMUType {
++    VIRT_IOMMU_NONE,
++    VIRT_IOMMU_SMMUV3,
++    VIRT_IOMMU_VIRTIO,
++} VirtIOMMUType;
++
++typedef struct VirtIOMMUInfo {
++    VirtIOMMUType type;
++    MemMapEntry reg;
++    int irq_base;
++} VirtIOMMUInfo;
++
  typedef struct {
      MachineState parent;
      Notifier machine_done;
-+    Notifier virtio_iommu_done;
-     FWCfgState *fw_cfg;
-     bool secure;
+@@ -98,6 +110,7 @@ typedef struct {
      bool highmem;
-@@ -105,6 +108,8 @@ typedef struct {
-     uint32_t clock_phandle;
-     uint32_t gic_phandle;
-     uint32_t msi_phandle;
-+    uint32_t iommu_phandle;
-+    char *pcie_host_nodename;
-     int psci_conduit;
-     PCIBus *pci_bus;
- } VirtMachineState;
+     bool its;
+     bool virt;
++    VirtIOMMUInfo iommu_info;
+     int32_t gic_version;
+     struct arm_boot_info bootinfo;
+     const MemMapEntry *memmap;
 -- 
 1.9.1
