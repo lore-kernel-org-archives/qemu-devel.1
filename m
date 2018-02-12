@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elKoP-0001j5-Ds
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:34:54 -0500
+	(envelope-from <david@redhat.com>) id 1elKpN-0002QI-Ap
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:35:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elKoL-0004rv-9l
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:34:53 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40716 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elKoL-0004rN-4M
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:34:49 -0500
-References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-18-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b6772d13-4b8d-4b9d-078b-3da01e0b564a@redhat.com>
-Date: Mon, 12 Feb 2018 14:34:47 -0600
+	(envelope-from <david@redhat.com>) id 1elKpI-0005mS-Cf
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 15:35:53 -0500
+References: <1518437672-7724-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518437672-7724-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c43ef4e7-7e51-1510-f382-47a8d4292023@redhat.com>
+Date: Mon, 12 Feb 2018 21:35:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180211093607.27351-18-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1518437672-7724-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 17/29] qapi: Record 'include' directives
- in intermediate representation
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, lcapitulino@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, dgilbert@redhat.com, rth@twiddle.net, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
 
-On 02/11/2018 03:35 AM, Markus Armbruster wrote:
-> The include directive permits modular QAPI schemata, but the generated
-> code is monolithic all the same.  To permit generating modular code,
-> the front end needs to pass more information on inclusions to the back
-> ends.  The commit before last added the necessary information to the
-> parse tree.  This commit adds it to the intermediate representation
-> and its QAPISchemaVisitor.  A later commit will use this to to
-> generate modular code.
->=20
-> New entity QAPISchemaInclude represents inclusions.  Call new visitor
-> method visit_include() for it, so visitors can see the sub-modules a
-> module includes.
->=20
-> Note that unlike other entities, QAPISchemaInclude has no name, and is
-> therefore not added to entity_dict.
->=20
-> New QAPISchemaEntity attribute @module names the entity's source file.
-> Call new visitor method visit_module() when it changes during a visit,
-> so visitors can keep track of the module being visited.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
-> @@ -1479,16 +1497,19 @@ class QAPISchema(object):
->           self._entity_dict =3D {}
->           self._predefining =3D True
->           self._def_predefineds()
-> -        self._predefining =3D False
->           self._def_exprs(exprs)
->           self.check()
+On 12.02.2018 13:14, Viktor Mihajlovski wrote:
+> From: Luiz Capitulino <lcapitulino@redhat.com>
+> 
+> The query-cpus command has an extremely serious side effect:
+> it always interrupts all running vCPUs so that they can run
+> ioctl calls. This can cause a huge performance degradation for
+> some workloads. And most of the information retrieved by the
+> ioctl calls are not even used by query-cpus.
+> 
+> This commit introduces a replacement for query-cpus called
+> query-cpus-fast, which has the following features:
+> 
+>  o Never interrupt vCPUs threads. query-cpus-fast only returns
+>    vCPU information maintained by QEMU itself, which should be
+>    sufficient for most management software needs
+> 
+>  o Make "halted" field optional: we only return it if the
+>    halted state is maintained by QEMU. But this also gives
+>    the option of dropping the field in the future (see below)
+> 
 
-Why does self._predfining not need to be toggled anymore?  Do we even=20
-need this variable any more...
+If I'm not wrong, this comment is superseded by ...
 
->=20
->      def _def_entity(self, ent):
->          # Only the predefined types are allowed to not have info
->          assert ent.info or self._predefining
-> -        assert ent.name not in self._entity_dict
+>  o Drop irrelevant fields such as "current", "pc" and "arch"
+> 
+>  o Drop field "halted" since it can't be provided fast reliably
+>    and is too volatile on most architectures to be really useful
+> 
 
-...and/or is this assert now worthless?
+this comment :)
+
+>  o Rename some fields for better clarification & proper naming
+>    standard>
+> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+
+Wondering if we could tweak the old interface with a simple flag "fast =
+true".
 
 
-> +++ b/tests/qapi-schema/comments.out
-> @@ -1,4 +1,5 @@
->   object q_empty
->   enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qb=
-ool']
->       prefix QTYPE
-> +module comments.json
->   enum Status ['good', 'bad', 'ugly']
+-- 
 
-Based on the generated output, it looks like you can tell whether you=20
-are in the predefining stage by not having any module at all; the first=20
-visit_module call is what flips the switch that everything else is=20
-defined by a module and must therefore have associated info.
+Thanks,
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+David / dhildenb
