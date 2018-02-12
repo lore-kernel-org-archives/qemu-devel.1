@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elGa1-0008AO-S9
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:03:51 -0500
+	(envelope-from <cohuck@redhat.com>) id 1elGd3-00022G-C2
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:06:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elGa0-0001XT-JW
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:03:45 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58838 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elGa0-0001X3-F0
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:03:44 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12B367CBDB
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 16:03:44 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 12 Feb 2018 16:03:40 +0000
-Message-Id: <20180212160340.15333-3-dgilbert@redhat.com>
-In-Reply-To: <20180212160340.15333-1-dgilbert@redhat.com>
-References: <20180212160340.15333-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] tests/migration: Add test for migration to
- bad destination
+	(envelope-from <cohuck@redhat.com>) id 1elGcy-0005eQ-Um
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 11:06:53 -0500
+Date: Mon, 12 Feb 2018 17:06:37 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180212170637.3cdc5623.cohuck@redhat.com>
+In-Reply-To: <1518437672-7724-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+References: <1518437672-7724-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518437672-7724-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com
-Cc: peterx@redhat.com
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, lcapitulino@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, dgilbert@redhat.com, rth@twiddle.net, borntraeger@de.ibm.com, agraf@suse.de, david@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, 12 Feb 2018 13:14:31 +0100
+Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
 
-Check the source survives.
+> From: Luiz Capitulino <lcapitulino@redhat.com>
+> 
+> The query-cpus command has an extremely serious side effect:
+> it always interrupts all running vCPUs so that they can run
+> ioctl calls. This can cause a huge performance degradation for
+> some workloads. And most of the information retrieved by the
+> ioctl calls are not even used by query-cpus.
+> 
+> This commit introduces a replacement for query-cpus called
+> query-cpus-fast, which has the following features:
+> 
+>  o Never interrupt vCPUs threads. query-cpus-fast only returns
+>    vCPU information maintained by QEMU itself, which should be
+>    sufficient for most management software needs
+> 
+>  o Make "halted" field optional: we only return it if the
+>    halted state is maintained by QEMU. But this also gives
+>    the option of dropping the field in the future (see below)
+> 
+>  o Drop irrelevant fields such as "current", "pc" and "arch"
+> 
+>  o Drop field "halted" since it can't be provided fast reliably
+>    and is too volatile on most architectures to be really useful
+> 
+>  o Rename some fields for better clarification & proper naming
+>    standard
+> 
+> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> ---
+>  cpus.c               | 38 ++++++++++++++++++++++++++++
+>  hmp-commands-info.hx | 14 +++++++++++
+>  hmp.c                | 21 ++++++++++++++++
+>  hmp.h                |  1 +
+>  qapi-schema.json     | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 144 insertions(+)
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tests/migration-test.c | 65 ++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 50 insertions(+), 15 deletions(-)
-
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index d0abad40f5..c1ebbdf08f 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -478,28 +478,31 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-     g_free(cmd_dst);
- }
- 
--static void test_migrate_end(QTestState *from, QTestState *to)
-+static void test_migrate_end(QTestState *from, QTestState *to, bool test_dest)
- {
-     unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
- 
-     qtest_quit(from);
- 
--    qtest_memread(to, start_address, &dest_byte_a, 1);
-+    if (test_dest) {
-+        qtest_memread(to, start_address, &dest_byte_a, 1);
- 
--    /* Destination still running, wait for a byte to change */
--    do {
--        qtest_memread(to, start_address, &dest_byte_b, 1);
--        usleep(1000 * 10);
--    } while (dest_byte_a == dest_byte_b);
-+        /* Destination still running, wait for a byte to change */
-+        do {
-+            qtest_memread(to, start_address, &dest_byte_b, 1);
-+            usleep(1000 * 10);
-+        } while (dest_byte_a == dest_byte_b);
-+
-+        qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
- 
--    qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
--    /* With it stopped, check nothing changes */
--    qtest_memread(to, start_address, &dest_byte_c, 1);
--    usleep(1000 * 200);
--    qtest_memread(to, start_address, &dest_byte_d, 1);
--    g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
-+        /* With it stopped, check nothing changes */
-+        qtest_memread(to, start_address, &dest_byte_c, 1);
-+        usleep(1000 * 200);
-+        qtest_memread(to, start_address, &dest_byte_d, 1);
-+        g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
- 
--    check_guests_ram(to);
-+        check_guests_ram(to);
-+    }
- 
-     qtest_quit(to);
- 
-@@ -591,7 +594,38 @@ static void test_migrate(void)
- 
-     g_free(uri);
- 
--    test_migrate_end(from, to);
-+    test_migrate_end(from, to, true);
-+}
-+
-+static void test_baddest(void)
-+{
-+    QTestState *from, *to;
-+    QDict *rsp, *rsp_return;
-+    const char *status;
-+    bool failed;
-+
-+    test_migrate_start(&from, &to, "tcp:0:0");
-+    migrate(from, "tcp:0:0");
-+    do {
-+        rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
-+        rsp_return = qdict_get_qdict(rsp, "return");
-+
-+        status = qdict_get_str(rsp_return, "status");
-+
-+        g_assert(!strcmp(status, "setup") || !(strcmp(status, "failed")));
-+        failed = !strcmp(status, "failed");
-+        QDECREF(rsp);
-+    } while (!failed);
-+
-+    /* Is the machine currently running? */
-+    rsp = wait_command(from, "{ 'execute': 'query-status' }");
-+    g_assert(qdict_haskey(rsp, "return"));
-+    rsp_return = qdict_get_qdict(rsp, "return");
-+    g_assert(qdict_haskey(rsp_return, "running"));
-+    g_assert(qdict_get_bool(rsp_return, "running"));
-+    QDECREF(rsp);
-+
-+    test_migrate_end(from, to, false);
- }
- 
- int main(int argc, char **argv)
-@@ -615,6 +649,7 @@ int main(int argc, char **argv)
- 
-     qtest_add_func("/migration/postcopy/unix", test_migrate);
-     qtest_add_func("/migration/deprecated", test_deprecated);
-+    qtest_add_func("/migration/bad_dest", test_baddest);
- 
-     ret = g_test_run();
- 
--- 
-2.14.3
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
