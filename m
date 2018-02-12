@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1elDcl-0000AC-5z
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 07:54:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1elDi9-0003Ee-Gc
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 07:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1elDcg-0007ZZ-3P
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 07:54:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1elDcf-0007Xz-P4
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 07:54:17 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1CCrf4X062055
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 07:54:16 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g3abqtbu8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 07:54:16 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 12 Feb 2018 12:54:13 -0000
-References: <20180212124718.21935-1-mreitz@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 12 Feb 2018 13:54:09 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1elDi2-00074D-Ii
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 07:59:54 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:46423)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1elDi2-000734-Dt
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 07:59:50 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id x21so11077756oie.13
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 04:59:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180212124718.21935-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <ec6116a6-80f7-4375-ecce-d34cb532c77d@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Use virtio-blk in 155
+In-Reply-To: <5f127fa6-170c-1bdc-17e5-7c41cbe6ebca@lauterbach.com>
+References: <d23a2730-a103-6336-0658-e12fa9b0193f@lauterbach.com>
+	<54f41a72-7b70-e5a6-d65f-ccce8a93f948@lauterbach.com>
+	<5f127fa6-170c-1bdc-17e5-7c41cbe6ebca@lauterbach.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Feb 2018 12:59:29 +0000
+Message-ID: <CAFEAcA8dYZUDS6xwtfN=yBCKgyfOSRz6tQVx6HeLMYkcC5S37g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] ping Re: [PATCH V2] target-arm:Add a dynamic
+ XML-description of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,73 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 12 February 2018 at 12:07, Abdallah Bouassida
+<abdallah.bouassida@lauterbach.com> wrote:
+> ping
+> http://patchwork.ozlabs.org/patch/867467/
+>
+>
+> ping
+> http://patchwork.ozlabs.org/patch/867467/
 
-On 02/12/2018 01:47 PM, Max Reitz wrote:
-> Only a few select machine types support floppy drives and there is
-> actually nothing preventing us from using virtio here, so let's do it.
-> 
-> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Hi -- thanks for the ping. I've been a bit busy recently but this
+is in my queue to look at and I'm hoping to get to it this week.
 
-
-
-> ---
->  tests/qemu-iotests/155 | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
-> index fc9fa975be..42dae04c83 100755
-> --- a/tests/qemu-iotests/155
-> +++ b/tests/qemu-iotests/155
-> @@ -64,7 +64,7 @@ class BaseClass(iotests.QMPTestCase):
->                      'file': {'driver': 'file',
->                               'filename': source_img}}
->          self.vm.add_blockdev(self.qmp_to_opts(blockdev))
-> -        self.vm.add_device('floppy,id=qdev0,drive=source')
-> +        self.vm.add_device('virtio-blk,id=qdev0,drive=source')
->          self.vm.launch()
-> 
->          self.assertIntactSourceBackingChain()
-> @@ -173,21 +173,24 @@ class MirrorBaseClass(BaseClass):
->      def testFull(self):
->          self.runMirror('full')
-> 
-> -        node = self.findBlockNode('target', 'qdev0')
-> +        node = self.findBlockNode('target',
-> +                                  '/machine/peripheral/qdev0/virtio-backend')
->          self.assertCorrectBackingImage(node, None)
->          self.assertIntactSourceBackingChain()
-> 
->      def testTop(self):
->          self.runMirror('top')
-> 
-> -        node = self.findBlockNode('target', 'qdev0')
-> +        node = self.findBlockNode('target',
-> +                                  '/machine/peripheral/qdev0/virtio-backend')
->          self.assertCorrectBackingImage(node, back2_img)
->          self.assertIntactSourceBackingChain()
-> 
->      def testNone(self):
->          self.runMirror('none')
-> 
-> -        node = self.findBlockNode('target', 'qdev0')
-> +        node = self.findBlockNode('target',
-> +                                  '/machine/peripheral/qdev0/virtio-backend')
->          self.assertCorrectBackingImage(node, source_img)
->          self.assertIntactSourceBackingChain()
-> 
-> @@ -239,7 +242,8 @@ class TestCommit(BaseClass):
-> 
->          self.vm.event_wait('BLOCK_JOB_COMPLETED')
-> 
-> -        node = self.findBlockNode(None, 'qdev0')
-> +        node = self.findBlockNode(None,
-> +                                  '/machine/peripheral/qdev0/virtio-backend')
->          self.assert_qmp(node, 'image' + '/backing-image' * 0 + '/filename',
->                          back1_img)
->          self.assert_qmp(node, 'image' + '/backing-image' * 1 + '/filename',
-> 
+-- PMM
