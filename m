@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elFhb-0000U4-QI
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:07:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elFqK-0005bN-TJ
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:16:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elFhY-0004Vu-Vb
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:07:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57478 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elFhY-0004P1-QZ
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:07:28 -0500
-Date: Mon, 12 Feb 2018 15:07:04 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180212150703.GB2545@work-vm>
-References: <20180205181846.29996-1-dgilbert@redhat.com>
-	<20180212133227.4lmmxomnddrb2vmt@kamzik.brq.redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1elFqJ-0007gD-OP
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:16:32 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-16-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <444b46ae-865a-ca6b-cacf-9898cf044891@redhat.com>
+Date: Mon, 12 Feb 2018 16:16:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180212133227.4lmmxomnddrb2vmt@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] tests/migration: Add source to PC boot
- block
+In-Reply-To: <20180208192328.16550-16-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="d37KvWGuD1E2rSrUKpkV4DJOnoEJM8kP9"
+Subject: Re: [Qemu-devel] [PATCH 15/27] rbd: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +24,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org, wei@redhat.com, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-* Andrew Jones (drjones@redhat.com) wrote:
-> On Mon, Feb 05, 2018 at 06:18:46PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
-> > new file mode 100755
-> > index 0000000000..c40f025e1a
-> > --- /dev/null
-> > +++ b/tests/migration/rebuild-x86-bootblock.sh
-> > @@ -0,0 +1,37 @@
-> > +#!/bin/sh
-> > +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > +# See the COPYING file in the top-level directory.
-> > +#
-> > +# Author: dgilbert@redhat.com
-> > +
-> > +ASMFILE=tests/migration/x86-a-b-bootblock.s
-> > +HEADER=tests/migration/x86-a-b-bootblock.h
-> > +
-> > +if [ ! -e "$ASMFILE" ]
-> > +then
-> > +  echo "Couldn't find $ASMFILE" >&2
-> > +  exit 1
-> > +fi
-> > +
-> > +ASM_WORK_DIR=/tmp/X86BB$$
-> 
-> mktemp?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--d37KvWGuD1E2rSrUKpkV4DJOnoEJM8kP9
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <444b46ae-865a-ca6b-cacf-9898cf044891@redhat.com>
+Subject: Re: [PATCH 15/27] rbd: Support .bdrv_co_create
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-16-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-16-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes, that's probably fair.
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> This adds the .bdrv_co_create driver callback to rbd, which enables
+> image creation over QMP.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json |  20 +++++++-
+>  block/rbd.c          | 137 +++++++++++++++++++++++++++++++++----------=
+--------
+>  2 files changed, 108 insertions(+), 49 deletions(-)
 
-> > +mkdir $ASM_WORK_DIR &&
-> > +as --32 -march=i486 "$ASMFILE" -o $ASM_WORK_DIR/bb.o &&
-> > +objcopy -O binary $ASM_WORK_DIR/bb.o $ASM_WORK_DIR/bb.boot &&
-> > +dd if=$ASM_WORK_DIR/bb.boot of=$ASM_WORK_DIR/bb.bootsect \
-> > +  bs=256 count=2 skip=124 &&
-> > +xxd -i $ASM_WORK_DIR/bb.bootsect |
-> 
-> Is xxd now considered a common enough tool for portable scripts? I've
-> always liked xxd for manual use, but scripted with 'od'.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-This script isn't part of a normal build or make check or anything, so
-jumping through hoops to make it portable for the mythical other person
-who might ever run it seems OTT, especially since xxd is very common,
-and I'm not sure how much I'd bet on the portability of od's output
-format either.
+Some comments below.
 
-Dave
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 5b4cd6bd12..370fcd9584 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3415,6 +3415,24 @@
+>              '*refcount-bits':   'int' } }
+> =20
+>  ##
+> +# @BlockdevCreateOptionsRbd:
+> +#
+> +# Driver specific image creation options for rbd/Ceph.
+> +#
+> +# @location         Where to store the new image file
 
-> > +sed -e 's/_tmp.*_bootsect/x86_bootsect/' -e 's/.*int.*//' > \
-> > +  $ASM_WORK_DIR/bb.hex &&
-> > +cat - $ASM_WORK_DIR/bb.hex <<HERE > "$HEADER"
-> > +/* This file is automatically generated from
-> > + * tests/migration/x86-a-b-bootblock.s, edit that and then run
-> > + * tests/migration/rebuild-x86-bootblock.sh to update,
-> > + * and then remember to send both in your patch submission.
-> > + */
-> > +HERE
-> > +
-> > +rm $ASM_WORK_DIR/bb.hex $ASM_WORK_DIR/bb.bootsect $ASM_WORK_DIR/bb.boot
-> > +rm $ASM_WORK_DIR/bb.o
-> > +rmdir $ASM_WORK_DIR
-> > +
-> 
-> Thanks,
-> drew
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Maybe this should mention that location.snapshot is not allowed?
+
+(And that location.server is ignored.  But is that even intended?)
+
+> +# @size             Size of the virtual disk in bytes
+> +# @password-secret  ID of secret providing the password
+> +# @cluster_size     RBD object size
+
+s/_/-/
+
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'BlockdevCreateOptionsRbd',
+> +  'data': { 'location':         'BlockdevOptionsRbd',
+> +            'size':             'size',
+> +            '*password-secret': 'str',
+> +            '*cluster-size' :   'size' } }
+> +
+> +##
+>  # @BlockdevCreateNotSupported:
+>  #
+>  # This is used for all drivers that don't support creating images.
+
+[...]
+
+> diff --git a/block/rbd.c b/block/rbd.c
+> index a76a5e8755..c164f70167 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+
+[...]
+
+> @@ -432,24 +409,87 @@ static int qemu_rbd_create(const char *filename, =
+QemuOpts *opts, Error **errp)
+
+[...]
+
+> +static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error=
+ **errp)
+> +{
+> +    BlockdevCreateOptions *create_options;
+> +    BlockdevCreateOptionsRbd *rbd_opts;
+> +    BlockdevOptionsRbd *loc;
+> +    Error *local_err =3D NULL;
+> +    const char *keypairs;
+> +    QDict *options =3D NULL;
+> +    int ret =3D 0;
+> +
+> +    create_options =3D g_new0(BlockdevCreateOptions, 1);
+> +    create_options->driver =3D BLOCKDEV_DRIVER_RBD;
+> +    rbd_opts =3D &create_options->u.rbd;
+> +
+> +    rbd_opts->location =3D g_new0(BlockdevOptionsRbd, 1);
+> +
+> +    rbd_opts->password_secret =3D (char *) qemu_opt_get(opts, "passwor=
+d-secret");
+> +
+> +    /* Read out options */
+> +    rbd_opts->size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_=
+SIZE, 0),
+> +                              BDRV_SECTOR_SIZE);
+> +    rbd_opts->cluster_size =3D qemu_opt_get_size_del(opts,
+> +                                                   BLOCK_OPT_CLUSTER_S=
+IZE, 0);
+> +    rbd_opts->has_cluster_size =3D (rbd_opts->cluster_size !=3D 0);
+> +
+> +    options =3D qdict_new();
+> +    qemu_rbd_parse_filename(filename, options, &local_err);
+> +    if (local_err) {
+> +        ret =3D -EINVAL;
+> +        error_propagate(errp, local_err);
+> +        goto exit;
+> +    }
+> +
+> +    /*
+> +     * Caution: while qdict_get_try_str() is fine, getting non-string
+> +     * types would require more care.  When @options come from -blockd=
+ev
+> +     * or blockdev_add, its members are typed according to the QAPI
+> +     * schema, but when they come from -drive, they're all QString.
+> +     */
+> +    loc =3D rbd_opts->location;
+> +    loc->pool     =3D g_strdup(qdict_get_try_str(options, "pool"));
+> +    loc->conf     =3D g_strdup(qdict_get_try_str(options, "conf"));
+> +    loc->has_conf =3D !!rbd_opts->location->conf;
+> +    loc->user     =3D g_strdup(qdict_get_try_str(options, "user"));
+> +    loc->has_user =3D !!rbd_opts->location->user;
+
+"!!loc->conf" and "!!loc->user" would be shorter and maybe a bit easier
+to get.
+
+Max
+
+> +    loc->image    =3D g_strdup(qdict_get_try_str(options, "image"));
+> +    keypairs      =3D qdict_get_try_str(options, "=3Dkeyvalue-pairs");=
+
+> +
+> +    ret =3D qemu_rbd_do_create(create_options, keypairs, errp);
+> +    if (ret < 0) {
+> +        goto exit;
+> +    }
+> =20
+>  exit:
+>      QDECREF(options);
+> +    qapi_free_BlockdevCreateOptions(create_options);
+>      return ret;
+>  }
+
+
+--d37KvWGuD1E2rSrUKpkV4DJOnoEJM8kP9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqBr7MSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AJTsH/RnBaJExAJoJfIY55PYItJqloG+RMLER
+qoSAiXzKWRWzmByYajeiqrA31Jxw9kSTiHZnAE9L5IK0lu47x1rhT1wp+9WWclzN
+UgGW+Vk/Zp2Xrbai8M4NvNxe99AscArStAb9BK96Ra9ueuCbvBMPPCpB1eIXoiUW
++FiDu3jcBLEYScFRpeenqK+CeIwNA6fnYpL9q5To3TV8klmbPYWpVVyWcGWI8pd0
+beMIQfq6X/4WOuC+z2khywL4m6GLA/mFLxUBqInehLRHXhOZEKReODPte/JvAhKH
+lJLTpOKes8vmQnZ1Ib7dFHGJAWkyqPFTI3w088Sy3Ij/yumEL1kUOIw=
+=9o1N
+-----END PGP SIGNATURE-----
+
+--d37KvWGuD1E2rSrUKpkV4DJOnoEJM8kP9--
