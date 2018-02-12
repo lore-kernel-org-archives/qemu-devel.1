@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1el8RN-0000jK-EN
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:19 -0500
+	(envelope-from <armbru@redhat.com>) id 1el8RP-0000l7-Dw
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1el8RK-0005vP-F7
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:17 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42992 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1el8RK-0005vk-KG
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:19 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42998 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1el8RK-0005uK-6B
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1el8RK-0005uR-8B
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:14 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 12 Feb 2018 08:21:57 +0100
-Message-Id: <20180212072207.9367-5-armbru@redhat.com>
+Date: Mon, 12 Feb 2018 08:21:59 +0100
+Message-Id: <20180212072207.9367-7-armbru@redhat.com>
 In-Reply-To: <20180212072207.9367-1-armbru@redhat.com>
 References: <20180212072207.9367-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RFC 04/14] qapi: generate a literal qobject for
- introspection
+Subject: [Qemu-devel] [PATCH RFC 06/14] qapi: add 'if' to top-level
+ expressions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,305 +32,357 @@ Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Replace the generated json string with a literal qobject. The later is
-easier to deal with, at run time as well as compile time: adding #if
-conditionals will be easier than in a json string.
+Accept 'if' key in top-level elements, accepted as string or list of
+string type. The following patches will modify the test visitor to
+check the value is correctly saved, and generate #if/#endif code (as a
+single #if/endif line or a series for a list).
+
+Example of 'if' key:
+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+  'if': 'defined(TEST_IF_STRUCT)' }
+
+The generated code is for now *unconditional*. Later patches generate
+the conditionals.
+
+A following patch for qapi-code-gen.txt will provide more complete
+documentation for 'if' usage.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-FIXME doc diffs
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt       | 29 +++++++++-----
- monitor.c                          |  2 +-
- scripts/qapi/introspect.py         | 80 ++++++++++++++++++++++----------=
+ scripts/qapi/common.py                   | 36 ++++++++++++++++++++++++++=
 ------
- tests/test-qobject-input-visitor.c | 11 ++++--
- 4 files changed, 73 insertions(+), 49 deletions(-)
+ tests/Makefile.include                   |  4 ++++
+ tests/qapi-schema/bad-if-empty-list.err  |  1 +
+ tests/qapi-schema/bad-if-empty-list.exit |  1 +
+ tests/qapi-schema/bad-if-empty-list.json |  3 +++
+ tests/qapi-schema/bad-if-empty-list.out  |  0
+ tests/qapi-schema/bad-if-empty.err       |  1 +
+ tests/qapi-schema/bad-if-empty.exit      |  1 +
+ tests/qapi-schema/bad-if-empty.json      |  3 +++
+ tests/qapi-schema/bad-if-empty.out       |  0
+ tests/qapi-schema/bad-if-list.err        |  1 +
+ tests/qapi-schema/bad-if-list.exit       |  1 +
+ tests/qapi-schema/bad-if-list.json       |  3 +++
+ tests/qapi-schema/bad-if-list.out        |  0
+ tests/qapi-schema/bad-if.err             |  1 +
+ tests/qapi-schema/bad-if.exit            |  1 +
+ tests/qapi-schema/bad-if.json            |  3 +++
+ tests/qapi-schema/bad-if.out             |  0
+ tests/qapi-schema/qapi-schema-test.json  | 20 ++++++++++++++++++
+ tests/qapi-schema/qapi-schema-test.out   | 22 +++++++++++++++++++
+ tests/test-qmp-cmds.c                    |  6 ++++++
+ 21 files changed, 102 insertions(+), 6 deletions(-)
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.err
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.exit
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.json
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.out
+ create mode 100644 tests/qapi-schema/bad-if-empty.err
+ create mode 100644 tests/qapi-schema/bad-if-empty.exit
+ create mode 100644 tests/qapi-schema/bad-if-empty.json
+ create mode 100644 tests/qapi-schema/bad-if-empty.out
+ create mode 100644 tests/qapi-schema/bad-if-list.err
+ create mode 100644 tests/qapi-schema/bad-if-list.exit
+ create mode 100644 tests/qapi-schema/bad-if-list.json
+ create mode 100644 tests/qapi-schema/bad-if-list.out
+ create mode 100644 tests/qapi-schema/bad-if.err
+ create mode 100644 tests/qapi-schema/bad-if.exit
+ create mode 100644 tests/qapi-schema/bad-if.json
+ create mode 100644 tests/qapi-schema/bad-if.out
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 0c4fc342fe..cb6175ba4d 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -1318,18 +1318,27 @@ Example:
-     #ifndef EXAMPLE_QMP_INTROSPECT_H
-     #define EXAMPLE_QMP_INTROSPECT_H
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index b9a52e820d..0254b9e1ef 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -637,6 +637,27 @@ def add_name(name, info, meta, implicit=3DFalse):
+     all_names[name] =3D meta
 =20
--    extern const char example_qmp_schema_json[];
-+    extern const QLitObject qmp_schema_qlit;
 =20
-     #endif
-     $ cat qapi-generated/example-qapi-introspect.c
- [Uninteresting stuff omitted...]
++def check_if(expr, info):
++
++    def check_if_str(ifcond, info):
++        if not isinstance(ifcond, str):
++            raise QAPISemError(
++                info, "'if' condition must be a string or a list of stri=
+ngs")
++        if ifcond =3D=3D '':
++            raise QAPISemError(info, "'if' condition '' makes no sense")
++
++    ifcond =3D expr.get('if')
++    if ifcond is None:
++        return
++    elif isinstance(ifcond, list):
++        if ifcond =3D=3D []:
++            raise QAPISemError(info, "'if' condition [] is useless")
++        for elt in ifcond:
++            check_if_str(elt, info)
++    else:
++        check_if_str(ifcond, info)
++
++
+ def check_type(info, source, value, allow_array=3DFalse,
+                allow_dict=3DFalse, allow_optional=3DFalse,
+                allow_metas=3D[]):
+@@ -876,6 +897,8 @@ def check_keys(expr_elem, meta, required, optional=3D=
+[]):
+             raise QAPISemError(info,
+                                "'%s' of %s '%s' should only use true val=
+ue"
+                                % (key, meta, name))
++        if key =3D=3D 'if':
++            check_if(expr, info)
+     for key in required:
+         if key not in expr:
+             raise QAPISemError(info, "Key '%s' is missing from %s '%s'"
+@@ -904,27 +927,28 @@ def check_exprs(exprs):
 =20
--    const char example_qmp_schema_json[] =3D "["
--        "{\"arg-type\": \"0\", \"meta-type\": \"event\", \"name\": \"MY_=
-EVENT\"}, "
--        "{\"arg-type\": \"1\", \"meta-type\": \"command\", \"name\": \"m=
-y-command\", \"ret-type\": \"2\"}, "
--        "{\"members\": [], \"meta-type\": \"object\", \"name\": \"0\"}, =
-"
--        "{\"members\": [{\"name\": \"arg1\", \"type\": \"[2]\"}], \"meta=
--type\": \"object\", \"name\": \"1\"}, "
--        "{\"members\": [{\"name\": \"integer\", \"type\": \"int\"}, {\"d=
-efault\": null, \"name\": \"string\", \"type\": \"str\"}], \"meta-type\":=
- \"object\", \"name\": \"2\"}, "
--        "{\"element-type\": \"2\", \"meta-type\": \"array\", \"name\": \=
-"[2]\"}, "
--        "{\"json-type\": \"int\", \"meta-type\": \"builtin\", \"name\": =
-\"int\"}, "
--        "{\"json-type\": \"string\", \"meta-type\": \"builtin\", \"name\=
-": \"str\"}]";
-+    const QLitObject example_qmp_schema_qlit =3D QLIT_QLIST(((QLitObject=
-[]) {
-+        QLIT_QDICT(((QLitDictEntry[]) {
-+            { "arg-type", QLIT_QSTR("0") },
-+            { "meta-type", QLIT_QSTR("event") },
-+            { "name", QLIT_QSTR("Event") },
-+            { }
-+        })),
-+        QLIT_QDICT(((QLitDictEntry[]) {
-+            { "members", QLIT_QLIST(((QLitObject[]) {
-+                { }
-+            })) },
-+            { "meta-type", QLIT_QSTR("object") },
-+            { "name", QLIT_QSTR("0") },
-+            { }
-+        })),
-+        ...
-+        { }
-+    }));
-diff --git a/monitor.c b/monitor.c
-index d0e8d350fd..877b90f16d 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -956,7 +956,7 @@ EventInfoList *qmp_query_events(Error **errp)
- static void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
-                                  Error **errp)
+         if 'enum' in expr:
+             meta =3D 'enum'
+-            check_keys(expr_elem, 'enum', ['data'], ['prefix'])
++            check_keys(expr_elem, 'enum', ['data'], ['if', 'prefix'])
+             enum_types[expr[meta]] =3D expr
+         elif 'union' in expr:
+             meta =3D 'union'
+             check_keys(expr_elem, 'union', ['data'],
+-                       ['base', 'discriminator'])
++                       ['base', 'discriminator', 'if'])
+             union_types[expr[meta]] =3D expr
+         elif 'alternate' in expr:
+             meta =3D 'alternate'
+-            check_keys(expr_elem, 'alternate', ['data'])
++            check_keys(expr_elem, 'alternate', ['data'], ['if'])
+         elif 'struct' in expr:
+             meta =3D 'struct'
+-            check_keys(expr_elem, 'struct', ['data'], ['base'])
++            check_keys(expr_elem, 'struct', ['data'], ['base', 'if'])
+             struct_types[expr[meta]] =3D expr
+         elif 'command' in expr:
+             meta =3D 'command'
+             check_keys(expr_elem, 'command', [],
+-                       ['data', 'returns', 'gen', 'success-response', 'b=
+oxed'])
++                       ['data', 'returns', 'gen', 'success-response', 'b=
+oxed',
++                        'if'])
+         elif 'event' in expr:
+             meta =3D 'event'
+-            check_keys(expr_elem, 'event', [], ['data', 'boxed'])
++            check_keys(expr_elem, 'event', [], ['data', 'boxed', 'if'])
+         else:
+             raise QAPISemError(expr_elem['info'],
+                                "Expression is missing metatype")
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index d71adf3996..a060ce24b7 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -429,6 +429,10 @@ qapi-schema +=3D args-unknown.json
+ qapi-schema +=3D bad-base.json
+ qapi-schema +=3D bad-data.json
+ qapi-schema +=3D bad-ident.json
++qapi-schema +=3D bad-if.json
++qapi-schema +=3D bad-if-empty.json
++qapi-schema +=3D bad-if-empty-list.json
++qapi-schema +=3D bad-if-list.json
+ qapi-schema +=3D bad-type-bool.json
+ qapi-schema +=3D bad-type-dict.json
+ qapi-schema +=3D bad-type-int.json
+diff --git a/tests/qapi-schema/bad-if-empty-list.err b/tests/qapi-schema/=
+bad-if-empty-list.err
+new file mode 100644
+index 0000000000..75fe6497bc
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-empty-list.err
+@@ -0,0 +1 @@
++tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] is useless
+diff --git a/tests/qapi-schema/bad-if-empty-list.exit b/tests/qapi-schema=
+/bad-if-empty-list.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-empty-list.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/bad-if-empty-list.json b/tests/qapi-schema=
+/bad-if-empty-list.json
+new file mode 100644
+index 0000000000..94f2eb8670
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-empty-list.json
+@@ -0,0 +1,3 @@
++# check empty 'if' list
++{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
++  'if': [] }
+diff --git a/tests/qapi-schema/bad-if-empty-list.out b/tests/qapi-schema/=
+bad-if-empty-list.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/bad-if-empty.err b/tests/qapi-schema/bad-i=
+f-empty.err
+new file mode 100644
+index 0000000000..358bdc3e51
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-empty.err
+@@ -0,0 +1 @@
++tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' makes no sense
+diff --git a/tests/qapi-schema/bad-if-empty.exit b/tests/qapi-schema/bad-=
+if-empty.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-empty.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/bad-if-empty.json b/tests/qapi-schema/bad-=
+if-empty.json
+new file mode 100644
+index 0000000000..fe1dd4eca6
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-empty.json
+@@ -0,0 +1,3 @@
++# check empty 'if'
++{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
++  'if': '' }
+diff --git a/tests/qapi-schema/bad-if-empty.out b/tests/qapi-schema/bad-i=
+f-empty.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/bad-if-list.err b/tests/qapi-schema/bad-if=
+-list.err
+new file mode 100644
+index 0000000000..0af6316f78
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-list.err
+@@ -0,0 +1 @@
++tests/qapi-schema/bad-if-list.json:2: 'if' condition '' makes no sense
+diff --git a/tests/qapi-schema/bad-if-list.exit b/tests/qapi-schema/bad-i=
+f-list.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-list.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/bad-if-list.json b/tests/qapi-schema/bad-i=
+f-list.json
+new file mode 100644
+index 0000000000..49ced9b9ca
+--- /dev/null
++++ b/tests/qapi-schema/bad-if-list.json
+@@ -0,0 +1,3 @@
++# check invalid 'if' content
++{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
++  'if': ['foo', ''] }
+diff --git a/tests/qapi-schema/bad-if-list.out b/tests/qapi-schema/bad-if=
+-list.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/bad-if.err b/tests/qapi-schema/bad-if.err
+new file mode 100644
+index 0000000000..c2e3f5f44c
+--- /dev/null
++++ b/tests/qapi-schema/bad-if.err
+@@ -0,0 +1 @@
++tests/qapi-schema/bad-if.json:2: 'if' condition must be a string or a li=
+st of strings
+diff --git a/tests/qapi-schema/bad-if.exit b/tests/qapi-schema/bad-if.exi=
+t
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/bad-if.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/bad-if.json b/tests/qapi-schema/bad-if.jso=
+n
+new file mode 100644
+index 0000000000..3edd1a0bf2
+--- /dev/null
++++ b/tests/qapi-schema/bad-if.json
+@@ -0,0 +1,3 @@
++# check invalid 'if' type
++{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
++  'if': { 'value': 'defined(TEST_IF_STRUCT)' } }
+diff --git a/tests/qapi-schema/bad-if.out b/tests/qapi-schema/bad-if.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index c72dbd8050..b997b2d43d 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -188,3 +188,23 @@
+   'data': { 'a': ['__org.qemu_x-Enum'], 'b': ['__org.qemu_x-Struct'],
+             'c': '__org.qemu_x-Union2', 'd': '__org.qemu_x-Alt' },
+   'returns': '__org.qemu_x-Union1' }
++
++# test 'if' condition handling
++
++{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
++  'if': 'defined(TEST_IF_STRUCT)' }
++
++{ 'enum': 'TestIfEnum', 'data': [ 'foo', 'bar' ],
++  'if': 'defined(TEST_IF_ENUM)' }
++
++{ 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
++  'if': 'defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)' }
++
++{ 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
+ruct' },
++  'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
++
++{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct' },
++  'if': ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'] }
++
++{ 'event': 'TestIfEvent', 'data': { 'foo': 'TestIfStruct' },
++  'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 012e7fc06a..b11682314c 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -230,3 +230,25 @@ object q_obj___org.qemu_x-command-arg
+     member d: __org.qemu_x-Alt optional=3DFalse
+ command __org.qemu_x-command q_obj___org.qemu_x-command-arg -> __org.qem=
+u_x-Union1
+    gen=3DTrue success_response=3DTrue boxed=3DFalse
++object TestIfStruct
++    member foo: int optional=3DFalse
++enum TestIfEnum ['foo', 'bar']
++object q_obj_TestStruct-wrapper
++    member data: TestStruct optional=3DFalse
++enum TestIfUnionKind ['foo']
++object TestIfUnion
++    member type: TestIfUnionKind optional=3DFalse
++    tag type
++    case foo: q_obj_TestStruct-wrapper
++alternate TestIfAlternate
++    tag type
++    case foo: int
++    case bar: TestStruct
++object q_obj_TestIfCmd-arg
++    member foo: TestIfStruct optional=3DFalse
++command TestIfCmd q_obj_TestIfCmd-arg -> None
++   gen=3DTrue success_response=3DTrue boxed=3DFalse
++object q_obj_TestIfEvent-arg
++    member foo: TestIfStruct optional=3DFalse
++event TestIfEvent q_obj_TestIfEvent-arg
++   boxed=3DFalse
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 5b1cee6912..c0a3c46439 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -12,6 +12,12 @@
+=20
+ static QmpCommandList qmp_commands;
+=20
++/* #if defined(TEST_IF_CMD) */
++void qmp_TestIfCmd(TestIfStruct *foo, Error **errp)
++{
++}
++/* #endif */
++
+ void qmp_user_def_cmd(Error **errp)
  {
--    *ret_data =3D qobject_from_json(qmp_schema_json, &error_abort);
-+    *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
  }
-=20
- /*
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 6c86673a09..e5c491d936 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -13,26 +13,35 @@ See the COPYING file in the top-level directory.
- from qapi.common import *
-=20
-=20
--# Caveman's json.dumps() replacement (we're stuck at Python 2.4)
--# TODO try to use json.dumps() once we get unstuck
--def to_json(obj, level=3D0):
-+def to_qlit(obj, level=3D0, suppress_first_indent=3DFalse):
-+
-+    def indent(level):
-+        return level * 4 * ' '
-+
-+    if not suppress_first_indent:
-+        ret =3D indent(level)
-     if obj is None:
--        ret =3D 'null'
-+        ret =3D 'QLIT_QNULL'
-     elif isinstance(obj, str):
--        ret =3D '"' + obj.replace('"', r'\"') + '"'
-+        ret =3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
-     elif isinstance(obj, list):
--        elts =3D [to_json(elt, level + 1)
-+        elts =3D [to_qlit(elt, level + 1)
-                 for elt in obj]
--        ret =3D '[' + ', '.join(elts) + ']'
-+        elts.append(indent(level + 1) + "{}")
-+        ret =3D 'QLIT_QLIST(((QLitObject[]) {\n'
-+        ret +=3D ',\n'.join(elts) + '\n'
-+        ret +=3D indent(level) + '}))'
-     elif isinstance(obj, dict):
--        elts =3D ['"%s": %s' % (key.replace('"', r'\"'),
--                              to_json(obj[key], level + 1))
--                for key in sorted(obj.keys())]
--        ret =3D '{' + ', '.join(elts) + '}'
-+        elts =3D []
-+        for key, value in sorted(obj.iteritems()):
-+            elts.append(indent(level + 1) + '{ %s, %s }' %
-+                        (to_c_string(key), to_qlit(value, level + 1, Tru=
-e)))
-+        elts.append(indent(level + 1) + '{}')
-+        ret =3D 'QLIT_QDICT(((QLitDictEntry[]) {\n'
-+        ret +=3D ',\n'.join(elts) + '\n'
-+        ret +=3D indent(level) + '}))'
-     else:
-         assert False                # not implemented
--    if level =3D=3D 1:
--        ret =3D '\n' + ret
-     return ret
-=20
-=20
-@@ -48,38 +57,41 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaMonoli=
-thicCVisitor):
-             ' * QAPI/QMP schema introspection', __doc__)
-         self._unmask =3D unmask
-         self._schema =3D None
--        self._jsons =3D []
-+        self._qlits =3D None
-+        self._used_types =3D None
-+        self._name_map =3D None
-+
-+    def visit_begin(self, schema):
-+        self._schema =3D schema
-+        self._qlits =3D []
-         self._used_types =3D []
-         self._name_map =3D {}
--        var =3D c_name(self._prefix, protect=3DFalse) + 'qmp_schema_json=
-'
-+        var =3D c_name(self._prefix, protect=3DFalse) + 'qmp_schema_qlit=
-'
-         self._genc.add(mcgen('''
- #include "qemu/osdep.h"
- #include "%(prefix)sqapi-introspect.h"
-=20
--const char %(var)s[] =3D ''',
--                             var=3Dvar, prefix=3Dprefix))
-+const QLitObject %(var)s =3D ''',
-+                             var=3Dvar, prefix=3Dself._prefix))
-         self._genh.add(mcgen('''
--extern const char %(var)s[];
-+#include "qapi/qmp/qlit.h"
-+
-+extern const QLitObject %(var)s;
- ''',
-                              var=3Dvar))
-=20
--    def visit_begin(self, schema):
--        self._schema =3D schema
--
-     def visit_end(self):
-         # visit the types that are actually used
-         for typ in self._used_types:
-             typ.visit(self)
-         # generate C
-         # TODO can generate awfully long lines
--        lines =3D to_json(self._jsons).split('\n')
--        c_string =3D '\n    '.join([to_c_string(line) for line in lines]=
-)
-         self._genc.add(mcgen('''
- %(c_string)s;
- ''',
--                             c_string=3Dc_string))
-+                             c_string=3Dto_qlit(self._qlits)))
-         self._schema =3D None
--        self._jsons =3D []
-+        self._qlits =3D None
-         self._used_types =3D []
-         self._name_map =3D {}
-=20
-@@ -113,12 +125,12 @@ extern const char %(var)s[];
-             return '[' + self._use_type(typ.element_type) + ']'
-         return self._name(typ.name)
-=20
--    def _gen_json(self, name, mtype, obj):
-+    def _gen_qlit(self, name, mtype, obj):
-         if mtype not in ('command', 'event', 'builtin', 'array'):
-             name =3D self._name(name)
-         obj['name'] =3D name
-         obj['meta-type'] =3D mtype
--        self._jsons.append(obj)
-+        self._qlits.append(obj)
-=20
-     def _gen_member(self, member):
-         ret =3D {'name': member.name, 'type': self._use_type(member.type=
-)}
-@@ -134,24 +146,24 @@ extern const char %(var)s[];
-         return {'case': variant.name, 'type': self._use_type(variant.typ=
-e)}
-=20
-     def visit_builtin_type(self, name, info, json_type):
--        self._gen_json(name, 'builtin', {'json-type': json_type})
-+        self._gen_qlit(name, 'builtin', {'json-type': json_type})
-=20
-     def visit_enum_type(self, name, info, values, prefix):
--        self._gen_json(name, 'enum', {'values': values})
-+        self._gen_qlit(name, 'enum', {'values': values})
-=20
-     def visit_array_type(self, name, info, element_type):
-         element =3D self._use_type(element_type)
--        self._gen_json('[' + element + ']', 'array', {'element-type': el=
-ement})
-+        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement})
-=20
-     def visit_object_type_flat(self, name, info, members, variants):
-         obj =3D {'members': [self._gen_member(m) for m in members]}
-         if variants:
-             obj.update(self._gen_variants(variants.tag_member.name,
-                                           variants.variants))
--        self._gen_json(name, 'object', obj)
-+        self._gen_qlit(name, 'object', obj)
-=20
-     def visit_alternate_type(self, name, info, variants):
--        self._gen_json(name, 'alternate',
-+        self._gen_qlit(name, 'alternate',
-                        {'members': [{'type': self._use_type(m.type)}
-                                     for m in variants.variants]})
-=20
-@@ -159,13 +171,13 @@ extern const char %(var)s[];
-                       gen, success_response, boxed):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         ret_type =3D ret_type or self._schema.the_empty_object_type
--        self._gen_json(name, 'command',
-+        self._gen_qlit(name, 'command',
-                        {'arg-type': self._use_type(arg_type),
-                         'ret-type': self._use_type(ret_type)})
-=20
-     def visit_event(self, name, info, arg_type, boxed):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
--        self._gen_json(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)})
-+        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)})
-=20
-=20
- def gen_introspect(schema, output_dir, prefix, opt_unmask):
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
-t-visitor.c
-index 79b1a8cb17..55db6bdef1 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -1250,24 +1250,27 @@ static void test_visitor_in_fail_alternate(TestIn=
-putVisitorData *data,
- }
-=20
- static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *data=
-,
--                                              const char *schema_json)
-+                                              const QLitObject *qlit)
- {
-     SchemaInfoList *schema =3D NULL;
-+    QObject *obj =3D qobject_from_qlit(qlit);
-     Visitor *v;
-=20
--    v =3D visitor_input_test_init_raw(data, schema_json);
-+    v =3D qobject_input_visitor_new(obj);
-=20
-     visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
-     g_assert(schema);
-=20
-     qapi_free_SchemaInfoList(schema);
-+    qobject_decref(obj);
-+    visit_free(v);
- }
-=20
- static void test_visitor_in_qmp_introspect(TestInputVisitorData *data,
-                                            const void *unused)
- {
--    do_test_visitor_in_qmp_introspect(data, test_qmp_schema_json);
--    do_test_visitor_in_qmp_introspect(data, qmp_schema_json);
-+    do_test_visitor_in_qmp_introspect(data, &test_qmp_schema_qlit);
-+    do_test_visitor_in_qmp_introspect(data, &qmp_schema_qlit);
- }
-=20
- int main(int argc, char **argv)
 --=20
 2.13.6
