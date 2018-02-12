@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elICk-0005Eb-K6
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:47:52 -0500
+	(envelope-from <berrange@redhat.com>) id 1elIDR-0005pU-SV
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:48:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elICi-0007P4-2u
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:47:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54452 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1elIDK-00005g-V1
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:48:33 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35060 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elICh-0007OB-Sh
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:47:47 -0500
-References: <20180212142506.28445-1-danielhb@linux.vnet.ibm.com>
-	<20180212142506.28445-2-danielhb@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0fc757fc-427d-65cf-910b-a2e611177f46@redhat.com>
-Date: Mon, 12 Feb 2018 11:47:29 -0600
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1elIDK-0008VO-AB
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:48:26 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90A9E9BA98
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 17:48:25 +0000 (UTC)
+Date: Mon, 12 Feb 2018 17:48:22 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180212174822.GZ4071@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180125155915.3226-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180212142506.28445-2-danielhb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] dump.c: allow fd_write_vmcore to
- return errno on failure
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180125155915.3226-1-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: convert socket server to
+ QIONetListener
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +35,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, Yasmin Beatriz <yasmins@linux.vnet.ibm.com>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 02/12/2018 08:25 AM, Daniel Henrique Barboza wrote:
-> From: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
-> 
-> fd_write_vmcore can fail to execute for a lot of reasons that can be
-> retrieved by errno, but it only returns -1. This makes difficult for
-> the caller to know what happened and only a generic error message is
-> propagated back to the user. This is an example using dump-guest-memory:
-> 
-> (qemu) dump-guest-memory /home/yasmin/mnt/test.dump
-> dump: failed to save memory
-> 
-...
-> This is the same dump-guest-memory example with this patch applied:
-> 
-> (qemu) dump-guest-memory /home/yasmin/mnt/test.dump
-> dump: failed to save memory: No space left on device
-> (qemu)
-> 
-> This example illustrates an error of fd_write_vmcore when called
-> from write_data. All other callers will benefit from better
-> error messages as well.
-> 
-> Reported-by: yilzhang@redhat.com
-> Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> Signed-off-by: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Ping, any thoughts on this ?
+
+NB, it will conflict with the multiple-sockets migration work I
+expect, since IIRC that assumes it can get the GSource ID of the
+migration listener, but that's not valid going forward, since
+the GSource's are private to the QIONetListener. The callers
+just register & unregister the callbacks.
+
+On Thu, Jan 25, 2018 at 03:59:15PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>=20
+> Instead of creating a QIOChannelSocket directly for the migration
+> server socket, use a QIONetListener. This provides the ability
+> to listen on multiple sockets at the same time, so enables
+> full support for IPv4/IPv6 dual stack.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->   dump.c | 23 ++++++++++++++---------
->   1 file changed, 14 insertions(+), 9 deletions(-)
-> 
+>  migration/socket.c | 48 ++++++++++++++++------------------------------=
+--
+>  1 file changed, 16 insertions(+), 32 deletions(-)
+>=20
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 3a8232dd2d..d0ef50765c 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -24,6 +24,7 @@
+>  #include "migration.h"
+>  #include "qemu-file.h"
+>  #include "io/channel-socket.h"
+> +#include "io/net-listener.h"
+>  #include "trace.h"
+> =20
+> =20
+> @@ -130,34 +131,20 @@ void unix_start_outgoing_migration(MigrationState=
+ *s,
+>  }
+> =20
+> =20
+> -static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+> -                                                 GIOCondition conditio=
+n,
+> -                                                 gpointer opaque)
+> +static void socket_accept_incoming_migration(QIONetListener *listener,
+> +                                             QIOChannelSocket *cioc,
+> +                                             gpointer opaque)
+>  {
+> -    QIOChannelSocket *sioc;
+> -    Error *err =3D NULL;
+> -
+> -    sioc =3D qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+> -                                     &err);
+> -    if (!sioc) {
+> -        error_report("could not accept migration connection (%s)",
+> -                     error_get_pretty(err));
+> -        goto out;
+> -    }
+> -
+>      trace_migration_socket_incoming_accepted();
+> =20
+> -    qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming=
+");
+> -    migration_channel_process_incoming(QIO_CHANNEL(sioc));
+> -    object_unref(OBJECT(sioc));
+> +    qio_channel_set_name(QIO_CHANNEL(cioc), "migration-socket-incoming=
+");
+> +    migration_channel_process_incoming(QIO_CHANNEL(cioc));
+> =20
+> -out:
+>      if (migration_has_all_channels()) {
+>          /* Close listening socket as its no longer needed */
+> -        qio_channel_close(ioc, NULL);
+> -        return G_SOURCE_REMOVE;
+> -    } else {
+> -        return G_SOURCE_CONTINUE;
+> +        qio_net_listener_disconnect(listener);
+> +
+> +        object_unref(OBJECT(listener));
+>      }
+>  }
+> =20
+> @@ -165,21 +152,18 @@ out:
+>  static void socket_start_incoming_migration(SocketAddress *saddr,
+>                                              Error **errp)
+>  {
+> -    QIOChannelSocket *listen_ioc =3D qio_channel_socket_new();
+> +    QIONetListener *listener =3D qio_net_listener_new();
+> =20
+> -    qio_channel_set_name(QIO_CHANNEL(listen_ioc),
+> -                         "migration-socket-listener");
+> +    qio_net_listener_set_name(listener, "migration-socket-listener");
+> =20
+> -    if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
+> -        object_unref(OBJECT(listen_ioc));
+> +    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
+> +        object_unref(OBJECT(listener));
+>          return;
+>      }
+> =20
+> -    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
+> -                          G_IO_IN,
+> -                          socket_accept_incoming_migration,
+> -                          listen_ioc,
+> -                          (GDestroyNotify)object_unref);
+> +    qio_net_listener_set_client_func(listener,
+> +                                     socket_accept_incoming_migration,
+> +                                     NULL, NULL);
+>  }
+> =20
+>  void tcp_start_incoming_migration(const char *host_port, Error **errp)
+> --=20
+> 2.14.3
+>=20
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
