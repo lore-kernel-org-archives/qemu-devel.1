@@ -1,28 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1elC1J-0000JT-9k
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:11:38 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1elC5y-00031N-TQ
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:16:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1elC1F-0001NI-V8
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:11:37 -0500
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:49547)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1elC1F-0001Ln-Or
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:11:33 -0500
-Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 09B9CA192F
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 12:11:31 +0100 (CET)
-Date: Mon, 12 Feb 2018 12:11:27 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180212120830.38b1470e@bahia.lan>
-In-Reply-To: <20180210092307.GQ11634@umbus.fritz.box>
-References: <20180209081858.27013-1-lvivier@redhat.com>
-	<20180209150649.7f557ff9@bahia.lan>
-	<20180210092307.GQ11634@umbus.fritz.box>
+	(envelope-from <borntraeger@de.ibm.com>) id 1elC5u-0007Ou-SX
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:16:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1elC5u-0007N6-GE
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 06:16:22 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1CBFXmq125095
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 06:16:20 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g3975hprg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 06:16:19 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 12 Feb 2018 11:16:16 -0000
+References: <20180123140201.31163-1-kwolf@redhat.com>
+	<20180123140201.31163-7-kwolf@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 12 Feb 2018 12:16:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180123140201.31163-7-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: set vsmt to MAX(8, smp_threads)
+Message-Id: <ffb4a2c5-1335-20f8-2760-b9cdd9e32600@de.ibm.com>
+Subject: Re: [Qemu-devel] [PULL 06/29] iotests: Make BD-{remove,
+ insert}-medium use @id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,141 +43,739 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-s390x <qemu-s390x@nongnu.org>
 
-On Sat, 10 Feb 2018 20:23:07 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Fri, Feb 09, 2018 at 03:06:49PM +0100, Greg Kurz wrote:
-> > On Fri,  9 Feb 2018 09:18:58 +0100
-> > Laurent Vivier <lvivier@redhat.com> wrote:
-> >   
-> > > We ignore silently the value of smp_threads when we set
-> > > the default VSMT value, and if smp_threads is greater than VSMT
-> > > kernel is going into trouble later.
-> > >   
-> > 
-> > Hi Laurent,
-> > 
-> > I've looked a bit more and I'm not sure what kernel troubles you're referring to,
-> > but several places in QEMU where we use kvm_ppc_smt() later on do assume that
-> > smp_threads > kvm_ppc_smt(). Basically, everywhere we compute a vCPU id:
-> > 
-> > In spapr_init_cpus() when creating DRC connectors:
-> > 
-> >         int core_id = i * smp_threads;
-> > 
-> >         if (mc->has_hotpluggable_cpus) {
-> >             spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
-> >                                    (core_id / smp_threads) * smt);
-> >         }
-> > 
-> > or in spapr_cpu_core_realize() when creating vCPUs:
-> > 
-> >         cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
-> > 
-> > It is visible by adding some printfs in the current code base. This is what
-> > happens when passing -smp cores=2,threads=16 without your patch:
-> > 
-> > DRC connector to vcpu_id 0
-> > CPU vcpu_id 0
-> > CPU vcpu_id 1
-> > CPU vcpu_id 2
-> > CPU vcpu_id 3
-> > CPU vcpu_id 4
-> > CPU vcpu_id 5
-> > CPU vcpu_id 6
-> > CPU vcpu_id 7
-> > CPU vcpu_id 8
-> > CPU vcpu_id 9
-> > CPU vcpu_id 10
-> > CPU vcpu_id 11
-> > CPU vcpu_id 12
-> > CPU vcpu_id 13
-> > CPU vcpu_id 14
-> > CPU vcpu_id 15
-> > DRC connector to vcpu_id 8
-> >                         ^^^
-> >                      should be 16
-> > CPU vcpu_id 8
-> >            ^^^
-> >    should start numbering at 16
-> > CPU vcpu_id 9
-> > CPU vcpu_id 10
-> > CPU vcpu_id 11
-> > CPU vcpu_id 12
-> > CPU vcpu_id 13
-> > CPU vcpu_id 14
-> > CPU vcpu_id 15
-> > CPU vcpu_id 16
-> > CPU vcpu_id 17
-> > CPU vcpu_id 18
-> > CPU vcpu_id 19
-> > CPU vcpu_id 20
-> > CPU vcpu_id 21
-> > CPU vcpu_id 22
-> > CPU vcpu_id 23
-> > qemu-system-ppc64: kvm_init_vcpu failed: File exists
-> >                                               ^^^^
-> >                                  CPU 8 already created by the first core
-> > 
-> > I'm not feeling comfortable with the rest of the code silently depending on
-> > the fact that spapr_set_vsmt_mode() terminates QEMU if it cannot enforce
-> > smp_threads <= kvm_ppc_smt().  
+On 01/23/2018 03:01 PM, Kevin Wolf wrote:
+> From: Max Reitz <mreitz@redhat.com>
 > 
-> I'm not quite sure what you're suggesting as an alternative, though.
+> In some cases, these commands still use the deprecated @device
+> parameter.  Fix that so we can later drop that parameter from their
+> interface.
 > 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Message-id: 20171110224302.14424-2-mreitz@redhat.com
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/118 | 184 +++++++++++++++++++++++--------------------------
+>  tests/qemu-iotests/155 |  60 ++++++++--------
 
-I haven't suggested anything yet :)
+This broke 155 on s390:
 
-But I was thinking of:
-- having a single function to compute the vcpu_id, instead of open-coding
-  the formula in several places like the current code does,
-- this function should ensure all pre-requisites to compute the vcpu_id are
-  met (including trying to set VSMT) or return an error
+-...................
++EEEEEEEEEEEEEEEEEEE
++======================================================================
++ERROR: testFull (__main__.TestBlockdevMirrorBacking)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "155", line 68, in setUp
++    self.vm.launch()
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qemu.py", line 203, in launch
++    self._post_launch()
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qtest.py", line 100, in _post_launch
++    super(QEMUQtestMachine, self)._post_launch()
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qemu.py", line 181, in _post_launch
++    self._qmp.accept()
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py", line 157, in accept
++    return self.__negotiate_capabilities()
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py", line 75, in __negotiate_capabilities
++    resp = self.cmd('qmp_capabilities')
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py", line 191, in cmd
++    return self.cmd_obj(qmp_cmd)
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py", line 174, in cmd_obj
++    resp = self.__json_read()
++  File "/home/cborntra/REPOS/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py", line 82, in __json_read
++    data = self.__sockfile.readline()
++  File "/usr/lib64/python2.7/socket.py", line 451, in readline
++    data = self._sock.recv(self._rbufsize)
++error: [Errno 104] Connection reset by peer
+[...]
 
-> > 
-> > Anyway, with your patch, the same command line as above gives:
-> > 
-> > qemu-system-ppc64: Failed to set KVM's VSMT mode to 16 (errno -22)
-> > On PPC, a VM with 16 threads/core on a host with 8 threads/core requires
-> >  the use of VSMT mode 16.
-> > This KVM seems to be too old to support VSMT.
-> > 
-> > This hammer is big enough to fix the vCPU ids miscalculations, so:
-> > 
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> >   
-> > > Fixes: 8904e5a750
-> > > ("spapr: Adjust default VSMT value for better migration compatibility")
-> > > 
-> > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> > > ---
-> > > 
-> > > Notes:
-> > >     v3: use MAX(8, smp_threads) and let KVM to return an error
-> > >         if nb_threads is too big
-> > >         update subject to reflect the change
-> > >     
-> > >     v2: display a specific error message when the default VSMT is used
-> > >         fix subject
-> > > 
-> > >  hw/ppc/spapr.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 32a876be56..c8a1eefa17 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2310,7 +2310,7 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
-> > >           * the value that we'd get with KVM on POWER8, the
-> > >           * overwhelmingly common case in production systems.
-> > >           */
-> > > -        spapr->vsmt = 8;
-> > > +        spapr->vsmt = MAX(8, smp_threads);
-> > >      }
-> > >  
-> > >      /* KVM: If necessary, set the SMT mode: */  
-> >   
+
+
+>  2 files changed, 113 insertions(+), 131 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
+> index 8a9e838c90..ca6965d23c 100755
+> --- a/tests/qemu-iotests/118
+> +++ b/tests/qemu-iotests/118
+> @@ -28,6 +28,14 @@ from iotests import qemu_img
+>  old_img = os.path.join(iotests.test_dir, 'test0.img')
+>  new_img = os.path.join(iotests.test_dir, 'test1.img')
+> 
+> +def interface_to_device_name(interface):
+> +    if interface == 'ide':
+> +        return 'ide-cd'
+> +    elif interface == 'floppy':
+> +        return 'floppy'
+> +    else:
+> +        return None
+> +
+>  class ChangeBaseClass(iotests.QMPTestCase):
+>      has_opened = False
+>      has_closed = False
+> @@ -63,7 +71,7 @@ class ChangeBaseClass(iotests.QMPTestCase):
+> 
+>  class GeneralChangeTestsBaseClass(ChangeBaseClass):
+> 
+> -    device_name = None
+> +    device_name = 'qdev0'
+> 
+>      def test_change(self):
+>          result = self.vm.qmp('change', device='drive0', target=new_img,
+> @@ -79,14 +87,9 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+> 
+>      def test_blockdev_change_medium(self):
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('blockdev-change-medium',
+> -                                 id=self.device_name, filename=new_img,
+> -                                 format=iotests.imgfmt)
+> -        else:
+> -            result = self.vm.qmp('blockdev-change-medium',
+> -                                 device='drive0', filename=new_img,
+> -                                 format=iotests.imgfmt)
+> +        result = self.vm.qmp('blockdev-change-medium',
+> +                             id=self.device_name, filename=new_img,
+> +                             format=iotests.imgfmt)
+> 
+>          self.assert_qmp(result, 'return', {})
+> 
+> @@ -99,10 +102,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+> 
+>      def test_eject(self):
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('eject', id=self.device_name, force=True)
+> -        else:
+> -            result = self.vm.qmp('eject', device='drive0', force=True)
+> +        result = self.vm.qmp('eject', id=self.device_name, force=True)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> @@ -113,10 +113,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          self.assert_qmp_absent(result, 'return[0]/inserted')
+> 
+>      def test_tray_eject_change(self):
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('eject', id=self.device_name, force=True)
+> -        else:
+> -            result = self.vm.qmp('eject', device='drive0', force=True)
+> +        result = self.vm.qmp('eject', id=self.device_name, force=True)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> @@ -126,12 +123,8 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>              self.assert_qmp(result, 'return[0]/tray_open', True)
+>          self.assert_qmp_absent(result, 'return[0]/inserted')
+> 
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+> -                                 filename=new_img, format=iotests.imgfmt)
+> -        else:
+> -            result = self.vm.qmp('blockdev-change-medium', device='drive0',
+> -                                 filename=new_img, format=iotests.imgfmt)
+> +        result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+> +                             filename=new_img, format=iotests.imgfmt)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_close()
+> @@ -142,12 +135,8 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+> 
+>      def test_tray_open_close(self):
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('blockdev-open-tray',
+> -                                 id=self.device_name, force=True)
+> -        else:
+> -            result = self.vm.qmp('blockdev-open-tray',
+> -                                 device='drive0', force=True)
+> +        result = self.vm.qmp('blockdev-open-tray',
+> +                             id=self.device_name, force=True)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> @@ -160,10 +149,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          else:
+>              self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
+> -        else:
+> -            result = self.vm.qmp('blockdev-close-tray', device='drive0')
+> +        result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          if self.has_real_tray or not self.was_empty:
+> @@ -178,7 +164,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>              self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+>      def test_tray_eject_close(self):
+> -        result = self.vm.qmp('eject', device='drive0', force=True)
+> +        result = self.vm.qmp('eject', id=self.device_name, force=True)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> @@ -188,10 +174,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>              self.assert_qmp(result, 'return[0]/tray_open', True)
+>          self.assert_qmp_absent(result, 'return[0]/inserted')
+> 
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
+> -        else:
+> -            result = self.vm.qmp('blockdev-close-tray', device='drive0')
+> +        result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_close()
+> @@ -202,7 +185,8 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          self.assert_qmp_absent(result, 'return[0]/inserted')
+> 
+>      def test_tray_open_change(self):
+> -        result = self.vm.qmp('blockdev-open-tray', device='drive0', force=True)
+> +        result = self.vm.qmp('blockdev-open-tray', id=self.device_name,
+> +                                                   force=True)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> @@ -215,7 +199,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          else:
+>              self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        result = self.vm.qmp('blockdev-change-medium', device='drive0',
+> +        result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+>                                                         filename=new_img,
+>                                                         format=iotests.imgfmt)
+>          self.assert_qmp(result, 'return', {})
+> @@ -235,12 +219,8 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>                                      'driver': 'file'})
+>          self.assert_qmp(result, 'return', {})
+> 
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('blockdev-open-tray',
+> -                                 id=self.device_name, force=True)
+> -        else:
+> -            result = self.vm.qmp('blockdev-open-tray',
+> -                                 device='drive0', force=True)
+> +        result = self.vm.qmp('blockdev-open-tray',
+> +                             id=self.device_name, force=True)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> @@ -253,11 +233,8 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          else:
+>              self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('x-blockdev-remove-medium',
+> -                                 id=self.device_name)
+> -        else:
+> -            result = self.vm.qmp('x-blockdev-remove-medium', device='drive0')
+> +        result = self.vm.qmp('x-blockdev-remove-medium',
+> +                             id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -265,12 +242,8 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>              self.assert_qmp(result, 'return[0]/tray_open', True)
+>          self.assert_qmp_absent(result, 'return[0]/inserted')
+> 
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('x-blockdev-insert-medium',
+> -                                 id=self.device_name, node_name='new')
+> -        else:
+> -            result = self.vm.qmp('x-blockdev-insert-medium',
+> -                                 device='drive0', node_name='new')
+> +        result = self.vm.qmp('x-blockdev-insert-medium',
+> +                             id=self.device_name, node_name='new')
+>          self.assert_qmp(result, 'return', {})
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -278,10 +251,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>              self.assert_qmp(result, 'return[0]/tray_open', True)
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+> 
+> -        if self.device_name is not None:
+> -            result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
+> -        else:
+> -            result = self.vm.qmp('blockdev-close-tray', device='drive0')
+> +        result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_close()
+> @@ -292,7 +262,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+> 
+>      def test_close_on_closed(self):
+> -        result = self.vm.qmp('blockdev-close-tray', device='drive0')
+> +        result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
+>          # Should be a no-op
+>          self.assert_qmp(result, 'return', {})
+>          self.assertEquals(self.vm.get_qmp_events(wait=False), [])
+> @@ -301,7 +271,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>          if not self.has_real_tray:
+>              return
+> 
+> -        result = self.vm.qmp('x-blockdev-remove-medium', device='drive0')
+> +        result = self.vm.qmp('x-blockdev-remove-medium', id=self.device_name)
+>          self.assert_qmp(result, 'error/class', 'GenericError')
+> 
+>      def test_insert_on_closed(self):
+> @@ -315,7 +285,7 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>                                     'driver': 'file'})
+>          self.assert_qmp(result, 'return', {})
+> 
+> -        result = self.vm.qmp('x-blockdev-insert-medium', device='drive0',
+> +        result = self.vm.qmp('x-blockdev-insert-medium', id=self.device_name,
+>                                                         node_name='new')
+>          self.assert_qmp(result, 'error/class', 'GenericError')
+> 
+> @@ -326,12 +296,10 @@ class TestInitiallyFilled(GeneralChangeTestsBaseClass):
+>          qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
+>          qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
+>          self.vm = iotests.VM()
+> -        if interface == 'ide':
+> -            self.device_name = 'qdev0'
+> -            self.vm.add_drive(old_img, 'media=%s' % media, 'none')
+> -            self.vm.add_device('ide-cd,drive=drive0,id=%s' % self.device_name)
+> -        else:
+> -            self.vm.add_drive(old_img, 'media=%s' % media, interface)
+> +        self.vm.add_drive(old_img, 'media=%s' % media, 'none')
+> +        self.vm.add_device('%s,drive=drive0,id=%s' %
+> +                           (interface_to_device_name(interface),
+> +                            self.device_name))
+>          self.vm.launch()
+> 
+>      def tearDown(self):
+> @@ -347,12 +315,12 @@ class TestInitiallyFilled(GeneralChangeTestsBaseClass):
+>                                     'driver': 'file'})
+>          self.assert_qmp(result, 'return', {})
+> 
+> -        result = self.vm.qmp('blockdev-open-tray', device='drive0')
+> +        result = self.vm.qmp('blockdev-open-tray', id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> 
+> -        result = self.vm.qmp('x-blockdev-insert-medium', device='drive0',
+> +        result = self.vm.qmp('x-blockdev-insert-medium', id=self.device_name,
+>                                                         node_name='new')
+>          self.assert_qmp(result, 'error/class', 'GenericError')
+> 
+> @@ -361,7 +329,10 @@ class TestInitiallyEmpty(GeneralChangeTestsBaseClass):
+> 
+>      def setUp(self, media, interface):
+>          qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
+> -        self.vm = iotests.VM().add_drive(None, 'media=%s' % media, interface)
+> +        self.vm = iotests.VM().add_drive(None, 'media=%s' % media, 'none')
+> +        self.vm.add_device('%s,drive=drive0,id=%s' %
+> +                           (interface_to_device_name(interface),
+> +                            self.device_name))
+>          self.vm.launch()
+> 
+>      def tearDown(self):
+> @@ -369,12 +340,12 @@ class TestInitiallyEmpty(GeneralChangeTestsBaseClass):
+>          os.remove(new_img)
+> 
+>      def test_remove_on_empty(self):
+> -        result = self.vm.qmp('blockdev-open-tray', device='drive0')
+> +        result = self.vm.qmp('blockdev-open-tray', id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.wait_for_open()
+> 
+> -        result = self.vm.qmp('x-blockdev-remove-medium', device='drive0')
+> +        result = self.vm.qmp('x-blockdev-remove-medium', id=self.device_name)
+>          # Should be a no-op
+>          self.assert_qmp(result, 'return', {})
+> 
+> @@ -410,6 +381,8 @@ class TestFloppyInitiallyEmpty(TestInitiallyEmpty):
+>          self.has_opened = True
+> 
+>  class TestChangeReadOnly(ChangeBaseClass):
+> +    device_name = 'qdev0'
+> +
+>      def setUp(self):
+>          qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
+>          qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
+> @@ -425,14 +398,15 @@ class TestChangeReadOnly(ChangeBaseClass):
+>      def test_ro_ro_retain(self):
+>          os.chmod(old_img, 0444)
+>          os.chmod(new_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+>          self.assert_qmp(result, 'return[0]/inserted/ro', True)
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        result = self.vm.qmp('blockdev-change-medium', device='drive0',
+> +        result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+>                                                         filename=new_img,
+>                                                         format=iotests.imgfmt,
+>                                                         read_only_mode='retain')
+> @@ -444,14 +418,15 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_ro_rw_retain(self):
+>          os.chmod(old_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+>          self.assert_qmp(result, 'return[0]/inserted/ro', True)
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        result = self.vm.qmp('blockdev-change-medium', device='drive0',
+> +        result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+>                                                         filename=new_img,
+>                                                         format=iotests.imgfmt,
+>                                                         read_only_mode='retain')
+> @@ -463,14 +438,15 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_rw_ro_retain(self):
+>          os.chmod(new_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+>          self.assert_qmp(result, 'return[0]/inserted/ro', False)
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        result = self.vm.qmp('blockdev-change-medium', device='drive0',
+> +        result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+>                                                         filename=new_img,
+>                                                         format=iotests.imgfmt,
+>                                                         read_only_mode='retain')
+> @@ -484,7 +460,8 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_ro_rw(self):
+>          os.chmod(old_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -492,7 +469,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+>          result = self.vm.qmp('blockdev-change-medium',
+> -                             device='drive0',
+> +                             id=self.device_name,
+>                               filename=new_img,
+>                               format=iotests.imgfmt,
+>                               read_only_mode='read-write')
+> @@ -504,7 +481,8 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_rw_ro(self):
+>          os.chmod(new_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -512,7 +490,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+>          result = self.vm.qmp('blockdev-change-medium',
+> -                             device='drive0',
+> +                             id=self.device_name,
+>                               filename=new_img,
+>                               format=iotests.imgfmt,
+>                               read_only_mode='read-only')
+> @@ -523,7 +501,8 @@ class TestChangeReadOnly(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+> 
+>      def test_make_rw_ro(self):
+> -        self.vm.add_drive(old_img, 'media=disk', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -531,7 +510,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+>          result = self.vm.qmp('blockdev-change-medium',
+> -                             device='drive0',
+> +                             id=self.device_name,
+>                               filename=new_img,
+>                               format=iotests.imgfmt,
+>                               read_only_mode='read-only')
+> @@ -543,7 +522,8 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_make_ro_rw(self):
+>          os.chmod(new_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -551,7 +531,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+>          result = self.vm.qmp('blockdev-change-medium',
+> -                             device='drive0',
+> +                             id=self.device_name,
+>                               filename=new_img,
+>                               format=iotests.imgfmt,
+>                               read_only_mode='read-write')
+> @@ -563,14 +543,15 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_make_rw_ro_by_retain(self):
+>          os.chmod(old_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+>          self.assert_qmp(result, 'return[0]/inserted/ro', True)
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        result = self.vm.qmp('blockdev-change-medium', device='drive0',
+> +        result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+>                                                         filename=new_img,
+>                                                         format=iotests.imgfmt,
+>                                                         read_only_mode='retain')
+> @@ -582,14 +563,15 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_make_ro_rw_by_retain(self):
+>          os.chmod(new_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+>          self.assert_qmp(result, 'return[0]/inserted/ro', False)
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        result = self.vm.qmp('blockdev-change-medium', device='drive0',
+> +        result = self.vm.qmp('blockdev-change-medium', id=self.device_name,
+>                                                         filename=new_img,
+>                                                         format=iotests.imgfmt,
+>                                                         read_only_mode='retain')
+> @@ -601,7 +583,8 @@ class TestChangeReadOnly(ChangeBaseClass):
+> 
+>      def test_rw_ro_cycle(self):
+>          os.chmod(new_img, 0444)
+> -        self.vm.add_drive(old_img, 'media=disk', 'floppy')
+> +        self.vm.add_drive(old_img, 'media=disk', 'none')
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -620,13 +603,13 @@ class TestChangeReadOnly(ChangeBaseClass):
+>          self.assert_qmp(result, 'return[0]/inserted/ro', False)
+>          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+> 
+> -        result = self.vm.qmp('x-blockdev-remove-medium', device='drive0')
+> +        result = self.vm.qmp('x-blockdev-remove-medium', id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          result = self.vm.qmp('query-block')
+>          self.assert_qmp_absent(result, 'return[0]/inserted')
+> 
+> -        result = self.vm.qmp('x-blockdev-insert-medium', device='drive0',
+> +        result = self.vm.qmp('x-blockdev-insert-medium', id=self.device_name,
+>                                                         node_name='new')
+>          self.assert_qmp(result, 'return', {})
+> 
+> @@ -644,11 +627,14 @@ TestInitiallyEmpty = None
+> 
+> 
+>  class TestBlockJobsAfterCycle(ChangeBaseClass):
+> +    device_name = 'qdev0'
+> +
+>      def setUp(self):
+> -        qemu_img('create', '-f', iotests.imgfmt, old_img, '1M')
+> +        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440K')
+> 
+>          self.vm = iotests.VM()
+>          self.vm.add_drive_raw("id=drive0,driver=null-co,if=none")
+> +        self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
+>          self.vm.launch()
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -656,7 +642,7 @@ class TestBlockJobsAfterCycle(ChangeBaseClass):
+> 
+>          # For device-less BBs, calling blockdev-open-tray or blockdev-close-tray
+>          # is not necessary
+> -        result = self.vm.qmp('x-blockdev-remove-medium', device='drive0')
+> +        result = self.vm.qmp('x-blockdev-remove-medium', id=self.device_name)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          result = self.vm.qmp('query-block')
+> @@ -669,7 +655,7 @@ class TestBlockJobsAfterCycle(ChangeBaseClass):
+>                                     'driver': 'file'})
+>          self.assert_qmp(result, 'return', {})
+> 
+> -        result = self.vm.qmp('x-blockdev-insert-medium', device='drive0',
+> +        result = self.vm.qmp('x-blockdev-insert-medium', id=self.device_name,
+>                                                         node_name='node0')
+>          self.assert_qmp(result, 'return', {})
+> 
+> diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
+> index 0b86ea4e5c..fc9fa975be 100755
+> --- a/tests/qemu-iotests/155
+> +++ b/tests/qemu-iotests/155
+> @@ -51,36 +51,30 @@ class BaseClass(iotests.QMPTestCase):
+>      target_real_backing = None
+> 
+>      def setUp(self):
+> -        qemu_img('create', '-f', iotests.imgfmt, back0_img, '1M')
+> +        qemu_img('create', '-f', iotests.imgfmt, back0_img, '1440K')
+>          qemu_img('create', '-f', iotests.imgfmt, '-b', back0_img, back1_img)
+>          qemu_img('create', '-f', iotests.imgfmt, '-b', back1_img, back2_img)
+>          qemu_img('create', '-f', iotests.imgfmt, '-b', back2_img, source_img)
+> 
+>          self.vm = iotests.VM()
+> -        self.vm.add_drive(None, '', 'none')
+> -        self.vm.launch()
+> -
+>          # Add the BDS via blockdev-add so it stays around after the mirror block
+>          # job has been completed
+> -        result = self.vm.qmp('blockdev-add',
+> -                             node_name='source',
+> -                             driver=iotests.imgfmt,
+> -                             file={'driver': 'file',
+> -                                   'filename': source_img})
+> -        self.assert_qmp(result, 'return', {})
+> -
+> -        result = self.vm.qmp('x-blockdev-insert-medium',
+> -                             device='drive0', node_name='source')
+> -        self.assert_qmp(result, 'return', {})
+> +        blockdev = {'node-name': 'source',
+> +                    'driver': iotests.imgfmt,
+> +                    'file': {'driver': 'file',
+> +                             'filename': source_img}}
+> +        self.vm.add_blockdev(self.qmp_to_opts(blockdev))
+> +        self.vm.add_device('floppy,id=qdev0,drive=source')
+> +        self.vm.launch()
+> 
+>          self.assertIntactSourceBackingChain()
+> 
+>          if self.existing:
+>              if self.target_backing:
+>                  qemu_img('create', '-f', iotests.imgfmt,
+> -                         '-b', self.target_backing, target_img, '1M')
+> +                         '-b', self.target_backing, target_img, '1440K')
+>              else:
+> -                qemu_img('create', '-f', iotests.imgfmt, target_img, '1M')
+> +                qemu_img('create', '-f', iotests.imgfmt, target_img, '1440K')
+> 
+>              if self.cmd == 'blockdev-mirror':
+>                  options = { 'node-name': 'target',
+> @@ -104,11 +98,11 @@ class BaseClass(iotests.QMPTestCase):
+>          except OSError:
+>              pass
+> 
+> -    def findBlockNode(self, node_name, id=None):
+> -        if id:
+> +    def findBlockNode(self, node_name, qdev=None):
+> +        if qdev:
+>              result = self.vm.qmp('query-block')
+>              for device in result['return']:
+> -                if device['device'] == id:
+> +                if device['qdev'] == qdev:
+>                      if node_name:
+>                          self.assert_qmp(device, 'inserted/node-name', node_name)
+>                      return device['inserted']
+> @@ -118,7 +112,7 @@ class BaseClass(iotests.QMPTestCase):
+>                  if node['node-name'] == node_name:
+>                      return node
+> 
+> -        self.fail('Cannot find node %s/%s' % (id, node_name))
+> +        self.fail('Cannot find node %s/%s' % (qdev, node_name))
+> 
+>      def assertIntactSourceBackingChain(self):
+>          node = self.findBlockNode('source')
+> @@ -155,22 +149,23 @@ class BaseClass(iotests.QMPTestCase):
+>  class MirrorBaseClass(BaseClass):
+>      def runMirror(self, sync):
+>          if self.cmd == 'blockdev-mirror':
+> -            result = self.vm.qmp(self.cmd, device='drive0', sync=sync,
+> -                                 target='target')
+> +            result = self.vm.qmp(self.cmd, job_id='mirror-job', device='source',
+> +                                 sync=sync, target='target')
+>          else:
+>              if self.existing:
+>                  mode = 'existing'
+>              else:
+>                  mode = 'absolute-paths'
+> -            result = self.vm.qmp(self.cmd, device='drive0', sync=sync,
+> -                                 target=target_img, format=iotests.imgfmt,
+> -                                 mode=mode, node_name='target')
+> +            result = self.vm.qmp(self.cmd, job_id='mirror-job', device='source',
+> +                                 sync=sync, target=target_img,
+> +                                 format=iotests.imgfmt, mode=mode,
+> +                                 node_name='target')
+> 
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.vm.event_wait('BLOCK_JOB_READY')
+> 
+> -        result = self.vm.qmp('block-job-complete', device='drive0')
+> +        result = self.vm.qmp('block-job-complete', device='mirror-job')
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.vm.event_wait('BLOCK_JOB_COMPLETED')
+> @@ -178,21 +173,21 @@ class MirrorBaseClass(BaseClass):
+>      def testFull(self):
+>          self.runMirror('full')
+> 
+> -        node = self.findBlockNode('target', 'drive0')
+> +        node = self.findBlockNode('target', 'qdev0')
+>          self.assertCorrectBackingImage(node, None)
+>          self.assertIntactSourceBackingChain()
+> 
+>      def testTop(self):
+>          self.runMirror('top')
+> 
+> -        node = self.findBlockNode('target', 'drive0')
+> +        node = self.findBlockNode('target', 'qdev0')
+>          self.assertCorrectBackingImage(node, back2_img)
+>          self.assertIntactSourceBackingChain()
+> 
+>      def testNone(self):
+>          self.runMirror('none')
+> 
+> -        node = self.findBlockNode('target', 'drive0')
+> +        node = self.findBlockNode('target', 'qdev0')
+>          self.assertCorrectBackingImage(node, source_img)
+>          self.assertIntactSourceBackingChain()
+> 
+> @@ -233,17 +228,18 @@ class TestCommit(BaseClass):
+>      existing = False
+> 
+>      def testCommit(self):
+> -        result = self.vm.qmp('block-commit', device='drive0', base=back1_img)
+> +        result = self.vm.qmp('block-commit', job_id='commit-job',
+> +                             device='source', base=back1_img)
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.vm.event_wait('BLOCK_JOB_READY')
+> 
+> -        result = self.vm.qmp('block-job-complete', device='drive0')
+> +        result = self.vm.qmp('block-job-complete', device='commit-job')
+>          self.assert_qmp(result, 'return', {})
+> 
+>          self.vm.event_wait('BLOCK_JOB_COMPLETED')
+> 
+> -        node = self.findBlockNode(None, 'drive0')
+> +        node = self.findBlockNode(None, 'qdev0')
+>          self.assert_qmp(node, 'image' + '/backing-image' * 0 + '/filename',
+>                          back1_img)
+>          self.assert_qmp(node, 'image' + '/backing-image' * 1 + '/filename',
 > 
