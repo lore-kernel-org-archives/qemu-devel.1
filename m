@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1elFeh-00075T-Lw
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:04:32 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1elFhb-0000U4-QI
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:07:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1elFee-0000IC-Uu
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:04:31 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1518441241-32557-3-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1518441241-32557-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1518441241-32557-3-git-send-email-anton.nefedov@virtuozzo.com>
-Date: Mon, 12 Feb 2018 16:03:49 +0100
-Message-ID: <w51sha68d2i.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1elFhY-0004Vu-Vb
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:07:31 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57478 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elFhY-0004P1-QZ
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:07:28 -0500
+Date: Mon, 12 Feb 2018 15:07:04 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180212150703.GB2545@work-vm>
+References: <20180205181846.29996-1-dgilbert@redhat.com>
+	<20180212133227.4lmmxomnddrb2vmt@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] block: fix write with zero flag set
- and iovector provided
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180212133227.4lmmxomnddrb2vmt@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] tests/migration: Add source to PC boot
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, eblake@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org, wei@redhat.com, peterx@redhat.com
 
-On Mon 12 Feb 2018 02:14:01 PM CET, Anton Nefedov wrote:
-> The normal bdrv_co_pwritev() use is either
->   - BDRV_REQ_ZERO_WRITE clear and iovector provided
->   - BDRV_REQ_ZERO_WRITE set and iovector == NULL
->
-> while
->   - the flag clear and iovector == NULL is an assertion failure
->     in bdrv_co_do_zero_pwritev()
->   - the flag set and iovector provided is in fact allowed
->     (the flag prevails and zeroes are written)
->
-> However the alignment logic does not support the latter case so the
-> padding areas get overwritten with zeroes.
+* Andrew Jones (drjones@redhat.com) wrote:
+> On Mon, Feb 05, 2018 at 06:18:46PM +0000, Dr. David Alan Gilbert (git) wrote:
+> > diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+> > new file mode 100755
+> > index 0000000000..c40f025e1a
+> > --- /dev/null
+> > +++ b/tests/migration/rebuild-x86-bootblock.sh
+> > @@ -0,0 +1,37 @@
+> > +#!/bin/sh
+> > +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+> > +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> > +# See the COPYING file in the top-level directory.
+> > +#
+> > +# Author: dgilbert@redhat.com
+> > +
+> > +ASMFILE=tests/migration/x86-a-b-bootblock.s
+> > +HEADER=tests/migration/x86-a-b-bootblock.h
+> > +
+> > +if [ ! -e "$ASMFILE" ]
+> > +then
+> > +  echo "Couldn't find $ASMFILE" >&2
+> > +  exit 1
+> > +fi
+> > +
+> > +ASM_WORK_DIR=/tmp/X86BB$$
+> 
+> mktemp?
 
-Oh, so this doesn't simply write zeroes in [offset, offset+bytes), but
-also in the head and tail areas, instead of keeping the previous
-contents.
+Yes, that's probably fair.
 
-This is a pretty serious bug, but I assume it can't be triggered
-(bdrv_pwrite_zeroes() is used in complete clusters). Did you check if
-there was any other scenario where this could happen?
+> > +mkdir $ASM_WORK_DIR &&
+> > +as --32 -march=i486 "$ASMFILE" -o $ASM_WORK_DIR/bb.o &&
+> > +objcopy -O binary $ASM_WORK_DIR/bb.o $ASM_WORK_DIR/bb.boot &&
+> > +dd if=$ASM_WORK_DIR/bb.boot of=$ASM_WORK_DIR/bb.bootsect \
+> > +  bs=256 count=2 skip=124 &&
+> > +xxd -i $ASM_WORK_DIR/bb.bootsect |
+> 
+> Is xxd now considered a common enough tool for portable scripts? I've
+> always liked xxd for manual use, but scripted with 'od'.
 
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+This script isn't part of a normal build or make check or anything, so
+jumping through hoops to make it portable for the mythical other person
+who might ever run it seems OTT, especially since xxd is very common,
+and I'm not sure how much I'd bet on the portability of od's output
+format either.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Dave
 
-Berto
+> > +sed -e 's/_tmp.*_bootsect/x86_bootsect/' -e 's/.*int.*//' > \
+> > +  $ASM_WORK_DIR/bb.hex &&
+> > +cat - $ASM_WORK_DIR/bb.hex <<HERE > "$HEADER"
+> > +/* This file is automatically generated from
+> > + * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> > + * tests/migration/rebuild-x86-bootblock.sh to update,
+> > + * and then remember to send both in your patch submission.
+> > + */
+> > +HERE
+> > +
+> > +rm $ASM_WORK_DIR/bb.hex $ASM_WORK_DIR/bb.bootsect $ASM_WORK_DIR/bb.boot
+> > +rm $ASM_WORK_DIR/bb.o
+> > +rmdir $ASM_WORK_DIR
+> > +
+> 
+> Thanks,
+> drew
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
