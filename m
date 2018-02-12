@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1el4zJ-0007gw-C6
+	(envelope-from <dgibson@ozlabs.org>) id 1el4zJ-0007gp-5J
 	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 22:41:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1el4zH-00067Q-UE
+	(envelope-from <dgibson@ozlabs.org>) id 1el4zH-00067b-UU
 	for qemu-devel@nongnu.org; Sun, 11 Feb 2018 22:41:05 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 12 Feb 2018 14:40:44 +1100
-Message-Id: <20180212034054.23441-3-david@gibson.dropbear.id.au>
+Date: Mon, 12 Feb 2018 14:40:47 +1100
+Message-Id: <20180212034054.23441-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20180212034054.23441-1-david@gibson.dropbear.id.au>
 References: <20180212034054.23441-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/12] hw/ppc: rename functions in comments
+Subject: [Qemu-devel] [PULL 05/12] spapr: set vsmt to MAX(8, smp_threads)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +20,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+From: Laurent Vivier <lvivier@redhat.com>
 
-Commit bcb5ce08cf ("spapr: Rename machine init functions for clarity")
-renamed ppc_spapr_reset to spapr_machine_reset and ppc_spapr_init
-to spapr_machine_init. Let's also rename the references in
-comments.
+We ignore silently the value of smp_threads when we set
+the default VSMT value, and if smp_threads is greater than VSMT
+kernel is going into trouble later.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Fixes: 8904e5a750
+("spapr: Adjust default VSMT value for better migration compatibility")
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c       | 3 ++-
- hw/ppc/spapr_hcall.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ hw/ppc/spapr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 659be6b746..96515036e6 100644
+index 96515036e6..9f29434819 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -464,7 +464,8 @@ static int spapr_populate_memory(sPAPRMachineState *s=
-papr, void *fdt)
-             }
-         }
-         if (!mem_start) {
--            /* ppc_spapr_init() checks for rma_size <=3D node0_size alre=
-ady */
-+            /* spapr_machine_init() checks for rma_size <=3D node0_size
-+             * already */
-             spapr_populate_memory_node(fdt, i, 0, spapr->rma_size);
-             mem_start +=3D spapr->rma_size;
-             node_size -=3D spapr->rma_size;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 596f58378a..76422cfac1 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1635,7 +1635,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
-     spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
-                                                           OV1_PPC_3_00);
-     if (!spapr->cas_reboot) {
--        /* If ppc_spapr_reset() did not set up a HPT but one is necessar=
-y
-+        /* If spapr_machine_reset() did not set up a HPT but one is nece=
-ssary
-          * (because the guest isn't going to use radix) then set it up h=
-ere. */
-         if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
-             /* legacy hash or new hash: */
---=20
+@@ -2310,7 +2310,7 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+          * the value that we'd get with KVM on POWER8, the
+          * overwhelmingly common case in production systems.
+          */
+-        spapr->vsmt = 8;
++        spapr->vsmt = MAX(8, smp_threads);
+     }
+ 
+     /* KVM: If necessary, set the SMT mode: */
+-- 
 2.14.3
