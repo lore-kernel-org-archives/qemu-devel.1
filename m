@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1elMaW-0002DR-Ui
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:42 -0500
+	(envelope-from <bsd@redhat.com>) id 1elMaW-0002DM-Tz
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1elMaR-0001Gb-Ud
+	(envelope-from <bsd@redhat.com>) id 1elMaR-0001Gh-Vu
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:40 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43120 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45062 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1elMaR-0001FM-Nf
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1elMaR-0001FQ-Nj
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:28:35 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 478AF404084B
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 22:28:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B5945EAEA3
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 22:28:29 +0000 (UTC)
 From: Bandan Das <bsd@redhat.com>
-Date: Mon, 12 Feb 2018 17:27:03 -0500
-Message-Id: <20180212222705.12718-4-bsd@redhat.com>
+Date: Mon, 12 Feb 2018 17:27:01 -0500
+Message-Id: <20180212222705.12718-2-bsd@redhat.com>
 In-Reply-To: <20180212222705.12718-1-bsd@redhat.com>
 References: <20180212222705.12718-1-bsd@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] usb-mtp: Support delete of mtp objects
+Subject: [Qemu-devel] [PATCH v2 1/5] usb-mtp: Add one more argument when
+ building results
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,186 +33,212 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kraxel@redhat.com
 
-Write of existing objects by the initiator is acheived by
-making a temporary buffer with the new changes, deleting the
-old file and then writing a new file with the same name.
-Advertise delete support and mark the store READ/WRITE since
-some initiators will fail the operation if the store is marked
-read only.
+The response to a SendObjectInfo consists of the storageid,
+parent obejct handle and the handle reserved for the new
+incoming object
 
 Signed-off-by: Bandan Das <bsd@redhat.com>
 ---
- hw/usb/dev-mtp.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+)
+ hw/usb/dev-mtp.c | 50 +++++++++++++++++++++++++++-----------------------
+ 1 file changed, 27 insertions(+), 23 deletions(-)
 
 diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 63f8f3b90b..5f53f200c4 100644
+index 94c2e94f10..b55aa8205e 100644
 --- a/hw/usb/dev-mtp.c
 +++ b/hw/usb/dev-mtp.c
-@@ -46,6 +46,7 @@ enum mtp_code {
-     CMD_GET_OBJECT_HANDLES         = 0x1007,
-     CMD_GET_OBJECT_INFO            = 0x1008,
-     CMD_GET_OBJECT                 = 0x1009,
-+    CMD_DELETE_OBJECT              = 0x100b,
-     CMD_GET_PARTIAL_OBJECT         = 0x101b,
-     CMD_GET_OBJECT_PROPS_SUPPORTED = 0x9801,
-     CMD_GET_OBJECT_PROP_DESC       = 0x9802,
-@@ -62,6 +63,8 @@ enum mtp_code {
-     RES_INVALID_STORAGE_ID         = 0x2008,
-     RES_INVALID_OBJECT_HANDLE      = 0x2009,
-     RES_INVALID_OBJECT_FORMAT_CODE = 0x200b,
-+    RES_STORE_READ_ONLY            = 0x200e,
-+    RES_PARTIAL_DELETE             = 0x2012,
-     RES_SPEC_BY_FORMAT_UNSUPPORTED = 0x2014,
-     RES_INVALID_PARENT_OBJECT      = 0x201a,
-     RES_INVALID_PARAMETER          = 0x201d,
-@@ -799,6 +802,7 @@ static MTPData *usb_mtp_get_device_info(MTPState *s, MTPControl *c)
-         CMD_GET_NUM_OBJECTS,
-         CMD_GET_OBJECT_HANDLES,
-         CMD_GET_OBJECT_INFO,
-+        CMD_DELETE_OBJECT,
-         CMD_GET_OBJECT,
-         CMD_GET_PARTIAL_OBJECT,
-         CMD_GET_OBJECT_PROPS_SUPPORTED,
-@@ -1113,6 +1117,120 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
-     return d;
- }
+@@ -765,7 +765,8 @@ static void usb_mtp_add_time(MTPData *data, time_t time)
+ /* ----------------------------------------------------------------------- */
  
-+/* Return correct return code for a delete event */
-+enum {
-+    ALL_DELETE,
-+    PARTIAL_DELETE,
-+    READ_ONLY,
-+};
-+
-+#ifndef CONFIG_INOTIFY1
-+/* Assumes that children, if any, have been already freed */
-+static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
-+{
-+    assert(o->nchildren == 0);
-+    QTAILQ_REMOVE(&s->objects, o, next);
-+    g_free(o->name);
-+    g_free(o->path);
-+    g_free(o);
-+}
-+#endif
-+
-+static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
-+{
-+    MTPObject *iter, *iter2;
-+    bool partial_delete = false;
-+    bool success = false;
-+
-+    /*
-+     * TODO: Add support for Protection Status
-+     */
-+
-+    QLIST_FOREACH(iter, &o->children, list) {
-+        if (iter->format == FMT_ASSOCIATION) {
-+            QLIST_FOREACH(iter2, &iter->children, list) {
-+                usb_mtp_deletefn(s, iter2, trans);
-+            }
-+        }
-+    }
-+
-+    if (o->format == FMT_UNDEFINED_OBJECT) {
-+        if (remove(o->path)) {
-+            partial_delete = true;
-+        } else {
-+#ifndef CONFIG_INOTIFY1
-+            usb_mtp_object_free_one(s, o);
-+#endif
-+            success = true;
-+        }
-+    }
-+
-+    if (o->format == FMT_ASSOCIATION) {
-+        if (rmdir(o->path)) {
-+            partial_delete = true;
-+        } else {
-+#ifndef CONFIG_INOTIFY1
-+            usb_mtp_object_free_one(s, o);
-+#endif
-+            success = true;
-+        }
-+    }
-+
-+    if (success && partial_delete) {
-+        return PARTIAL_DELETE;
-+    }
-+    if (!success && partial_delete) {
-+        return READ_ONLY;
-+    }
-+    return ALL_DELETE;
-+}
-+
-+static void usb_mtp_object_delete(MTPState *s, uint32_t handle,
-+                                  uint32_t format_code, uint32_t trans)
-+{
-+    MTPObject *o;
-+    int ret;
-+
-+    /* Return error if store is read-only */
-+    if (!FLAG_SET(s, MTP_FLAG_WRITABLE)) {
-+        usb_mtp_queue_result(s, RES_STORE_READ_ONLY,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    }
-+
-+    if (format_code != 0) {
-+        usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    }
-+
-+    if (handle == 0xFFFFFFF) {
-+        o = QTAILQ_FIRST(&s->objects);
-+    } else {
-+        o = usb_mtp_object_lookup(s, handle);
-+    }
-+    if (o == NULL) {
-+        usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    }
-+
-+    ret = usb_mtp_deletefn(s, o, trans);
-+    if (ret == PARTIAL_DELETE) {
-+        usb_mtp_queue_result(s, RES_PARTIAL_DELETE,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    } else if (ret == READ_ONLY) {
-+        usb_mtp_queue_result(s, RES_STORE_READ_ONLY, trans,
-+                             0, 0, 0, 0);
-+        return;
-+    } else {
-+        usb_mtp_queue_result(s, RES_OK, trans,
-+                             0, 0, 0, 0);
-+        return;
-+    }
-+}
-+
- static void usb_mtp_command(MTPState *s, MTPControl *c)
+ static void usb_mtp_queue_result(MTPState *s, uint16_t code, uint32_t trans,
+-                                 int argc, uint32_t arg0, uint32_t arg1)
++                                 int argc, uint32_t arg0, uint32_t arg1,
++                                 uint32_t arg2)
  {
-     MTPData *data_in = NULL;
-@@ -1239,6 +1357,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+     MTPControl *c = g_new0(MTPControl, 1);
+ 
+@@ -778,6 +779,9 @@ static void usb_mtp_queue_result(MTPState *s, uint16_t code, uint32_t trans,
+     if (argc > 1) {
+         c->argv[1] = arg1;
+     }
++    if (argc > 2) {
++        c->argv[2] = arg2;
++    }
+ 
+     assert(s->result == NULL);
+     s->result = c;
+@@ -1119,7 +1123,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+     /* sanity checks */
+     if (c->code >= CMD_CLOSE_SESSION && s->session == 0) {
+         usb_mtp_queue_result(s, RES_SESSION_NOT_OPEN,
+-                             c->trans, 0, 0, 0);
++                             c->trans, 0, 0, 0, 0);
+         return;
+     }
+ 
+@@ -1131,12 +1135,12 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+     case CMD_OPEN_SESSION:
+         if (s->session) {
+             usb_mtp_queue_result(s, RES_SESSION_ALREADY_OPEN,
+-                                 c->trans, 1, s->session, 0);
++                                 c->trans, 1, s->session, 0, 0);
+             return;
+         }
+         if (c->argv[0] == 0) {
+             usb_mtp_queue_result(s, RES_INVALID_PARAMETER,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         trace_usb_mtp_op_open_session(s->dev.addr);
+@@ -1165,7 +1169,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         if (c->argv[0] != QEMU_STORAGE_ID &&
+             c->argv[0] != 0xffffffff) {
+             usb_mtp_queue_result(s, RES_INVALID_STORAGE_ID,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         data_in = usb_mtp_get_storage_info(s, c);
+@@ -1175,12 +1179,12 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         if (c->argv[0] != QEMU_STORAGE_ID &&
+             c->argv[0] != 0xffffffff) {
+             usb_mtp_queue_result(s, RES_INVALID_STORAGE_ID,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         if (c->argv[1] != 0x00000000) {
+             usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         if (c->argv[2] == 0x00000000 ||
+@@ -1191,12 +1195,12 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         }
+         if (o == NULL) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         if (o->format != FMT_ASSOCIATION) {
+             usb_mtp_queue_result(s, RES_INVALID_PARENT_OBJECT,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         usb_mtp_object_readdir(s, o);
+@@ -1212,7 +1216,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         o = usb_mtp_object_lookup(s, c->argv[0]);
+         if (o == NULL) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         data_in = usb_mtp_get_object_info(s, c, o);
+@@ -1221,18 +1225,18 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         o = usb_mtp_object_lookup(s, c->argv[0]);
+         if (o == NULL) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         if (o->format == FMT_ASSOCIATION) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         data_in = usb_mtp_get_object(s, c, o);
+         if (data_in == NULL) {
+             usb_mtp_queue_result(s, RES_GENERAL_ERROR,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
              return;
          }
          break;
-+    case CMD_DELETE_OBJECT:
-+        usb_mtp_object_delete(s, c->argv[0], c->argv[1], c->trans);
-+        return;
-     case CMD_GET_PARTIAL_OBJECT:
+@@ -1240,18 +1244,18 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
          o = usb_mtp_object_lookup(s, c->argv[0]);
          if (o == NULL) {
-@@ -1545,6 +1666,8 @@ static void usb_mtp_realize(USBDevice *dev, Error **errp)
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
              return;
          }
-         s->desc = strrchr(s->root, '/');
-+        /* Mark store as RW */
-+        s->flags |= (1 << MTP_FLAG_WRITABLE);
-         if (s->desc && s->desc[0]) {
-             s->desc = g_strdup(s->desc + 1);
-         } else {
+         if (o->format == FMT_ASSOCIATION) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         data_in = usb_mtp_get_partial_object(s, c, o);
+         if (data_in == NULL) {
+             usb_mtp_queue_result(s, RES_GENERAL_ERROR,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         nres = 1;
+@@ -1261,7 +1265,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         if (c->argv[0] != FMT_UNDEFINED_OBJECT &&
+             c->argv[0] != FMT_ASSOCIATION) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_FORMAT_CODE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         data_in = usb_mtp_get_object_props_supported(s, c);
+@@ -1270,13 +1274,13 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         if (c->argv[1] != FMT_UNDEFINED_OBJECT &&
+             c->argv[1] != FMT_ASSOCIATION) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_FORMAT_CODE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         data_in = usb_mtp_get_object_prop_desc(s, c);
+         if (data_in == NULL) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_PROP_CODE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         break;
+@@ -1284,20 +1288,20 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         o = usb_mtp_object_lookup(s, c->argv[0]);
+         if (o == NULL) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         data_in = usb_mtp_get_object_prop_value(s, c, o);
+         if (data_in == NULL) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECT_PROP_CODE,
+-                                 c->trans, 0, 0, 0);
++                                 c->trans, 0, 0, 0, 0);
+             return;
+         }
+         break;
+     default:
+         trace_usb_mtp_op_unknown(s->dev.addr, c->code);
+         usb_mtp_queue_result(s, RES_OPERATION_NOT_SUPPORTED,
+-                             c->trans, 0, 0, 0);
++                             c->trans, 0, 0, 0, 0);
+         return;
+     }
+ 
+@@ -1306,7 +1310,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         assert(s->data_in == NULL);
+         s->data_in = data_in;
+     }
+-    usb_mtp_queue_result(s, RES_OK, c->trans, nres, res0, 0);
++    usb_mtp_queue_result(s, RES_OK, c->trans, nres, res0, 0, 0);
+ }
+ 
+ /* ----------------------------------------------------------------------- */
 -- 
 2.14.3
