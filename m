@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1elHYX-0005LS-CQ
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:06:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1elHji-0006IR-Jm
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1elHYT-0006yd-O7
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:06:17 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:39164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1elHYT-0006xk-H3
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:06:13 -0500
-Received: by mail-io0-x243.google.com with SMTP id b198so18024192iof.6
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 09:06:13 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180212154903.8859-1-dgilbert@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <2c8c252d-0430-9adf-15d4-fc4082984251@twiddle.net>
-Date: Mon, 12 Feb 2018 09:06:08 -0800
+	(envelope-from <eblake@redhat.com>) id 1elHje-0003cT-KD
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:17:49 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34212 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elHje-0003bQ-Fl
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:17:46 -0500
+References: <20180212124008.8960-1-cohuck@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d369e62c-3fe6-060b-9e2a-6ae948d939dd@redhat.com>
+Date: Mon, 12 Feb 2018 11:17:38 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180212154903.8859-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180212124008.8960-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390/stattrib: Make SaveVMHandlers data
- static
+Subject: Re: [Qemu-devel] [PATCH v2] docs: document our stable process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, agraf@suse.de, david@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-On 02/12/2018 07:49 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 02/12/2018 06:40 AM, Cornelia Huck wrote:
+> Some pointers on how to get a patch into stable.
 > 
-> There's no need for this to be dynamic, make it static.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> [contains some suggestions by mdroth]
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  hw/s390x/s390-stattrib.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
+> RFC/D->v2: added mdroth's suggestions
+> ---
+>   docs/stable-process.rst | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 67 insertions(+)
+>   create mode 100644 docs/stable-process.rst
 > 
-> diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-> index a1d2135a60..adf07ef312 100644
-> --- a/hw/s390x/s390-stattrib.c
-> +++ b/hw/s390x/s390-stattrib.c
-> @@ -365,22 +365,22 @@ static inline void s390_stattrib_set_migration_enabled(Object *obj, bool value,
->      s->migration_enabled = value;
->  }
->  
-> +static SaveVMHandlers savevm_s390_stattrib_handlers = {
-> +    .save_setup = cmma_save_setup,
-> +    .save_live_iterate = cmma_save_iterate,
-> +    .save_live_complete_precopy = cmma_save_complete,
-> +    .save_live_pending = cmma_save_pending,
-> +    .save_cleanup = cmma_save_cleanup,
-> +    .load_state = cmma_load,
-> +    .is_active = cmma_active,
-> +};
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> +     Cc: qemu-stable@nongnu.org
+> +
+> +  to the patch description. By default, this will send a copy of the  patch
 
-Bonus points for the follow-on to make this const.  I realize that
-register_savevm_live is not currently prepared for this, so pushing the
-qualifier down will take some doing.
+Spurious double space.
+
+> +  to ``qemu-stable@nongnu.org`` if you use git send-email, which is where
+> +  patches that are stable candidates are tracked by the maintainers.
+> +
+
+> +Stable release process
+> +----------------------
+> +
+> +When the stable maintainers prepare a new stable release, they will prepare
+> +a git branch with a release candidate and send the patches out to
+> +``qemu-devel@nongnu.org`` for review. If any of your patches are included,
+> +please verify that they look fine.
+
+Maybe add: especially if the maintainer had to tweak the patch as part 
+of back-porting things across branches.
 
 
-r~
+>        You may also nominate other patches that
+> +you think are suitable for inclusion. After review is complete (may involve
+> +more release candidates), a new stable release is made available.
+> 
+
+What you have is an obvious improvement over the "nothing" that was 
+before, so whether or not you fold in my additional comments, you can add:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
