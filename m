@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elMiX-0000SL-Da
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:36:58 -0500
+	(envelope-from <cota@braap.org>) id 1elMoV-0004md-7F
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elMiV-0008W1-Bi
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:36:57 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43532 helo=mx1.redhat.com)
+	(envelope-from <cota@braap.org>) id 1elMoR-0005Q5-9o
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:43:07 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:44041)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elMiV-0008Vh-5l
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:36:55 -0500
-References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-28-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f96c450c-9d20-c976-aa4e-6c6438788adb@redhat.com>
-Date: Mon, 12 Feb 2018 16:36:38 -0600
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1elMoR-0005Os-5S
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:43:03 -0500
+Date: Mon, 12 Feb 2018 17:43:00 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180212224229.GA17948@flamenco>
+References: <20180211203934.15546-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180211093607.27351-28-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 27/29] qapi: Move qapi-schema.json to
- qapi/, rename generated files
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180211203934.15546-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] tcg: Improve tcg_gen_muli_i32/i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +26,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On 02/11/2018 03:36 AM, Markus Armbruster wrote:
-> Move qapi-schema.json to qapi/, so it's next to its modules, and all
-> files get generated to qapi/, not just the ones generated for modules.
+On Sun, Feb 11, 2018 at 12:39:34 -0800, Richard Henderson wrote:
+> Convert multiplication by power of two to left shift.
 > 
-> Consistently name the generated files qapi-MODULE.EXT:
-> qmp-commands.[ch] become qapi-commands.[ch], qapi-event.[ch] become
-> qapi-events.[ch], and qmp-introspect.[ch] become qapi-introspect.[ch].
-> This gets rid of the temporary hacks in scripts/qapi/commands.py and
-> scripts/qapi/events.py.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Ah, so my parallel series that proposed naming the file 
-qapi/qmp-schema.qapi gets interesting, with your patch favoring the 
-qapi- naming everywhere.  I'll have to think about how much (or little) 
-of my series to rebase on top of this (I like my notion of renaming to 
-the .qapi suffix, though, as we really are using files that aren't JSON, 
-but only resemble it).
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+Thanks,
 
-> +++ b/.gitignore
-> @@ -29,8 +29,8 @@
->   /qga/qapi-generated
->   /qapi-generated
->   /qapi-gen-timestamp
-> -/qapi-builtin-types.[ch]
-> -/qapi-builtin-visit.[ch]
-> +/qapi/qapi-builtin-types.[ch]
-> +/qapi/qapi-builtin-visit.[ch]
-
-Might be some interesting churn if you like my idea of using globs for 
-easier maintenance of this file.
-
-> +++ b/tpm.c
-> @@ -182,7 +182,6 @@ int tpm_config_parse(QemuOptsList *opts_list, const char *optarg)
->   
->   /*
->    * Walk the list of active TPM backends and collect information about them
-> - * following the schema description in qapi-schema.json.
->    */
-
-Should the overall comment keep the trailing '.'?
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+		Emilio
