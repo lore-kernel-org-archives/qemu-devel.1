@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elI6B-0008L9-Aj
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:41:04 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elI6m-0000RS-EL
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:41:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elI69-0006J3-S0
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:41:03 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:42431)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1elI69-0006IZ-Mk
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:41:01 -0500
-Received: by mail-oi0-x241.google.com with SMTP id u6so11788949oiv.9
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 09:41:01 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1elI6l-00071W-Mf
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 12:41:40 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-25-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <32d252a0-0d81-b672-a5c5-2ced50b9fd16@redhat.com>
+Date: Mon, 12 Feb 2018 18:41:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180212034054.23441-1-david@gibson.dropbear.id.au>
-References: <20180212034054.23441-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Feb 2018 17:40:40 +0000
-Message-ID: <CAFEAcA8hr5mhNfYAcmJZENo7v83W3ZYDk2oA=tNQrFYscRawiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180212
+In-Reply-To: <20180208192328.16550-25-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="twL51DsdxANMGTSzmHWkSaHQDSx4g0gMu"
+Subject: Re: [Qemu-devel] [PATCH 24/27] file-posix: Fix no-op
+ bdrv_truncate() with falloc preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On 12 February 2018 at 03:40, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit c7b02d7d032d6022060e4b393827c963c93ce63f:
->
->   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-speedup-090218-1' into staging (2018-02-09 16:12:34 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180212
->
-> for you to fetch changes up to 51f233ec92cdab7030cb7407dd7f009911c805b0:
->
->   misc: introduce new mos6522 VIA device and enable it for ppc builds (2018-02-11 10:18:52 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2018-02-12
->
-> Here's the accumulatead ppc and pseries related patches for the last
-> while.  Highlights are:
->     * A number of Macintosh / CUDA cleanups from Mark Cave-Ayland
->     * An important bug fix (missing "break;") for
->       H_GET_CPU_CHARACTERISTICS
->     * Yet another fix for SMT mode handling
->     * Assorted other cleanups and fixes
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--twL51DsdxANMGTSzmHWkSaHQDSx4g0gMu
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <32d252a0-0d81-b672-a5c5-2ced50b9fd16@redhat.com>
+Subject: Re: [PATCH 24/27] file-posix: Fix no-op bdrv_truncate() with falloc
+ preallocation
+References: <20180208192328.16550-1-kwolf@redhat.com>
+ <20180208192328.16550-25-kwolf@redhat.com>
+In-Reply-To: <20180208192328.16550-25-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 2018-02-08 20:23, Kevin Wolf wrote:
+> If bdrv_truncate() is called, but the requested size is the same as
+> before, don't call posix_fallocate(), which returns -EINVAL for length
+> zero and would therefore make bdrv_truncate() fail.
+>=20
+> The problem can be triggered by creating a zero-sized raw image with
+> 'falloc' preallocation mode.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/file-posix.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 
--- PMM
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--twL51DsdxANMGTSzmHWkSaHQDSx4g0gMu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqB0ckSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AcVgIAMHNGHFbG0DS9eDiDTyXV7fjfHmWOIHU
+venr9xEJ5vTp2NI5r51Uyazxxz23/B57Pmd+cwBnFGxLccqeFMvhtLRjFHr/DlEu
+2pr+Mqk+ioDWAa9YLxUThxargcC7+4ku8gLAl3CTl99LWYXHgD4xa0cL8yLAB39j
+JGax3BEhnat82So/4Ry0ePbkkjqV+GmWYktC3bVKYaokeLOt3OIY2NUdEM0wlMjk
+tWF0LlZu2nwjEk308n9yARVQyo6aV39rFW5SeYt/+o3o5YrOVzwE20xtiHEA25T9
+pApZ0x8ImIPnkVhSh5J9PgktVr/dABLo0mJFmH/nb67WK9GnFuJdRa4=
+=zufg
+-----END PGP SIGNATURE-----
+
+--twL51DsdxANMGTSzmHWkSaHQDSx4g0gMu--
