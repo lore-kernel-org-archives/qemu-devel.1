@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1elEmk-00042V-7i
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:08:47 -0500
+	(envelope-from <stefanha@redhat.com>) id 1elEoJ-0005DL-PM
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:10:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1elEmg-00089f-QG
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:08:46 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53830 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1elEoG-0001SA-Cc
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:10:23 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55598 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1elEmg-00088q-M0
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:08:42 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1elEoG-0001Ro-6W
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 09:10:20 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53241814DF4C
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 14:08:31 +0000 (UTC)
-Date: Mon, 12 Feb 2018 14:08:25 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id DB09F9BA98
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 14:10:19 +0000 (UTC)
+Date: Mon, 12 Feb 2018 14:10:18 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180212140825.GF4913@stefanha-x1.localdomain>
+Message-ID: <20180212141018.GG4913@stefanha-x1.localdomain>
 References: <20180208171807.24267-1-stefanha@redhat.com>
-	<20180208171807.24267-2-stefanha@redhat.com>
-	<ea22850e-f1b3-bcdd-db48-b6060e468296@redhat.com>
-	<20180209172314.GA3129@localhost.localdomain>
-	<94eef553-a2d6-cfac-9e5a-006ceee74519@redhat.com>
+	<20180208171807.24267-3-stefanha@redhat.com>
+	<012d5365-3c70-daff-4037-0253996abf98@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="CXFpZVxO6m2Ol4tQ"
+	protocol="application/pgp-signature"; boundary="Cgrdyab2wu3Akvjd"
 Content-Disposition: inline
-In-Reply-To: <94eef553-a2d6-cfac-9e5a-006ceee74519@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] block: add BlockBackend->in_flight
- counter
+In-Reply-To: <012d5365-3c70-daff-4037-0253996abf98@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] block: test blk_aio_flush() with
+ blk->root == NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,69 +36,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
 
---CXFpZVxO6m2Ol4tQ
+--Cgrdyab2wu3Akvjd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 09, 2018 at 06:26:41PM +0100, Paolo Bonzini wrote:
-> On 09/02/2018 18:23, Kevin Wolf wrote:
-> > Am 09.02.2018 um 17:28 hat Paolo Bonzini geschrieben:
-> >> On 08/02/2018 18:18, Stefan Hajnoczi wrote:
-> >>> +    BlockDriverState *bs =3D blk_bs(blk);
-> >>> +
-> >>> +    if (bs) {
-> >>> +        bdrv_drained_begin(bs);
-> >>> +    }
-> >>> +
-> >>> +    /* We may have aio requests like -ENOMEDIUM in flight */
-> >>> +    while (atomic_mb_read(&blk->in_flight) > 0) {
-> >>> +        aio_poll(blk_get_aio_context(blk), true);
-> >>> +    }
-> >>> +
-> >>> +    if (bs) {
-> >>> +        bdrv_drained_end(bs);
-> >>
-> >> This only works if you are in the default AioContext, otherwise you can
-> >> run handlers for one AioContexts in two threads.
+On Fri, Feb 09, 2018 at 09:23:53AM -0600, Eric Blake wrote:
+> On 02/08/2018 11:18 AM, Stefan Hajnoczi wrote:
+> > From: Kevin Wolf <kwolf@redhat.com>
 > >=20
-> > Should aio_poll() assert that it's called in the right thread to make
-> > sure we obey the rules?
+> > This patch adds test cases for the scenario where blk_aio_flush() is
+> > called on a BlockBackend with no root.  Calling drain afterwards should
+> > complete the requests with -ENOMEDIUM.
 > >=20
-> >> bdrv_dec_in_flight uses bdrv_wakeup and BDRV_POLL_WHILE to ensure that
-> >> this doesn't happen, so there would be more code that you have to copy
-> >> into block-backend.c.
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >   tests/Makefile.include     |  2 ++
+> >   tests/test-block-backend.c | 82 +++++++++++++++++++++++++++++++++++++=
++++++++++
+> >   2 files changed, 84 insertions(+)
+> >   create mode 100644 tests/test-block-backend.c
 > >=20
-> > Instead of copying, can't we generalise it into a POLL_WHILE(ctx,
-> > wakeup, cond) and make BDRV_POLL_WHILE() a wrapper for that?
 >=20
-> Yes, or even move bdrv_wakeup to AioContext would do.  We already have
-> block layer-specific fields such as the linux-aio state(*).
+> > +++ b/tests/test-block-backend.c
+> > @@ -0,0 +1,82 @@
+> > +/*
+> > + * BlockBackend tests
+> > + *
+> > + * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
 >=20
-> 	(*) though now that linux-aio has been improved to do something
-> 	    like epoll, there may be a better reason to place linux-aio
-> 	    state in AioContext.
+> Want to include 2018?  Using a redhat.com address but a personal copyrigh=
+t?
+> (Then again, Red Hat has some pretty cool policies on what it permits for
+> code written on an employee's own time).
+>=20
+> As long as Kevin is happy with the final copyright line that goes into the
+> commit:
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Thanks for the ideas, will fix in v2.
+This is how I got the test case from Kevin, I didn't change the
+copyright line.
 
 Stefan
 
---CXFpZVxO6m2Ol4tQ
+--Cgrdyab2wu3Akvjd
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJagZ/ZAAoJEJykq7OBq3PIxU4H/3gLtBLtpP8D20/q1/doJSTX
-MZCJdNgfypOLl0R1rBOvd727l7hyrv4spsLoKjRLQtT6+TuicuoRGmMVXK/mFn5Y
-x69gB3SHiGtPMWcNw9TmID1yz4bvxltzzCInbqaKVEVhIwiZLwUiAMMPxmo6qREp
-XUgnWuk7o9k8NzCf7qrUIjDCYa+b7smI4WpAJj1CZgd5Yb3Sb5Cc1zFAI7dyvq6b
-6Yr6K8WPkACLGFmyV3CUjnJtetYg/aFxrDAbcVirXHLhIJnNZhfNKjmx/x30AxSx
-XIIJPt0gHcvVu5QFF/WnG9ORXouokuu4NHMMH4F/4JIyWocy93tqz7oqYvbnD9M=
-=ZuMl
+iQEcBAEBAgAGBQJagaBKAAoJEJykq7OBq3PI6IIH/1AOC8eC/Yv5eIH/3ew62j1P
+DGiJMzywCGS1J97P9q2aTBL4dNQxjV/k+qbR7WEekqvnCa3OKQ8EgcjpZEOtRxue
+6Bq0ihWggDbV2C60URnc2p0dao8XYloFP9jOBbmQZIRQYWZg6/6HXok6sBj1sNHQ
+uPuy8TXVfh3SdqS9oxntHwdYf74GQmsSr/nVRy+yIA33LqmddyUXlQz1s766L+9q
+Ypx3o+L6lMlbc6E9gF2Def2ppYryLFFJ6S0urkfLogMXSUUUx3DfZrLDNW314sYp
+R9KfPHKlIkFuPYMsDEpFEucasmCHBhDEuEZA2v7CuHDFbDAj59WuKt4zd9R7pYs=
+=3aA5
 -----END PGP SIGNATURE-----
 
---CXFpZVxO6m2Ol4tQ--
+--Cgrdyab2wu3Akvjd--
