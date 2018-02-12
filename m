@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elMFO-0006Kl-If
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:06:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1elMM4-0001Iz-Mu
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elMFL-0003K4-QY
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:06:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39984 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1elMM1-0002aQ-GM
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:13:44 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43724 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elMFL-0003JN-L0
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:06:47 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elMM1-0002ZY-B0
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 17:13:41 -0500
 References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-23-armbru@redhat.com>
+	<20180211093607.27351-24-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <cfdefa70-ce8c-5afd-0ddf-5fad17062171@redhat.com>
-Date: Mon, 12 Feb 2018 16:06:28 -0600
+Message-ID: <1011949b-ca28-3c9e-9aed-21f8af8d5f7e@redhat.com>
+Date: Mon, 12 Feb 2018 16:13:24 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180211093607.27351-23-armbru@redhat.com>
+In-Reply-To: <20180211093607.27351-24-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 22/29] qapi: Generate separate .h,
- .c for each module
+Subject: Re: [Qemu-devel] [PATCH v2 23/29] Include less of the generated
+ modular QAPI headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +33,85 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
 
 On 02/11/2018 03:36 AM, Markus Armbruster wrote:
-> Our qapi-schema.json is composed of modules connected by include
-> directives, but the generated code is monolithic all the same: one
-> qapi-types.h with all the types, one qapi-visit.h with all the
-> visitors, and so forth.  These monolithic headers get included all
-> over the place.  In my "build everything" tree, adding a QAPI type
-> recompiles about 4800 out of 5100 objects.
+> In my "build everything" tree, a change to the types in
+> qapi-schema.json triggers a recompile of about 4800 out of 5100
+> objects.
 > 
-> We wouldn't write such monolithic headers by hand.  It stands to
-> reason that we shouldn't generate them, either.
+> The previous commit split up qmp-commands.h, qmp-event.h, qmp-visit.h,
+> qapi-types.h.  Each of these headers still includes all its shards.
+> Reduce compile time by including just the shards we actually need.
 > 
-> Split up generated qapi-types.h to mirror the schema's modular
-> structure: one header per module.  Name the main module's header
-> qapi-types.h, and sub-module D/B.json's header D/qapi-types-B.h.
-> 
-> Mirror the schema's includes in the headers, so that qapi-types.h gets
-> you everything exactly as before.  If you need less, you can include
-> one or more of the sub-module headers.  To be exploited shortly.
-> 
-> Split up qapi-types.c, qapi-visit.h, qapi-visit.c, qmp-commands.h,
-> qmp-commands.c, qapi-event.h, qapi-event.c the same way.
-> qmp-introspect.h, qmp-introspect.c and qapi.texi remain monolithic.
-
-Make sense.
-
-> 
-> The split of qmp-commands.c duplicates static helper function
-> qmp_marshal_output_str() in qapi-commands-char.c and
-> qapi-commands-misc.c.  This happens when commands returning the same
-> type occur in multiple modules.  Not worth avoiding.
-
-As long as it is static, and neither .c file includes the other, we're 
-fine (gdb may have a harder time figuring out which copy to put a 
-breakpoint on, but that's not too terrible).
-
-> 
-> Since I'm going to rename qapi-event.[ch] to qapi-events.[ch], and
-> qmp-commands.[ch] to qapi-commands.[ch], name the shards that way
-> already, to reduce churn.  This requires temporary hacks in
-> commands.py and events.py.  They'll go away with the rename.
-
-The planned rename makes sense; prepping now is fine.
-
+> To illustrate the benefits: adding a type to qapi/migration.json now
+> recompiles some 2300 instead of 4800 objects.  The next commit will
+> improve it further.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   .gitignore               |  60 ++++++++++++++++++++++++
->   Makefile                 | 120 +++++++++++++++++++++++++++++++++++++++++++++++
->   Makefile.objs            |  65 ++++++++++++++++++++++++-
->   scripts/qapi/commands.py |  35 +++++++++-----
->   scripts/qapi/common.py   |  21 +++++++--
->   scripts/qapi/events.py   |  19 ++++++--
->   6 files changed, 300 insertions(+), 20 deletions(-)
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 9477a08b6b..42c57998fd 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -31,7 +31,67 @@
->   /qapi-gen-timestamp
->   /qapi-builtin-types.[ch]
->   /qapi-builtin-visit.[ch]
-> +/qapi/qapi-commands-block-core.[ch]
-> +/qapi/qapi-commands-block.[ch]
+>   backends/cryptodev.c             |  1 -
+>   backends/hostmem.c               |  3 ++-
 
-Is it worth using a glob instead of specific patterns, as in:
+How did you determine which shards to include where? Remove all shards, 
+try compiling, and see what fails, then add back in the right includes? 
+Or was it scripted somehow?  (Trying to figure out, in case I have to 
+rebase this patch)
 
-/qapi/qapi-commands-*.[ch]
+> +++ b/block/crypto.c
+> @@ -24,9 +24,9 @@
+>   #include "sysemu/block-backend.h"
+>   #include "crypto/block.h"
+>   #include "qapi/opts-visitor.h"
+> +#include "qapi/qapi-visit-crypto.h"
+>   #include "qapi/qmp/qdict.h"
+>   #include "qapi/qobject-input-visitor.h"
+> -#include "qapi-visit.h"
+>   #include "qapi/error.h"
 
-Maybe being precise doesn't hurt, if we aren't adding sub-modules all 
-that often; but being generous with a glob makes it less likely that a 
-future module addition will forget to update .gitignore.
+Any rhyme or reason to the resulting include order that I should be 
+looking for (we aren't alphabetical in general, but if your changes were 
+trying to honor a particular pattern among the few affected lines, 
+that's useful to know).
 
+> +++ b/scripts/qapi/commands.py
 
-> +++ b/Makefile
-> @@ -92,10 +92,70 @@ include $(SRC_PATH)/rules.mak
->   GENERATED_FILES = qemu-version.h config-host.h qemu-options.def
->   GENERATED_FILES += qapi-builtin-types.h qapi-builtin-types.c
->   GENERATED_FILES += qapi-types.h qapi-types.c
-> +GENERATED_FILES += qapi/qapi-types-block-core.h qapi/qapi-types-block-core.c
+The non-mechanical portion of the patch :)
 
-For the makefile, I'd suggest using an intermediate list of module 
-names, and then using make string operations to expand it into larger 
-lists, to cut down on the repetition.  Something like (untested):
-
-QAPI_MODULES = block-core block char common ...
-GENERATED_FILES += $(addprefix qapi/qapi-types-,$(addsuffix 
-.c,$(QAPI_MODULES))
-GENERATED_FILES += $(addprefix qapi/qapi-types-,$(addsuffix 
-.h,$(QAPI_MODULES))
-
-
-> @@ -525,10 +585,70 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+> @@ -241,6 +241,9 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCVisitor):
 >   
->   qapi-builtin-types.c qapi-builtin-types.h \
->   qapi-types.c qapi-types.h \
-> +qapi/qapi-types-block-core.c qapi/qapi-types-block-core.h \
-> +qapi/qapi-types-block.c qapi/qapi-types-block.h \
+>       def _begin_module(self, name):
+>           self._visited_ret_types[self._genc] = set()
+> +        commands = self._module_basename('qapi-commands', name)
+> +        types = self._module_basename('qapi-types', name)
+> +        visit = self._module_basename('qapi-visit', name)
+>           self._genc.add(mcgen('''
+>   #include "qemu/osdep.h"
+>   #include "qemu-common.h"
+> @@ -251,18 +254,17 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCVisitor):
+>   #include "qapi/qobject-input-visitor.h"
+>   #include "qapi/dealloc-visitor.h"
+>   #include "qapi/error.h"
+> -#include "%(prefix)sqapi-types.h"
+> -#include "%(prefix)sqapi-visit.h"
+> -#include "%(prefix)sqmp-commands.h"
+> +#include "%(visit)s.h"
+> +#include "%(commands)s.h"
+>   
+>   ''',
+> -                             prefix=self._prefix))
+> +                             commands=commands, visit=visit))
+>           self._genh.add(mcgen('''
+> -#include "%(prefix)sqapi-types.h"
+> +#include "%(types)s.h"
+>   #include "qapi/qmp/dispatch.h"
+>   
+>   ''',
+> -                             prefix=self._prefix))
+> +                             types=types))
 
-And repeating the list of filenames; again, an intermediate variable 
-would let you do:
+Makes sense.
 
-QAPI_GENERATED_FILES = ...
-GENERATED_FILES += $(QAPI_GENERATED_FILES)
+The compiler will catch anything we did wrong.
 
-$(QAPI_GENERATED_FILES): ...
-
->   qmp-introspect.h qmp-introspect.c \
->   qapi-doc.texi: \
->   qapi-gen-timestamp ;
-
-Not only does it cut down on the repetition, but it will make adding a 
-future module easier.
-
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 2813e984fd..7a55d45669 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -3,8 +3,56 @@
->   stub-obj-y = stubs/ crypto/
->   util-obj-y = util/ qobject/ qapi/
->   util-obj-y += qapi-builtin-types.o
-> +util-obj-y += qapi-types.o
-> +util-obj-y += qapi/qapi-types-block-core.o
-
-Perhaps this can also exploit make text manipulation?
-
-Otherwise looks good.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
