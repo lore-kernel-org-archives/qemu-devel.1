@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBQ-0003LZ-MJ
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:22 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBV-0003RM-5T
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1elGBO-00041J-9y
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:20 -0500
-Received: from mail-by2nam01on0066.outbound.protection.outlook.com
-	([104.47.34.66]:9248
+	(envelope-from <brijesh.singh@amd.com>) id 1elGBR-00046V-J9
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:25 -0500
+Received: from mail-by2nam01on0078.outbound.protection.outlook.com
+	([104.47.34.78]:9788
 	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1elGBN-0003yS-U8
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:18 -0500
+	id 1elGBR-00044L-6s
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 10:38:21 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 12 Feb 2018 09:36:55 -0600
-Message-Id: <20180212153715.87555-9-brijesh.singh@amd.com>
+Date: Mon, 12 Feb 2018 09:36:57 -0600
+Message-Id: <20180212153715.87555-11-brijesh.singh@amd.com>
 In-Reply-To: <20180212153715.87555-1-brijesh.singh@amd.com>
 References: <20180212153715.87555-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 08/28] docs: add AMD Secure Encrypted
- Virtualization (SEV)
+Subject: [Qemu-devel] [PATCH v8 10/28] sev/i386: add command to initialize
+ the memory encryption context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +30,359 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-Create a documentation entry to describe the AMD Secure Encrypted
-Virtualization (SEV) feature.
+When memory encryption is enabled, KVM_SEV_INIT command is used to
+initialize the platform. The command loads the SEV related persistent
+data from non-volatile storage and initializes the platform context.
+This command should be first issued before invoking any other guest
+commands provided by the SEV firmware.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- docs/amd-memory-encryption.txt | 92 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
- create mode 100644 docs/amd-memory-encryption.txt
+ accel/kvm/kvm-all.c      |  15 +++++
+ include/sysemu/sev.h     |  16 +++++
+ stubs/Makefile.objs      |   1 +
+ stubs/sev.c              |  43 +++++++++++++
+ target/i386/sev.c        | 161 +++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events |   3 +
+ 6 files changed, 239 insertions(+)
+ create mode 100644 stubs/sev.c
 
-diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index b91fcb7160d3..300fc3cd44ce 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -38,6 +38,7 @@
+ #include "qemu/event_notifier.h"
+ #include "trace.h"
+ #include "hw/irq.h"
++#include "sysemu/sev.h"
+ 
+ #include "hw/boards.h"
+ 
+@@ -103,6 +104,9 @@ struct KVMState
+ #endif
+     KVMMemoryListener memory_listener;
+     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
++
++    /* memory encryption */
++    void *memcrypt_handle;
+ };
+ 
+ KVMState *kvm_state;
+@@ -1636,6 +1640,17 @@ static int kvm_init(MachineState *ms)
+ 
+     kvm_state = s;
+ 
++    /*
++     * if memory encryption object is specified then initialize the memory
++     * encryption context.
++     */
++    if (ms->memory_encryption) {
++        kvm_state->memcrypt_handle = sev_guest_init(ms->memory_encryption);
++        if (!kvm_state->memcrypt_handle) {
++            goto err;
++        }
++    }
++
+     ret = kvm_arch_init(ms, s);
+     if (ret < 0) {
+         goto err;
+diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+index eed679653dbc..121e7e4aa44c 100644
+--- a/include/sysemu/sev.h
++++ b/include/sysemu/sev.h
+@@ -14,6 +14,8 @@
+ #ifndef QEMU_SEV_H
+ #define QEMU_SEV_H
+ 
++#include <linux/kvm.h>
++
+ #include "qom/object.h"
+ #include "qapi/error.h"
+ #include "sysemu/kvm.h"
+@@ -23,6 +25,12 @@
+ #define QSEV_GUEST_INFO(obj)                  \
+     OBJECT_CHECK(QSevGuestInfo, (obj), TYPE_QSEV_GUEST_INFO)
+ 
++extern bool sev_enabled(void);
++extern uint64_t sev_get_me_mask(void);
++extern void sev_get_current_state(char **state);
++extern void sev_get_fw_version(uint8_t *major, uint8_t *minor, uint8_t *build);
++extern void sev_get_policy(uint32_t *policy);
++
+ typedef struct QSevGuestInfo QSevGuestInfo;
+ typedef struct QSevGuestInfoClass QSevGuestInfoClass;
+ 
+@@ -50,5 +58,13 @@ struct QSevGuestInfoClass {
+     ObjectClass parent_class;
+ };
+ 
++struct SEVState {
++    QSevGuestInfo *sev_info;
++};
++
++typedef struct SEVState SEVState;
++
++void *sev_guest_init(const char *id);
++
+ #endif
+ 
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 2d59d8409162..31b36fdfdb88 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -43,3 +43,4 @@ stub-obj-y += xen-common.o
+ stub-obj-y += xen-hvm.o
+ stub-obj-y += pci-host-piix.o
+ stub-obj-y += ram-block.o
++stub-obj-y += sev.o
+diff --git a/stubs/sev.c b/stubs/sev.c
 new file mode 100644
-index 000000000000..72a92b6c6353
+index 000000000000..e3076f009a48
 --- /dev/null
-+++ b/docs/amd-memory-encryption.txt
-@@ -0,0 +1,92 @@
-+Secure Encrypted Virtualization (SEV) is a feature found on AMD processors.
++++ b/stubs/sev.c
+@@ -0,0 +1,43 @@
++/*
++ * QEMU SEV stub
++ *
++ * Copyright Advanced Micro Devices 2018
++ *
++ * Authors:
++ *      Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
-+SEV is an extension to the AMD-V architecture which supports running encrypted
-+virtual machine (VMs) under the control of KVM. Encrypted VMs have their pages
-+(code and data) secured such that only the guest itself has access to the
-+unencrypted version. Each encrypted VM is associated with a unique encryption
-+key; if its data is accessed to a different entity using a different key the
-+encrypted guests data will be incorrectly decrypted, leading to unintelligible
-+data.
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/sev.h"
 +
-+The key management of this feature is handled by separate processor known as
-+AMD secure processor (AMD-SP) which is present in AMD SOCs. Firmware running
-+inside the AMD-SP provide commands to support common VM lifecycle. This
-+includes commands for launching, snapshotting, migrating and debugging the
-+encrypted guest. Those SEV command can be issued via KVM_MEMORY_ENCRYPT_OP
-+ioctls.
++void sev_get_current_state(char **state)
++{
++}
 +
-+Launching
-+---------
-+Boot images (such as bios) must be encrypted before guest can be booted.
-+MEMORY_ENCRYPT_OP ioctl provides commands to encrypt the images :LAUNCH_START,
-+LAUNCH_UPDATE_DATA, LAUNCH_MEASURE and LAUNCH_FINISH. These four commands
-+together generate a fresh memory encryption key for the VM, encrypt the boot
-+images and provide a measurement than can be used as an attestation of the
-+successful launch.
++bool sev_enabled(void)
++{
++    return false;
++}
 +
-+LAUNCH_START is called first to create a cryptographic launch context within
-+the firmware. To create this context, guest owner must provides guest policy,
-+its public Diffie-Hellman key (PDH) and session parameters. These inputs
-+should be treated as binary blob and must be passed as-is to the SEV firmware.
++void *sev_guest_init(const char *id)
++{
++    return NULL;
++}
 +
-+The guest policy is passed as plaintext and hypervisor may able to read it
-+but should not modify it (any modification of the policy bits will result
-+in bad measurement). The guest policy is a 4-byte data structure containing
-+several flags that restricts what can be done on running SEV guest.
-+See KM Spec section 3 and 6.2 for more details.
++uint64_t sev_get_me_mask(void)
++{
++    return ~0UL;
++}
 +
-+Guest owners provided DH certificate and session parameters will be used to
-+establish a cryptographic session with the guest owner to negotiate keys used
-+for the attestation.
++void sev_get_fw_version(uint8_t *major, uint8_t *minor, uint8_t *build)
++{
++}
 +
-+LAUNCH_UPDATE_DATA encrypts the memory region using the cryptographic context
-+created via LAUNCH_START command. If required, this command can be called
-+multiple times to encrypt different memory regions. The command also calculates
-+the measurement of the memory contents as it encrypts.
++void sev_get_policy(uint32_t *policy)
++{
++}
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 57e092a0bddd..d5fd975792b8 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -18,10 +18,74 @@
+ #include "sysemu/kvm.h"
+ #include "sysemu/sev.h"
+ #include "sysemu/sysemu.h"
++#include "trace.h"
+ 
+ #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+ #define DEFAULT_SEV_DEVICE      "/dev/sev"
+ 
++static uint64_t me_mask;
++static bool sev_active;
++static int sev_fd;
 +
-+LAUNCH_MEASURE command can be used to retrieve the measurement of encrypted
-+memory. This measurement is a signature of the memory contents that can be
-+sent to the guest owner as an attestation that the memory was encrypted
-+correctly by the firmware. The guest owner may wait to provide the guest
-+confidential information until it can verify the attestation measurement.
-+Since the guest owner knows the initial contents of the guest at boot, the
-+attestation measurement can be verified by comparing it to what the guest owner
-+expects.
++#define SEV_FW_MAX_ERROR      0x17
 +
-+LAUNCH_FINISH command finalizes the guest launch and destroy's the cryptographic
-+context.
++static const char *const sev_fw_errlist[] = {
++    "",
++    "Platform state is invalid",
++    "Guest state is invalid",
++    "Platform configuration is invalid",
++    "Buffer too small",
++    "Platform is already owned",
++    "Certificate is invalid",
++    "Policy is not allowed",
++    "Guest is not active",
++    "Invalid address",
++    "Bad signature",
++    "Bad measurement",
++    "Asid is already owned",
++    "Invalid ASID",
++    "WBINVD is required",
++    "DF_FLUSH is required",
++    "Guest handle is invalid",
++    "Invalid command",
++    "Guest is active",
++    "Hardware error",
++    "Hardware unsafe",
++    "Feature not supported",
++    "Invalid parameter"
++};
 +
-+See SEV KM API Spec [1] 'Launching a guest' usage flow (Appendix A) for the
-+complete flow chart.
++static int
++sev_ioctl(int cmd, void *data, int *error)
++{
++    int r;
++    struct kvm_sev_cmd input;
 +
-+Debugging
-+-----------
-+Since memory contents of SEV guest is encrypted hence hypervisor access to the
-+guest memory will get a cipher text. If guest policy allows debugging, then
-+hypervisor can use DEBUG_DECRYPT and DEBUG_ENCRYPT commands access the guest
-+memory region for debug purposes.
++    memset(&input, 0x0, sizeof(input));
 +
-+Snapshot/Restore
-+-----------------
-+TODO
++    input.id = cmd;
++    input.sev_fd = sev_fd;
++    input.data = (__u64)data;
 +
-+Live Migration
-+----------------
-+TODO
++    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &input);
 +
-+References
-+-----------------
++    if (error) {
++        *error = input.error;
++    }
 +
-+AMD Memory Encryption whitepaper:
-+http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
++    return r;
++}
 +
-+Secure Encrypted Virutualization Key Management:
-+[1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
++static const char *
++fw_error_to_str(int code)
++{
++    if (code >= SEV_FW_MAX_ERROR) {
++        return "unknown error";
++    }
 +
-+KVM Forum slides:
-+http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
++    return sev_fw_errlist[code];
++}
 +
-+AMD64 Architecture Programmer's Manual:
-+   http://support.amd.com/TechDocs/24593.pdf
-+   SME is section 7.10
-+   SEV is section 15.34
+ static void
+ qsev_guest_finalize(Object *obj)
+ {
+@@ -205,6 +269,103 @@ static const TypeInfo qsev_guest_info = {
+     }
+ };
+ 
++static QSevGuestInfo *
++lookup_sev_guest_info(const char *id)
++{
++    Object *obj;
++    QSevGuestInfo *info;
++
++    obj = object_resolve_path_component(object_get_objects_root(), id);
++    if (!obj) {
++        return NULL;
++    }
++
++    info = (QSevGuestInfo *)
++            object_dynamic_cast(obj, TYPE_QSEV_GUEST_INFO);
++    if (!info) {
++        return NULL;
++    }
++
++    return info;
++}
++
++uint64_t
++sev_get_me_mask(void)
++{
++    return ~me_mask;
++}
++
++void
++sev_get_current_state(char **state)
++{
++}
++
++bool
++sev_enabled(void)
++{
++    return sev_active;
++}
++
++void
++sev_get_fw_version(uint8_t *major, uint8_t *minor, uint8_t *build)
++{
++}
++
++void
++sev_get_policy(uint32_t *policy)
++{
++}
++
++void *
++sev_guest_init(const char *id)
++{
++    SEVState *s;
++    char *devname;
++    int ret, fw_error;
++    uint32_t host_cbitpos, cbitpos;
++
++    s = g_new0(SEVState, 1);
++    s->sev_info = lookup_sev_guest_info(id);
++    if (!s->sev_info) {
++        error_report("%s: '%s' is not a valid '%s' object",
++                     __func__, id, TYPE_QSEV_GUEST_INFO);
++        goto err;
++    }
++
++    host_cbitpos = sev_get_host_cbitpos();
++    cbitpos = object_property_get_int(OBJECT(s->sev_info), "cbitpos", NULL);
++    if (host_cbitpos != cbitpos) {
++        error_report("%s: cbitpos check failed, host '%d' request '%d'",
++                     __func__, host_cbitpos, cbitpos);
++        goto err;
++    }
++
++    me_mask = (1UL << cbitpos);
++
++    devname = object_property_get_str(OBJECT(s->sev_info), "sev-device", NULL);
++    sev_fd = open(devname, O_RDWR);
++    if (sev_fd < 0) {
++        error_report("%s: Failed to open %s '%s'", __func__,
++                     devname, strerror(errno));
++        goto err;
++    }
++    g_free(devname);
++
++    trace_kvm_sev_init();
++    ret = sev_ioctl(KVM_SEV_INIT, NULL, &fw_error);
++    if (ret) {
++        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
++                     __func__, ret, fw_error, fw_error_to_str(fw_error));
++        goto err;
++    }
++
++    sev_active = true;
++    return s;
++err:
++    g_free(s);
++    return NULL;
++}
++
+ static void
+ sev_register_types(void)
+ {
+diff --git a/target/i386/trace-events b/target/i386/trace-events
+index 3153fd445488..797b716751b7 100644
+--- a/target/i386/trace-events
++++ b/target/i386/trace-events
+@@ -5,3 +5,6 @@ kvm_x86_fixup_msi_error(uint32_t gsi) "VT-d failed to remap interrupt for GSI %"
+ kvm_x86_add_msi_route(int virq) "Adding route entry for virq %d"
+ kvm_x86_remove_msi_route(int virq) "Removing route entry for virq %d"
+ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
++
++# target/i386/sev.c
++kvm_sev_init(void) ""
 -- 
 2.14.3
