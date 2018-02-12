@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elDiP-0003Qi-P4
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:00:14 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1elDwE-0003Ra-Gi
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:14:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elDiN-0007Ub-RG
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:00:13 -0500
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:46427)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1elDiN-0007U6-MT
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:00:11 -0500
-Received: by mail-oi0-x22e.google.com with SMTP id x21so11078580oie.13
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 05:00:11 -0800 (PST)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1elDwB-00087y-8E
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 08:14:30 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Mon, 12 Feb 2018 16:13:59 +0300
+Message-Id: <1518441241-32557-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180209190824.32221-1-eblake@redhat.com>
-References: <20180209190824.32221-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Feb 2018 12:59:50 +0000
-Message-ID: <CAFEAcA-0URsE9h3FQTRYWq76_4g_Lik4at=XLwnAuq2xfYmvuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] NBD patches through 2018-02-09
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 0/2] block: fix write with zero flag set and
+ iovector provided
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +20,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, berto@igalia.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On 9 February 2018 at 19:08, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit c7b02d7d032d6022060e4b393827c963c93ce63f:
->
->   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-speedup-090218-1' into staging (2018-02-09 16:12:34 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-02-09
->
-> for you to fetch changes up to e24d813b29d3a478a9309078487efc8ce8599f22:
->
->   block: Simplify bdrv_can_write_zeroes_with_unmap() (2018-02-09 12:32:44 -0600)
->
-> ----------------------------------------------------------------
-> nbd patches for 2018-02-09
->
-> - Vladimir Sementsov-Ogievskiy: iotests: 205: support luks format
-> - Eric Blake: block: Simplify bdrv_can_write_zeroes_with_unmap()
->
+v2:
+  patch 1: commit message fixed
+  test added (patch 2)
 
-Applied, thanks.
+v1: http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg00131.html
 
--- PMM
+Anton Nefedov (2):
+  iotest 033: add misaligned write-zeroes test via truncate
+  block: fix write with zero flag set and iovector provided
+
+ block/io.c                 |  2 +-
+ tests/qemu-iotests/033     | 28 ++++++++++++++++++++++++++++
+ tests/qemu-iotests/033.out | 13 +++++++++++++
+ 3 files changed, 42 insertions(+), 1 deletion(-)
+
+-- 
+2.7.4
