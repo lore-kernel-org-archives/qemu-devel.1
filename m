@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1elJI8-0006sC-Kc
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:57:32 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1elJJd-0008G0-Ny
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:59:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1elJI3-0000Dx-Uy
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:57:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1elJI3-0000Bx-P0
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:57:23 -0500
-Date: Mon, 12 Feb 2018 16:57:13 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180212185713.GS13981@localhost.localdomain>
-References: <20180212153715.87555-1-brijesh.singh@amd.com>
-	<20180212153715.87555-11-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180212153715.87555-11-brijesh.singh@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v8 10/28] sev/i386: add command to
- initialize the memory encryption context
+	(envelope-from <eric.auger@redhat.com>) id 1elJJc-0002LE-Ug
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:59:01 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon, 12 Feb 2018 18:58:03 +0000
+Message-Id: <1518461904-5305-2-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
+References: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v6 01/22] machine: Add a get_primary_pci_bus
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +20,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Richard Henderson <rth@twiddle.net>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
+Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-On Mon, Feb 12, 2018 at 09:36:57AM -0600, Brijesh Singh wrote:
-[...]
-> +#define SEV_FW_MAX_ERROR      0x17
-> +
-> +static const char *const sev_fw_errlist[] = {
+After e492dc5a267e "pci: Eliminate pci_find_primary_bus()" we don't
+have an easy mean to retrieve the primary bus of a machine. This will be
+needed by virtio-iommu-device which is bound to be dynamically instantiated
+in at least ARM virt and Q35 machines.
 
-This requires anybody reading the code to manually count the
-number of items on the array to be sure fw_error_to_str() is
-safe.
+Adding a get_primary_pci_bus() callback allows to retrieve the PCIBus the
+iommu is connected to.
 
-What about:
-  #define SEV_FW_MAX_ERROR ARRAY_SIZE(sev_fw_errlist)
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
+---
 
-> +    "",
-> +    "Platform state is invalid",
-> +    "Guest state is invalid",
-> +    "Platform configuration is invalid",
-> +    "Buffer too small",
-> +    "Platform is already owned",
-> +    "Certificate is invalid",
-> +    "Policy is not allowed",
-> +    "Guest is not active",
-> +    "Invalid address",
-> +    "Bad signature",
-> +    "Bad measurement",
-> +    "Asid is already owned",
-> +    "Invalid ASID",
-> +    "WBINVD is required",
-> +    "DF_FLUSH is required",
-> +    "Guest handle is invalid",
-> +    "Invalid command",
-> +    "Guest is active",
-> +    "Hardware error",
-> +    "Hardware unsafe",
-> +    "Feature not supported",
-> +    "Invalid parameter"
-> +};
-[...]
-> +fw_error_to_str(int code)
-> +{
-> +    if (code >= SEV_FW_MAX_ERROR) {
-> +        return "unknown error";
-> +    }
-> +
-> +    return sev_fw_errlist[code];
-> +}
-> +
+This is a temporary solution until we decide whether the
+virtio-iommu-device should be instantiable through a -device command
+line or through a machine command line, as already suggested by Peter
+(for vsmmuv3 though).
+---
+ include/hw/boards.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index efb0a9e..0ed376a 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -156,6 +156,8 @@ typedef struct {
+  *    should instead use "unimplemented-device" for all memory ranges where
+  *    the guest will attempt to probe for a device that QEMU doesn't
+  *    implement and a stub device is required.
++ * @get_primary_pci_bus: return the primary PCI bus or NULL if there are
++ *    several root buses
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -212,6 +214,7 @@ struct MachineClass {
+                                                          unsigned cpu_index);
+     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+     int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
++    PCIBus *(*get_primary_pci_bus)(const MachineState *ms);
+ };
+ 
+ /**
 -- 
-Eduardo
+1.9.1
