@@ -1,15 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elJ9y-0007wd-15
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:49:03 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1elJEi-0003cv-62
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:53:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elJ9x-0005SW-1t
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:49:02 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 12 Feb 2018 18:48:49 +0000
-Message-Id: <20180212184849.11858-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] qemu-io: fix EOF Ctrl-D handling in qemu-io
- readline code
+	(envelope-from <ehabkost@redhat.com>) id 1elJEf-0004GF-8h
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:53:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1elJEf-0004Fh-3a
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 13:53:53 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 12 Feb 2018 16:53:40 -0200
+Message-Id: <20180212185347.8433-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 0/7] machine/CPU queue, 2018-02-12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,95 +21,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+The following changes since commit 8e3fb8029efaf220ab48290cdb5151c682227030:
 
-qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
-done and thus getchar() will never return the EOF constant. Instead we have to
-query the TTY attributes to determine the configured EOF character (usually
-Ctrl-D / 0x4), and then explicitly check for that value. This fixes the
-regression that prevented Ctrl-D from triggering an exit of qemu-io that has
-existed since readline was first added in
+  Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' into staging (2018-02-12 13:00:03 +0000)
 
-  commit 0cf17e181798063c3824c8200ba46f25f54faa1a
-  Author: Stefan Hajnoczi <stefanha@redhat.com>
-  Date:   Thu Nov 14 11:54:17 2013 +0100
+are available in the Git repository at:
 
-    qemu-io: use readline.c
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
 
-It also ensures that a newline is printed when exiting, to complete the
-line output by the "qemu-io> " prompt.
+for you to fetch changes up to 71479144b8c743f0f2b7cdf831f65edc6931c3cf:
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
+  cpu: drop unnecessary NULL check and cpu_common_class_by_name() (2018-02-12 15:17:05 -0200)
 
-Changed in v3:
+----------------------------------------------------------------
+machine/CPU queue, 2018-02-12
 
- - print newline when exiting
+----------------------------------------------------------------
 
- qemu-io.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+Igor Mammedov (6):
+  nios2: 10m50_devboard: replace cpu_model with cpu_type
+  tests: add machine 'none' with -cpu test
+  cpu: add CPU_RESOLVING_TYPE macro
+  Use cpu_create(type) instead of cpu_init(cpu_model)
+  cpu: get rid of unused cpu_init() defines
+  cpu: drop unnecessary NULL check and cpu_common_class_by_name()
 
-diff --git a/qemu-io.c b/qemu-io.c
-index f554ab614b..2c00ea068e 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -11,6 +11,9 @@
- #include "qemu/osdep.h"
- #include <getopt.h>
- #include <libgen.h>
-+#ifndef _WIN32
-+#include <termios.h>
-+#endif
- 
- #include "qapi/error.h"
- #include "qemu-io.h"
-@@ -42,6 +45,26 @@ static bool imageOpts;
- 
- static ReadLineState *readline_state;
- 
-+static int ttyEOF;
-+
-+static int get_eof_char(void)
-+{
-+#ifdef _WIN32
-+    return 0x4; /* Ctrl-D */
-+#else
-+    struct termios tty;
-+    if (tcgetattr(STDIN_FILENO, &tty) != 0) {
-+        if (errno == ENOTTY) {
-+            return 0x0; /* just expect read() == 0 */
-+        } else {
-+            return 0x4; /* Ctrl-D */
-+        }
-+    }
-+
-+    return tty.c_cc[VEOF];
-+#endif
-+}
-+
- static int close_f(BlockBackend *blk, int argc, char **argv)
- {
-     blk_unref(qemuio_blk);
-@@ -323,7 +346,8 @@ static char *fetchline_readline(void)
-     readline_start(readline_state, get_prompt(), 0, readline_func, &line);
-     while (!line) {
-         int ch = getchar();
--        if (ch == EOF) {
-+        if (ttyEOF != 0x0 && ch == ttyEOF) {
-+            printf("\n");
-             break;
-         }
-         readline_handle_byte(readline_state, ch);
-@@ -593,6 +617,7 @@ int main(int argc, char **argv)
-     qemuio_add_command(&close_cmd);
- 
-     if (isatty(STDIN_FILENO)) {
-+        ttyEOF = get_eof_char();
-         readline_state = readline_init(readline_printf_func,
-                                        readline_flush_func,
-                                        NULL,
+Wang Xin (1):
+  pc: correct misspelled CPU model-id for pc 2.2
+
+ include/hw/boards.h       |   1 -
+ include/hw/i386/pc.h      |   2 +-
+ include/qom/cpu.h         |  16 +-------
+ target/alpha/cpu.h        |   3 +-
+ target/arm/cpu.h          |   3 +-
+ target/cris/cpu.h         |   3 +-
+ target/hppa/cpu.h         |   2 +-
+ target/i386/cpu.h         |   3 +-
+ target/lm32/cpu.h         |   3 +-
+ target/m68k/cpu.h         |   3 +-
+ target/microblaze/cpu.h   |   2 +-
+ target/mips/cpu.h         |   3 +-
+ target/moxie/cpu.h        |   3 +-
+ target/nios2/cpu.h        |   2 +-
+ target/openrisc/cpu.h     |   3 +-
+ target/ppc/cpu.h          |   3 +-
+ target/s390x/cpu.h        |   3 +-
+ target/sh4/cpu.h          |   3 +-
+ target/sparc/cpu.h        |   5 +--
+ target/tilegx/cpu.h       |   2 +-
+ target/tricore/cpu.h      |   3 +-
+ target/unicore32/cpu.h    |   3 +-
+ target/xtensa/cpu.h       |   3 +-
+ bsd-user/main.c           |   4 +-
+ exec.c                    |  23 +++++++++++
+ hw/core/null-machine.c    |   6 +--
+ hw/nios2/10m50_devboard.c |   2 +-
+ linux-user/main.c         |   8 +++-
+ qom/cpu.c                 |  61 +++-------------------------
+ target/i386/cpu.c         |   8 +---
+ tests/machine-none-test.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++
+ vl.c                      |  10 ++---
+ tests/Makefile.include    |   2 +
+ 33 files changed, 171 insertions(+), 130 deletions(-)
+ create mode 100644 tests/machine-none-test.c
+
 -- 
 2.14.3
