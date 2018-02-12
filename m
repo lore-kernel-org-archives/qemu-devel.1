@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1el8RN-0000j8-B4
+	(envelope-from <armbru@redhat.com>) id 1el8RN-0000jF-CZ
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1el8RK-0005vw-M4
+	(envelope-from <armbru@redhat.com>) id 1el8RK-0005uz-Al
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:17 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43056 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42990 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1el8RK-0005tq-AJ
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1el8RK-0005tr-3h
 	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 02:22:14 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 12 Feb 2018 08:22:02 +0100
-Message-Id: <20180212072207.9367-10-armbru@redhat.com>
+Date: Mon, 12 Feb 2018 08:22:01 +0100
+Message-Id: <20180212072207.9367-9-armbru@redhat.com>
 In-Reply-To: <20180212072207.9367-1-armbru@redhat.com>
 References: <20180212072207.9367-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 09/14] qapi: Pass ifcond to visitors
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH RFC 08/14] qapi: leave the ifcond attribute
+ undefined until check()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,157 +30,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+We commonly initialize attributes to None in .init(), then set their
+real value in .check().  Accessing the attribute before .check()
+yields None.  If we're lucky, the code that accesses the attribute
+prematurely chokes on None.
+
+It won't for .ifcond, because None is a legitimate value.
+
+Leave the ifcond attribute undefined until check().
+
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/common.py                 | 15 +++++++++++++++
- tests/qapi-schema/qapi-schema-test.out |  9 +++++++++
- tests/qapi-schema/test-qapi.py         | 19 +++++++++++++++++++
- 3 files changed, 43 insertions(+)
+ scripts/qapi/common.py | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 78aeec785e..692a7ec7c2 100644
+index 789c77f11f..78aeec785e 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -1066,6 +1066,9 @@ class QAPISchemaVisitor(object):
-     def visit_include(self, fname, info):
-         pass
- 
-+    def visit_ifcond(self, ifcond, begin):
-+        pass
-+
-     def visit_builtin_type(self, name, info, json_type):
-         pass
- 
-@@ -1792,12 +1795,24 @@ class QAPISchema(object):
-     def visit(self, visitor):
-         visitor.visit_begin(self)
-         module = None
-+        ifcond = None
-         for entity in self._entity_list:
-             if visitor.visit_needed(entity):
-                 if entity.module != module:
-+                    if ifcond:
-+                        visitor.visit_ifcond(ifcond, False)
-+                        ifcond = None
-                     module = entity.module
-                     visitor.visit_module(module)
-+                if entity.ifcond != ifcond:
-+                    if ifcond:
-+                        visitor.visit_ifcond(ifcond, False)
-+                    ifcond = entity.ifcond
-+                    if ifcond:
-+                        visitor.visit_ifcond(ifcond, True)
-                 entity.visit(visitor)
-+        if ifcond:
-+            visitor.visit_ifcond(ifcond, False)
-         visitor.visit_end()
- 
- 
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index b11682314c..8fe9d7a3a8 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -232,23 +232,32 @@ command __org.qemu_x-command q_obj___org.qemu_x-command-arg -> __org.qemu_x-Unio
-    gen=True success_response=True boxed=False
- object TestIfStruct
-     member foo: int optional=False
-+    if ['defined(TEST_IF_STRUCT)']
- enum TestIfEnum ['foo', 'bar']
-+    if ['defined(TEST_IF_ENUM)']
- object q_obj_TestStruct-wrapper
-     member data: TestStruct optional=False
- enum TestIfUnionKind ['foo']
-+    if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
- object TestIfUnion
-     member type: TestIfUnionKind optional=False
-     tag type
-     case foo: q_obj_TestStruct-wrapper
-+    if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
- alternate TestIfAlternate
-     tag type
-     case foo: int
-     case bar: TestStruct
-+    if ['defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)']
- object q_obj_TestIfCmd-arg
-     member foo: TestIfStruct optional=False
-+    if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
- command TestIfCmd q_obj_TestIfCmd-arg -> None
-    gen=True success_response=True boxed=False
-+    if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
- object q_obj_TestIfEvent-arg
-     member foo: TestIfStruct optional=False
-+    if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
- event TestIfEvent q_obj_TestIfEvent-arg
-    boxed=False
-+    if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index 67e417e298..fcdbb5b1ea 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -17,16 +17,26 @@ from qapi.common import QAPIError, QAPISchema, QAPISchemaVisitor
- 
- class QAPISchemaTestVisitor(QAPISchemaVisitor):
- 
-+    def __init__(self):
-+        self._ifcond = None
-+
-     def visit_module(self, name):
-         print('module %s' % name)
- 
-     def visit_include(self, name, info):
-         print('include %s' % name)
- 
-+    def visit_ifcond(self, ifcond, begin):
-+        if begin:
-+            self._ifcond = ifcond
+@@ -1028,13 +1028,19 @@ class QAPISchemaEntity(object):
+         # such place).
+         self.info =3D info
+         self.doc =3D doc
+-        self.ifcond =3D listify_cond(ifcond)
++        self._ifcond =3D ifcond  # self.ifcond is set after check()
+=20
+     def c_name(self):
+         return c_name(self.name)
+=20
+     def check(self, schema):
+-        pass
++        if isinstance(self._ifcond, QAPISchemaType):
++            # inherit the condition from a type
++            typ =3D self._ifcond
++            typ.check(schema)
++            self.ifcond =3D typ.ifcond
 +        else:
-+            self._ifcond = None
-+
-     def visit_enum_type(self, name, info, values, prefix):
-         print('enum %s %s' % (name, values))
-         if prefix:
-             print('    prefix %s' % prefix)
-+        self._print_if(self._ifcond)
- 
-     def visit_object_type(self, name, info, base, members, variants):
-         print('object %s' % name)
-@@ -36,10 +46,12 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-             print('    member %s: %s optional=%s' % \
-                   (m.name, m.type.name, m.optional))
-         self._print_variants(variants)
-+        self._print_if(self._ifcond)
- 
-     def visit_alternate_type(self, name, info, variants):
-         print('alternate %s' % name)
-         self._print_variants(variants)
-+        self._print_if(self._ifcond)
- 
-     def visit_command(self, name, info, arg_type, ret_type,
-                       gen, success_response, boxed):
-@@ -47,10 +59,12 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-               (name, arg_type and arg_type.name, ret_type and ret_type.name))
-         print('   gen=%s success_response=%s boxed=%s' % \
-               (gen, success_response, boxed))
-+        self._print_if(self._ifcond)
- 
-     def visit_event(self, name, info, arg_type, boxed):
-         print('event %s %s' % (name, arg_type and arg_type.name))
-         print('   boxed=%s' % boxed)
-+        self._print_if(self._ifcond)
- 
-     @staticmethod
-     def _print_variants(variants):
-@@ -59,6 +73,11 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-             for v in variants.variants:
-                 print('    case %s: %s' % (v.name, v.type.name))
- 
-+    @staticmethod
-+    def _print_if(ifcond, indent=4):
-+        if ifcond:
-+            print('%sif %s' % (' ' * indent, ifcond))
-+
- 
- try:
-     schema = QAPISchema(sys.argv[1])
--- 
++            self.ifcond =3D listify_cond(self._ifcond)
+=20
+     def is_implicit(self):
+         return not self.info
+@@ -1171,6 +1177,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+         self.prefix =3D prefix
+=20
+     def check(self, schema):
++        QAPISchemaType.check(self, schema)
+         seen =3D {}
+         for v in self.values:
+             v.check_clash(self.info, seen)
+@@ -1203,8 +1210,10 @@ class QAPISchemaArrayType(QAPISchemaType):
+         self.element_type =3D None
+=20
+     def check(self, schema):
++        QAPISchemaType.check(self, schema)
+         self.element_type =3D schema.lookup_type(self._element_type_name=
+)
+         assert self.element_type
++        self.element_type.check(schema)
+         self.ifcond =3D self.element_type.ifcond
+=20
+     def is_implicit(self):
+@@ -1247,6 +1256,7 @@ class QAPISchemaObjectType(QAPISchemaType):
+         self.members =3D None
+=20
+     def check(self, schema):
++        QAPISchemaType.check(self, schema)
+         if self.members is False:               # check for cycles
+             raise QAPISemError(self.info,
+                                "Object %s contains itself" % self.name)
+@@ -1429,6 +1439,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+         self.variants =3D variants
+=20
+     def check(self, schema):
++        QAPISchemaType.check(self, schema)
+         self.variants.tag_member.check(schema)
+         # Not calling self.variants.check_clash(), because there's nothi=
+ng
+         # to clash with
+@@ -1471,6 +1482,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         self.boxed =3D boxed
+=20
+     def check(self, schema):
++        QAPISchemaEntity.check(self, schema)
+         if self._arg_type_name:
+             self.arg_type =3D schema.lookup_type(self._arg_type_name)
+             assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+@@ -1504,6 +1516,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+         self.boxed =3D boxed
+=20
+     def check(self, schema):
++        QAPISchemaEntity.check(self, schema)
+         if self._arg_type_name:
+             self.arg_type =3D schema.lookup_type(self._arg_type_name)
+             assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+@@ -1632,7 +1645,7 @@ class QAPISchema(object):
+             # But it's not tight: the disjunction need not imply it.  We
+             # may end up compiling useless wrapper types.
+             # TODO kill simple unions or implement the disjunction
+-            assert ifcond =3D=3D typ.ifcond
++            assert ifcond =3D=3D typ._ifcond
+         else:
+             self._def_entity(QAPISchemaObjectType(name, info, doc, ifcon=
+d,
+                                                   None, members, None))
+@@ -1678,7 +1691,7 @@ class QAPISchema(object):
+             assert len(typ) =3D=3D 1
+             typ =3D self._make_array_type(typ[0], info)
+         typ =3D self._make_implicit_object_type(
+-            typ, info, None, self.lookup_type(typ).ifcond,
++            typ, info, None, self.lookup_type(typ),
+             'wrapper', [self._make_member('data', typ, info)])
+         return QAPISchemaObjectTypeVariant(case, typ)
+=20
+--=20
 2.13.6
