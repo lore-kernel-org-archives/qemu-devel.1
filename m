@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eldTl-0004qw-Tx
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:30:53 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eldUh-0005TT-KM
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:31:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eldTi-0006tb-7C
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:30:49 -0500
-Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:48685)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eldTi-0006nX-0d
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:30:46 -0500
-Received: from player711.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 8E44BC86FA
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 17:30:35 +0100 (CET)
-Date: Tue, 13 Feb 2018 17:30:22 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180213173022.25c0fd8b@bahia.lan>
-In-Reply-To: <20180212161323.GC2545@work-vm>
-References: <20180206191515.25830-1-mdroth@linux.vnet.ibm.com>
-	<1fa746ad-7640-6159-26e3-b2fb378c68af@kamp.de>
-	<20180212161323.GC2545@work-vm>
+	(envelope-from <no-reply@patchew.org>) id 1eldUd-0007H3-8t
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:31:47 -0500
+Resent-Message-Id: <E1eldUd-0007H3-8t@eggs.gnu.org>
+In-Reply-To: <20180213161240.19891-1-david@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151853948001.582.10146832003778705101@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/54] Patch Round-up for
- stable 2.11.1, freeze on 2018-02-12
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 13 Feb 2018 08:31:21 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/tcg: fix disabling/enabling DAT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org, christian.ehrhardt@canonical.com, qemu-devel@nongnu.org
+To: david@redhat.com
+Cc: famz@redhat.com, qemu-s390x@nongnu.org, agraf@suse.de, cohuck@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
 
-On Mon, 12 Feb 2018 16:13:23 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-
-> * Peter Lieven (pl@kamp.de) wrote:
-> > Am 06.02.2018 um 20:14 schrieb Michael Roth:  
-> > > Hi everyone,
-> > > 
-> > > The following new patches are queued for QEMU stable v2.11.1:
-> > > 
-> > >    https://github.com/mdroth/qemu/commits/stable-2.11-staging
-> > > 
-> > > The release is planned for 2017-02-14:
-> > > 
-> > >    https://wiki.qemu.org/Planning/2.11
-> > > 
-> > > Please respond here or CC qemu-stable@nongnu.org on any patches you
-> > > think should be included in the release.
-> > > 
-> > > Of particular importance would be any feedback on the various QEMU
-> > > patches relating to Spectre/Meltdown mitigation. The current tree has
-> > > what I understand to be the QEMU components required for x86, s390,
-> > > and pseries, but feedback/confirmation from the various authors would
-> > > be greatly appreciated.  
-> > 
-> > Hi,
-> > 
-> > I also found the following patches that affect migration:
-> > 
-> > migration: Don't leak IO channels
-> > migration: Recover block devices if failure in device state
-> > migration/savevm.c: set MAX_VM_CMD_PACKAGED_SIZE to 1ul << 32
-> > 
-> > In general it seems that migration related patches are often not tagged qemu-stable.
-> > David, can you check if there are patches missing?  
-> 
-> I'm always a bit cautious about forwarding stuff to stable; just because
-> it's landed in our main branch it doesn't mean many people have tested
-> it, so I'd rather wait unless it was particularly urgent.
-> 
-> The 'migration: Recover block devices if failure in device state' is
-> probably a good candidate.
-> Another one would be Greg Kurz's:
-> 875fcd013ab68c64802998b22f54f0184479d21b - migration: incoming postcopy advise sanity checks
-> 
-
-Yeah. Mike pushed it to its stable-2.11-staging tree:
-
-https://github.com/mdroth/qemu/commit/a3fd64f2fe9f90c7b4d002910a54049ee6a09b64
-
-Cheers,
-
---
-Greg
-
-> Dave
-> 
-> > Thank you,
-> > Peter
-> >   
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjEzMTYxMjQwLjE5ODkxLTEtZGF2aWRAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxXSBzMzkweC90Y2c6IGZpeCBkaXNhYmxpbmcvZW5hYmxp
+bmcgREFUCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
+czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAg
+ICAgICAgcGF0Y2hldy8yMDE4MDEwOTEyMjI1Mi4xNzY3MC0xLWFsZXguYmVubmVlQGxpbmFyby5v
+cmcgLT4gcGF0Y2hldy8yMDE4MDEwOTEyMjI1Mi4xNzY3MC0xLWFsZXguYmVubmVlQGxpbmFyby5v
+cmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIwNjE2NDgxNS4xMDA4
+NC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDIwNjE2NDgxNS4xMDA4
+NC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
+Y2hldy8yMDE4MDIxMzEzMDM1Ni44ODg1LTEtbXJlaXR6QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
+MDE4MDIxMzEzMDM1Ni44ODg1LTEtbXJlaXR6QHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE4MDIxMzEzMjI0Ni4yNjg0NC0xLXBldGVyLm1heWRlbGxAbGlu
+YXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwMjEzMTMyMjQ2LjI2ODQ0LTEtcGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAyMTMxNDAw
+MjkuODMwOC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwMjEzMTQw
+MDI5LjgzMDgtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAg
+ICAgICAgcGF0Y2hldy8yMDE4MDIxMzE0MjEwMi4xNDQ1MC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20g
+LT4gcGF0Y2hldy8yMDE4MDIxMzE0MjEwMi4xNDQ1MC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KICog
+W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIxMzE2MTI0MC4xOTg5MS0xLWRh
+dmlkQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDIxMzE2MTI0MC4xOTg5MS0xLWRhdmlkQHJl
+ZGhhdC5jb20KQXV0byBwYWNraW5nIHRoZSByZXBvc2l0b3J5IGluIGJhY2tncm91bmQgZm9yIG9w
+dGltdW0gcGVyZm9ybWFuY2UuClNlZSAiZ2l0IGhlbHAgZ2MiIGZvciBtYW51YWwgaG91c2VrZWVw
+aW5nLgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjM5MzFmMmZkZDcgczM5MHgvdGNn
+OiBmaXggZGlzYWJsaW5nL2VuYWJsaW5nIERBVAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS8xOiBzMzkweC90Y2c6IGZpeCBkaXNhYmxpbmcvZW5hYmxpbmcgREFULi4uCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogdGFyZ2V0L3MzOTB4L2Nw
+dS5oOjMyMDoKKyNkZWZpbmUgRkxBR19NQVNLX1BTVwkJKEZMQUdfTUFTS19QRVIgfCBGTEFHX01B
+U0tfREFUIHwgRkxBR19NQVNLX1BTVEFURSBcCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMzMjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdS5oOjMyMDoKKyNkZWZpbmUg
+RkxBR19NQVNLX1BTV15JXkkoRkxBR19NQVNLX1BFUiB8IEZMQUdfTUFTS19EQVQgfCBGTEFHX01B
+U0tfUFNUQVRFIFwkCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDUxIGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
