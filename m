@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRfF-0001zY-OH
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 22:53:54 -0500
+	(envelope-from <peterx@redhat.com>) id 1elRiQ-0003yW-SS
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 22:57:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRfB-0006LQ-Mm
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 22:53:53 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:38896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRfB-0006KJ-I5
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 22:53:49 -0500
-Received: by mail-qk0-x244.google.com with SMTP id s198so4920864qke.5
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 19:53:49 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180213025306.16736-1-linzhecheng@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <11266f1b-1001-4ddc-173b-7d079b3cc221@amsat.org>
-Date: Tue, 13 Feb 2018 00:53:45 -0300
+	(envelope-from <peterx@redhat.com>) id 1elRiN-0000Ew-Jw
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 22:57:10 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48722 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1elRiN-0000E6-Ew
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 22:57:07 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D77598182D2D
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 03:56:55 +0000 (UTC)
+Date: Tue, 13 Feb 2018 11:56:47 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180213035647.GE4472@xz-mi>
+References: <20180212160340.15333-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180213025306.16736-1-linzhecheng@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix memory leak
+Content-Disposition: inline
+In-Reply-To: <20180212160340.15333-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] migration: Fix early failure crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linzhecheng <linzhecheng@huawei.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, wangxinxin.wang@huawei.com, lidonglin@huawei.com, mst@redhat.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-Hi Linzhecheng,
-
-On 02/12/2018 11:53 PM, linzhecheng wrote:
-> fix memory leak
+On Mon, Feb 12, 2018 at 04:03:38PM +0000, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+> This fixes a crash for the case where a migration exits with an error
+> very early, this is probably due to my recent error handling change.
 > 
-> diff --git a/net/vhost-user.c b/net/vhost-user.c
-> index cb45512506..d024573e45 100644
-> --- a/net/vhost-user.c
-> +++ b/net/vhost-user.c
-> @@ -109,6 +109,7 @@ static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
->  err:
->      if (net) {
->          vhost_net_cleanup(net);
-> +        g_free(net);
-
-I think this g_free() belongs to vhost_net_cleanup() in net/vhost_net.c:
-
-void vhost_net_cleanup(struct vhost_net *net)
-{
-    vhost_dev_cleanup(&net->dev);
-    g_free(net);
-}
-
-Regards,
-
-Phil.
-
->      }
->      vhost_user_stop(i, ncs);
->      return -1;
+> I also add a test to make sure this doesn't fail again, the test does
+> output one line of junk, suggestions for how to clean it up are welcome:
 > 
+> [dgilbert@dgilbert-t530 try]$ tests/migration-test 
+> /x86_64/migration/deprecated: OK
+> /x86_64/migration/bad_dest: qemu-system-x86_64: Failed to connect socket: Connection refused
+> OK
+> /x86_64/migration/postcopy/unix: OK
+
+So we have more than one way to log things (error_report routes things
+directly to stderr while we also have the qemu log stuff).
+
+A stupid but fast way I can think of is just don't dump this in
+migrate_fd_cleanup, since after all it's only for HMP and people
+should also see that when query migration status.  But it'll be a bit
+inconvenient for HMP users encountering failures.
+
+Or maybe we can hack around fd 2 specifically in that test?  It's at
+least ugly though...
+
+Anyway, the patches look good to me.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+-- 
+Peter Xu
