@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1Z-0002l7-PJ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1d-0002nc-CX
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1X-0005B8-Tt
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005Fa-E1
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:49 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:36 +0100
-Message-Id: <20180213170529.10858-3-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:38 +0100
+Message-Id: <20180213170529.10858-5-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 02/55] qemu-img.texi: Clean up parameter list
+Subject: [Qemu-devel] [PULL 04/55] docs: Document share-rw property more
+ thoroughly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,142 +25,35 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Fam Zheng <famz@redhat.com>
 
-Split options out of the "@table @var" section and create a "@table
-@option", then use whitespaces and blank lines consistently.
-
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-img.texi | 66 +++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 39 insertions(+), 27 deletions(-)
+ docs/qemu-block-drivers.texi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index fdcf120f36..60a0e080c6 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -33,38 +33,14 @@ The following commands are supported:
+diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+index cd74767ed3..f1793692bb 100644
+--- a/docs/qemu-block-drivers.texi
++++ b/docs/qemu-block-drivers.texi
+@@ -845,6 +845,16 @@ QEMU transparently handles lock handover during shared storage migration.  For
+ shared virtual disk images between multiple VMs, the "share-rw" device option
+ should be used.
  
- Command parameters:
- @table @var
--@item filename
-- is a disk image filename
--
--@item --object @var{objectdef}
--
--is a QEMU user creatable object definition. See the @code{qemu(1)} manual
--page for a description of the object properties. The most common object
--type is a @code{secret}, which is used to supply passwords and/or encryption
--keys.
--
--@item --image-opts
--
--Indicates that the source @var{filename} parameter is to be interpreted as a
--full option string, not a plain filename. This parameter is mutually
--exclusive with the @var{-f} parameter.
--
--@item --target-image-opts
- 
--Indicates that the @var{output_filename} parameter(s) are to be interpreted as
--a full option string, not a plain filename. This parameter is mutually
--exclusive with the @var{-O} parameters. It is currently required to also use
--the @var{-n} parameter to skip image creation. This restriction may be relaxed
--in a future release.
-+@item filename
-+is a disk image filename
- 
- @item fmt
- is the disk image format. It is guessed automatically in most cases. See below
- for a description of the supported disk formats.
- 
--@item --backing-chain
--will enumerate information about backing files in a disk image chain. Refer
--below for further description.
--
- @item size
- is the disk image size in bytes. Optional suffixes @code{k} or @code{K}
- (kilobyte, 1024) @code{M} (megabyte, 1024k) and @code{G} (gigabyte, 1024M)
-@@ -74,42 +50,78 @@ and T (terabyte, 1024G) are supported.  @code{b} is ignored.
- is the destination disk image filename
- 
- @item output_fmt
-- is the destination format
-+is the destination format
++By default, the guest has exclusive write access to its disk image. If the
++guest can safely share the disk image with other writers the @code{-device
++...,share-rw=on} parameter can be used.  This is only safe if the guest is
++running software, such as a cluster file system, that coordinates disk accesses
++to avoid corruption.
 +
- @item options
- is a comma separated list of format specific options in a
- name=value format. Use @code{-o ?} for an overview of the options supported
- by the used format or see the format descriptions below for details.
++Note that share-rw=on only declares the guest's ability to share the disk.
++Some QEMU features, such as image file formats, require exclusive write access
++to the disk image and this is unaffected by the share-rw=on option.
 +
- @item snapshot_param
- is param used for internal snapshot, format is
- 'snapshot.id=[ID],snapshot.name=[NAME]' or '[ID_OR_NAME]'
-+
- @item snapshot_id_or_name
- is deprecated, use snapshot_param instead
- 
-+@end table
-+
-+@table @option
-+
-+@item --object @var{objectdef}
-+is a QEMU user creatable object definition. See the @code{qemu(1)} manual
-+page for a description of the object properties. The most common object
-+type is a @code{secret}, which is used to supply passwords and/or encryption
-+keys.
-+
-+@item --image-opts
-+Indicates that the source @var{filename} parameter is to be interpreted as a
-+full option string, not a plain filename. This parameter is mutually
-+exclusive with the @var{-f} parameter.
-+
-+@item --target-image-opts
-+Indicates that the @var{output_filename} parameter(s) are to be interpreted as
-+a full option string, not a plain filename. This parameter is mutually
-+exclusive with the @var{-O} parameters. It is currently required to also use
-+the @var{-n} parameter to skip image creation. This restriction may be relaxed
-+in a future release.
-+
-+@item --backing-chain
-+will enumerate information about backing files in a disk image chain. Refer
-+below for further description.
-+
- @item -c
- indicates that target image must be compressed (qcow format only)
-+
- @item -h
- with or without a command shows help and lists the supported formats
-+
- @item -p
- display progress bar (compare, convert and rebase commands only).
- If the @var{-p} option is not used for a command that supports it, the
- progress is reported when the process receives a @code{SIGUSR1} or
- @code{SIGINFO} signal.
-+
- @item -q
- Quiet mode - do not print any output (except errors). There's no progress bar
- in case both @var{-q} and @var{-p} options are used.
-+
- @item -S @var{size}
- indicates the consecutive number of bytes that must contain only zeros
- for qemu-img to create a sparse image during conversion. This value is rounded
- down to the nearest 512 bytes. You may use the common size suffixes like
- @code{k} for kilobytes.
-+
- @item -t @var{cache}
- specifies the cache mode that should be used with the (destination) file. See
- the documentation of the emulator's @code{-drive cache=...} option for allowed
- values.
-+
- @item -T @var{src_cache}
- specifies the cache mode that should be used with the source file(s). See
- the documentation of the emulator's @code{-drive cache=...} option for allowed
- values.
-+
- @end table
- 
- Parameters to snapshot subcommand:
+ Alternatively, locking can be fully disabled by "locking=off" block device
+ option. In the command line, the option is usually in the form of
+ "file.locking=off" as the protocol driver is normally placed as a "file" child
 -- 
 2.13.6
