@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elXTn-00036o-Ig
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:06:29 -0500
+	(envelope-from <david.engraf@sysgo.com>) id 1elXjz-0001yn-EU
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:23:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elXTg-0005Ex-NQ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:06:27 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36288 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elXTg-0005ET-IQ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:06:20 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 13 Feb 2018 10:06:06 +0000
-Message-Id: <20180213100606.5379-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4] tests/migration: Add source to PC boot block
+	(envelope-from <david.engraf@sysgo.com>) id 1elXjv-00060j-8m
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:23:11 -0500
+From: David Engraf <david.engraf@sysgo.com>
+Date: Tue, 13 Feb 2018 11:22:58 +0100
+Message-Id: <20180213102258.26145-1-david.engraf@sysgo.com>
+In-Reply-To: <20180130075847.6023-1-david.engraf@sysgo.com>
+References: <20180130075847.6023-1-david.engraf@sysgo.com>
+Subject: [Qemu-devel] [PATCH v2] PPC: e500: Fix duplicate kernel load and
+ device tree overlap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,300 +20,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, drjones@redhat.com, wei@redhat.com, eblake@redhat.com
-Cc: peter.maydell@linaro.org, peterx@redhat.com
+To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Engraf <david.engraf@sysgo.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+This patch fixes an incorrect behavior when the -kernel argument has been
+specified without -bios. In this case the kernel was loaded twice. At address
+32M as a raw image and afterwards by load_elf/load_uimage at the
+corresponding load address. In this case the region for the device tree and
+the raw kernel image may overlap.
 
-The boot block used in the migration test is currently only
-shipped as a hex (with the source in the git commit message of ea0c6d62),
-change this to actually include the source.
+The patch fixes the behavior by loading the kernel image once with
+load_elf/load_uimage and skips loading the raw image. It also ensures that
+the device tree is generated behind bios/kernel/initrd.
 
-A script is added to rebuild the header but the expectation is that
-the generated hex is shipped as well as the .s, so that
-there's no requirement to have just the right assembler etc.
+When here do not use bios_name/size for the kernel and use a more generic
+name called payload_name/size.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: David Engraf <david.engraf@sysgo.com>
 ---
- tests/migration-test.c                   | 52 ++----------------
- tests/migration/rebuild-x86-bootblock.sh | 34 ++++++++++++
- tests/migration/x86-a-b-bootblock.h      | 51 ++++++++++++++++++
- tests/migration/x86-a-b-bootblock.s      | 92 ++++++++++++++++++++++++++++++++
- 4 files changed, 181 insertions(+), 48 deletions(-)
- create mode 100755 tests/migration/rebuild-x86-bootblock.sh
- create mode 100644 tests/migration/x86-a-b-bootblock.h
- create mode 100644 tests/migration/x86-a-b-bootblock.s
+ hw/ppc/e500.c | 112 ++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 65 insertions(+), 47 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index c1ebbdf08f..74f9361bdd 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -1,7 +1,7 @@
- /*
-  * QTest testcase for migration
-  *
-- * Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-+ * Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
-  *   based on the vhost-user-test.c that is:
-  *      Copyright (c) 2014 Virtual Open Systems Sarl.
-  *
-@@ -78,59 +78,15 @@ static bool ufd_version_check(void)
- static const char *tmpfs;
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index c4fe06ea2a..d12b9d6121 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -776,7 +776,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     PCIBus *pci_bus;
+     CPUPPCState *env = NULL;
+-    uint64_t loadaddr;
+     hwaddr kernel_base = -1LL;
+     int kernel_size = 0;
+     hwaddr dt_base = 0;
+@@ -784,8 +783,10 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     int initrd_size = 0;
+     hwaddr cur_base = 0;
+     char *filename;
++    const char *payload_name;
++    bool kernel_as_payload;
+     hwaddr bios_entry = 0;
+-    target_long bios_size;
++    target_long payload_size;
+     struct boot_info *boot_info;
+     int dt_size;
+     int i;
+@@ -913,11 +914,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     /* Register spinning region */
+     sysbus_create_simple("e500-spin", params->spin_base, NULL);
  
- /* A simple PC boot sector that modifies memory (1-100MB) quickly
-- * outputing a 'B' every so often if it's still running.
-+ * outputting a 'B' every so often if it's still running.
-  */
--unsigned char bootsect[] = {
--  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
--  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
--  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
--  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
--  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
--  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
--  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
--  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
--};
-+#include "tests/migration/x86-a-b-bootblock.h"
+-    if (cur_base < (32 * 1024 * 1024)) {
+-        /* u-boot occupies memory up to 32MB, so load blobs above */
+-        cur_base = (32 * 1024 * 1024);
+-    }
+-
+     if (params->has_mpc8xxx_gpio) {
+         qemu_irq poweroff_irq;
  
- static void init_bootfile_x86(const char *bootpath)
- {
-     FILE *bootfile = fopen(bootpath, "wb");
+@@ -952,36 +948,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+                                     sysbus_mmio_get_region(s, 0));
+     }
  
--    g_assert_cmpint(fwrite(bootsect, 512, 1, bootfile), ==, 1);
-+    g_assert_cmpint(fwrite(x86_bootsect, 512, 1, bootfile), ==, 1);
-     fclose(bootfile);
- }
+-    /* Load kernel. */
+-    if (machine->kernel_filename) {
+-        kernel_base = cur_base;
+-        kernel_size = load_image_targphys(machine->kernel_filename,
+-                                          cur_base,
+-                                          ram_size - cur_base);
+-        if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    machine->kernel_filename);
+-            exit(1);
+-        }
+-
+-        cur_base += kernel_size;
+-    }
+-
+-    /* Load initrd. */
+-    if (machine->initrd_filename) {
+-        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+-        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
+-                                          ram_size - initrd_base);
+-
+-        if (initrd_size < 0) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
+-                    machine->initrd_filename);
+-            exit(1);
+-        }
+-
+-        cur_base = initrd_base + initrd_size;
+-    }
+-
+     /*
+      * Smart firmware defaults ahead!
+      *
+@@ -997,33 +963,85 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+      * This ensures backwards compatibility with how we used to expose
+      * -kernel to users but allows them to run through u-boot as well.
+      */
++    kernel_as_payload = false;
+     if (bios_name == NULL) {
+         if (machine->kernel_filename) {
+-            bios_name = machine->kernel_filename;
++            payload_name = machine->kernel_filename;
++            kernel_as_payload = true;
+         } else {
+-            bios_name = "u-boot.e500";
++            payload_name = "u-boot.e500";
+         }
++    } else {
++        payload_name = bios_name;
+     }
+-    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
  
-diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
-new file mode 100755
-index 0000000000..05ed9ba451
---- /dev/null
-+++ b/tests/migration/rebuild-x86-bootblock.sh
-@@ -0,0 +1,34 @@
-+#!/bin/sh
-+# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+#
-+# Author: dgilbert@redhat.com
+-    bios_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
+-                         1, PPC_ELF_MACHINE, 0, 0);
+-    if (bios_size < 0) {
++    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, payload_name);
 +
-+ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
-+HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
++    payload_size = load_elf(filename, NULL, NULL, &bios_entry, &cur_base, NULL,
++                            1, PPC_ELF_MACHINE, 0, 0);
++    if (payload_size < 0) {
+         /*
+          * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
+          * ePAPR compliant kernel
+          */
+-        kernel_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
+-                                  NULL, NULL);
+-        if (kernel_size < 0) {
++        payload_size = load_uimage(filename, &bios_entry, &cur_base, NULL,
++                                   NULL, NULL);
++        if (payload_size < 0) {
+             fprintf(stderr, "qemu: could not load firmware '%s'\n", filename);
+             exit(1);
+         }
+     }
 +
-+if [ ! -e "$ASMFILE" ]
-+then
-+  echo "Couldn't find $ASMFILE" >&2
-+  exit 1
-+fi
+     g_free(filename);
+ 
++    if (kernel_as_payload) {
++        kernel_base = cur_base;
++        kernel_size = payload_size;
++    }
 +
-+ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
-+cd "$ASM_WORK_DIR" &&
-+as --32 -march=i486 "$ASMFILE" -o x86.o &&
-+objcopy -O binary x86.o x86.boot &&
-+dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
-+xxd -i x86.bootsect |
-+sed -e 's/.*int.*//' > x86.hex &&
-+cat - x86.hex <<HERE > "$HEADER"
-+/* This file is automatically generated from
-+ * tests/migration/x86-a-b-bootblock.s, edit that and then run
-+ * tests/migration/rebuild-x86-bootblock.sh to update,
-+ * and then remember to send both in your patch submission.
-+ */
-+HERE
++    cur_base += payload_size;
 +
-+rm x86.hex x86.bootsect x86.boot x86.o
-+cd .. && rmdir "$ASM_WORK_DIR"
++    /* Load bare kernel only if no bios/u-boot has been provided */
++    if (machine->kernel_filename && !kernel_as_payload) {
++        kernel_base = cur_base;
++        kernel_size = load_image_targphys(machine->kernel_filename,
++                                          cur_base,
++                                          ram_size - cur_base);
++        if (kernel_size < 0) {
++            fprintf(stderr, "qemu: could not load kernel '%s'\n",
++                    machine->kernel_filename);
++            exit(1);
++        }
 +
-diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
-new file mode 100644
-index 0000000000..78a151fe2a
---- /dev/null
-+++ b/tests/migration/x86-a-b-bootblock.h
-@@ -0,0 +1,51 @@
-+/* This file is automatically generated from
-+ * tests/migration/x86-a-b-bootblock.s, edit that and then run
-+ * tests/migration/rebuild-x86-bootblock.sh to update,
-+ * and then remember to send both in your patch submission.
-+ */
-+unsigned char x86_bootsect[] = {
-+  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-+  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
-+  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
-+  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
-+  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
-+  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
-+  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
-+  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
-+};
++        cur_base += kernel_size;
++    }
 +
-diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
-new file mode 100644
-index 0000000000..b1642641a7
---- /dev/null
-+++ b/tests/migration/x86-a-b-bootblock.s
-@@ -0,0 +1,92 @@
-+# x86 bootblock used in migration test
-+#  repeatedly increments the first byte of each page in a 100MB
-+#  range.
-+#  Outputs an initial 'A' on serial followed by repeated 'B's
-+#
-+# run   tests/migration/rebuild-x86-bootblock.sh
-+#   to regenerate the hex, and remember to include both the .h and .s
-+#   in any patches.
-+#
-+# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+#
-+# Author: dgilbert@redhat.com
++    if (cur_base < (32 * 1024 * 1024)) {
++        /* u-boot occupies memory up to 32MB, so load blobs above */
++        cur_base = (32 * 1024 * 1024);
++    }
 +
++    /* Load initrd. */
++    if (machine->initrd_filename) {
++        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
++        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
++                                          ram_size - initrd_base);
 +
-+.code16
-+.org 0x7c00
-+        .file   "fill.s"
-+        .text
-+        .globl  start
-+        .type   start, @function
-+start:             # at 0x7c00 ?
-+        cli
-+        lgdt gdtdesc
-+        mov $1,%eax
-+        mov %eax,%cr0  # Protected mode enable
-+        data32 ljmp $8,$0x7c20
++        if (initrd_size < 0) {
++            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
++                    machine->initrd_filename);
++            exit(1);
++        }
 +
-+.org 0x7c20
-+.code32
-+        # A20 enable - not sure I actually need this
-+        inb $0x92,%al
-+        or  $2,%al
-+        outb %al, $0x92
++        cur_base = initrd_base + initrd_size;
++    }
 +
-+        # set up DS for the whole of RAM (needed on KVM)
-+        mov $16,%eax
-+        mov %eax,%ds
-+
-+        mov $65,%ax
-+        mov $0x3f8,%dx
-+        outb %al,%dx
-+
-+        # bl keeps a counter so we limit the output speed
-+        mov $0, %bl
-+mainloop:
-+        # Start from 1MB
-+        mov $(1024*1024),%eax
-+innerloop:
-+        incb (%eax)
-+        add $4096,%eax
-+        cmp $(100*1024*1024),%eax
-+        jl innerloop
-+
-+        inc %bl
-+        jnz mainloop
-+
-+        mov $66,%ax
-+        mov $0x3f8,%dx
-+        outb %al,%dx
-+
-+        jmp mainloop
-+
-+        # GDT magic from old (GPLv2)  Grub startup.S
-+        .p2align        2       /* force 4-byte alignment */
-+gdt:
-+        .word   0, 0
-+        .byte   0, 0, 0, 0
-+
-+        /* -- code segment --
-+         * base = 0x00000000, limit = 0xFFFFF (4 KiB Granularity), present
-+         * type = 32bit code execute/read, DPL = 0
-+         */
-+        .word   0xFFFF, 0
-+        .byte   0, 0x9A, 0xCF, 0
-+
-+        /* -- data segment --
-+         * base = 0x00000000, limit 0xFFFFF (4 KiB Granularity), present
-+         * type = 32 bit data read/write, DPL = 0
-+         */
-+        .word   0xFFFF, 0
-+        .byte   0, 0x92, 0xCF, 0
-+
-+gdtdesc:
-+        .word   0x27                    /* limit */
-+        .long   gdt                     /* addr */
-+
-+/* I'm a bootable disk */
-+.org 0x7dfe
-+        .byte 0x55
-+        .byte 0xAA
+     /* Reserve space for dtb */
+-    dt_base = (loadaddr + bios_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
++    dt_base = (cur_base + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
++    if (dt_base + DTB_MAX_SIZE > ram_size) {
++            fprintf(stderr, "qemu: not enough memory for device tree\n");
++            exit(1);
++    }
+ 
+     dt_size = ppce500_prep_device_tree(machine, params, dt_base,
+                                        initrd_base, initrd_size,
 -- 
-2.14.3
+2.14.1
