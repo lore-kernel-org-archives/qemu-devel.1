@@ -1,38 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ciro.santilli@gmail.com>) id 1elYu4-00083e-Cf
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:37:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1elZ0c-0003bh-TT
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ciro.santilli@gmail.com>) id 1elYu3-00076U-5b
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:37:40 -0500
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:46494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
-	id 1elYu2-000769-VT
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:37:39 -0500
-Received: by mail-io0-x241.google.com with SMTP id k80so9546708ioe.13
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 03:37:38 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1elZ0c-0004Qn-1i
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:44:26 -0500
+Date: Tue, 13 Feb 2018 11:43:55 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180213114355.GC2378@work-vm>
+References: <20180107122336.29333-1-richiejp@f-m.fm>
+	<fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+	<5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
+	<20180111130427.GG8326@redhat.com>
+	<20180213105024.GC5083@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <002d01d3a4b8$b73a37e0$25aea7a0$@ru>
-References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
-	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
-	<002401d3a010$8d551280$a7ff3780$@ru>
-	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
-	<CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
-	<001b01d3a3c5$032e09f0$098a1dd0$@ru>
-	<CAFXrp_dNj+BSYo+0rpv5d4PxdjJ1RL_cROaDWRvjQTLziFtO_Q@mail.gmail.com>
-	<000c01d3a496$fd2bc470$f7834d50$@ru>
-	<CAFXrp_cEsHH_6VQevxsrj8GTchraGKEJ_t0xhSbfajcBu-mmzg@mail.gmail.com>
-	<001a01d3a4b1$273f1a90$75bd4fb0$@ru>
-	<002201d3a4b5$2a642b80$7f2c8280$@ru>
-	<CAFEAcA9yO_4FX0J6hsdAmV7TwZd5kp9J-B2EPwm_KZxDO25bGQ@mail.gmail.com>
-	<002d01d3a4b8$b73a37e0$25aea7a0$@ru>
-From: Ciro Santilli <ciro.santilli@gmail.com>
-Date: Tue, 13 Feb 2018 11:37:17 +0000
-Message-ID: <CAFXrp_dVnWzpDb0p8nGC4eGZ_mWh-pXgozZ7Q0kewRdJE5hM2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180213105024.GC5083@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH 1/2] Add save-snapshot,
+ load-snapshot and delete-snapshot to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,66 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, war2jordan@live.com, Igor R <boost.lists@gmail.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, Gerd Hoffmann <kraxel@redhat.com>, Thomas Dullien <thomas.dullien@googlemail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Palethorpe <richiejp@f-m.fm>, Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, rpalethorpe@suse.com
 
-On Tue, Feb 13, 2018 at 10:52 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru>
-wrote:
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 11.01.2018 um 14:04 hat Daniel P. Berrange geschrieben:
+> > On Thu, Jan 11, 2018 at 01:46:38PM +0100, Max Reitz wrote:
+> > > On 2018-01-08 14:52, Eric Blake wrote:
+> > > > On 01/07/2018 06:23 AM, Richard Palethorpe wrote:
+> > > >> Add QAPI wrapper functions for the existing snapshot functionality. These
+> > > >> functions behave the same way as the HMP savevm, loadvm and delvm
+> > > >> commands. This will allow applications, such as OpenQA, to programmatically
+> > > >> revert the VM to a previous state with no dependence on HMP or qemu-img.
+> > > > 
+> > > > That's already possible; libvirt uses QMP's human-monitor-command to
+> > > > access these HMP commands programmatically.
+> > > > 
+> > > > We've had discussions in the past about what it would take to have
+> > > > specific QMP commands for these operations; the biggest problem is that
+> > > > these commands promote the use of internal snapshots, and there are
+> > > > enough performance and other issues with internal snapshots that we are
+> > > > not yet ready to commit to a long-term interface for making their use
+> > > > easier.  At this point, our recommendation is to prefer external snapshots.
+> > > 
+> > > We already have QMP commands for internal snapshots, though.  Isn't the
+> > > biggest issue that savevm takes too much time to be a synchronous QMP
+> > > command?
+> > 
+> > Ultimately savevm/loadvm are using much of the migration code internally,
+> > but are not exposed as URI schemes. Could we perhaps take advantage of
+> > the internal common layer and define a migration URI scheme
+> > 
+> >    snapshot:<name>
+> > 
+> > where '<name>' is the name of the internal snapshot in the qcow2 file.
+> 
+> Let's include a node-name there, please. QEMU automagically deciding
+> where to store the VM state is one of the major problems of the HMP
+> interface.
+> 
+> And while we're at it, we can make it more future-proof by allowing to
+> specify arbitrary options:
+> 
+>     snapshot:node=<node-name>,name=<snapshot-name>
+> 
+> That would allow us to add something like compressed=on|off later.
+> Actually, compressed VM state sounds pretty nice. Why don't we have this
+> yet? The qcow2 format already provides everything you need for it.
+> 
+> > Then you could just use the regular migrate QMP commands for loading
+> > and saving snapshots.
+> 
+> Yes, you could. I think for a proper implementation you would want to do
+> better, though. Live migration provides just a stream, but that's not
+> really well suited for snapshots. When a RAM page is dirtied, you just
+> want to overwrite the old version of it in a snapshot, you don't want to
+> waste space by keeping both the old and the current version of the page
+> content in the file.
 
-> > From: Peter Maydell [mailto:peter.maydell@linaro.org]
-> > On 13 February 2018 at 10:26, Pavel Dovgalyuk <dovgaluk@ispras.ru>
-> wrote:
-> > > Then I added SCSI adapter with the option =E2=80=93device lsi,id=3Dsc=
-si0 and QEMU
-> > > failed with the following error:
-> > >
-> > > qemu: fatal: IO on conditional branch instruction
-> >
-> > > Seems, that your kernel is incomatible with QEMU, which ARM emulation
-> is not
-> > > good enough.
->
+The current snapshots are run with the CPU paused aren't they?  They
+share exactly the same RAM saving code as migration.
 
-Just to clarify, this is my working ARM command that works without record /
-replay:
+Dave
 
-./buildroot/output.arm~/host/usr/bin/qemu-system-arm -m 128M -monitor
-telnet::45454,server,nowait -netdev user,hostfwd=3Dtcp::45455-:45455,id=3Dn=
-et0
--smp 1  -M versatilepb -append 'root=3D/dev/sda nokaslr norandmaps
-printk.devkmsg=3Don printk.time=3Dy' -device rtl8139,netdev=3Dnet0 -drive
-file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,format=3Draw -d=
-tb
-./buildroot/output.arm~/images/versatile-pb.dtb -kernel
-./buildroot/output.arm~/images/zImage -serial stdio
-
-I then tried to modify it for record / replay to use similar options to the
-x86 version. The only non-trivial change was what to use for the drive. So
-I tried to replace them with:
-
--drive file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Dimg=
--direct,format=3Draw
-\
--drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay \
--device scsi-hd,drive=3Dimg-blkreplay \
-
-and some other variations, but this is just guesswork and likely to be
-wrong, since I don't understand those options very well.
-
-I don't need to use SCSI if that is not supported, I'd be happy with any
-record / replay QEMU command that works with the image I uploaded on the
-.zip.
-
-
-> >
-> > It seems fairly unlikely to me that the Linux driver for this
-> > SCSI adaptor is using weirdo self-modifying code of the kind
-> > that would trip up that cpu_abort(). I would suggest a bit
-> > more investigation into what's actually happening...
->
-> It happens for any SCSI adapter (i.e., for every system able to run).
-> And the log is not very big. Therefore the problem is in early boot code.
->
-> Pavel Dovgalyuk
->
->
+> Kevin
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
