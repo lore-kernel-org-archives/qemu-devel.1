@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59936)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1elhaZ-0006Lm-Ti
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:09 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60013)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <rbraun@sceen.net>) id 1elhaq-0006bK-QP
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1elhaW-0002n8-Sx
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:07 -0500
-Received: from mx01.kamp.de ([82.141.2.16]:38929)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1elhaW-0002kd-I2
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:04 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 21:53:57 +0100
-References: <1513866427-27125-1-git-send-email-mst@redhat.com>
-	<1513866427-27125-11-git-send-email-mst@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <800aef3f-56c1-b896-1c93-24e2a523833d@kamp.de>
-Date: Tue, 13 Feb 2018 21:53:58 +0100
-MIME-Version: 1.0
-In-Reply-To: <1513866427-27125-11-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-stable] [PULL 10/25] virtio_error: don't
- invoke status callbacks
+	(envelope-from <rbraun@sceen.net>) id 1elhap-0003OU-Nz
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:24 -0500
+Received: from shattrath.sceen.net ([2001:41d0:c:ada::1]:53105
+	helo=mail.sceen.net) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <rbraun@sceen.net>) id 1elhap-0003Gh-HB
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:23 -0500
+From: Richard Braun <rbraun@sceen.net>
+Date: Tue, 13 Feb 2018 21:54:19 +0100
+Message-Id: <1518555259-26463-1-git-send-email-rbraun@sceen.net>
+In-Reply-To: <20180209093643.GC27456@shattrath>
+References: <20180209093643.GC27456@shattrath>
+Subject: [Qemu-devel] [PATCH v2] hw/char/stm32f2xx_usart: fix TXE/TC bit
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Ilya Maximets <i.maximets@samsung.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>
 
+I/O currently being synchronous, there is no reason to ever clear the
+SR_TXE bit. However the SR_TC bit may be cleared by software writing
+to the SR register, so set it on each write.
 
-Am 21.12.2017 um 15:29 schrieb Michael S. Tsirkin:
-> Backends don't need to know what frontend requested a reset,
-> and notifying then from virtio_error is messy because
-> virtio_error itself might be invoked from backend.
->
-> Let's just set the status directly.
->
-> Cc: qemu-stable@nongnu.org
-> Reported-by: Ilya Maximets <i.maximets@samsung.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/virtio/virtio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index ad564b0..d6002ee 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2469,7 +2469,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->      va_end(ap);
->  
->      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> +        vdev->status = vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET;
->          virtio_notify_config(vdev);
->      }
->  
+In addition, fix the reset value of the USART status register.
 
+Signed-off-by: Richard Braun <rbraun@sceen.net>
+---
+ hw/char/stm32f2xx_usart.c         | 12 ++++++++----
+ include/hw/char/stm32f2xx_usart.h |  7 ++++++-
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-Is it possible that this patch introduces a stall in I/O and a deadlock on a drain all?
-
-I have seen Qemu VMs being I/O stalled and deadlocking on a vm stop command in
-
-blk_drain_all. This happened after a longer storage outage.
-
-
-I am asking just theoretically because I have seen this behaviour first when we
-
-backported this patch in our stable 2.9 branch.
-
-
-Thank you,
-
-Peter
+diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+index 07b462d4b6..032b5fda13 100644
+--- a/hw/char/stm32f2xx_usart.c
++++ b/hw/char/stm32f2xx_usart.c
+@@ -96,12 +96,10 @@ static uint64_t stm32f2xx_usart_read(void *opaque, hwaddr addr,
+     switch (addr) {
+     case USART_SR:
+         retvalue = s->usart_sr;
+-        s->usart_sr &= ~USART_SR_TC;
+         qemu_chr_fe_accept_input(&s->chr);
+         return retvalue;
+     case USART_DR:
+         DB_PRINT("Value: 0x%" PRIx32 ", %c\n", s->usart_dr, (char) s->usart_dr);
+-        s->usart_sr |= USART_SR_TXE;
+         s->usart_sr &= ~USART_SR_RXNE;
+         qemu_chr_fe_accept_input(&s->chr);
+         qemu_set_irq(s->irq, 0);
+@@ -137,7 +135,9 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
+     switch (addr) {
+     case USART_SR:
+         if (value <= 0x3FF) {
+-            s->usart_sr = value;
++            /* I/O being synchronous, TXE is always set. In addition, it may
++               only be set by hardware, so keep it set here. */
++            s->usart_sr = value | USART_SR_TXE;
+         } else {
+             s->usart_sr &= value;
+         }
+@@ -151,8 +151,12 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
+             /* XXX this blocks entire thread. Rewrite to use
+              * qemu_chr_fe_write and background I/O callbacks */
+             qemu_chr_fe_write_all(&s->chr, &ch, 1);
++            /* XXX I/O are currently synchronous, making it impossible for
++               software to observe transient states where TXE or TC aren't
++               set. Unlike TXE however, which is read-only, software may
++               clear TC by writing 0 to the SR register, so set it again
++               on each write. */
+             s->usart_sr |= USART_SR_TC;
+-            s->usart_sr &= ~USART_SR_TXE;
+         }
+         return;
+     case USART_BRR:
+diff --git a/include/hw/char/stm32f2xx_usart.h b/include/hw/char/stm32f2xx_usart.h
+index 9d03a7527c..7ea7448813 100644
+--- a/include/hw/char/stm32f2xx_usart.h
++++ b/include/hw/char/stm32f2xx_usart.h
+@@ -37,7 +37,12 @@
+ #define USART_CR3  0x14
+ #define USART_GTPR 0x18
+ 
+-#define USART_SR_RESET 0x00C00000
++/*
++ * XXX The reset value mentioned in "24.6.1 Status register" seems bogus.
++ * Looking at "Table 98 USART register map and reset values", it seems it
++ * should be 0xc0, and that's how real hardware behaves.
++ */
++#define USART_SR_RESET (USART_SR_TXE | USART_SR_TC)
+ 
+ #define USART_SR_TXE  (1 << 7)
+ #define USART_SR_TC   (1 << 6)
+-- 
+2.11.0
