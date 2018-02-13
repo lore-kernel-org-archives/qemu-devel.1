@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1elagj-0007vm-Le
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:32:07 -0500
+	(envelope-from <lcapitulino@redhat.com>) id 1elaqB-00088y-CH
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:41:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1elagg-0002cS-Bv
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:32:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42666 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1elagg-0002Za-5M
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:31:58 -0500
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
-	<20180212194531.GA26349@morn.lan>
-	<5345fb74-02cf-9793-78d7-490e5e77ad27@linux.vnet.ibm.com>
-	<20180213135739.3fd6fad6@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <46a90b58-33e0-d17b-e81a-98d10f73a957@redhat.com>
-Date: Tue, 13 Feb 2018 14:31:41 +0100
+	(envelope-from <lcapitulino@redhat.com>) id 1elaq8-0001FE-9i
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:41:47 -0500
+Date: Tue, 13 Feb 2018 08:41:23 -0500
+From: Luiz Capitulino <lcapitulino@redhat.com>
+Message-ID: <20180213084123.0fab5012@redhat.com>
+In-Reply-To: <9757bd46-06f2-1ce2-9cbd-9118c4a6cb9c@linux.vnet.ibm.com>
+References: <1518437672-7724-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518437672-7724-4-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<20180212131504.1243e696@redhat.com>
+	<9757bd46-06f2-1ce2-9cbd-9118c4a6cb9c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180213135739.3fd6fad6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
- interface
+Subject: Re: [Qemu-devel] [PATCH 3/3] qmp: add architecture specific cpu
+ data for query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: Kevin O'Connor <kevin@koconnor.net>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, dgilbert@redhat.com, rth@twiddle.net, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, david@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
 
-On 02/13/18 13:57, Igor Mammedov wrote:
-> On Mon, 12 Feb 2018 15:17:21 -0500
-> Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> 
->> On 02/12/2018 02:45 PM, Kevin O'Connor wrote:
->>> On Fri, Feb 09, 2018 at 03:19:31PM -0500, Stefan Berger wrote:  
->>>> I have played around with this patch and some modifications to EDK2. Though
->>>> for EDK2 the question is whether to try to circumvent their current
->>>> implementation that uses SMM or use SMM. With this patch so far I circumvent
->>>> it, which is maybe not a good idea.
->>>>
->>>> The facts for EDK2's PPI:
->>>>
->>>> - from within the OS a PPI code is submitted to ACPI and ACPI enters SMM via
->>>> an SMI and the PPI code is written into a UEFI variable. For this ACPI uses
->>>> the memory are at 0xFFFF 0000 to pass parameters from the OS (via ACPI) to
->>>> SMM. This is declared in ACPI with an OperationRegion() at that address.
->>>> Once the machine is rebooted, UEFI reads the variable and finds the PPI code
->>>> and reacts to it.  
->>> I'm a bit confused by this.  The top 1M of the first 4G of ram is
->>> generally mapped to the flash device on real machines.  Indeed, this
->>> is part of the mechanism used to boot an X86 machine - it starts
->>> execution from flash at 0xfffffff0.  This is true even on modern
->>> machines.
->>>
->>> So, it seems strange that UEFI is pushing a code through a memory
->>> device at 0xffff0000.  I can't see how that would be portable.  Are
->>> you sure the memory write to 0xffff0000 is not just a trigger to
->>> invoke the SMI?  
->>
->> I base this on the code here:
->>
->> https://github.com/tianocore/edk2/blob/master/SecurityPkg/Tcg/Tcg2Smm/Tpm.asl#L81
->>
->> OperationRegion (TNVS, SystemMemory, 0xFFFF0000, 0xF0)
-> Is the goal to reuse EDK PPI impl. including ASL?
+On Tue, 13 Feb 2018 13:30:02 +0100
+Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
 
-Right, that is one important question. Some code in edk2 is meant only
-as example code (so actual firmware platforms are encouraged to copy &
-customize the code, or use similar or dissimilar alternatives). Some
-modules are meant for inclusion "as-is" in the platform description
-files (~ makefiles). There are so many edk2 modules related to TPM
-(several versions of the specs even) that it's hard to say what is meant
-for what usage type. (By my earlier count, there are 19 modules.)
+> On 12.02.2018 19:15, Luiz Capitulino wrote:
+> > On Mon, 12 Feb 2018 13:14:32 +0100
+> > Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+> >   
+> >> -{ 'struct': 'CpuInfoFast',
+> >> -  'data': {'cpu-index': 'int', 'qom-path': 'str',
+> >> -           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
+> >> +{ 'union': 'CpuInfoFast',
+> >> +  'base': {'cpu-index': 'int', 'qom-path': 'str',
+> >> +           'thread-id': 'int', '*props': 'CpuInstanceProperties',
+> >> +           'arch': 'CpuInfoArch' },
+> >> +  'discriminator': 'arch',
+> >> +  'data': { 'x86': 'CpuInfoOther',
+> >> +            'sparc': 'CpuInfoOther',
+> >> +            'ppc': 'CpuInfoOther',
+> >> +            'mips': 'CpuInfoOther',
+> >> +            'tricore': 'CpuInfoOther',
+> >> +            's390': 'CpuInfoS390Fast',
+> >> +            'other': 'CpuInfoOther' } }  
+> > 
+> > Consider this a minor comment (and QMP maintainers can give a much
+> > better advice than me), but I think this arch list has problems. For
+> > one thing, it's incomplete. And the second problem is the 'other'
+> > field. What happens when QEMU starts supporting a new arch? 'other'
+> > becomes the new arch. Is this compatible? I don't know.  
+> This seems to be the customary approach, see
+> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01986.html
+> > 
+> > I don't know if this would work with the QAPI, but you could have
+> > a '*arch-data' field in the CpuInfoFast definition, like:
+> > 
+> > 'data': { ..., '*arch-data': 'CpuInfoFastArchData' }
+> > 
+> > where 'CpuInfoFastArchData' is defined by each arch that supports
+> > the field. An arch supporting the field could also export a
+> > query_cpus_fast_arch() function, which is called by qmp_query_cpus_fast().
+> >   
+> I had it like this in my first reply to your initial patch. However,
+> that adds an additional hierarchy level in the return data. This
+> prevents clients like libvirt to reuse the data extraction code when
+> they switch over to using query-cpus-fast.
 
-> If it's so, then perhaps we only need to write address into QEMU
-> and let OVMF to discard PPI SSDT from QEMU.
-
-That's something I would not like. When running on QEMU, it's OK for
-some edk2 modules to install their own ACPI tables, but only if they are
-"software" tables, such as the IBFT for iSCSI booting, BGRT (boot
-graphics table) for the boot logo / splash screen, etc. For ACPI tables
-that describe hardware (data tables) or carry out actions related to
-hardware (DefinitionBlocks / AML), I much prefer QEMU to generate all
-the stuff.
-
-If there is a conflict between hardware-related tables that QEMU
-generates and similar tables that pre-exist in edk2, I prefer working
-with the edk2 maintainers to customize their subsystems, so that a
-concrete firmware platform, such as OvmfPkg and ArmVirtPkg, can
-conditionalize / exclude those preexistent ACPI tables, while benefiting
-from the rest of the code. Then the ACPI linker/loader client used in
-both OvmfPkg and ArmVirtPkg can remain dumb and process & expose
-whatever tables QEMU generates.
-
-We could control the AML payload for TPM and/or TPM PPI -- e.g. whether
-it should raise an SMI -- via "-device tpm2,smi=on", for example. (Just
-making up the syntax, but you know what I mean.)
-
-We could go one step further, "-device tpm2,acpi=[on|off]". acpi=on
-would make QEMU generate the TPM related tables (perhaps targeting only
-SeaBIOS, if that makes sense), acpi=off would leave the related tables
-to the firmware.
-
-This is just speculation on my part; the point is I'd like to avoid any
-more "intelligent filtering" regarding ACPI tables in OVMF. What we have
-there is terrible enough already.
-
-Thanks
-Laszlo
+OK, fair enough.
