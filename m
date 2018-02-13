@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1g-0002qy-4s
+	(envelope-from <kwolf@redhat.com>) id 1ele1g-0002r1-5l
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1d-0005Gj-Hj
+	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005G7-Uf
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:52 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:45 +0100
-Message-Id: <20180213170529.10858-12-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:41 +0100
+Message-Id: <20180213170529.10858-8-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 11/55] gluster: Query current size in
- do_truncate()
+Subject: [Qemu-devel] [PULL 07/55] iotests: Use virtio-blk in 155
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +24,67 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Instead of expecting the current size to be 0, query it and allocate
-only the area [current_size, offset) if preallocation is requested.
+Only a few select machine types support floppy drives and there is
+actually nothing preventing us from using virtio here, so let's do it.
 
+Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/gluster.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/155 | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 8178541416..806b894bc8 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -968,10 +968,27 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
- static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
-                                     PreallocMode prealloc, Error **errp)
- {
-+    int64_t current_length;
-+
-+    current_length = glfs_lseek(fd, 0, SEEK_END);
-+    if (current_length < 0) {
-+        error_setg_errno(errp, errno, "Failed to determine current size");
-+        return -errno;
-+    }
-+
-+    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Cannot use preallocation for shrinking files");
-+        return -ENOTSUP;
-+    }
-+
-+    if (current_length == offset) {
-+        return 0;
-+    }
-+
-     switch (prealloc) {
- #ifdef CONFIG_GLUSTERFS_FALLOCATE
-     case PREALLOC_MODE_FALLOC:
--        if (glfs_fallocate(fd, 0, 0, offset)) {
-+        if (glfs_fallocate(fd, 0, current_length, offset - current_length)) {
-             error_setg_errno(errp, errno, "Could not preallocate data");
-             return -errno;
-         }
-@@ -983,7 +1000,7 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
-             error_setg_errno(errp, errno, "Could not resize file");
-             return -errno;
-         }
--        if (glfs_zerofill(fd, 0, offset)) {
-+        if (glfs_zerofill(fd, current_length, offset - current_length)) {
-             error_setg_errno(errp, errno, "Could not zerofill the new area");
-             return -errno;
-         }
+diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
+index fc9fa975be..42dae04c83 100755
+--- a/tests/qemu-iotests/155
++++ b/tests/qemu-iotests/155
+@@ -64,7 +64,7 @@ class BaseClass(iotests.QMPTestCase):
+                     'file': {'driver': 'file',
+                              'filename': source_img}}
+         self.vm.add_blockdev(self.qmp_to_opts(blockdev))
+-        self.vm.add_device('floppy,id=qdev0,drive=source')
++        self.vm.add_device('virtio-blk,id=qdev0,drive=source')
+         self.vm.launch()
+ 
+         self.assertIntactSourceBackingChain()
+@@ -173,21 +173,24 @@ class MirrorBaseClass(BaseClass):
+     def testFull(self):
+         self.runMirror('full')
+ 
+-        node = self.findBlockNode('target', 'qdev0')
++        node = self.findBlockNode('target',
++                                  '/machine/peripheral/qdev0/virtio-backend')
+         self.assertCorrectBackingImage(node, None)
+         self.assertIntactSourceBackingChain()
+ 
+     def testTop(self):
+         self.runMirror('top')
+ 
+-        node = self.findBlockNode('target', 'qdev0')
++        node = self.findBlockNode('target',
++                                  '/machine/peripheral/qdev0/virtio-backend')
+         self.assertCorrectBackingImage(node, back2_img)
+         self.assertIntactSourceBackingChain()
+ 
+     def testNone(self):
+         self.runMirror('none')
+ 
+-        node = self.findBlockNode('target', 'qdev0')
++        node = self.findBlockNode('target',
++                                  '/machine/peripheral/qdev0/virtio-backend')
+         self.assertCorrectBackingImage(node, source_img)
+         self.assertIntactSourceBackingChain()
+ 
+@@ -239,7 +242,8 @@ class TestCommit(BaseClass):
+ 
+         self.vm.event_wait('BLOCK_JOB_COMPLETED')
+ 
+-        node = self.findBlockNode(None, 'qdev0')
++        node = self.findBlockNode(None,
++                                  '/machine/peripheral/qdev0/virtio-backend')
+         self.assert_qmp(node, 'image' + '/backing-image' * 0 + '/filename',
+                         back1_img)
+         self.assert_qmp(node, 'image' + '/backing-image' * 1 + '/filename',
 -- 
 2.13.6
