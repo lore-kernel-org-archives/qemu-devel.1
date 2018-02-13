@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elbkL-0007Ey-LA
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:39:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1elbl8-0007uV-DM
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:40:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elbkK-0003yi-Tw
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:39:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1elbl7-0004Nr-He
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:40:38 -0500
 References: <cover.1517840876.git.berto@igalia.com>
-	<1cb44a5b68be5334cb01b97a3db3a3c5a43396e5.1517840877.git.berto@igalia.com>
+	<ebc16e7e79fa6969d8975ef487d679794de4fbcc.1517840877.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <7c8f18f4-d17e-6bfb-75d2-22a65cdda89a@redhat.com>
-Date: Tue, 13 Feb 2018 08:39:25 -0600
+Message-ID: <882995e5-c409-a9b5-2b21-cbb7ca9db17b@redhat.com>
+Date: Tue, 13 Feb 2018 08:40:30 -0600
 MIME-Version: 1.0
-In-Reply-To: <1cb44a5b68be5334cb01b97a3db3a3c5a43396e5.1517840877.git.berto@igalia.com>
+In-Reply-To: <ebc16e7e79fa6969d8975ef487d679794de4fbcc.1517840877.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 24/39] qcow2: Update discard_single_l2()
- to support L2 slices
+Subject: Re: [Qemu-devel] [PATCH v4 25/39] qcow2: Update zero_single_l2() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +29,18 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
 On 02/05/2018 08:33 AM, Alberto Garcia wrote:
-> discard_single_l2() limits the number of clusters to be discarded
-> to the amount that fits inside an L2 table. Since we'll be loading
-> L2 slices instead of full tables we need to update that limit. The
-> function is renamed to discard_in_l2_slice() for clarity.
+> zero_single_l2() limits the number of clusters to be zeroed to the
+> amount that fits inside an L2 table. Since we'll be loading L2 slices
+> instead of full tables we need to update that limit. The function is
+> renamed to zero_in_l2_slice() for clarity.
 > 
 > Apart from that, this function doesn't need any additional changes, so
 > this patch simply updates the variable name from l2_table to l2_slice.
 > 
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->   block/qcow2-cluster.c | 32 ++++++++++++++++----------------
->   1 file changed, 16 insertions(+), 16 deletions(-)
+>   block/qcow2-cluster.c | 28 ++++++++++++++--------------
+>   1 file changed, 14 insertions(+), 14 deletions(-)
 > 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
