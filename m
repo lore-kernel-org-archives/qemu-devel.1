@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david.engraf@sysgo.com>) id 1elXjz-0001yn-EU
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:23:15 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1elXnd-0005Iw-VP
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:26:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david.engraf@sysgo.com>) id 1elXjv-00060j-8m
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:23:11 -0500
-From: David Engraf <david.engraf@sysgo.com>
-Date: Tue, 13 Feb 2018 11:22:58 +0100
-Message-Id: <20180213102258.26145-1-david.engraf@sysgo.com>
-In-Reply-To: <20180130075847.6023-1-david.engraf@sysgo.com>
-References: <20180130075847.6023-1-david.engraf@sysgo.com>
-Subject: [Qemu-devel] [PATCH v2] PPC: e500: Fix duplicate kernel load and
- device tree overlap
+	(envelope-from <dovgaluk@ispras.ru>) id 1elXnZ-0000Mp-SE
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:26:57 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:57600)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1elXnZ-0000Km-9j
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:26:53 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
+	<002401d3a010$8d551280$a7ff3780$@ru>
+	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
+	<CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
+	<001b01d3a3c5$032e09f0$098a1dd0$@ru>
+	<CAFXrp_dNj+BSYo+0rpv5d4PxdjJ1RL_cROaDWRvjQTLziFtO_Q@mail.gmail.com>
+	<000c01d3a496$fd2bc470$f7834d50$@ru>
+	<CAFXrp_cEsHH_6VQevxsrj8GTchraGKEJ_t0xhSbfajcBu-mmzg@mail.gmail.com>
+	<001a01d3a4b1$273f1a90$75bd4fb0$@ru>
+In-Reply-To: <001a01d3a4b1$273f1a90$75bd4fb0$@ru>
+Date: Tue, 13 Feb 2018 13:26:52 +0300
+Message-ID: <002201d3a4b5$2a642b80$7f2c8280$@ru>
+MIME-Version: 1.0
+Content-Language: ru
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,195 +37,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Engraf <david.engraf@sysgo.com>
+To: 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, 'Ciro Santilli' <ciro.santilli@gmail.com>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, 'Peter Maydell' <peter.maydell@linaro.org>, war2jordan@live.com, 'Igor R' <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, kraxel@redhat.com, 'Thomas Dullien' <thomas.dullien@googlemail.com>, pbonzini@redhat.com, =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
 
-This patch fixes an incorrect behavior when the -kernel argument has been
-specified without -bios. In this case the kernel was loaded twice. At address
-32M as a raw image and afterwards by load_elf/load_uimage at the
-corresponding load address. In this case the region for the device tree and
-the raw kernel image may overlap.
+Then I added SCSI adapter with the option =E2=80=93device lsi,id=3Dscsi0 =
+and QEMU failed with the following error:
 
-The patch fixes the behavior by loading the kernel image once with
-load_elf/load_uimage and skips loading the raw image. It also ensures that
-the device tree is generated behind bios/kernel/initrd.
+qemu: fatal: IO on conditional branch instruction
 
-When here do not use bios_name/size for the kernel and use a more generic
-name called payload_name/size.
+=20
 
-Signed-off-by: David Engraf <david.engraf@sysgo.com>
----
- hw/ppc/e500.c | 112 ++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 65 insertions(+), 47 deletions(-)
+It happens here:
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index c4fe06ea2a..d12b9d6121 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -776,7 +776,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     PCIBus *pci_bus;
-     CPUPPCState *env = NULL;
--    uint64_t loadaddr;
-     hwaddr kernel_base = -1LL;
-     int kernel_size = 0;
-     hwaddr dt_base = 0;
-@@ -784,8 +783,10 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     int initrd_size = 0;
-     hwaddr cur_base = 0;
-     char *filename;
-+    const char *payload_name;
-+    bool kernel_as_payload;
-     hwaddr bios_entry = 0;
--    target_long bios_size;
-+    target_long payload_size;
-     struct boot_info *boot_info;
-     int dt_size;
-     int i;
-@@ -913,11 +914,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     /* Register spinning region */
-     sysbus_create_simple("e500-spin", params->spin_base, NULL);
- 
--    if (cur_base < (32 * 1024 * 1024)) {
--        /* u-boot occupies memory up to 32MB, so load blobs above */
--        cur_base = (32 * 1024 * 1024);
--    }
--
-     if (params->has_mpc8xxx_gpio) {
-         qemu_irq poweroff_irq;
- 
-@@ -952,36 +948,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-                                     sysbus_mmio_get_region(s, 0));
-     }
- 
--    /* Load kernel. */
--    if (machine->kernel_filename) {
--        kernel_base = cur_base;
--        kernel_size = load_image_targphys(machine->kernel_filename,
--                                          cur_base,
--                                          ram_size - cur_base);
--        if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    machine->kernel_filename);
--            exit(1);
--        }
--
--        cur_base += kernel_size;
--    }
--
--    /* Load initrd. */
--    if (machine->initrd_filename) {
--        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
--        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
--                                          ram_size - initrd_base);
--
--        if (initrd_size < 0) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
--                    machine->initrd_filename);
--            exit(1);
--        }
--
--        cur_base = initrd_base + initrd_size;
--    }
--
-     /*
-      * Smart firmware defaults ahead!
-      *
-@@ -997,33 +963,85 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-      * This ensures backwards compatibility with how we used to expose
-      * -kernel to users but allows them to run through u-boot as well.
-      */
-+    kernel_as_payload = false;
-     if (bios_name == NULL) {
-         if (machine->kernel_filename) {
--            bios_name = machine->kernel_filename;
-+            payload_name = machine->kernel_filename;
-+            kernel_as_payload = true;
-         } else {
--            bios_name = "u-boot.e500";
-+            payload_name = "u-boot.e500";
-         }
-+    } else {
-+        payload_name = bios_name;
-     }
--    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
- 
--    bios_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
--                         1, PPC_ELF_MACHINE, 0, 0);
--    if (bios_size < 0) {
-+    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, payload_name);
-+
-+    payload_size = load_elf(filename, NULL, NULL, &bios_entry, &cur_base, NULL,
-+                            1, PPC_ELF_MACHINE, 0, 0);
-+    if (payload_size < 0) {
-         /*
-          * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
-          * ePAPR compliant kernel
-          */
--        kernel_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
--                                  NULL, NULL);
--        if (kernel_size < 0) {
-+        payload_size = load_uimage(filename, &bios_entry, &cur_base, NULL,
-+                                   NULL, NULL);
-+        if (payload_size < 0) {
-             fprintf(stderr, "qemu: could not load firmware '%s'\n", filename);
-             exit(1);
-         }
-     }
-+
-     g_free(filename);
- 
-+    if (kernel_as_payload) {
-+        kernel_base = cur_base;
-+        kernel_size = payload_size;
-+    }
-+
-+    cur_base += payload_size;
-+
-+    /* Load bare kernel only if no bios/u-boot has been provided */
-+    if (machine->kernel_filename && !kernel_as_payload) {
-+        kernel_base = cur_base;
-+        kernel_size = load_image_targphys(machine->kernel_filename,
-+                                          cur_base,
-+                                          ram_size - cur_base);
-+        if (kernel_size < 0) {
-+            fprintf(stderr, "qemu: could not load kernel '%s'\n",
-+                    machine->kernel_filename);
-+            exit(1);
-+        }
-+
-+        cur_base += kernel_size;
-+    }
-+
-+    if (cur_base < (32 * 1024 * 1024)) {
-+        /* u-boot occupies memory up to 32MB, so load blobs above */
-+        cur_base = (32 * 1024 * 1024);
-+    }
-+
-+    /* Load initrd. */
-+    if (machine->initrd_filename) {
-+        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
-+        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
-+                                          ram_size - initrd_base);
-+
-+        if (initrd_size < 0) {
-+            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
-+                    machine->initrd_filename);
-+            exit(1);
-+        }
-+
-+        cur_base = initrd_base + initrd_size;
-+    }
-+
-     /* Reserve space for dtb */
--    dt_base = (loadaddr + bios_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
-+    dt_base = (cur_base + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
-+    if (dt_base + DTB_MAX_SIZE > ram_size) {
-+            fprintf(stderr, "qemu: not enough memory for device tree\n");
-+            exit(1);
-+    }
- 
-     dt_size = ppce500_prep_device_tree(machine, params, dt_base,
-                                        initrd_base, initrd_size,
--- 
-2.14.1
+static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+
+{
+
+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+
+=20
+
+    if (tb_cflags(dc->base.tb) & CF_LAST_IO && dc->condjmp) {
+
+        /* FIXME: This can theoretically happen with self-modifying =
+code. */
+
+        cpu_abort(cpu, "IO on conditional branch instruction");
+
+    }
+
+=20
+
+Seems, that your kernel is incomatible with QEMU, which ARM emulation is =
+not good enough.
+
+=20
+
+Pavel Dovgalyuk
+
+=20
+
+From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]=20
+Sent: Tuesday, February 13, 2018 12:58 PM
+To: 'Ciro Santilli'
+Cc: 'Pavel Dovgalyuk'; qemu-devel@nongnu.org; kwolf@redhat.com; 'Peter =
+Maydell'; war2jordan@live.com; 'Igor R'; quintela@redhat.com; =
+jasowang@redhat.com; mst@redhat.com; 'Aleksandr Bezzubikov'; =
+maria.klimushenkova@ispras.ru; kraxel@redhat.com; 'Thomas Dullien'; =
+pbonzini@redhat.com; 'Alex Benn=C3=A9e'
+Subject: RE: [RFC PATCH v6 00/20] replay additions
+
+=20
+
+There is the same file I downloaded this morning.=20
+
+Now I re-checked everything and it prints the following error: =
+qemu-system-arm: -device scsi-hd,drive=3Dimg-blkreplay: No 'SCSI' bus =
+found for device 'scsi-hd'
+
+=20
+
+Pavel Dovgalyuk
+
+=20
+
+From: Ciro Santilli [mailto:ciro.santilli@gmail.com]=20
+Sent: Tuesday, February 13, 2018 12:07 PM
+To: Pavel Dovgalyuk
+Cc: Pavel Dovgalyuk; qemu-devel@nongnu.org; kwolf@redhat.com; Peter =
+Maydell; war2jordan@live.com; Igor R; quintela@redhat.com; =
+jasowang@redhat.com; mst@redhat.com; Aleksandr Bezzubikov; =
+maria.klimushenkova@ispras.ru; kraxel@redhat.com; Thomas Dullien; =
+pbonzini@redhat.com; Alex Benn=C3=A9e
+Subject: Re: [RFC PATCH v6 00/20] replay additions
+
+=20
+
+=20
+
+=20
+
+On Tue, Feb 13, 2018 at 6:50 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
+wrote:
+
+Your command line looks wrong, because you forgot =E2=80=93icount, but =
+specified other replay options
+
+=20
+
+Sorry about that, my full command is exactly the previous but with =
+-icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin' added to the end.
+
+=20
+
+.
+
+I tried recording and replaying with your command line and the execution =
+hangs at some moment of replay.
+
+The problem may be hidden in =E2=80=93dtb option, because it may add the =
+devices without configuring replay for them.
+
+Can you specify the whole hardware configuration in the command line?
+
+=20
+
+Ah, now that you mentioned this, I had a modification on the DTB which =
+needed to be reverted. I have re-uploaded it to the same address: =
+https://github.com/cirosantilli/linux-kernel-module-cheat/releases/downlo=
+ad/test-replay-arm/images.zip please use the new one instead.
+
+=20
+
+Now it should be just the vanilla Linux kernel versatilepb one.
+
+=20
+
+How to specify the --dtb configuration explicitly on the command line? I =
+have also included the dts on the zip if that helps.
+
+=20
+
+=20
+
+Pavel Dovgalyuk
+
+=20
+
+From: Ciro Santilli [mailto:ciro.santilli@gmail.com]=20
+Sent: Tuesday, February 13, 2018 8:58 AM
+To: Pavel Dovgalyuk
+Cc: Pavel Dovgalyuk; qemu-devel@nongnu.org; kwolf@redhat.com; Peter =
+Maydell; war2jordan@live.com; Igor R; quintela@redhat.com; =
+jasowang@redhat.com; mst@redhat.com; Aleksandr Bezzubikov; =
+maria.klimushenkova@ispras.ru; kraxel@redhat.com; Thomas Dullien; =
+pbonzini@redhat.com; Alex Benn=C3=A9e
+Subject: Re: [RFC PATCH v6 00/20] replay additions
+
+=20
+
+=20
+
+=20
+
+On Mon, Feb 12, 2018 at 5:47 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
+wrote:
+
+I tested ARM only with =E2=80=93kernel and =E2=80=93initrd.
+
+Can you provide the full command line and the disk image?
+
+=20
+
+=20
+
+The command I tried was:
+
+=20
+
+time ./buildroot/output.arm~/host/usr/bin/qemu-system-arm -M versatilepb =
+-append 'root=3D/dev/sda nokaslr norandmaps printk.devkmsg=3Don =
+printk.time=3Dy - lkmc_eval=3D"/rand_check.out;wget -S =
+google.com;/poweroff.out;"' -kernel =
+./buildroot/output.arm~/images/zImage -dtb =
+./buildroot/output.arm~/images/versatile-pb.dtb -nographic -drive =
+file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Dimg-dire=
+ct,format=3Draw -drive =
+driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay =
+-device scsi-hd,drive=3Dimg-blkreplay -netdev user,id=3Dnet1 -device =
+rtl8139,netdev=3Dnet1 -object filter-replay,id=3Dreplay,netdev=3Dnet1=20
+
+=20
+
+and the required files can be downloaded from:
+
+=20
+
+https://github.com/cirosantilli/linux-kernel-module-cheat/releases/downlo=
+ad/test-replay-arm/images.zip
+
+=20
+
+They were generated with:
+
+=20
+
+./build -a arm
+
+=20
+
+on that repo.
+
+=20
+
+=20
+
+Pavel Dovgalyuk
+
+=20
+
+From: Ciro Santilli [mailto:ciro.santilli@gmail.com]=20
+Sent: Saturday, February 10, 2018 3:09 AM
+To: Pavel Dovgalyuk
+Cc: Pavel Dovgalyuk; qemu-devel@nongnu.org; kwolf@redhat.com; Peter =
+Maydell; war2jordan@live.com; Igor R; quintela@redhat.com; =
+jasowang@redhat.com; mst@redhat.com; Aleksandr Bezzubikov; =
+maria.klimushenkova@ispras.ru; kraxel@redhat.com; Thomas Dullien; =
+pbonzini@redhat.com; Alex Benn=C3=A9e
+Subject: Re: [RFC PATCH v6 00/20] replay additions
+
+=20
+
+Also, what command do you use to test on ARM? I'm a bit stuck to get the =
+drive part right, e.g.:
+
+=20
+
+-drive =
+file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Dimg-dire=
+ct,format=3Draw \
+
+-drive =
+driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay \
+
+-device scsi-hd,drive=3Dimg-blkreplay \
+
+=20
+
+fails with: qemu-system-arm: -device scsi-hd,drive=3Dimg-blkreplay: =
+Conflicts with use by img-direct as 'root', which does not allow 'write' =
+on #block968
+
+=20
+
+=20
+
+=20
