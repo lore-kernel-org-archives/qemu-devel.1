@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1elcS4-0004VO-2E
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:25:02 -0500
+	(envelope-from <mlureau@redhat.com>) id 1elcSG-0004cK-7f
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:25:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1elcS1-0001Vy-Dd
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:25:00 -0500
-Received: from mail-qk0-f175.google.com ([209.85.220.175]:42427)
+	(envelope-from <mlureau@redhat.com>) id 1elcS7-0001YA-1A
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:25:09 -0500
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:43005)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1elcS1-0001Vk-8B
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:24:57 -0500
-Received: by mail-qk0-f175.google.com with SMTP id b130so5749817qkg.9
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 07:24:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1elcS6-0001Xs-R5
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:25:02 -0500
+Received: by mail-qk0-f196.google.com with SMTP id b130so5750152qkg.9
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 07:25:02 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180211093607.27351-10-armbru@redhat.com>
+In-Reply-To: <20180211093607.27351-19-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-10-armbru@redhat.com>
+	<20180211093607.27351-19-armbru@redhat.com>
 From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Tue, 13 Feb 2018 16:24:56 +0100
-Message-ID: <CAMxuvaxy+T0wS9Jf7uHfMpwFLi6RYaaiEBkOMJLSrMbS6Us=2A@mail.gmail.com>
+Date: Tue, 13 Feb 2018 16:25:01 +0100
+Message-ID: <CAMxuvayUp0k6bxAPWmHf3ZKiRgBEtqKyUT-R8nHj0c9deGTPVQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/29] qapi-gen: Convert from getopt to
- argparse
+Subject: Re: [Qemu-devel] [PATCH v2 18/29] qapi: Rename generated
+ qmp-marshal.c to qmp-commands.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,159 +35,231 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 On Sun, Feb 11, 2018 at 10:35 AM, Markus Armbruster <armbru@redhat.com> wro=
 te:
-> argparse is nicer to use than getopt, and gives us --help almost for
-> free.
+> All generated .c are named like their .h, except for qmp-marshal.c and
+> qmp-commands.h.  To add to the confusion, tests-qmp-commands.c falsely
+> matches generated test-qmp-commands.h.
+>
+> Get rid of this unnecessary complication.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-nice,
+that makes more sense,
+
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  scripts/qapi-gen.py    | 48 ++++++++++++++++++++++++++++++--------------=
-----
->  scripts/qapi/common.py | 43 -------------------------------------------
->  2 files changed, 30 insertions(+), 61 deletions(-)
+>  .gitignore                                     |  3 +--
+>  Makefile                                       |  6 +++---
+>  Makefile.objs                                  |  2 +-
+>  docs/devel/qapi-code-gen.txt                   |  6 +++---
+>  qga/Makefile.objs                              |  2 +-
+>  scripts/qapi/commands.py                       |  2 +-
+>  tests/.gitignore                               |  5 ++---
+>  tests/Makefile.include                         | 10 +++++-----
+>  tests/{test-qmp-commands.c =3D> test-qmp-cmds.c} |  0
+>  9 files changed, 17 insertions(+), 19 deletions(-)
+>  rename tests/{test-qmp-commands.c =3D> test-qmp-cmds.c} (100%)
 >
-> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
-> index 2100ca1145..e5be484e3e 100755
-> --- a/scripts/qapi-gen.py
-> +++ b/scripts/qapi-gen.py
-> @@ -4,8 +4,11 @@
->  # This work is licensed under the terms of the GNU GPL, version 2 or lat=
-er.
->  # See the COPYING file in the top-level directory.
+> diff --git a/.gitignore b/.gitignore
+> index 2f9a92f6cc..7d783e6e66 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -33,9 +33,8 @@
+>  /qapi-visit.[ch]
+>  /qapi-event.[ch]
+>  /qapi-doc.texi
+> -/qmp-commands.h
+> +/qmp-commands.[ch]
+>  /qmp-introspect.[ch]
+> -/qmp-marshal.c
+>  /qemu-doc.html
+>  /qemu-doc.info
+>  /qemu-doc.txt
+> diff --git a/Makefile b/Makefile
+> index bd781c6aad..164a38578e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -91,7 +91,7 @@ include $(SRC_PATH)/rules.mak
 >
-> +from __future__ import print_function
-> +import argparse
-> +import re
->  import sys
-> -from qapi.common import parse_command_line, QAPISchema
-> +from qapi.common import QAPISchema
->  from qapi.types import gen_types
->  from qapi.visit import gen_visit
->  from qapi.commands import gen_commands
-> @@ -15,26 +18,35 @@ from qapi.doc import gen_doc
+>  GENERATED_FILES =3D qemu-version.h config-host.h qemu-options.def
+>  GENERATED_FILES +=3D qmp-commands.h qapi-types.h qapi-visit.h qapi-event=
+.h
+> -GENERATED_FILES +=3D qmp-marshal.c qapi-types.c qapi-visit.c qapi-event.=
+c
+> +GENERATED_FILES +=3D qmp-commands.c qapi-types.c qapi-visit.c qapi-event=
+.c
+>  GENERATED_FILES +=3D qmp-introspect.h
+>  GENERATED_FILES +=3D qmp-introspect.c
+>  GENERATED_FILES +=3D qapi-doc.texi
+> @@ -496,7 +496,7 @@ $(SRC_PATH)/scripts/qapi-gen.py
 >
+>  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h =
+\
+>  qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h =
+\
+> -qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal=
+.c \
+> +qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-command=
+s.c \
+>  qga/qapi-generated/qga-qapi-doc.texi: \
+>  qga/qapi-generated/qapi-gen-timestamp ;
+>  qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json =
+$(qapi-py)
+> @@ -522,7 +522,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
+ATH)/qapi/common.json \
 >
->  def main(argv):
-> -    (input_file, output_dir, prefix, opts) =3D \
-> -        parse_command_line('bu', ['builtins', 'unmask-non-abi-names'])
-> +    parser =3D argparse.ArgumentParser(
-> +        description=3D'Generate code from a QAPI schema')
-> +    parser.add_argument('-b', '--builtins', action=3D'store_true',
-> +                        help=3D"generate code for built-in types")
-> +    parser.add_argument('-o', '--output_dir', action=3D'store', default=
-=3D'',
-> +                        help=3D"write output to directory OUTPUT_DIR")
-> +    parser.add_argument('-p', '--prefix', action=3D'store', default=3D''=
-,
-> +                        help=3D"prefix for symbols")
-> +    parser.add_argument('-u', '--unmask-non-abi-names', action=3D'store_=
-true',
-> +                        dest=3D'unmask',
-> +                        help=3D"expose non-ABI names in introspection")
-> +    parser.add_argument('schema', action=3D'store')
-> +    args =3D parser.parse_args()
+>  qapi-types.c qapi-types.h \
+>  qapi-visit.c qapi-visit.h \
+> -qmp-commands.h qmp-marshal.c \
+> +qmp-commands.h qmp-commands.c \
+>  qapi-event.c qapi-event.h \
+>  qmp-introspect.h qmp-introspect.c \
+>  qapi-doc.texi: \
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 2efba6d768..d255aaf194 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -78,7 +78,7 @@ common-obj-$(CONFIG_FDT) +=3D device_tree.o
+>  ######################################################################
+>  # qapi
 >
-> -    opt_builtins =3D False
-> -    opt_unmask =3D False
-> +    match =3D re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', args.prefix)
-> +    if match.end() !=3D len(args.prefix):
-> +        print("%s: 'funny character '%s' in argument of --prefix"
-> +              % (sys.argv[0], args.prefix[match.end()]),
-> +              file=3Dsys.stderr)
-> +        sys.exit(1)
+> -common-obj-y +=3D qmp-marshal.o
+> +common-obj-y +=3D qmp-commands.o
+>  common-obj-y +=3D qmp-introspect.o
+>  common-obj-y +=3D qmp.o hmp.o
+>  endif
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 1a1cbaea7b..ba1dc73298 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -1147,8 +1147,8 @@ declares qmp_COMMAND() that the user must implement=
+.
 >
-> -    for o, a in opts:
-> -        if o in ('-b', '--builtins'):
-> -            opt_builtins =3D True
-> -        if o in ('-u', '--unmask-non-abi-names'):
-> -            opt_unmask =3D True
-> +    schema =3D QAPISchema(args.schema)
+>  The following files are generated:
 >
-> -    schema =3D QAPISchema(input_file)
-> -
-> -    gen_types(schema, output_dir, prefix, opt_builtins)
-> -    gen_visit(schema, output_dir, prefix, opt_builtins)
-> -    gen_commands(schema, output_dir, prefix)
-> -    gen_events(schema, output_dir, prefix)
-> -    gen_introspect(schema, output_dir, prefix, opt_unmask)
-> -    gen_doc(schema, output_dir, prefix)
-> +    gen_types(schema, args.output_dir, args.prefix, args.builtins)
-> +    gen_visit(schema, args.output_dir, args.prefix, args.builtins)
-> +    gen_commands(schema, args.output_dir, args.prefix)
-> +    gen_events(schema, args.output_dir, args.prefix)
-> +    gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
-> +    gen_doc(schema, args.output_dir, args.prefix)
+> -$(prefix)qmp-marshal.c: Command marshal/dispatch functions for each
+> -                        QMP command defined in the schema
+> +$(prefix)qmp-commands.c: Command marshal/dispatch functions for each
+> +                         QMP command defined in the schema
 >
+>  $(prefix)qmp-commands.h: Function prototypes for the QMP commands
+>                           specified in the schema
+> @@ -1170,7 +1170,7 @@ Example:
+>      void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
+);
 >
->  if __name__ =3D=3D '__main__':
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 868ec25deb..8290795dc1 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -13,7 +13,6 @@
+>      #endif
+> -    $ cat qapi-generated/example-qmp-marshal.c
+> +    $ cat qapi-generated/example-qmp-commands.c
+>  [Uninteresting stuff omitted...]
 >
->  from __future__ import print_function
->  import errno
-> -import getopt
->  import os
->  import re
->  import string
-> @@ -1924,48 +1923,6 @@ def build_params(arg_type, boxed, extra):
+>      static void qmp_marshal_output_UserDefOne(UserDefOne *ret_in, QObjec=
+t **ret_out, Error **errp)
+> diff --git a/qga/Makefile.objs b/qga/Makefile.objs
+> index 1c5986c0bb..6151378ae4 100644
+> --- a/qga/Makefile.objs
+> +++ b/qga/Makefile.objs
+> @@ -3,6 +3,6 @@ qga-obj-$(CONFIG_POSIX) +=3D commands-posix.o channel-pos=
+ix.o
+>  qga-obj-$(CONFIG_WIN32) +=3D commands-win32.o channel-win32.o service-wi=
+n32.o
+>  qga-obj-$(CONFIG_WIN32) +=3D vss-win32.o
+>  qga-obj-y +=3D qapi-generated/qga-qapi-types.o qapi-generated/qga-qapi-v=
+isit.o
+> -qga-obj-y +=3D qapi-generated/qga-qmp-marshal.o
+> +qga-obj-y +=3D qapi-generated/qga-qmp-commands.o
 >
+>  qga-vss-dll-obj-$(CONFIG_QGA_VSS) +=3D vss-win32/
+> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+> index a744611d58..05fe33a03b 100644
+> --- a/scripts/qapi/commands.py
+> +++ b/scripts/qapi/commands.py
+> @@ -289,5 +289,5 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmd=
+s);
+>      schema.visit(vis)
+>      genc.add(vis.defn)
+>      genh.add(vis.decl)
+> -    genc.write(output_dir, prefix + 'qmp-marshal.c')
+> +    genc.write(output_dir, prefix + 'qmp-commands.c')
+>      genh.write(output_dir, prefix + 'qmp-commands.h')
+> diff --git a/tests/.gitignore b/tests/.gitignore
+> index e5c744b7ed..2629cfc2f9 100644
+> --- a/tests/.gitignore
+> +++ b/tests/.gitignore
+> @@ -70,13 +70,12 @@ test-qdist
+>  test-qga
+>  test-qht
+>  test-qht-par
+> -test-qmp-commands
+> -test-qmp-commands.h
+> +test-qmp-cmds
+> +test-qmp-commands.[ch]
+>  test-qmp-event
+>  test-qobject-input-strict
+>  test-qobject-input-visitor
+>  test-qmp-introspect.[ch]
+> -test-qmp-marshal.c
+>  test-qobject-output-visitor
+>  test-rcu-list
+>  test-replication
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index b406531b34..9a21ed7ee9 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -61,8 +61,8 @@ check-unit-y +=3D tests/test-clone-visitor$(EXESUF)
+>  gcov-files-test-clone-visitor-y =3D qapi/qapi-clone-visitor.c
+>  check-unit-y +=3D tests/test-qobject-input-visitor$(EXESUF)
+>  gcov-files-test-qobject-input-visitor-y =3D qapi/qobject-input-visitor.c
+> -check-unit-y +=3D tests/test-qmp-commands$(EXESUF)
+> -gcov-files-test-qmp-commands-y =3D qapi/qmp-dispatch.c
+> +check-unit-y +=3D tests/test-qmp-cmds$(EXESUF)
+> +gcov-files-test-qmp-cmds-y =3D qapi/qmp-dispatch.c
+>  check-unit-y +=3D tests/test-string-input-visitor$(EXESUF)
+>  gcov-files-test-string-input-visitor-y =3D qapi/string-input-visitor.c
+>  check-unit-y +=3D tests/test-string-output-visitor$(EXESUF)
+> @@ -576,7 +576,7 @@ test-obj-y =3D tests/check-qnum.o tests/check-qstring=
+.o tests/check-qdict.o \
+>         tests/test-string-input-visitor.o tests/test-qobject-output-visit=
+or.o \
+>         tests/test-clone-visitor.o \
+>         tests/test-qobject-input-visitor.o \
+> -       tests/test-qmp-commands.o tests/test-visitor-serialization.o \
+> +       tests/test-qmp-cmds.o tests/test-visitor-serialization.o \
+>         tests/test-x86-cpuid.o tests/test-mul64.o tests/test-int128.o \
+>         tests/test-opts-visitor.o tests/test-qmp-event.o \
+>         tests/rcutorture.o tests/test-rcu-list.o \
+> @@ -656,7 +656,7 @@ tests/test-replication$(EXESUF): tests/test-replicati=
+on.o $(test-util-obj-y) \
 >
->  #
-> -# Common command line parsing
-> -#
-> -
-> -
-> -def parse_command_line(extra_options=3D'', extra_long_options=3D[]):
-> -
-> -    try:
-> -        opts, args =3D getopt.gnu_getopt(sys.argv[1:],
-> -                                       'p:o:' + extra_options,
-> -                                       ['prefix=3D', 'output-dir=3D']
-> -                                       + extra_long_options)
-> -    except getopt.GetoptError as err:
-> -        print("%s: %s" % (sys.argv[0], str(err)), file=3Dsys.stderr)
-> -        sys.exit(1)
-> -
-> -    output_dir =3D ''
-> -    prefix =3D ''
-> -    extra_opts =3D []
-> -
-> -    for oa in opts:
-> -        o, a =3D oa
-> -        if o in ('-p', '--prefix'):
-> -            match =3D re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', a)
-> -            if match.end() !=3D len(a):
-> -                print("%s: 'funny character '%s' in argument of --prefix=
-" \
-> -                      % (sys.argv[0], a[match.end()]), file=3Dsys.stderr=
-)
-> -                sys.exit(1)
-> -            prefix =3D a
-> -        elif o in ('-o', '--output-dir'):
-> -            output_dir =3D a + '/'
-> -        else:
-> -            extra_opts.append(oa)
-> -
-> -    if len(args) !=3D 1:
-> -        print("%s: need exactly one argument" % sys.argv[0], file=3Dsys.=
-stderr)
-> -        sys.exit(1)
-> -    fname =3D args[0]
-> -
-> -    return (fname, output_dir, prefix, extra_opts)
-> -
-> -
-> -#
->  # Accumulate and write output
->  #
+>  tests/test-qapi-types.c tests/test-qapi-types.h \
+>  tests/test-qapi-visit.c tests/test-qapi-visit.h \
+> -tests/test-qmp-commands.h tests/test-qmp-marshal.c \
+> +tests/test-qmp-commands.h tests/test-qmp-commands.c \
+>  tests/test-qapi-event.c tests/test-qapi-event.h \
+>  tests/test-qmp-introspect.c tests/test-qmp-introspect.h: \
+>  tests/test-qapi-gen-timestamp ;
+> @@ -679,7 +679,7 @@ tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o=
+ $(test-qapi-obj-y)
+>  tests/test-qobject-output-visitor$(EXESUF): tests/test-qobject-output-vi=
+sitor.o $(test-qapi-obj-y)
+>  tests/test-clone-visitor$(EXESUF): tests/test-clone-visitor.o $(test-qap=
+i-obj-y)
+>  tests/test-qobject-input-visitor$(EXESUF): tests/test-qobject-input-visi=
+tor.o $(test-qapi-obj-y)
+> -tests/test-qmp-commands$(EXESUF): tests/test-qmp-commands.o tests/test-q=
+mp-marshal.o $(test-qapi-obj-y)
+> +tests/test-qmp-cmds$(EXESUF): tests/test-qmp-cmds.o tests/test-qmp-comma=
+nds.o $(test-qapi-obj-y)
+>  tests/test-visitor-serialization$(EXESUF): tests/test-visitor-serializat=
+ion.o $(test-qapi-obj-y)
+>  tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-=
+obj-y)
 >
+> diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-cmds.c
+> similarity index 100%
+> rename from tests/test-qmp-commands.c
+> rename to tests/test-qmp-cmds.c
 > --
 > 2.13.6
 >
