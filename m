@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eldoW-0006zm-OE
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:52:20 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eldpF-0007dm-8P
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eldoT-0004MI-Mq
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:52:16 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56308 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eldoT-0004MA-Gk
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:52:13 -0500
-Date: Tue, 13 Feb 2018 18:52:04 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180213184729-mutt-send-email-mst@kernel.org>
-References: <1518116908-10852-1-git-send-email-mst@redhat.com>
-	<CAFEAcA8kvkfoxnQbqZ4Y44uWtbsirCKdmTcnZJzu=ege9YRfTg@mail.gmail.com>
-	<20180209190703-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_CL6P31EJyzxom1oh6j8LNDD2+OXjJ65hKsB=zBw6tWQ@mail.gmail.com>
-	<CAFEAcA_z25p0NrRuH3vJm9mJJzHZXbgct2GwyojuHXKqejc8JA@mail.gmail.com>
+	(envelope-from <stefanha@redhat.com>) id 1eldpE-0004Xb-7j
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:53:01 -0500
+Date: Tue, 13 Feb 2018 16:52:55 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180213165255.GC22618@stefanha-x1.localdomain>
+References: <20180203061621.7033-1-stefanha@redhat.com>
+	<20180203061621.7033-4-stefanha@redhat.com>
+	<c937a67c-743c-4e19-8e59-de839e05185c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="6zdv2QT/q3FMhpsV"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_z25p0NrRuH3vJm9mJJzHZXbgct2GwyojuHXKqejc8JA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
- fixes and cleanups
+In-Reply-To: <c937a67c-743c-4e19-8e59-de839e05185c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] block/iscsi: fix ioctl cancel
+ use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +26,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Felipe Franciosi <felipe@nutanix.com>, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>
 
-On Tue, Feb 13, 2018 at 04:33:14PM +0000, Peter Maydell wrote:
-> On 12 February 2018 at 09:35, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > This asserts in 'make check' for NetBSD, FreeBSD, OpenBSD, OSX:
-> >
-> > TEST: tests/device-introspect-test... (pid=19530)
-> >   /aarch64/device/introspect/list:                                     OK
-> >   /aarch64/device/introspect/list-fields:                              OK
-> >   /aarch64/device/introspect/none:                                     OK
-> >   /aarch64/device/introspect/abstract:                                 OK
-> >   /aarch64/device/introspect/concrete:                                 **
-> > ERROR:/root/qemu/qom/object.c:372:object_initialize_with_type:
-> > assertion failed: (type != NULL)
-> > Broken pipe
-> > FAIL
-> > GTester: last random seed: R02Sd4e2c04f6ac00d843a31ccac4de0d914
-> > (pid=12686)
-> >   /aarch64/device/introspect/abstract-interfaces:                      OK
-> > FAIL: tests/device-introspect-test
-> >
-> > (other archs fail too, aarch64 is just the first one we hit). This
-> > error is often "device A instantiates device B, but device B is
-> > conditionally compiled in and A is always compiled; so test fails
-> > trying to create device A on hosts where device B isn't built" I think.
-> 
-> This part is indeed that problem -- the 'virtio-crypto-device' object
-> is built only if CONFIG_LINUX, but 'virtio-crypto-pci' is built if
-> CONFIG_VIRTIO_PCI, so on systems where the latter is true but not the
-> former you get a virtio-crypto-pci device that crashes when instantiated.
-> 
-> The fix should be
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -8,7 +8,7 @@ obj-y += virtio.o virtio-balloon.o
->  obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
->  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
->  obj-$(CONFIG_LINUX) += virtio-crypto.o
-> -obj-$(CONFIG_VIRTIO_PCI) += virtio-crypto-pci.o
-> +obj-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
->  endif
-> 
->  common-obj-$(call lnot,$(CONFIG_LINUX)) += vhost-stub.o
-> 
-> 
-> thanks
-> -- PMM
 
-Thanks for your help with this!
+--6zdv2QT/q3FMhpsV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think the root cause is that one of the patches disables
-virtio-crypto build on non linux which used to be enabled.
+On Fri, Feb 09, 2018 at 06:50:06PM +0100, Paolo Bonzini wrote:
+> On 03/02/2018 07:16, Stefan Hajnoczi wrote:
+> > iscsi_aio_cancel() does not increment the request's reference count,
+> > causing a use-after-free when ABORT TASK finishes after the request has
+> > already completed.
+> >=20
+> > There are some additional issues with iscsi_aio_cancel():
+> > 1. Several ABORT TASKs may be sent for the same task if
+> >    iscsi_aio_cancel() is invoked multiple times.  It's better to avoid
+> >    this just in case the command identifier is reused.
+> > 2. The iscsilun->mutex protection is missing in iscsi_aio_cancel().
+> >=20
+> > Reported-by: Felipe Franciosi <felipe@nutanix.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  block/iscsi.c | 21 ++++++++++++++++++---
+> >  1 file changed, 18 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/block/iscsi.c b/block/iscsi.c
+> > index 1cfe1c647c..8140baac15 100644
+> > --- a/block/iscsi.c
+> > +++ b/block/iscsi.c
+> > @@ -119,6 +119,7 @@ typedef struct IscsiAIOCB {
+> >  #ifdef __linux__
+> >      sg_io_hdr_t *ioh;
+> >  #endif
+> > +    bool cancelled;
+> >  } IscsiAIOCB;
+> > =20
+> >  /* libiscsi uses time_t so its enough to process events every second */
+> > @@ -282,6 +283,7 @@ static void iscsi_co_init_iscsitask(IscsiLun *iscsi=
+lun, struct IscsiTask *iTask)
+> >      };
+> >  }
+> > =20
+> > +/* Called (via iscsi_service) with QemuMutex held. */
+> >  static void
+> >  iscsi_abort_task_cb(struct iscsi_context *iscsi, int status, void *com=
+mand_data,
+> >                      void *private_data)
+> > @@ -290,6 +292,7 @@ iscsi_abort_task_cb(struct iscsi_context *iscsi, in=
+t status, void *command_data,
+> > =20
+> >      acb->status =3D -ECANCELED;
+> >      iscsi_schedule_bh(acb);
+> > +    qemu_aio_unref(acb); /* acquired in iscsi_aio_cancel() */
+> >  }
+> > =20
+> >  static void
+> > @@ -298,14 +301,25 @@ iscsi_aio_cancel(BlockAIOCB *blockacb)
+> >      IscsiAIOCB *acb =3D (IscsiAIOCB *)blockacb;
+> >      IscsiLun *iscsilun =3D acb->iscsilun;
+> > =20
+> > -    if (acb->status !=3D -EINPROGRESS) {
+> > +    qemu_mutex_lock(&iscsilun->mutex);
+> > +
+> > +    /* If it was cancelled or completed already, our work is done here=
+ */
+> > +    if (acb->cancelled || acb->status !=3D -EINPROGRESS) {
+> > +        qemu_mutex_unlock(&iscsilun->mutex);
+> >          return;
+> >      }
+> > =20
+> > +    acb->cancelled =3D true;
+> > +
+> > +    qemu_aio_ref(acb); /* released in iscsi_abort_task_cb() */
+> > +
+> >      /* send a task mgmt call to the target to cancel the task on the t=
+arget */
+> > -    iscsi_task_mgmt_abort_task_async(iscsilun->iscsi, acb->task,
+> > -                                     iscsi_abort_task_cb, acb);
+> > +    if (iscsi_task_mgmt_abort_task_async(iscsilun->iscsi, acb->task,
+> > +                                         iscsi_abort_task_cb, acb) < 0=
+) {
+> > +        qemu_aio_unref(acb); /* since iscsi_abort_task_cb() won't be c=
+alled */
+> > +    }
+> > =20
+> > +    qemu_mutex_unlock(&iscsilun->mutex);
+> >  }
+> > =20
+> >  static const AIOCBInfo iscsi_aiocb_info =3D {
+> > @@ -1000,6 +1014,7 @@ static BlockAIOCB *iscsi_aio_ioctl(BlockDriverSta=
+te *bs,
+> >      acb->bh          =3D NULL;
+> >      acb->status      =3D -EINPROGRESS;
+> >      acb->ioh         =3D buf;
+> > +    acb->cancelled   =3D false;
+> > =20
+> >      if (req !=3D SG_IO) {
+> >          iscsi_ioctl_handle_emulated(acb, req, buf);
+> >=20
+>=20
+> BTW, this is okay even without the follow-up, since libiscsi seems not
+> to obey its contract...
 
-This has been silently done by a patch which was supposed to
-merely add a vhost crypto device, I'm sorry I missed that
-in the review.
+I'm awaiting feedback from Felipe to see if these fixes plus the
+follow-up have solved the issue.  Then I'll send a new revision.
 
-I've dropped the crypto vhost patches from the pull request for now.
+Stefan
 
-Pushed with the same name - should be fine now.
+--6zdv2QT/q3FMhpsV
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-MST
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJagxfnAAoJEJykq7OBq3PIR5sH/Rt4T9Cgan94kzRtPIzdKoo9
+tDWrhpQnjGV13vxxFKDzkiCJ1wnZKnsTblcC2m6GJCPQkbEWgqQAazVcxaFxn0M5
+7F+fujdsKs/L45Tg5B1KUFWVxzzwJwE0Iw4uu1WT/CVS/UERKOOqeeB8GHoSmf/a
+T6JvqrvG8g3oJt0kRpDWV7phupGepTgGToqTQYe4XBhP7GQAt8WtFnTGgApr9sWV
+qfKYwgTrCKBkX+IrL8a2TJ73dzLTZLD01YZtXXyxQct4d7cb+UFTTXTv+ndPxThS
+7X3qA2AK8bulCIjjjToioSaqeBhuONz+BYkwuWORs0YtFahLE5oc5nWJCRPmnCA=
+=gDG/
+-----END PGP SIGNATURE-----
+
+--6zdv2QT/q3FMhpsV--
