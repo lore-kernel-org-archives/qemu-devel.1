@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele27-0003Q9-LE
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele27-0003Pu-IF
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele24-0005dn-FB
+	(envelope-from <kwolf@redhat.com>) id 1ele24-0005eG-RU
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:19 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:05:09 +0100
-Message-Id: <20180213170529.10858-36-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:05:07 +0100
+Message-Id: <20180213170529.10858-34-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 35/55] qcow2: Update get_cluster_table() to
- support L2 slices
+Subject: [Qemu-devel] [PULL 33/55] qcow2: Update l2_allocate() to support L2
+ slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +25,152 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-This patch updates get_cluster_table() to return L2 slices instead of
-full L2 tables.
+This patch updates l2_allocate() to support the qcow2 cache returning
+L2 slices instead of full L2 tables.
 
-The code itself needs almost no changes, it only needs to call
-offset_to_l2_slice_index() instead of offset_to_l2_index(). This patch
-also renames all the relevant variables and the documentation.
+The old code simply gets an L2 table from the cache and initializes it
+with zeroes or with the contents of an existing table. With a cache
+that returns slices instead of tables the idea remains the same, but
+the code must now iterate over all the slices that are contained in an
+L2 table.
+
+Since now we're operating with slices the function can no longer
+return the newly-allocated table, so it's up to the caller to retrieve
+the appropriate L2 slice after calling l2_allocate() (note that with
+this patch the caller is still loading full L2 tables, but we'll deal
+with that in a separate patch).
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20fc0415bf0e011e29f6487ec86eb06a11f37445.1517840877.git.berto@igalia.com
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 64cf064c0021ba315d3f3032da0f95db1b615f33.1517840877.git.berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ block/qcow2-cluster.c | 56 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 34 insertions(+), 22 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 044eccda72..cd1ba40f74 100644
+index 3f7272441d..4aa9ea7b29 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -659,20 +659,20 @@ fail:
-  * get_cluster_table
+@@ -263,11 +263,12 @@ int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index)
   *
-  * for a given disk offset, load (and allocate if needed)
-- * the l2 table.
-+ * the appropriate slice of its l2 table.
-  *
-- * the cluster index in the l2 table is given to the caller.
-+ * the cluster index in the l2 slice is given to the caller.
-  *
-  * Returns 0 on success, -errno in failure case
   */
- static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
--                             uint64_t **new_l2_table,
-+                             uint64_t **new_l2_slice,
-                              int *new_l2_index)
+ 
+-static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
++static int l2_allocate(BlockDriverState *bs, int l1_index)
  {
      BDRVQcow2State *s = bs->opaque;
-     unsigned int l2_index;
-     uint64_t l1_index, l2_offset;
+     uint64_t old_l2_offset;
 -    uint64_t *l2_table = NULL;
 +    uint64_t *l2_slice = NULL;
++    unsigned slice, slice_size2, n_slices;
+     int64_t l2_offset;
      int ret;
  
-     /* seek to the l2 offset in the l1 table */
-@@ -712,17 +712,17 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
-         assert(offset_into_cluster(s, l2_offset) == 0);
+@@ -298,42 +299,45 @@ static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
+ 
+     /* allocate a new entry in the l2 cache */
+ 
++    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
++    n_slices = s->cluster_size / slice_size2;
++
+     trace_qcow2_l2_allocate_get_empty(bs, l1_index);
+-    {
++    for (slice = 0; slice < n_slices; slice++) {
+         ret = qcow2_cache_get_empty(bs, s->l2_table_cache,
+-                                    l2_offset,
+-                                    (void **) table);
++                                    l2_offset + slice * slice_size2,
++                                    (void **) &l2_slice);
+         if (ret < 0) {
+             goto fail;
+         }
+ 
+-        l2_table = *table;
+-
+         if ((old_l2_offset & L1E_OFFSET_MASK) == 0) {
+-            /* if there was no old l2 table, clear the new table */
+-            memset(l2_table, 0, s->l2_size * sizeof(uint64_t));
++            /* if there was no old l2 table, clear the new slice */
++            memset(l2_slice, 0, slice_size2);
+         } else {
+-            uint64_t *old_table;
++            uint64_t *old_slice;
++            uint64_t old_l2_slice_offset =
++                (old_l2_offset & L1E_OFFSET_MASK) + slice * slice_size2;
+ 
+-            /* if there was an old l2 table, read it from the disk */
++            /* if there was an old l2 table, read a slice from the disk */
+             BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_COW_READ);
+-            ret = qcow2_cache_get(bs, s->l2_table_cache,
+-                                  old_l2_offset & L1E_OFFSET_MASK,
+-                                  (void **) &old_table);
++            ret = qcow2_cache_get(bs, s->l2_table_cache, old_l2_slice_offset,
++                                  (void **) &old_slice);
+             if (ret < 0) {
+                 goto fail;
+             }
+ 
+-            memcpy(l2_table, old_table, s->cluster_size);
++            memcpy(l2_slice, old_slice, slice_size2);
+ 
+-            qcow2_cache_put(s->l2_table_cache, (void **) &old_table);
++            qcow2_cache_put(s->l2_table_cache, (void **) &old_slice);
+         }
+ 
+-        /* write the l2 table to the file */
++        /* write the l2 slice to the file */
+         BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_WRITE);
+ 
+         trace_qcow2_l2_allocate_write_l2(bs, l1_index);
+-        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
++        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
++        qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
      }
  
--    /* load the l2 table in memory */
--    ret = l2_load(bs, offset, l2_offset, &l2_table);
-+    /* load the l2 slice in memory */
-+    ret = l2_load(bs, offset, l2_offset, &l2_slice);
-     if (ret < 0) {
-         return ret;
+     ret = qcow2_cache_flush(bs, s->l2_table_cache);
+@@ -349,14 +353,13 @@ static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
+         goto fail;
+     }
+ 
+-    *table = l2_table;
+     trace_qcow2_l2_allocate_done(bs, l1_index, 0);
+     return 0;
+ 
+ fail:
+     trace_qcow2_l2_allocate_done(bs, l1_index, ret);
+-    if (l2_table != NULL) {
+-        qcow2_cache_put(s->l2_table_cache, (void **) table);
++    if (l2_slice != NULL) {
++        qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+     }
+     s->l1_table[l1_index] = old_l2_offset;
+     if (l2_offset > 0) {
+@@ -701,7 +704,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+         }
+     } else {
+         /* First allocate a new L2 table (and do COW if needed) */
+-        ret = l2_allocate(bs, l1_index, &l2_table);
++        ret = l2_allocate(bs, l1_index);
+         if (ret < 0) {
+             return ret;
+         }
+@@ -711,6 +714,15 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+             qcow2_free_clusters(bs, l2_offset, s->l2_size * sizeof(uint64_t),
+                                 QCOW2_DISCARD_OTHER);
+         }
++
++        /* Get the offset of the newly-allocated l2 table */
++        l2_offset = s->l1_table[l1_index] & L1E_OFFSET_MASK;
++        assert(offset_into_cluster(s, l2_offset) == 0);
++        /* Load the l2 table in memory */
++        ret = l2_load(bs, offset, l2_offset, &l2_table);
++        if (ret < 0) {
++            return ret;
++        }
      }
  
      /* find the cluster offset for the given disk offset */
- 
--    l2_index = offset_to_l2_index(s, offset);
-+    l2_index = offset_to_l2_slice_index(s, offset);
- 
--    *new_l2_table = l2_table;
-+    *new_l2_slice = l2_slice;
-     *new_l2_index = l2_index;
- 
-     return 0;
 -- 
 2.13.6
