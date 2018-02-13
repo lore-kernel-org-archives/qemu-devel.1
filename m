@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elYZO-0003CA-35
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:18 -0500
+	(envelope-from <david@redhat.com>) id 1elYZz-0003bc-IR
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elYZN-0000aN-4y
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:18 -0500
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:36539)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1elYZM-0000Zx-VV
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:17 -0500
-Received: by mail-oi0-x22d.google.com with SMTP id 24so13611593oij.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 03:16:16 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1elYZy-0000qa-M4
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:55 -0500
+References: <1518437672-7724-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518437672-7724-2-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<20180212130301.1714d393@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <5b46d287-cc8a-4d84-cbb4-d6d45e60135b@redhat.com>
+Date: Tue, 13 Feb 2018 12:16:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <d23a2730-a103-6336-0658-e12fa9b0193f@lauterbach.com>
-References: <d23a2730-a103-6336-0658-e12fa9b0193f@lauterbach.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Feb 2018 11:15:55 +0000
-Message-ID: <CAFEAcA-tc+-+KLcMPB=BV0zCmO6t7tuKHM4=kyRf_Xx0aCCidA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V2] target-arm:Add a dynamic
- XML-description of the cp-registers to GDB
+In-Reply-To: <20180212130301.1714d393@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/3] qmp: expose s390-specific
+ CPU info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Luiz Capitulino <lcapitulino@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: agraf@suse.de, berrange@redhat.com, ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, eblake@redhat.com, rth@twiddle.net
 
-On 30 January 2018 at 11:16, Abdallah Bouassida
-<abdallah.bouassida@lauterbach.com> wrote:
-> [PATCH V2] target-arm:Add a dynamic XML-description of the cp-registers to
-> GDB
->
-> This patch offers to GDB the ability to read/write all the coprocessor
-> registers for ARM and ARM64 by generating dynamically an XML-description for
-> these registers.
->
-> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-> ---
->
+On 12.02.2018 19:03, Luiz Capitulino wrote:
+> On Mon, 12 Feb 2018 13:14:30 +0100
+> Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+> 
+>> Presently s390x is the only architecture not exposing specific
+>> CPU information via QMP query-cpus. Upstream discussion has shown
+>> that it could make sense to report the architecture specific CPU
+>> state, e.g. to detect that a CPU has been stopped.
+>>
+>> With this change the output of query-cpus will look like this on
+>> s390:
+>>
+>>    [
+>>      {"arch": "s390", "current": true,
+>>       "props": {"core-id": 0}, "cpu-state": "operating", "CPU": 0,
+>>       "qom_path": "/machine/unattached/device[0]",
+>>       "halted": false, "thread_id": 63115},
+>>      {"arch": "s390", "current": false,
+>>       "props": {"core-id": 1}, "cpu-state": "stopped", "CPU": 1,
+>>       "qom_path": "/machine/unattached/device[1]",
+>>       "halted": true, "thread_id": 63116}
+>>    ]
+> 
+> We're adding the same information to query-cpus-fast. Why do we
+> need to duplicate this into query-cpus? Do you plan to keep using
+> query-cpus? If yes, why?
 
-Hi. I tried applying this patch to review it, but unfortunately your
-email client has made a complete mess of it. In particular:
- * it is wrapping long lines
- * it is converting all the leading space characters to unicode
-   non-breaking space characters
+Wonder if we could simply pass a flag to query-cpus "fast=true", that
+makes it behave differently. (either not indicate the critical values or
+simply provide dummy values - e.g. simply halted=false)
 
-which means that it won't apply. Can you resend using something that
-doesn't mangle plaintext, please?
+> 
+> Libvirt for one, should move away from it. We don't want to run
+> into the risk of having the same issue we had with x86 in other
+> archs.
+> 
+>>
 
-thanks
--- PMM
+
+-- 
+
+Thanks,
+
+David / dhildenb
