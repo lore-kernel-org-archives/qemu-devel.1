@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53173)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRud-0001li-3k
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:09:50 -0500
+	id 1elRui-0001sW-UA
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:09:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRuc-00006B-69
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:09:47 -0500
+	id 1elRuh-00008w-Vo
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:09:52 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33064)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1elRuh-00008n-Qx
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:09:51 -0500
+Received: by mail-qt0-x241.google.com with SMTP id d8so2253285qtm.0
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 20:09:51 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 13 Feb 2018 01:08:06 -0300
-Message-Id: <20180213040809.26021-28-f4bug@amsat.org>
+Date: Tue, 13 Feb 2018 01:08:08 -0300
+Message-Id: <20180213040809.26021-30-f4bug@amsat.org>
 In-Reply-To: <20180213040809.26021-1-f4bug@amsat.org>
 References: <20180213040809.26021-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v13 27/30] hw/arm/xilinx_zynqmp: enable the
- UHS-I mode
+Subject: [Qemu-devel] [PATCH v13 29/30] sdhci: add a check_capab_v3() qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +34,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Fam Zheng <famz@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>
-
-see the Xilinx datasheet "UG1085" (v1.7)
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Fam Zheng <famz@redhat.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/arm/xlnx-zynqmp.c | 1 +
- 1 file changed, 1 insertion(+)
+ tests/sdhci-test.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index e39ad73bec..4b93a3abd2 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -400,6 +400,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-          */
-         object_property_set_uint(sdhci, 3, "sd-spec-version", &err);
-         object_property_set_uint(sdhci, SDHCI_CAPABILITIES, "capareg", &err);
-+        object_property_set_uint(sdhci, UHS_I, "uhs", &err);
-         object_property_set_bool(sdhci, true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
+diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+index 39d0f87788..c0b45da88a 100644
+--- a/tests/sdhci-test.c
++++ b/tests/sdhci-test.c
+@@ -16,6 +16,8 @@
+ #define SDHC_CAPAB                      0x40
+ FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
+ FIELD(SDHC_CAPAB, SDMA,                     22, 1);
++FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
++FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
+ #define SDHC_HCVER                      0xFE
+ 
+ static const struct sdhci_t {
+@@ -161,6 +163,20 @@ static void check_capab_sdma(QSDHCI *s, bool supported)
+     g_assert_cmpuint(capab_sdma, ==, supported);
+ }
+ 
++static void check_capab_v3(QSDHCI *s, uint8_t version)
++{
++    uint64_t capab, capab_v3;
++
++    if (version < 3) {
++        /* before v3 those fields are RESERVED */
++        capab = sdhci_readq(s, SDHC_CAPAB);
++        capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, SDR);
++        g_assert_cmpuint(capab_v3, ==, 0);
++        capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, DRIVER);
++        g_assert_cmpuint(capab_v3, ==, 0);
++    }
++}
++
+ static QSDHCI *machine_start(const struct sdhci_t *test)
+ {
+     QSDHCI *s = g_new0(QSDHCI, 1);
+@@ -209,6 +225,7 @@ static void test_machine(const void *data)
+     check_specs_version(s, test->sdhci.version);
+     check_capab_capareg(s, test->sdhci.capab.reg);
+     check_capab_readonly(s);
++    check_capab_v3(s, test->sdhci.version);
+     check_capab_sdma(s, test->sdhci.capab.sdma);
+     check_capab_baseclock(s, test->sdhci.baseclock);
+ 
 -- 
 2.16.1
