@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1g-0002r1-5l
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1i-0002wI-GY
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005G7-Uf
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1h-0005KJ-G5
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:54 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:41 +0100
-Message-Id: <20180213170529.10858-8-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:48 +0100
+Message-Id: <20180213170529.10858-15-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 07/55] iotests: Use virtio-blk in 155
+Subject: [Qemu-devel] [PULL 14/55] sheepdog: Pass old and new size to
+ sd_prealloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +25,70 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Only a few select machine types support floppy drives and there is
-actually nothing preventing us from using virtio here, so let's do it.
+sd_prealloc() will now preallocate the area [old_size, new_size).  As
+before, it rounds to buf_size and may thus overshoot and preallocate
+areas that were not requested to be preallocated.  For image creation,
+this is no change in behavior.  For truncation, this is in accordance
+with the documentation for preallocated truncation.
 
-Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/155 | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ block/sheepdog.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
-diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
-index fc9fa975be..42dae04c83 100755
---- a/tests/qemu-iotests/155
-+++ b/tests/qemu-iotests/155
-@@ -64,7 +64,7 @@ class BaseClass(iotests.QMPTestCase):
-                     'file': {'driver': 'file',
-                              'filename': source_img}}
-         self.vm.add_blockdev(self.qmp_to_opts(blockdev))
--        self.vm.add_device('floppy,id=qdev0,drive=source')
-+        self.vm.add_device('virtio-blk,id=qdev0,drive=source')
-         self.vm.launch()
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index cc1d37b3da..d300fb69c0 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -1826,14 +1826,14 @@ static int do_sd_create(BDRVSheepdogState *s, uint32_t *vdi_id, int snapshot,
+     return 0;
+ }
  
-         self.assertIntactSourceBackingChain()
-@@ -173,21 +173,24 @@ class MirrorBaseClass(BaseClass):
-     def testFull(self):
-         self.runMirror('full')
+-static int sd_prealloc(BlockDriverState *bs, Error **errp)
++static int sd_prealloc(BlockDriverState *bs, int64_t old_size, int64_t new_size,
++                       Error **errp)
+ {
+     BlockBackend *blk = NULL;
+     BDRVSheepdogState *base = bs->opaque;
+     unsigned long buf_size;
+     uint32_t idx, max_idx;
+     uint32_t object_size;
+-    int64_t vdi_size;
+     void *buf = NULL;
+     int ret;
  
--        node = self.findBlockNode('target', 'qdev0')
-+        node = self.findBlockNode('target',
-+                                  '/machine/peripheral/qdev0/virtio-backend')
-         self.assertCorrectBackingImage(node, None)
-         self.assertIntactSourceBackingChain()
+@@ -1847,19 +1847,13 @@ static int sd_prealloc(BlockDriverState *bs, Error **errp)
  
-     def testTop(self):
-         self.runMirror('top')
+     blk_set_allow_write_beyond_eof(blk, true);
  
--        node = self.findBlockNode('target', 'qdev0')
-+        node = self.findBlockNode('target',
-+                                  '/machine/peripheral/qdev0/virtio-backend')
-         self.assertCorrectBackingImage(node, back2_img)
-         self.assertIntactSourceBackingChain()
+-    vdi_size = blk_getlength(blk);
+-    if (vdi_size < 0) {
+-        ret = vdi_size;
+-        goto out;
+-    }
+-
+     object_size = (UINT32_C(1) << base->inode.block_size_shift);
+     buf_size = MIN(object_size, SD_DATA_OBJ_SIZE);
+     buf = g_malloc0(buf_size);
  
-     def testNone(self):
-         self.runMirror('none')
+-    max_idx = DIV_ROUND_UP(vdi_size, buf_size);
++    max_idx = DIV_ROUND_UP(new_size, buf_size);
  
--        node = self.findBlockNode('target', 'qdev0')
-+        node = self.findBlockNode('target',
-+                                  '/machine/peripheral/qdev0/virtio-backend')
-         self.assertCorrectBackingImage(node, source_img)
-         self.assertIntactSourceBackingChain()
+-    for (idx = 0; idx < max_idx; idx++) {
++    for (idx = old_size / buf_size; idx < max_idx; idx++) {
+         /*
+          * The created image can be a cloned image, so we need to read
+          * a data from the source image.
+@@ -2119,7 +2113,7 @@ static int sd_create(const char *filename, QemuOpts *opts,
+             goto out;
+         }
  
-@@ -239,7 +242,8 @@ class TestCommit(BaseClass):
+-        ret = sd_prealloc(bs, errp);
++        ret = sd_prealloc(bs, 0, s->inode.vdi_size, errp);
  
-         self.vm.event_wait('BLOCK_JOB_COMPLETED')
- 
--        node = self.findBlockNode(None, 'qdev0')
-+        node = self.findBlockNode(None,
-+                                  '/machine/peripheral/qdev0/virtio-backend')
-         self.assert_qmp(node, 'image' + '/backing-image' * 0 + '/filename',
-                         back1_img)
-         self.assert_qmp(node, 'image' + '/backing-image' * 1 + '/filename',
+         bdrv_unref(bs);
+     }
 -- 
 2.13.6
