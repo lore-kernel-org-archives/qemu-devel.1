@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yanjun.zhu@oracle.com>) id 1elVsG-00088J-Mb
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:40 -0500
+	(envelope-from <t.pageflt@gmail.com>) id 1elZF8-0002um-QA
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:59:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yanjun.zhu@oracle.com>) id 1elVsC-0006L9-Pw
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:36 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:56102)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yanjun.zhu@oracle.com>)
-	id 1elVsC-0006K4-AA
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:32 -0500
-References: <20180212180819.82556-1-marcel@redhat.com>
-	<20180212180819.82556-6-marcel@redhat.com>
-From: Yanjun Zhu <yanjun.zhu@oracle.com>
-Message-ID: <ebbe23a0-8676-dad0-1003-a70d120fe2e3@oracle.com>
-Date: Tue, 13 Feb 2018 16:23:22 +0800
+	(envelope-from <t.pageflt@gmail.com>) id 1elZF5-0005ok-Ie
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:59:26 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54732)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <t.pageflt@gmail.com>) id 1elZF5-0005lM-Ca
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:59:23 -0500
+Received: by mail-wm0-x243.google.com with SMTP id i186so15503794wmi.4
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 03:59:22 -0800 (PST)
+From: Dimitris Karagkasidis <t.pageflt@gmail.com>
+Message-ID: <807b2724-7a5f-9d62-55aa-b5b3cf0c9503@gmail.com>
+Date: Tue, 13 Feb 2018 12:59:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180212180819.82556-6-marcel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V10 5/9] hw/rdma: Definitions for rdma
- device and rdma resource manager
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] monitor.c: Fix infinite loop in monitor's
+ auto-complete functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,205 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, yuval.shaia@oracle.com, mst@redhat.com, dotanb@mellanox.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
+The QEMU monitor enters an infinite loop when trying to auto-complete commands
+that accept only optional parameters. The commands currently affected by this
+issue are 'info registers' and 'info mtree'.
 
+Signed-off-by: Dimitris Karagkasidis <t.pagef.lt@gmail.com>
+---
+ monitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 2018/2/13 2:08, Marcel Apfelbaum wrote:
-> From: Yuval Shaia <yuval.shaia@oracle.com>
->
-> Definition of various structures and constants used in backend and
-> resource manager modules.
->
-> Reviewed-by: Dotan Barak <dotanb@mellanox.com>
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Zhu Yanjun <yanjun.zhu@oracle.com>
-
-Zhu Yanjun
-> ---
->   hw/rdma/rdma_backend_defs.h |  62 ++++++++++++++++++++++++++
->   hw/rdma/rdma_rm_defs.h      | 104 ++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 166 insertions(+)
->   create mode 100644 hw/rdma/rdma_backend_defs.h
->   create mode 100644 hw/rdma/rdma_rm_defs.h
->
-> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-> new file mode 100644
-> index 0000000000..837e32419c
-> --- /dev/null
-> +++ b/hw/rdma/rdma_backend_defs.h
-> @@ -0,0 +1,62 @@
-> +/*
-> + *  RDMA device: Definitions of Backend Device structures
-> + *
-> + * Copyright (C) 2018 Oracle
-> + * Copyright (C) 2018 Red Hat Inc
-> + *
-> + * Authors:
-> + *     Yuval Shaia <yuval.shaia@oracle.com>
-> + *     Marcel Apfelbaum <marcel@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#ifndef RDMA_BACKEND_DEFS_H
-> +#define RDMA_BACKEND_DEFS_H
-> +
-> +#include <infiniband/verbs.h>
-> +#include <qemu/thread.h>
-> +
-> +typedef struct RdmaDeviceResources RdmaDeviceResources;
-> +
-> +typedef struct RdmaBackendThread {
-> +    QemuThread thread;
-> +    QemuMutex mutex;
-> +    bool run;
-> +} RdmaBackendThread;
-> +
-> +typedef struct RdmaBackendDev {
-> +    struct ibv_device_attr dev_attr;
-> +    RdmaBackendThread comp_thread;
-> +    union ibv_gid gid;
-> +    PCIDevice *dev;
-> +    RdmaDeviceResources *rdma_dev_res;
-> +    struct ibv_device *ib_dev;
-> +    struct ibv_context *context;
-> +    struct ibv_comp_channel *channel;
-> +    uint8_t port_num;
-> +    uint8_t backend_gid_idx;
-> +} RdmaBackendDev;
-> +
-> +typedef struct RdmaBackendPD {
-> +    struct ibv_pd *ibpd;
-> +} RdmaBackendPD;
-> +
-> +typedef struct RdmaBackendMR {
-> +    struct ibv_pd *ibpd;
-> +    struct ibv_mr *ibmr;
-> +} RdmaBackendMR;
-> +
-> +typedef struct RdmaBackendCQ {
-> +    RdmaBackendDev *backend_dev;
-> +    struct ibv_cq *ibcq;
-> +} RdmaBackendCQ;
-> +
-> +typedef struct RdmaBackendQP {
-> +    struct ibv_pd *ibpd;
-> +    struct ibv_qp *ibqp;
-> +} RdmaBackendQP;
-> +
-> +#endif
-> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-> new file mode 100644
-> index 0000000000..6522dca68f
-> --- /dev/null
-> +++ b/hw/rdma/rdma_rm_defs.h
-> @@ -0,0 +1,104 @@
-> +/*
-> + * RDMA device: Definitions of Resource Manager structures
-> + *
-> + * Copyright (C) 2018 Oracle
-> + * Copyright (C) 2018 Red Hat Inc
-> + *
-> + * Authors:
-> + *     Yuval Shaia <yuval.shaia@oracle.com>
-> + *     Marcel Apfelbaum <marcel@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#ifndef RDMA_RM_DEFS_H
-> +#define RDMA_RM_DEFS_H
-> +
-> +#include "rdma_backend_defs.h"
-> +
-> +#define MAX_PORTS             1
-> +#define MAX_PORT_GIDS         1
-> +#define MAX_PORT_PKEYS        1
-> +#define MAX_PKEYS             1
-> +#define MAX_GIDS              2048
-> +#define MAX_UCS               512
-> +#define MAX_MR_SIZE           (1UL << 27)
-> +#define MAX_QP                1024
-> +#define MAX_SGE               4
-> +#define MAX_CQ                2048
-> +#define MAX_MR                1024
-> +#define MAX_PD                1024
-> +#define MAX_QP_RD_ATOM        16
-> +#define MAX_QP_INIT_RD_ATOM   16
-> +#define MAX_AH                64
-> +
-> +#define MAX_RMRESTBL_NAME_SZ 16
-> +typedef struct RdmaRmResTbl {
-> +    char name[MAX_RMRESTBL_NAME_SZ];
-> +    QemuMutex lock;
-> +    unsigned long *bitmap;
-> +    size_t tbl_sz;
-> +    size_t res_sz;
-> +    void *tbl;
-> +} RdmaRmResTbl;
-> +
-> +typedef struct RdmaRmPD {
-> +    RdmaBackendPD backend_pd;
-> +    uint32_t ctx_handle;
-> +} RdmaRmPD;
-> +
-> +typedef struct RdmaRmCQ {
-> +    RdmaBackendCQ backend_cq;
-> +    void *opaque;
-> +    bool notify;
-> +} RdmaRmCQ;
-> +
-> +typedef struct RdmaRmUserMR {
-> +    uint64_t host_virt;
-> +    uint64_t guest_start;
-> +    size_t length;
-> +} RdmaRmUserMR;
-> +
-> +/* MR (DMA region) */
-> +typedef struct RdmaRmMR {
-> +    RdmaBackendMR backend_mr;
-> +    RdmaRmUserMR user_mr;
-> +    uint32_t pd_handle;
-> +    uint32_t lkey;
-> +    uint32_t rkey;
-> +} RdmaRmMR;
-> +
-> +typedef struct RdmaRmUC {
-> +    uint64_t uc_handle;
-> +} RdmaRmUC;
-> +
-> +typedef struct RdmaRmQP {
-> +    RdmaBackendQP backend_qp;
-> +    void *opaque;
-> +    uint32_t qp_type;
-> +    uint32_t qpn;
-> +    uint32_t send_cq_handle;
-> +    uint32_t recv_cq_handle;
-> +    enum ibv_qp_state qp_state;
-> +} RdmaRmQP;
-> +
-> +typedef struct RdmaRmPort {
-> +    union ibv_gid gid_tbl[MAX_PORT_GIDS];
-> +    enum ibv_port_state state;
-> +    int *pkey_tbl; /* TODO: Not yet supported */
-> +} RdmaRmPort;
-> +
-> +typedef struct RdmaDeviceResources {
-> +    RdmaRmPort ports[MAX_PORTS];
-> +    RdmaRmResTbl pd_tbl;
-> +    RdmaRmResTbl mr_tbl;
-> +    RdmaRmResTbl uc_tbl;
-> +    RdmaRmResTbl qp_tbl;
-> +    RdmaRmResTbl cq_tbl;
-> +    RdmaRmResTbl cqe_ctx_tbl;
-> +    GHashTable *qp_hash; /* Keeps mapping between real and emulated */
-> +} RdmaDeviceResources;
-> +
-> +#endif
+diff --git a/monitor.c b/monitor.c
+index f4992505b1..d8b7270d9b 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3741,7 +3741,7 @@ static void monitor_find_completion_by_table(Monitor *mon,
+             }
+         }
+         str = args[nb_args - 1];
+-        while (*ptype == '-' && ptype[1] != '\0') {
++        while (*ptype == '-' && ptype[2] != '\0') {
+             ptype = next_arg_type(ptype);
+         }
+         switch(*ptype) {
+-- 
+2.14.1
