@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele23-0003KZ-0g
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele27-0003Q4-Ji
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1y-0005ZO-HZ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele24-0005eL-Rj
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:19 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:05:06 +0100
-Message-Id: <20180213170529.10858-33-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:05:15 +0100
+Message-Id: <20180213170529.10858-42-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 32/55] qcow2: Prepare l2_allocate() for adding
- L2 slice support
+Subject: [Qemu-devel] [PULL 41/55] qcow2: Update zero_single_l2() to support
+ L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +25,104 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-Adding support for L2 slices to l2_allocate() needs (among other
-things) an extra loop that iterates over all slices of a new L2 table.
+zero_single_l2() limits the number of clusters to be zeroed to the
+amount that fits inside an L2 table. Since we'll be loading L2 slices
+instead of full tables we need to update that limit. The function is
+renamed to zero_in_l2_slice() for clarity.
 
-Putting all changes in one patch would make it hard to read because
-all semantic changes would be mixed with pure indentation changes.
-
-To make things easier this patch simply creates a new block and
-changes the indentation of all lines of code inside it. Thus, all
-modifications in this patch are cosmetic. There are no semantic
-changes and no variables are renamed yet. The next patch will take
-care of that.
+Apart from that, this function doesn't need any additional changes, so
+this patch simply updates the variable name from l2_table to l2_slice.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
+Message-id: ebc16e7e79fa6969d8975ef487d679794de4fbcc.1517840877.git.berto@igalia.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: d0d7dca8520db304524f52f49d8157595a707a35.1517840877.git.berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 53 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 29 insertions(+), 24 deletions(-)
+ block/qcow2-cluster.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 542080aed0..3f7272441d 100644
+index 62336960a5..f440105f6c 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -299,38 +299,43 @@ static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
-     /* allocate a new entry in the l2 cache */
+@@ -1752,33 +1752,33 @@ fail:
  
-     trace_qcow2_l2_allocate_get_empty(bs, l1_index);
--    ret = qcow2_cache_get_empty(bs, s->l2_table_cache, l2_offset, (void**) table);
--    if (ret < 0) {
--        goto fail;
--    }
-+    {
-+        ret = qcow2_cache_get_empty(bs, s->l2_table_cache,
-+                                    l2_offset,
-+                                    (void **) table);
-+        if (ret < 0) {
-+            goto fail;
-+        }
+ /*
+  * This zeroes as many clusters of nb_clusters as possible at once (i.e.
+- * all clusters in the same L2 table) and returns the number of zeroed
++ * all clusters in the same L2 slice) and returns the number of zeroed
+  * clusters.
+  */
+-static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
+-                          uint64_t nb_clusters, int flags)
++static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
++                            uint64_t nb_clusters, int flags)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t *l2_table;
++    uint64_t *l2_slice;
+     int l2_index;
+     int ret;
+     int i;
+     bool unmap = !!(flags & BDRV_REQ_MAY_UNMAP);
  
--    l2_table = *table;
-+        l2_table = *table;
- 
--    if ((old_l2_offset & L1E_OFFSET_MASK) == 0) {
--        /* if there was no old l2 table, clear the new table */
--        memset(l2_table, 0, s->l2_size * sizeof(uint64_t));
--    } else {
--        uint64_t* old_table;
-+        if ((old_l2_offset & L1E_OFFSET_MASK) == 0) {
-+            /* if there was no old l2 table, clear the new table */
-+            memset(l2_table, 0, s->l2_size * sizeof(uint64_t));
-+        } else {
-+            uint64_t *old_table;
- 
--        /* if there was an old l2 table, read it from the disk */
--        BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_COW_READ);
--        ret = qcow2_cache_get(bs, s->l2_table_cache,
--            old_l2_offset & L1E_OFFSET_MASK,
--            (void**) &old_table);
--        if (ret < 0) {
--            goto fail;
-+            /* if there was an old l2 table, read it from the disk */
-+            BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_COW_READ);
-+            ret = qcow2_cache_get(bs, s->l2_table_cache,
-+                                  old_l2_offset & L1E_OFFSET_MASK,
-+                                  (void **) &old_table);
-+            if (ret < 0) {
-+                goto fail;
-+            }
-+
-+            memcpy(l2_table, old_table, s->cluster_size);
-+
-+            qcow2_cache_put(s->l2_table_cache, (void **) &old_table);
-         }
- 
--        memcpy(l2_table, old_table, s->cluster_size);
-+        /* write the l2 table to the file */
-+        BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_WRITE);
- 
--        qcow2_cache_put(s->l2_table_cache, (void **) &old_table);
-+        trace_qcow2_l2_allocate_write_l2(bs, l1_index);
-+        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
+-    ret = get_cluster_table(bs, offset, &l2_table, &l2_index);
++    ret = get_cluster_table(bs, offset, &l2_slice, &l2_index);
+     if (ret < 0) {
+         return ret;
      }
  
--    /* write the l2 table to the file */
--    BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_WRITE);
--
--    trace_qcow2_l2_allocate_write_l2(bs, l1_index);
--    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-     ret = qcow2_cache_flush(bs, s->l2_table_cache);
-     if (ret < 0) {
-         goto fail;
+-    /* Limit nb_clusters to one L2 table */
+-    nb_clusters = MIN(nb_clusters, s->l2_size - l2_index);
++    /* Limit nb_clusters to one L2 slice */
++    nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
+     assert(nb_clusters <= INT_MAX);
+ 
+     for (i = 0; i < nb_clusters; i++) {
+         uint64_t old_offset;
+         QCow2ClusterType cluster_type;
+ 
+-        old_offset = be64_to_cpu(l2_table[l2_index + i]);
++        old_offset = be64_to_cpu(l2_slice[l2_index + i]);
+ 
+         /*
+          * Minimize L2 changes if the cluster already reads back as
+@@ -1790,16 +1790,16 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
+             continue;
+         }
+ 
+-        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
++        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+         if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
+-            l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
++            l2_slice[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
+             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
+         } else {
+-            l2_table[l2_index + i] |= cpu_to_be64(QCOW_OFLAG_ZERO);
++            l2_slice[l2_index + i] |= cpu_to_be64(QCOW_OFLAG_ZERO);
+         }
+     }
+ 
+-    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
++    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+ 
+     return nb_clusters;
+ }
+@@ -1823,13 +1823,13 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+         return -ENOTSUP;
+     }
+ 
+-    /* Each L2 table is handled by its own loop iteration */
++    /* Each L2 slice is handled by its own loop iteration */
+     nb_clusters = size_to_clusters(s, bytes);
+ 
+     s->cache_discards = true;
+ 
+     while (nb_clusters > 0) {
+-        cleared = zero_single_l2(bs, offset, nb_clusters, flags);
++        cleared = zero_in_l2_slice(bs, offset, nb_clusters, flags);
+         if (cleared < 0) {
+             ret = cleared;
+             goto fail;
 -- 
 2.13.6
