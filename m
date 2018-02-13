@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elaFq-0007YX-0I
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:04:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1elaFq-0007Yd-3t
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:04:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1elaFp-0006SP-9I
+	(envelope-from <mreitz@redhat.com>) id 1elaFp-0006SF-71
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:04:14 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 13 Feb 2018 14:03:49 +0100
-Message-Id: <20180213130356.8885-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/7] block: Preallocated truncation for gluster
- and sheepdog
+Date: Tue, 13 Feb 2018 14:03:51 +0100
+Message-Id: <20180213130356.8885-3-mreitz@redhat.com>
+In-Reply-To: <20180213130356.8885-1-mreitz@redhat.com>
+References: <20180213130356.8885-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/7] gluster: Pull truncation from
+ qemu_gluster_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,29 +23,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, sheepdog@lists.wpkg.org, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>
 
-As far as I can see, these are the only protocols beside file-posix that
-support preallocated creation.  In contrast to file-posix, however, they
-have not supported preallocated truncation so far.  This series brings
-their truncation code to feature parity with their creation code in this
-regard.
+Pull out the truncation code from the qemu_cluster_create() function so
+we can later reuse it in qemu_gluster_truncate().
 
-Note that I do not have a test setup for either of the two drivers, so I
-do not actually know whether this works.  Anyone with a setup is more
-than welcome to test this series.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/gluster.c | 74 +++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 40 insertions(+), 34 deletions(-)
 
-
-Max Reitz (7):
-  gluster: Move glfs_close() to create's clean-up
-  gluster: Pull truncation from qemu_gluster_create
-  gluster: Query current size in do_truncate()
-  gluster: Add preallocated truncation
-  sheepdog: Make sd_prealloc() take a BDS
-  sheepdog: Pass old and new size to sd_prealloc()
-  sheepdog: Allow fully preallocated truncation
-
- block/gluster.c  | 116 ++++++++++++++++++++++++++++++-------------------------
- block/sheepdog.c |  56 +++++++++++++++++----------
- 2 files changed, 99 insertions(+), 73 deletions(-)
-
+diff --git a/block/gluster.c b/block/gluster.c
+index 7fab2dfa12..8178541416 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -965,6 +965,45 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
+ }
+ #endif
+ 
++static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
++                                    PreallocMode prealloc, Error **errp)
++{
++    switch (prealloc) {
++#ifdef CONFIG_GLUSTERFS_FALLOCATE
++    case PREALLOC_MODE_FALLOC:
++        if (glfs_fallocate(fd, 0, 0, offset)) {
++            error_setg_errno(errp, errno, "Could not preallocate data");
++            return -errno;
++        }
++        break;
++#endif /* CONFIG_GLUSTERFS_FALLOCATE */
++#ifdef CONFIG_GLUSTERFS_ZEROFILL
++    case PREALLOC_MODE_FULL:
++        if (glfs_ftruncate(fd, offset)) {
++            error_setg_errno(errp, errno, "Could not resize file");
++            return -errno;
++        }
++        if (glfs_zerofill(fd, 0, offset)) {
++            error_setg_errno(errp, errno, "Could not zerofill the new area");
++            return -errno;
++        }
++        break;
++#endif /* CONFIG_GLUSTERFS_ZEROFILL */
++    case PREALLOC_MODE_OFF:
++        if (glfs_ftruncate(fd, offset)) {
++            error_setg_errno(errp, errno, "Could not resize file");
++            return -errno;
++        }
++        break;
++    default:
++        error_setg(errp, "Unsupported preallocation mode: %s",
++                   PreallocMode_str(prealloc));
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
+ static int qemu_gluster_create(const char *filename,
+                                QemuOpts *opts, Error **errp)
+ {
+@@ -1019,40 +1058,7 @@ static int qemu_gluster_create(const char *filename,
+         goto out;
+     }
+ 
+-    switch (prealloc) {
+-#ifdef CONFIG_GLUSTERFS_FALLOCATE
+-    case PREALLOC_MODE_FALLOC:
+-        if (glfs_fallocate(fd, 0, 0, total_size)) {
+-            error_setg(errp, "Could not preallocate data for the new file");
+-            ret = -errno;
+-        }
+-        break;
+-#endif /* CONFIG_GLUSTERFS_FALLOCATE */
+-#ifdef CONFIG_GLUSTERFS_ZEROFILL
+-    case PREALLOC_MODE_FULL:
+-        if (!glfs_ftruncate(fd, total_size)) {
+-            if (glfs_zerofill(fd, 0, total_size)) {
+-                error_setg(errp, "Could not zerofill the new file");
+-                ret = -errno;
+-            }
+-        } else {
+-            error_setg(errp, "Could not resize file");
+-            ret = -errno;
+-        }
+-        break;
+-#endif /* CONFIG_GLUSTERFS_ZEROFILL */
+-    case PREALLOC_MODE_OFF:
+-        if (glfs_ftruncate(fd, total_size) != 0) {
+-            ret = -errno;
+-            error_setg(errp, "Could not resize file");
+-        }
+-        break;
+-    default:
+-        ret = -EINVAL;
+-        error_setg(errp, "Unsupported preallocation mode: %s",
+-                   PreallocMode_str(prealloc));
+-        break;
+-    }
++    ret = qemu_gluster_do_truncate(fd, total_size, prealloc, errp);
+ 
+ out:
+     if (fd) {
 -- 
 2.14.3
