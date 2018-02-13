@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele22-0003KV-DQ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1u-0003AT-Ml
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele21-0005bc-Eo
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1t-0005VG-Oc
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:06 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:05:11 +0100
-Message-Id: <20180213170529.10858-38-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:05:03 +0100
+Message-Id: <20180213170529.10858-30-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 37/55] qcow2: Update
- qcow2_alloc_cluster_link_l2() to support L2 slices
+Subject: [Qemu-devel] [PULL 29/55] qcow2: Add l2_slice_size field to
+ BDRVQcow2State
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +25,70 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-There's a loop in this function that iterates over the L2 entries in a
-table, so now we need to assert that it remains within the limits of
-an L2 slice.
+The BDRVQcow2State structure contains an l2_size field, which stores
+the number of 64-bit entries in an L2 table.
 
-Apart from that, this function doesn't need any additional changes, so
-this patch simply updates the variable name from l2_table to l2_slice.
+For efficiency reasons we want to be able to load slices instead of
+full L2 tables, so we need to know how many entries an L2 slice can
+hold.
+
+An L2 slice is the portion of an L2 table that is loaded by the qcow2
+cache. At the moment that cache can only load complete tables,
+therefore an L2 slice has the same size as an L2 table (one cluster)
+and l2_size == l2_slice_size.
+
+Later we'll allow smaller slices, but until then we have to use this
+new l2_slice_size field to make the rest of the code ready for that.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: f9846a1c2efc51938e877e2a25852d9ab14797ff.1517840877.git.berto@igalia.com
+Message-id: adb048595f9fb5dfb110c802a8b3c3be3b937f37.1517840877.git.berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ block/qcow2.h | 1 +
+ block/qcow2.c | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index e0eea73297..a01abb3b18 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -922,7 +922,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
- {
-     BDRVQcow2State *s = bs->opaque;
-     int i, j = 0, l2_index, ret;
--    uint64_t *old_cluster, *l2_table;
-+    uint64_t *old_cluster, *l2_slice;
-     uint64_t cluster_offset = m->alloc_offset;
- 
-     trace_qcow2_cluster_link_l2(qemu_coroutine_self(), m->nb_clusters);
-@@ -949,13 +949,13 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-                                    s->refcount_block_cache);
-     }
- 
--    ret = get_cluster_table(bs, m->offset, &l2_table, &l2_index);
-+    ret = get_cluster_table(bs, m->offset, &l2_slice, &l2_index);
-     if (ret < 0) {
-         goto err;
-     }
--    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-+    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
- 
--    assert(l2_index + m->nb_clusters <= s->l2_size);
-+    assert(l2_index + m->nb_clusters <= s->l2_slice_size);
-     for (i = 0; i < m->nb_clusters; i++) {
-         /* if two concurrent writes happen to the same unallocated cluster
-          * each write allocates separate cluster and writes data concurrently.
-@@ -963,16 +963,16 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-          * cluster the second one has to do RMW (which is done above by
-          * perform_cow()), update l2 table with its cluster pointer and free
-          * old cluster. This is what this loop does */
--        if (l2_table[l2_index + i] != 0) {
--            old_cluster[j++] = l2_table[l2_index + i];
-+        if (l2_slice[l2_index + i] != 0) {
-+            old_cluster[j++] = l2_slice[l2_index + i];
+diff --git a/block/qcow2.h b/block/qcow2.h
+index d9ba57c030..45fb7f4299 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -251,6 +251,7 @@ typedef struct BDRVQcow2State {
+     int cluster_bits;
+     int cluster_size;
+     int cluster_sectors;
++    int l2_slice_size;
+     int l2_bits;
+     int l2_size;
+     int l1_size;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 461cc7ab1c..ba8d71c72d 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -807,6 +807,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+ typedef struct Qcow2ReopenState {
+     Qcow2Cache *l2_table_cache;
+     Qcow2Cache *refcount_block_cache;
++    int l2_slice_size; /* Number of entries in a slice of the L2 table */
+     bool use_lazy_refcounts;
+     int overlap_check;
+     bool discard_passthrough[QCOW2_DISCARD_MAX];
+@@ -888,6 +889,7 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
          }
+     }
  
--        l2_table[l2_index + i] = cpu_to_be64((cluster_offset +
-+        l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
-                     (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
-      }
++    r->l2_slice_size = s->cluster_size / sizeof(uint64_t);
+     r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size);
+     r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size);
+     if (r->l2_table_cache == NULL || r->refcount_block_cache == NULL) {
+@@ -1051,6 +1053,7 @@ static void qcow2_update_options_commit(BlockDriverState *bs,
+     }
+     s->l2_table_cache = r->l2_table_cache;
+     s->refcount_block_cache = r->refcount_block_cache;
++    s->l2_slice_size = r->l2_slice_size;
  
- 
--    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
-+    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
- 
-     /*
-      * If this was a COW, we need to decrease the refcount of the old cluster.
+     s->overlap_check = r->overlap_check;
+     s->use_lazy_refcounts = r->use_lazy_refcounts;
 -- 
 2.13.6
