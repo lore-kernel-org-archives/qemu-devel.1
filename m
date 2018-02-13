@@ -1,14 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eldCR-0005rh-EZ
+	(envelope-from <mlureau@redhat.com>) id 1eldCV-0005sT-8i
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:13:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eldCO-0001WA-NR
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:12:55 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 13 Feb 2018 17:12:40 +0100
-Message-Id: <20180213161240.19891-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] s390x/tcg: fix disabling/enabling DAT
+	(envelope-from <mlureau@redhat.com>) id 1eldCS-0001Z6-H1
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:12:59 -0500
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:45287)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eldCS-0001Yv-Bl
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:12:56 -0500
+Received: by mail-qk0-f194.google.com with SMTP id g2so2027911qkd.12
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:12:56 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180211093607.27351-29-armbru@redhat.com>
+References: <20180211093607.27351-1-armbru@redhat.com>
+	<20180211093607.27351-29-armbru@redhat.com>
+From: Marc-Andre Lureau <mlureau@redhat.com>
+Date: Tue, 13 Feb 2018 17:12:55 +0100
+Message-ID: <CAMxuvazZT6G3A64ELXGVebLm8ks5cUYfj_H_9aV87-YV2Be-tA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 28/29] Fix up dangling references to
+ qmp-commands.* in comment and doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,95 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, marcandre <marcandre.lureau@redhat.com>, "Blake, Eric" <eblake@redhat.com>
 
-Currently, all memory accesses go via the MMU of the address space
-(primary, secondary, ...). This is bad, because we don't flush the TLB
-when disabling/enabling DAT. So we could add a tlb flush. However it
-is easier to simply select the MMU we already have in place for real
-memory access.
+On Sun, Feb 11, 2018 at 10:36 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> Fix up the reference to qmp-commands.hx in qmp.c.  Missed in commit
+> 5032a16d1d.
+>
+> Fix up the reference to qmp-commands.txt in
+> docs/xen-save-devices-state.txt.  Missed in commit 4d8bb958fa.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  docs/xen-save-devices-state.txt |  3 +--
+>  qmp.c                           | 14 +++++++-------
+>  2 files changed, 8 insertions(+), 9 deletions(-)
+>
+> diff --git a/docs/xen-save-devices-state.txt b/docs/xen-save-devices-stat=
+e.txt
+> index a72ecc8081..1912ecad25 100644
+> --- a/docs/xen-save-devices-state.txt
+> +++ b/docs/xen-save-devices-state.txt
+> @@ -8,8 +8,7 @@ These operations are normally used with migration (see mi=
+gration.txt),
+>  however it is also possible to save the state of all devices to file,
+>  without saving the RAM or the block devices of the VM.
+>
+> -This operation is called "xen-save-devices-state" (see
+> -qmp-commands.txt)
+> +The save operation is available as QMP command xen-save-devices-state.
+>
+>
+>  The binary format used in the file is the following:
+> diff --git a/qmp.c b/qmp.c
+> index a8d4eba973..ba82e1df9f 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -147,13 +147,13 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+>
+>  #ifndef CONFIG_SPICE
+>  /*
+> - * qmp-commands.hx ensures that QMP command query-spice exists only
+> - * #ifdef CONFIG_SPICE.  Necessary for an accurate query-commands
+> - * result.  However, the QAPI schema is blissfully unaware of that,
+> - * and the QAPI code generator happily generates a dead
+> - * qmp_marshal_query_spice() that calls qmp_query_spice().  Provide it
+> - * one, or else linking fails.  FIXME Educate the QAPI schema on
+> - * CONFIG_SPICE.
+> + * qmp_unregister_commands_hack() ensures that QMP command query-spice
+> + * exists only #ifdef CONFIG_SPICE.  Necessary for an accurate
+> + * query-commands result.  However, the QAPI schema is blissfully
+> + * unaware of that, and the QAPI code generator happily generates a
+> + * dead qmp_marshal_query_spice() that calls qmp_query_spice().
+> + * Provide it one, or else linking fails.  FIXME Educate the QAPI
+> + * schema on CONFIG_SPICE.
+>   */
 
-All we have to do is point at the right MMU and allow to execute these
-pages.
+I hope this comment will go away soon,
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
 
-This is necessary to make the upcomming kvm-unit-tests with vmalloc support
-pass under TCG.
-
- target/s390x/cpu.h        |  7 ++++++-
- target/s390x/mmu_helper.c |  2 +-
- target/s390x/translate.c  | 10 +++++++---
- 3 files changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 21ce40d5b6..c8008df845 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -312,11 +312,12 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- 
- #define FLAG_MASK_PSW_SHIFT     31
- #define FLAG_MASK_PER           (PSW_MASK_PER    >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_DAT           (PSW_MASK_DAT    >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_PSTATE        (PSW_MASK_PSTATE >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_ASC           (PSW_MASK_ASC    >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_64            (PSW_MASK_64     >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_32            (PSW_MASK_32     >> FLAG_MASK_PSW_SHIFT)
--#define FLAG_MASK_PSW		(FLAG_MASK_PER | FLAG_MASK_PSTATE \
-+#define FLAG_MASK_PSW		(FLAG_MASK_PER | FLAG_MASK_DAT | FLAG_MASK_PSTATE \
-                                 | FLAG_MASK_ASC | FLAG_MASK_64 | FLAG_MASK_32)
- 
- /* Control register 0 bits */
-@@ -340,6 +341,10 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- 
- static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
- {
-+    if (!(env->psw.mask & PSW_MASK_DAT)) {
-+        return MMU_REAL_IDX;
-+    }
-+
-     switch (env->psw.mask & PSW_MASK_ASC) {
-     case PSW_ASC_PRIMARY:
-         return MMU_PRIMARY_IDX;
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index f477cc006a..23fb2e7501 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -544,7 +544,7 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
- {
-     const bool lowprot_enabled = env->cregs[0] & CR0_LOWPROT;
- 
--    *flags = PAGE_READ | PAGE_WRITE;
-+    *flags = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     if (is_low_address(raddr & TARGET_PAGE_MASK) && lowprot_enabled) {
-         /* see comment in mmu_translate() how this works */
-         *flags |= PAGE_WRITE_INV;
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index b470d691d3..5aea3bbca6 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -252,13 +252,17 @@ static inline uint64_t ld_code4(CPUS390XState *env, uint64_t pc)
- 
- static int get_mem_index(DisasContext *s)
- {
-+    if (!(s->tb->flags & FLAG_MASK_DAT)) {
-+        return MMU_REAL_IDX;
-+    }
-+
-     switch (s->tb->flags & FLAG_MASK_ASC) {
-     case PSW_ASC_PRIMARY >> FLAG_MASK_PSW_SHIFT:
--        return 0;
-+        return MMU_PRIMARY_IDX;
-     case PSW_ASC_SECONDARY >> FLAG_MASK_PSW_SHIFT:
--        return 1;
-+        return MMU_SECONDARY_IDX;
-     case PSW_ASC_HOME >> FLAG_MASK_PSW_SHIFT:
--        return 2;
-+        return MMU_HOME_IDX;
-     default:
-         tcg_abort();
-         break;
--- 
-2.14.3
+>  SpiceInfo *qmp_query_spice(Error **errp)
+>  {
+> --
+> 2.13.6
+>
