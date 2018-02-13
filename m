@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1d-0002oL-UT
+	(envelope-from <kwolf@redhat.com>) id 1ele1d-0002no-GR
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005G2-QQ
+	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005Fn-Iu
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:49 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:44 +0100
-Message-Id: <20180213170529.10858-11-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:39 +0100
+Message-Id: <20180213170529.10858-6-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 10/55] gluster: Pull truncation from
- qemu_gluster_create
+Subject: [Qemu-devel] [PULL 05/55] qcow2: Use g_try_realloc() in
+ qcow2_expand_zero_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +23,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Pull out the truncation code from the qemu_cluster_create() function so
-we can later reuse it in qemu_gluster_truncate().
+g_realloc() aborts the program if it fails to allocate the required
+amount of memory. We want to detect that scenario and return an error
+instead, so let's use g_try_realloc().
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/gluster.c | 74 +++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 40 insertions(+), 34 deletions(-)
+ block/qcow2-cluster.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 7fab2dfa12..8178541416 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -965,6 +965,45 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
- }
- #endif
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 3a979bcd82..f077cd3ac5 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -2070,7 +2070,15 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+         int l1_sectors = DIV_ROUND_UP(s->snapshots[i].l1_size *
+                                       sizeof(uint64_t), BDRV_SECTOR_SIZE);
  
-+static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
-+                                    PreallocMode prealloc, Error **errp)
-+{
-+    switch (prealloc) {
-+#ifdef CONFIG_GLUSTERFS_FALLOCATE
-+    case PREALLOC_MODE_FALLOC:
-+        if (glfs_fallocate(fd, 0, 0, offset)) {
-+            error_setg_errno(errp, errno, "Could not preallocate data");
-+            return -errno;
-+        }
-+        break;
-+#endif /* CONFIG_GLUSTERFS_FALLOCATE */
-+#ifdef CONFIG_GLUSTERFS_ZEROFILL
-+    case PREALLOC_MODE_FULL:
-+        if (glfs_ftruncate(fd, offset)) {
-+            error_setg_errno(errp, errno, "Could not resize file");
-+            return -errno;
-+        }
-+        if (glfs_zerofill(fd, 0, offset)) {
-+            error_setg_errno(errp, errno, "Could not zerofill the new area");
-+            return -errno;
-+        }
-+        break;
-+#endif /* CONFIG_GLUSTERFS_ZEROFILL */
-+    case PREALLOC_MODE_OFF:
-+        if (glfs_ftruncate(fd, offset)) {
-+            error_setg_errno(errp, errno, "Could not resize file");
-+            return -errno;
-+        }
-+        break;
-+    default:
-+        error_setg(errp, "Unsupported preallocation mode: %s",
-+                   PreallocMode_str(prealloc));
-+        return -EINVAL;
-+    }
+-        l1_table = g_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
++        uint64_t *new_l1_table =
++            g_try_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
 +
-+    return 0;
-+}
++        if (!new_l1_table) {
++            ret = -ENOMEM;
++            goto fail;
++        }
 +
- static int qemu_gluster_create(const char *filename,
-                                QemuOpts *opts, Error **errp)
- {
-@@ -1019,40 +1058,7 @@ static int qemu_gluster_create(const char *filename,
-         goto out;
-     }
++        l1_table = new_l1_table;
  
--    switch (prealloc) {
--#ifdef CONFIG_GLUSTERFS_FALLOCATE
--    case PREALLOC_MODE_FALLOC:
--        if (glfs_fallocate(fd, 0, 0, total_size)) {
--            error_setg(errp, "Could not preallocate data for the new file");
--            ret = -errno;
--        }
--        break;
--#endif /* CONFIG_GLUSTERFS_FALLOCATE */
--#ifdef CONFIG_GLUSTERFS_ZEROFILL
--    case PREALLOC_MODE_FULL:
--        if (!glfs_ftruncate(fd, total_size)) {
--            if (glfs_zerofill(fd, 0, total_size)) {
--                error_setg(errp, "Could not zerofill the new file");
--                ret = -errno;
--            }
--        } else {
--            error_setg(errp, "Could not resize file");
--            ret = -errno;
--        }
--        break;
--#endif /* CONFIG_GLUSTERFS_ZEROFILL */
--    case PREALLOC_MODE_OFF:
--        if (glfs_ftruncate(fd, total_size) != 0) {
--            ret = -errno;
--            error_setg(errp, "Could not resize file");
--        }
--        break;
--    default:
--        ret = -EINVAL;
--        error_setg(errp, "Unsupported preallocation mode: %s",
--                   PreallocMode_str(prealloc));
--        break;
--    }
-+    ret = qemu_gluster_do_truncate(fd, total_size, prealloc, errp);
- 
- out:
-     if (fd) {
+         ret = bdrv_read(bs->file,
+                         s->snapshots[i].l1_table_offset / BDRV_SECTOR_SIZE,
 -- 
 2.13.6
