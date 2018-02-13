@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan@doxpara.com>) id 1elQZD-0004um-PZ
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 21:43:36 -0500
+	(envelope-from <linzhecheng@huawei.com>) id 1elQj8-0001jT-43
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 21:53:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan@doxpara.com>) id 1elQZD-0008A5-2F
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 21:43:35 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:38452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan@doxpara.com>) id 1elQZC-00088D-R1
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 21:43:34 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id h14so15939069otj.5
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 18:43:34 -0800 (PST)
+	(envelope-from <linzhecheng@huawei.com>) id 1elQj3-0001do-FN
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 21:53:50 -0500
+Received: from [45.249.212.32] (port=50430 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1elQj3-0001Ya-33
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 21:53:45 -0500
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Tue, 13 Feb 2018 10:53:06 +0800
+Message-ID: <20180213025306.16736-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-From: Dan Kaminsky <dan@doxpara.com>
-Date: Mon, 12 Feb 2018 18:43:33 -0800
-Message-ID: <CAEW7AC=UFbKT9MPb-q4KvBRSBf-O_V2QjG_1BkfyYf1Rt_bOsA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] gdbstub.c gdb-get-register returns 0,
- breaking remote gdb call
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] vhost-user: fix memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +25,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mst@redhat.com, wangxinxin.wang@huawei.com, lidonglin@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-Unsure the scope of this bug or the proper fix, so bringing it up here
-first.
+fix memory leak
 
-gdbstub.c:gdb_read_register will return 0, and thus E14, when a remote gdb
-tries to call a function in the exposed linux kernel.  This appears to be
-because the caller expects to be able to receive a generic register size by
-calling one plus the number of known registers.  However,
-x86_cpu_gdb_read_register() in target/i386/gdbstub.c will only provide
-register sizes for known registers, since they're not always the same.
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-I'm dealing with this just by shimming 8 whenever gdb_read_register returns
-0, but that's obviously not correct.  Suggestions?
-
---Dan
-
-P.S.  call still won't work unless linux is launched with noexec=off
-noexec32=off, due to NX.
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index cb45512506..d024573e45 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -109,6 +109,7 @@ static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
+ err:
+     if (net) {
+         vhost_net_cleanup(net);
++        g_free(net);
+     }
+     vhost_user_stop(i, ncs);
+     return -1;
+-- 
+2.12.2.windows.2
