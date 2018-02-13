@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elcUL-0006cV-8o
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:27:22 -0500
+	(envelope-from <berrange@redhat.com>) id 1elcUx-0007Ix-Kw
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:28:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elcUK-0002yF-B1
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:27:21 -0500
-Date: Tue, 13 Feb 2018 15:27:11 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180213152711.GI2378@work-vm>
-References: <20180111130427.GG8326@redhat.com>
-	<20180213105024.GC5083@localhost.localdomain>
-	<20180213143001.GA2354@rkaganb.sw.ru>
-	<20180213143615.GN573@redhat.com>
-	<20180213144521.GI5083@localhost.localdomain>
-	<20180213144838.GO573@redhat.com> <20180213145913.GE2378@work-vm>
-	<6845a694-aa22-90e8-7a9b-ce0283be450c@virtuozzo.com>
-	<20180213150503.GF2378@work-vm>
-	<20180213151352.GF2307@rkaganb.sw.ru>
+	(envelope-from <berrange@redhat.com>) id 1elcUu-0003Ct-U3
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:27:59 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47368 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1elcUu-0003Cb-Nr
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:27:56 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5F6B87CBA5
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 15:27:56 +0000 (UTC)
+Date: Tue, 13 Feb 2018 15:27:53 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180213152753.GR573@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1518531279-11966-1-git-send-email-thuth@redhat.com>
+	<20180213150911.GG2378@work-vm> <20180213151125.GQ573@redhat.com>
+	<20180213152529.GH2378@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180213151352.GF2307@rkaganb.sw.ru>
+In-Reply-To: <20180213152529.GH2378@work-vm>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH 1/2] Add save-snapshot,
- load-snapshot and delete-snapshot to QAPI
+Subject: Re: [Qemu-devel] [PATCH] io/channel-command: Delay the killing of
+ the child after closing the pipe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +37,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "Denis V. Lunev" <den@virtuozzo.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Palethorpe <richiejp@f-m.fm>, Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>, rpalethorpe@suse.com, Denis Plotnikov <dplotnikov@virtuozzo.com>, aarcange@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-* Roman Kagan (rkagan@virtuozzo.com) wrote:
-> On Tue, Feb 13, 2018 at 03:05:03PM +0000, Dr. David Alan Gilbert wrote:
-> > * Denis V. Lunev (den@virtuozzo.com) wrote:
-> > > On 02/13/2018 05:59 PM, Dr. David Alan Gilbert wrote:
-> > > > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> > > >> That doesn't seem practical unless you can instantaneously write=
- out
-> > > >> the entire guest RAM to disk without blocking, or can somehow sn=
-apshot
-> > > >> the RAM so you can write out a consistent view of the original R=
-AM,
-> > > >> while the guest continues to dirty RAM pages.
-> > > > People have suggested doing something like that with userfault wr=
-ite
-> > > > mode; but the same would also be doable just by write protecting =
+On Tue, Feb 13, 2018 at 03:25:30PM +0000, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > On Tue, Feb 13, 2018 at 03:09:12PM +0000, Dr. David Alan Gilbert wrot=
+e:
+> > > * Thomas Huth (thuth@redhat.com) wrote:
+> > > > We are currently facing some migration failure on s390x when runn=
+ing
+> > > > certain avocado tests, e.g. when running the test
+> > > > type_specific.io-github-autotest-qemu.migrate.with_reboot.exec.gz=
+ip_exec.
+> > > > This test is using 'migrate -d "exec:nc localhost 5200"' for the =
+migration.
+> > > > The problem is detected at the receiving side, where the migratio=
+n stream
+> > > > apparently ends too early. However, the cause for the problem is =
 the
-> > > > whole of RAM and then following the faults.
+> > > > sending side: After writing the migration stream into the pipe to=
+ netcat,
+> > > > the source QEMU calls qio_channel_command_close() which closes th=
+e pipe
+> > > > and immediately (!) kills the child process afterwards. So if the
+> > > > sending netcat did not read the final bytes from the pipe yet, or
+> > > > if it did not manage to send out all its buffers yet, it is kille=
+d
+> > > > before the whole migration stream is passed to the destination si=
+de.
 > > >=20
-> > > nope, userfault fd does not help :( We have tried, the functionalit=
-y is not
-> > > enough. Better to have small extension to KVM to protect all memory
-> > > and notify QEMU with accessed address.
+> > > Thanks for tracking that down!
+> > >=20
+> > > > To ease the situation at least a little bit, we should give the c=
+hild
+> > > > process at least some few more time slices before we kill it with
+> > > > SIGTERM and then with SIGKILL. With this change, the avocado test=
+ now
+> > > > succeeds here in 10 out of 10 runs.
+> > > >=20
+> > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > ---
+> > > >  io/channel-command.c | 6 +++---
+> > > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > >=20
+> > > > diff --git a/io/channel-command.c b/io/channel-command.c
+> > > > index 319c5ed..f64db3e 100644
+> > > > --- a/io/channel-command.c
+> > > > +++ b/io/channel-command.c
+> > > > @@ -177,11 +177,11 @@ static int qio_channel_command_abort(QIOCha=
+nnelCommand *ioc,
+> > > >              return -1;
+> > > >          }
+> > > >      } else if (ret =3D=3D 0) {
+> > > > -        if (step =3D=3D 0) {
+> > > > +        if (step =3D=3D 4) {
+> > > >              kill(ioc->pid, SIGTERM);
+> > > > -        } else if (step =3D=3D 1) {
+> > > > +        } else if (step =3D=3D 8) {
+> > > >              kill(ioc->pid, SIGKILL);
+> > > > -        } else {
+> > > > +        } else if (step >=3D 9) {
+> > >=20
+> > > Hmm.  This seems pretty arbitrary; if I understand correctly you're
+> > > saying it'll get a SIGTERM after 4 (arbitrary) * 10ms (arbitrary).
+> > >=20
+> > > Who is to say that's enough for a scp or gzip or the like?
 > >=20
-> > Can you explain why? I thought the write-protect mode of userfaultfd =
-was
-> > supposed to be able to do that; cc'ing in Andrea
+> > We could conceivably implement the  qio_channel_shutdown() operation
+> > for the QIOChannelCommand class. It would merely close the FD to the
+> > child process, but leave it running. That would give it time to read
+> > any data still in the pipe from QEMU IIUC.
 >=20
-> IIRC it would if it worked; it just didn't when we tried.
+> Yeh that's better; although when would we call shutdown or close on it?
 
-Hmm that doesn't seem to be the ideal reason to create new KVM
-functionality, especially since there were a bunch of people wanting the
-userfaultfd-write mode for other uses.
+Doesn't QEMU alredy use  shutdown() during the right part of migration,
+or is that only wrt post-copy ?
 
-Dave
 
-> Roman.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
