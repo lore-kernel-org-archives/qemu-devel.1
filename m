@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHL-00042Z-7D
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:49 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHO-00045Q-8n
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHJ-0007Zf-K4
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:43 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36567)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHM-0007ag-Vf
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:46 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40345)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1elZHJ-0007ZQ-AL
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:41 -0500
-Received: by mail-wm0-x244.google.com with SMTP id f3so15602470wmc.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 04:01:41 -0800 (PST)
+	id 1elZHM-0007aV-MC
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:44 -0500
+Received: by mail-wm0-x244.google.com with SMTP id v123so15588248wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 04:01:44 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Feb 2018 13:00:11 +0100
-Message-Id: <1518523252-49106-8-git-send-email-pbonzini@redhat.com>
+Date: Tue, 13 Feb 2018 13:00:14 +0100
+Message-Id: <1518523252-49106-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1518523252-49106-1-git-send-email-pbonzini@redhat.com>
 References: <1518523252-49106-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 07/48] hw/net/can: Kvaser PCI CAN-S (single
- SJA1000 channel) emulation
+Subject: [Qemu-devel] [PULL 10/48] net/can: documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,355 +35,123 @@ From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/pci.mak     |   1 +
- hw/net/can/Makefile.objs    |   1 +
- hw/net/can/can_kvaser_pci.c | 319 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 321 insertions(+)
- create mode 100644 hw/net/can/can_kvaser_pci.c
+ docs/can.txt | 107 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 107 insertions(+)
+ create mode 100644 docs/can.txt
 
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index 23f91d0..35e7596 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -33,6 +33,7 @@ CONFIG_SERIAL_ISA=y
- CONFIG_SERIAL_PCI=y
- CONFIG_CAN_BUS=y
- CONFIG_CAN_SJA1000=y
-+CONFIG_CAN_PCI=y
- CONFIG_IPACK=y
- CONFIG_WDT_IB6300ESB=y
- CONFIG_PCI_TESTDEV=y
-diff --git a/hw/net/can/Makefile.objs b/hw/net/can/Makefile.objs
-index c299f83..9d4a515 100644
---- a/hw/net/can/Makefile.objs
-+++ b/hw/net/can/Makefile.objs
-@@ -1 +1,2 @@
- common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
-+common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
-diff --git a/hw/net/can/can_kvaser_pci.c b/hw/net/can/can_kvaser_pci.c
+diff --git a/docs/can.txt b/docs/can.txt
 new file mode 100644
-index 0000000..2d77ef2
+index 0000000..a357105
 --- /dev/null
-+++ b/hw/net/can/can_kvaser_pci.c
-@@ -0,0 +1,319 @@
-+/*
-+ * Kvaser PCI CAN device (SJA1000 based) emulation
-+ *
-+ * Copyright (c) 2013-2014 Jin Yang
-+ * Copyright (c) 2014-2018 Pavel Pisa
-+ *
-+ * Partially based on educational PCIexpress APOHW hardware
-+ * emulator used fro class A0B36APO at CTU FEE course by
-+ *    Rostislav Lisovy and Pavel Pisa
-+ *
-+ * Initial development supported by Google GSoC 2013 from RTEMS project slot
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
++++ b/docs/can.txt
+@@ -0,0 +1,107 @@
++QEMU CAN bus emulation support
++==============================
 +
-+#include "qemu/osdep.h"
-+#include "qemu/event_notifier.h"
-+#include "qemu/thread.h"
-+#include "qemu/sockets.h"
-+#include "qapi/error.h"
-+#include "chardev/char.h"
-+#include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "net/can_emu.h"
++The CAN bus emulation provides mechanism to connect multiple
++emulated CAN controller chips together by one or multiple CAN busses
++(the controller device "canbus"  parameter). The individual busses
++can be connected to host system CAN API (at this time only Linux
++SocketCAN is supported).
 +
-+#include "can_sja1000.h"
++The concept of busses is generic and different CAN controllers
++can be implemented for it but at this time only SJA1000 chip
++controller is implemented.
 +
-+#define TYPE_CAN_PCI_DEV "kvaser_pci"
++The PCI addon card hardware has been selected as the first CAN
++interface to implement because such device can be easily connected
++to systems with different CPU architectures (x86, PowerPC, ARM, etc.).
 +
-+#define KVASER_PCI_DEV(obj) \
-+    OBJECT_CHECK(KvaserPCIState, (obj), TYPE_CAN_PCI_DEV)
++The project has been initially started in frame of RTEMS GSoC 2013
++slot by Jin Yang under our mentoring  The initial idea was to provide generic
++CAN subsystem for RTEMS. But lack of common environment for code and RTEMS
++testing lead to goal change to provide environment which provides complete
++emulated environment for testing and RTEMS GSoC slot has been donated
++to work on CAN hardware emulation on QEMU.
 +
-+#ifndef KVASER_PCI_VENDOR_ID1
-+#define KVASER_PCI_VENDOR_ID1     0x10e8    /* the PCI device and vendor IDs */
-+#endif
++Examples how to use CAN emulation
++=================================
 +
-+#ifndef KVASER_PCI_DEVICE_ID1
-+#define KVASER_PCI_DEVICE_ID1     0x8406
-+#endif
++When QEMU with CAN PCI support is compiled then one of the next
++CAN boards can be selected
 +
-+#define KVASER_PCI_S5920_RANGE    0x80
-+#define KVASER_PCI_SJA_RANGE      0x80
-+#define KVASER_PCI_XILINX_RANGE   0x8
++ (1) CAN bus Kvaser PCI CAN-S (single SJA1000 channel) boad. QEMU startup options
++    -object can-bus,id=canbus0
++    -device kvaser_pci,canbus=canbus0
++    Add "can-host-socketcan" object to connect device to host system CAN bus
++    -object can-host-socketcan,id=canhost0,if=can0,canbus=canbus0
 +
-+#define KVASER_PCI_BYTES_PER_SJA  0x20
++ (2) CAN bus PCM-3680I PCI (dual SJA1000 channel) emulation
++    -object can-bus,id=canbus0
++    -device pcm3680_pci,canbus0=canbus0,canbus1=canbus0
 +
-+#define S5920_OMB                 0x0C
-+#define S5920_IMB                 0x1C
-+#define S5920_MBEF                0x34
-+#define S5920_INTCSR              0x38
-+#define S5920_RCR                 0x3C
-+#define S5920_PTCR                0x60
++ another example:
++    -object can-bus,id=canbus0
++    -object can-bus,id=canbus1
++    -device pcm3680_pci,canbus0=canbus0,canbus1=canbus1
 +
-+#define S5920_INTCSR_ADDON_INTENABLE_M        0x2000
-+#define S5920_INTCSR_INTERRUPT_ASSERTED_M     0x800000
++ (3) CAN bus MIOe-3680 PCI (dual SJA1000 channel) emulation
++    -device mioe3680_pci,canbus0=canbus0
 +
-+#define KVASER_PCI_XILINX_VERINT  7   /* Lower nibble simulate interrupts,
-+                                         high nibble version number. */
 +
-+#define KVASER_PCI_XILINX_VERSION_NUMBER 13
++The ''kvaser_pci'' board/device model is compatible with and has been tested with
++''kvaser_pci'' driver included in mainline Linux kernel.
++The tested setup was Linux 4.9 kernel on the host and guest side.
++Example for qemu-system-x86_64:
 +
-+typedef struct KvaserPCIState {
-+    /*< private >*/
-+    PCIDevice       dev;
-+    /*< public >*/
-+    MemoryRegion    s5920_io;
-+    MemoryRegion    sja_io;
-+    MemoryRegion    xilinx_io;
++    qemu-system-x86_64 -enable-kvm -kernel /boot/vmlinuz-4.9.0-4-amd64 \
++      -initrd ramdisk.cpio \
++      -virtfs local,path=shareddir,security_model=none,mount_tag=shareddir \
++      -object can-bus,id=canbus0 \
++      -object can-host-socketcan,id=canhost0,if=can0,canbus=canbus0 \
++      -device kvaser_pci,canbus=canbus0 \
++      -nographic -append "console=ttyS0"
 +
-+    CanSJA1000State sja_state;
-+    qemu_irq        irq;
++Example for qemu-system-arm:
 +
-+    uint32_t        s5920_intcsr;
-+    uint32_t        s5920_irqstate;
++    qemu-system-arm -cpu arm1176 -m 256 -M versatilepb \
++      -kernel kernel-qemu-arm1176-versatilepb \
++      -hda rpi-wheezy-overlay \
++      -append "console=ttyAMA0 root=/dev/sda2 ro init=/sbin/init-overlay" \
++      -nographic \
++      -virtfs local,path=shareddir,security_model=none,mount_tag=shareddir \
++      -object can-bus,id=canbus0 \
++      -object can-host-socketcan,id=canhost0,if=can0,canbus=canbus0 \
++      -device kvaser_pci,canbus=canbus0,host=can0 \
 +
-+    CanBusState     *canbus;
-+} KvaserPCIState;
++The CAN interface of the host system has to be configured for proper
++bitrate and set up. Configuration is not propagated from emulated
++devices through bus to the physical host device. Example configuration
++for 1 Mbit/s
 +
-+static void kvaser_pci_irq_handler(void *opaque, int irq_num, int level)
-+{
-+    KvaserPCIState *d = (KvaserPCIState *)opaque;
++  ip link set can0 type can bitrate 1000000
++  ip link set can0 up
 +
-+    d->s5920_irqstate = level;
-+    if (d->s5920_intcsr & S5920_INTCSR_ADDON_INTENABLE_M) {
-+        pci_set_irq(&d->dev, level);
-+    }
-+}
++Virtual (host local only) can interface can be used on the host
++side instead of physical interface
 +
-+static void kvaser_pci_reset(DeviceState *dev)
-+{
-+    KvaserPCIState *d = KVASER_PCI_DEV(dev);
-+    CanSJA1000State *s = &d->sja_state;
++  ip link add dev can0 type vcan
 +
-+    can_sja_hardware_reset(s);
-+}
++The CAN interface on the host side can be used to analyze CAN
++traffic with "candump" command which is included in "can-utils".
 +
-+static uint64_t kvaser_pci_s5920_io_read(void *opaque, hwaddr addr,
-+                                         unsigned size)
-+{
-+    KvaserPCIState *d = opaque;
-+    uint64_t val;
++  candump can0
 +
-+    switch (addr) {
-+    case S5920_INTCSR:
-+        val = d->s5920_intcsr;
-+        val &= ~S5920_INTCSR_INTERRUPT_ASSERTED_M;
-+        if (d->s5920_irqstate) {
-+            val |= S5920_INTCSR_INTERRUPT_ASSERTED_M;
-+        }
-+        return val;
-+    }
-+    return 0;
-+}
++Links to other resources
++========================
 +
-+static void kvaser_pci_s5920_io_write(void *opaque, hwaddr addr, uint64_t data,
-+                                      unsigned size)
-+{
-+    KvaserPCIState *d = opaque;
-+
-+    switch (addr) {
-+    case S5920_INTCSR:
-+        if (d->s5920_irqstate &&
-+            ((d->s5920_intcsr ^ data) & S5920_INTCSR_ADDON_INTENABLE_M)) {
-+            pci_set_irq(&d->dev, !!(data & S5920_INTCSR_ADDON_INTENABLE_M));
-+        }
-+        d->s5920_intcsr = data;
-+        break;
-+    }
-+}
-+
-+static uint64_t kvaser_pci_sja_io_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    KvaserPCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state;
-+
-+    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
-+        return 0;
-+    }
-+
-+    return can_sja_mem_read(s, addr, size);
-+}
-+
-+static void kvaser_pci_sja_io_write(void *opaque, hwaddr addr, uint64_t data,
-+                                    unsigned size)
-+{
-+    KvaserPCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state;
-+
-+    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
-+        return;
-+    }
-+
-+    can_sja_mem_write(s, addr, data, size);
-+}
-+
-+static uint64_t kvaser_pci_xilinx_io_read(void *opaque, hwaddr addr,
-+                                          unsigned size)
-+{
-+    switch (addr) {
-+    case KVASER_PCI_XILINX_VERINT:
-+        return (KVASER_PCI_XILINX_VERSION_NUMBER << 4) | 0;
-+    }
-+
-+    return 0;
-+}
-+
-+static void kvaser_pci_xilinx_io_write(void *opaque, hwaddr addr, uint64_t data,
-+                             unsigned size)
-+{
-+
-+}
-+
-+static const MemoryRegionOps kvaser_pci_s5920_io_ops = {
-+    .read = kvaser_pci_s5920_io_read,
-+    .write = kvaser_pci_s5920_io_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static const MemoryRegionOps kvaser_pci_sja_io_ops = {
-+    .read = kvaser_pci_sja_io_read,
-+    .write = kvaser_pci_sja_io_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static const MemoryRegionOps kvaser_pci_xilinx_io_ops = {
-+    .read = kvaser_pci_xilinx_io_read,
-+    .write = kvaser_pci_xilinx_io_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static void kvaser_pci_realize(PCIDevice *pci_dev, Error **errp)
-+{
-+    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
-+    CanSJA1000State *s = &d->sja_state;
-+    uint8_t *pci_conf;
-+
-+    pci_conf = pci_dev->config;
-+    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
-+
-+    d->irq = qemu_allocate_irq(kvaser_pci_irq_handler, d, 0);
-+
-+    can_sja_init(s, d->irq);
-+
-+    if (can_sja_connect_to_bus(s, d->canbus) < 0) {
-+        error_setg(errp, "can_sja_connect_to_bus failed");
-+        return;
-+    }
-+
-+    memory_region_init_io(&d->s5920_io, OBJECT(d), &kvaser_pci_s5920_io_ops,
-+                          d, "kvaser_pci-s5920", KVASER_PCI_S5920_RANGE);
-+    memory_region_init_io(&d->sja_io, OBJECT(d), &kvaser_pci_sja_io_ops,
-+                          d, "kvaser_pci-sja", KVASER_PCI_SJA_RANGE);
-+    memory_region_init_io(&d->xilinx_io, OBJECT(d), &kvaser_pci_xilinx_io_ops,
-+                          d, "kvaser_pci-xilinx", KVASER_PCI_XILINX_RANGE);
-+
-+    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO,
-+                                            &d->s5920_io);
-+    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO,
-+                                            &d->sja_io);
-+    pci_register_bar(&d->dev, /*BAR*/ 2, PCI_BASE_ADDRESS_SPACE_IO,
-+                                            &d->xilinx_io);
-+}
-+
-+static void kvaser_pci_exit(PCIDevice *pci_dev)
-+{
-+    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
-+    CanSJA1000State *s = &d->sja_state;
-+
-+    can_sja_disconnect(s);
-+
-+    qemu_free_irq(d->irq);
-+}
-+
-+static const VMStateDescription vmstate_kvaser_pci = {
-+    .name = "kvaser_pci",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(dev, KvaserPCIState),
-+        VMSTATE_STRUCT(sja_state, KvaserPCIState, 0, vmstate_can_sja,
-+                       CanSJA1000State),
-+        VMSTATE_UINT32(s5920_intcsr, KvaserPCIState),
-+        VMSTATE_UINT32(s5920_irqstate, KvaserPCIState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void kvaser_pci_instance_init(Object *obj)
-+{
-+    KvaserPCIState *d = KVASER_PCI_DEV(obj);
-+
-+    object_property_add_link(obj, "canbus", TYPE_CAN_BUS,
-+                             (Object **)&d->canbus,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             0, &error_abort);
-+}
-+
-+static void kvaser_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = kvaser_pci_realize;
-+    k->exit = kvaser_pci_exit;
-+    k->vendor_id = KVASER_PCI_VENDOR_ID1;
-+    k->device_id = KVASER_PCI_DEVICE_ID1;
-+    k->revision = 0x00;
-+    k->class_id = 0x00ff00;
-+    dc->desc = "Kvaser PCICANx";
-+    dc->vmsd = &vmstate_kvaser_pci;
-+    dc->reset = kvaser_pci_reset;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+}
-+
-+static const TypeInfo kvaser_pci_info = {
-+    .name          = TYPE_CAN_PCI_DEV,
-+    .parent        = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(KvaserPCIState),
-+    .class_init    = kvaser_pci_class_init,
-+    .instance_init = kvaser_pci_instance_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },
-+    },
-+};
-+
-+static void kvaser_pci_register_types(void)
-+{
-+    type_register_static(&kvaser_pci_info);
-+}
-+
-+type_init(kvaser_pci_register_types)
++ (1) Repository with development branch can-pci at Czech Technical University
++     https://gitlab.fel.cvut.cz/canbus/qemu-canbus
++ (2) GitHub repository with can-pci and our other changes included
++     https://gitlab.fel.cvut.cz/canbus/qemu-canbus
++ (3) RTEMS page describing project
++     https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation
++ (4) RTLWS 2015 article about the projevt and its use with CANopen emulation
++     http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can.pdf
++     Slides
++     http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can-slides.pdf
++ (5) Linux SocketCAN utilities
++     https://github.com/linux-can/can-utils/
+\ No newline at end of file
 -- 
 1.8.3.1
