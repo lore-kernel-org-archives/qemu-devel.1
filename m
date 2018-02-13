@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1elelt-0001mT-CW
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:53:38 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eleqJ-0005fB-LY
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1elelq-0007ZG-Ax
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:53:37 -0500
-Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:33104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1elelq-0007Yi-3h
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:53:34 -0500
-Received: by mail-io0-x229.google.com with SMTP id n7so22219030iob.0
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 09:53:33 -0800 (PST)
-References: <20180213072150.32252-1-richard.henderson@linaro.org>
-	<CAFEAcA_Nj8ToSr2cDZja9qMiTVanhGAwLcj4LNFW4z2MjJpNmw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b0bb245c-2e98-7f86-feea-b331aeb9f95c@linaro.org>
-Date: Tue, 13 Feb 2018 09:53:29 -0800
+	(envelope-from <cohuck@redhat.com>) id 1eleqG-0001eW-HO
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:58:11 -0500
+Date: Tue, 13 Feb 2018 18:57:45 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180213185745.6f695120.cohuck@redhat.com>
+In-Reply-To: <20180213161240.19891-1-david@redhat.com>
+References: <20180213161240.19891-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Nj8ToSr2cDZja9qMiTVanhGAwLcj4LNFW4z2MjJpNmw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] scripts: Add decodetree.py
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/tcg: fix disabling/enabling DAT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,15 +22,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-On 02/13/2018 02:05 AM, Peter Maydell wrote:
-> Trivial-but-important nit: all these new files are missing
-> copyright-and-license comment headers.
+On Tue, 13 Feb 2018 17:12:40 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Oops, fixed.  I also added a one-line comment describing what each of the tests
-are attempting.
+> Currently, all memory accesses go via the MMU of the address space
+> (primary, secondary, ...). This is bad, because we don't flush the TLB
+> when disabling/enabling DAT. So we could add a tlb flush. However it
+> is easier to simply select the MMU we already have in place for real
+> memory access.
+> 
+> All we have to do is point at the right MMU and allow to execute these
+> pages.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+> 
+> This is necessary to make the upcomming kvm-unit-tests with vmalloc support
+> pass under TCG.
+> 
+>  target/s390x/cpu.h        |  7 ++++++-
+>  target/s390x/mmu_helper.c |  2 +-
+>  target/s390x/translate.c  | 10 +++++++---
+>  3 files changed, 14 insertions(+), 5 deletions(-)
 
-
-r~
+Thanks, applied (with tabs removed).
