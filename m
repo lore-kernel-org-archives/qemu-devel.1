@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1elTLT-0005cL-Ii
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:41:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1elTNH-00076Z-VO
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:43:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1elTLQ-00029R-Ej
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:41:35 -0500
-Date: Tue, 13 Feb 2018 16:39:00 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1elTNG-00038B-PL
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:43:28 -0500
+Date: Tue, 13 Feb 2018 16:43:15 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180213053900.GM11634@umbus.fritz.box>
+Message-ID: <20180213054315.GO11634@umbus.fritz.box>
 References: <20180209075503.16996-1-aik@ozlabs.ru>
-	<20180209075503.16996-4-aik@ozlabs.ru>
+	<20180209075503.16996-5-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="xiGzRFbP+7h+smMw"
+	protocol="application/pgp-signature"; boundary="Q4RbCnAmn9VrkE5p"
 Content-Disposition: inline
-In-Reply-To: <20180209075503.16996-4-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v7 3/4] vfio-pci: Allow mmap of MSIX
- BAR
+In-Reply-To: <20180209075503.16996-5-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v7 4/4] ppc/spapr,
+ vfio: Turn off MSIX emulation for VFIO devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +29,96 @@ To: Alexey Kardashevskiy <aik@ozlabs.ru>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
 
---xiGzRFbP+7h+smMw
+--Q4RbCnAmn9VrkE5p
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 09, 2018 at 06:55:02PM +1100, Alexey Kardashevskiy wrote:
-> At the moment we unconditionally avoid mapping MSIX data of a BAR and
-> emulate MSIX table in QEMU. However it is 1) not always necessary as
-> a platform may prodive a paravirt interface for MSIX configuration;
-> 2) can affect the speed of MMIO access by emulating them in QEMU when
-> frequently accessed registers share same system page with MSIX data,
-> this is particularly a problem for systems with the page size bigger
-> than 4KB.
+On Fri, Feb 09, 2018 at 06:55:03PM +1100, Alexey Kardashevskiy wrote:
+> This adds a possibility for the platform to tell VFIO not to emulate MSIX
+> so MMIO memory regions do not get split into chunks in flatview and
+> the entire page can be registered as a KVM memory slot and make direct
+> MMIO access possible for the guest.
 >=20
-> A new capability - VFIO_REGION_INFO_CAP_MSIX_MAPPABLE - has been added
-> to the kernel [1] which tells the userspace that mapping of the MSIX data
-> is possible now. This makes use of it so from now on QEMU tries mapping
-> the entire BAR as a whole and emulate MSIX on top of that.
+> This enables the entire MSIX BAR mapping to the guest for the pseries
+> platform in order to achieve the maximum MMIO preformance for certain
+> devices.
 >=20
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
-mmit/?id=3Da32295c612c57990d17fb0f41e7134394b2f35f6
+> Tested on:
+> LSI Logic / Symbios Logic SAS3008 PCI-Express Fusion-MPT SAS-3 (rev 02)
 >=20
 > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+I still think having the property on the machine is an uglier option
+than having it on the device, but Alex didn't like that, so I'll roll
+with it.
+
+Reivewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
-> Changes:
-> v7:
-> * test iova/llsize against pgmask in vfio_listener_region_add/del
-> * s/vfio_is_cap_present/vfio_has_region_cap/
-> * added comments here and there
-> * s/vdev->msix->table_bar/region-nr/
-> ---
->  include/hw/vfio/vfio-common.h |  1 +
->  hw/vfio/common.c              | 15 +++++++++++++++
->  hw/vfio/pci.c                 |  9 +++++++++
->  3 files changed, 25 insertions(+)
 >=20
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index f3a2ac9..42dd2b0 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int in=
-dex,
->                           struct vfio_region_info **info);
->  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
->                               uint32_t subtype, struct vfio_region_info *=
-*info);
-> +bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_=
-type);
->  #endif
->  extern const MemoryListener vfio_prereg_listener;
-> =20
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 736f271..b99ae77 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1464,6 +1464,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev,=
- uint32_t type,
->      return -ENODEV;
+> Need to split this in two?
+> ---
+>  hw/ppc/spapr.c |  7 +++++++
+>  hw/vfio/pci.c  | 13 +++++++++++++
+>  2 files changed, 20 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index eb3e1a7..14d8ecb 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2855,6 +2855,11 @@ static void spapr_set_modern_hotplug_events(Object=
+ *obj, bool value,
+>      spapr->use_hotplug_event_source =3D value;
 >  }
 > =20
-> +bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_=
-type)
+> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
 > +{
-> +    struct vfio_region_info *info =3D NULL;
-> +    bool ret =3D false;
-> +
-> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
-> +        if (vfio_get_region_info_cap(info, cap_type)) {
-> +            ret =3D true;
-> +        }
-> +        g_free(info);
-> +    }
-> +
-> +    return ret;
+> +    return true;
 > +}
 > +
->  /*
->   * Interfaces for IBM EEH (Enhanced Error Handling)
->   */
+>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> @@ -2936,6 +2941,8 @@ static void spapr_instance_init(Object *obj)
+>      object_property_set_description(obj, "vsmt",
+>                                      "Virtual SMT: KVM behaves as if this=
+ were"
+>                                      " the host's SMT mode", &error_abort=
+);
+> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
+> +                             spapr_get_msix_emulation, NULL, NULL);
+>  }
+> =20
+>  static void spapr_machine_finalizefn(Object *obj)
 > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 879510c..ae9098d 100644
+> index ae9098d..4a03085 100644
 > --- a/hw/vfio/pci.c
 > +++ b/hw/vfio/pci.c
-> @@ -1294,6 +1294,15 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevi=
-ce *vdev)
->      VFIORegion *region =3D &vdev->bars[vdev->msix->table_bar].region;
+> @@ -1580,6 +1580,19 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, in=
+t pos, Error **errp)
+>       */
+>      memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
 > =20
->      /*
-> +     * If the host driver allows mapping of a MSIX data, we are going to
-> +     * do map the entire BAR and emulate MSIX table on top of that.
+> +    /*
+> +     * The emulated machine may provide a paravirt interface for MSIX se=
+tup
+> +     * so it is not strictly necessary to emulate MSIX here. This becomes
+> +     * helpful when frequently accessed MMIO registers are located in
+> +     * subpages adjacent to the MSIX table but the MSIX data containing =
+page
+> +     * cannot be mapped because of a host page size bigger than the MSIX=
+ table
+> +     * alignment.
 > +     */
-> +    if (vfio_has_region_cap(&vdev->vbasedev, region->nr,
-> +                            VFIO_REGION_INFO_CAP_MSIX_MAPPABLE)) {
-> +        return;
+> +    if (object_property_get_bool(OBJECT(qdev_get_machine()),
+> +                                 "vfio-no-msix-emulation", NULL)) {
+> +        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
 > +    }
 > +
-> +    /*
->       * We expect to find a single mmap covering the whole BAR, anything =
-else
->       * means it's either unsupported or already setup.
->       */
+>      return 0;
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -140,24 +126,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---xiGzRFbP+7h+smMw
+--Q4RbCnAmn9VrkE5p
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqCefQACgkQbDjKyiDZ
-s5IRvA//RCM+c2EwcZUha5IZh22aSJRPTDhlzFnrMiKqo7jPZMeyGalV7Ny+Cfdz
-sou7Vh4PVDMCaGAHo6Rut53omfFuHwVLoggbs1G7HV830NVYR7nRjJVDpNplSGrk
-/f+8NRuUR3lHFkuMthMHEi3kUDURONqyfQ3LbyLgGRYD43seHDwMMO1b6diQcEvo
-9FX8dbPKoNz8+WtNn9thg4WJKfFxnpwKwtP5lnn7tjwHJs+V7XfLFsbYmWE2fhK4
-Fb+VvIZFv3elNaCK1M7cGylNkSd13uf4Rsu1O0sqK2h4oWmaJ11ITH1ZQjiYxwsz
-tD3T+5JGDznYGo4I7/V6KxZ9lF2XBnFcmsPWcnh3ujvgQ5mEmI4TgpvBGc/1ZSKX
-z2i31YdTxIeu1dg5fgBaxRUiCMUs+XzJb8UFyY49KjJwn2CnRX+wkO0JwV0ciAZ+
-H7dtP0Gm3AbKJYLn07c1CRR+phKZwL6RSMeLe62FRlwsSmcFu1pa/83NYxufn8wV
-ykoS0lJ/s8uCfZaE0wYN7dknzk/EMIX7KUmxxTeg6YRca3k/qcuMO3AiBLF0g0nK
-9g3b9HhFGBd1FLgJTTUTpjvzj2tszLi/0dG+f/0OiKGrbB4c5YUmNCHXJkfEx25w
-k53aQFT7AqcHBier5SCMgXqNz4hSgSXgYp/mp6sy9kzVks0ViWE=
-=kphE
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqCevIACgkQbDjKyiDZ
+s5JK9hAAtao8NyvORd168yUPqBiTQKPQOYRVBef1nrhW4dv1m5fsOAkxhkmp+rzo
+FswSmpB27kHNwU0EDayV1srnxvOsEad0isiVkY/P5u4ICE+heptBfYNS9wY84zWR
+rLh/CB1r5csRozAvj2ToAnzR5iEvqm13BBJGVE9KIL0v/qx0+DuWr3hNQeSSi0jw
+axCxDjqE5WloBDUA45BUv0rIysGeenAthbfTzBYdYnEv1WoyTxnx/B14SUJUaAM9
+fY+ylvXodH+iLak814367KeVB11PahmjaXLJKTD/EZ+iLjnHJO82wx79e6vI8mPS
+Y/qf1wT9gww6ohbuj41+lV+JQoC2wDRYgIwJg3S5FYYocsqxp52MU160Yt/Zdt/c
+eN9l+1ffRvrr4d7EEMR8L68kJYRTjIc8jUhUU0SusIpPlTsjEe21YK2ph/YkYBIj
+lu6aj9h1ubwqL73t5YZH9pFkAXLmxpHbREk1McbEmztpVfGuj1pxhnh7yfiefK4B
+tgA6BMzAx40xYzlKYv52zfRpHlMinFtCIsiPoFGQbmH4cKe9hl09e1u09El7imqP
+QnbcS8WuVTT96JPp+e/WDcwTzPvLXqGRAk8ckB6zM/p8Yn+nqpPykkVpl5chCHls
+Xu+3XVuzDdOj6uzmzdgjbyyUvMkPBCMtjDPXs0F5smndWaJdGsM=
+=whes
 -----END PGP SIGNATURE-----
 
---xiGzRFbP+7h+smMw--
+--Q4RbCnAmn9VrkE5p--
