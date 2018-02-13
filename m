@@ -1,27 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eldCV-0005sT-8i
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:13:00 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eldCY-0005vB-5v
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:13:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eldCS-0001Z6-H1
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eldCV-0001aB-FY
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:13:02 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60540
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1eldCV-0001Zp-9N
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:12:59 -0500
-Received: from mail-qk0-f194.google.com ([209.85.220.194]:45287)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eldCS-0001Yv-Bl
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:12:56 -0500
-Received: by mail-qk0-f194.google.com with SMTP id g2so2027911qkd.12
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:12:56 -0800 (PST)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1DG9COA112410
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 11:12:58 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g426mbnpk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 11:12:58 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Tue, 13 Feb 2018 16:12:56 -0000
+References: <1518437672-7724-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518437672-7724-4-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<20180212172332.6d5c3232.cohuck@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Tue, 13 Feb 2018 17:12:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180211093607.27351-29-armbru@redhat.com>
-References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-29-armbru@redhat.com>
-From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Tue, 13 Feb 2018 17:12:55 +0100
-Message-ID: <CAMxuvazZT6G3A64ELXGVebLm8ks5cUYfj_H_9aV87-YV2Be-tA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 28/29] Fix up dangling references to
- qmp-commands.* in comment and doc
+In-Reply-To: <20180212172332.6d5c3232.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <0152b654-a745-271f-2984-e9e078d986ed@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] qmp: add architecture specific cpu
+ data for query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +45,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, marcandre <marcandre.lureau@redhat.com>, "Blake, Eric" <eblake@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: agraf@suse.de, ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, david@redhat.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Sun, Feb 11, 2018 at 10:36 AM, Markus Armbruster <armbru@redhat.com> wro=
-te:
-> Fix up the reference to qmp-commands.hx in qmp.c.  Missed in commit
-> 5032a16d1d.
->
-> Fix up the reference to qmp-commands.txt in
-> docs/xen-save-devices-state.txt.  Missed in commit 4d8bb958fa.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  docs/xen-save-devices-state.txt |  3 +--
->  qmp.c                           | 14 +++++++-------
->  2 files changed, 8 insertions(+), 9 deletions(-)
->
-> diff --git a/docs/xen-save-devices-state.txt b/docs/xen-save-devices-stat=
-e.txt
-> index a72ecc8081..1912ecad25 100644
-> --- a/docs/xen-save-devices-state.txt
-> +++ b/docs/xen-save-devices-state.txt
-> @@ -8,8 +8,7 @@ These operations are normally used with migration (see mi=
-gration.txt),
->  however it is also possible to save the state of all devices to file,
->  without saving the RAM or the block devices of the VM.
->
-> -This operation is called "xen-save-devices-state" (see
-> -qmp-commands.txt)
-> +The save operation is available as QMP command xen-save-devices-state.
->
->
->  The binary format used in the file is the following:
-> diff --git a/qmp.c b/qmp.c
-> index a8d4eba973..ba82e1df9f 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -147,13 +147,13 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
->
->  #ifndef CONFIG_SPICE
->  /*
-> - * qmp-commands.hx ensures that QMP command query-spice exists only
-> - * #ifdef CONFIG_SPICE.  Necessary for an accurate query-commands
-> - * result.  However, the QAPI schema is blissfully unaware of that,
-> - * and the QAPI code generator happily generates a dead
-> - * qmp_marshal_query_spice() that calls qmp_query_spice().  Provide it
-> - * one, or else linking fails.  FIXME Educate the QAPI schema on
-> - * CONFIG_SPICE.
-> + * qmp_unregister_commands_hack() ensures that QMP command query-spice
-> + * exists only #ifdef CONFIG_SPICE.  Necessary for an accurate
-> + * query-commands result.  However, the QAPI schema is blissfully
-> + * unaware of that, and the QAPI code generator happily generates a
-> + * dead qmp_marshal_query_spice() that calls qmp_query_spice().
-> + * Provide it one, or else linking fails.  FIXME Educate the QAPI
-> + * schema on CONFIG_SPICE.
->   */
+On 12.02.2018 17:23, Cornelia Huck wrote:
+[...]
+>> diff --git a/cpus.c b/cpus.c
+>> index 6df6660..af67826 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -2166,6 +2166,10 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+>>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>>      CpuInfoFastList *head = NULL, *cur_item = NULL;
+>>      CPUState *cpu;
+>> +#if defined(TARGET_S390X)
+>> +    S390CPU *s390_cpu;
+>> +    CPUS390XState *env;
+>> +#endif
+>>  
+>>      CPU_FOREACH(cpu) {
+>>          CpuInfoFastList *info = g_malloc0(sizeof(*info));
+>> @@ -2183,6 +2187,12 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+>>              info->value->props = props;
+>>          }
+>>  
+>> +#if defined(TARGET_S390X)
+>> +        s390_cpu = S390_CPU(cpu);
+>> +        env = &s390_cpu->env;
+> 
+> You should be able to omit the s390_cpu variable by using
+> 
+>            env = &S390_CPU(cpu)->env;
+> 
+True, but I wanted to stay in style with the code in qmp_query_cpus.
+>> +        info->value->arch = CPU_INFO_ARCH_S390;
+>> +        info->value->u.s390.cpu_state = env->cpu_state;
+>> +#endif
+>>          if (!cur_item) {
+>>              head = cur_item = info;
+>>          } else {
+> 
+> As you mentioned in the patch description, the duplication is a bit
+> awkward. I'll let the QAPI experts judge that; otherwise, this looks
+> fine to me.
+> 
 
-I hope this comment will go away soon,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
->  SpiceInfo *qmp_query_spice(Error **errp)
->  {
-> --
-> 2.13.6
->
+-- 
+Regards,
+ Viktor Mihajlovski
