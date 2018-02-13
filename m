@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1d-0002nc-CX
+	(envelope-from <kwolf@redhat.com>) id 1ele1d-0002oM-Us
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005Fa-E1
+	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005Ft-JW
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:49 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:38 +0100
-Message-Id: <20180213170529.10858-5-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:42 +0100
+Message-Id: <20180213170529.10858-9-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 04/55] docs: Document share-rw property more
- thoroughly
+Subject: [Qemu-devel] [PULL 08/55] qemu-io: fix EOF Ctrl-D handling in
+ qemu-io readline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +23,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
+done and thus getchar() will never return the EOF constant. Instead we have to
+query the TTY attributes to determine the configured EOF character (usually
+Ctrl-D / 0x4), and then explicitly check for that value. This fixes the
+regression that prevented Ctrl-D from triggering an exit of qemu-io that has
+existed since readline was first added in
+
+  commit 0cf17e181798063c3824c8200ba46f25f54faa1a
+  Author: Stefan Hajnoczi <stefanha@redhat.com>
+  Date:   Thu Nov 14 11:54:17 2013 +0100
+
+    qemu-io: use readline.c
+
+It also ensures that a newline is printed when exiting, to complete the
+line output by the "qemu-io> " prompt.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- docs/qemu-block-drivers.texi | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ qemu-io.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-index cd74767ed3..f1793692bb 100644
---- a/docs/qemu-block-drivers.texi
-+++ b/docs/qemu-block-drivers.texi
-@@ -845,6 +845,16 @@ QEMU transparently handles lock handover during shared storage migration.  For
- shared virtual disk images between multiple VMs, the "share-rw" device option
- should be used.
+diff --git a/qemu-io.c b/qemu-io.c
+index f554ab614b..2c00ea068e 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -11,6 +11,9 @@
+ #include "qemu/osdep.h"
+ #include <getopt.h>
+ #include <libgen.h>
++#ifndef _WIN32
++#include <termios.h>
++#endif
  
-+By default, the guest has exclusive write access to its disk image. If the
-+guest can safely share the disk image with other writers the @code{-device
-+...,share-rw=on} parameter can be used.  This is only safe if the guest is
-+running software, such as a cluster file system, that coordinates disk accesses
-+to avoid corruption.
+ #include "qapi/error.h"
+ #include "qemu-io.h"
+@@ -42,6 +45,26 @@ static bool imageOpts;
+ 
+ static ReadLineState *readline_state;
+ 
++static int ttyEOF;
 +
-+Note that share-rw=on only declares the guest's ability to share the disk.
-+Some QEMU features, such as image file formats, require exclusive write access
-+to the disk image and this is unaffected by the share-rw=on option.
++static int get_eof_char(void)
++{
++#ifdef _WIN32
++    return 0x4; /* Ctrl-D */
++#else
++    struct termios tty;
++    if (tcgetattr(STDIN_FILENO, &tty) != 0) {
++        if (errno == ENOTTY) {
++            return 0x0; /* just expect read() == 0 */
++        } else {
++            return 0x4; /* Ctrl-D */
++        }
++    }
 +
- Alternatively, locking can be fully disabled by "locking=off" block device
- option. In the command line, the option is usually in the form of
- "file.locking=off" as the protocol driver is normally placed as a "file" child
++    return tty.c_cc[VEOF];
++#endif
++}
++
+ static int close_f(BlockBackend *blk, int argc, char **argv)
+ {
+     blk_unref(qemuio_blk);
+@@ -323,7 +346,8 @@ static char *fetchline_readline(void)
+     readline_start(readline_state, get_prompt(), 0, readline_func, &line);
+     while (!line) {
+         int ch = getchar();
+-        if (ch == EOF) {
++        if (ttyEOF != 0x0 && ch == ttyEOF) {
++            printf("\n");
+             break;
+         }
+         readline_handle_byte(readline_state, ch);
+@@ -593,6 +617,7 @@ int main(int argc, char **argv)
+     qemuio_add_command(&close_cmd);
+ 
+     if (isatty(STDIN_FILENO)) {
++        ttyEOF = get_eof_char();
+         readline_state = readline_init(readline_printf_func,
+                                        readline_flush_func,
+                                        NULL,
 -- 
 2.13.6
