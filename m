@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elY7p-0005d4-Uk
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:47:50 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1elY9f-0006z4-2W
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:49:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elY7o-0005Bj-Ue
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:47:50 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42052)
+	(envelope-from <peter.maydell@linaro.org>) id 1elY9e-00070p-Av
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:49:43 -0500
+Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:36436)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1elY7o-0005BV-Pb
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:47:48 -0500
-Received: by mail-ot0-x244.google.com with SMTP id a7so16930564otk.9
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 02:47:48 -0800 (PST)
+	id 1elY9e-00070Z-6Z
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:49:42 -0500
+Received: by mail-oi0-x22d.google.com with SMTP id 24so13564690oij.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 02:49:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKM7bO2dwPVkUSz5Mc=CrBWvFFAYY1vD4Q4bMht4=dVoww@mail.gmail.com>
-References: <cover.1516746211.git.alistair.francis@xilinx.com>
-	<29c39a6f9ce3734bf693581348ed78f4bff3e0ef.1516746211.git.alistair.francis@xilinx.com>
-	<CAFEAcA-eOMvYYv--wjs+i1wGG3AN1VueqZjtnE5vpBH=UavkfQ@mail.gmail.com>
-	<CAKmqyKPAmzwFkY5MAiPA-epY-HCbBfBpHGWdanvEef2keaSXew@mail.gmail.com>
-	<CAFEAcA8Fo5gVsjVB5PdU6sKWZAZ2ZscUzEhiDMwZY-LiDGtqOA@mail.gmail.com>
-	<CAKmqyKM7bO2dwPVkUSz5Mc=CrBWvFFAYY1vD4Q4bMht4=dVoww@mail.gmail.com>
+In-Reply-To: <002201d3a4b5$2a642b80$7f2c8280$@ru>
+References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
+	<002401d3a010$8d551280$a7ff3780$@ru>
+	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
+	<CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
+	<001b01d3a3c5$032e09f0$098a1dd0$@ru>
+	<CAFXrp_dNj+BSYo+0rpv5d4PxdjJ1RL_cROaDWRvjQTLziFtO_Q@mail.gmail.com>
+	<000c01d3a496$fd2bc470$f7834d50$@ru>
+	<CAFXrp_cEsHH_6VQevxsrj8GTchraGKEJ_t0xhSbfajcBu-mmzg@mail.gmail.com>
+	<001a01d3a4b1$273f1a90$75bd4fb0$@ru>
+	<002201d3a4b5$2a642b80$7f2c8280$@ru>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Feb 2018 10:47:27 +0000
-Message-ID: <CAFEAcA_VHsONyCXjDsFmiKrRGpC9Zu+XA1=bYPHTTU1dBVUhGw@mail.gmail.com>
+Date: Tue, 13 Feb 2018 10:49:21 +0000
+Message-ID: <CAFEAcA9yO_4FX0J6hsdAmV7TwZd5kp9J-B2EPwm_KZxDO25bGQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] xlnx-zynqmp-rtc: Add basic time
- support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +39,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Ciro Santilli <ciro.santilli@gmail.com>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, war2jordan@live.com, Igor R <boost.lists@gmail.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, Gerd Hoffmann <kraxel@redhat.com>, Thomas Dullien <thomas.dullien@googlemail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 8 February 2018 at 17:21, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Thu, Feb 8, 2018 at 7:42 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Doing it this way round means that it gets complicated when the
->> guest writes to the RTC, though. At the moment I can't see anywhere
->> that sets the current_tm fields except for reset and post-migration.
->> Isn't something missing here? I'm wondering if this choice of
->> migration state is going to paint us into a corner for handling
->> guest-writes-to-rtc.
+On 13 February 2018 at 10:26, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+> Then I added SCSI adapter with the option =E2=80=93device lsi,id=3Dscsi0 =
+and QEMU
+> failed with the following error:
 >
-> I don't have guest write support. The main focus was just allowing
-> users to set the time when they boot QEMU. We haven't seen any request
-> to allow guests to set the time, so I didn't bother.
->
-> Wouldn't adding guest write support just be as simple as converting
-> the value written to a current_tm field?
+> qemu: fatal: IO on conditional branch instruction
 
-Yes, but then why are we using the current_tm format at all?
-It's not what the guest wants to see for reads, it's not what writes
-would naturally be, and it's not what you're using at runtime (you
-convert it immediately to a tick_offset and ignore the current_tm
-stuff). I guess it can be made to work, it just seems like a weird
-format to use for migration.
+> Seems, that your kernel is incomatible with QEMU, which ARM emulation is =
+not
+> good enough.
 
-I've also just reread the patch and am a bit confused -- don't
-you need some code that writes the correct value for the current
-guest time to the current_tm fields before migration ?
+It seems fairly unlikely to me that the Linux driver for this
+SCSI adaptor is using weirdo self-modifying code of the kind
+that would trip up that cpu_abort(). I would suggest a bit
+more investigation into what's actually happening...
 
 thanks
 -- PMM
