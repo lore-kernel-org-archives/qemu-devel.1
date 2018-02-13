@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1elaXz-00089L-JF
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:23:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1elaZi-00017p-Nk
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:24:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1elaXy-0004PL-M3
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:22:59 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1elaXy-0004Jz-FU
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:22:58 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Feb 2018 13:22:46 +0000
-Message-Id: <20180213132246.26844-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] linux-user: Remove THREAD macro
+	(envelope-from <bounces@canonical.com>) id 1elaZf-00065B-IB
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:24:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1elaZf-00062x-Cd
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:24:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1elaZc-0000jQ-Ho
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 13:24:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6EB692E80CD
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 13:24:40 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Feb 2018 13:12:45 -0000
+From: Thomas Huth <1392504@bugs.launchpad.net>
+Reply-To: Bug 1392504 <1392504@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141113221259.14703.69827.malonedeb@wampee.canonical.com>
+Message-Id: <151852756770.29573.15093344179616625994.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1392504] Re: libvirt not relabeling devices on
+ USB Passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +38,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-Back when we used to support compiling either with or without
-NPTL threading library support, we used a macro THREAD which would
-expand either to nothing (no thread support) or to __thread (threads
-supported). For a long time now we have required thread support,
-so remove the macro and just use __thread directly as other parts
-of QEMU do.
+** Project changed: qemu =3D> qemu (Ubuntu)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- linux-user/qemu.h | 4 +---
- linux-user/main.c | 2 +-
- 2 files changed, 2 insertions(+), 4 deletions(-)
+-- =
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 4edd7d0c08..bc4bf35036 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -18,8 +18,6 @@
- #include "exec/gdbstub.h"
- #include "qemu/queue.h"
- 
--#define THREAD __thread
--
- /* This is the size of the host kernel's sigset_t, needed where we make
-  * direct system calls that take a sigset_t pointer and a size.
-  */
-@@ -201,7 +199,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                     abi_long arg5, abi_long arg6, abi_long arg7,
-                     abi_long arg8);
- void gemu_log(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
--extern THREAD CPUState *thread_cpu;
-+extern __thread CPUState *thread_cpu;
- void cpu_loop(CPUArchState *env);
- const char *target_strerror(int err);
- int get_osversion(void);
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 7de0e02487..fd7900628b 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -3835,7 +3835,7 @@ void cpu_loop(CPUHPPAState *env)
- 
- #endif /* TARGET_HPPA */
- 
--THREAD CPUState *thread_cpu;
-+__thread CPUState *thread_cpu;
- 
- bool qemu_cpu_is_self(CPUState *cpu)
- {
--- 
-2.16.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1392504
+
+Title:
+  libvirt not relabeling devices on USB Passthrough
+
+Status in libvirt package in Ubuntu:
+  Triaged
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  After upgrading from Ubuntu 14.04 to Ubuntu 14.10 USB passthrough in
+  QEMU (version is now 2.1.0 - Debian2.1+dfsg-4ubuntu6.1) is not working
+  any more. Already tried to remove and attach the USB devices. I use 1
+  USB2 HDD  +  1 USB3 HDD to a virtual linux machine; 1 USB2 HDD to a
+  virual FNAS machine and a USB 2camera to virtual Win7 machine. All
+  these devices are not working any more.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/1392504/+subscriptio=
+ns
