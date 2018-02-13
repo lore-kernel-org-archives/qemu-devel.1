@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elXMd-0006ok-EA
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 04:59:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1elXSx-0002ZV-MV
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elXMZ-0007mb-4u
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 04:59:03 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46332 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elXMY-0007m8-Vn
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 04:58:59 -0500
-Date: Tue, 13 Feb 2018 09:58:43 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180213095843.GA2378@work-vm>
-References: <20180212183415.5357-1-dgilbert@redhat.com>
-	<0350cc68-0c9c-8ef2-0fcb-f39c90904a49@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1elXSw-0004wU-Mu
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:05:35 -0500
+Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:42560)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1elXSw-0004wE-EY
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:05:34 -0500
+Received: by mail-ot0-x22c.google.com with SMTP id a7so16829447otk.9
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 02:05:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0350cc68-0c9c-8ef2-0fcb-f39c90904a49@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] tests/migration: Add source to PC boot
- block
+In-Reply-To: <20180213072150.32252-1-richard.henderson@linaro.org>
+References: <20180213072150.32252-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Feb 2018 10:05:12 +0000
+Message-ID: <CAFEAcA_Nj8ToSr2cDZja9qMiTVanhGAwLcj4LNFW4z2MjJpNmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] scripts: Add decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, drjones@redhat.com, wei@redhat.com, peter.maydell@linaro.org, peterx@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 02/12/2018 12:34 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > The boot block used in the migration test is currently only
-> > shipped as a hex (with the source in the git commit message),
-> 
-> Would be nice to point to commit ea0c6d62 (I assume that's the commit
-> message you're referring to).
+On 13 February 2018 at 07:21, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> To be used to decode ARM SVE, but could be used for any fixed-width ISA.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Done.
+>  create mode 100755 scripts/decodetree.py
+>  create mode 100755 tests/decode/check.sh
+>  create mode 100644 tests/decode/err_argset1.def
+>  create mode 100644 tests/decode/err_argset2.def
+>  create mode 100644 tests/decode/err_field1.def
+>  create mode 100644 tests/decode/err_field2.def
+>  create mode 100644 tests/decode/err_field3.def
+>  create mode 100644 tests/decode/err_field4.def
+>  create mode 100644 tests/decode/err_field5.def
+>  create mode 100644 tests/decode/err_init1.def
+>  create mode 100644 tests/decode/err_init2.def
+>  create mode 100644 tests/decode/err_init3.def
+>  create mode 100644 tests/decode/err_init4.def
+>  create mode 100644 tests/decode/err_overlap1.def
+>  create mode 100644 tests/decode/err_overlap2.def
+>  create mode 100644 tests/decode/err_overlap3.def
+>  create mode 100644 tests/decode/err_overlap4.def
+>  create mode 100644 tests/decode/err_overlap5.def
+>  create mode 100644 tests/decode/err_overlap6.def
+>  create mode 100644 tests/decode/err_overlap7.def
+>  create mode 100644 tests/decode/err_overlap8.def
+>  create mode 100644 tests/decode/err_overlap9.def
+>
 
-> > change this to actually include the source.
-> 
-> Yeah, GPL really wants us to ship the preferred editing form of sources ;)
-> 
-> > 
-> > A script is added to rebuild the header but the expectation is that
-> > the generated hex is shipped as well as the .s, so that
-> > there's no requirement to have just the right assembler etc.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> 
-> > +++ b/tests/migration-test.c
-> > @@ -80,57 +80,13 @@ static const char *tmpfs;
-> >   /* A simple PC boot sector that modifies memory (1-100MB) quickly
-> >    * outputing a 'B' every so often if it's still running.
-> 
-> Pre-existing, but while here,
-> s/outputing/outputting/
+Trivial-but-important nit: all these new files are missing
+copyright-and-license comment headers.
 
-Extra 't'
-
-> > diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
-> > new file mode 100755
-> > index 0000000000..ee9b53ceb4
-> > --- /dev/null
-> > +++ b/tests/migration/rebuild-x86-bootblock.sh
-> > @@ -0,0 +1,35 @@
-> > +#!/bin/sh
-> > +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > +# See the COPYING file in the top-level directory.
-> > +#
-> > +# Author: dgilbert@redhat.com
-> > +
-> > +ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
-> > +HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
-> > +
-> > +if [ ! -e "$ASMFILE" ]
-> > +then
-> > +  echo "Couldn't find $ASMFILE" >&2
-> > +  exit 1
-> > +fi
-> > +
-> > +ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXX)
-> Portable use of mktemp requires at least 6 X, not 5.
-
-Extra 'X'
-
-> > +cd $ASM_WORK_DIR &&
-> 
-> Unsafe if $PWD contains spaces; needs to be quoted.
-
-Done.
-
-> > +as --32 -march=i486 "$ASMFILE" -o x86.o &&
-> > +objcopy -O binary x86.o x86.boot &&
-> > +dd if=x86.boot of=x86.bootsect \
-> > +  bs=256 count=2 skip=124 &&
-> > +xxd -i x86.bootsect |
-> > +sed -e 's/.*int.*//' > x86.hex &&
-> > +cat - x86.hex <<HERE > "$HEADER"
-> > +/* This file is automatically generated from
-> > + * tests/migration/x86-a-b-bootblock.s, edit that and then run
-> > + * tests/migration/rebuild-x86-bootblock.sh to update,
-> > + * and then remember to send both in your patch submission.
-> > + */
-> > +HERE
-> > +
-> > +rm x86.hex x86.bootsect x86.boot x86.o
-> > +cd .. && rmdir $ASM_WORK_DIR
-> 
-> Another place that needs quoting.
-
-Done.
-
-> > +++ b/tests/migration/x86-a-b-bootblock.s
-> > @@ -0,0 +1,92 @@
-> > +# x86 bootblock used in migration test
-> > +#  repeatedly increments the first byte of each page in a 100MB
-> > +#  range.
-> > +#  Outputs an initial 'A' on serial followed by repeated 'B's
-> > +#
-> > +# run   tests/migration/rebuild-x86-bootblock.sh
-> > +#   to regenerate the hex, and remember to include both the .h and .s
-> > +#   in any patches.
-> > +#
-> > +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-> 
-> Do you want to add 2018, since you've now modified things since the original
-> commit?
-
-Done.
-
-Dave
-
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
