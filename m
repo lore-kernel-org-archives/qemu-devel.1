@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHY-0004Iv-O9
+	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHc-0004Mn-SR
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHS-0007dB-Lb
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:56 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33937)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHb-0007j8-FI
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:00 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36396)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1elZHS-0007cs-BR
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:50 -0500
-Received: by mail-wr0-x243.google.com with SMTP id m5so6314288wrg.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 04:01:50 -0800 (PST)
+	id 1elZHb-0007iv-5h
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:01:59 -0500
+Received: by mail-wm0-x230.google.com with SMTP id f3so15604147wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 04:01:58 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Feb 2018 13:00:19 +0100
-Message-Id: <1518523252-49106-16-git-send-email-pbonzini@redhat.com>
+Date: Tue, 13 Feb 2018 13:00:27 +0100
+Message-Id: <1518523252-49106-24-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1518523252-49106-1-git-send-email-pbonzini@redhat.com>
 References: <1518523252-49106-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/48] sdhci: add qtest to check the SD
- capabilities register
+Subject: [Qemu-devel] [PULL 23/48] sdhci: check the Spec v1 capabilities
+ correctness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,194 +36,226 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-The PCI model is tested with the pc/x86_64 machine,
-the SysBus model with the smdkc210/arm machine.
+Incorrect value will throw an error.
+
+Note than Spec v2 is supported by default.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20180208164818.7961-3-f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-Id: <20180208164818.7961-11-f4bug@amsat.org>
 ---
- tests/Makefile.include |   3 ++
- tests/sdhci-test.c     | 143 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 146 insertions(+)
- create mode 100644 tests/sdhci-test.c
+ hw/sd/sdhci-internal.h | 20 ++++++++++-
+ hw/sd/sdhci.c          | 97 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/sd/trace-events     |  1 +
+ 3 files changed, 116 insertions(+), 2 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f41da23..52be9b3 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -294,6 +294,7 @@ check-qtest-i386-y += tests/migration-test$(EXESUF)
- check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
-+check-qtest-x86_64-y += tests/sdhci-test$(EXESUF)
- gcov-files-i386-y += i386-softmmu/hw/timer/mc146818rtc.c
- gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y))
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index def1c7f..f3d54fd 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -87,6 +87,8 @@
+ /* R/W Host control Register 0x0 */
+ #define SDHC_HOSTCTL                   0x28
+ #define SDHC_CTRL_LED                  0x01
++#define SDHC_CTRL_DATATRANSFERWIDTH    0x02 /* SD mode only */
++#define SDHC_CTRL_HIGH_SPEED           0x04
+ #define SDHC_CTRL_DMA_CHECK_MASK       0x18
+ #define SDHC_CTRL_SDMA                 0x00
+ #define SDHC_CTRL_ADMA1_32             0x08
+@@ -102,6 +104,7 @@
+ /* R/W Power Control Register 0x0 */
+ #define SDHC_PWRCON                    0x29
+ #define SDHC_POWER_ON                  (1 << 0)
++FIELD(SDHC_PWRCON, BUS_VOLTAGE,        1, 3);
  
-@@ -367,6 +368,7 @@ gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
- gcov-files-arm-y += hw/timer/arm_mptimer.c
- check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
-+check-qtest-arm-y += tests/sdhci-test$(EXESUF)
+ /* R/W Block Gap Control Register 0x0 */
+ #define SDHC_BLKGAP                    0x2A
+@@ -124,6 +127,7 @@
  
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+ /* R/W Timeout Control Register 0x0 */
+ #define SDHC_TIMEOUTCON                0x2E
++FIELD(SDHC_TIMEOUTCON, COUNTER,        0, 4);
  
-@@ -822,6 +824,7 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
- tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
-+tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
+ /* R/W Software Reset Register 0x0 */
+ #define SDHC_SWRST                     0x2F
+@@ -180,17 +184,31 @@
  
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-new file mode 100644
-index 0000000..817d9c1
---- /dev/null
-+++ b/tests/sdhci-test.c
-@@ -0,0 +1,143 @@
-+/*
-+ * QTest testcase for SDHCI controllers
-+ *
-+ * Written by Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/registerfields.h"
-+#include "libqtest.h"
-+#include "libqos/pci-pc.h"
-+#include "hw/pci/pci.h"
-+
-+#define SDHC_CAPAB                      0x40
-+#define SDHC_HCVER                      0xFE
-+
-+static const struct sdhci_t {
-+    const char *arch, *machine;
-+    struct {
-+        uintptr_t addr;
-+        uint8_t version;
-+        uint8_t baseclock;
-+        struct {
-+            bool sdma;
-+            uint64_t reg;
-+        } capab;
-+    } sdhci;
-+    struct {
-+        uint16_t vendor_id, device_id;
-+    } pci;
-+} models[] = {
-+    /* PC via PCI */
-+    { "x86_64", "pc",
-+        {-1,         2, 0,  {1, 0x057834b4} },
-+        .pci = { PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_SDHCI } },
-+
-+    /* Exynos4210 */
-+    { "arm",    "smdkc210",
-+        {0x12510000, 2, 0,  {1, 0x5e80080} } },
-+};
-+
-+typedef struct QSDHCI {
-+    struct {
-+        QPCIBus *bus;
-+        QPCIDevice *dev;
-+    } pci;
-+    union {
-+        QPCIBar mem_bar;
-+        uint64_t addr;
-+    };
-+} QSDHCI;
-+
-+static uint64_t sdhci_readq(QSDHCI *s, uint32_t reg)
+ /* ROC Auto CMD12 error status register 0x0 */
+ #define SDHC_ACMD12ERRSTS              0x3C
++FIELD(SDHC_ACMD12ERRSTS, TIMEOUT_ERR,  1, 1);
++FIELD(SDHC_ACMD12ERRSTS, CRC_ERR,      2, 1);
++FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
+ 
+ /* HWInit Capabilities Register 0x05E80080 */
+ #define SDHC_CAPAB                     0x40
+-#define SDHC_CAN_DO_DMA                0x00400000
+ #define SDHC_CAN_DO_ADMA2              0x00080000
+ #define SDHC_CAN_DO_ADMA1              0x00100000
+ #define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
++FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
++FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
++FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
+ FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
++FIELD(SDHC_CAPAB, HIGHSPEED,          21, 1);
++FIELD(SDHC_CAPAB, SDMA,               22, 1);
++FIELD(SDHC_CAPAB, SUSPRESUME,         23, 1);
++FIELD(SDHC_CAPAB, V33,                24, 1);
++FIELD(SDHC_CAPAB, V30,                25, 1);
++FIELD(SDHC_CAPAB, V18,                26, 1);
+ 
+ /* HWInit Maximum Current Capabilities Register 0x0 */
+ #define SDHC_MAXCURR                   0x48
++FIELD(SDHC_MAXCURR, V33_VDD1,          0, 8);
++FIELD(SDHC_MAXCURR, V30_VDD1,          8, 8);
++FIELD(SDHC_MAXCURR, V18_VDD1,         16, 8);
+ 
+ /* W Force Event Auto CMD12 Error Interrupt Register 0x0000 */
+ #define SDHC_FEAER                     0x50
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index f22ed91..116565a 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+ #include "sysemu/block-backend.h"
+@@ -63,6 +64,92 @@ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+     return 1 << (9 + FIELD_EX32(s->capareg, SDHC_CAPAB, MAXBLOCKLENGTH));
+ }
+ 
++/* return true on error */
++static bool sdhci_check_capab_freq_range(SDHCIState *s, const char *desc,
++                                         uint8_t freq, Error **errp)
 +{
-+    uint64_t val;
-+
-+    if (s->pci.dev) {
-+        qpci_memread(s->pci.dev, s->mem_bar, reg, &val, sizeof(val));
-+    } else {
-+        val = qtest_readq(global_qtest, s->addr + reg);
++    switch (freq) {
++    case 0:
++    case 10 ... 63:
++        break;
++    default:
++        error_setg(errp, "SD %s clock frequency can have value"
++                   "in range 0-63 only", desc);
++        return true;
 +    }
-+
-+    return val;
++    return false;
 +}
 +
-+static void check_capab_capareg(QSDHCI *s, uint64_t expec_capab)
++static void sdhci_check_capareg(SDHCIState *s, Error **errp)
 +{
-+    uint64_t capab;
++    uint64_t msk = s->capareg;
++    uint32_t val;
++    bool y;
 +
-+    capab = sdhci_readq(s, SDHC_CAPAB);
-+    g_assert_cmphex(capab, ==, expec_capab);
-+}
++    switch (s->sd_spec_version) {
++    case 2: /* default version */
 +
-+static QSDHCI *machine_start(const struct sdhci_t *test)
-+{
-+    QSDHCI *s = g_new0(QSDHCI, 1);
++    /* fallthrough */
++    case 1:
++        y = FIELD_EX64(s->capareg, SDHC_CAPAB, TOUNIT);
++        msk = FIELD_DP64(msk, SDHC_CAPAB, TOUNIT, 0);
 +
-+    if (test->pci.vendor_id) {
-+        /* PCI */
-+        uint16_t vendor_id, device_id;
-+        uint64_t barsize;
-+
-+        global_qtest = qtest_startf("-machine %s -device sdhci-pci",
-+                                    test->machine);
-+
-+        s->pci.bus = qpci_init_pc(NULL);
-+
-+        /* Find PCI device and verify it's the right one */
-+        s->pci.dev = qpci_device_find(s->pci.bus, QPCI_DEVFN(4, 0));
-+        g_assert_nonnull(s->pci.dev);
-+        vendor_id = qpci_config_readw(s->pci.dev, PCI_VENDOR_ID);
-+        device_id = qpci_config_readw(s->pci.dev, PCI_DEVICE_ID);
-+        g_assert(vendor_id == test->pci.vendor_id);
-+        g_assert(device_id == test->pci.device_id);
-+        s->mem_bar = qpci_iomap(s->pci.dev, 0, &barsize);
-+        qpci_device_enable(s->pci.dev);
-+    } else {
-+        /* SysBus */
-+        global_qtest = qtest_startf("-machine %s", test->machine);
-+        s->addr = test->sdhci.addr;
-+    }
-+
-+    return s;
-+}
-+
-+static void machine_stop(QSDHCI *s)
-+{
-+    g_free(s->pci.dev);
-+    qtest_quit(global_qtest);
-+}
-+
-+static void test_machine(const void *data)
-+{
-+    const struct sdhci_t *test = data;
-+    QSDHCI *s;
-+
-+    s = machine_start(test);
-+
-+    check_capab_capareg(s, test->sdhci.capab.reg);
-+
-+    machine_stop(s);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    const char *arch = qtest_get_arch();
-+    char *name;
-+    int i;
-+
-+    g_test_init(&argc, &argv, NULL);
-+    for (i = 0; i < ARRAY_SIZE(models); i++) {
-+        if (strcmp(arch, models[i].arch)) {
-+            continue;
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, TOCLKFREQ);
++        trace_sdhci_capareg(y ? "timeout (MHz)" : "Timeout (KHz)", val);
++        if (sdhci_check_capab_freq_range(s, "timeout", val, errp)) {
++            return;
 +        }
-+        name = g_strdup_printf("sdhci/%s", models[i].machine);
-+        qtest_add_data_func(name, &models[i], test_machine);
-+        g_free(name);
-+    }
++        msk = FIELD_DP64(msk, SDHC_CAPAB, TOCLKFREQ, 0);
 +
-+    return g_test_run();
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, BASECLKFREQ);
++        trace_sdhci_capareg(y ? "base (MHz)" : "Base (KHz)", val);
++        if (sdhci_check_capab_freq_range(s, "base", val, errp)) {
++            return;
++        }
++        msk = FIELD_DP64(msk, SDHC_CAPAB, BASECLKFREQ, 0);
++
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, MAXBLOCKLENGTH);
++        if (val >= 3) {
++            error_setg(errp, "block size can be 512, 1024 or 2048 only");
++            return;
++        }
++        trace_sdhci_capareg("max block length", sdhci_get_fifolen(s));
++        msk = FIELD_DP64(msk, SDHC_CAPAB, MAXBLOCKLENGTH, 0);
++
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, HIGHSPEED);
++        trace_sdhci_capareg("high speed", val);
++        msk = FIELD_DP64(msk, SDHC_CAPAB, HIGHSPEED, 0);
++
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, SDMA);
++        trace_sdhci_capareg("SDMA", val);
++        msk = FIELD_DP64(msk, SDHC_CAPAB, SDMA, 0);
++
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, SUSPRESUME);
++        trace_sdhci_capareg("suspend/resume", val);
++        msk = FIELD_DP64(msk, SDHC_CAPAB, SUSPRESUME, 0);
++
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, V33);
++        trace_sdhci_capareg("3.3v", val);
++        msk = FIELD_DP64(msk, SDHC_CAPAB, V33, 0);
++
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, V30);
++        trace_sdhci_capareg("3.0v", val);
++        msk = FIELD_DP64(msk, SDHC_CAPAB, V30, 0);
++
++        val = FIELD_EX64(s->capareg, SDHC_CAPAB, V18);
++        trace_sdhci_capareg("1.8v", val);
++        msk = FIELD_DP64(msk, SDHC_CAPAB, V18, 0);
++        break;
++
++    default:
++        error_setg(errp, "Unsupported spec version: %u", s->sd_spec_version);
++    }
++    if (msk) {
++        qemu_log_mask(LOG_UNIMP,
++                      "SDHCI: unknown CAPAB mask: 0x%016" PRIx64 "\n", msk);
++    }
 +}
++
+ static uint8_t sdhci_slotint(SDHCIState *s)
+ {
+     return (s->norintsts & s->norintsigen) || (s->errintsts & s->errintsigen) ||
+@@ -990,7 +1077,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+     case SDHC_TRNMOD:
+         /* DMA can be enabled only if it is supported as indicated by
+          * capabilities register */
+-        if (!(s->capareg & SDHC_CAN_DO_DMA)) {
++        if (!(s->capareg & R_SDHC_CAPAB_SDMA_MASK)) {
+             value &= ~SDHC_TRNS_DMA;
+         }
+         MASKED_WRITE(s->trnmod, mask, value & SDHC_TRNMOD_MASK);
+@@ -1125,11 +1212,19 @@ static const MemoryRegionOps sdhci_mmio_ops = {
+ 
+ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+ {
++    Error *local_err = NULL;
++
+     if (s->sd_spec_version != 2) {
+         error_setg(errp, "Only Spec v2 is supported");
+         return;
+     }
+     s->version = (SDHC_HCVER_VENDOR << 8) | (s->sd_spec_version - 1);
++
++    sdhci_check_capareg(s, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ }
+ 
+ /* --- qdev common --- */
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index 0a12115..78d8707 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -13,6 +13,7 @@ sdhci_adma_transfer_completed(void) ""
+ sdhci_access(const char *access, unsigned int size, uint64_t offset, const char *dir, uint64_t val, uint64_t val2) "%s%u: addr[0x%04" PRIx64 "] %s 0x%08" PRIx64 " (%" PRIu64 ")"
+ sdhci_read_dataport(uint16_t data_count) "all %u bytes of data have been read from input buffer"
+ sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u bytes of data"
++sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
+ 
+ # hw/sd/milkymist-memcard.c
+ milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
 -- 
 1.8.3.1
