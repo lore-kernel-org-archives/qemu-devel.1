@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTe-0002Fk-Dm
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:48 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eleTj-0002Jd-2z
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTa-0003BR-RG
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:46 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57508 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1eleTi-0003G2-9d
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52364 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTa-0003B4-MU
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:42 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTi-0003Fo-5R
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:50 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 13 Feb 2018 17:34:26 +0000
-Message-Id: <20180213173429.19501-3-stefanha@redhat.com>
+Date: Tue, 13 Feb 2018 17:34:29 +0000
+Message-Id: <20180213173429.19501-6-stefanha@redhat.com>
 In-Reply-To: <20180213173429.19501-1-stefanha@redhat.com>
 References: <20180213173429.19501-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/5] README: Document 'git-publish' workflow
+Subject: [Qemu-devel] [PATCH 5/5] misc: fix spelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +27,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-[Fixed s/git-profile/git-publish/ typo and s/for once/the first time/.
---Stefan]
+s/pupulate/populate
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20180205054725.25634-3-famz@redhat.com
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20180208162447.10851-1-marcandre.lureau@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- README | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+ util/qemu-coroutine-lock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/README b/README
-index 2c8e1c8cc4..627633fe1d 100644
---- a/README
-+++ b/README
-@@ -56,12 +56,41 @@ The QEMU source code is maintained under the GIT vers=
-ion control system.
-=20
-    git clone git://git.qemu.org/qemu.git
-=20
--When submitting patches, the preferred approach is to use 'git
-+When submitting patches, one common approach is to use 'git
- format-patch' and/or 'git send-email' to format & send the mail to the
- qemu-devel@nongnu.org mailing list. All patches submitted must contain
- a 'Signed-off-by' line from the author. Patches should follow the
- guidelines set out in the HACKING and CODING_STYLE files.
-=20
-+A 'git-publish' utility was created to make above process less
-+cumbersome, and is highly recommended for making regular contributions,
-+or even just for sending consecutive patch series revisions. It also
-+requires a working 'git send-email' setup, and by default doesn't
-+automate everything, so you may want to go through the above steps
-+manually the first time.
-+
-+For installation instructions, please go to
-+
-+  https://github.com/stefanha/git-publish
-+
-+The workflow with 'git-publish' is:
-+
-+  $ git checkout master -b my-feature
-+  $ # work on new commits, add your 'Signed-off-by' lines to each
-+  $ git publish
-+
-+Your patch series will be sent and tagged as my-feature-v1 if you need t=
-o refer
-+back to it in the future.
-+
-+Sending v2:
-+
-+  $ git checkout my-feature # same topic branch
-+  $ # making changes to the commits (using 'git rebase', for example)
-+  $ git publish
-+
-+Your patch series will be sent with 'v2' tag in the subject and the git =
-tip
-+will be tagged as my-feature-v2.
-+
- Additional information on submitting patches can be found online via
- the QEMU website
-=20
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index 78fb79acf8..5a80c10690 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -89,7 +89,7 @@ void qemu_co_queue_run_restart(Coroutine *co)
+      * invalid memory.  Therefore, use a temporary queue and do not touc=
+h
+      * the "co" coroutine as soon as you enter another one.
+      *
+-     * In its turn resumed "co" can pupulate "co_queue_wakeup" queue wit=
+h
++     * In its turn resumed "co" can populate "co_queue_wakeup" queue wit=
+h
+      * new coroutines to be woken up.  The caller, who has resumed "co",
+      * will be responsible for traversing the same queue, which may caus=
+e
+      * a different wakeup order but not any missing wakeups.
 --=20
 2.14.3
