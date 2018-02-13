@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elZRs-0004m9-69
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:12:37 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1elZSP-0005BH-CE
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:13:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elZRq-0005uE-NG
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:12:36 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:42929)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1elZRq-0005u4-GT
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:12:34 -0500
-Received: by mail-ot0-x241.google.com with SMTP id a7so17111461otk.9
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 04:12:34 -0800 (PST)
+	(envelope-from <dovgaluk@ispras.ru>) id 1elZSL-00064t-Ux
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:13:09 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:41274)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1elZSL-000643-Gz
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:13:05 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
+	<002401d3a010$8d551280$a7ff3780$@ru>
+	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
+	<CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
+	<001b01d3a3c5$032e09f0$098a1dd0$@ru>
+	<CAFXrp_dNj+BSYo+0rpv5d4PxdjJ1RL_cROaDWRvjQTLziFtO_Q@mail.gmail.com>
+	<000c01d3a496$fd2bc470$f7834d50$@ru>
+	<CAFXrp_cEsHH_6VQevxsrj8GTchraGKEJ_t0xhSbfajcBu-mmzg@mail.gmail.com>
+	<001a01d3a4b1$273f1a90$75bd4fb0$@ru>
+	<002201d3a4b5$2a642b80$7f2c8280$@ru>
+	<CAFEAcA9yO_4FX0J6hsdAmV7TwZd5kp9J-B2EPwm_KZxDO25bGQ@mail.gmail.com>
+	<002d01d3a4b8$b73a37e0$25aea7a0$@ru>
+	<CAFXrp_dVnWzpDb0p8nGC4eGZ_mWh-pXgozZ7Q0kewRdJE5hM2Q@mail.gmail.com>
+In-Reply-To: <CAFXrp_dVnWzpDb0p8nGC4eGZ_mWh-pXgozZ7Q0kewRdJE5hM2Q@mail.gmail.com>
+Date: Tue, 13 Feb 2018 15:13:03 +0300
+Message-ID: <003701d3a4c3$ffff3650$fffda2f0$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20180128221510.13722-1-richard.henderson@linaro.org>
-References: <20180128221510.13722-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Feb 2018 12:12:13 +0000
-Message-ID: <CAFEAcA_3s_prsUy7CXP3rC-i048FeEduqe92Mwg_VrTJ7YScHg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Use *at functions to implement
- interp_prefix
+Content-Language: ru
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,192 +41,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>
+To: 'Ciro Santilli' <ciro.santilli@gmail.com>
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Kevin Wolf' <kwolf@redhat.com>, war2jordan@live.com, 'Igor R' <boost.lists@gmail.com>, 'Juan Quintela' <quintela@redhat.com>, 'Jason Wang' <jasowang@redhat.com>, "'Michael S. Tsirkin'" <mst@redhat.com>, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, 'Gerd Hoffmann' <kraxel@redhat.com>, 'Thomas Dullien' <thomas.dullien@googlemail.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
 
-On 28 January 2018 at 22:15, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> From: Richard Henderson <rth@twiddle.net>
->
-> If the interp_prefix is a complete chroot, it may have a *lot* of files.
-> Setting up the cache for this is quite expensive.
->
-> For the most part, we can use the *at versions of various syscalls to
-> attempt the operation in the prefix.  For the few cases that remain,
-> use faccessat and create the full path on demand.
->
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->
-> Changes since v3 (Dec 29 2017):
->   * Use DO/WHILE as the control construct; wrap it in a macro.
->   * Introduce linux_user_path to handle the cases *at syscalls
->     do not cover.
->
-> Changes since v2 (Dec 4 2017):
->   * Use IF as the control construct instead of SWITCH.
->
-> Changes since v1 (Nov 2016):
->   * Require interp_dirfd set before trying the *at path.
->
->
-> r~
->
-> ---
->  linux-user/qemu.h    |  15 ++++++
->  linux-user/elfload.c |   5 +-
->  linux-user/main.c    |  36 +++++++++++++-
->  linux-user/syscall.c | 130 +++++++++++++++++++++++++++++++++++----------------
->  4 files changed, 141 insertions(+), 45 deletions(-)
->
-> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-> index 4edd7d0c08..5b621f26e0 100644
-> --- a/linux-user/qemu.h
-> +++ b/linux-user/qemu.h
-> @@ -437,8 +437,23 @@ void mmap_fork_start(void);
->  void mmap_fork_end(int child);
->
->  /* main.c */
-> +extern int interp_dirfd;
->  extern unsigned long guest_stack_size;
->
-> +#define CHOOSE_INTERP(RET, PATH, OPENAT_EXPR, NORMAL_EXPR)  \
-> +    do {                                                    \
-> +        if (interp_dirfd >= 0 && PATH[0] == '/') {          \
-> +            RET = OPENAT_EXPR;                              \
-> +            if (!(RET < 0 && errno == ENOENT)) {            \
-> +                break;                                      \
-> +            }                                               \
-> +        }                                                   \
-> +        RET = NORMAL_EXPR;                                  \
-> +    } while (0)
-> +
-> +const char *linux_user_path(const char *);
-> +#define path(x)  linux_user_path(x)
-> +
->  /* user access */
->
->  #define VERIFY_READ 0
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 32a47674e6..1fb097e30d 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -6,7 +6,6 @@
->
->  #include "qemu.h"
->  #include "disas/disas.h"
-> -#include "qemu/path.h"
->
->  #ifdef _ARCH_PPC64
->  #undef ARCH_DLINFO
-> @@ -2204,7 +2203,9 @@ static void load_elf_interp(const char *filename, struct image_info *info,
->  {
->      int fd, retval;
->
-> -    fd = open(path(filename), O_RDONLY);
-> +    CHOOSE_INTERP(fd, filename,
-> +                  openat(interp_dirfd, filename + 1, O_RDONLY),
-> +                  open(filename, O_RDONLY));
->      if (fd < 0) {
->          goto exit_perror;
->      }
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index 2140465709..8f4087d508 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -23,7 +23,6 @@
->
->  #include "qapi/error.h"
->  #include "qemu.h"
-> -#include "qemu/path.h"
->  #include "qemu/config-file.h"
->  #include "qemu/cutils.h"
->  #include "qemu/help_option.h"
-> @@ -98,8 +97,41 @@ unsigned long reserved_va;
->  static void usage(int exitcode);
->
->  static const char *interp_prefix = CONFIG_QEMU_INTERP_PREFIX;
-> +int interp_dirfd;
->  const char *qemu_uname_release;
->
-> +const char *linux_user_path(const char *pathname)
-> +{
-> +    static THREAD size_t save_len;
-> +    static THREAD char *save_buf;
+I=E2=80=99ve tried starting QEMU with your files without SCSI at all.
 
-I think THREAD is a remnant of when we used to support configuration
-with and without NPTL, so we should be looking to get rid of it,
-and just use __thread instead.
+The problem is with implementation of icount in ARM.
 
-> +    size_t len, prefix_len, path_len;
-> +    int e;
-> +
-> +    /* Only consider absolute paths.  */
-> +    if (pathname[0] != '/' || interp_dirfd < 0) {
-> +        return pathname;
-> +    }
-> +
-> +    /* Test if the path within interp_dir exists.  */
-> +    e = faccessat(interp_dirfd, pathname + 1, F_OK, AT_SYMLINK_NOFOLLOW);
-> +    if (e < 0 && errno != ENOENT) {
-> +        return pathname;
-> +    }
-> +
-> +    /* It does -- form the new absolute path.  */
-> +    prefix_len = strlen(interp_prefix);
-> +    path_len = strlen(pathname) + 1;
-> +    len = prefix_len + path_len;
-> +    if (len <= save_len) {
-> +        save_len = len;
-> +        save_buf = realloc(save_buf, len);
-> +    }
-> +    memcpy(save_buf, interp_prefix, prefix_len);
-> +    memcpy(save_buf + prefix_len, pathname, path_len);
-> +
-> +    return save_buf;
-> +}
+The following command line fails with the same error:=20
 
-The split of an atomic syscall into a two-part thing involving
-an existence/access check and then the syscall makes me a bit
-nervous about races, but I guess there's nothing terrible that
-would happen here...
+=20
 
-I had a look at where we still need this function:
- * NR_acct
- * NR_statfs (various flavours)
- * NR_inotify_add_watch
+./bin/qemu-system-arm -icount 7 -M versatilepb -nographic -dtb =
+./images/arm/versatile-pb.dtb -kernel ./images/arm/zImage -net none
 
-For inotify_add_watch, we can first try the syscall on the
-path inside the interp_dir, and if that fails ENOENT then
-try it with the normal path.
+=20
 
-Similarly with NR_acct and the statfs syscalls I think we can do
-"try the interp_dir path first, then the other if that fails ENOENT".
+And it does not fail when I remove icount.
 
-That would allow us to get rid of this function entirely.
+=20
 
-> +
->  /* XXX: on x86 MAP_GROWSDOWN only works if ESP <= address + 32, so
->     we allocate a bigger stack. Need a better solution, for example
->     by remapping the process stack directly at the right place */
-> @@ -4319,7 +4351,7 @@ int main(int argc, char **argv, char **envp)
->      memset(&bprm, 0, sizeof (bprm));
+Pavel Dovgalyuk
+
+=20
+
+From: Ciro Santilli [mailto:ciro.santilli@gmail.com]=20
+Sent: Tuesday, February 13, 2018 2:37 PM
+To: Pavel Dovgalyuk
+Cc: Peter Maydell; Pavel Dovgalyuk; QEMU Developers; Kevin Wolf; =
+war2jordan@live.com; Igor R; Juan Quintela; Jason Wang; Michael S. =
+Tsirkin; Aleksandr Bezzubikov; maria.klimushenkova@ispras.ru; Gerd =
+Hoffmann; Thomas Dullien; Paolo Bonzini; Alex Benn=C3=A9e
+Subject: Re: [RFC PATCH v6 00/20] replay additions
+
+=20
+
+=20
+
+=20
+
+On Tue, Feb 13, 2018 at 10:52 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
+wrote:
+
+> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+> On 13 February 2018 at 10:26, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
+wrote:
+> > Then I added SCSI adapter with the option =E2=80=93device =
+lsi,id=3Dscsi0 and QEMU
+> > failed with the following error:
+> >
+> > qemu: fatal: IO on conditional branch instruction
 >
->      /* Scan interp_prefix dir for replacement files. */
-> -    init_paths(interp_prefix);
-> +    interp_dirfd = open(interp_prefix, O_CLOEXEC | O_DIRECTORY | O_PATH);
+> > Seems, that your kernel is incomatible with QEMU, which ARM =
+emulation is not
+> > good enough.
+
+=20
+
+Just to clarify, this is my working ARM command that works without =
+record / replay:
+
+=20
+
+./buildroot/output.arm~/host/usr/bin/qemu-system-arm -m 128M -monitor =
+telnet::45454,server,nowait -netdev =
+user,hostfwd=3Dtcp::45455-:45455,id=3Dnet0 -smp 1  -M versatilepb =
+-append 'root=3D/dev/sda nokaslr norandmaps printk.devkmsg=3Don =
+printk.time=3Dy' -device rtl8139,netdev=3Dnet0 -drive =
+file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,format=3Draw =
+-dtb ./buildroot/output.arm~/images/versatile-pb.dtb -kernel =
+./buildroot/output.arm~/images/zImage -serial stdio
+
+=20
+
+I then tried to modify it for record / replay to use similar options to =
+the x86 version. The only non-trivial change was what to use for the =
+drive. So I tried to replace them with:
+
+=20
+
+-drive =
+file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Dimg-dire=
+ct,format=3Draw \
+
+-drive =
+driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay \
+
+-device scsi-hd,drive=3Dimg-blkreplay \
+
+=20
+
+and some other variations, but this is just guesswork and likely to be =
+wrong, since I don't understand those options very well.
+
+=20
+
+I don't need to use SCSI if that is not supported, I'd be happy with any =
+record / replay QEMU command that works with the image I uploaded on the =
+.zip.
+
+=20
+
 >
->      init_qemu_uname_release();
+> It seems fairly unlikely to me that the Linux driver for this
+> SCSI adaptor is using weirdo self-modifying code of the kind
+> that would trip up that cpu_abort(). I would suggest a bit
+> more investigation into what's actually happening...
 
-I wonder if there are guest programs that make assumptions about
-file descriptor numbers such that it would be worthwhile dup2'ing
-the interp_dirfd away from the presumably low number fd it will
-get by default into something larger...
+It happens for any SCSI adapter (i.e., for every system able to run).
+And the log is not very big. Therefore the problem is in early boot =
+code.
 
-Have you tried an LTP test run with this patchset to see whether
-we get any new passes/fails ?
+Pavel Dovgalyuk
 
-thanks
--- PMM
+=20
