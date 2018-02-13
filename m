@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRtp-0000yh-ST
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:08:58 -0500
+	id 1elRtx-00016g-2u
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRtp-0007jl-34
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:08:57 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1elRto-0007jW-Ui
-	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:08:57 -0500
-Received: by mail-qk0-x241.google.com with SMTP id 15so21063194qkl.3
-	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 20:08:56 -0800 (PST)
+	id 1elRtw-0007mA-3i
+	for qemu-devel@nongnu.org; Mon, 12 Feb 2018 23:09:05 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 13 Feb 2018 01:07:51 -0300
-Message-Id: <20180213040809.26021-13-f4bug@amsat.org>
+Date: Tue, 13 Feb 2018 01:07:53 -0300
+Message-Id: <20180213040809.26021-15-f4bug@amsat.org>
 In-Reply-To: <20180213040809.26021-1-f4bug@amsat.org>
 References: <20180213040809.26021-1-f4bug@amsat.org>
-Subject: [Qemu-devel] [PATCH v13 12/30] sdhci: Fix 64-bit ADMA2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v13 14/30] hw/arm/exynos4210: access the 64-bit
+ capareg with qdev_prop_set_uint64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +28,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sai Pavan Boddu <saipava@xilinx.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Fam Zheng <famz@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "open list:Exynos" <qemu-arm@nongnu.org>
 
-From: Sai Pavan Boddu <saipava@xilinx.com>
+We only set a 32-bit value, but this is a good practice in case this
+code is used as reference.
 
-The 64-bit ADMA address is not converted to the cpu endianes correctly.
-This patch fixes the issue and uses a valid mask for the attribute data.
+(missed in 5efc9016e52)
 
-Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
-[AF: Re-write commit message]
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/sd/sdhci.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/arm/exynos4210.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 650265a472..4bd35078a9 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -667,8 +667,8 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
-         dscr->length = le16_to_cpu(dscr->length);
-         dma_memory_read(s->dma_as, entry_addr + 4,
-                         (uint8_t *)(&dscr->addr), 8);
--        dscr->attr = le64_to_cpu(dscr->attr);
--        dscr->attr &= 0xfffffff8;
-+        dscr->addr = le64_to_cpu(dscr->addr);
-+        dscr->attr &= (uint8_t) ~0xC0;
-         dscr->incr = 12;
-         break;
-     }
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index e8e1d81e62..d89322c7ea 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -378,7 +378,7 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
+         DriveInfo *di;
+ 
+         dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
+-        qdev_prop_set_uint32(dev, "capareg", EXYNOS4210_SDHCI_CAPABILITIES);
++        qdev_prop_set_uint64(dev, "capareg", EXYNOS4210_SDHCI_CAPABILITIES);
+         qdev_init_nofail(dev);
+ 
+         busdev = SYS_BUS_DEVICE(dev);
 -- 
 2.16.1
