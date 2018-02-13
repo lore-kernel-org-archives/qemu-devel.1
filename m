@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eldXo-0008IP-Eq
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:35:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1eldb6-0003ZL-DV
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:38:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eldXj-0002ai-Gu
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:35:00 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50190 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1eldb1-00040t-Pf
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:38:24 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55960 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eldXj-0002a6-Bt
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:34:55 -0500
-Date: Tue, 13 Feb 2018 17:34:52 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180213173452.20fe8f2f@redhat.com>
-In-Reply-To: <e8cf7f36-249f-a3cc-f414-fac4e8b56b51@redhat.com>
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
-	<20180212204609.GB30111@morn.lan>
-	<b2725975-6823-8919-e937-56d8cb404372@linux.vnet.ibm.com>
-	<e8cf7f36-249f-a3cc-f414-fac4e8b56b51@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eldb1-0003zz-JL
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:38:19 -0500
+References: <20180128221510.13722-1-richard.henderson@linaro.org>
+	<CAFEAcA_3s_prsUy7CXP3rC-i048FeEduqe92Mwg_VrTJ7YScHg@mail.gmail.com>
+	<18af5519-95cd-f00e-1915-75183e94eb38@twiddle.net>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <aff1a8c0-4e99-b52e-f933-fdc900bd91fd@redhat.com>
+Date: Tue, 13 Feb 2018 10:38:18 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <18af5519-95cd-f00e-1915-75183e94eb38@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
- interface
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Use *at functions to implement
+ interp_prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,16 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Kevin O'Connor <kevin@koconnor.net>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 13 Feb 2018 17:16:49 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
-
-[...]
+On 02/13/2018 09:31 AM, Richard Henderson wrote:
+>> I wonder if there are guest programs that make assumptions about
+>> file descriptor numbers such that it would be worthwhile dup2'ing
+>> the interp_dirfd away from the presumably low number fd it will
+>> get by default into something larger...
 > 
-> It's possible that I'll scream for additional hw enlightement under OVMF
-> later; so I suggest designing in some kind of feature negotiation up-front.
-We can add an extra fwcfg file for that later, when/if it's actually needed.
+> Hmm.  Using dup2(probe, probe) to test if the new (high) fd itself has not been
+> allocated?
 
-[...]
+fcntl(F_DUPFD[_CLOEXEC]) is smarter than dup2/3, if you plan on 
+atomically guaranteeing a dup to a not-in-use fd.
+
+Will dup'ing to a high fd violate assumptions of programs that assume 
+that open() and friends favor the next available fd by default, rather 
+than having a gap?  (Probably not, but skipping fds is not usual, so 
+it's worth asking.)
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
