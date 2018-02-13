@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elcyh-0001Ge-6V
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:58:44 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eld0O-00030C-8A
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:00:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1elcye-0001W9-CD
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:58:43 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47928 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1elcye-0001UZ-6b
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:58:40 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 204F7EAEB0
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 15:58:36 +0000 (UTC)
-Date: Tue, 13 Feb 2018 15:58:27 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180213155827.GU573@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1518531279-11966-1-git-send-email-thuth@redhat.com>
-	<20180213150911.GG2378@work-vm> <20180213151125.GQ573@redhat.com>
-	<20180213152529.GH2378@work-vm> <20180213152753.GR573@redhat.com>
-	<20180213154145.GJ2378@work-vm> <20180213154512.GT573@redhat.com>
-	<20180213154942.GL2378@work-vm>
+	(envelope-from <mlureau@redhat.com>) id 1eld0L-0002yv-Ll
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:00:28 -0500
+Received: from mail-qk0-f195.google.com ([209.85.220.195]:36630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eld0L-0002yU-7e
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:00:25 -0500
+Received: by mail-qk0-f195.google.com with SMTP id 15so23006953qkl.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:00:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180213154942.GL2378@work-vm>
+In-Reply-To: <20180211093607.27351-26-armbru@redhat.com>
+References: <20180211093607.27351-1-armbru@redhat.com>
+	<20180211093607.27351-26-armbru@redhat.com>
+From: Marc-Andre Lureau <mlureau@redhat.com>
+Date: Tue, 13 Feb 2018 17:00:23 +0100
+Message-ID: <CAMxuvayQ29r30T+foMCCrTDTUSayhRV07r1Ek6ECcj11oy4bow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] io/channel-command: Delay the killing of
- the child after closing the pipe
+Subject: Re: [Qemu-devel] [PATCH v2 25/29] docs/devel/writing-qmp-commands:
+ Update for modular QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,122 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, marcandre <marcandre.lureau@redhat.com>, "Blake, Eric" <eblake@redhat.com>
 
-On Tue, Feb 13, 2018 at 03:49:42PM +0000, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Tue, Feb 13, 2018 at 03:41:45PM +0000, Dr. David Alan Gilbert wrot=
-e:
-> > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > > > On Tue, Feb 13, 2018 at 03:25:30PM +0000, Dr. David Alan Gilbert =
-wrote:
-> > > > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > > > > > On Tue, Feb 13, 2018 at 03:09:12PM +0000, Dr. David Alan Gilb=
-ert wrote:
-> > > > > > > * Thomas Huth (thuth@redhat.com) wrote:
-> > > > > > > > We are currently facing some migration failure on s390x w=
-hen running
-> > > > > > > > certain avocado tests, e.g. when running the test
-> > > > > > > > type_specific.io-github-autotest-qemu.migrate.with_reboot=
-.exec.gzip_exec.
-> > > > > > > > This test is using 'migrate -d "exec:nc localhost 5200"' =
-for the migration.
-> > > > > > > > The problem is detected at the receiving side, where the =
-migration stream
-> > > > > > > > apparently ends too early. However, the cause for the pro=
-blem is the
-> > > > > > > > sending side: After writing the migration stream into the=
- pipe to netcat,
-> > > > > > > > the source QEMU calls qio_channel_command_close() which c=
-loses the pipe
-> > > > > > > > and immediately (!) kills the child process afterwards. S=
-o if the
-> > > > > > > > sending netcat did not read the final bytes from the pipe=
- yet, or
-> > > > > > > > if it did not manage to send out all its buffers yet, it =
-is killed
-> > > > > > > > before the whole migration stream is passed to the destin=
-ation side.
-> > > > > > >=20
-> > > > > > > Thanks for tracking that down!
-> > > > > > >=20
-> > > > > > > > To ease the situation at least a little bit, we should gi=
-ve the child
-> > > > > > > > process at least some few more time slices before we kill=
- it with
-> > > > > > > > SIGTERM and then with SIGKILL. With this change, the avoc=
-ado test now
-> > > > > > > > succeeds here in 10 out of 10 runs.
-> > > > > > > >=20
-> > > > > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > > > > > > ---
-> > > > > > > >  io/channel-command.c | 6 +++---
-> > > > > > > >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > > > > > > >=20
-> > > > > > > > diff --git a/io/channel-command.c b/io/channel-command.c
-> > > > > > > > index 319c5ed..f64db3e 100644
-> > > > > > > > --- a/io/channel-command.c
-> > > > > > > > +++ b/io/channel-command.c
-> > > > > > > > @@ -177,11 +177,11 @@ static int qio_channel_command_abor=
-t(QIOChannelCommand *ioc,
-> > > > > > > >              return -1;
-> > > > > > > >          }
-> > > > > > > >      } else if (ret =3D=3D 0) {
-> > > > > > > > -        if (step =3D=3D 0) {
-> > > > > > > > +        if (step =3D=3D 4) {
-> > > > > > > >              kill(ioc->pid, SIGTERM);
-> > > > > > > > -        } else if (step =3D=3D 1) {
-> > > > > > > > +        } else if (step =3D=3D 8) {
-> > > > > > > >              kill(ioc->pid, SIGKILL);
-> > > > > > > > -        } else {
-> > > > > > > > +        } else if (step >=3D 9) {
-> > > > > > >=20
-> > > > > > > Hmm.  This seems pretty arbitrary; if I understand correctl=
-y you're
-> > > > > > > saying it'll get a SIGTERM after 4 (arbitrary) * 10ms (arbi=
-trary).
-> > > > > > >=20
-> > > > > > > Who is to say that's enough for a scp or gzip or the like?
-> > > > > >=20
-> > > > > > We could conceivably implement the  qio_channel_shutdown() op=
-eration
-> > > > > > for the QIOChannelCommand class. It would merely close the FD=
- to the
-> > > > > > child process, but leave it running. That would give it time =
-to read
-> > > > > > any data still in the pipe from QEMU IIUC.
-> > > > >=20
-> > > > > Yeh that's better; although when would we call shutdown or clos=
-e on it?
-> > > >=20
-> > > > Doesn't QEMU alredy use  shutdown() during the right part of migr=
-ation,
-> > > > or is that only wrt post-copy ?
-> > >=20
-> > > We only use it for cancel and errors, not during the normal behavio=
-ur.
-> >=20
-> > So we could do with shutdown() for sake of post-copy anyway, but for
-> > normal behaviour maybe the right answer is for close() to just wait a
-> > real long time for the child app to exit ?  If we close the pipes, an=
-d
-> > then wait 5 seconds or more before giving up ?
->=20
-> Yes, I'm happier with a much longer arbitrary value than a short
-> arbitrary value; but I do wonder if there's any real need to kill it.
+On Sun, Feb 11, 2018 at 10:36 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> With modular code generation, putting stuff right into
+> qapi-schema.json is a bad idea.  Update writing-qmp-commands.txt
+> accordingly.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-If we don't kill it, then if it gets stuck for some reason it will live
-forever. If we don't kill it but just close the FD, then we still need
-to waitpid at some point otherwise we get a zombie - unless we decide
-to daemonize the child instead ?
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+> ---
+>  docs/devel/writing-qmp-commands.txt | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp=
+-commands.txt
+> index 4f5b24c0c4..776b3b41ca 100644
+> --- a/docs/devel/writing-qmp-commands.txt
+> +++ b/docs/devel/writing-qmp-commands.txt
+> @@ -15,8 +15,8 @@ start with docs/interop/qmp-intro.txt.
+>  Generally speaking, the following steps should be taken in order to writ=
+e a
+>  new QMP command.
+>
+> -1. Write the command's and type(s) specification in the QAPI schema file
+> -   (qapi-schema.json in the root source directory)
+> +1. Define the command and any types it needs in the appropriate QAPI
+> +   schema module.
+>
+>  2. Write the QMP command itself, which is a regular C function. Preferab=
+ly,
+>     the command should be exported by some QEMU subsystem. But it can als=
+o be
+> @@ -88,8 +88,9 @@ command carries some meaningful action in QEMU but here=
+ it will just print
+>  Our command will be called "hello-world". It takes no arguments, nor doe=
+s it
+>  return any data.
+>
+> -The first step is to add the following line to the bottom of the
+> -qapi-schema.json file:
+> +The first step is defining the command in the appropriate QAPI schema
+> +module.  We pick module qapi/misc.json, and add the following line at
+> +the bottom:
+>
+>  { 'command': 'hello-world' }
+>
+> @@ -245,7 +246,7 @@ This is very important. No QMP command will be accept=
+ed in QEMU without proper
+>  documentation.
+>
+>  There are many examples of such documentation in the schema file already=
+, but
+> -here goes "hello-world"'s new entry for the qapi-schema.json file:
+> +here goes "hello-world"'s new entry for qapi/misc.json:
+>
+>  ##
+>  # @hello-world
+> @@ -425,8 +426,7 @@ There are a number of things to be noticed:
+>     allocated by the implementation. This is so because the QAPI also gen=
+erates
+>     a function to free its types and it cannot distinguish between dynami=
+cally
+>     or statically allocated strings
+> -6. You have to include the "qmp-commands.h" header file in qemu-timer.c,
+> -   otherwise qemu won't build
+> +6. You have to include "qapi/qmp-commands-misc.h" in qemu-timer.c
+>
+>  Time to test the new command. Build qemu, run it as described in the "Te=
+sting"
+>  section and try this:
+> --
+> 2.13.6
+>
