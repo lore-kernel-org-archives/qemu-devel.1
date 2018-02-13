@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eldir-00025B-HZ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:46:26 -0500
+	(envelope-from <mst@redhat.com>) id 1eldjh-0002pb-F5
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:47:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eldio-0001Iy-EW
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:46:25 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56164 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1eldje-0001c0-Bc
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:47:17 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50016 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eldio-0001Hq-8N
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:46:22 -0500
-Date: Tue, 13 Feb 2018 18:46:21 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eldje-0001bs-59
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:47:14 -0500
+Date: Tue, 13 Feb 2018 18:47:10 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180213183154-mutt-send-email-mst@kernel.org>
+Message-ID: <20180213184624-mutt-send-email-mst@kernel.org>
 References: <cover.1516538887.git.arei.gonglei@huawei.com>
-	<f50145f0696050167fbfde1656a687d42954f258.1516538887.git.arei.gonglei@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f50145f0696050167fbfde1656a687d42954f258.1516538887.git.arei.gonglei@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] cryptodev: add vhost-user as a new
- cryptodev backend
+In-Reply-To: <cover.1516538887.git.arei.gonglei@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] cryptodev: add vhost support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +29,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Jay Zhou <jianjay.zhou@huawei.com>
 Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
 
-On Sun, Jan 21, 2018 at 08:54:47PM +0800, Jay Zhou wrote:
-> diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
-> new file mode 100644
-> index 0000000..4e63ece
-> --- /dev/null
-> +++ b/backends/cryptodev-vhost-user.c
-> @@ -0,0 +1,333 @@
-> +/*
-> + * QEMU Cryptodev backend for QEMU cipher APIs
-> + *
-> + * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-> + *
-> + * Authors:
-> + *    Gonglei <arei.gonglei@huawei.com>
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/boards.h"
-> +#include "qapi/error.h"
-> +#include "qapi/qmp/qerror.h"
-> +#include "qemu/error-report.h"
-> +#include "standard-headers/linux/virtio_crypto.h"
-> +#include "sysemu/cryptodev-vhost.h"
-> +#include "chardev/char-fe.h"
-> +
-> +
-> +/**
-> + * @TYPE_CRYPTODEV_BACKEND_VHOST_USER:
-> + * name of backend that uses vhost user server
-> + */
-> +#define TYPE_CRYPTODEV_BACKEND_VHOST_USER "cryptodev-vhost-user"
-> +
-> +#define CRYPTODEV_BACKEND_VHOST_USER(obj) \
-> +    OBJECT_CHECK(CryptoDevBackendVhostUser, \
-> +                 (obj), TYPE_CRYPTODEV_BACKEND_VHOST_USER)
-> +
-> +
-> +typedef struct CryptoDevBackendVhostUser {
-> +    CryptoDevBackend parent_obj;
-> +
-> +    CharBackend chr;
-> +    char *chr_name;
-> +    bool opened;
-> +    CryptoDevBackendVhost *vhost_crypto[MAX_CRYPTO_QUEUE_NUM];
-> +} CryptoDevBackendVhostUser;
-> +
-> +static int
-> +cryptodev_vhost_user_running(
-> +             CryptoDevBackendVhost *crypto)
-> +{
-> +    return crypto ? 1 : 0;
-> +}
-> +
-> +static void cryptodev_vhost_user_stop(int queues,
-> +                          CryptoDevBackendVhostUser *s)
-> +{
-> +    size_t i;
-> +
-> +    for (i = 0; i < queues; i++) {
-> +        if (!cryptodev_vhost_user_running(s->vhost_crypto[i])) {
-> +            continue;
-> +        }
-> +
-> +        if (s->vhost_crypto) {
-> +            cryptodev_vhost_cleanup(s->vhost_crypto[i]);
-> +            s->vhost_crypto[i] = NULL;
-> +        }
-> +    }
-> +}
+On Sun, Jan 21, 2018 at 08:54:46PM +0800, Jay Zhou wrote:
+> From: Gonglei <arei.gonglei@huawei.com>
+> 
+> I posted the RFC verion a few months ago for DPDK
+> vhost-crypto implmention, and now it's time to send
+> the formal version. Because we need an user space scheme
+> for better performance.
+> 
+> The vhost user crypto server side patches had been
+> sent to DPDK community, pls see
 
-This test is problematic: clang build triggers an error:
-> /home/petmay01/linaro/qemu-for-merges/backends/cryptodev-vhost-user.c:86:16:
-> error: address of array 's->vhost_crypto' will always evaluate to
-> 'true' [-Werror,-Wpointer-bool-conversion]
->         if (s->vhost_crypto) {
->         ~~  ~~~^~~~~~~~~~~~
+I dropped the patchset from the latest pull request.
+Please address the issues found, test stop path some more
+and resumit.
 
-I really don't see how this could do the right thing, which
-makes me suspect that either you did not test stop, or
-you always have all queues enabled.
+Thanks!
 
-Pls test a config with some queues disabled.
-
-In particular this machinery needs some unit tests
-to catch errors like this.
-
-
--- 
-MST
+> [RFC PATCH 0/6] lib/librte_vhost: introduce new vhost_user crypto backend
+> support
+> http://dpdk.org/ml/archives/dev/2017-November/081048.html
+> 
+> You also can get virtio-crypto polling mode driver from:
+> 
+> [PATCH] virtio: add new driver for crypto devices
+> http://dpdk.org/ml/archives/dev/2017-November/081985.html
+> 
+> v5 -> v6:
+>   Fix compile error about backends/cryptodev-vhost-user.o and rebase on
+>   the master
+> v4 -> v5:
+>   squash [PATCH v4 5/5] into previous patches [Michael]
+> v3 -> v4:
+>   "[PATCH v4 5/5] cryptodev-vhost-user: depend on CONFIG_VHOST_CRYPTO
+>   and CONFIG_VHOST_USER" newly added to fix compilation dependency [Michael]
+> v2 -> v3:
+>   New added vhost user messages should be sent only when feature
+>   has been successfully negotiated [Michael]
+> v1 -> v2:
+>   Fix compile error on mingw32
+> 
+> Gonglei (4):
+>   cryptodev: add vhost-user as a new cryptodev backend
+>   cryptodev: add vhost support
+>   cryptodev-vhost-user: add crypto session handler
+>   cryptodev-vhost-user: set the key length
+> 
+>  backends/Makefile.objs                |   6 +
+>  backends/cryptodev-builtin.c          |   1 +
+>  backends/cryptodev-vhost-user.c       | 379 ++++++++++++++++++++++++++++++++++
+>  backends/cryptodev-vhost.c            | 347 +++++++++++++++++++++++++++++++
+>  configure                             |  15 ++
+>  docs/interop/vhost-user.txt           |  26 +++
+>  hw/virtio/Makefile.objs               |   2 +-
+>  hw/virtio/vhost-user.c                | 104 ++++++++++
+>  hw/virtio/virtio-crypto.c             |  70 +++++++
+>  include/hw/virtio/vhost-backend.h     |   8 +
+>  include/hw/virtio/virtio-crypto.h     |   1 +
+>  include/sysemu/cryptodev-vhost-user.h |  47 +++++
+>  include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
+>  include/sysemu/cryptodev.h            |   8 +
+>  qemu-options.hx                       |  21 ++
+>  vl.c                                  |   6 +
+>  16 files changed, 1194 insertions(+), 1 deletion(-)
+>  create mode 100644 backends/cryptodev-vhost-user.c
+>  create mode 100644 backends/cryptodev-vhost.c
+>  create mode 100644 include/sysemu/cryptodev-vhost-user.h
+>  create mode 100644 include/sysemu/cryptodev-vhost.h
+> 
+> --
+> 1.8.3.1
+> 
