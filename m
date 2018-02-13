@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elYUW-0000g1-28
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:11:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1elYZO-0003CA-35
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elYUR-0005oh-W8
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:11:16 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58734 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elYUR-0005oQ-Rl
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:11:11 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 164538182D2E
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 11:11:00 +0000 (UTC)
-Date: Tue, 13 Feb 2018 11:10:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180213111052.GB2378@work-vm>
-References: <20180209104546.29401-1-pbonzini@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1elYZN-0000aN-4y
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:18 -0500
+Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:36539)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1elYZM-0000Zx-VV
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 06:16:17 -0500
+Received: by mail-oi0-x22d.google.com with SMTP id 24so13611593oij.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 03:16:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180209104546.29401-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] tcg: fix dirty bitmap race with MTTCG
+In-Reply-To: <d23a2730-a103-6336-0658-e12fa9b0193f@lauterbach.com>
+References: <d23a2730-a103-6336-0658-e12fa9b0193f@lauterbach.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Feb 2018 11:15:55 +0000
+Message-ID: <CAFEAcA-tc+-+KLcMPB=BV0zCmO6t7tuKHM4=kyRf_Xx0aCCidA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V2] target-arm:Add a dynamic
+ XML-description of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> This is a race that can happen when migrating TCG guests under load.
-> It was introduced by the change to run vCPUs outside the big QEMU lock.
+On 30 January 2018 at 11:16, Abdallah Bouassida
+<abdallah.bouassida@lauterbach.com> wrote:
+> [PATCH V2] target-arm:Add a dynamic XML-description of the cp-registers to
+> GDB
+>
+> This patch offers to GDB the ability to read/write all the coprocessor
+> registers for ARM and ARM64 by generating dynamically an XML-description for
+> these registers.
+>
+> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+> ---
+>
 
-That does seem to fix the case I was seeing on x86;
+Hi. I tried applying this patch to review it, but unfortunately your
+email client has made a complete mess of it. In particular:
+ * it is wrapping long lines
+ * it is converting all the leading space characters to unicode
+   non-breaking space characters
 
-rmmod kvm-intel
-taskset -c 0 bash
-export QTEST_QEMU_BINARY=$PWD/x86_64-softmmu/qemu-system-x86_64
-for S in $(seq 1 10); do ./tests/migration-test & done
+which means that it won't apply. Can you resend using something that
+doesn't mangle plaintext, please?
 
-that would throw a :
-'Memory content inconsistency'
-
-most times (may have to increase the 10 to get it to do it
-every time?)
-
-Dave
-
-
-> Paolo Bonzini (4):
->   memory: remove memory_region_test_and_clear_dirty
->   memory: hide memory_region_sync_dirty_bitmap behind
->     DirtyBitmapSnapshot
->   memory: introduce memory_global_after_dirty_log_sync
->   memory: unify loops to sync dirty log bitmap
-> 
->  exec.c                       | 31 ++++++++++++++++++
->  hw/display/cg3.c             |  1 -
->  hw/display/exynos4210_fimd.c |  1 -
->  hw/display/framebuffer.c     |  1 -
->  hw/display/g364fb.c          |  1 -
->  hw/display/sm501.c           |  1 -
->  hw/display/tcx.c             |  2 --
->  hw/display/vga.c             |  6 ----
->  include/exec/memory.h        | 47 +++++++++------------------
->  memory.c                     | 76 +++++++++++++++++---------------------------
->  migration/ram.c              |  1 +
->  11 files changed, 76 insertions(+), 92 deletions(-)
-> 
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
