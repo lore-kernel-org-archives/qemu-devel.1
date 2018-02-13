@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTe-0002Fl-E9
+	(envelope-from <stefanha@redhat.com>) id 1eleTe-0002Fn-Ep
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTc-0003C7-KD
+	(envelope-from <stefanha@redhat.com>) id 1eleTa-0003BC-GB
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:46 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51834 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39062 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTc-0003Bu-GB
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:44 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTa-0003Ac-Bk
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:42 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 13 Feb 2018 17:34:27 +0000
-Message-Id: <20180213173429.19501-4-stefanha@redhat.com>
+Date: Tue, 13 Feb 2018 17:34:25 +0000
+Message-Id: <20180213173429.19501-2-stefanha@redhat.com>
 In-Reply-To: <20180213173429.19501-1-stefanha@redhat.com>
 References: <20180213173429.19501-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] vl: pause vcpus before stopping iothreads
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 1/5] Add a git-publish configuration file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +27,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Commit dce8921b2baaf95974af8176406881872067adfa ("iothread: Stop threads
-before main() quits") introduced iothread_stop_all() to avoid the
-following virtio-scsi assertion failure:
+From: Fam Zheng <famz@redhat.com>
 
-  assert(blk_get_aio_context(d->conf.blk) == s->ctx);
+git-publish [1] is a convenient tool to send patches and has been
+popular among QEMU developers.  Recently it has been made available in
+Fedora official repo thanks to Stefan's work.
 
-Back then the assertion failed because when bdrv_close_all() made
-d->conf.blk NULL, blk_get_aio_context() returned the global AioContext
-instead of s->ctx.
+One nice feature of the tool is a per-project configuration with
+profiles, especially in which the cccmd option is a handy method to
+create the Cc list.
 
-The same assertion can still fail today when vcpus submit new I/O
-requests after iothread_stop_all() has moved the BDS to the global
-AioContext.
+[1]: https://github.com/stefanha/git-publish
 
-This patch hardens the iothread_stop_all() approach by pausing vcpus
-before calling iothread_stop_all().
-
-Note that the assertion failure is a race condition.  It is not possible
-to reproduce it reliably.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20180201110708.8080-1-stefanha@redhat.com
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20180205054725.25634-2-famz@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- vl.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ .gitpublish | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
++++
+ 1 file changed, 58 insertions(+)
+ create mode 100644 .gitpublish
 
-diff --git a/vl.c b/vl.c
-index 21878496ec..7a5554bc41 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4767,10 +4767,18 @@ int main(int argc, char **argv, char **envp)
- 
-     main_loop();
-     replay_disable_events();
+diff --git a/.gitpublish b/.gitpublish
+new file mode 100644
+index 0000000000..ed48f6e52c
+--- /dev/null
++++ b/.gitpublish
+@@ -0,0 +1,58 @@
++#
++# Common git-publish profiles that can be used to send patches to QEMU u=
+pstream.
++#
++# See https://github.com/stefanha/git-publish for more information
++#
++[gitpublishprofile "default"]
++base =3D master
++prefix =3D PATCH
++to =3D qemu-devel@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
 +
-+    /* The ordering of the following is delicate.  Stop vcpus to prevent new
-+     * I/O requests being queued by the guest.  Then stop IOThreads (this
-+     * includes a drain operation and completes all request processing).  At
-+     * this point emulated devices are still associated with their IOThreads
-+     * (if any) but no longer have any work to do.  Only then can we close
-+     * block devices safely because we know there is no more I/O coming.
-+     */
-+    pause_all_vcpus();
-     iothread_stop_all();
--
--    pause_all_vcpus();
-     bdrv_close_all();
++[gitpublishprofile "rfc"]
++base =3D master
++prefix =3D RFC PATCH
++to =3D qemu-devel@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
 +
-     res_free();
- 
-     /* vhost-user must be cleaned up before chardevs.  */
--- 
++[gitpublishprofile "stable"]
++base =3D master
++prefix =3D PATCH
++to =3D qemu-devel@nongnu.org
++cc =3D qemu-stable@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
++
++[gitpublishprofile "trivial"]
++base =3D master
++prefix =3D PATCH
++to =3D qemu-devel@nongnu.org
++cc =3D qemu-trivial@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
++
++[gitpublishprofile "block"]
++base =3D master
++prefix =3D PATCH
++to =3D qemu-devel@nongnu.org
++cc =3D qemu-block@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
++
++[gitpublishprofile "arm"]
++base =3D master
++prefix =3D PATCH
++to =3D qemu-devel@nongnu.org
++cc =3D qemu-arm@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
++
++[gitpublishprofile "s390"]
++base =3D master
++prefix =3D PATCH
++to =3D qemu-devel@nongnu.org
++cc =3D qemu-s390@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
++
++[gitpublishprofile "ppc"]
++base =3D master
++prefix =3D PATCH
++to =3D qemu-devel@nongnu.org
++cc =3D qemu-ppc@nongnu.org
++cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+--=20
 2.14.3
