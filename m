@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elclo-0006Z0-6R
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:45:25 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1elcq5-0001YZ-KZ
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:49:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elcll-0004fq-Ru
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:45:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48232 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1elcq2-0004ne-B8
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:49:49 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47648 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elclk-0004cD-Vy
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:45:21 -0500
-Date: Tue, 13 Feb 2018 15:45:08 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elcq2-0004nO-4q
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 10:49:46 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B1524EAEB0
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 15:49:45 +0000 (UTC)
+Date: Tue, 13 Feb 2018 15:49:42 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180213154508.GK2378@work-vm>
-References: <20180212153715.87555-1-brijesh.singh@amd.com>
-	<20180212153715.87555-6-brijesh.singh@amd.com>
-	<20180212183803.GR13981@localhost.localdomain>
-	<4a1f22d9-da2e-618b-1423-629817389948@amd.com>
-	<20180212211948.GK14422@pd.tnic>
-	<CA+HCGMYvh081neh=aF45qG0WF2vpJwkZ4unnLPLwhEkDNPWZsQ@mail.gmail.com>
+Message-ID: <20180213154942.GL2378@work-vm>
+References: <1518531279-11966-1-git-send-email-thuth@redhat.com>
+	<20180213150911.GG2378@work-vm> <20180213151125.GQ573@redhat.com>
+	<20180213152529.GH2378@work-vm> <20180213152753.GR573@redhat.com>
+	<20180213154145.GJ2378@work-vm> <20180213154512.GT573@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CA+HCGMYvh081neh=aF45qG0WF2vpJwkZ4unnLPLwhEkDNPWZsQ@mail.gmail.com>
+In-Reply-To: <20180213154512.GT573@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 05/28] target/i386: add memory
- encryption feature cpuid support
+Subject: Re: [Qemu-devel] [PATCH] io/channel-command: Delay the killing of
+ the child after closing the pipe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +37,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.ksingh@gmail.com>
-Cc: Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Stefan Hajnoczi <stefanha@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Alistair Francis <alistair.francis@xilinx.com>, Bruce Rogers <brogers@suse.com>, Richard Henderson <rth@twiddle.net>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-* Brijesh Singh (brijesh.ksingh@gmail.com) wrote:
-> On Mon, Feb 12, 2018 at 3:19 PM, Borislav Petkov <bp@suse.de> wrote:
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Tue, Feb 13, 2018 at 03:41:45PM +0000, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > On Tue, Feb 13, 2018 at 03:25:30PM +0000, Dr. David Alan Gilbert wr=
+ote:
+> > > > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > > > On Tue, Feb 13, 2018 at 03:09:12PM +0000, Dr. David Alan Gilber=
+t wrote:
+> > > > > > * Thomas Huth (thuth@redhat.com) wrote:
+> > > > > > > We are currently facing some migration failure on s390x whe=
+n running
+> > > > > > > certain avocado tests, e.g. when running the test
+> > > > > > > type_specific.io-github-autotest-qemu.migrate.with_reboot.e=
+xec.gzip_exec.
+> > > > > > > This test is using 'migrate -d "exec:nc localhost 5200"' fo=
+r the migration.
+> > > > > > > The problem is detected at the receiving side, where the mi=
+gration stream
+> > > > > > > apparently ends too early. However, the cause for the probl=
+em is the
+> > > > > > > sending side: After writing the migration stream into the p=
+ipe to netcat,
+> > > > > > > the source QEMU calls qio_channel_command_close() which clo=
+ses the pipe
+> > > > > > > and immediately (!) kills the child process afterwards. So =
+if the
+> > > > > > > sending netcat did not read the final bytes from the pipe y=
+et, or
+> > > > > > > if it did not manage to send out all its buffers yet, it is=
+ killed
+> > > > > > > before the whole migration stream is passed to the destinat=
+ion side.
+> > > > > >=20
+> > > > > > Thanks for tracking that down!
+> > > > > >=20
+> > > > > > > To ease the situation at least a little bit, we should give=
+ the child
+> > > > > > > process at least some few more time slices before we kill i=
+t with
+> > > > > > > SIGTERM and then with SIGKILL. With this change, the avocad=
+o test now
+> > > > > > > succeeds here in 10 out of 10 runs.
+> > > > > > >=20
+> > > > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > > > > ---
+> > > > > > >  io/channel-command.c | 6 +++---
+> > > > > > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > > > > >=20
+> > > > > > > diff --git a/io/channel-command.c b/io/channel-command.c
+> > > > > > > index 319c5ed..f64db3e 100644
+> > > > > > > --- a/io/channel-command.c
+> > > > > > > +++ b/io/channel-command.c
+> > > > > > > @@ -177,11 +177,11 @@ static int qio_channel_command_abort(=
+QIOChannelCommand *ioc,
+> > > > > > >              return -1;
+> > > > > > >          }
+> > > > > > >      } else if (ret =3D=3D 0) {
+> > > > > > > -        if (step =3D=3D 0) {
+> > > > > > > +        if (step =3D=3D 4) {
+> > > > > > >              kill(ioc->pid, SIGTERM);
+> > > > > > > -        } else if (step =3D=3D 1) {
+> > > > > > > +        } else if (step =3D=3D 8) {
+> > > > > > >              kill(ioc->pid, SIGKILL);
+> > > > > > > -        } else {
+> > > > > > > +        } else if (step >=3D 9) {
+> > > > > >=20
+> > > > > > Hmm.  This seems pretty arbitrary; if I understand correctly =
+you're
+> > > > > > saying it'll get a SIGTERM after 4 (arbitrary) * 10ms (arbitr=
+ary).
+> > > > > >=20
+> > > > > > Who is to say that's enough for a scp or gzip or the like?
+> > > > >=20
+> > > > > We could conceivably implement the  qio_channel_shutdown() oper=
+ation
+> > > > > for the QIOChannelCommand class. It would merely close the FD t=
+o the
+> > > > > child process, but leave it running. That would give it time to=
+ read
+> > > > > any data still in the pipe from QEMU IIUC.
+> > > >=20
+> > > > Yeh that's better; although when would we call shutdown or close =
+on it?
+> > >=20
+> > > Doesn't QEMU alredy use  shutdown() during the right part of migrat=
+ion,
+> > > or is that only wrt post-copy ?
+> >=20
+> > We only use it for cancel and errors, not during the normal behaviour=
+.
 >=20
-> > On Mon, Feb 12, 2018 at 03:07:26PM -0600, Brijesh Singh wrote:
-> > > In current implementation, when -cpu ...,+sev is passed without
-> > > appropriate SEV configuration then we populate the Fn8000_001F CPUI=
-D but
-> > > VMCB will not have SEV bit set hence a guest will be launched as
-> > > non-SEV.
-> >
-> > I think we should fail the guest init if sev is not really supported =
-by
-> > the host. Otherwise people might get mislead.
-> >
-> >
->=20
-> Sure I will do that. We can simplify this patch if we don't fill the CP=
-UID
-> for non SEV guest. I am thinking of doing something like this:
->=20
-> "If SEV configration is provided in QEMU command line then
-> automatically increase xlevel to 0x8000_001F and populate the EAX and E=
-BX
-> registers"
->=20
->=20
->=20
-> > > > Changing existing CPU models is possible only on very specific
-> > > > circumstances (where VMs that are currently runnable would always
-> > > > stay runnable), and would require compat_props entries to keep
-> > > > compatibility on existing machine-types.
-> > >
-> > > Ah I didn't consider that case. What is recommendation, should we c=
-reate
-> > > a new CPU Model (EPYC-SEV) ?
-> >
-> > Can we please stop creating a new CPU model with every new CPUID feat=
-ure
-> > support added? This is just ridiculous.
-> >
-> > If this is about live migration, then by all means, fail the migratio=
-n
-> > if the feature bits are not compatible. But replicating CPU models an=
-d
-> > then adding one new differing feature doesn't make any sense.
-> >
-> >
-> Yes, I think we should be able to avoid creating new CPU model to handl=
-e
-> this case.
-> I am leaning towards dropping this patch and implement logic to populat=
-e the
-> CPUID 0x8000_001F only when SEV is enabled. This should not require any
-> changes
-> in existing CPU model feature flag and live migration of existing guest
-> should work fine.
+> So we could do with shutdown() for sake of post-copy anyway, but for
+> normal behaviour maybe the right answer is for close() to just wait a
+> real long time for the child app to exit ?  If we close the pipes, and
+> then wait 5 seconds or more before giving up ?
 
-Take care that a non-SEV guest works migrating from a SEV-enabled host
-back to a non-SEV-enabled host.  Similarly a guest that understands SEV
-but you aren't going to enable it for this VM.
+Yes, I'm happier with a much longer arbitrary value than a short
+arbitrary value; but I do wonder if there's any real need to kill it.
 
 Dave
 
->=20
->=20
-> > --
-> > Regards/Gruss,
-> >     Boris.
-> >
-> > SUSE Linux GmbH, GF: Felix Imend=F6rffer, Jane Smithard, Graham Norto=
-n, HRB
-> > 21284 (AG N=FCrnberg)
-> > --
-> >
-> >
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
