@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTe-0002Fn-Ep
+	(envelope-from <stefanha@redhat.com>) id 1eleTe-0002Fk-Dm
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTa-0003BC-GB
+	(envelope-from <stefanha@redhat.com>) id 1eleTa-0003BR-RG
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:46 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39062 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57508 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTa-0003Ac-Bk
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTa-0003B4-MU
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:42 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 13 Feb 2018 17:34:25 +0000
-Message-Id: <20180213173429.19501-2-stefanha@redhat.com>
+Date: Tue, 13 Feb 2018 17:34:26 +0000
+Message-Id: <20180213173429.19501-3-stefanha@redhat.com>
 In-Reply-To: <20180213173429.19501-1-stefanha@redhat.com>
 References: <20180213173429.19501-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/5] Add a git-publish configuration file
+Subject: [Qemu-devel] [PATCH 2/5] README: Document 'git-publish' workflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +31,66 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
 
 From: Fam Zheng <famz@redhat.com>
 
-git-publish [1] is a convenient tool to send patches and has been
-popular among QEMU developers.  Recently it has been made available in
-Fedora official repo thanks to Stefan's work.
-
-One nice feature of the tool is a per-project configuration with
-profiles, especially in which the cccmd option is a handy method to
-create the Cc list.
-
-[1]: https://github.com/stefanha/git-publish
+[Fixed s/git-profile/git-publish/ typo and s/for once/the first time/.
+--Stefan]
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20180205054725.25634-2-famz@redhat.com
+Message-id: 20180205054725.25634-3-famz@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- .gitpublish | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++
- 1 file changed, 58 insertions(+)
- create mode 100644 .gitpublish
+ README | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/.gitpublish b/.gitpublish
-new file mode 100644
-index 0000000000..ed48f6e52c
---- /dev/null
-+++ b/.gitpublish
-@@ -0,0 +1,58 @@
-+#
-+# Common git-publish profiles that can be used to send patches to QEMU u=
-pstream.
-+#
-+# See https://github.com/stefanha/git-publish for more information
-+#
-+[gitpublishprofile "default"]
-+base =3D master
-+prefix =3D PATCH
-+to =3D qemu-devel@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
+diff --git a/README b/README
+index 2c8e1c8cc4..627633fe1d 100644
+--- a/README
++++ b/README
+@@ -56,12 +56,41 @@ The QEMU source code is maintained under the GIT vers=
+ion control system.
+=20
+    git clone git://git.qemu.org/qemu.git
+=20
+-When submitting patches, the preferred approach is to use 'git
++When submitting patches, one common approach is to use 'git
+ format-patch' and/or 'git send-email' to format & send the mail to the
+ qemu-devel@nongnu.org mailing list. All patches submitted must contain
+ a 'Signed-off-by' line from the author. Patches should follow the
+ guidelines set out in the HACKING and CODING_STYLE files.
+=20
++A 'git-publish' utility was created to make above process less
++cumbersome, and is highly recommended for making regular contributions,
++or even just for sending consecutive patch series revisions. It also
++requires a working 'git send-email' setup, and by default doesn't
++automate everything, so you may want to go through the above steps
++manually the first time.
 +
-+[gitpublishprofile "rfc"]
-+base =3D master
-+prefix =3D RFC PATCH
-+to =3D qemu-devel@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
++For installation instructions, please go to
 +
-+[gitpublishprofile "stable"]
-+base =3D master
-+prefix =3D PATCH
-+to =3D qemu-devel@nongnu.org
-+cc =3D qemu-stable@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
++  https://github.com/stefanha/git-publish
 +
-+[gitpublishprofile "trivial"]
-+base =3D master
-+prefix =3D PATCH
-+to =3D qemu-devel@nongnu.org
-+cc =3D qemu-trivial@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
++The workflow with 'git-publish' is:
 +
-+[gitpublishprofile "block"]
-+base =3D master
-+prefix =3D PATCH
-+to =3D qemu-devel@nongnu.org
-+cc =3D qemu-block@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
++  $ git checkout master -b my-feature
++  $ # work on new commits, add your 'Signed-off-by' lines to each
++  $ git publish
 +
-+[gitpublishprofile "arm"]
-+base =3D master
-+prefix =3D PATCH
-+to =3D qemu-devel@nongnu.org
-+cc =3D qemu-arm@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
++Your patch series will be sent and tagged as my-feature-v1 if you need t=
+o refer
++back to it in the future.
 +
-+[gitpublishprofile "s390"]
-+base =3D master
-+prefix =3D PATCH
-+to =3D qemu-devel@nongnu.org
-+cc =3D qemu-s390@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
++Sending v2:
 +
-+[gitpublishprofile "ppc"]
-+base =3D master
-+prefix =3D PATCH
-+to =3D qemu-devel@nongnu.org
-+cc =3D qemu-ppc@nongnu.org
-+cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
++  $ git checkout my-feature # same topic branch
++  $ # making changes to the commits (using 'git rebase', for example)
++  $ git publish
++
++Your patch series will be sent with 'v2' tag in the subject and the git =
+tip
++will be tagged as my-feature-v2.
++
+ Additional information on submitting patches can be found online via
+ the QEMU website
+=20
 --=20
 2.14.3
