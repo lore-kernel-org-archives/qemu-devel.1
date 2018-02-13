@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1i-0002w8-Dd
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1j-0002yO-9b
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1h-0005KC-Es
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1i-0005M1-Dw
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:55 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:47 +0100
-Message-Id: <20180213170529.10858-14-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:51 +0100
+Message-Id: <20180213170529.10858-18-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 13/55] sheepdog: Make sd_prealloc() take a BDS
+Subject: [Qemu-devel] [PULL 17/55] qcow2: Fix documentation of
+ get_cluster_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +23,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-We want to use this function in sd_truncate() later on, so taking a
-filename is not exactly ideal.
+This function has not been returning the offset of the L2 table since
+commit 3948d1d4876065160583e79533bf604481063833
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: b498733b6706a859a03678d74ecbd26aeba129aa.1517840876.git.berto@igalia.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/sheepdog.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ block/qcow2-cluster.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index af125a2c8d..cc1d37b3da 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1826,10 +1826,10 @@ static int do_sd_create(BDRVSheepdogState *s, uint32_t *vdi_id, int snapshot,
-     return 0;
- }
- 
--static int sd_prealloc(const char *filename, Error **errp)
-+static int sd_prealloc(BlockDriverState *bs, Error **errp)
- {
-     BlockBackend *blk = NULL;
--    BDRVSheepdogState *base = NULL;
-+    BDRVSheepdogState *base = bs->opaque;
-     unsigned long buf_size;
-     uint32_t idx, max_idx;
-     uint32_t object_size;
-@@ -1837,10 +1837,11 @@ static int sd_prealloc(const char *filename, Error **errp)
-     void *buf = NULL;
-     int ret;
- 
--    blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
--    if (blk == NULL) {
--        ret = -EIO;
-+    blk = blk_new(BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_PERM_RESIZE,
-+                  BLK_PERM_ALL);
-+
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-         goto out_with_err_set;
-     }
- 
-@@ -1852,7 +1853,6 @@ static int sd_prealloc(const char *filename, Error **errp)
-         goto out;
-     }
- 
--    base = blk_bs(blk)->opaque;
-     object_size = (UINT32_C(1) << base->inode.block_size_shift);
-     buf_size = MIN(object_size, SD_DATA_OBJ_SIZE);
-     buf = g_malloc0(buf_size);
-@@ -2108,7 +2108,20 @@ static int sd_create(const char *filename, QemuOpts *opts,
-     }
- 
-     if (prealloc) {
--        ret = sd_prealloc(filename, errp);
-+        BlockDriverState *bs;
-+        QDict *opts;
-+
-+        opts = qdict_new();
-+        qdict_put_str(opts, "driver", "sheepdog");
-+        bs = bdrv_open(filename, NULL, opts, BDRV_O_PROTOCOL | BDRV_O_RDWR,
-+                       errp);
-+        if (!bs) {
-+            goto out;
-+        }
-+
-+        ret = sd_prealloc(bs, errp);
-+
-+        bdrv_unref(bs);
-     }
- out:
-     g_free(backing_file);
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index f077cd3ac5..e5ab102c29 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -647,8 +647,7 @@ fail:
+  * for a given disk offset, load (and allocate if needed)
+  * the l2 table.
+  *
+- * the l2 table offset in the qcow2 file and the cluster index
+- * in the l2 table are given to the caller.
++ * the cluster index in the l2 table is given to the caller.
+  *
+  * Returns 0 on success, -errno in failure case
+  */
 -- 
 2.13.6
