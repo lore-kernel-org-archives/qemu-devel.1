@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1d-0002oM-Us
+	(envelope-from <kwolf@redhat.com>) id 1ele1d-0002oL-UT
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005Ft-JW
+	(envelope-from <kwolf@redhat.com>) id 1ele1c-0005G2-QQ
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:49 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:42 +0100
-Message-Id: <20180213170529.10858-9-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:44 +0100
+Message-Id: <20180213170529.10858-11-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 08/55] qemu-io: fix EOF Ctrl-D handling in
- qemu-io readline code
+Subject: [Qemu-devel] [PULL 10/55] gluster: Pull truncation from
+ qemu_gluster_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +23,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
-done and thus getchar() will never return the EOF constant. Instead we have to
-query the TTY attributes to determine the configured EOF character (usually
-Ctrl-D / 0x4), and then explicitly check for that value. This fixes the
-regression that prevented Ctrl-D from triggering an exit of qemu-io that has
-existed since readline was first added in
+Pull out the truncation code from the qemu_cluster_create() function so
+we can later reuse it in qemu_gluster_truncate().
 
-  commit 0cf17e181798063c3824c8200ba46f25f54faa1a
-  Author: Stefan Hajnoczi <stefanha@redhat.com>
-  Date:   Thu Nov 14 11:54:17 2013 +0100
-
-    qemu-io: use readline.c
-
-It also ensures that a newline is printed when exiting, to complete the
-line output by the "qemu-io> " prompt.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-io.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ block/gluster.c | 74 +++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 40 insertions(+), 34 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index f554ab614b..2c00ea068e 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -11,6 +11,9 @@
- #include "qemu/osdep.h"
- #include <getopt.h>
- #include <libgen.h>
-+#ifndef _WIN32
-+#include <termios.h>
-+#endif
+diff --git a/block/gluster.c b/block/gluster.c
+index 7fab2dfa12..8178541416 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -965,6 +965,45 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
+ }
+ #endif
  
- #include "qapi/error.h"
- #include "qemu-io.h"
-@@ -42,6 +45,26 @@ static bool imageOpts;
- 
- static ReadLineState *readline_state;
- 
-+static int ttyEOF;
-+
-+static int get_eof_char(void)
++static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
++                                    PreallocMode prealloc, Error **errp)
 +{
-+#ifdef _WIN32
-+    return 0x4; /* Ctrl-D */
-+#else
-+    struct termios tty;
-+    if (tcgetattr(STDIN_FILENO, &tty) != 0) {
-+        if (errno == ENOTTY) {
-+            return 0x0; /* just expect read() == 0 */
-+        } else {
-+            return 0x4; /* Ctrl-D */
++    switch (prealloc) {
++#ifdef CONFIG_GLUSTERFS_FALLOCATE
++    case PREALLOC_MODE_FALLOC:
++        if (glfs_fallocate(fd, 0, 0, offset)) {
++            error_setg_errno(errp, errno, "Could not preallocate data");
++            return -errno;
 +        }
++        break;
++#endif /* CONFIG_GLUSTERFS_FALLOCATE */
++#ifdef CONFIG_GLUSTERFS_ZEROFILL
++    case PREALLOC_MODE_FULL:
++        if (glfs_ftruncate(fd, offset)) {
++            error_setg_errno(errp, errno, "Could not resize file");
++            return -errno;
++        }
++        if (glfs_zerofill(fd, 0, offset)) {
++            error_setg_errno(errp, errno, "Could not zerofill the new area");
++            return -errno;
++        }
++        break;
++#endif /* CONFIG_GLUSTERFS_ZEROFILL */
++    case PREALLOC_MODE_OFF:
++        if (glfs_ftruncate(fd, offset)) {
++            error_setg_errno(errp, errno, "Could not resize file");
++            return -errno;
++        }
++        break;
++    default:
++        error_setg(errp, "Unsupported preallocation mode: %s",
++                   PreallocMode_str(prealloc));
++        return -EINVAL;
 +    }
 +
-+    return tty.c_cc[VEOF];
-+#endif
++    return 0;
 +}
 +
- static int close_f(BlockBackend *blk, int argc, char **argv)
+ static int qemu_gluster_create(const char *filename,
+                                QemuOpts *opts, Error **errp)
  {
-     blk_unref(qemuio_blk);
-@@ -323,7 +346,8 @@ static char *fetchline_readline(void)
-     readline_start(readline_state, get_prompt(), 0, readline_func, &line);
-     while (!line) {
-         int ch = getchar();
--        if (ch == EOF) {
-+        if (ttyEOF != 0x0 && ch == ttyEOF) {
-+            printf("\n");
-             break;
-         }
-         readline_handle_byte(readline_state, ch);
-@@ -593,6 +617,7 @@ int main(int argc, char **argv)
-     qemuio_add_command(&close_cmd);
+@@ -1019,40 +1058,7 @@ static int qemu_gluster_create(const char *filename,
+         goto out;
+     }
  
-     if (isatty(STDIN_FILENO)) {
-+        ttyEOF = get_eof_char();
-         readline_state = readline_init(readline_printf_func,
-                                        readline_flush_func,
-                                        NULL,
+-    switch (prealloc) {
+-#ifdef CONFIG_GLUSTERFS_FALLOCATE
+-    case PREALLOC_MODE_FALLOC:
+-        if (glfs_fallocate(fd, 0, 0, total_size)) {
+-            error_setg(errp, "Could not preallocate data for the new file");
+-            ret = -errno;
+-        }
+-        break;
+-#endif /* CONFIG_GLUSTERFS_FALLOCATE */
+-#ifdef CONFIG_GLUSTERFS_ZEROFILL
+-    case PREALLOC_MODE_FULL:
+-        if (!glfs_ftruncate(fd, total_size)) {
+-            if (glfs_zerofill(fd, 0, total_size)) {
+-                error_setg(errp, "Could not zerofill the new file");
+-                ret = -errno;
+-            }
+-        } else {
+-            error_setg(errp, "Could not resize file");
+-            ret = -errno;
+-        }
+-        break;
+-#endif /* CONFIG_GLUSTERFS_ZEROFILL */
+-    case PREALLOC_MODE_OFF:
+-        if (glfs_ftruncate(fd, total_size) != 0) {
+-            ret = -errno;
+-            error_setg(errp, "Could not resize file");
+-        }
+-        break;
+-    default:
+-        ret = -EINVAL;
+-        error_setg(errp, "Unsupported preallocation mode: %s",
+-                   PreallocMode_str(prealloc));
+-        break;
+-    }
++    ret = qemu_gluster_do_truncate(fd, total_size, prealloc, errp);
+ 
+ out:
+     if (fd) {
 -- 
 2.13.6
