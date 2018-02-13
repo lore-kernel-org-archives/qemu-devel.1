@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elaeO-0005y7-Fb
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:37 -0500
+	(envelope-from <lersek@redhat.com>) id 1elagj-0007vm-Le
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:32:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elaeN-0001fT-1F
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48466)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1elaeM-0001fF-Rg
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1elaeM-00021j-01
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 13:29:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F35832E80C3
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 13:29:33 +0000 (UTC)
+	(envelope-from <lersek@redhat.com>) id 1elagg-0002cS-Bv
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:32:01 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42666 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1elagg-0002Za-5M
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:31:58 -0500
+References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
+	<20180212194531.GA26349@morn.lan>
+	<5345fb74-02cf-9793-78d7-490e5e77ad27@linux.vnet.ibm.com>
+	<20180213135739.3fd6fad6@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <46a90b58-33e0-d17b-e81a-98d10f73a957@redhat.com>
+Date: Tue, 13 Feb 2018 14:31:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Feb 2018 13:19:29 -0000
-From: Thomas Huth <1397157@bugs.launchpad.net>
-Reply-To: Bug 1397157 <1397157@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141128021917.32359.93361.malonedeb@gac.canonical.com>
-Message-Id: <151852796929.10064.13639538995213408893.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1397157] Re: cpu high with ps2 keyboard on
- multi-core win7 guest os
+In-Reply-To: <20180213135739.3fd6fad6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +33,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Kevin O'Connor <kevin@koconnor.net>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+On 02/13/18 13:57, Igor Mammedov wrote:
+> On Mon, 12 Feb 2018 15:17:21 -0500
+> Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+> 
+>> On 02/12/2018 02:45 PM, Kevin O'Connor wrote:
+>>> On Fri, Feb 09, 2018 at 03:19:31PM -0500, Stefan Berger wrote:  
+>>>> I have played around with this patch and some modifications to EDK2. Though
+>>>> for EDK2 the question is whether to try to circumvent their current
+>>>> implementation that uses SMM or use SMM. With this patch so far I circumvent
+>>>> it, which is maybe not a good idea.
+>>>>
+>>>> The facts for EDK2's PPI:
+>>>>
+>>>> - from within the OS a PPI code is submitted to ACPI and ACPI enters SMM via
+>>>> an SMI and the PPI code is written into a UEFI variable. For this ACPI uses
+>>>> the memory are at 0xFFFF 0000 to pass parameters from the OS (via ACPI) to
+>>>> SMM. This is declared in ACPI with an OperationRegion() at that address.
+>>>> Once the machine is rebooted, UEFI reads the variable and finds the PPI code
+>>>> and reacts to it.  
+>>> I'm a bit confused by this.  The top 1M of the first 4G of ram is
+>>> generally mapped to the flash device on real machines.  Indeed, this
+>>> is part of the mechanism used to boot an X86 machine - it starts
+>>> execution from flash at 0xfffffff0.  This is true even on modern
+>>> machines.
+>>>
+>>> So, it seems strange that UEFI is pushing a code through a memory
+>>> device at 0xffff0000.  I can't see how that would be portable.  Are
+>>> you sure the memory write to 0xffff0000 is not just a trigger to
+>>> invoke the SMI?  
+>>
+>> I base this on the code here:
+>>
+>> https://github.com/tianocore/edk2/blob/master/SecurityPkg/Tcg/Tcg2Smm/Tpm.asl#L81
+>>
+>> OperationRegion (TNVS, SystemMemory, 0xFFFF0000, 0xF0)
+> Is the goal to reuse EDK PPI impl. including ASL?
 
-** Bug watch removed: Red Hat Bugzilla #1169267
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1169267
+Right, that is one important question. Some code in edk2 is meant only
+as example code (so actual firmware platforms are encouraged to copy &
+customize the code, or use similar or dissimilar alternatives). Some
+modules are meant for inclusion "as-is" in the platform description
+files (~ makefiles). There are so many edk2 modules related to TPM
+(several versions of the specs even) that it's hard to say what is meant
+for what usage type. (By my earlier count, there are 19 modules.)
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+> If it's so, then perhaps we only need to write address into QEMU
+> and let OVMF to discard PPI SSDT from QEMU.
 
--- =
+That's something I would not like. When running on QEMU, it's OK for
+some edk2 modules to install their own ACPI tables, but only if they are
+"software" tables, such as the IBFT for iSCSI booting, BGRT (boot
+graphics table) for the boot logo / splash screen, etc. For ACPI tables
+that describe hardware (data tables) or carry out actions related to
+hardware (DefinitionBlocks / AML), I much prefer QEMU to generate all
+the stuff.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1397157
+If there is a conflict between hardware-related tables that QEMU
+generates and similar tables that pre-exist in edk2, I prefer working
+with the edk2 maintainers to customize their subsystems, so that a
+concrete firmware platform, such as OvmfPkg and ArmVirtPkg, can
+conditionalize / exclude those preexistent ACPI tables, while benefiting
+from the rest of the code. Then the ACPI linker/loader client used in
+both OvmfPkg and ArmVirtPkg can remain dumb and process & expose
+whatever tables QEMU generates.
 
-Title:
-  cpu high with ps2 keyboard on multi-core win7 guest os
+We could control the AML payload for TPM and/or TPM PPI -- e.g. whether
+it should raise an SMI -- via "-device tpm2,smi=on", for example. (Just
+making up the syntax, but you know what I mean.)
 
-Status in QEMU:
-  Incomplete
+We could go one step further, "-device tpm2,acpi=[on|off]". acpi=on
+would make QEMU generate the TPM related tables (perhaps targeting only
+SeaBIOS, if that makes sense), acpi=off would leave the related tables
+to the firmware.
 
-Bug description:
-  =
+This is just speculation on my part; the point is I'd like to avoid any
+more "intelligent filtering" regarding ACPI tables in OVMF. What we have
+there is terrible enough already.
 
-  qemu ver: 1.5.3-Latest =
-
-
-  guest os: window 7 64bit with 2 cpu and ps2 keybord.
-
-  problem: Use virt-viwer as client to connect, When input quickly, the
-  guest and host cpu will high and the input-char will display later.
-  but when only 1 cpu on the vm, the problem will not display or When
-  qemu ver is 0.12.1, the problem will not display.
-
-  qemu cmd:
-  /usr/libexec/qemu-kvm -name xx_win7 -machine pc-i440fx-rhel7.0.0,accel=3D=
-kvm,usb=3Doff -cpu qemu64,+sse4.2,+sse4.1,+ssse3,-svm,hv_relaxed,hv_vapic,h=
-v_spinlocks=3D0x1000 -m 4096 -realtime mlock=3Doff -smp 2,sockets=3D1,cores=
-=3D2,threads=3D1 -uuid 0860a434-6560-591b-f92f-c13c5caaf52d -rtc base=3Dloc=
-altime -no-shutdown -boot strict=3Don -device ich9-usb-ehci1,id=3Dusb,bus=
-=3Dpci.0,addr=3D0x5.0x7 -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=
-=3D0,bus=3Dpci.0,multifunction=3Don,addr=3D0x5 -device ich9-usb-uhci2,maste=
-rbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x5.0x1 -device ich9-usb-uhci=
-3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x5.0x2 -device virtio=
--serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -drive file=3D/lfs/x=
-x_win7/xx_win7.vda,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=
-=3Dwriteback -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=
-=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D2 -drive if=3Dnone,id=
-=3Ddrive-ide0-0-0,readonly=3Don,format=3Draw -device ide-cd,bus=3Dide.0,uni=
-t=3D0,drive=3Ddrive-ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -chardev spicevmc,=
-id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvirtio-serial=
-0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spice.0 -=
-device usb-tablet,id=3Dinput0 -spice port=3D5900,addr=3D::,disable-ticketin=
-g,plaintext-channel=3Dmain,plaintext-channel=3Ddisplay,plaintext-channel=3D=
-inputs,plaintext-channel=3Dcursor,plaintext-channel=3Dplayback,plaintext-ch=
-annel=3Drecord,plaintext-channel=3Dusbredir,image-compression=3Dauto_glz,jp=
-eg-wan-compression=3Dauto,zlib-glz-wan-compression=3Dauto,playback-compress=
-ion=3Don,disable-copy-paste,seamless-migration=3Don -vga qxl -global qxl-vg=
-a.ram_size=3D268435456 -global qxl-vga.vram_size=3D67108864 -device intel-h=
-da,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-duplex,id=3Dsound0-codec0=
-,bus=3Dsound0.0,cad=3D0 -chardev spicevmc,id=3Dcharredir0,name=3Dusbredir -=
-device usb-redir,chardev=3Dcharredir0,id=3Dredir0 -chardev spicevmc,id=3Dch=
-arredir1,name=3Dusbredir -device usb-redir,chardev=3Dcharredir1,id=3Dredir1=
- -chardev spicevmc,id=3Dcharredir2,name=3Dusbredir -device usb-redir,charde=
-v=3Dcharredir2,id=3Dredir2 -chardev spicevmc,id=3Dcharredir3,name=3Dusbredi=
-r -device usb-redir,chardev=3Dcharredir3,id=3Dredir3 -device virtio-balloon=
--pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1397157/+subscriptions
+Thanks
+Laszlo
