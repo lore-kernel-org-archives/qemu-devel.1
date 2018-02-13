@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eldWS-0006xt-LK
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:33:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eldXa-00083r-5r
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:34:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eldWR-0000sW-KX
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:33:36 -0500
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:44570)
+	(envelope-from <peter.maydell@linaro.org>) id 1eldXZ-0002Va-FD
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:34:46 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:39340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eldWR-0000qJ-E7
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:33:35 -0500
-Received: by mail-oi0-x22c.google.com with SMTP id b3so14296414oib.11
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:33:35 -0800 (PST)
+	id 1eldXZ-0002VK-BD
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:34:45 -0500
+Received: by mail-ot0-x242.google.com with SMTP id f18so17808542otf.6
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:34:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_CL6P31EJyzxom1oh6j8LNDD2+OXjJ65hKsB=zBw6tWQ@mail.gmail.com>
-References: <1518116908-10852-1-git-send-email-mst@redhat.com>
-	<CAFEAcA8kvkfoxnQbqZ4Y44uWtbsirCKdmTcnZJzu=ege9YRfTg@mail.gmail.com>
-	<20180209190703-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_CL6P31EJyzxom1oh6j8LNDD2+OXjJ65hKsB=zBw6tWQ@mail.gmail.com>
+In-Reply-To: <8c0097ba-fe66-5a28-17ed-7f22c486f034@linaro.org>
+References: <20180206164815.10084-1-alex.bennee@linaro.org>
+	<20180206164815.10084-23-alex.bennee@linaro.org>
+	<CAFEAcA_Tp9cH5CBi4C6CRHpZ4ozygGSFYhdLaURBQOVZ9zVxvA@mail.gmail.com>
+	<8c0097ba-fe66-5a28-17ed-7f22c486f034@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Feb 2018 16:33:14 +0000
-Message-ID: <CAFEAcA_z25p0NrRuH3vJm9mJJzHZXbgct2GwyojuHXKqejc8JA@mail.gmail.com>
+Date: Tue, 13 Feb 2018 16:34:24 +0000
+Message-ID: <CAFEAcA9LbaZG0i87Y5X9Ws5D7UNODYBSUMedrim4-GOkGGjEnQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
- fixes and cleanups
+Subject: Re: [Qemu-devel] [PATCH v4 22/22] fpu/softfloat: re-factor sqrt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 12 February 2018 at 09:35, Peter Maydell <peter.maydell@linaro.org> wrote:
-> This asserts in 'make check' for NetBSD, FreeBSD, OpenBSD, OSX:
+On 13 February 2018 at 16:23, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 02/13/2018 07:50 AM, Peter Maydell wrote:
+>>> +    /* We need two overflow bits at the top.  Adding room for that is
+>>> +       a right shift.  If the exponent is odd, we can discard the low
+>>> +       bit by multiplying the fraction by 2; that's a left shift.
+>>> +       Combine those and we shift right if the exponent is even.  */
+>>> +    a_frac = a.frac;
+>>> +    if (!(a.exp & 1)) {
+>>> +        a_frac >>= 1;
+>>> +    }
+>>> +    a.exp >>= 1;
+>> Comment says "shift right if the exponent is even", but code
+>> says "shift right by 1 if exponent is odd, by 2 if exponent is even".
+>>
 >
-> TEST: tests/device-introspect-test... (pid=19530)
->   /aarch64/device/introspect/list:                                     OK
->   /aarch64/device/introspect/list-fields:                              OK
->   /aarch64/device/introspect/none:                                     OK
->   /aarch64/device/introspect/abstract:                                 OK
->   /aarch64/device/introspect/concrete:                                 **
-> ERROR:/root/qemu/qom/object.c:372:object_initialize_with_type:
-> assertion failed: (type != NULL)
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sd4e2c04f6ac00d843a31ccac4de0d914
-> (pid=12686)
->   /aarch64/device/introspect/abstract-interfaces:                      OK
-> FAIL: tests/device-introspect-test
->
-> (other archs fail too, aarch64 is just the first one we hit). This
-> error is often "device A instantiates device B, but device B is
-> conditionally compiled in and A is always compiled; so test fails
-> trying to create device A on hosts where device B isn't built" I think.
+> The last line is dividing the exponent by 2, not shifting the fraction.
 
-This part is indeed that problem -- the 'virtio-crypto-device' object
-is built only if CONFIG_LINUX, but 'virtio-crypto-pci' is built if
-CONFIG_VIRTIO_PCI, so on systems where the latter is true but not the
-former you get a virtio-crypto-pci device that crashes when instantiated.
+Doh, so it is.
 
-The fix should be
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -8,7 +8,7 @@ obj-y += virtio.o virtio-balloon.o
- obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
- obj-$(CONFIG_LINUX) += virtio-crypto.o
--obj-$(CONFIG_VIRTIO_PCI) += virtio-crypto-pci.o
-+obj-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
- endif
-
- common-obj-$(call lnot,$(CONFIG_LINUX)) += vhost-stub.o
-
-
-thanks
 -- PMM
