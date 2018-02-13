@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elhAi-0008Bj-9W
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1elhAh-0008Ao-FY
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elhAg-0007gp-26
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1elhAf-0007gB-G7
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:23 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 13 Feb 2018 14:26:46 -0600
-Message-Id: <20180213202701.15858-7-eblake@redhat.com>
+Date: Tue, 13 Feb 2018 14:26:44 -0600
+Message-Id: <20180213202701.15858-5-eblake@redhat.com>
 In-Reply-To: <20180213202701.15858-1-eblake@redhat.com>
 References: <20180213202701.15858-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 06/21] iscsi: Switch cluster_sectors to
- byte-based
+Subject: [Qemu-devel] [PATCH v8 04/21] file-posix: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,162 +21,143 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Convert all uses of
-the cluster size in sectors, along with adding assertions that we
-are not dividing by zero.
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Update the file protocol driver accordingly.
 
-Improve some comment grammar while in the area.
+In want_zero mode, we continue to report fine-grained hole
+information (the caller wants as much mapping detail as possible);
+but when not in that mode, the caller prefers larger *pnum and
+merely cares about what offsets are allocated at this layer, rather
+than where the holes live.  Since holes still read as zeroes at
+this layer (rather than deferring to a backing layer), we can take
+the shortcut of skipping lseek(), and merely state that all bytes
+are allocated.
+
+We can also drop redundant bounds checks that are already
+guaranteed by the block layer.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 
 ---
-v8: rebase to master
-v2-v7: no change
+v6-v7: no change
+v5: drop redundant code
+v4: tweak commit message [Fam], rebase to interface tweak
+v3: no change
+v2: tweak comment, add mapping support
 ---
- block/iscsi.c | 56 +++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 35 insertions(+), 21 deletions(-)
+ block/file-posix.c | 62 +++++++++++++++++++++++++-----------------------------
+ 1 file changed, 29 insertions(+), 33 deletions(-)
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 421983dd6ff..3414c21c7f5 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -86,7 +86,7 @@ typedef struct IscsiLun {
-     unsigned long *allocmap;
-     unsigned long *allocmap_valid;
-     long allocmap_size;
--    int cluster_sectors;
-+    int cluster_size;
-     bool use_16_for_rw;
-     bool write_protected;
-     bool lbpme;
-@@ -430,9 +430,10 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
- {
-     iscsi_allocmap_free(iscsilun);
-
-+    assert(iscsilun->cluster_size);
-     iscsilun->allocmap_size =
--        DIV_ROUND_UP(sector_lun2qemu(iscsilun->num_blocks, iscsilun),
--                     iscsilun->cluster_sectors);
-+        DIV_ROUND_UP(iscsilun->num_blocks * iscsilun->block_size,
-+                     iscsilun->cluster_size);
-
-     iscsilun->allocmap = bitmap_try_new(iscsilun->allocmap_size);
-     if (!iscsilun->allocmap) {
-@@ -440,7 +441,7 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
-     }
-
-     if (open_flags & BDRV_O_NOCACHE) {
--        /* in case that cache.direct = on all allocmap entries are
-+        /* when cache.direct = on all allocmap entries are
-          * treated as invalid to force a relookup of the block
-          * status on every read request */
-         return 0;
-@@ -461,17 +462,19 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
-                       int nb_sectors, bool allocated, bool valid)
- {
-     int64_t cl_num_expanded, nb_cls_expanded, cl_num_shrunk, nb_cls_shrunk;
-+    int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
-
-     if (iscsilun->allocmap == NULL) {
-         return;
-     }
-     /* expand to entirely contain all affected clusters */
--    cl_num_expanded = sector_num / iscsilun->cluster_sectors;
-+    assert(cluster_sectors);
-+    cl_num_expanded = sector_num / cluster_sectors;
-     nb_cls_expanded = DIV_ROUND_UP(sector_num + nb_sectors,
--                                   iscsilun->cluster_sectors) - cl_num_expanded;
-+                                   cluster_sectors) - cl_num_expanded;
-     /* shrink to touch only completely contained clusters */
--    cl_num_shrunk = DIV_ROUND_UP(sector_num, iscsilun->cluster_sectors);
--    nb_cls_shrunk = (sector_num + nb_sectors) / iscsilun->cluster_sectors
-+    cl_num_shrunk = DIV_ROUND_UP(sector_num, cluster_sectors);
-+    nb_cls_shrunk = (sector_num + nb_sectors) / cluster_sectors
-                       - cl_num_shrunk;
-     if (allocated) {
-         bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
-@@ -535,9 +538,12 @@ iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t sector_num,
-     if (iscsilun->allocmap == NULL) {
-         return true;
-     }
--    size = DIV_ROUND_UP(sector_num + nb_sectors, iscsilun->cluster_sectors);
-+    assert(iscsilun->cluster_size);
-+    size = DIV_ROUND_UP(sector_num + nb_sectors,
-+                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
-     return !(find_next_bit(iscsilun->allocmap, size,
--                           sector_num / iscsilun->cluster_sectors) == size);
-+                           sector_num * BDRV_SECTOR_SIZE /
-+                           iscsilun->cluster_size) == size);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index ca49c1a98ae..f1591c38490 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2131,25 +2131,24 @@ static int find_allocation(BlockDriverState *bs, off_t start,
  }
 
- static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
-@@ -547,9 +553,12 @@ static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
-     if (iscsilun->allocmap_valid == NULL) {
-         return false;
-     }
--    size = DIV_ROUND_UP(sector_num + nb_sectors, iscsilun->cluster_sectors);
-+    assert(iscsilun->cluster_size);
-+    size = DIV_ROUND_UP(sector_num + nb_sectors,
-+                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
-     return (find_next_zero_bit(iscsilun->allocmap_valid, size,
--                               sector_num / iscsilun->cluster_sectors) == size);
-+                               sector_num * BDRV_SECTOR_SIZE /
-+                               iscsilun->cluster_size) == size);
- }
-
- static int coroutine_fn
-@@ -793,16 +802,21 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
-         BlockDriverState *file;
-         /* check the block status from the beginning of the cluster
-          * containing the start sector */
--        int64_t ret = iscsi_co_get_block_status(bs,
--                          sector_num - sector_num % iscsilun->cluster_sectors,
--                          BDRV_REQUEST_MAX_SECTORS, &pnum, &file);
-+        int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
-+        int head;
-+        int64_t ret;
-+
-+        assert(cluster_sectors);
-+        head = sector_num % cluster_sectors;
-+        ret = iscsi_co_get_block_status(bs, sector_num - head,
-+                                        BDRV_REQUEST_MAX_SECTORS, &pnum,
-+                                        &file);
-         if (ret < 0) {
-             return ret;
-         }
-         /* if the whole request falls into an unallocated area we can avoid
--         * to read and directly return zeroes instead */
--        if (ret & BDRV_BLOCK_ZERO &&
--            pnum >= nb_sectors + sector_num % iscsilun->cluster_sectors) {
-+         * reading and directly return zeroes instead */
-+        if (ret & BDRV_BLOCK_ZERO && pnum >= nb_sectors + head) {
-             qemu_iovec_memset(iov, 0, 0x00, iov->size);
-             return 0;
-         }
-@@ -1953,8 +1967,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-      * reasonable size */
-     if (iscsilun->bl.opt_unmap_gran * iscsilun->block_size >= 4 * 1024 &&
-         iscsilun->bl.opt_unmap_gran * iscsilun->block_size <= 16 * 1024 * 1024) {
--        iscsilun->cluster_sectors = (iscsilun->bl.opt_unmap_gran *
--                                     iscsilun->block_size) >> BDRV_SECTOR_BITS;
-+        iscsilun->cluster_size = iscsilun->bl.opt_unmap_gran *
-+            iscsilun->block_size;
-         if (iscsilun->lbprz) {
-             ret = iscsi_allocmap_init(iscsilun, bs->open_flags);
-         }
-@@ -2163,7 +2177,7 @@ static int iscsi_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+ /*
+- * Returns the allocation status of the specified sectors.
++ * Returns the allocation status of the specified offset.
+  *
+- * If 'sector_num' is beyond the end of the disk image the return value is 0
+- * and 'pnum' is set to 0.
++ * The block layer guarantees 'offset' and 'bytes' are within bounds.
+  *
+- * 'pnum' is set to the number of sectors (including and immediately following
+- * the specified sector) that are known to be in the same
++ * 'pnum' is set to the number of bytes (including and immediately following
++ * the specified offset) that are known to be in the same
+  * allocated/unallocated state.
+  *
+- * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
+- * beyond the end of the disk image it will be clamped.
++ * 'bytes' is the max value 'pnum' should be set to.
+  */
+-static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+-                                                    int64_t sector_num,
+-                                                    int nb_sectors, int *pnum,
+-                                                    BlockDriverState **file)
++static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
++                                            bool want_zero,
++                                            int64_t offset,
++                                            int64_t bytes, int64_t *pnum,
++                                            int64_t *map,
++                                            BlockDriverState **file)
  {
-     IscsiLun *iscsilun = bs->opaque;
-     bdi->unallocated_blocks_are_zero = iscsilun->lbprz;
--    bdi->cluster_size = iscsilun->cluster_sectors * BDRV_SECTOR_SIZE;
-+    bdi->cluster_size = iscsilun->cluster_size;
-     return 0;
+-    off_t start, data = 0, hole = 0;
+-    int64_t total_size;
++    off_t data = 0, hole = 0;
+     int ret;
+
+     ret = fd_open(bs);
+@@ -2157,39 +2156,36 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+         return ret;
+     }
+
+-    start = sector_num * BDRV_SECTOR_SIZE;
+-    total_size = bdrv_getlength(bs);
+-    if (total_size < 0) {
+-        return total_size;
+-    } else if (start >= total_size) {
+-        *pnum = 0;
+-        return 0;
+-    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
+-        nb_sectors = DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SIZE);
++    if (!want_zero) {
++        *pnum = bytes;
++        *map = offset;
++        *file = bs;
++        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+     }
+
+-    ret = find_allocation(bs, start, &data, &hole);
++    ret = find_allocation(bs, offset, &data, &hole);
+     if (ret == -ENXIO) {
+         /* Trailing hole */
+-        *pnum = nb_sectors;
++        *pnum = bytes;
+         ret = BDRV_BLOCK_ZERO;
+     } else if (ret < 0) {
+         /* No info available, so pretend there are no holes */
+-        *pnum = nb_sectors;
++        *pnum = bytes;
+         ret = BDRV_BLOCK_DATA;
+-    } else if (data == start) {
+-        /* On a data extent, compute sectors to the end of the extent,
++    } else if (data == offset) {
++        /* On a data extent, compute bytes to the end of the extent,
+          * possibly including a partial sector at EOF. */
+-        *pnum = MIN(nb_sectors, DIV_ROUND_UP(hole - start, BDRV_SECTOR_SIZE));
++        *pnum = MIN(bytes, hole - offset);
+         ret = BDRV_BLOCK_DATA;
+     } else {
+-        /* On a hole, compute sectors to the beginning of the next extent.  */
+-        assert(hole == start);
+-        *pnum = MIN(nb_sectors, (data - start) / BDRV_SECTOR_SIZE);
++        /* On a hole, compute bytes to the beginning of the next extent.  */
++        assert(hole == offset);
++        *pnum = MIN(bytes, data - offset);
+         ret = BDRV_BLOCK_ZERO;
+     }
++    *map = offset;
+     *file = bs;
+-    return ret | BDRV_BLOCK_OFFSET_VALID | start;
++    return ret | BDRV_BLOCK_OFFSET_VALID;
  }
 
+ static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
+@@ -2282,7 +2278,7 @@ BlockDriver bdrv_file = {
+     .bdrv_close = raw_close,
+     .bdrv_create = raw_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_co_get_block_status = raw_co_get_block_status,
++    .bdrv_co_block_status = raw_co_block_status,
+     .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
+
+     .bdrv_co_preadv         = raw_co_preadv,
 -- 
 2.14.3
