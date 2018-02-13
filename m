@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele2P-0003li-Bp
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele2H-0003ae-O8
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele2M-0005ur-6q
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele2D-0005mZ-Bw
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:28 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:05:27 +0100
-Message-Id: <20180213170529.10858-54-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:05:23 +0100
+Message-Id: <20180213170529.10858-50-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 53/55] iotests: Test valid values of
- l2-cache-entry-size
+Subject: [Qemu-devel] [PULL 49/55] qcow2: Rename l2_table in
+ count_contiguous_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +25,54 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-The l2-cache-entry-size setting can only contain values that are
-powers of two between 512 and the cluster size.
+This function doesn't need any changes to support L2 slices, but since
+it's now dealing with slices intead of full tables, the l2_table
+variable is renamed for clarity.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: bd3547b670b8d0af11480c760991a22bcae5b48c.1517840877.git.berto@igalia.com
-[mreitz: Changed non-power-of-two test value from 300 to 4242]
+Message-id: 812b0c3505bb1687e51285dccf1a94f0cecb1f74.1517840877.git.berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/103     | 17 +++++++++++++++++
- tests/qemu-iotests/103.out |  3 +++
- 2 files changed, 20 insertions(+)
+ block/qcow2-cluster.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index d0cfab8844..2841318492 100755
---- a/tests/qemu-iotests/103
-+++ b/tests/qemu-iotests/103
-@@ -66,6 +66,14 @@ $QEMU_IO -c "open -o cache-size=1M,refcount-cache-size=2M $TEST_IMG" 2>&1 \
- $QEMU_IO -c "open -o cache-size=0,l2-cache-size=0,refcount-cache-size=0 $TEST_IMG" \
-     2>&1 | _filter_testdir | _filter_imgfmt
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 24055e19a1..54ae210b43 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -370,19 +370,19 @@ fail:
+ }
  
-+# Invalid cache entry sizes
-+$QEMU_IO -c "open -o l2-cache-entry-size=256 $TEST_IMG" \
-+    2>&1 | _filter_testdir | _filter_imgfmt
-+$QEMU_IO -c "open -o l2-cache-entry-size=4242 $TEST_IMG" \
-+    2>&1 | _filter_testdir | _filter_imgfmt
-+$QEMU_IO -c "open -o l2-cache-entry-size=128k $TEST_IMG" \
-+    2>&1 | _filter_testdir | _filter_imgfmt
-+
- echo
- echo '=== Testing valid option combinations ==='
- echo
-@@ -94,6 +102,15 @@ $QEMU_IO -c "open -o l2-cache-size=1M,refcount-cache-size=0.25M $TEST_IMG" \
-          -c 'read -P 42 0 64k' \
-     | _filter_qemu_io
+ /*
+- * Checks how many clusters in a given L2 table are contiguous in the image
++ * Checks how many clusters in a given L2 slice are contiguous in the image
+  * file. As soon as one of the flags in the bitmask stop_flags changes compared
+  * to the first cluster, the search is stopped and the cluster is not counted
+  * as contiguous. (This allows it, for example, to stop at the first compressed
+  * cluster which may require a different handling)
+  */
+ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+-        uint64_t *l2_table, uint64_t stop_flags)
++        uint64_t *l2_slice, uint64_t stop_flags)
+ {
+     int i;
+     QCow2ClusterType first_cluster_type;
+     uint64_t mask = stop_flags | L2E_OFFSET_MASK | QCOW_OFLAG_COMPRESSED;
+-    uint64_t first_entry = be64_to_cpu(l2_table[0]);
++    uint64_t first_entry = be64_to_cpu(l2_slice[0]);
+     uint64_t offset = first_entry & mask;
  
-+# Valid cache entry sizes
-+$QEMU_IO -c "open -o l2-cache-entry-size=512 $TEST_IMG" \
-+    2>&1 | _filter_testdir | _filter_imgfmt
-+$QEMU_IO -c "open -o l2-cache-entry-size=16k $TEST_IMG" \
-+    2>&1 | _filter_testdir | _filter_imgfmt
-+$QEMU_IO -c "open -o l2-cache-entry-size=64k $TEST_IMG" \
-+    2>&1 | _filter_testdir | _filter_imgfmt
-+
-+
- echo
- echo '=== Testing minimal L2 cache and COW ==='
- echo
-diff --git a/tests/qemu-iotests/103.out b/tests/qemu-iotests/103.out
-index b7aaadf89a..bd45d3875a 100644
---- a/tests/qemu-iotests/103.out
-+++ b/tests/qemu-iotests/103.out
-@@ -9,6 +9,9 @@ can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cach
- can't open device TEST_DIR/t.IMGFMT: l2-cache-size may not exceed cache-size
- can't open device TEST_DIR/t.IMGFMT: refcount-cache-size may not exceed cache-size
- can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
-+can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
-+can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
-+can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+     if (!offset) {
+@@ -395,7 +395,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+            first_cluster_type == QCOW2_CLUSTER_ZERO_ALLOC);
  
- === Testing valid option combinations ===
- 
+     for (i = 0; i < nb_clusters; i++) {
+-        uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
++        uint64_t l2_entry = be64_to_cpu(l2_slice[i]) & mask;
+         if (offset + (uint64_t) i * cluster_size != l2_entry) {
+             break;
+         }
 -- 
 2.13.6
