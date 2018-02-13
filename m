@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elhAp-0008LT-9m
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:35 -0500
+	(envelope-from <jonathan.helman@oracle.com>) id 1elhD8-0001q0-1o
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:29:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elhAn-0007o4-Tx
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:31 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 13 Feb 2018 14:26:58 -0600
-Message-Id: <20180213202701.15858-19-eblake@redhat.com>
-In-Reply-To: <20180213202701.15858-1-eblake@redhat.com>
-References: <20180213202701.15858-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 18/21] vmdk: Switch to
- .bdrv_co_block_status()
+	(envelope-from <jonathan.helman@oracle.com>) id 1elhD4-0001TA-V5
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:29:54 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:47556)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jonathan.helman@oracle.com>)
+	id 1elhD4-0001Rb-Gw
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:29:50 -0500
+References: <cover.1512476043.git.tgolembi@redhat.com>
+	<938dc32019864c9c19259bdddd64a53b6b99efef.1512476043.git.tgolembi@redhat.com>
+	<20180205130824.79f570bc@fiorina>
+From: Jonathan Helman <jonathan.helman@oracle.com>
+Message-ID: <1e6717d5-a1bc-3409-b01f-24ea761659fb@oracle.com>
+Date: Tue, 13 Feb 2018 12:29:39 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180205130824.79f570bc@fiorina>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-balloon: include statistics
+ of disk/file caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,109 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the vmdk driver accordingly.  Drop the
-now-unused vmdk_find_index_in_cluster().
 
-Also, fix a pre-existing bug: if find_extent() fails (unlikely,
-since the block layer did a bounds check), then we must return a
-failure, rather than 0.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+On 02/05/2018 04:08 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD wrote:
+> ping
+>=20
+> On Tue,  5 Dec 2017 13:14:46 +0100
+> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
+>=20
 
----
-v6-v7: no change
-v5: drop dead code [Vladimir], return error on find_extent() failure
-v4: rebase to interface tweak
-v3: no change
-v2: rebase to mapping flag
----
- block/vmdk.c | 38 ++++++++++++++------------------------
- 1 file changed, 14 insertions(+), 24 deletions(-)
+It would be good to include the corresponding upstream kernel change in=20
+the commit message. This would be similar to a previous change:=20
+https://lists.gnu.org/archive/html/qemu-devel/2016-02/msg05555.html
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index ef15ddbfd3d..75f84213e6f 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1304,33 +1304,27 @@ static inline uint64_t vmdk_find_offset_in_cluster(VmdkExtent *extent,
-     return extent_relative_offset % cluster_size;
- }
+>> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+>> ---
+>>   hw/virtio/virtio-balloon.c                      | 1 +
+>>   include/standard-headers/linux/virtio_balloon.h | 3 ++-
+>>   2 files changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+>> index 37cde38982..8141326a51 100644
+>> --- a/hw/virtio/virtio-balloon.c
+>> +++ b/hw/virtio/virtio-balloon.c
+>> @@ -50,6 +50,7 @@ static const char *balloon_stat_names[] =3D {
+>>      [VIRTIO_BALLOON_S_MEMFREE] =3D "stat-free-memory",
+>>      [VIRTIO_BALLOON_S_MEMTOT] =3D "stat-total-memory",
+>>      [VIRTIO_BALLOON_S_AVAIL] =3D "stat-available-memory",
+>> +   [VIRTIO_BALLOON_S_CACHES] =3D "stat-disk-caches",
+>>      [VIRTIO_BALLOON_S_NR] =3D NULL
+>>   };
+>>  =20
+>> diff --git a/include/standard-headers/linux/virtio_balloon.h b/include=
+/standard-headers/linux/virtio_balloon.h
+>> index 9d06ccd066..7b0a41b8fc 100644
+>> --- a/include/standard-headers/linux/virtio_balloon.h
+>> +++ b/include/standard-headers/linux/virtio_balloon.h
+>> @@ -52,7 +52,8 @@ struct virtio_balloon_config {
+>>   #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free memory=
+ */
+>>   #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
+>>   #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /pro=
+c */
+>> -#define VIRTIO_BALLOON_S_NR       7
+>> +#define VIRTIO_BALLOON_S_CACHES   7   /* Disk caches */
 
--static inline uint64_t vmdk_find_index_in_cluster(VmdkExtent *extent,
--                                                  int64_t sector_num)
--{
--    uint64_t offset;
--    offset = vmdk_find_offset_in_cluster(extent, sector_num * BDRV_SECTOR_SIZE);
--    return offset / BDRV_SECTOR_SIZE;
--}
--
--static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int coroutine_fn vmdk_co_block_status(BlockDriverState *bs,
-+                                             bool want_zero,
-+                                             int64_t offset, int64_t bytes,
-+                                             int64_t *pnum, int64_t *map,
-+                                             BlockDriverState **file)
- {
-     BDRVVmdkState *s = bs->opaque;
-     int64_t index_in_cluster, n, ret;
--    uint64_t offset;
-+    uint64_t cluster_offset;
-     VmdkExtent *extent;
+I've been wondering, VIRTIO_BALLOON_S_AVAIL is not in the virtio spec=20
+(see Section 5.5.6.3). It seems like this header file needs to be in=20
+sync with the virtio spec in order to make this change.
 
--    extent = find_extent(s, sector_num, NULL);
-+    extent = find_extent(s, offset >> BDRV_SECTOR_BITS, NULL);
-     if (!extent) {
--        return 0;
-+        return -EIO;
-     }
-     qemu_co_mutex_lock(&s->lock);
--    ret = get_cluster_offset(bs, extent, NULL,
--                             sector_num * 512, false, &offset,
-+    ret = get_cluster_offset(bs, extent, NULL, offset, false, &cluster_offset,
-                              0, 0);
-     qemu_co_mutex_unlock(&s->lock);
+I have a similar change to add a new statistic and was wondering this.
 
--    index_in_cluster = vmdk_find_index_in_cluster(extent, sector_num);
-+    index_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
-     switch (ret) {
-     case VMDK_ERROR:
-         ret = -EIO;
-@@ -1345,18 +1339,14 @@ static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
-         ret = BDRV_BLOCK_DATA;
-         if (!extent->compressed) {
-             ret |= BDRV_BLOCK_OFFSET_VALID;
--            ret |= (offset + (index_in_cluster << BDRV_SECTOR_BITS))
--                    & BDRV_BLOCK_OFFSET_MASK;
-+            *map = cluster_offset + index_in_cluster;
-         }
-         *file = extent->file->bs;
-         break;
-     }
+>> +#define VIRTIO_BALLOON_S_NR       8
+>>  =20
+>>   /*
+>>    * Memory statistics structure.
+>> --=20
+>> 2.15.1
+>>
+>=20
+>=20
 
--    n = extent->cluster_sectors - index_in_cluster;
--    if (n > nb_sectors) {
--        n = nb_sectors;
--    }
--    *pnum = n;
-+    n = extent->cluster_sectors * BDRV_SECTOR_SIZE - index_in_cluster;
-+    *pnum = MIN(n, bytes);
-     return ret;
- }
+You need to add your new stat to the list of stats in=20
+docs/virtio-balloon-stats.txt.
 
-@@ -2410,7 +2400,7 @@ static BlockDriver bdrv_vmdk = {
-     .bdrv_close                   = vmdk_close,
-     .bdrv_create                  = vmdk_create,
-     .bdrv_co_flush_to_disk        = vmdk_co_flush,
--    .bdrv_co_get_block_status     = vmdk_co_get_block_status,
-+    .bdrv_co_block_status         = vmdk_co_block_status,
-     .bdrv_get_allocated_file_size = vmdk_get_allocated_file_size,
-     .bdrv_has_zero_init           = vmdk_has_zero_init,
-     .bdrv_get_specific_info       = vmdk_get_specific_info,
--- 
-2.14.3
+Jon
