@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1v-0003BV-D5
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:11 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele20-0003HO-L5
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1u-0005Vp-B6
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1z-0005aP-N0
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:12 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:05:04 +0100
-Message-Id: <20180213170529.10858-31-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:05:08 +0100
+Message-Id: <20180213170529.10858-35-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 30/55] qcow2: Add offset_to_l2_slice_index()
+Subject: [Qemu-devel] [PULL 34/55] qcow2: Refactor get_cluster_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +24,60 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-Similar to offset_to_l2_index(), this function takes a guest offset
-and returns the index in the L2 slice that contains its L2 entry.
+After the previous patch we're now always using l2_load() in
+get_cluster_table() regardless of whether a new L2 table has to be
+allocated or not.
 
-An L2 slice has currently the same size as an L2 table (one cluster),
-so both functions return the same value for now.
+This patch refactors that part of the code to use one single l2_load()
+call.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: a1c45c5c5a76146dd1712d8d1e7b409ad539c718.1517840877.git.berto@igalia.com
+Message-id: ce31758c4a1fadccea7a6ccb93951eb01d95fd4c.1517840877.git.berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/qcow2-cluster.c | 21 +++++++--------------
+ 1 file changed, 7 insertions(+), 14 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 45fb7f4299..d956a6cdd2 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -474,6 +474,11 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
-     return (offset >> s->cluster_bits) & (s->l2_size - 1);
- }
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 4aa9ea7b29..044eccda72 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -694,15 +694,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+         return -EIO;
+     }
  
-+static inline int offset_to_l2_slice_index(BDRVQcow2State *s, int64_t offset)
-+{
-+    return (offset >> s->cluster_bits) & (s->l2_slice_size - 1);
-+}
+-    /* seek the l2 table of the given l2 offset */
+-
+-    if (s->l1_table[l1_index] & QCOW_OFLAG_COPIED) {
+-        /* load the l2 table in memory */
+-        ret = l2_load(bs, offset, l2_offset, &l2_table);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-    } else {
++    if (!(s->l1_table[l1_index] & QCOW_OFLAG_COPIED)) {
+         /* First allocate a new L2 table (and do COW if needed) */
+         ret = l2_allocate(bs, l1_index);
+         if (ret < 0) {
+@@ -718,11 +710,12 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+         /* Get the offset of the newly-allocated l2 table */
+         l2_offset = s->l1_table[l1_index] & L1E_OFFSET_MASK;
+         assert(offset_into_cluster(s, l2_offset) == 0);
+-        /* Load the l2 table in memory */
+-        ret = l2_load(bs, offset, l2_offset, &l2_table);
+-        if (ret < 0) {
+-            return ret;
+-        }
++    }
 +
- static inline int64_t align_offset(int64_t offset, int n)
- {
-     offset = (offset + n - 1) & ~(n - 1);
++    /* load the l2 table in memory */
++    ret = l2_load(bs, offset, l2_offset, &l2_table);
++    if (ret < 0) {
++        return ret;
+     }
+ 
+     /* find the cluster offset for the given disk offset */
 -- 
 2.13.6
