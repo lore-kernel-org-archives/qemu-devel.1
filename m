@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1elh89-0006iN-1I
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:24:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1elhAh-0008A5-1l
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1elh88-0006Us-0Y
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:24:45 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180213200450-mutt-send-email-mst@kernel.org>
-References: <20180213170712.18239-1-andrew.smirnov@gmail.com>
-	<20180213170712.18239-2-andrew.smirnov@gmail.com>
-	<20180213200450-mutt-send-email-mst@kernel.org>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Tue, 13 Feb 2018 12:24:40 -0800
-Message-ID: <CAHQ1cqEpeq+M6bVTBLd6dvN7=h-s_bPTXRx_GaoMFhhpq2gTpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 1/3] pci: Add support for Designware IP
- block
+	(envelope-from <eblake@redhat.com>) id 1elhAf-0007fq-1Q
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:27:22 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 13 Feb 2018 14:26:42 -0600
+Message-Id: <20180213202701.15858-3-eblake@redhat.com>
+In-Reply-To: <20180213202701.15858-1-eblake@redhat.com>
+References: <20180213202701.15858-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 02/21] nvme: Drop pointless
+ .bdrv_co_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +20,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Tue, Feb 13, 2018 at 10:13 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Tue, Feb 13, 2018 at 09:07:10AM -0800, Andrey Smirnov wrote:
->> +static void designware_pcie_root_class_init(ObjectClass *klass, void *data)
->> +{
->> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->> +
->> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->> +
->> +    k->vendor_id = PCI_VENDOR_ID_SYNOPSYS;
->> +    k->device_id = 0xABCD;
->> +    k->revision = 0;
->> +    k->class_id = PCI_CLASS_BRIDGE_PCI;
->> +    k->is_express = true;
->> +    k->is_bridge = true;
->> +    k->exit = pci_bridge_exitfn;
->> +    k->realize = designware_pcie_root_realize;
->> +    k->config_read = designware_pcie_root_config_read;
->> +    k->config_write = designware_pcie_root_config_write;
->> +
->> +    dc->reset = pci_bridge_reset;
->> +    /*
->> +     * PCI-facing part of the host bridge, not usable without the
->> +     * host-facing part, which can't be device_add'ed, yet.
->> +     */
->> +    dc->user_creatable = false;
->> +    dc->vmsd = &vmstate_designware_pcie_root;
->> +}
->> +
->> +static uint64_t designware_pcie_host_mmio_read(void *opaque, hwaddr addr,
->> +                                               unsigned int size)
->> +{
->> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
->> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
->> +
->> +    return pci_host_config_read_common(device,
->> +                                       addr,
->> +                                       pci_config_size(device),
->> +                                       size);
->> +}
->> +
->> +static void designware_pcie_host_mmio_write(void *opaque, hwaddr addr,
->> +                                            uint64_t val, unsigned int size)
->> +{
->> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
->> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
->> +
->> +    return pci_host_config_write_common(device,
->> +                                        addr,
->> +                                        pci_config_size(device),
->> +                                        val, size);
->> +}
->> +
->> +static const MemoryRegionOps designware_pci_mmio_ops = {
->> +    .read       = designware_pcie_host_mmio_read,
->> +    .write      = designware_pcie_host_mmio_write,
->> +    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .impl = {
->> +        /*
->> +         * Our device would not work correctly if the guest was doing
->> +         * unaligned access. This might not be a limitation on the real
->> +         * device but in practice there is no reason for a guest to access
->> +         * this device unaligned.
->> +         */
->> +        .min_access_size = 4,
->> +        .max_access_size = 4,
->> +        .unaligned = false,
->> +    },
->> +};
->
-> Could you pls add some comments explaining why is DEVICE_NATIVE_ENDIAN
-> appropriate here?  Most of these cases are plain "we never bothered
-> about cross-endian setups". Some are "there's a mix of different
-> endian-ness values, need to handle in a special way".
->
-> I suspect you really need DEVICE_LITTLE_ENDIAN.
->
+Commit bdd6a90 has a bug: drivers should never directly set
+BDRV_BLOCK_ALLOCATED, but only io.c should do that (as needed).
+Instead, drivers should report BDRV_BLOCK_DATA if it knows that
+data comes from this BDS.
 
-That MemoryRegion corresponds to a register file permanently mapped
-into CPU's address space, so my assumption is that SoC designers will
-wire it according to CPUs endianness be it big or little. I am not
-aware of any big-endian CPU based SoC on the market using Designware's
-IP block, so I don't think there are any precedent confirming or
-denying correctness of my assumption. IMHO, this is also the reason
-why all of Linux driver code for that IP assumes little endianness.
+But let's look at the bigger picture: semantically, the nvme
+driver is similar to the nbd, null, and raw drivers (no backing
+file, all data comes from this BDS).  But while two of those
+other drivers have to supply the callback (null because it can
+special-case BDRV_BLOCK_ZERO, raw because it can special-case
+a different offset), in this case the block layer defaults are
+good enough without the callback at all (similar to nbd).
 
-I can't say that I testing this code against a big-endian guest/CPU,
-but that is primarily due to the fact that there's no real use case
-and any test set up I can put toghere would be a contrived example
-pointlessly proving my point.
+So, fix the bug by deletion ;)
 
-Anyway, I am more than happy to switch it to use DEVICE_LITTLE_ENDIAN,
-I just don't know if doing so is any more justified than keeping it
-DEVICE_NATIVE_ENDIAN.
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Thanks,
-Andrey Smirnov
+---
+v8: new patch
+---
+ block/nvme.c | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/block/nvme.c b/block/nvme.c
+index 10bffbbf2f4..4e561b08df3 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -1068,18 +1068,6 @@ static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
+     return 0;
+ }
+
+-static int64_t coroutine_fn nvme_co_get_block_status(BlockDriverState *bs,
+-                                                     int64_t sector_num,
+-                                                     int nb_sectors, int *pnum,
+-                                                     BlockDriverState **file)
+-{
+-    *pnum = nb_sectors;
+-    *file = bs;
+-
+-    return BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
+-}
+-
+ static void nvme_refresh_filename(BlockDriverState *bs, QDict *opts)
+ {
+     QINCREF(opts);
+@@ -1179,8 +1167,6 @@ static BlockDriver bdrv_nvme = {
+     .bdrv_co_flush_to_disk    = nvme_co_flush,
+     .bdrv_reopen_prepare      = nvme_reopen_prepare,
+
+-    .bdrv_co_get_block_status = nvme_co_get_block_status,
+-
+     .bdrv_refresh_filename    = nvme_refresh_filename,
+     .bdrv_refresh_limits      = nvme_refresh_limits,
+
+-- 
+2.14.3
