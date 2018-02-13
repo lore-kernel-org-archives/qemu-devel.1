@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1elbw6-0000Cp-62
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:51:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1elbwP-0000Uo-7Q
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:52:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1elbw0-0003pq-68
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:51:56 -0500
-References: <20180107122336.29333-1-richiejp@f-m.fm>
-	<fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
-	<5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
-	<20180111130427.GG8326@redhat.com>
-	<20180213105024.GC5083@localhost.localdomain>
-	<20180213143001.GA2354@rkaganb.sw.ru> <20180213143615.GN573@redhat.com>
-	<20180213144521.GI5083@localhost.localdomain>
-	<20180213144838.GO573@redhat.com>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <29531119-45d2-2d11-914e-7997122c4b29@virtuozzo.com>
-Date: Tue, 13 Feb 2018 17:51:45 +0300
+	(envelope-from <eblake@redhat.com>) id 1elbwO-00042M-Fj
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:52:17 -0500
+References: <cover.1517840876.git.berto@igalia.com>
+	<1fd7d272b5e7b66254a090b74cf2bed1cc334c0e.1517840877.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c619966e-56e9-d5d1-04eb-c2cbb03ae3e3@redhat.com>
+Date: Tue, 13 Feb 2018 08:52:09 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180213144838.GO573@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1fd7d272b5e7b66254a090b74cf2bed1cc334c0e.1517840877.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH 1/2] Add save-snapshot,
- load-snapshot and delete-snapshot to QAPI
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 31/39] qcow2: Update qcow2_truncate() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Roman Kagan <rkagan@virtuozzo.com>, Richard Palethorpe <richiejp@f-m.fm>, Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>, rpalethorpe@suse.com, dgilbert@redhat.com, Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 02/13/2018 05:48 PM, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Feb 13, 2018 at 03:45:21PM +0100, Kevin Wolf wrote:
->> Am 13.02.2018 um 15:36 hat Daniel P. Berrang=C3=A9 geschrieben:
->>> On Tue, Feb 13, 2018 at 05:30:02PM +0300, Roman Kagan wrote:
->>>> On Tue, Feb 13, 2018 at 11:50:24AM +0100, Kevin Wolf wrote:
->>>>> Am 11.01.2018 um 14:04 hat Daniel P. Berrange geschrieben:
->>>>>> Then you could just use the regular migrate QMP commands for loading
->>>>>> and saving snapshots.
->>>>> Yes, you could. I think for a proper implementation you would want to=
- do
->>>>> better, though. Live migration provides just a stream, but that's not
->>>>> really well suited for snapshots. When a RAM page is dirtied, you jus=
-t
->>>>> want to overwrite the old version of it in a snapshot [...]
->>>> This means the point in time where the guest state is snapshotted is n=
-ot
->>>> when the command is issued, but any unpredictable amount of time later=
-.
->>>>
->>>> I'm not sure this is what a user expects.
->>>>
->>>> A better approach for the save part appears to be to stop the vcpus,
->>>> dump the device state, resume the vcpus, and save the memory contents =
-in
->>>> the background, prioritizing the old copies of the pages that change.
->>>> No multiple copies of the same page would have to be saved so the stre=
-am
->>>> format would be fine.  For the load part the usual inmigrate should
->>>> work.
->>> No, that's policy decision that doesn't matter from QMP pov. If the mgm=
-t
->>> app wants the snapshot to be wrt to the initial time, it can simply
->>> invoke the "stop" QMP command before doing the live migration and
->>> "cont" afterwards.
->> That would be non-live. I think Roman means a live snapshot that saves
->> the state at the beginning of the operation. Basically the difference
->> between blockdev-backup (state at the beginning) and blockdev-mirror
->> (state at the end), except for a whole VM.
-> That doesn't seem practical unless you can instantaneously write out
-> the entire guest RAM to disk without blocking, or can somehow snapshot
-> the RAM so you can write out a consistent view of the original RAM,
-> while the guest continues to dirty RAM pages.
->
-> Regards,
-> Daniel
-we have working prototype of that right now, not yet ready to be
-submitted even as RFC. In practice here we are spoken about
-snapshots with memory as "The equivalent HMP command is savevm."
-Thus all Roman's concerns are here.
+On 02/05/2018 08:33 AM, Alberto Garcia wrote:
+> The qcow2_truncate() code is mostly independent from whether
+> we're using L2 slices or full L2 tables, but in full and
+> falloc preallocation modes new L2 tables are allocated using
+> qcow2_alloc_cluster_link_l2().  Therefore the code needs to be
+> modified to ensure that all nb_clusters that are processed in each
+> call can be allocated with just one L2 slice.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>   block/qcow2.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
 
-Den
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
