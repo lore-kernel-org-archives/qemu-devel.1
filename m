@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTj-0002Ja-1k
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eleVh-00045q-LY
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:36:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTe-0003EJ-UZ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38534 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTe-0003Du-Pe
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:46 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 13 Feb 2018 17:34:28 +0000
-Message-Id: <20180213173429.19501-5-stefanha@redhat.com>
-In-Reply-To: <20180213173429.19501-1-stefanha@redhat.com>
-References: <20180213173429.19501-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] ratelimit: don't align wait time with
- slices
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eleVd-0003rg-Oz
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:36:53 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e6d0b42b-2e23-b518-5c1f-1049a286aff4@virtuozzo.com>
+Date: Tue, 13 Feb 2018 20:36:41 +0300
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: [Qemu-devel] block_status automatically added flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +21,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>
+To: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Hi Eric!
 
-It is possible for rate limited writes to keep overshooting a slice's
-quota by a tiny amount causing the slice-aligned waiting period to
-effectively halve the rate.
+I'm now testing my nbd block status realization (block_status part, not=20
+about dirty bitmaps), and faced into the following effect.
 
-Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20180207071758.6818-1-w.bumiller@proxmox.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/qemu/ratelimit.h | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+I created empty qcow2 image and wrote to the first sector, so
 
-diff --git a/include/qemu/ratelimit.h b/include/qemu/ratelimit.h
-index 8dece483f5..1b38291823 100644
---- a/include/qemu/ratelimit.h
-+++ b/include/qemu/ratelimit.h
-@@ -36,7 +36,7 @@ typedef struct {
- static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
- {
-     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
--    uint64_t delay_slices;
-+    double delay_slices;
- 
-     assert(limit->slice_quota && limit->slice_ns);
- 
-@@ -55,12 +55,11 @@ static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
-         return 0;
-     }
- 
--    /* Quota exceeded. Calculate the next time slice we may start
--     * sending data again. */
--    delay_slices = (limit->dispatched + limit->slice_quota - 1) /
--        limit->slice_quota;
-+    /* Quota exceeded. Wait based on the excess amount and then start a new
-+     * slice. */
-+    delay_slices = (double)limit->dispatched / limit->slice_quota;
-     limit->slice_end_time = limit->slice_start_time +
--        delay_slices * limit->slice_ns;
-+        (uint64_t)(delay_slices * limit->slice_ns);
-     return limit->slice_end_time - now;
- }
- 
--- 
-2.14.3
+qemu-io -c map x
+
+reports:
+
+64 KiB (0x10000) bytes=C2=A0=C2=A0=C2=A0=C2=A0 allocated at offset 0 bytes =
+(0x0)
+9.938 MiB (0x9f0000) bytes not allocated at offset 64 KiB (0x10000)
+
+But I can't get same results, when connecting to nbd server, exporting=20
+the same qcow2 file, I get
+
+10 MiB (0xa00000) bytes=C2=A0=C2=A0=C2=A0=C2=A0 allocated at offset 0 bytes=
+ (0x0)
+
+
+Finally, I understand the reason:
+
+for local file, qemu-io calls bdrv_is_allocated, which calls=20
+bdrv_common_block_status_above with want_zero=3Dfalse. So, it doesn't set=20
+BDRV_BLOCK_ZERO, and doesn't set BDRV_BLOCK_ALLOCATED. And, even if we=20
+change want_zero to true, here, it will set BDRV_BLOCK_ZERO, but will=20
+not set BDRV_BLOCK_ALLOCATED, which contradicts with it's definition:
+
+ =C2=A0BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 layer (short f=
+or DATA || ZERO), set by block layer
+
+
+for nbd, we go through the similar way on server (but with want_zero =3D=20
+true), and we finally have BDRV_BLOCK_ZERO without BDRV_BLOCK_ALLOCATED,=20
+which maps to NBD_STATE_HOLE+NBD_STATE_ZERO. But then, in the client we=20
+have BDRV_BLOCK_ZERO not automatically added by block layer but directly=20
+from nbd driver, therefor BDRV_BLOCK_ALLOCATED is set and I get=20
+different result.
+
+
+this all looks weird for me.
+
+BDRV_BLOCK_ALLOCATED definition should be fixed, to show that this flag=20
+show only reported by driver flags, not automatically added.
+
+And then the situation with nbd looks strange, because automatically=20
+added flag becomes "flag, reported by block driver".
+
+On the other hand, it is not wrong.
+
+
+I think, to test the feature, I'll improve qemu-io map, to show zeros=20
+(or is it better to add separate command?) and leave the other things as=20
+is. What do you think?
+
+--=20
+Best regards,
+Vladimir
