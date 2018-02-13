@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHx-0004ZM-B6
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:25 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1elZI3-0004hE-T6
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1elZHw-0007rw-Eu
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:21 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:45201)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1elZI2-0007uf-NW
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:27 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42236)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1elZHw-0007re-8Q
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:20 -0500
-Received: by mail-wr0-x242.google.com with SMTP id h9so18378075wre.12
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 04:02:20 -0800 (PST)
+	id 1elZI2-0007uE-Ha
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:02:26 -0500
+Received: by mail-wr0-x242.google.com with SMTP id k9so4585906wre.9
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 04:02:26 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Feb 2018 13:00:46 +0100
-Message-Id: <1518523252-49106-43-git-send-email-pbonzini@redhat.com>
+Date: Tue, 13 Feb 2018 13:00:52 +0100
+Message-Id: <1518523252-49106-49-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1518523252-49106-1-git-send-email-pbonzini@redhat.com>
 References: <1518523252-49106-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 42/48] sdhci: add a check_capab_v3() qtest
+Subject: [Qemu-devel] [PULL 48/48] travis: use libgcc-4.8-dev (libgcc-6-dev
+ is not available on Ubuntu 14.04)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +36,40 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20180208164818.7961-30-f4bug@amsat.org>
----
- tests/sdhci-test.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Travis image is based on Ubuntu Trusty (14.04), since d83414e1fd1 we get:
 
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 08bc5cd..4fdb1b4 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -16,6 +16,8 @@
- #define SDHC_CAPAB                      0x40
- FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
- FIELD(SDHC_CAPAB, SDMA,                     22, 1);
-+FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
-+FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
- #define SDHC_HCVER                      0xFE
- 
- static const struct sdhci_t {
-@@ -159,6 +161,20 @@ static void check_capab_sdma(QSDHCI *s, bool supported)
-     g_assert_cmpuint(capab_sdma, ==, supported);
- }
- 
-+static void check_capab_v3(QSDHCI *s, uint8_t version)
-+{
-+    uint64_t capab, capab_v3;
-+
-+    if (version < 3) {
-+        /* before v3 those fields are RESERVED */
-+        capab = sdhci_readq(s, SDHC_CAPAB);
-+        capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, SDR);
-+        g_assert_cmpuint(capab_v3, ==, 0);
-+        capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, DRIVER);
-+        g_assert_cmpuint(capab_v3, ==, 0);
-+    }
-+}
-+
- static QSDHCI *machine_start(const struct sdhci_t *test)
- {
-     QSDHCI *s = g_new0(QSDHCI, 1);
-@@ -207,6 +223,7 @@ static void test_machine(const void *data)
-     check_specs_version(s, test->sdhci.version);
-     check_capab_capareg(s, test->sdhci.capab.reg);
-     check_capab_readonly(s);
-+    check_capab_v3(s, test->sdhci.version);
-     check_capab_sdma(s, test->sdhci.capab.sdma);
-     check_capab_baseclock(s, test->sdhci.baseclock);
- 
+  $ sudo -E \
+    apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
+      install \
+        libaio-dev libattr1-dev libbrlapi-dev libcap-ng-dev libgcc-6-dev \
+        libgnutls-dev libgtk-3-dev libiscsi-dev liblttng-ust-dev \
+        libncurses5-dev libnfs-dev libnss3-dev libpixman-1-dev libpng12-dev \
+        librados-dev libsdl1.2-dev libseccomp-dev libspice-protocol-dev \
+        libspice-server-dev libssh2-1-dev liburcu-dev libusb-1.0-0-dev \
+        libvte-2.90-dev sparse uuid-dev
+  Reading package lists...
+  Building dependency tree...
+  Reading state information...
+  E: Unable to locate package libgcc-6-dev
+
+Signed-off-by: Philippe Mathieu-DaudÃ© <f4bug@amsat.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ .travis.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index 0dd5020..79377c8 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -13,7 +13,7 @@ addons:
+       - libattr1-dev
+       - libbrlapi-dev
+       - libcap-ng-dev
+-      - libgcc-6-dev
++      - libgcc-4.8-dev
+       - libgnutls-dev
+       - libgtk-3-dev
+       - libiscsi-dev
 -- 
 1.8.3.1
