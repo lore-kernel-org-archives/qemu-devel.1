@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lcapitulino@redhat.com>) id 1elaqB-00088y-CH
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:41:49 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1elb8M-0003xd-Sv
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:00:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lcapitulino@redhat.com>) id 1elaq8-0001FE-9i
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:41:47 -0500
-Date: Tue, 13 Feb 2018 08:41:23 -0500
-From: Luiz Capitulino <lcapitulino@redhat.com>
-Message-ID: <20180213084123.0fab5012@redhat.com>
-In-Reply-To: <9757bd46-06f2-1ce2-9cbd-9118c4a6cb9c@linux.vnet.ibm.com>
-References: <1518437672-7724-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<1518437672-7724-4-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<20180212131504.1243e696@redhat.com>
-	<9757bd46-06f2-1ce2-9cbd-9118c4a6cb9c@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] qmp: add architecture specific cpu
- data for query-cpus-fast
+	(envelope-from <pm215@archaic.org.uk>) id 1elb8L-00063X-GN
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:00:34 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1elb8L-00062c-1y
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:00:33 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Feb 2018 14:00:29 +0000
+Message-Id: <20180213140029.8308-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] log-for-trace.h: Split out parts of log.h used
+ by trace.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +23,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, dgilbert@redhat.com, rth@twiddle.net, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, david@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 13 Feb 2018 13:30:02 +0100
-Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+A persistent build problem we see is where a source file
+accidentally omits the #include of log.h. This slips through
+local developer testing because if you configure with the
+default (log) trace backend trace.h will pull in log.h for you.
+Compilation fails only if some other backend is selected.
 
-> On 12.02.2018 19:15, Luiz Capitulino wrote:
-> > On Mon, 12 Feb 2018 13:14:32 +0100
-> > Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
-> >   
-> >> -{ 'struct': 'CpuInfoFast',
-> >> -  'data': {'cpu-index': 'int', 'qom-path': 'str',
-> >> -           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
-> >> +{ 'union': 'CpuInfoFast',
-> >> +  'base': {'cpu-index': 'int', 'qom-path': 'str',
-> >> +           'thread-id': 'int', '*props': 'CpuInstanceProperties',
-> >> +           'arch': 'CpuInfoArch' },
-> >> +  'discriminator': 'arch',
-> >> +  'data': { 'x86': 'CpuInfoOther',
-> >> +            'sparc': 'CpuInfoOther',
-> >> +            'ppc': 'CpuInfoOther',
-> >> +            'mips': 'CpuInfoOther',
-> >> +            'tricore': 'CpuInfoOther',
-> >> +            's390': 'CpuInfoS390Fast',
-> >> +            'other': 'CpuInfoOther' } }  
-> > 
-> > Consider this a minor comment (and QMP maintainers can give a much
-> > better advice than me), but I think this arch list has problems. For
-> > one thing, it's incomplete. And the second problem is the 'other'
-> > field. What happens when QEMU starts supporting a new arch? 'other'
-> > becomes the new arch. Is this compatible? I don't know.  
-> This seems to be the customary approach, see
-> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01986.html
-> > 
-> > I don't know if this would work with the QAPI, but you could have
-> > a '*arch-data' field in the CpuInfoFast definition, like:
-> > 
-> > 'data': { ..., '*arch-data': 'CpuInfoFastArchData' }
-> > 
-> > where 'CpuInfoFastArchData' is defined by each arch that supports
-> > the field. An arch supporting the field could also export a
-> > query_cpus_fast_arch() function, which is called by qmp_query_cpus_fast().
-> >   
-> I had it like this in my first reply to your initial patch. However,
-> that adds an additional hierarchy level in the return data. This
-> prevents clients like libvirt to reuse the data extraction code when
-> they switch over to using query-cpus-fast.
+To make this error cause a compile failure regardless of
+the configured trace backend, split out the parts of log.h
+that trace.h requires into a new log-for-trace.h header.
+Since almost all manual uses of the log.h functions will
+use constants or functions which aren't in log-for-trace.h,
+this will let us catch missing #include "qemu/log.h" more
+consistently.
 
-OK, fair enough.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/qemu/log-for-trace.h     | 35 +++++++++++++++++++++++++++++++++++
+ include/qemu/log.h               | 18 ++++--------------
+ scripts/tracetool/backend/log.py | 13 ++++++-------
+ 3 files changed, 45 insertions(+), 21 deletions(-)
+ create mode 100644 include/qemu/log-for-trace.h
+
+diff --git a/include/qemu/log-for-trace.h b/include/qemu/log-for-trace.h
+new file mode 100644
+index 0000000000..2f0a5b080e
+--- /dev/null
++++ b/include/qemu/log-for-trace.h
+@@ -0,0 +1,35 @@
++/* log-for-trace.h: logging basics required by the trace.h generated
++ * by the log trace backend.
++ *
++ * This should not be included directly by any .c file: if you
++ * need to use the logging functions include "qemu/log.h".
++ *
++ * The purpose of splitting these parts out into their own header
++ * is to catch the easy mistake where a .c file includes trace.h
++ * but forgets to include qemu/log.h. Without this split, that
++ * would result in the .c file compiling fine when the default
++ * trace backend is in use but failing to compile with any other
++ * backend.
++ *
++ * This code is licensed under the GNU General Public License,
++ * version 2 or (at your option) any later version.
++ */
++
++#ifndef QEMU_LOG_FOR_TRACE_H
++#define QEMU_LOG_FOR_TRACE_H
++
++/* Private global variable, don't use */
++extern int qemu_loglevel;
++
++#define LOG_TRACE          (1 << 15)
++
++/* Returns true if a bit is set in the current loglevel mask */
++static inline bool qemu_loglevel_mask(int mask)
++{
++    return (qemu_loglevel & mask) != 0;
++}
++
++/* main logging function */
++int GCC_FMT_ATTR(1, 2) qemu_log(const char *fmt, ...);
++
++#endif
+diff --git a/include/qemu/log.h b/include/qemu/log.h
+index a50e994c21..ff92a8b86a 100644
+--- a/include/qemu/log.h
++++ b/include/qemu/log.h
+@@ -1,10 +1,11 @@
+ #ifndef QEMU_LOG_H
+ #define QEMU_LOG_H
+ 
++/* A small part of this API is split into its own header */
++#include "qemu/log-for-trace.h"
+ 
+-/* Private global variables, don't use */
++/* Private global variable, don't use */
+ extern FILE *qemu_logfile;
+-extern int qemu_loglevel;
+ 
+ /* 
+  * The new API:
+@@ -41,16 +42,9 @@ static inline bool qemu_log_separate(void)
+ #define CPU_LOG_MMU        (1 << 12)
+ #define CPU_LOG_TB_NOCHAIN (1 << 13)
+ #define CPU_LOG_PAGE       (1 << 14)
+-#define LOG_TRACE          (1 << 15)
++/* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
+ #define CPU_LOG_TB_OP_IND  (1 << 16)
+ 
+-/* Returns true if a bit is set in the current loglevel mask
+- */
+-static inline bool qemu_loglevel_mask(int mask)
+-{
+-    return (qemu_loglevel & mask) != 0;
+-}
+-
+ /* Lock output for a series of related logs.  Since this is not needed
+  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
+  * assume that qemu_loglevel_mask has already been tested, and that
+@@ -69,10 +63,6 @@ static inline void qemu_log_unlock(void)
+ 
+ /* Logging functions: */
+ 
+-/* main logging function
+- */
+-int GCC_FMT_ATTR(1, 2) qemu_log(const char *fmt, ...);
+-
+ /* vfprintf-like logging function
+  */
+ static inline void GCC_FMT_ATTR(1, 0)
+diff --git a/scripts/tracetool/backend/log.py b/scripts/tracetool/backend/log.py
+index da86f6b882..78933d03ad 100644
+--- a/scripts/tracetool/backend/log.py
++++ b/scripts/tracetool/backend/log.py
+@@ -20,7 +20,7 @@ PUBLIC = True
+ 
+ 
+ def generate_h_begin(events, group):
+-    out('#include "qemu/log.h"',
++    out('#include "qemu/log-for-trace.h"',
+         '')
+ 
+ 
+@@ -35,14 +35,13 @@ def generate_h(event, group):
+     else:
+         cond = "trace_event_get_state(%s)" % ("TRACE_" + event.name.upper())
+ 
+-    out('    if (%(cond)s) {',
++    out('    if (%(cond)s && qemu_loglevel_mask(LOG_TRACE)) {',
+         '        struct timeval _now;',
+         '        gettimeofday(&_now, NULL);',
+-        '        qemu_log_mask(LOG_TRACE,',
+-        '                      "%%d@%%zd.%%06zd:%(name)s " %(fmt)s "\\n",',
+-        '                      getpid(),',
+-        '                      (size_t)_now.tv_sec, (size_t)_now.tv_usec',
+-        '                      %(argnames)s);',
++        '        qemu_log("%%d@%%zd.%%06zd:%(name)s " %(fmt)s "\\n",',
++        '                 getpid(),',
++        '                 (size_t)_now.tv_sec, (size_t)_now.tv_usec',
++        '                 %(argnames)s);',
+         '    }',
+         cond=cond,
+         name=event.name,
+-- 
+2.16.1
