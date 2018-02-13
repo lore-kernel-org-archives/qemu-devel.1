@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1elXnd-0005Iw-VP
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:26:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1elY7p-0005d4-Uk
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:47:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1elXnZ-0000Mp-SE
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:26:57 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:57600)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1elXnZ-0000Km-9j
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:26:53 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
-	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
-	<002401d3a010$8d551280$a7ff3780$@ru>
-	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
-	<CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
-	<001b01d3a3c5$032e09f0$098a1dd0$@ru>
-	<CAFXrp_dNj+BSYo+0rpv5d4PxdjJ1RL_cROaDWRvjQTLziFtO_Q@mail.gmail.com>
-	<000c01d3a496$fd2bc470$f7834d50$@ru>
-	<CAFXrp_cEsHH_6VQevxsrj8GTchraGKEJ_t0xhSbfajcBu-mmzg@mail.gmail.com>
-	<001a01d3a4b1$273f1a90$75bd4fb0$@ru>
-In-Reply-To: <001a01d3a4b1$273f1a90$75bd4fb0$@ru>
-Date: Tue, 13 Feb 2018 13:26:52 +0300
-Message-ID: <002201d3a4b5$2a642b80$7f2c8280$@ru>
+	(envelope-from <peter.maydell@linaro.org>) id 1elY7o-0005Bj-Ue
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:47:50 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1elY7o-0005BV-Pb
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 05:47:48 -0500
+Received: by mail-ot0-x244.google.com with SMTP id a7so16930564otk.9
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 02:47:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Language: ru
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
+In-Reply-To: <CAKmqyKM7bO2dwPVkUSz5Mc=CrBWvFFAYY1vD4Q4bMht4=dVoww@mail.gmail.com>
+References: <cover.1516746211.git.alistair.francis@xilinx.com>
+	<29c39a6f9ce3734bf693581348ed78f4bff3e0ef.1516746211.git.alistair.francis@xilinx.com>
+	<CAFEAcA-eOMvYYv--wjs+i1wGG3AN1VueqZjtnE5vpBH=UavkfQ@mail.gmail.com>
+	<CAKmqyKPAmzwFkY5MAiPA-epY-HCbBfBpHGWdanvEef2keaSXew@mail.gmail.com>
+	<CAFEAcA8Fo5gVsjVB5PdU6sKWZAZ2ZscUzEhiDMwZY-LiDGtqOA@mail.gmail.com>
+	<CAKmqyKM7bO2dwPVkUSz5Mc=CrBWvFFAYY1vD4Q4bMht4=dVoww@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Feb 2018 10:47:27 +0000
+Message-ID: <CAFEAcA_VHsONyCXjDsFmiKrRGpC9Zu+XA1=bYPHTTU1dBVUhGw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] xlnx-zynqmp-rtc: Add basic time
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,239 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, 'Ciro Santilli' <ciro.santilli@gmail.com>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, 'Peter Maydell' <peter.maydell@linaro.org>, war2jordan@live.com, 'Igor R' <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, kraxel@redhat.com, 'Thomas Dullien' <thomas.dullien@googlemail.com>, pbonzini@redhat.com, =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-
-Then I added SCSI adapter with the option =E2=80=93device lsi,id=3Dscsi0 =
-and QEMU failed with the following error:
-
-qemu: fatal: IO on conditional branch instruction
-
-=20
-
-It happens here:
-
-static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-
-{
-
-    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-
-=20
-
-    if (tb_cflags(dc->base.tb) & CF_LAST_IO && dc->condjmp) {
-
-        /* FIXME: This can theoretically happen with self-modifying =
-code. */
-
-        cpu_abort(cpu, "IO on conditional branch instruction");
-
-    }
-
-=20
-
-Seems, that your kernel is incomatible with QEMU, which ARM emulation is =
-not good enough.
-
-=20
-
-Pavel Dovgalyuk
-
-=20
-
-From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]=20
-Sent: Tuesday, February 13, 2018 12:58 PM
-To: 'Ciro Santilli'
-Cc: 'Pavel Dovgalyuk'; qemu-devel@nongnu.org; kwolf@redhat.com; 'Peter =
-Maydell'; war2jordan@live.com; 'Igor R'; quintela@redhat.com; =
-jasowang@redhat.com; mst@redhat.com; 'Aleksandr Bezzubikov'; =
-maria.klimushenkova@ispras.ru; kraxel@redhat.com; 'Thomas Dullien'; =
-pbonzini@redhat.com; 'Alex Benn=C3=A9e'
-Subject: RE: [RFC PATCH v6 00/20] replay additions
-
-=20
-
-There is the same file I downloaded this morning.=20
-
-Now I re-checked everything and it prints the following error: =
-qemu-system-arm: -device scsi-hd,drive=3Dimg-blkreplay: No 'SCSI' bus =
-found for device 'scsi-hd'
-
-=20
-
-Pavel Dovgalyuk
-
-=20
-
-From: Ciro Santilli [mailto:ciro.santilli@gmail.com]=20
-Sent: Tuesday, February 13, 2018 12:07 PM
-To: Pavel Dovgalyuk
-Cc: Pavel Dovgalyuk; qemu-devel@nongnu.org; kwolf@redhat.com; Peter =
-Maydell; war2jordan@live.com; Igor R; quintela@redhat.com; =
-jasowang@redhat.com; mst@redhat.com; Aleksandr Bezzubikov; =
-maria.klimushenkova@ispras.ru; kraxel@redhat.com; Thomas Dullien; =
-pbonzini@redhat.com; Alex Benn=C3=A9e
-Subject: Re: [RFC PATCH v6 00/20] replay additions
-
-=20
-
-=20
-
-=20
-
-On Tue, Feb 13, 2018 at 6:50 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
-wrote:
-
-Your command line looks wrong, because you forgot =E2=80=93icount, but =
-specified other replay options
-
-=20
-
-Sorry about that, my full command is exactly the previous but with =
--icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin' added to the end.
-
-=20
-
-.
-
-I tried recording and replaying with your command line and the execution =
-hangs at some moment of replay.
-
-The problem may be hidden in =E2=80=93dtb option, because it may add the =
-devices without configuring replay for them.
-
-Can you specify the whole hardware configuration in the command line?
-
-=20
-
-Ah, now that you mentioned this, I had a modification on the DTB which =
-needed to be reverted. I have re-uploaded it to the same address: =
-https://github.com/cirosantilli/linux-kernel-module-cheat/releases/downlo=
-ad/test-replay-arm/images.zip please use the new one instead.
-
-=20
-
-Now it should be just the vanilla Linux kernel versatilepb one.
-
-=20
-
-How to specify the --dtb configuration explicitly on the command line? I =
-have also included the dts on the zip if that helps.
-
-=20
-
-=20
-
-Pavel Dovgalyuk
-
-=20
-
-From: Ciro Santilli [mailto:ciro.santilli@gmail.com]=20
-Sent: Tuesday, February 13, 2018 8:58 AM
-To: Pavel Dovgalyuk
-Cc: Pavel Dovgalyuk; qemu-devel@nongnu.org; kwolf@redhat.com; Peter =
-Maydell; war2jordan@live.com; Igor R; quintela@redhat.com; =
-jasowang@redhat.com; mst@redhat.com; Aleksandr Bezzubikov; =
-maria.klimushenkova@ispras.ru; kraxel@redhat.com; Thomas Dullien; =
-pbonzini@redhat.com; Alex Benn=C3=A9e
-Subject: Re: [RFC PATCH v6 00/20] replay additions
-
-=20
-
-=20
-
-=20
-
-On Mon, Feb 12, 2018 at 5:47 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
-wrote:
-
-I tested ARM only with =E2=80=93kernel and =E2=80=93initrd.
-
-Can you provide the full command line and the disk image?
-
-=20
-
-=20
-
-The command I tried was:
-
-=20
-
-time ./buildroot/output.arm~/host/usr/bin/qemu-system-arm -M versatilepb =
--append 'root=3D/dev/sda nokaslr norandmaps printk.devkmsg=3Don =
-printk.time=3Dy - lkmc_eval=3D"/rand_check.out;wget -S =
-google.com;/poweroff.out;"' -kernel =
-./buildroot/output.arm~/images/zImage -dtb =
-./buildroot/output.arm~/images/versatile-pb.dtb -nographic -drive =
-file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Dimg-dire=
-ct,format=3Draw -drive =
-driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay =
--device scsi-hd,drive=3Dimg-blkreplay -netdev user,id=3Dnet1 -device =
-rtl8139,netdev=3Dnet1 -object filter-replay,id=3Dreplay,netdev=3Dnet1=20
-
-=20
-
-and the required files can be downloaded from:
-
-=20
-
-https://github.com/cirosantilli/linux-kernel-module-cheat/releases/downlo=
-ad/test-replay-arm/images.zip
-
-=20
-
-They were generated with:
-
-=20
-
-./build -a arm
-
-=20
-
-on that repo.
-
-=20
-
-=20
-
-Pavel Dovgalyuk
-
-=20
-
-From: Ciro Santilli [mailto:ciro.santilli@gmail.com]=20
-Sent: Saturday, February 10, 2018 3:09 AM
-To: Pavel Dovgalyuk
-Cc: Pavel Dovgalyuk; qemu-devel@nongnu.org; kwolf@redhat.com; Peter =
-Maydell; war2jordan@live.com; Igor R; quintela@redhat.com; =
-jasowang@redhat.com; mst@redhat.com; Aleksandr Bezzubikov; =
-maria.klimushenkova@ispras.ru; kraxel@redhat.com; Thomas Dullien; =
-pbonzini@redhat.com; Alex Benn=C3=A9e
-Subject: Re: [RFC PATCH v6 00/20] replay additions
-
-=20
-
-Also, what command do you use to test on ARM? I'm a bit stuck to get the =
-drive part right, e.g.:
-
-=20
-
--drive =
-file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Dimg-dire=
-ct,format=3Draw \
-
--drive =
-driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay \
-
--device scsi-hd,drive=3Dimg-blkreplay \
-
-=20
-
-fails with: qemu-system-arm: -device scsi-hd,drive=3Dimg-blkreplay: =
-Conflicts with use by img-direct as 'root', which does not allow 'write' =
-on #block968
-
-=20
-
-=20
-
-=20
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+
+On 8 February 2018 at 17:21, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Thu, Feb 8, 2018 at 7:42 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Doing it this way round means that it gets complicated when the
+>> guest writes to the RTC, though. At the moment I can't see anywhere
+>> that sets the current_tm fields except for reset and post-migration.
+>> Isn't something missing here? I'm wondering if this choice of
+>> migration state is going to paint us into a corner for handling
+>> guest-writes-to-rtc.
+>
+> I don't have guest write support. The main focus was just allowing
+> users to set the time when they boot QEMU. We haven't seen any request
+> to allow guests to set the time, so I didn't bother.
+>
+> Wouldn't adding guest write support just be as simple as converting
+> the value written to a current_tm field?
+
+Yes, but then why are we using the current_tm format at all?
+It's not what the guest wants to see for reads, it's not what writes
+would naturally be, and it's not what you're using at runtime (you
+convert it immediately to a tick_offset and ignore the current_tm
+stuff). I guess it can be made to work, it just seems like a weird
+format to use for migration.
+
+I've also just reread the patch and am a bit confused -- don't
+you need some code that writes the correct value for the current
+guest time to the current_tm fields before migration ?
+
+thanks
+-- PMM
