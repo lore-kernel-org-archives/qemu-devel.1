@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1Z-0002l5-HI
+	(envelope-from <kwolf@redhat.com>) id 1ele1a-0002lB-41
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele1X-0005Aw-T9
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele1Z-0005Bv-30
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:05:46 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:04:37 +0100
-Message-Id: <20180213170529.10858-4-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:04:40 +0100
+Message-Id: <20180213170529.10858-7-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 03/55] qemu-img: Document --force-share / -U
+Subject: [Qemu-devel] [PULL 06/55] block: early check for blockers on
+ drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,34 +23,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+Even if an op blocker is present for BLOCK_OP_TYPE_MIRROR_SOURCE,
+it is checked a bit late and the result is that the target is
+created even if drive-mirror subsequently fails.  Add an early
+check to avoid this.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-img.texi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ blockdev.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 60a0e080c6..8a26400adb 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -86,6 +86,14 @@ exclusive with the @var{-O} parameters. It is currently required to also use
- the @var{-n} parameter to skip image creation. This restriction may be relaxed
- in a future release.
+diff --git a/blockdev.c b/blockdev.c
+index bdbdeae7e4..7423c5317b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3569,6 +3569,11 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         return;
+     }
  
-+@item --force-share (-U)
-+If specified, @code{qemu-img} will open the image in shared mode, allowing
-+other QEMU processes to open it in write mode. For example, this can be used to
-+get the image information (with 'info' subcommand) when the image is used by a
-+running guest.  Note that this could produce inconsistent results because of
-+concurrent metadata changes, etc. This option is only allowed when opening
-+images in read-only mode.
++    /* Early check to avoid creating target */
++    if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_MIRROR_SOURCE, errp)) {
++        return;
++    }
 +
- @item --backing-chain
- will enumerate information about backing files in a disk image chain. Refer
- below for further description.
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
 -- 
 2.13.6
