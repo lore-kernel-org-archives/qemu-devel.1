@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1elikJ-00058C-Vf
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:08:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1elimT-0006c1-9t
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:10:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1elikF-0003qm-0e
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:08:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35692 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1elikE-0003qY-RC
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:08:10 -0500
-Date: Wed, 14 Feb 2018 00:07:53 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180214000454-mutt-send-email-mst@kernel.org>
-References: <cover.1512476043.git.tgolembi@redhat.com>
-	<938dc32019864c9c19259bdddd64a53b6b99efef.1512476043.git.tgolembi@redhat.com>
-	<20180205130824.79f570bc@fiorina>
-	<1e6717d5-a1bc-3409-b01f-24ea761659fb@oracle.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1elimO-00050Y-Mx
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:10:29 -0500
+Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:42549)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1elimO-00050I-7x
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:10:24 -0500
+Received: by mail-pl0-x22e.google.com with SMTP id 31so1812113ple.9
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 14:10:24 -0800 (PST)
+References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
+	<1518053328-34687-10-git-send-email-mjc@sifive.com>
+	<20180213215541.GA1816@flamenco>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <731db20e-4d86-e288-504c-30c83b56fd33@linaro.org>
+Date: Tue, 13 Feb 2018 14:10:20 -0800
 MIME-Version: 1.0
+In-Reply-To: <20180213215541.GA1816@flamenco>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1e6717d5-a1bc-3409-b01f-24ea761659fb@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-balloon: include statistics
- of disk/file caches
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 09/23] RISC-V TCG Code Generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jonathan Helman <jonathan.helman@oracle.com>
-Cc: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Wei Wang <wei.w.wang@intel.com>
+To: "Emilio G. Cota" <cota@braap.org>, Michael Clark <mjc@sifive.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On Tue, Feb 13, 2018 at 12:29:39PM -0800, Jonathan Helman wrote:
->=20
->=20
-> On 02/05/2018 04:08 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD wrote:
-> > ping
-> >=20
-> > On Tue,  5 Dec 2017 13:14:46 +0100
-> > Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
-> >=20
->=20
-> It would be good to include the corresponding upstream kernel change in=
- the
-> commit message. This would be similar to a previous change:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-02/msg05555.html
+On 02/13/2018 01:55 PM, Emilio G. Cota wrote:
+> On Thu, Feb 08, 2018 at 14:28:34 +1300, Michael Clark wrote:
+>> TCG code generation for the RV32IMAFDC and RV64IMAFDC. The QEMU
+>> RISC-V code generator has complete coverage for the Base ISA v2.2,
+>> Privileged ISA v1.9.1 and Privileged ISA v1.10:
+>>
+>> - RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
+>> - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
+>> - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
+>>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: Michael Clark <mjc@sifive.com>
+>> ---
+> (snip)
+>> +++ b/target/riscv/translate.c
+> (snip)
+>> +enum {
+>> +    BS_NONE     = 0, /* When seen outside of translation while loop, indicates
+>> +                     need to exit tb due to end of page. */
+>> +    BS_STOP     = 1, /* Need to exit tb for syscall, sret, etc. */
+> 
+> Are we planning to use BS_STOP in the future? I see it has no setters,
+> although we check for it in gen_intermediate_code:
 
-good idea, but this has been merged by now.
+No, but the whole port should be converted to exec/translator.h, which defines
+DisasJumpType.  Not something I'm going to require on initial submission until
+we've gotten most of the other targets cleaned up.
 
-> > > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.c=
-om>
-> > > ---
-> > >   hw/virtio/virtio-balloon.c                      | 1 +
-> > >   include/standard-headers/linux/virtio_balloon.h | 3 ++-
-> > >   2 files changed, 3 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.=
-c
-> > > index 37cde38982..8141326a51 100644
-> > > --- a/hw/virtio/virtio-balloon.c
-> > > +++ b/hw/virtio/virtio-balloon.c
-> > > @@ -50,6 +50,7 @@ static const char *balloon_stat_names[] =3D {
-> > >      [VIRTIO_BALLOON_S_MEMFREE] =3D "stat-free-memory",
-> > >      [VIRTIO_BALLOON_S_MEMTOT] =3D "stat-total-memory",
-> > >      [VIRTIO_BALLOON_S_AVAIL] =3D "stat-available-memory",
-> > > +   [VIRTIO_BALLOON_S_CACHES] =3D "stat-disk-caches",
-> > >      [VIRTIO_BALLOON_S_NR] =3D NULL
-> > >   };
-> > > diff --git a/include/standard-headers/linux/virtio_balloon.h b/incl=
-ude/standard-headers/linux/virtio_balloon.h
-> > > index 9d06ccd066..7b0a41b8fc 100644
-> > > --- a/include/standard-headers/linux/virtio_balloon.h
-> > > +++ b/include/standard-headers/linux/virtio_balloon.h
-> > > @@ -52,7 +52,8 @@ struct virtio_balloon_config {
-> > >   #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free mem=
-ory */
-> > >   #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory *=
-/
-> > >   #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /=
-proc */
-> > > -#define VIRTIO_BALLOON_S_NR       7
-> > > +#define VIRTIO_BALLOON_S_CACHES   7   /* Disk caches */
->=20
-> I've been wondering, VIRTIO_BALLOON_S_AVAIL is not in the virtio spec (=
-see
-> Section 5.5.6.3). It seems like this header file needs to be in sync wi=
-th
-> the virtio spec in order to make this change.
->=20
-> I have a similar change to add a new statistic and was wondering this.
 
-Absolutely. Tom=C3=A1=C5=A1?
-
-> > > +#define VIRTIO_BALLOON_S_NR       8
-> > >   /*
-> > >    * Memory statistics structure.
-> > > --=20
-> > > 2.15.1
-> > >=20
-> >=20
-> >=20
->=20
-> You need to add your new stat to the list of stats in
-> docs/virtio-balloon-stats.txt.
->=20
-> Jon
-
-Can't hurt, I agree.
-
---=20
-MST
+r~
