@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yanjun.zhu@oracle.com>) id 1elVsc-0008P6-Ll
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:24:02 -0500
+	(envelope-from <yanjun.zhu@oracle.com>) id 1elVsG-00088J-Mb
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yanjun.zhu@oracle.com>) id 1elVsZ-0006nU-Fl
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:58 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:43822)
+	(envelope-from <yanjun.zhu@oracle.com>) id 1elVsC-0006L9-Pw
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:36 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:56102)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yanjun.zhu@oracle.com>)
-	id 1elVsY-0006mZ-UZ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:55 -0500
+	id 1elVsC-0006K4-AA
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 03:23:32 -0500
 References: <20180212180819.82556-1-marcel@redhat.com>
-	<20180212180819.82556-5-marcel@redhat.com>
+	<20180212180819.82556-6-marcel@redhat.com>
 From: Yanjun Zhu <yanjun.zhu@oracle.com>
-Message-ID: <199d86c3-ace7-7fe5-8783-f0e1503f9f74@oracle.com>
-Date: Tue, 13 Feb 2018 16:23:44 +0800
+Message-ID: <ebbe23a0-8676-dad0-1003-a70d120fe2e3@oracle.com>
+Date: Tue, 13 Feb 2018 16:23:22 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180212180819.82556-5-marcel@redhat.com>
+In-Reply-To: <20180212180819.82556-6-marcel@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V10 4/9] hw/rdma: Add wrappers and macros
+Subject: Re: [Qemu-devel] [PATCH V10 5/9] hw/rdma: Definitions for rdma
+ device and rdma resource manager
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,10 +38,8 @@ Cc: peter.maydell@linaro.org, ehabkost@redhat.com, yuval.shaia@oracle.com, mst@r
 On 2018/2/13 2:08, Marcel Apfelbaum wrote:
 > From: Yuval Shaia <yuval.shaia@oracle.com>
 >
-> As all mapping for this device are from driver to device,
-> declare wrappers on top of pci_dma_*map functions.
->
-> In addition, declare macros to be used for debug messages.
+> Definition of various structures and constants used in backend and
+> resource manager modules.
 >
 > Reviewed-by: Dotan Barak <dotanb@mellanox.com>
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
@@ -49,44 +48,20 @@ Reviewed-by: Zhu Yanjun <yanjun.zhu@oracle.com>
 
 Zhu Yanjun
 > ---
->   hw/Makefile.objs      |  1 +
->   hw/rdma/Makefile.objs |  3 +++
->   hw/rdma/rdma_utils.c  | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->   hw/rdma/rdma_utils.h  | 43 +++++++++++++++++++++++++++++++++++++++++++
->   4 files changed, 98 insertions(+)
->   create mode 100644 hw/rdma/Makefile.objs
->   create mode 100644 hw/rdma/rdma_utils.c
->   create mode 100644 hw/rdma/rdma_utils.h
+>   hw/rdma/rdma_backend_defs.h |  62 ++++++++++++++++++++++++++
+>   hw/rdma/rdma_rm_defs.h      | 104 ++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 166 insertions(+)
+>   create mode 100644 hw/rdma/rdma_backend_defs.h
+>   create mode 100644 hw/rdma/rdma_rm_defs.h
 >
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index cf4cb2010b..6a0ffe0afd 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -18,6 +18,7 @@ devices-dirs-$(CONFIG_IPMI) += ipmi/
->   devices-dirs-$(CONFIG_SOFTMMU) += isa/
->   devices-dirs-$(CONFIG_SOFTMMU) += misc/
->   devices-dirs-$(CONFIG_SOFTMMU) += net/
-> +devices-dirs-$(CONFIG_SOFTMMU) += rdma/
->   devices-dirs-$(CONFIG_SOFTMMU) += nvram/
->   devices-dirs-$(CONFIG_SOFTMMU) += pci/
->   devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
-> diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
+> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
 > new file mode 100644
-> index 0000000000..cdffe4a9a3
+> index 0000000000..837e32419c
 > --- /dev/null
-> +++ b/hw/rdma/Makefile.objs
-> @@ -0,0 +1,3 @@
-> +ifeq ($(CONFIG_RDMA),y)
-> +obj-$(CONFIG_PCI) += rdma_utils.o
-> +endif
-> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-> new file mode 100644
-> index 0000000000..0e5caffd40
-> --- /dev/null
-> +++ b/hw/rdma/rdma_utils.c
-> @@ -0,0 +1,51 @@
+> +++ b/hw/rdma/rdma_backend_defs.h
+> @@ -0,0 +1,62 @@
 > +/*
-> + * QEMU paravirtual RDMA - Generic RDMA backend
+> + *  RDMA device: Definitions of Backend Device structures
 > + *
 > + * Copyright (C) 2018 Oracle
 > + * Copyright (C) 2018 Red Hat Inc
@@ -100,88 +75,160 @@ Zhu Yanjun
 > + *
 > + */
 > +
-> +#include "rdma_utils.h"
+> +#ifndef RDMA_BACKEND_DEFS_H
+> +#define RDMA_BACKEND_DEFS_H
 > +
-> +void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen)
-> +{
-> +    void *p;
-> +    hwaddr len = plen;
+> +#include <infiniband/verbs.h>
+> +#include <qemu/thread.h>
 > +
-> +    if (!addr) {
-> +        pr_dbg("addr is NULL\n");
-> +        return NULL;
-> +    }
+> +typedef struct RdmaDeviceResources RdmaDeviceResources;
 > +
-> +    p = pci_dma_map(dev, addr, &len, DMA_DIRECTION_TO_DEVICE);
-> +    if (!p) {
-> +        pr_dbg("Fail in pci_dma_map, addr=0x%llx, len=%ld\n",
-> +               (long long unsigned int)addr, len);
-> +        return NULL;
-> +    }
+> +typedef struct RdmaBackendThread {
+> +    QemuThread thread;
+> +    QemuMutex mutex;
+> +    bool run;
+> +} RdmaBackendThread;
 > +
-> +    if (len != plen) {
-> +        rdma_pci_dma_unmap(dev, p, len);
-> +        return NULL;
-> +    }
+> +typedef struct RdmaBackendDev {
+> +    struct ibv_device_attr dev_attr;
+> +    RdmaBackendThread comp_thread;
+> +    union ibv_gid gid;
+> +    PCIDevice *dev;
+> +    RdmaDeviceResources *rdma_dev_res;
+> +    struct ibv_device *ib_dev;
+> +    struct ibv_context *context;
+> +    struct ibv_comp_channel *channel;
+> +    uint8_t port_num;
+> +    uint8_t backend_gid_idx;
+> +} RdmaBackendDev;
 > +
-> +    pr_dbg("0x%llx -> %p (len=%ld)\n", (long long unsigned int)addr, p, len);
+> +typedef struct RdmaBackendPD {
+> +    struct ibv_pd *ibpd;
+> +} RdmaBackendPD;
 > +
-> +    return p;
-> +}
+> +typedef struct RdmaBackendMR {
+> +    struct ibv_pd *ibpd;
+> +    struct ibv_mr *ibmr;
+> +} RdmaBackendMR;
 > +
-> +void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
-> +{
-> +    pr_dbg("%p\n", buffer);
-> +    if (buffer) {
-> +        pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
-> +    }
-> +}
-> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-> new file mode 100644
-> index 0000000000..cdac910e24
-> --- /dev/null
-> +++ b/hw/rdma/rdma_utils.h
-> @@ -0,0 +1,43 @@
-> +/*
-> + * RDMA device: Debug utilities
-> + *
-> + * Copyright (C) 2018 Oracle
-> + * Copyright (C) 2018 Red Hat Inc
-> + *
-> + *
-> + * Authors:
-> + *     Yuval Shaia <yuval.shaia@oracle.com>
-> + *     Marcel Apfelbaum <marcel@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
+> +typedef struct RdmaBackendCQ {
+> +    RdmaBackendDev *backend_dev;
+> +    struct ibv_cq *ibcq;
+> +} RdmaBackendCQ;
 > +
-> +#ifndef RDMA_UTILS_H
-> +#define RDMA_UTILS_H
+> +typedef struct RdmaBackendQP {
+> +    struct ibv_pd *ibpd;
+> +    struct ibv_qp *ibqp;
+> +} RdmaBackendQP;
 > +
-> +#include <qemu/osdep.h>
-> +#include <include/hw/pci/pci.h>
-> +#include <include/sysemu/dma.h>
-> +
-> +#define pr_info(fmt, ...) \
-> +    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma",  __func__, __LINE__,\
-> +           ## __VA_ARGS__)
-> +
-> +#define pr_err(fmt, ...) \
-> +    fprintf(stderr, "%s: Error at %-20s (%3d): " fmt, "pvrdma", __func__, \
-> +        __LINE__, ## __VA_ARGS__)
-> +
-> +#ifdef PVRDMA_DEBUG
-> +#define pr_dbg(fmt, ...) \
-> +    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma", __func__, __LINE__,\
-> +           ## __VA_ARGS__)
-> +#else
-> +#define pr_dbg(fmt, ...)
 > +#endif
+> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+> new file mode 100644
+> index 0000000000..6522dca68f
+> --- /dev/null
+> +++ b/hw/rdma/rdma_rm_defs.h
+> @@ -0,0 +1,104 @@
+> +/*
+> + * RDMA device: Definitions of Resource Manager structures
+> + *
+> + * Copyright (C) 2018 Oracle
+> + * Copyright (C) 2018 Red Hat Inc
+> + *
+> + * Authors:
+> + *     Yuval Shaia <yuval.shaia@oracle.com>
+> + *     Marcel Apfelbaum <marcel@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
 > +
-> +void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
-> +void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
+> +#ifndef RDMA_RM_DEFS_H
+> +#define RDMA_RM_DEFS_H
+> +
+> +#include "rdma_backend_defs.h"
+> +
+> +#define MAX_PORTS             1
+> +#define MAX_PORT_GIDS         1
+> +#define MAX_PORT_PKEYS        1
+> +#define MAX_PKEYS             1
+> +#define MAX_GIDS              2048
+> +#define MAX_UCS               512
+> +#define MAX_MR_SIZE           (1UL << 27)
+> +#define MAX_QP                1024
+> +#define MAX_SGE               4
+> +#define MAX_CQ                2048
+> +#define MAX_MR                1024
+> +#define MAX_PD                1024
+> +#define MAX_QP_RD_ATOM        16
+> +#define MAX_QP_INIT_RD_ATOM   16
+> +#define MAX_AH                64
+> +
+> +#define MAX_RMRESTBL_NAME_SZ 16
+> +typedef struct RdmaRmResTbl {
+> +    char name[MAX_RMRESTBL_NAME_SZ];
+> +    QemuMutex lock;
+> +    unsigned long *bitmap;
+> +    size_t tbl_sz;
+> +    size_t res_sz;
+> +    void *tbl;
+> +} RdmaRmResTbl;
+> +
+> +typedef struct RdmaRmPD {
+> +    RdmaBackendPD backend_pd;
+> +    uint32_t ctx_handle;
+> +} RdmaRmPD;
+> +
+> +typedef struct RdmaRmCQ {
+> +    RdmaBackendCQ backend_cq;
+> +    void *opaque;
+> +    bool notify;
+> +} RdmaRmCQ;
+> +
+> +typedef struct RdmaRmUserMR {
+> +    uint64_t host_virt;
+> +    uint64_t guest_start;
+> +    size_t length;
+> +} RdmaRmUserMR;
+> +
+> +/* MR (DMA region) */
+> +typedef struct RdmaRmMR {
+> +    RdmaBackendMR backend_mr;
+> +    RdmaRmUserMR user_mr;
+> +    uint32_t pd_handle;
+> +    uint32_t lkey;
+> +    uint32_t rkey;
+> +} RdmaRmMR;
+> +
+> +typedef struct RdmaRmUC {
+> +    uint64_t uc_handle;
+> +} RdmaRmUC;
+> +
+> +typedef struct RdmaRmQP {
+> +    RdmaBackendQP backend_qp;
+> +    void *opaque;
+> +    uint32_t qp_type;
+> +    uint32_t qpn;
+> +    uint32_t send_cq_handle;
+> +    uint32_t recv_cq_handle;
+> +    enum ibv_qp_state qp_state;
+> +} RdmaRmQP;
+> +
+> +typedef struct RdmaRmPort {
+> +    union ibv_gid gid_tbl[MAX_PORT_GIDS];
+> +    enum ibv_port_state state;
+> +    int *pkey_tbl; /* TODO: Not yet supported */
+> +} RdmaRmPort;
+> +
+> +typedef struct RdmaDeviceResources {
+> +    RdmaRmPort ports[MAX_PORTS];
+> +    RdmaRmResTbl pd_tbl;
+> +    RdmaRmResTbl mr_tbl;
+> +    RdmaRmResTbl uc_tbl;
+> +    RdmaRmResTbl qp_tbl;
+> +    RdmaRmResTbl cq_tbl;
+> +    RdmaRmResTbl cqe_ctx_tbl;
+> +    GHashTable *qp_hash; /* Keeps mapping between real and emulated */
+> +} RdmaDeviceResources;
 > +
 > +#endif
