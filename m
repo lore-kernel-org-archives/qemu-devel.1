@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elbXe-0005in-Tx
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:26:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1elbXg-0005kP-AC
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:26:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1elbXe-0007cj-0u
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:26:42 -0500
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:46572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1elbXd-0007cS-RY
+	(envelope-from <eblake@redhat.com>) id 1elbXd-0007cF-3W
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:26:44 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44498 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elbXc-0007bf-Uj
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:26:41 -0500
-Received: by mail-oi0-x229.google.com with SMTP id x21so13976193oie.13
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 06:26:41 -0800 (PST)
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 951E6EB700
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 14:26:29 +0000 (UTC)
+References: <20180213070526.22475-1-kraxel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <db9528b7-3965-5c64-31f2-68b12a91cfde@redhat.com>
+Date: Tue, 13 Feb 2018 08:26:22 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180208173157.24705-4-alex.bennee@linaro.org>
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
-	<20180208173157.24705-4-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Feb 2018 14:26:20 +0000
-Message-ID: <CAFEAcA-=Oh=MgSGoheP70o9dy0hgo64PBtRH5u1u51bjqUAh7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/32] target/arm/cpu64: allow fp16 to
- be disabled
+In-Reply-To: <20180213070526.22475-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vnc: add qapi/error.h include to stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 8 February 2018 at 17:31, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> While for CONFIG_USER_ONLY it is policy for the "cpu" to be the most
-> capable is can be this does cause problems. For example legacy RISU
-> runs would fail as there are a bunch of implemented instructions which
-> would have caused failures that now trigger actual calculations.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On 02/13/2018 01:05 AM, Gerd Hoffmann wrote:
+> Fixes --disable-vnc build failure.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   ui/vnc-stubs.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
 
->  static void aarch64_cpu_initfn(Object *obj)
->  {
->      object_property_add_bool(obj, "aarch64", aarch64_cpu_get_aarch64,
-> @@ -283,6 +303,13 @@ static void aarch64_cpu_initfn(Object *obj)
->                                      "Set on/off to enable/disable aarch6=
-4 "
->                                      "execution state ",
->                                      NULL);
-> +#ifdef CONFIG_USER_ONLY
-> +    object_property_add_bool(obj, "fp16", aarch64_cpu_get_fp16,
-> +                             aarch64_cpu_set_fp16, NULL);
-> +    object_property_set_description(obj, "fp16",
-> +                                    "Set on/off to enable/disable FP16 e=
-xtensions ",
-> +                                    NULL);
-> +#endif
->  }
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Good news everybody -- this is an opportunity for a naming bikeshed
-discussion!
+> diff --git a/ui/vnc-stubs.c b/ui/vnc-stubs.c
+> index f51280549a..06c4ac6296 100644
+> --- a/ui/vnc-stubs.c
+> +++ b/ui/vnc-stubs.c
+> @@ -1,5 +1,6 @@
+>   #include "qemu/osdep.h"
+>   #include "ui/console.h"
+> +#include "qapi/error.h"
+>   
+>   int vnc_display_password(const char *id, const char *password)
+>   {
+> 
 
-The property names we use here are effectively ABI because they'll
-be available to the user on the command line, so we want to get the
-right names. This is the first of these, but we can reasonably
-assume we'll have more feature switches in the future for various
-other optional instruction set extensions.
-
-There are two obvious choices here:
- * use the architecture extension names from the Arm ARM A1.7.4
-   (in this case that's "ARMv8.2-FP16", which we could reasonably
-   abbreviate to fp16)
- * use the hwcaps names that Linux defines and prints in /proc/cpuinfo
-   (in this case that would be a combination of "fphp" and "asimdhp",
-   since hwcaps reflects the ID register setup that allows a CPU
-   to report support for one and not the other)
-
-Whatever we do, we should have a comment describing our naming
-conventions, so we can follow it next time we add one of these...
-
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
