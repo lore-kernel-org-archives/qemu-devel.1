@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ela2q-0004If-39
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:50:50 -0500
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ela3l-0005Ic-2N
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:51:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ela2l-0006CV-3h
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:50:48 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41268 helo=mx1.redhat.com)
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ela3g-0006gs-3h
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:51:45 -0500
+Received: from smtp1.lauterbach.com ([62.154.241.196]:35750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ela2k-0006CJ-Tr
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:50:43 -0500
-Date: Tue, 13 Feb 2018 13:50:39 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180213135039.28813f33@redhat.com>
-In-Reply-To: <cc3261c2-1d72-42d0-15c6-3163c36aac69@linux.vnet.ibm.com>
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
-	<20180212152745.2e333fa6@redhat.com>
-	<89bd0c08-f00d-e6c7-c548-1d80fb951b8d@linux.vnet.ibm.com>
-	<20180212185229.2eea53b9@redhat.com>
-	<cc3261c2-1d72-42d0-15c6-3163c36aac69@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ela3f-0006ZB-NU
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 07:51:40 -0500
+Received: from unknown (HELO [192.168.187.23])
+	(Authenticated_SSL:abouassida@[41.224.44.126])
+	(envelope-sender <abdallah.bouassida@lauterbach.com>)
+	by smtp1.lauterbach.com (qmail-ldap-1.03) with
+	ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+	for <qemu-devel@nongnu.org>; 13 Feb 2018 12:51:20 -0000
+References: <d23a2730-a103-6336-0658-e12fa9b0193f@lauterbach.com>
+	<CAFEAcA-tc+-+KLcMPB=BV0zCmO6t7tuKHM4=kyRf_Xx0aCCidA@mail.gmail.com>
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Message-ID: <2f4fd465-ab3a-d75d-ca91-86417b84ba9c@lauterbach.com>
+Date: Tue, 13 Feb 2018 13:51:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
- interface
+In-Reply-To: <CAFEAcA-tc+-+KLcMPB=BV0zCmO6t7tuKHM4=kyRf_Xx0aCCidA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V2] target-arm:Add a dynamic
+ XML-description of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,270 +38,354 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: marcandre.lureau@redhat.com, kevin@koconnor.net, lersek@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Khaled Jmal <khaled.jmal@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 12 Feb 2018 13:45:17 -0500
-Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+[PATCH V2] target-arm:Add a dynamic XML-description of the cp-registers 
+to GDB
 
-> On 02/12/2018 12:52 PM, Igor Mammedov wrote:
-> > On Mon, 12 Feb 2018 11:44:16 -0500
-> > Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> >  
-> >> On 02/12/2018 09:27 AM, Igor Mammedov wrote:  
-> >>> On Fri, 9 Feb 2018 15:19:31 -0500
-> >>> Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> >>>     
-> >>>> On 01/16/2018 10:51 AM, Stefan Berger wrote:  
-> >>>>> The TPM Physical Presence interface consists of an ACPI part, a shared
-> >>>>> memory part, and code in the firmware. Users can send messages to the
-> >>>>> firmware by writing a code into the shared memory through invoking the
-> >>>>> ACPI code. When a reboot happens, the firmware looks for the code and
-> >>>>> acts on it by sending sequences of commands to the TPM.
-> >>>>>
-> >>>>> This patch adds the ACPI code. It is similar to the one in EDK2 but doesn't
-> >>>>> assume that SMIs are necessary to use. It uses a similar datastructure for
-> >>>>> the shared memory as EDK2 does so that EDK2 and SeaBIOS could both make use
-> >>>>> of it. I extended the shared memory data structure with an array of 256
-> >>>>> bytes, one for each code that could be implemented. The array contains
-> >>>>> flags describing the individual codes. This decouples the ACPI implementation
-> >>>>> from the firmware implementation.
-> >>>>>
-> >>>>> The underlying TCG specification is accessible from the following page.
-> >>>>>
-> >>>>> https://trustedcomputinggroup.org/tcg-physical-presence-interface-specification/
-> >>>>>
-> >>>>> This patch implements version 1.30.  
-> >>>> I have played around with this patch and some modifications to EDK2.
-> >>>> Though for EDK2 the question is whether to try to circumvent their
-> >>>> current implementation that uses SMM or use SMM. With this patch so far
-> >>>> I circumvent it, which is maybe not a good idea.
-> >>>>
-> >>>> The facts for EDK2's PPI:
-> >>>>
-> >>>> - from within the OS a PPI code is submitted to ACPI and ACPI enters SMM
-> >>>> via an SMI and the PPI code is written into a UEFI variable. For this
-> >>>> ACPI uses the memory are at 0xFFFF 0000 to pass parameters from the OS
-> >>>> (via ACPI) to SMM. This is declared in ACPI with an OperationRegion() at
-> >>>> that address. Once the machine is rebooted, UEFI reads the variable and
-> >>>> finds the PPI code and reacts to it.
-> >>>>
-> >>>>
-> >>>> The facts for SeaBIOS:
-> >>>> - we cannot use the area at 0xFFFF 0000 since SeaBIOS is also mapped to
-> >>>> this address. So we would have to use the PPI memory device's memory
-> >>>> region, which is currently at 0xFED4 5000. SeaBIOS doesn't have
-> >>>> persistent memory like NVRAM where it stores varaibles. So to pass the
-> >>>> PPI code here the OS would invoke ACPI, which in turn would write the
-> >>>> PPI code into the PPI memory directly. Upon reboot SeaBIOS would find
-> >>>> the PPI code in the PPI memory device and react to it.
-> >>>>
-> >>>> The PPI device in this patch series allocates 0x400 bytes. 0x200 bytes
-> >>>> are used by the OperationRegion() in this patch series. The rest was
-> >>>> thought of for future extensions.
-> >>>>
-> >>>> To allow both firmwares to use PPI, we would need to be able to have the
-> >>>> OperationRegion() be flexible and located at 0xFFFF 0000 for EDK2 and
-> >>>> 0xFED4 5000 for SeaBIOS, per choice of the firmware. One way to achieve
-> >>>> this would be to have the firmwares choose their operation region base
-> >>>> address by writing into the PPI memory device at offset 0x200 (for
-> >>>> example). A '1' there would mean that we want the OperationRegion() at
-> >>>> 0xFFFF 0000, and a '2' would mean at the base address of the PPI device
-> >>>> (0xFED4 5000). This could be achieved by declaring a 2nd
-> >>>> OperationRegion() in the ACPI code that is located at 0xFED4 5200 and we
-> >>>> declare that 1st OperationRegion()'s address based on findings from
-> >>>> there. Further, a flags variable at offset 0x201 could indicate whether
-> >>>> an SMI is needed to enter SMM or not. Obviously, the ACPI code would
-> >>>> become more complex to be able to support both firmwares at the same time.
-> >>>> This is a lot of details but I rather post this description before
-> >>>> posting more patches. To make these changes and get it to work with at
-> >>>> least SeaBIOS is probably fairly easy. But is this acceptable?  
-> >>> You could use hw/acpi/vmgenid.c as example,
-> >>>
-> >>> use following command to instruct firmware to write address back to QEMU:
-> >>>
-> >>>       bios_linker_loader_write_pointer(linker,
-> >>>           TMP_PPI_ADDR_FW_CFG_FILE, 0, sizeof(uint64_t),
-> >>>           TPM_PPI_MEM_FW_CFG_FILE, TPM_PPI_MEM_OFFSET);
-> >>>
-> >>> then when address is written into fwcfg, a callback in QEMU would be called due to
-> >>>
-> >>>       /* Create a read-write fw_cfg file for Address */
-> >>>       fw_cfg_add_file_callback(s, TPM_PPI_ADDR_FW_CFG_FILE, ...);
-> >>>
-> >>> when CB is called you could map persistent overlay memory region
-> >>> (PPI memory device) at address written by firmware.  
-> >>  
-> >>> As for OperationRegion, you can instruct firmware to patch address
-> >>> in AML as well, using bios_linker_loader_add_pointer() linker command.
-> >>> what I'd suggest is to use dedicated TPM SSDT table and
-> >>> at its start put a DWORD/QWORD variable where address would be patched in
-> >>> and then use that variable as argument to OperationRegion
-> >>>
-> >>>    ssdt = init_aml_allocator();
-> >>>    ...
-> >>>    addr_offset = table_data->len + build_append_named_dword(ssdt->buf, "PPIA");
-> >>>    ...
-> >>>    ... aml_operation_region("TPPI", AML_SYSTEM_MEMORY,
-> >>>                         aml_name("PPIA"), TPM_PPI_STRUCT_SIZE)
-> >>>    ...
-> >>>    bios_linker_loader_add_pointer(linker,
-> >>>          ACPI_BUILD_TABLE_FILE, addr_offset, sizeof(uint32_t),
-> >>>          TPM_PPI_MEM_FW_CFG_FILE, 0);
-> >>>
-> >>> This way both UEFI and Seabios would use the same implementation and
-> >>> work the same way.  
-> >> Thanks for this sample code. Though it only applies to how they write
-> >> the base address for the OperationRegion() and not the behaviour of the
-> >> code when it comes to SMI versus non-SMI.  
-> >  From what I've gathered from discussions around the topic
-> > is that untrusted guest code writes request into PPI memory
-> > and then FW on reboot should act on it somehow (i.e. ask
-> > user a terminal id changes are ok).
-> >
-> > So I'd say, SMI versus non-SMI is a separate issue and we shouldn't
-> > mix it with how firmware allocates PPI memory.
-> >  
-> >>> aml_operation_region("TPPI",..., aml_name("PPIA"), ...)
-> >>> might work but it's not per spec, so it would be better to add
-> >>> an API similar to build_append_named_dword() but only for
-> >>> OperationRegion() which would return its offset within the table.
-> >>> And skip on intermediate dword variable.
-> >>>
-> >>>
-> >>> Wrt migration, you'd need to migrate address where PPI memory device
-> >>> is mapped and its memory region.  
-> >> So today the PPI memory device is located at some address A. If we
-> >> decided that we need to move it to address B due to a collision with
-> >> another device, then are we going to be able to update the ACPI
-> >> OperationRegion base address post-migration to move it from address A to
-> >> address B? Or should we refuse the migration ? Keeping it at address A
-> >> seems wrong due to the collision.  
-> > Rule of the thumb is that HW on src and dst must be the same,
-> > which implies the same address.  
-> 
-> Following this we don't need to migrate the address, do we ? My current 
-> implementation doesn't and uses a constant to set the subregion.
-see below why migrating address might be necessary
- 
-> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m, Object *obj)
-> +{
-> +    memory_region_init_io(&tpmppi->mmio, obj, &tpm_ppi_memory_ops,
-> +                          tpmppi, "tpm-ppi-mmio",
-> +                          TPM_PPI_ADDR_SIZE);
-> +
-> +    memory_region_add_subregion(m, TPM_PPI_ADDR_BASE, &tpmppi->mmio);
-In QEMU typically it's not acceptable for device to map itself at some
-fixed address. (but there are exceptions). Usually mapping in
-common address space is done by board that uses device.
+This patch offers to GDB the ability to read/write all the coprocessor
+registers for ARM and ARM64 by generating dynamically an XML-description for
+these registers.
 
-> +}
-> 
-> 
-> Here TPM_PPI_ADDR_BASE is set to 0xfed4 5000. Is that wrong and would 
-> have to be dynamic?I must admit I haven't spent much thought on EDK2's 
-> 0xffff 0000 area and how that would be handled. It may very well have to 
-> be yet another region because in the current PPI memory is more data 
-> stored than what EDK2 uses in the 0xffff 0000 region.
-If you in advance take in account that address might be different
-depending on target/board/FW kind or even version. Starting
-with flexible allocation makes more sense, since one won't have
-to redo implementation once something else beside SeaBIOS
-needed to be supported. And there won't be need to introduce
-negotiation mechanism on top to allow FW specify which of fixed
-addresses to use. With all this building up, a simplistic
-fixed address impl. becomes rather complex.
+Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+---
 
-> > Also note that firmware on src is in RAM and it's also
-> > migrated including address it's allocated/reported to QEMU on src.
-> > So above mismatch nor collision isn't possible.  
-> 
-> > Though, more important point is that QEMU doesn't have to
-> > give a damn (besides migrating this values from src to dst and
-> > remapping overlay PPI memory region at that address (PCI code does
-> > similar thing for migrated BARs)) about where in RAM this address
-> > is allocated (it's upto firmware and should eliminate cross
-> > version QEMU migration issues).
-> > On new boot dst could get a new firmware which might allocate
-> > region somewhere else and it would still work if it's migrated
-> > back to the old host.  
-> 
-> That it can get a region somewhere else would depend on 'what'? Would 
-> the firmware decide the address of the PPI device?
-Yes, firmware would decide where to put it
-For example EDK could write 0xffff0000 into fwcgf file
-while SeaBIOS could write there something else.
+> Hi. I tried applying this patch to review it, but unfortunately your
+> email client has made a complete mess of it. In particular:
+>   * it is wrapping long lines
+>   * it is converting all the leading space characters to unicode
+>     non-breaking space characters
+>
+> which means that it won't apply. Can you resend using something that
+> doesn't mangle plaintext, please?
+Hi Peter,
 
-If bios_linker API is used to allocate region, then that address
-is taken from RAM address space that firmware reserves for ACPI
-tables (i.e. it doesn't conflict with anything and won't be used
-by guest OS as it's reported as reserved in E802 table).
+Thanks for the review!
+I'm sorry, I wasn't aware of such a wrapping problem. So, here it is the 
+patch as
+a plain text email.
 
-> So the call 
-> 'memory_region_add_subregion(m, TPM_PPI_ADDR_BASE, &tpmppi->mmio)' above 
-> would have to be called by that callback ?
-the callback, attached to file, will map PPI device memory
-at written address:
-  memory_region_add_subregion(m, fw_reported_ppi_addr, &tpmppi->mmio)
+Best regards,
+Abdallah
 
-> I don't understand the part why 'it would still work if it's migrated 
-> back to the old host.'  Maybe there's more flexibility with moving 
-> addresses between migrations than what I currently know how to 
-> implement. My understanding is that the base address of the PPI device 
-> cannot change and both source and destination QEMU need to have it at 
-> the same address. As I point out above, I am working with a hard coded 
-> address that may have to be changed (=edited in the .h file) if we ever 
-> were to detect a collision with another device.
-And that changing 'fixed' address is the problem in case of
-cross version migrations, as fixed address implies lockstep
-update in both QEMU and firmware.
-In case firmware with OLD constant is migrated to newer QEMU
-with another address and vice verse, things will break.
-Then to overcome issue you would have to migrate address as
-device state anyway (but that would work only one way since
-older QEMU with simple fixed address didn't have a clue about
-it, plus other surrounding compat glue for supporting
-old/new/other firmware).
+  gdbstub.c              | 18 +++++++++++
+  include/qom/cpu.h      |  3 ++
+  target/arm/cpu.c       |  3 ++
+  target/arm/cpu.h       | 18 +++++++++++
+  target/arm/gdbstub.c   | 87 
+++++++++++++++++++++++++++++++++++++++++++++++++++
+  target/arm/gdbstub64.c | 25 +++++++++++++++
+  target/arm/helper.c    |  3 +-
+  7 files changed, 155 insertions(+), 2 deletions(-)
 
-If you go dynamic approach from the begging, you'll have
-address as migrated state from the starters and QEMU won't
-have any fixed address built in so there won't be any
-dependency between QEMU and firmware. It won't matter
-whether it's old or new QEMU is used, as firmware decides
-how to program TMP/PPI device (allocates address from its
-free address pool).
+diff --git a/gdbstub.c b/gdbstub.c
+index f1d5148..f54053f 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -670,10 +670,20 @@ static const char *get_feature_xml(const char *p, 
+const char **newp,
+                  pstrcat(target_xml, sizeof(target_xml), r->xml);
+                  pstrcat(target_xml, sizeof(target_xml), "\"/>");
+              }
++            if (cc->has_dynamic_xml) {
++                cc->gen_dynamic_xml(cpu);
++                pstrcat(target_xml, sizeof(target_xml), "<xi:include 
+href=\"");
++                pstrcat(target_xml, sizeof(target_xml), 
+"dynamic_desc.xml");
++                pstrcat(target_xml, sizeof(target_xml), "\"/>");
++            }
+              pstrcat(target_xml, sizeof(target_xml), "</target>");
+          }
+          return target_xml;
+      }
++    if (strncmp(p, "dynamic_desc.xml", len) == 0) {
++        CPUState *cpu = first_cpu;
++        return cc->get_dynamic_xml(cpu);
++    }
+      for (i = 0; ; i++) {
+          name = xml_builtin[i][0];
+          if (!name || (strncmp(name, p, len) == 0 && strlen(name) == len))
+@@ -697,6 +707,10 @@ static int gdb_read_register(CPUState *cpu, uint8_t 
+*mem_buf, int reg)
+              return r->get_reg(env, mem_buf, reg - r->base_reg);
+          }
+      }
++
++    if (cc->has_dynamic_xml) {
++        return cc->gdb_read_register(cpu, mem_buf, reg);
++    }
+      return 0;
+  }
 
-Considering you already have 2 different addresses depending
-on firmware and there might be 3rd when ARM comes in
-picture, I'm trying to persuade you to use dynamic approach
-from the beginning to avoid compatibility/migration issues
-in future.
+@@ -715,6 +729,10 @@ static int gdb_write_register(CPUState *cpu, 
+uint8_t *mem_buf, int reg)
+              return r->set_reg(env, mem_buf, reg - r->base_reg);
+          }
+      }
++
++    if (cc->has_dynamic_xml) {
++        return cc->gdb_write_register(cpu, mem_buf, reg);
++    }
+      return 0;
+  }
 
-Maybe instead of rewriting PPI series again, you could
-just start with a simple prototype that would implement
-this allocation logic in QEMU/SeaBIOS/EDK. And once that
-is settled, fill it in with TPM specific logic.
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 93bd546..a3105c0 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -197,6 +197,9 @@ typedef struct CPUClass {
+      const struct VMStateDescription *vmsd;
+      const char *gdb_core_xml_file;
+      gchar * (*gdb_arch_name)(CPUState *cpu);
++    bool has_dynamic_xml;
++    void (*gen_dynamic_xml)(CPUState *cpu);
++    char *(*get_dynamic_xml)(CPUState *cpu);
 
-PS:
-I can guide you wrt usage of bios_liker API if hw/acpi/vmgenid.c
-isn't enough of example.
+      void (*cpu_exec_enter)(CPUState *cpu);
+      void (*cpu_exec_exit)(CPUState *cpu);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index cc1856c..410e250 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1752,6 +1752,9 @@ static void arm_cpu_class_init(ObjectClass *oc, 
+void *data)
+      cc->gdb_num_core_regs = 26;
+      cc->gdb_core_xml_file = "arm-core.xml";
+      cc->gdb_arch_name = arm_gdb_arch_name;
++    cc->has_dynamic_xml = true;
++    cc->gen_dynamic_xml = arm_gen_dynamic_xml;
++    cc->get_dynamic_xml = arm_get_dynamic_xml;
+      cc->gdb_stop_before_watchpoint = true;
+      cc->debug_excp_handler = arm_debug_excp_handler;
+      cc->debug_check_watchpoint = arm_debug_check_watchpoint;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9631670..bcb567b 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -135,6 +135,19 @@ enum {
+     s<2n+1> maps to the most significant half of d<n>
+   */
 
-> >>> As for giving up control to from OS (APCI) to firmware that would be
-> >>> target depended, one could use writing to SMM port to trigger SMI
-> >>> for example and something else in case of ARM or x86 SMM-less design.  
-> >> Though to support these different cases, we either need to be able to
-> >> generate different ACPI code or make it configurable via some sort of
-> >> register. If we cannot get rid of these flag to let the firmware for
-> >> example choose between non-SMI and SMI, then do we need to use the above
-> >> shown callback mechanisms to avoid a 2nd field that lets one choose the
-> >> base address of the PPI memory device?  
-> > I'm sorry this is long discussion across several threads and
-> > I've lost track of SMI vs SMI-less issue.
-> > Could you point it out to me or describe here again what's the
-> > problem and why we would need one vs another.  
-> 
-> See the explanation above. With SeaBIOS we wouldn't need SMM since we 
-> wouldn't write the data in anything else than PPI. EDK2 uses SMM to 
-> write the data into UEFI variables and ACPI would transition to it via 
-> that interrupt.
-I think Kevin did nice sum up of design.
++/**
++ * XMLDynamicDescription:
++ * @desc: Contains the XML descriptions.
++ * @num_cpregs: Number of the Coprocessor registers seen by GDB.
++ * @cpregs_keys: Array that contains the corresponding Key of
++ * a given cpreg with the same order of the cpreg in the XML description.
++ */
++typedef struct XMLDynamicDescription {
++    char *desc;
++    int num_cpregs;
++    uint32_t *cpregs_keys;
++} XMLDynamicDescription;
++
+  /* CPU state for each instance of a generic timer (in cp15 c14) */
+  typedef struct ARMGenericTimer {
+      uint64_t cval; /* Timer CompareValue register */
+@@ -633,6 +646,8 @@ struct ARMCPU {
+      uint64_t *cpreg_vmstate_values;
+      int32_t cpreg_vmstate_array_len;
+
++    XMLDynamicDescription dyn_xml;
++
+      /* Timers used by the generic (architected) timer */
+      QEMUTimer *gt_timer[NUM_GTIMERS];
+      /* GPIO outputs for generic timer */
+@@ -797,6 +812,8 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState 
+*cpu, vaddr addr,
+
+  int arm_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+  int arm_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
++void arm_gen_dynamic_xml(CPUState *cpu);
++char *arm_get_dynamic_xml(CPUState *cpu);
+
+  int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+                               int cpuid, void *opaque);
+@@ -2005,6 +2022,7 @@ static inline bool cp_access_ok(int current_el,
+
+  /* Raw read of a coprocessor register (as needed for migration, etc) */
+  uint64_t read_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri);
++void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri, 
+uint64_t v);
+
+  /**
+   * write_list_to_cpustate
+diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+index 04c1208..7cffe87 100644
+--- a/target/arm/gdbstub.c
++++ b/target/arm/gdbstub.c
+@@ -56,6 +56,17 @@ int arm_cpu_gdb_read_register(CPUState *cs, uint8_t 
+*mem_buf, int n)
+          /* CPSR */
+          return gdb_get_reg32(mem_buf, cpsr_read(env));
+      }
++    if (n >= cs->gdb_num_regs &&
++        n < cs->gdb_num_regs + cpu->dyn_xml.num_cpregs) {
++        const ARMCPRegInfo *ri;
++        uint32_t key;
++
++        key = cpu->dyn_xml.cpregs_keys[n - cs->gdb_num_regs];
++        ri = get_arm_cp_reginfo(arm_env_get_cpu(env)->cp_regs, key);
++        if (ri) {
++            return gdb_get_reg32(mem_buf, 
+(uint32_t)read_raw_cp_reg(env, ri));
++        }
++    }
+      /* Unknown register.  */
+      return 0;
+  }
+@@ -98,6 +109,82 @@ int arm_cpu_gdb_write_register(CPUState *cs, uint8_t 
+*mem_buf, int n)
+          cpsr_write(env, tmp, 0xffffffff, CPSRWriteByGDBStub);
+          return 4;
+      }
++    if (n >= cs->gdb_num_regs &&
++        n < cs->gdb_num_regs + cpu->dyn_xml.num_cpregs) {
++        const ARMCPRegInfo *ri;
++        uint32_t key;
++
++        key = cpu->dyn_xml.cpregs_keys[n - cs->gdb_num_regs];
++        ri = get_arm_cp_reginfo(arm_env_get_cpu(env)->cp_regs, key);
++        if (ri) {
++            if (!(ri->type & ARM_CP_CONST)) {
++                write_raw_cp_reg(env, ri, tmp);
++                return 4;
++            }
++        }
++    }
+      /* Unknown register.  */
+      return 0;
+  }
++
++static void arm_gen_xml_reg(gpointer key, gpointer value, gpointer cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    XMLDynamicDescription *dyn_xml = &cpu->dyn_xml;
++    ARMCPRegInfo *ri = value;
++    uint32_t ri_key = *(uint32_t *)key;
++    CPUARMState *env = &cpu->env;
++    char **target_xml = (char **)&(dyn_xml->desc);
++    char *tmp_xml = *target_xml;
++
++    if (!(ri->type & (ARM_CP_NO_RAW | ARM_CP_ALIAS))) {
++        if (env->aarch64) {
++            if (cpreg_field_is_64bit(ri)) {
++                *target_xml = g_strconcat(*target_xml,
++                                        "<reg name=\"", ri->name, "\" ",
++                                        "bitsize=\"64\" 
+group=\"cp_regs\"/>",
++                                        NULL);
++            } else {
++                return;
++            }
++        } else {
++            if (ri->secure & ARM_CP_SECSTATE_S) {
++                *target_xml = g_strconcat(*target_xml,
++                                          "<reg name=\"", ri->name, 
+"_S\" ",
++                                          "bitsize=\"32\" 
+group=\"cp_regs\"/>",
++                                          NULL);
++            } else {
++                *target_xml = g_strconcat(*target_xml,
++                                          "<reg name=\"", ri->name, "\" ",
++                                          "bitsize=\"32\" 
+group=\"cp_regs\"/>",
++                                          NULL);
++            }
++        }
++        g_free(tmp_xml);
++        dyn_xml->num_cpregs++;
++        dyn_xml->cpregs_keys = g_renew(uint32_t,
++                                       dyn_xml->cpregs_keys,
++                                       dyn_xml->num_cpregs);
++        dyn_xml->cpregs_keys[dyn_xml->num_cpregs - 1] = ri_key;
++    }
++}
++
++void arm_gen_dynamic_xml(CPUState *cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++
++    cpu->dyn_xml.num_cpregs = 0;
++    cpu->dyn_xml.desc = g_strconcat("<?xml version=\"1.0\"?>",
++                                 "<!DOCTYPE target SYSTEM 
+\"gdb-target.dtd\">",
++                                   "<feature 
+name=\"org.gnu.gdb.dynamic.cp\">",
++                                   NULL);
++    g_hash_table_foreach(cpu->cp_regs, arm_gen_xml_reg, cs);
++    cpu->dyn_xml.desc = g_strconcat(cpu->dyn_xml.desc, "</feature>", NULL);
++}
++
++char *arm_get_dynamic_xml(CPUState *cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++
++    return cpu->dyn_xml.desc;
++}
+diff --git a/target/arm/gdbstub64.c b/target/arm/gdbstub64.c
+index 49bc3fc..6cf302f 100644
+--- a/target/arm/gdbstub64.c
++++ b/target/arm/gdbstub64.c
+@@ -38,6 +38,17 @@ int aarch64_cpu_gdb_read_register(CPUState *cs, 
+uint8_t *mem_buf, int n)
+      case 33:
+          return gdb_get_reg32(mem_buf, pstate_read(env));
+      }
++    if (n >= cs->gdb_num_regs &&
++        n < cs->gdb_num_regs + cpu->dyn_xml.num_cpregs) {
++        const ARMCPRegInfo *ri;
++        uint32_t key;
++
++        key = cpu->dyn_xml.cpregs_keys[n - cs->gdb_num_regs];
++        ri = get_arm_cp_reginfo(arm_env_get_cpu(env)->cp_regs, key);
++        if (ri) {
++            return gdb_get_reg64(mem_buf, 
+(uint64_t)read_raw_cp_reg(env, ri));
++        }
++    }
+      /* Unknown register.  */
+      return 0;
+  }
+@@ -67,6 +78,20 @@ int aarch64_cpu_gdb_write_register(CPUState *cs, 
+uint8_t *mem_buf, int n)
+          pstate_write(env, tmp);
+          return 4;
+      }
++    if (n >= cs->gdb_num_regs &&
++        n < cs->gdb_num_regs + cpu->dyn_xml.num_cpregs) {
++        const ARMCPRegInfo *ri;
++        uint32_t key;
++
++        key = cpu->dyn_xml.cpregs_keys[n - cs->gdb_num_regs];
++        ri = get_arm_cp_reginfo(arm_env_get_cpu(env)->cp_regs, key);
++        if (ri) {
++            if (!(ri->type & ARM_CP_CONST)) {
++                write_raw_cp_reg(env, ri, tmp);
++                return 8;
++            }
++        }
++    }
+      /* Unknown register.  */
+      return 0;
+  }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c83c901..223372f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -191,8 +191,7 @@ uint64_t read_raw_cp_reg(CPUARMState *env, const 
+ARMCPRegInfo *ri)
+      }
+  }
+
+-static void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri,
+-                             uint64_t v)
++void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t v)
+  {
+      /* Raw write of a coprocessor register (as needed for migration, etc).
+       * Note that constant registers are treated as write-ignored; the
+-- 
+1.9.1
