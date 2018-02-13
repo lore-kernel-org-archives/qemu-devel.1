@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elaeN-0005xV-P8
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:36 -0500
+	(envelope-from <bounces@canonical.com>) id 1elaeO-0005y7-Fb
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elaeM-0001fL-NH
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48448)
+	(envelope-from <bounces@canonical.com>) id 1elaeN-0001fT-1F
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:36 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48466)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1elaeM-0001fA-HH
+	id 1elaeM-0001fF-Rg
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 08:29:34 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1elaeL-00021e-Ma
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 13:29:33 +0000
+	id 1elaeM-00021j-01
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 13:29:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 99CF62E80CB
+	by loganberry.canonical.com (Postfix) with ESMTP id F35832E80C3
 	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 13:29:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Feb 2018 13:16:35 -0000
-From: Thomas Huth <1402289@bugs.launchpad.net>
-Reply-To: Bug 1402289 <1402289@bugs.launchpad.net>
+Date: Tue, 13 Feb 2018 13:19:29 -0000
+From: Thomas Huth <1397157@bugs.launchpad.net>
+Reply-To: Bug 1397157 <1397157@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20141213223120.22142.21828.malonedeb@gac.canonical.com>
-Message-Id: <151852779547.3120.17225975801010413046.malone@gac.canonical.com>
+References: <20141128021917.32359.93361.malonedeb@gac.canonical.com>
+Message-Id: <151852796929.10064.13639538995213408893.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1402289] Re: netware 5.1 and SCSI (LSI Logic
- 53c895a) = lsi_scsi: error: readb 0x49
+Subject: [Qemu-devel] [Bug 1397157] Re: cpu high with ps2 keyboard on
+ multi-core win7 guest os
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,6 +42,9 @@ To: qemu-devel@nongnu.org
 Triaging old bug tickets... can you still reproduce this issue with the
 latest version of QEMU? Or could we close this ticket nowadays?
 
+** Bug watch removed: Red Hat Bugzilla #1169267
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1169267
+
 ** Changed in: qemu
        Status: New =3D> Incomplete
 
@@ -49,24 +52,60 @@ latest version of QEMU? Or could we close this ticket nowadays?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1402289
+https://bugs.launchpad.net/bugs/1397157
 
 Title:
-  netware 5.1 and SCSI (LSI Logic 53c895a) =3D lsi_scsi: error: readb 0x49
+  cpu high with ps2 keyboard on multi-core win7 guest os
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Subj.
+  =
 
-  This error occurs while loading LSIHINW.HAM driver in the netware5.1
-  SP8 installer.
+  qemu ver: 1.5.3-Latest =
 
-  Affected versions: qemu 2.1.2 and 2.2.50 from git (2014-12-14).
-  Linux kernel: 3.17.6 and 3.18.0.
 
-  Debug log for machine in the attachment.
+  guest os: window 7 64bit with 2 cpu and ps2 keybord.
+
+  problem: Use virt-viwer as client to connect, When input quickly, the
+  guest and host cpu will high and the input-char will display later.
+  but when only 1 cpu on the vm, the problem will not display or When
+  qemu ver is 0.12.1, the problem will not display.
+
+  qemu cmd:
+  /usr/libexec/qemu-kvm -name xx_win7 -machine pc-i440fx-rhel7.0.0,accel=3D=
+kvm,usb=3Doff -cpu qemu64,+sse4.2,+sse4.1,+ssse3,-svm,hv_relaxed,hv_vapic,h=
+v_spinlocks=3D0x1000 -m 4096 -realtime mlock=3Doff -smp 2,sockets=3D1,cores=
+=3D2,threads=3D1 -uuid 0860a434-6560-591b-f92f-c13c5caaf52d -rtc base=3Dloc=
+altime -no-shutdown -boot strict=3Don -device ich9-usb-ehci1,id=3Dusb,bus=
+=3Dpci.0,addr=3D0x5.0x7 -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=
+=3D0,bus=3Dpci.0,multifunction=3Don,addr=3D0x5 -device ich9-usb-uhci2,maste=
+rbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x5.0x1 -device ich9-usb-uhci=
+3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x5.0x2 -device virtio=
+-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -drive file=3D/lfs/x=
+x_win7/xx_win7.vda,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=
+=3Dwriteback -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=
+=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D2 -drive if=3Dnone,id=
+=3Ddrive-ide0-0-0,readonly=3Don,format=3Draw -device ide-cd,bus=3Dide.0,uni=
+t=3D0,drive=3Ddrive-ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -chardev spicevmc,=
+id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvirtio-serial=
+0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spice.0 -=
+device usb-tablet,id=3Dinput0 -spice port=3D5900,addr=3D::,disable-ticketin=
+g,plaintext-channel=3Dmain,plaintext-channel=3Ddisplay,plaintext-channel=3D=
+inputs,plaintext-channel=3Dcursor,plaintext-channel=3Dplayback,plaintext-ch=
+annel=3Drecord,plaintext-channel=3Dusbredir,image-compression=3Dauto_glz,jp=
+eg-wan-compression=3Dauto,zlib-glz-wan-compression=3Dauto,playback-compress=
+ion=3Don,disable-copy-paste,seamless-migration=3Don -vga qxl -global qxl-vg=
+a.ram_size=3D268435456 -global qxl-vga.vram_size=3D67108864 -device intel-h=
+da,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-duplex,id=3Dsound0-codec0=
+,bus=3Dsound0.0,cad=3D0 -chardev spicevmc,id=3Dcharredir0,name=3Dusbredir -=
+device usb-redir,chardev=3Dcharredir0,id=3Dredir0 -chardev spicevmc,id=3Dch=
+arredir1,name=3Dusbredir -device usb-redir,chardev=3Dcharredir1,id=3Dredir1=
+ -chardev spicevmc,id=3Dcharredir2,name=3Dusbredir -device usb-redir,charde=
+v=3Dcharredir2,id=3Dredir2 -chardev spicevmc,id=3Dcharredir3,name=3Dusbredi=
+r -device usb-redir,chardev=3Dcharredir3,id=3Dredir3 -device virtio-balloon=
+-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1402289/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1397157/+subscriptions
