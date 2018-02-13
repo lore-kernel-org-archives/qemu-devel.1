@@ -1,45 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1elhDb-0002KO-W7
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:30:25 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1elhKZ-0008EL-Ul
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:37:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1elhDX-0001np-AN
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:30:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42832)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1elhDX-0001KU-0t
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:30:19 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1DKT8FC140909
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 15:29:25 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g46qb8u71-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 15:29:25 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 13 Feb 2018 13:29:24 -0700
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
-	<20180212204609.GB30111@morn.lan>
-	<b2725975-6823-8919-e937-56d8cb404372@linux.vnet.ibm.com>
-	<e8cf7f36-249f-a3cc-f414-fac4e8b56b51@redhat.com>
-	<20180213193758.GA21083@morn.lan>
-	<17e5dd66-e54d-56a3-7852-daf5bc11b741@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 13 Feb 2018 15:29:20 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1elhKW-0006pu-Sv
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:37:35 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1elhKW-0006pd-N7
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:37:32 -0500
+Received: by mail-qt0-x244.google.com with SMTP id g14so5164065qti.2
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 12:37:32 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180213050837.40964-1-linzhecheng@huawei.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <91ad0c10-646f-2c03-46eb-504d6606956a@amsat.org>
+Date: Tue, 13 Feb 2018 17:37:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <17e5dd66-e54d-56a3-7852-daf5bc11b741@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <ead467f1-ab61-6350-e0bf-66ce0cbb06a1@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
- interface
+In-Reply-To: <20180213050837.40964-1-linzhecheng@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: fix memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,126 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Kevin O'Connor <kevin@koconnor.net>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, Igor Mammedov <imammedo@redhat.com>
+To: linzhecheng <linzhecheng@huawei.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, wangxinxin.wang@huawei.com, lidonglin@huawei.com, pbonzini@redhat.com
 
-On 02/13/2018 02:59 PM, Laszlo Ersek wrote:
-> On 02/13/18 20:37, Kevin O'Connor wrote:
->> On Tue, Feb 13, 2018 at 05:16:49PM +0100, Laszlo Ersek wrote:
->>> On 02/12/18 21:49, Stefan Berger wrote:
->>>> On 02/12/2018 03:46 PM, Kevin O'Connor wrote:
->>>>> I'm not sure I fully understand the goals of the PPI interface.
->>>>> Here's what I understand so far:
->>>>>
->>>>> The TPM specs define some actions that are considered privileged.  An
->>>>> example of this would be disabling the TPM itself.  In order to
->>>>> prevent an attacker from performing these actions without
->>>>> authorization, the TPM specs define a mechanism to assert "physical
->>>>> presence" before the privileged action can be done.  They do this by
->>>>> having the firmware present a menu during early boot that permits
->>>>> these privileged operations, and then the firmware locks the TPM chip
->>>>> so the actions can no longer be done by any software that runs after
->>>>> the firmware.  Thus "physical presence" is asserted by demonstrating
->>>>> one has console access to the machine during early boot.
->>>>>
->>>>> The PPI spec implements a work around for this - presumably some found
->>>>> the enforcement mechanism too onerous.  It allows the OS to provide a
->>>>> request code to the firmware, and on the next boot the firmware will
->>>>> take the requested action before it locks the chip.  Thus allowing the
->>>>> OS to indirectly perform the privileged action even after the chip has
->>>>> been locked.  Thus, the PPI system seems to be an "elaborate hack" to
->>>>> allow users to circumvent the physical presence mechanism (if they
->>>>> choose to).
->>>> Correct.
->>>>> Here's what I understand the proposed implementation involves:
->>>>>
->>>>> 1 - in addition to emulating the TPM device itself, QEMU will also
->>>>>       introduce a virtual memory device with 0x400 bytes.
->>>> Correct.
->>>>> 2 - on first boot the firmware (seabios and uefi) will populate the
->>>>>       memory region created in step 1.  In particular it will fill an
->>>>>       array with the list of request codes it supports.  (Each request
->>>>>       is an 8bit value, the array has 256 entries.)
->>>> Correct. Each firmware would fill out the 256 byte array depending on
->>>> what it supports. The 8 bit values are basically flags and so on.
->>>>> 3 - QEMU will produce AML code implementing the standard PPI ACPI
->>>>>       interface.  This AML code will take the request, find the table
->>>>>       produced in step 1, compare it to the list of accepted requests
->>>>>       produced in step 2, and then place the 8bit request in another
->>>>>       qemu virtual memory device (at 0xFFFF0000 or 0xFED45000).
->>>> Correct.
->>>>
->>>> Now EDK2 wants to store the code in a UEFI variable in NVRAM. We
->>>> therefore would need to trigger an SMI. In SeaBIOS we wouldn't have to
->>>> do this.
->>>>
->>>>> 4 - the OS will signal a reboot, qemu will do its normal reboot logic,
->>>>>       and the firmware will be run again.
->>>>>
->>>>> 5 - the firmware will extract the code written in stage 3, and if the
->>>>>       tpm device has been configured to accept PPI codes from the OS, it
->>>>>       will invoke the requested action.
->>>> SeaBIOS would look into memory to find the code. EDK2 will read the code
->>>> from a UEFI variable.
->>>>
->>>>> Did I understand the above correctly?
->>>> I think so. With the fine differences between SeaBIOS and EDK2 pointed out.
->>> Here's what I suggest:
->>>
->>> Please everyone continue working on this, according to Kevin's &
->>> Stefan's description, but focus on QEMU and SeaBIOS *only*. Ignore edk2
->>> for now.
->> If this were targetted at SeaBIOS, I'd look for a simpler
->> QEMU/firmware interface.  Something like:
->>
->> A - QEMU produces AML code implementing the standard PPI ACPI
->>      interface that generates a request code and stores it in the
->>      device memory of an existing device (eg, writable fw_cfg or an
->>      extension field in the existing emulated TPM device).
+On 02/13/2018 02:08 AM, linzhecheng wrote:
+> g_free() was moved from vhost_net_cleanup in commit e6bcb1b, so we should
+> free net after vhost_net_cleanup
+> 
+> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-ACPI code writing into fw_cfg sounds difficult.
-I initially had PPI SeaBIOS code write into the TPM TIS device's memory 
-into some custom addresses. I'd consider this a hack. Now we have that 
-virtual memory device with those 0x400 bytes...
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-In these 0x400 bytes we have 256 bytes that are used for configuration 
-flags describing the supported opcode as you previously described. This 
-array allows us to decouple the firmware implementation from the ACPI 
-code and we need not hard code what is supported in the firmware inside 
-the ACPI code (which would be difficult to do anyway since in QEMU we 
-would not what firmware will be started and what PPI opcodes are 
-support) and the ppi sysfs entries in Linux for example show exactly 
-those PPI opcodes that are supported. The firmware needs to set those 
-flags and the firmware knows what it supports.
-
-I hope we can settle that this device is the right path.
-
->>
->> B - after a reboot the firmware extracts the PPI request code
->>      (produced in step A) and performs the requested action (if the TPM
->>      is configured to accept OS generated codes).
->>
->> That is, skip steps 1 and 2 from the original proposal.
-> I think A/B can work fine, as long as
-> - the firmware can somehow dynamically recognize the device / "register
->    block" that the request codes have to be pulled from, and
-
-I experimented with what Igor had suggested with the fw_cfg file 
-callback and so on.
-
-> - QEMU is free to move the device or register block around, from release
->    to release, without disturbing migration.
-
-I think we should basically limit the firmware to writing two addresses 
-into this fw_cfg file:
-- SeaBIOS: write back the same address that QEMU suggested in the file 
-(currently 0xfed4 5000)
-- EDK2: write back 0xffff 0000
-
-No other address would be accepted by QEMU since presumably QEMU knows 
-where otherwise address collisions can occur.
-
->
-> Thanks!
-> Laszlo
->
+> 
+> diff --git a/net/vhost-user.c b/net/vhost-user.c
+> index cb45512506..d024573e45 100644
+> --- a/net/vhost-user.c
+> +++ b/net/vhost-user.c
+> @@ -109,6 +109,7 @@ static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
+>  err:
+>      if (net) {
+>          vhost_net_cleanup(net);
+> +        g_free(net);
+>      }
+>      vhost_user_stop(i, ncs);
+>      return -1;
+> 
