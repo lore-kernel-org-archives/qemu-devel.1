@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1elf5D-0003tn-Ul
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 13:13:36 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1elf9j-0008JX-F7
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 13:18:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1elf5D-000584-0X
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 13:13:35 -0500
-Date: Tue, 13 Feb 2018 20:13:27 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180213200450-mutt-send-email-mst@kernel.org>
-References: <20180213170712.18239-1-andrew.smirnov@gmail.com>
-	<20180213170712.18239-2-andrew.smirnov@gmail.com>
+	(envelope-from <dgilbert@redhat.com>) id 1elf9f-0007Og-Cs
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 13:18:15 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43030 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elf9f-0007Oa-6l
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 13:18:11 -0500
+Date: Tue, 13 Feb 2018 18:17:51 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180213181750.GQ2378@work-vm>
+References: <20180208103132.28452-1-peterx@redhat.com>
+	<20180208103132.28452-22-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180213170712.18239-2-andrew.smirnov@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/3] pci: Add support for Designware IP
- block
+In-Reply-To: <20180208103132.28452-22-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 21/28] migration: setup ramstate for
+ resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Tue, Feb 13, 2018 at 09:07:10AM -0800, Andrey Smirnov wrote:
-> +static void designware_pcie_root_class_init(ObjectClass *klass, void *data)
+* Peter Xu (peterx@redhat.com) wrote:
+> After we updated the dirty bitmaps of ramblocks, we also need to update
+> the critical fields in RAMState to make sure it is ready for a resume.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/ram.c        | 40 +++++++++++++++++++++++++++++++++++++++-
+>  migration/trace-events |  1 +
+>  2 files changed, 40 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index a2a4b05d5c..d275875f54 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2250,6 +2250,36 @@ static int ram_init_all(RAMState **rsp)
+>      return 0;
+>  }
+>  
+> +static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
 > +{
-> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    RAMBlock *block;
+> +    long pages = 0;
 > +
-> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> +
-> +    k->vendor_id = PCI_VENDOR_ID_SYNOPSYS;
-> +    k->device_id = 0xABCD;
-> +    k->revision = 0;
-> +    k->class_id = PCI_CLASS_BRIDGE_PCI;
-> +    k->is_express = true;
-> +    k->is_bridge = true;
-> +    k->exit = pci_bridge_exitfn;
-> +    k->realize = designware_pcie_root_realize;
-> +    k->config_read = designware_pcie_root_config_read;
-> +    k->config_write = designware_pcie_root_config_write;
-> +
-> +    dc->reset = pci_bridge_reset;
 > +    /*
-> +     * PCI-facing part of the host bridge, not usable without the
-> +     * host-facing part, which can't be device_add'ed, yet.
+> +     * Postcopy is not using xbzrle/compression, so no need for that.
+> +     * Also, since source are already halted, we don't need to care
+> +     * about dirty page logging as well.
 > +     */
-> +    dc->user_creatable = false;
-> +    dc->vmsd = &vmstate_designware_pcie_root;
+> +
+> +    RAMBLOCK_FOREACH(block) {
+> +        pages += bitmap_count_one(block->bmap,
+> +                                  block->used_length >> TARGET_PAGE_BITS);
+> +    }
+> +
+> +    /* This may not be aligned with current bitmaps. Recalculate. */
+> +    rs->migration_dirty_pages = pages;
+
+migration_dirty_pages is uint64_t - so we should probably do the cast
+above and keep 'pages' as uint64_t.
+
+> +    rs->last_seen_block = NULL;
+> +    rs->last_sent_block = NULL;
+> +    rs->last_page = 0;
+> +    rs->last_version = ram_list.version;
+
+Do you need to explicitly set
+       rs->ram_bulk_stage = false;
+
+if the failure happened just after the start of postcopy and no
+requested pages had been sent, I think it might still  be set?
+
+
+> +    /* Update RAMState cache of output QEMUFile */
+> +    rs->f = out;
+> +
+> +    trace_ram_state_resume_prepare(pages);
 > +}
 > +
-> +static uint64_t designware_pcie_host_mmio_read(void *opaque, hwaddr addr,
-> +                                               unsigned int size)
-> +{
-> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
-> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
+>  /*
+>   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+>   * long-running RCU critical section.  When rcu-reclaims in the code
+> @@ -3178,8 +3208,16 @@ out:
+>  static int ram_resume_prepare(MigrationState *s, void *opaque)
+>  {
+>      RAMState *rs = *(RAMState **)opaque;
+> +    int ret;
+>  
+> -    return ram_dirty_bitmap_sync_all(s, rs);
+> +    ret = ram_dirty_bitmap_sync_all(s, rs);
+> +    if (ret) {
+> +        return ret;
+> +    }
 > +
-> +    return pci_host_config_read_common(device,
-> +                                       addr,
-> +                                       pci_config_size(device),
-> +                                       size);
-> +}
+> +    ram_state_resume_prepare(rs, s->to_dst_file);
 > +
-> +static void designware_pcie_host_mmio_write(void *opaque, hwaddr addr,
-> +                                            uint64_t val, unsigned int size)
-> +{
-> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
-> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
-> +
-> +    return pci_host_config_write_common(device,
-> +                                        addr,
-> +                                        pci_config_size(device),
-> +                                        val, size);
-> +}
-> +
-> +static const MemoryRegionOps designware_pci_mmio_ops = {
-> +    .read       = designware_pcie_host_mmio_read,
-> +    .write      = designware_pcie_host_mmio_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .impl = {
-> +        /*
-> +         * Our device would not work correctly if the guest was doing
-> +         * unaligned access. This might not be a limitation on the real
-> +         * device but in practice there is no reason for a guest to access
-> +         * this device unaligned.
-> +         */
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +        .unaligned = false,
-> +    },
-> +};
+> +    return 0;
+>  }
+>  
+>  static SaveVMHandlers savevm_ram_handlers = {
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 45b1d89217..f5913ff51c 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -88,6 +88,7 @@ ram_dirty_bitmap_reload_complete(char *str) "%s"
+>  ram_dirty_bitmap_sync_start(void) ""
+>  ram_dirty_bitmap_sync_wait(void) ""
+>  ram_dirty_bitmap_sync_complete(void) ""
+> +ram_state_resume_prepare(long v) "%ld"
+>  
+>  # migration/migration.c
+>  await_return_path_close_on_source_close(void) ""
 
-Could you pls add some comments explaining why is DEVICE_NATIVE_ENDIAN
-appropriate here?  Most of these cases are plain "we never bothered
-about cross-endian setups". Some are "there's a mix of different
-endian-ness values, need to handle in a special way".
+Dave
 
-I suspect you really need DEVICE_LITTLE_ENDIAN.
-
--- 
-MST
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
