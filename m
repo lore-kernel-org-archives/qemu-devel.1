@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1elTNH-00076Z-VO
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:43:29 -0500
+	(envelope-from <ciro.santilli@gmail.com>) id 1elTbv-00031x-E0
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:58:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1elTNG-00038B-PL
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:43:28 -0500
-Date: Tue, 13 Feb 2018 16:43:15 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180213054315.GO11634@umbus.fritz.box>
-References: <20180209075503.16996-1-aik@ozlabs.ru>
-	<20180209075503.16996-5-aik@ozlabs.ru>
+	(envelope-from <ciro.santilli@gmail.com>) id 1elTbs-0004lk-VA
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:58:34 -0500
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:40123)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
+	id 1elTbs-0004l6-Nq
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 00:58:32 -0500
+Received: by mail-io0-x241.google.com with SMTP id t22so20089352ioa.7
+	for <qemu-devel@nongnu.org>; Mon, 12 Feb 2018 21:58:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Q4RbCnAmn9VrkE5p"
-Content-Disposition: inline
-In-Reply-To: <20180209075503.16996-5-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v7 4/4] ppc/spapr,
- vfio: Turn off MSIX emulation for VFIO devices
+In-Reply-To: <001b01d3a3c5$032e09f0$098a1dd0$@ru>
+References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
+	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
+	<002401d3a010$8d551280$a7ff3780$@ru>
+	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
+	<CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
+	<001b01d3a3c5$032e09f0$098a1dd0$@ru>
+From: Ciro Santilli <ciro.santilli@gmail.com>
+Date: Tue, 13 Feb 2018 05:58:10 +0000
+Message-ID: <CAFXrp_dNj+BSYo+0rpv5d4PxdjJ1RL_cROaDWRvjQTLziFtO_Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +34,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>, war2jordan@live.com, Igor R <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, kraxel@redhat.com, Thomas Dullien <thomas.dullien@googlemail.com>, pbonzini@redhat.com, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+
+On Mon, Feb 12, 2018 at 5:47 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote=
+:
+
+> I tested ARM only with =E2=80=93kernel and =E2=80=93initrd.
+>
+> Can you provide the full command line and the disk image?
+>
+>
+>
+
+The command I tried was:
+
+time ./buildroot/output.arm~/host/usr/bin/qemu-system-arm -M versatilepb
+-append 'root=3D/dev/sda nokaslr norandmaps printk.devkmsg=3Don printk.time=
+=3Dy -
+lkmc_eval=3D"/rand_check.out;wget -S google.com;/poweroff.out;"' -kernel
+./buildroot/output.arm~/images/zImage -dtb
+./buildroot/output.arm~/images/versatile-pb.dtb -nographic -drive
+file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Dimg-direct=
+,format=3Draw
+-drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay -=
+device
+scsi-hd,drive=3Dimg-blkreplay -netdev user,id=3Dnet1 -device
+rtl8139,netdev=3Dnet1 -object filter-replay,id=3Dreplay,netdev=3Dnet1
+
+and the required files can be downloaded from:
+
+https://github.com/cirosantilli/linux-kernel-module-cheat/releases/download=
+/test-replay-arm/images.zip
+
+They were generated with:
+
+./build -a arm
+
+on that repo.
 
 
---Q4RbCnAmn9VrkE5p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 09, 2018 at 06:55:03PM +1100, Alexey Kardashevskiy wrote:
-> This adds a possibility for the platform to tell VFIO not to emulate MSIX
-> so MMIO memory regions do not get split into chunks in flatview and
-> the entire page can be registered as a KVM memory slot and make direct
-> MMIO access possible for the guest.
->=20
-> This enables the entire MSIX BAR mapping to the guest for the pseries
-> platform in order to achieve the maximum MMIO preformance for certain
-> devices.
->=20
-> Tested on:
-> LSI Logic / Symbios Logic SAS3008 PCI-Express Fusion-MPT SAS-3 (rev 02)
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-I still think having the property on the machine is an uglier option
-than having it on the device, but Alex didn't like that, so I'll roll
-with it.
-
-Reivewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->=20
-> Need to split this in two?
-> ---
->  hw/ppc/spapr.c |  7 +++++++
->  hw/vfio/pci.c  | 13 +++++++++++++
->  2 files changed, 20 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index eb3e1a7..14d8ecb 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2855,6 +2855,11 @@ static void spapr_set_modern_hotplug_events(Object=
- *obj, bool value,
->      spapr->use_hotplug_event_source =3D value;
->  }
-> =20
-> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
-> +{
-> +    return true;
-> +}
-> +
->  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> @@ -2936,6 +2941,8 @@ static void spapr_instance_init(Object *obj)
->      object_property_set_description(obj, "vsmt",
->                                      "Virtual SMT: KVM behaves as if this=
- were"
->                                      " the host's SMT mode", &error_abort=
-);
-> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
-> +                             spapr_get_msix_emulation, NULL, NULL);
->  }
-> =20
->  static void spapr_machine_finalizefn(Object *obj)
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index ae9098d..4a03085 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -1580,6 +1580,19 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, in=
-t pos, Error **errp)
->       */
->      memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
-> =20
-> +    /*
-> +     * The emulated machine may provide a paravirt interface for MSIX se=
-tup
-> +     * so it is not strictly necessary to emulate MSIX here. This becomes
-> +     * helpful when frequently accessed MMIO registers are located in
-> +     * subpages adjacent to the MSIX table but the MSIX data containing =
-page
-> +     * cannot be mapped because of a host page size bigger than the MSIX=
- table
-> +     * alignment.
-> +     */
-> +    if (object_property_get_bool(OBJECT(qdev_get_machine()),
-> +                                 "vfio-no-msix-emulation", NULL)) {
-> +        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
-> +    }
-> +
->      return 0;
->  }
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Q4RbCnAmn9VrkE5p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqCevIACgkQbDjKyiDZ
-s5JK9hAAtao8NyvORd168yUPqBiTQKPQOYRVBef1nrhW4dv1m5fsOAkxhkmp+rzo
-FswSmpB27kHNwU0EDayV1srnxvOsEad0isiVkY/P5u4ICE+heptBfYNS9wY84zWR
-rLh/CB1r5csRozAvj2ToAnzR5iEvqm13BBJGVE9KIL0v/qx0+DuWr3hNQeSSi0jw
-axCxDjqE5WloBDUA45BUv0rIysGeenAthbfTzBYdYnEv1WoyTxnx/B14SUJUaAM9
-fY+ylvXodH+iLak814367KeVB11PahmjaXLJKTD/EZ+iLjnHJO82wx79e6vI8mPS
-Y/qf1wT9gww6ohbuj41+lV+JQoC2wDRYgIwJg3S5FYYocsqxp52MU160Yt/Zdt/c
-eN9l+1ffRvrr4d7EEMR8L68kJYRTjIc8jUhUU0SusIpPlTsjEe21YK2ph/YkYBIj
-lu6aj9h1ubwqL73t5YZH9pFkAXLmxpHbREk1McbEmztpVfGuj1pxhnh7yfiefK4B
-tgA6BMzAx40xYzlKYv52zfRpHlMinFtCIsiPoFGQbmH4cKe9hl09e1u09El7imqP
-QnbcS8WuVTT96JPp+e/WDcwTzPvLXqGRAk8ckB6zM/p8Yn+nqpPykkVpl5chCHls
-Xu+3XVuzDdOj6uzmzdgjbyyUvMkPBCMtjDPXs0F5smndWaJdGsM=
-=whes
------END PGP SIGNATURE-----
-
---Q4RbCnAmn9VrkE5p--
+> Pavel Dovgalyuk
+>
+>
+>
+> *From:* Ciro Santilli [mailto:ciro.santilli@gmail.com]
+> *Sent:* Saturday, February 10, 2018 3:09 AM
+> *To:* Pavel Dovgalyuk
+> *Cc:* Pavel Dovgalyuk; qemu-devel@nongnu.org; kwolf@redhat.com; Peter
+> Maydell; war2jordan@live.com; Igor R; quintela@redhat.com;
+> jasowang@redhat.com; mst@redhat.com; Aleksandr Bezzubikov;
+> maria.klimushenkova@ispras.ru; kraxel@redhat.com; Thomas Dullien;
+> pbonzini@redhat.com; Alex Benn=C3=A9e
+> *Subject:* Re: [RFC PATCH v6 00/20] replay additions
+>
+>
+>
+> Also, what command do you use to test on ARM? I'm a bit stuck to get the
+> drive part right, e.g.:
+>
+>
+>
+> -drive file=3D./buildroot/output.arm~/images/rootfs.ext2,if=3Dscsi,id=3Di=
+mg-direct,format=3Draw
+> \
+>
+> -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
+ \
+>
+> -device scsi-hd,drive=3Dimg-blkreplay \
+>
+>
+>
+> fails with: qemu-system-arm: -device scsi-hd,drive=3Dimg-blkreplay:
+> Conflicts with use by img-direct as 'root', which does not allow 'write' =
+on
+> #block968
+>
+>
+>
