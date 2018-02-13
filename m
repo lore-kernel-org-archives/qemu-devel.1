@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eld34-0004ye-Ax
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:03:16 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eld3h-0005aH-Nn
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:03:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eld2z-0003yT-Rz
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:03:14 -0500
-Received: from mail-qt0-f175.google.com ([209.85.216.175]:41093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eld2z-0003yK-Mc
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:03:09 -0500
-Received: by mail-qt0-f175.google.com with SMTP id a9so4138187qtj.8
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:03:09 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1eld3f-0004RD-1o
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:03:53 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54916 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eld3e-0004R3-Rj
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:03:50 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 54CBE40FB645
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 16:03:46 +0000 (UTC)
+Date: Tue, 13 Feb 2018 16:03:39 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180213160338.GM2378@work-vm>
+References: <1518531279-11966-1-git-send-email-thuth@redhat.com>
+	<20180213150911.GG2378@work-vm> <20180213151125.GQ573@redhat.com>
+	<20180213152529.GH2378@work-vm> <20180213152753.GR573@redhat.com>
+	<20180213154145.GJ2378@work-vm> <20180213154512.GT573@redhat.com>
+	<20180213154942.GL2378@work-vm> <20180213155827.GU573@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180211093607.27351-27-armbru@redhat.com>
-References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-27-armbru@redhat.com>
-From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Tue, 13 Feb 2018 17:03:08 +0100
-Message-ID: <CAMxuvaw6JMtbG6r60KV-ATmyTLEnxJ1eCSVLov2Lm1SKvb66Ug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180213155827.GU573@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 26/29] docs: Correct outdated
- information on QAPI
+Subject: Re: [Qemu-devel] [PATCH] io/channel-command: Delay the killing of
+ the child after closing the pipe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +38,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, marcandre <marcandre.lureau@redhat.com>, "Blake, Eric" <eblake@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-On Sun, Feb 11, 2018 at 10:36 AM, Markus Armbruster <armbru@redhat.com> wro=
-te:
-> * Fix guidance on error classes
->
-> * Point to generated documentation
->
-> * Drop plea for documentation, because the QAPI code generator
->   enforces it since commit 3313b6124b
->
-> * Minor tweaks here and there
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Tue, Feb 13, 2018 at 03:49:42PM +0000, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > On Tue, Feb 13, 2018 at 03:41:45PM +0000, Dr. David Alan Gilbert wr=
+ote:
+> > > > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > > > On Tue, Feb 13, 2018 at 03:25:30PM +0000, Dr. David Alan Gilber=
+t wrote:
+> > > > > > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > > > > > On Tue, Feb 13, 2018 at 03:09:12PM +0000, Dr. David Alan Gi=
+lbert wrote:
+> > > > > > > > * Thomas Huth (thuth@redhat.com) wrote:
+> > > > > > > > > We are currently facing some migration failure on s390x=
+ when running
+> > > > > > > > > certain avocado tests, e.g. when running the test
+> > > > > > > > > type_specific.io-github-autotest-qemu.migrate.with_rebo=
+ot.exec.gzip_exec.
+> > > > > > > > > This test is using 'migrate -d "exec:nc localhost 5200"=
+' for the migration.
+> > > > > > > > > The problem is detected at the receiving side, where th=
+e migration stream
+> > > > > > > > > apparently ends too early. However, the cause for the p=
+roblem is the
+> > > > > > > > > sending side: After writing the migration stream into t=
+he pipe to netcat,
+> > > > > > > > > the source QEMU calls qio_channel_command_close() which=
+ closes the pipe
+> > > > > > > > > and immediately (!) kills the child process afterwards.=
+ So if the
+> > > > > > > > > sending netcat did not read the final bytes from the pi=
+pe yet, or
+> > > > > > > > > if it did not manage to send out all its buffers yet, i=
+t is killed
+> > > > > > > > > before the whole migration stream is passed to the dest=
+ination side.
+> > > > > > > >=20
+> > > > > > > > Thanks for tracking that down!
+> > > > > > > >=20
+> > > > > > > > > To ease the situation at least a little bit, we should =
+give the child
+> > > > > > > > > process at least some few more time slices before we ki=
+ll it with
+> > > > > > > > > SIGTERM and then with SIGKILL. With this change, the av=
+ocado test now
+> > > > > > > > > succeeds here in 10 out of 10 runs.
+> > > > > > > > >=20
+> > > > > > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > > > > > > ---
+> > > > > > > > >  io/channel-command.c | 6 +++---
+> > > > > > > > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > > > > > > >=20
+> > > > > > > > > diff --git a/io/channel-command.c b/io/channel-command.=
+c
+> > > > > > > > > index 319c5ed..f64db3e 100644
+> > > > > > > > > --- a/io/channel-command.c
+> > > > > > > > > +++ b/io/channel-command.c
+> > > > > > > > > @@ -177,11 +177,11 @@ static int qio_channel_command_ab=
+ort(QIOChannelCommand *ioc,
+> > > > > > > > >              return -1;
+> > > > > > > > >          }
+> > > > > > > > >      } else if (ret =3D=3D 0) {
+> > > > > > > > > -        if (step =3D=3D 0) {
+> > > > > > > > > +        if (step =3D=3D 4) {
+> > > > > > > > >              kill(ioc->pid, SIGTERM);
+> > > > > > > > > -        } else if (step =3D=3D 1) {
+> > > > > > > > > +        } else if (step =3D=3D 8) {
+> > > > > > > > >              kill(ioc->pid, SIGKILL);
+> > > > > > > > > -        } else {
+> > > > > > > > > +        } else if (step >=3D 9) {
+> > > > > > > >=20
+> > > > > > > > Hmm.  This seems pretty arbitrary; if I understand correc=
+tly you're
+> > > > > > > > saying it'll get a SIGTERM after 4 (arbitrary) * 10ms (ar=
+bitrary).
+> > > > > > > >=20
+> > > > > > > > Who is to say that's enough for a scp or gzip or the like=
+?
+> > > > > > >=20
+> > > > > > > We could conceivably implement the  qio_channel_shutdown() =
+operation
+> > > > > > > for the QIOChannelCommand class. It would merely close the =
+FD to the
+> > > > > > > child process, but leave it running. That would give it tim=
+e to read
+> > > > > > > any data still in the pipe from QEMU IIUC.
+> > > > > >=20
+> > > > > > Yeh that's better; although when would we call shutdown or cl=
+ose on it?
+> > > > >=20
+> > > > > Doesn't QEMU alredy use  shutdown() during the right part of mi=
+gration,
+> > > > > or is that only wrt post-copy ?
+> > > >=20
+> > > > We only use it for cancel and errors, not during the normal behav=
+iour.
+> > >=20
+> > > So we could do with shutdown() for sake of post-copy anyway, but fo=
+r
+> > > normal behaviour maybe the right answer is for close() to just wait=
+ a
+> > > real long time for the child app to exit ?  If we close the pipes, =
+and
+> > > then wait 5 seconds or more before giving up ?
+> >=20
+> > Yes, I'm happier with a much longer arbitrary value than a short
+> > arbitrary value; but I do wonder if there's any real need to kill it.
+>=20
+> If we don't kill it, then if it gets stuck for some reason it will live
+> forever. If we don't kill it but just close the FD, then we still need
+> to waitpid at some point otherwise we get a zombie - unless we decide
+> to daemonize the child instead ?
 
-looks good to me,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Well we used to rely on popen/pclose which I think just waited for it.
 
+You could rely on migration_cancel calling shutdown and causing that to
+do the kill, but always waiting in the normal course of things; which is
+probably OK unless it decides to hang right at the end.
 
-> ---
->  docs/devel/writing-qmp-commands.txt | 25 +++++++++----------------
->  docs/interop/qmp-intro.txt          |  3 ++-
->  2 files changed, 11 insertions(+), 17 deletions(-)
->
-> diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp=
--commands.txt
-> index 776b3b41ca..50385eff27 100644
-> --- a/docs/devel/writing-qmp-commands.txt
-> +++ b/docs/devel/writing-qmp-commands.txt
-> @@ -36,9 +36,9 @@ very simple and get more complex as we progress.
->  For all the examples in the next sections, the test setup is the same an=
-d is
->  shown here.
->
-> -First, QEMU should be started as:
-> +First, QEMU should be started like this:
->
-> -# /path/to/your/source/qemu [...] \
-> +# qemu-system-TARGET [...] \
->      -chardev socket,id=3Dqmp,port=3D4444,host=3Dlocalhost,server \
->      -mon chardev=3Dqmp,mode=3Dcontrol,pretty=3Don
->
-> @@ -179,7 +179,7 @@ described in the "Testing" section and then send two =
-commands:
->      }
->  }
->
-> -You should see "Hello, world" and "we love qemu" in the terminal running=
- qemu,
-> +You should see "Hello, world" and "We love qemu" in the terminal running=
- qemu,
->  if you don't see these strings, then something went wrong.
->
->  =3D=3D=3D Errors =3D=3D=3D
-> @@ -221,30 +221,23 @@ The QMP server's response should be:
->      }
->  }
->
-> -As a general rule, all QMP errors should use ERROR_CLASS_GENERIC_ERROR
-> -(done by default when using error_setg()). There are two exceptions to
-> -this rule:
-> +Note that error_setg() produces a "GenericError" class.  In general,
-> +all QMP errors should have that error class.  There are two exceptions
-> +to this rule:
->
-> - 1. A non-generic ErrorClass value exists* for the failure you want to r=
-eport
-> -    (eg. DeviceNotFound)
-> + 1. To support a management application's need to recognize a specific
-> +    error for special handling
->
-> - 2. Management applications have to take special action on the failure y=
-ou
-> -    want to report, hence you have to add a new ErrorClass value so that=
- they
-> -    can check for it
-> + 2. Backward compatibility
->
->  If the failure you want to report falls into one of the two cases above,
->  use error_set() with a second argument of an ErrorClass value.
->
-> - * All existing ErrorClass values are defined in the qapi-schema.json fi=
-le
-> -
->  =3D=3D=3D Command Documentation =3D=3D=3D
->
->  There's only one step missing to make "hello-world"'s implementation com=
-plete,
->  and that's its documentation in the schema file.
->
-> -This is very important. No QMP command will be accepted in QEMU without =
-proper
-> -documentation.
-> -
->  There are many examples of such documentation in the schema file already=
-, but
->  here goes "hello-world"'s new entry for qapi/misc.json:
->
-> diff --git a/docs/interop/qmp-intro.txt b/docs/interop/qmp-intro.txt
-> index adbc94abb1..430fe1b747 100644
-> --- a/docs/interop/qmp-intro.txt
-> +++ b/docs/interop/qmp-intro.txt
-> @@ -78,7 +78,8 @@ Escape character is '^]'.
->      }
->  }
->
-> -Please, refer to the qapi-schema.json file for a complete command refere=
-nce.
-> +Please refer to docs/interop/qemu-qmp-ref.* for a complete command
-> +reference, generated from qapi-schema.json.
->
->  QMP wiki page
->  -------------
-> --
-> 2.13.6
->
+Dave
+
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
