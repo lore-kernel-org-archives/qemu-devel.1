@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eldUh-0005TT-KM
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:31:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eldWS-0006xt-LK
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:33:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eldUd-0007H3-8t
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:31:47 -0500
-Resent-Message-Id: <E1eldUd-0007H3-8t@eggs.gnu.org>
-In-Reply-To: <20180213161240.19891-1-david@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151853948001.582.10146832003778705101@bdbb90650ae5>
+	(envelope-from <peter.maydell@linaro.org>) id 1eldWR-0000sW-KX
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:33:36 -0500
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:44570)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eldWR-0000qJ-E7
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:33:35 -0500
+Received: by mail-oi0-x22c.google.com with SMTP id b3so14296414oib.11
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:33:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 13 Feb 2018 08:31:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/tcg: fix disabling/enabling DAT
+In-Reply-To: <CAFEAcA_CL6P31EJyzxom1oh6j8LNDD2+OXjJ65hKsB=zBw6tWQ@mail.gmail.com>
+References: <1518116908-10852-1-git-send-email-mst@redhat.com>
+	<CAFEAcA8kvkfoxnQbqZ4Y44uWtbsirCKdmTcnZJzu=ege9YRfTg@mail.gmail.com>
+	<20180209190703-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_CL6P31EJyzxom1oh6j8LNDD2+OXjJ65hKsB=zBw6tWQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Feb 2018 16:33:14 +0000
+Message-ID: <CAFEAcA_z25p0NrRuH3vJm9mJJzHZXbgct2GwyojuHXKqejc8JA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
+ fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@redhat.com
-Cc: famz@redhat.com, qemu-s390x@nongnu.org, agraf@suse.de, cohuck@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjEzMTYxMjQwLjE5ODkxLTEtZGF2aWRAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxXSBzMzkweC90Y2c6IGZpeCBkaXNhYmxpbmcvZW5hYmxp
-bmcgREFUCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
-czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAg
-ICAgICAgcGF0Y2hldy8yMDE4MDEwOTEyMjI1Mi4xNzY3MC0xLWFsZXguYmVubmVlQGxpbmFyby5v
-cmcgLT4gcGF0Y2hldy8yMDE4MDEwOTEyMjI1Mi4xNzY3MC0xLWFsZXguYmVubmVlQGxpbmFyby5v
-cmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIwNjE2NDgxNS4xMDA4
-NC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDIwNjE2NDgxNS4xMDA4
-NC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
-Y2hldy8yMDE4MDIxMzEzMDM1Ni44ODg1LTEtbXJlaXR6QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
-MDE4MDIxMzEzMDM1Ni44ODg1LTEtbXJlaXR6QHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE4MDIxMzEzMjI0Ni4yNjg0NC0xLXBldGVyLm1heWRlbGxAbGlu
-YXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwMjEzMTMyMjQ2LjI2ODQ0LTEtcGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAyMTMxNDAw
-MjkuODMwOC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwMjEzMTQw
-MDI5LjgzMDgtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAg
-ICAgICAgcGF0Y2hldy8yMDE4MDIxMzE0MjEwMi4xNDQ1MC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20g
-LT4gcGF0Y2hldy8yMDE4MDIxMzE0MjEwMi4xNDQ1MC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KICog
-W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIxMzE2MTI0MC4xOTg5MS0xLWRh
-dmlkQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDIxMzE2MTI0MC4xOTg5MS0xLWRhdmlkQHJl
-ZGhhdC5jb20KQXV0byBwYWNraW5nIHRoZSByZXBvc2l0b3J5IGluIGJhY2tncm91bmQgZm9yIG9w
-dGltdW0gcGVyZm9ybWFuY2UuClNlZSAiZ2l0IGhlbHAgZ2MiIGZvciBtYW51YWwgaG91c2VrZWVw
-aW5nLgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjM5MzFmMmZkZDcgczM5MHgvdGNn
-OiBmaXggZGlzYWJsaW5nL2VuYWJsaW5nIERBVAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
-bmcgUEFUQ0ggMS8xOiBzMzkweC90Y2c6IGZpeCBkaXNhYmxpbmcvZW5hYmxpbmcgREFULi4uCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogdGFyZ2V0L3MzOTB4L2Nw
-dS5oOjMyMDoKKyNkZWZpbmUgRkxBR19NQVNLX1BTVwkJKEZMQUdfTUFTS19QRVIgfCBGTEFHX01B
-U0tfREFUIHwgRkxBR19NQVNLX1BTVEFURSBcCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
-dmVyIHVzZSB0YWJzCiMzMjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdS5oOjMyMDoKKyNkZWZpbmUg
-RkxBR19NQVNLX1BTV15JXkkoRkxBR19NQVNLX1BFUiB8IEZMQUdfTUFTS19EQVQgfCBGTEFHX01B
-U0tfUFNUQVRFIFwkCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDUxIGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 12 February 2018 at 09:35, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This asserts in 'make check' for NetBSD, FreeBSD, OpenBSD, OSX:
+>
+> TEST: tests/device-introspect-test... (pid=19530)
+>   /aarch64/device/introspect/list:                                     OK
+>   /aarch64/device/introspect/list-fields:                              OK
+>   /aarch64/device/introspect/none:                                     OK
+>   /aarch64/device/introspect/abstract:                                 OK
+>   /aarch64/device/introspect/concrete:                                 **
+> ERROR:/root/qemu/qom/object.c:372:object_initialize_with_type:
+> assertion failed: (type != NULL)
+> Broken pipe
+> FAIL
+> GTester: last random seed: R02Sd4e2c04f6ac00d843a31ccac4de0d914
+> (pid=12686)
+>   /aarch64/device/introspect/abstract-interfaces:                      OK
+> FAIL: tests/device-introspect-test
+>
+> (other archs fail too, aarch64 is just the first one we hit). This
+> error is often "device A instantiates device B, but device B is
+> conditionally compiled in and A is always compiled; so test fails
+> trying to create device A on hosts where device B isn't built" I think.
+
+This part is indeed that problem -- the 'virtio-crypto-device' object
+is built only if CONFIG_LINUX, but 'virtio-crypto-pci' is built if
+CONFIG_VIRTIO_PCI, so on systems where the latter is true but not the
+former you get a virtio-crypto-pci device that crashes when instantiated.
+
+The fix should be
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -8,7 +8,7 @@ obj-y += virtio.o virtio-balloon.o
+ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+ obj-$(CONFIG_LINUX) += virtio-crypto.o
+-obj-$(CONFIG_VIRTIO_PCI) += virtio-crypto-pci.o
++obj-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+ endif
+
+ common-obj-$(call lnot,$(CONFIG_LINUX)) += vhost-stub.o
+
+
+thanks
+-- PMM
