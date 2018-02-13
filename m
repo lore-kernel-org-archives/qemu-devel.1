@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1elize-0004bM-D2
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:24:07 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eljMI-0005qj-3S
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:47:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eliza-0005ft-E8
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:24:06 -0500
-Date: Wed, 14 Feb 2018 00:23:44 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180214001809-mutt-send-email-mst@kernel.org>
-References: <1513866427-27125-1-git-send-email-mst@redhat.com>
-	<1513866427-27125-11-git-send-email-mst@redhat.com>
-	<800aef3f-56c1-b896-1c93-24e2a523833d@kamp.de>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eljMG-0001ao-J4
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:47:30 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <800aef3f-56c1-b896-1c93-24e2a523833d@kamp.de>
-Subject: Re: [Qemu-devel] [Qemu-stable] [PULL 10/25] virtio_error: don't
- invoke status callbacks
+In-Reply-To: <20180214000837-mutt-send-email-mst@kernel.org>
+References: <20180213170712.18239-1-andrew.smirnov@gmail.com>
+	<20180213170712.18239-2-andrew.smirnov@gmail.com>
+	<20180213200450-mutt-send-email-mst@kernel.org>
+	<CAHQ1cqEpeq+M6bVTBLd6dvN7=h-s_bPTXRx_GaoMFhhpq2gTpA@mail.gmail.com>
+	<20180214000837-mutt-send-email-mst@kernel.org>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Tue, 13 Feb 2018 14:47:24 -0800
+Message-ID: <CAHQ1cqEDDz5ni-+MfQp7dE0x_b51=JwgU-fwS4Y+AkyDyLpxRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 1/3] pci: Add support for Designware IP
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +26,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, Ilya Maximets <i.maximets@samsung.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Tue, Feb 13, 2018 at 09:53:58PM +0100, Peter Lieven wrote:
-> 
-> Am 21.12.2017 um 15:29 schrieb Michael S. Tsirkin:
-> > Backends don't need to know what frontend requested a reset,
-> > and notifying then from virtio_error is messy because
-> > virtio_error itself might be invoked from backend.
-> >
-> > Let's just set the status directly.
-> >
-> > Cc: qemu-stable@nongnu.org
-> > Reported-by: Ilya Maximets <i.maximets@samsung.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  hw/virtio/virtio.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > index ad564b0..d6002ee 100644
-> > --- a/hw/virtio/virtio.c
-> > +++ b/hw/virtio/virtio.c
-> > @@ -2469,7 +2469,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-> >      va_end(ap);
-> >  
-> >      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> > -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> > +        vdev->status = vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET;
-> >          virtio_notify_config(vdev);
-> >      }
-> >  
-> 
-> 
-> Is it possible that this patch introduces a stall in I/O and a deadlock on a drain all?
-> 
-> I have seen Qemu VMs being I/O stalled and deadlocking on a vm stop command in
-> 
-> blk_drain_all. This happened after a longer storage outage.
-> 
-> 
-> I am asking just theoretically because I have seen this behaviour first when we
-> 
-> backported this patch in our stable 2.9 branch.
-> 
-> 
-> Thank you,
-> 
-> Peter
+On Tue, Feb 13, 2018 at 2:15 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Tue, Feb 13, 2018 at 12:24:40PM -0800, Andrey Smirnov wrote:
+>> On Tue, Feb 13, 2018 at 10:13 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>> > On Tue, Feb 13, 2018 at 09:07:10AM -0800, Andrey Smirnov wrote:
+>> >> +static void designware_pcie_root_class_init(ObjectClass *klass, void *data)
+>> >> +{
+>> >> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>> >> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> >> +
+>> >> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>> >> +
+>> >> +    k->vendor_id = PCI_VENDOR_ID_SYNOPSYS;
+>> >> +    k->device_id = 0xABCD;
+>> >> +    k->revision = 0;
+>> >> +    k->class_id = PCI_CLASS_BRIDGE_PCI;
+>> >> +    k->is_express = true;
+>> >> +    k->is_bridge = true;
+>> >> +    k->exit = pci_bridge_exitfn;
+>> >> +    k->realize = designware_pcie_root_realize;
+>> >> +    k->config_read = designware_pcie_root_config_read;
+>> >> +    k->config_write = designware_pcie_root_config_write;
+>> >> +
+>> >> +    dc->reset = pci_bridge_reset;
+>> >> +    /*
+>> >> +     * PCI-facing part of the host bridge, not usable without the
+>> >> +     * host-facing part, which can't be device_add'ed, yet.
+>> >> +     */
+>> >> +    dc->user_creatable = false;
+>> >> +    dc->vmsd = &vmstate_designware_pcie_root;
+>> >> +}
+>> >> +
+>> >> +static uint64_t designware_pcie_host_mmio_read(void *opaque, hwaddr addr,
+>> >> +                                               unsigned int size)
+>> >> +{
+>> >> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
+>> >> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
+>> >> +
+>> >> +    return pci_host_config_read_common(device,
+>> >> +                                       addr,
+>> >> +                                       pci_config_size(device),
+>> >> +                                       size);
+>> >> +}
+>> >> +
+>> >> +static void designware_pcie_host_mmio_write(void *opaque, hwaddr addr,
+>> >> +                                            uint64_t val, unsigned int size)
+>> >> +{
+>> >> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
+>> >> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
+>> >> +
+>> >> +    return pci_host_config_write_common(device,
+>> >> +                                        addr,
+>> >> +                                        pci_config_size(device),
+>> >> +                                        val, size);
+>> >> +}
+>> >> +
+>> >> +static const MemoryRegionOps designware_pci_mmio_ops = {
+>> >> +    .read       = designware_pcie_host_mmio_read,
+>> >> +    .write      = designware_pcie_host_mmio_write,
+>> >> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>> >> +    .impl = {
+>> >> +        /*
+>> >> +         * Our device would not work correctly if the guest was doing
+>> >> +         * unaligned access. This might not be a limitation on the real
+>> >> +         * device but in practice there is no reason for a guest to access
+>> >> +         * this device unaligned.
+>> >> +         */
+>> >> +        .min_access_size = 4,
+>> >> +        .max_access_size = 4,
+>> >> +        .unaligned = false,
+>> >> +    },
+>> >> +};
+>> >
+>> > Could you pls add some comments explaining why is DEVICE_NATIVE_ENDIAN
+>> > appropriate here?  Most of these cases are plain "we never bothered
+>> > about cross-endian setups". Some are "there's a mix of different
+>> > endian-ness values, need to handle in a special way".
+>> >
+>> > I suspect you really need DEVICE_LITTLE_ENDIAN.
+>> >
+>>
+>> That MemoryRegion corresponds to a register file permanently mapped
+>> into CPU's address space, so my assumption is that SoC designers will
+>> wire it according to CPUs endianness be it big or little. I am not
+>> aware of any big-endian CPU based SoC on the market using Designware's
+>> IP block, so I don't think there are any precedent confirming or
+>> denying correctness of my assumption. IMHO, this is also the reason
+>> why all of Linux driver code for that IP assumes little endianness.
+>
+> IMHO if Linux driver code does cpu_to_le then it seems best to be
+> consistent with that.
+>
 
-Well - this patch was introduced to fix a crash, but
-a well behaved VM should not trigger VIRTIO_CONFIG_S_NEEDS_RESET -
-did you see any error messages in the log when this triggered?
+Well, all of the DW code does so implicitly by using readl()/writel()
+helpers which will perform cpu_to_le/le_to_cpu under the hood. But is
+seems to me that it could be either because the access does have to be
+LE always or simply because readl()/writel() are goto memory helpers
+on ARM/LE-platforms.
 
--- 
-MST
+FWIW: Somewhat similar precedent of MIPS/Boston machine can serve as
+counter-example to my assumption, since Xilinx PCIE IP there seem to
+be wired to be LE despite being attached to BE CPU.
+
+Thanks,
+Andrey Smirnov
