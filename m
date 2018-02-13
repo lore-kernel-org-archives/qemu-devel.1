@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1elbSU-0001Cc-Gz
+	(envelope-from <stefanha@redhat.com>) id 1elbSU-0001CS-AM
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:21:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1elbST-0002L2-OB
+	(envelope-from <stefanha@redhat.com>) id 1elbST-0002Kb-1R
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:21:22 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33904 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35760 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1elbST-0002Kr-KJ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:21:21 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1elbSS-0002KH-Sn
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 09:21:20 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 13 Feb 2018 14:20:58 +0000
-Message-Id: <20180213142102.14450-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/4] block: fix blk_aio_*() segfault when
+Date: Tue, 13 Feb 2018 14:21:01 +0000
+Message-Id: <20180213142102.14450-4-stefanha@redhat.com>
+In-Reply-To: <20180213142102.14450-1-stefanha@redhat.com>
+References: <20180213142102.14450-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 3/4] block: test blk_aio_flush() with
  blk->root == NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,43 +27,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: John Snow <jsnow@redhat.com>, mark.kanda@oracle.com, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-v2:
- * Introduce AIO_WAIT_WHILE() since aio_poll(ctx, true) is not allowed [Paolo]
+From: Kevin Wolf <kwolf@redhat.com>
 
-Using bdrv_inc_in_flight(blk_bs(blk)) doesn't work since BlockBackend->root may
-be NULL.
+This patch adds test cases for the scenario where blk_aio_flush() is
+called on a BlockBackend with no root.  Calling drain afterwards should
+complete the requests with -ENOMEDIUM.
 
-This patch series solves the issue by adding an BlockBackend->in_flight counter
-so requests can be tracked even when there is no BlockDriverState.
-
-This should fix the IDE and virtio-blk segfaults that have been encountered
-when there is no BlockDriverState.
-
-The patch is based on work by Kevin Wolf.
-
-Kevin Wolf (1):
-  block: test blk_aio_flush() with blk->root == NULL
-
-Stefan Hajnoczi (3):
-  block: extract AIO_WAIT_WHILE() from BlockDriverState
-  block: add BlockBackend->in_flight counter
-  Revert "IDE: Do not flush empty CDROM drives"
-
- tests/Makefile.include     |   2 +
- util/Makefile.objs         |   2 +-
- include/block/aio-wait.h   | 116 +++++++++++++++++++++++++++++++++++++++++++++
- include/block/block.h      |  40 +++-------------
- include/block/block_int.h  |   7 ++-
- block.c                    |   7 ++-
- block/block-backend.c      |  60 ++++++++++++++++++++---
- block/io.c                 |  10 +---
- hw/ide/core.c              |  10 +---
- tests/test-block-backend.c |  82 ++++++++++++++++++++++++++++++++
- util/aio-wait.c            |  40 ++++++++++++++++
- 11 files changed, 313 insertions(+), 63 deletions(-)
- create mode 100644 include/block/aio-wait.h
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ tests/Makefile.include     |  2 ++
+ tests/test-block-backend.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
  create mode 100644 tests/test-block-backend.c
- create mode 100644 util/aio-wait.c
 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f41da235ae..1a457c29bc 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -83,6 +83,7 @@ gcov-files-test-hbitmap-y = blockjob.c
+ check-unit-y += tests/test-bdrv-drain$(EXESUF)
+ check-unit-y += tests/test-blockjob$(EXESUF)
+ check-unit-y += tests/test-blockjob-txn$(EXESUF)
++check-unit-y += tests/test-block-backend$(EXESUF)
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ gcov-files-test-x86-cpuid-y =
+@@ -609,6 +610,7 @@ tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
+ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
++tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+diff --git a/tests/test-block-backend.c b/tests/test-block-backend.c
+new file mode 100644
+index 0000000000..fd59f02bd0
+--- /dev/null
++++ b/tests/test-block-backend.c
+@@ -0,0 +1,82 @@
++/*
++ * BlockBackend tests
++ *
++ * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++
++static void test_drain_aio_error_flush_cb(void *opaque, int ret)
++{
++    bool *completed = opaque;
++
++    g_assert(ret == -ENOMEDIUM);
++    *completed = true;
++}
++
++static void test_drain_aio_error(void)
++{
++    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    BlockAIOCB *acb;
++    bool completed = false;
++
++    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
++    g_assert(acb != NULL);
++    g_assert(completed == false);
++
++    blk_drain(blk);
++    g_assert(completed == true);
++
++    blk_unref(blk);
++}
++
++static void test_drain_all_aio_error(void)
++{
++    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    BlockAIOCB *acb;
++    bool completed = false;
++
++    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
++    g_assert(acb != NULL);
++    g_assert(completed == false);
++
++    blk_drain_all();
++    g_assert(completed == true);
++
++    blk_unref(blk);
++}
++
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
++
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/block-backend/drain_aio_error", test_drain_aio_error);
++    g_test_add_func("/block-backend/drain_all_aio_error",
++                    test_drain_all_aio_error);
++
++    return g_test_run();
++}
 -- 
 2.14.3
