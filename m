@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eldjh-0002pb-F5
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:47:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eldmr-0005Xp-Iz
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eldje-0001c0-Bc
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:47:17 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50016 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eldje-0001bs-59
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:47:14 -0500
-Date: Tue, 13 Feb 2018 18:47:10 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180213184624-mutt-send-email-mst@kernel.org>
-References: <cover.1516538887.git.arei.gonglei@huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eldmq-0003y2-LD
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:50:33 -0500
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:43327)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eldmq-0003xe-G6
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:50:32 -0500
+Received: by mail-oi0-x234.google.com with SMTP id 4so14341240ois.10
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:50:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1516538887.git.arei.gonglei@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] cryptodev: add vhost support
+In-Reply-To: <CAFEAcA-xRtcaRA6_ApZ2Ohfpz0ZCED1y3SyLpGCOWThPFpUr_Q@mail.gmail.com>
+References: <20180128221510.13722-1-richard.henderson@linaro.org>
+	<CAFEAcA_3s_prsUy7CXP3rC-i048FeEduqe92Mwg_VrTJ7YScHg@mail.gmail.com>
+	<18af5519-95cd-f00e-1915-75183e94eb38@twiddle.net>
+	<aff1a8c0-4e99-b52e-f933-fdc900bd91fd@redhat.com>
+	<CAFEAcA-xRtcaRA6_ApZ2Ohfpz0ZCED1y3SyLpGCOWThPFpUr_Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Feb 2018 16:50:11 +0000
+Message-ID: <CAFEAcA_NXwhfJjJnihZdCHAL7A-ZntuNDgrpPkQQDycuMOkdgw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Use *at functions to implement
+ interp_prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Sun, Jan 21, 2018 at 08:54:46PM +0800, Jay Zhou wrote:
-> From: Gonglei <arei.gonglei@huawei.com>
-> 
-> I posted the RFC verion a few months ago for DPDK
-> vhost-crypto implmention, and now it's time to send
-> the formal version. Because we need an user space scheme
-> for better performance.
-> 
-> The vhost user crypto server side patches had been
-> sent to DPDK community, pls see
+On 13 February 2018 at 16:43, Peter Maydell <peter.maydell@linaro.org> wrote:
+> OTOH, maybe we should just go ahead without weird games with dup2 and
+> see whether any real code gets confused...
 
-I dropped the patchset from the latest pull request.
-Please address the issues found, test stop path some more
-and resumit.
+Here's some real-world code that would break with this patch
+as it stands, though dup2 games wouldn't be the fix in this case:
+ https://github.com/xinetd-org/xinetd/blob/master/xinetd/init.c#L79
 
-Thanks!
+(it iterates through all fds above 2 closing them, and we don't
+protect against the guest being able to perform syscalls on
+interp_dirfd)
 
-> [RFC PATCH 0/6] lib/librte_vhost: introduce new vhost_user crypto backend
-> support
-> http://dpdk.org/ml/archives/dev/2017-November/081048.html
-> 
-> You also can get virtio-crypto polling mode driver from:
-> 
-> [PATCH] virtio: add new driver for crypto devices
-> http://dpdk.org/ml/archives/dev/2017-November/081985.html
-> 
-> v5 -> v6:
->   Fix compile error about backends/cryptodev-vhost-user.o and rebase on
->   the master
-> v4 -> v5:
->   squash [PATCH v4 5/5] into previous patches [Michael]
-> v3 -> v4:
->   "[PATCH v4 5/5] cryptodev-vhost-user: depend on CONFIG_VHOST_CRYPTO
->   and CONFIG_VHOST_USER" newly added to fix compilation dependency [Michael]
-> v2 -> v3:
->   New added vhost user messages should be sent only when feature
->   has been successfully negotiated [Michael]
-> v1 -> v2:
->   Fix compile error on mingw32
-> 
-> Gonglei (4):
->   cryptodev: add vhost-user as a new cryptodev backend
->   cryptodev: add vhost support
->   cryptodev-vhost-user: add crypto session handler
->   cryptodev-vhost-user: set the key length
-> 
->  backends/Makefile.objs                |   6 +
->  backends/cryptodev-builtin.c          |   1 +
->  backends/cryptodev-vhost-user.c       | 379 ++++++++++++++++++++++++++++++++++
->  backends/cryptodev-vhost.c            | 347 +++++++++++++++++++++++++++++++
->  configure                             |  15 ++
->  docs/interop/vhost-user.txt           |  26 +++
->  hw/virtio/Makefile.objs               |   2 +-
->  hw/virtio/vhost-user.c                | 104 ++++++++++
->  hw/virtio/virtio-crypto.c             |  70 +++++++
->  include/hw/virtio/vhost-backend.h     |   8 +
->  include/hw/virtio/virtio-crypto.h     |   1 +
->  include/sysemu/cryptodev-vhost-user.h |  47 +++++
->  include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
->  include/sysemu/cryptodev.h            |   8 +
->  qemu-options.hx                       |  21 ++
->  vl.c                                  |   6 +
->  16 files changed, 1194 insertions(+), 1 deletion(-)
->  create mode 100644 backends/cryptodev-vhost-user.c
->  create mode 100644 backends/cryptodev-vhost.c
->  create mode 100644 include/sysemu/cryptodev-vhost-user.h
->  create mode 100644 include/sysemu/cryptodev-vhost.h
-> 
-> --
-> 1.8.3.1
-> 
+thanks
+-- PMM
