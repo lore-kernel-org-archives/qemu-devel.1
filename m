@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eldgI-0007vu-Ij
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:43:47 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eldgr-0008Vo-0L
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eldgH-0007gJ-Mo
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:43:46 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40220)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eldgH-0007fm-H3
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:43:45 -0500
-Received: by mail-ot0-x243.google.com with SMTP id s4so17822783oth.7
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 08:43:45 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1eldgn-00081Z-Tk
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:44:21 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56076 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eldgn-00080c-PI
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:44:17 -0500
+Date: Tue, 13 Feb 2018 16:44:01 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180213164401.GO2378@work-vm>
+References: <20180212153715.87555-1-brijesh.singh@amd.com>
+	<20180212153715.87555-28-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <aff1a8c0-4e99-b52e-f933-fdc900bd91fd@redhat.com>
-References: <20180128221510.13722-1-richard.henderson@linaro.org>
-	<CAFEAcA_3s_prsUy7CXP3rC-i048FeEduqe92Mwg_VrTJ7YScHg@mail.gmail.com>
-	<18af5519-95cd-f00e-1915-75183e94eb38@twiddle.net>
-	<aff1a8c0-4e99-b52e-f933-fdc900bd91fd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Feb 2018 16:43:24 +0000
-Message-ID: <CAFEAcA-xRtcaRA6_ApZ2Ohfpz0ZCED1y3SyLpGCOWThPFpUr_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Use *at functions to implement
- interp_prefix
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180212153715.87555-28-brijesh.singh@amd.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 27/28] tests/qmp-test: blacklist
+ query-sev-launch-measure command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
 
-On 13 February 2018 at 16:38, Eric Blake <eblake@redhat.com> wrote:
-> On 02/13/2018 09:31 AM, Richard Henderson wrote:
->>>
->>> I wonder if there are guest programs that make assumptions about
->>> file descriptor numbers such that it would be worthwhile dup2'ing
->>> the interp_dirfd away from the presumably low number fd it will
->>> get by default into something larger...
->>
->>
->> Hmm.  Using dup2(probe, probe) to test if the new (high) fd itself has not
->> been
->> allocated?
->
->
-> fcntl(F_DUPFD[_CLOEXEC]) is smarter than dup2/3, if you plan on atomically
-> guaranteeing a dup to a not-in-use fd.
->
-> Will dup'ing to a high fd violate assumptions of programs that assume that
-> open() and friends favor the next available fd by default, rather than
-> having a gap?  (Probably not, but skipping fds is not usual, so it's worth
-> asking.)
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+> The query-sev-launch-measure command returns a measurement of encrypted
+> memory when SEV is enabled otherwise it returns an error. Blacklist the
+> command in qmp-test to fix the 'make check' failure.
+>=20
+> Cc: "Daniel P. Berrang=E9" <berrange@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
-Well, the idea is that this fd is qemu-internal, so we want the guest
-to see that from its point of view the first fd it opens will be 3
-if it starts with the usual stdin/stdout/stderr. If we don't move it
-then interp_dirfd gets 3 and the guest sees a "gap" from its POV.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-(Not being able to hide this qemu-internal fd from the guest properly
-is the one awkward part of this patch.)
-
-OTOH, maybe we should just go ahead without weird games with dup2 and
-see whether any real code gets confused...
-
-thanks
--- PMM
+> ---
+>  tests/qmp-test.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+> index 908f9b981f6e..d8720798ad0b 100644
+> --- a/tests/qmp-test.c
+> +++ b/tests/qmp-test.c
+> @@ -202,6 +202,8 @@ static bool query_is_blacklisted(const char *cmd)
+>          "query-gic-capabilities", /* arm */
+>          /* Success depends on target-specific build configuration: */
+>          "query-pci",              /* CONFIG_PCI */
+> +        /* Success depends on launching SEV guest */
+> +        "query-sev-launch-measure",
+>          NULL
+>      };
+>      int i;
+> --=20
+> 2.14.3
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
