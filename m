@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elgyi-0002hV-Io
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:15:01 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1elh89-0006iN-1I
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:24:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elgyf-0000mv-EA
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:15:00 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43028 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elgyf-0000mf-8e
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:14:57 -0500
-Date: Tue, 13 Feb 2018 20:14:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180213201453.GV2378@work-vm>
-References: <20180208103132.28452-1-peterx@redhat.com>
-	<20180208103132.28452-29-peterx@redhat.com>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1elh88-0006Us-0Y
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:24:45 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180208103132.28452-29-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 28/28] migration/hmp: add migrate_pause
- command
+In-Reply-To: <20180213200450-mutt-send-email-mst@kernel.org>
+References: <20180213170712.18239-1-andrew.smirnov@gmail.com>
+	<20180213170712.18239-2-andrew.smirnov@gmail.com>
+	<20180213200450-mutt-send-email-mst@kernel.org>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Tue, 13 Feb 2018 12:24:40 -0800
+Message-ID: <CAHQ1cqEpeq+M6bVTBLd6dvN7=h-s_bPTXRx_GaoMFhhpq2gTpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 1/3] pci: Add support for Designware IP
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Wrapper for QMP command "migrate-pause".
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Tue, Feb 13, 2018 at 10:13 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Tue, Feb 13, 2018 at 09:07:10AM -0800, Andrey Smirnov wrote:
+>> +static void designware_pcie_root_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +
+>> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>> +
+>> +    k->vendor_id = PCI_VENDOR_ID_SYNOPSYS;
+>> +    k->device_id = 0xABCD;
+>> +    k->revision = 0;
+>> +    k->class_id = PCI_CLASS_BRIDGE_PCI;
+>> +    k->is_express = true;
+>> +    k->is_bridge = true;
+>> +    k->exit = pci_bridge_exitfn;
+>> +    k->realize = designware_pcie_root_realize;
+>> +    k->config_read = designware_pcie_root_config_read;
+>> +    k->config_write = designware_pcie_root_config_write;
+>> +
+>> +    dc->reset = pci_bridge_reset;
+>> +    /*
+>> +     * PCI-facing part of the host bridge, not usable without the
+>> +     * host-facing part, which can't be device_add'ed, yet.
+>> +     */
+>> +    dc->user_creatable = false;
+>> +    dc->vmsd = &vmstate_designware_pcie_root;
+>> +}
+>> +
+>> +static uint64_t designware_pcie_host_mmio_read(void *opaque, hwaddr addr,
+>> +                                               unsigned int size)
+>> +{
+>> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
+>> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
+>> +
+>> +    return pci_host_config_read_common(device,
+>> +                                       addr,
+>> +                                       pci_config_size(device),
+>> +                                       size);
+>> +}
+>> +
+>> +static void designware_pcie_host_mmio_write(void *opaque, hwaddr addr,
+>> +                                            uint64_t val, unsigned int size)
+>> +{
+>> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
+>> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
+>> +
+>> +    return pci_host_config_write_common(device,
+>> +                                        addr,
+>> +                                        pci_config_size(device),
+>> +                                        val, size);
+>> +}
+>> +
+>> +static const MemoryRegionOps designware_pci_mmio_ops = {
+>> +    .read       = designware_pcie_host_mmio_read,
+>> +    .write      = designware_pcie_host_mmio_write,
+>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>> +    .impl = {
+>> +        /*
+>> +         * Our device would not work correctly if the guest was doing
+>> +         * unaligned access. This might not be a limitation on the real
+>> +         * device but in practice there is no reason for a guest to access
+>> +         * this device unaligned.
+>> +         */
+>> +        .min_access_size = 4,
+>> +        .max_access_size = 4,
+>> +        .unaligned = false,
+>> +    },
+>> +};
+>
+> Could you pls add some comments explaining why is DEVICE_NATIVE_ENDIAN
+> appropriate here?  Most of these cases are plain "we never bothered
+> about cross-endian setups". Some are "there's a mix of different
+> endian-ness values, need to handle in a special way".
+>
+> I suspect you really need DEVICE_LITTLE_ENDIAN.
+>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+That MemoryRegion corresponds to a register file permanently mapped
+into CPU's address space, so my assumption is that SoC designers will
+wire it according to CPUs endianness be it big or little. I am not
+aware of any big-endian CPU based SoC on the market using Designware's
+IP block, so I don't think there are any precedent confirming or
+denying correctness of my assumption. IMHO, this is also the reason
+why all of Linux driver code for that IP assumes little endianness.
 
-> ---
->  hmp-commands.hx | 14 ++++++++++++++
->  hmp.c           |  9 +++++++++
->  hmp.h           |  1 +
->  3 files changed, 24 insertions(+)
-> 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 7563f3eaa0..32549702ee 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -969,6 +969,20 @@ STEXI
->  @item migrate_recover @var{uri}
->  @findex migrate_recover
->  Continue a paused incoming postcopy migration using the @var{uri}.
-> +ETEXI
-> +
-> +    {
-> +        .name       = "migrate_pause",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "Pause an ongoing migration (postcopy-only)",
-> +        .cmd        = hmp_migrate_pause,
-> +    },
-> +
-> +STEXI
-> +@item migrate_pause
-> +@findex migrate_pause
-> +Pause an ongoing migration.  Currently it only supports postcopy.
->  ETEXI
->  
->      {
-> diff --git a/hmp.c b/hmp.c
-> index 4062d3fdba..ae6266cb21 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1529,6 +1529,15 @@ void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
->      hmp_handle_error(mon, &err);
->  }
->  
-> +void hmp_migrate_pause(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *err = NULL;
-> +
-> +    qmp_migrate_pause(&err);
-> +
-> +    hmp_handle_error(mon, &err);
-> +}
-> +
->  /* Kept for backwards compatibility */
->  void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
->  {
-> diff --git a/hmp.h b/hmp.h
-> index 0d53fe78d9..0aa8dca738 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -71,6 +71,7 @@ void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
-> +void hmp_migrate_pause(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I can't say that I testing this code against a big-endian guest/CPU,
+but that is primarily due to the fact that there's no real use case
+and any test set up I can put toghere would be a contrived example
+pointlessly proving my point.
+
+Anyway, I am more than happy to switch it to use DEVICE_LITTLE_ENDIAN,
+I just don't know if doing so is any more justified than keeping it
+DEVICE_NATIVE_ENDIAN.
+
+Thanks,
+Andrey Smirnov
