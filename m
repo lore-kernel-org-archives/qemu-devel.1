@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele2A-0003VA-Pn
+	(envelope-from <kwolf@redhat.com>) id 1ele2A-0003Tl-9s
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele29-0005i5-3i
+	(envelope-from <kwolf@redhat.com>) id 1ele28-0005hR-JO
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:22 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:05:14 +0100
-Message-Id: <20180213170529.10858-41-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:05:10 +0100
+Message-Id: <20180213170529.10858-37-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 40/55] qcow2: Update discard_single_l2() to
- support L2 slices
+Subject: [Qemu-devel] [PULL 36/55] qcow2: Update qcow2_get_cluster_offset()
+ to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +25,122 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-discard_single_l2() limits the number of clusters to be discarded
-to the amount that fits inside an L2 table. Since we'll be loading
-L2 slices instead of full tables we need to update that limit. The
-function is renamed to discard_in_l2_slice() for clarity.
+qcow2_get_cluster_offset() checks how many contiguous bytes are
+available at a given offset. The returned number of bytes is limited
+by the amount that can be addressed without having to load more than
+one L2 table.
 
-Apart from that, this function doesn't need any additional changes, so
-this patch simply updates the variable name from l2_table to l2_slice.
+Since we'll be loading L2 slices instead of full tables this patch
+changes the limit accordingly using the size of the L2 slice for the
+calculations instead of the full table size.
+
+One consequence of this is that with small L2 slices operations such
+as 'qemu-img map' will need to iterate in more steps because each
+qcow2_get_cluster_offset() call will potentially return a smaller
+number. However the code is already prepared for that so this doesn't
+break semantics.
+
+The l2_table variable is also renamed to l2_slice to reflect this, and
+offset_to_l2_index() is replaced with offset_to_l2_slice_index().
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Message-id: 1cb44a5b68be5334cb01b97a3db3a3c5a43396e5.1517840877.git.berto@igalia.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 6b602260acb33da56ed6af9611731cb7acd110eb.1517840877.git.berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ block/qcow2-cluster.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index dbd57cd35f..62336960a5 100644
+index cd1ba40f74..e0eea73297 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1631,32 +1631,32 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
- 
- /*
-  * This discards as many clusters of nb_clusters as possible at once (i.e.
-- * all clusters in the same L2 table) and returns the number of discarded
-+ * all clusters in the same L2 slice) and returns the number of discarded
-  * clusters.
-  */
--static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
--                             uint64_t nb_clusters, enum qcow2_discard_type type,
--                             bool full_discard)
-+static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-+                               uint64_t nb_clusters,
-+                               enum qcow2_discard_type type, bool full_discard)
+@@ -529,8 +529,8 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
  {
      BDRVQcow2State *s = bs->opaque;
--    uint64_t *l2_table;
-+    uint64_t *l2_slice;
-     int l2_index;
-     int ret;
-     int i;
+     unsigned int l2_index;
+-    uint64_t l1_index, l2_offset, *l2_table;
+-    int l1_bits, c;
++    uint64_t l1_index, l2_offset, *l2_slice;
++    int c;
+     unsigned int offset_in_cluster;
+     uint64_t bytes_available, bytes_needed, nb_clusters;
+     QCow2ClusterType type;
+@@ -539,12 +539,12 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+     offset_in_cluster = offset_into_cluster(s, offset);
+     bytes_needed = (uint64_t) *bytes + offset_in_cluster;
  
--    ret = get_cluster_table(bs, offset, &l2_table, &l2_index);
-+    ret = get_cluster_table(bs, offset, &l2_slice, &l2_index);
+-    l1_bits = s->l2_bits + s->cluster_bits;
+-
+     /* compute how many bytes there are between the start of the cluster
+-     * containing offset and the end of the l1 entry */
+-    bytes_available = (1ULL << l1_bits) - (offset & ((1ULL << l1_bits) - 1))
+-                    + offset_in_cluster;
++     * containing offset and the end of the l2 slice that contains
++     * the entry pointing to it */
++    bytes_available =
++        ((uint64_t) (s->l2_slice_size - offset_to_l2_slice_index(s, offset)))
++        << s->cluster_bits;
+ 
+     if (bytes_needed > bytes_available) {
+         bytes_needed = bytes_available;
+@@ -573,17 +573,17 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+         return -EIO;
+     }
+ 
+-    /* load the l2 table in memory */
++    /* load the l2 slice in memory */
+ 
+-    ret = l2_load(bs, offset, l2_offset, &l2_table);
++    ret = l2_load(bs, offset, l2_offset, &l2_slice);
      if (ret < 0) {
          return ret;
      }
  
--    /* Limit nb_clusters to one L2 table */
--    nb_clusters = MIN(nb_clusters, s->l2_size - l2_index);
-+    /* Limit nb_clusters to one L2 slice */
-+    nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
-     assert(nb_clusters <= INT_MAX);
+     /* find the cluster offset for the given disk offset */
  
-     for (i = 0; i < nb_clusters; i++) {
-         uint64_t old_l2_entry;
+-    l2_index = offset_to_l2_index(s, offset);
+-    *cluster_offset = be64_to_cpu(l2_table[l2_index]);
++    l2_index = offset_to_l2_slice_index(s, offset);
++    *cluster_offset = be64_to_cpu(l2_slice[l2_index]);
  
--        old_l2_entry = be64_to_cpu(l2_table[l2_index + i]);
-+        old_l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
- 
-         /*
-          * If full_discard is false, make sure that a discarded area reads back
-@@ -1694,18 +1694,18 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
-         }
- 
-         /* First remove L2 entries */
--        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-+        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
-         if (!full_discard && s->qcow_version >= 3) {
--            l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
-+            l2_slice[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
-         } else {
--            l2_table[l2_index + i] = cpu_to_be64(0);
-+            l2_slice[l2_index + i] = cpu_to_be64(0);
-         }
- 
-         /* Then decrease the refcount */
-         qcow2_free_any_clusters(bs, old_l2_entry, 1, type);
+     nb_clusters = size_to_clusters(s, bytes_needed);
+     /* bytes_needed <= *bytes + offset_in_cluster, both of which are unsigned
+@@ -610,14 +610,14 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+     case QCOW2_CLUSTER_UNALLOCATED:
+         /* how many empty clusters ? */
+         c = count_contiguous_clusters_unallocated(nb_clusters,
+-                                                  &l2_table[l2_index], type);
++                                                  &l2_slice[l2_index], type);
+         *cluster_offset = 0;
+         break;
+     case QCOW2_CLUSTER_ZERO_ALLOC:
+     case QCOW2_CLUSTER_NORMAL:
+         /* how many allocated clusters ? */
+         c = count_contiguous_clusters(nb_clusters, s->cluster_size,
+-                                      &l2_table[l2_index], QCOW_OFLAG_ZERO);
++                                      &l2_slice[l2_index], QCOW_OFLAG_ZERO);
+         *cluster_offset &= L2E_OFFSET_MASK;
+         if (offset_into_cluster(s, *cluster_offset)) {
+             qcow2_signal_corruption(bs, true, -1, -1,
+@@ -633,7 +633,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+         abort();
      }
  
 -    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
 +    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
  
-     return nb_clusters;
+     bytes_available = (int64_t)c * s->cluster_size;
+ 
+@@ -651,7 +651,7 @@ out:
+     return type;
+ 
+ fail:
+-    qcow2_cache_put(s->l2_table_cache, (void **)&l2_table);
++    qcow2_cache_put(s->l2_table_cache, (void **)&l2_slice);
+     return ret;
  }
-@@ -1729,10 +1729,10 @@ int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
  
-     s->cache_discards = true;
- 
--    /* Each L2 table is handled by its own loop iteration */
-+    /* Each L2 slice is handled by its own loop iteration */
-     while (nb_clusters > 0) {
--        cleared = discard_single_l2(bs, offset, nb_clusters, type,
--                                    full_discard);
-+        cleared = discard_in_l2_slice(bs, offset, nb_clusters, type,
-+                                      full_discard);
-         if (cleared < 0) {
-             ret = cleared;
-             goto fail;
 -- 
 2.13.6
