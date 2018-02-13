@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eld17-0003Wx-Vn
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:01:15 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1eld1k-000406-V1
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eld12-0003JS-2e
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:01:14 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35852 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eld11-0003J2-U0
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:01:08 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 67B7E4023141
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 16:01:07 +0000 (UTC)
-References: <20180213142102.14450-1-stefanha@redhat.com>
-	<20180213142102.14450-2-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <73eb771d-ddcd-42e6-5895-23e6024ccc80@redhat.com>
-Date: Tue, 13 Feb 2018 10:01:06 -0600
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1eld1i-0003bv-AL
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 11:01:53 -0500
+References: <fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+	<5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
+	<20180111130427.GG8326@redhat.com>
+	<20180213105024.GC5083@localhost.localdomain>
+	<20180213143001.GA2354@rkaganb.sw.ru> <20180213143615.GN573@redhat.com>
+	<20180213144521.GI5083@localhost.localdomain>
+	<20180213144838.GO573@redhat.com> <20180213145913.GE2378@work-vm>
+	<6845a694-aa22-90e8-7a9b-ce0283be450c@virtuozzo.com>
+	<20180213150503.GF2378@work-vm>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <26142d76-940a-01e7-fb13-f2a841301e92@virtuozzo.com>
+Date: Tue, 13 Feb 2018 19:01:40 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180213142102.14450-2-stefanha@redhat.com>
+In-Reply-To: <20180213150503.GF2378@work-vm>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] block: extract AIO_WAIT_WHILE()
- from BlockDriverState
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH 1/2] Add save-snapshot,
+ load-snapshot and delete-snapshot to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,128 +32,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
-
-On 02/13/2018 08:20 AM, Stefan Hajnoczi wrote:
-> BlockDriverState has the BDRV_POLL_WHILE() macro to wait on event loop
-> activity while a condition evaluates to true.  This is used to implement
-> synchronous operations where it acts as a condvar between the IOThread
-> running the operation and the main loop waiting for the operation.  It
-> can also be called from the thread that owns the AioContext and in that
-> case it's just a nested event loop.
-> 
-> BlockBackend needs this behavior but doesn't always have a
-> BlockDriverState it can use.  This patch extracts BDRV_POLL_WHILE() into
-> the AioWait abstraction, which can be used with AioContext and isn't
-> tied to BlockDriverState anymore.
-> 
-> This feature could be built directly into AioContext but then all users
-> would kick the event loop even if they signal different conditions.
-> Imagine an AioContext with many BlockDriverStates, each time a request
-> completes any waiter would wake up and re-check their condition.  It's
-> nicer to keep a separate AioWait object for each condition instead.
-> 
-> Please see "block/aio-wait.h" for details on the API.
-> 
-> The name AIO_WAIT_WHILE() avoids the confusion between AIO_POLL_WHILE()
-> and AioContext polling.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-
-Trying to understand here:
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Richard Palethorpe <richiejp@f-m.fm>, Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>, rpalethorpe@suse.com, aarcange@redhat.com
 
 
-> +#define AIO_WAIT_WHILE(wait, ctx, cond) ({                  \
-> +    bool waited_ = false;                                   \
-> +    bool busy_ = true;                                      \
-> +    AioWait *wait_ = (wait);                                \
-> +    AioContext *ctx_ = (ctx);                               \
-> +    if (aio_context_in_iothread(ctx_)) {                    \
-> +        while ((cond) || busy_) {                           \
-> +            busy_ = aio_poll(ctx_, (cond));                 \
-> +            waited_ |= !!(cond) | busy_;                    \
-> +        }                                                   \
 
-If we are in an iothread already, we never dereference wait,
+On 13.02.2018 18:05, Dr. David Alan Gilbert wrote:
+> * Denis V. Lunev (den@virtuozzo.com) wrote:
+>> On 02/13/2018 05:59 PM, Dr. David Alan Gilbert wrote:
+>>> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>>>> On Tue, Feb 13, 2018 at 03:45:21PM +0100, Kevin Wolf wrote:
+>>>>> Am 13.02.2018 um 15:36 hat Daniel P. Berrang=C3=A9 geschrieben:
+>>>>>> On Tue, Feb 13, 2018 at 05:30:02PM +0300, Roman Kagan wrote:
+>>>>>>> On Tue, Feb 13, 2018 at 11:50:24AM +0100, Kevin Wolf wrote:
+>>>>>>>> Am 11.01.2018 um 14:04 hat Daniel P. Berrange geschrieben:
+>>>>>>>>> Then you could just use the regular migrate QMP commands for load=
+ing
+>>>>>>>>> and saving snapshots.
+>>>>>>>> Yes, you could. I think for a proper implementation you would want=
+ to do
+>>>>>>>> better, though. Live migration provides just a stream, but that's =
+not
+>>>>>>>> really well suited for snapshots. When a RAM page is dirtied, you =
+just
+>>>>>>>> want to overwrite the old version of it in a snapshot [...]
+>>>>>>> This means the point in time where the guest state is snapshotted i=
+s not
+>>>>>>> when the command is issued, but any unpredictable amount of time la=
+ter.
+>>>>>>>
+>>>>>>> I'm not sure this is what a user expects.
+>>>>>>>
+>>>>>>> A better approach for the save part appears to be to stop the vcpus=
+,
+>>>>>>> dump the device state, resume the vcpus, and save the memory conten=
+ts in
+>>>>>>> the background, prioritizing the old copies of the pages that chang=
+e.
+>>>>>>> No multiple copies of the same page would have to be saved so the s=
+tream
+>>>>>>> format would be fine.  For the load part the usual inmigrate should
+>>>>>>> work.
+>>>>>> No, that's policy decision that doesn't matter from QMP pov. If the =
+mgmt
+>>>>>> app wants the snapshot to be wrt to the initial time, it can simply
+>>>>>> invoke the "stop" QMP command before doing the live migration and
+>>>>>> "cont" afterwards.
+>>>>> That would be non-live. I think Roman means a live snapshot that save=
+s
+>>>>> the state at the beginning of the operation. Basically the difference
+>>>>> between blockdev-backup (state at the beginning) and blockdev-mirror
+>>>>> (state at the end), except for a whole VM.
+>>>> That doesn't seem practical unless you can instantaneously write out
+>>>> the entire guest RAM to disk without blocking, or can somehow snapshot
+>>>> the RAM so you can write out a consistent view of the original RAM,
+>>>> while the guest continues to dirty RAM pages.
+>>> People have suggested doing something like that with userfault write
+>>> mode; but the same would also be doable just by write protecting the
+>>> whole of RAM and then following the faults.
+>>
+>> nope, userfault fd does not help :( We have tried, the functionality is =
+not
+>> enough. Better to have small extension to KVM to protect all memory
+>> and notify QEMU with accessed address.
+>=20
+> Can you explain why? I thought the write-protect mode of userfaultfd was
+> supposed to be able to do that; cc'ing in Andrea
 
-> +    } else {                                                \
-> +        assert(qemu_get_current_aio_context() ==            \
-> +               qemu_get_aio_context());                     \
-> +        assert(!wait_->need_kick);                          \
+Hi everybody
 
-but if we are in the main loop, wait must be non-NULL.
+Yes, that's true but it isn't implemented yet in the kernel
 
-> +++ b/include/block/block.h
-> @@ -2,6 +2,7 @@
->   #define BLOCK_H
->   
->   #include "block/aio.h"
-> +#include "block/aio-wait.h"
->   #include "qapi-types.h"
->   #include "qemu/iov.h"
->   #include "qemu/coroutine.h"
-> @@ -367,41 +368,14 @@ void bdrv_drain_all_begin(void);
->   void bdrv_drain_all_end(void);
->   void bdrv_drain_all(void);
->   
-> +/* Returns NULL when bs == NULL */
-> +AioWait *bdrv_get_aio_wait(BlockDriverState *bs);
+...
+userfaultfd_register
 
-This can return NULL, so it is only ever safe to use in an iothread; 
-because if it is used in the main loop,...
+         if (uffdio_register.mode & UFFDIO_REGISTER_MODE_WP) {
+                 vm_flags |=3D VM_UFFD_WP;
+                 /*
+                  * FIXME: remove the below error constraint by
+                  * implementing the wprotect tracking mode.
+                  */
+                 ret =3D -EINVAL;
+                 goto out;
+         }
 
-> +
->   #define BDRV_POLL_WHILE(bs, cond) ({                       \
+and I don't feel like doing that taking into account that somebody has=20
+it done already
+but when it's done I'll use it with pleasure.
 
-> +    AIO_WAIT_WHILE(bdrv_get_aio_wait(bs_),                 \
-> +                   bdrv_get_aio_context(bs_),              \
-> +                   cond); })
+KVM need to tiny wini modification to be made in its mmu part which=20
+would tell to the userspace the fault address. This is a simple solution=20
+which can be used while we're living without userfaultfd.
 
-...we can pass NULL as the wait parameter, which will crash.
+>=20
+> Dave
+>=20
+>> Den
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
 
-> +++ b/block.c
-> @@ -4716,6 +4716,11 @@ AioContext *bdrv_get_aio_context(BlockDriverState *bs)
->       return bs->aio_context;
->   }
->   
-> +AioWait *bdrv_get_aio_wait(BlockDriverState *bs)
-> +{
-> +    return bs ? &bs->wait : NULL;
-> +}
-
-So, do we need documentation to that fact?  Also,
-
-> +++ b/block/io.c
-
->   void bdrv_wakeup(BlockDriverState *bs)
->   {
-> -    /* The barrier (or an atomic op) is in the caller.  */
-> -    if (atomic_read(&bs->wakeup)) {
-> -        aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
-> -    }
-> +    aio_wait_kick(bdrv_get_aio_wait(bs));
-
-this is another case where passing NULL...
-
-> +++ b/util/aio-wait.c
-
-> +void aio_wait_kick(AioWait *wait)
-> +{
-> +    /* The barrier (or an atomic op) is in the caller.  */
-> +    if (atomic_read(&wait->need_kick)) {
-
-...is bad.  Does that mean bdrv_wakeup() can only be called when bs is 
-non-NULL?  Does that need documentation?
-
-It may be that your patch is correct (as I'm not an expert on the rules 
-in play here), but more comments may help.  Or you may have a NULL 
-dereference bug lurking.  So at this point, I can't give R-b, even 
-though the refactoring of the BDRV_POLL_WHILE() macro into a separate 
-helper makes sense from the high level view.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--=20
+Best,
+Denis
