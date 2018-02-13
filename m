@@ -1,18 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eleVh-00045q-LY
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:36:54 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eleWP-0004kB-14
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:37:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eleVd-0003rg-Oz
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:36:53 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e6d0b42b-2e23-b518-5c1f-1049a286aff4@virtuozzo.com>
-Date: Tue, 13 Feb 2018 20:36:41 +0300
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: [Qemu-devel] block_status automatically added flags
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eleWL-0004CF-3h
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:37:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eleWK-0004AS-R1
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:37:33 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1DHYP6v084254
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 12:37:31 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g42sew5ty-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 12:37:30 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 13 Feb 2018 12:37:29 -0500
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 13 Feb 2018 15:37:16 -0200
+Message-Id: <20180213173716.21358-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] hw/ppc/spapr_hcall: set htab_shift after
+ kvmppc_resize_hpt_commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,68 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Hi Eric!
+Newer kernels have a htab resize capability when adding or remove
+memory. At these situations, the guest kernel might reallocate its
+htab to a more suitable size based on the resulting memory.
 
-I'm now testing my nbd block status realization (block_status part, not=20
-about dirty bitmaps), and faced into the following effect.
+However, we're not setting the new value back into the machine state
+when a KVM guest resizes its htab. At first this doesn't seem harmful,
+but when migrating or saving the guest state (via virsh managedsave,
+for instance) this mismatch between the htab size of QEMU and the
+kernel makes the guest hangs when trying to load its state.
 
-I created empty qcow2 image and wrote to the first sector, so
+Inside h_resize_hpt_commit, the hypercall that commits the hash page
+resize changes, let's set spapr->htab_shift to the new value if we're
+sure that kvmppc_resize_hpt_commit were successful.
 
-qemu-io -c map x
+While we're here, add a "not RADIX" sanity check as it is already done
+in the related hypercall h_resize_hpt_prepare.
 
-reports:
+Fixes: https://github.com/open-power-host-os/qemu/issues/28
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr_hcall.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-64 KiB (0x10000) bytes=C2=A0=C2=A0=C2=A0=C2=A0 allocated at offset 0 bytes =
-(0x0)
-9.938 MiB (0x9f0000) bytes not allocated at offset 64 KiB (0x10000)
-
-But I can't get same results, when connecting to nbd server, exporting=20
-the same qcow2 file, I get
-
-10 MiB (0xa00000) bytes=C2=A0=C2=A0=C2=A0=C2=A0 allocated at offset 0 bytes=
- (0x0)
-
-
-Finally, I understand the reason:
-
-for local file, qemu-io calls bdrv_is_allocated, which calls=20
-bdrv_common_block_status_above with want_zero=3Dfalse. So, it doesn't set=20
-BDRV_BLOCK_ZERO, and doesn't set BDRV_BLOCK_ALLOCATED. And, even if we=20
-change want_zero to true, here, it will set BDRV_BLOCK_ZERO, but will=20
-not set BDRV_BLOCK_ALLOCATED, which contradicts with it's definition:
-
- =C2=A0BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 layer (short f=
-or DATA || ZERO), set by block layer
-
-
-for nbd, we go through the similar way on server (but with want_zero =3D=20
-true), and we finally have BDRV_BLOCK_ZERO without BDRV_BLOCK_ALLOCATED,=20
-which maps to NBD_STATE_HOLE+NBD_STATE_ZERO. But then, in the client we=20
-have BDRV_BLOCK_ZERO not automatically added by block layer but directly=20
-from nbd driver, therefor BDRV_BLOCK_ALLOCATED is set and I get=20
-different result.
-
-
-this all looks weird for me.
-
-BDRV_BLOCK_ALLOCATED definition should be fixed, to show that this flag=20
-show only reported by driver flags, not automatically added.
-
-And then the situation with nbd looks strange, because automatically=20
-added flag becomes "flag, reported by block driver".
-
-On the other hand, it is not wrong.
-
-
-I think, to test the feature, I'll improve qemu-io map, to show zeros=20
-(or is it better to add separate command?) and leave the other things as=20
-is. What do you think?
-
---=20
-Best regards,
-Vladimir
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 76422cfac1..1986560480 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -731,11 +731,21 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+         return H_AUTHORITY;
+     }
+ 
++    if (!spapr->htab_shift) {
++        /* Radix guest, no HPT */
++        return H_NOT_AVAILABLE;
++    }
++
+     trace_spapr_h_resize_hpt_commit(flags, shift);
+ 
+     rc = kvmppc_resize_hpt_commit(cpu, flags, shift);
+     if (rc != -ENOSYS) {
+-        return resize_hpt_convert_rc(rc);
++        rc = resize_hpt_convert_rc(rc);
++        if (rc == H_SUCCESS) {
++            /* Need to set the new htab_shift in the machine state */
++            spapr->htab_shift = shift;
++        }
++        return rc;
+     }
+ 
+     if (flags != 0) {
+-- 
+2.14.3
