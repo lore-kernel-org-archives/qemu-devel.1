@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eliYE-0006dm-UB
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 16:55:49 -0500
+	(envelope-from <cota@braap.org>) id 1eliZZ-0007RB-EO
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 16:57:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eliYB-0003tD-SN
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 16:55:47 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:34607)
+	(envelope-from <cota@braap.org>) id 1eliZX-0004ON-8Z
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 16:57:09 -0500
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:38809)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eliYB-0003sv-LP
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 16:55:43 -0500
-Date: Tue, 13 Feb 2018 16:55:41 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eliZX-0004OA-3I
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 16:57:07 -0500
+Date: Tue, 13 Feb 2018 16:57:04 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180213215541.GA1816@flamenco>
+Message-ID: <20180213215704.GB1816@flamenco>
 References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
 	<1518053328-34687-10-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
@@ -45,21 +45,9 @@ On Thu, Feb 08, 2018 at 14:28:34 +1300, Michael Clark wrote:
 (snip)
 > +++ b/target/riscv/translate.c
 (snip)
-> +enum {
-> +    BS_NONE     = 0, /* When seen outside of translation while loop, indicates
-> +                     need to exit tb due to end of page. */
-> +    BS_STOP     = 1, /* Need to exit tb for syscall, sret, etc. */
+> +        /* Address comparion failure.  However, we still need to
+> +           provide the memory barrier implied by AQ/RL.  */
 
-Are we planning to use BS_STOP in the future? I see it has no setters,
-although we check for it in gen_intermediate_code:
+s/comparion/comparison/
 
-(snip)
-> +    switch (ctx.bstate) {
-> +    case BS_STOP:
-> +        gen_goto_tb(&ctx, 0, ctx.pc);
-> +        break;
-> +    case BS_NONE: /* handle end of page - DO NOT CHAIN. See gen_goto_tb. */
-
-Should we get rid of it?
-
-		Emilio
+		E.
