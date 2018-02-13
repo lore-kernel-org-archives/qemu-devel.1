@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele2K-0003eh-5q
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:33 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele2P-0003li-Bp
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ele2J-0005rl-7r
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ele2M-0005ur-6q
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:06:37 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Feb 2018 18:05:29 +0100
-Message-Id: <20180213170529.10858-56-kwolf@redhat.com>
+Date: Tue, 13 Feb 2018 18:05:27 +0100
+Message-Id: <20180213170529.10858-54-kwolf@redhat.com>
 In-Reply-To: <20180213170529.10858-1-kwolf@redhat.com>
 References: <20180213170529.10858-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 55/55] iotests: Add l2-cache-entry-size to
- iotest 137
+Subject: [Qemu-devel] [PULL 53/55] iotests: Test valid values of
+ l2-cache-entry-size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +25,68 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-This test tries reopening a qcow2 image with valid and invalid
-options. This patch adds l2-cache-entry-size to the set.
+The l2-cache-entry-size setting can only contain values that are
+powers of two between 512 and the cluster size.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 3d3b7d2dbfc020deaef60fb58739b0801eb9517c.1517840877.git.berto@igalia.com
+Message-id: bd3547b670b8d0af11480c760991a22bcae5b48c.1517840877.git.berto@igalia.com
+[mreitz: Changed non-power-of-two test value from 300 to 4242]
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/137     | 5 +++++
- tests/qemu-iotests/137.out | 2 ++
- 2 files changed, 7 insertions(+)
+ tests/qemu-iotests/103     | 17 +++++++++++++++++
+ tests/qemu-iotests/103.out |  3 +++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 5a01250005..87965625d8 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -83,6 +83,9 @@ $QEMU_IO \
-     -c "reopen -o overlap-check.inactive-l2=off" \
-     -c "reopen -o cache-size=1M" \
-     -c "reopen -o l2-cache-size=512k" \
-+    -c "reopen -o l2-cache-entry-size=512" \
-+    -c "reopen -o l2-cache-entry-size=4k" \
-+    -c "reopen -o l2-cache-entry-size=64k" \
-     -c "reopen -o refcount-cache-size=128k" \
-     -c "reopen -o cache-clean-interval=5" \
-     -c "reopen -o cache-clean-interval=0" \
-@@ -107,6 +110,8 @@ $QEMU_IO \
-     -c "reopen -o cache-size=1M,l2-cache-size=2M" \
-     -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
-     -c "reopen -o l2-cache-size=256T" \
-+    -c "reopen -o l2-cache-entry-size=33k" \
-+    -c "reopen -o l2-cache-entry-size=128k" \
-     -c "reopen -o refcount-cache-size=256T" \
-     -c "reopen -o overlap-check=constant,overlap-check.template=all" \
-     -c "reopen -o overlap-check=blubb" \
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index 05efd74d17..e28e1eadba 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -20,6 +20,8 @@ cache-size, l2-cache-size and refcount-cache-size may not be set the same time
- l2-cache-size may not exceed cache-size
- refcount-cache-size may not exceed cache-size
- L2 cache size too big
-+L2 cache entry size must be a power of two between 512 and the cluster size (65536)
-+L2 cache entry size must be a power of two between 512 and the cluster size (65536)
- L2 cache size too big
- Conflicting values for qcow2 options 'overlap-check' ('constant') and 'overlap-check.template' ('all')
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
+diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
+index d0cfab8844..2841318492 100755
+--- a/tests/qemu-iotests/103
++++ b/tests/qemu-iotests/103
+@@ -66,6 +66,14 @@ $QEMU_IO -c "open -o cache-size=1M,refcount-cache-size=2M $TEST_IMG" 2>&1 \
+ $QEMU_IO -c "open -o cache-size=0,l2-cache-size=0,refcount-cache-size=0 $TEST_IMG" \
+     2>&1 | _filter_testdir | _filter_imgfmt
+ 
++# Invalid cache entry sizes
++$QEMU_IO -c "open -o l2-cache-entry-size=256 $TEST_IMG" \
++    2>&1 | _filter_testdir | _filter_imgfmt
++$QEMU_IO -c "open -o l2-cache-entry-size=4242 $TEST_IMG" \
++    2>&1 | _filter_testdir | _filter_imgfmt
++$QEMU_IO -c "open -o l2-cache-entry-size=128k $TEST_IMG" \
++    2>&1 | _filter_testdir | _filter_imgfmt
++
+ echo
+ echo '=== Testing valid option combinations ==='
+ echo
+@@ -94,6 +102,15 @@ $QEMU_IO -c "open -o l2-cache-size=1M,refcount-cache-size=0.25M $TEST_IMG" \
+          -c 'read -P 42 0 64k' \
+     | _filter_qemu_io
+ 
++# Valid cache entry sizes
++$QEMU_IO -c "open -o l2-cache-entry-size=512 $TEST_IMG" \
++    2>&1 | _filter_testdir | _filter_imgfmt
++$QEMU_IO -c "open -o l2-cache-entry-size=16k $TEST_IMG" \
++    2>&1 | _filter_testdir | _filter_imgfmt
++$QEMU_IO -c "open -o l2-cache-entry-size=64k $TEST_IMG" \
++    2>&1 | _filter_testdir | _filter_imgfmt
++
++
+ echo
+ echo '=== Testing minimal L2 cache and COW ==='
+ echo
+diff --git a/tests/qemu-iotests/103.out b/tests/qemu-iotests/103.out
+index b7aaadf89a..bd45d3875a 100644
+--- a/tests/qemu-iotests/103.out
++++ b/tests/qemu-iotests/103.out
+@@ -9,6 +9,9 @@ can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cach
+ can't open device TEST_DIR/t.IMGFMT: l2-cache-size may not exceed cache-size
+ can't open device TEST_DIR/t.IMGFMT: refcount-cache-size may not exceed cache-size
+ can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
++can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
++can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
++can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+ 
+ === Testing valid option combinations ===
+ 
 -- 
 2.13.6
