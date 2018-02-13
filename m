@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eldxB-0007I3-4E
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:01:15 -0500
+	(envelope-from <lersek@redhat.com>) id 1eldy4-0007wM-75
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eldxA-0002Pg-D9
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:01:13 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55711)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eldxA-0002Ol-6u
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:01:12 -0500
-Received: by mail-wm0-x241.google.com with SMTP id a84so6048203wmi.5
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 09:01:11 -0800 (PST)
+	(envelope-from <lersek@redhat.com>) id 1eldy1-00031X-MQ
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:02:08 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56530 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eldy1-000315-Hk
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:02:05 -0500
+References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
+	<20180212204609.GB30111@morn.lan>
+	<b2725975-6823-8919-e937-56d8cb404372@linux.vnet.ibm.com>
+	<e8cf7f36-249f-a3cc-f414-fac4e8b56b51@redhat.com>
+	<20180213173452.20fe8f2f@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <0d108314-0915-50b5-255e-ece22c7dfaf0@redhat.com>
+Date: Tue, 13 Feb 2018 18:01:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180213050837.40964-1-linzhecheng@huawei.com>
-References: <20180213050837.40964-1-linzhecheng@huawei.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 13 Feb 2018 18:01:09 +0100
-Message-ID: <CAJ+F1CK1c+demhjd4kWJzm-gjmg0Bf2e+4zhj9P2ENgDZoe2Qg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: fix memory leak
+In-Reply-To: <20180213173452.20fe8f2f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +34,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linzhecheng <linzhecheng@huawei.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, wangxinxin.wang@huawei.com, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, lidonglin@huawei.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Kevin O'Connor <kevin@koconnor.net>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 
-On Tue, Feb 13, 2018 at 6:08 AM, linzhecheng <linzhecheng@huawei.com> wrote=
-:
-> g_free() was moved from vhost_net_cleanup in commit e6bcb1b, so we should
-> free net after vhost_net_cleanup
->
-> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+On 02/13/18 17:34, Igor Mammedov wrote:
+> On Tue, 13 Feb 2018 17:16:49 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+> [...]
+>>
+>> It's possible that I'll scream for additional hw enlightement under OVMF
+>> later; so I suggest designing in some kind of feature negotiation up-front.
+> We can add an extra fwcfg file for that later, when/if it's actually needed.
 
-This can be reproduced and catched by ASAN too:
+Works for me.
 
-=3D=3D11833=3D=3DERROR: LeakSanitizer: detected memory leaks
-
-Direct leak of 784 byte(s) in 1 object(s) allocated from:
-    #0 0x7fa1aed89a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea38)
-    #1 0x7fa1adadff75 in g_malloc0 ../glib/gmem.c:124
-    #2 0x56082a195515 in vhost_net_init
-/home/elmarco/src/qemu/hw/net/vhost_net.c:147
-    #3 0x61500000bbff  (<unknown module>)
-
-
-good catch,
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau < marcandre.lureau@redhat.com>
-
->
-> diff --git a/net/vhost-user.c b/net/vhost-user.c
-> index cb45512506..d024573e45 100644
-> --- a/net/vhost-user.c
-> +++ b/net/vhost-user.c
-> @@ -109,6 +109,7 @@ static int vhost_user_start(int queues, NetClientStat=
-e *ncs[], CharBackend *be)
->  err:
->      if (net) {
->          vhost_net_cleanup(net);
-> +        g_free(net);
->      }
->      vhost_user_stop(i, ncs);
->      return -1;
-> --
-> 2.12.2.windows.2
->
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Thanks
+Laszlo
