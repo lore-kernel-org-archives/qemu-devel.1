@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rbraun@sceen.net>) id 1elhaq-0006bK-QP
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:25 -0500
+	(envelope-from <steven.seeger@flightsystems.net>) id 1elhdj-000149-0q
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:57:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rbraun@sceen.net>) id 1elhap-0003OU-Nz
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:24 -0500
-Received: from shattrath.sceen.net ([2001:41d0:c:ada::1]:53105
-	helo=mail.sceen.net) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rbraun@sceen.net>) id 1elhap-0003Gh-HB
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:54:23 -0500
-From: Richard Braun <rbraun@sceen.net>
-Date: Tue, 13 Feb 2018 21:54:19 +0100
-Message-Id: <1518555259-26463-1-git-send-email-rbraun@sceen.net>
-In-Reply-To: <20180209093643.GC27456@shattrath>
-References: <20180209093643.GC27456@shattrath>
-Subject: [Qemu-devel] [PATCH v2] hw/char/stm32f2xx_usart: fix TXE/TC bit
- handling
+	(envelope-from <steven.seeger@flightsystems.net>) id 1elhdg-0004uP-0B
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:57:23 -0500
+Received: from p3plsmtpa06-06.prod.phx3.secureserver.net
+	([173.201.192.107]:45889)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <steven.seeger@flightsystems.net>)
+	id 1elhdf-0004so-Qe
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 15:57:19 -0500
+From: Steven Seeger <steven.seeger@flightsystems.net>
+Reply-To: steven.seeger@flightsystems.net
+Date: Tue, 13 Feb 2018 15:57:14 -0500
+Message-ID: <4476423.I6xtnU8gSc@wirbelwind>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Subject: [Qemu-devel] sparc branch to pc+4 issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-I/O currently being synchronous, there is no reason to ever clear the
-SR_TXE bit. However the SR_TC bit may be cleared by software writing
-to the SR register, so set it on each write.
+Consider pc==0x100:
 
-In addition, fix the reset value of the USART status register.
+0x100   b 0x104
 
-Signed-off-by: Richard Braun <rbraun@sceen.net>
----
- hw/char/stm32f2xx_usart.c         | 12 ++++++++----
- include/hw/char/stm32f2xx_usart.h |  7 ++++++-
- 2 files changed, 14 insertions(+), 5 deletions(-)
+The uncondtional not-annulled branch will go to 0x104, which is the next 
+instruction anyway. do_branch() will leave dc->pc and dc->npc both set to 
+0x104. This causes gdb to have a problem when single stepping. It will be 
+stuck. QEMU will execute past this somehow, but I'm not sure with what side 
+effect. It seems to me the following patch will fix this:
 
-diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
-index 07b462d4b6..032b5fda13 100644
---- a/hw/char/stm32f2xx_usart.c
-+++ b/hw/char/stm32f2xx_usart.c
-@@ -96,12 +96,10 @@ static uint64_t stm32f2xx_usart_read(void *opaque, hwaddr addr,
-     switch (addr) {
-     case USART_SR:
-         retvalue = s->usart_sr;
--        s->usart_sr &= ~USART_SR_TC;
-         qemu_chr_fe_accept_input(&s->chr);
-         return retvalue;
-     case USART_DR:
-         DB_PRINT("Value: 0x%" PRIx32 ", %c\n", s->usart_dr, (char) s->usart_dr);
--        s->usart_sr |= USART_SR_TXE;
-         s->usart_sr &= ~USART_SR_RXNE;
-         qemu_chr_fe_accept_input(&s->chr);
-         qemu_set_irq(s->irq, 0);
-@@ -137,7 +135,9 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
-     switch (addr) {
-     case USART_SR:
-         if (value <= 0x3FF) {
--            s->usart_sr = value;
-+            /* I/O being synchronous, TXE is always set. In addition, it may
-+               only be set by hardware, so keep it set here. */
-+            s->usart_sr = value | USART_SR_TXE;
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index 71e0853e43..95ca90b51a 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -1464,6 +1464,7 @@ static void do_branch(DisasContext *dc, int32_t offset, 
+uint32_t insn, int cc)
+             dc->npc = dc->pc + 4;
          } else {
-             s->usart_sr &= value;
+             dc->pc = dc->npc;
++            if(target==dc->pc) target += 4;
+             dc->npc = target;
+             tcg_gen_mov_tl(cpu_pc, cpu_npc);
          }
-@@ -151,8 +151,12 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
-             /* XXX this blocks entire thread. Rewrite to use
-              * qemu_chr_fe_write and background I/O callbacks */
-             qemu_chr_fe_write_all(&s->chr, &ch, 1);
-+            /* XXX I/O are currently synchronous, making it impossible for
-+               software to observe transient states where TXE or TC aren't
-+               set. Unlike TXE however, which is read-only, software may
-+               clear TC by writing 0 to the SR register, so set it again
-+               on each write. */
-             s->usart_sr |= USART_SR_TC;
--            s->usart_sr &= ~USART_SR_TXE;
-         }
-         return;
-     case USART_BRR:
-diff --git a/include/hw/char/stm32f2xx_usart.h b/include/hw/char/stm32f2xx_usart.h
-index 9d03a7527c..7ea7448813 100644
---- a/include/hw/char/stm32f2xx_usart.h
-+++ b/include/hw/char/stm32f2xx_usart.h
-@@ -37,7 +37,12 @@
- #define USART_CR3  0x14
- #define USART_GTPR 0x18
- 
--#define USART_SR_RESET 0x00C00000
-+/*
-+ * XXX The reset value mentioned in "24.6.1 Status register" seems bogus.
-+ * Looking at "Table 98 USART register map and reset values", it seems it
-+ * should be 0xc0, and that's how real hardware behaves.
-+ */
-+#define USART_SR_RESET (USART_SR_TXE | USART_SR_TC)
- 
- #define USART_SR_TXE  (1 << 7)
- #define USART_SR_TC   (1 << 6)
--- 
-2.11.0
+
+I apologize if I am missing something with this assessment.
+
+Steven
