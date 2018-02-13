@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTf-0002Ft-IJ
+	(envelope-from <stefanha@redhat.com>) id 1eleTe-0002Fl-E9
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eleTe-0003E9-Q1
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42082 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTe-0003DY-Mm
+	(envelope-from <stefanha@redhat.com>) id 1eleTc-0003C7-KD
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:46 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51834 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eleTc-0003Bu-GB
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 12:34:44 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 13 Feb 2018 17:34:24 +0000
-Message-Id: <20180213173429.19501-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/5] Block patches
+Date: Tue, 13 Feb 2018 17:34:27 +0000
+Message-Id: <20180213173429.19501-4-stefanha@redhat.com>
+In-Reply-To: <20180213173429.19501-1-stefanha@redhat.com>
+References: <20180213173429.19501-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/5] vl: pause vcpus before stopping iothreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +26,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-The following changes since commit fb68096da3d35e64c88cd610c1fa42766c58e9=
-2a:
+Commit dce8921b2baaf95974af8176406881872067adfa ("iothread: Stop threads
+before main() quits") introduced iothread_stop_all() to avoid the
+following virtio-scsi assertion failure:
 
-  Revert "tests: use memfd in vhost-user-test" (2018-02-13 09:51:52 +0000=
-)
+  assert(blk_get_aio_context(d->conf.blk) == s->ctx);
 
-are available in the Git repository at:
+Back then the assertion failed because when bdrv_close_all() made
+d->conf.blk NULL, blk_get_aio_context() returned the global AioContext
+instead of s->ctx.
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
+The same assertion can still fail today when vcpus submit new I/O
+requests after iothread_stop_all() has moved the BDS to the global
+AioContext.
 
-for you to fetch changes up to 64b01feca991e5b19a5d750ef77cdca92b68bdbb:
+This patch hardens the iothread_stop_all() approach by pausing vcpus
+before calling iothread_stop_all().
 
-  misc: fix spelling (2018-02-13 15:38:17 +0000)
+Note that the assertion failure is a race condition.  It is not possible
+to reproduce it reliably.
 
-----------------------------------------------------------------
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20180201110708.8080-1-stefanha@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ vl.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-----------------------------------------------------------------
-
-Fam Zheng (2):
-  Add a git-publish configuration file
-  README: Document 'git-publish' workflow
-
-Marc-Andr=C3=A9 Lureau (1):
-  misc: fix spelling
-
-Stefan Hajnoczi (1):
-  vl: pause vcpus before stopping iothreads
-
-Wolfgang Bumiller (1):
-  ratelimit: don't align wait time with slices
-
- include/qemu/ratelimit.h   | 11 ++++-----
- util/qemu-coroutine-lock.c |  2 +-
- vl.c                       | 12 ++++++++--
- .gitpublish                | 58 ++++++++++++++++++++++++++++++++++++++++=
-++++++
- README                     | 31 ++++++++++++++++++++++++-
- 5 files changed, 104 insertions(+), 10 deletions(-)
- create mode 100644 .gitpublish
-
---=20
+diff --git a/vl.c b/vl.c
+index 21878496ec..7a5554bc41 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4767,10 +4767,18 @@ int main(int argc, char **argv, char **envp)
+ 
+     main_loop();
+     replay_disable_events();
++
++    /* The ordering of the following is delicate.  Stop vcpus to prevent new
++     * I/O requests being queued by the guest.  Then stop IOThreads (this
++     * includes a drain operation and completes all request processing).  At
++     * this point emulated devices are still associated with their IOThreads
++     * (if any) but no longer have any work to do.  Only then can we close
++     * block devices safely because we know there is no more I/O coming.
++     */
++    pause_all_vcpus();
+     iothread_stop_all();
+-
+-    pause_all_vcpus();
+     bdrv_close_all();
++
+     res_free();
+ 
+     /* vhost-user must be cleaned up before chardevs.  */
+-- 
 2.14.3
