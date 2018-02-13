@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1elimT-0006c1-9t
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:10:30 -0500
+	(envelope-from <mst@redhat.com>) id 1elis3-0000b9-VZ
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1elimO-00050Y-Mx
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:10:29 -0500
-Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:42549)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1elimO-00050I-7x
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:10:24 -0500
-Received: by mail-pl0-x22e.google.com with SMTP id 31so1812113ple.9
-	for <qemu-devel@nongnu.org>; Tue, 13 Feb 2018 14:10:24 -0800 (PST)
-References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
-	<1518053328-34687-10-git-send-email-mjc@sifive.com>
-	<20180213215541.GA1816@flamenco>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <731db20e-4d86-e288-504c-30c83b56fd33@linaro.org>
-Date: Tue, 13 Feb 2018 14:10:20 -0800
+	(envelope-from <mst@redhat.com>) id 1elis3-0000Cr-17
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 17:16:15 -0500
+Date: Wed, 14 Feb 2018 00:15:52 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180214000837-mutt-send-email-mst@kernel.org>
+References: <20180213170712.18239-1-andrew.smirnov@gmail.com>
+	<20180213170712.18239-2-andrew.smirnov@gmail.com>
+	<20180213200450-mutt-send-email-mst@kernel.org>
+	<CAHQ1cqEpeq+M6bVTBLd6dvN7=h-s_bPTXRx_GaoMFhhpq2gTpA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180213215541.GA1816@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 09/23] RISC-V TCG Code Generation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHQ1cqEpeq+M6bVTBLd6dvN7=h-s_bPTXRx_GaoMFhhpq2gTpA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/3] pci: Add support for Designware IP
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +26,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, Michael Clark <mjc@sifive.com>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 02/13/2018 01:55 PM, Emilio G. Cota wrote:
-> On Thu, Feb 08, 2018 at 14:28:34 +1300, Michael Clark wrote:
->> TCG code generation for the RV32IMAFDC and RV64IMAFDC. The QEMU
->> RISC-V code generator has complete coverage for the Base ISA v2.2,
->> Privileged ISA v1.9.1 and Privileged ISA v1.10:
->>
->> - RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
->> - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
->> - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
->>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: Michael Clark <mjc@sifive.com>
->> ---
-> (snip)
->> +++ b/target/riscv/translate.c
-> (snip)
->> +enum {
->> +    BS_NONE     = 0, /* When seen outside of translation while loop, indicates
->> +                     need to exit tb due to end of page. */
->> +    BS_STOP     = 1, /* Need to exit tb for syscall, sret, etc. */
+On Tue, Feb 13, 2018 at 12:24:40PM -0800, Andrey Smirnov wrote:
+> On Tue, Feb 13, 2018 at 10:13 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > On Tue, Feb 13, 2018 at 09:07:10AM -0800, Andrey Smirnov wrote:
+> >> +static void designware_pcie_root_class_init(ObjectClass *klass, void *data)
+> >> +{
+> >> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> >> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> >> +
+> >> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> >> +
+> >> +    k->vendor_id = PCI_VENDOR_ID_SYNOPSYS;
+> >> +    k->device_id = 0xABCD;
+> >> +    k->revision = 0;
+> >> +    k->class_id = PCI_CLASS_BRIDGE_PCI;
+> >> +    k->is_express = true;
+> >> +    k->is_bridge = true;
+> >> +    k->exit = pci_bridge_exitfn;
+> >> +    k->realize = designware_pcie_root_realize;
+> >> +    k->config_read = designware_pcie_root_config_read;
+> >> +    k->config_write = designware_pcie_root_config_write;
+> >> +
+> >> +    dc->reset = pci_bridge_reset;
+> >> +    /*
+> >> +     * PCI-facing part of the host bridge, not usable without the
+> >> +     * host-facing part, which can't be device_add'ed, yet.
+> >> +     */
+> >> +    dc->user_creatable = false;
+> >> +    dc->vmsd = &vmstate_designware_pcie_root;
+> >> +}
+> >> +
+> >> +static uint64_t designware_pcie_host_mmio_read(void *opaque, hwaddr addr,
+> >> +                                               unsigned int size)
+> >> +{
+> >> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
+> >> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
+> >> +
+> >> +    return pci_host_config_read_common(device,
+> >> +                                       addr,
+> >> +                                       pci_config_size(device),
+> >> +                                       size);
+> >> +}
+> >> +
+> >> +static void designware_pcie_host_mmio_write(void *opaque, hwaddr addr,
+> >> +                                            uint64_t val, unsigned int size)
+> >> +{
+> >> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
+> >> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
+> >> +
+> >> +    return pci_host_config_write_common(device,
+> >> +                                        addr,
+> >> +                                        pci_config_size(device),
+> >> +                                        val, size);
+> >> +}
+> >> +
+> >> +static const MemoryRegionOps designware_pci_mmio_ops = {
+> >> +    .read       = designware_pcie_host_mmio_read,
+> >> +    .write      = designware_pcie_host_mmio_write,
+> >> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> >> +    .impl = {
+> >> +        /*
+> >> +         * Our device would not work correctly if the guest was doing
+> >> +         * unaligned access. This might not be a limitation on the real
+> >> +         * device but in practice there is no reason for a guest to access
+> >> +         * this device unaligned.
+> >> +         */
+> >> +        .min_access_size = 4,
+> >> +        .max_access_size = 4,
+> >> +        .unaligned = false,
+> >> +    },
+> >> +};
+> >
+> > Could you pls add some comments explaining why is DEVICE_NATIVE_ENDIAN
+> > appropriate here?  Most of these cases are plain "we never bothered
+> > about cross-endian setups". Some are "there's a mix of different
+> > endian-ness values, need to handle in a special way".
+> >
+> > I suspect you really need DEVICE_LITTLE_ENDIAN.
+> >
 > 
-> Are we planning to use BS_STOP in the future? I see it has no setters,
-> although we check for it in gen_intermediate_code:
+> That MemoryRegion corresponds to a register file permanently mapped
+> into CPU's address space, so my assumption is that SoC designers will
+> wire it according to CPUs endianness be it big or little. I am not
+> aware of any big-endian CPU based SoC on the market using Designware's
+> IP block, so I don't think there are any precedent confirming or
+> denying correctness of my assumption. IMHO, this is also the reason
+> why all of Linux driver code for that IP assumes little endianness.
 
-No, but the whole port should be converted to exec/translator.h, which defines
-DisasJumpType.  Not something I'm going to require on initial submission until
-we've gotten most of the other targets cleaned up.
+IMHO if Linux driver code does cpu_to_le then it seems best to be
+consistent with that.
 
+> I can't say that I testing this code against a big-endian guest/CPU,
+> but that is primarily due to the fact that there's no real use case
+> and any test set up I can put toghere would be a contrived example
+> pointlessly proving my point.
+> 
+> Anyway, I am more than happy to switch it to use DEVICE_LITTLE_ENDIAN,
+> I just don't know if doing so is any more justified than keeping it
+> DEVICE_NATIVE_ENDIAN.
+> 
+> Thanks,
+> Andrey Smirnov
 
-r~
+I agree it's probably not critical for a target-specific device.
+
+-- 
+MST
