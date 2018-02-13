@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elgWC-0002KA-Gv
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 14:45:33 -0500
+	(envelope-from <den@virtuozzo.com>) id 1elgWF-0002Ly-CF
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 14:45:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elgW9-0002dG-EJ
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 14:45:32 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45944 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elgW9-0002cv-7t
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 14:45:29 -0500
-Date: Tue, 13 Feb 2018 19:45:09 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180213194508.GT2378@work-vm>
-References: <20180208103132.28452-1-peterx@redhat.com>
-	<20180208103132.28452-27-peterx@redhat.com>
+	(envelope-from <den@virtuozzo.com>) id 1elgWC-0002f8-9M
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 14:45:35 -0500
+References: <20180107122336.29333-1-richiejp@f-m.fm>
+	<fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+	<5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
+	<20180111130427.GG8326@redhat.com>
+	<20180213105024.GC5083@localhost.localdomain>
+	<20180213143001.GA2354@rkaganb.sw.ru> <20180213143615.GN573@redhat.com>
+	<20180213144521.GI5083@localhost.localdomain>
+	<20180213144838.GO573@redhat.com>
+	<1ac12a06-4031-f35c-da18-8c1cbbf7921d@redhat.com>
+From: "Denis V. Lunev" <den@virtuozzo.com>
+Message-ID: <bb0b226b-b276-79dc-378b-c32ae5716d93@virtuozzo.com>
+Date: Tue, 13 Feb 2018 22:45:23 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180208103132.28452-27-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 26/28] hmp/migration: add
- migrate_recover command
+In-Reply-To: <1ac12a06-4031-f35c-da18-8c1cbbf7921d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] Add save-snapshot,
+ load-snapshot and delete-snapshot to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Richard Palethorpe <richiejp@f-m.fm>, Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, Denis Plotnikov <dplotnikov@virtuozzo.com>, Roman Kagan <rkagan@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, rpalethorpe@suse.com, dgilbert@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Sister command to migrate-recover in QMP.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 02/13/2018 07:46 PM, Eric Blake wrote:
+> On 02/13/2018 08:48 AM, Daniel P. Berrang=C3=A9 wrote:
+>>>> No, that's policy decision that doesn't matter from QMP pov. If the
+>>>> mgmt
+>>>> app wants the snapshot to be wrt to the initial time, it can simply
+>>>> invoke the "stop" QMP command before doing the live migration and
+>>>> "cont" afterwards.
+>>>
+>>> That would be non-live. I think Roman means a live snapshot that saves
+>>> the state at the beginning of the operation. Basically the difference
+>>> between blockdev-backup (state at the beginning) and blockdev-mirror
+>>> (state at the end), except for a whole VM.
+>>
+>> That doesn't seem practical unless you can instantaneously write out
+>> the entire guest RAM to disk without blocking, or can somehow snapshot
+>> the RAM so you can write out a consistent view of the original RAM,
+>> while the guest continues to dirty RAM pages.
+>
+> One idea for that is via fork()'s copy-on-write semantics; the parent
+> continues processing the guest, while the child writes out RAM pages.
+> Pages touched by the guest in the parent are now cleanly copied by the
+> OS so that the child can take all the time it wants, but still writes
+> out the state of the guest at the time of the fork().=C2=A0 It may be
+> possible to use userfaultfd to achieve the same effects without a fork().
+>
+this would be problematic as we for sure will face memory problems.
+Guest stalls are IMHO much less problematic (as they are expected
+by end-user) then memory shortage.
 
-Yes, useful for testing, although we don't have any OOB equivalent yet,
-something I need to look at.
+Anyway, this is discussable.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  hmp-commands.hx | 13 +++++++++++++
->  hmp.c           | 10 ++++++++++
->  hmp.h           |  1 +
->  3 files changed, 24 insertions(+)
-> 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 28ed5a7a13..7563f3eaa0 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -955,7 +955,20 @@ STEXI
->  @findex migrate_incoming
->  Continue an incoming migration using the @var{uri} (that has the same syntax
->  as the -incoming option).
-> +ETEXI
->  
-> +    {
-> +        .name       = "migrate_recover",
-> +        .args_type  = "uri:s",
-> +        .params     = "uri",
-> +        .help       = "Continue a paused incoming postcopy migration",
-> +        .cmd        = hmp_migrate_recover,
-> +    },
-> +
-> +STEXI
-> +@item migrate_recover @var{uri}
-> +@findex migrate_recover
-> +Continue a paused incoming postcopy migration using the @var{uri}.
->  ETEXI
->  
->      {
-> diff --git a/hmp.c b/hmp.c
-> index 6f8eec8365..4062d3fdba 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1519,6 +1519,16 @@ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict)
->      hmp_handle_error(mon, &err);
->  }
->  
-> +void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *err = NULL;
-> +    const char *uri = qdict_get_str(qdict, "uri");
-> +
-> +    qmp_migrate_recover(uri, &err);
-> +
-> +    hmp_handle_error(mon, &err);
-> +}
-> +
->  /* Kept for backwards compatibility */
->  void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
->  {
-> diff --git a/hmp.h b/hmp.h
-> index 536cb91caa..0d53fe78d9 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -70,6 +70,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
-> +void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Den
