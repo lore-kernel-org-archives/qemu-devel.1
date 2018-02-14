@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1elwsu-0005q2-1B
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:14:07 -0500
+	(envelope-from <stefanha@redhat.com>) id 1elx3w-00033M-VL
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:25:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1elwsq-0000kL-1o
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:14:04 -0500
-Received: from michel.telenet-ops.be ([2a02:1800:110:4::f00:18]:32870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <geert@linux-m68k.org>)
-	id 1elwsp-0000i1-QO
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:13:59 -0500
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-Date: Wed, 14 Feb 2018 14:13:55 +0100
-Message-Id: <1518614035-9907-1-git-send-email-geert+renesas@glider.be>
-Subject: [Qemu-devel] [PATCH v2] device_tree: Increase FDT_MAX_SIZE to 1 MiB
+	(envelope-from <stefanha@redhat.com>) id 1elx3t-0000hp-QI
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:25:28 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54914 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1elx3t-0000hb-I8
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:25:25 -0500
+Date: Wed, 14 Feb 2018 13:25:08 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180214132508.GA7545@stefanha-x1.localdomain>
+References: <20180213173429.19501-1-stefanha@redhat.com>
+	<20180214004820.GA15103@lemon.usersys.redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="xHFwDpU9dbj6ez1V"
+Content-Disposition: inline
+In-Reply-To: <20180214004820.GA15103@lemon.usersys.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-It is not uncommon for a contemporary FDT to be larger than 64 KiB,
-leading to failures loading the device tree from sysfs:
 
-    qemu-system-aarch64: qemu_fdt_setprop: Couldn't set ...: FDT_ERR_NOSPACE
+--xHFwDpU9dbj6ez1V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hence increase the limit to 1 MiB, like on PPC.
+On Wed, Feb 14, 2018 at 08:48:20AM +0800, Fam Zheng wrote:
+> On Tue, 02/13 17:34, Stefan Hajnoczi wrote:
+> > The following changes since commit fb68096da3d35e64c88cd610c1fa42766c58=
+e92a:
+> >=20
+> >   Revert "tests: use memfd in vhost-user-test" (2018-02-13 09:51:52 +00=
+00)
+> >=20
+> > are available in the Git repository at:
+> >=20
+> >   git://github.com/stefanha/qemu.git tags/block-pull-request
+> >=20
+> > for you to fetch changes up to 64b01feca991e5b19a5d750ef77cdca92b68bdbb:
+> >=20
+> >   misc: fix spelling (2018-02-13 15:38:17 +0000)
+>=20
+> Did you mean "PULL" in the subject?
 
-For reference, the largest arm64 DTB created from the Linux sources is
-70 KiB large (93 KiB when built with symbols/fixup support).
+git-publish is just obeying your profile settings:
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
-v2:
-  - Enlarge from 128 KiB to 1 MiB, as suggested by Peter Maydell.
----
- device_tree.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
++[gitpublishprofile "default"]
++base =3D master
++prefix =3D PATCH
+ ^---- :)
 
-diff --git a/device_tree.c b/device_tree.c
-index a24ddff02bdd857c..9eb5fae7381fe885 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -29,7 +29,7 @@
- 
- #include <libfdt.h>
- 
--#define FDT_MAX_SIZE  0x10000
-+#define FDT_MAX_SIZE  0x100000
- 
- void *create_device_tree(int *sizep)
- {
--- 
-2.7.4
+I used PULL myself in the past but am happy with using whatever we
+decide the standard should be.
+
+Shall we remove prefix from the profiles (it defaults to "PATCH" for
+regular patches and "PULL" for pull requests)?
+
+Stefan
+
+--xHFwDpU9dbj6ez1V
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJahDi0AAoJEJykq7OBq3PIP74IAIijkpX8IWQa0Ks1Ur/RDEPR
+mCuYXc7h/z/oKBFJuNL4Obm4OB94LI7RHjnlOK7BM2cRfSl3HblDECp2lHDv4peb
+bKhDDJ6F49yWVPU2AKm/J9It8gAzHELMgqPnxQ27hYZok51gMLPev7vFWQmEMJ7p
+in0uYJqvJUNh6WZsuDCC54KofiJmDQgd0wRqbTjvSMNZ12sAsmwFlfB4p4Wr7kma
+9/Be826Jhggpahld0/UUcQOjlBrD6BkhPFLIM05FZVT+fQquPLRy7bFOzVPh9swS
+AL+CA4YB6g/fnzbhs531Z2CsA1Bvscyn1nZDmiTF3H5tOJmHjJ8ko0XAASHf7uA=
+=reV3
+-----END PGP SIGNATURE-----
+
+--xHFwDpU9dbj6ez1V--
