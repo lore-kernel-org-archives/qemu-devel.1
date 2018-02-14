@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elyiR-0004mO-TN
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:11:24 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1elzA3-0008Ia-Fg
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elyiN-000656-4l
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:11:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57526 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1elzA0-00075a-8L
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40564 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1elyiM-00064N-Mz
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:11:18 -0500
-References: <201297396.3423395.1518598461012.JavaMail.zimbra@oxygem.tv>
-	<1564471998.3427173.1518601541505.JavaMail.zimbra@oxygem.tv>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <83c0fdee-126f-18f1-a691-053669325cb9@redhat.com>
-Date: Wed, 14 Feb 2018 09:11:02 -0600
-MIME-Version: 1.0
-In-Reply-To: <1564471998.3427173.1518601541505.JavaMail.zimbra@oxygem.tv>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] drive-mirroring to nbd is failing with multiple
- parallel jobs (qemu 2.9 -> 2.11)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elz9z-00074X-VL
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:52 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 14 Feb 2018 15:39:29 +0000
+Message-Id: <20180214153938.5410-2-dgilbert@redhat.com>
+In-Reply-To: <20180214153938.5410-1-dgilbert@redhat.com>
+References: <20180214153938.5410-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 01/10] migration/xen: Check return value of
+ qemu_fclose
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexandre DERUMIER <aderumier@odiso.com>, qemu-devel <qemu-devel@nongnu.org>, nbd list <nbd@other.debian.org>
+To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, groug@kaod.org, ross.lagerwall@citrix.com
 
-[adding nbd list]
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
 
-On 02/14/2018 03:45 AM, Alexandre DERUMIER wrote:
-> Sorry, I just find that the problem is in our proxmox implementation,
-> 
-> as we use a socat tunnel for the nbd mirroring, with a timeout of 30s in case of inactivity.
-> 
-> So, not a qemu bug.
+QEMUFile uses buffered IO so when writing small amounts (such as the Xen
+device state file), the actual write call and any errors that may occur
+only happen as part of qemu_fclose(). Therefore, report IO errors when
+saving the device state under Xen by checking the return value of
+qemu_fclose().
 
-Good to hear. Still, it makes me wonder if the NBD protocol itself 
-should have some sort of a keepalive mechanism, maybe a new NBD_CMD_PING 
-that can be used as a no-op command to keep the line alive if there is 
-no other command to send for a while?  A client can always use a 
-throwaway NBD_CMD_READ to keep the line alive, but that has more 
-overhead; conversely, an extension is only useful if both client and 
-server can negotiate to use it, which means that clients still have to 
-be prepared for alternative fallbacks if they want to keep the line 
-alive.  And we still don't have support for the server ever sending 
-unsolicited messages (other than perhaps a structured reply where the 
-server sends periodic reply chunks but never sends a final chunk - but 
-still something that the guest initiates the sequence of server 
-replies), so while the guest can keep the line to the server up, having 
-the server keep the line open to the guest is a bit harder.
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Message-Id: <20180206163039.23661-1-ross.lagerwall@citrix.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/savevm.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-This is more food for thought on whether it even makes sense for NBD to 
-worry about assisting in keepalive matters, or whether it would just be 
-bloating the protocol.
-
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 3f611c02e8..68b652ff76 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2284,8 +2284,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+     f = qemu_fopen_channel_output(QIO_CHANNEL(ioc));
+     object_unref(OBJECT(ioc));
+     ret = qemu_save_device_state(f);
+-    qemu_fclose(f);
+-    if (ret < 0) {
++    if (ret < 0 || qemu_fclose(f) < 0) {
+         error_setg(errp, QERR_IO_ERROR);
+     } else {
+         /* libxl calls the QMP command "stop" before calling
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
