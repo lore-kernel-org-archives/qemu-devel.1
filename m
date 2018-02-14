@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eloRb-0001aN-I3
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eloRb-0001a7-70
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:13:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eloRa-0007Sp-Ex
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eloRa-0007Sf-Cu
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:13:19 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Wed, 14 Feb 2018 15:12:56 +1100
-Message-Id: <20180214041256.25473-3-sjitindarsingh@gmail.com>
+Date: Wed, 14 Feb 2018 15:12:55 +1100
+Message-Id: <20180214041256.25473-2-sjitindarsingh@gmail.com>
 In-Reply-To: <20180214041256.25473-1-sjitindarsingh@gmail.com>
 References: <20180214041256.25473-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC PATCH 3/3] ppc/spapr-caps: For pseries-2.12
- change spapr-cap defaults
+Subject: [Qemu-devel] [QEMU-PPC PATCH 2/3] ppc/spapr-caps: Disallow setting
+ workaround for spapr-cap-ibs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +23,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-For the pseries-2.12 machine type, make the spapr-caps SPAPR_CAP_CFPC
-and SPAPR_CAP_SBBC default to workaround. This means the guest will
-be able to take advantage of these workarounds by default, so long
-as the host is capable.
+The spapr-cap cap-ibs can only have values broken or fixed as there is
+no workaround. Currently setting the value workaround will hit an assert
+if the guest makes the hcall h_get_cpu_characteristics.
 
+Report an error when attempting to apply the setting with a more helpful
+error message.
+
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/spapr.c      | 11 ++++++++++-
- hw/ppc/spapr_caps.c | 10 ++++++++++
- include/hw/compat.h |  2 ++
- 3 files changed, 22 insertions(+), 1 deletion(-)
+ hw/ppc/spapr_caps.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 32a876be56..cd4a024660 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3941,13 +3941,20 @@ static const TypeInfo spapr_machine_info = {
- /*
-  * pseries-2.12
-  */
-+#define SPAPR_COMPAT_2_12                                              \
-+    HW_COMPAT_2_12
-+
- static void spapr_machine_2_12_instance_options(MachineState *machine)
- {
- }
- 
- static void spapr_machine_2_12_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class */
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-+
-+    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_WORKAROUND;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_WORKAROUND;
-+    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
- }
- 
- DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
-@@ -3969,6 +3976,8 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
- 
-     spapr_machine_2_12_class_options(mc);
-     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_ON;
-+    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
- }
- 
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 1cd73b617f..3dda1db812 100644
+index e69d308560..1cd73b617f 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -283,11 +283,21 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
- 
-     caps = smc->default_caps;
- 
-+    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
-+                          0, spapr->max_compat_pvr)) {
-+        caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-+    }
-+
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-                           0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-     }
- 
-+    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
-+                          0, spapr->max_compat_pvr)) {
-+        caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-+    }
-+
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-                           0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_OFF;
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 7f31850dfa..13238239da 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -1,6 +1,8 @@
- #ifndef HW_COMPAT_H
- #define HW_COMPAT_H
- 
-+#define HW_COMPAT_2_12
-+
- #define HW_COMPAT_2_11 \
-     {\
-         .driver   = "hpet",\
+@@ -205,7 +205,9 @@ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
+ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+                                            uint8_t val, Error **errp)
+ {
+-    if (tcg_enabled() && val) {
++    if (val == SPAPR_CAP_WORKAROUND) { /* Can only be Broken or Fixed */
++        error_setg(errp, "Requested safe indirect branch capability level \"workaround\" not valid, try cap-ibs=fixed");
++    } else if (tcg_enabled() && val) {
+         /* TODO - for now only allow broken for TCG */
+         error_setg(errp, "Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
+     } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
 -- 
 2.13.6
