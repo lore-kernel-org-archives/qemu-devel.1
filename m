@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1em45D-00070c-EO
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:55:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1em4Ih-00069A-72
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 16:09:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1em45C-0005F3-N2
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:55:15 -0500
-References: <20180213233324.5096-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <95035782-da08-4da5-d7fc-82e7b8cb155e@redhat.com>
-Date: Wed, 14 Feb 2018 21:54:58 +0100
+	(envelope-from <eblake@redhat.com>) id 1em4Id-00070o-ME
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 16:09:11 -0500
+References: <20180214204915.7980-1-mreitz@redhat.com>
+	<20180214204915.7980-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <626a7ee0-faef-863f-4dcf-384e9a18ba81@redhat.com>
+Date: Wed, 14 Feb 2018 15:08:19 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180213233324.5096-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi"
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] s/size/entries/ when dealing with
- non-byte units
+In-Reply-To: <20180214204915.7980-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] block/ssh: Pull ssh_grow_file() from
+ ssh_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, berto@igalia.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, berto@igalia.com
-Message-ID: <95035782-da08-4da5-d7fc-82e7b8cb155e@redhat.com>
-Subject: Re: [RFC PATCH 0/2] s/size/entries/ when dealing with non-byte units
-References: <20180213233324.5096-1-eblake@redhat.com>
-In-Reply-To: <20180213233324.5096-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/14/2018 02:49 PM, Max Reitz wrote:
+> If we ever want to offer even rudimentary truncation functionality for
+> ssh, we should put the respective code into a reusable function.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block/ssh.c | 30 ++++++++++++++++++++++--------
+>   1 file changed, 22 insertions(+), 8 deletions(-)
+> 
 
-On 2018-02-14 00:33, Eric Blake wrote:
-> I mentioned this while reviewing Berto's series on L2 slice handling;
-> this is a first cut at patches that I think are worth doing throughout
-> the qcow2 code base if we like the idea.
+> +++ b/block/ssh.c
+> @@ -803,6 +803,26 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+>       return ret;
+>   }
+>   
+> +static int ssh_grow_file(BDRVSSHState *s, int64_t offset, Error **errp)
+> +{
+> +    ssize_t ret;
+> +    char c[1] = { '\0' };
 
-I like the idea. :-)
+Could spell this 'char c[1] = "";', but you just did code motion.
 
-The patches look good to me.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Max
-
-> Eric Blake (2):
->   qcow2: Prefer 'entries' over 'size' for non-byte values in spec
->   qcow2: Prefer 'entries' over 'size' during cache creation
->=20
->  docs/interop/qcow2.txt |  4 ++--
->  block/qcow2.h          |  4 ++--
->  block/qcow2.c          | 21 +++++++++++----------
->  3 files changed, 15 insertions(+), 14 deletions(-)
->=20
-
-
-
---LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqEoiISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AJDYH/AkrN/vCGyiura6chwI6z/w6EofhzEgQ
-31igQliw7TTMQqs0JahsOYHslhH0YbHxLMPf9Np947Rh5+rF0gB1qesl8JKajDsn
-aGZaFCkHI13ZnAz9Q18POfNQ7tFX8JbcNwH6PxM8MgH8+8fawx2Y6Pdz97DK5pRZ
-mSV1cNERpRsuLxCuXi8IiR3yGYijFWdJs8Fr3ooUggtEZz5ayj4ff5YvMbBc/+Tv
-XDg0Lz9GRQyWdhVZgXRVgzba0URgtTQ2kMrQSZEJGp3UFRTsJePQKZBYnK/cQX3p
-A3t2xt8j0F/aqlMSFzHbu00x4mQxQ30egrCbnaqELyf0zK7VjRxaZKM=
-=+v1W
------END PGP SIGNATURE-----
-
---LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
