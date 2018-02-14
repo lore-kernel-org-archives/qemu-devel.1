@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1elu36-00019R-3h
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:12:25 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1elu41-0001lT-Ee
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:13:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1elu31-0003Gz-D5
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:12:24 -0500
-Date: Wed, 14 Feb 2018 11:11:58 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180214111158.68881e63.cohuck@redhat.com>
-In-Reply-To: <1518542328-25741-3-git-send-email-mihajlov@linux.vnet.ibm.com>
-References: <1518542328-25741-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<1518542328-25741-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1elu3y-0004Bb-8o
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:13:21 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33224 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1elu3y-0004Ap-3H
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:13:18 -0500
+References: <1518598187-27169-1-git-send-email-whois.zihan.yang@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4f4fd107-e836-ad27-0778-aa13c9f93b23@redhat.com>
+Date: Wed, 14 Feb 2018 11:13:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1518598187-27169-1-git-send-email-whois.zihan.yang@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv2 2/3] qmp: add query-cpus-fast
+Subject: Re: [Qemu-devel] [PATCH] RAMList: replace QemuMutex with
+ CompatGMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com
+To: Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, 13 Feb 2018 18:18:47 +0100
-Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+On 14/02/2018 09:49, Zihan Yang wrote:
+> change the mutex member in RAMList structure from QemuMutex to CompatGMutex.
+> qemu_mutex_init() is just deleted instead of being replaced with g_mutex_init()
+> because there is no need to do initialize a mutex that is statically allocated.
+> 
+> Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
 
-> From: Luiz Capitulino <lcapitulino@redhat.com>
-> 
-> The query-cpus command has an extremely serious side effect:
-> it always interrupts all running vCPUs so that they can run
-> ioctl calls. This can cause a huge performance degradation for
-> some workloads. And most of the information retrieved by the
-> ioctl calls are not even used by query-cpus.
-> 
-> This commit introduces a replacement for query-cpus called
-> query-cpus-fast, which has the following features:
-> 
->  o Never interrupt vCPUs threads. query-cpus-fast only returns
->    vCPU information maintained by QEMU itself, which should be
->    sufficient for most management software needs
-> 
->  o Make "halted" field optional: we only return it if the
->    halted state is maintained by QEMU. But this also gives
->    the option of dropping the field in the future (see below)
-> 
->  o Drop irrelevant fields such as "current", "pc", "arch"
->    and "halted"
+I'm not sure what is the advantage of this change.  QEMU is more or less
+uniformly using QemuMutex and QemuCond.
 
-I'd suggest updating this description, as "halted" is now gone
-completely... what about:
+Paolo
 
-o Drop the "halted" field, even if the halted state is maintained by
-QEMU. It had unclear semantics anyway.
-
-o Drop irrelevant fields such as "current", "pc", or "arch"
-
-> 
->  o Rename some fields for better clarification & proper naming
->    standard
-> 
-> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 > ---
->  cpus.c               | 38 ++++++++++++++++++++++++++++
->  hmp-commands-info.hx | 14 +++++++++++
->  hmp.c                | 14 +++++++++++
->  hmp.h                |  1 +
->  qapi-schema.json     | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 137 insertions(+)
-
-Otherwise, looks good to me.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>  exec.c                 | 5 ++---
+>  include/exec/ramlist.h | 2 +-
+>  2 files changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index e8d7b33..90cdd05 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1423,12 +1423,12 @@ void qemu_flush_coalesced_mmio_buffer(void)
+>  
+>  void qemu_mutex_lock_ramlist(void)
+>  {
+> -    qemu_mutex_lock(&ram_list.mutex);
+> +    g_mutex_lock(&ram_list.mutex);
+>  }
+>  
+>  void qemu_mutex_unlock_ramlist(void)
+>  {
+> -    qemu_mutex_unlock(&ram_list.mutex);
+> +    g_mutex_unlock(&ram_list.mutex);
+>  }
+>  
+>  void ram_block_dump(Monitor *mon)
+> @@ -3331,7 +3331,6 @@ void cpu_register_map_client(QEMUBH *bh)
+>  
+>  void cpu_exec_init_all(void)
+>  {
+> -    qemu_mutex_init(&ram_list.mutex);
+>      /* The data structures we set up here depend on knowing the page size,
+>       * so no more changes can be made after this point.
+>       * In an ideal world, nothing we did before we had finished the
+> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
+> index 2e2ac6c..24be5e4 100644
+> --- a/include/exec/ramlist.h
+> +++ b/include/exec/ramlist.h
+> @@ -45,7 +45,7 @@ typedef struct {
+>  } DirtyMemoryBlocks;
+>  
+>  typedef struct RAMList {
+> -    QemuMutex mutex;
+> +    CompatGMutex mutex;
+>      RAMBlock *mru_block;
+>      /* RCU-enabled, writes protected by the ramlist lock. */
+>      QLIST_HEAD(, RAMBlock) blocks;
+> 
