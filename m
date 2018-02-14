@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elohS-0002GB-4x
+	(envelope-from <bounces@canonical.com>) id 1elohS-0002GA-4u
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:29:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elohO-00006p-9r
+	(envelope-from <bounces@canonical.com>) id 1elohO-00006e-43
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:29:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49694)
+Received: from indium.canonical.com ([91.189.90.7]:49664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1elohO-00006S-4Z
+	id 1elohN-00006M-UJ
 	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:29:38 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1elohN-0001UL-2F
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:29:37 +0000
+	id 1elohM-0001Uk-KB
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:29:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0ECF12E80D1
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:29:37 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 95F2F2E80D0
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:29:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Feb 2018 04:17:31 -0000
-From: Launchpad Bug Tracker <855630@bugs.launchpad.net>
-Reply-To: Bug 855630 <855630@bugs.launchpad.net>
+Date: Wed, 14 Feb 2018 04:17:29 -0000
+From: Launchpad Bug Tracker <916720@bugs.launchpad.net>
+Reply-To: Bug 916720 <916720@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20110921150616.12335.44343.malonedeb@gac.canonical.com>
-Message-Id: <151858185119.8459.630875613141894160.malone@loganberry.canonical.com>
+References: <20120115095715.18770.20465.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151858185015.8459.2977489676004114119.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 855630] Re: Cant Run Wine (posix not nptl) past
- 0.14.1
+Subject: [Qemu-devel] [Bug 916720] Re: select fails on windows because a
+ non-socket fd is in the rfds set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,20 +48,30 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/855630
+https://bugs.launchpad.net/bugs/916720
 
 Title:
-  Cant Run Wine (posix not nptl) past 0.14.1
+  select fails on windows because a non-socket fd is in the rfds set
 
 Status in QEMU:
   Expired
 
 Bug description:
-  when trying to build qemu I can build with ./configure --static
-  --target-list=3Di386-linux-user just fine with 0.14.1
+  The select call in file main_loop.c at line 460 fails on windows
+  because a non-socket fd is in the rfds set. As a result, gdb remote
+  connections will never be accepted by qemu. The select function
+  returns with -1. WSAGetLastError returns code 10038 (WSAENOTSOCK).
 
-  But when I try to go on 0.15.0 or higher (tested on 0.15.0). About to
-  test on 0.15.5 from git
+  I start qemu as follows:
+  qemu-system-arm -cpu cortex-m3 -M lm3s6965evb -nographic -monitor null -s=
+erial null -semihosting -kernel test1.elf -S -gdb tcp:127.0.0.1:2200
+
+  qemu is configure with:
+  CFLAGS=3D"-O4 -march=3Di686"
+  configure --target-list=3D"i386-softmmu arm-softmmu sparc-softmmu ppc-sof=
+tmmu" --prefix=3D/home/qemu/install --cc=3Dmingw32-gcc --host-cc=3Dmingw32-=
+gcc --audio-drv-list=3D"dsound sdl" --audio-card-list=3D"ac97 es1370 sb16 c=
+s4231a adlib gus"
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/855630/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/916720/+subscriptions
