@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1elvT2-0002AY-VK
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:43:18 -0500
+	(envelope-from <kwolf@redhat.com>) id 1elvd5-00074p-2W
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:53:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1elvT1-0004yh-Mt
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:43:17 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:45958)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1elvT1-0004xp-Aq
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:43:15 -0500
-Received: by mail-lf0-x243.google.com with SMTP id x196so28997708lfd.12
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 03:43:15 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1elvd3-00045r-Lz
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:53:39 -0500
+Date: Wed, 14 Feb 2018 12:53:12 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180214115312.GA4766@localhost.localdomain>
+References: <20180213202701.15858-1-eblake@redhat.com>
+	<20180213202701.15858-9-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4f4fd107-e836-ad27-0778-aa13c9f93b23@redhat.com>
-References: <1518598187-27169-1-git-send-email-whois.zihan.yang@gmail.com>
-	<4f4fd107-e836-ad27-0778-aa13c9f93b23@redhat.com>
-From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Wed, 14 Feb 2018 19:43:13 +0800
-Message-ID: <CAKwiv-gm39NU0Y5sWaWHoKq6_LBo2FR1RopXLSoi0tC_Ray71w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] RAMList: replace QemuMutex with
- CompatGMutex
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180213202701.15858-9-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 08/21] iscsi: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +24,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
 
-> I'm not sure what is the advantage of this change.  QEMU is more or less
-> uniformly using QemuMutex and QemuCond.
+Am 13.02.2018 um 21:26 hat Eric Blake geschrieben:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the iscsi driver accordingly.  In this case,
+> it is handy to teach iscsi_co_block_status() to handle a NULL map
+> and file parameter, even though the block layer passes non-NULL
+> values, because we also call the function directly.  For now, there
+> are no optimizations done based on the want_zero flag.
+> 
+> We can also make the simplification of asserting that the block
+> layer passed in aligned values.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> 
+> ---
+> v8: rebase to master
+> v7: rebase to master
+> v6: no change
+> v5: assert rather than check for alignment
+> v4: rebase to interface tweaks
+> v3: no change
+> v2: rebase to mapping parameter
+> ---
+>  block/iscsi.c | 67 ++++++++++++++++++++++++++++-------------------------------
+>  1 file changed, 32 insertions(+), 35 deletions(-)
+> 
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index d2b0466775c..4842519fdad 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -653,36 +653,36 @@ out_unlock:
+> 
+> 
+> 
+> -static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+> -                                                  int64_t sector_num,
+> -                                                  int nb_sectors, int *pnum,
+> -                                                  BlockDriverState **file)
+> +static int coroutine_fn iscsi_co_block_status(BlockDriverState *bs,
+> +                                              bool want_zero, int64_t offset,
+> +                                              int64_t bytes, int64_t *pnum,
+> +                                              int64_t *map,
+> +                                              BlockDriverState **file)
+>  {
+>      IscsiLun *iscsilun = bs->opaque;
+>      struct scsi_get_lba_status *lbas = NULL;
+>      struct scsi_lba_status_descriptor *lbasd = NULL;
+>      struct IscsiTask iTask;
+>      uint64_t lba;
+> -    int64_t ret;
+> +    int ret;
+> 
+>      iscsi_co_init_iscsitask(iscsilun, &iTask);
+> 
+> -    if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
+> -        ret = -EINVAL;
+> -        goto out;
+> -    }
+> +    assert(QEMU_IS_ALIGNED(offset | bytes, iscsilun->block_size));
+> 
+>      /* default to all sectors allocated */
+> -    ret = BDRV_BLOCK_DATA;
+> -    ret |= (sector_num << BDRV_SECTOR_BITS) | BDRV_BLOCK_OFFSET_VALID;
+> -    *pnum = nb_sectors;
+> +    ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+> +    if (map) {
+> +        *map = offset;
+> +    }
 
-I see. QEMU uses some glib functions, like g_new, g_free, g_hash_table ,
-g_assert and g_poll, so I thought there was a trend for making more use of
-glib.
-I get the point now.
+Can map ever be NULL? You didn't have that check in other drivers.
 
+> +    *pnum = bytes;
+> 
+>      /* LUN does not support logical block provisioning */
+>      if (!iscsilun->lbpme) {
+>          goto out;
+>      }
+> 
+> -    lba = sector_qemu2lun(sector_num, iscsilun);
+> +    lba = offset / iscsilun->block_size;
+> 
+>      qemu_mutex_lock(&iscsilun->mutex);
+>  retry:
+> @@ -727,12 +727,12 @@ retry:
+> 
+>      lbasd = &lbas->descriptors[0];
+> 
+> -    if (sector_qemu2lun(sector_num, iscsilun) != lbasd->lba) {
+> +    if (lba != lbasd->lba) {
+>          ret = -EIO;
+>          goto out_unlock;
+>      }
+> 
+> -    *pnum = sector_lun2qemu(lbasd->num_blocks, iscsilun);
+> +    *pnum = lbasd->num_blocks * iscsilun->block_size;
+> 
+>      if (lbasd->provisioning == SCSI_PROVISIONING_TYPE_DEALLOCATED ||
+>          lbasd->provisioning == SCSI_PROVISIONING_TYPE_ANCHORED) {
+> @@ -743,15 +743,13 @@ retry:
+>      }
+> 
+>      if (ret & BDRV_BLOCK_ZERO) {
+> -        iscsi_allocmap_set_unallocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> -                                       *pnum * BDRV_SECTOR_SIZE);
+> +        iscsi_allocmap_set_unallocated(iscsilun, offset, *pnum);
+>      } else {
+> -        iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> -                                     *pnum * BDRV_SECTOR_SIZE);
+> +        iscsi_allocmap_set_allocated(iscsilun, offset, *pnum);
+>      }
+> 
+> -    if (*pnum > nb_sectors) {
+> -        *pnum = nb_sectors;
+> +    if (*pnum > bytes) {
+> +        *pnum = bytes;
+>      }
+>  out_unlock:
+>      qemu_mutex_unlock(&iscsilun->mutex);
+> @@ -760,7 +758,7 @@ out:
+>      if (iTask.task != NULL) {
+>          scsi_free_scsi_task(iTask.task);
+>      }
+> -    if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID) {
+> +    if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID && file) {
+>          *file = bs;
+>      }
 
-2018-02-14 18:13 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
+Can file ever be NULL?
 
-> On 14/02/2018 09:49, Zihan Yang wrote:
-> > change the mutex member in RAMList structure from QemuMutex to
-> CompatGMutex.
-> > qemu_mutex_init() is just deleted instead of being replaced with
-> g_mutex_init()
-> > because there is no need to do initialize a mutex that is statically
-> allocated.
-> >
-> > Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
->
-> I'm not sure what is the advantage of this change.  QEMU is more or less
-> uniformly using QemuMutex and QemuCond.
->
-> Paolo
->
-> > ---
-> >  exec.c                 | 5 ++---
-> >  include/exec/ramlist.h | 2 +-
-> >  2 files changed, 3 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/exec.c b/exec.c
-> > index e8d7b33..90cdd05 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -1423,12 +1423,12 @@ void qemu_flush_coalesced_mmio_buffer(void)
-> >
-> >  void qemu_mutex_lock_ramlist(void)
-> >  {
-> > -    qemu_mutex_lock(&ram_list.mutex);
-> > +    g_mutex_lock(&ram_list.mutex);
-> >  }
-> >
-> >  void qemu_mutex_unlock_ramlist(void)
-> >  {
-> > -    qemu_mutex_unlock(&ram_list.mutex);
-> > +    g_mutex_unlock(&ram_list.mutex);
-> >  }
-> >
-> >  void ram_block_dump(Monitor *mon)
-> > @@ -3331,7 +3331,6 @@ void cpu_register_map_client(QEMUBH *bh)
-> >
-> >  void cpu_exec_init_all(void)
-> >  {
-> > -    qemu_mutex_init(&ram_list.mutex);
-> >      /* The data structures we set up here depend on knowing the page
-> size,
-> >       * so no more changes can be made after this point.
-> >       * In an ideal world, nothing we did before we had finished the
-> > diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> > index 2e2ac6c..24be5e4 100644
-> > --- a/include/exec/ramlist.h
-> > +++ b/include/exec/ramlist.h
-> > @@ -45,7 +45,7 @@ typedef struct {
-> >  } DirtyMemoryBlocks;
-> >
-> >  typedef struct RAMList {
-> > -    QemuMutex mutex;
-> > +    CompatGMutex mutex;
-> >      RAMBlock *mru_block;
-> >      /* RCU-enabled, writes protected by the ramlist lock. */
-> >      QLIST_HEAD(, RAMBlock) blocks;
-> >
->
->
+>      return ret;
+> @@ -800,25 +798,24 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
+>                                   nb_sectors * BDRV_SECTOR_SIZE) &&
+
+No iscsi_co_preadv() yet... :-(
+
+>          !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+>                                       nb_sectors * BDRV_SECTOR_SIZE)) {
+> -        int pnum;
+> -        BlockDriverState *file;
+> +        int64_t pnum;
+>          /* check the block status from the beginning of the cluster
+>           * containing the start sector */
+> -        int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
+> -        int head;
+> -        int64_t ret;
+> +        int64_t head;
+> +        int ret;
+> 
+> -        assert(cluster_sectors);
+> -        head = sector_num % cluster_sectors;
+> -        ret = iscsi_co_get_block_status(bs, sector_num - head,
+> -                                        BDRV_REQUEST_MAX_SECTORS, &pnum,
+> -                                        &file);
+> +        assert(iscsilun->cluster_size);
+> +        head = (sector_num * BDRV_SECTOR_SIZE) % iscsilun->cluster_size;
+> +        ret = iscsi_co_block_status(bs, false,
+> +                                    sector_num * BDRV_SECTOR_SIZE - head,
+> +                                    BDRV_REQUEST_MAX_BYTES, &pnum, NULL, NULL);
+
+It doesn't make a difference with your current implementation because it
+ignores want_zero, but consistent with your approach that
+want_zero=false returns just that everyhting is allocated for drivers
+without support for backing files, I think you want want_zero=true here.
+
+>          if (ret < 0) {
+>              return ret;
+>          }
+>          /* if the whole request falls into an unallocated area we can avoid
+>           * reading and directly return zeroes instead */
+> -        if (ret & BDRV_BLOCK_ZERO && pnum >= nb_sectors + head) {
+> +        if (ret & BDRV_BLOCK_ZERO &&
+> +            pnum >= nb_sectors * BDRV_SECTOR_SIZE + head) {
+>              qemu_iovec_memset(iov, 0, 0x00, iov->size);
+>              return 0;
+>          }
+
+Kevin
