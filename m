@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eltOu-0003di-E6
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:30:53 -0500
+	(envelope-from <groug@kaod.org>) id 1eltcG-0003Lg-Lh
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eltOo-00009c-Jl
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:30:52 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42582)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eltOo-00006v-BO
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:30:46 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1E9UYMP098053
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:30:45 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g4eqe0dw1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:30:44 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 14 Feb 2018 09:30:40 -0000
-References: <1518542328-25741-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<1518542328-25741-2-git-send-email-mihajlov@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 14 Feb 2018 10:30:36 +0100
+	(envelope-from <groug@kaod.org>) id 1eltcC-0001E1-Oh
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:44:40 -0500
+Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:36159)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eltcC-0001Dk-Gc
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:44:36 -0500
+Received: from player157.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 5BF9511BD3B
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:44:34 +0100 (CET)
+Date: Wed, 14 Feb 2018 10:44:31 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180214104431.294a5280@bahia.lan>
+In-Reply-To: <20180207155500.GO2665@work-vm>
+References: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
+	<20180207155500.GO2665@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <1518542328-25741-2-git-send-email-mihajlov@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <133f597f-283e-9b86-34df-7a2ada5faa6c@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCHv2 1/3] qmp: expose s390-specific CPU info
+Subject: Re: [Qemu-devel] [PATCH] migration: improve documentation of
+ postcopy-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,32 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, dgilbert@redhat.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
+On Wed, 7 Feb 2018 15:55:01 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-
-On 02/13/2018 06:18 PM, Viktor Mihajlovski wrote:
-> Presently s390x is the only architecture not exposing specific
-> CPU information via QMP query-cpus. Upstream discussion has shown
-> that it could make sense to report the architecture specific CPU
-> state, e.g. to detect that a CPU has been stopped.
+> * Greg Kurz (groug@kaod.org) wrote:
+> > This capability must have the same value on both source and destination,
+> > otherwise migration fails (commit 875fcd013ab6 "migration: incoming
+> > postcopy advise sanity checks").
+> > 
+> > Let's write it down in various places where postcopy-ram is documented.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>  
 > 
-> With this change the output of query-cpus will look like this on
-> s390:
+> Thanks,
 > 
->    [
->      {"arch": "s390", "current": true,
->       "props": {"core-id": 0}, "cpu-state": "operating", "CPU": 0,
->       "qom_path": "/machine/unattached/device[0]",
->       "halted": false, "thread_id": 63115},
->      {"arch": "s390", "current": false,
->       "props": {"core-id": 1}, "cpu-state": "stopped", "CPU": 1,
->       "qom_path": "/machine/unattached/device[1]",
->       "halted": true, "thread_id": 63116}
->    ]
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > 
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-> Acked-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Who should pick this up ?
+
+> > ---
+> >  docs/devel/migration.rst |    4 ++--
+> >  hmp-commands.hx          |    3 ++-
+> >  qapi/migration.json      |   10 ++++++----
+> >  3 files changed, 10 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+> > index bf97080dac2f..9d1b7657f0cf 100644
+> > --- a/docs/devel/migration.rst
+> > +++ b/docs/devel/migration.rst
+> > @@ -387,8 +387,8 @@ doesn't finish in a given time the switch is made to postcopy.
+> >  Enabling postcopy
+> >  -----------------
+> >  
+> > -To enable postcopy, issue this command on the monitor prior to the
+> > -start of migration:
+> > +To enable postcopy, issue this command on the monitor (both source and
+> > +destination) prior to the start of migration:
+> >  
+> >  ``migrate_set_capability postcopy-ram on``
+> >  
+> > diff --git a/hmp-commands.hx b/hmp-commands.hx
+> > index 15620c94d3fc..d26eb4119b9d 100644
+> > --- a/hmp-commands.hx
+> > +++ b/hmp-commands.hx
+> > @@ -1041,7 +1041,8 @@ ETEXI
+> >          .params     = "",
+> >          .help       = "Followup to a migration command to switch the migration"
+> >                        " to postcopy mode. The postcopy-ram capability must "
+> > -                      "be set before the original migration command.",
+> > +                      "be set on both source and destination before the "
+> > +                      "original migration command .",
+> >          .cmd        = hmp_migrate_start_postcopy,
+> >      },
+> >  
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index 4cd3d1315884..7f465a1902ce 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -327,8 +327,10 @@
+> >  #          to speed up convergence of RAM migration. (since 1.6)
+> >  #
+> >  # @postcopy-ram: Start executing on the migration target before all of RAM has
+> > -#          been migrated, pulling the remaining pages along as needed. NOTE: If
+> > -#          the migration fails during postcopy the VM will fail.  (since 2.6)
+> > +#          been migrated, pulling the remaining pages along as needed. The
+> > +#          capacity must have the same setting on both source and target
+> > +#          or migration will not even start. NOTE: If the migration fails during
+> > +#          postcopy the VM will fail.  (since 2.6)
+> >  #
+> >  # @x-colo: If enabled, migration will never end, and the state of the VM on the
+> >  #        primary side will be migrated continuously to the VM on secondary
+> > @@ -742,8 +744,8 @@
+> >  # @migrate-start-postcopy:
+> >  #
+> >  # Followup to a migration command to switch the migration to postcopy mode.
+> > -# The postcopy-ram capability must be set before the original migration
+> > -# command.
+> > +# The postcopy-ram capability must be set on both source and destination
+> > +# before the original migration command.
+> >  #
+> >  # Since: 2.5
+> >  #
+> >   
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
