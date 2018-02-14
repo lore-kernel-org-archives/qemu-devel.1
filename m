@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1em2vb-0003gr-7y
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:41:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1em31Q-0000RU-IB
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:47:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1em2vV-00036g-Cb
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:41:15 -0500
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:44638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1em2vV-00035q-5w
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:41:09 -0500
-Received: from player168.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 80B8FA3FFA
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:41:07 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 14 Feb 2018 20:41:03 +0100
-Message-ID: <151863726311.3003.8227524786940828598.stgit@bahia.lan>
-In-Reply-To: <151863720814.3003.4939908778788942974.stgit@bahia.lan>
-References: <151863720814.3003.4939908778788942974.stgit@bahia.lan>
+	(envelope-from <eblake@redhat.com>) id 1em31M-00075f-2N
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:47:16 -0500
+References: <1518542328-25741-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518542328-25741-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5d3cae28-9b13-3570-0be4-44de64102647@redhat.com>
+Date: Wed, 14 Feb 2018 13:46:54 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1518542328-25741-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 5/5] spapr: drop DIV_ROUND_UP() from
- xics_max_server_number()
+Subject: Re: [Qemu-devel] [PATCHv2 2/3] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +24,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>, Laurent Vivier <lvivier@redhat.com>
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-XICS needs to know the highest VCPU id that may be presented to the
-guest plus 1. Commit f303f117fec3 "spapr: ensure we have at least one
-XICS server" changed how the maximum is computed from:
+On 02/13/2018 11:18 AM, Viktor Mihajlovski wrote:
+> From: Luiz Capitulino <lcapitulino@redhat.com>
+> 
+> The query-cpus command has an extremely serious side effect:
+> it always interrupts all running vCPUs so that they can run
+> ioctl calls. This can cause a huge performance degradation for
+> some workloads. And most of the information retrieved by the
+> ioctl calls are not even used by query-cpus.
+> 
+> This commit introduces a replacement for query-cpus called
+> query-cpus-fast, which has the following features:
+> 
+>   o Never interrupt vCPUs threads. query-cpus-fast only returns
+>     vCPU information maintained by QEMU itself, which should be
+>     sufficient for most management software needs
+> 
+>   o Make "halted" field optional: we only return it if the
+>     halted state is maintained by QEMU. But this also gives
+>     the option of dropping the field in the future (see below)
+> 
+>   o Drop irrelevant fields such as "current", "pc", "arch"
+>     and "halted"
+> 
 
-        smp_cpus * kvmppc_smt_threads() / smp_threads
+Others have pointed out the commit message inconsistencies; I'm focusing 
+on the QMP.
 
-to:
+> +++ b/qapi-schema.json
+> @@ -552,6 +552,12 @@
+>   #
+>   # Returns a list of information about each virtual CPU.
+>   #
+> +# This command causes vCPU threads to exit to userspace, which causes
+> +# an small interruption guest CPU execution. This will have a negative
 
-        DIV_ROUND_UP(smp_cpus * kvmppc_smt_threads(), smp_threads)
+s/an small interruption/a small interruption to/
 
-This was done because at the time we could pass broken CPU topologies
-to the -smp command line options, such as threads=9,cpus=1. On a POWER8
-host this would give:
+> +# impact on realtime guests and other latency sensitive guest workloads.
+> +# It is recommended to use @query-cpus-fast instead of this command to
+> +# avoid the vCPU interruption.
+> +#
+>   # Returns: a list of @CpuInfo for each virtual CPU
+>   #
+>   # Since: 0.14.0
+> @@ -585,6 +591,70 @@
+>   { 'command': 'query-cpus', 'returns': ['CpuInfo'] }
+>   
+>   ##
+> +# @CpuInfoFast:
+> +#
+> +# Information about a virtual CPU
+> +#
+> +# @cpu-index: index of the virtual CPU
+> +#
+> +# @qom-path: path to the CPU object in the QOM tree
+> +#
+> +# @thread-id: ID of the underlying host thread
+> +#
+> +# @props: properties describing to which node/socket/core/thread
+> +#         virtual CPU belongs to, provided if supported by board
+> +#
+> +# Since: 2.12
+> +#
+> +##
+> +{ 'struct': 'CpuInfoFast',
+> +  'data': {'cpu-index': 'int', 'qom-path': 'str',
+> +           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
 
-        1 * 8 / 9 == 0 servers
+Comparing against the existing CpuInfo: if I'm not mistaken, you've renamed:
 
-and cause QEMU to crash later during XICS setup.
+CPU -> cpu-index
+qom_path -> qom-path
+thread_id -> thread-id
 
-The formulat evolved a bit to accomodate CPU hot-plug and VSMT, but
-most important, stricter checks are performed on the CPU topology.
+and kept props unchanged.
 
-With -smp threads=9,cpus=1:
+If we REALLY cared about reducing duplication, we can do:
 
-qemu-system-ppc64:
- cpu topology: sockets (1) * cores (1) * threads (9) > maxcpus (1)
+{ 'struct': 'CpuInfoFast',
+   'data': { 'CPU': 'int', 'qom_path': 'str', 'thread_id': 'int',
+             '*props': 'CpuInstanceProperties' } }
+{ 'struct': 'CpuInfoBase',
+   'base': 'CpuInfoFast',
+   'data': { 'current': 'bool', 'halted': 'bool',
+             'arch': 'CpuInfoArch' } }
+{ 'union': 'CpuInfo', 'base': 'CpuInfoBase', 'discriminator': 'arch',
+   'data': { ... } }
 
-With -smp threads=9,maxcpus=1:
+but I'm not yet convinced whether we need that.  If we're going to 
+deprecate the old command, having the new command use modern spelling is 
+a nice change, even though it costs some duplication in the qapi file; 
+where sharing code may save qapi costs in the short run, but will burden 
+us with poor naming down the road even when we delete the slow command.
 
-qemu-system-ppc64: maxcpus must be equal to or greater than smp
+> +
+> +##
+> +# @query-cpus-fast:
+> +#
+> +# Returns information about all virtual CPUs. This command does not
+> +# incur a performance penalty and should be used in production
+> +# instead of query-cpus.
+> +#
+> +# Returns: list of @CpuInfoFast
+> +#
+> +# Notes: The CPU architecture name is not returned by query-cpus-fast.
+> +#        Use query-target to retrieve that information.
+> +#
+> +# Since: 2.12
 
-More generally, machine types with hotplug support (2.7 and up), no
-longer allow to set maxcpus or smp_cpus to a value that isnt't a
-multiple of smp_threads.
+> +{ 'command': 'query-cpus-fast', 'returns': [ 'CpuInfoFast' ] }
+> +
+> +##
+>   # @IOThreadInfo:
+>   #
+>   # Information about an iothread
+> 
 
-With -smp threads=4,cpus=6:
+I didn't inspect the code, so similar to 1/3, once you fix the grammar 
+nit and commit message,
 
-qemu-system-ppc64: smp_cpus (6) must be multiple of threads (4)
+Acked-by: Eric Blake <eblake@redhat.com>
 
-With -smp threads=4,maxcpus=6:
-
-qemu-system-ppc64: max_cpus (6) must be multiple of threads (4)
-
-This means that the division is perfect and we don't need DIV_ROUND_UP(),
-and we could do a regular division:
-
-        max_cpus * spapr->vsmt / smp_threads
-
-So this patch changes xics_max_server_number() to use the spapr_vcpu_id(),
-which works too since max_cpus is a multiple of smp_threads:
-
-    (max_cpus / smp_threads ) * spapr->vsmt + max_cpus % smp_threads
-
-It breaks migration of pre-2.7 machine types with unusual CPU topologies,
-but I guess this is an acceptable trade-off.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 800d3f001253..f1722214cc74 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -176,7 +176,7 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int i)
- 
- static int xics_max_server_number(sPAPRMachineState *spapr)
- {
--    return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
-+    return spapr_vcpu_id(spapr, max_cpus)
- }
- 
- static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
