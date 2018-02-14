@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7K-0006Ij-HT
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1elv7M-0006Iy-JM
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7H-00078z-Ci
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34520 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1elv7K-00079Y-4J
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58244 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7H-00078N-6B
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:47 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7J-00079P-TT
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:50 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 14 Feb 2018 12:20:20 +0100
-Message-Id: <1518607234-17739-5-git-send-email-thuth@redhat.com>
+Date: Wed, 14 Feb 2018 12:20:22 +0100
+Message-Id: <1518607234-17739-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1518607234-17739-1-git-send-email-thuth@redhat.com>
 References: <1518607234-17739-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 04/18] libqos: Use explicit QTestState for
- fw_cfg operations
+Subject: [Qemu-devel] [PULL 06/18] libqos: Use explicit QTestState for i2c
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,351 +28,400 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-Drop one more client of global_qtest by teaching all fw_cfg test
-functionality (invoked through alloc-pc) to pass in an explicit
-QTestState, adjusting all callers.  In particular, fw_cfg-test
-had to reorder things to create the test state prior to creating
-the fw_cfg (and drop a pointless strdup in the meantime), but that
-test now no longer depends on global_qtest.
+Drop one more client of global_qtest by teaching all i2c test
+functionality to pass in an explicit QTestState, adjusting all
+callers.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-[thuth: Fixed conflict wrt pc_alloc_init() in vhost-user-test.c]
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/boot-order-test.c     |  6 +++---
- tests/e1000e-test.c         |  2 +-
- tests/fw_cfg-test.c         | 13 ++++---------
- tests/ide-test.c            |  2 +-
- tests/libqos/fw_cfg.c       | 14 ++++++++------
- tests/libqos/fw_cfg.h       | 10 ++++++----
- tests/libqos/libqos.c       |  2 +-
- tests/libqos/libqos.h       |  2 +-
- tests/libqos/malloc-pc.c    |  8 ++++----
- tests/libqos/malloc-pc.h    |  4 ++--
- tests/libqos/malloc-spapr.c |  4 ++--
- tests/libqos/malloc-spapr.h |  2 +-
- tests/libqos/malloc.h       |  1 +
- tests/vhost-user-test.c     |  2 +-
- 14 files changed, 36 insertions(+), 36 deletions(-)
+ tests/ds1338-test.c     |  6 ++---
+ tests/libqos/i2c-imx.c  | 67 +++++++++++++++++++++++++------------------------
+ tests/libqos/i2c-omap.c | 45 +++++++++++++++++----------------
+ tests/libqos/i2c.h      |  7 ++++--
+ tests/tmp105-test.c     |  6 ++---
+ 5 files changed, 66 insertions(+), 65 deletions(-)
 
-diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
-index 508469a..e70f5de 100644
---- a/tests/boot-order-test.c
-+++ b/tests/boot-order-test.c
-@@ -132,7 +132,7 @@ static void test_prep_boot_order(void)
- 
- static uint64_t read_boot_order_pmac(void)
- {
--    QFWCFG *fw_cfg = mm_fw_cfg_init(0xf0000510);
-+    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xf0000510);
- 
-     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-@@ -157,7 +157,7 @@ static void test_pmac_newworld_boot_order(void)
- 
- static uint64_t read_boot_order_sun4m(void)
- {
--    QFWCFG *fw_cfg = mm_fw_cfg_init(0xd00000510ULL);
-+    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xd00000510ULL);
- 
-     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-@@ -169,7 +169,7 @@ static void test_sun4m_boot_order(void)
- 
- static uint64_t read_boot_order_sun4u(void)
- {
--    QFWCFG *fw_cfg = io_fw_cfg_init(0x510);
-+    QFWCFG *fw_cfg = io_fw_cfg_init(global_qtest, 0x510);
- 
-     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index d8085d9..32aa738 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -392,7 +392,7 @@ static void data_test_init(e1000e_device *d)
-     qtest_start(cmdline);
-     g_free(cmdline);
- 
--    test_alloc = pc_alloc_init();
-+    test_alloc = pc_alloc_init(global_qtest);
-     g_assert_nonnull(test_alloc);
- 
-     test_bus = qpci_init_pc(global_qtest, test_alloc);
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index 81f45bd..1548bf1 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -102,12 +102,13 @@ static void test_fw_cfg_boot_menu(void)
- int main(int argc, char **argv)
- {
-     QTestState *s;
--    char *cmdline;
-     int ret;
- 
+diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
+index 26968bc..742dad9 100644
+--- a/tests/ds1338-test.c
++++ b/tests/ds1338-test.c
+@@ -61,16 +61,14 @@ int main(int argc, char **argv)
      g_test_init(&argc, &argv, NULL);
  
--    fw_cfg = pc_fw_cfg_init();
-+    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
-+
-+    fw_cfg = pc_fw_cfg_init(s);
+     s = qtest_start("-display none -machine imx25-pdk");
+-    i2c = imx_i2c_create(IMX25_I2C_0_BASE);
++    i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
+     addr = DS1338_ADDR;
  
-     qtest_add_func("fw_cfg/signature", test_fw_cfg_signature);
-     qtest_add_func("fw_cfg/id", test_fw_cfg_id);
-@@ -125,15 +126,9 @@ int main(int argc, char **argv)
-     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
-     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
+     qtest_add_func("/ds1338/tx-rx", send_and_receive);
  
--    cmdline = g_strdup_printf("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 ");
--    s = qtest_start(cmdline);
--    g_free(cmdline);
--
      ret = g_test_run();
  
 -    if (s) {
 -        qtest_quit(s);
 -    }
 +    qtest_quit(s);
+     g_free(i2c);
  
      return ret;
- }
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index ed71db0..2384c2c 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -132,7 +132,7 @@ static void ide_test_start(const char *cmdline_fmt, ...)
-     va_end(ap);
- 
-     qtest_start(cmdline);
--    guest_malloc = pc_alloc_init();
-+    guest_malloc = pc_alloc_init(global_qtest);
- 
-     g_free(cmdline);
- }
-diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-index 4d9dc3f..d0889d1 100644
---- a/tests/libqos/fw_cfg.c
-+++ b/tests/libqos/fw_cfg.c
-@@ -56,7 +56,7 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)
- 
- static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+diff --git a/tests/libqos/i2c-imx.c b/tests/libqos/i2c-imx.c
+index 1c4b431..0945f2e 100644
+--- a/tests/libqos/i2c-imx.c
++++ b/tests/libqos/i2c-imx.c
+@@ -40,8 +40,8 @@ typedef struct IMXI2C {
+ static void imx_i2c_set_slave_addr(IMXI2C *s, uint8_t addr,
+                                    enum IMXI2CDirection direction)
  {
--    writew(fw_cfg->base, key);
-+    qtest_writew(fw_cfg->qts, fw_cfg->base, key);
+-    writeb(s->addr + I2DR_ADDR, (addr << 1) |
+-           (direction == IMX_I2C_READ ? 1 : 0));
++    qtest_writeb(s->parent.qts, s->addr + I2DR_ADDR,
++                 (addr << 1) | (direction == IMX_I2C_READ ? 1 : 0));
  }
  
- static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-@@ -65,15 +65,16 @@ static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-     int i;
+ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
+@@ -63,35 +63,35 @@ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
+            I2CR_MTX |
+            I2CR_TXAK;
  
-     for (i = 0; i < len; i++) {
--        ptr[i] = readb(fw_cfg->base + 2);
-+        ptr[i] = qtest_readb(fw_cfg->qts, fw_cfg->base + 2);
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) != 0);
+ 
+     /* set the slave address */
+     imx_i2c_set_slave_addr(s, addr, IMX_I2C_WRITE);
+-    status = readb(s->addr + I2SR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) != 0);
+     g_assert((status & I2SR_RXAK) == 0);
+ 
+     /* ack the interrupt */
+-    writeb(s->addr + I2SR_ADDR, 0);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) == 0);
+ 
+     while (size < len) {
+         /* check we are still busy */
+-        status = readb(s->addr + I2SR_ADDR);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IBB) != 0);
+ 
+         /* write the data */
+-        writeb(s->addr + I2DR_ADDR, buf[size]);
+-        status = readb(s->addr + I2SR_ADDR);
++        qtest_writeb(i2c->qts, s->addr + I2DR_ADDR, buf[size]);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IIF) != 0);
+         g_assert((status & I2SR_RXAK) == 0);
+ 
+         /* ack the interrupt */
+-        writeb(s->addr + I2SR_ADDR, 0);
+-        status = readb(s->addr + I2SR_ADDR);
++        qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IIF) == 0);
+ 
+         size++;
+@@ -99,8 +99,8 @@ static void imx_i2c_send(I2CAdapter *i2c, uint8_t addr,
+ 
+     /* release the bus */
+     data &= ~(I2CR_MSTA | I2CR_MTX);
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) == 0);
+ }
+ 
+@@ -123,19 +123,19 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+            I2CR_MTX |
+            I2CR_TXAK;
+ 
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) != 0);
+ 
+     /* set the slave address */
+     imx_i2c_set_slave_addr(s, addr, IMX_I2C_READ);
+-    status = readb(s->addr + I2SR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) != 0);
+     g_assert((status & I2SR_RXAK) == 0);
+ 
+     /* ack the interrupt */
+-    writeb(s->addr + I2SR_ADDR, 0);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) == 0);
+ 
+     /* set the bus for read */
+@@ -144,23 +144,23 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+     if (len != 1) {
+         data &= ~I2CR_TXAK;
      }
- }
+-    writeb(s->addr + I2CR_ADDR, data);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) != 0);
  
--QFWCFG *mm_fw_cfg_init(uint64_t base)
-+QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base)
- {
-     QFWCFG *fw_cfg = g_malloc0(sizeof(*fw_cfg));
+     /* dummy read */
+-    readb(s->addr + I2DR_ADDR);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_readb(i2c->qts, s->addr + I2DR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) != 0);
  
-     fw_cfg->base = base;
-+    fw_cfg->qts = qts;
-     fw_cfg->select = mm_fw_cfg_select;
-     fw_cfg->read = mm_fw_cfg_read;
+     /* ack the interrupt */
+-    writeb(s->addr + I2SR_ADDR, 0);
+-    status = readb(s->addr + I2SR_ADDR);
++    qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IIF) == 0);
  
-@@ -82,7 +83,7 @@ QFWCFG *mm_fw_cfg_init(uint64_t base)
+     while (size < len) {
+         /* check we are still busy */
+-        status = readb(s->addr + I2SR_ADDR);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IBB) != 0);
  
- static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
- {
--    outw(fw_cfg->base, key);
-+    qtest_outw(fw_cfg->qts, fw_cfg->base, key);
- }
+         if (size == (len - 1)) {
+@@ -170,30 +170,30 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+             /* ack the data read */
+             data |= I2CR_TXAK;
+         }
+-        writeb(s->addr + I2CR_ADDR, data);
++        qtest_writeb(i2c->qts, s->addr + I2CR_ADDR, data);
  
- static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-@@ -91,15 +92,16 @@ static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-     int i;
+         /* read the data */
+-        buf[size] = readb(s->addr + I2DR_ADDR);
++        buf[size] = qtest_readb(i2c->qts, s->addr + I2DR_ADDR);
  
-     for (i = 0; i < len; i++) {
--        ptr[i] = inb(fw_cfg->base + 1);
-+        ptr[i] = qtest_inb(fw_cfg->qts, fw_cfg->base + 1);
+         if (size != (len - 1)) {
+-            status = readb(s->addr + I2SR_ADDR);
++            status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+             g_assert((status & I2SR_IIF) != 0);
+ 
+             /* ack the interrupt */
+-            writeb(s->addr + I2SR_ADDR, 0);
++            qtest_writeb(i2c->qts, s->addr + I2SR_ADDR, 0);
+         }
+ 
+-        status = readb(s->addr + I2SR_ADDR);
++        status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+         g_assert((status & I2SR_IIF) == 0);
+ 
+         size++;
      }
+ 
+-    status = readb(s->addr + I2SR_ADDR);
++    status = qtest_readb(i2c->qts, s->addr + I2SR_ADDR);
+     g_assert((status & I2SR_IBB) == 0);
  }
  
--QFWCFG *io_fw_cfg_init(uint16_t base)
-+QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base)
+-I2CAdapter *imx_i2c_create(uint64_t addr)
++I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr)
  {
-     QFWCFG *fw_cfg = g_malloc0(sizeof(*fw_cfg));
+     IMXI2C *s = g_malloc0(sizeof(*s));
+     I2CAdapter *i2c = (I2CAdapter *)s;
+@@ -202,6 +202,7 @@ I2CAdapter *imx_i2c_create(uint64_t addr)
  
-     fw_cfg->base = base;
-+    fw_cfg->qts = qts;
-     fw_cfg->select = io_fw_cfg_select;
-     fw_cfg->read = io_fw_cfg_read;
+     i2c->send = imx_i2c_send;
+     i2c->recv = imx_i2c_recv;
++    i2c->qts = qts;
  
-diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-index e8371b2..0353416 100644
---- a/tests/libqos/fw_cfg.h
-+++ b/tests/libqos/fw_cfg.h
-@@ -13,12 +13,14 @@
- #ifndef LIBQOS_FW_CFG_H
- #define LIBQOS_FW_CFG_H
+     return i2c;
+ }
+diff --git a/tests/libqos/i2c-omap.c b/tests/libqos/i2c-omap.c
+index f603fdf..1ef6e7b 100644
+--- a/tests/libqos/i2c-omap.c
++++ b/tests/libqos/i2c-omap.c
+@@ -51,8 +51,8 @@ static void omap_i2c_set_slave_addr(OMAPI2C *s, uint8_t addr)
+ {
+     uint16_t data = addr;
+ 
+-    writew(s->addr + OMAP_I2C_SA, data);
+-    data = readw(s->addr + OMAP_I2C_SA);
++    qtest_writew(s->parent.qts, s->addr + OMAP_I2C_SA, data);
++    data = qtest_readw(s->parent.qts, s->addr + OMAP_I2C_SA);
+     g_assert_cmphex(data, ==, addr);
+ }
+ 
+@@ -65,38 +65,38 @@ static void omap_i2c_send(I2CAdapter *i2c, uint8_t addr,
+     omap_i2c_set_slave_addr(s, addr);
+ 
+     data = len;
+-    writew(s->addr + OMAP_I2C_CNT, data);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CNT, data);
+ 
+     data = OMAP_I2C_CON_I2C_EN |
+            OMAP_I2C_CON_TRX |
+            OMAP_I2C_CON_MST |
+            OMAP_I2C_CON_STT |
+            OMAP_I2C_CON_STP;
+-    writew(s->addr + OMAP_I2C_CON, data);
+-    data = readw(s->addr + OMAP_I2C_CON);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CON, data);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) != 0);
+ 
+-    data = readw(s->addr + OMAP_I2C_STAT);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+     g_assert((data & OMAP_I2C_STAT_NACK) == 0);
+ 
+     while (len > 1) {
+-        data = readw(s->addr + OMAP_I2C_STAT);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+         g_assert((data & OMAP_I2C_STAT_XRDY) != 0);
+ 
+         data = buf[0] | ((uint16_t)buf[1] << 8);
+-        writew(s->addr + OMAP_I2C_DATA, data);
++        qtest_writew(i2c->qts, s->addr + OMAP_I2C_DATA, data);
+         buf = (uint8_t *)buf + 2;
+         len -= 2;
+     }
+     if (len == 1) {
+-        data = readw(s->addr + OMAP_I2C_STAT);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+         g_assert((data & OMAP_I2C_STAT_XRDY) != 0);
+ 
+         data = buf[0];
+-        writew(s->addr + OMAP_I2C_DATA, data);
++        qtest_writew(i2c->qts, s->addr + OMAP_I2C_DATA, data);
+     }
+ 
+-    data = readw(s->addr + OMAP_I2C_CON);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) == 0);
+ }
+ 
+@@ -109,30 +109,30 @@ static void omap_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+     omap_i2c_set_slave_addr(s, addr);
+ 
+     data = len;
+-    writew(s->addr + OMAP_I2C_CNT, data);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CNT, data);
+ 
+     data = OMAP_I2C_CON_I2C_EN |
+            OMAP_I2C_CON_MST |
+            OMAP_I2C_CON_STT |
+            OMAP_I2C_CON_STP;
+-    writew(s->addr + OMAP_I2C_CON, data);
+-    data = readw(s->addr + OMAP_I2C_CON);
++    qtest_writew(i2c->qts, s->addr + OMAP_I2C_CON, data);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) == 0);
+ 
+-    data = readw(s->addr + OMAP_I2C_STAT);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+     g_assert((data & OMAP_I2C_STAT_NACK) == 0);
+ 
+-    data = readw(s->addr + OMAP_I2C_CNT);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CNT);
+     g_assert_cmpuint(data, ==, len);
+ 
+     while (len > 0) {
+-        data = readw(s->addr + OMAP_I2C_STAT);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+         g_assert((data & OMAP_I2C_STAT_RRDY) != 0);
+         g_assert((data & OMAP_I2C_STAT_ROVR) == 0);
+ 
+-        data = readw(s->addr + OMAP_I2C_DATA);
++        data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_DATA);
+ 
+-        stat = readw(s->addr + OMAP_I2C_STAT);
++        stat = qtest_readw(i2c->qts, s->addr + OMAP_I2C_STAT);
+ 
+         if (unlikely(len == 1)) {
+             g_assert((stat & OMAP_I2C_STAT_SBD) != 0);
+@@ -148,11 +148,11 @@ static void omap_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+         }
+     }
+ 
+-    data = readw(s->addr + OMAP_I2C_CON);
++    data = qtest_readw(i2c->qts, s->addr + OMAP_I2C_CON);
+     g_assert((data & OMAP_I2C_CON_STP) == 0);
+ }
+ 
+-I2CAdapter *omap_i2c_create(uint64_t addr)
++I2CAdapter *omap_i2c_create(QTestState *qts, uint64_t addr)
+ {
+     OMAPI2C *s = g_malloc0(sizeof(*s));
+     I2CAdapter *i2c = (I2CAdapter *)s;
+@@ -162,9 +162,10 @@ I2CAdapter *omap_i2c_create(uint64_t addr)
+ 
+     i2c->send = omap_i2c_send;
+     i2c->recv = omap_i2c_recv;
++    i2c->qts = qts;
+ 
+     /* verify the mmio address by looking for a known signature */
+-    data = readw(addr + OMAP_I2C_REV);
++    data = qtest_readw(qts, addr + OMAP_I2C_REV);
+     g_assert_cmphex(data, ==, 0x34);
+ 
+     return i2c;
+diff --git a/tests/libqos/i2c.h b/tests/libqos/i2c.h
+index 6e648f9..eb40b80 100644
+--- a/tests/libqos/i2c.h
++++ b/tests/libqos/i2c.h
+@@ -9,6 +9,7 @@
+ #ifndef LIBQOS_I2C_H
+ #define LIBQOS_I2C_H
  
 +#include "libqtest.h"
  
- typedef struct QFWCFG QFWCFG;
- 
- struct QFWCFG
- {
-     uint64_t base;
+ typedef struct I2CAdapter I2CAdapter;
+ struct I2CAdapter {
+@@ -16,6 +17,8 @@ struct I2CAdapter {
+                  const uint8_t *buf, uint16_t len);
+     void (*recv)(I2CAdapter *adapter, uint8_t addr,
+                  uint8_t *buf, uint16_t len);
++
 +    QTestState *qts;
-     void (*select)(QFWCFG *fw_cfg, uint16_t key);
-     void (*read)(QFWCFG *fw_cfg, void *data, size_t len);
  };
-@@ -30,12 +32,12 @@ uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
- uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
- uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
  
--QFWCFG *mm_fw_cfg_init(uint64_t base);
--QFWCFG *io_fw_cfg_init(uint16_t base);
-+QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
-+QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
+ void i2c_send(I2CAdapter *i2c, uint8_t addr,
+@@ -24,9 +27,9 @@ void i2c_recv(I2CAdapter *i2c, uint8_t addr,
+               uint8_t *buf, uint16_t len);
  
--static inline QFWCFG *pc_fw_cfg_init(void)
-+static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
- {
--    return io_fw_cfg_init(0x510);
-+    return io_fw_cfg_init(qts, 0x510);
- }
+ /* libi2c-omap.c */
+-I2CAdapter *omap_i2c_create(uint64_t addr);
++I2CAdapter *omap_i2c_create(QTestState *qts, uint64_t addr);
+ 
+ /* libi2c-imx.c */
+-I2CAdapter *imx_i2c_create(uint64_t addr);
++I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr);
  
  #endif
-diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 18f08cf..5729a06 100644
---- a/tests/libqos/libqos.c
-+++ b/tests/libqos/libqos.c
-@@ -24,7 +24,7 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
-     qs->qts = qtest_start(cmdline);
-     qs->ops = ops;
-     if (ops) {
--        qs->alloc = ops->init_allocator(ALLOC_NO_FLAGS);
-+        qs->alloc = ops->init_allocator(qs->qts, ALLOC_NO_FLAGS);
-         qs->pcibus = ops->qpci_init(qs->qts, qs->alloc);
-     }
+diff --git a/tests/tmp105-test.c b/tests/tmp105-test.c
+index e9a3cb7..66c7a01 100644
+--- a/tests/tmp105-test.c
++++ b/tests/tmp105-test.c
+@@ -155,15 +155,13 @@ int main(int argc, char **argv)
+     s = qtest_start("-machine n800 "
+                     "-device tmp105,bus=i2c-bus.0,id=" TMP105_TEST_ID
+                     ",address=0x49");
+-    i2c = omap_i2c_create(OMAP2_I2C_1_BASE);
++    i2c = omap_i2c_create(s, OMAP2_I2C_1_BASE);
  
-diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
-index 78e5c04..07d4b93 100644
---- a/tests/libqos/libqos.h
-+++ b/tests/libqos/libqos.h
-@@ -8,7 +8,7 @@
- typedef struct QOSState QOSState;
+     qtest_add_func("/tmp105/tx-rx", send_and_receive);
  
- typedef struct QOSOps {
--    QGuestAllocator *(*init_allocator)(QAllocOpts);
-+    QGuestAllocator *(*init_allocator)(QTestState *qts, QAllocOpts);
-     void (*uninit_allocator)(QGuestAllocator *);
-     QPCIBus *(*qpci_init)(QTestState *qts, QGuestAllocator *alloc);
-     void (*qpci_free)(QPCIBus *bus);
-diff --git a/tests/libqos/malloc-pc.c b/tests/libqos/malloc-pc.c
-index dd2b900..634b9c2 100644
---- a/tests/libqos/malloc-pc.c
-+++ b/tests/libqos/malloc-pc.c
-@@ -29,11 +29,11 @@ void pc_alloc_uninit(QGuestAllocator *allocator)
-     alloc_uninit(allocator);
- }
+     ret = g_test_run();
  
--QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags)
-+QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags)
- {
-     QGuestAllocator *s;
-     uint64_t ram_size;
--    QFWCFG *fw_cfg = pc_fw_cfg_init();
-+    QFWCFG *fw_cfg = pc_fw_cfg_init(qts);
+-    if (s) {
+-        qtest_quit(s);
+-    }
++    qtest_quit(s);
+     g_free(i2c);
  
-     ram_size = qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE);
-     s = alloc_init_flags(flags, 1 << 20, MIN(ram_size, 0xE0000000));
-@@ -45,7 +45,7 @@ QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags)
-     return s;
- }
- 
--inline QGuestAllocator *pc_alloc_init(void)
-+inline QGuestAllocator *pc_alloc_init(QTestState *qts)
- {
--    return pc_alloc_init_flags(ALLOC_NO_FLAGS);
-+    return pc_alloc_init_flags(qts, ALLOC_NO_FLAGS);
- }
-diff --git a/tests/libqos/malloc-pc.h b/tests/libqos/malloc-pc.h
-index 86ab9f0..10f3da6 100644
---- a/tests/libqos/malloc-pc.h
-+++ b/tests/libqos/malloc-pc.h
-@@ -15,8 +15,8 @@
- 
- #include "libqos/malloc.h"
- 
--QGuestAllocator *pc_alloc_init(void);
--QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags);
-+QGuestAllocator *pc_alloc_init(QTestState *qts);
-+QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags);
- void pc_alloc_uninit(QGuestAllocator *allocator);
- 
- #endif
-diff --git a/tests/libqos/malloc-spapr.c b/tests/libqos/malloc-spapr.c
-index 006404a..1c359ce 100644
---- a/tests/libqos/malloc-spapr.c
-+++ b/tests/libqos/malloc-spapr.c
-@@ -22,7 +22,7 @@ void spapr_alloc_uninit(QGuestAllocator *allocator)
-     alloc_uninit(allocator);
- }
- 
--QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags)
-+QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags)
- {
-     QGuestAllocator *s;
- 
-@@ -34,5 +34,5 @@ QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags)
- 
- QGuestAllocator *spapr_alloc_init(void)
- {
--    return spapr_alloc_init_flags(ALLOC_NO_FLAGS);
-+    return spapr_alloc_init_flags(NULL, ALLOC_NO_FLAGS);
- }
-diff --git a/tests/libqos/malloc-spapr.h b/tests/libqos/malloc-spapr.h
-index 64d0e77..52a9346 100644
---- a/tests/libqos/malloc-spapr.h
-+++ b/tests/libqos/malloc-spapr.h
-@@ -11,7 +11,7 @@
- #include "libqos/malloc.h"
- 
- QGuestAllocator *spapr_alloc_init(void);
--QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags);
-+QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags);
- void spapr_alloc_uninit(QGuestAllocator *allocator);
- 
- #endif
-diff --git a/tests/libqos/malloc.h b/tests/libqos/malloc.h
-index ae9dac8..828fdda 100644
---- a/tests/libqos/malloc.h
-+++ b/tests/libqos/malloc.h
-@@ -14,6 +14,7 @@
- #define LIBQOS_MALLOC_H
- 
- #include "qemu/queue.h"
-+#include "libqtest.h"
- 
- typedef enum {
-     ALLOC_NO_FLAGS    = 0x00,
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 3f74511..22e9202 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -191,7 +191,7 @@ static void init_virtio_dev(TestServer *s, uint32_t features_mask)
-     qvirtio_set_acknowledge(&s->dev->vdev);
-     qvirtio_set_driver(&s->dev->vdev);
- 
--    s->alloc = pc_alloc_init();
-+    s->alloc = pc_alloc_init(global_qtest);
- 
-     for (i = 0; i < s->queues * 2; i++) {
-         s->vq[i] = qvirtqueue_setup(&s->dev->vdev, s->alloc, i);
+     return ret;
 -- 
 1.8.3.1
