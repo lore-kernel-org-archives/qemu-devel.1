@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1elugP-0000xL-MM
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:53:02 -0500
+	(envelope-from <david@redhat.com>) id 1elukS-0003IZ-Ly
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:57:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1elugO-0000zs-MI
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:53:01 -0500
-References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
-	<1518189456-2873-6-git-send-email-geert+renesas@glider.be>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <79b1983f-cf83-624b-bd4d-86a2b6cc25e0@redhat.com>
-Date: Wed, 14 Feb 2018 11:52:32 +0100
+	(envelope-from <david@redhat.com>) id 1elukP-0002nF-KR
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:57:12 -0500
+References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1517864246-11101-12-git-send-email-walling@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8259c694-3f9a-ce9e-9d1d-252568f3e73a@redhat.com>
+Date: Wed, 14 Feb 2018 11:57:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <1518189456-2873-6-git-send-email-geert+renesas@glider.be>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1517864246-11101-12-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH/RFC 5/5] hw/arm/sysbus-fdt: Enable
- rcar-gen3-gpio dynamic instantiation
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 11/12] s390-ccw: clear
+ pending irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
-Cc: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, thuth@redhat.com, cohuck@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-Hi Geert,
-
-On 09/02/18 16:17, Geert Uytterhoeven wrote:
-> Allow the instantiation of a Renesas R-Car Gen3 GPIO controller device
-> from the QEMU command line:
+On 05.02.2018 21:57, Collin L. Walling wrote:
+> It is possible while waiting for multiple types of external
+> interrupts that we might have pending irqs remaining between
+> irq consumption and irq disabling. Those interrupts could
+> propagate to the guest after IPL completes and cause unwanted
+> behavior.
 > 
-> -device vfio-platform,host=<device>,manufacturer=renesas,model=rcar-gen3-gpio
-> -device vfio-platform,sysfsdev=<path>,manufacturer=renesas,model=rcar-gen3-gpio
+> To avoid this, we clear the write event mask to prevent further
+> service interrupts from ASCII events and then consume all pending
+> irqs for a miniscule duration. Once finished, we reset the write
+> event mask and resume business as usual.
 > 
-> A specialized device tree node is created for the guest, containing
-> compatible, reg, gpio-controller, and #gpio-cells properties.
-> 
-> Not-Yet-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 > ---
-> Question:
->   - Why do we need the manufacturer=foo,model=bar syntax? Can't this
->     just be extracted from the host DT?
-I think this could be achieved that way too. We just need to pay
-attention to the fact the dt node creation function matches the exact
-same compatible property value.
-
+>  pc-bios/s390-ccw/menu.c | 16 ++++++++++++++++
+>  pc-bios/s390-ccw/sclp.c | 12 ++++++++++++
+>  2 files changed, 28 insertions(+)
 > 
-> TODO:
->   - Copy properties from the host DT, as add_amd_xgbe_fdt_node() does,
->   - Make this more generic?
-
-Yes I think devising helpers to generate regs/interrupts properties
-could help reducing the amount of code to be written
-
-Thanks
-
-Eric
-> ---
->  hw/arm/sysbus-fdt.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 47 insertions(+)
-> 
-> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-> index c5d4fd5604c28118..428175f343d9f3b9 100644
-> --- a/hw/arm/sysbus-fdt.c
-> +++ b/hw/arm/sysbus-fdt.c
-> @@ -416,6 +416,52 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
->      return 0;
+> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+> index 85d285f..971f6b6 100644
+> --- a/pc-bios/s390-ccw/menu.c
+> +++ b/pc-bios/s390-ccw/menu.c
+> @@ -64,6 +64,20 @@ static inline bool check_clock_int(void)
+>      return *code == 0x1004;
 >  }
 >  
-> +/**
-> + * add_rcar_gpio_fdt_node
-> + *
-> + * Generates a simple node with following properties:
-> + * compatible string, regs, #gpio-cells, gpio-controller
-> + */
-> +static int add_rcar_gpio_fdt_node(SysBusDevice *sbdev, void *opaque)
+> +static void clear_pending_irqs(void)
 > +{
-> +    PlatformBusFDTData *data = opaque;
-> +    PlatformBusDevice *pbus = data->pbus;
-> +    void *fdt = data->fdt;
-> +    const char *parent_node = data->pbus_node_name;
-> +    int compat_str_len, i;
-> +    char *nodename;
-> +    uint32_t *reg_attr;
-> +    uint64_t mmio_base;
-> +    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
+> +    uint64_t time = 50 * TOD_CLOCK_SECOND / 0x3e8;
 > +
-> +    mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
-> +    nodename = g_strdup_printf("%s/%s@%" PRIx64, parent_node,
-> +                               vbasedev->name, mmio_base);
-> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    sclp_clear_write_mask();
 > +
-> +    compat_str_len = strlen(vdev->compat) + 1;
-> +    qemu_fdt_setprop(fdt, nodename, "compatible",
-> +                          vdev->compat, compat_str_len);
+> +    set_clock_comparator(get_clock() + time);
+> +    enable_clock_int();
+> +    consume_sclp_int();
+> +    disable_clock_int();
 > +
-> +    qemu_fdt_setprop(fdt, nodename, "gpio-controller", NULL, 0);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "#gpio-cells", 2);
-> +
-> +    reg_attr = g_new(uint32_t, vbasedev->num_regions * 2);
-> +    for (i = 0; i < vbasedev->num_regions; i++) {
-> +        mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, i);
-> +        reg_attr[2 * i] = cpu_to_be32(mmio_base);
-> +        reg_attr[2 * i + 1] = cpu_to_be32(
-> +                                memory_region_size(vdev->regions[i]->mem));
-> +    }
-> +    qemu_fdt_setprop(fdt, nodename, "reg", reg_attr,
-> +                     vbasedev->num_regions * 2 * sizeof(uint32_t));
-> +
-> +    g_free(reg_attr);
-> +    g_free(nodename);
-> +    return 0;
+> +    sclp_setup(); /* re-enable write mask */
 > +}
 > +
->  /* manufacturer/model matching */
->  static bool vfio_platform_match(SysBusDevice *sbdev,
->                                  const BindingEntry *entry)
-> @@ -454,6 +500,7 @@ static const BindingEntry bindings[] = {
->      TYPE_BINDING(TYPE_VFIO_CALXEDA_XGMAC, add_calxeda_midway_xgmac_fdt_node),
->      TYPE_BINDING(TYPE_VFIO_AMD_XGBE, add_amd_xgbe_fdt_node),
->      VFIO_PLATFORM_BINDING("amd", "xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
-> +    VFIO_PLATFORM_BINDING("renesas", "rcar-gen3-gpio", add_rcar_gpio_fdt_node),
->  #endif
->      TYPE_BINDING("", NULL), /* last element */
->  };
+>  static int read_prompt(char *buf, size_t len)
+>  {
+>      char inp[2] = {};
+> @@ -165,6 +179,8 @@ static int get_boot_index(int entries)
+>      sclp_print("\nBooting entry #");
+>      sclp_print(itostr(boot_index, tmp, sizeof(tmp)));
+>  
+> +    clear_pending_irqs();
+> +
+>      return boot_index;
+>  }
+>  
+> diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+> index 5902d5b..025eb2d 100644
+> --- a/pc-bios/s390-ccw/sclp.c
+> +++ b/pc-bios/s390-ccw/sclp.c
+> @@ -46,6 +46,18 @@ static int sclp_service_call(unsigned int command, void *sccb)
+>          return 0;
+>  }
+>  
+> +void sclp_clear_write_mask(void)
+> +{
+> +    WriteEventMask *sccb = (void *)_sccb;
+> +
+> +    sccb->h.length = sizeof(WriteEventMask);
+> +    sccb->mask_length = sizeof(unsigned int);
+> +    sccb->cp_receive_mask = 0;
+> +    sccb->cp_send_mask = 0;
+> +
+> +    sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
+> +}
+> +
+>  static void sclp_set_write_mask(void)
+>  {
+>      WriteEventMask *sccb = (void *)_sccb;
 > 
+
+1. CKC interrupts can be cleared by resetting the CKC
+2. SCLP interrupts can be cleared only via delivery (apart from CPU reset)
+
+So if you have CKC and SCLP pending at the same time, you get the CKC
+delivered first and the SCLP remains pending.
+
+Now, the easiest way to clear that (if you don't know if any is
+pending!) is to simply print a string. Then you know that you have
+exactly one SCLP interrupt pending.
+
+So simply printing a string after potentially reading should be
+sufficient to clear the SCLP interrupt deterministically :)
+
+-- 
+
+Thanks,
+
+David / dhildenb
