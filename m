@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1em1io-0000CN-Tl
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:23:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1em1qm-0006H6-Uz
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:32:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1em1im-0003zJ-8N
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:23:58 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:45805)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1em1im-0003yi-1q
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:23:56 -0500
-Received: by mail-pg0-x241.google.com with SMTP id e11so2233162pgq.12
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:23:55 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 14 Feb 2018 12:23:44 -0600
-Message-Id: <1518632624-29965-3-git-send-email-minyard@acm.org>
-In-Reply-To: <1518632624-29965-1-git-send-email-minyard@acm.org>
-References: <1518632624-29965-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 2/2] ipmi: Use proper struct reference for
- BT vmstate
+	(envelope-from <eblake@redhat.com>) id 1em1qm-0000Xa-2P
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:32:12 -0500
+References: <1518624560-38060-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1518624560-38060-2-git-send-email-anton.nefedov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <188eaa75-9562-0492-6fb6-4b45cadc0a28@redhat.com>
+Date: Wed, 14 Feb 2018 12:31:55 -0600
+MIME-Version: 1.0
+In-Reply-To: <1518624560-38060-2-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] iotest 033: add misaligned
+ write-zeroes test via truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, berto@igalia.com
 
-From: Corey Minyard <cminyard@mvista.com>
+On 02/14/2018 10:09 AM, Anton Nefedov wrote:
+> This new test case only makes sense for qcow2 while iotest 033 is generic;
+> however it matches the test purpose perfectly and also 033 contains those
+> do_test() tricks to pass the alignment, which won't look nice being
+> duplicated in other tests or moved to the common code.
+> 
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/033     | 29 +++++++++++++++++++++++++++++
+>   tests/qemu-iotests/033.out | 13 +++++++++++++
+>   2 files changed, 42 insertions(+)
+> 
 
-The vmstate for isa_ipmi_bt was referencing into the bt structure,
-instead create a bt structure separate and use that.
+> +# only interested in qcow2 here; also other formats might respond with
+> +#  "not supported" error message
+> +if [ $IMGFMT = "qcow2" ]; then
+> +    do_test 512 "truncate $L2_COVERAGE" "$TEST_IMG" | _filter_qemu_io
+> +fi
 
-The version 1 of the BT transfer was fairly broken, if a migration
-occured during an IPMI operation, it is likely the migration would
-be corrupted because I misunderstood the VMSTATE_VBUFFER_UINT32()
-handling, I thought it handled transferring the length field,
-too.  So I just remove support for that.  I doubt anyone is using
-it at this point.
+But without an else branch that echoes the same text as the if branch 
+generates, your .out file is now broken for other image formats.  Or 
+does 'qemu-io -c truncate' not produce output?
 
-This also removes the transfer of use_irq, since that should come
-from configuration.
+/me goes and tests...
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/ipmi/isa_ipmi_bt.c | 61 ++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 48 insertions(+), 13 deletions(-)
+Okay, looks like truncate is silent; and that the truncation (or 
+skipping of the truncation) doesn't affect things.
 
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index e946030..b64dce2 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -450,22 +450,57 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
-     isa_register_ioport(isadev, &iib->bt.io, iib->bt.io_base);
- }
- 
--static const VMStateDescription vmstate_ISAIPMIBTDevice = {
--    .name = TYPE_IPMI_INTERFACE,
-+static int ipmi_bt_vmstate_post_load(void *opaque, int version)
-+{
-+    IPMIBT *ib = opaque;
-+
-+    /* Make sure all the values are sane. */
-+    if (ib->outpos >= MAX_IPMI_MSG_SIZE || ib->outlen >= MAX_IPMI_MSG_SIZE ||
-+        ib->outpos >= ib->outlen) {
-+        ib->outpos = 0;
-+        ib->outlen = 0;
-+    }
-+
-+    if (ib->inlen >= MAX_IPMI_MSG_SIZE) {
-+        ib->inlen = 0;
-+    }
-+
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_IPMIBT = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "bt",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .post_load = ipmi_bt_vmstate_post_load,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_BOOL(obf_irq_set, IPMIBT),
-+        VMSTATE_BOOL(atn_irq_set, IPMIBT),
-+        VMSTATE_BOOL(irqs_enabled, IPMIBT),
-+        VMSTATE_UINT32(outpos, IPMIBT),
-+        VMSTATE_UINT32(outlen, IPMIBT),
-+        VMSTATE_UINT8_ARRAY(outmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT32(inlen, IPMIBT),
-+        VMSTATE_UINT8_ARRAY(inmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT8(control_reg, IPMIBT),
-+        VMSTATE_UINT8(mask_reg, IPMIBT),
-+        VMSTATE_UINT8(waiting_rsp, IPMIBT),
-+        VMSTATE_UINT8(waiting_seq, IPMIBT),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_ISAIPMIBTDevice = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-bt",
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-+    /*
-+     * Version 1 had messed up the array transfer, it's not even usable
-+     * because it used VMSTATE_VBUFFER_UINT32, but it did not transfer
-+     * the buffer length, so random things would happen.
-+     */
-     .fields      = (VMStateField[]) {
--        VMSTATE_BOOL(bt.obf_irq_set, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.atn_irq_set, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
--        VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
--        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
--        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
--        VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.waiting_seq, ISAIPMIBTDevice),
-+        VMSTATE_STRUCT(bt, ISAIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
-         VMSTATE_END_OF_LIST()
-     }
- };
+Tested-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.7.4
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
