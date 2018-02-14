@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1elukS-0003IZ-Ly
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:57:13 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eluko-0003X6-9z
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:57:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1elukP-0002nF-KR
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:57:12 -0500
-References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1517864246-11101-12-git-send-email-walling@linux.vnet.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8259c694-3f9a-ce9e-9d1d-252568f3e73a@redhat.com>
-Date: Wed, 14 Feb 2018 11:57:06 +0100
+	(envelope-from <cohuck@redhat.com>) id 1elukl-0002tn-42
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:57:34 -0500
+Date: Wed, 14 Feb 2018 11:57:25 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180214115725.34ba0008.cohuck@redhat.com>
+In-Reply-To: <1518542328-25741-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+References: <1518542328-25741-1-git-send-email-mihajlov@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1517864246-11101-12-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 11/12] s390-ccw: clear
- pending irqs
+Subject: Re: [Qemu-devel] [PATCHv2 0/3] add query-cpu-fast and related s390
+ changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, thuth@redhat.com, cohuck@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com
 
-On 05.02.2018 21:57, Collin L. Walling wrote:
-> It is possible while waiting for multiple types of external
-> interrupts that we might have pending irqs remaining between
-> irq consumption and irq disabling. Those interrupts could
-> propagate to the guest after IPL completes and cause unwanted
-> behavior.
+On Tue, 13 Feb 2018 18:18:45 +0100
+Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+
+> This series consolidates patches around a performance issue
+> caused by the usage of QMP query-cpus.
 > 
-> To avoid this, we clear the write event mask to prevent further
-> service interrupts from ASCII events and then consume all pending
-> irqs for a miniscule duration. Once finished, we reset the write
-> event mask and resume business as usual.
+> A performance issue was found in an OpenStack environment, where
+> ceilometer was collecting domain statistics with libvirt. The domain
+> statistics reported by libvirt include the vCPU halted state, which 
+> in turn is retrieved with QMP query-cpus.
 > 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> ---
->  pc-bios/s390-ccw/menu.c | 16 ++++++++++++++++
->  pc-bios/s390-ccw/sclp.c | 12 ++++++++++++
->  2 files changed, 28 insertions(+)
+> This causes two issues:
+> 1. Performance: on most architectures query-cpus needs to issue a KVM ioctl
+>    to find out whether a vCPU was halted. This is not the case for s390
+>    but query-cpus is always causing the vCPU to exit the VM.
 > 
-> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-> index 85d285f..971f6b6 100644
-> --- a/pc-bios/s390-ccw/menu.c
-> +++ b/pc-bios/s390-ccw/menu.c
-> @@ -64,6 +64,20 @@ static inline bool check_clock_int(void)
->      return *code == 0x1004;
->  }
->  
-> +static void clear_pending_irqs(void)
-> +{
-> +    uint64_t time = 50 * TOD_CLOCK_SECOND / 0x3e8;
-> +
-> +    sclp_clear_write_mask();
-> +
-> +    set_clock_comparator(get_clock() + time);
-> +    enable_clock_int();
-> +    consume_sclp_int();
-> +    disable_clock_int();
-> +
-> +    sclp_setup(); /* re-enable write mask */
-> +}
-> +
->  static int read_prompt(char *buf, size_t len)
->  {
->      char inp[2] = {};
-> @@ -165,6 +179,8 @@ static int get_boot_index(int entries)
->      sclp_print("\nBooting entry #");
->      sclp_print(itostr(boot_index, tmp, sizeof(tmp)));
->  
-> +    clear_pending_irqs();
-> +
->      return boot_index;
->  }
->  
-> diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-> index 5902d5b..025eb2d 100644
-> --- a/pc-bios/s390-ccw/sclp.c
-> +++ b/pc-bios/s390-ccw/sclp.c
-> @@ -46,6 +46,18 @@ static int sclp_service_call(unsigned int command, void *sccb)
->          return 0;
->  }
->  
-> +void sclp_clear_write_mask(void)
-> +{
-> +    WriteEventMask *sccb = (void *)_sccb;
-> +
-> +    sccb->h.length = sizeof(WriteEventMask);
-> +    sccb->mask_length = sizeof(unsigned int);
-> +    sccb->cp_receive_mask = 0;
-> +    sccb->cp_send_mask = 0;
-> +
-> +    sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
-> +}
-> +
->  static void sclp_set_write_mask(void)
->  {
->      WriteEventMask *sccb = (void *)_sccb;
+> 2. Semantics: on x86 and other architectures, halted is a highly transient
+>    state, which is likely to have already changed shortly after the state
+>    information has been retrieved. This is not the case for s390, where
+>    halted is an indication that the vCPU is stopped, meaning its not
+>    available to the guest operating system until it has been restarted.
 > 
+> The following patches help to alleviate the issues:
+> 
+> Patch 1/3:
+>   Adds architecture specific data to the QMP CpuInfo type, exposing
+>   the existing s390 cpu-state in QMP. The cpu-state is a representation
+>   more adequate than the ambiguous 'halted' condition.
+> 
+> Patch 2/3:
+>   Adds a new QMP function query-cpus-fast, which will only retrieve
+>   vCPU information that can be obtained without interrupting the
+>   vCPUs of a running VM. It introduces a new return type CpuInfoFast
+>   with the subset of fields meeting this condition. Specifically, the
+>   halted state is not part of CpuInfoFast. QMP clients like libvirt
+>   are encouraged to switch to the new API for vCPU information.
+> 
+> Patch 3/3:
+>   Adds the s390-specific cpu state to CpuInfoFast, allowing management
+>   apps to find out whether a vCPU is in the stopped state. This extension
+>   leads to a partial duplication of field definitions from CpuInfo
+>   to CpuInfoFast. This should be tolerable if CpuInfo is deprecated and
+>   eventually removed.
 
-1. CKC interrupts can be cleared by resetting the CKC
-2. SCLP interrupts can be cleared only via delivery (apart from CPU reset)
+How shall we proceed with this series? Patch 3 depends upon patch 1, so
+I think it makes sense to merge this in one go.
 
-So if you have CKC and SCLP pending at the same time, you get the CKC
-delivered first and the SCLP remains pending.
-
-Now, the easiest way to clear that (if you don't know if any is
-pending!) is to simply print a string. Then you know that you have
-exactly one SCLP interrupt pending.
-
-So simply printing a string after potentially reading should be
-sufficient to clear the SCLP interrupt deterministically :)
-
--- 
-
-Thanks,
-
-David / dhildenb
+I can give my R-b on patch 1 and Someone(tm) can merge this, or I can
+take the whole series through the s390 tree (with some further
+reviews/acks on patches 2/3).
