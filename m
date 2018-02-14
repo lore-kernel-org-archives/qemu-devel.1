@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eloiV-00030e-9D
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:30:48 -0500
+	(envelope-from <brogers@suse.com>) id 1eloqo-00084x-Bo
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:39:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eloiR-0000fi-W2
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:30:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56092 helo=mx1.redhat.com)
+	(envelope-from <brogers@suse.com>) id 1eloql-0007Ok-3L
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:39:22 -0500
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:38326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eloiR-0000eh-Qw
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:30:43 -0500
-Date: Wed, 14 Feb 2018 12:30:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180214043030.GG4472@xz-mi>
-References: <20180208103132.28452-1-peterx@redhat.com>
-	<20180208103132.28452-26-peterx@redhat.com>
-	<20180213185650.GR2378@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(Exim 4.71) (envelope-from <brogers@suse.com>) id 1eloqk-0007KN-PY
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 23:39:19 -0500
+Message-Id: <5A83BD72020000480006932A@prv-mh.provo.novell.com>
+Date: Tue, 13 Feb 2018 21:39:14 -0700
+From: "Bruce Rogers" <brogers@suse.com>
+References: <20180214001105.21508-1-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20180214001105.21508-1-mdroth@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20180213185650.GR2378@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v6 25/28] qmp/migration: new command
- migrate-recover
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a blog post documenting
+ Spectre/Meltdown options for QEMU 2.11.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +28,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, david@gibson.dropbear.id.au, sjitindarsingh@gmail.com, peter.maydell@linaro.org, cohuck@redhat.com, ehabkost@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com
 
-On Tue, Feb 13, 2018 at 06:56:51PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > The first allow-oob=true command.  It's used on destination side when
-> > the postcopy migration is paused and ready for a recovery.  After
-> > execution, a new migration channel will be established for postcopy to
-> > continue.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/migration.c | 26 ++++++++++++++++++++++++++
-> >  migration/migration.h |  1 +
-> >  migration/savevm.c    |  3 +++
-> >  qapi/migration.json   | 20 ++++++++++++++++++++
-> >  4 files changed, 50 insertions(+)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index cf3a3f416c..bb57ed9ade 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1422,6 +1422,32 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
-> >      once = false;
-> >  }
-> >  
-> > +void qmp_migrate_recover(const char *uri, Error **errp)
-> > +{
-> > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > +
-> > +    if (mis->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
-> > +        error_setg(errp, "Migrate recover can only be run "
-> > +                   "when postcopy is paused.");
-> > +        return;
-> > +    }
-> 
-> OK, if it did come back as Paused I don't think it can leave it again
-> except this way, so I'm not too worried it being thread safe.
-> 
-> > +    if (mis->postcopy_recover_triggered) {
-> > +        error_setg(errp, "Migrate recovery is triggered already");
-> > +        return;
-> > +    }
-> > +
-> > +    /* This will make sure we'll only allow one recover for one pause */
-> > +    mis->postcopy_recover_triggered = true;
-> 
-> However, does that need to be done with a :
->    if (atomic_cmpxchg(mis->postcopy_recovery_triggered, false, true) ==
->        true) {
->       error_setg(errp, "Migrate recovery is triggered already");
->    }
-> 
-> for the slim chance that someone did this command on the main and the
-> oob monitor?
+On 2/13/2018 at 5:11 PM, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> This blog entry is intended as a follow=E2=80=91up to the original entry =
+in
+> January regarding Spectre/Meltdown and the proposed changes to address
+> them in the upcoming 2.11.1 release.
+>=20
+> This entry is meant to accompany the 2.11.1 release (planned for
+> 2018=E2=80=9102=E2=80=9114) and document how to make use of the new =
+options for
+> various architectures.
+>=20
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Signed=E2=80=91off=E2=80=91by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> =E2=80=91=E2=80=91=E2=80=91
+>=20
+> The pseries/s390 bits have gotten some initial review (thanks=20
+> Suraj/Christian),
+> but it can definitely use some additional review on the x86 side of =
+things.
+>=20
+> Also, Peter if think anything extra should to be mentioned on the ARM =
+side=20
+> just
+> let me know what to add.
+>=20
+>  .../2018=E2=80=9102=E2=80=9114=E2=80=91qemu=E2=80=912=E2=80=9111=E2=80=
+=911=E2=80=91and=E2=80=91spectre=E2=80=91update.md   | 180 ++++++++++++++++=
++++++
+>  1 file changed, 180 insertions(+)
+>  create mode 100644 _posts/2018=E2=80=9102=E2=80=9114=E2=80=91qemu=E2=80=
+=912=E2=80=9111=E2=80=911=E2=80=91and=E2=80=91spectre=E2=80=91update.md
+>=20
+> diff =E2=80=91=E2=80=91git a/_posts/2018=E2=80=9102=E2=80=9114=E2=80=91qe=
+mu=E2=80=912=E2=80=9111=E2=80=911=E2=80=91and=E2=80=91spectre=E2=80=91updat=
+e.md=20
+> b/_posts/2018=E2=80=9102=E2=80=9114=E2=80=91qemu=E2=80=912=E2=80=9111=E2=
+=80=911=E2=80=91and=E2=80=91spectre=E2=80=91update.md
+> new file mode 100644
+> index 0000000..7cdea59
+> =E2=80=91=E2=80=91=E2=80=91 /dev/null
+> +++ b/_posts/2018=E2=80=9102=E2=80=9114=E2=80=91qemu=E2=80=912=E2=80=9111=
+=E2=80=911=E2=80=91and=E2=80=91spectre=E2=80=91update.md
+> @@ =E2=80=910,0 +1,180 @@
+> +=E2=80=91=E2=80=91=E2=80=91
+> +layout: post
+> +title:  "QEMU 2.11.1 and making use of Spectre/Meltdown mitigation for =
+KVM=20
+> guests"
+> +date: 2018=E2=80=9102=E2=80=9114 10:35:44 =E2=80=910600
+> +author: Michael Roth
+> +categories: [meltdown, spectre, security, x86, ppc, s390, releases, =
+'qemu=20
+> 2.11']
+> +=E2=80=91=E2=80=91=E2=80=91
+> +
+> +In a [previous post](https://www.qemu.org/2018/01/04/spectre/) it was
+> +detailed how QEMU/KVM might be affected by Spectre/Meltdown attacks, =
+and=20
+> what
+> +the plan was to mitigate them in QEMU 2.11.1 (and eventually QEMU =
+2.12).
+> +
+> +QEMU 2.11.1 is now available, and contains the aforementioned mitigation=
+s=20
+> for
+> +x86 guests, along with additional mitigation functionality for pseries =
+and
+> +s390 guests (ARM guests do not currently require additional QEMU =
+patches).
+> +However, enabling this functionality requires additional configuration=
+=20
+> beyond
+> +just updating QEMU, which we hope to address with this post.
+> +
+> +Please note that, as mentioned in the previous blog post, QEMU/KVM=20
+> generally
+> +has the same requirements as other unpriviledged processes running on =
+the
+> +host WRT Spectre/Meltdown mitigation. What is being addressed here is
+> +enabling a guest operating system to enable the same (or similar)=20
+> mitigations
+> +to protect itself from unpriviledged guest processes. Thus, the
+> +patches/requirements listed here are specific to that goal and should =
+not=20
+> be
+> +regarded as the full set of requirements to enable mitigations on the =
+host
+> +side (though in some cases there is some overlap between the two WRT=20
+> required
+> +patches/etc).
+> +
+> +Also please note that this is a best=E2=80=91effort from the QEMU/KVM =
+community, and
+> +these mitigations rely on a mix of additional kernel/firmware/microcode
+> +updates that are in some cases not available publically, or may not yet =
+be
+> +implemented in some distros, so users are highly encouraged to consult =
+with
+> +their respective vendors/distros to confirm whether all the required
+> +components are in place. We do our best to highlight the requirements =
+here,
+> +but this may not be an exhaustive list.
+> +
+> +
+> +## enabling mitigations for x86 KVM guests
+> +
+> +For x86 guests there are 2 additional CPU flags associated with
+> +Spectre/Meltdown mitigation
+: **spec=E2=80=91ctrl**, and **ibpb**. These flags
+> +expose additional functionality made available through new microcode
+> +updates for certain Intel/AMD processors that can be used to mitigate
+> +various attack vectors related to Spectre. (Meltdown mitigation via =
+KPTI
+> +does not require additional CPU functionality or microcode, and does =
+not
+> +require an updated QEMU, only the related guest/host kernel patches).
+> +
+> +These CPU flags:
+> +
+> +* spec=E2=80=91ctrl: exposes Indirect Branch Restricted Speculation =
+(IBRS)
+> +* ibpb: exposes Indirect Branch Prediction Barriers
+> +
+> +are both features requiring guest/host kernel updates, as well as
+> +microcode updates for Intel and recent AMD processors. The status of
+> +these kernel patches upstream is still in flux, but most supported
+> +distros have some form of the patches that is sufficient to make use
+> +of the features. The current status/availability of microcode updates
+> +depends on your CPU architecture/model. Please check with your
+> +vendor/distro to confirm these prerequisites are available/installed.
+> +
+> +Generally, for Intel CPUs with updated microcode, **spec=E2=80=91ctrl** =
+will
+> +enable both IBRS and IBPB functionality. For AMD EPYC processors,
+> +**ibpb** can be used to enable IBPB specifically, and is thought to
+> +be sufficient by itself that particular architecture.
 
-Yes, slim chance, but I agree. :)
+be sufficient by itself for that particular architecture
 
-I wasn't that strict on this, but I should.  Since we are at it, maybe
-I'll also...
+> +
+> +These flags can be set in a similar manner as other CPU flags, i.e.:
+> +
+> +    qemu=E2=80=91system=E2=80=91x86_64 =E2=80=91cpu qemu64,+spec=E2=80=
+=91ctrl,... ...
+> +    qemu=E2=80=91system=E2=80=91x86_64 =E2=80=91cpu IvyBridge,+spec=E2=
+=80=91ctrl,... ...
+> +    qemu=E2=80=91system=E2=80=91x86_64 =E2=80=91cpu EPYC,+ibpb
+> +    etc...
 
-> 
-> Dave
-> 
-> > +    /*
-> > +     * Note that this call will never start a real migration; it will
-> > +     * only re-setup the migration stream and poke existing migration
-> > +     * to continue using that newly established channel.
-> > +     */
-> > +    qemu_start_incoming_migration(uri, errp);
-> > +}
-> > +
-> >  bool migration_is_blocked(Error **errp)
-> >  {
-> >      if (qemu_savevm_state_blocked(errp)) {
-> > diff --git a/migration/migration.h b/migration/migration.h
-> > index 88f5614b90..581bf4668b 100644
-> > --- a/migration/migration.h
-> > +++ b/migration/migration.h
-> > @@ -65,6 +65,7 @@ struct MigrationIncomingState {
-> >      QemuSemaphore colo_incoming_sem;
-> >  
-> >      /* notify PAUSED postcopy incoming migrations to try to continue */
-> > +    bool postcopy_recover_triggered;
-> >      QemuSemaphore postcopy_pause_sem_dst;
-> >      QemuSemaphore postcopy_pause_sem_fault;
-> >  };
-> > diff --git a/migration/savevm.c b/migration/savevm.c
-> > index d40092a2b6..5f41b062ba 100644
-> > --- a/migration/savevm.c
-> > +++ b/migration/savevm.c
-> > @@ -2182,6 +2182,9 @@ static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-> >      /* Notify the fault thread for the invalidated file handle */
-> >      postcopy_fault_thread_notify(mis);
-> >  
-> > +    /* Clear the triggered bit to allow one recovery */
-> > +    mis->postcopy_recover_triggered = false;
-> > +
+kind of a nit, but might as well be consistent here, as in:
+qemu-system-x86_64 -cpu EPYC,+ibpb,... ...
 
-... move this set operation above migrate_set_state() since there can
-also be a slim chance too that we may be handling migrate-recover even
-before setting up postcopy_recover_triggered=false first.
 
-Thanks,
+Thanks for putting this together!
 
--- 
-Peter Xu
+Bruce
