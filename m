@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1em3zj-0002IP-P0
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:36 -0500
+	(envelope-from <mreitz@redhat.com>) id 1em3zk-0002KO-Pg
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1em3zi-0001uf-VR
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1em3zj-0001wS-UF
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:36 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 14 Feb 2018 21:49:14 +0100
-Message-Id: <20180214204915.7980-3-mreitz@redhat.com>
-In-Reply-To: <20180214204915.7980-1-mreitz@redhat.com>
-References: <20180214204915.7980-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] block/ssh: Make ssh_grow_file() blocking
+Date: Wed, 14 Feb 2018 21:49:12 +0100
+Message-Id: <20180214204915.7980-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] block/ssh: Add basic .bdrv_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,46 +20,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-At runtime (that is, during a future ssh_truncate()), the SSH session is
-non-blocking.  However, ssh_truncate() (or rather, bdrv_truncate() in
-general) is not a coroutine, so this resize operation needs to block.
+For (x-)blockdev-create, all protocol drivers that support image
+creation also need to offer a .bdrv_truncate() implementation that
+matches in features.  A previous series of mine brought gluster's and
+sheepdog's implementation up to par regarding preallocated truncation;
+but I forgot about drivers that have a .bdrv_create() but no
+.bdrv_truncate() at all.
 
-For ssh_create(), that is fine, too; the session is never set to
-non-blocking anyway.
+There is only one of these, and that is ssh.  Since libssh2 does not
+seem to know any way of truncating files, we can only support growing
+files -- but that is what we need for (x-)blockdev-create.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/ssh.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Note that there are also drivers which do not support growing files,
+namely iscsi and file-posix for host devices (maybe more?  I hope not).
+But these also pretty much ignore the specified size on .bdrv_create()
+and just use the size of the existing device.  They just check that the
+specified size does not exceed the actual size, so that pretty much
+matches what their .bdrv_truncate() supports, and we should be fine
+there.
 
-diff --git a/block/ssh.c b/block/ssh.c
-index 964e55f7fe..ff8576f21e 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -803,17 +803,24 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
-     return ret;
- }
- 
-+/* Note: This is a blocking operation */
- static int ssh_grow_file(BDRVSSHState *s, int64_t offset, Error **errp)
- {
-     ssize_t ret;
-     char c[1] = { '\0' };
-+    int was_blocking = libssh2_session_get_blocking(s->session);
- 
-     /* offset must be strictly greater than the current size so we do
-      * not overwrite anything */
-     assert(offset > 0 && offset > s->attrs.filesize);
- 
-+    libssh2_session_set_blocking(s->session, 1);
-+
-     libssh2_sftp_seek64(s->sftp_handle, offset - 1);
-     ret = libssh2_sftp_write(s->sftp_handle, c, 1);
-+
-+    libssh2_session_set_blocking(s->session, was_blocking);
-+
-     if (ret < 0) {
-         sftp_error_setg(errp, s, "Failed to grow file");
-         return -EIO;
+
+Max Reitz (3):
+  block/ssh: Pull ssh_grow_file() from ssh_create()
+  block/ssh: Make ssh_grow_file() blocking
+  block/ssh: Add basic .bdrv_truncate()
+
+ block/ssh.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 53 insertions(+), 8 deletions(-)
+
 -- 
 2.14.3
