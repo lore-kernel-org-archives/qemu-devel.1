@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1els8A-0008Uk-Fi
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:09:32 -0500
+	(envelope-from <bounces@canonical.com>) id 1elsiB-0003Fe-GQ
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1els83-00058W-UF
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:09:28 -0500
-Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:33322)
+	(envelope-from <bounces@canonical.com>) id 1elsi7-0003mG-Jc
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1els83-00058A-MU
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:09:23 -0500
-Received: by mail-io0-x232.google.com with SMTP id n7so24283296iob.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 00:09:23 -0800 (PST)
-References: <20180209075503.16996-1-aik@ozlabs.ru>
-	<20180209075503.16996-3-aik@ozlabs.ru>
-	<20180212051954.GE11634@umbus.fritz.box>
-	<0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
-	<20180212090653.42bdd2e2@w520.home>
-	<0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
-	<20180213053630.GL11634@umbus.fritz.box>
-	<20180213054124.GN11634@umbus.fritz.box>
-	<8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
-	<20180214013323.GA5247@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
-Date: Wed, 14 Feb 2018 19:09:16 +1100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1elsi7-0003m1-Dj
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1elsi6-0000FM-Bn
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:46:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 54ED42E80CB
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:46:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180214013323.GA5247@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO"
-Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
- for MMIO regions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Feb 2018 08:27:47 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+Reply-To: Bug 1254786 <1254786@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131125163240.27695.53246.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151859686768.13602.2664042976631411702.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1254786] Re: qemu-m68k-static: illegal
+ instruction ebc0 during debootstrap second stage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,217 +37,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-Message-ID: <843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
-Subject: Re: [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors for MMIO
- regions
-References: <20180209075503.16996-1-aik@ozlabs.ru>
- <20180209075503.16996-3-aik@ozlabs.ru>
- <20180212051954.GE11634@umbus.fritz.box>
- <0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
- <20180212090653.42bdd2e2@w520.home>
- <0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
- <20180213053630.GL11634@umbus.fritz.box>
- <20180213054124.GN11634@umbus.fritz.box>
- <8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
- <20180214013323.GA5247@umbus.fritz.box>
-In-Reply-To: <20180214013323.GA5247@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+0xebc0 is "bfexts" with register and is implemented since:
 
-On 14/02/18 12:33, David Gibson wrote:
-> On Tue, Feb 13, 2018 at 07:20:56PM +1100, Alexey Kardashevskiy wrote:
->> On 13/02/18 16:41, David Gibson wrote:
->>> On Tue, Feb 13, 2018 at 04:36:30PM +1100, David Gibson wrote:
->>>> On Tue, Feb 13, 2018 at 12:15:52PM +1100, Alexey Kardashevskiy wrote=
-:
->>>>> On 13/02/18 03:06, Alex Williamson wrote:
->>>>>> On Mon, 12 Feb 2018 18:05:54 +1100
->>>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>>>>>
->>>>>>> On 12/02/18 16:19, David Gibson wrote:
->>>>>>>> On Fri, Feb 09, 2018 at 06:55:01PM +1100, Alexey Kardashevskiy w=
-rote: =20
->>>>>>>>> At the moment if vfio_memory_listener is registered in the syst=
-em memory
->>>>>>>>> address space, it maps/unmaps every RAM memory region for DMA.
->>>>>>>>> It expects system page size aligned memory sections so vfio_dma=
-_map
->>>>>>>>> would not fail and so far this has been the case. A mapping fai=
-lure
->>>>>>>>> would be fatal. A side effect of such behavior is that some MMI=
-O pages
->>>>>>>>> would not be mapped silently.
->>>>>>>>>
->>>>>>>>> However we are going to change MSIX BAR handling so we will end=
- having
->>>>>>>>> non-aligned sections in vfio_memory_listener (more details is i=
-n
->>>>>>>>> the next patch) and vfio_dma_map will exit QEMU.
->>>>>>>>>
->>>>>>>>> In order to avoid fatal failures on what previously was not a f=
-ailure and
->>>>>>>>> was just silently ignored, this checks the section alignment to=
+    ac815f46a3 target-m68k: Implement bitfield ops for registers
 
->>>>>>>>> the smallest supported IOMMU page size and prints an error if n=
-ot aligned;
->>>>>>>>> it also prints an error if vfio_dma_map failed despite the page=
- size check.
->>>>>>>>> Both errors are not fatal; only MMIO RAM regions are checked
->>>>>>>>> (aka "RAM device" regions).
->>>>>>>>>
->>>>>>>>> If the amount of errors printed is overwhelming, the MSIX reloc=
-ation
->>>>>>>>> could be used to avoid excessive error output.
->>>>>>>>>
->>>>>>>>> This is unlikely to cause any behavioral change.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru> =20
->>>>>>>>
->>>>>>>> There are some relatively superficial problems noted below.
->>>>>>>>
->>>>>>>> But more fundamentally, this feels like it's extending an existi=
-ng
->>>>>>>> hack past the point of usefulness.
->>>>>>>>
->>>>>>>> The explicit check for is_ram_device() here has always bothered =
-me -
->>>>>>>> it's not like a real bus bridge magically knows whether a target=
+Available since qemu v2.9.0
 
->>>>>>>> address maps to RAM or not.
->>>>>>>>
->>>>>>>> What I think is really going on is that even for systems without=
- an
->>>>>>>> IOMMU, it's not really true to say that the PCI address space ma=
-ps
->>>>>>>> directly onto address_space_memory.  Instead, there's a large, b=
-ut
->>>>>>>> much less than 2^64 sized, "upstream window" at address 0 on the=
- PCI
->>>>>>>> bus, which is identity mapped to the system bus.  Details will v=
-ary
->>>>>>>> with the system, but in practice we expect nothing but RAM to be=
- in
->>>>>>>> that window.  Addresses not within that window won't be mapped t=
-o the
->>>>>>>> system bus but will just be broadcast on the PCI bus and might b=
-e
->>>>>>>> picked up as a p2p transaction. =20
->>>>>>>
->>>>>>> Currently this p2p works only via the IOMMU, direct p2p is not po=
-ssible as
->>>>>>> the guest needs to know physical MMIO addresses to make p2p work =
-and it
->>>>>>> does not.
->>>>>>
->>>>>> /me points to the Direct Translated P2P section of the ACS spec, t=
-hough
->>>>>> it's as prone to spoofing by the device as ATS.  In any case, p2p
->>>>>> reflected from the IOMMU is still p2p and offloads the CPU even if=
+-- =
 
->>>>>> bandwidth suffers vs bare metal depending on if the data doubles b=
-ack
->>>>>> over any links.  Thanks,
->>>>>
->>>>> Sure, I was just saying that p2p via IOMMU won't be as simple as br=
-oadcast
->>>>> on the PCI bus, IOMMU needs to be programmed in advance to make thi=
-s work,
->>>>> and current that broadcast won't work for the passed through device=
-s.
->>>>
->>>> Well, sure, p2p in a guest with passthrough devices clearly needs to=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1254786
 
->>>> be translated through the IOMMU (and p2p from a passthrough to an
->>>> emulated device is essentially impossible).
->>>>
->>>> But.. what does that have to do with this code.  This is the memory
->>>> area watcher, looking for memory regions being mapped directly into
->>>> the PCI space.  NOT IOMMU regions, since those are handled separatel=
-y
->>>> by wiring up the IOMMU notifier.  This will only trigger if RAM-like=
-,
->>>> non-RAM regions are put into PCI space *not* behind an IOMMMU.
->>>
->>> Duh, sorry, realised I was mixing up host and guest IOMMU.  I guess
->>> the point here is that this will map RAM-like devices into the host
->>> IOMMU when there is no guest IOMMU, allowing p2p transactions between=
+Title:
+  qemu-m68k-static: illegal instruction ebc0 during debootstrap second
+  stage
 
->>> passthrough devices (though not from passthrough to emulated devices)=
-=2E
->>
->> Correct.
->>
->>>
->>> The conditions still seem kind of awkward to me, but I guess it makes=
+Status in QEMU:
+  Incomplete
+Status in qemu-linaro package in Ubuntu:
+  New
 
->>> sense.
->>
->> Is it the time to split this listener to RAM-listener and PCI bus list=
-ener?
->=20
-> I'm not really sure what you mean by that.
->=20
->> On x86 it listens on the "memory" AS, on spapr - on the
->> "pci@800000020000000" AS, this will just create more confusion over ti=
-me...
->=20
-> Hm, it's still logically the same AS in each case - the PCI address
-> space.  It's just that in the x86 case that happens to be the same as
-> the memory AS (at least when there isn't a guest side IOMMU).
+Bug description:
+  Host: Ubuntu Precise amd64
+  Guest: Debian (ports) sid m68k
 
-Hm. Ok.
+  $ sudo qemu-debootstrap --no-check-gpg --arch=3Dm68k sid m68k http://ftp.=
+debian-ports.org/debian
+  I: Running command: debootstrap --arch m68k --foreign --no-check-gpg sid =
+m68k http://ftp.debian-ports.org/debian
+  [...]
+  I: Running command: chroot m68k /debootstrap/debootstrap --second-stage
+  qemu: fatal: Illegal instruction: ebc0 @ f67e5662
+  D0 =3D 6ffffef5   A0 =3D f67fbf58   F0 =3D 0000000000000000 (           0)
+  D1 =3D 0000010a   A1 =3D 00000000   F1 =3D 0000000000000000 (           0)
+  D2 =3D 0000000f   A2 =3D 00000000   F2 =3D 0000000000000000 (           0)
+  D3 =3D 00000000   A3 =3D f67e0000   F3 =3D 0000000000000000 (           0)
+  D4 =3D 00000000   A4 =3D 00000000   F4 =3D 0000000000000000 (           0)
+  D5 =3D 00000000   A5 =3D f67fc000   F5 =3D 0000000000000000 (           0)
+  D6 =3D 00000000   A6 =3D f6fff7cc   F6 =3D 0000000000000000 (           0)
+  D7 =3D 00000000   A7 =3D f6fff580   F7 =3D 0000000000000000 (           0)
+  PC =3D f67e5662   SR =3D 0000 ----- FPRESULT =3D            0
+  Aborted (core dumped)
 
-> I do wonder if that's really right even for x86 without IOMMU.  The
-> PCI address space is identity mapped to the "main" memory address
-> space there, but I'm not sure it's mapped th *all* of the main memory
+  ProblemType: Bug
+  DistroRelease: Ubuntu 12.04
+  Package: qemu-user-static 1.0.50-2012.03-0ubuntu2.1
+  ProcVersionSignature: Ubuntu 3.8.0-33.48~precise1-generic 3.8.13.11
+  Uname: Linux 3.8.0-33-generic x86_64
+  NonfreeKernelModules: wl
+  ApportVersion: 2.0.1-0ubuntu17.6
+  Architecture: amd64
+  Date: Mon Nov 25 16:08:26 2013
+  Dependencies:
+   =
 
-What should have been in the place of "th" above? :)
+  InstallationMedia: Ubuntu 12.04.3 LTS "Precise Pangolin" - Release amd64 =
+(20130820.1)
+  MarkForUpload: True
+  ProcEnviron:
+   LANGUAGE=3Den_GB:en
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   LANG=3Den_GB.UTF-8
+   SHELL=3D/bin/bash
+  SourcePackage: qemu-linaro
+  UpgradeStatus: No upgrade log present (probably fresh install)
 
-> address space, probably just certain ranges of it.  That's what I was
-> suggesting earlier in the thread.
-
-afaict vfio is trying to mmap every RAM MR =3D=3D KVM memory slot, no ran=
-ges or
-anything like that. I am trying to figure out what is not correct with th=
-e
-patch. Thanks,
-
-
-
---=20
-Alexey
-
-
---o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlqD7qwOHGFpa0Bvemxh
-YnMucnUACgkQhhM92CvBILkFag//avpDIoa5QvrdaDTgOKAhJhS56P8UfZTuZy+/
-D1R3E3uphIJctRWoC6w53HYzIJtkLKU3R33lALnwYeaF+bDHhqPLp7hS276IXCJX
-0L6chA2PzALZsOizVvl987Vnse/vD0wBRlWpTH0PSp6stHhE6JMmA9aDnRzc7ecT
-IqK/5peabz3mzIDtSH5t1k3OnAaYf295rqENFpspWjpsIkzzf34qwTFo67hp3JlM
-xaiAOAWe5Ug8VtfPnLJ6GW1tlzZttPMNNvYD2nonOl2AzVIVeT/q+E0NnqX0wkNc
-VXgmbOGpoYnmZNQNmiWAbsrpYlP9y9PeO2s4+tWCCgXD9BgLlzY1COF6UrwLWGNn
-FLZ+5eYoFC9bqkP9eCHWe0yghCxzTyKHT7+sOhy8VHQX/o+DBUpFz1KkcDqi8Fa4
-q71AgLupnMuGZYYWT12f3y/qqQiY8szTxhlc1W3qqozKCNY5zVCYDgf1R769ZLLO
-xPhRRWvOvwB7FWci9mGQyYFu+hltjmAb1047ocMHzAJh/4hcOR352QxE1FJhU8q2
-mfoSG+kJ3VAwAnVDOaW+Ab8eIA0qlAjZ4NF85ShF8x2Y2TX5i02yX0nhp0kaugST
-gekvJlz5fAQxsV7Vh16svTXhp0fsSMbWobikDhxFe/sHqso2F4LbUb5awqeXmGaC
-x77abhE=
-=w2hm
------END PGP SIGNATURE-----
-
---o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1254786/+subscriptions
