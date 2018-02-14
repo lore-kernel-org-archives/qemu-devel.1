@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1em1zQ-00038Q-7p
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:41:09 -0500
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1em25S-0005Qd-Fw
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:47:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1em1zN-0004mp-0O
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:41:08 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45958 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1em1zM-0004mj-RI
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:41:04 -0500
-Date: Wed, 14 Feb 2018 18:40:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180214184045.GE2507@work-vm>
-References: <20180208103132.28452-1-peterx@redhat.com>
-	<20180208103132.28452-22-peterx@redhat.com>
-	<20180213181750.GQ2378@work-vm> <20180214042000.GF4472@xz-mi>
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1em25Q-00073p-Uh
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:47:22 -0500
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:41204)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anatoly.trosinenko@gmail.com>)
+	id 1em25Q-00073S-Nj
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:47:20 -0500
+Received: by mail-oi0-x232.google.com with SMTP id l71so1852482oig.8
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:47:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180214042000.GF4472@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v6 21/28] migration: setup ramstate for
- resume
+In-Reply-To: <20180205133228.25082-1-anatoly.trosinenko@gmail.com>
+References: <20180205133228.25082-1-anatoly.trosinenko@gmail.com>
+From: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Date: Wed, 14 Feb 2018 21:47:19 +0300
+Message-ID: <CAE5jQCewU3WcjA=CKA_33tSJzvV5Ov_ATNi17soCUHSH6fPAGg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] sdl: restore optimized redraw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Tue, Feb 13, 2018 at 06:17:51PM +0000, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > After we updated the dirty bitmaps of ramblocks, we also need to update
-> > > the critical fields in RAMState to make sure it is ready for a resume.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  migration/ram.c        | 40 +++++++++++++++++++++++++++++++++++++++-
-> > >  migration/trace-events |  1 +
-> > >  2 files changed, 40 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index a2a4b05d5c..d275875f54 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -2250,6 +2250,36 @@ static int ram_init_all(RAMState **rsp)
-> > >      return 0;
-> > >  }
-> > >  
-> > > +static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
-> > > +{
-> > > +    RAMBlock *block;
-> > > +    long pages = 0;
-> > > +
-> > > +    /*
-> > > +     * Postcopy is not using xbzrle/compression, so no need for that.
-> > > +     * Also, since source are already halted, we don't need to care
-> > > +     * about dirty page logging as well.
-> > > +     */
-> > > +
-> > > +    RAMBLOCK_FOREACH(block) {
-> > > +        pages += bitmap_count_one(block->bmap,
-> > > +                                  block->used_length >> TARGET_PAGE_BITS);
-> > > +    }
-> > > +
-> > > +    /* This may not be aligned with current bitmaps. Recalculate. */
-> > > +    rs->migration_dirty_pages = pages;
-> > 
-> > migration_dirty_pages is uint64_t - so we should probably do the cast
-> > above and keep 'pages' as uint64_t.
-> 
-> Sure.
-> 
-> > 
-> > > +    rs->last_seen_block = NULL;
-> > > +    rs->last_sent_block = NULL;
-> > > +    rs->last_page = 0;
-> > > +    rs->last_version = ram_list.version;
-> > 
-> > Do you need to explicitly set
-> >        rs->ram_bulk_stage = false;
-> > 
-> > if the failure happened just after the start of postcopy and no
-> > requested pages had been sent, I think it might still  be set?
-> 
-> Could you elaborate what would go wrong even if it's still set?
+Ping.
+Patchwork link: http://patchwork.ozlabs.org/patch/869283/
 
-I think it might start sending all pages rather than just those
-that are dirty/needed;  see migration_bitmap_find_dirty.
+2018-02-05 16:32 GMT+03:00 Anatoly Trosinenko <anatoly.trosinenko@gmail.com=
+>
+:
 
-Dave
+> The documentation on SDL_RenderPresent function states that
+> "the backbuffer should be considered invalidated after each present",
+> so copy the entire texture on each redraw.
+>
+> On the other hand, SDL_UpdateTexture function is described as
+> "fairly slow function", so restrict it to just the changed pixels.
+>
+> Also added SDL_RenderClear call, as suggested in the documentation
+> page on SDL_RenderPresent.
+>
+> Signed-off-by: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+> ---
+> I managed to reproduce some flicker when using SDL 2D UI (and #if 1)
+> and it disappeared after this patch. I don't know the original
+> testcase, though. Hope I correctly calculated the offset. :)
+>
+> Meanwhile, is it correct to calculate surface_data_offset before assert,
+> is everything always initialized enough at this point even if assert fail=
+s?
+>
+>  ui/sdl2-2d.c | 23 +++++++----------------
+>  1 file changed, 7 insertions(+), 16 deletions(-)
+>
+> diff --git a/ui/sdl2-2d.c b/ui/sdl2-2d.c
+> index 8ab68d67b9..1f34817bae 100644
+> --- a/ui/sdl2-2d.c
+> +++ b/ui/sdl2-2d.c
+> @@ -36,6 +36,8 @@ void sdl2_2d_update(DisplayChangeListener *dcl,
+>      struct sdl2_console *scon =3D container_of(dcl, struct sdl2_console,
+> dcl);
+>      DisplaySurface *surf =3D qemu_console_surface(dcl->con);
+>      SDL_Rect rect;
+> +    size_t surface_data_offset =3D surface_bytes_per_pixel(surf) * x +
+> +                                 surface_stride(surf) * y;
+>
+>      assert(!scon->opengl);
+>
+> @@ -46,27 +48,16 @@ void sdl2_2d_update(DisplayChangeListener *dcl,
+>          return;
+>      }
+>
+> -    /*
+> -     * SDL2 seems to do some double-buffering, and trying to only
+> -     * update the changed areas results in only one of the two buffers
+> -     * being updated.  Which flickers alot.  So lets not try to be
+> -     * clever do a full update every time ...
+> -     */
+> -#if 0
+>      rect.x =3D x;
+>      rect.y =3D y;
+>      rect.w =3D w;
+>      rect.h =3D h;
+> -#else
+> -    rect.x =3D 0;
+> -    rect.y =3D 0;
+> -    rect.w =3D surface_width(surf);
+> -    rect.h =3D surface_height(surf);
+> -#endif
+> -
+> -    SDL_UpdateTexture(scon->texture, NULL, surface_data(surf),
+> +
+> +    SDL_UpdateTexture(scon->texture, &rect,
+> +                      surface_data(surf) + surface_data_offset,
+>                        surface_stride(surf));
+> -    SDL_RenderCopy(scon->real_renderer, scon->texture, &rect, &rect);
+> +    SDL_RenderClear(scon->real_renderer);
+> +    SDL_RenderCopy(scon->real_renderer, scon->texture, NULL, NULL);
+>      SDL_RenderPresent(scon->real_renderer);
+>  }
+>
+> --
+> 2.14.1
+>
+>
 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--=20
+=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+=D0=90=D0=BD=D0=B0=D1=82=D0=BE=D0=BB=D0=B8=D0=B9 =D0=A2=D1=80=D0=BE=D1=81=
+=D0=B8=D0=BD=D0=B5=D0=BD=D0=BA=D0=BE
+e-mail: anatoly.trosinenko@gmail.com
