@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7T-0006Rw-5q
+	(envelope-from <thuth@redhat.com>) id 1elv7T-0006Rx-6D
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7R-0007Ck-TO
+	(envelope-from <thuth@redhat.com>) id 1elv7Q-0007CH-Ts
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34532 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34528 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7R-0007CU-Py
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:57 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7Q-0007C5-OW
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:56 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 14 Feb 2018 12:20:28 +0100
-Message-Id: <1518607234-17739-13-git-send-email-thuth@redhat.com>
+Date: Wed, 14 Feb 2018 12:20:27 +0100
+Message-Id: <1518607234-17739-12-git-send-email-thuth@redhat.com>
 In-Reply-To: <1518607234-17739-1-git-send-email-thuth@redhat.com>
 References: <1518607234-17739-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 12/18] tests/boot-serial: Enable the boot-serial
- test on SPARC machines, too
+Subject: [Qemu-devel] [PULL 11/18] wdt_ib700-test: Drop dependence on
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +26,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-OpenBIOS prints out the name of the detected CPU here, so looking for
-this string is a nice test to verify that the CPU detection is still
-working correctly.
+From: Eric Blake <eblake@redhat.com>
 
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+As a general rule, we prefer avoiding implicit global state
+because it makes code harder to safely copy and paste without
+thinking about the global state.  Improve this test to be
+explicit about the state.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include   | 2 ++
- tests/boot-serial-test.c | 4 ++++
- 2 files changed, 6 insertions(+)
+ tests/wdt_ib700-test.c | 63 +++++++++++++++++++++++++++-----------------------
+ 1 file changed, 34 insertions(+), 29 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 278c13a..8b304ea 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -353,11 +353,13 @@ check-qtest-sh4eb-y = tests/endianness-test$(EXESUF)
- check-qtest-sparc-y = tests/prom-env-test$(EXESUF)
- #check-qtest-sparc-y += tests/m48t59-test$(EXESUF)
- #gcov-files-sparc-y = hw/timer/m48t59.c
-+check-qtest-sparc-y += tests/boot-serial-test$(EXESUF)
+diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
+index d777f32..3b5bbcf 100644
+--- a/tests/wdt_ib700-test.c
++++ b/tests/wdt_ib700-test.c
+@@ -12,9 +12,9 @@
+ #include "qapi/qmp/qdict.h"
+ #include "qemu/timer.h"
  
- check-qtest-sparc64-y = tests/endianness-test$(EXESUF)
- #check-qtest-sparc64-y += tests/m48t59-test$(EXESUF)
- #gcov-files-sparc64-y += hw/timer/m48t59.c
- check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
-+check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
+-static void qmp_check_no_event(void)
++static void qmp_check_no_event(QTestState *s)
+ {
+-    QDict *resp = qmp("{'execute':'query-status'}");
++    QDict *resp = qtest_qmp(s, "{'execute':'query-status'}");
+     g_assert(qdict_haskey(resp, "return"));
+     QDECREF(resp);
+ }
+@@ -23,30 +23,30 @@ static QDict *ib700_program_and_wait(QTestState *s)
+ {
+     QDict *event, *data;
  
- check-qtest-arm-y = tests/tmp105-test$(EXESUF)
- check-qtest-arm-y += tests/ds1338-test$(EXESUF)
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index ea87a80..996d3d7 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -78,6 +78,10 @@ static testdef_t tests[] = {
-     { "i386", "q35", "-device sga", "SGABIOS" },
-     { "x86_64", "isapc", "-cpu qemu32 -device sga", "SGABIOS" },
-     { "x86_64", "q35", "-device sga", "SGABIOS" },
-+    { "sparc", "LX", "", "TMS390S10" },
-+    { "sparc", "SS-4", "", "MB86904" },
-+    { "sparc", "SS-600MP", "", "TMS390Z55" },
-+    { "sparc64", "sun4u", "", "UltraSPARC" },
-     { "s390x", "s390-ccw-virtio",
-       "-nodefaults -device sclpconsole,chardev=serial0", "virtio device" },
-     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
+-    clock_step(NANOSECONDS_PER_SECOND * 40);
+-    qmp_check_no_event();
++    qtest_clock_step(s, NANOSECONDS_PER_SECOND * 40);
++    qmp_check_no_event(s);
+ 
+     /* 2 second limit */
+-    outb(0x443, 14);
++    qtest_outb(s, 0x443, 14);
+ 
+     /* Ping */
+-    clock_step(NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
+-    outb(0x443, 14);
++    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
++    qtest_outb(s, 0x443, 14);
+ 
+     /* Disable */
+-    clock_step(NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
+-    outb(0x441, 1);
+-    clock_step(3 * NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
++    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
++    qtest_outb(s, 0x441, 1);
++    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
+ 
+     /* Enable and let it fire */
+-    outb(0x443, 13);
+-    clock_step(3 * NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
+-    clock_step(2 * NANOSECONDS_PER_SECOND);
+-    event = qmp_eventwait_ref("WATCHDOG");
++    qtest_outb(s, 0x443, 13);
++    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
++    qtest_clock_step(s, 2 * NANOSECONDS_PER_SECOND);
++    event = qtest_qmp_eventwait_ref(s, "WATCHDOG");
+     data = qdict_get_qdict(event, "data");
+     QINCREF(data);
+     QDECREF(event);
+@@ -57,48 +57,53 @@ static QDict *ib700_program_and_wait(QTestState *s)
+ static void ib700_pause(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action pause -device ib700");
++    QTestState *s = qtest_init("-watchdog-action pause -device ib700");
++
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "pause"));
+     QDECREF(d);
+-    qmp_eventwait("STOP");
+-    qtest_end();
++    qtest_qmp_eventwait(s, "STOP");
++    qtest_quit(s);
+ }
+ 
+ static void ib700_reset(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action reset -device ib700");
++    QTestState *s = qtest_init("-watchdog-action reset -device ib700");
++
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
+     QDECREF(d);
+-    qmp_eventwait("RESET");
+-    qtest_end();
++    qtest_qmp_eventwait(s, "RESET");
++    qtest_quit(s);
+ }
+ 
+ static void ib700_shutdown(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action reset -no-reboot -device ib700");
++    QTestState *s;
++
++    s = qtest_init("-watchdog-action reset -no-reboot -device ib700");
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
+     QDECREF(d);
+-    qmp_eventwait("SHUTDOWN");
+-    qtest_end();
++    qtest_qmp_eventwait(s, "SHUTDOWN");
++    qtest_quit(s);
+ }
+ 
+ static void ib700_none(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action none -device ib700");
++    QTestState *s = qtest_init("-watchdog-action none -device ib700");
++
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "none"));
+     QDECREF(d);
+-    qtest_end();
++    qtest_quit(s);
+ }
+ 
+ int main(int argc, char **argv)
 -- 
 1.8.3.1
