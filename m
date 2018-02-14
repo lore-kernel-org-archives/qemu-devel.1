@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50781)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1em4Lh-0008WB-CD
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 16:12:18 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51061)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1em4ME-0000US-5Y
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 16:12:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1em4Lg-0000Hd-IM
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 16:12:17 -0500
-References: <20180214204915.7980-1-mreitz@redhat.com>
-	<20180214204915.7980-4-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6f446d3c-0df1-d979-337d-f6b7ca0974d3@redhat.com>
-Date: Wed, 14 Feb 2018 15:12:11 -0600
+	(envelope-from <pl@kamp.de>) id 1em4MB-0000U4-Dy
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 16:12:50 -0500
+Received: from mx01.kamp.de ([82.141.2.16]:45684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1em4MB-0000T5-3y
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 16:12:47 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 22:12:40 +0100
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<1513866427-27125-11-git-send-email-mst@redhat.com>
+	<800aef3f-56c1-b896-1c93-24e2a523833d@kamp.de>
+	<20180214001809-mutt-send-email-mst@kernel.org>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <b2f3cfb7-a5f3-a4ca-018a-1fdbec4e6e6d@kamp.de>
+Date: Wed, 14 Feb 2018 22:12:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180214204915.7980-4-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20180214001809-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] block/ssh: Add basic .bdrv_truncate()
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-stable] [PULL 10/25] virtio_error: don't
+ invoke status callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ilya Maximets <i.maximets@samsung.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On 02/14/2018 02:49 PM, Max Reitz wrote:
-> libssh2 does not seem to offer real truncation support, so we can only
-> grow files -- but that is better than nothing.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   block/ssh.c | 24 ++++++++++++++++++++++++
->   1 file changed, 24 insertions(+)
-> 
+Am 13.02.2018 um 23:23 schrieb Michael S. Tsirkin:
+> On Tue, Feb 13, 2018 at 09:53:58PM +0100, Peter Lieven wrote:
+>> Am 21.12.2017 um 15:29 schrieb Michael S. Tsirkin:
+>>> Backends don't need to know what frontend requested a reset,
+>>> and notifying then from virtio_error is messy because
+>>> virtio_error itself might be invoked from backend.
+>>>
+>>> Let's just set the status directly.
+>>>
+>>> Cc: qemu-stable@nongnu.org
+>>> Reported-by: Ilya Maximets <i.maximets@samsung.com>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>  hw/virtio/virtio.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>>> index ad564b0..d6002ee 100644
+>>> --- a/hw/virtio/virtio.c
+>>> +++ b/hw/virtio/virtio.c
+>>> @@ -2469,7 +2469,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+>>>      va_end(ap);
+>>>  
+>>>      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+>>> -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+>>> +        vdev->status = vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET;
+>>>          virtio_notify_config(vdev);
+>>>      }
+>>>  
+>>
+>> Is it possible that this patch introduces a stall in I/O and a deadlock on a drain all?
+>>
+>> I have seen Qemu VMs being I/O stalled and deadlocking on a vm stop command in
+>>
+>> blk_drain_all. This happened after a longer storage outage.
+>>
+>>
+>> I am asking just theoretically because I have seen this behaviour first when we
+>>
+>> backported this patch in our stable 2.9 branch.
+>>
+>>
+>> Thank you,
+>>
+>> Peter
+> Well - this patch was introduced to fix a crash, but
+> a well behaved VM should not trigger VIRTIO_CONFIG_S_NEEDS_RESET -
+> did you see any error messages in the log when this triggered?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+You mean in the guest or on the host? On the host I have seen nothing.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I actually did not know the reasoning behing this patch. I was just searching for an explaination
+for the strange I/O stalls that I have seen.
+
+And it was not only one guest but a few hundreds. So I think I have to search for another cause.
+
+Thank you,
+Peter
