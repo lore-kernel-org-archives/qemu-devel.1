@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elsiB-0003Fe-GQ
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:44 -0500
+	(envelope-from <berrange@redhat.com>) id 1elsiE-0003HC-6f
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elsi7-0003mG-Jc
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1elsi7-0003m1-Dj
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1elsi6-0000FM-Bn
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:46:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 54ED42E80CB
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:46:38 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1elsiA-0003n9-3V
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:46 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48826 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1elsi9-0003mq-Ta
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:46:42 -0500
+Date: Wed, 14 Feb 2018 08:46:28 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180214084628.GC13644@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <embe7de3dd-331d-44fe-9c32-75916c902fb6@ndc-wkst-2>
+	<20180213162857.GV573@redhat.com>
+	<7a31ffe6-03a2-8add-3d24-399651cd856f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7a31ffe6-03a2-8add-3d24-399651cd856f@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Feb 2018 08:27:47 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-Reply-To: Bug 1254786 <1254786@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131125163240.27695.53246.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151859686768.13602.2664042976631411702.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1254786] Re: qemu-m68k-static: illegal
- instruction ebc0 during debootstrap second stage
+Subject: Re: [Qemu-devel] QEMU leaves pidfile behind on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Shaun Reitan <shaun.reitan@ndchost.com>, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-0xebc0 is "bfexts" with register and is implemented since:
+On Tue, Feb 13, 2018 at 08:35:23PM +0100, Laszlo Ersek wrote:
+> On 02/13/18 17:28, Daniel P. Berrang=C3=A9 wrote:
+> > On Fri, Feb 09, 2018 at 07:12:59PM +0000, Shaun Reitan wrote:
+> >> QEMU leaves the pidfile behind on a clean exit when using the option
+> >> -pidfile /var/run/qemu.pid.
+> >>
+> >> Should QEMU leave it behind or should it clean up after itself?
+> >>
+> >> I'm willing to take a crack at a patch to fix the issue, but before =
+I do, I
+> >> want to make sure that leaving the pidfile behind was not intentiona=
+l?
+> >=20
+> > If QEMU deletes the pidfile on exit then, with the current pidfile
+> > acquisition logic, there's a race condition possible:
+> >=20
+> > To acquire we do
+> >=20
+> >  1. fd =3D open()
+> >  2. lockf(fd)
+> >=20
+> > If the first QEMU that currently owns the pidfile unlinks in, while
+> > a second qemu is in betweeen steps 1 & 2, the second QEMU will
+> > acquire the pidfile successfully (which is fine) but the pidfile
+> > is now unlinked. This is not fine, because a 3rd qemu can now come
+> > and try to acquire the pidfile (by creating a new one) and succeed,
+> > despite the second qemu still owning the (now unlinked) pidfile.
+> >=20
+> > It is possible to deal with this race by making qemu_create_pidfile
+> > more intelligent [1]. It would have todo
+> >=20
+> >   1. fd =3D open(filename)
+> >   2. fstat(fd)
+> >   3. lockf(fd)
+> >   4. stat(filename)
+> >=20
+> > It must then compare the results of 2 + 4 to ensure the pidfile it
+> > acquired is the same as the one on disk. With this change, it would
+> > be safe for QEMU to delete the pidfile on exit.
+>=20
+> Why don't we just open the pidfile with (O_CREAT | O_EXCL)? O_EXCL is
+> supposed to be atomic.
 
-    ac815f46a3 target-m68k: Implement bitfield ops for registers
+O_EXCL isn't a good idea because if QEMU crashes without cleaning up
+you have a stale pidfile and O_EXCL will turn that into a failure to
+acquire pidfile. The key point of using lockf() is to ensure we can
+cope reliably with stale pidfiles
 
-Available since qemu v2.9.0
+>=20
+> ... The open(2) manual on Linux says,
+>=20
+>               On  NFS,  O_EXCL  is  supported only when using NFSv3 or
+>               later on kernel 2.6 or later.  In NFS environments where
+>               O_EXCL support is not provided, programs that rely on it
+>               for performing locking tasks will contain a race  condi-
+>               tion.   [...]
+>=20
+> Sigh.
+>=20
+> > [1] See the equiv libvirt logic for pidfile acquisition in
+> >      https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dblob;f=3Dsrc/util/v=
+irpidfile.c;h=3D58ab29f77f2cfb8583447112dae77a07446bc627;hb=3DHEAD#l384
+> >=20
+>=20
+> To my knowledge, "same file" should be checked with:
+>=20
+>   a.st_dev =3D=3D b.st_dev && a.st_ino =3D=3D b.st_ino
+>=20
+> Example:
+> - "filename" is "/var/run/qemu.pid"
+> - "/var/run" is originally a symbolic link to "/mnt/fs1/"
+> - between steps #1 and #4, "/var/run" is re-created as a symbolic link
+>   to "/mnt/fs2/" -- a different filesystem from fs1
+> - "/mnt/fs2/qemu.pid" happens to have the same inode number as
+>   "/mnt/fs1/qemu.pid"
 
--- =
+I don't really think we need to worry about the admin changing symlinks
+like this while QEMU is in middle of acquiring the PID.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1254786
-
-Title:
-  qemu-m68k-static: illegal instruction ebc0 during debootstrap second
-  stage
-
-Status in QEMU:
-  Incomplete
-Status in qemu-linaro package in Ubuntu:
-  New
-
-Bug description:
-  Host: Ubuntu Precise amd64
-  Guest: Debian (ports) sid m68k
-
-  $ sudo qemu-debootstrap --no-check-gpg --arch=3Dm68k sid m68k http://ftp.=
-debian-ports.org/debian
-  I: Running command: debootstrap --arch m68k --foreign --no-check-gpg sid =
-m68k http://ftp.debian-ports.org/debian
-  [...]
-  I: Running command: chroot m68k /debootstrap/debootstrap --second-stage
-  qemu: fatal: Illegal instruction: ebc0 @ f67e5662
-  D0 =3D 6ffffef5   A0 =3D f67fbf58   F0 =3D 0000000000000000 (           0)
-  D1 =3D 0000010a   A1 =3D 00000000   F1 =3D 0000000000000000 (           0)
-  D2 =3D 0000000f   A2 =3D 00000000   F2 =3D 0000000000000000 (           0)
-  D3 =3D 00000000   A3 =3D f67e0000   F3 =3D 0000000000000000 (           0)
-  D4 =3D 00000000   A4 =3D 00000000   F4 =3D 0000000000000000 (           0)
-  D5 =3D 00000000   A5 =3D f67fc000   F5 =3D 0000000000000000 (           0)
-  D6 =3D 00000000   A6 =3D f6fff7cc   F6 =3D 0000000000000000 (           0)
-  D7 =3D 00000000   A7 =3D f6fff580   F7 =3D 0000000000000000 (           0)
-  PC =3D f67e5662   SR =3D 0000 ----- FPRESULT =3D            0
-  Aborted (core dumped)
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 12.04
-  Package: qemu-user-static 1.0.50-2012.03-0ubuntu2.1
-  ProcVersionSignature: Ubuntu 3.8.0-33.48~precise1-generic 3.8.13.11
-  Uname: Linux 3.8.0-33-generic x86_64
-  NonfreeKernelModules: wl
-  ApportVersion: 2.0.1-0ubuntu17.6
-  Architecture: amd64
-  Date: Mon Nov 25 16:08:26 2013
-  Dependencies:
-   =
-
-  InstallationMedia: Ubuntu 12.04.3 LTS "Precise Pangolin" - Release amd64 =
-(20130820.1)
-  MarkForUpload: True
-  ProcEnviron:
-   LANGUAGE=3Den_GB:en
-   TERM=3Dxterm
-   PATH=3D(custom, no user)
-   LANG=3Den_GB.UTF-8
-   SHELL=3D/bin/bash
-  SourcePackage: qemu-linaro
-  UpgradeStatus: No upgrade log present (probably fresh install)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1254786/+subscriptions
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
