@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7X-0006Xj-W5
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:21:07 -0500
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1elvT2-0002AY-VK
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:43:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7X-0007GE-3Q
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:21:03 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38372 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7W-0007G7-VH
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:21:03 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 14 Feb 2018 12:20:33 +0100
-Message-Id: <1518607234-17739-18-git-send-email-thuth@redhat.com>
-In-Reply-To: <1518607234-17739-1-git-send-email-thuth@redhat.com>
-References: <1518607234-17739-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 17/18] tests/Makefile: Derive
- check-qtest-ppc64-y from check-qtest-ppc-y
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1elvT1-0004yh-Mt
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:43:17 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:45958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1elvT1-0004xp-Aq
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:43:15 -0500
+Received: by mail-lf0-x243.google.com with SMTP id x196so28997708lfd.12
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 03:43:15 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <4f4fd107-e836-ad27-0778-aa13c9f93b23@redhat.com>
+References: <1518598187-27169-1-git-send-email-whois.zihan.yang@gmail.com>
+	<4f4fd107-e836-ad27-0778-aa13c9f93b23@redhat.com>
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Wed, 14 Feb 2018 19:43:13 +0800
+Message-ID: <CAKwiv-gm39NU0Y5sWaWHoKq6_LBo2FR1RopXLSoi0tC_Ray71w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] RAMList: replace QemuMutex with
+ CompatGMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-ppc64 is a superset of ppc, so the ppc64 tests should include all
-the ppc tests.
+> I'm not sure what is the advantage of this change.  QEMU is more or less
+> uniformly using QemuMutex and QemuCond.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+I see. QEMU uses some glib functions, like g_new, g_free, g_hash_table ,
+g_assert and g_poll, so I thought there was a trend for making more use of
+glib.
+I get the point now.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c27a9a5..95ce99e 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -320,15 +320,12 @@ check-qtest-ppc-y += tests/prom-env-test$(EXESUF)
- check-qtest-ppc-y += tests/drive_del-test$(EXESUF)
- check-qtest-ppc-y += tests/boot-serial-test$(EXESUF)
- 
--check-qtest-ppc64-y = tests/spapr-phb-test$(EXESUF)
--gcov-files-ppc64-y = ppc64-softmmu/hw/ppc/spapr_pci.c
--check-qtest-ppc64-y += tests/endianness-test$(EXESUF)
--check-qtest-ppc64-y += tests/boot-order-test$(EXESUF)
--check-qtest-ppc64-y += tests/prom-env-test$(EXESUF)
-+check-qtest-ppc64-y = $(check-qtest-ppc-y)
-+gcov-files-ppc64-y = $(subst ppc-softmmu/,ppc64-softmmu/,$(gcov-files-ppc-y))
-+check-qtest-ppc64-y += tests/spapr-phb-test$(EXESUF)
-+gcov-files-ppc64-y += ppc64-softmmu/hw/ppc/spapr_pci.c
- check-qtest-ppc64-y += tests/pnv-xscom-test$(EXESUF)
--check-qtest-ppc64-y += tests/drive_del-test$(EXESUF)
- check-qtest-ppc64-y += tests/migration-test$(EXESUF)
--check-qtest-ppc64-y += tests/boot-serial-test$(EXESUF)
- check-qtest-ppc64-y += tests/rtas-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- check-qtest-ppc64-y += tests/usb-hcd-ohci-test$(EXESUF)
--- 
-1.8.3.1
+
+2018-02-14 18:13 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
+
+> On 14/02/2018 09:49, Zihan Yang wrote:
+> > change the mutex member in RAMList structure from QemuMutex to
+> CompatGMutex.
+> > qemu_mutex_init() is just deleted instead of being replaced with
+> g_mutex_init()
+> > because there is no need to do initialize a mutex that is statically
+> allocated.
+> >
+> > Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+>
+> I'm not sure what is the advantage of this change.  QEMU is more or less
+> uniformly using QemuMutex and QemuCond.
+>
+> Paolo
+>
+> > ---
+> >  exec.c                 | 5 ++---
+> >  include/exec/ramlist.h | 2 +-
+> >  2 files changed, 3 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/exec.c b/exec.c
+> > index e8d7b33..90cdd05 100644
+> > --- a/exec.c
+> > +++ b/exec.c
+> > @@ -1423,12 +1423,12 @@ void qemu_flush_coalesced_mmio_buffer(void)
+> >
+> >  void qemu_mutex_lock_ramlist(void)
+> >  {
+> > -    qemu_mutex_lock(&ram_list.mutex);
+> > +    g_mutex_lock(&ram_list.mutex);
+> >  }
+> >
+> >  void qemu_mutex_unlock_ramlist(void)
+> >  {
+> > -    qemu_mutex_unlock(&ram_list.mutex);
+> > +    g_mutex_unlock(&ram_list.mutex);
+> >  }
+> >
+> >  void ram_block_dump(Monitor *mon)
+> > @@ -3331,7 +3331,6 @@ void cpu_register_map_client(QEMUBH *bh)
+> >
+> >  void cpu_exec_init_all(void)
+> >  {
+> > -    qemu_mutex_init(&ram_list.mutex);
+> >      /* The data structures we set up here depend on knowing the page
+> size,
+> >       * so no more changes can be made after this point.
+> >       * In an ideal world, nothing we did before we had finished the
+> > diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
+> > index 2e2ac6c..24be5e4 100644
+> > --- a/include/exec/ramlist.h
+> > +++ b/include/exec/ramlist.h
+> > @@ -45,7 +45,7 @@ typedef struct {
+> >  } DirtyMemoryBlocks;
+> >
+> >  typedef struct RAMList {
+> > -    QemuMutex mutex;
+> > +    CompatGMutex mutex;
+> >      RAMBlock *mru_block;
+> >      /* RCU-enabled, writes protected by the ramlist lock. */
+> >      QLIST_HEAD(, RAMBlock) blocks;
+> >
+>
+>
