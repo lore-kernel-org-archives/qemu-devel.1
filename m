@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eltcG-0003Lg-Lh
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:44:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1eltd8-0003vk-H0
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eltcC-0001E1-Oh
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:44:40 -0500
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:36159)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eltcC-0001Dk-Gc
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:44:36 -0500
-Received: from player157.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 5BF9511BD3B
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:44:34 +0100 (CET)
-Date: Wed, 14 Feb 2018 10:44:31 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180214104431.294a5280@bahia.lan>
-In-Reply-To: <20180207155500.GO2665@work-vm>
-References: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
-	<20180207155500.GO2665@work-vm>
+	(envelope-from <bounces@canonical.com>) id 1eltd4-0001Yc-KZ
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:34 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57222)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eltd4-0001Y3-Dy
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:30 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eltd3-0003pU-8U
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 09:45:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2958E2E8435
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 09:45:29 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: improve documentation of
- postcopy-ram
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Feb 2018 09:31:42 -0000
+From: Thomas Huth <1254786@bugs.launchpad.net>
+Reply-To: Bug 1254786 <1254786@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131125163240.27695.53246.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151860070387.16822.7483090803004065536.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1254786] Re: qemu-m68k-static: illegal
+ instruction ebc0 during debootstrap second stage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, 7 Feb 2018 15:55:01 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-> * Greg Kurz (groug@kaod.org) wrote:
-> > This capability must have the same value on both source and destination,
-> > otherwise migration fails (commit 875fcd013ab6 "migration: incoming
-> > postcopy advise sanity checks").
-> > 
-> > Let's write it down in various places where postcopy-ram is documented.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>  
-> 
-> Thanks,
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
+-- =
 
-Who should pick this up ?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1254786
 
-> > ---
-> >  docs/devel/migration.rst |    4 ++--
-> >  hmp-commands.hx          |    3 ++-
-> >  qapi/migration.json      |   10 ++++++----
-> >  3 files changed, 10 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-> > index bf97080dac2f..9d1b7657f0cf 100644
-> > --- a/docs/devel/migration.rst
-> > +++ b/docs/devel/migration.rst
-> > @@ -387,8 +387,8 @@ doesn't finish in a given time the switch is made to postcopy.
-> >  Enabling postcopy
-> >  -----------------
-> >  
-> > -To enable postcopy, issue this command on the monitor prior to the
-> > -start of migration:
-> > +To enable postcopy, issue this command on the monitor (both source and
-> > +destination) prior to the start of migration:
-> >  
-> >  ``migrate_set_capability postcopy-ram on``
-> >  
-> > diff --git a/hmp-commands.hx b/hmp-commands.hx
-> > index 15620c94d3fc..d26eb4119b9d 100644
-> > --- a/hmp-commands.hx
-> > +++ b/hmp-commands.hx
-> > @@ -1041,7 +1041,8 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "Followup to a migration command to switch the migration"
-> >                        " to postcopy mode. The postcopy-ram capability must "
-> > -                      "be set before the original migration command.",
-> > +                      "be set on both source and destination before the "
-> > +                      "original migration command .",
-> >          .cmd        = hmp_migrate_start_postcopy,
-> >      },
-> >  
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index 4cd3d1315884..7f465a1902ce 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -327,8 +327,10 @@
-> >  #          to speed up convergence of RAM migration. (since 1.6)
-> >  #
-> >  # @postcopy-ram: Start executing on the migration target before all of RAM has
-> > -#          been migrated, pulling the remaining pages along as needed. NOTE: If
-> > -#          the migration fails during postcopy the VM will fail.  (since 2.6)
-> > +#          been migrated, pulling the remaining pages along as needed. The
-> > +#          capacity must have the same setting on both source and target
-> > +#          or migration will not even start. NOTE: If the migration fails during
-> > +#          postcopy the VM will fail.  (since 2.6)
-> >  #
-> >  # @x-colo: If enabled, migration will never end, and the state of the VM on the
-> >  #        primary side will be migrated continuously to the VM on secondary
-> > @@ -742,8 +744,8 @@
-> >  # @migrate-start-postcopy:
-> >  #
-> >  # Followup to a migration command to switch the migration to postcopy mode.
-> > -# The postcopy-ram capability must be set before the original migration
-> > -# command.
-> > +# The postcopy-ram capability must be set on both source and destination
-> > +# before the original migration command.
-> >  #
-> >  # Since: 2.5
-> >  #
-> >   
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+Title:
+  qemu-m68k-static: illegal instruction ebc0 during debootstrap second
+  stage
+
+Status in QEMU:
+  Fix Released
+Status in qemu-linaro package in Ubuntu:
+  New
+
+Bug description:
+  Host: Ubuntu Precise amd64
+  Guest: Debian (ports) sid m68k
+
+  $ sudo qemu-debootstrap --no-check-gpg --arch=3Dm68k sid m68k http://ftp.=
+debian-ports.org/debian
+  I: Running command: debootstrap --arch m68k --foreign --no-check-gpg sid =
+m68k http://ftp.debian-ports.org/debian
+  [...]
+  I: Running command: chroot m68k /debootstrap/debootstrap --second-stage
+  qemu: fatal: Illegal instruction: ebc0 @ f67e5662
+  D0 =3D 6ffffef5   A0 =3D f67fbf58   F0 =3D 0000000000000000 (           0)
+  D1 =3D 0000010a   A1 =3D 00000000   F1 =3D 0000000000000000 (           0)
+  D2 =3D 0000000f   A2 =3D 00000000   F2 =3D 0000000000000000 (           0)
+  D3 =3D 00000000   A3 =3D f67e0000   F3 =3D 0000000000000000 (           0)
+  D4 =3D 00000000   A4 =3D 00000000   F4 =3D 0000000000000000 (           0)
+  D5 =3D 00000000   A5 =3D f67fc000   F5 =3D 0000000000000000 (           0)
+  D6 =3D 00000000   A6 =3D f6fff7cc   F6 =3D 0000000000000000 (           0)
+  D7 =3D 00000000   A7 =3D f6fff580   F7 =3D 0000000000000000 (           0)
+  PC =3D f67e5662   SR =3D 0000 ----- FPRESULT =3D            0
+  Aborted (core dumped)
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 12.04
+  Package: qemu-user-static 1.0.50-2012.03-0ubuntu2.1
+  ProcVersionSignature: Ubuntu 3.8.0-33.48~precise1-generic 3.8.13.11
+  Uname: Linux 3.8.0-33-generic x86_64
+  NonfreeKernelModules: wl
+  ApportVersion: 2.0.1-0ubuntu17.6
+  Architecture: amd64
+  Date: Mon Nov 25 16:08:26 2013
+  Dependencies:
+   =
+
+  InstallationMedia: Ubuntu 12.04.3 LTS "Precise Pangolin" - Release amd64 =
+(20130820.1)
+  MarkForUpload: True
+  ProcEnviron:
+   LANGUAGE=3Den_GB:en
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   LANG=3Den_GB.UTF-8
+   SHELL=3D/bin/bash
+  SourcePackage: qemu-linaro
+  UpgradeStatus: No upgrade log present (probably fresh install)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1254786/+subscriptions
