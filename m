@@ -1,43 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1elyQO-00085h-Mk
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:52:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1elyT0-0001zR-IN
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:55:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1elyQL-000087-ST
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:52:44 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52552
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1elyQL-00006e-O8
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:52:41 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1EEn57D003599
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 09:52:39 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g4m8tgstq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 09:52:38 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Wed, 14 Feb 2018 07:52:38 -0700
-References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
-	<0c40e592-32e7-315e-fbad-1969c90b9b01@redhat.com>
-	<60be1af6-ab00-5425-1cac-edb722dfcc1a@linux.vnet.ibm.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Wed, 14 Feb 2018 09:51:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1elySz-0001TP-9L
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:55:26 -0500
+Date: Wed, 14 Feb 2018 15:55:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180214145500.GE4766@localhost.localdomain>
+References: <20180213202701.15858-1-eblake@redhat.com>
+	<20180213202701.15858-10-eblake@redhat.com>
+	<20180214120525.GB4766@localhost.localdomain>
+	<a2842a3d-158b-14a1-fdd8-679cd919c655@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <60be1af6-ab00-5425-1cac-edb722dfcc1a@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <5d52424e-c6ee-2c0a-a8ee-14f01bc25747@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 05/12] s390-ccw: move
- auxiliary IPL data to separate location
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a2842a3d-158b-14a1-fdd8-679cd919c655@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 09/21] null: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,41 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 02/06/2018 05:13 AM, Viktor Mihajlovski wrote:
-> On 06.02.2018 10:23, Thomas Huth wrote:
->> On 05.02.2018 21:57, Collin L. Walling wrote:
->> [...]
->>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
->>> index e857ce4..825a1a3 100644
->>> --- a/pc-bios/s390-ccw/main.c
->>> +++ b/pc-bios/s390-ccw/main.c
->>> @@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned_=
-_(PAGE_SIZE)));
->>>   static SubChannelId blk_schid =3D { .one =3D 1 };
->>>   IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
->>>   static char loadparm[8] =3D { 0, 0, 0, 0, 0, 0, 0, 0 };
->>> +QemuIplParameters qipl;
->>>  =20
->>>   /*
->>>    * Priniciples of Operations (SA22-7832-09) chapter 17 requires tha=
-t
->>> @@ -81,6 +82,7 @@ static void virtio_setup(void)
->>>       uint16_t dev_no;
->>>       char ldp[] =3D "LOADPARM=3D[________]\n";
->>>       VDev *vdev =3D virtio_get_device();
->>> +    QemuIplParameters *early_qipl =3D (QemuIplParameters *)204;
->> Could you please introduce a proper #define for that magic 204 value
->> (and use it in s390_ipl_prepare_qipl, too)? ... so that it is later
->> easier to grep for this.
->>
-> Hm ... I was following the pattern established in
-> write_subsystem_identification(). Christian, what is your opinion?
+Am 14.02.2018 um 15:44 hat Eric Blake geschrieben:
+> On 02/14/2018 06:05 AM, Kevin Wolf wrote:
+> > Am 13.02.2018 um 21:26 hat Eric Blake geschrieben:
+> > > We are gradually moving away from sector-based interfaces, towards
+> > > byte-based.  Update the null driver accordingly.
+> > > 
+> > > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > > Reviewed-by: Fam Zheng <famz@redhat.com>
+> > > 
+> 
+> > >       if (s->read_zeroes) {
+> > > -        return BDRV_BLOCK_OFFSET_VALID | start | BDRV_BLOCK_ZERO;
+> > > -    } else {
+> > > -        return BDRV_BLOCK_OFFSET_VALID | start;
+> > > +        ret |= BDRV_BLOCK_ZERO;
+> > >       }
+> > > +    return ret;
+> > >   }
+> > 
+> > Preexisting, but I think this return value is wrong. OFFSET_VALID
+> > without DATA is to documented to have the following semantics:
+> > 
+> >   * DATA ZERO OFFSET_VALID
+> >   *  f    t        t       sectors preallocated, read as zero, returned file not
+> >   *                        necessarily zero at offset
+> >   *  f    f        t       sectors preallocated but read from backing_hd,
+> >   *                        returned file contains garbage at offset
+> > 
+> > I'm not sure what OFFSET_VALID is even supposed to mean for null.
+> 
+> Yeah, and I was even thinking about that a bit yesterday when figuring out
+> what to do with nvme.  It does highlight the fact that you get garbage when
+> reading from the null driver (unless the zero option was enabled, then ZERO
+> is set and you know you read zeros instead) - but there no pointer that is
+> preallocated (whether it contains garbage or otherwise) that you can
+> actually dereference to read what the guest would see.
+> 
+> > 
+> > Or in fact, what it is supposed to mean for any protocol driver, because
+> > normally it just means I can use this offset for accessing bs->file. But
+> > protocol drivers don't have a bs->file, so it's interesting to see that
+> > they still all set this flag.
+> > 
+> > OFFSET_VALID | DATA might be excusable because I can see that it's
+> > convenient that a protocol driver refers to itself as *file instead of
+> > returning NULL there and then the offset is valid (though it would be
+> > pointless to actually follow the file pointer), but OFFSET_VALID without
+> > DATA probably isn't.
+> 
+> Hmm, you're probably right.  Maybe that means I should tweak the
+> documentation to be more explicit: for a format driver, OFFSET_VALID can
+> always be used (and *file will be set to the underlying protocol driver);
+> but for a protocol driver, OFFSET_VALID only makes sense if *file is the BDS
+> itself and there is an actual buffer to read (that is, the protocol driver
+> must also be returning DATA and/or ZERO).  Or maybe we can indeed state that
+> protocol drivers always set *file to NULL (there is no further backing file
+> to reference), and thus never need to return OFFSET_VALID (but I'm not sure
+> whether that will accidentally propagate back up the call stack and
+> negatively affect status queries of format drivers).
+> 
+> Since it is pre-existing, should I respin to address the issue in a separate
+> patch, or should that be a followup after this series?
 
-Any updates on this?=C2=A0 Last change I need to make before the next pos=
-t.
+It's a more fundamental question that shouldn't hold up this series. I
+just wanted to raise it while I was looking at it. So yes, a followup is
+fine.
 
---=20
-- Collin L Walling
+Kevin
