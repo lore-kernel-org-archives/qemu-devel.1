@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elzUR-0003eD-2M
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:01:03 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1em2W9-0006a2-IH
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:14:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1elzUM-0008Dk-8o
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:00:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42162)
+	(envelope-from <richard.henderson@linaro.org>) id 1em2W5-0002rx-EA
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:14:57 -0500
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:37899)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1elzUM-0008D9-1l
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:00:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1elzUJ-0004aB-GC
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:00:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 72D382E8075
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:00:51 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1em2W5-0002rn-7E
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:14:53 -0500
+Received: by mail-pg0-x22c.google.com with SMTP id l24so2304222pgc.5
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 11:14:52 -0800 (PST)
+References: <1518053328-34687-1-git-send-email-mjc@sifive.com>
+	<1518053328-34687-10-git-send-email-mjc@sifive.com>
+	<20180213215541.GA1816@flamenco>
+	<731db20e-4d86-e288-504c-30c83b56fd33@linaro.org>
+	<20180214001053.GA23702@flamenco>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c2663cf3-54cc-d4fc-2cc5-151407d81c4b@linaro.org>
+Date: Wed, 14 Feb 2018 11:14:48 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Feb 2018 15:46:36 -0000
-From: =?utf-8?q?G=C3=A9rard_Vidal?= <gerard.f.vidal@gmail.com>
-Reply-To: Bug 1749393 <1749393@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151859702399.9461.6832978283203997178.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151862319674.16822.12889032896764063070.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1749393] Re: sbrk() not working under qemu-user
- with a PIE-compiled binary?
+In-Reply-To: <20180214001053.GA23702@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 09/23] RISC-V TCG Code Generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Michael Clark <mjc@sifive.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-Affected by the same bug.
-target architecture arm
-host architecture amd64
+On 02/13/2018 04:10 PM, Emilio G. Cota wrote:
+> On Tue, Feb 13, 2018 at 14:10:20 -0800, Richard Henderson wrote:
+>> On 02/13/2018 01:55 PM, Emilio G. Cota wrote:
+>>> Are we planning to use BS_STOP in the future? I see it has no setters,
+>>> although we check for it in gen_intermediate_code:
+>>
+>> No, but the whole port should be converted to exec/translator.h, which defines
+>> DisasJumpType.  Not something I'm going to require on initial submission until
+>> we've gotten most of the other targets cleaned up.
+> 
+> I see. I've just done the conversion for v5:
+>   https://github.com/cota/qemu/commits/riscv-v5-trloop
+> 
+> Can you please take a look?
 
-bug message
-bash: xmalloc: .././locale.c:****: cannot allocate 2 bytes (0 bytes allocat=
-ed)
+Looks ok.  Watch your formatting, e.g { } on the same line.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1749393
-
-Title:
-  sbrk() not working under qemu-user with a PIE-compiled binary?
-
-Status in QEMU:
-  New
-
-Bug description:
-  In Debian unstable, we recently switched bash to be a PIE-compiled
-  binary (for hardening). Unfortunately this resulted in bash being
-  broken when run under qemu-user (for all target architectures, host
-  being amd64 for me).
-
-  $ sudo chroot /srv/chroots/sid-i386/ qemu-i386-static /bin/bash
-  bash: xmalloc: .././shell.c:1709: cannot allocate 10 bytes (0 bytes alloc=
-ated)
-
-  bash has its own malloc implementation based on sbrk():
-  https://git.savannah.gnu.org/cgit/bash.git/tree/lib/malloc/malloc.c
-
-  When we disable this internal implementation and rely on glibc's
-  malloc, then everything is fine. But it might be that glibc has a
-  fallback when sbrk() is not working properly and it might hide the
-  underlying problem in qemu-user.
-
-  This issue has also been reported to the bash upstream author and he sugg=
-ested that the issue might be in qemu-user so I'm opening a ticket here. He=
-re's the discussion with the bash upstream author:
-  https://lists.gnu.org/archive/html/bug-bash/2018-02/threads.html#00080
-
-  You can find the problematic bash binary in that .deb file:
-  http://snapshot.debian.org/archive/debian/20180206T154716Z/pool/main/b/ba=
-sh/bash_4.4.18-1_i386.deb
-
-  The version of qemu I have been using is 2.11 (Debian package qemu-
-  user-static version 1:2.11+dfsg-1) but I have had reports that the
-  problem is reproducible with older versions (back to 2.8 at least).
-
-  Here are the related Debian bug reports:
-  https://bugs.debian.org/889869
-  https://bugs.debian.org/865599
-
-  It's worth noting that bash used to have this problem (when compiled as a=
- PIE binary) even when run directly but then something got fixed in the ker=
-nel and now the problem only appears when run under qemu-user:
-  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1518483
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1749393/+subscriptions
+r~
