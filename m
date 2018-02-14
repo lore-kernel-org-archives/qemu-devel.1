@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1em0Lt-0006gW-9z
+	(envelope-from <bounces@canonical.com>) id 1em0Lt-0006gU-9i
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1em0Lq-0006vz-IW
+	(envelope-from <bounces@canonical.com>) id 1em0Lq-0006vp-7R
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:56:13 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59434)
+Received: from indium.canonical.com ([91.189.90.7]:59424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1em0Lq-0006vh-Bd
+	id 1em0Lq-0006vT-1S
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:56:10 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1em0Lp-0006NF-F8
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:56:09 +0000
+	id 1em0Lo-0006NC-Uq
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:56:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 716192E8071
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:56:09 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D925C2E806B
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:56:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Feb 2018 16:39:19 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 589315 <589315@bugs.launchpad.net>
+Date: Wed, 14 Feb 2018 16:39:40 -0000
+From: Thomas Huth <1461918@bugs.launchpad.net>
+Reply-To: Bug 1461918 <1461918@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100603181944.2106.17684.malonedeb@soybean.canonical.com>
-Message-Id: <151862635907.9308.2339015783347033214.malone@chaenomeles.canonical.com>
+References: <20150604121104.9929.24787.malonedeb@wampee.canonical.com>
+Message-Id: <151862638054.8935.7371361161398164395.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 589315] Re: qemu: Improve error reporting when
- migration can't connect
+Subject: [Qemu-devel] [Bug 1461918] Re: guest hangs after use ethtool to set
+ scatter-gather on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,65 +39,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-yep, it's been giving errors now for a while (and not hanging) and also
-recently gained the error text in 'info migrate':
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU and Fedora? Or could we close this ticket
+nowadays?
 
-[dgilbert@dgilbert-t530 ~]$ /usr/bin/qemu-system-x86_64 -nographic
-QEMU 2.10.1 monitor - type 'help' for more information
-(qemu) migrate tcp:0:12345
-qemu-system-x86_64: Failed to connect socket: Connection refused
-(qemu) info migrate
-globals: store-global-state=3D1, only_migratable=3D0, send-configuration=3D=
-1, send-section-footer=3D1
-capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks:=
- off compress: off events: off postcopy-ram: off x-colo: off release-ram: o=
-ff block: off return-path: off =
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Migration status: failed (Failed to connect socket: Connection refused)
-total time: 0 milliseconds
-(qemu) =
-
-
-So marking as fix-release
-
-(Note that there's a bug that causes a crash in the disconnect case on
-current head, but that's only been in for a week or so and I've just
-sent a fix for it).
+** Changed in: qemu
+     Assignee: kifast (kifast) =3D> (unassigned)
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/589315
+https://bugs.launchpad.net/bugs/1461918
 
 Title:
-  qemu: Improve error reporting when migration can't connect
+  guest hangs after use ethtool to set scatter-gather on
 
 Status in QEMU:
-  In Progress
+  Incomplete
 
 Bug description:
-  Tested with upstream qemu as of Jun 3 2010
+  On the guests,  i have a rtl8139 nic,  I use ethtool to set  scatter-gath=
+er on ( ethtool -K eth0 sg on ),
+  after that,   at host side,  I  use scp to send a file into guest.  As a =
+result, guest hang.
+  At that point qemu is using 100% of one host CPU, about 100% guest.
 
-  If the source qemu instance can't connect to the migration destination (s=
-ay
-  there is no listening QEMU instance, or port is blocked by a firewall), a=
-ll we
-  get is info migrate -> Migration status: failed. This is all we have to r=
-eport
-  back to libvirt users if their firewall is misconfigured, which is crappy.
+  If guest is centOS6.5=EF=BC=8C with no problem.
 
-  Ideally, if we can't connect, migration would fail immediately with a rel=
-evant
-  message and strerror(). More info from 'info migrate' would be nice too, =
-no
-  idea how this will play with QMP though.
 
-  As a slightly related issue, try entering
+  The guest system is Fedora release 19(Kernel 3.11.10-200.fc19.x86_64).
 
-  migrate tcp:127.0.0.0:6000
+  host system is debian 7.1.
+  Kernel:3.10.0
+  Qemu: 2.3.0
 
-  We get a 'migration failed' error, and then the monitor hangs!
+  cmd:
+  /boot/qemu-2.3.0-bin/qemu-system-x86_64 -vnc :13 -enable-kvm -name fedora=
+ -smp sockets=3D1,cores=3D2 -cpu core2duo -nodefaults -vga cirrus -k en-us =
+-boot menu=3Don,splash-time=3D8000 -m 2048 -usb -drive file=3D/boot/vm-disk=
+-1.qcow2,if=3Dnone,id=3Ddrive-ide0,cache=3Dnone,aio=3Dnative -device ide-hd=
+,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0,id=3Dide0,bootindex=3D100 -netdev =
+type=3Dtap,id=3Dnet0,ifname=3D200,script=3D/etc/kvm/vtp-bridge -device rtl8=
+139,romfile=3D,mac=3DFE:FC:FE:5C:58:65,netdev=3Dnet0,bus=3Dpci.0,addr=3D0x1=
+2,id=3Dnet0
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/589315/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1461918/+subscriptions
