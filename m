@@ -1,17 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1elqv9-0002Zu-5V
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 01:52:02 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1els8A-0008Uk-Fi
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:09:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1elqv8-0003gN-31
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 01:51:59 -0500
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Wed, 14 Feb 2018 17:51:35 +1100
-Message-Id: <20180214065135.11633-3-sjitindarsingh@gmail.com>
-In-Reply-To: <20180214065135.11633-1-sjitindarsingh@gmail.com>
-References: <20180214065135.11633-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 3/3] ppc/spapr-caps: For
- pseries-2.12 change spapr-cap defaults
+	(envelope-from <aik@ozlabs.ru>) id 1els83-00058W-UF
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:09:28 -0500
+Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:33322)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1els83-00058A-MU
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 03:09:23 -0500
+Received: by mail-io0-x232.google.com with SMTP id n7so24283296iob.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 00:09:23 -0800 (PST)
+References: <20180209075503.16996-1-aik@ozlabs.ru>
+	<20180209075503.16996-3-aik@ozlabs.ru>
+	<20180212051954.GE11634@umbus.fritz.box>
+	<0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
+	<20180212090653.42bdd2e2@w520.home>
+	<0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
+	<20180213053630.GL11634@umbus.fritz.box>
+	<20180213054124.GN11634@umbus.fritz.box>
+	<8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
+	<20180214013323.GA5247@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
+Date: Wed, 14 Feb 2018 19:09:16 +1100
+MIME-Version: 1.0
+In-Reply-To: <20180214013323.GA5247@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO"
+Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
+ for MMIO regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,97 +39,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-For the pseries-2.12 machine type, make the spapr-caps SPAPR_CAP_CFPC
-and SPAPR_CAP_SBBC default to workaround. Thus if the host is capable
-the guest will be able to take advantage of these workarounds by default.
-Otherwise if the host doesn't have these capabilities qemu will fail to
-start and they will have to be explicitly disabled on the command line
-with:
--machine pseries,cap-cfpc=broken,cap-sbbc=broken
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
+Message-ID: <843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
+Subject: Re: [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors for MMIO
+ regions
+References: <20180209075503.16996-1-aik@ozlabs.ru>
+ <20180209075503.16996-3-aik@ozlabs.ru>
+ <20180212051954.GE11634@umbus.fritz.box>
+ <0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
+ <20180212090653.42bdd2e2@w520.home>
+ <0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
+ <20180213053630.GL11634@umbus.fritz.box>
+ <20180213054124.GN11634@umbus.fritz.box>
+ <8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
+ <20180214013323.GA5247@umbus.fritz.box>
+In-Reply-To: <20180214013323.GA5247@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- hw/ppc/spapr.c      | 11 ++++++++++-
- hw/ppc/spapr_caps.c | 10 ++++++++++
- include/hw/compat.h |  2 ++
- 3 files changed, 22 insertions(+), 1 deletion(-)
+On 14/02/18 12:33, David Gibson wrote:
+> On Tue, Feb 13, 2018 at 07:20:56PM +1100, Alexey Kardashevskiy wrote:
+>> On 13/02/18 16:41, David Gibson wrote:
+>>> On Tue, Feb 13, 2018 at 04:36:30PM +1100, David Gibson wrote:
+>>>> On Tue, Feb 13, 2018 at 12:15:52PM +1100, Alexey Kardashevskiy wrote=
+:
+>>>>> On 13/02/18 03:06, Alex Williamson wrote:
+>>>>>> On Mon, 12 Feb 2018 18:05:54 +1100
+>>>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>>>>
+>>>>>>> On 12/02/18 16:19, David Gibson wrote:
+>>>>>>>> On Fri, Feb 09, 2018 at 06:55:01PM +1100, Alexey Kardashevskiy w=
+rote: =20
+>>>>>>>>> At the moment if vfio_memory_listener is registered in the syst=
+em memory
+>>>>>>>>> address space, it maps/unmaps every RAM memory region for DMA.
+>>>>>>>>> It expects system page size aligned memory sections so vfio_dma=
+_map
+>>>>>>>>> would not fail and so far this has been the case. A mapping fai=
+lure
+>>>>>>>>> would be fatal. A side effect of such behavior is that some MMI=
+O pages
+>>>>>>>>> would not be mapped silently.
+>>>>>>>>>
+>>>>>>>>> However we are going to change MSIX BAR handling so we will end=
+ having
+>>>>>>>>> non-aligned sections in vfio_memory_listener (more details is i=
+n
+>>>>>>>>> the next patch) and vfio_dma_map will exit QEMU.
+>>>>>>>>>
+>>>>>>>>> In order to avoid fatal failures on what previously was not a f=
+ailure and
+>>>>>>>>> was just silently ignored, this checks the section alignment to=
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 969db6cde2..e2ebb76242 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3941,13 +3941,20 @@ static const TypeInfo spapr_machine_info = {
- /*
-  * pseries-2.12
-  */
-+#define SPAPR_COMPAT_2_12                                              \
-+    HW_COMPAT_2_12
-+
- static void spapr_machine_2_12_instance_options(MachineState *machine)
- {
- }
- 
- static void spapr_machine_2_12_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class */
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-+
-+    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_WORKAROUND;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_WORKAROUND;
-+    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
- }
- 
- DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
-@@ -3969,6 +3976,8 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
- 
-     spapr_machine_2_12_class_options(mc);
-     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_ON;
-+    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
- }
- 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 05997b0842..c25c2bca52 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -281,11 +281,21 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
- 
-     caps = smc->default_caps;
- 
-+    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
-+                          0, spapr->max_compat_pvr)) {
-+        caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-+    }
-+
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-                           0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-     }
- 
-+    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
-+                          0, spapr->max_compat_pvr)) {
-+        caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-+    }
-+
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-                           0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_OFF;
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 7f31850dfa..13238239da 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -1,6 +1,8 @@
- #ifndef HW_COMPAT_H
- #define HW_COMPAT_H
- 
-+#define HW_COMPAT_2_12
-+
- #define HW_COMPAT_2_11 \
-     {\
-         .driver   = "hpet",\
--- 
-2.13.6
+>>>>>>>>> the smallest supported IOMMU page size and prints an error if n=
+ot aligned;
+>>>>>>>>> it also prints an error if vfio_dma_map failed despite the page=
+ size check.
+>>>>>>>>> Both errors are not fatal; only MMIO RAM regions are checked
+>>>>>>>>> (aka "RAM device" regions).
+>>>>>>>>>
+>>>>>>>>> If the amount of errors printed is overwhelming, the MSIX reloc=
+ation
+>>>>>>>>> could be used to avoid excessive error output.
+>>>>>>>>>
+>>>>>>>>> This is unlikely to cause any behavioral change.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru> =20
+>>>>>>>>
+>>>>>>>> There are some relatively superficial problems noted below.
+>>>>>>>>
+>>>>>>>> But more fundamentally, this feels like it's extending an existi=
+ng
+>>>>>>>> hack past the point of usefulness.
+>>>>>>>>
+>>>>>>>> The explicit check for is_ram_device() here has always bothered =
+me -
+>>>>>>>> it's not like a real bus bridge magically knows whether a target=
+
+>>>>>>>> address maps to RAM or not.
+>>>>>>>>
+>>>>>>>> What I think is really going on is that even for systems without=
+ an
+>>>>>>>> IOMMU, it's not really true to say that the PCI address space ma=
+ps
+>>>>>>>> directly onto address_space_memory.  Instead, there's a large, b=
+ut
+>>>>>>>> much less than 2^64 sized, "upstream window" at address 0 on the=
+ PCI
+>>>>>>>> bus, which is identity mapped to the system bus.  Details will v=
+ary
+>>>>>>>> with the system, but in practice we expect nothing but RAM to be=
+ in
+>>>>>>>> that window.  Addresses not within that window won't be mapped t=
+o the
+>>>>>>>> system bus but will just be broadcast on the PCI bus and might b=
+e
+>>>>>>>> picked up as a p2p transaction. =20
+>>>>>>>
+>>>>>>> Currently this p2p works only via the IOMMU, direct p2p is not po=
+ssible as
+>>>>>>> the guest needs to know physical MMIO addresses to make p2p work =
+and it
+>>>>>>> does not.
+>>>>>>
+>>>>>> /me points to the Direct Translated P2P section of the ACS spec, t=
+hough
+>>>>>> it's as prone to spoofing by the device as ATS.  In any case, p2p
+>>>>>> reflected from the IOMMU is still p2p and offloads the CPU even if=
+
+>>>>>> bandwidth suffers vs bare metal depending on if the data doubles b=
+ack
+>>>>>> over any links.  Thanks,
+>>>>>
+>>>>> Sure, I was just saying that p2p via IOMMU won't be as simple as br=
+oadcast
+>>>>> on the PCI bus, IOMMU needs to be programmed in advance to make thi=
+s work,
+>>>>> and current that broadcast won't work for the passed through device=
+s.
+>>>>
+>>>> Well, sure, p2p in a guest with passthrough devices clearly needs to=
+
+>>>> be translated through the IOMMU (and p2p from a passthrough to an
+>>>> emulated device is essentially impossible).
+>>>>
+>>>> But.. what does that have to do with this code.  This is the memory
+>>>> area watcher, looking for memory regions being mapped directly into
+>>>> the PCI space.  NOT IOMMU regions, since those are handled separatel=
+y
+>>>> by wiring up the IOMMU notifier.  This will only trigger if RAM-like=
+,
+>>>> non-RAM regions are put into PCI space *not* behind an IOMMMU.
+>>>
+>>> Duh, sorry, realised I was mixing up host and guest IOMMU.  I guess
+>>> the point here is that this will map RAM-like devices into the host
+>>> IOMMU when there is no guest IOMMU, allowing p2p transactions between=
+
+>>> passthrough devices (though not from passthrough to emulated devices)=
+=2E
+>>
+>> Correct.
+>>
+>>>
+>>> The conditions still seem kind of awkward to me, but I guess it makes=
+
+>>> sense.
+>>
+>> Is it the time to split this listener to RAM-listener and PCI bus list=
+ener?
+>=20
+> I'm not really sure what you mean by that.
+>=20
+>> On x86 it listens on the "memory" AS, on spapr - on the
+>> "pci@800000020000000" AS, this will just create more confusion over ti=
+me...
+>=20
+> Hm, it's still logically the same AS in each case - the PCI address
+> space.  It's just that in the x86 case that happens to be the same as
+> the memory AS (at least when there isn't a guest side IOMMU).
+
+Hm. Ok.
+
+> I do wonder if that's really right even for x86 without IOMMU.  The
+> PCI address space is identity mapped to the "main" memory address
+> space there, but I'm not sure it's mapped th *all* of the main memory
+
+What should have been in the place of "th" above? :)
+
+> address space, probably just certain ranges of it.  That's what I was
+> suggesting earlier in the thread.
+
+afaict vfio is trying to mmap every RAM MR =3D=3D KVM memory slot, no ran=
+ges or
+anything like that. I am trying to figure out what is not correct with th=
+e
+patch. Thanks,
+
+
+
+--=20
+Alexey
+
+
+--o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlqD7qwOHGFpa0Bvemxh
+YnMucnUACgkQhhM92CvBILkFag//avpDIoa5QvrdaDTgOKAhJhS56P8UfZTuZy+/
+D1R3E3uphIJctRWoC6w53HYzIJtkLKU3R33lALnwYeaF+bDHhqPLp7hS276IXCJX
+0L6chA2PzALZsOizVvl987Vnse/vD0wBRlWpTH0PSp6stHhE6JMmA9aDnRzc7ecT
+IqK/5peabz3mzIDtSH5t1k3OnAaYf295rqENFpspWjpsIkzzf34qwTFo67hp3JlM
+xaiAOAWe5Ug8VtfPnLJ6GW1tlzZttPMNNvYD2nonOl2AzVIVeT/q+E0NnqX0wkNc
+VXgmbOGpoYnmZNQNmiWAbsrpYlP9y9PeO2s4+tWCCgXD9BgLlzY1COF6UrwLWGNn
+FLZ+5eYoFC9bqkP9eCHWe0yghCxzTyKHT7+sOhy8VHQX/o+DBUpFz1KkcDqi8Fa4
+q71AgLupnMuGZYYWT12f3y/qqQiY8szTxhlc1W3qqozKCNY5zVCYDgf1R769ZLLO
+xPhRRWvOvwB7FWci9mGQyYFu+hltjmAb1047ocMHzAJh/4hcOR352QxE1FJhU8q2
+mfoSG+kJ3VAwAnVDOaW+Ab8eIA0qlAjZ4NF85ShF8x2Y2TX5i02yX0nhp0kaugST
+gekvJlz5fAQxsV7Vh16svTXhp0fsSMbWobikDhxFe/sHqso2F4LbUb5awqeXmGaC
+x77abhE=
+=w2hm
+-----END PGP SIGNATURE-----
+
+--o3qBHzkIUBpa61mh8Zivgq5wgtIxYgMGO--
