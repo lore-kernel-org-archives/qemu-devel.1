@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7K-0006Ig-GK
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:51 -0500
+	(envelope-from <thuth@redhat.com>) id 1elv7K-0006Ik-Hm
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7H-00078u-CP
+	(envelope-from <thuth@redhat.com>) id 1elv7I-00079B-Md
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57164 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41970 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7H-00078M-6h
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:47 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7I-000796-H5
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:48 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 14 Feb 2018 12:20:18 +0100
-Message-Id: <1518607234-17739-3-git-send-email-thuth@redhat.com>
+Date: Wed, 14 Feb 2018 12:20:21 +0100
+Message-Id: <1518607234-17739-6-git-send-email-thuth@redhat.com>
 In-Reply-To: <1518607234-17739-1-git-send-email-thuth@redhat.com>
 References: <1518607234-17739-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/18] libqtest: Use qemu_strtoul()
+Subject: [Qemu-devel] [PULL 05/18] libqos: Use explicit QTestState for rtas
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +28,223 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-This will keep checkpatch happy when the next patch does code motion.
-Fix the include order to match HACKING when adding the needed header.
+Drop one more client of global_qtest by teaching all rtas test
+functionality to pass in an explicit QTestState, adjusting all
+callers.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+[thuth: Use nicer indentation in rtas.h]
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/libqtest.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ tests/libqos/pci-spapr.c | 18 ++++++++++++------
+ tests/libqos/rtas.c      | 36 ++++++++++++++++++++----------------
+ tests/libqos/rtas.h      | 12 +++++++-----
+ tests/rtas-test.c        |  2 +-
+ 4 files changed, 40 insertions(+), 28 deletions(-)
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index f2c2853..13c9100 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -15,12 +15,13 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "libqtest.h"
-=20
- #include <sys/socket.h>
- #include <sys/wait.h>
- #include <sys/un.h>
-=20
-+#include "libqtest.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/json-streamer.h"
-@@ -363,12 +364,14 @@ redo:
-     g_string_free(line, TRUE);
-=20
-     if (strcmp(words[0], "IRQ") =3D=3D 0) {
--        int irq;
-+        long irq;
-+        int ret;
-=20
-         g_assert(words[1] !=3D NULL);
-         g_assert(words[2] !=3D NULL);
-=20
--        irq =3D strtoul(words[2], NULL, 0);
-+        ret =3D qemu_strtol(words[2], NULL, 0, &irq);
-+        g_assert(!ret);
-         g_assert_cmpint(irq, >=3D, 0);
-         g_assert_cmpint(irq, <, MAX_IRQ);
-=20
-@@ -730,11 +733,13 @@ void qtest_outl(QTestState *s, uint16_t addr, uint3=
-2_t value)
- static uint32_t qtest_in(QTestState *s, const char *cmd, uint16_t addr)
+diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+index ef52fcb..c0f7e6d 100644
+--- a/tests/libqos/pci-spapr.c
++++ b/tests/libqos/pci-spapr.c
+@@ -108,21 +108,24 @@ static uint8_t qpci_spapr_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
  {
-     gchar **args;
--    uint32_t value;
-+    int ret;
-+    unsigned long value;
-=20
-     qtest_sendf(s, "%s 0x%x\n", cmd, addr);
-     args =3D qtest_rsp(s, 2);
--    value =3D strtoul(args[1], NULL, 0);
-+    ret =3D qemu_strtoul(args[1], NULL, 0, &value);
-+    g_assert(!ret && value <=3D UINT32_MAX);
-     g_strfreev(args);
-=20
-     return value;
-@@ -785,11 +790,13 @@ void qtest_writeq(QTestState *s, uint64_t addr, uin=
-t64_t value)
- static uint64_t qtest_read(QTestState *s, const char *cmd, uint64_t addr=
-)
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 1);
++    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
++                                     config_addr, 1);
+ }
+ 
+ static uint16_t qpci_spapr_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
  {
-     gchar **args;
-+    int ret;
-     uint64_t value;
-=20
-     qtest_sendf(s, "%s 0x%" PRIx64 "\n", cmd, addr);
-     args =3D qtest_rsp(s, 2);
--    value =3D strtoull(args[1], NULL, 0);
-+    ret =3D qemu_strtou64(args[1], NULL, 0, &value);
-+    g_assert(!ret);
-     g_strfreev(args);
-=20
-     return value;
---=20
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 2);
++    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
++                                     config_addr, 2);
+ }
+ 
+ static uint32_t qpci_spapr_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 4);
++    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
++                                     config_addr, 4);
+ }
+ 
+ static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
+@@ -130,7 +133,8 @@ static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 1, value);
++    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
++                               config_addr, 1, value);
+ }
+ 
+ static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
+@@ -138,7 +142,8 @@ static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 2, value);
++    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
++                               config_addr, 2, value);
+ }
+ 
+ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+@@ -146,7 +151,8 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 4, value);
++    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
++                               config_addr, 4, value);
+ }
+ 
+ #define SPAPR_PCI_BASE               (1ULL << 45)
+diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
+index 0269803..d81ff42 100644
+--- a/tests/libqos/rtas.c
++++ b/tests/libqos/rtas.c
+@@ -7,26 +7,28 @@
+ #include "libqtest.h"
+ #include "libqos/rtas.h"
+ 
+-static void qrtas_copy_args(uint64_t target_args, uint32_t nargs,
+-                            uint32_t *args)
++static void qrtas_copy_args(QTestState *qts, uint64_t target_args,
++                            uint32_t nargs, uint32_t *args)
+ {
+     int i;
+ 
+     for (i = 0; i < nargs; i++) {
+-        writel(target_args + i * sizeof(uint32_t), args[i]);
++        qtest_writel(qts, target_args + i * sizeof(uint32_t), args[i]);
+     }
+ }
+ 
+-static void qrtas_copy_ret(uint64_t target_ret, uint32_t nret, uint32_t *ret)
++static void qrtas_copy_ret(QTestState *qts, uint64_t target_ret,
++                           uint32_t nret, uint32_t *ret)
+ {
+     int i;
+ 
+     for (i = 0; i < nret; i++) {
+-        ret[i] = readl(target_ret + i * sizeof(uint32_t));
++        ret[i] = qtest_readl(qts, target_ret + i * sizeof(uint32_t));
+     }
+ }
+ 
+-static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
++static uint64_t qrtas_call(QTestState *qts, QGuestAllocator *alloc,
++                           const char *name,
+                            uint32_t nargs, uint32_t *args,
+                            uint32_t nret, uint32_t *ret)
+ {
+@@ -36,10 +38,9 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
+     target_args = guest_alloc(alloc, nargs * sizeof(uint32_t));
+     target_ret = guest_alloc(alloc, nret * sizeof(uint32_t));
+ 
+-    qrtas_copy_args(target_args, nargs, args);
+-    res = qtest_rtas_call(global_qtest, name,
+-                          nargs, target_args, nret, target_ret);
+-    qrtas_copy_ret(target_ret, nret, ret);
++    qrtas_copy_args(qts, target_args, nargs, args);
++    res = qtest_rtas_call(qts, name, nargs, target_args, nret, target_ret);
++    qrtas_copy_ret(qts, target_ret, nret, ret);
+ 
+     guest_free(alloc, target_ret);
+     guest_free(alloc, target_args);
+@@ -47,12 +48,13 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
+     return res;
+ }
+ 
+-int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
++int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
++                          struct tm *tm, uint32_t *ns)
+ {
+     int res;
+     uint32_t ret[8];
+ 
+-    res = qrtas_call(alloc, "get-time-of-day", 0, NULL, 8, ret);
++    res = qrtas_call(qts, alloc, "get-time-of-day", 0, NULL, 8, ret);
+     if (res != 0) {
+         return res;
+     }
+@@ -70,7 +72,8 @@ int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
+     return res;
+ }
+ 
+-uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
++uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                                   uint64_t buid,
+                                    uint32_t addr, uint32_t size)
+ {
+     int res;
+@@ -80,7 +83,7 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+     args[1] = buid >> 32;
+     args[2] = buid & 0xffffffff;
+     args[3] = size;
+-    res = qrtas_call(alloc, "ibm,read-pci-config", 4, args, 2, ret);
++    res = qrtas_call(qts, alloc, "ibm,read-pci-config", 4, args, 2, ret);
+     if (res != 0) {
+         return -1;
+     }
+@@ -92,7 +95,8 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+     return ret[1];
+ }
+ 
+-int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
++int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                               uint64_t buid,
+                                uint32_t addr, uint32_t size, uint32_t val)
+ {
+     int res;
+@@ -103,7 +107,7 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+     args[2] = buid & 0xffffffff;
+     args[3] = size;
+     args[4] = val;
+-    res = qrtas_call(alloc, "ibm,write-pci-config", 5, args, 1, ret);
++    res = qrtas_call(qts, alloc, "ibm,write-pci-config", 5, args, 1, ret);
+     if (res != 0) {
+         return -1;
+     }
+diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
+index 498eb19..459e23a 100644
+--- a/tests/libqos/rtas.h
++++ b/tests/libqos/rtas.h
+@@ -7,9 +7,11 @@
+ #define LIBQOS_RTAS_H
+ #include "libqos/malloc.h"
+ 
+-int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns);
+-uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+-                                   uint32_t addr, uint32_t size);
+-int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+-                               uint32_t addr, uint32_t size, uint32_t val);
++int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
++                          struct tm *tm, uint32_t *ns);
++uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                                   uint64_t buid, uint32_t addr, uint32_t size);
++int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                               uint64_t buid, uint32_t addr, uint32_t size,
++                               uint32_t val);
+ #endif /* LIBQOS_RTAS_H */
+diff --git a/tests/rtas-test.c b/tests/rtas-test.c
+index 276c87e..34a6921 100644
+--- a/tests/rtas-test.c
++++ b/tests/rtas-test.c
+@@ -16,7 +16,7 @@ static void test_rtas_get_time_of_day(void)
+     qs = qtest_spapr_boot("-machine pseries");
+ 
+     t1 = time(NULL);
+-    ret = qrtas_get_time_of_day(qs->alloc, &tm, &ns);
++    ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
+     g_assert_cmpint(ret, ==, 0);
+     t2 = mktimegm(&tm);
+     g_assert(t2 - t1 < 5); /* 5 sec max to run the test */
+-- 
 1.8.3.1
