@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1eltdO-00046m-Lb
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:56 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eltdl-0004MX-6o
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:46:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1eltdI-0001ef-VG
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:50 -0500
-Received: from mailpro.odiso.net ([89.248.211.110]:56730)
+	(envelope-from <dgilbert@redhat.com>) id 1eltdh-0001vx-9Q
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:46:13 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60772 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1eltdI-0001e6-OJ
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:44 -0500
-Received: from localhost (localhost [127.0.0.1])
-	by mailpro.odiso.net (Postfix) with ESMTP id D28EC1F55D40
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:45:41 +0100 (CET)
-Received: from mailpro.odiso.net ([127.0.0.1])
-	by localhost (mailpro.odiso.net [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id Zl-48MhnOF1i for <qemu-devel@nongnu.org>;
-	Wed, 14 Feb 2018 10:45:41 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by mailpro.odiso.net (Postfix) with ESMTP id B90901F55D42
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:45:41 +0100 (CET)
-Received: from mailpro.odiso.net ([127.0.0.1])
-	by localhost (mailpro.odiso.net [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id kBTA0GXY-AVU for <qemu-devel@nongnu.org>;
-	Wed, 14 Feb 2018 10:45:41 +0100 (CET)
-Received: from mailpro.odiso.net (mailpro.odiso.net [10.1.31.111])
-	by mailpro.odiso.net (Postfix) with ESMTP id A5D921F55D40
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:45:41 +0100 (CET)
-Date: Wed, 14 Feb 2018 10:45:41 +0100 (CET)
-From: Alexandre DERUMIER <aderumier@odiso.com>
-Message-ID: <1564471998.3427173.1518601541505.JavaMail.zimbra@oxygem.tv>
-In-Reply-To: <201297396.3423395.1518598461012.JavaMail.zimbra@oxygem.tv>
-References: <201297396.3423395.1518598461012.JavaMail.zimbra@oxygem.tv>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eltdh-0001vT-34
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:46:09 -0500
+Date: Wed, 14 Feb 2018 09:45:50 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180214094550.GA2507@work-vm>
+References: <151801810352.29167.4832480228518630626.stgit@bahia.lan>
+	<20180207155500.GO2665@work-vm> <20180214104431.294a5280@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] drive-mirroring to nbd is failing with multiple
- parallel jobs (qemu 2.9 -> 2.11)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180214104431.294a5280@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] migration: improve documentation of
+ postcopy-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,68 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-Sorry, I just find that the problem is in our proxmox implementation,
+* Greg Kurz (groug@kaod.org) wrote:
+> On Wed, 7 Feb 2018 15:55:01 +0000
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Greg Kurz (groug@kaod.org) wrote:
+> > > This capability must have the same value on both source and destination,
+> > > otherwise migration fails (commit 875fcd013ab6 "migration: incoming
+> > > postcopy advise sanity checks").
+> > > 
+> > > Let's write it down in various places where postcopy-ram is documented.
+> > > 
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>  
+> > 
+> > Thanks,
+> > 
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > 
+> 
+> Who should pick this up ?
 
-as we use a socat tunnel for the nbd mirroring, with a timeout of 30s in ca=
-se of inactivity.
+I was going to pick it up in a migration pull today.
 
-So, not a qemu bug.
+Dave
 
-Regards,
-
-Alexandre
-
------ Mail original -----
-De: "aderumier" <aderumier@odiso.com>
-=C3=80: "qemu-devel" <qemu-devel@nongnu.org>
-Envoy=C3=A9: Mercredi 14 F=C3=A9vrier 2018 09:54:21
-Objet: [Qemu-devel] drive-mirroring to nbd is failing with multiple paralle=
-l jobs (qemu 2.9 -> 2.11)
-
-Hi,=20
-
-I currently have failing mirroring jobs to nbd, when multiple jobs are runn=
-ing in parallel.=20
-
-
-step to reproduce, with 2 disks:=20
-
-
-1) launch mirroring job of first disk to remote target nbd.(to qemu running=
- target)=20
-2) wait until is reach ready =3D 1 , do not complete=20
-3) launch mirroring job of second disk to remote target nbd(to same qemu ru=
-nning target)=20
-
--> mirroring job of second disk is currently running (ready=3D0), first dis=
-k is still at ready=3D1 and still mirroring new write coming.=20
-
-
-then, after some time, mainly if no new write are coming to first disk (aro=
-und 30-40s), the first job is crashing with input/output error.=20
-
-
-
-Note that I don't have network problem, or disk problem, I'm able to mirror=
- both disk individually.=20
-
-
-Another similar bug report on proxmox bugzilla:=20
-
-https://bugzilla.proxmox.com/show_bug.cgi?id=3D1664=20
-
-
-Maybe related to this :=20
-https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03086.html=20
-?=20
-
-
-I don't remember to have the problem with qemu 2.7, but I'm able to reprodu=
-ce with qemu 2.9 && qemu 2.11.=20
-
-
-Best Regards,=20
-
-Alexandre=20
+> > > ---
+> > >  docs/devel/migration.rst |    4 ++--
+> > >  hmp-commands.hx          |    3 ++-
+> > >  qapi/migration.json      |   10 ++++++----
+> > >  3 files changed, 10 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+> > > index bf97080dac2f..9d1b7657f0cf 100644
+> > > --- a/docs/devel/migration.rst
+> > > +++ b/docs/devel/migration.rst
+> > > @@ -387,8 +387,8 @@ doesn't finish in a given time the switch is made to postcopy.
+> > >  Enabling postcopy
+> > >  -----------------
+> > >  
+> > > -To enable postcopy, issue this command on the monitor prior to the
+> > > -start of migration:
+> > > +To enable postcopy, issue this command on the monitor (both source and
+> > > +destination) prior to the start of migration:
+> > >  
+> > >  ``migrate_set_capability postcopy-ram on``
+> > >  
+> > > diff --git a/hmp-commands.hx b/hmp-commands.hx
+> > > index 15620c94d3fc..d26eb4119b9d 100644
+> > > --- a/hmp-commands.hx
+> > > +++ b/hmp-commands.hx
+> > > @@ -1041,7 +1041,8 @@ ETEXI
+> > >          .params     = "",
+> > >          .help       = "Followup to a migration command to switch the migration"
+> > >                        " to postcopy mode. The postcopy-ram capability must "
+> > > -                      "be set before the original migration command.",
+> > > +                      "be set on both source and destination before the "
+> > > +                      "original migration command .",
+> > >          .cmd        = hmp_migrate_start_postcopy,
+> > >      },
+> > >  
+> > > diff --git a/qapi/migration.json b/qapi/migration.json
+> > > index 4cd3d1315884..7f465a1902ce 100644
+> > > --- a/qapi/migration.json
+> > > +++ b/qapi/migration.json
+> > > @@ -327,8 +327,10 @@
+> > >  #          to speed up convergence of RAM migration. (since 1.6)
+> > >  #
+> > >  # @postcopy-ram: Start executing on the migration target before all of RAM has
+> > > -#          been migrated, pulling the remaining pages along as needed. NOTE: If
+> > > -#          the migration fails during postcopy the VM will fail.  (since 2.6)
+> > > +#          been migrated, pulling the remaining pages along as needed. The
+> > > +#          capacity must have the same setting on both source and target
+> > > +#          or migration will not even start. NOTE: If the migration fails during
+> > > +#          postcopy the VM will fail.  (since 2.6)
+> > >  #
+> > >  # @x-colo: If enabled, migration will never end, and the state of the VM on the
+> > >  #        primary side will be migrated continuously to the VM on secondary
+> > > @@ -742,8 +744,8 @@
+> > >  # @migrate-start-postcopy:
+> > >  #
+> > >  # Followup to a migration command to switch the migration to postcopy mode.
+> > > -# The postcopy-ram capability must be set before the original migration
+> > > -# command.
+> > > +# The postcopy-ram capability must be set on both source and destination
+> > > +# before the original migration command.
+> > >  #
+> > >  # Since: 2.5
+> > >  #
+> > >   
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
