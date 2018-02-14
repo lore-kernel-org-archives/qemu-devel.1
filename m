@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1em5aX-00068l-6P
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 17:31:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1em5ax-0006Pr-MI
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 17:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1em5aW-0003Qm-7L
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 17:31:41 -0500
-Message-ID: <1518647487.2430.1.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu, 15 Feb 2018 09:31:27 +1100
-In-Reply-To: <20180214152039.24ca0cf2@bahia.lan>
-References: <20180214065135.11633-1-sjitindarsingh@gmail.com>
-	<20180214065135.11633-3-sjitindarsingh@gmail.com>
-	<20180214152039.24ca0cf2@bahia.lan>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <eblake@redhat.com>) id 1em5at-0003mz-4v
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 17:32:07 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51810 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1em5as-0003mh-Us
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 17:32:03 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E24339BB57
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 22:31:51 +0000 (UTC)
+References: <20180213142102.14450-1-stefanha@redhat.com>
+	<20180213142102.14450-2-stefanha@redhat.com>
+	<73eb771d-ddcd-42e6-5895-23e6024ccc80@redhat.com>
+	<20180214140647.GC7545@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8894e9fa-8e3d-ecfe-07f4-61a465f4bf57@redhat.com>
+Date: Wed, 14 Feb 2018 16:31:45 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180214140647.GC7545@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V2 3/3]
- ppc/spapr-caps: For pseries-2.12 change spapr-cap defaults
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] block: extract AIO_WAIT_WHILE()
+ from BlockDriverState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,130 +37,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Wed, 2018-02-14 at 15:20 +0100, Greg Kurz wrote:
-> On Wed, 14 Feb 2018 17:51:35 +1100
-> Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
+On 02/14/2018 08:06 AM, Stefan Hajnoczi wrote:
+> On Tue, Feb 13, 2018 at 10:01:06AM -0600, Eric Blake wrote:
+>> Trying to understand here:
+>>
+>>
+>>> +#define AIO_WAIT_WHILE(wait, ctx, cond) ({                  \
+>>> +    bool waited_ = false;                                   \
+>>> +    bool busy_ = true;                                      \
+>>> +    AioWait *wait_ = (wait);                                \
+>>> +    AioContext *ctx_ = (ctx);                               \
+>>> +    if (aio_context_in_iothread(ctx_)) {                    \
+>>> +        while ((cond) || busy_) {                           \
+>>> +            busy_ = aio_poll(ctx_, (cond));                 \
+>>> +            waited_ |= !!(cond) | busy_;                    \
+>>> +        }                                                   \
+>>
+>> If we are in an iothread already, we never dereference wait,
 > 
-> > For the pseries-2.12 machine type, make the spapr-caps
-> > SPAPR_CAP_CFPC
-> > and SPAPR_CAP_SBBC default to workaround. Thus if the host is
-> > capable
-> > the guest will be able to take advantage of these workarounds by
-> > default.
-> > Otherwise if the host doesn't have these capabilities qemu will
-> > fail to
-> > start and they will have to be explicitly disabled on the command
-> > line
-> > with:
-> > -machine pseries,cap-cfpc=broken,cap-sbbc=broken
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > ---
-> >  hw/ppc/spapr.c      | 11 ++++++++++-
-> >  hw/ppc/spapr_caps.c | 10 ++++++++++
-> >  include/hw/compat.h |  2 ++
-> >  3 files changed, 22 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 969db6cde2..e2ebb76242 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -3941,13 +3941,20 @@ static const TypeInfo spapr_machine_info =
-> > {
-> >  /*
-> >   * pseries-2.12
-> >   */
-> > +#define
-> > SPAPR_COMPAT_2_12                                              \
-> > +    HW_COMPAT_2_12
-> > +
-> >  static void spapr_machine_2_12_instance_options(MachineState
-> > *machine)
-> >  {
-> >  }
-> >  
-> >  static void spapr_machine_2_12_class_options(MachineClass *mc)
-> >  {
-> > -    /* Defaults for the latest behaviour inherited from the base
-> > class */
-> > +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-> > +
-> > +    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_WORKAROUND;
-> > +    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_WORKAROUND;
+> No, the name and documentation for aio_context_in_iothread() is
+> misleading.  It actually means "does this AioContext belong to the
+> current thread?", which is more general than just the IOThread case.
 > 
-> As written in the comment, the default for the latest machine type
-> should
-> be set at the base class level, in spapr_machine_class_init()... not
-> sure
-> to understand why you set it here...
+> aio_context_in_iothread() returns true when:
+> 1. We are the IOThread that owns ctx. <-- the case you thought of
+> 2. We are the main loop and ctx == qemu_get_aio_context().
+>     ^--- the sneaky case that BDRV_POLL_WHILE() has always relied on
 
-Ah yes, my bad.
+Thanks, that helps.
+
+
+>>> +    AIO_WAIT_WHILE(bdrv_get_aio_wait(bs_),                 \
+>>> +                   bdrv_get_aio_context(bs_),              \
+>>> +                   cond); })
+>>
+>> ...we can pass NULL as the wait parameter, which will crash.
+> 
+> It won't crash since if (aio_context_in_iothread(ctx_)) will take the true
+> case when bs_ == NULL.
+
+Okay, you've solved that one.
 
 > 
-> > +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
+>>> +++ b/block/io.c
+>>
+>>>    void bdrv_wakeup(BlockDriverState *bs)
+>>>    {
+>>> -    /* The barrier (or an atomic op) is in the caller.  */
+>>> -    if (atomic_read(&bs->wakeup)) {
+>>> -        aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
+>>> -    }
+>>> +    aio_wait_kick(bdrv_get_aio_wait(bs));
+>>
+>> this is another case where passing NULL...
 > 
-> And so, you shouldn't need to setup 2.12 compat mode before 2.12 was
-> even
-> released :)
+> bdrv_wakeup() is only called when bs != NULL.
 
-Fair enough :)
+And looks like we're safe, there, as well.
 
 > 
-> >  }
-> >  
-> >  DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
-> > @@ -3969,6 +3976,8 @@ static void
-> > spapr_machine_2_11_class_options(MachineClass *mc)
-> >  
-> >      spapr_machine_2_12_class_options(mc);
-> >      smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_ON;
-> > +    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-> > +    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
-> >  }
-> >  
-> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > index 05997b0842..c25c2bca52 100644
-> > --- a/hw/ppc/spapr_caps.c
-> > +++ b/hw/ppc/spapr_caps.c
-> > @@ -281,11 +281,21 @@ static sPAPRCapabilities
-> > default_caps_with_cpu(sPAPRMachineState *spapr,
-> >  
-> >      caps = smc->default_caps;
-> >  
-> > +    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
-> > +                          0, spapr->max_compat_pvr)) {
-> > +        caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-> > +    }
-> > +
-> >      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-> >                            0, spapr->max_compat_pvr)) {
-> >          caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-> >      }
-> >  
-> > +    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
-> > +                          0, spapr->max_compat_pvr)) {
-> > +        caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-> > +    }
-> > +
-> >      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-> >                            0, spapr->max_compat_pvr)) {
-> >          caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_OFF;
-> > diff --git a/include/hw/compat.h b/include/hw/compat.h
-> > index 7f31850dfa..13238239da 100644
-> > --- a/include/hw/compat.h
-> > +++ b/include/hw/compat.h
-> > @@ -1,6 +1,8 @@
-> >  #ifndef HW_COMPAT_H
-> >  #define HW_COMPAT_H
-> >  
-> > +#define HW_COMPAT_2_12
-> > +
-> >  #define HW_COMPAT_2_11 \
-> >      {\
-> >          .driver   = "hpet",\
+> I hope this explains things!  The main issue that raised these questions
+> was that aio_context_in_iothread() has a misleading name.  Shall we
+> rename it?
+
+Maybe, but that's a separate patch.  What name would we bikeshed, maybe 
+aio_context_correct_thread() (we are the correct thread if we are the 
+iothread that owns ctx, or if we are the main thread and have properly 
+acquired ctx) or aio_context_use_okay() (we can only use the ctx if we 
+own it [native iothread] or have acquired it [main loop])
+
 > 
+> I'm having a hard time picking a new name because it must not be
+> confused with AioContext acquire/release, which doesn't influence the
+> "native" AioContext that the current thread has an affinity with.
 > 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
