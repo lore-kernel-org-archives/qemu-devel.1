@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elyIW-0003WV-Et
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:44:37 -0500
+	(envelope-from <eblake@redhat.com>) id 1elyOZ-0006LV-O6
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1elyIV-00049J-HO
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:44:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1elyOY-0007xV-Rc
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 09:50:51 -0500
 References: <20180213202701.15858-1-eblake@redhat.com>
-	<20180213202701.15858-10-eblake@redhat.com>
-	<20180214120525.GB4766@localhost.localdomain>
+	<20180213202701.15858-21-eblake@redhat.com>
+	<20180214131215.GD4766@localhost.localdomain>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a2842a3d-158b-14a1-fdd8-679cd919c655@redhat.com>
-Date: Wed, 14 Feb 2018 08:44:12 -0600
+Message-ID: <54c1036c-4d51-51cb-7cae-1e4bfac3bacc@redhat.com>
+Date: Wed, 14 Feb 2018 08:50:39 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180214120525.GB4766@localhost.localdomain>
+In-Reply-To: <20180214131215.GD4766@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 09/21] null: Switch to
+Subject: Re: [Qemu-devel] [PATCH v8 20/21] vvfat: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,70 +29,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 02/14/2018 06:05 AM, Kevin Wolf wrote:
-> Am 13.02.2018 um 21:26 hat Eric Blake geschrieben:
+On 02/14/2018 07:12 AM, Kevin Wolf wrote:
+> Am 13.02.2018 um 21:27 hat Eric Blake geschrieben:
 >> We are gradually moving away from sector-based interfaces, towards
->> byte-based.  Update the null driver accordingly.
+>> byte-based.  Update the vvfat driver accordingly.  Note that we
+>> can rely on the block driver having already clamped limits to our
+>> block size, and simplify accordingly.
 >>
 >> Signed-off-by: Eric Blake <eblake@redhat.com>
 >> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> Reviewed-by: Fam Zheng <famz@redhat.com>
->>
 
->>       if (s->read_zeroes) {
->> -        return BDRV_BLOCK_OFFSET_VALID | start | BDRV_BLOCK_ZERO;
->> -    } else {
->> -        return BDRV_BLOCK_OFFSET_VALID | start;
->> +        ret |= BDRV_BLOCK_ZERO;
->>       }
->> +    return ret;
+>>   {
+>> -    *n = bs->total_sectors - sector_num;
+>> -    if (*n > nb_sectors) {
+>> -        *n = nb_sectors;
+>> -    } else if (*n < 0) {
+>> -        return 0;
+>> -    }
+>> +    *n = bytes;
+>>       return BDRV_BLOCK_DATA;
 >>   }
 > 
-> Preexisting, but I think this return value is wrong. OFFSET_VALID
-> without DATA is to documented to have the following semantics:
+> Preexisting, but this is inconsistent with other protocol drivers as far
+> as OFFSET_VALID is concerned (as I hinted in another mail, I like it
+> better this way, but it's still inconsistent).
 > 
->   * DATA ZERO OFFSET_VALID
->   *  f    t        t       sectors preallocated, read as zero, returned file not
->   *                        necessarily zero at offset
->   *  f    f        t       sectors preallocated but read from backing_hd,
->   *                        returned file contains garbage at offset
-> 
-> I'm not sure what OFFSET_VALID is even supposed to mean for null.
+> Do we actually need any callback here or could the solution be to simply
+> remove it like with nvme?
 
-Yeah, and I was even thinking about that a bit yesterday when figuring 
-out what to do with nvme.  It does highlight the fact that you get 
-garbage when reading from the null driver (unless the zero option was 
-enabled, then ZERO is set and you know you read zeros instead) - but 
-there no pointer that is preallocated (whether it contains garbage or 
-otherwise) that you can actually dereference to read what the guest 
-would see.
-
-> 
-> Or in fact, what it is supposed to mean for any protocol driver, because
-> normally it just means I can use this offset for accessing bs->file. But
-> protocol drivers don't have a bs->file, so it's interesting to see that
-> they still all set this flag.
-> 
-> OFFSET_VALID | DATA might be excusable because I can see that it's
-> convenient that a protocol driver refers to itself as *file instead of
-> returning NULL there and then the offset is valid (though it would be
-> pointless to actually follow the file pointer), but OFFSET_VALID without
-> DATA probably isn't.
-
-Hmm, you're probably right.  Maybe that means I should tweak the 
-documentation to be more explicit: for a format driver, OFFSET_VALID can 
-always be used (and *file will be set to the underlying protocol 
-driver); but for a protocol driver, OFFSET_VALID only makes sense if 
-*file is the BDS itself and there is an actual buffer to read (that is, 
-the protocol driver must also be returning DATA and/or ZERO).  Or maybe 
-we can indeed state that protocol drivers always set *file to NULL 
-(there is no further backing file to reference), and thus never need to 
-return OFFSET_VALID (but I'm not sure whether that will accidentally 
-propagate back up the call stack and negatively affect status queries of 
-format drivers).
-
-Since it is pre-existing, should I respin to address the issue in a 
-separate patch, or should that be a followup after this series?
+Does that mean io.c's defaults for protocol drivers is wrong?  It 
+defaults to setting OFFSET_VALID and *map on all protocol drivers 
+without a callback (at least nvme, nbd); I didn't delete this callback 
+because I noticed the difference in return value, and couldn't justify 
+whether it was intentional.  Also, vvfat is weird - it is somewhat of a 
+format driver, rather than just a protocol; even though it sets 
+.protocol_name.  It may be possible for vvfat to actually set 
+OFFSET_VALID to particular offsets within the host file that correspond 
+to what the guest would read, where it is not a simple 1:1 mapping, 
+precisely because it is imposing format on the host file.  However, 
+vvfat is one of those things that I try to avoid as much as possible, 
+because it is just so weird.
 
 -- 
 Eric Blake, Principal Software Engineer
