@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ellx5-0005tQ-Hd
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 20:33:42 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1elmhf-0003cE-Ew
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 21:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ellx4-0004t4-2W
-	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 20:33:39 -0500
-Date: Wed, 14 Feb 2018 12:33:23 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180214013323.GA5247@umbus.fritz.box>
-References: <20180209075503.16996-1-aik@ozlabs.ru>
-	<20180209075503.16996-3-aik@ozlabs.ru>
-	<20180212051954.GE11634@umbus.fritz.box>
-	<0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
-	<20180212090653.42bdd2e2@w520.home>
-	<0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
-	<20180213053630.GL11634@umbus.fritz.box>
-	<20180213054124.GN11634@umbus.fritz.box>
-	<8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1elmhc-0002i4-5v
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 21:21:47 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2321 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1elmhb-0002gy-Ql
+	for qemu-devel@nongnu.org; Tue, 13 Feb 2018 21:21:44 -0500
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Wed, 14 Feb 2018 02:21:33 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7473AB94B41@DGGEMM505-MBS.china.huawei.com>
+References: <1518116908-10852-1-git-send-email-mst@redhat.com>
+	<CAFEAcA8kvkfoxnQbqZ4Y44uWtbsirCKdmTcnZJzu=ege9YRfTg@mail.gmail.com>
+	<20180209190703-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_CL6P31EJyzxom1oh6j8LNDD2+OXjJ65hKsB=zBw6tWQ@mail.gmail.com>
+	<CAFEAcA_z25p0NrRuH3vJm9mJJzHZXbgct2GwyojuHXKqejc8JA@mail.gmail.com>
+	<20180213184729-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180213184729-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
-Content-Disposition: inline
-In-Reply-To: <8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
- for MMIO regions
+Subject: Re: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
+ fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,165 +34,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
---+QahgC5+KEYLbs62
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Feb 13, 2018 at 07:20:56PM +1100, Alexey Kardashevskiy wrote:
-> On 13/02/18 16:41, David Gibson wrote:
-> > On Tue, Feb 13, 2018 at 04:36:30PM +1100, David Gibson wrote:
-> >> On Tue, Feb 13, 2018 at 12:15:52PM +1100, Alexey Kardashevskiy wrote:
-> >>> On 13/02/18 03:06, Alex Williamson wrote:
-> >>>> On Mon, 12 Feb 2018 18:05:54 +1100
-> >>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >>>>
-> >>>>> On 12/02/18 16:19, David Gibson wrote:
-> >>>>>> On Fri, Feb 09, 2018 at 06:55:01PM +1100, Alexey Kardashevskiy wro=
-te: =20
-> >>>>>>> At the moment if vfio_memory_listener is registered in the system=
- memory
-> >>>>>>> address space, it maps/unmaps every RAM memory region for DMA.
-> >>>>>>> It expects system page size aligned memory sections so vfio_dma_m=
-ap
-> >>>>>>> would not fail and so far this has been the case. A mapping failu=
-re
-> >>>>>>> would be fatal. A side effect of such behavior is that some MMIO =
-pages
-> >>>>>>> would not be mapped silently.
-> >>>>>>>
-> >>>>>>> However we are going to change MSIX BAR handling so we will end h=
-aving
-> >>>>>>> non-aligned sections in vfio_memory_listener (more details is in
-> >>>>>>> the next patch) and vfio_dma_map will exit QEMU.
-> >>>>>>>
-> >>>>>>> In order to avoid fatal failures on what previously was not a fai=
-lure and
-> >>>>>>> was just silently ignored, this checks the section alignment to
-> >>>>>>> the smallest supported IOMMU page size and prints an error if not=
- aligned;
-> >>>>>>> it also prints an error if vfio_dma_map failed despite the page s=
-ize check.
-> >>>>>>> Both errors are not fatal; only MMIO RAM regions are checked
-> >>>>>>> (aka "RAM device" regions).
-> >>>>>>>
-> >>>>>>> If the amount of errors printed is overwhelming, the MSIX relocat=
-ion
-> >>>>>>> could be used to avoid excessive error output.
-> >>>>>>>
-> >>>>>>> This is unlikely to cause any behavioral change.
-> >>>>>>>
-> >>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru> =20
-> >>>>>>
-> >>>>>> There are some relatively superficial problems noted below.
-> >>>>>>
-> >>>>>> But more fundamentally, this feels like it's extending an existing
-> >>>>>> hack past the point of usefulness.
-> >>>>>>
-> >>>>>> The explicit check for is_ram_device() here has always bothered me=
- -
-> >>>>>> it's not like a real bus bridge magically knows whether a target
-> >>>>>> address maps to RAM or not.
-> >>>>>>
-> >>>>>> What I think is really going on is that even for systems without an
-> >>>>>> IOMMU, it's not really true to say that the PCI address space maps
-> >>>>>> directly onto address_space_memory.  Instead, there's a large, but
-> >>>>>> much less than 2^64 sized, "upstream window" at address 0 on the P=
-CI
-> >>>>>> bus, which is identity mapped to the system bus.  Details will vary
-> >>>>>> with the system, but in practice we expect nothing but RAM to be in
-> >>>>>> that window.  Addresses not within that window won't be mapped to =
-the
-> >>>>>> system bus but will just be broadcast on the PCI bus and might be
-> >>>>>> picked up as a p2p transaction. =20
-> >>>>>
-> >>>>> Currently this p2p works only via the IOMMU, direct p2p is not poss=
-ible as
-> >>>>> the guest needs to know physical MMIO addresses to make p2p work an=
-d it
-> >>>>> does not.
-> >>>>
-> >>>> /me points to the Direct Translated P2P section of the ACS spec, tho=
-ugh
-> >>>> it's as prone to spoofing by the device as ATS.  In any case, p2p
-> >>>> reflected from the IOMMU is still p2p and offloads the CPU even if
-> >>>> bandwidth suffers vs bare metal depending on if the data doubles back
-> >>>> over any links.  Thanks,
-> >>>
-> >>> Sure, I was just saying that p2p via IOMMU won't be as simple as broa=
-dcast
-> >>> on the PCI bus, IOMMU needs to be programmed in advance to make this =
-work,
-> >>> and current that broadcast won't work for the passed through devices.
-> >>
-> >> Well, sure, p2p in a guest with passthrough devices clearly needs to
-> >> be translated through the IOMMU (and p2p from a passthrough to an
-> >> emulated device is essentially impossible).
-> >>
-> >> But.. what does that have to do with this code.  This is the memory
-> >> area watcher, looking for memory regions being mapped directly into
-> >> the PCI space.  NOT IOMMU regions, since those are handled separately
-> >> by wiring up the IOMMU notifier.  This will only trigger if RAM-like,
-> >> non-RAM regions are put into PCI space *not* behind an IOMMMU.
-> >=20
-> > Duh, sorry, realised I was mixing up host and guest IOMMU.  I guess
-> > the point here is that this will map RAM-like devices into the host
-> > IOMMU when there is no guest IOMMU, allowing p2p transactions between
-> > passthrough devices (though not from passthrough to emulated devices).
+> -----Original Message-----
+> From: Qemu-devel [mailto:qemu-devel-
+> bounces+jianjay.zhou=3Dhuawei.com@nongnu.org] On Behalf Of Michael S. Tsi=
+rkin
+> Sent: Wednesday, February 14, 2018 12:52 AM
+> To: Peter Maydell <peter.maydell@linaro.org>
+> Cc: QEMU Developers <qemu-devel@nongnu.org>
+> Subject: Re: [Qemu-devel] [PULL 00/26] virtio, vhost, pci, pc: features,
+> fixes and cleanups
 >=20
-> Correct.
+> On Tue, Feb 13, 2018 at 04:33:14PM +0000, Peter Maydell wrote:
+> > On 12 February 2018 at 09:35, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+> > > This asserts in 'make check' for NetBSD, FreeBSD, OpenBSD, OSX:
+> > >
+> > > TEST: tests/device-introspect-test... (pid=3D19530)
+> > >   /aarch64/device/introspect/list:                                   =
+  OK
+> > >   /aarch64/device/introspect/list-fields:                            =
+  OK
+> > >   /aarch64/device/introspect/none:                                   =
+  OK
+> > >   /aarch64/device/introspect/abstract:                               =
+  OK
+> > >   /aarch64/device/introspect/concrete:                               =
+  **
+> > > ERROR:/root/qemu/qom/object.c:372:object_initialize_with_type:
+> > > assertion failed: (type !=3D NULL)
+> > > Broken pipe
+> > > FAIL
+> > > GTester: last random seed: R02Sd4e2c04f6ac00d843a31ccac4de0d914
+> > > (pid=3D12686)
+> > >   /aarch64/device/introspect/abstract-interfaces:                    =
+  OK
+> > > FAIL: tests/device-introspect-test
+> > >
+> > > (other archs fail too, aarch64 is just the first one we hit). This
+> > > error is often "device A instantiates device B, but device B is
+> > > conditionally compiled in and A is always compiled; so test fails
+> > > trying to create device A on hosts where device B isn't built" I thin=
+k.
+> >
+> > This part is indeed that problem -- the 'virtio-crypto-device' object
+> > is built only if CONFIG_LINUX, but 'virtio-crypto-pci' is built if
+> > CONFIG_VIRTIO_PCI, so on systems where the latter is true but not the
+> > former you get a virtio-crypto-pci device that crashes when instantiate=
+d.
+> >
+> > The fix should be
+> > --- a/hw/virtio/Makefile.objs
+> > +++ b/hw/virtio/Makefile.objs
+> > @@ -8,7 +8,7 @@ obj-y +=3D virtio.o virtio-balloon.o
+> >  obj-$(CONFIG_LINUX) +=3D vhost.o vhost-backend.o vhost-user.o
+> >  obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o
+> >  obj-$(CONFIG_LINUX) +=3D virtio-crypto.o
+> > -obj-$(CONFIG_VIRTIO_PCI) +=3D virtio-crypto-pci.o
+> > +obj-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_PCI)) +=3D
+> > +virtio-crypto-pci.o
+> >  endif
+> >
+> >  common-obj-$(call lnot,$(CONFIG_LINUX)) +=3D vhost-stub.o
+> >
+> >
+> > thanks
+> > -- PMM
 >=20
-> >=20
-> > The conditions still seem kind of awkward to me, but I guess it makes
-> > sense.
+> Thanks for your help with this!
 >=20
-> Is it the time to split this listener to RAM-listener and PCI bus listene=
-r?
+> I think the root cause is that one of the patches disables virtio-crypto
+> build on non linux which used to be enabled.
+>=20
+> This has been silently done by a patch which was supposed to merely add a
+> vhost crypto device, I'm sorry I missed that in the review.
 
-I'm not really sure what you mean by that.
+Hi Michael, Peter
 
-> On x86 it listens on the "memory" AS, on spapr - on the
-> "pci@800000020000000" AS, this will just create more confusion over time.=
-=2E.
+Sorry for the late response and the trouble I have made, I just returned
+from a vacation.
+Thanks for your help and pointing out the root cause, I should explicitly
+put the config change of virtio-crypto into a separate patch to make
+review much easier.
 
-Hm, it's still logically the same AS in each case - the PCI address
-space.  It's just that in the x86 case that happens to be the same as
-the memory AS (at least when there isn't a guest side IOMMU).
+>=20
+> I've dropped the crypto vhost patches from the pull request for now.
 
-I do wonder if that's really right even for x86 without IOMMU.  The
-PCI address space is identity mapped to the "main" memory address
-space there, but I'm not sure it's mapped th *all* of the main memory
-address space, probably just certain ranges of it.  That's what I was
-suggesting earlier in the thread.
+Will fix the issue in the next version, sorry again for the inconvenience.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Regards,
+Jay
 
---+QahgC5+KEYLbs62
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqDkeEACgkQbDjKyiDZ
-s5It3w/+JUlCy5wbfp1WBDpCvDcZVcJt+I7gFu0vagmqYrwKD4Ygr/sdOoHuB4jo
-anwl9Ca3JZouAJ3RlNKz8QcKyMjlSSPDfaBVxsfBvNXW/eiVyfyF7uRY+uyNjixo
-+aofEr+4R8nVejwF374eCveM2OSipcilzYJoAZLAPe9NALgEKbgGOVFHWIUDdbzP
-gA+I2cUzvGt78LFuAc3iujG1zAC2ymuHnZUZXkbmHeshZutzXIrmBkCLBVefjkiQ
-VNO3xPuzhdt9fFacudPx1Yo5Ki8I767pYEEqmzbcguiXNEgOjn+Fwnupy2O9ZRR5
-7H7NxAY2iaYx+Tgky1lteiIh+QwvuPw4ECoYLtv/nagfNDpb1KXL8+VTaxLSRIml
-SjwEHa2snANv9YcEaNKgKeRBEJM5QyHfQNAAOKKwJgVpFOlVHNBBzxDFllz+OVdO
-CYHXPchqpj76mM8a4quRtHY87/5DVoYxpelwE9n0xApnuZR+XB9I0jwMPOhfuGPS
-cbI6/JELj2gUmVfTqrmZzEWd7vqktraD9H0sLSCftRQpEQBqE1+28jbj9cFwIkeX
-QZYy1AcHFmXQytYzC4wWhWM/nguFVxMrebh0/eHop0BkCVQKXnOG9HZjKcYH7G89
-mX6aLbhq3kLUaAvRyB52NBlDTp/+AH9xbSute3wZhfRKpb5U3RY=
-=Fw/T
------END PGP SIGNATURE-----
-
---+QahgC5+KEYLbs62--
+>=20
+> Pushed with the same name - should be fine now.
+>=20
+> --
+> MST
