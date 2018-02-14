@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elzA3-0008Ic-SS
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:58 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1elzA7-0008Mt-5S
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:40:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elzA2-00076z-0M
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45878 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1elzA4-00078s-E9
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:58 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40576 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elzA1-00076d-OO
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:53 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elzA4-00078J-09
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:56 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 14 Feb 2018 15:39:35 +0000
-Message-Id: <20180214153938.5410-8-dgilbert@redhat.com>
+Date: Wed, 14 Feb 2018 15:39:37 +0000
+Message-Id: <20180214153938.5410-10-dgilbert@redhat.com>
 In-Reply-To: <20180214153938.5410-1-dgilbert@redhat.com>
 References: <20180214153938.5410-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 07/10] migration: reuse mis->userfault_quit_fd
+Subject: [Qemu-devel] [PULL 09/10] migration: allow send_rq to fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +27,106 @@ To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, groug@kaod.or
 
 From: Peter Xu <peterx@redhat.com>
 
-It was only used for quitting the page fault thread before. Let it be
-something more useful - now we can use it to notify a "wake" for the
-page fault thread (for any reason), and it only means "quit" if the
-fault_thread_quit is set.
-
-Since we changed what it does, renaming it to userfault_event_fd.
+We will not allow failures to happen when sending data from destination
+to source via the return path. However it is possible that there can be
+errors along the way.  This patch allows the migrate_send_rp_message()
+to return error when it happens, and further extended it to
+migrate_send_rp_req_pages().
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180208103132.28452-3-peterx@redhat.com>
+Message-Id: <20180208103132.28452-9-peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.h    |  6 ++++--
- migration/postcopy-ram.c | 29 ++++++++++++++++++++---------
- 2 files changed, 24 insertions(+), 11 deletions(-)
+ migration/migration.c | 35 ++++++++++++++++++++++++++++-------
+ migration/migration.h |  2 +-
+ 2 files changed, 29 insertions(+), 8 deletions(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index e2a5a832c6..913f658c3e 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -205,17 +205,35 @@ static void deferred_incoming_migration(Error **errp)
+  * Send a message on the return channel back to the source
+  * of the migration.
+  */
+-static void migrate_send_rp_message(MigrationIncomingState *mis,
+-                                    enum mig_rp_message_type message_type,
+-                                    uint16_t len, void *data)
++static int migrate_send_rp_message(MigrationIncomingState *mis,
++                                   enum mig_rp_message_type message_type,
++                                   uint16_t len, void *data)
+ {
++    int ret = 0;
++
+     trace_migrate_send_rp_message((int)message_type, len);
+     qemu_mutex_lock(&mis->rp_mutex);
++
++    /*
++     * It's possible that the file handle got lost due to network
++     * failures.
++     */
++    if (!mis->to_src_file) {
++        ret = -EIO;
++        goto error;
++    }
++
+     qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
+     qemu_put_be16(mis->to_src_file, len);
+     qemu_put_buffer(mis->to_src_file, data, len);
+     qemu_fflush(mis->to_src_file);
++
++    /* It's possible that qemu file got error during sending */
++    ret = qemu_file_get_error(mis->to_src_file);
++
++error:
+     qemu_mutex_unlock(&mis->rp_mutex);
++    return ret;
+ }
+ 
+ /* Request a range of pages from the source VM at the given
+@@ -225,11 +243,12 @@ static void migrate_send_rp_message(MigrationIncomingState *mis,
+  *   Start: Address offset within the RB
+  *   Len: Length in bytes required - must be a multiple of pagesize
+  */
+-void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+-                               ram_addr_t start, size_t len)
++int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
++                              ram_addr_t start, size_t len)
+ {
+     uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
+     size_t msglen = 12; /* start + len */
++    enum mig_rp_message_type msg_type;
+ 
+     *(uint64_t *)bufc = cpu_to_be64((uint64_t)start);
+     *(uint32_t *)(bufc + 8) = cpu_to_be32((uint32_t)len);
+@@ -241,10 +260,12 @@ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+         bufc[msglen++] = rbname_len;
+         memcpy(bufc + msglen, rbname, rbname_len);
+         msglen += rbname_len;
+-        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES_ID, msglen, bufc);
++        msg_type = MIG_RP_MSG_REQ_PAGES_ID;
+     } else {
+-        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES, msglen, bufc);
++        msg_type = MIG_RP_MSG_REQ_PAGES;
+     }
++
++    return migrate_send_rp_message(mis, msg_type, msglen, bufc);
+ }
+ 
+ void qemu_start_incoming_migration(const char *uri, Error **errp)
 diff --git a/migration/migration.h b/migration/migration.h
-index 848f638a20..75c72d3c8f 100644
+index 75c72d3c8f..f515b8994f 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -35,6 +35,8 @@ struct MigrationIncomingState {
-     bool           have_fault_thread;
-     QemuThread     fault_thread;
-     QemuSemaphore  fault_thread_sem;
-+    /* Set this when we want the fault thread to quit */
-+    bool           fault_thread_quit;
+@@ -230,7 +230,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
+                           uint32_t value);
+ void migrate_send_rp_pong(MigrationIncomingState *mis,
+                           uint32_t value);
+-void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
++int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+                               ram_addr_t start, size_t len);
  
-     bool           have_listen_thread;
-     QemuThread     listen_thread;
-@@ -42,8 +44,8 @@ struct MigrationIncomingState {
- 
-     /* For the kernel to send us notifications */
-     int       userfault_fd;
--    /* To tell the fault_thread to quit */
--    int       userfault_quit_fd;
-+    /* To notify the fault_thread to wake, e.g., when need to quit */
-+    int       userfault_event_fd;
-     QEMUFile *to_src_file;
-     QemuMutex rp_mutex;    /* We send replies from multiple threads */
-     void     *postcopy_tmp_page;
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index bec6c2c66b..9ad4f20f82 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -387,17 +387,18 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-          * currently be at 0, we're going to increment it to 1
-          */
-         tmp64 = 1;
--        if (write(mis->userfault_quit_fd, &tmp64, 8) == 8) {
-+        atomic_set(&mis->fault_thread_quit, 1);
-+        if (write(mis->userfault_event_fd, &tmp64, 8) == 8) {
-             trace_postcopy_ram_incoming_cleanup_join();
-             qemu_thread_join(&mis->fault_thread);
-         } else {
-             /* Not much we can do here, but may as well report it */
--            error_report("%s: incrementing userfault_quit_fd: %s", __func__,
-+            error_report("%s: incrementing userfault_event_fd: %s", __func__,
-                          strerror(errno));
-         }
-         trace_postcopy_ram_incoming_cleanup_closeuf();
-         close(mis->userfault_fd);
--        close(mis->userfault_quit_fd);
-+        close(mis->userfault_event_fd);
-         mis->have_fault_thread = false;
-     }
- 
-@@ -520,7 +521,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
-         pfd[0].fd = mis->userfault_fd;
-         pfd[0].events = POLLIN;
-         pfd[0].revents = 0;
--        pfd[1].fd = mis->userfault_quit_fd;
-+        pfd[1].fd = mis->userfault_event_fd;
-         pfd[1].events = POLLIN; /* Waiting for eventfd to go positive */
-         pfd[1].revents = 0;
- 
-@@ -530,8 +531,18 @@ static void *postcopy_ram_fault_thread(void *opaque)
-         }
- 
-         if (pfd[1].revents) {
--            trace_postcopy_ram_fault_thread_quit();
--            break;
-+            uint64_t tmp64 = 0;
-+
-+            /* Consume the signal */
-+            if (read(mis->userfault_event_fd, &tmp64, 8) != 8) {
-+                /* Nothing obviously nicer than posting this error. */
-+                error_report("%s: read() failed", __func__);
-+            }
-+
-+            if (atomic_read(&mis->fault_thread_quit)) {
-+                trace_postcopy_ram_fault_thread_quit();
-+                break;
-+            }
-         }
- 
-         ret = read(mis->userfault_fd, &msg, sizeof(msg));
-@@ -610,9 +621,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-     }
- 
-     /* Now an eventfd we use to tell the fault-thread to quit */
--    mis->userfault_quit_fd = eventfd(0, EFD_CLOEXEC);
--    if (mis->userfault_quit_fd == -1) {
--        error_report("%s: Opening userfault_quit_fd: %s", __func__,
-+    mis->userfault_event_fd = eventfd(0, EFD_CLOEXEC);
-+    if (mis->userfault_event_fd == -1) {
-+        error_report("%s: Opening userfault_event_fd: %s", __func__,
-                      strerror(errno));
-         close(mis->userfault_fd);
-         return -1;
+ #endif
 -- 
 2.14.3
