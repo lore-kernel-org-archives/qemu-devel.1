@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1em3zk-0002KO-Pg
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:37 -0500
+	(envelope-from <mreitz@redhat.com>) id 1em45D-00070c-EO
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:55:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1em3zj-0001wS-UF
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:36 -0500
+	(envelope-from <mreitz@redhat.com>) id 1em45C-0005F3-N2
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:55:15 -0500
+References: <20180213233324.5096-1-eblake@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 14 Feb 2018 21:49:12 +0100
-Message-Id: <20180214204915.7980-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] block/ssh: Add basic .bdrv_truncate()
+Message-ID: <95035782-da08-4da5-d7fc-82e7b8cb155e@redhat.com>
+Date: Wed, 14 Feb 2018 21:54:58 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180213233324.5096-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi"
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] s/size/entries/ when dealing with
+ non-byte units
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,36 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, berto@igalia.com
 
-For (x-)blockdev-create, all protocol drivers that support image
-creation also need to offer a .bdrv_truncate() implementation that
-matches in features.  A previous series of mine brought gluster's and
-sheepdog's implementation up to par regarding preallocated truncation;
-but I forgot about drivers that have a .bdrv_create() but no
-.bdrv_truncate() at all.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, berto@igalia.com
+Message-ID: <95035782-da08-4da5-d7fc-82e7b8cb155e@redhat.com>
+Subject: Re: [RFC PATCH 0/2] s/size/entries/ when dealing with non-byte units
+References: <20180213233324.5096-1-eblake@redhat.com>
+In-Reply-To: <20180213233324.5096-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-There is only one of these, and that is ssh.  Since libssh2 does not
-seem to know any way of truncating files, we can only support growing
-files -- but that is what we need for (x-)blockdev-create.
+On 2018-02-14 00:33, Eric Blake wrote:
+> I mentioned this while reviewing Berto's series on L2 slice handling;
+> this is a first cut at patches that I think are worth doing throughout
+> the qcow2 code base if we like the idea.
 
-Note that there are also drivers which do not support growing files,
-namely iscsi and file-posix for host devices (maybe more?  I hope not).
-But these also pretty much ignore the specified size on .bdrv_create()
-and just use the size of the existing device.  They just check that the
-specified size does not exceed the actual size, so that pretty much
-matches what their .bdrv_truncate() supports, and we should be fine
-there.
+I like the idea. :-)
+
+The patches look good to me.
+
+Max
+
+> Eric Blake (2):
+>   qcow2: Prefer 'entries' over 'size' for non-byte values in spec
+>   qcow2: Prefer 'entries' over 'size' during cache creation
+>=20
+>  docs/interop/qcow2.txt |  4 ++--
+>  block/qcow2.h          |  4 ++--
+>  block/qcow2.c          | 21 +++++++++++----------
+>  3 files changed, 15 insertions(+), 14 deletions(-)
+>=20
 
 
-Max Reitz (3):
-  block/ssh: Pull ssh_grow_file() from ssh_create()
-  block/ssh: Make ssh_grow_file() blocking
-  block/ssh: Add basic .bdrv_truncate()
 
- block/ssh.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 53 insertions(+), 8 deletions(-)
+--LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-2.14.3
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqEoiISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AJDYH/AkrN/vCGyiura6chwI6z/w6EofhzEgQ
+31igQliw7TTMQqs0JahsOYHslhH0YbHxLMPf9Np947Rh5+rF0gB1qesl8JKajDsn
+aGZaFCkHI13ZnAz9Q18POfNQ7tFX8JbcNwH6PxM8MgH8+8fawx2Y6Pdz97DK5pRZ
+mSV1cNERpRsuLxCuXi8IiR3yGYijFWdJs8Fr3ooUggtEZz5ayj4ff5YvMbBc/+Tv
+XDg0Lz9GRQyWdhVZgXRVgzba0URgtTQ2kMrQSZEJGp3UFRTsJePQKZBYnK/cQX3p
+A3t2xt8j0F/aqlMSFzHbu00x4mQxQ30egrCbnaqELyf0zK7VjRxaZKM=
+=+v1W
+-----END PGP SIGNATURE-----
+
+--LsaPDJjNg2gIt7KKJrZ2I0jNDQkmkIjBi--
