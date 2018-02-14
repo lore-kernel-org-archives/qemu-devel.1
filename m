@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1elwrK-0004hV-4c
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:12:27 -0500
+	(envelope-from <geert@linux-m68k.org>) id 1elwsu-0005q2-1B
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:14:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1elwrJ-000887-6R
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:12:26 -0500
-Date: Wed, 14 Feb 2018 14:12:15 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180214131215.GD4766@localhost.localdomain>
-References: <20180213202701.15858-1-eblake@redhat.com>
-	<20180213202701.15858-21-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180213202701.15858-21-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 20/21] vvfat: Switch to
- .bdrv_co_block_status()
+	(envelope-from <geert@linux-m68k.org>) id 1elwsq-0000kL-1o
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:14:04 -0500
+Received: from michel.telenet-ops.be ([2a02:1800:110:4::f00:18]:32870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <geert@linux-m68k.org>)
+	id 1elwsp-0000i1-QO
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:13:59 -0500
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+Date: Wed, 14 Feb 2018 14:13:55 +0100
+Message-Id: <1518614035-9907-1-git-send-email-geert+renesas@glider.be>
+Subject: [Qemu-devel] [PATCH v2] device_tree: Increase FDT_MAX_SIZE to 1 MiB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +22,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
 
-Am 13.02.2018 um 21:27 hat Eric Blake geschrieben:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Update the vvfat driver accordingly.  Note that we
-> can rely on the block driver having already clamped limits to our
-> block size, and simplify accordingly.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> 
-> ---
-> v5-v7: no change
-> v4: rebase to interface tweak
-> v3: no change
-> v2: rebase to earlier changes, simplify
-> ---
->  block/vvfat.c | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
-> 
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index 7e06ebacf61..4a17a49e128 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -3088,15 +3088,13 @@ vvfat_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->      return ret;
->  }
-> 
-> -static int64_t coroutine_fn vvfat_co_get_block_status(BlockDriverState *bs,
-> -        int64_t sector_num, int nb_sectors, int *n, BlockDriverState **file)
-> +static int coroutine_fn vvfat_co_block_status(BlockDriverState *bs,
-> +                                              bool want_zero, int64_t offset,
-> +                                              int64_t bytes, int64_t *n,
-> +                                              int64_t *map,
-> +                                              BlockDriverState **file)
->  {
-> -    *n = bs->total_sectors - sector_num;
-> -    if (*n > nb_sectors) {
-> -        *n = nb_sectors;
-> -    } else if (*n < 0) {
-> -        return 0;
-> -    }
-> +    *n = bytes;
->      return BDRV_BLOCK_DATA;
->  }
+It is not uncommon for a contemporary FDT to be larger than 64 KiB,
+leading to failures loading the device tree from sysfs:
 
-Preexisting, but this is inconsistent with other protocol drivers as far
-as OFFSET_VALID is concerned (as I hinted in another mail, I like it
-better this way, but it's still inconsistent).
+    qemu-system-aarch64: qemu_fdt_setprop: Couldn't set ...: FDT_ERR_NOSPACE
 
-Do we actually need any callback here or could the solution be to simply
-remove it like with nvme?
+Hence increase the limit to 1 MiB, like on PPC.
 
-Kevin
+For reference, the largest arm64 DTB created from the Linux sources is
+70 KiB large (93 KiB when built with symbols/fixup support).
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+v2:
+  - Enlarge from 128 KiB to 1 MiB, as suggested by Peter Maydell.
+---
+ device_tree.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/device_tree.c b/device_tree.c
+index a24ddff02bdd857c..9eb5fae7381fe885 100644
+--- a/device_tree.c
++++ b/device_tree.c
+@@ -29,7 +29,7 @@
+ 
+ #include <libfdt.h>
+ 
+-#define FDT_MAX_SIZE  0x10000
++#define FDT_MAX_SIZE  0x100000
+ 
+ void *create_device_tree(int *sizep)
+ {
+-- 
+2.7.4
