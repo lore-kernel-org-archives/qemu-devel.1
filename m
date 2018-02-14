@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1em1io-0000CQ-U0
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:23:59 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1em1io-0000CO-U1
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:24:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1em1il-0003yw-LJ
+	(envelope-from <tcminyard@gmail.com>) id 1em1im-0003zV-Ep
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:23:58 -0500
-Received: from mail-pl0-x232.google.com ([2607:f8b0:400e:c01::232]:36186)
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:34496)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1em1il-0003yY-Fa
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:23:55 -0500
-Received: by mail-pl0-x232.google.com with SMTP id v3so9001910plg.3
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:23:55 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1em1im-0003z0-6V
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:23:56 -0500
+Received: by mail-pg0-x243.google.com with SMTP id m19so2255274pgn.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:23:56 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Wed, 14 Feb 2018 12:23:42 -0600
-Message-Id: <1518632624-29965-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 0/2] ipmi: Fix vmstate transfer
+Date: Wed, 14 Feb 2018 12:23:43 -0600
+Message-Id: <1518632624-29965-2-git-send-email-minyard@acm.org>
+In-Reply-To: <1518632624-29965-1-git-send-email-minyard@acm.org>
+References: <1518632624-29965-1-git-send-email-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH v2 1/2] ipmi: Use proper struct reference for
+ KCS vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +28,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-This took a while because I had other distractions and I spent some
-time studying how all this vmstate code works, and that itself got
-to be a distraction.
+From: Corey Minyard <cminyard@mvista.com>
 
-I'm not 100% sure what I have done is right.  Maybe there is a way to
-do a backwards migration for KCS, but I'm not sure how.
+The vmstate for isa_ipmi_kcs was referencing into the kcs structure,
+instead create a kcs structure separate and use that.
 
-Changes from v1:
-  * Validate the data values in a pre_load functions.
-  * For KCS, instead of an old function, create a separate vmstate
-    structure for the new version.  The name on the old vmstate
-    structure wasn't specific enough, so a new name was needed,
-    The old structure is set up to never be sent, but it can be
-    received.
+There were also some issues in the state transfer.  The inlen field
+was not being transferred, so if a transaction was in process during
+the transfer it would be messed up.  And the use_irq field was
+transferred, but that should come from the configuration.  And the
+name on the man VMStateDescription was incorrect, it needed to be
+differentiated from the BT one.
+
+To fix this, a new VMStateDescription is added that is hopefully
+correct, and the old one is kept (modified to remove use_irq) in
+a way that it can be received from the remote but will not be sent.
+So an upgrade should work for KCS.
+
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/ipmi/isa_ipmi_kcs.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
+index 689587b..2a2784d 100644
+--- a/hw/ipmi/isa_ipmi_kcs.c
++++ b/hw/ipmi/isa_ipmi_kcs.c
+@@ -422,14 +422,86 @@ static void ipmi_isa_realize(DeviceState *dev, Error **errp)
+     isa_register_ioport(isadev, &iik->kcs.io, iik->kcs.io_base);
+ }
+ 
+-const VMStateDescription vmstate_ISAIPMIKCSDevice = {
++static int ipmi_kcs_vmstate_post_load(void *opaque, int version)
++{
++    IPMIKCS *ik = opaque;
++
++    /* Make sure all the values are sane. */
++    if (ik->outpos >= MAX_IPMI_MSG_SIZE || ik->outlen >= MAX_IPMI_MSG_SIZE ||
++        ik->outpos >= ik->outlen) {
++        ik->outpos = 0;
++        ik->outlen = 0;
++    }
++
++    if (ik->inlen >= MAX_IPMI_MSG_SIZE) {
++        ik->inlen = 0;
++    }
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_IPMIKCS = {
++    .name = TYPE_IPMI_INTERFACE_PREFIX "kcs",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = ipmi_kcs_vmstate_post_load,
++    .fields      = (VMStateField[]) {
++        VMSTATE_BOOL(obf_irq_set, IPMIKCS),
++        VMSTATE_BOOL(atn_irq_set, IPMIKCS),
++        VMSTATE_BOOL(irqs_enabled, IPMIKCS),
++        VMSTATE_UINT32(outpos, IPMIKCS),
++        VMSTATE_UINT32(outlen, IPMIKCS),
++        VMSTATE_UINT8_ARRAY(outmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
++        VMSTATE_UINT32(inlen, IPMIKCS),
++        VMSTATE_UINT8_ARRAY(inmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
++        VMSTATE_BOOL(write_end, IPMIKCS),
++        VMSTATE_UINT8(status_reg, IPMIKCS),
++        VMSTATE_UINT8(data_out_reg, IPMIKCS),
++        VMSTATE_INT16(data_in_reg, IPMIKCS),
++        VMSTATE_INT16(cmd_reg, IPMIKCS),
++        VMSTATE_UINT8(waiting_rsp, IPMIKCS),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_ISAIPMIKCSDevice = {
++    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-kcs",
++    .version_id = 2,
++    .minimum_version_id = 2,
++    .fields      = (VMStateField[]) {
++        VMSTATE_STRUCT(kcs, ISAIPMIKCSDevice, 1, vmstate_IPMIKCS, IPMIKCS),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++/*
++ * Old version of the vmstate transfer that has a number of issues.
++ * We changed the vm state description name, so we need a separate
++ * structure and need to register it separately.
++ */
++static int ipmi_kcs_v1_vmstate_post_load(void *opaque, int version)
++{
++    ISAIPMIKCSDevice *iik = opaque;
++
++    return ipmi_kcs_vmstate_post_load(&iik->kcs, version);
++}
++
++static bool ipmi_kcs_v1_vmstate_needed(void *opaque)
++{
++    /* Never transmit this, it is just for receiving old versions. */
++    return false;
++}
++
++const VMStateDescription vmstate_v1_ISAIPMIKCSDevice = {
+     .name = TYPE_IPMI_INTERFACE,
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .post_load = ipmi_kcs_v1_vmstate_post_load,
++    .needed = ipmi_kcs_v1_vmstate_needed,
+     .fields      = (VMStateField[]) {
+         VMSTATE_BOOL(kcs.obf_irq_set, ISAIPMIKCSDevice),
+         VMSTATE_BOOL(kcs.atn_irq_set, ISAIPMIKCSDevice),
+-        VMSTATE_BOOL(kcs.use_irq, ISAIPMIKCSDevice),
++        VMSTATE_UNUSED(1), /* Was use_irq */
+         VMSTATE_BOOL(kcs.irqs_enabled, ISAIPMIKCSDevice),
+         VMSTATE_UINT32(kcs.outpos, ISAIPMIKCSDevice),
+         VMSTATE_UINT8_ARRAY(kcs.outmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
+@@ -451,6 +523,7 @@ static void isa_ipmi_kcs_init(Object *obj)
+     ipmi_bmc_find_and_link(obj, (Object **) &iik->kcs.bmc);
+ 
+     vmstate_register(NULL, 0, &vmstate_ISAIPMIKCSDevice, iik);
++    vmstate_register(NULL, 0, &vmstate_v1_ISAIPMIKCSDevice, iik);
+ }
+ 
+ static void *isa_ipmi_kcs_get_backend_data(IPMIInterface *ii)
+-- 
+2.7.4
