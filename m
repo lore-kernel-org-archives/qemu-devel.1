@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1em2FA-00039L-Hp
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:57:25 -0500
+	(envelope-from <alistair23@gmail.com>) id 1em2Io-0005yN-LL
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:01:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1em2F5-0006Bn-Lu
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:57:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55228 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1em2F5-0006Ba-Gh
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 13:57:19 -0500
-Date: Wed, 14 Feb 2018 18:56:59 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180214185658.GF2507@work-vm>
-References: <20180208103132.28452-1-peterx@redhat.com>
-	<20180208103132.28452-28-peterx@redhat.com>
-	<20180213201059.GU2378@work-vm> <20180214045639.GI4472@xz-mi>
+	(envelope-from <alistair23@gmail.com>) id 1em2In-00008L-8V
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:01:10 -0500
+Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:36580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1em2Im-00007X-So
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 14:01:09 -0500
+Received: by mail-lf0-x229.google.com with SMTP id t79so30881269lfe.3
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 11:01:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180214045639.GI4472@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v6 27/28] migration/qmp: add command
- migrate-pause
+In-Reply-To: <20180115125933.GA11737@stefanha-x1.localdomain>
+References: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
+	<CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
+	<CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
+	<CAKmqyKP2cQGXSmPvaGt3AwDz6zewJ6HH=vVTSnk6GVAQAhW5uA@mail.gmail.com>
+	<20180115125933.GA11737@stefanha-x1.localdomain>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 14 Feb 2018 11:00:36 -0800
+Message-ID: <CAKmqyKMoqyyr2oBWyEarZhxxBS+F_=zCJARdVvpFkyPv+L3xJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Call for GSoC & Outreachy 2018 mentors & project
+ ideas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +33,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Tue, Feb 13, 2018 at 08:11:00PM +0000, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > It pauses an ongoing migration.  Currently it only supports postcopy.
-> > > Note that this command will work on either side of the migration.
-> > > Basically when we trigger this on one side, it'll interrupt the other
-> > > side as well since the other side will get notified on the disconnect
-> > > event.
-> > > 
-> > > However, it's still possible that the other side is not notified, for
-> > > example, when the network is totally broken, or due to some firewall
-> > > configuration changes.  In that case, we will also need to run the same
-> > > command on the other side so both sides will go into the paused state.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  migration/migration.c | 27 +++++++++++++++++++++++++++
-> > >  qapi/migration.json   | 16 ++++++++++++++++
-> > >  2 files changed, 43 insertions(+)
-> > > 
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index bb57ed9ade..139abec0c3 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -1448,6 +1448,33 @@ void qmp_migrate_recover(const char *uri, Error **errp)
-> > >      qemu_start_incoming_migration(uri, errp);
-> > >  }
-> > >  
-> > > +void qmp_migrate_pause(Error **errp)
-> > > +{
-> > > +    MigrationState *ms = migrate_get_current();
-> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > +    int ret;
-> > > +
-> > > +    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> > > +        /* Source side, during postcopy */
-> > > +        ret = qemu_file_shutdown(ms->to_dst_file);
-> > 
-> > This doesn't feel thread safe; although I'm not sure how to make it so.
-> > If the migration finishes just after we check the state but before the
-> > shutdown we end up using a bogus QEMUFile*
-> > Making all the places that close a QEMUFile* set hte pointer Null before
-> > they do the close doesn't help because you still race with that.
-> > 
-> > (The race is small, but still)
-> 
-> IMHO we can fix it by adding a migration lock for management code. If
-> you see my previous migrate cleanup series, it's in my todo. ;)
-> 
-> The basic idea is that we take the lock for critical paths (but not
-> during most of the migration process).  E.g., we may need the lock
-> for:
-> 
-> - very beginning of migration, during setup
-> - reaching the end of migration
-> - every single migration QMP command (since HMP calls them so HMP will
->   also acquire the lock)
-> - anywhere else I didn't mention that may necessary, e.g., when we
->   change migrate state, meanwhile we do something else - basically
->   that should be an "atomic operation", and we need the lock to make
->   sure of that.
+On Mon, Jan 15, 2018 at 4:59 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Thu, Jan 11, 2018 at 03:25:56PM -0800, Alistair Francis wrote:
+>> On Wed, Jan 10, 2018 at 4:52 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> > On Tue, Jan 9, 2018 at 9:45 PM, Alistair Francis <alistair23@gmail.com> wrote:
+>> >> Can anyone who has done this before chime in.
+>> >>
+>> >> What do you think about getting someone to cleanup and improve the GDB
+>> >> support in QEMU? Would that be the right difficulty of task for a GSoC
+>> >> project?
+>> >
+>> > There is not enough information to give feedback on whether this
+>> > project idea is suitable.  What are the specific tasks you'd like the
+>> > student to work on?
+>> >
+>> > In general, I'm sure there are well-defined 12-week project ideas
+>> > around the GDB stub.  New features are easy to propose and are usually
+>> > well-defined (e.g. implement these commands that are documented in the
+>> > GDB protocol documentation).  Cleaning up code is less clear and it
+>> > would depend on exactly what needs to be done.  Interns will not have
+>> > a background in the QEMU codebase and may not be able to make
+>> > judgements about how to structure things, so I would be more careful
+>> > about refactoring/cleanup projects.
+>> >
+>> > Please see my talk about QEMU GSoC for guidelines on project ideas:
+>> > https://www.youtube.com/watch?v=xNVCX7YMUL8&t=19m11s
+>> > http://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
+>>
+>> That helps a lot, thanks for that.
+>>
+>> So for a more concrete solution, how would adding support for multi
+>> CPU support to the GDB server sound?
+>>
+>> This would allow GDB debugging for the A53 and the R5 on the Xilinx
+>> ZynqMP for example. This is something we have in the Xilinx tree, but
+>> it is in no state to go upstream and really needs to be re-write to be
+>> upstreamable and more generic.
+>
+> Excellent.  Then they'll already have an idea of "how" it can be
+> achieved but have the freedom to write code that is most suitable for
+> upstream.  That is a good starting point for a project.
+>
+> Here is the project idea template:
+>
+> === TITLE ===
+>
+>  '''Summary:''' Short description of the project
+>
+>  Detailed description of the project.
+>
+>  '''Links:'''
+>  * Wiki links to relevant material
+>  * External links to mailing lists or web sites
+>
+>  '''Details:'''
+>  * Skill level: beginner or intermediate or advanced
+>  * Language: C
+>  * Mentor: Email address and IRC nick
+>  * Suggested by: Person who suggested the idea
+>
+> Once you have written down the project idea, please post it under
+> Internships/ProjectIdeas/MultiCPUGDBStub and then add it to the
+> Google_Summer_of_Code_2018 wiki page using the
+> "{{:Internships/ProjectIdeas/MultiCPUGDBStub}}" inlining syntax.
+>
+> Or if you prefer, just reply with the project idea to this email and
+> I'll post it on the wiki for you.
+>
+> Can you think of a co-mentor who would be willing to participate?  It
+> makes internships easier when there are multiple mentors - less stress
+> for mentors, faster communication for students.
 
-But then we couldn't take that lock in an OOB command, you'd have to
-audit all of those places that took it to make sure it didn't do any of
-the things OOB commands aren't allowed to do.
+Yep, here is my proposal. I don't have wiki access, so I can't add it myself.
 
-> For the recovery series, I would prefer that we ignore this issue for
-> now - since this problem is there for quite a long time AFAICT in the
-> whole migration code rather than this series only, and we need to
-> solve it once and for all.
+I think Philippe would be a good co-mentor, if he is happy to. I am
+also welcome to mentor other ideas, it doesn't have to be this one.
 
-I don't think those problems happen (much) in the existing code, because
-everything is done in the main thread.
-That's one reason why the to_dst_file is closed in migrate_fd_cleanup
-which is normally closed in the back-half run on the main thread.
+=== Multi-CPU cluster support for GDB server in QEMU ===
 
-One way would be to make the state go to POSTCOPY_PAUSED here;
-note that migrate_set_state already uses an atomic_cmpxchg to do the
-update.
+There are many examples in modern computing where multiple CPU
+clusters are grouped together in a single SoC. This is common in the
+ARM world especially. There are numerous examples such as ARM's
+big.LITTLE implementations and Xilinx's 4xA53s and 2xR5s on the ZynqMP
+SoC. The goal of this task is to add support to the GDB server to
+allow users to debug across these clusters.
 
-Dave
+This is another step towards single binary QEMU as well.
 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Detailed description of the project.
+
+Xilinx has an out of tree implementation that can be used as a
+starting point. Work will need to be done on top of this to prepare it
+for upstream submission and to ensure the implementation is more
+generic.
+
+This will mostly involve extending GDB server to tell GDB about
+different architectures and then allow the user to swap between them.
+
+The Xilinx implementation can be seen here:
+https://github.com/Xilinx/qemu/blob/master/gdbstub.c
+There has been some steps in preparing the work to go upstream, which
+can be seen here:
+https://github.com/Xilinx/qemu/tree/mainline/alistair/gdb
+
+ '''Details:'''
+ * Skill level: advanced
+ * Language: C
+ * Mentor: alistair23@gmail.com, Philippe?
+ * Suggested by: Alistair Francis
+
+>
+> Stefan
