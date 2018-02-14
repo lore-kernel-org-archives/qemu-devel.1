@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eluRX-0000vM-4t
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:37:40 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eluT6-0002ME-Jk
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:39:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eluRW-0001c9-DN
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:37:39 -0500
-References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
-	<1518189456-2873-4-git-send-email-geert+renesas@glider.be>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3ee22637-a0a9-306a-4e6d-14295d4bcb27@redhat.com>
-Date: Wed, 14 Feb 2018 11:37:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <1518189456-2873-4-git-send-email-geert+renesas@glider.be>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH/RFC 3/5] hw/arm/virt: Allow dynamic sysbus
- devices again
+	(envelope-from <laurent@vivier.eu>) id 1eluT2-0003Gy-Jm
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:39:16 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:52309)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eluT2-0003Fx-9U
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 05:39:12 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Wed, 14 Feb 2018 11:39:06 +0100
+Message-Id: <20180214103906.3704-2-laurent@vivier.eu>
+In-Reply-To: <20180214103906.3704-1-laurent@vivier.eu>
+References: <20180214103906.3704-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 1/1] m68k: implement movep instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +23,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
-Cc: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Mihail Abakumov <mikhail.abakumov@ispras.ru>, Laurent Vivier <laurent@vivier.eu>
 
-Hi Geert,
-On 09/02/18 16:17, Geert Uytterhoeven wrote:
-> Allow the instantation of generic dynamic sysbus devices again, without
-> the need to create a new device-specific vfio type.
-> 
-> This is a partial revert of commit  6f2062b9758ebc64 ("hw/arm/virt:
-> Allow only supported dynamic sysbus devices").
-> 
-> Not-Yet-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  hw/arm/virt.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index b334c82edae9fb1f..fa83784fc08ed076 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1596,6 +1596,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      mc->max_cpus = 255;
->      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
->      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
-Couldn't you limit that to TYPE_VFIO_PLATFORM instead?
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Thanks
+This patch implements movep instruction. It moves data between a data register
+and alternate bytes within the address space starting at the location
+specified and incrementing by two.
 
-Eric
->      mc->block_default_type = IF_VIRTIO;
->      mc->no_cdrom = 1;
->      mc->pci_allow_0_address = true;
-> 
+It was designed for the original 68000 and used in firmwares for
+interfacing the 8-bit peripherals through the 16-bit data bus.
+Without this patch opcode for this instruction is recognized as some bitop.
+
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Tested-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180206124431.31433.91946.stgit@pasha-VirtualBox>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/cpu.c       |  2 ++
+ target/m68k/cpu.h       |  1 +
+ target/m68k/translate.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
+
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 6a80be009b..3026714471 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -113,6 +113,7 @@ static void m68000_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_M68000);
+     m68k_set_feature(env, M68K_FEATURE_USP);
+     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ 
+ static void m68020_cpu_initfn(Object *obj)
+@@ -135,6 +136,7 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
+     m68k_set_feature(env, M68K_FEATURE_RTD);
+     m68k_set_feature(env, M68K_FEATURE_CHK2);
++    m68k_set_feature(env, M68K_FEATURE_MOVEP);
+ }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+ 
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 627fb787b6..1d79885222 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -492,6 +492,7 @@ enum m68k_features {
+     M68K_FEATURE_RTD,
+     M68K_FEATURE_CHK2,
+     M68K_FEATURE_M68040, /* instructions specific to MC68040 */
++    M68K_FEATURE_MOVEP,
+ };
+ 
+ static inline int m68k_feature(CPUM68KState *env, int feature)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 34db97b8a0..70c7583621 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2078,6 +2078,51 @@ DISAS_INSN(movem)
+     tcg_temp_free(addr);
+ }
+ 
++DISAS_INSN(movep)
++{
++    uint8_t i;
++    int16_t displ;
++    TCGv reg;
++    TCGv addr;
++    TCGv abuf;
++    TCGv dbuf;
++
++    displ = read_im16(env, s);
++
++    addr = AREG(insn, 0);
++    reg = DREG(insn, 9);
++
++    abuf = tcg_temp_new();
++    tcg_gen_addi_i32(abuf, addr, displ);
++    dbuf = tcg_temp_new();
++
++    if (insn & 0x40) {
++        i = 4;
++    } else {
++        i = 2;
++    }
++
++    if (insn & 0x80) {
++        for ( ; i > 0 ; i--) {
++            tcg_gen_shri_i32(dbuf, reg, (i - 1) * 8);
++            tcg_gen_qemu_st8(dbuf, abuf, IS_USER(s));
++            if (i > 1) {
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    } else {
++        for ( ; i > 0 ; i--) {
++            tcg_gen_qemu_ld8u(dbuf, abuf, IS_USER(s));
++            tcg_gen_deposit_i32(reg, reg, dbuf, (i - 1) * 8, 8);
++            if (i > 1) {
++                tcg_gen_addi_i32(abuf, abuf, 2);
++            }
++        }
++    }
++    tcg_temp_free(abuf);
++    tcg_temp_free(dbuf);
++}
++
+ DISAS_INSN(bitop_im)
+ {
+     int opsize;
+@@ -5678,6 +5723,7 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(bitop_reg, 0140, f1c0);
+     BASE(bitop_reg, 0180, f1c0);
+     BASE(bitop_reg, 01c0, f1c0);
++    INSN(movep,     0108, f138, MOVEP);
+     INSN(arith_im,  0280, fff8, CF_ISA_A);
+     INSN(arith_im,  0200, ff00, M68000);
+     INSN(undef,     02c0, ffc0, M68000);
+-- 
+2.14.3
