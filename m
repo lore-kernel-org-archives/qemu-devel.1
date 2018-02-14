@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eltF1-0006AM-IY
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:20:42 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eltOu-0003di-E6
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eltEw-0001bW-KH
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:20:39 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:38500)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eltEw-0001a5-BR
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:20:34 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
-	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
-	<002401d3a010$8d551280$a7ff3780$@ru>
-	<CAFXrp_eOdwSz7U+VepkNHwPakLt3TZYBYw66dk_CpqpdaT6bOA@mail.gmail.com>
-In-Reply-To: <CAFXrp_eOdwSz7U+VepkNHwPakLt3TZYBYw66dk_CpqpdaT6bOA@mail.gmail.com>
-Date: Wed, 14 Feb 2018 12:20:32 +0300
-Message-ID: <000c01d3a575$10abaf40$32030dc0$@ru>
+	(envelope-from <borntraeger@de.ibm.com>) id 1eltOo-00009c-Jl
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:30:52 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eltOo-00006v-BO
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:30:46 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1E9UYMP098053
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:30:45 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g4eqe0dw1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 04:30:44 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 14 Feb 2018 09:30:40 -0000
+References: <1518542328-25741-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518542328-25741-2-git-send-email-mihajlov@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 14 Feb 2018 10:30:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+In-Reply-To: <1518542328-25741-2-git-send-email-mihajlov@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
+Message-Id: <133f597f-283e-9b86-34df-7a2ada5faa6c@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCHv2 1/3] qmp: expose s390-specific CPU info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +42,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Ciro Santilli' <ciro.santilli@gmail.com>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Kevin Wolf' <kwolf@redhat.com>, 'Peter Maydell' <peter.maydell@linaro.org>, war2jordan@live.com, 'Igor R' <boost.lists@gmail.com>, 'Juan Quintela' <quintela@redhat.com>, 'Jason Wang' <jasowang@redhat.com>, "'Michael S. Tsirkin'" <mst@redhat.com>, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, 'Gerd Hoffmann' <kraxel@redhat.com>, 'Thomas Dullien' <thomas.dullien@googlemail.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, dgilbert@redhat.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com
 
-> From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
-> The patch 23bdb6f7ce73c33f96449e43b4cae01e55f79ae1 appears to be
-> segfaulting `qemu-img` at `replay_mutex_lock`.
 
-Thanks, fixed.
 
+On 02/13/2018 06:18 PM, Viktor Mihajlovski wrote:
+> Presently s390x is the only architecture not exposing specific
+> CPU information via QMP query-cpus. Upstream discussion has shown
+> that it could make sense to report the architecture specific CPU
+> state, e.g. to detect that a CPU has been stopped.
 > 
-> The problem does not happen on the patch base
-> bc2943d6caf787e1c9a5f3109cdb98f37630b89e
+> With this change the output of query-cpus will look like this on
+> s390:
 > 
-> The command is:
+>    [
+>      {"arch": "s390", "current": true,
+>       "props": {"core-id": 0}, "cpu-state": "operating", "CPU": 0,
+>       "qom_path": "/machine/unattached/device[0]",
+>       "halted": false, "thread_id": 63115},
+>      {"arch": "s390", "current": false,
+>       "props": {"core-id": 1}, "cpu-state": "stopped", "CPU": 1,
+>       "qom_path": "/machine/unattached/device[1]",
+>       "halted": true, "thread_id": 63116}
+>    ]
 > 
->     buildroot/output.x86_64~/images
->     ../host/bin/qemu-img convert -f raw -O qcow2 rootfs.ext2 rootfs.ext2.qcow2
->     Aborted (core dumped)
-> 
-> and the backtrace:
-> 
->     >>> bt
->     #0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
->     #1  0x00007ffff5ce6f5d in __GI_abort () at abort.c:90
->     #2  0x000055555565ae79 in replay_mutex_unlock () at stubs/replay.c:79
->     #3  0x00005555556393a3 in os_host_main_loop_wait
-> (timeout=<optimized out>) at util/main-loop.c:256
->     #4  main_loop_wait (nonblocking=<optimized out>) at util/main-loop.c:522
->     #5  0x0000555555576890 in convert_do_copy (s=0x7fffffffca10) at
-> qemu-img.c:1900
->     #6  img_convert (argc=<optimized out>, argv=<optimized out>) at
-> qemu-img.c:2332
->     #7  0x0000555555571dda in main (argc=7, argv=<optimized out>) at
-> qemu-img.c:4763
->     >>>
-> 
->     77 void replay_mutex_lock(void)
->     78 {
->     79     abort();
->     80 }
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> Acked-by: Eric Blake <eblake@redhat.com>
 
-Pavel Dovgalyuk
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
