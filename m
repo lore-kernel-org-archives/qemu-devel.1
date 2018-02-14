@@ -1,34 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eltd8-0003vk-H0
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:37 -0500
+	(envelope-from <aderumier@oxygem.tv>) id 1eltdO-00046m-Lb
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eltd4-0001Yc-KZ
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eltd4-0001Y3-Dy
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:30 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eltd3-0003pU-8U
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 09:45:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2958E2E8435
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 09:45:29 +0000 (UTC)
+	(envelope-from <aderumier@oxygem.tv>) id 1eltdI-0001ef-VG
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:50 -0500
+Received: from mailpro.odiso.net ([89.248.211.110]:56730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1eltdI-0001e6-OJ
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 04:45:44 -0500
+Received: from localhost (localhost [127.0.0.1])
+	by mailpro.odiso.net (Postfix) with ESMTP id D28EC1F55D40
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:45:41 +0100 (CET)
+Received: from mailpro.odiso.net ([127.0.0.1])
+	by localhost (mailpro.odiso.net [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id Zl-48MhnOF1i for <qemu-devel@nongnu.org>;
+	Wed, 14 Feb 2018 10:45:41 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by mailpro.odiso.net (Postfix) with ESMTP id B90901F55D42
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:45:41 +0100 (CET)
+Received: from mailpro.odiso.net ([127.0.0.1])
+	by localhost (mailpro.odiso.net [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id kBTA0GXY-AVU for <qemu-devel@nongnu.org>;
+	Wed, 14 Feb 2018 10:45:41 +0100 (CET)
+Received: from mailpro.odiso.net (mailpro.odiso.net [10.1.31.111])
+	by mailpro.odiso.net (Postfix) with ESMTP id A5D921F55D40
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 10:45:41 +0100 (CET)
+Date: Wed, 14 Feb 2018 10:45:41 +0100 (CET)
+From: Alexandre DERUMIER <aderumier@odiso.com>
+Message-ID: <1564471998.3427173.1518601541505.JavaMail.zimbra@oxygem.tv>
+In-Reply-To: <201297396.3423395.1518598461012.JavaMail.zimbra@oxygem.tv>
+References: <201297396.3423395.1518598461012.JavaMail.zimbra@oxygem.tv>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Feb 2018 09:31:42 -0000
-From: Thomas Huth <1254786@bugs.launchpad.net>
-Reply-To: Bug 1254786 <1254786@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131125163240.27695.53246.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151860070387.16822.7483090803004065536.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1254786] Re: qemu-m68k-static: illegal
- instruction ebc0 during debootstrap second stage
+Subject: Re: [Qemu-devel] drive-mirroring to nbd is failing with multiple
+ parallel jobs (qemu 2.9 -> 2.11)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +44,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+Sorry, I just find that the problem is in our proxmox implementation,
 
--- =
+as we use a socat tunnel for the nbd mirroring, with a timeout of 30s in ca=
+se of inactivity.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1254786
+So, not a qemu bug.
 
-Title:
-  qemu-m68k-static: illegal instruction ebc0 during debootstrap second
-  stage
+Regards,
 
-Status in QEMU:
-  Fix Released
-Status in qemu-linaro package in Ubuntu:
-  New
+Alexandre
 
-Bug description:
-  Host: Ubuntu Precise amd64
-  Guest: Debian (ports) sid m68k
+----- Mail original -----
+De: "aderumier" <aderumier@odiso.com>
+=C3=80: "qemu-devel" <qemu-devel@nongnu.org>
+Envoy=C3=A9: Mercredi 14 F=C3=A9vrier 2018 09:54:21
+Objet: [Qemu-devel] drive-mirroring to nbd is failing with multiple paralle=
+l jobs (qemu 2.9 -> 2.11)
 
-  $ sudo qemu-debootstrap --no-check-gpg --arch=3Dm68k sid m68k http://ftp.=
-debian-ports.org/debian
-  I: Running command: debootstrap --arch m68k --foreign --no-check-gpg sid =
-m68k http://ftp.debian-ports.org/debian
-  [...]
-  I: Running command: chroot m68k /debootstrap/debootstrap --second-stage
-  qemu: fatal: Illegal instruction: ebc0 @ f67e5662
-  D0 =3D 6ffffef5   A0 =3D f67fbf58   F0 =3D 0000000000000000 (           0)
-  D1 =3D 0000010a   A1 =3D 00000000   F1 =3D 0000000000000000 (           0)
-  D2 =3D 0000000f   A2 =3D 00000000   F2 =3D 0000000000000000 (           0)
-  D3 =3D 00000000   A3 =3D f67e0000   F3 =3D 0000000000000000 (           0)
-  D4 =3D 00000000   A4 =3D 00000000   F4 =3D 0000000000000000 (           0)
-  D5 =3D 00000000   A5 =3D f67fc000   F5 =3D 0000000000000000 (           0)
-  D6 =3D 00000000   A6 =3D f6fff7cc   F6 =3D 0000000000000000 (           0)
-  D7 =3D 00000000   A7 =3D f6fff580   F7 =3D 0000000000000000 (           0)
-  PC =3D f67e5662   SR =3D 0000 ----- FPRESULT =3D            0
-  Aborted (core dumped)
+Hi,=20
 
-  ProblemType: Bug
-  DistroRelease: Ubuntu 12.04
-  Package: qemu-user-static 1.0.50-2012.03-0ubuntu2.1
-  ProcVersionSignature: Ubuntu 3.8.0-33.48~precise1-generic 3.8.13.11
-  Uname: Linux 3.8.0-33-generic x86_64
-  NonfreeKernelModules: wl
-  ApportVersion: 2.0.1-0ubuntu17.6
-  Architecture: amd64
-  Date: Mon Nov 25 16:08:26 2013
-  Dependencies:
-   =
+I currently have failing mirroring jobs to nbd, when multiple jobs are runn=
+ing in parallel.=20
 
-  InstallationMedia: Ubuntu 12.04.3 LTS "Precise Pangolin" - Release amd64 =
-(20130820.1)
-  MarkForUpload: True
-  ProcEnviron:
-   LANGUAGE=3Den_GB:en
-   TERM=3Dxterm
-   PATH=3D(custom, no user)
-   LANG=3Den_GB.UTF-8
-   SHELL=3D/bin/bash
-  SourcePackage: qemu-linaro
-  UpgradeStatus: No upgrade log present (probably fresh install)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1254786/+subscriptions
+step to reproduce, with 2 disks:=20
+
+
+1) launch mirroring job of first disk to remote target nbd.(to qemu running=
+ target)=20
+2) wait until is reach ready =3D 1 , do not complete=20
+3) launch mirroring job of second disk to remote target nbd(to same qemu ru=
+nning target)=20
+
+-> mirroring job of second disk is currently running (ready=3D0), first dis=
+k is still at ready=3D1 and still mirroring new write coming.=20
+
+
+then, after some time, mainly if no new write are coming to first disk (aro=
+und 30-40s), the first job is crashing with input/output error.=20
+
+
+
+Note that I don't have network problem, or disk problem, I'm able to mirror=
+ both disk individually.=20
+
+
+Another similar bug report on proxmox bugzilla:=20
+
+https://bugzilla.proxmox.com/show_bug.cgi?id=3D1664=20
+
+
+Maybe related to this :=20
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03086.html=20
+?=20
+
+
+I don't remember to have the problem with qemu 2.7, but I'm able to reprodu=
+ce with qemu 2.9 && qemu 2.11.=20
+
+
+Best Regards,=20
+
+Alexandre=20
