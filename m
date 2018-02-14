@@ -1,50 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1elxYz-0006Fh-Ou
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:57:35 -0500
+	(envelope-from <groug@kaod.org>) id 1elxa2-0006xd-N7
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:59:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1elxYw-0002hS-NF
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:57:33 -0500
-Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:47099)
+	(envelope-from <groug@kaod.org>) id 1elxZq-0003KB-HT
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:58:38 -0500
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:44372)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1elxYw-0002hH-Ii
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:57:30 -0500
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w1EDtbJn041214
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:57:29 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id AA6486D
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:57:30 -0500 (EST)
-Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
-	[128.59.72.16]) by hazelnut (Postfix) with ESMTP id 955017E
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:57:30 -0500 (EST)
-Received: from mail-wr0-f200.google.com (mail-wr0-f200.google.com
-	[209.85.128.200])
-	by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w1EDvSGw047566
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 08:57:29 -0500
-Received: by mail-wr0-f200.google.com with SMTP id d17so23063wrc.19
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 05:57:29 -0800 (PST)
-Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com.
-	[209.85.128.172])
-	by smtp.gmail.com with ESMTPSA id y3sm8983139edb.1.2018.02.14.05.57.26
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 14 Feb 2018 05:57:26 -0800 (PST)
-Received: by mail-wr0-f172.google.com with SMTP id b52so12660wrd.10
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 05:57:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1elxZq-0003DD-A0
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 08:58:26 -0500
+Received: from player157.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 6D2AC11BDA0
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 14:58:24 +0100 (CET)
+Date: Wed, 14 Feb 2018 14:58:18 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180214145818.334dffc9@bahia.lan>
+In-Reply-To: <20180214065135.11633-2-sjitindarsingh@gmail.com>
+References: <20180214065135.11633-1-sjitindarsingh@gmail.com>
+	<20180214065135.11633-2-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180214053626.GJ4472@xz-mi>
-References: <CAHyh4xiTDwB2xG_bg00bMA0042yTRq7-dJ-+y3muR+=9N3Vx-g@mail.gmail.com>
-	<20180214053626.GJ4472@xz-mi>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Wed, 14 Feb 2018 08:57:25 -0500
-Message-ID: <CAHyh4xj_RTADcQQQ7qOcBhJPxeziBEmgDx5Mfr2ei7uCsym-Gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Assigning network devices to nested VMs results in
- driver errors in nested VMs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V2 2/3]
+ ppc/spapr-caps: Convert spapr-cap-ibs to be a boolean
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,83 +31,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, vfio-users@redhat.com
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On Wed, Feb 14, 2018 at 12:36 AM, Peter Xu <peterx@redhat.com> wrote:
-> On Tue, Feb 13, 2018 at 11:44:09PM -0500, Jintack Lim wrote:
->> Hi,
->>
->> I'm trying to assign network devices to nested VMs on x86 using KVM,
->> but I got network device driver errors in the nested VMs. (I've tried
->> this about an year ago when vIOMMU patches were not upstreamed, and I
->> got similar errors at that time.)
->>
->> This could be network driver issues, but I'd like to get some help if
->> somebody encountered similar issues.
->>
->> I'm using v4.15.0 kernel and v2.11.0 QEMU, and I followed this [1]
->> guide. I had no problem with assigning devices to the first level VMs
->> (L1 VMs). And I also checked that the devices were assigned to nested
->> VMs with the lspci command in the nested VMs. But network device
->> drivers failed to initialize the device. I tried two network cards -
->> Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection and
->> Mellanox Technologies MT27500 Family.
->>
->> Intel driver error in the nested VM looks like this.
->> [    1.939552] ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver -
->> version 5.1.0-k
->> [    1.949796] ixgbe: Copyright (c) 1999-2016 Intel Corporation.
->> [    2.210024] ixgbe 0000:00:04.0: HW Init failed: -12
->> [    2.218144] ixgbe: probe of 0000:00:04.0 failed with error -12
->>
->> and I saw lots of these messages in the host (L0) kernel log when
->> booting the nested VM.
->>
->> [ 1557.404173] DMAR: DRHD: handling fault status reg 102
->> [ 1557.409813] DMAR: [DMA Read] Request device [06:00.0] fault addr
->> 90000 [fault reason 06] PTE Read access is not set
->> [ 1561.383957] DMAR: DRHD: handling fault status reg 202
->> [ 1561.389598] DMAR: [DMA Read] Request device [06:00.0] fault addr
->> 90000 [fault reason 06] PTE Read access is not set
->>
->> This is Mellanox driver error in another nested VM.
->> [    2.481694] mlx4_core: Initializing 0000:00:04.0
->> [    3.519422] mlx4_core 0000:00:04.0: Installed FW has unsupported
->> command interface revision 0
->> [    3.537769] mlx4_core 0000:00:04.0: (Installed FW version is 0.0.000)
->> [    3.551733] mlx4_core 0000:00:04.0: This driver version supports
->> only revisions 2 to 3
->> [    3.568758] mlx4_core 0000:00:04.0: QUERY_FW command failed, aborting
->> [    3.582789] mlx4_core 0000:00:04.0: Failed to init fw, aborting.
->>
->> The host showed similar messages as above.
->>
->> I wonder what could be the cause of these errors. Please let me know
->> if further information is needed.
->>
->> [1] https://wiki.qemu.org/Features/VT-d
->
-> Hi, Jintack,
+On Wed, 14 Feb 2018 17:51:34 +1100
+Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
 
-Hi Peter,
+> The spapr-cap cap-ibs can only have values broken or fixed as there is
+> no workaround. Currently setting the value workaround will hit an assert
+> if the guest makes the hcall h_get_cpu_characteristics.
+> 
+> Thus this capability is better suited to being represented as a boolean.
+> Setting this to OFF corresponds to the old BROKEN, that is no indirect
+> branch serialisation. Setting this to ON corresponds to the old FIXED,
+> that is indirect branches are serialised.
+> 
+> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
 
->
-> Thanks for reporting the problem.
->
-> I haven't been playing with nested assignment much recently (and even
-> before), but I think I encountered similar problem too in the past.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Oh, that's good to hear that :)
-
->
-> Will let you know if I had any progress, but it's possibly not gonna
-> happen in a few days since there'll be a whole week holiday starting
-> from tomorrow (which is Chinese Spring Festival).
-
-Thanks a lot. Enjoy Lunar New Year!
-
->
-> --
-> Peter Xu
->
+>  hw/ppc/spapr.c      |  2 +-
+>  hw/ppc/spapr_caps.c | 12 ++++++------
+>  target/ppc/kvm.c    |  2 +-
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 32a876be56..969db6cde2 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3886,7 +3886,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
+>      smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
+> -    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
+> +    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_OFF;
+>      spapr_caps_add_properties(smc, &error_abort);
+>  }
+>  
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index e69d308560..05997b0842 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -207,9 +207,9 @@ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+>  {
+>      if (tcg_enabled() && val) {
+>          /* TODO - for now only allow broken for TCG */
+> -        error_setg(errp, "Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
+> +        error_setg(errp, "Indirect Branch Serialisation support not available, try cap-ibs=off");
+>      } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
+> -        error_setg(errp, "Requested safe indirect branch capability level not supported by kvm, try a different value for cap-ibs");
+> +        error_setg(errp, "Indirect Branch Serialisation support not available, try cap-ibs=off");
+>      }
+>  }
+>  
+> @@ -263,11 +263,11 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>      },
+>      [SPAPR_CAP_IBS] = {
+>          .name = "ibs",
+> -        .description = "Indirect Branch Serialisation" VALUE_DESC_TRISTATE,
+> +        .description = "Indirect Branch Serialisation",
+>          .index = SPAPR_CAP_IBS,
+> -        .get = spapr_cap_get_tristate,
+> -        .set = spapr_cap_set_tristate,
+> -        .type = "string",
+> +        .get = spapr_cap_get_bool,
+> +        .set = spapr_cap_set_bool,
+> +        .type = "bool",
+>          .apply = cap_safe_indirect_branch_apply,
+>      },
+>  };
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 9842b3bb12..3e3e5f9c1f 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2495,7 +2495,7 @@ static void kvmppc_get_cpu_characteristics(KVMState *s)
+>      }
+>      /* Parse and set cap_ppc_safe_indirect_branch */
+>      if (c.character & H_CPU_CHAR_BCCTRL_SERIALISED) {
+> -        cap_ppc_safe_indirect_branch = 2;
+> +        cap_ppc_safe_indirect_branch = 1;
+>      }
+>  }
+>  
