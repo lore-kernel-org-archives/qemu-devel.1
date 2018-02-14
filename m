@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1em0Gq-00034E-OW
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:51:05 -0500
+	(envelope-from <bounces@canonical.com>) id 1em0Lt-0006gW-9z
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1em0Gn-0003op-JG
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:51:00 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51840 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1em0Gn-0003oW-E0
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:50:57 -0500
-Date: Wed, 14 Feb 2018 16:50:40 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180214165040.GA2508@work-vm>
-References: <20180214001105.21508-1-mdroth@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1em0Lq-0006vz-IW
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:56:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59434)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1em0Lq-0006vh-Bd
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 11:56:10 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1em0Lp-0006NF-F8
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:56:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 716192E8071
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 16:56:09 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180214001105.21508-1-mdroth@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a blog post documenting
- Spectre/Meltdown options for QEMU 2.11.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Feb 2018 16:39:19 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 589315 <589315@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100603181944.2106.17684.malonedeb@soybean.canonical.com>
+Message-Id: <151862635907.9308.2339015783347033214.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 589315] Re: qemu: Improve error reporting when
+ migration can't connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,237 +37,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-* Michael Roth (mdroth@linux.vnet.ibm.com) wrote:
-> This blog entry is intended as a follow-up to the original entry in
-> January regarding Spectre/Meltdown and the proposed changes to address
-> them in the upcoming 2.11.1 release.
-> 
-> This entry is meant to accompany the 2.11.1 release (planned for
-> 2018-02-14) and document how to make use of the new options for
-> various architectures.
-> 
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> ---
-> 
-> The pseries/s390 bits have gotten some initial review (thanks Suraj/Christian),
-> but it can definitely use some additional review on the x86 side of things.
-> 
-> Also, Peter if think anything extra should to be mentioned on the ARM side just
-> let me know what to add.
-> 
->  .../2018-02-14-qemu-2-11-1-and-spectre-update.md   | 180 +++++++++++++++++++++
->  1 file changed, 180 insertions(+)
->  create mode 100644 _posts/2018-02-14-qemu-2-11-1-and-spectre-update.md
-> 
-> diff --git a/_posts/2018-02-14-qemu-2-11-1-and-spectre-update.md b/_posts/2018-02-14-qemu-2-11-1-and-spectre-update.md
-> new file mode 100644
-> index 0000000..7cdea59
-> --- /dev/null
-> +++ b/_posts/2018-02-14-qemu-2-11-1-and-spectre-update.md
-> @@ -0,0 +1,180 @@
-> +---
-> +layout: post
-> +title:  "QEMU 2.11.1 and making use of Spectre/Meltdown mitigation for KVM guests"
-> +date: 2018-02-14 10:35:44 -0600
-> +author: Michael Roth
-> +categories: [meltdown, spectre, security, x86, ppc, s390, releases, 'qemu 2.11']
-> +---
-> +
-> +In a [previous post](https://www.qemu.org/2018/01/04/spectre/) it was
-> +detailed how QEMU/KVM might be affected by Spectre/Meltdown attacks, and what
-> +the plan was to mitigate them in QEMU 2.11.1 (and eventually QEMU 2.12).
-> +
-> +QEMU 2.11.1 is now available, and contains the aforementioned mitigations for
-> +x86 guests, along with additional mitigation functionality for pseries and
-> +s390 guests (ARM guests do not currently require additional QEMU patches).
-> +However, enabling this functionality requires additional configuration beyond
-> +just updating QEMU, which we hope to address with this post.
-> +
-> +Please note that, as mentioned in the previous blog post, QEMU/KVM generally
-> +has the same requirements as other unpriviledged processes running on the
-> +host WRT Spectre/Meltdown mitigation. What is being addressed here is
-> +enabling a guest operating system to enable the same (or similar) mitigations
-> +to protect itself from unpriviledged guest processes. Thus, the
-> +patches/requirements listed here are specific to that goal and should not be
-> +regarded as the full set of requirements to enable mitigations on the host
-> +side (though in some cases there is some overlap between the two WRT required
-> +patches/etc).
-> +
-> +Also please note that this is a best-effort from the QEMU/KVM community, and
-> +these mitigations rely on a mix of additional kernel/firmware/microcode
-> +updates that are in some cases not available publically, or may not yet be
-> +implemented in some distros, so users are highly encouraged to consult with
-> +their respective vendors/distros to confirm whether all the required
-> +components are in place. We do our best to highlight the requirements here,
-> +but this may not be an exhaustive list.
-> +
-> +
-> +## enabling mitigations for x86 KVM guests
-> +
-> +For x86 guests there are 2 additional CPU flags associated with
-> +Spectre/Meltdown mitigation: **spec-ctrl**, and **ibpb**. These flags
-> +expose additional functionality made available through new microcode
-> +updates for certain Intel/AMD processors that can be used to mitigate
-> +various attack vectors related to Spectre. (Meltdown mitigation via KPTI
-> +does not require additional CPU functionality or microcode, and does not
-> +require an updated QEMU, only the related guest/host kernel patches).
-> +
-> +These CPU flags:
-> +
-> +* spec-ctrl: exposes Indirect Branch Restricted Speculation (IBRS)
-> +* ibpb: exposes Indirect Branch Prediction Barriers
-> +
-> +are both features requiring guest/host kernel updates, as well as
-> +microcode updates for Intel and recent AMD processors. The status of
-> +these kernel patches upstream is still in flux, but most supported
-> +distros have some form of the patches that is sufficient to make use
-> +of the features. The current status/availability of microcode updates
-> +depends on your CPU architecture/model. Please check with your
-> +vendor/distro to confirm these prerequisites are available/installed.
-> +
-> +Generally, for Intel CPUs with updated microcode, **spec-ctrl** will
-> +enable both IBRS and IBPB functionality. For AMD EPYC processors,
-> +**ibpb** can be used to enable IBPB specifically, and is thought to
-> +be sufficient by itself that particular architecture.
-> +
-> +These flags can be set in a similar manner as other CPU flags, i.e.:
-> +
-> +    qemu-system-x86_64 -cpu qemu64,+spec-ctrl,... ...
-> +    qemu-system-x86_64 -cpu IvyBridge,+spec-ctrl,... ...
-> +    qemu-system-x86_64 -cpu EPYC,+ibpb
-> +    etc...
-> +
-> +Additionally, for management stacks that lack support for setting
-> +specific CPU flags, a set of new CPU types have been added which
-> +enable the appropriate CPU flags automatically:
-> +
-> +    qemu-system-x86_64 -cpu Nehalem-IBRS ...
-> +    qemu-system-x86_64 -cpu Westmere-IBRS ...
-> +    qemu-system-x86_64 -cpu SandyBridge-IBRS ...
-> +    qemu-system-x86_64 -cpu IvyBridge-IBRS ...
-> +    qemu-system-x86_64 -cpu Haswell-IBRS ...
-> +    qemu-system-x86_64 -cpu Haswell-noTSX-IBRS ...
-> +    qemu-system-x86_64 -cpu Broadwell-IBRS ...
-> +    qemu-system-x86_64 -cpu Broadwell-noTSX-IBRS ...
-> +    qemu-system-x86_64 -cpu Skylake-Client-IBRS ...
-> +    qemu-system-x86_64 -cpu Skylake-Server-IBRS ...
-> +    qemu-system-x86_64 -cpu EPYC-IBPB ...
-> +
-> +With these settings enabled, guests may still require additional
-> +configuration to enable IBRS/IBPB, which may vary somewhat from one
-> +distro to another. For RHEL guests, the following resource may be
-> +useful:
-> +
-> +* https://access.redhat.com/articles/3311301
-> +
-> +WRT migration compatibility, **spec-ctrl**/**ibrs** (or the corresponding
-> +CPU type) should be set the same on both source/target to maintain
-> +compatibility. Thus, guests will need to be rebooted to make use of
-> +the new features.
+yep, it's been giving errors now for a while (and not hanging) and also
+recently gained the error text in 'info migrate':
 
-There is an unfortunate wrinkle with respect to CPU type compatibility
-on x86;  the retpoline code is looking like it has to do special
-cases for Skylake and other recent CPUs (fluching the return buffer) and
-it does this on the basis of CPUid/model rather than flags;  so from
-QEMUs point of view, the normal trick we do about giving guests a false
-earlier CPU name (e.g. -cpu IvyBridge) and expecting them to run across
-a wide range of more modern hardware may not be secure.
+[dgilbert@dgilbert-t530 ~]$ /usr/bin/qemu-system-x86_64 -nographic
+QEMU 2.10.1 monitor - type 'help' for more information
+(qemu) migrate tcp:0:12345
+qemu-system-x86_64: Failed to connect socket: Connection refused
+(qemu) info migrate
+globals: store-global-state=3D1, only_migratable=3D0, send-configuration=3D=
+1, send-section-footer=3D1
+capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks:=
+ off compress: off events: off postcopy-ram: off x-colo: off release-ram: o=
+ff block: off return-path: off =
 
-Dave
+Migration status: failed (Failed to connect socket: Connection refused)
+total time: 0 milliseconds
+(qemu) =
 
-> +## enabling mitigations for pseries KVM guests
-> +
-> +For pseries guests there are 3 tri-state -machine options/capabilities
-> +relating to Spectre/Meltdown mitigation: **cap-cfpc**, **cap-sbbc**,
-> +**cap-ibs**, which each correspond to a set of host machine capabilities
-> +advertised by the KVM kernel module in new/patched host kernels that can
-> +be used to mitigate various aspects of Spectre/Meltdown:
-> +
-> +* cap-cfpc: Cache Flush on Privilege Change
-> +* cap-sbbc: Speculation Barrier Bounds Checking
-> +* cap-ibs: Indirect Branch Serialisation
-> +
-> +Each option can be set to one of "broken", "workaround", or "fixed", which
-> +correspond, respectively, to instructing the guest whether the host is
-> +vulnerable, has OS-level workarounds available, or has hardware/firmware
-> +that does not require OS-level workarounds. Based on these options, QEMU
-> +will perform checks to validate whether the specified settings are available
-> +on the current host and pass these settings on to the guest kernel. At a
-> +minimum, any setting other than "broken" will require a host kernel that has
-> +some form of the following patches:
-> +
-> +    commit 3214d01f139b7544e870fc0b7fcce8da13c1cb51
-> +    KVM: PPC: Book3S: Provide information about hardware/firmware CVE workarounds
-> +  
-> +    commit 191eccb1580939fb0d47deb405b82a85b0379070
-> +    powerpc/pseries: Add H_GET_CPU_CHARACTERISTICS flags & wrapper
-> +
-> +and whether a host will support "workaround" and "fixed" settings for each
-> +option will depend on the hardware/firmware level of the host system.
-> +
-> +In turn, to make use of "workaround" or "fixed" settings for each option,
-> +the guest kernel will require at least the following set of patches:
-> +
-> +* https://lists.ozlabs.org/pipermail/linuxppc-dev/2018-January/167455.html
-> +
-> +These are available upstream and have been backported to a number of stable
-> +kernels. Please check with your vendor/distro to confirm the required
-> +hardware/firmware and guest kernel patches are available/installed.
-> +
-> +By default, all three options, **cap-cfpc**, **cap-sbbc**, and **cap-ibs**
-> +default to "broken" to maintain compatibility with previous versions of QEMU
-> +and unpatched host kernels. To enable them you must start QEMU with the
-> +desired mitigation strategy specified explicitly. For example:
-> +
-> +    qemu-system-ppc64 ... \
-> +      -machine pseries-2.11,cap-cfpc=workaround,cap-sbbc=workaround,cap-ibs=fixed
-> +
-> +WRT migration compatibility, setting any of these features to a value other
-> +than "broken" will require an identical setting for that option on the
-> +source/destination guest. To enable these settings your guests will need to
-> +be rebooted at some point.
-> +
-> +
-> +## enabling mitigations for s390 KVM guests
-> +
-> +For s390 guests there are 2 CPU options relating to Spectre/Meltdown:
-> +
-> +* bpb: Branch prediction blocking
-> +* ppa15: PPA15 is installed
-> +
-> +**bpb** requires a host kernel patched with:
-> +
-> +    commit 35b3fde6203b932b2b1a5b53b3d8808abc9c4f60
-> +    KVM: s390: wire up bpb feature
-> +
-> +and both **bpb** and **ppa15** require a firmware with the appropriate support
-> +level as well as guest kernel patches to enable the functionality within
-> +guests. Please check with your distro/vendor to confirm.
-> +
-> +Both **bpb** and **ppa15** are enabled by default with newer/patched host
-> +kernels, and can also be set manually. For example:
-> +
-> +    qemu-system-s390x -M s390-ccw-virtio-2.11 ... \
-> +      -cpu zEC12,bpb=on,ppa15=on 
-> +
-> +WRT to migration, enabling **bpb** requires the source/target also have **bpb**
-> +enabled. Since this is enabled by default, you must ensure that **bpb**=off if
-> +you wish to maintain migration compatibility with existing guests, or take
-> +steps to reboot guests with **bpb** enabled prior to migrating them.
-> -- 
-> 2.11.0
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+So marking as fix-release
+
+(Note that there's a bug that causes a crash in the disconnect case on
+current head, but that's only been in for a week or so and I've just
+sent a fix for it).
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/589315
+
+Title:
+  qemu: Improve error reporting when migration can't connect
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  Tested with upstream qemu as of Jun 3 2010
+
+  If the source qemu instance can't connect to the migration destination (s=
+ay
+  there is no listening QEMU instance, or port is blocked by a firewall), a=
+ll we
+  get is info migrate -> Migration status: failed. This is all we have to r=
+eport
+  back to libvirt users if their firewall is misconfigured, which is crappy.
+
+  Ideally, if we can't connect, migration would fail immediately with a rel=
+evant
+  message and strerror(). More info from 'info migrate' would be nice too, =
+no
+  idea how this will play with QMP though.
+
+  As a slightly related issue, try entering
+
+  migrate tcp:127.0.0.0:6000
+
+  We get a 'migration failed' error, and then the monitor hangs!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/589315/+subscriptions
