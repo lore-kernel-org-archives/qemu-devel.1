@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1em3bG-000689-Pd
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:24:20 -0500
+	(envelope-from <mreitz@redhat.com>) id 1em3zj-0002IO-Mw
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1em3bE-0008W1-4F
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:24:18 -0500
-References: <1518629505-22480-1-git-send-email-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9a9ac3ae-5974-f462-7321-9ae2ad5b78ae@redhat.com>
-Date: Wed, 14 Feb 2018 14:23:58 -0600
-MIME-Version: 1.0
-In-Reply-To: <1518629505-22480-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] configure: Add missing space when using
- --with-pkgversion
+	(envelope-from <mreitz@redhat.com>) id 1em3zi-0001uI-SK
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:49:35 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 14 Feb 2018 21:49:15 +0100
+Message-Id: <20180214204915.7980-4-mreitz@redhat.com>
+In-Reply-To: <20180214204915.7980-1-mreitz@redhat.com>
+References: <20180214204915.7980-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/3] block/ssh: Add basic .bdrv_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +19,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On 02/14/2018 11:31 AM, Thomas Huth wrote:
-> When running configure with --with-pkgversion=foo there is no
-> space anymore between the version number and the parentheses:
-> 
-> $ m68k-softmmu/qemu-system-m68k -version
-> QEMU emulator version 2.11.50(foo)
-> 
-> Fix it by moving the space from the configure script to the Makefile.
-> 
-> Fixes: 67a1de0d195a6185c39b436159c9ffc7720bf979
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1673373
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   Makefile  | 2 +-
->   configure | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 4ec7a3c..41adbc9 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -369,7 +369,7 @@ qemu-version.h: FORCE
->   		(cd $(SRC_PATH); \
->   		printf '#define QEMU_PKGVERSION '; \
->   		if test -n "$(PKGVERSION)"; then \
-> -			printf '"$(PKGVERSION)"\n'; \
-> +			printf '" ($(PKGVERSION))"\n'; \
+libssh2 does not seem to offer real truncation support, so we can only
+grow files -- but that is better than nothing.
 
-I would argue that putting a space here is awkward; wouldn't it instead 
-be easier to have all CLIENTS of QEMU_PKGVERSION in the source code 
-assume that the macro does NOT have a leading space, and to supply a 
-space themselves?
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/ssh.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-That is, change THESE locations:
-
-bsd-user/main.c:    printf("qemu-" TARGET_NAME " version " QEMU_VERSION 
-QEMU_PKGVERSION
-linux-user/main.c:    printf("qemu-" TARGET_NAME " version " 
-QEMU_VERSION QEMU_PKGVERSION
-qemu-img.c:#define QEMU_IMG_VERSION "qemu-img version " QEMU_VERSION 
-QEMU_PKGVERSION \
-qemu-io.c:            printf("%s version " QEMU_VERSION QEMU_PKGVERSION "\n"
-qemu-nbd.c:"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
-qga/main.c:"QEMU Guest Agent " QEMU_VERSION QEMU_PKGVERSION "\n"
-scsi/qemu-pr-helper.c:"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
-ui/cocoa.m:    @"QEMU emulator version %s%s", QEMU_VERSION, 
-QEMU_PKGVERSION];
-vl.c:    printf("QEMU emulator version " QEMU_VERSION QEMU_PKGVERSION "\n"
-
-to instead supply the missing space, and have configure/Makefile always 
-generate without a leading space.
-
-> +++ b/configure
-> @@ -1162,7 +1162,7 @@ for opt do
->     ;;
->     --disable-blobs) blobs="no"
->     ;;
-> -  --with-pkgversion=*) pkgversion=" ($optarg)"
-> +  --with-pkgversion=*) pkgversion="$optarg"
-
-Hmm - here you're changing who supplies the ().  But that argues that 
-maybe the callsites should supply " (" and ")" themselves.
-
-Here's how coreutils does it, by using gnulib's version-etc module:
-
-src/local.mk:     $(AM_V_at)printf 'char const *Version = 
-"$(PACKAGE_VERSION)";\n' >> $@t
-
-src/system.h:    version_etc (stdout, Program_name, PACKAGE_NAME, 
-Version, Authors,
-
-version_etc_arn (FILE *stream,
-                  const char *command_name, const char *package,
-                  const char *version,
-                  const char * const * authors, size_t n_authors)
-{
-   if (command_name)
-     fprintf (stream, "%s (%s) %s\n", command_name, package, version);
-
-which means that the Makefile magic outputs JUST the text that goes 
-inside the (), and the callsite that outputs version information is what 
-supplies the " (" and ")".
-
+diff --git a/block/ssh.c b/block/ssh.c
+index ff8576f21e..c235eec255 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -1219,6 +1219,29 @@ static int64_t ssh_getlength(BlockDriverState *bs)
+     return length;
+ }
+ 
++static int ssh_truncate(BlockDriverState *bs, int64_t offset,
++                        PreallocMode prealloc, Error **errp)
++{
++    BDRVSSHState *s = bs->opaque;
++
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_str(prealloc));
++        return -ENOTSUP;
++    }
++
++    if (offset < s->attrs.filesize) {
++        error_setg(errp, "ssh driver does not support shrinking files");
++        return -ENOTSUP;
++    }
++
++    if (offset == s->attrs.filesize) {
++        return 0;
++    }
++
++    return ssh_grow_file(s, offset, errp);
++}
++
+ static BlockDriver bdrv_ssh = {
+     .format_name                  = "ssh",
+     .protocol_name                = "ssh",
+@@ -1231,6 +1254,7 @@ static BlockDriver bdrv_ssh = {
+     .bdrv_co_readv                = ssh_co_readv,
+     .bdrv_co_writev               = ssh_co_writev,
+     .bdrv_getlength               = ssh_getlength,
++    .bdrv_truncate                = ssh_truncate,
+     .bdrv_co_flush_to_disk        = ssh_co_flush,
+     .create_opts                  = &ssh_create_opts,
+ };
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
