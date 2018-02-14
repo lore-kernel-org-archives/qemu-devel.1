@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elzA3-0008IY-EM
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1elzA3-0008Ic-SS
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1elzA0-00075Y-7W
+	(envelope-from <dgilbert@redhat.com>) id 1elzA2-00076z-0M
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40565 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45878 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elz9z-00074Y-VK
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:52 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1elzA1-00076d-OO
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 10:39:53 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 14 Feb 2018 15:39:32 +0000
-Message-Id: <20180214153938.5410-5-dgilbert@redhat.com>
+Date: Wed, 14 Feb 2018 15:39:35 +0000
+Message-Id: <20180214153938.5410-8-dgilbert@redhat.com>
 In-Reply-To: <20180214153938.5410-1-dgilbert@redhat.com>
 References: <20180214153938.5410-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 04/10] migration: Fix early failure cleanup
+Subject: [Qemu-devel] [PULL 07/10] migration: reuse mis->userfault_quit_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +25,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, groug@kaod.org, ross.lagerwall@citrix.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-Avoid crash in cleanup after a very early migration failure
-(possibly due to my 688a3dcba980bf01344a  'Route errors down ...')
+It was only used for quitting the page fault thread before. Let it be
+something more useful - now we can use it to notify a "wake" for the
+page fault thread (for any reason), and it only means "quit" if the
+fault_thread_quit is set.
 
+Since we changed what it does, renaming it to userfault_event_fd.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180208103132.28452-3-peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20180212160340.15333-2-dgilbert@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ migration/migration.h    |  6 ++++--
+ migration/postcopy-ram.c | 29 ++++++++++++++++++++---------
+ 2 files changed, 24 insertions(+), 11 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 8333d8e35e..7095c1040e 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1602,11 +1602,13 @@ static void xbzrle_load_cleanup(void)
+diff --git a/migration/migration.h b/migration/migration.h
+index 848f638a20..75c72d3c8f 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -35,6 +35,8 @@ struct MigrationIncomingState {
+     bool           have_fault_thread;
+     QemuThread     fault_thread;
+     QemuSemaphore  fault_thread_sem;
++    /* Set this when we want the fault thread to quit */
++    bool           fault_thread_quit;
  
- static void ram_state_cleanup(RAMState **rsp)
- {
--    migration_page_queue_free(*rsp);
--    qemu_mutex_destroy(&(*rsp)->bitmap_mutex);
--    qemu_mutex_destroy(&(*rsp)->src_page_req_mutex);
--    g_free(*rsp);
--    *rsp = NULL;
-+    if (*rsp) {
-+        migration_page_queue_free(*rsp);
-+        qemu_mutex_destroy(&(*rsp)->bitmap_mutex);
-+        qemu_mutex_destroy(&(*rsp)->src_page_req_mutex);
-+        g_free(*rsp);
-+        *rsp = NULL;
-+    }
- }
+     bool           have_listen_thread;
+     QemuThread     listen_thread;
+@@ -42,8 +44,8 @@ struct MigrationIncomingState {
  
- static void xbzrle_cleanup(void)
+     /* For the kernel to send us notifications */
+     int       userfault_fd;
+-    /* To tell the fault_thread to quit */
+-    int       userfault_quit_fd;
++    /* To notify the fault_thread to wake, e.g., when need to quit */
++    int       userfault_event_fd;
+     QEMUFile *to_src_file;
+     QemuMutex rp_mutex;    /* We send replies from multiple threads */
+     void     *postcopy_tmp_page;
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index bec6c2c66b..9ad4f20f82 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -387,17 +387,18 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+          * currently be at 0, we're going to increment it to 1
+          */
+         tmp64 = 1;
+-        if (write(mis->userfault_quit_fd, &tmp64, 8) == 8) {
++        atomic_set(&mis->fault_thread_quit, 1);
++        if (write(mis->userfault_event_fd, &tmp64, 8) == 8) {
+             trace_postcopy_ram_incoming_cleanup_join();
+             qemu_thread_join(&mis->fault_thread);
+         } else {
+             /* Not much we can do here, but may as well report it */
+-            error_report("%s: incrementing userfault_quit_fd: %s", __func__,
++            error_report("%s: incrementing userfault_event_fd: %s", __func__,
+                          strerror(errno));
+         }
+         trace_postcopy_ram_incoming_cleanup_closeuf();
+         close(mis->userfault_fd);
+-        close(mis->userfault_quit_fd);
++        close(mis->userfault_event_fd);
+         mis->have_fault_thread = false;
+     }
+ 
+@@ -520,7 +521,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
+         pfd[0].fd = mis->userfault_fd;
+         pfd[0].events = POLLIN;
+         pfd[0].revents = 0;
+-        pfd[1].fd = mis->userfault_quit_fd;
++        pfd[1].fd = mis->userfault_event_fd;
+         pfd[1].events = POLLIN; /* Waiting for eventfd to go positive */
+         pfd[1].revents = 0;
+ 
+@@ -530,8 +531,18 @@ static void *postcopy_ram_fault_thread(void *opaque)
+         }
+ 
+         if (pfd[1].revents) {
+-            trace_postcopy_ram_fault_thread_quit();
+-            break;
++            uint64_t tmp64 = 0;
++
++            /* Consume the signal */
++            if (read(mis->userfault_event_fd, &tmp64, 8) != 8) {
++                /* Nothing obviously nicer than posting this error. */
++                error_report("%s: read() failed", __func__);
++            }
++
++            if (atomic_read(&mis->fault_thread_quit)) {
++                trace_postcopy_ram_fault_thread_quit();
++                break;
++            }
+         }
+ 
+         ret = read(mis->userfault_fd, &msg, sizeof(msg));
+@@ -610,9 +621,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+     }
+ 
+     /* Now an eventfd we use to tell the fault-thread to quit */
+-    mis->userfault_quit_fd = eventfd(0, EFD_CLOEXEC);
+-    if (mis->userfault_quit_fd == -1) {
+-        error_report("%s: Opening userfault_quit_fd: %s", __func__,
++    mis->userfault_event_fd = eventfd(0, EFD_CLOEXEC);
++    if (mis->userfault_event_fd == -1) {
++        error_report("%s: Opening userfault_event_fd: %s", __func__,
+                      strerror(errno));
+         close(mis->userfault_fd);
+         return -1;
 -- 
 2.14.3
