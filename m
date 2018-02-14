@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1em3FF-00030m-0D
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:01:37 -0500
+	(envelope-from <eblake@redhat.com>) id 1em3TS-0000mk-7Z
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1em3FE-0000ye-07
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:01:33 -0500
-References: <1518542328-25741-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<20180214115725.34ba0008.cohuck@redhat.com>
-	<a6135d66-6673-a49d-01fa-9fa4d55b3aa1@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1em3TO-0002MR-UD
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 15:16:14 -0500
+References: <1518629505-22480-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-R0aq7Sp6P2TYrMDE0p0ewwpuXPp6=RzF1bU11FQwJxA@mail.gmail.com>
+	<8d49363d-7569-e95d-1d06-17a572c922db@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <cc093bbf-9470-d9ab-4390-5e93f33c13fb@redhat.com>
-Date: Wed, 14 Feb 2018 14:01:21 -0600
+Message-ID: <ab218589-ebb1-b7dd-0e99-3db89d6a2f28@redhat.com>
+Date: Wed, 14 Feb 2018 14:15:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <a6135d66-6673-a49d-01fa-9fa4d55b3aa1@redhat.com>
+In-Reply-To: <8d49363d-7569-e95d-1d06-17a572c922db@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv2 0/3] add query-cpu-fast and related s390
- changes
+Subject: Re: [Qemu-devel] [PATCH] configure: Add missing space when using
+ --with-pkgversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: agraf@suse.de, ehabkost@redhat.com, david@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 02/14/2018 09:16 AM, Eric Blake wrote:
->> How shall we proceed with this series? Patch 3 depends upon patch 1, so
->> I think it makes sense to merge this in one go.
+On 02/14/2018 02:00 PM, Thomas Huth wrote:
+> On 14.02.2018 19:33, Peter Maydell wrote:
+>> On 14 February 2018 at 17:31, Thomas Huth <thuth@redhat.com> wrote:
+>>> When running configure with --with-pkgversion=foo there is no
+>>> space anymore between the version number and the parentheses:
+>>>
+>>> $ m68k-softmmu/qemu-system-m68k -version
+>>> QEMU emulator version 2.11.50(foo)
+
+It would be nice to document this as '--version' rather than '-version' 
+(both work; but see our BiteSized task: 
+https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation)
+
 >>
->> I can give my R-b on patch 1 and Someone(tm) can merge this, or I can
->> take the whole series through the s390 tree (with some further
->> reviews/acks on patches 2/3).
+>> -- does this patch change the QMP reported string
+>> unexpectedly?
 > 
-> I'd still like to give a thorough QMP review; it's on my list to get to 
-> today.
+> Without my patch and with --with-pkgversion=foo :
+> 
+> { "execute": "query-version" }
+> {"return": {"qemu": {"micro": 50, "minor": 11, "major": 2}, "package": "(foo)"}}
 
-Okay, I've added more review comments; I think there's still enough 
-worth polishing that resending a v3 of the series is worthwhile, and do 
-agree that we want all three patches through a single tree (s390 sound 
-fine to me).  But in general, I'm okay with the QMP changes (what looks 
-like duplication is caused by modernizing the naming, which means we 
-DON'T want to play games with trying to inherit one type from the other, 
-and the argument about deprecating the old naming seems reasonable).
+Looks nice.  And the version info is ALSO passed as part of the initial 
+handshake, even before you call query-version.
+
+> 
+> With my patch and with --with-pkgversion=foo :
+> 
+> { "execute": "query-version" }
+> {"return": {"qemu": {"micro": 50, "minor": 11, "major": 2}, "package": " (foo)"}}
+
+Potential regression (arguably cosmetic, though)
+
+> 
+> Without my patch and without --with-pkgversion :
+> 
+> { "execute": "query-version" }
+> {"return": {"qemu": {"micro": 50, "minor": 11, "major": 2}, "package": " (v2.11.0-1512-g02f4fbe)"}}
+
+And that means we're already inconsistent, so your patch at least made 
+things consistent,
+
+> 
+> Using the old QEMU version 67a1de0d19~1 with  --with-pkgversion=foo :
+> 
+> { "execute": "query-version" }
+> {"return": {"qemu": {"micro": 50, "minor": 6, "major": 2}, "package": " (foo)"}}
+
+and that means we've already "regressed", which further means:
+- it definitely is cosmetic, if no one is complaining
+- changing it to look nicer won't break anyone
+
+> 
+> So yes, this patch changes the behavior of query-version, but the new
+> behavior is now the same behavior that you get without --with-pkgversion
+> (i.e. a space is included) and it is the same as the behavior that we had
+> in the past, before commit 67a1de0d19 has been merged. So I think this
+> is the right way to go.
+> Alternatively, we could maybe change query-version to always skip the
+> initial space?
+
+Yes, I like that option.
+
+So, if I'm summarizing correctly, your v2 patch will have:
+
+$ qemu --version
+QEMU emulator version 2.11.50 (foo)
+
+QMP query-version
+{"return": {"qemu": {"micro": 50, "minor": 6, "major": 2}, "package": 
+"(foo)"}}
+
+regardless of whether --with-pkgversion was used during configure.
 
 -- 
 Eric Blake, Principal Software Engineer
