@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7N-0006J9-2q
+	(envelope-from <thuth@redhat.com>) id 1elv7N-0006JC-6B
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1elv7L-0007AQ-H7
+	(envelope-from <thuth@redhat.com>) id 1elv7L-0007Aa-Px
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:53 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41982 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58256 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7L-0007AE-CB
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1elv7L-0007AI-Ib
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 06:20:51 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 14 Feb 2018 12:20:23 +0100
-Message-Id: <1518607234-17739-8-git-send-email-thuth@redhat.com>
-In-Reply-To: <1518607234-17739-1-git-send-email-thuth@redhat.com>
-References: <1518607234-17739-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 07/18] libqos: Use explicit QTestState for ahci
- operations
+Date: Wed, 14 Feb 2018 12:20:16 +0100
+Message-Id: <1518607234-17739-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/18] qtest patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,193 +26,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+The following changes since commit bec9c64ef7be8063f1192608b83877bc5c9ea2=
+17:
 
-Drop one more client of global_qtest by teaching all ahci test
-functionality to pass in an explicit QTestState.  The state was
-already available, so no callers had to be adjusted.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2018-02-13 18:24:08 +0000)
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/libqos/ahci.c | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
+are available in the git repository at:
 
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 40c532e..bc201d7 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -283,7 +283,8 @@ void ahci_hba_enable(AHCIQState *ahci)
-         /* Allocate Memory for the Command List Buffer & FIS Buffer */
-         /* PxCLB space ... 0x20 per command, as in 4.2.2 p 36 */
-         ahci->port[i].clb = ahci_alloc(ahci, num_cmd_slots * 0x20);
--        qmemset(ahci->port[i].clb, 0x00, num_cmd_slots * 0x20);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].clb, 0x00,
-+                     num_cmd_slots * 0x20);
-         g_test_message("CLB: 0x%08" PRIx64, ahci->port[i].clb);
-         ahci_px_wreg(ahci, i, AHCI_PX_CLB, ahci->port[i].clb);
-         g_assert_cmphex(ahci->port[i].clb, ==,
-@@ -291,7 +292,7 @@ void ahci_hba_enable(AHCIQState *ahci)
- 
-         /* PxFB space ... 0x100, as in 4.2.1 p 35 */
-         ahci->port[i].fb = ahci_alloc(ahci, 0x100);
--        qmemset(ahci->port[i].fb, 0x00, 0x100);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].fb, 0x00, 0x100);
-         g_test_message("FB: 0x%08" PRIx64, ahci->port[i].fb);
-         ahci_px_wreg(ahci, i, AHCI_PX_FB, ahci->port[i].fb);
-         g_assert_cmphex(ahci->port[i].fb, ==,
-@@ -397,7 +398,7 @@ void ahci_port_clear(AHCIQState *ahci, uint8_t port)
-     g_assert_cmphex(ahci_px_rreg(ahci, port, AHCI_PX_IS), ==, 0);
- 
-     /* Wipe the FIS-Receive Buffer */
--    qmemset(ahci->port[port].fb, 0x00, 0x100);
-+    qtest_memset(ahci->parent->qts, ahci->port[port].fb, 0x00, 0x100);
- }
- 
- /**
-@@ -466,7 +467,7 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_t slot)
-     RegD2HFIS *d2h = g_malloc0(0x20);
-     uint32_t reg;
- 
--    memread(ahci->port[port].fb + 0x40, d2h, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x40, d2h, 0x20);
-     g_assert_cmphex(d2h->fis_type, ==, 0x34);
- 
-     reg = ahci_px_rreg(ahci, port, AHCI_PX_TFD);
-@@ -484,7 +485,7 @@ void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
-     /* We cannot check the Status or E_Status registers, because
-      * the status may have again changed between the PIO Setup FIS
-      * and the conclusion of the command with the D2H Register FIS. */
--    memread(ahci->port[port].fb + 0x20, pio, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, 0x20);
-     g_assert_cmphex(pio->fis_type, ==, 0x5f);
- 
-     /* BUG: PIO Setup FIS as utilized by QEMU tries to fit the entire
-@@ -516,7 +517,7 @@ void ahci_get_command_header(AHCIQState *ahci, uint8_t port,
- {
-     uint64_t ba = ahci->port[port].clb;
-     ba += slot * sizeof(AHCICommandHeader);
--    memread(ba, cmd, sizeof(AHCICommandHeader));
-+    qtest_memread(ahci->parent->qts, ba, cmd, sizeof(AHCICommandHeader));
- 
-     cmd->flags = le16_to_cpu(cmd->flags);
-     cmd->prdtl = le16_to_cpu(cmd->prdtl);
-@@ -537,7 +538,7 @@ void ahci_set_command_header(AHCIQState *ahci, uint8_t port,
-     tmp.prdbc = cpu_to_le32(cmd->prdbc);
-     tmp.ctba = cpu_to_le64(cmd->ctba);
- 
--    memwrite(ba, &tmp, sizeof(AHCICommandHeader));
-+    qtest_memwrite(ahci->parent->qts, ba, &tmp, sizeof(AHCICommandHeader));
- }
- 
- void ahci_destroy_command(AHCIQState *ahci, uint8_t port, uint8_t slot)
-@@ -575,7 +576,7 @@ void ahci_write_fis(AHCIQState *ahci, AHCICommand *cmd)
-         tmp.count = cpu_to_le16(tmp.count);
-     }
- 
--    memwrite(addr, &tmp, sizeof(tmp));
-+    qtest_memwrite(ahci->parent->qts, addr, &tmp, sizeof(tmp));
- }
- 
- unsigned ahci_pick_cmd(AHCIQState *ahci, uint8_t port)
-@@ -636,7 +637,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     if (opts->size && !opts->buffer) {
-         opts->buffer = ahci_alloc(ahci, opts->size);
-         g_assert(opts->buffer);
--        qmemset(opts->buffer, 0x00, opts->size);
-+        qtest_memset(ahci->parent->qts, opts->buffer, 0x00, opts->size);
-     }
- 
-     /* Command creation */
-@@ -661,15 +662,15 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
-     if (opts->error) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(ahci->parent->qts, "STOP");
-     }
-     if (opts->mid_cb) {
-         rc = opts->mid_cb(ahci, cmd, opts);
-         g_assert_cmpint(rc, ==, 0);
-     }
-     if (opts->error) {
--        qmp_async("{'execute':'cont' }");
--        qmp_eventwait("RESUME");
-+        qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+        qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     }
- 
-     /* Wait for command to complete and verify sanity */
-@@ -697,7 +698,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
-     ahci_command_adjust(cmd, sector, buffer, bufsize, 0);
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
--    qmp_eventwait("STOP");
-+    qtest_qmp_eventwait(ahci->parent->qts, "STOP");
- 
-     return cmd;
- }
-@@ -706,8 +707,8 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
- void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
- {
-     /* Complete the command */
--    qmp_async("{'execute':'cont' }");
--    qmp_eventwait("RESUME");
-+    qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+    qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     ahci_command_wait(ahci, cmd);
-     ahci_command_verify(ahci, cmd);
-     ahci_command_free(cmd);
-@@ -754,16 +755,16 @@ void ahci_io(AHCIQState *ahci, uint8_t port, uint8_t ide_cmd,
-     g_assert(props);
-     ptr = ahci_alloc(ahci, bufsize);
-     g_assert(!bufsize || ptr);
--    qmemset(ptr, 0x00, bufsize);
-+    qtest_memset(ahci->parent->qts, ptr, 0x00, bufsize);
- 
-     if (bufsize && props->write) {
--        bufwrite(ptr, buffer, bufsize);
-+        qtest_bufwrite(ahci->parent->qts, ptr, buffer, bufsize);
-     }
- 
-     ahci_guest_io(ahci, port, ide_cmd, ptr, bufsize, sector);
- 
-     if (bufsize && props->read) {
--        bufread(ptr, buffer, bufsize);
-+        qtest_bufread(ahci->parent->qts, ptr, buffer, bufsize);
-     }
- 
-     ahci_free(ahci, ptr);
-@@ -901,7 +902,7 @@ static int copy_buffer(AHCIQState *ahci, AHCICommand *cmd,
-                         const AHCIOpts *opts)
- {
-     unsigned char *rx = opts->opaque;
--    bufread(opts->buffer, rx, opts->size);
-+    qtest_bufread(ahci->parent->qts, opts->buffer, rx, opts->size);
-     return 0;
- }
- 
-@@ -1141,7 +1142,7 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-     ahci_write_fis(ahci, cmd);
-     /* Then ATAPI CMD, if needed */
-     if (cmd->props->atapi) {
--        memwrite(table_ptr + 0x40, cmd->atapi_cmd, 16);
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x40, cmd->atapi_cmd, 16);
-     }
- 
-     /* Construct and write the PRDs to the command table */
-@@ -1162,8 +1163,8 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-         prd.dbc |= cpu_to_le32(0x80000000); /* Request DPS Interrupt */
- 
-         /* Commit the PRD entry to the Command Table */
--        memwrite(table_ptr + 0x80 + (i * sizeof(PRD)),
--                 &prd, sizeof(PRD));
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x80 + (i * sizeof(PRD)),
-+                       &prd, sizeof(PRD));
-     }
- 
-     /* Bookmark the PRDTL and CTBA values */
--- 
-1.8.3.1
+  https://github.com/huth/qemu.git tags/pull-request-2018-02-14
+
+for you to fetch changes up to 02f4fbecb93da2125d22d3f0b62c6ee44aea84d4:
+
+  tests/m48t59: Use the m48t59 test on ppc, too (2018-02-14 11:43:42 +010=
+0)
+
+----------------------------------------------------------------
+Various improvements to the qtest checks:
+- Clean-ups by Eric Blake with regards to the global_qtest variable
+- Some more test cases for the boot-serial tester
+- Re-activation of the m48t59-test
+----------------------------------------------------------------
+
+Eric Blake (10):
+      libqtest: Use qemu_strtoul()
+      libqos: Track QTestState with QPCIBus
+      libqos: Use explicit QTestState for fw_cfg operations
+      libqos: Use explicit QTestState for rtas operations
+      libqos: Use explicit QTestState for i2c operations
+      libqos: Use explicit QTestState for ahci operations
+      libqos: Use explicit QTestState for remaining libqos operations
+      qmp-test: Drop dependence on global_qtest
+      tests/boot-sector: Drop dependence on global_qtest
+      wdt_ib700-test: Drop dependence on global_qtest
+
+Markus Armbruster (1):
+      tests: Clean up wait for event
+
+Thomas Huth (6):
+      tests/boot-serial: Enable the boot-serial test on SPARC machines, t=
+oo
+      tests/boot-serial: Add tests for PowerPC Mac machines
+      tests/m48t59: Fix and re-enable the test for sparc
+      tests/m48t59: Make the test independent of global_qtest
+      tests/Makefile: Derive check-qtest-ppc64-y from check-qtest-ppc-y
+      tests/m48t59: Use the m48t59 test on ppc, too
+
+Wei Huang (1):
+      tests/boot-serial-test: Add support for the aarch64 virt machine
+
+ tests/Makefile.include      |  22 ++++----
+ tests/ahci-test.c           |   3 +-
+ tests/bios-tables-test.c    |   2 +-
+ tests/boot-order-test.c     |   8 +--
+ tests/boot-sector.c         |   8 +--
+ tests/boot-sector.h         |   6 ++-
+ tests/boot-serial-test.c    |  16 ++++++
+ tests/ds1338-test.c         |   6 +--
+ tests/e1000e-test.c         |   8 +--
+ tests/fw_cfg-test.c         |  13 ++---
+ tests/i440fx-test.c         |   2 +-
+ tests/ide-test.c            |   4 +-
+ tests/ivshmem-test.c        |   1 +
+ tests/libqos/ahci.c         |  49 +++++++++---------
+ tests/libqos/ahci.h         |   2 +-
+ tests/libqos/fw_cfg.c       |  14 ++---
+ tests/libqos/fw_cfg.h       |  10 ++--
+ tests/libqos/i2c-imx.c      |  67 ++++++++++++------------
+ tests/libqos/i2c-omap.c     |  45 ++++++++--------
+ tests/libqos/i2c.h          |   7 ++-
+ tests/libqos/libqos-pc.c    |   2 +-
+ tests/libqos/libqos.c       |  40 +++++---------
+ tests/libqos/libqos.h       |   4 +-
+ tests/libqos/malloc-pc.c    |   8 +--
+ tests/libqos/malloc-pc.h    |   4 +-
+ tests/libqos/malloc-spapr.c |   4 +-
+ tests/libqos/malloc-spapr.h |   2 +-
+ tests/libqos/malloc.h       |   1 +
+ tests/libqos/pci-pc.c       |  13 ++---
+ tests/libqos/pci-pc.h       |   2 +-
+ tests/libqos/pci-spapr.c    |  25 +++++----
+ tests/libqos/pci-spapr.h    |   2 +-
+ tests/libqos/pci.h          |   1 +
+ tests/libqos/rtas.c         |  36 +++++++------
+ tests/libqos/rtas.h         |  12 +++--
+ tests/libqtest.c            |  19 ++++---
+ tests/m48t59-test.c         | 123 ++++++++++++++++++++++++--------------=
+------
+ tests/megasas-test.c        |   5 +-
+ tests/pxe-test.c            |   2 +-
+ tests/q35-test.c            |   4 +-
+ tests/qmp-test.c            |  35 +++++++------
+ tests/rtas-test.c           |   3 +-
+ tests/rtl8139-test.c        |   5 +-
+ tests/sdhci-test.c          |   2 +-
+ tests/tco-test.c            |   5 +-
+ tests/tmp105-test.c         |   6 +--
+ tests/usb-hcd-ehci-test.c   |   2 +-
+ tests/usb-hcd-uhci-test.c   |   1 +
+ tests/vhost-user-test.c     |   4 +-
+ tests/virtio-9p-test.c      |   1 +
+ tests/virtio-blk-test.c     |   1 +
+ tests/virtio-net-test.c     |  15 +++---
+ tests/virtio-scsi-test.c    |  16 +++---
+ tests/vmgenid-test.c        |   2 +-
+ tests/wdt_ib700-test.c      |  90 ++++++++++++++------------------
+ 55 files changed, 416 insertions(+), 374 deletions(-)
