@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emHzJ-0005Qc-CN
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:46:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1emI1h-0006vx-NX
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:48:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emHzE-0001hS-Go
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:46:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59218)
+	(envelope-from <peter.maydell@linaro.org>) id 1emI1g-0002YK-LA
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:48:33 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42210)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1emHzE-0001h4-9L
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:46:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1emHzB-0001PW-Ru
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:45:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 034A92E80C8
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:45:57 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1emI1g-0002Y6-Dd
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:48:32 -0500
+Received: by mail-ot0-x244.google.com with SMTP id a7so23149259otk.9
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 03:48:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Feb 2018 11:31:49 -0000
-From: Thomas Huth <1739413@bugs.launchpad.net>
-Reply-To: Bug 1739413 <1739413@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151377269069.19770.3703612061677458311.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151869431000.14307.13151210757958720707.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739413] Re: Hotplugged vcpu does not guarantee
- cpu compat mode(power8) on power9 host
+In-Reply-To: <20180208055039.24666-2-penberg@iki.fi>
+References: <20180208055039.24666-1-penberg@iki.fi>
+	<20180208055039.24666-2-penberg@iki.fi>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 11:48:11 +0000
+Message-ID: <CAFEAcA8EWmaf5JWEmgBsNknTHuKDaHCnEAQgatn7Ppq-Gy8Fzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] bcm2836: Make CPU type configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pekka Enberg <penberg@iki.fi>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-David's patch has been included here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D51f84465dd985fc21589b=
-2e
+On 8 February 2018 at 05:50, Pekka Enberg <penberg@iki.fi> wrote:
+> This patch adds a "cpu-type" property to BCM2836 SoC in preparation for
+> reusing the code for the Raspberry Pi 3, which has a different processor
+> model.
+>
+> Signed-off-by: Pekka Enberg <penberg@iki.fi>
 
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -135,6 +135,8 @@ static void raspi2_init(MachineState *machine)
+>      /* Setup the SOC */
+>      object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram),
+>                                     &error_abort);
+> +    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
+> +                            &error_abort);
+>      object_property_set_int(OBJECT(&s->soc), smp_cpus, "enabled-cpus",
+>                              &error_abort);
+>      object_property_set_int(OBJECT(&s->soc), 0xa21041, "board-rev",
+> @@ -166,6 +168,7 @@ static void raspi2_machine_init(MachineClass *mc)
+>      mc->no_parallel = 1;
+>      mc->no_floppy = 1;
+>      mc->no_cdrom = 1;
+> +    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+>      mc->max_cpus = BCM2836_NCPUS;
+>      mc->min_cpus = BCM2836_NCPUS;
+>      mc->default_cpus = BCM2836_NCPUS;
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+This change means that instead of ignoring the user's -cpu argument
+we'll now unconditionally accept it even if it's nonsense for this
+board. Neither behaviour is great. However, the patchset to allow
+boards to easily specify the valid set of CPU types is still in
+code review:
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg00308.html
 
--- =
+so I'm happy to take this as-is, and we'll add the validity check
+when that patchset goes in.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739413
-
-Title:
-  Hotplugged vcpu does not guarantee cpu compat mode(power8) on power9
-  host
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  ./ppc64-softmmu/qemu-system-ppc64 -version
-  QEMU emulator version 2.11.50 (v2.11.0-254-gaf35267)
-
-  1. Boot a power8 compat mode guest power9 HW.
-  ./ppc64-softmmu/qemu-system-ppc64 -machine pseries,accel=3Dkvm,max-cpu-co=
-mpat=3Dpower8 -m 4096 /home/sath/images/guest.qcow2 -smp 1,maxcpus=3D2 -ser=
-ial /dev/pts/8  -monitor stdio -vga none -nographic
-  QEMU 2.11.50 monitor - type 'help' for more information
-  (qemu) =
-
-
-  2. Check for cpuinfo
-
-  # cat /proc/cpuinfo =
-
-  processor	: 0
-  cpu		: POWER8 (architected), altivec supported
-  clock		: 2200.000000MHz
-  revision	: 2.1 (pvr 004e 1201)
-
-  timebase	: 512000000
-  platform	: pSeries
-  model		: IBM pSeries (emulated by qemu)
-  machine		: CHRP IBM pSeries (emulated by qemu)
-  MMU		: Hash
-
-  =
-
-  3. Run a small program invoking isa v3.0 instruction, it should complain =
-'Illegal instruction' as it is a power8 compat guest
-  # cat 1.c =
-
-  #include <stdio.h>
-  void main()
-      {
-      asm volatile (".long 0x7c0005e6");
-      }
-  # ./a.out =
-
-  [   59.352795] a.out[1741]: unhandled signal 4 at 0000000010000600 nip 00=
-00000010000600 lr 00007fffb4da5080 code 1
-  Illegal instruction =
-
-
-  4. Hotplug a vcpu
-  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-  (qemu) info cpus
-  * CPU #0: nip=3D0xc0000000000de42c thread_id=3D113110
-    CPU #1: nip=3D0xc0000000000de42c thread_id=3D113348
-
-  5. Try running the same program in the hotplugged vcpu and it does not
-  complain as 'Illegal instruction'
-
-  #taskset -c 1 ./a.out ----------------------NOK
-  #  =
-
-
-  # taskset -c 0 ./a.out =
-
-  [  356.618031] a.out[1755]: unhandled signal 4 at 0000000010000600 nip 00=
-00000010000600 lr 00007fffae7f5080 code 1
-  Illegal instruction
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739413/+subscriptions
+thanks
+-- PMM
