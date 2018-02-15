@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34398)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBB1-0007ja-CS
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:44 -0500
+	id 1emBB5-0007nV-2A
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBAz-00040F-UE
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:43 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBAz-000409-PV
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:41 -0500
-Received: by mail-qk0-x243.google.com with SMTP id f25so3891004qkm.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:29:41 -0800 (PST)
+	id 1emBB3-000412-9B
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:47 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 01:28:39 -0300
-Message-Id: <20180215042900.16078-10-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 01:28:40 -0300
+Message-Id: <20180215042900.16078-11-f4bug@amsat.org>
 In-Reply-To: <20180215042900.16078-1-f4bug@amsat.org>
 References: <20180215042900.16078-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/30] hw/sparc: use the BYTE-based definitions
+Subject: [Qemu-devel] [PATCH 10/30] hw/ppc: use the BYTE-based definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +27,316 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:PReP" <qemu-ppc@nongnu.org>
 
 It ease code review, unit is explicit.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sparc/leon3.c     | 8 ++++----
- hw/sparc/sun4m.c     | 7 +++----
- hw/sparc64/niagara.c | 2 +-
- hw/sparc64/sun4u.c   | 2 +-
- 4 files changed, 9 insertions(+), 10 deletions(-)
+ include/hw/ppc/spapr.h |  2 +-
+ hw/pci-host/prep.c     |  2 +-
+ hw/ppc/e500.c          |  8 ++++----
+ hw/ppc/mac_oldworld.c  |  7 +++----
+ hw/ppc/ppc405_boards.c |  8 ++++----
+ hw/ppc/ppc405_uc.c     |  6 +++---
+ hw/ppc/ppc4xx_devs.c   | 21 +++++++++++----------
+ hw/ppc/ppce500_spin.c  |  2 +-
+ hw/ppc/prep.c          |  2 +-
+ hw/ppc/rs6000_mc.c     | 12 ++++++------
+ hw/ppc/virtex_ml507.c  |  4 ++--
+ 11 files changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index bba3aa3dee..31be3f32b0 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -139,9 +139,9 @@ static void leon3_generic_hw_init(MachineState *machine)
-     env->qemu_irq_ack = leon3_irq_manager;
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 62c077ac20..ceeb274205 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -746,7 +746,7 @@ int spapr_rng_populate_dt(void *fdt);
+ #define SPAPR_MAX_RAM_SLOTS     32
  
-     /* Allocate RAM */
--    if ((uint64_t)ram_size > (1UL << 30)) {
--        error_report("Too much memory for this machine: %d, maximum 1G",
--                     (unsigned int)(ram_size / (1024 * 1024)));
-+    if (ram_size > 1 * G_BYTE) {
-+        error_report("Too much memory for this machine: %lluMB, maximum 1G",
-+                     ram_size / M_BYTE);
-         exit(1);
+ /* 1GB alignment for hotplug memory region */
+-#define SPAPR_HOTPLUG_MEM_ALIGN (1ULL << 30)
++#define SPAPR_HOTPLUG_MEM_ALIGN (1 * G_BYTE)
+ 
+ /*
+  * Number of 32 bit words in each LMB list entry in ibm,dynamic-memory
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index 01f67f9db1..d06498e131 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -70,7 +70,7 @@ typedef struct PRePPCIState {
+     int contiguous_map;
+ } PREPPCIState;
+ 
+-#define BIOS_SIZE (1024 * 1024)
++#define BIOS_SIZE (1 * M_BYTE)
+ 
+ static inline uint32_t raven_pci_io_config(hwaddr addr)
+ {
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index a40d3ec3e3..02675c7be4 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -45,7 +45,7 @@
+ #define BINARY_DEVICE_TREE_FILE    "mpc8544ds.dtb"
+ #define DTC_LOAD_PAD               0x1800000
+ #define DTC_PAD_MASK               0xFFFFF
+-#define DTB_MAX_SIZE               (8 * 1024 * 1024)
++#define DTB_MAX_SIZE               (8 * M_BYTE)
+ #define INITRD_LOAD_PAD            0x2000000
+ #define INITRD_PAD_MASK            0xFFFFFF
+ 
+@@ -597,7 +597,7 @@ static int ppce500_prep_device_tree(MachineState *machine,
+ /* Create -kernel TLB entries for BookE.  */
+ hwaddr booke206_page_size_to_tlb(uint64_t size)
+ {
+-    return 63 - clz64(size >> 10);
++    return 63 - clz64(size / K_BYTE);
+ }
+ 
+ static int booke206_initial_map_tsize(CPUPPCState *env)
+@@ -913,9 +913,9 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     /* Register spinning region */
+     sysbus_create_simple("e500-spin", params->spin_base, NULL);
+ 
+-    if (cur_base < (32 * 1024 * 1024)) {
++    if (cur_base < 32 * M_BYTE) {
+         /* u-boot occupies memory up to 32MB, so load blobs above */
+-        cur_base = (32 * 1024 * 1024);
++        cur_base = 32 * M_BYTE;
      }
  
-@@ -149,7 +149,7 @@ static void leon3_generic_hw_init(MachineState *machine)
-     memory_region_add_subregion(address_space_mem, 0x40000000, ram);
- 
-     /* Allocate BIOS */
--    prom_size = 8 * 1024 * 1024; /* 8Mb */
-+    prom_size = 8 * M_BYTE;
-     memory_region_init_ram(prom, NULL, "Leon3.bios", prom_size, &error_fatal);
-     memory_region_set_readonly(prom, true);
-     memory_region_add_subregion(address_space_mem, 0x00000000, prom);
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 0008b90b04..40f4e0c883 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -66,7 +66,7 @@
- #define KERNEL_LOAD_ADDR     0x00004000
- #define CMDLINE_ADDR         0x007ff000
- #define INITRD_LOAD_ADDR     0x00800000
--#define PROM_SIZE_MAX        (1024 * 1024)
-+#define PROM_SIZE_MAX        (1 * M_BYTE)
- #define PROM_VADDR           0xffd00000
- #define PROM_FILENAME        "openbios-sparc32"
- #define CFG_ADDR             0xd00000510ULL
-@@ -744,9 +744,8 @@ static void ram_init(hwaddr addr, ram_addr_t RAM_size,
+     if (params->has_mpc8xxx_gpio) {
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 9b19551f56..a6b8b77937 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -117,10 +117,9 @@ static void ppc_heathrow_init(MachineState *machine)
+     }
  
      /* allocate RAM */
-     if ((uint64_t)RAM_size > max_mem) {
--        error_report("Too much memory for this machine: %d, maximum %d",
--                     (unsigned int)(RAM_size / (1024 * 1024)),
--                     (unsigned int)(max_mem / (1024 * 1024)));
-+        error_report("Too much memory for this machine: %llu, maximum %llu",
-+                     RAM_size / M_BYTE, max_mem / M_BYTE);
+-    if (ram_size > (2047 << 20)) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d MB, maximum 2047 MB\n",
+-                ((unsigned int)ram_size / (1 << 20)));
++    if (ram_size > 2047 * M_BYTE) {
++        error_report("Too much memory for this machine: %llu MB, "
++                     "maximum 2047 MB", ram_size / M_BYTE);
          exit(1);
      }
-     dev = qdev_create(NULL, "memory");
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index 1874477ef6..97a78ca9a2 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -84,7 +84,7 @@ typedef struct NiagaraBoardState {
- #define NIAGARA_PROM_BASE   0xfff0000000ULL
- #define NIAGARA_Q_OFFSET    0x10000ULL
- #define NIAGARA_OBP_OFFSET  0x80000ULL
--#define PROM_SIZE_MAX       (4 * 1024 * 1024)
-+#define PROM_SIZE_MAX       (4 * M_BYTE)
  
- static void add_rom_or_fail(const char *file, const hwaddr addr)
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 0b658931ee..8c742449b8 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -41,7 +41,7 @@
+ #include "exec/address-spaces.h"
+ 
+ #define BIOS_FILENAME "ppc405_rom.bin"
+-#define BIOS_SIZE (2048 * 1024)
++#define BIOS_SIZE (2 * M_BYTE)
+ 
+ #define KERNEL_LOAD_ADDR 0x00000000
+ #define INITRD_LOAD_ADDR 0x01800000
+@@ -217,14 +217,14 @@ static void ref405ep_init(MachineState *machine)
+     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
+     ram_bases[1] = 0x00000000;
+     ram_sizes[1] = 0x00000000;
+-    ram_size = 128 * 1024 * 1024;
++    ram_size = 128 * M_BYTE;
+ #ifdef DEBUG_BOARD_INIT
+     printf("%s: register cpu\n", __func__);
+ #endif
+     env = ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
+                         33333333, &pic, kernel_filename == NULL ? 0 : 1);
+     /* allocate SRAM */
+-    sram_size = 512 * 1024;
++    sram_size = 512 * K_BYTE;
+     memory_region_init_ram(sram, NULL, "ef405ep.sram", sram_size,
+                            &error_fatal);
+     memory_region_add_subregion(sysmem, 0xFFF00000, sram);
+@@ -590,7 +590,7 @@ static void taihu_405ep_init(MachineState *machine)
+ 
+         bios_size = blk_getlength(blk);
+         /* XXX: should check that size is 32MB */
+-        bios_size = 32 * 1024 * 1024;
++        bios_size = 32 * M_BYTE;
+         fl_sectors = (bios_size + 65535) >> 16;
+ #ifdef DEBUG_BOARD_INIT
+         printf("Register parallel flash %d size %lx"
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index 205ebcea93..0e9d5b0ff9 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -983,10 +983,10 @@ static void ppc405_ocm_init(CPUPPCState *env)
+ 
+     ocm = g_malloc0(sizeof(ppc405_ocm_t));
+     /* XXX: Size is 4096 or 0x04000000 */
+-    memory_region_init_ram(&ocm->isarc_ram, NULL, "ppc405.ocm", 4096,
++    memory_region_init_ram(&ocm->isarc_ram, NULL, "ppc405.ocm", 4 * K_BYTE,
+                            &error_fatal);
+-    memory_region_init_alias(&ocm->dsarc_ram, NULL, "ppc405.dsarc", &ocm->isarc_ram,
+-                             0, 4096);
++    memory_region_init_alias(&ocm->dsarc_ram, NULL, "ppc405.dsarc",
++                             &ocm->isarc_ram, 0, 4 * K_BYTE);
+     qemu_register_reset(&ocm_reset, ocm);
+     ppc_dcr_register(env, OCM0_ISARC,
+                      ocm, &dcr_read_ocm, &dcr_write_ocm);
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index 2e963894fe..52de988b13 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -29,6 +29,7 @@
+ #include "hw/boards.h"
+ #include "qemu/log.h"
+ #include "exec/address-spaces.h"
++#include "qemu/error-report.h"
+ 
+ #define DEBUG_UIC
+ 
+@@ -353,25 +354,25 @@ static uint32_t sdram_bcr (hwaddr ram_base,
+     uint32_t bcr;
+ 
+     switch (ram_size) {
+-    case (4 * 1024 * 1024):
++    case 4 * M_BYTE:
+         bcr = 0x00000000;
+         break;
+-    case (8 * 1024 * 1024):
++    case 8 * M_BYTE:
+         bcr = 0x00020000;
+         break;
+-    case (16 * 1024 * 1024):
++    case 16 * M_BYTE:
+         bcr = 0x00040000;
+         break;
+-    case (32 * 1024 * 1024):
++    case 32 * M_BYTE:
+         bcr = 0x00060000;
+         break;
+-    case (64 * 1024 * 1024):
++    case 64 * M_BYTE:
+         bcr = 0x00080000;
+         break;
+-    case (128 * 1024 * 1024):
++    case 128 * M_BYTE:
+         bcr = 0x000A0000;
+         break;
+-    case (256 * 1024 * 1024):
++    case 256 * M_BYTE:
+         bcr = 0x000C0000;
+         break;
+     default:
+@@ -399,7 +400,7 @@ static target_ulong sdram_size (uint32_t bcr)
+     if (sh == 7)
+         size = -1;
+     else
+-        size = (4 * 1024 * 1024) << sh;
++        size = (4 * M_BYTE) << sh;
+ 
+     return size;
+ }
+@@ -702,8 +703,8 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+ 
+     ram_size -= size_left;
+     if (size_left) {
+-        printf("Truncating memory to %d MiB to fit SDRAM controller limits.\n",
+-               (int)(ram_size >> 20));
++        error_report("Truncating memory to %llu MiB to fit SDRAM "
++                     "controller limits", ram_size / M_BYTE);
+     }
+ 
+     memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_size);
+diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
+index 69ca2d0e42..b6d224c45b 100644
+--- a/hw/ppc/ppce500_spin.c
++++ b/hw/ppc/ppce500_spin.c
+@@ -89,7 +89,7 @@ static void spin_kick(CPUState *cs, run_on_cpu_data data)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
+     SpinInfo *curspin = data.host_ptr;
+-    hwaddr map_size = 64 * 1024 * 1024;
++    hwaddr map_size = 64 * M_BYTE;
+     hwaddr map_start;
+ 
+     cpu_synchronize_state(cs);
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index f7c0a48558..eae475a34d 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -59,7 +59,7 @@
+ 
+ #define CFG_ADDR 0xf0000510
+ 
+-#define BIOS_SIZE (1024 * 1024)
++#define BIOS_SIZE (1 * M_BYTE)
+ #define BIOS_FILENAME "ppc_rom.bin"
+ #define KERNEL_LOAD_ADDR 0x01000000
+ #define INITRD_LOAD_ADDR 0x01800000
+diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
+index b6135650bd..6999994fe4 100644
+--- a/hw/ppc/rs6000_mc.c
++++ b/hw/ppc/rs6000_mc.c
+@@ -109,7 +109,7 @@ static void rs6000mc_port0820_write(void *opaque, uint32_t addr, uint32_t val)
+             size = end_address - start_address;
+             memory_region_set_enabled(&s->simm[socket - 1], size != 0);
+             memory_region_set_address(&s->simm[socket - 1],
+-                                      start_address * 8 * 1024 * 1024);
++                                      start_address * 8 * M_BYTE);
+         }
+     }
+ }
+@@ -140,7 +140,7 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
  {
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index b84589e0b6..7a39ec7859 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -53,7 +53,7 @@
+     RS6000MCState *s = RS6000MC_DEVICE(dev);
+     int socket = 0;
+-    unsigned int ram_size = s->ram_size / (1024 * 1024);
++    unsigned int ram_size = s->ram_size / M_BYTE;
  
- #define KERNEL_LOAD_ADDR     0x00404000
- #define CMDLINE_ADDR         0x003ff000
--#define PROM_SIZE_MAX        (4 * 1024 * 1024)
-+#define PROM_SIZE_MAX        (4 * M_BYTE)
- #define PROM_VADDR           0x000ffd00000ULL
- #define PBM_SPECIAL_BASE     0x1fe00000000ULL
- #define PBM_MEM_BASE         0x1ff00000000ULL
+     while (socket < 6) {
+         if (ram_size >= 64) {
+@@ -163,8 +163,8 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
+             char name[] = "simm.?";
+             name[5] = socket + '0';
+             memory_region_allocate_system_memory(&s->simm[socket], OBJECT(dev),
+-                                                 name, s->simm_size[socket]
+-                                                 * 1024 * 1024);
++                                                 name,
++                                                 s->simm_size[socket] * M_BYTE);
+             memory_region_add_subregion_overlap(get_system_memory(), 0,
+                                                 &s->simm[socket], socket);
+         }
+@@ -172,8 +172,8 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
+     if (ram_size) {
+         /* unable to push all requested RAM in SIMMs */
+         error_setg(errp, "RAM size incompatible with this board. "
+-                   "Try again with something else, like %d MB",
+-                   s->ram_size / 1024 / 1024 - ram_size);
++                   "Try again with something else, like %lld MB",
++                   s->ram_size / M_BYTE - ram_size);
+         return;
+     }
+ 
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 77a1778e07..dcfb6c2670 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -47,7 +47,7 @@
+ #include "sysemu/block-backend.h"
+ 
+ #define EPAPR_MAGIC    (0x45504150)
+-#define FLASH_SIZE     (16 * 1024 * 1024)
++#define FLASH_SIZE     (16 * M_BYTE)
+ 
+ #define INTC_BASEADDR       0x81800000
+ #define UART16550_BASEADDR  0x83e01003
+@@ -237,7 +237,7 @@ static void virtex_init(MachineState *machine)
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     pflash_cfi01_register(PFLASH_BASEADDR, NULL, "virtex.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                          (64 * 1024), FLASH_SIZE >> 16,
++                          64 * K_BYTE, FLASH_SIZE >> 16,
+                           1, 0x89, 0x18, 0x0000, 0x0, 1);
+ 
+     cpu_irq = (qemu_irq *) &env->irq_inputs[PPC40x_INPUT_INT];
 -- 
 2.16.1
