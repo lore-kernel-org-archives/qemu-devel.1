@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRfl-0006dU-Gj
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:06:34 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1emRk2-00027L-HD
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRfk-0001Hp-Iz
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:06:33 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34892)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRfk-0001HU-F2
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:06:32 -0500
-Received: by mail-qt0-x243.google.com with SMTP id g14so1618973qti.2
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:06:32 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 19:05:40 -0300
-Message-Id: <20180215220540.6556-12-f4bug@amsat.org>
-In-Reply-To: <20180215220540.6556-1-f4bug@amsat.org>
-References: <20180215220540.6556-1-f4bug@amsat.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1emRk1-0003vs-6c
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:10:58 -0500
+Message-Id: <cover.1518730026.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Thu, 15 Feb 2018 22:27:06 +0100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 11/11] sdcard: use the registerfields API to
- access the OCR register
+Date: Thu, 15 Feb 2018 22:27:06 +0100
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/3] Sam460ex emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,101 +21,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrzej Zaborowski <balrogg@gmail.com>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- include/hw/sd/sd.h |  1 -
- hw/sd/sd.c         | 21 +++++++++++++--------
- 2 files changed, 13 insertions(+), 9 deletions(-)
+Remaining patches for Sam460ex emulation. The original cover letter
+with more details is here:
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index bf1eb0713c..9bdb3c9285 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -53,7 +53,6 @@
- #define READY_FOR_DATA		(1 << 8)
- #define APP_CMD			(1 << 5)
- #define AKE_SEQ_ERROR		(1 << 3)
--#define OCR_CCS_BITN        30
- 
- typedef enum {
-     SD_VOLTAGE_0_4V     = 400,  /* currently not supported */
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 28837768d4..fbee87afef 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -32,6 +32,7 @@
- #include "qemu/osdep.h"
- #include "hw/qdev.h"
- #include "hw/hw.h"
-+#include "hw/registerfields.h"
- #include "sysemu/block-backend.h"
- #include "hw/sd/sd.h"
- #include "qapi/error.h"
-@@ -47,8 +48,6 @@
- //#define DEBUG_SD 1
- 
- #define ACMD41_ENQUIRY_MASK     0x00ffffff
--#define OCR_POWER_UP            0x80000000
--#define OCR_POWER_DELAY_NS      500000 /* 0.5ms */
- 
- typedef enum {
-     sd_r0 = 0,    /* no response */
-@@ -272,6 +271,11 @@ static uint16_t sd_crc16(void *message, size_t width)
-     return shift_reg;
- }
- 
-+#define OCR_POWER_DELAY_NS      500000 /* 0.5ms */
-+
-+FIELD(OCR, CARD_CAPACITY,              30,  1) /* 0:SDSC, 1:SDHC/SDXC */
-+FIELD(OCR, CARD_POWER_UP,              31,  1)
-+
- static void sd_set_ocr(SDState *sd)
- {
-     /* All voltages OK, Standard Capacity SD Memory Card, not yet powered up */
-@@ -283,9 +287,10 @@ static void sd_ocr_powerup(void *opaque)
-     SDState *sd = opaque;
- 
-     trace_sdcard_powerup();
--    /* Set powered up bit in OCR */
--    assert(!(sd->ocr & OCR_POWER_UP));
--    sd->ocr |= OCR_POWER_UP;
-+    assert(!FIELD_EX32(sd->ocr, OCR, CARD_POWER_UP));
-+
-+    /* card power-up OK */
-+    sd->ocr = FIELD_DP32(sd->ocr, OCR, CARD_POWER_UP, 1);
- }
- 
- static void sd_set_scr(SDState *sd)
-@@ -571,7 +576,7 @@ static bool sd_ocr_vmstate_needed(void *opaque)
-     SDState *sd = opaque;
- 
-     /* Include the OCR state (and timer) if it is not yet powered up */
--    return !(sd->ocr & OCR_POWER_UP);
-+    return !FIELD_EX32(sd->ocr, OCR, CARD_POWER_UP);
- }
- 
- static const VMStateDescription sd_ocr_vmstate = {
-@@ -681,7 +686,7 @@ static void sd_erase(SDState *sd)
-         return;
-     }
- 
--    if (extract32(sd->ocr, OCR_CCS_BITN, 1)) {
-+    if (FIELD_EX32(sd->ocr, OCR, CARD_CAPACITY)) {
-         /* High capacity memory card: erase units are 512 byte blocks */
-         erase_start *= 512;
-         erase_end *= 512;
-@@ -1473,7 +1478,7 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-              * UEFI, which sends an initial enquiry ACMD41, but
-              * assumes that the card is in ready state as soon as it
-              * sees the power up bit set. */
--            if (!(sd->ocr & OCR_POWER_UP)) {
-+            if (!FIELD_EX32(sd->ocr, OCR, CARD_POWER_UP)) {
-                 if ((req.arg & ACMD41_ENQUIRY_MASK) != 0) {
-                     timer_del(sd->ocr_power_timer);
-                     sd_ocr_powerup(sd);
--- 
-2.16.1
+http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00112.html
+
+We'll need to also add binaries for firmware (customised u-boot
+version) and dtb but I'm not sure how to submit those.
+
+Current status for OSes I've tried:
+
+- AROS boots (after I've fixed some bugs in it which are now upstream
+  so the nightly iso should work) but keyboard doesn't work (could be
+  a bug in AROS's HID driver) and time is going slow (this can be seen
+  in time prefs). This may be a QEMU bug and possibly causes the hang
+  seen in other OSes but I don't know what causes it or how to fix it.
+  Maybe related to some internal timing registers of the SoC because
+  setting multipliers to real values causes U-Boot to become slow.
+  Anyone with more knowledge of this hardware has any idea?
+
+- Linux: kernel boots but hangs during user space (again could be the
+  above timing problem or maybe missing emac network interface
+  emulation but I don't really know).
+
+- AmigaOS 4 seems to boot but display is not working so not usable
+  (either related to timing problem or could be SM502 emulation).
+
+- MorphOS does not boot (it seems to either deliberately do stuff to
+  prevent it from running on QEMU or it has bugs but developers are
+  not communicative about it)
+
+Regards,
+BALATON Zoltan
+
+BALATON Zoltan (3):
+  ppc4xx: Add device models found in PPC440 core SoCs
+  ppc440: Add emulation of plb-pcix controller found in some 440 SoCs
+  ppc: Add aCube Sam460ex board
+
+ default-configs/ppc-softmmu.mak    |    2 +
+ default-configs/ppcemb-softmmu.mak |    1 +
+ hw/ppc/Makefile.objs               |    3 +-
+ hw/ppc/ppc440.h                    |   26 +
+ hw/ppc/ppc440_pcix.c               |  528 ++++++++++++++++
+ hw/ppc/ppc440_uc.c                 | 1159 ++++++++++++++++++++++++++++++=
+++++++
+ hw/ppc/sam460ex.c                  |  603 +++++++++++++++++++
+ hw/ppc/trace-events                |    8 +
+ include/hw/pci/pcie_host.h         |    2 +-
+ 9 files changed, 2330 insertions(+), 2 deletions(-)
+ create mode 100644 hw/ppc/ppc440.h
+ create mode 100644 hw/ppc/ppc440_pcix.c
+ create mode 100644 hw/ppc/ppc440_uc.c
+ create mode 100644 hw/ppc/sam460ex.c
+
+--=20
+2.7.6
