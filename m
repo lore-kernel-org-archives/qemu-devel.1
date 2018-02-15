@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRnM-0005mE-EM
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:14:25 -0500
+	id 1emRnT-0005wC-Gy
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRnL-0005XY-H0
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:14:24 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34467)
+	id 1emRnO-0005Yz-F3
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:14:31 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:32843)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRnL-0005X5-AF
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:14:23 -0500
-Received: by mail-qk0-x242.google.com with SMTP id o7so1603111qkc.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:14:23 -0800 (PST)
+	id 1emRnO-0005Yn-9s
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:14:26 -0500
+Received: by mail-qk0-x241.google.com with SMTP id f25so1601352qkm.0
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:14:26 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 19:13:22 -0300
-Message-Id: <20180215221325.7611-18-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 19:13:23 -0300
+Message-Id: <20180215221325.7611-19-f4bug@amsat.org>
 In-Reply-To: <20180215221325.7611-1-f4bug@amsat.org>
 References: <20180215221325.7611-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 17/20] sdcard: add SD SEND_TUNING_BLOCK
- (CMD19)
+Subject: [Qemu-devel] [PATCH v4 18/20] sdcard: implement the UHS-I
+ SWITCH_FUNCTION entries (Spec v3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,59 +40,197 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
  from qemu/xilinx tag xilinx-v2015.2]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/sd/sd.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ hw/sd/sd.c         | 148 +++++++++++++++++++++++++++++++++++++++++++++--------
+ hw/sd/trace-events |   1 +
+ 2 files changed, 127 insertions(+), 22 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 911aae6233..4b0bb7992d 100644
+index 4b0bb7992d..ada96f5574 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -1166,6 +1166,14 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-         }
-         break;
+@@ -124,6 +124,7 @@ struct SDState {
+     bool enable;
+     uint8_t dat_lines;
+     bool cmd_line;
++    bool uhs_enabled;
+ };
  
-+    case 19:    /* CMD19: SEND_TUNING_BLOCK (SD) */
-+        if (sd->state == sd_transfer_state) {
-+            sd->state = sd_sendingdata_state;
-+            sd->data_offset = 0;
-+            return sd_r1;
-+        }
-+        break;
-+
-     case 23:    /* CMD23: SET_BLOCK_COUNT */
-         switch (sd->state) {
-         case sd_transfer_state:
-@@ -1889,6 +1897,15 @@ void sd_write_data(SDState *sd, uint8_t value)
-     }
+ static const char *sd_state_name(enum SDCardStates state)
+@@ -563,6 +564,7 @@ static void sd_reset(DeviceState *dev)
+     sd->expecting_acmd = false;
+     sd->dat_lines = 0xf;
+     sd->cmd_line = true;
++    sd->uhs_enabled = false;
+     sd->multi_blk_cnt = 0;
  }
  
-+#define SD_TUNING_BLOCK_SIZE    64
-+
-+static const uint32_t sd_tunning_data[SD_TUNING_BLOCK_SIZE / 4] = {
-+    0xFF0FFF00, 0x0FFCC3CC, 0xC33CCCFF, 0xFEFFFEEF,
-+    0xFFDFFFDD, 0xFFFBFFFB, 0XBFFF7FFF, 0X77F7BDEF,
-+    0XFFF0FFF0, 0X0FFCCC3C, 0XCC33CCCF, 0XFFEFFFEE,
-+    0XFFFDFFFD, 0XDFFFBFFF, 0XBBFFF7FF, 0XF77F7BDE,
+@@ -761,30 +763,132 @@ static uint32_t sd_wpbits(SDState *sd, uint64_t addr)
+     return ret;
+ }
+ 
++/* Function Group */
++enum {
++    SD_FG_MIN               = 1,
++    SD_FG_ACCESS_MODE       = 1,
++    SD_FG_COMMAND_SYSTEM    = 2,
++    SD_FG_DRIVER_STRENGTH   = 3,
++    SD_FG_CURRENT_LIMIT     = 4,
++    SD_FG_RSVD_5            = 5,
++    SD_FG_RSVD_6            = 6,
++    SD_FG_COUNT
 +};
 +
- uint8_t sd_read_data(SDState *sd)
- {
-     /* TODO: Append CRCs */
-@@ -1968,6 +1985,13 @@ uint8_t sd_read_data(SDState *sd)
-         }
-         break;
- 
-+    case 19:    /* CMD19:  SEND_TUNING_BLOCK (SD) */
-+        if (sd->data_offset >= SD_TUNING_BLOCK_SIZE - 1) {
-+            sd->state = sd_transfer_state;
-+        }
-+        ret = ((uint8_t *)(&sd_tunning_data))[sd->data_offset++];
-+        break;
++/* Function name */
++#define SD_FN_COUNT 16
 +
-     case 22:	/* ACMD22: SEND_NUM_WR_BLOCKS */
-         ret = sd->data[sd->data_offset ++];
++static const char *sd_fn_grp_name[SD_FG_COUNT] = {
++    [SD_FG_ACCESS_MODE]     = "ACCESS_MODE",
++    [SD_FG_COMMAND_SYSTEM]  = "COMMAND_SYSTEM",
++    [SD_FG_DRIVER_STRENGTH] = "DRIVER_STRENGTH",
++    [SD_FG_CURRENT_LIMIT]   = "CURRENT_LIMIT",
++    [SD_FG_RSVD_5]          = "RSVD5",
++    [SD_FG_RSVD_6]          = "RSVD6",
++};
++
++typedef struct sd_fn_support {
++    const char *name;
++    bool uhs_only;
++    bool unimp;
++} sd_fn_support;
++
++static const sd_fn_support *sd_fn_support_defs[SD_FG_COUNT] = {
++    [SD_FG_ACCESS_MODE] = (sd_fn_support [SD_FN_COUNT]) {
++        [0] = { .name = "default/SDR12" },
++        [1] = { .name = "high-speed/SDR25" },
++        [2] = { .name = "SDR50",    .uhs_only = true },
++        [3] = { .name = "SDR104",   .uhs_only = true },
++        [4] = { .name = "DDR50",    .uhs_only = true },
++    },
++    [SD_FG_COMMAND_SYSTEM] = (sd_fn_support [SD_FN_COUNT]) {
++        [0] = { .name = "default" },
++        [1] = { .name = "For eC" },
++        [3] = { .name = "OTP",      .unimp = true },
++        [4] = { .name = "ASSD",     .unimp = true },
++    },
++    [SD_FG_DRIVER_STRENGTH] = (sd_fn_support [SD_FN_COUNT]) {
++        [0] = { .name = "default/Type B" },
++        [1] = { .name = "Type A",   .uhs_only = true },
++        [2] = { .name = "Type C",   .uhs_only = true },
++        [3] = { .name = "Type D",   .uhs_only = true },
++    },
++    [SD_FG_CURRENT_LIMIT] = (sd_fn_support [SD_FN_COUNT]) {
++        [0] = { .name = "default/200mA" },
++        [1] = { .name = "400mA",    .uhs_only = true },
++        [2] = { .name = "600mA",    .uhs_only = true },
++        [3] = { .name = "800mA",    .uhs_only = true },
++    },
++    [SD_FG_RSVD_5] = (sd_fn_support [SD_FN_COUNT]) {
++        [0] = { .name = "default" },
++    },
++    [SD_FG_RSVD_6] = (sd_fn_support [SD_FN_COUNT]) {
++        [0] = { .name = "default" },
++    },
++};
++
++#define SD_FN_NO_INFLUENCE          (1 << 15)
++
+ static void sd_function_switch(SDState *sd, uint32_t arg)
+ {
+-    int i, mode, new_func;
+-    mode = !!(arg & 0x80000000);
+-
+-    sd->data[0] = 0x00;		/* Maximum current consumption */
+-    sd->data[1] = 0x01;
+-    sd->data[2] = 0x80;		/* Supported group 6 functions */
+-    sd->data[3] = 0x01;
+-    sd->data[4] = 0x80;		/* Supported group 5 functions */
+-    sd->data[5] = 0x01;
+-    sd->data[6] = 0x80;		/* Supported group 4 functions */
+-    sd->data[7] = 0x01;
+-    sd->data[8] = 0x80;		/* Supported group 3 functions */
+-    sd->data[9] = 0x01;
+-    sd->data[10] = 0x80;	/* Supported group 2 functions */
+-    sd->data[11] = 0x43;
+-    sd->data[12] = 0x80;	/* Supported group 1 functions */
+-    sd->data[13] = 0x03;
+-    for (i = 0; i < 6; i ++) {
+-        new_func = (arg >> (i * 4)) & 0x0f;
+-        if (mode && new_func != 0x0f)
+-            sd->function_group[i] = new_func;
+-        sd->data[14 + (i >> 1)] = new_func << ((i * 4) & 4);
++    int fn_grp, new_func, i;
++    uint8_t *data_p;
++    bool mode = extract32(arg, 31, 1);  /* 0: check only, 1: do switch */
++
++    stw_be_p(sd->data + 0, 0x0001);     /* Maximum current consumption */
++
++    data_p = &sd->data[2];
++    for (fn_grp = SD_FG_COUNT - 1; fn_grp >= SD_FG_MIN; fn_grp--) {
++        uint16_t supported_fns = SD_FN_NO_INFLUENCE;
++        for (i = 0; i < SD_FN_COUNT; ++i) {
++            const sd_fn_support *def = &sd_fn_support_defs[fn_grp][i];
++
++            if (def->name && !def->unimp &&
++                    !(def->uhs_only && !sd->uhs_enabled)) {
++                supported_fns |= 1 << i;
++            }
++        }
++        stw_be_p(data_p, supported_fns);
++        data_p += 2;
++    }
++
++    assert(data_p == &sd->data[14]);
++    for (fn_grp = SD_FG_COUNT - 1; fn_grp >= SD_FG_MIN; fn_grp--) {
++        new_func = (arg >> ((fn_grp - 1) * 4)) & 0x0f;
++        if (new_func == 0xf) {
++            new_func = sd->function_group[fn_grp - 1];
++        } else {
++            const sd_fn_support *def = &sd_fn_support_defs[fn_grp][new_func];
++            if (mode) {
++                if (!def->name) {
++                    qemu_log_mask(LOG_GUEST_ERROR,
++                                  "Function %d not a valid for "
++                                  "function group %d\n",
++                                  new_func, fn_grp);
++                    new_func = 0xf;
++                } else if (def->unimp) {
++                    qemu_log_mask(LOG_UNIMP,
++                                  "Function %s (fn grp %d) not implemented\n",
++                                  def->name, fn_grp);
++                    new_func = 0xf;
++                } else if (def->uhs_only && !sd->uhs_enabled) {
++                    qemu_log_mask(LOG_GUEST_ERROR,
++                                  "Function %s (fn grp %d) only "
++                                  "valid in UHS mode\n",
++                                  def->name, fn_grp);
++                    new_func = 0xf;
++                } else {
++                    sd->function_group[fn_grp - 1] = new_func;
++                }
++            }
++            trace_sdcard_function_select(def->name, sd_fn_grp_name[fn_grp],
++                                         mode);
++        }
++        if (!(fn_grp & 0x1)) { /* evens go in high nibble */
++            *data_p = new_func << 4;
++        } else { /* odds go in low nibble */
++            *(data_p++) |= new_func;
++        }
+     }
+     memset(&sd->data[17], 0, 47);
+     stw_be_p(sd->data + 65, sd_crc16(sd->data, 64));
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index 2059ace61f..c106541a47 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -42,6 +42,7 @@ sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
+ sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint8_t value) "%s %20s/ CMD%02d value 0x%02x"
+ sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, int length) "%s %20s/ CMD%02d len %d"
+ sdcard_set_voltage(uint16_t millivolts) "%u mV"
++sdcard_function_select(const char *fn_name, const char *grp_name, bool do_switch) "Function %s (group: %s, sw: %u)"
  
+ # hw/sd/milkymist-memcard.c
+ milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
 -- 
 2.16.1
