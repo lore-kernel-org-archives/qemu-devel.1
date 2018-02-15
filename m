@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1emOCt-0005lE-Ar
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1emOCv-0005mp-EC
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1emOCq-0007tv-5m
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48162 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1emOCu-0007v5-Ew
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:33 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36802 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1emOCq-0007tX-0x
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:28 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8697540744C6
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:24:22 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-References: <20180215102602.10864-1-berrange@redhat.com>
-Date: Thu, 15 Feb 2018 13:24:14 -0500
-In-Reply-To: <20180215102602.10864-1-berrange@redhat.com> ("Daniel
-	P. \=\?utf-8\?Q\?Berrang\=C3\=A9\=22's\?\= message of "Thu,
-	15 Feb 2018 10:26:02 +0000")
-Message-ID: <jpglgfucdrl.fsf@linux.bootlegged.copy>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1emOCu-0007v1-Ai
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:32 -0500
+References: <20180215171611.11962-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2218393d-c61a-32c5-68bf-ffd993d209dc@redhat.com>
+Date: Thu, 15 Feb 2018 12:24:16 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180215171611.11962-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vnc: remove bogus object_unref on client
- socket
+Subject: Re: [Qemu-devel] [PATCH] tests: dump config.log when configure
+ fails in docker job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-
-> vnc_listen_io() does not own the reference on the 'cioc' parameter is it
-> passed, so should not be unref'ing it.
->
-> Reported-by: Bandan Das <bsd@redhat.com>
+On 02/15/2018 11:16 AM, Daniel P. Berrang=C3=A9 wrote:
+> When configure fails inside a docker job it is not easy to get access t=
+o
+> the config.log file. It is nicer for developers if we just splatter the
+> contents of config.log to stdout upon failure
+>=20
+> Suggested-by: Eric Blake <eblake@redhat.com>
 > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-Daniel, wouldn't a Fixes: 13e1d0e71e78a925848258391a6e616b6b5ae219
-be helpful here ?
-
 > ---
->  ui/vnc.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index c715bae1cf..b97769aa9e 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -3152,7 +3152,6 @@ static void vnc_listen_io(QIONetListener *listener,
->                           isWebsock ? "vnc-ws-server" : "vnc-server");
->      qio_channel_set_delay(QIO_CHANNEL(cioc), false);
->      vnc_connect(vd, cioc, false, isWebsock);
-> -    object_unref(OBJECT(cioc));
->  }
->=20=20
->  static const DisplayChangeListenerOps dcl_ops =3D {
+>   tests/docker/common.rc | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+> index 7951555e3f..ecbea13443 100755
+> --- a/tests/docker/common.rc
+> +++ b/tests/docker/common.rc
+> @@ -30,7 +30,8 @@ build_qemu()
+>                    $@"
+>       echo "Configure options:"
+>       echo $config_opts
+> -    $QEMU_SRC/configure $config_opts && make $MAKEFLAGS
+
+The old code dies if either configure or make has non-zero exit status.
+
+> +    $QEMU_SRC/configure $config_opts || cat config.log
+> +    make $MAKEFLAGS
+
+But this turns a failure of configure into a successful exit status=20
+(presuming that cat doesn't also fail), which means we try the make no=20
+matter whether configure succeeded.
+
+Better might be:
+
+$QEMU_SRC/configure $config_opts || { cat config.log; exit 1; }
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
