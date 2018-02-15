@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34525)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBF-0007x5-IA
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:58 -0500
+	id 1emBBL-0007zb-1d
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBE-00045L-Nx
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:57 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:46695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBE-00045D-Iv
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:56 -0500
-Received: by mail-qt0-x241.google.com with SMTP id u6so10464148qtg.13
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:29:56 -0800 (PST)
+	id 1emBBH-00046f-Uz
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:03 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 01:28:45 -0300
-Message-Id: <20180215042900.16078-16-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 01:28:46 -0300
+Message-Id: <20180215042900.16078-17-f4bug@amsat.org>
 In-Reply-To: <20180215042900.16078-1-f4bug@amsat.org>
 References: <20180215042900.16078-1-f4bug@amsat.org>
-Subject: [Qemu-devel] [PATCH 15/30] hw/lm32: use the BYTE-based definitions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 16/30] hw/sh4: use the BYTE-based definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +27,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Michael Walle <michael@walle.cc>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, "open list:Block layer core" <qemu-block@nongnu.org>
 
 It ease code review, unit is explicit.
----
- hw/lm32/lm32_boards.c | 12 ++++++------
- hw/lm32/milkymist.c   |  8 ++++----
- 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index 527bcc229c..15315101be 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -88,10 +88,10 @@ static void lm32_evr_init(MachineState *machine)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/block/tc58128.c | 2 +-
+ hw/sh4/r2d.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/block/tc58128.c b/hw/block/tc58128.c
+index 1d9f7ee000..3e658d509f 100644
+--- a/hw/block/tc58128.c
++++ b/hw/block/tc58128.c
+@@ -26,7 +26,7 @@ typedef struct {
  
-     /* memory map */
-     hwaddr flash_base  = 0x04000000;
--    size_t flash_sector_size       = 256 * 1024;
--    size_t flash_size              = 32 * 1024 * 1024;
-+    size_t flash_sector_size       = 256 * K_BYTE;
-+    size_t flash_size              = 32 * M_BYTE;
-     hwaddr ram_base    = 0x08000000;
--    size_t ram_size                = 64 * 1024 * 1024;
-+    size_t ram_size                = 64 * M_BYTE;
-     hwaddr timer0_base = 0x80002000;
-     hwaddr uart0_base  = 0x80006000;
-     hwaddr timer1_base = 0x8000a000;
-@@ -174,10 +174,10 @@ static void lm32_uclinux_init(MachineState *machine)
+ static tc58128_dev tc58128_devs[2];
  
-     /* memory map */
-     hwaddr flash_base   = 0x04000000;
--    size_t flash_sector_size        = 256 * 1024;
--    size_t flash_size               = 32 * 1024 * 1024;
-+    size_t flash_sector_size        = 256 * K_BYTE;
-+    size_t flash_size               = 32 * M_BYTE;
-     hwaddr ram_base     = 0x08000000;
--    size_t ram_size                 = 64 * 1024 * 1024;
-+    size_t ram_size                 = 64 * M_BYTE;
-     hwaddr uart0_base   = 0x80000000;
-     hwaddr timer0_base  = 0x80002000;
-     hwaddr timer1_base  = 0x80010000;
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index c28379399f..b884b825bc 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -36,7 +36,7 @@
+-#define FLASH_SIZE (16*1024*1024)
++#define FLASH_SIZE (16 * M_BYTE)
  
- #define BIOS_FILENAME    "mmone-bios.bin"
- #define BIOS_OFFSET      0x00860000
--#define BIOS_SIZE        (512*1024)
-+#define BIOS_SIZE        (512 * K_BYTE)
- #define KERNEL_LOAD_ADDR 0x40000000
+ static void init_dev(tc58128_dev * dev, const char *filename)
+ {
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index 458ed83297..720bd6ad04 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -292,7 +292,7 @@ static void r2d_init(MachineState *machine)
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                          (16 * 1024), FLASH_SIZE >> 16,
++                          16 * K_BYTE, FLASH_SIZE >> 16,
+                           1, 4, 0x0000, 0x0000, 0x0000, 0x0000,
+                           0x555, 0x2aa, 0);
  
- typedef struct {
-@@ -95,10 +95,10 @@ milkymist_init(MachineState *machine)
- 
-     /* memory map */
-     hwaddr flash_base   = 0x00000000;
--    size_t flash_sector_size        = 128 * 1024;
--    size_t flash_size               = 32 * 1024 * 1024;
-+    size_t flash_sector_size        = 128 * K_BYTE;
-+    size_t flash_size               = 32 * M_BYTE;
-     hwaddr sdram_base   = 0x40000000;
--    size_t sdram_size               = 128 * 1024 * 1024;
-+    size_t sdram_size               = 128 * M_BYTE;
- 
-     hwaddr initrd_base  = sdram_base + 0x1002000;
-     hwaddr cmdline_base = sdram_base + 0x1000000;
 -- 
 2.16.1
