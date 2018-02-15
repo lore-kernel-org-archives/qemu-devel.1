@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1emFlI-0005Bd-9Y
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:23:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1emFpI-0000jV-ME
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:27:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1emFlF-0000Ch-1p
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:23:28 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43684 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1emFpF-0002Hg-Cs
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:27:36 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54784 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1emFlE-00009Y-QQ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:23:24 -0500
-Date: Thu, 15 Feb 2018 10:23:02 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180215092302.y6qwyyh65f3xx676@kamzik.brq.redhat.com>
-References: <1518212562-21606-1-git-send-email-wei@redhat.com>
-	<1518212562-21606-2-git-send-email-wei@redhat.com>
-	<20180212173100.wmt2ouak6b3thnxd@kamzik.brq.redhat.com>
-	<245a4e34-06f2-bab1-e67b-53be45e95d40@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emFpF-0002H8-6X
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:27:33 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1E1DF40FB64F
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 09:27:32 +0000 (UTC)
+Date: Thu, 15 Feb 2018 09:27:30 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180215092730.GA23321@stefanha-x1.localdomain>
+References: <20180213142102.14450-1-stefanha@redhat.com>
+	<20180213142102.14450-2-stefanha@redhat.com>
+	<73eb771d-ddcd-42e6-5895-23e6024ccc80@redhat.com>
+	<20180214140647.GC7545@stefanha-x1.localdomain>
+	<8894e9fa-8e3d-ecfe-07f4-61a465f4bf57@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
 Content-Disposition: inline
-In-Reply-To: <245a4e34-06f2-bab1-e67b-53be45e95d40@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2 1/1] tests: Add migration test for
- aarch64
+In-Reply-To: <8894e9fa-8e3d-ecfe-07f4-61a465f4bf57@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] block: extract AIO_WAIT_WHILE()
+ from BlockDriverState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,442 +38,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Wed, Feb 14, 2018 at 02:17:34PM -0600, Wei Huang wrote:
-> 
-> 
-> On 02/12/2018 11:31 AM, Andrew Jones wrote:
-> > On Fri, Feb 09, 2018 at 04:42:42PM -0500, Wei Huang wrote:
-> >> This patch adds migration test support for aarch64. The test code, which
-> >> implements the same functionality as x86, is booted as a kernel in qemu.
-> >> Here are the design choices we make for aarch64:
-> >>
-> >>  * We choose this -kernel approach because aarch64 QEMU doesn't provide a
-> >>    built-in fw like x86 does. So instead of relying on a boot loader, we
-> >>    use -kernel approach for aarch64.
-> >>  * The serial output is sent to PL011 directly.
-> >>  * The physical memory base for mach-virt machine is 0x40000000. We change
-> >>    the start_address and end_address for aarch64.
-> >>
-> >> In addition to providing the binary, this patch also includes the test source
-> >> and the build script in tests/migration. So users can change/re-compile
-> >> the binary as they wish.
-> >>
-> >> Signed-off-by: Wei Huang <wei@redhat.com>
-> >> ---
-> >>  tests/Makefile.include                    |  1 +
-> >>  tests/migration-test.c                    | 29 ++++++++++---
-> >>  tests/migration/aarch64-a-b-kernel.h      | 19 +++++++++
-> >>  tests/migration/aarch64-a-b-kernel.s      | 67 +++++++++++++++++++++++++++++++
-> >>  tests/migration/rebuild-aarch64-kernel.sh | 67 +++++++++++++++++++++++++++++++
-> >>  5 files changed, 177 insertions(+), 6 deletions(-)
-> >>  create mode 100644 tests/migration/aarch64-a-b-kernel.h
-> >>  create mode 100644 tests/migration/aarch64-a-b-kernel.s
-> >>  create mode 100755 tests/migration/rebuild-aarch64-kernel.sh
-> >>
-> >> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> >> index f41da23..0fd18fd 100644
-> >> --- a/tests/Makefile.include
-> >> +++ b/tests/Makefile.include
-> >> @@ -369,6 +369,7 @@ gcov-files-arm-y += hw/timer/arm_mptimer.c
-> >>  check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
-> >>  
-> >>  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
-> >> +check-qtest-aarch64-y += tests/migration-test$(EXESUF)
-> >>  
-> >>  check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
-> >>  
-> >> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> >> index 85d4014..b16944c 100644
-> >> --- a/tests/migration-test.c
-> >> +++ b/tests/migration-test.c
-> >> @@ -22,8 +22,8 @@
-> >>  
-> >>  #define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
-> >>  
-> >> -const unsigned start_address = 1024 * 1024;
-> >> -const unsigned end_address = 100 * 1024 * 1024;
-> >> +unsigned start_address = 1024 * 1024;
-> >> +unsigned end_address = 100 * 1024 * 1024;
-> >>  bool got_stop;
-> >>  
-> >>  #if defined(__linux__)
-> >> @@ -80,12 +80,13 @@ static const char *tmpfs;
-> >>   * outputing a 'B' every so often if it's still running.
-> >>   */
-> >>  #include "tests/migration/x86-a-b-bootblock.h"
-> >> +#include "tests/migration/aarch64-a-b-kernel.h"
-> >>  
-> >> -static void init_bootfile_x86(const char *bootpath)
-> >> +static void init_bootfile(const char *bootpath, void *content)
-> >>  {
-> >>      FILE *bootfile = fopen(bootpath, "wb");
-> >>  
-> >> -    g_assert_cmpint(fwrite(x86_bootsect, 512, 1, bootfile), ==, 1);
-> >> +    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
-> >>      fclose(bootfile);
-> >>  }
-> >>  
-> >> @@ -391,7 +392,7 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-> >>      got_stop = false;
-> >>  
-> >>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> >> -        init_bootfile_x86(bootpath);
-> >> +        init_bootfile(bootpath, x86_bootsect);
-> >>          cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
-> >>                                    " -name source,debug-threads=on"
-> >>                                    " -serial file:%s/src_serial"
-> >> @@ -420,6 +421,22 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-> >>                                    " -serial file:%s/dest_serial"
-> >>                                    " -incoming %s",
-> >>                                    accel, tmpfs, uri);
-> >> +    } else if (strcmp(arch, "aarch64") == 0) {
-> >> +        init_bootfile(bootpath, aarch64_kernel);
-> >> +        cmd_src = g_strdup_printf("-machine virt,accel=kvm:tcg -m 150M "
-> >> +                                  "-name vmsource,debug-threads=on -cpu host "
-> > 
-> > We can't use '-cpu host' with tcg, so the accel fallback won't work.
-> 
-> Will fix
-> 
-> > 
-> >> +                                  "-serial file:%s/src_serial "
-> >> +                                  "-kernel %s ",
-> >> +                                  tmpfs, bootpath);
-> >> +        cmd_dst = g_strdup_printf("-machine virt,accel=kvm:tcg -m 150M "
-> >> +                                  "-name vmdest,debug-threads=on -cpu host "
-> >> +                                  "-serial file:%s/dest_serial "
-> >> +                                  "-kernel %s "
-> >> +                                  "-incoming %s ",
-> >> +                                  tmpfs, bootpath, uri);
-> >> +        /* aarch64 virt machine physical mem started from 0x40000000 */
-> > 
-> > s/mem started from/memory starts at/
-> 
-> will fix
-> 
-> > 
-> >> +        start_address += 0x40000000;
-> >> +        end_address += 0x40000000;
-> > 
-> > Why is end_address == start_address?
-> 
-> No, these two variables have been defined above. We just need to shift
-> them to new locations.
 
-eh, I was reading too fast.
+--YiEDa0DAkWCtVeE4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> > 
-> >>      } else {
-> >>          g_assert_not_reached();
-> >>      }
-> >> @@ -501,7 +518,7 @@ static void test_deprecated(void)
-> >>  {
-> >>      QTestState *from;
-> >>  
-> >> -    from = qtest_start("");
-> >> +    from = qtest_start("-machine none");
-> >>  
-> >>      deprecated_set_downtime(from, 0.12345);
-> >>      deprecated_set_speed(from, "12345");
-> >> diff --git a/tests/migration/aarch64-a-b-kernel.h b/tests/migration/aarch64-a-b-kernel.h
-> >> new file mode 100644
-> >> index 0000000..5bdc74b
-> >> --- /dev/null
-> >> +++ b/tests/migration/aarch64-a-b-kernel.h
-> >> @@ -0,0 +1,19 @@
-> >> +/* This file is automatically generated from
-> >> + * tests/migration/aarch64-a-b-kernel.s, edit that and then run
-> >> + * tests/migration/rebuild-aarch64-kernel.sh to update, and then
-> >> + * remember to send both in your patch submission.
-> >> + */
-> >> +unsigned char aarch64_kernel[] = {
-> >> +  0x00, 0x10, 0x38, 0xd5, 0x00, 0xf8, 0x7f, 0x92, 0x00, 0x10, 0x18, 0xd5,
-> >> +  0xdf, 0x3f, 0x03, 0xd5, 0x24, 0x08, 0x80, 0x52, 0x05, 0x20, 0xa1, 0xd2,
-> >> +  0xa4, 0x00, 0x00, 0x39, 0x06, 0x00, 0x80, 0x52, 0x03, 0xc8, 0xa8, 0xd2,
-> >> +  0x02, 0x02, 0xa8, 0xd2, 0x01, 0x00, 0x80, 0x52, 0x41, 0x00, 0x00, 0x39,
-> >> +  0x42, 0x04, 0x40, 0x91, 0x5f, 0x00, 0x03, 0xeb, 0xad, 0xff, 0xff, 0x54,
-> >> +  0x02, 0x02, 0xa8, 0xd2, 0x22, 0x7e, 0x0b, 0xd5, 0x41, 0x00, 0x40, 0x39,
-> >> +  0x21, 0x04, 0x00, 0x11, 0x21, 0x1c, 0x00, 0x12, 0x41, 0x00, 0x00, 0x39,
-> >> +  0x42, 0x04, 0x40, 0x91, 0x5f, 0x00, 0x03, 0xeb, 0x2b, 0xff, 0xff, 0x54,
-> >> +  0xc6, 0x04, 0x00, 0x11, 0xc6, 0x1c, 0x00, 0x12, 0xdf, 0x00, 0x00, 0x71,
-> >> +  0x81, 0xfe, 0xff, 0x54, 0x44, 0x08, 0x80, 0x52, 0x05, 0x20, 0xa1, 0xd2,
-> >> +  0xa4, 0x00, 0x00, 0x39, 0xf0, 0xff, 0xff, 0x97
-> >> +};
-> >> +
-> >> diff --git a/tests/migration/aarch64-a-b-kernel.s b/tests/migration/aarch64-a-b-kernel.s
-> >> new file mode 100644
-> >> index 0000000..bc20c81
-> >> --- /dev/null
-> >> +++ b/tests/migration/aarch64-a-b-kernel.s
-> >> @@ -0,0 +1,67 @@
-> >> +#!/bin/sh
-> >> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-> >> +#
-> >> +# Authors:
-> >> +#   Wei Huang <wei@redhat.com>
-> >> +#
-> >> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> >> +# See the COPYING file in the top-level directory.
-> >> +
-> >> +.section .text
-> >> +
-> >> +        .globl  start
-> >> +
-> >> +start:
-> >> +        /* disable MMU to use phys mem address */
-> >> +        mrs     x0, sctlr_el1
-> >> +        bic     x0, x0, #(1<<0)
-> >> +        msr     sctlr_el1, x0
-> >> +        isb
-> > 
-> > The MMU is always initially off, so this isn't really necessary, but OK.
-> > 
-> >> +
-> >> +        /* output char 'A' to PL011 */
-> >> +        mov     w4, #65
-> >> +        mov     x5, #0x9000000
-> >> +        strb    w4, [x5]
-> >> +
-> >> +        /* w6 keeps a counter so we can limit the output speed */
-> >> +        mov     w6, #0
-> >> +
-> >> +        /* phys mem base addr = 0x40000000 */
-> >> +        mov     x3, #(0x40000000 + 100 *1024*1024) /* traverse 1M-100M */
-> >> +        mov     x2, #(0x40000000 + 1 * 1024*1024)
-> > 
-> > How about creating a tests include file that contains this memory base
-> > address so we don't have to scatter it around too many files? We can
-> > throw in other defines too.
-> > 
-> >  tests/arm-mach-virt.h:
-> >  #define ARM_MACH_VIRT_UART      0x09000000
-> >  #define ARM_MACH_VIRT_PHYS_BASE 0x40000000
-> >  #define ARM_MACH_VIRT_A_B_START 0x40000000
-> >  #define ARM_MACH_VIRT_A_B_END   (0x40000000 * 100)
-> 
-> Will fix with ".set"
-> 
-> > 
-> >> +
-> >> +        /* clean up memory first */
-> >> +        mov     w1, #0
-> >> +clean:
-> >> +        strb    w1, [x2]
-> >> +        add     x2, x2, #(4096)
-> >> +        cmp     x2, x3
-> >> +        ble     clean
-> > 
-> > Why are we only clearing the first byte of each 4K chunk? Anyway QEMU
-> > always gives us clean memory, so this isn't really necessary.
-> 
-> Unfortunately this isn't always true. I wrote a small program to check
-> guest VM's memory on AArch64 (every 4KB). It turned that three locations
-> have non-zero content:
-> 
-> Addr=0x40100000, Content=0x10
-> Addr=0x40110000, Content=0x10
-> Addr=0x44c01000, Content=0x6d
+On Wed, Feb 14, 2018 at 04:31:45PM -0600, Eric Blake wrote:
+> On 02/14/2018 08:06 AM, Stefan Hajnoczi wrote:
+> > On Tue, Feb 13, 2018 at 10:01:06AM -0600, Eric Blake wrote:
+> > I hope this explains things!  The main issue that raised these questions
+> > was that aio_context_in_iothread() has a misleading name.  Shall we
+> > rename it?
+>=20
+> Maybe, but that's a separate patch.  What name would we bikeshed, maybe
+> aio_context_correct_thread() (we are the correct thread if we are the
+> iothread that owns ctx, or if we are the main thread and have properly
+> acquired ctx)=20
 
-I guess the fist two are from your code and data. Maybe take a look at
-your binary's headers (objdump -h) to see if you might not be putting
-code and data past the 1 MB offset. If so, you'll need to pick a bigger
-offset. The third one is the DTB, which gets put in about the middle
-of memory. So, you're right, the memory isn't going to be clean, but
-besides the DTB, you should avoid stepping on what isn't. Also, you can
-force the DTB to be put at the 128 MB offset (outside your 100 MB region)
-by giving the guest 256 MB or more memory. See the comment block about
-the initrd in arm_load_kernel_notify() and note that the DTB is placed
-after initrd. As you don't have an initrd, then after will mean at the
-initrd offset.
+Having acquired the AioContext does not make this function return true.
+The semantics are:
+1. Current thread is the IOThread that runs the AioContext
+2. Current thread is the main loop and the AioContext is the global
+   AioContext.
 
-> 
-> 
-> > 
-> >> +
-> >> +        /* main body */
-> >> +mainloop:
-> >> +        mov     x2, #(0x40000000 + 1 * 1024*1024)
-> > 
-> > nit: This reassignment of x2 would be unnecessary if you copied x2 into
-> >      a scratch register (x7) prior to the clean loop, and then used the
-> >      scratch register there. It's the same number of instructions, but
-> >      less hard coded constants floating around.
-> 
-> Will fix
-> 
-> > 
-> >> +
-> >> +innerloop:
-> >> +        /* clean cache because el2 might still cache guest data under KVM */
-> >> +        dc      civac, x2
-> > 
-> > Blank line here and a comment introducing the next block would be nice.
-> > 
-> >> +        ldrb    w1, [x2]
-> >> +        add     w1, w1, #1
-> >> +        and     w1, w1, #(0xff)
-> >> +        strb    w1, [x2]
-> >> +
-> >> +        add     x2, x2, #(4096)
-> >> +        cmp     x2, x3
-> >> +        blt     innerloop
-> > 
-> > OK, I guess we only care about the first byte of each 4K chunk.
-> > 
-> >> +
-> >> +        add     w6, w6, #1
-> >> +        and     w6, w6, #(0xff)
-> >> +        cmp     w6, #0
-> >> +        bne     mainloop
-> > 
-> > So we limit the output speed by doing the write loop 256 times? How was
-> > the number 256 selected? If we want to delay the outputs we can use the
-> > timer counter to ensure we only output every N us. I pulled together
-> > some code that implements a 100 us delay:
-> > 
-> >  	mrs	x0, cntfrq_el0
-> >  	mov	x1, #10000
-> >  	udiv	x1, x0, x1
-> >  	mrs	x0, cntvct_el0
-> >  	add	x0, x0, x1
-> >  1:	isb
-> >  	mrs	x1, cntvct_el0
-> >  	subs	x1, x0, x1
-> > 	b.gt	1b
-> > 
-> 
-> 256 is a number I picked after trying on aarch64 server. I think I will
-> stick with the original design. The reason is that we don't want to rely
-> on hardware availability (timer) in such a short program. 256 is a good
-> enough choice which serves the purpose and still is very portable.
+The function tests whether the current thread is the "native" or "home"
+thread for this AioContext.  Perhaps we could also call it the "poller"
+thread because only that thread is allowed to call aio_poll(ctx, true).
 
-But you'll get totally different "delays" depending on the speed of the
-hardware and load of the processors. If you really need a delay, then
-the only way to implement one reliably is to use a timer. If it doesn't
-really matter, then why do it at all?
+  if (aio_context_in_native_thread(ctx)) {
+      ...
+  } else {
+      ...
+  }
 
-> 
-> >> +
-> >> +        /* output char 'B' to PL011 */
-> >> +        mov     w4, #66
-> >> +        mov     x5, #0x9000000
-> > 
-> > You never overwrote x5, so you don't need to rewrite the uart addr here.
-> > 
-> >> +        strb    w4, [x5]
-> >> +
-> >> +        bl      mainloop
-> >> diff --git a/tests/migration/rebuild-aarch64-kernel.sh b/tests/migration/rebuild-aarch64-kernel.sh
-> >> new file mode 100755
-> >> index 0000000..0fbca99
-> >> --- /dev/null
-> >> +++ b/tests/migration/rebuild-aarch64-kernel.sh
-> >> @@ -0,0 +1,67 @@
-> >> +#!/bin/sh
-> >> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-> >> +#
-> >> +# Authors:
-> >> +#   Wei Huang <wei@redhat.com>
-> >> +#
-> >> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> >> +# See the COPYING file in the top-level directory.
-> >> +
-> >> +ASMFILE=tests/migration/aarch64-a-b-kernel.s
-> >> +HEADER=tests/migration/aarch64-a-b-kernel.h
-> >> +
-> >> +if [ ! -e "$ASMFILE" ]
-> >> +then
-> >> +  echo "Couldn't find $ASMFILE" >&2
-> >> +  exit 1
-> >> +fi
-> >> +
-> >> +ASM_WORK_DIR=/tmp/AARCH64BB$$
-> > 
-> > Same mktemp comment as in David's patch.
-> 
-> Will do
-> 
-> > 
-> >> +
-> >> +mkdir $ASM_WORK_DIR &&
-> >> +cat <<EOF > "$ASM_WORK_DIR/linker.lds" &&
-> >> +SECTIONS
-> >> +{
-> >> +    .text : { *(.init) *(.text) *(.text.*) }
-> >> +    . = ALIGN(64K);
-> >> +    etext = .;
-> >> +    .data : {
-> >> +        *(.data)
-> >> +    }
-> >> +    . = ALIGN(16);
-> >> +    .rodata : { *(.rodata) }
-> >> +    . = ALIGN(16);
-> >> +    .bss : { *(.bss) }
-> >> +    . = ALIGN(64K);
-> >> +    edata = .;
-> >> +    . += 64K;
-> >> +    . = ALIGN(64K);
-> >> +    /*
-> >> +     * stack depth is 16K for arm and PAGE_SIZE for arm64, see THREAD_SIZE
-> >> +     * sp must be 16 byte aligned for arm64, and 8 byte aligned for arm
-> >> +     * sp must always be strictly less than the true stacktop
-> >> +     */
-> >> +    stackptr = . - 16;
-> >> +    stacktop = .;
-> >> +}
-> >> +ENTRY(start)
-> >> +EOF
-> >> +as -march="armv8-a" -c "$ASMFILE" -o $ASM_WORK_DIR/kernel.o &&
-> >> +gcc -O2 -o $ASM_WORK_DIR/kernel.elf -nostdlib \
-> >> +    -Wl,-T,$ASM_WORK_DIR/linker.lds,--build-id=none,-Ttext=40080000 \
-> >> +    $ASM_WORK_DIR/kernel.o &&
-> > 
-> > You don't need the above linker script nor the 'as' line. Just do
-> > 
-> >  gcc -o $ASM_WORK_DIR/kernel.elf \
-> >      -nostdlib -Wl,--build-id=none,-Ttext=40080000 $ASMFILE
-> > 
-> 
-> Will do
-> 
-> >> +objcopy -O binary $ASM_WORK_DIR/kernel.elf $ASM_WORK_DIR/kernel.flat &&
-> > 
-> > Shouldn't gcc and objcopy have a $CROSS_COMPILER prefix variable
-> > prepended? Does the QEMU test build environment support cross
-> > compiling? Can this script get build environment variables some how?
-> > 
-> 
-> I think this is a good point. For cross compilation, I decided to change
-> this re-build script into a Makefile (also merged with Dave Gilbert's
-> version).
-> 
-> >> +xxd -i $ASM_WORK_DIR/kernel.flat |
-> >> +sed -e 's/_tmp.*_kernel_flat/aarch64_kernel/' -e 's/.*int.*//' > \
-> >> +  $ASM_WORK_DIR/kernel.hex &&
-> >> +cat - $ASM_WORK_DIR/kernel.hex <<EOF > "$HEADER"
-> >> +/* This file is automatically generated from
-> >> + * tests/migration/aarch64-a-b-kernel.s, edit that and then run
-> >> + * tests/migration/rebuild-aarch64-kernel.sh to update, and then
-> >> + * remember to send both in your patch submission.
-> >> + */
-> >> +EOF
-> >> +
-> >> +rm $ASM_WORK_DIR/kernel.hex $ASM_WORK_DIR/kernel.flat \
-> >> +    $ASM_WORK_DIR/kernel.elf $ASM_WORK_DIR/kernel.o $ASM_WORK_DIR/linker.lds
-> >> +rmdir $ASM_WORK_DIR
-> >> -- 
-> >> 1.8.3.1
-> >>
-> >>
-> > 
-> > Thanks,
-> > drew 
-> > 
->
+What do you think?
 
-Thanks,
-drew
+--YiEDa0DAkWCtVeE4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJahVKCAAoJEJykq7OBq3PI2qEIALsOIcVdEEq1j/xk6SMAn5PX
+V8HJASDshsNhq86Ov1Tsi5rjGAaJn9XQ/43yi4/igVNDKKHCwZjHpQYZ9AxMQJx8
+am/ukwJ7cgmwvoWkGIHB1NCeAxJjYDo6mRTlGeTIAZ6cK+w2xQNkASUxT8v+Jdvs
+yiRVInQ1yvxu3UEk9bW2wbYE/h2xvFs1G72p2YASTR1xhZ6YJRq5XRkOpACuo656
+QhtLnFEbfamqbSYLjCUmfw8kkiQGFgXFVCPPxUr8HNVZ9bLjpknjqPR4bXWLSbzV
+5FFqXQKb4F3Txg7raj8E7pLCxWlzqD6RvNPvmDVANM8GkB84GlBWa3tRtulsMC4=
+=Xou3
+-----END PGP SIGNATURE-----
+
+--YiEDa0DAkWCtVeE4--
