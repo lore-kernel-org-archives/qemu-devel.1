@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emK2L-00088v-0c
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:57:22 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emK2J-00086q-DM
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:57:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emK2K-00055z-5y
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:57:21 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46416)
+	(envelope-from <pm215@archaic.org.uk>) id 1emK2I-000548-Bd
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:57:19 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46410)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1emK2J-00054C-Ul
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:57:20 -0500
+	id 1emK2I-0004yn-3u
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:57:18 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1emK2I-0001pZ-M6
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:57:18 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1emK2G-0001p4-VX
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:57:16 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Feb 2018 13:57:01 +0000
-Message-Id: <20180215135702.1340-21-peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 13:56:59 +0000
+Message-Id: <20180215135702.1340-19-peter.maydell@linaro.org>
 In-Reply-To: <20180215135702.1340-1-peter.maydell@linaro.org>
 References: <20180215135702.1340-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 20/21] target/arm: Migrate v7m.other_sp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 18/21] hw/intc/armv7m_nvic: Fix
+ byte-to-interrupt number conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +33,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In commit abc24d86cc0364f we accidentally broke migration of
-the stack pointer value for the mode (process, handler) the CPU
-is not currently running as. (The commit correctly removed the
-no-longer-used v7m.current_sp flag from the VMState but also
-deleted the still very much in use v7m.other_sp SP value field.)
-
-Add a subsection to migrate it again. (We don't need to care
-about trying to retain compatibility with pre-abc24d86cc0364f
-versions of QEMU, because that commit bumped the version_id
-and we've since bumped it again a couple of times.)
+In many of the NVIC registers relating to interrupts, we
+have to convert from a byte offset within a register set
+into the number of the first interrupt which is affected.
+We were getting this wrong for:
+ * reads of NVIC_ISPR<n>, NVIC_ISER<n>, NVIC_ICPR<n>, NVIC_ICER<n>,
+   NVIC_IABR<n> -- in all these cases we were missing the "* 8"
+   needed to convert from the byte offset to the interrupt number
+   (since all these registers use one bit per interrupt)
+ * writes of NVIC_IPR<n> had the opposite problem of a spurious
+   "* 8" (since these registers use one byte per interrupt)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180209165810.6668-11-peter.maydell@linaro.org
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180209165810.6668-9-peter.maydell@linaro.org
 ---
- target/arm/machine.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ hw/intc/armv7m_nvic.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 25cdf4d581..1a20d6c36c 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -236,6 +236,16 @@ static const VMStateDescription vmstate_m_scr = {
-     }
- };
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index ea3b7cce14..c51151fa8a 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -1724,7 +1724,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+         /* fall through */
+     case 0x180 ... 0x1bf: /* NVIC Clear enable */
+         val = 0;
+-        startvec = offset - 0x180 + NVIC_FIRST_IRQ; /* vector # */
++        startvec = 8 * (offset - 0x180) + NVIC_FIRST_IRQ; /* vector # */
  
-+static const VMStateDescription vmstate_m_other_sp = {
-+    .name = "cpu/m/other-sp",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.v7m.other_sp, ARMCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_m = {
-     .name = "cpu/m",
-     .version_id = 4,
-@@ -259,6 +269,7 @@ static const VMStateDescription vmstate_m = {
-         &vmstate_m_faultmask_primask,
-         &vmstate_m_csselr,
-         &vmstate_m_scr,
-+        &vmstate_m_other_sp,
-         NULL
-     }
- };
+         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
+             if (s->vectors[startvec + i].enabled &&
+@@ -1738,7 +1738,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+         /* fall through */
+     case 0x280 ... 0x2bf: /* NVIC Clear pend */
+         val = 0;
+-        startvec = offset - 0x280 + NVIC_FIRST_IRQ; /* vector # */
++        startvec = 8 * (offset - 0x280) + NVIC_FIRST_IRQ; /* vector # */
+         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
+             if (s->vectors[startvec + i].pending &&
+                 (attrs.secure || s->itns[startvec + i])) {
+@@ -1748,7 +1748,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+         break;
+     case 0x300 ... 0x33f: /* NVIC Active */
+         val = 0;
+-        startvec = offset - 0x300 + NVIC_FIRST_IRQ; /* vector # */
++        startvec = 8 * (offset - 0x300) + NVIC_FIRST_IRQ; /* vector # */
+ 
+         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
+             if (s->vectors[startvec + i].active &&
+@@ -1863,7 +1863,7 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
+     case 0x300 ... 0x33f: /* NVIC Active */
+         return MEMTX_OK; /* R/O */
+     case 0x400 ... 0x5ef: /* NVIC Priority */
+-        startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
++        startvec = (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
+ 
+         for (i = 0; i < size && startvec + i < s->num_irq; i++) {
+             if (attrs.secure || s->itns[startvec + i]) {
 -- 
 2.16.1
