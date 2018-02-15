@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1emSn3-0003bR-56
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:18:11 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emTNY-0005zj-Rr
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1emSmz-0000l8-Ts
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:18:09 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:58143)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1emSmz-0000ko-Ok
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:18:05 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 15 Feb 2018 18:17:56 -0500
-Message-Id: <1518736676-5994-4-git-send-email-cota@braap.org>
-In-Reply-To: <1518736676-5994-1-git-send-email-cota@braap.org>
-References: <1518736676-5994-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 3/3] target/sparc: convert to TranslatorOps
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emTNU-0005Uc-QO
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:55:52 -0500
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:44405)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emTNU-0005UK-LG
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:55:48 -0500
+Received: by mail-qt0-x231.google.com with SMTP id f18so1868915qth.11
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 15:55:48 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180204222356.14546-1-richard.henderson@linaro.org>
+	<20180204222356.14546-3-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3edd5d86-1c7c-1a32-4203-5ea4c432ad1f@amsat.org>
+Date: Thu, 15 Feb 2018 20:55:45 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180204222356.14546-3-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 2/3] tests: Enable boot-serial-test for hppa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,240 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Notes:
+On 02/04/2018 07:23 PM, Richard Henderson wrote:
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tests/boot-serial-test.c | 1 +
+>  tests/Makefile.include   | 2 ++
+>  2 files changed, 3 insertions(+)
+> 
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index 418c5b92dc..ea87a80be7 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -87,6 +87,7 @@ static testdef_t tests[] = {
+>        sizeof(kernel_plml605), kernel_plml605 },
+>      { "moxie", "moxiesim", "", "TT", sizeof(bios_moxiesim), 0, bios_moxiesim },
+>      { "arm", "raspi2", "", "TT", sizeof(bios_raspi2), 0, bios_raspi2 },
+> +    { "hppa", "hppa", "", "SeaBIOS wants SYSTEM HALT" },
+>  
+>      { NULL }
+>  };
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index ca82e0c0cc..83def6994c 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -299,6 +299,8 @@ gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y)
+>  
+>  check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
+>  
+> +check-qtest-hppa-y = tests/boot-serial-test$(EXESUF)
+> +
+>  check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
+>  
+>  check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
+> 
 
-- Moved the cross-page check from the end of translate_insn to
-  init_disas_context.
+I got this failure in 2 different branches:
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- target/sparc/translate.c | 181 +++++++++++++++++++++++------------------------
- 1 file changed, 88 insertions(+), 93 deletions(-)
+  GTESTER check-qtest-hppa
+**
+ERROR:tests/boot-serial-test.c:137:check_guest_output: assertion failed:
+(output_ok)
+GTester: last random seed: R02S55e7df877597841c1b3b62962e410123
+make: *** [check-qtest-hppa] Error 1
+make: *** Waiting for unfinished jobs....
 
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index da77a27..5a25a51 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5732,105 +5732,94 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-     }
- }
- 
--void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
-+static int sparc_tr_init_disas_context(DisasContextBase *dcbase,
-+                                       CPUState *cs, int max_insns)
- {
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-     CPUSPARCState *env = cs->env_ptr;
--    DisasContext dc1, *dc = &dc1;
--    int max_insns;
--    unsigned int insn;
--
--    memset(dc, 0, sizeof(DisasContext));
--    dc->base.tb = tb;
--    dc->base.pc_first = tb->pc;
--    dc->base.pc_next = tb->pc;
--    dc->base.is_jmp = DISAS_NEXT;
--    dc->base.num_insns = 0;
--    dc->base.singlestep_enabled = cs->singlestep_enabled;
-+    int bound;
- 
-     dc->pc = dc->base.pc_first;
--    dc->npc = (target_ulong) tb->cs_base;
-+    dc->npc = (target_ulong)dc->base.tb->cs_base;
-     dc->cc_op = CC_OP_DYNAMIC;
--    dc->mem_idx = tb->flags & TB_FLAG_MMU_MASK;
-+    dc->mem_idx = dc->base.tb->flags & TB_FLAG_MMU_MASK;
-     dc->def = &env->def;
--    dc->fpu_enabled = tb_fpu_enabled(tb->flags);
--    dc->address_mask_32bit = tb_am_enabled(tb->flags);
-+    dc->fpu_enabled = tb_fpu_enabled(dc->base.tb->flags);
-+    dc->address_mask_32bit = tb_am_enabled(dc->base.tb->flags);
- 
- #ifndef CONFIG_USER_ONLY
--    dc->supervisor = (tb->flags & TB_FLAG_SUPER) != 0;
-+    dc->supervisor = (dc->base.tb->flags & TB_FLAG_SUPER) != 0;
- #endif
- #ifdef TARGET_SPARC64
-     dc->fprs_dirty = 0;
--    dc->asi = (tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
-+    dc->asi = (dc->base.tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
- #ifndef CONFIG_USER_ONLY
--    dc->hypervisor = (tb->flags & TB_FLAG_HYPER) != 0;
-+    dc->hypervisor = (dc->base.tb->flags & TB_FLAG_HYPER) != 0;
- #endif
- #endif
-+    /*
-+     * if we reach a page boundary, we stop generation so that the
-+     * PC of a TT_TFAULT exception is always in the right page
-+     */
-+    bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
-+    return MIN(max_insns, bound);
-+}
- 
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
--    if (singlestep) {
--        max_insns = 1;
--    }
-+static void sparc_tr_tb_start(DisasContextBase *db, CPUState *cs)
-+{
-+}
- 
--    gen_tb_start(tb);
--    do {
--        if (dc->npc & JUMP_PC) {
--            assert(dc->jump_pc[1] == dc->pc + 4);
--            tcg_gen_insn_start(dc->pc, dc->jump_pc[0] | JUMP_PC);
--        } else {
--            tcg_gen_insn_start(dc->pc, dc->npc);
--        }
--        dc->base.num_insns++;
-+static void sparc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--        if (unlikely(cpu_breakpoint_test(cs, dc->base.pc_next, BP_ANY))) {
--            if (dc->pc != dc->base.pc_first) {
--                save_state(dc);
--            }
--            gen_helper_debug(cpu_env);
--            tcg_gen_exit_tb(0);
--            dc->base.is_jmp = DISAS_NORETURN;
--            dc->base.pc_next += 4;
--            goto exit_gen_loop;
--        }
-+    if (dc->npc & JUMP_PC) {
-+        assert(dc->jump_pc[1] == dc->pc + 4);
-+        tcg_gen_insn_start(dc->pc, dc->jump_pc[0] | JUMP_PC);
-+    } else {
-+        tcg_gen_insn_start(dc->pc, dc->npc);
-+    }
-+}
- 
--        if (dc->base.num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
--            gen_io_start();
--        }
-+static bool sparc_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-+                                      const CPUBreakpoint *bp)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--        insn = cpu_ldl_code(env, dc->pc);
--        dc->base.pc_next += 4;
-+    if (dc->pc != dc->base.pc_first) {
-+        save_state(dc);
-+    }
-+    gen_helper_debug(cpu_env);
-+    tcg_gen_exit_tb(0);
-+    dc->base.is_jmp = DISAS_NORETURN;
-+    /* update pc_next so that the current instruction is included in tb->size */
-+    dc->base.pc_next += 4;
-+    return true;
-+}
- 
--        disas_sparc_insn(dc, insn);
-+static void sparc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    CPUSPARCState *env = cs->env_ptr;
-+    unsigned int insn;
- 
--        if (dc->base.is_jmp == DISAS_NORETURN) {
--            break;
--        }
--        /* if the next PC is different, we abort now */
--        if (dc->pc != dc->base.pc_next) {
--            break;
--        }
--        /* if we reach a page boundary, we stop generation so that the
--           PC of a TT_TFAULT exception is always in the right page */
--        if ((dc->pc & (TARGET_PAGE_SIZE - 1)) == 0)
--            break;
--        /* if single step mode, we generate only one instruction and
--           generate an exception */
--        if (dc->base.singlestep_enabled) {
--            break;
--        }
--    } while (!tcg_op_buf_full() &&
--             (dc->pc - dc->base.pc_first) < (TARGET_PAGE_SIZE - 32) &&
--             dc->base.num_insns < max_insns);
-+    insn = cpu_ldl_code(env, dc->pc);
-+    dc->base.pc_next += 4;
-+    disas_sparc_insn(dc, insn);
- 
-- exit_gen_loop:
--    if (tb_cflags(tb) & CF_LAST_IO) {
--        gen_io_end();
-+    if (dc->base.is_jmp == DISAS_NORETURN) {
-+        return;
-+    }
-+    if (dc->pc != dc->base.pc_next ||
-+        (dc->pc - dc->base.pc_first) >= (TARGET_PAGE_SIZE - 32)) {
-+        dc->base.is_jmp = DISAS_TOO_MANY;
-     }
-+}
-+
-+static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+
-     if (dc->base.is_jmp != DISAS_NORETURN) {
-         if (dc->pc != DYNAMIC_PC &&
-             (dc->npc != DYNAMIC_PC && dc->npc != JUMP_PC)) {
-@@ -5844,23 +5833,29 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
-             tcg_gen_exit_tb(0);
-         }
-     }
--    gen_tb_end(tb, dc->base.num_insns);
--
--    tb->size = dc->base.pc_next - dc->base.pc_first;
--    tb->icount = dc->base.num_insns;
--
--#ifdef DEBUG_DISAS
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
--        && qemu_log_in_addr_range(dc->base.pc_first)) {
--        qemu_log_lock();
--        qemu_log("--------------\n");
--        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--        log_target_disas(cs, dc->base.pc_first,
--                         dc->base.pc_next - dc->base.pc_first);
--        qemu_log("\n");
--        qemu_log_unlock();
--    }
--#endif
-+}
-+
-+static void sparc_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
-+{
-+    qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
-+    log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
-+}
-+
-+static const TranslatorOps sparc_tr_ops = {
-+    .init_disas_context = sparc_tr_init_disas_context,
-+    .tb_start           = sparc_tr_tb_start,
-+    .insn_start         = sparc_tr_insn_start,
-+    .breakpoint_check   = sparc_tr_breakpoint_check,
-+    .translate_insn     = sparc_tr_translate_insn,
-+    .tb_stop            = sparc_tr_tb_stop,
-+    .disas_log          = sparc_tr_disas_log,
-+};
-+
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+{
-+    DisasContext dc = {};
-+
-+    translator_loop(&sparc_tr_ops, &dc.base, cs, tb);
- }
- 
- void sparc_tcg_init(void)
--- 
-2.7.4
+https://travis-ci.org/philmd/qemu/jobs/341959060
+  "compiler": "gcc",
+  "env": "CONFIG=\"--disable-linux-user\"",
+  "dist": "trusty",
+  "os": "linux"
+
+https://travis-ci.org/philmd/qemu/jobs/341979253
+  "compiler": "gcc",
+  "env": "CONFIG=\"--with-coroutine=ucontext --disable-linux-user\"",
+  "dist": "trusty",
+  "os": "linux"
