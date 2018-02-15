@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1emGB0-0007rz-FA
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:50:03 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1emGCM-0000Tl-3t
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1emGAv-0007Z2-MX
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:50:02 -0500
-Date: Thu, 15 Feb 2018 10:49:53 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180215104953.1fa574ba.cohuck@redhat.com>
-In-Reply-To: <4c8b5c14-bef0-ef8a-1237-5146c3ee37b1@redhat.com>
-References: <20180214173102.9363-1-david@redhat.com>
-	<a3b2029e-a092-e7f7-8953-12d59b874736@twiddle.net>
-	<4c8b5c14-bef0-ef8a-1237-5146c3ee37b1@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1emGCL-0000QK-B2
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:51:26 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38533)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1emGCL-0000OY-3J
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:51:25 -0500
+Received: by mail-wm0-x242.google.com with SMTP id 141so26630720wme.3
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 01:51:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] s390x/tcg: add various
- alignment check
+In-Reply-To: <20180215042900.16078-30-f4bug@amsat.org>
+References: <20180215042900.16078-1-f4bug@amsat.org>
+	<20180215042900.16078-30-f4bug@amsat.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 15 Feb 2018 10:51:23 +0100
+Message-ID: <CAJ+F1CLcYqhjk2xh3Bd0HQh73F4QhbY0QC8-J5tqbL-hq4m7yw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 29/30] tpm: use the BYTE-based definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Thu, 15 Feb 2018 10:47:45 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Thu, Feb 15, 2018 at 5:28 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> It ease code review, unit is explicit.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-> On 14.02.2018 20:04, Richard Henderson wrote:
-> > On 02/14/2018 09:31 AM, David Hildenbrand wrote:  
-> >> Let's add proper alignment checks for a handful of instructions that
-> >> require a SPECIFICATION exception in case alignment is violated.
-> >>
-> >> Introduce new wout/in functions. Declare them as "static inline" to avoid
-> >> warnings about not being used for CONFIG_USER_ONLY (as we are right
-> >> now only using them for privileged instructions).  
-> > 
-> > Annoyingly, clang will still warn for this.
-> >   
-> 
-> Hm, so the only solution is to add nasty idfefs then :(
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Yup, very annoying indeed, but probably the only way to shut clang up...
+
+> ---
+>  include/hw/acpi/tpm.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> index 96fd3a92f7..751567a73a 100644
+> --- a/include/hw/acpi/tpm.h
+> +++ b/include/hw/acpi/tpm.h
+> @@ -71,7 +71,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>  #define TPM_CRB_ADDR_CTRL           (TPM_CRB_ADDR_BASE + A_CRB_CTRL_REQ)
+>  #define TPM_CRB_R_MAX               R_CRB_DATA_BUFFER
+>
+> -#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * 1024)
+> +#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * K_BYTE)
+>
+>  #define TPM_TCPA_ACPI_CLASS_CLIENT  0
+>  #define TPM_TCPA_ACPI_CLASS_SERVER  1
+> --
+> 2.16.1
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
