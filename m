@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emJWC-00041M-BO
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:24:12 -0500
+	(envelope-from <laurent@vivier.eu>) id 1emJZJ-0006NS-1g
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:27:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emJW8-00069Z-7P
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:24:08 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:41805)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1emJW7-000692-Ti
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:24:04 -0500
-References: <mvm7es7sds9.fsf@suse.de> <mvm8tcmqdp3.fsf@suse.de>
-	<mvmbmhdosb9.fsf_-_@suse.de>
+	(envelope-from <laurent@vivier.eu>) id 1emJZI-0008Ox-31
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:27:21 -0500
+References: <671eaa99f4e0bf3a58f76f9151f7cfa24662227f.1517565566.git.agx@sigxcpu.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <459e8c24-719e-7c0a-9c8f-86e98b5802d4@vivier.eu>
-Date: Thu, 15 Feb 2018 14:23:59 +0100
+Message-ID: <548deb35-8970-8dae-2baa-7e60c610ae4b@vivier.eu>
+Date: Thu, 15 Feb 2018 14:26:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <mvmbmhdosb9.fsf_-_@suse.de>
+In-Reply-To: <671eaa99f4e0bf3a58f76f9151f7cfa24662227f.1517565566.git.agx@sigxcpu.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Implement ioctl cmd
- TIOCGPTPEER
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Fix register used for 6th
+ and 7th syscall argument on aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +24,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@linaro.org>
+To: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-Le 29/01/2018 à 11:47, Andreas Schwab a écrit :
-> With glibc 2.27 the openpty function prefers the TIOCGPTPEER ioctl.
+Le 02/02/2018 à 11:02, Guido Günther a écrit :
+> This unbreaks the testcase from
 > 
-> Signed-off-by: Andreas Schwab <schwab@suse.de>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>     http://lists.nongnu.org/archive/html/qemu-arm/2018-01/msg00514.html
+> 
+> Thanks to Laurent Vivier for spotting the 7th one.
+> 
+> Signed-off-by: Guido Günther <agx@sigxcpu.org>
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Suggested-by: Laurent Vivier <laurent@vivier.eu>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> v2: handle host with old kernel headers
-> v3: fix sparc typos
-> ---
->  linux-user/aarch64/termbits.h    | 2 ++
->  linux-user/alpha/termbits.h      | 1 +
->  linux-user/arm/termbits.h        | 1 +
->  linux-user/cris/termbits.h       | 1 +
->  linux-user/hppa/termbits.h       | 2 ++
->  linux-user/i386/termbits.h       | 1 +
->  linux-user/ioctls.h              | 3 +++
->  linux-user/m68k/termbits.h       | 1 +
->  linux-user/microblaze/termbits.h | 1 +
->  linux-user/mips/termbits.h       | 1 +
->  linux-user/nios2/termbits.h      | 2 ++
->  linux-user/openrisc/termbits.h   | 2 ++
->  linux-user/ppc/termbits.h        | 1 +
->  linux-user/s390x/termbits.h      | 1 +
->  linux-user/sh4/termbits.h        | 1 +
->  linux-user/sparc/termbits.h      | 1 +
->  linux-user/sparc64/termbits.h    | 1 +
->  linux-user/syscall.c             | 9 +++++++++
->  linux-user/tilegx/termbits.h     | 1 +
->  linux-user/x86_64/termbits.h     | 1 +
->  20 files changed, 34 insertions(+)
+> v3 collects *-by: replies. Anything else I can do to get this applied?
+> 
+>  linux-user/host/aarch64/safe-syscall.inc.S | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
 Applied to my 'linux-user-for-2.12' branch.
 
