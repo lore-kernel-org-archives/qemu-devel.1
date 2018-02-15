@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emNXQ-0004LQ-Gw
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:41:41 -0500
+	(envelope-from <berrange@redhat.com>) id 1emNgT-00022m-Qd
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emNXL-0003D6-Kv
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:41:40 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:52633)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1emNXL-0003Ct-Az
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:41:35 -0500
-References: <20180124130126.20871-1-f4bug@amsat.org>
-	<20180124130126.20871-3-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <331c79b5-87eb-a04a-8ad3-37f91f95cbc4@vivier.eu>
-Date: Thu, 15 Feb 2018 18:41:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180124130126.20871-3-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/11] linux-user/strace: improve sendto()
- output
+	(envelope-from <berrange@redhat.com>) id 1emNgP-0003KI-0e
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:01 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35606 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emNgO-0003Jg-Rn
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:50:56 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 15 Feb 2018 17:50:38 +0000
+Message-Id: <20180215175044.8159-2-berrange@redhat.com>
+In-Reply-To: <20180215175044.8159-1-berrange@redhat.com>
+References: <20180215175044.8159-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL 1/7] io: fix QIONetListener memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +23,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-Le 24/01/2018 à 14:01, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  linux-user/strace.c    | 16 ++++++++++++++++
->  linux-user/strace.list |  2 +-
->  2 files changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 7eb5e2ab48..e7272f4ede 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -1922,6 +1922,22 @@ print_socketcall(const struct syscallname *name,
->  }
->  #endif
->  
-> +#if defined(TARGET_NR_sendto)
-> +static void
-> +print_sendto(const struct syscallname *name,
-> +             abi_long arg0, abi_long arg1, abi_long arg2,
-> +             abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_raw_param(TARGET_ABI_FMT_ld, arg0, 0);
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Other strace functions (accept(), fcntl(), ...) use "%d" for fd.
+The sources array does not escape out of qio_net_listener_wait_client, so
+we have to free it.
 
-Thanks,
-Laurent
+Reported by Coverity.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ io/net-listener.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/io/net-listener.c b/io/net-listener.c
+index 77a4e2831c..de38dfae99 100644
+--- a/io/net-listener.c
++++ b/io/net-listener.c
+@@ -234,6 +234,7 @@ QIOChannelSocket *qio_net_listener_wait_client(QIONetListener *listener)
+     for (i = 0; i < listener->nsioc; i++) {
+         g_source_unref(sources[i]);
+     }
++    g_free(sources);
+     g_main_loop_unref(loop);
+     g_main_context_unref(ctxt);
+ 
+-- 
+2.14.3
