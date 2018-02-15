@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emOPC-0006Gb-NO
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:15 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emOP8-0006Bd-9u
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emOPB-0004IU-Ib
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:14 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46446)
+	(envelope-from <pm215@archaic.org.uk>) id 1emOP7-0004FK-C4
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:10 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1emOPB-0004H0-B5
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:13 -0500
+	id 1emOP7-0004EX-5K
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:09 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1emOPA-00027X-4V
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:37:12 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1emOP5-000262-VE
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:37:07 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Feb 2018 18:36:55 +0000
-Message-Id: <20180215183700.26101-16-peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 18:36:49 +0000
+Message-Id: <20180215183700.26101-10-peter.maydell@linaro.org>
 In-Reply-To: <20180215183700.26101-1-peter.maydell@linaro.org>
 References: <20180215183700.26101-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/20] hw/intc/armv7m_nvic: Fix
- byte-to-interrupt number conversions
+Subject: [Qemu-devel] [PULL 09/20] hw/intc/armv7m_nvic: Fix ICSR
+ PENDNMISET/CLR handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +30,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In many of the NVIC registers relating to interrupts, we
-have to convert from a byte offset within a register set
-into the number of the first interrupt which is affected.
-We were getting this wrong for:
- * reads of NVIC_ISPR<n>, NVIC_ISER<n>, NVIC_ICPR<n>, NVIC_ICER<n>,
-   NVIC_IABR<n> -- in all these cases we were missing the "* 8"
-   needed to convert from the byte offset to the interrupt number
-   (since all these registers use one bit per interrupt)
- * writes of NVIC_IPR<n> had the opposite problem of a spurious
-   "* 8" (since these registers use one byte per interrupt)
+The PENDNMISET/CLR bits in the ICSR should be RAZ/WI from
+NonSecure state if the AIRCR.BFHFNMINS bit is zero. We had
+misimplemented this as making the bits RAZ/WI from both
+Secure and NonSecure states. Fix this bug by checking
+attrs.secure so that Secure code can pend and unpend NMIs.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180209165810.6668-9-peter.maydell@linaro.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180209165810.6668-3-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/intc/armv7m_nvic.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index ea3b7cce14..c51151fa8a 100644
+index 63da0fee34..06b9598fbe 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -1724,7 +1724,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         /* fall through */
-     case 0x180 ... 0x1bf: /* NVIC Clear enable */
-         val = 0;
--        startvec = offset - 0x180 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x180) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].enabled &&
-@@ -1738,7 +1738,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         /* fall through */
-     case 0x280 ... 0x2bf: /* NVIC Clear pend */
-         val = 0;
--        startvec = offset - 0x280 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x280) + NVIC_FIRST_IRQ; /* vector # */
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].pending &&
-                 (attrs.secure || s->itns[startvec + i])) {
-@@ -1748,7 +1748,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+@@ -830,8 +830,8 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+             }
+         }
+         /* NMIPENDSET */
+-        if ((cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) &&
+-            s->vectors[ARMV7M_EXCP_NMI].pending) {
++        if ((attrs.secure || (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK))
++            && s->vectors[ARMV7M_EXCP_NMI].pending) {
+             val |= (1 << 31);
+         }
+         /* ISRPREEMPT: RES0 when halting debug not implemented */
+@@ -1193,7 +1193,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
          break;
-     case 0x300 ... 0x33f: /* NVIC Active */
-         val = 0;
--        startvec = offset - 0x300 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x300) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].active &&
-@@ -1863,7 +1863,7 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-     case 0x300 ... 0x33f: /* NVIC Active */
-         return MEMTX_OK; /* R/O */
-     case 0x400 ... 0x5ef: /* NVIC Priority */
--        startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0; i < size && startvec + i < s->num_irq; i++) {
-             if (attrs.secure || s->itns[startvec + i]) {
+     }
+     case 0xd04: /* Interrupt Control State (ICSR) */
+-        if (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) {
++        if (attrs.secure || cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) {
+             if (value & (1 << 31)) {
+                 armv7m_nvic_set_pending(s, ARMV7M_EXCP_NMI, false);
+             } else if (value & (1 << 30) &&
 -- 
 2.16.1
