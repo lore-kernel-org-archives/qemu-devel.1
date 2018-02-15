@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34819)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBe-0008JQ-5S
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:22 -0500
+	id 1emBBj-0008Sg-I7
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBb-0004R1-RF
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:22 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:39843)
+	id 1emBBi-0004cy-Mj
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:27 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:41147)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBb-0004Po-Mn
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:19 -0500
-Received: by mail-qk0-x242.google.com with SMTP id z197so12596459qkb.6
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:30:19 -0800 (PST)
+	id 1emBBi-0004c7-Hy
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:26 -0500
+Received: by mail-qk0-x242.google.com with SMTP id h129so9491156qke.8
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:30:26 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 01:28:54 -0300
-Message-Id: <20180215042900.16078-25-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 01:28:57 -0300
+Message-Id: <20180215042900.16078-28-f4bug@amsat.org>
 In-Reply-To: <20180215042900.16078-1-f4bug@amsat.org>
 References: <20180215042900.16078-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 24/30] hw/ipack: use the BYTE-based definitions
+Subject: [Qemu-devel] [PATCH 27/30] vfio/pci: use the BYTE-based definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +34,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alberto Garcia <berto@igalia.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alex Williamson <alex.williamson@redhat.com>
 
 It ease code review, unit is explicit.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/ipack/tpci200.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/vfio/pci-quirks.c | 8 ++++----
+ hw/vfio/pci.c        | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ipack/tpci200.c b/hw/ipack/tpci200.c
-index da05c8589d..56c0ad8932 100644
---- a/hw/ipack/tpci200.c
-+++ b/hw/ipack/tpci200.c
-@@ -597,9 +597,9 @@ static void tpci200_realize(PCIDevice *pci_dev, Error **errp)
-     memory_region_init_io(&s->las1, OBJECT(s), &tpci200_las1_ops,
-                           s, "tpci200_las1", 1024);
-     memory_region_init_io(&s->las2, OBJECT(s), &tpci200_las2_ops,
--                          s, "tpci200_las2", 1024*1024*32);
-+                          s, "tpci200_las2", 32 * M_BYTE);
-     memory_region_init_io(&s->las3, OBJECT(s), &tpci200_las3_ops,
--                          s, "tpci200_las3", 1024*1024*16);
-+                          s, "tpci200_las3", 16 * M_BYTE);
-     pci_register_bar(&s->dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio);
-     pci_register_bar(&s->dev, 1, PCI_BASE_ADDRESS_SPACE_IO,     &s->io);
-     pci_register_bar(&s->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->las0);
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index e5779a7ad3..3c091106dd 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -1255,9 +1255,9 @@ static int vfio_igd_gtt_max(VFIOPCIDevice *vdev)
+         ggms = 1 << ggms;
+     }
+ 
+-    ggms *= 1024 * 1024;
++    ggms *= M_BYTE;
+ 
+-    return (ggms / (4 * 1024)) * (gen < 8 ? 4 : 8);
++    return (ggms / (4 * K_BYTE)) * (gen < 8 ? 4 : 8);
+ }
+ 
+ /*
+@@ -1514,7 +1514,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     igd->vdev = vdev;
+     igd->index = ~0;
+     igd->bdsm = vfio_pci_read_config(&vdev->pdev, IGD_BDSM, 4);
+-    igd->bdsm &= ~((1 << 20) - 1); /* 1MB aligned */
++    igd->bdsm &= ~((1 * M_BYTE) - 1); /* 1MB aligned */
+ 
+     memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_igd_index_quirk,
+                           igd, "vfio-igd-index-quirk", 4);
+@@ -1561,7 +1561,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+      * config offset 0x5C.
+      */
+     bdsm_size = g_malloc(sizeof(*bdsm_size));
+-    *bdsm_size = cpu_to_le64((ggms_mb + gms_mb) * 1024 * 1024);
++    *bdsm_size = cpu_to_le64((ggms_mb + gms_mb) * M_BYTE);
+     fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
+                     bdsm_size, sizeof(*bdsm_size));
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 033cc8dea1..db337476ef 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1408,7 +1408,7 @@ static void vfio_pci_relocate_msix(VFIOPCIDevice *vdev, Error **errp)
+     }
+ 
+     /* 2GB max size for 32-bit BARs, cannot double if already > 1G */
+-    if (vdev->bars[target_bar].size > (1 * 1024 * 1024 * 1024) &&
++    if (vdev->bars[target_bar].size > 1 * G_BYTE &&
+         !vdev->bars[target_bar].mem64) {
+         error_setg(errp, "Invalid MSI-X relocation BAR %d, "
+                    "no space to extend 32-bit BAR", target_bar);
 -- 
 2.16.1
