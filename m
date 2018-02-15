@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emNgT-00022o-Qa
+	(envelope-from <berrange@redhat.com>) id 1emNgT-00022n-Qr
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emNgP-0003KO-0H
+	(envelope-from <berrange@redhat.com>) id 1emNgP-0003KY-2A
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36402 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60016 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emNgO-0003Ji-Rg
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emNgO-0003Jh-SA
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:50:56 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 15 Feb 2018 17:50:43 +0000
-Message-Id: <20180215175044.8159-7-berrange@redhat.com>
+Date: Thu, 15 Feb 2018 17:50:39 +0000
+Message-Id: <20180215175044.8159-3-berrange@redhat.com>
 In-Reply-To: <20180215175044.8159-1-berrange@redhat.com>
 References: <20180215175044.8159-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 6/7] io/channel-command: Do not kill the child
- process after closing the pipe
+Subject: [Qemu-devel] [PULL 2/7] io/channel-websock: handle continuous reads
+ without any data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +25,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 
-We are currently facing some migration failure on s390x when running
-certain avocado-vt tests, e.g. when running the test
-type_specific.io-github-autotest-qemu.migrate.with_reboot.exec.gzip_exec.
-This test is using 'migrate -d "exec:nc localhost 5200"' for the migratio=
-n.
-The problem is detected at the receiving side, where the migration stream
-apparently ends too early. However, the cause for the problem is at the
-sending side: After writing the migration stream into the pipe to netcat,
-the source QEMU calls qio_channel_command_close() which closes the pipe
-and immediately (!) kills the child process afterwards (via the function
-qio_channel_command_abort()). So if the  sending netcat did not read the
-final bytes from the pipe yet, or  if it did not manage to send out all
-its buffers yet, it is killed before the whole migration stream is passed
-to the destination side.
+According to the current implementation of websocket protocol in QEMU,
+qio_channel_websock_handshake_io tries to read handshake from the
+channel to start communication over socket. But this approach
+doesn't cover scenario when socket was closed while handshaking.
+Therefore, if G_IO_IN is caught and qio_channel_read returns zero,
+error has to be set and connection has to be done.
 
-QEMU can not know how much time is required by the child process to send
-over all migration data, so we should not kill it, neither directly nor
-after a delay. Let's simply wait for the child process to exit gracefully
-instead (this was also the behaviour of pclose() that was used in "exec:"
-migration before the QIOChannel rework).
+Such behaviour causes 100% CPU load in main QEMU loop, because main loop
+poll continues to receive and handle G_IO_IN events from websocket.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Step to reproduce 100% CPU load:
+1) start qemu with the simplest configuration
+$ qemu -vnc [::1]:1,websocket=7500
+2) open any vnc listener (which doesn't follow websocket
+protocol)
+$ vncviewer :7500
+3) kill listener
+4) qemu main thread eats 100% CPU
+
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- io/channel-command.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ io/channel-websock.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/io/channel-command.c b/io/channel-command.c
-index 319c5ed50c..3e7eb17eff 100644
---- a/io/channel-command.c
-+++ b/io/channel-command.c
-@@ -301,6 +301,9 @@ static int qio_channel_command_close(QIOChannel *ioc,
- {
-     QIOChannelCommand *cioc =3D QIO_CHANNEL_COMMAND(ioc);
-     int rv =3D 0;
-+#ifndef WIN32
-+    pid_t wp;
-+#endif
-=20
-     /* We close FDs before killing, because that
-      * gives a better chance of clean shutdown
-@@ -315,11 +318,18 @@ static int qio_channel_command_close(QIOChannel *io=
-c,
-         rv =3D -1;
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 7fd6bb68ba..ec48a305f0 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -499,9 +499,12 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+             error_setg(errp,
+                        "End of headers not found in first 4096 bytes");
+             return 1;
+-        } else {
+-            return 0;
++        } else if (ret == 0) {
++            error_setg(errp,
++                       "End of headers not found before connection closed");
++            return -1;
+         }
++        return 0;
      }
-     cioc->writefd =3D cioc->readfd =3D -1;
-+
- #ifndef WIN32
--    if (qio_channel_command_abort(cioc, errp) < 0) {
-+    do {
-+        wp =3D waitpid(cioc->pid, NULL, 0);
-+    } while (wp =3D=3D (pid_t)-1 && errno =3D=3D EINTR);
-+    if (wp =3D=3D (pid_t)-1) {
-+        error_setg_errno(errp, errno, "Failed to wait for pid %llu",
-+                         (unsigned long long)cioc->pid);
-         return -1;
-     }
- #endif
-+
-     if (rv < 0) {
-         error_setg_errno(errp, errno, "%s",
-                          "Unable to close command");
---=20
+     *handshake_end = '\0';
+ 
+-- 
 2.14.3
