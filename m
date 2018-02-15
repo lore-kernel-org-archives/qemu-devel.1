@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33983)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1emKT7-0001qY-5t
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:25:06 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36504)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1emKZI-0008Aw-Cc
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1emKT4-0002F8-06
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:25:01 -0500
-Received: from mx01.kamp.de ([82.141.2.16]:52023)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1emKT3-0002Ei-M7
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:24:57 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 15:24:53 +0100
-References: <20180215111526.2464-1-stefanha@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <ecc44671-4f09-5c52-57ea-4818b351795d@kamp.de>
-Date: Thu, 15 Feb 2018 15:24:54 +0100
+	(envelope-from <laurent@vivier.eu>) id 1emKZF-0006GD-6d
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:31:24 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:39827)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1emKZE-0006Fj-Sp
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:31:21 -0500
+References: <mvmmv0nk6g7.fsf@suse.de> <mvmvafah0jd.fsf@suse.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <13e5772f-7b47-4a34-3316-a908dc7d4f85@vivier.eu>
+Date: Thu, 15 Feb 2018 15:31:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180215111526.2464-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <mvmvafah0jd.fsf@suse.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] block/iscsi: cancel libiscsi task when
- ABORT TASK TMF completes
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Implement copy_file_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Felipe Franciosi <felipe@nutanix.com>
+To: Andreas Schwab <schwab@suse.de>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-Am 15.02.2018 um 12:15 schrieb Stefan Hajnoczi:
-> The libiscsi iscsi_task_mgmt_async() API documentation says:
->
->    abort_task will also cancel the scsi task. The callback for the scsi
->    task will be invoked with SCSI_STATUS_CANCELLED
->
-> The libiscsi implementation does not fulfil this promise.  The task's
-> callback is not invoked and its struct iscsi_pdu remains in the internal
-> list (effectively leaked).
+Le 06/02/2018 à 11:31, Andreas Schwab a écrit :
+> No attempt is made to emulate it on the host.
 
-If that contract is fixed in libiscsi, will the Qemu iSCSI driver still work?
+I don't understand what you mean here...
 
-Peter
+> Signed-off-by: Andreas Schwab <schwab@suse.de>
+> ---
+> v2: fix spacing
+> ---
+>  linux-user/syscall.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index bed154139e..92b4f59c05 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+...
+> +#if defined(TARGET_NR_copy_file_range) && defined(__NR_copy_file_range)
+> +    case TARGET_NR_copy_file_range:
+> +        {
+> +            loff_t inoff, outoff;
+> +            loff_t *pinoff = NULL, *poutoff = NULL;
+> +
+> +            if (arg2) {
+> +                if (get_user_u64(inoff, arg2)) {
+> +                    goto efault;
+> +                }
+> +                pinoff = &inoff;
+> +            }
+> +            if (arg4) {
+> +                if (get_user_u64(outoff, arg4)) {
+> +                    goto efault;
+> +                }
+> +                poutoff = &outoff;
+> +            }
+> +            ret = get_errno(safe_copy_file_range(arg1, pinoff, arg3, poutoff,
+> +                                                 arg5, arg6));
+> +            if (arg2) {
+> +                if (put_user_u64(inoff, arg2)) {
+> +                    goto efault;
+> +                }
+> +            }
+> +            if (arg4) {
+> +                if (put_user_u64(outoff, arg4)) {
+> +                    goto efault;
+> +                }
+> +            }
+
+According to the linux implementation, this should be something like:
+
+if (ret > 0) {
+    if (arg2) {
+        if (put_user_u64(inoff, arg2)) {
+            ret = -TARGET_EFAULT;
+        }
+    }
+    if (arg4) {
+        if (put_user_u64(outoff, arg4)) {
+            ret = -TARGET_EFAULT;
+        }
+    }
+}
+
+[TARGET_NR_splice should do this the same way]
+
+Thanks,
+Laurent
