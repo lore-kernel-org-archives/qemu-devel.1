@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emPD9-0006Fz-Mz
+	(envelope-from <eblake@redhat.com>) id 1emPDA-0006Gs-3p
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:28:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emPD8-0000ma-Hw
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:28:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1emPD8-0000mV-GN
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:28:52 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 15 Feb 2018 13:28:25 -0600
-Message-Id: <20180215192829.9944-3-eblake@redhat.com>
+Date: Thu, 15 Feb 2018 13:28:24 -0600
+Message-Id: <20180215192829.9944-2-eblake@redhat.com>
 In-Reply-To: <20180215192829.9944-1-eblake@redhat.com>
 References: <20180215192829.9944-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/6] file-win32: Switch to byte-based callbacks
+Subject: [Qemu-devel] [PATCH 1/6] block: Support byte-based aio callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,137 +20,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Make the change for the last few sector-based callbacks
-in the file-win32 driver.
+byte-based.  Add new sector-based aio callbacks for read and write,
+to match the fact that bdrv_aio_pdiscard is already byte-based.
 
-Note that the driver was already using byte-based calls for
-performing actual I/O, so this just gets rid of a round trip
-of scaling; however, the block layer defaults this driver to
-use request_alignment of 512, and I did not change that,
-because I don't know if Windows is tolerant of non-sector AIO
-operations.
+Ideally, drivers should be converted to use coroutine callbacks
+rather than aio; but that is not quite as trivial (if we do that
+conversion, the null-aio driver will disappear), so for the
+short term, converting the signature but keeping things with aio
+is easier.  Once all drivers are converted, the sector-based aio
+callbacks will be removed.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-
 ---
-Compile-tested via 'make docker-test-mingw@fedora', but I don't
-have a sane way to test whether it actually works.
----
- include/block/raw-aio.h |  2 +-
- block/file-win32.c      | 36 ++++++++++++++++++------------------
- block/win32-aio.c       |  5 ++---
- 3 files changed, 21 insertions(+), 22 deletions(-)
+ include/block/block_int.h |  6 ++++++
+ block/io.c                | 37 +++++++++++++++++++++++++++----------
+ 2 files changed, 33 insertions(+), 10 deletions(-)
 
-diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
-index a4cdbbf1b7a..9e47b8a629d 100644
---- a/include/block/raw-aio.h
-+++ b/include/block/raw-aio.h
-@@ -57,7 +57,7 @@ void win32_aio_cleanup(QEMUWin32AIOState *aio);
- int win32_aio_attach(QEMUWin32AIOState *aio, HANDLE hfile);
- BlockAIOCB *win32_aio_submit(BlockDriverState *bs,
-         QEMUWin32AIOState *aio, HANDLE hfile,
--        int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
-+        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov,
-         BlockCompletionFunc *cb, void *opaque, int type);
- void win32_aio_detach_aio_context(QEMUWin32AIOState *aio,
-                                   AioContext *old_context);
-diff --git a/block/file-win32.c b/block/file-win32.c
-index f24c7bb92c6..7a2e3367946 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -410,32 +410,32 @@ fail:
-     return ret;
- }
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 5ae7738cf8d..c882dc4232d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -137,9 +137,15 @@ struct BlockDriver {
+     BlockAIOCB *(*bdrv_aio_readv)(BlockDriverState *bs,
+         int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+         BlockCompletionFunc *cb, void *opaque);
++    BlockAIOCB *(*bdrv_aio_preadv)(BlockDriverState *bs,
++        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
++        BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_writev)(BlockDriverState *bs,
+         int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+         BlockCompletionFunc *cb, void *opaque);
++    BlockAIOCB *(*bdrv_aio_pwritev)(BlockDriverState *bs,
++        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
++        BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_flush)(BlockDriverState *bs,
+         BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_pdiscard)(BlockDriverState *bs,
+diff --git a/block/io.c b/block/io.c
+index 4d3d1f640a3..84a4caa72b7 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -934,9 +934,11 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+     sector_num = offset >> BDRV_SECTOR_BITS;
+     nb_sectors = bytes >> BDRV_SECTOR_BITS;
 
--static BlockAIOCB *raw_aio_readv(BlockDriverState *bs,
--                         int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
--                         BlockCompletionFunc *cb, void *opaque)
-+static BlockAIOCB *raw_aio_preadv(BlockDriverState *bs,
-+                                  uint64_t offset, uint64_t bytes,
-+                                  QEMUIOVector *qiov, int flags,
-+                                  BlockCompletionFunc *cb, void *opaque)
- {
-     BDRVRawState *s = bs->opaque;
-     if (s->aio) {
--        return win32_aio_submit(bs, s->aio, s->hfile, sector_num, qiov,
--                                nb_sectors, cb, opaque, QEMU_AIO_READ);
-+        return win32_aio_submit(bs, s->aio, s->hfile, offset, bytes, qiov,
-+                                cb, opaque, QEMU_AIO_READ);
-     } else {
--        return paio_submit(bs, s->hfile, sector_num << BDRV_SECTOR_BITS, qiov,
--                           nb_sectors << BDRV_SECTOR_BITS,
-+        return paio_submit(bs, s->hfile, offset, qiov, bytes,
-                            cb, opaque, QEMU_AIO_READ);
-     }
- }
+-    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    if (!drv->bdrv_aio_preadv) {
++        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    }
 
--static BlockAIOCB *raw_aio_writev(BlockDriverState *bs,
--                          int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
--                          BlockCompletionFunc *cb, void *opaque)
-+static BlockAIOCB *raw_aio_pwritev(BlockDriverState *bs,
-+                                   uint64_t offset, uint64_t bytes,
-+                                   QEMUIOVector *qiov, int flags,
-+                                   BlockCompletionFunc *cb, void *opaque)
- {
-     BDRVRawState *s = bs->opaque;
-     if (s->aio) {
--        return win32_aio_submit(bs, s->aio, s->hfile, sector_num, qiov,
--                                nb_sectors, cb, opaque, QEMU_AIO_WRITE);
-+        return win32_aio_submit(bs, s->aio, s->hfile, offset, bytes, qiov,
-+                                cb, opaque, QEMU_AIO_WRITE);
-     } else {
--        return paio_submit(bs, s->hfile, sector_num << BDRV_SECTOR_BITS, qiov,
--                           nb_sectors << BDRV_SECTOR_BITS,
-+        return paio_submit(bs, s->hfile, offset, qiov, bytes,
-                            cb, opaque, QEMU_AIO_WRITE);
-     }
- }
-@@ -602,8 +602,8 @@ BlockDriver bdrv_file = {
-     .bdrv_create        = raw_create,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+     if (drv->bdrv_co_readv) {
+         return drv->bdrv_co_readv(bs, sector_num, nb_sectors, qiov);
+@@ -946,8 +948,13 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+             .coroutine = qemu_coroutine_self(),
+         };
 
--    .bdrv_aio_readv     = raw_aio_readv,
--    .bdrv_aio_writev    = raw_aio_writev,
-+    .bdrv_aio_preadv    = raw_aio_preadv,
-+    .bdrv_aio_pwritev   = raw_aio_pwritev,
-     .bdrv_aio_flush     = raw_aio_flush,
+-        acb = bs->drv->bdrv_aio_readv(bs, sector_num, qiov, nb_sectors,
+-                                      bdrv_co_io_em_complete, &co);
++        if (drv->bdrv_aio_preadv) {
++            acb = bs->drv->bdrv_aio_preadv(bs, offset, bytes, qiov, flags,
++                                           bdrv_co_io_em_complete, &co);
++        } else {
++            acb = bs->drv->bdrv_aio_readv(bs, sector_num, qiov, nb_sectors,
++                                          bdrv_co_io_em_complete, &co);
++        }
+         if (acb == NULL) {
+             return -EIO;
+         } else {
+@@ -982,9 +989,11 @@ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+     sector_num = offset >> BDRV_SECTOR_BITS;
+     nb_sectors = bytes >> BDRV_SECTOR_BITS;
 
-     .bdrv_truncate	= raw_truncate,
-@@ -764,8 +764,8 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_file_open	= hdev_open,
-     .bdrv_close		= raw_close,
+-    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    if (!drv->bdrv_aio_pwritev) {
++        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    }
 
--    .bdrv_aio_readv     = raw_aio_readv,
--    .bdrv_aio_writev    = raw_aio_writev,
-+    .bdrv_aio_preadv    = raw_aio_preadv,
-+    .bdrv_aio_pwritev   = raw_aio_pwritev,
-     .bdrv_aio_flush     = raw_aio_flush,
+     if (drv->bdrv_co_writev_flags) {
+         ret = drv->bdrv_co_writev_flags(bs, sector_num, nb_sectors, qiov,
+@@ -999,8 +1008,16 @@ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+             .coroutine = qemu_coroutine_self(),
+         };
 
-     .bdrv_detach_aio_context = raw_detach_aio_context,
-diff --git a/block/win32-aio.c b/block/win32-aio.c
-index 3be8f458fab..9cd355d42f8 100644
---- a/block/win32-aio.c
-+++ b/block/win32-aio.c
-@@ -112,15 +112,14 @@ static const AIOCBInfo win32_aiocb_info = {
-
- BlockAIOCB *win32_aio_submit(BlockDriverState *bs,
-         QEMUWin32AIOState *aio, HANDLE hfile,
--        int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
-+        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov,
-         BlockCompletionFunc *cb, void *opaque, int type)
- {
-     struct QEMUWin32AIOCB *waiocb;
--    uint64_t offset = sector_num * 512;
-     DWORD rc;
-
-     waiocb = qemu_aio_get(&win32_aiocb_info, bs, cb, opaque);
--    waiocb->nbytes = nb_sectors * 512;
-+    waiocb->nbytes = bytes;
-     waiocb->qiov = qiov;
-     waiocb->is_read = (type == QEMU_AIO_READ);
-
+-        acb = bs->drv->bdrv_aio_writev(bs, sector_num, qiov, nb_sectors,
+-                                       bdrv_co_io_em_complete, &co);
++        if (drv->bdrv_aio_pwritev) {
++            acb = bs->drv->bdrv_aio_pwritev(bs, offset, bytes, qiov,
++                                            flags & bs->supported_write_flags,
++                                            bdrv_co_io_em_complete, &co);
++            flags &= ~bs->supported_write_flags;
++        } else {
++            assert(!bs->supported_write_flags);
++            acb = bs->drv->bdrv_aio_writev(bs, sector_num, qiov, nb_sectors,
++                                           bdrv_co_io_em_complete, &co);
++        }
+         if (acb == NULL) {
+             ret = -EIO;
+         } else {
 -- 
 2.14.3
