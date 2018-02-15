@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emHjI-0005bU-PQ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:29:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1emHpT-0000XP-Gm
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emHjH-0008Uz-Qv
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:29:32 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42060)
+	(envelope-from <bounces@canonical.com>) id 1emHpQ-00052A-Cn
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:35:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1emHjH-0008Uj-LQ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:29:31 -0500
-Received: by mail-ot0-x244.google.com with SMTP id a7so23109384otk.9
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 03:29:31 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1emHpQ-00051W-6d
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:35:52 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1emHpO-0000FH-6A
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:35:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2CF6B2E80C8
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:35:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <fa1d4990d897f61dd748ad7f10f6b88435e6cb46.1517532021.git.alistair.francis@xilinx.com>
-References: <cover.1517532021.git.alistair.francis@xilinx.com>
-	<fa1d4990d897f61dd748ad7f10f6b88435e6cb46.1517532021.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Feb 2018 11:29:10 +0000
-Message-ID: <CAFEAcA_T4S8kU5GtatL+1Uos2oqBuYH-=GqhEWm=y3q4TmF+-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] raspi: Specify the valid CPUs
+Date: Thu, 15 Feb 2018 11:27:07 -0000
+From: Thomas Huth <1726394@bugs.launchpad.net>
+Reply-To: Bug 1726394 <1726394@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150876459007.17533.9812313883985505054.malonedeb@wampee.canonical.com>
+Message-Id: <151869402757.14271.11081915260444494831.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1726394] Re: Passes through prctl(PR_SET_SECCOMP,
+ SECCOMP_MODE_FILTER, address)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 2 February 2018 at 00:42, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> List all possible valid CPU options.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->
-> V5:
->  - Use cpu_model names
-> V4:
->  - Remove spaces
-> V3:
->  - Add static property
-> V2:
->  - Fix the indentation
->
->  hw/arm/raspi.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index cd5fa8c3dc..745a880726 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -158,6 +158,11 @@ static void raspi2_init(MachineState *machine)
->      setup_boot(machine, 2, machine->ram_size - vcram_size);
->  }
->
-> +static const char *raspi2_valid_cpus[] =3D {
-> +    "cortex-a7",
-> +    NULL
-> +};
+Fix has been released with QEMU 2.11:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da8b154a637b586441b
 
-Is this definitely right? Looking at the code, the raspi2 board
-creates a TYPE_BCM2836, and that creates cortex-a15 CPUs...
+** Changed in: qemu
+       Status: In Progress =3D> Fix Released
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1726394
+
+Title:
+  Passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, address)
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Won't Fix
+Status in qemu source package in Zesty:
+  Won't Fix
+Status in qemu source package in Artful:
+  Won't Fix
+Status in qemu package in Debian:
+  Confirmed
+
+Bug description:
+  qemu-user passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER,
+  address) unmodified, but the third argument is an address to a BPF
+  filter, causing an EFAULT. Now, the filter is architecture-specifc, so
+  you can't just rewrite the addresses, so the safest bet is to just
+  return an error here.
+
+  I guess you should just return EINVAL, but not sure. I'd really like
+  something that can be identified, so seccomp errors can be ignored
+  when it's not supported.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1726394/+subscriptions
