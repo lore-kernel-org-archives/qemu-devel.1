@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emNJz-0000Z1-Sc
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:27:48 -0500
+	(envelope-from <berrange@redhat.com>) id 1emNQo-0005Ls-Sm
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emNJw-0004D0-OJ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:27:47 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:49957)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1emNJw-0004Ci-Dt
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:27:44 -0500
-References: <20180124130126.20871-1-f4bug@amsat.org>
-	<20180124130126.20871-11-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <de201d07-7c25-f6f8-c68a-ca8d0f1c2ad6@vivier.eu>
-Date: Thu, 15 Feb 2018 18:27:30 +0100
+	(envelope-from <berrange@redhat.com>) id 1emNQl-0000hB-Q5
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:34:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59004 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emNQl-0000gv-L2
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:34:47 -0500
+Date: Thu, 15 Feb 2018 17:34:29 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180215173429.GB24818@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180215172306.10389-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180124130126.20871-11-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 10/11] linux-user/syscall: verify
- recvfrom(addr) is user-writable
+Content-Disposition: inline
+In-Reply-To: <20180215172306.10389-1-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: dump 'config.log' if ./configure
+ fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-Le 24/01/2018 à 14:01, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Thu, Feb 15, 2018 at 02:23:06PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  linux-user/syscall.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 11c9116c4a..b6b9beca5b 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -4040,6 +4040,11 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
->              ret = -TARGET_EINVAL;
->              goto fail;
->          }
-> +        if (!access_ok(VERIFY_WRITE, target_addr, addrlen)) {
-> +            ret = -TARGET_EFAULT;
-> +            goto fail;
-> +        }
-> +
->          addr = alloca(addrlen);
->          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
->                                        addr, &addrlen));
-> 
+>  tests/docker/common.rc | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+> index 7951555e3f..dd011cdf1e 100755
+> --- a/tests/docker/common.rc
+> +++ b/tests/docker/common.rc
+> @@ -30,7 +30,9 @@ build_qemu()
+>                   $@"
+>      echo "Configure options:"
+>      echo $config_opts
+> -    $QEMU_SRC/configure $config_opts && make $MAKEFLAGS
+> +    $QEMU_SRC/configure $config_opts || \
+> +        (cat config.log && prep_fail "Failed to run 'configure'")
+> +    make $MAKEFLAGS
+>  }
 
-Even if host_to_target_sockaddr() will do the check before copying data
-to the target, I think it is good to check this before reading the data, so:
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Slightly nicer than my patch thanks to the prep_fail addition.
 
-Thanks,
-Laurent
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
