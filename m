@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emClN-0008F6-7A
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:11:22 -0500
+	(envelope-from <thuth@redhat.com>) id 1emCtO-0002Ie-Mk
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:19:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emClM-00020w-6r
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:11:21 -0500
+	(envelope-from <thuth@redhat.com>) id 1emCtL-0005dR-C7
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:19:38 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50736 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1emCtL-0005cw-7S
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:19:35 -0500
 References: <20180215042900.16078-1-f4bug@amsat.org>
-	<20180215042900.16078-3-f4bug@amsat.org>
+	<20180215042900.16078-6-f4bug@amsat.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8fd4272f-8c40-3804-8449-752aea88a7cc@redhat.com>
-Date: Thu, 15 Feb 2018 07:10:40 +0100
+Message-ID: <36b2678c-0e9f-9f92-6832-895d7cb1ee89@redhat.com>
+Date: Thu, 15 Feb 2018 07:19:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180215042900.16078-3-f4bug@amsat.org>
+In-Reply-To: <20180215042900.16078-6-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/30] hw: include "qemu/cunits.h" and
- clean unused "qemu/cutils.h"
+Subject: Re: [Qemu-devel] [PATCH 05/30] hw/mips/r4k: constify params_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +29,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Marek Vasut <marex@denx.de>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Chris Wulff <crwulff@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Paul Burton <paul.burton@mips.com>, qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
 
 On 15.02.2018 05:28, Philippe Mathieu-Daud=C3=A9 wrote:
-> These files were including "qemu/cutils.h" to use the byte-based size
-> definitions, now available in "qemu/cunits.h".
->=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  include/hw/hw.h       | 1 +
->  hw/arm/msf2-soc.c     | 1 -
->  hw/arm/msf2-som.c     | 1 -
->  hw/core/loader-fit.c  | 1 -
->  hw/core/loader.c      | 1 -
->  hw/core/machine.c     | 1 -
->  hw/cris/boot.c        | 1 -
->  hw/display/sm501.c    | 1 -
->  hw/hppa/machine.c     | 1 -
->  hw/lm32/milkymist.c   | 1 -
->  hw/microblaze/boot.c  | 1 -
->  hw/mips/boston.c      | 1 -
->  hw/misc/mos6522.c     | 1 -
->  hw/nios2/boot.c       | 1 -
->  hw/ppc/mac_newworld.c | 1 -
->  hw/ppc/mac_oldworld.c | 1 -
->  hw/ppc/pnv.c          | 1 -
->  hw/ppc/prep.c         | 1 -
->  hw/ppc/spapr_rtas.c   | 1 -
->  hw/sd/sdhci.c         | 1 -
->  hw/sparc/sun4m.c      | 1 -
->  hw/sparc64/sun4u.c    | 1 -
->  hw/usb/dev-serial.c   | 1 -
->  hw/usb/dev-storage.c  | 1 -
->  24 files changed, 1 insertion(+), 23 deletions(-)
+>  hw/mips/mips_r4k.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/include/hw/hw.h b/include/hw/hw.h
-> index ab4950c312..8249448cac 100644
-> --- a/include/hw/hw.h
-> +++ b/include/hw/hw.h
-> @@ -14,6 +14,7 @@
->  #include "migration/qemu-file-types.h"
->  #include "qemu/module.h"
->  #include "sysemu/reset.h"
-> +#include "qemu/cunits.h"
+> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+> index 830ee7732c..5a74c44b9a 100644
+> --- a/hw/mips/mips_r4k.c
+> +++ b/hw/mips/mips_r4k.c
+> @@ -79,8 +79,9 @@ typedef struct ResetData {
+> =20
+>  static int64_t load_kernel(void)
+>  {
+> +    const size_t params_size =3D 264;
+>      int64_t entry, kernel_high;
+> -    long kernel_size, initrd_size, params_size;
+> +    long kernel_size, initrd_size;
+>      ram_addr_t initrd_offset;
+>      uint32_t *params_buf;
+>      int big_endian;
+> @@ -128,7 +129,6 @@ static int64_t load_kernel(void)
+>      }
+> =20
+>      /* Store command line.  */
+> -    params_size =3D 264;
+>      params_buf =3D g_malloc(params_size);
+> =20
+>      params_buf[0] =3D tswap32(ram_size);
+> @@ -144,7 +144,6 @@ static int64_t load_kernel(void)
+> =20
+>      rom_add_blob_fixed("params", params_buf, params_size,
+>                         (16 << 20) - 264);
+> -
+>      g_free(params_buf);
+>      return entry;
+>  }
 
-Instead of adding this to a header and creating yet another possible
-recompile-the-world dependency this way, wouldn't it be better to
-include the cunits.h only from the .c files that need the definitions?
+The last hunk is an unnecessary white-space change. Did you maybe rather
+wanted to replace the 264 in the preceding line instead?
 
  Thomas
