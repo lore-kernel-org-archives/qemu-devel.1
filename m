@@ -1,22 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1emKyY-0000qz-4t
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:57:32 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1emL10-0003bg-Bp
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:00:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1emKyU-0005lk-4q
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:57:30 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180215103822.15179-1-david@redhat.com>
-	<867f5506-293c-43c6-d54b-b719f67607bb@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <be9226bb-b2ff-fb6b-e3a6-646e26c57a92@twiddle.net>
-Date: Thu, 15 Feb 2018 06:57:20 -0800
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1emL0w-0007pg-Dl
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:00:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60986)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1emL0w-0007ou-5U
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:59:58 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1FEtjM7130299
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 09:59:56 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5avucfga-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 09:59:54 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Thu, 15 Feb 2018 14:59:52 -0000
+References: <1518690027-31318-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518690027-31318-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<3b41b0f0-09cf-9e43-bfa4-617335d76584@redhat.com>
+	<50053a43-4905-9609-9be3-8418f1978465@linux.vnet.ibm.com>
+	<cded2e23-fa97-0a11-c30c-9c6b79088fcf@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Thu, 15 Feb 2018 15:59:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <867f5506-293c-43c6-d54b-b719f67607bb@redhat.com>
+In-Reply-To: <cded2e23-fa97-0a11-c30c-9c6b79088fcf@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/tcg: add various alignment checks
+Content-Language: en-GB
+Message-Id: <55d9d665-df3d-80d1-2aab-a914493febc8@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCHv3 2/4] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,238 +45,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-On 02/15/2018 02:50 AM, David Hildenbrand wrote:
-> On 15.02.2018 11:38, David Hildenbrand wrote:
->> Let's add proper alignment checks for a handful of instructions that
->> require a SPECIFICATION exception in case alignment is violated.
->>
->> Introduce new wout/in functions. As we are right now only using them for
->> privileged instructions, we have to add ugly ifdefs to silence
->> compilers.
->>
->> Convert STORE CPU ID right away to make use of the wout function.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/insn-data.def | 16 ++++++++--------
->>  target/s390x/mem_helper.c  | 25 +++++++++++++++++++++++++
->>  target/s390x/translate.c   | 43 ++++++++++++++++++++++++++++++++++++++++++-
->>  3 files changed, 75 insertions(+), 9 deletions(-)
->>
->> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
->> index 621e10d615..157619403d 100644
->> --- a/target/s390x/insn-data.def
->> +++ b/target/s390x/insn-data.def
->> @@ -1000,13 +1000,13 @@
->>      /* ??? Not implemented - is it necessary? */
->>      C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
->>  /* SET CLOCK COMPARATOR */
->> -    C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
->> +    C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
->>  /* SET CLOCK PROGRAMMABLE FIELD */
->>      C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
->>  /* SET CPU TIMER */
->> -    C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
->> +    C(0xb208, SPT,     S,     Z,   0, m2_64a, 0, 0, spt, 0)
->>  /* SET PREFIX */
->> -    C(0xb210, SPX,     S,     Z,   0, m2_32u, 0, 0, spx, 0)
->> +    C(0xb210, SPX,     S,     Z,   0, m2_32ua, 0, 0, spx, 0)
->>  /* SET PSW KEY FROM ADDRESS */
->>      C(0xb20a, SPKA,    S,     Z,   0, a2, 0, 0, spka, 0)
->>  /* SET STORAGE KEY EXTENDED */
->> @@ -1021,20 +1021,20 @@
->>  /* STORE CLOCK EXTENDED */
->>      C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
->>  /* STORE CLOCK COMPARATOR */
->> -    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64, stckc, 0)
->> +    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0)
->>  /* STORE CONTROL */
->>      C(0xb600, STCTL,   RS_a,  Z,   0, a2, 0, 0, stctl, 0)
->>      C(0xeb25, STCTG,   RSY_a, Z,   0, a2, 0, 0, stctg, 0)
->>  /* STORE CPU ADDRESS */
->> -    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16, stap, 0)
->> +    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16a, stap, 0)
->>  /* STORE CPU ID */
->> -    C(0xb202, STIDP,   S,     Z,   la2, 0, new, 0, stidp, 0)
->> +    C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64a, stidp, 0)
->>  /* STORE CPU TIMER */
->> -    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
->> +    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64a, stpt, 0)
->>  /* STORE FACILITY LIST */
->>      C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
->>  /* STORE PREFIX */
->> -    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32, stpx, 0)
->> +    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32a, stpx, 0)
->>  /* STORE SYSTEM INFORMATION */
->>      C(0xb27d, STSI,    S,     Z,   0, a2, 0, 0, stsi, 0)
->>  /* STORE THEN AND SYSTEM MASK */
->> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
->> index 427b795a78..d5291b246e 100644
->> --- a/target/s390x/mem_helper.c
->> +++ b/target/s390x/mem_helper.c
->> @@ -693,6 +693,11 @@ void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->>      uintptr_t ra = GETPC();
->>      int i;
->>  
->> +    if (a2 & 0x3) {
->> +        /* we either came here by lam or lamy, which have different lengths */
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
->> +    }
->> +
->>      for (i = r1;; i = (i + 1) % 16) {
->>          env->aregs[i] = cpu_ldl_data_ra(env, a2, ra);
->>          a2 += 4;
->> @@ -709,6 +714,10 @@ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->>      uintptr_t ra = GETPC();
->>      int i;
->>  
->> +    if (a2 & 0x3) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
->> +    }
->> +
->>      for (i = r1;; i = (i + 1) % 16) {
->>          cpu_stl_data_ra(env, a2, env->aregs[i], ra);
->>          a2 += 4;
->> @@ -1620,6 +1629,10 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->>      uint64_t src = a2;
->>      uint32_t i;
->>  
->> +    if (src & 0x7) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
->> +    }
->> +
->>      for (i = r1;; i = (i + 1) % 16) {
->>          uint64_t val = cpu_ldq_data_ra(env, src, ra);
->>          if (env->cregs[i] != val && i >= 9 && i <= 11) {
->> @@ -1650,6 +1663,10 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->>      uint64_t src = a2;
->>      uint32_t i;
->>  
->> +    if (src & 0x3) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
->> +    }
->> +
->>      for (i = r1;; i = (i + 1) % 16) {
->>          uint32_t val = cpu_ldl_data_ra(env, src, ra);
->>          if ((uint32_t)env->cregs[i] != val && i >= 9 && i <= 11) {
->> @@ -1677,6 +1694,10 @@ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->>      uint64_t dest = a2;
->>      uint32_t i;
->>  
->> +    if (dest & 0x7) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
->> +    }
->> +
->>      for (i = r1;; i = (i + 1) % 16) {
->>          cpu_stq_data_ra(env, dest, env->cregs[i], ra);
->>          dest += sizeof(uint64_t);
->> @@ -1693,6 +1714,10 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->>      uint64_t dest = a2;
->>      uint32_t i;
->>  
->> +    if (dest & 0x3) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
->> +    }
->> +
->>      for (i = r1;; i = (i + 1) % 16) {
->>          cpu_stl_data_ra(env, dest, env->cregs[i], ra);
->>          dest += sizeof(uint32_t);
->> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
->> index 5aea3bbca6..7d39ab350d 100644
->> --- a/target/s390x/translate.c
->> +++ b/target/s390x/translate.c
->> @@ -4062,7 +4062,6 @@ static ExitStatus op_stidp(DisasContext *s, DisasOps *o)
->>  {
->>      check_privileged(s);
->>      tcg_gen_ld_i64(o->out, cpu_env, offsetof(CPUS390XState, cpuid));
->> -    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
->>      return NO_EXIT;
->>  }
->>  
->> @@ -5220,18 +5219,42 @@ static void wout_m1_16(DisasContext *s, DisasFields *f, DisasOps *o)
->>  }
->>  #define SPEC_wout_m1_16 0
->>  
->> +#ifndef CONFIG_USER_ONLY
->> +static void wout_m1_16a(DisasContext *s, DisasFields *f, DisasOps *o)
->> +{
->> +    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUW | MO_ALIGN);
->> +}
->> +#define SPEC_wout_m1_16a 0
->> +#endif
->> +
->>  static void wout_m1_32(DisasContext *s, DisasFields *f, DisasOps *o)
->>  {
->>      tcg_gen_qemu_st32(o->out, o->addr1, get_mem_index(s));
->>  }
->>  #define SPEC_wout_m1_32 0
->>  
->> +#ifndef CONFIG_USER_ONLY
->> +static void wout_m1_32a(DisasContext *s, DisasFields *f, DisasOps *o)
->> +{
->> +    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUL | MO_ALIGN);
->> +}
->> +#define SPEC_wout_m1_32a 0
->> +#endif
->> +
->>  static void wout_m1_64(DisasContext *s, DisasFields *f, DisasOps *o)
->>  {
->>      tcg_gen_qemu_st64(o->out, o->addr1, get_mem_index(s));
->>  }
->>  #define SPEC_wout_m1_64 0
->>  
->> +#ifndef CONFIG_USER_ONLY
->> +static void wout_m1_64a(DisasContext *s, DisasFields *f, DisasOps *o)
->> +{
->> +    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
->> +}
->> +#define SPEC_wout_m1_64a 0
->> +#endif
->> +
->>  static void wout_m2_32(DisasContext *s, DisasFields *f, DisasOps *o)
->>  {
->>      tcg_gen_qemu_st32(o->out, o->in2, get_mem_index(s));
->> @@ -5657,6 +5680,15 @@ static void in2_m2_32u(DisasContext *s, DisasFields *f, DisasOps *o)
->>  }
->>  #define SPEC_in2_m2_32u 0
->>  
->> +#ifndef CONFIG_USER_ONLY
->> +static void in2_m2_32ua(DisasContext *s, DisasFields *f, DisasOps *o)
->> +{
->> +    in2_a2(s, f, o);
->> +    tcg_gen_qemu_ld_tl(o->in2, o->in2, get_mem_index(s), MO_TEUL | MO_ALIGN);
->> +}
->> +#define SPEC_in2_m2_32ua 0
->> +#endif
->> +
->>  static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
->>  {
->>      in2_a2(s, f, o);
->> @@ -5664,6 +5696,15 @@ static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
->>  }
->>  #define SPEC_in2_m2_64 0
->>  
->> +#ifndef CONFIG_USER_ONLY
->> +static void in2_m2_64a(DisasContext *s, DisasFields *f, DisasOps *o)
->> +{
->> +    in2_a2(s, f, o);
->> +    tcg_gen_qemu_ld_i64(o->in2, o->in2, get_mem_index(s), MO_TEQ | MO_ALIGN);
->> +}
->> +#define SPEC_in2_m2_64a 0
->> +#endif
->> +
->>  static void in2_mri2_16u(DisasContext *s, DisasFields *f, DisasOps *o)
->>  {
->>      in2_ri2(s, f, o);
->>
-> 
-> Conny, if there are no new comments, can you make sure to add Richard's
-> r-b when applying? thanks!
-> 
+On 15.02.2018 15:53, Eric Blake wrote:
+> On 02/15/2018 08:40 AM, Viktor Mihajlovski wrote:
+>> On 15.02.2018 15:19, Eric Blake wrote:
+>>> On 02/15/2018 04:20 AM, Viktor Mihajlovski wrote:
+>>>> From: Luiz Capitulino <lcapitulino@redhat.com>
+>>>>
+>>>> The query-cpus command has an extremely serious side effect:
+>>>> it always interrupts all running vCPUs so that they can run
+>>>> ioctl calls. This can cause a huge performance degradation for
+>>>> some workloads. And most of the information retrieved by the
+>>>> ioctl calls are not even used by query-cpus.
+>>>>
+>>>> This commit introduces a replacement for query-cpus called
+>=20
+>>> You know, we have no back-compat guarantees on HMP.=C2=A0 We could ma=
+ke 'info
+>>> cpu' just ALWAYS call query-cpus-fast, with no HMP counterpart for th=
+e
+>>> slower query-cpus, and without needing a deprecation period.=C2=A0 Bu=
+t I'll
+>>> leave that up to David if that makes more sense.
+>> Ditching info cpus_fast would make me happy as well, because it would
+>> cause less headache on the libvirt side of things.
+>=20
+> Why is libvirt using HMP in the first place?=C2=A0 Libvirt should alway=
+s be
+> using the QMP command, when one exists.
+> Which it does, but there's still a lot of fallback code including HMP
+"info cpus". In real life this should of course never be used, because
+the QMP is always there.
 
-None from me.  ;-)
-
-(re-)Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+--=20
+Regards,
+ Viktor Mihajlovski
