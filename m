@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emG3d-00023t-J6
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:42:29 -0500
+	(envelope-from <wouter@grep.be>) id 1emG46-0002Ra-F8
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:42:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emG3Z-00007y-M7
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:42:25 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 15 Feb 2018 09:42:10 +0000
-Message-Id: <20180215094210.27770-4-stefanha@redhat.com>
-In-Reply-To: <20180215094210.27770-1-stefanha@redhat.com>
-References: <20180215094210.27770-1-stefanha@redhat.com>
+	(envelope-from <wouter@grep.be>) id 1emG41-0000Qn-JQ
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:42:54 -0500
+Received: from latin.grep.be ([2a01:4f8:140:52e5::2]:55522)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1emG41-0000F4-94
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:42:49 -0500
+Date: Thu, 15 Feb 2018 10:42:20 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20180215094220.GA3203@grep.be>
+References: <201297396.3423395.1518598461012.JavaMail.zimbra@oxygem.tv>
+	<1564471998.3427173.1518601541505.JavaMail.zimbra@oxygem.tv>
+	<83c0fdee-126f-18f1-a691-053669325cb9@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 3/3] misc: fix spelling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <83c0fdee-126f-18f1-a691-053669325cb9@redhat.com>
+Subject: Re: [Qemu-devel] drive-mirroring to nbd is failing with multiple
+ parallel jobs (qemu 2.9 -> 2.11)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Alexandre DERUMIER <aderumier@odiso.com>, qemu-devel <qemu-devel@nongnu.org>, nbd list <nbd@other.debian.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Hi Eric,
 
-s/pupulate/populate
+On Wed, Feb 14, 2018 at 09:11:02AM -0600, Eric Blake wrote:
+[NBD and keepalive]
+> This is more food for thought on whether it even makes sense for NBD to
+> worry about assisting in keepalive matters, or whether it would just be
+> bloating the protocol.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180208162447.10851-1-marcandre.lureau@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- util/qemu-coroutine-lock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm currently leaning towards the latter. I don't think it makes (much)
+sense to run NBD over an unreliable transport. It uses TCP specifically
+to not have to worry about that, under the expectation that it won't
+break except in unusual circumstances; if you break that expectation, I
+think it's not unfair to say "well, then you get to keep both pieces".
 
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 78fb79acf8..5a80c10690 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -89,7 +89,7 @@ void qemu_co_queue_run_restart(Coroutine *co)
-      * invalid memory.  Therefore, use a temporary queue and do not touc=
-h
-      * the "co" coroutine as soon as you enter another one.
-      *
--     * In its turn resumed "co" can pupulate "co_queue_wakeup" queue wit=
-h
-+     * In its turn resumed "co" can populate "co_queue_wakeup" queue wit=
-h
-      * new coroutines to be woken up.  The caller, who has resumed "co",
-      * will be responsible for traversing the same queue, which may caus=
-e
-      * a different wakeup order but not any missing wakeups.
---=20
-2.14.3
+We already set the SO_KEEPALIVE socket option (at least nbd-server does;
+don't know about qemu) to make the kernel send out TCP-level keepalive
+probes. This happens only after two hours (by default), but it's
+something you can configure on your system if you need it to be lower.
+
+Having said that, I can always be convinced otherwise by good arguments
+:-)
+
+-- 
+Could you people please use IRC like normal people?!?
+
+  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
+     Hacklab
