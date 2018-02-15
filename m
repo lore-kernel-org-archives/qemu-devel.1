@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emAqS-0006VF-KY
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:08:29 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emBAa-0007NK-AG
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emAqR-0001Fx-Az
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:08:28 -0500
-Date: Thu, 15 Feb 2018 15:05:51 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180215040551.GG5247@umbus.fritz.box>
-References: <151863720814.3003.4939908778788942974.stgit@bahia.lan>
-	<151863725388.3003.620735626834741475.stgit@bahia.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emBAX-0003pw-29
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:16 -0500
+Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:44399)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emBAW-0003pn-Sp
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:29:12 -0500
+Received: by mail-qt0-x234.google.com with SMTP id f18so10449957qth.11
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:29:11 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 01:28:30 -0300
+Message-Id: <20180215042900.16078-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="df+09Je9rNq3P+GE"
-Content-Disposition: inline
-In-Reply-To: <151863725388.3003.620735626834741475.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 4/5] spapr: consolidate the VCPU id
- numbering logic in a single place
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/30] hw: use the BYTE-based definitions when
+ useful
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,166 +32,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+Hi,
 
---df+09Je9rNq3P+GE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This series:
 
-On Wed, Feb 14, 2018 at 08:40:53PM +0100, Greg Kurz wrote:
-> Several places in the code need to calculate a VCPU id:
->=20
->     (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads
->     (core_id / smp_threads) * spapr->vsmt (1 user)
->     index * spapr->vsmt (2 users)
->=20
-> or guess that the VCPU id of a given VCPU is the first thread of a virtual
-> core:
->=20
->     index % spapr->vsmt !=3D 0
->=20
-> Even if the numbering logic isn't that complex, it is rather fragile to
-> have these assumptions open-coded in several places. FWIW this was
-> proved with recent issues related to VSMT.
->=20
-> This patch moves the VCPU id formula to a single function to be called
-> everywhere the code needs to compute one. It also adds an helper to
-> guess if a VCPU is the first thread of a VCORE.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+- split the byte-based definitions from "qemu/cutils.h" to "qemu/cunits.h"
+  and let them available for all hw/ files (via "hw/hw.h");
+- clean hw/ includes;
+- replace different constants used for byte size with their corresponding
+  BYTE-based definitions.
 
-Good change.  I don't like the name 'spapr_is_vcore' though - cores
-are a logically different thing from thread0 of the core.  So I've
-renamed it to spapr_is_thread0_of_vcore() as I've applied it.
+patches generated using:
 
-> ---
->  hw/ppc/spapr.c |   29 ++++++++++++++++++++++-------
->  1 file changed, 22 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 18ebc058acdd..800d3f001253 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -99,6 +99,20 @@
-> =20
->  #define PHANDLE_XICP            0x00001111
-> =20
-> +/* These two functions implement the VCPU id numbering: one to compute t=
-hem
-> + * all and one to identify thread 0 of a VCORE. Any change to the first =
-one
-> + * is likely to have an impact on the second one, so let's keep them clo=
-se.
-> + */
-> +static int spapr_vcpu_id(sPAPRMachineState *spapr, int cpu_index)
-> +{
-> +    return
-> +        (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_thread=
-s;
-> +}
-> +static bool spapr_is_vcore(sPAPRMachineState *spapr, PowerPCCPU *cpu)
-> +{
-> +    return spapr_get_vcpu_id(cpu) % spapr->vsmt =3D=3D 0;
-> +}
-> +
->  static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
->                                    const char *type_ics,
->                                    int nr_irqs, Error **errp)
-> @@ -345,7 +359,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachine=
-State *spapr)
->          int index =3D spapr_get_vcpu_id(cpu);
->          int compat_smt =3D MIN(smp_threads, ppc_compat_max_vthreads(cpu)=
-);
-> =20
-> -        if (index % spapr->vsmt !=3D 0) {
-> +        if (!spapr_is_vcore(spapr, cpu)) {
->              continue;
->          }
-> =20
-> @@ -630,7 +644,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sP=
-APRMachineState *spapr)
->          DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
->          int offset;
-> =20
-> -        if (index % spapr->vsmt !=3D 0) {
-> +        if (!spapr_is_vcore(spapr, cpu)) {
->              continue;
->          }
-> =20
-> @@ -2251,7 +2265,7 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
-r)
-> =20
->          if (mc->has_hotpluggable_cpus) {
->              spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
-> -                                   (core_id / smp_threads) * spapr->vsmt=
-);
-> +                                   spapr_vcpu_id(spapr, core_id));
->          }
-> =20
->          if (i < boot_cores_nr) {
-> @@ -3293,7 +3307,8 @@ void spapr_core_unplug_request(HotplugHandler *hotp=
-lug_dev, DeviceState *dev,
->          return;
->      }
-> =20
-> -    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
-> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_CPU,
-> +                          spapr_vcpu_id(spapr, cc->core_id));
->      g_assert(drc);
-> =20
->      spapr_drc_detach(drc);
-> @@ -3322,7 +3337,8 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
->                     cc->core_id);
->          return;
->      }
-> -    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
-> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_CPU,
-> +                          spapr_vcpu_id(spapr, cc->core_id));
-> =20
->      g_assert(drc || !mc->has_hotpluggable_cpus);
-> =20
-> @@ -3807,8 +3823,7 @@ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_ind=
-ex, Error **errp)
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      int vcpu_id;
-> =20
-> -    vcpu_id =3D
-> -        (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_thread=
-s;
-> +    vcpu_id =3D spapr_vcpu_id(spapr, cpu_index);
-> =20
->      if (kvm_enabled() && !kvm_vcpu_id_is_valid(vcpu_id)) {
->          error_setg(errp, "Can't create CPU with id %d in KVM", vcpu_id);
->=20
+$ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+and modified manually.
 
---df+09Je9rNq3P+GE
-Content-Type: application/pgp-signature; name="signature.asc"
+Regards,
 
------BEGIN PGP SIGNATURE-----
+Phil.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqFBxwACgkQbDjKyiDZ
-s5Iq3w//ZYJJrBpEpwOo0cFSMErGGQxRYBYrVFvBYYrBYpxuTX3rdk88IrPSJGdm
-L1UX6aII6+7BZsqwbl5cvMxtfxEAkgkXerZI5p6EbM/TUtEhKsniBxUA4GvvoPhu
-SgmS73eszSKPcl4WDgRhM2hkGr6DfOymefsQBg/zQKK3vAWWoQSQs5t8vfBJdhKT
-fONQztVAvbpboj/E/y9Uedg80s0rhho2WtXqU+nHXOLTqtSq2FSFLD1jc8nu7K5d
-47R0w9k7H37KivXtb38KZCFKoq26CHqlOaqC1fuFDmF9UVM9nu728gxR9K68ZOYT
-xCJWTbg+KHpTeWatf9H7EGggQ89OZakPq78Dte5lYRUXGuJ/woxIf0ILNIJi/VOH
-ZvIYN4W/LwHJusfq1Zv7huE+bhn7tah7OOAfRG3L+iG5QW09ZBkkAFyvFgwBCkOF
-S9JjRig35tGmpYQ+pLJeYUcZUI+hbkHu0PBaXYjht8Q5Ej+Dj9aZ6JRubxgKmipq
-dcbnd+UOkaQ2VPxtJZZr4xs3f0Cgy95nwjhv7+ERSHE7EMthEE0hny3OQcukiI0l
-L43D4R2t+JhEzccpQdy+mE5H3gt70iQVKlxDq8GekNktWxGQvNV0BOGNCIdLNpfP
-+L0aKYgprouT+tQ+1+mPYEHeox3jJnxKSh4Vo9mYQtOs0oTcqB4=
-=1S/9
------END PGP SIGNATURE-----
+Philippe Mathieu-Daudé (30):
+  util/cutils: extract byte-based definitions into a new header:
+    "qemu/cunits.h"
+  hw: include "qemu/cunits.h" and clean unused "qemu/cutils.h"
+  hw/block/nvme: include the "qemu/cutils.h" in the source file
+  hw/lm32/milkymist: remove unused include
+  hw/mips/r4k: constify params_size
+  hw/mips: use the BYTE-based definitions
+  hw/arm: use the BYTE-based definitions
+  hw/i386: use the BYTE-based definitions
+  hw/sparc: use the BYTE-based definitions
+  hw/ppc: use the BYTE-based definitions
+  hw/s390x: use the BYTE-based definitions
+  hw/hppa: use the BYTE-based definitions
+  hw/xtensa: use the BYTE-based definitions
+  hw/alpha: use the BYTE-based definitions
+  hw/lm32: use the BYTE-based definitions
+  hw/sh4: use the BYTE-based definitions
+  hw/tricore: use the BYTE-based definitions
+  hw/microblaze: use the BYTE-based definitions
+  hw/nios2: use the BYTE-based definitions
+  hw/cris: use the BYTE-based definitions
+  hw/misc: use the BYTE-based definitions
+  hw/display: use the BYTE-based definitions
+  hw/net: use the BYTE-based definitions
+  hw/ipack: use the BYTE-based definitions
+  hw/scsi: use the BYTE-based definitions
+  hw/smbios: use the BYTE-based definitions
+  vfio/pci: use the BYTE-based definitions
+  ivshmem: use the BYTE-based definitions
+  tpm: use the BYTE-based definitions
+  xen: use the BYTE-based definitions
 
---df+09Je9rNq3P+GE--
+ hw/block/nvme.h                          |  1 -
+ include/hw/acpi/tpm.h                    |  2 +-
+ include/hw/arm/stm32f205_soc.h           |  4 ++--
+ include/hw/hw.h                          |  1 +
+ include/hw/i386/ich9.h                   |  2 +-
+ include/hw/intc/mips_gic.h               |  2 +-
+ include/hw/mips/bios.h                   |  2 +-
+ include/hw/net/allwinner_emac.h          |  4 ++--
+ include/hw/ppc/spapr.h                   |  2 +-
+ include/qemu/cunits.h                    | 11 +++++++++++
+ include/qemu/cutils.h                    |  8 +-------
+ hw/alpha/typhoon.c                       | 16 +++++++---------
+ hw/arm/boot.c                            |  6 +++---
+ hw/arm/collie.c                          |  4 ++--
+ hw/arm/digic_boards.c                    |  6 +++---
+ hw/arm/gumstix.c                         |  2 +-
+ hw/arm/integratorcp.c                    |  2 +-
+ hw/arm/mainstone.c                       |  2 +-
+ hw/arm/msf2-soc.c                        |  1 -
+ hw/arm/msf2-som.c                        |  1 -
+ hw/arm/musicpal.c                        |  8 ++++----
+ hw/arm/omap_sx1.c                        |  8 ++++----
+ hw/arm/raspi.c                           |  2 +-
+ hw/arm/stellaris.c                       |  4 ++--
+ hw/arm/versatilepb.c                     |  4 ++--
+ hw/arm/vexpress.c                        |  6 +++---
+ hw/arm/virt.c                            |  4 ++--
+ hw/arm/xilinx_zynq.c                     |  4 ++--
+ hw/block/nvme.c                          |  1 +
+ hw/block/tc58128.c                       |  2 +-
+ hw/block/xen_disk.c                      |  4 ++--
+ hw/core/loader-fit.c                     |  1 -
+ hw/core/loader.c                         |  1 -
+ hw/core/machine.c                        |  1 -
+ hw/cris/axis_dev88.c                     |  2 +-
+ hw/cris/boot.c                           |  1 -
+ hw/display/cirrus_vga.c                  |  9 ++++-----
+ hw/display/g364fb.c                      |  2 +-
+ hw/display/qxl.c                         | 26 +++++++++++---------------
+ hw/display/sm501.c                       |  1 -
+ hw/display/vga-isa-mm.c                  |  4 ++--
+ hw/display/vga.c                         |  4 ++--
+ hw/display/virtio-gpu.c                  |  3 +--
+ hw/display/vmware_vga.c                  |  2 +-
+ hw/display/xenfb.c                       |  2 +-
+ hw/hppa/dino.c                           |  2 +-
+ hw/hppa/machine.c                        |  9 ++++-----
+ hw/i386/acpi-build.c                     |  4 ++--
+ hw/i386/pc.c                             | 18 +++++++++---------
+ hw/i386/pc_piix.c                        |  2 +-
+ hw/i386/pc_q35.c                         |  2 +-
+ hw/i386/pc_sysfw.c                       |  8 ++++----
+ hw/i386/xen/xen-mapcache.c               |  2 +-
+ hw/intc/apic_common.c                    |  2 +-
+ hw/ipack/tpci200.c                       |  4 ++--
+ hw/lm32/lm32_boards.c                    | 12 ++++++------
+ hw/lm32/milkymist.c                      | 10 ++++------
+ hw/microblaze/boot.c                     |  1 -
+ hw/microblaze/petalogix_ml605_mmu.c      |  6 +++---
+ hw/microblaze/petalogix_s3adsp1800_mmu.c |  6 +++---
+ hw/mips/boston.c                         |  3 +--
+ hw/mips/mips_fulong2e.c                  |  6 +++---
+ hw/mips/mips_malta.c                     | 19 ++++++++++---------
+ hw/mips/mips_r4k.c                       | 15 +++++++--------
+ hw/misc/aspeed_sdmc.c                    |  8 ++++----
+ hw/misc/auxbus.c                         |  2 +-
+ hw/misc/edu.c                            |  2 +-
+ hw/misc/imx7_gpr.c                       |  2 +-
+ hw/misc/ivshmem.c                        |  2 +-
+ hw/misc/mips_itu.c                       |  2 +-
+ hw/misc/mos6522.c                        |  1 -
+ hw/misc/omap_gpmc.c                      |  4 ++--
+ hw/net/e1000e.c                          |  6 +++---
+ hw/net/eepro100.c                        |  6 ++----
+ hw/nios2/boot.c                          |  3 +--
+ hw/pci-host/gpex.c                       |  2 +-
+ hw/pci-host/piix.c                       |  4 ++--
+ hw/pci-host/prep.c                       |  2 +-
+ hw/pci-host/q35.c                        | 16 ++++++++--------
+ hw/pci-host/xilinx-pcie.c                |  4 ++--
+ hw/ppc/e500.c                            |  8 ++++----
+ hw/ppc/mac_newworld.c                    |  1 -
+ hw/ppc/mac_oldworld.c                    |  8 +++-----
+ hw/ppc/pnv.c                             |  1 -
+ hw/ppc/ppc405_boards.c                   |  8 ++++----
+ hw/ppc/ppc405_uc.c                       |  6 +++---
+ hw/ppc/ppc4xx_devs.c                     | 21 +++++++++++----------
+ hw/ppc/ppce500_spin.c                    |  2 +-
+ hw/ppc/prep.c                            |  3 +--
+ hw/ppc/rs6000_mc.c                       | 12 ++++++------
+ hw/ppc/spapr_rtas.c                      |  1 -
+ hw/ppc/virtex_ml507.c                    |  4 ++--
+ hw/s390x/sclp.c                          |  4 ++--
+ hw/scsi/scsi-disk.c                      |  8 ++++----
+ hw/sd/sdhci.c                            |  1 -
+ hw/sh4/r2d.c                             |  2 +-
+ hw/smbios/smbios.c                       | 14 +++++---------
+ hw/sparc/leon3.c                         |  8 ++++----
+ hw/sparc/sun4m.c                         |  8 +++-----
+ hw/sparc64/niagara.c                     |  2 +-
+ hw/sparc64/sun4u.c                       |  3 +--
+ hw/ssi/aspeed_smc.c                      | 28 ++++++++++++++--------------
+ hw/tricore/tricore_testboard.c           | 12 ++++++------
+ hw/usb/dev-serial.c                      |  1 -
+ hw/usb/dev-storage.c                     |  1 -
+ hw/vfio/pci-quirks.c                     |  8 ++++----
+ hw/vfio/pci.c                            |  2 +-
+ hw/xenpv/xen_domainbuild.c               | 10 +++++-----
+ hw/xtensa/xtfpga.c                       |  2 +-
+ 109 files changed, 269 insertions(+), 302 deletions(-)
+ create mode 100644 include/qemu/cunits.h
+
+-- 
+2.16.1
