@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emOG7-0000J1-NS
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:27:52 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emOP2-00066t-UF
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emOG6-0000Z8-Vd
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:27:51 -0500
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:43461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1emOG6-0000Yy-QN
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:27:50 -0500
-Received: by mail-ot0-x22f.google.com with SMTP id q12so561200otg.10
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 10:27:50 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180212124008.8960-1-cohuck@redhat.com>
-References: <20180212124008.8960-1-cohuck@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1emOP1-0004CV-Rd
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:04 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46434)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1emOP1-0004Bf-Jh
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:37:03 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1emOOz-00023j-FQ
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:37:01 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Feb 2018 18:27:29 +0000
-Message-ID: <CAFEAcA_JpeUeWoxyhTzzPAkH-Kc0OwV-r91LP=Mt27z1=icdQA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] docs: document our stable process
+Date: Thu, 15 Feb 2018 18:36:40 +0000
+Message-Id: <20180215183700.26101-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/20] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On 12 February 2018 at 12:40, Cornelia Huck <cohuck@redhat.com> wrote:
-> Some pointers on how to get a patch into stable.
->
-> [contains some suggestions by mdroth]
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> RFC/D->v2: added mdroth's suggestions
-> ---
->  docs/stable-process.rst | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 67 insertions(+)
->  create mode 100644 docs/stable-process.rst
->
+Changes v1->v2: it turns out that the raspi3 support exposes a
+preexisting bug in our register definitions for VMPIDR/VMIDR:
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04181.html
 
-Drive-by bikeshed comment: should this be in docs/devel ?
-It's aimed at QEMU developers rather than users...
+So I've dropped the final "enable raspi3 board" patch for the
+moment. When that VMIDR/VMPIDR patch gets reviewed we can
+put the raspi3 patch in with it.
+
 
 thanks
 -- PMM
+
+The following changes since commit f003d07337a6d4d02c43429b26a4270459afb51a:
+
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-02-15 15:45:33 +0000)
+
+are available in the Git repository at:
+
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180215-1
+
+for you to fetch changes up to bade58166f4466546600d824a2695a00269d10eb:
+
+  raspi: Raspberry Pi 3 support (2018-02-15 18:33:46 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * aspeed: code cleanup to use unimplemented_device
+ * preparatory work for 'raspi3' RaspberryPi 3 machine model
+ * more SVE prep work
+ * v8M: add minor missing registers
+ * v7M: fix bug where we weren't migrating v7m.other_sp
+ * v7M: fix bugs in handling of interrupt registers for
+   external interrupts beyond 32
+
+----------------------------------------------------------------
+Pekka Enberg (2):
+      bcm2836: Make CPU type configurable
+      raspi: Raspberry Pi 3 support
+
+Peter Maydell (11):
+      hw/intc/armv7m_nvic: Don't hardcode M profile ID registers in NVIC
+      hw/intc/armv7m_nvic: Fix ICSR PENDNMISET/CLR handling
+      hw/intc/armv7m_nvic: Implement M profile cache maintenance ops
+      hw/intc/armv7m_nvic: Implement v8M CPPWR register
+      hw/intc/armv7m_nvic: Implement cache ID registers
+      hw/intc/armv7m_nvic: Implement SCR
+      target/arm: Implement writing to CONTROL_NS for v8M
+      hw/intc/armv7m_nvic: Fix byte-to-interrupt number conversions
+      target/arm: Add AIRCR to vmstate struct
+      target/arm: Migrate v7m.other_sp
+      target/arm: Implement v8M MSPLIM and PSPLIM registers
+
+Philippe Mathieu-Daudé (2):
+      hw/arm/aspeed: directly map the serial device to the system address space
+      hw/arm/aspeed: simplify using the 'unimplemented device' for aspeed_soc.io
+
+Richard Henderson (5):
+      target/arm: Remove ARM_CP_64BIT from ZCR_EL registers
+      target/arm: Enforce FP access to FPCR/FPSR
+      target/arm: Suppress TB end for FPCR/FPSR
+      target/arm: Enforce access to ZCR_EL at translation
+      target/arm: Handle SVE registers when using clear_vec_high
+
+ include/hw/arm/aspeed_soc.h |   1 -
+ include/hw/arm/bcm2836.h    |   1 +
+ target/arm/cpu.h            |  71 ++++++++++++-----
+ target/arm/internals.h      |   6 ++
+ hw/arm/aspeed_soc.c         |  35 ++-------
+ hw/arm/bcm2836.c            |  17 +++--
+ hw/arm/raspi.c              |  34 ++++++---
+ hw/intc/armv7m_nvic.c       |  98 ++++++++++++++++++------
+ target/arm/cpu.c            |  28 +++++++
+ target/arm/helper.c         |  84 +++++++++++++++-----
+ target/arm/machine.c        |  84 ++++++++++++++++++++
+ target/arm/translate-a64.c  | 181 ++++++++++++++++++++------------------------
+ 12 files changed, 429 insertions(+), 211 deletions(-)
