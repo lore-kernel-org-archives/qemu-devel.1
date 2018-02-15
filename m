@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emNmV-00086L-PL
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:57:16 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emNmX-000881-AA
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:57:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emNmU-0000cW-PX
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:57:15 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emNmW-0000de-H3
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:57:17 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Feb 2018 17:57:06 +0000
-Message-Id: <20180215175707.15491-4-peter.maydell@linaro.org>
-In-Reply-To: <20180215175707.15491-1-peter.maydell@linaro.org>
-References: <20180215175707.15491-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/3] hw/arm/armv7m: Honour CPU's address space
- for image loads
+Date: Thu, 15 Feb 2018 17:57:03 +0000
+Message-Id: <20180215175707.15491-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/3] Arm: honour CPU address space for image
+ loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +21,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Instead of loading guest images to the system address space, use the
-CPU's address space.  This is important if we're trying to load the
-file to memory or via an alias memory region that is provided by an
-SoC object and thus not mapped into the system address space.
+This patchset makes the Arm code for loading kernels, initrds,
+etc etc honour the CPU's address space rather than loading
+everything via the system address space. This makes a difference
+when the image is being loaded to memory or via an alias memory
+region which is implemented by an SoC container object (and
+which therefore doesn't appear in the system address space).
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/armv7m.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+I needed this in particular for M profile, but I'd written all
+the boot.c changes before I remembered that M profile doesn't
+use that code at all :-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 56770a7048..facc536b07 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -270,6 +270,9 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
-     uint64_t entry;
-     uint64_t lowaddr;
-     int big_endian;
-+    AddressSpace *as;
-+    int asidx;
-+    CPUState *cs = CPU(cpu);
- 
- #ifdef TARGET_WORDS_BIGENDIAN
-     big_endian = 1;
-@@ -282,11 +285,19 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
-         exit(1);
-     }
- 
-+    if (arm_feature(&cpu->env, ARM_FEATURE_EL3)) {
-+        asidx = ARMASIdx_S;
-+    } else {
-+        asidx = ARMASIdx_NS;
-+    }
-+    as = cpu_get_address_space(cs, asidx);
-+
-     if (kernel_filename) {
--        image_size = load_elf(kernel_filename, NULL, NULL, &entry, &lowaddr,
--                              NULL, big_endian, EM_ARM, 1, 0);
-+        image_size = load_elf_as(kernel_filename, NULL, NULL, &entry, &lowaddr,
-+                                 NULL, big_endian, EM_ARM, 1, 0, as);
-         if (image_size < 0) {
--            image_size = load_image_targphys(kernel_filename, 0, mem_size);
-+            image_size = load_image_targphys_as(kernel_filename, 0,
-+                                                mem_size, as);
-             lowaddr = 0;
-         }
-         if (image_size < 0) {
+thanks
+-- PMM
+
+Peter Maydell (3):
+  loader: Add new load_ramdisk_as()
+  hw/arm/boot: Honour CPU's address space for image loads
+  hw/arm/armv7m: Honour CPU's address space for image loads
+
+ include/hw/loader.h |  12 +++++-
+ hw/arm/armv7m.c     |  17 ++++++--
+ hw/arm/boot.c       | 119 +++++++++++++++++++++++++++++++++-------------------
+ hw/core/loader.c    |   8 +++-
+ 4 files changed, 108 insertions(+), 48 deletions(-)
+
 -- 
 2.16.1
