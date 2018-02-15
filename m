@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58287)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRmb-0004eM-Ky
+	id 1emRmb-0004eK-Kn
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:13:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRmZ-0004yt-CO
+	id 1emRmW-0004xa-KS
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:13:37 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:45768)
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:43801)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emRmZ-0004yb-7K
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:13:35 -0500
-Received: by mail-qk0-x242.google.com with SMTP id g2so1548440qkd.12
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:13:35 -0800 (PST)
+	id 1emRmW-0004xJ-F9
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:13:32 -0500
+Received: by mail-qk0-x244.google.com with SMTP id i184so1554978qkf.10
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:13:32 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 19:13:06 -0300
-Message-Id: <20180215221325.7611-2-f4bug@amsat.org>
-In-Reply-To: <20180215221325.7611-1-f4bug@amsat.org>
-References: <20180215221325.7611-1-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 19:13:05 -0300
+Message-Id: <20180215221325.7611-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 01/20] sdcard: Don't always set the high
- capacity bit
+Subject: [Qemu-devel] [PATCH v4 00/20] SDCard: bugfixes,
+ support UHS-I (part 5)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +35,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrzej Zaborowski <balrogg@gmail.com>
 
-Don't set the high capacity bit by default as it will be set if required
-in the sd_set_csd() function.
+Some refactors, few bugfixes, better SD/SPI support.
 
-[based on a patch from Alistair Francis <alistair.francis@xilinx.com>
- and Peter Ogden <ogden@xilinx.com> from qemu/xilinx tag xilinx-v2015.4]
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- hw/sd/sd.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+With this series apply, machines can use SD cards in UHS-I mode.
+(mostly imported from Alistair Francis work)
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index fbee87afef..9dfbd65ac8 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -291,6 +291,10 @@ static void sd_ocr_powerup(void *opaque)
- 
-     /* card power-up OK */
-     sd->ocr = FIELD_DP32(sd->ocr, OCR, CARD_POWER_UP, 1);
-+
-+    if (sd->size > 1 * G_BYTE) {
-+        sd->ocr = FIELD_DP32(sd->ocr, OCR, CARD_CAPACITY, 1);
-+    }
- }
- 
- static void sd_set_scr(SDState *sd)
-@@ -395,7 +399,6 @@ static void sd_set_csd(SDState *sd, uint64_t size)
-         sd->csd[13] = 0x40;
-         sd->csd[14] = 0x00;
-         sd->csd[15] = 0x00;
--        sd->ocr |= 1 << 30;     /* High Capacity SD Memory Card */
-     }
- }
- 
+MMC mode split out for another series,
+so UHS enabled MMC cards are still not usable:
+
+  kernel: mmc0: SDHCI controller on PCI [0000:00:05.0] using ADMA
+  kernel: sd 0:0:0:0: Attached scsi generic sg0 type 0
+  kernel: mmc0: Skipping voltage switch
+  [mmc kthread looping]
+
+Since v3:
+- simpler SPI handling, improved descriptions (Alistair review)
+- inverted patches 16/17 order
+
+Since v2:
+- split again in 2... other part is cleanup/tracing
+
+Since v1:
+- rewrote mostly all patches to keep it simpler.
+
+$ git backport-diff
+001/20:[----] [-C] 'sdcard: Don't always set the high capacity bit'
+002/20:[----] [-C] 'sdcard: update the CSD CRC register regardless the CSD structure version'
+003/20:[----] [-C] 'sdcard: fix the 'maximum data transfer rate' to 25MHz'
+004/20:[----] [-C] 'sdcard: clean the SCR register and add few comments'
+005/20:[----] [--] 'sdcard: remove commands from unsupported old MMC specification'
+006/20:[----] [--] 'sdcard: simplify using the ldst API'
+007/20:[0008] [FC] 'sdcard: use the correct masked OCR in the R3 reply'
+008/20:[----] [-C] 'sdcard: use the registerfields API for the CARD_STATUS register masks'
+009/20:[----] [--] 'sdcard: handle CMD54 (SDIO)'
+010/20:[down] 'sdcard: handle the Security Specification commands'
+011/20:[down] 'sdcard: use a more descriptive label 'unimplemented_spi_cmd''
+012/20:[0034] [FC] 'sdcard: handles more commands in SPI mode'
+013/20:[----] [--] 'sdcard: check the card is in correct state for APP CMD (CMD55)'
+014/20:[----] [--] 'sdcard: warn if host uses an incorrect address for APP CMD (CMD55)'
+015/20:[----] [--] 'sdcard: simplify SEND_IF_COND (CMD8)'
+016/20:[----] [--] 'sdcard: simplify SD_SEND_OP_COND (ACMD41)'
+017/20:[----] [--] 'sdcard: add SD SEND_TUNING_BLOCK (CMD19)'
+018/20:[----] [--] 'sdcard: implement the UHS-I SWITCH_FUNCTION entries (Spec v3)'
+019/20:[----] [-C] 'sdcard: add a 'uhs' property, update the OCR register ACCEPT_SWITCH_1V8 bit'
+020/20:[----] [--] 'sdcard: add an enum for the SD PHY Spec version'
+
+Based-on: 20180215220540.6556-12-f4bug@amsat.org
+
+Philippe Mathieu-Daudé (20):
+  sdcard: Don't always set the high capacity bit
+  sdcard: update the CSD CRC register regardless the CSD structure
+    version
+  sdcard: fix the 'maximum data transfer rate' to 25MHz
+  sdcard: clean the SCR register and add few comments
+  sdcard: remove commands from unsupported old MMC specification
+  sdcard: simplify using the ldst API
+  sdcard: use the correct masked OCR in the R3 reply
+  sdcard: use the registerfields API for the CARD_STATUS register masks
+  sdcard: handle CMD54 (SDIO)
+  sdcard: handle the Security Specification commands
+  sdcard: use a more descriptive label 'unimplemented_spi_cmd'
+  sdcard: handles more commands in SPI mode
+  sdcard: check the card is in correct state for APP CMD (CMD55)
+  sdcard: warn if host uses an incorrect address for APP CMD (CMD55)
+  sdcard: simplify SEND_IF_COND (CMD8)
+  sdcard: simplify SD_SEND_OP_COND (ACMD41)
+  sdcard: add SD SEND_TUNING_BLOCK (CMD19)
+  sdcard: implement the UHS-I SWITCH_FUNCTION entries (Spec v3)
+  sdcard: add a 'uhs' property, update the OCR register
+    ACCEPT_SWITCH_1V8 bit
+  sdcard: add an enum for the SD PHY Spec version
+
+ hw/sd/sd.c         | 498 ++++++++++++++++++++++++++++++++++++-----------------
+ hw/sd/trace-events |   1 +
+ 2 files changed, 343 insertions(+), 156 deletions(-)
+
 -- 
 2.16.1
