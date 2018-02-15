@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLel-0004aS-QL
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:09 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1emLeg-0004X4-LK
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLeh-0003cU-Sk
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:07 -0500
-Received: from mail-bn3nam01on0059.outbound.protection.outlook.com
-	([104.47.33.59]:63552
+	(envelope-from <brijesh.singh@amd.com>) id 1emLea-0003aW-Nm
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:02 -0500
+Received: from mail-bn3nam01on0057.outbound.protection.outlook.com
+	([104.47.33.57]:36448
 	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1emLeh-0003c3-LS
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:03 -0500
+	id 1emLea-0003aM-Gq
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:56 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu, 15 Feb 2018 09:39:46 -0600
-Message-Id: <20180215153955.3253-21-brijesh.singh@amd.com>
+Date: Thu, 15 Feb 2018 09:39:43 -0600
+Message-Id: <20180215153955.3253-18-brijesh.singh@amd.com>
 In-Reply-To: <20180215153955.3253-1-brijesh.singh@amd.com>
 References: <20180215153955.3253-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 20/29] hw/i386: set ram_debug_ops when
- memory encryption is enabled
+Subject: [Qemu-devel] [PATCH v9 17/29] target/i386: encrypt bios rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +31,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-When memory encryption is enabled, the guest RAM and boot flash ROM will
-contain the encrypted data. By setting the debug ops allow us to invoke
-encryption APIs when accessing the memory for the debug purposes.
+SEV requires that guest bios must be encrypted before booting the guest.
 
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- hw/i386/pc.c       | 9 +++++++++
- hw/i386/pc_sysfw.c | 6 ++++++
- 2 files changed, 15 insertions(+)
+ hw/i386/pc_sysfw.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 55e69d66fe6f..53ddecef369c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1360,6 +1360,15 @@ void pc_memory_init(PCMachineState *pcms,
-         e820_add_entry(0x100000000ULL, pcms->above_4g_mem_size, E820_RAM);
-     }
- 
-+    /*
-+     * When memory encryption is enabled, the guest RAM will be encrypted with
-+     * a guest unique key. Set the debug ops so that any debug access to the
-+     * guest RAM will go through the memory encryption APIs.
-+     */
-+    if (kvm_memcrypt_enabled()) {
-+        kvm_memcrypt_set_debug_ops(ram);
-+    }
-+
-     if (!pcmc->has_reserved_memory &&
-         (machine->ram_slots ||
-          (machine->maxram_size > machine->ram_size))) {
 diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 73ac783f2055..845240f97293 100644
+index 4325575e7d82..73ac783f2055 100644
 --- a/hw/i386/pc_sysfw.c
 +++ b/hw/i386/pc_sysfw.c
-@@ -181,6 +181,12 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
-                     error_report("failed to encrypt pflash rom");
-                     exit(1);
-                 }
+@@ -113,6 +113,8 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
+     pflash_t *system_flash;
+     MemoryRegion *flash_mem;
+     char name[64];
++    void *flash_ptr;
++    int ret, flash_size;
+ 
+     sector_bits = 12;
+     sector_size = 1 << sector_bits;
+@@ -169,6 +171,17 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
+         if (unit == 0) {
+             flash_mem = pflash_cfi01_get_memory(system_flash);
+             pc_isa_bios_init(rom_memory, flash_mem, size);
 +
-+                /*
-+                 * The pflash ROM is encrypted, set the debug ops so that any
-+                 * debug accesses will use memory encryption APIs.
-+                 */
-+                kvm_memcrypt_set_debug_ops(flash_mem);
-             }
++            /* Encrypt the pflash boot ROM */
++            if (kvm_memcrypt_enabled()) {
++                flash_ptr = memory_region_get_ram_ptr(flash_mem);
++                flash_size = memory_region_size(flash_mem);
++                ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
++                if (ret) {
++                    error_report("failed to encrypt pflash rom");
++                    exit(1);
++                }
++            }
          }
      }
+ }
 -- 
 2.14.3
