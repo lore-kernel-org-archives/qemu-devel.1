@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emOF0-0007r4-2W
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:26:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1emOG7-0000J1-NS
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:27:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emOEw-0000AX-VF
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:26:42 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37408 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1emOEw-0000A3-R8
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:26:38 -0500
-References: <20180215172306.10389-1-f4bug@amsat.org>
-	<20180215173429.GB24818@redhat.com>
-	<df9e3a19-494d-a67b-4178-97f81229bf45@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c89deba6-a203-bea6-d196-8aad45136420@redhat.com>
-Date: Thu, 15 Feb 2018 12:26:35 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1emOG6-0000Z8-Vd
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:27:51 -0500
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:43461)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1emOG6-0000Yy-QN
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:27:50 -0500
+Received: by mail-ot0-x22f.google.com with SMTP id q12so561200otg.10
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 10:27:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <df9e3a19-494d-a67b-4178-97f81229bf45@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docker: dump 'config.log' if ./configure
- fails
+In-Reply-To: <20180212124008.8960-1-cohuck@redhat.com>
+References: <20180212124008.8960-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 18:27:29 +0000
+Message-ID: <CAFEAcA_JpeUeWoxyhTzzPAkH-Kc0OwV-r91LP=Mt27z1=icdQA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] docs: document our stable process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 02/15/2018 11:41 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 02/15/2018 02:34 PM, Daniel P. Berrang=C3=A9 wrote:
->> On Thu, Feb 15, 2018 at 02:23:06PM -0300, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->>> Suggested-by: Eric Blake <eblake@redhat.com>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> ---
->>>   tests/docker/common.rc | 4 +++-
->>>   1 file changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
->>> index 7951555e3f..dd011cdf1e 100755
->>> --- a/tests/docker/common.rc
->>> +++ b/tests/docker/common.rc
->>> @@ -30,7 +30,9 @@ build_qemu()
->>>                    $@"
->>>       echo "Configure options:"
->>>       echo $config_opts
->>> -    $QEMU_SRC/configure $config_opts && make $MAKEFLAGS
->>> +    $QEMU_SRC/configure $config_opts || \
->>> +        (cat config.log && prep_fail "Failed to run 'configure'")
+On 12 February 2018 at 12:40, Cornelia Huck <cohuck@redhat.com> wrote:
+> Some pointers on how to get a patch into stable.
+>
+> [contains some suggestions by mdroth]
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> RFC/D->v2: added mdroth's suggestions
+> ---
+>  docs/stable-process.rst | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 67 insertions(+)
+>  create mode 100644 docs/stable-process.rst
+>
 
-Is a subshell necessary; or can you get by with the simpler
-  { cat && prep_fail "..."; }
+Drive-by bikeshed comment: should this be in docs/devel ?
+It's aimed at QEMU developers rather than users...
 
->>> +    make $MAKEFLAGS
->>>   }
->>
->> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->>
->> Slightly nicer than my patch thanks to the prep_fail addition.
->=20
-> Haha this was a funny experience of parallel programming :)
->=20
-> However your patch has a slightly nicer description!
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
