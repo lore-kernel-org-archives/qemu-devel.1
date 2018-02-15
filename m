@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emKbD-0001ME-5C
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:33:24 -0500
+	(envelope-from <schwab@suse.de>) id 1emKcf-0002k9-25
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:34:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emKbA-00078f-0K
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:33:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34800)
+	(envelope-from <schwab@suse.de>) id 1emKcb-0008Q6-T9
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:34:53 -0500
+Received: from mx2.suse.de ([195.135.220.15]:60167)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1emKb9-00077p-Ql
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:33:19 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B9933F741
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:33:19 +0000 (UTC)
-References: <20180215102602.10864-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2905a78b-72ce-5f76-d9d4-b39fd8058f6e@redhat.com>
-Date: Thu, 15 Feb 2018 08:32:46 -0600
+	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1emKcb-0008P0-Mh
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:34:49 -0500
+From: Andreas Schwab <schwab@suse.de>
+References: <mvmmv0nk6g7.fsf@suse.de> <mvmvafah0jd.fsf@suse.de>
+	<13e5772f-7b47-4a34-3316-a908dc7d4f85@vivier.eu>
+Date: Thu, 15 Feb 2018 15:34:47 +0100
+In-Reply-To: <13e5772f-7b47-4a34-3316-a908dc7d4f85@vivier.eu> (Laurent
+	Vivier's message of "Thu, 15 Feb 2018 15:31:03 +0100")
+Message-ID: <mvmr2pms4mw.fsf@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20180215102602.10864-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vnc: remove bogus object_unref on client
- socket
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Implement copy_file_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-On 02/15/2018 04:26 AM, Daniel P. Berrang=C3=A9 wrote:
-> vnc_listen_io() does not own the reference on the 'cioc' parameter is i=
-t
-> passed, so should not be unref'ing it.
->=20
-> Reported-by: Bandan Das <bsd@redhat.com>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->   ui/vnc.c | 1 -
->   1 file changed, 1 deletion(-)
+On Feb 15 2018, Laurent Vivier <laurent@vivier.eu> wrote:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> Le 06/02/2018 =C3=A0 11:31, Andreas Schwab a =C3=A9crit=C2=A0:
+>> No attempt is made to emulate it on the host.
+>
+> I don't understand what you mean here...
 
->=20
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index c715bae1cf..b97769aa9e 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -3152,7 +3152,6 @@ static void vnc_listen_io(QIONetListener *listene=
-r,
->                            isWebsock ? "vnc-ws-server" : "vnc-server");
->       qio_channel_set_delay(QIO_CHANNEL(cioc), false);
->       vnc_connect(vd, cioc, false, isWebsock);
-> -    object_unref(OBJECT(cioc));
->   }
->  =20
->   static const DisplayChangeListenerOps dcl_ops =3D {
->=20
+If your host doesn't have it, neither will the emulation.
+
+Andreas.
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Andreas Schwab, SUSE Labs, schwab@suse.de
+GPG Key fingerprint =3D 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D=
+7
+"And now for something completely different."
