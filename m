@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSan-0007Su-8k
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSan-0007Sx-98
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSai-0003NV-2M
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSai-0003Nc-4s
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:29 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58958)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40194)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1emSah-0003MS-GS
+	id 1emSah-0003MU-Im
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:23 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1FN4RPK109685
+	w1FN5Dv1059238
 	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:05:22 -0500
 Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5kec0aef-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5ke889yd-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:05:22 -0500
 Received: from localhost
 	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Thu, 15 Feb 2018 15:55:10 -0700
+	Thu, 15 Feb 2018 15:55:14 -0700
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Thu, 15 Feb 2018 17:54:29 -0500
+Date: Thu, 15 Feb 2018 17:54:31 -0500
 In-Reply-To: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1518735273-16089-9-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v6 08/12] s390-ccw: read stage2 boot loader
- data to find menu
+Message-Id: <1518735273-16089-11-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 10/12] s390-ccw: read user input for boot
+ index via the SCLP console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,257 +41,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Read the stage2 boot loader data block-by-block. We scan the
-current block for the string "zIPL" to detect the start of the
-boot menu banner. We then load the adjacent blocks (previous
-block and next block) to account for the possibility of menu
-data spanning multiple blocks.
+Implements an sclp_read function to capture input from the
+console and a wrapper function that handles parsing certain
+characters and adding input to a buffer. The input is checked
+for any erroneous values and is handled appropriately.
+
+A prompt will persist until input is entered or the timeout
+expires (if one was set). Example:
+
+    Please choose (default will boot in 10 seconds):
+
+Correct input will boot the respective boot index. If the
+user's input is empty, 0, or if the timeout expires, then
+the default zipl entry will be chosen. If the input is
+within the range of available boot entries, then the
+selection will be booted. Any erroneous input will cancel
+the timeout and re-prompt the user.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c | 94 +++++++++++++++++++++++++++++++++++++++++++---
- pc-bios/s390-ccw/bootmap.h | 23 +++++++++++-
- pc-bios/s390-ccw/menu.c    |  5 +++
- pc-bios/s390-ccw/menu.h    |  1 +
- 4 files changed, 116 insertions(+), 7 deletions(-)
+ pc-bios/s390-ccw/menu.c     | 146 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/s390-ccw/s390-ccw.h |   2 +
+ pc-bios/s390-ccw/sclp.c     |  19 ++++++
+ pc-bios/s390-ccw/virtio.c   |   2 +-
+ 4 files changed, 167 insertions(+), 2 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index a94638d..5358301 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -13,6 +13,7 @@
- #include "bootmap.h"
- #include "virtio.h"
- #include "bswap.h"
-+#include "menu.h"
- 
- #ifdef DEBUG
- /* #define DEBUG_FALLBACK */
-@@ -83,6 +84,10 @@ static void jump_to_IPL_code(uint64_t address)
- 
- static unsigned char _bprs[8*1024]; /* guessed "max" ECKD sector size */
- static const int max_bprs_entries = sizeof(_bprs) / sizeof(ExtEckdBlockPtr);
-+static uint8_t _s2[MAX_SECTOR_SIZE * 3] __attribute__((__aligned__(PAGE_SIZE)));
-+static void *s2_prev_blk = _s2;
-+static void *s2_cur_blk = _s2 + MAX_SECTOR_SIZE;
-+static void *s2_next_blk = _s2 + MAX_SECTOR_SIZE * 2;
- 
- static inline void verify_boot_info(BootInfo *bip)
- {
-@@ -182,7 +187,76 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
-     return block_nr;
- }
- 
--static void run_eckd_boot_script(block_number_t bmt_block_nr)
-+static bool find_zipl_boot_menu_banner(int *offset)
-+{
-+    int i;
-+
-+    /* Menu banner starts with "zIPL" */
-+    for (i = 0; i < virtio_get_block_size() - 4; i++) {
-+        if (magic_match(s2_cur_blk + i, ZIPL_MAGIC_EBCDIC)) {
-+            *offset = i;
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
-+static int eckd_get_boot_menu_index(block_number_t s1b_block_nr)
-+{
-+    block_number_t cur_block_nr;
-+    block_number_t prev_block_nr = 0;
-+    block_number_t next_block_nr = 0;
-+    EckdStage1b *s1b = (void *)sec;
-+    int offset;
-+    int i;
-+
-+    /* Get Stage1b data */
-+    memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-+    read_block(s1b_block_nr, s1b, "Cannot read stage1b boot loader");
-+
-+    memset(_s2, FREE_SPACE_FILLER, sizeof(_s2));
-+
-+    /* Get Stage2 data */
-+    for (i = 0; i < STAGE2_BLK_CNT_MAX; i++) {
-+        cur_block_nr = eckd_block_num(&s1b->seek[i].chs);
-+
-+        if (!cur_block_nr) {
-+            break;
-+        }
-+
-+        read_block(cur_block_nr, s2_cur_blk, "Cannot read stage2 boot loader");
-+
-+        if (find_zipl_boot_menu_banner(&offset)) {
-+            /* Load the adjacent blocks to account for the
-+             * possibility of menu data spanning multiple blocks.
-+             */
-+            if (prev_block_nr) {
-+                read_block(prev_block_nr, s2_prev_blk,
-+                           "Cannot read stage2 boot loader");
-+            }
-+
-+            if (i + 1 < STAGE2_BLK_CNT_MAX) {
-+                next_block_nr = eckd_block_num(&s1b->seek[i + 1].chs);
-+            }
-+
-+            if (next_block_nr) {
-+                read_block(next_block_nr, s2_next_blk,
-+                           "Cannot read stage2 boot loader");
-+            }
-+
-+            return menu_get_zipl_boot_index(s2_cur_blk, offset);
-+        }
-+
-+        prev_block_nr = cur_block_nr;
-+    }
-+
-+    sclp_print("No zipl boot menu data found. Booting default entry.");
-+    return 0;
-+}
-+
-+static void run_eckd_boot_script(block_number_t bmt_block_nr,
-+                                 block_number_t s1b_block_nr)
- {
-     int i;
-     unsigned int loadparm = get_loadparm_index();
-@@ -191,6 +265,10 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
-     BootMapTable *bmt = (void *)sec;
-     BootMapScript *bms = (void *)sec;
- 
-+    if (menu_check_flags(BOOT_MENU_FLAG_CMD_OPTS | BOOT_MENU_FLAG_ZIPL_OPTS)) {
-+        loadparm = eckd_get_boot_menu_index(s1b_block_nr);
-+    }
-+
-     debug_print_int("loadparm", loadparm);
-     IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
-                " maximum number of boot entries allowed");
-@@ -223,7 +301,7 @@ static void ipl_eckd_cdl(void)
-     XEckdMbr *mbr;
-     EckdCdlIpl2 *ipl2 = (void *)sec;
-     IplVolumeLabel *vlbl = (void *)sec;
--    block_number_t bmt_block_nr;
-+    block_number_t bmt_block_nr, s1b_block_nr;
- 
-     /* we have just read the block #0 and recognized it as "IPL1" */
-     sclp_print("CDL\n");
-@@ -241,6 +319,9 @@ static void ipl_eckd_cdl(void)
-     /* save pointer to Boot Map Table */
-     bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
- 
-+    /* save pointer to Stage1b Data */
-+    s1b_block_nr = eckd_block_num(&ipl2->stage1.seek[0].chs);
-+
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(2, vlbl, "Cannot read Volume Label at block 2");
-     IPL_assert(magic_match(vlbl->key, VOL1_MAGIC),
-@@ -249,7 +330,7 @@ static void ipl_eckd_cdl(void)
-                "Invalid magic of volser block");
-     print_volser(vlbl->f.volser);
- 
--    run_eckd_boot_script(bmt_block_nr);
-+    run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
-     /* no return */
- }
- 
-@@ -280,7 +361,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
- 
- static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
- {
--    block_number_t bmt_block_nr;
-+    block_number_t bmt_block_nr, s1b_block_nr;
-     EckdLdlIpl1 *ipl1 = (void *)sec;
- 
-     if (mode != ECKD_LDL_UNLABELED) {
-@@ -302,7 +383,10 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
-     /* save pointer to Boot Map Table */
-     bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
- 
--    run_eckd_boot_script(bmt_block_nr);
-+    /* save pointer to Stage1b Data */
-+    s1b_block_nr = eckd_block_num(&ipl1->stage1.seek[0].chs);
-+
-+    run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
-     /* no return */
- }
- 
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 1ddc08f..9f873b5 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -88,6 +88,7 @@ typedef struct ScsiMbr {
- } __attribute__ ((packed)) ScsiMbr;
- 
- #define ZIPL_MAGIC              "zIPL"
-+#define ZIPL_MAGIC_EBCDIC       "\xa9\xc9\xd7\xd3"
- #define IPL1_MAGIC "\xc9\xd7\xd3\xf1" /* == "IPL1" in EBCDIC */
- #define IPL2_MAGIC "\xc9\xd7\xd3\xf2" /* == "IPL2" in EBCDIC */
- #define VOL1_MAGIC "\xe5\xd6\xd3\xf1" /* == "VOL1" in EBCDIC */
-@@ -250,15 +251,33 @@ typedef struct EckdCdlIpl1 {
-     uint8_t data[24];
- } __attribute__((packed)) EckdCdlIpl1;
- 
-+typedef struct EckdSeekArg {
-+    uint16_t pad;
-+    EckdCHS chs;
-+    uint8_t pad2;
-+} __attribute__ ((packed)) EckdSeekArg;
-+
-+typedef struct EckdStage1b {
-+    uint8_t reserved[32 * STAGE2_BLK_CNT_MAX];
-+    struct EckdSeekArg seek[STAGE2_BLK_CNT_MAX];
-+    uint8_t unused[64];
-+} __attribute__ ((packed)) EckdStage1b;
-+
-+typedef struct EckdStage1 {
-+    uint8_t reserved[72];
-+    struct EckdSeekArg seek[2];
-+} __attribute__ ((packed)) EckdStage1;
-+
- typedef struct EckdCdlIpl2 {
-     uint8_t key[4]; /* == "IPL2" */
--    uint8_t reserved0[88];
-+    struct EckdStage1 stage1;
-     XEckdMbr mbr;
-     uint8_t reserved[24];
- } __attribute__((packed)) EckdCdlIpl2;
- 
- typedef struct EckdLdlIpl1 {
--    uint8_t reserved[112];
-+    uint8_t reserved[24];
-+    struct EckdStage1 stage1;
-     BootInfo bip; /* BootInfo is MBR for LDL */
- } __attribute__((packed)) EckdLdlIpl1;
- 
 diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 3056cfc..5790e0c 100644
+index 9631ac0..9601043 100644
 --- a/pc-bios/s390-ccw/menu.c
 +++ b/pc-bios/s390-ccw/menu.c
-@@ -14,6 +14,11 @@
+@@ -12,16 +12,160 @@
+ #include "menu.h"
+ #include "s390-ccw.h"
+ 
++#define KEYCODE_NO_INP '\0'
++#define KEYCODE_ESCAPE '\033'
++#define KEYCODE_BACKSP '\177'
++#define KEYCODE_ENTER  '\r'
++
+ /* Offsets from zipl fields to zipl banner start */
+ #define ZIPL_TIMEOUT_OFFSET 138
+ #define ZIPL_FLAG_OFFSET    140
+ 
++#define TOD_CLOCK_MILLISECOND   0x3e8000
++
  static uint8_t flags;
  static uint64_t timeout;
  
-+int menu_get_zipl_boot_index(const void *stage2, int offset)
++static inline void enable_clock_int(void)
 +{
-+    return 0; /* implemented next patch */
++    uint64_t tmp = 0;
++
++    asm volatile(
++        "stctg      0,0,%0\n"
++        "oi         6+%0, 0x8\n"
++        "lctlg      0,0,%0"
++        : : "Q" (tmp) : "memory"
++    );
 +}
 +
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
++static inline void disable_clock_int(void)
++{
++    uint64_t tmp = 0;
++
++    asm volatile(
++        "stctg      0,0,%0\n"
++        "ni         6+%0, 0xf7\n"
++        "lctlg      0,0,%0"
++        : : "Q" (tmp) : "memory"
++    );
++}
++
++static inline void set_clock_comparator(uint64_t time)
++{
++    asm volatile("sckc %0" : : "Q" (time));
++}
++
++static inline bool check_clock_int(void)
++{
++    uint16_t *code = (uint16_t *)0x86; /* low-core external interrupt code */
++
++    consume_sclp_int();
++
++    return *code == 0x1004;
++}
++
++static int read_prompt(char *buf, size_t len)
++{
++    char inp[2] = {};
++    uint8_t idx = 0;
++    uint64_t time;
++
++    if (timeout) {
++        time = get_clock() + timeout * TOD_CLOCK_MILLISECOND;
++        set_clock_comparator(time);
++        enable_clock_int();
++        timeout = 0;
++    }
++
++    while (!check_clock_int()) {
++
++        sclp_read(inp, 1); /* Process only one character at a time */
++
++        switch (inp[0]) {
++        case KEYCODE_NO_INP:
++        case KEYCODE_ESCAPE:
++            continue;
++        case KEYCODE_BACKSP:
++            if (idx > 0) {
++                buf[--idx] = 0;
++                sclp_print("\b \b");
++            }
++            continue;
++        case KEYCODE_ENTER:
++            disable_clock_int();
++            return idx;
++        default:
++            /* Echo input and add to buffer */
++            if (idx < len) {
++                buf[idx++] = inp[0];
++                sclp_print(inp);
++            }
++        }
++    }
++
++    disable_clock_int();
++    *buf = 0;
++
++    return 0;
++}
++
++static int get_index(void)
++{
++    char buf[10];
++    int len;
++    int i;
++
++    memset(buf, 0, sizeof(buf));
++
++    len = read_prompt(buf, sizeof(buf));
++
++    /* If no input, boot default */
++    if (len == 0) {
++        return 0;
++    }
++
++    /* Check for erroneous input */
++    for (i = 0; i < len; i++) {
++        if (!isdigit(buf[i])) {
++            return -1;
++        }
++    }
++
++    return atoui(buf);
++}
++
++static void boot_menu_prompt(bool retry)
++{
++    char tmp[6];
++
++    if (retry) {
++        sclp_print("\nError: undefined configuration"
++                   "\nPlease choose:\n");
++    } else if (timeout > 0) {
++        sclp_print("Please choose (default will boot in ");
++        sclp_print(uitoa(timeout / 1000, tmp, sizeof(tmp)));
++        sclp_print(" seconds):\n");
++    } else {
++        sclp_print("Please choose:\n");
++    }
++}
++
+ static int get_boot_index(int entries)
  {
-     flags = boot_menu_flag;
-diff --git a/pc-bios/s390-ccw/menu.h b/pc-bios/s390-ccw/menu.h
-index 7df4114..c603de3 100644
---- a/pc-bios/s390-ccw/menu.h
-+++ b/pc-bios/s390-ccw/menu.h
-@@ -17,6 +17,7 @@
- #define BOOT_MENU_FLAG_CMD_OPTS  0x80
- #define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
+-    return 0; /* Implemented next patch */
++    int boot_index;
++    bool retry = false;
++    char tmp[5];
++
++    do {
++        boot_menu_prompt(retry);
++        boot_index = get_index();
++        retry = true;
++    } while (boot_index < 0 || boot_index >= entries);
++
++    sclp_print("\nBooting entry #");
++    sclp_print(uitoa(boot_index, tmp, sizeof(tmp)));
++
++    return boot_index;
+ }
  
-+int menu_get_zipl_boot_index(const void *stage2, int offset);
- void menu_set_parms(uint8_t boot_menu_flags, uint32_t boot_menu_timeout);
- bool menu_check_flags(uint8_t check_flags);
+ static void zipl_println(const char *data, size_t len)
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 25d4d21..a7e6253 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -71,6 +71,7 @@ unsigned int get_loadparm_index(void);
+ void sclp_print(const char *string);
+ void sclp_setup(void);
+ void sclp_get_loadparm_ascii(char *loadparm);
++int sclp_read(char *str, size_t count);
+ 
+ /* virtio.c */
+ unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
+@@ -79,6 +80,7 @@ bool virtio_is_supported(SubChannelId schid);
+ void virtio_blk_setup_device(SubChannelId schid);
+ int virtio_read(ulong sector, void *load_addr);
+ int enable_mss_facility(void);
++u64 get_clock(void);
+ ulong get_second(void);
+ 
+ /* bootmap.c */
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index 90d1bc3..abce139 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -127,3 +127,22 @@ void sclp_get_loadparm_ascii(char *loadparm)
+         ebcdic_to_ascii((char *) sccb->loadparm, loadparm, 8);
+     }
+ }
++
++int sclp_read(char *str, size_t count)
++{
++    ReadEventData *sccb = (void *)_sccb;
++    char *buf = (char *)(&sccb->ebh) + 7;
++
++    /* If count exceeds max buffer size, then restrict it to the max size */
++    if (count > SCCB_SIZE - 8) {
++        count = SCCB_SIZE - 8;
++    }
++
++    sccb->h.length = SCCB_SIZE;
++    sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
++
++    sclp_service_call(SCLP_CMD_READ_EVENT_DATA, sccb);
++    memcpy(str, buf, count);
++
++    return sccb->ebh.length - 7;
++}
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index c890a03..817e7f5 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -176,7 +176,7 @@ void vring_send_buf(VRing *vr, void *p, int len, int flags)
+     }
+ }
+ 
+-static u64 get_clock(void)
++u64 get_clock(void)
+ {
+     u64 r;
  
 -- 
 2.7.4
