@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emAEi-0003ra-VF
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 22:29:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emAiN-0001GB-S7
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:00:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emAEi-0000Oh-1u
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 22:29:28 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 14 Feb 2018 21:29:05 -0600
-Message-Id: <20180215032905.27146-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] nbd: Honor server's advertised minimum block
- size
+	(envelope-from <dgibson@ozlabs.org>) id 1emAiM-0004AT-T3
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:00:07 -0500
+Date: Thu, 15 Feb 2018 14:40:54 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180215034054.GD5247@umbus.fritz.box>
+References: <20180215004443.18013-1-sjitindarsingh@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="rz+pwK2yUstbofK6"
+Content-Disposition: inline
+In-Reply-To: <20180215004443.18013-1-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V3 1/3] ppc/spapr-caps: Change
+ migration macro to take full spapr-cap name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,73 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-Commit 79ba8c98 (v2.7) changed the setting of request_alignment
-to occur only during bdrv_refresh_limits(), rather than at at
-bdrv_open() time; but at the time, NBD was unaffected, because
-it still used sector-based callbacks, so the block layer
-defaulted NBD to use 512 request_alignment.
 
-Later, commit 70c4fb26 (also v2.7) changed NBD to use byte-based
-callbacks, without setting request_alignment.  This resulted in
-NBD using request_alignment of 1, which works great when the
-server supports it (as is the case for qemu-nbd), but falls apart
-miserably if the server requires alignment (but only if qemu
-actually sends a sub-sector request; qemu-io can do it, but
-most qemu operations still perform on sectors or larger).
+--rz+pwK2yUstbofK6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Even later, the NBD protocol was updated to document that clients
-should learn the server's minimum alignment during NBD_OPT_GO;
-and recommended that clients should assume a minimum size of 512
-unless the server understands NBD_OPT_GO and replied with a smaller
-size.  Commit 081dd1fe (v2.10) attempted to do that, by assigning
-request_alignment to whatever was learned from the server; but
-it has two flaws: the assignment is done during bdrv_open() so
-it gets unconditionally wiped out back to 1 during any later
-bdrv_refresh_limits(); and the code is not using a default of 512
-when the server did not report a minimum size.
+On Thu, Feb 15, 2018 at 11:44:41AM +1100, Suraj Jitindar Singh wrote:
+> Change the macro that generates the vmstate migration field and the needed
+> function for the spapr-caps to take the full spapr-cap name. This has
+> the benefit of meaning this instance will be picked up when greping
+> for the spapr-caps and making it more obvious what this macro is doing.
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Fix these issues by moving the assignment to request_alignment
-to the right function, and by using a sane default when the
-server does not advertise a minimum size.
+Applied, thanks.
 
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/nbd-client.c | 3 ---
- block/nbd.c        | 2 ++
- 2 files changed, 2 insertions(+), 3 deletions(-)
+> ---
+>  hw/ppc/spapr_caps.c | 30 +++++++++++++++---------------
+>  1 file changed, 15 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 62efdaee38..e69d308560 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -350,34 +350,34 @@ int spapr_caps_post_migration(sPAPRMachineState *sp=
+apr)
+>  }
+> =20
+>  /* Used to generate the migration field and needed function for a spapr =
+cap */
+> -#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
+> -static bool spapr_cap_##cap##_needed(void *opaque)      \
+> +#define SPAPR_CAP_MIG_STATE(sname, cap)                 \
+> +static bool spapr_cap_##sname##_needed(void *opaque)    \
+>  {                                                       \
+>      sPAPRMachineState *spapr =3D opaque;                  \
+>                                                          \
+> -    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
+> -           (spapr->eff.caps[SPAPR_CAP_##ccap] !=3D        \
+> -            spapr->def.caps[SPAPR_CAP_##ccap]);         \
+> +    return spapr->cmd_line_caps[cap] &&                 \
+> +           (spapr->eff.caps[cap] !=3D                     \
+> +            spapr->def.caps[cap]);                      \
+>  }                                                       \
+>                                                          \
+> -const VMStateDescription vmstate_spapr_cap_##cap =3D {    \
+> -    .name =3D "spapr/cap/" #cap,                          \
+> +const VMStateDescription vmstate_spapr_cap_##sname =3D {  \
+> +    .name =3D "spapr/cap/" #sname,                        \
+>      .version_id =3D 1,                                    \
+>      .minimum_version_id =3D 1,                            \
+> -    .needed =3D spapr_cap_##cap##_needed,                 \
+> +    .needed =3D spapr_cap_##sname##_needed,               \
+>      .fields =3D (VMStateField[]) {                        \
+> -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
+> +        VMSTATE_UINT8(mig.caps[cap],                    \
+>                        sPAPRMachineState),               \
+>          VMSTATE_END_OF_LIST()                           \
+>      },                                                  \
+>  }
+> =20
+> -SPAPR_CAP_MIG_STATE(htm, HTM);
+> -SPAPR_CAP_MIG_STATE(vsx, VSX);
+> -SPAPR_CAP_MIG_STATE(dfp, DFP);
+> -SPAPR_CAP_MIG_STATE(cfpc, CFPC);
+> -SPAPR_CAP_MIG_STATE(sbbc, SBBC);
+> -SPAPR_CAP_MIG_STATE(ibs, IBS);
+> +SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_HTM);
+> +SPAPR_CAP_MIG_STATE(vsx, SPAPR_CAP_VSX);
+> +SPAPR_CAP_MIG_STATE(dfp, SPAPR_CAP_DFP);
+> +SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
+> +SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+> +SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
+> =20
+>  void spapr_caps_reset(sPAPRMachineState *spapr)
+>  {
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 9206652e45c..7b68499b76a 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -846,9 +846,6 @@ int nbd_client_init(BlockDriverState *bs,
-     if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
-         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
-     }
--    if (client->info.min_block > bs->bl.request_alignment) {
--        bs->bl.request_alignment = client->info.min_block;
--    }
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-     qemu_co_mutex_init(&client->send_mutex);
-     qemu_co_queue_init(&client->free_sema);
-diff --git a/block/nbd.c b/block/nbd.c
-index ef81a9f53ba..69b5fd5e8fa 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -474,8 +474,10 @@ static int nbd_co_flush(BlockDriverState *bs)
- static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
- {
-     NBDClientSession *s = nbd_get_client_session(bs);
-+    uint32_t min = s->info.min_block;
-     uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
+--rz+pwK2yUstbofK6
+Content-Type: application/pgp-signature; name="signature.asc"
 
-+    bs->bl.request_alignment = min ? min : BDRV_SECTOR_SIZE;
-     bs->bl.max_pdiscard = max;
-     bs->bl.max_pwrite_zeroes = max;
-     bs->bl.max_transfer = max;
--- 
-2.14.3
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqFAUEACgkQbDjKyiDZ
+s5I3fg/+MzsTxwOY7IMSB645zErmK1KYEbt9wetq2Q9ARt5Y5H4RS3v9LCtlio5g
+0q7Z6YcCh+kco0Ng97RDcFQJ8XPjoOkyDdBAwNpKs9J3uzu8Mm2NK/J9HOBO41cS
+3pKOATawUdMxFwkga/BL8/5baKoOr0Vu6srow7Fd/1mC9kYVNv4jiBmvsQa7wtsI
+yWjT0uTQxGXv/3YadKWfEZfjhTaOmQCysqO1/fynLzUMgj33ScF/saDiMueNdp17
+7W4bJhuRqmEBRDpu2gE5O4v0Md6fPrfZ2ZmBzFEENIHcz/R82HhCzKa4ZISCBFbb
+svUEFimN1jNXSCO4gU+sqjyzHL1seDIgdShBBIgku6Don0sQiZpW6mmBUN2i61tR
+ryc7VNisyseaS/HYqKl4yTJykFS9ug/wMe8ToOApUCk/e5e7ySa9tKOQqt5Rl/Lb
+y4WEDxvT1aMMarzxZPGTLaNDidJVdB6wB+3XHdw1LtzTSsqDxak2bYSG7KYgd4LR
+iYS9hKOKUy6p/mxioQe604I5KfifY/ddd7BtSr6hQAtA/8PXgrln7md3+cFYpWyk
+U8muKxXlVMhYpiROg4XWl8Jq9KejJNTBydkiI4a6FVUAtk60p0hdohGAHtqu0ks6
+TbLSt+67bBbCyiMAppTnft57/jeVAZplQOQewtbVwXixUURSwJc=
+=CTd8
+-----END PGP SIGNATURE-----
+
+--rz+pwK2yUstbofK6--
