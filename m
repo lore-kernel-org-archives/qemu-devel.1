@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1emR2h-0005tN-PJ
+	(envelope-from <marcandre.lureau@redhat.com>) id 1emR2i-0005tb-16
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 16:26:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1emR2h-0000q7-1x
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 16:26:11 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37690 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1emR2g-0000pq-UG
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 16:26:11 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8AF304023112
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 21:26:10 +0000 (UTC)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1emR2h-0000qH-8f
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 16:26:12 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 15 Feb 2018 22:25:52 +0100
-Message-Id: <20180215212552.26997-7-marcandre.lureau@redhat.com>
+Date: Thu, 15 Feb 2018 22:25:51 +0100
+Message-Id: <20180215212552.26997-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20180215212552.26997-1-marcandre.lureau@redhat.com>
 References: <20180215212552.26997-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 6/6] sdhci-test: fix leaks
+Subject: [Qemu-devel] [PATCH 5/6] ahci-test: fix opts leak of skip tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +23,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>
 
-Fix the following ASAN reports:
+Fixes the following ASAN report:
 
-=3D=3D20125=3D=3DERROR: LeakSanitizer: detected memory leaks
-
-Direct leak of 24 byte(s) in 1 object(s) allocated from:
-    #0 0x7f0faea03a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
-8)
-    #1 0x7f0fae450f75 in g_malloc0 ../glib/gmem.c:124
-    #2 0x562fffd526fc in machine_start /home/elmarco/src/qemu/tests/sdhci=
--test.c:180
-
-Indirect leak of 152 byte(s) in 1 object(s) allocated from:
-    #0 0x7f0faea03850 in malloc (/lib64/libasan.so.4+0xde850)
-    #1 0x7f0fae450f0c in g_malloc ../glib/gmem.c:94
-    #2 0x562fffd5d21d in qpci_init_pc /home/elmarco/src/qemu/tests/libqos=
-/pci-pc.c:122
+Direct leak of 128 byte(s) in 8 object(s) allocated from:
+    #0 0x7fefce311850 in malloc (/lib64/libasan.so.4+0xde850)
+    #1 0x7fefcdd5ef0c in g_malloc ../glib/gmem.c:94
+    #2 0x559b976faff0 in create_ahci_io_test /home/elmarco/src/qemu/tests=
+/ahci-test.c:1810
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/sdhci-test.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/ahci-test.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 493023fd0c..8a7099398c 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -209,8 +209,10 @@ static QSDHCI *machine_start(const struct sdhci_t *t=
-est)
-=20
- static void machine_stop(QSDHCI *s)
- {
-+    qpci_free_pc(s->pci.bus);
-     g_free(s->pci.dev);
-     qtest_quit(global_qtest);
-+    g_free(s);
- }
-=20
- static void test_machine(const void *data)
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index 7aa5af428c..1bd3cc7ca8 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -1822,6 +1822,7 @@ static void create_ahci_io_test(enum IOMode type, e=
+num AddrMode addr,
+     if ((addr =3D=3D ADDR_MODE_LBA48) && (offset =3D=3D OFFSET_HIGH) &&
+         (mb_to_sectors(test_image_size_mb) <=3D 0xFFFFFFF)) {
+         g_test_message("%s: skipped; test image too small", name);
++        g_free(opts);
+         g_free(name);
+         return;
+     }
 --=20
 2.16.1.73.g5832b7e9f2
