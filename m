@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emNgT-00022l-QO
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:07 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emNmU-00085F-VS
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:57:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emNgP-0003Kp-Io
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36780 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emNgP-0003Kc-DL
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:50:57 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 15 Feb 2018 17:50:44 +0000
-Message-Id: <20180215175044.8159-8-berrange@redhat.com>
-In-Reply-To: <20180215175044.8159-1-berrange@redhat.com>
-References: <20180215175044.8159-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] allow to build with older sed
+	(envelope-from <pm215@archaic.org.uk>) id 1emNmU-0000bi-3h
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:57:15 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 17:57:04 +0000
+Message-Id: <20180215175707.15491-2-peter.maydell@linaro.org>
+In-Reply-To: <20180215175707.15491-1-peter.maydell@linaro.org>
+References: <20180215175707.15491-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/3] loader: Add new load_ramdisk_as()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +19,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Beulich <JBeulich@suse.com>, Jan Beulich <jbeulich@suse.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-From: Jan Beulich <JBeulich@suse.com>
+Add a function load_ramdisk_as() which behaves like the existing
+load_ramdisk() but allows the caller to specify the AddressSpace
+to use. This matches the pattern we have already for various
+other loader functions.
 
-sed's -E option may not be supported by older distros. As there's no
-point using sed here at all, use just shell mechanisms to establish the
-variable values, starting from the stem instead of the full target.
-
-Signed-off-by: Jan Beulich <jbeulich@suse.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- Makefile | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ include/hw/loader.h | 12 +++++++++++-
+ hw/core/loader.c    |  8 +++++++-
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index b5a6d602b2..90e05ac409 100644
---- a/Makefile
-+++ b/Makefile
-@@ -256,8 +256,7 @@ GENERATED_FILES += $(KEYCODEMAP_FILES)
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 355fe0f5a2..1fd4256782 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -163,16 +163,26 @@ int load_uimage(const char *filename, hwaddr *ep,
+                 void *translate_opaque);
  
- ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
- 	$(call quiet-command,\
--	    src=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\1,") && \
--	    dst=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\2,") && \
-+	    stem=$* && src=$${stem%-to-*} dst=$${stem#*-to-} && \
- 	    test -e $(KEYCODEMAP_GEN) && \
- 	    $(PYTHON) $(KEYCODEMAP_GEN) \
- 	          --lang glib2 \
+ /**
+- * load_ramdisk:
++ * load_ramdisk_as:
+  * @filename: Path to the ramdisk image
+  * @addr: Memory address to load the ramdisk to
+  * @max_sz: Maximum allowed ramdisk size (for non-u-boot ramdisks)
++ * @as: The AddressSpace to load the ELF to. The value of address_space_memory
++ *      is used if nothing is supplied here.
+  *
+  * Load a ramdisk image with U-Boot header to the specified memory
+  * address.
+  *
+  * Returns the size of the loaded image on success, -1 otherwise.
+  */
++int load_ramdisk_as(const char *filename, hwaddr addr, uint64_t max_sz,
++                    AddressSpace *as);
++
++/**
++ * load_ramdisk:
++ * Same as load_ramdisk_as(), but doesn't allow the caller to specify
++ * an AddressSpace.
++ */
+ int load_ramdisk(const char *filename, hwaddr addr, uint64_t max_sz);
+ 
+ ssize_t gunzip(void *dst, size_t dstlen, uint8_t *src, size_t srclen);
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 91669d65aa..2b9e7394a1 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -729,9 +729,15 @@ int load_uimage_as(const char *filename, hwaddr *ep, hwaddr *loadaddr,
+ 
+ /* Load a ramdisk.  */
+ int load_ramdisk(const char *filename, hwaddr addr, uint64_t max_sz)
++{
++    return load_ramdisk_as(filename, addr, max_sz, NULL);
++}
++
++int load_ramdisk_as(const char *filename, hwaddr addr, uint64_t max_sz,
++                    AddressSpace *as)
+ {
+     return load_uboot_image(filename, NULL, &addr, NULL, IH_TYPE_RAMDISK,
+-                            NULL, NULL, NULL);
++                            NULL, NULL, as);
+ }
+ 
+ /* Load a gzip-compressed kernel to a dynamically allocated buffer. */
 -- 
-2.14.3
+2.16.1
