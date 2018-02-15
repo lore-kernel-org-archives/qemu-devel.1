@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emFqV-0001rZ-R3
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:28:52 -0500
+	(envelope-from <david.engraf@sysgo.com>) id 1emFyA-0006CR-EK
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:36:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emFqS-0002un-Nf
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:28:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54800 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emFqS-0002uf-Hh
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:28:48 -0500
-Date: Thu, 15 Feb 2018 09:28:31 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180215092831.GB23321@stefanha-x1.localdomain>
-References: <20180213142102.14450-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
-Content-Disposition: inline
-In-Reply-To: <20180213142102.14450-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] block: fix blk_aio_*() segfault
- when blk->root == NULL
+	(envelope-from <david.engraf@sysgo.com>) id 1emFy5-0006XA-MS
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:36:46 -0500
+From: David Engraf <david.engraf@sysgo.com>
+Date: Thu, 15 Feb 2018 10:36:00 +0100
+Message-Id: <20180215093600.18505-1-david.engraf@sysgo.com>
+In-Reply-To: <20180213102258.26145-1-david.engraf@sysgo.com>
+References: <20180213102258.26145-1-david.engraf@sysgo.com>
+Subject: [Qemu-devel] [PATCH v3] PPC: e500: Fix duplicate kernel load and
+ device tree overlap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +20,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, mark.kanda@oracle.com, Kevin Wolf <kwolf@redhat.com>
+To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Engraf <david.engraf@sysgo.com>
 
+This patch fixes an incorrect behavior when the -kernel argument has been
+specified without -bios. In this case the kernel was loaded twice. At address
+32M as a raw image and afterwards by load_elf/load_uimage at the
+corresponding load address. In this case the region for the device tree and
+the raw kernel image may overlap.
 
---tjCHc7DPkfUGtrlw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The patch fixes the behavior by loading the kernel image once with
+load_elf/load_uimage and skips loading the raw image.
 
-On Tue, Feb 13, 2018 at 02:20:58PM +0000, Stefan Hajnoczi wrote:
-> v2:
->  * Introduce AIO_WAIT_WHILE() since aio_poll(ctx, true) is not allowed [P=
-aolo]
->=20
-> Using bdrv_inc_in_flight(blk_bs(blk)) doesn't work since BlockBackend->ro=
-ot may
-> be NULL.
->=20
-> This patch series solves the issue by adding an BlockBackend->in_flight c=
-ounter
-> so requests can be tracked even when there is no BlockDriverState.
->=20
-> This should fix the IDE and virtio-blk segfaults that have been encounter=
-ed
-> when there is no BlockDriverState.
->=20
-> The patch is based on work by Kevin Wolf.
->=20
-> Kevin Wolf (1):
->   block: test blk_aio_flush() with blk->root =3D=3D NULL
->=20
-> Stefan Hajnoczi (3):
->   block: extract AIO_WAIT_WHILE() from BlockDriverState
->   block: add BlockBackend->in_flight counter
->   Revert "IDE: Do not flush empty CDROM drives"
->=20
->  tests/Makefile.include     |   2 +
->  util/Makefile.objs         |   2 +-
->  include/block/aio-wait.h   | 116 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  include/block/block.h      |  40 +++-------------
->  include/block/block_int.h  |   7 ++-
->  block.c                    |   7 ++-
->  block/block-backend.c      |  60 ++++++++++++++++++++---
->  block/io.c                 |  10 +---
->  hw/ide/core.c              |  10 +---
->  tests/test-block-backend.c |  82 ++++++++++++++++++++++++++++++++
->  util/aio-wait.c            |  40 ++++++++++++++++
->  11 files changed, 313 insertions(+), 63 deletions(-)
->  create mode 100644 include/block/aio-wait.h
->  create mode 100644 tests/test-block-backend.c
->  create mode 100644 util/aio-wait.c
+When here do not use bios_name/size for the kernel and use a more generic
+name called payload_name/size.
 
-Eric has posted R-b for all patches.
+New in v3: dtb must be stored between kernel and initrd because Linux can
+           handle the dtb only within the first 64MB. Add a comment to
+           clarify the behavior.
 
-Kevin or Paolo: Are you happy with this series?
+Signed-off-by: David Engraf <david.engraf@sysgo.com>
+---
+ hw/ppc/e500.c | 116 +++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 70 insertions(+), 46 deletions(-)
 
---tjCHc7DPkfUGtrlw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJahVK/AAoJEJykq7OBq3PIqYkIAIWLaYph6bM3fdb14//zJxOV
-ri54yDkTPYTwnFMG59teJLwIVlWotwaRgA2no2swgMQlMJVVzb6UAy4AcLZDvCF/
-n4FRL0A4eRyJyw94DB7Eoxtnbk500iyc07Zqhyp/muvohoEJEbLgpFwMWvDnZQTd
-YEepq+mfxumvtHUwkY4kMEP35R4Hpn8rUhZ2OGpUkAaGda3Z6EINYPgHhsJGSOvD
-ppFv4oz1o9v0LpVPoiB3Fd42m78evq/7eU8QpGnvKuf9XmvkGaUDuT387ZEowl3I
-IR9iyCtOgHq+qlswHYnD+fUELHClBms7Bs5HBInY1vQLvPVq6xVHTvH0qaGrcmc=
-=ZctX
------END PGP SIGNATURE-----
-
---tjCHc7DPkfUGtrlw--
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index c4fe06ea2a..414c4beaab 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -784,8 +784,10 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     int initrd_size = 0;
+     hwaddr cur_base = 0;
+     char *filename;
++    const char *payload_name;
++    bool kernel_as_payload;
+     hwaddr bios_entry = 0;
+-    target_long bios_size;
++    target_long payload_size;
+     struct boot_info *boot_info;
+     int dt_size;
+     int i;
+@@ -913,11 +915,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     /* Register spinning region */
+     sysbus_create_simple("e500-spin", params->spin_base, NULL);
+ 
+-    if (cur_base < (32 * 1024 * 1024)) {
+-        /* u-boot occupies memory up to 32MB, so load blobs above */
+-        cur_base = (32 * 1024 * 1024);
+-    }
+-
+     if (params->has_mpc8xxx_gpio) {
+         qemu_irq poweroff_irq;
+ 
+@@ -952,8 +949,61 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+                                     sysbus_mmio_get_region(s, 0));
+     }
+ 
+-    /* Load kernel. */
+-    if (machine->kernel_filename) {
++    /*
++     * Smart firmware defaults ahead!
++     *
++     * We follow the following table to select which payload we execute.
++     *
++     *  -kernel | -bios | payload
++     * ---------+-------+---------
++     *     N    |   Y   | u-boot
++     *     N    |   N   | u-boot
++     *     Y    |   Y   | u-boot
++     *     Y    |   N   | kernel
++     *
++     * This ensures backwards compatibility with how we used to expose
++     * -kernel to users but allows them to run through u-boot as well.
++     */
++    kernel_as_payload = false;
++    if (bios_name == NULL) {
++        if (machine->kernel_filename) {
++            payload_name = machine->kernel_filename;
++            kernel_as_payload = true;
++        } else {
++            payload_name = "u-boot.e500";
++        }
++    } else {
++        payload_name = bios_name;
++    }
++
++    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, payload_name);
++
++    payload_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
++                            1, PPC_ELF_MACHINE, 0, 0);
++    if (payload_size < 0) {
++        /*
++         * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
++         * ePAPR compliant kernel
++         */
++        payload_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
++                                   NULL, NULL);
++        if (payload_size < 0) {
++            fprintf(stderr, "qemu: could not load firmware '%s'\n", filename);
++            exit(1);
++        }
++    }
++
++    g_free(filename);
++
++    if (kernel_as_payload) {
++        kernel_base = loadaddr;
++        kernel_size = payload_size;
++    }
++
++    cur_base = loadaddr + payload_size;
++
++    /* Load bare kernel only if no bios/u-boot has been provided */
++    if (machine->kernel_filename && !kernel_as_payload) {
+         kernel_base = cur_base;
+         kernel_size = load_image_targphys(machine->kernel_filename,
+                                           cur_base,
+@@ -967,6 +1017,11 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+         cur_base += kernel_size;
+     }
+ 
++    if (cur_base < (32 * 1024 * 1024)) {
++        /* u-boot occupies memory up to 32MB, so load blobs above */
++        cur_base = (32 * 1024 * 1024);
++    }
++
+     /* Load initrd. */
+     if (machine->initrd_filename) {
+         initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+@@ -983,47 +1038,16 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     }
+ 
+     /*
+-     * Smart firmware defaults ahead!
+-     *
+-     * We follow the following table to select which payload we execute.
+-     *
+-     *  -kernel | -bios | payload
+-     * ---------+-------+---------
+-     *     N    |   Y   | u-boot
+-     *     N    |   N   | u-boot
+-     *     Y    |   Y   | u-boot
+-     *     Y    |   N   | kernel
+-     *
+-     * This ensures backwards compatibility with how we used to expose
+-     * -kernel to users but allows them to run through u-boot as well.
++     * Reserve space for dtb behind the kernel image because Linux has a bug
++     * where it can only handle the dtb if it's within the first 64MB of where
++     * <kernel> starts. dtb cannot not reach initrd_base because INITRD_LOAD_PAD
++     * ensures enough space between kernel and initrd.
+      */
+-    if (bios_name == NULL) {
+-        if (machine->kernel_filename) {
+-            bios_name = machine->kernel_filename;
+-        } else {
+-            bios_name = "u-boot.e500";
+-        }
+-    }
+-    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+-
+-    bios_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
+-                         1, PPC_ELF_MACHINE, 0, 0);
+-    if (bios_size < 0) {
+-        /*
+-         * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
+-         * ePAPR compliant kernel
+-         */
+-        kernel_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
+-                                  NULL, NULL);
+-        if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load firmware '%s'\n", filename);
++    dt_base = (loadaddr + payload_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
++    if (dt_base + DTB_MAX_SIZE > ram_size) {
++            fprintf(stderr, "qemu: not enough memory for device tree\n");
+             exit(1);
+-        }
+     }
+-    g_free(filename);
+-
+-    /* Reserve space for dtb */
+-    dt_base = (loadaddr + bios_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
+ 
+     dt_size = ppce500_prep_device_tree(machine, params, dt_base,
+                                        initrd_base, initrd_size,
+-- 
+2.14.1
