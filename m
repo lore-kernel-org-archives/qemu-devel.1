@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emJRP-0008QR-VC
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:19:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1emJT9-0001Xs-H6
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emJRP-0002hB-2Z
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:19:11 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:41560)
+	(envelope-from <peter.maydell@linaro.org>) id 1emJT8-0004T4-H2
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:20:59 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:43772)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1emJRO-0002gu-Tl
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:19:11 -0500
-Received: by mail-ot0-x241.google.com with SMTP id w38so5276217ota.8
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 05:19:10 -0800 (PST)
+	id 1emJT8-0004SZ-CD
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:20:58 -0500
+Received: by mail-ot0-x243.google.com with SMTP id q12so23333333otg.10
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 05:20:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a3f95aa2-3a13-8a67-4fe2-b7da6eace585@amsat.org>
-References: <20180208055039.24666-1-penberg@iki.fi>
-	<20180208055039.24666-4-penberg@iki.fi>
-	<CAFEAcA_008TiXr0RYmPuhPcmSY9qx=Ju8CMAu_t-z+DBRruykA@mail.gmail.com>
-	<9c52a265-6659-5c9c-27c7-eced8528fb63@amsat.org>
-	<a3f95aa2-3a13-8a67-4fe2-b7da6eace585@amsat.org>
+In-Reply-To: <20180211205848.4568-7-richard.henderson@linaro.org>
+References: <20180211205848.4568-1-richard.henderson@linaro.org>
+	<20180211205848.4568-7-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Feb 2018 13:18:49 +0000
-Message-ID: <CAFEAcA8Zhih61YZNBEQQOFv_XKWknw7oN80pQbK+NgcB1mEsYQ@mail.gmail.com>
+Date: Thu, 15 Feb 2018 13:20:37 +0000
+Message-ID: <CAFEAcA_1wbQukD_rQzxMWMox7wtOopUd5sVPiyxsH0th_anA_A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 3/3] raspi: Add "raspi3"
- machine type
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] linux-user: Support SVE in aarch64
+ signal frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Pekka Enberg <penberg@iki.fi>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 15 February 2018 at 13:14, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> On 02/15/2018 09:49 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 02/15/2018 09:39 AM, Peter Maydell wrote:
->>> On 8 February 2018 at 05:50, Pekka Enberg <penberg@iki.fi> wrote:
+On 11 February 2018 at 20:58, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/signal.c | 348 ++++++++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 283 insertions(+), 65 deletions(-)
 >
-> Now I remember why I hesitated with this patch,
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 9a380b9e31..af953175db 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -1443,35 +1443,61 @@ struct target_fpsimd_context {
+>      uint64_t vregs[32 * 2]; /* really uint128_t vregs[32] */
+>  };
 >
-> This part {
->
->>>> +    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53");
->>>> +    mc->max_cpus =3D BCM2836_NCPUS;
->>>> +    mc->min_cpus =3D BCM2836_NCPUS;
->>>> +    mc->default_cpus =3D BCM2836_NCPUS;
->
-> } is the BCM2837 SoC, very similar to the BCM2836.
+> -/*
+> - * Auxiliary context saved in the sigcontext.__reserved array. Not exported to
+> - * user space as it will change with the addition of new context. User space
+> - * should check the magic/size information.
+> - */
+> -struct target_aux_context {
+> -    struct target_fpsimd_context fpsimd;
+> -    /* additional context to be added before "end" */
+> -    struct target_aarch64_ctx end;
+> +#define TARGET_EXTRA_MAGIC  0x45585401
+> +
+> +struct target_extra_context {
+> +    struct target_aarch64_ctx head;
+> +    uint64_t datap; /* 16-byte aligned pointer to extra space cast to __u64 */
+> +    uint32_t size; /* size in bytes of the extra space */
+> +    uint32_t reserved[3];
+> +};
+> +
+> +#define TARGET_SVE_MAGIC    0x53564501
+> +
+> +struct target_sve_context {
+> +    struct target_aarch64_ctx head;
+> +    uint16_t vl;
+> +    uint16_t reserved[3];
+>  };
 
-Yeah, we had a whole go-around about whether we should have a
-BCM2837 object or just make the BCM2836 object have a configurable
-CPU type. You could argue either way...
+I found this patch too hard to review. It looks like you've combined
+a refactoring of how we handle the AArch64 "bunch of extra auxiliary
+context records" sigframe information with the addition of the SVE
+context record. Could you split that into separate patches, please?
+A description of why the current code isn't sufficient would also
+be helpful.
 
 thanks
 -- PMM
