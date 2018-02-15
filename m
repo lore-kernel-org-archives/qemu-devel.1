@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emOTS-0002CP-Ri
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:41:39 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1emOV9-0003vf-B2
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emOTN-0001W8-R2
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:41:38 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:44257)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emOTN-0001Vs-Mg
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:41:33 -0500
-Received: by mail-qt0-x242.google.com with SMTP id f18so824908qth.11
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 10:41:33 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180215172306.10389-1-f4bug@amsat.org>
-	<20180215173429.GB24818@redhat.com>
-	<df9e3a19-494d-a67b-4178-97f81229bf45@amsat.org>
-	<c89deba6-a203-bea6-d196-8aad45136420@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <890fe7eb-fe23-6df0-b759-c06999337a26@amsat.org>
-Date: Thu, 15 Feb 2018 15:41:29 -0300
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1emOV8-00026d-Kt
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:43:23 -0500
+References: <20180126144742.3636-1-lvivier@redhat.com>
+	<1ad5086b-1704-0561-2d29-147d3d2ee6d3@ilande.co.uk>
+	<3bb55aca-77fa-9ab7-4b13-98698d3c0008@redhat.com>
+	<9f0f9819-f608-c326-f975-a3338d6fc24d@redhat.com>
+	<65da244c-1550-0292-a849-10c0dc1f35b0@ilande.co.uk>
+	<20180214045833.GB5247@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <a47d9769-0a0f-4aff-21d9-ca68025a1d55@ilande.co.uk>
+Date: Thu, 15 Feb 2018 18:42:56 +0000
 MIME-Version: 1.0
-In-Reply-To: <c89deba6-a203-bea6-d196-8aad45136420@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] docker: dump 'config.log' if ./configure
- fails
+In-Reply-To: <20180214045833.GB5247@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] hw/char: remove legacy interface
+ escc_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,48 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 02/15/2018 03:26 PM, Eric Blake wrote:
-> On 02/15/2018 11:41 AM, Philippe Mathieu-Daudé wrote:
->> On 02/15/2018 02:34 PM, Daniel P. Berrangé wrote:
->>> On Thu, Feb 15, 2018 at 02:23:06PM -0300, Philippe Mathieu-Daudé wrote:
->>>> Suggested-by: Eric Blake <eblake@redhat.com>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> ---
->>>>   tests/docker/common.rc | 4 +++-
->>>>   1 file changed, 3 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
->>>> index 7951555e3f..dd011cdf1e 100755
->>>> --- a/tests/docker/common.rc
->>>> +++ b/tests/docker/common.rc
->>>> @@ -30,7 +30,9 @@ build_qemu()
->>>>                    $@"
->>>>       echo "Configure options:"
->>>>       echo $config_opts
->>>> -    $QEMU_SRC/configure $config_opts && make $MAKEFLAGS
->>>> +    $QEMU_SRC/configure $config_opts || \
->>>> +        (cat config.log && prep_fail "Failed to run 'configure'")
-> 
-> Is a subshell necessary; or can you get by with the simpler
->  { cat && prep_fail "..."; }
+On 14/02/18 04:58, David Gibson wrote:
 
-You are right, since the subshell is not necessary, better to use { ;}
+>> David, would you be willing to take this via ppc-for-2.12 since it covers
+>> the ESCC used in the PPC Mac machines?
+> 
+> Short term: Yes, I can stage this.  I've lost track of this thread
+> though.  Laurent, can you please resend with the various R-bs collated
+> together.
+> 
+> Long term: I've been thinking for a while that I'm not greatly
+> qualified to review or test patches for the Macintosh platforms.  And
+> I've also been thinking for a while that you (Mark) seem the obvious
+> choice to be sub-maintainer for the ppc based Macintosh machine types
+> and related device models.  Would you be willing to take that on?
 
-TIL :)
+Sure, I'm happy to do that. Not that I know a great deal about PPC Macs, 
+but I've got a good set of test images that get booted regularly when 
+testing OpenBIOS, so it's fairly easy for me to pick up regressions.
 
-> 
->>>> +    make $MAKEFLAGS
->>>>   }
->>>
->>> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
->>>
->>> Slightly nicer than my patch thanks to the prep_fail addition.
->>
->> Haha this was a funny experience of parallel programming :)
->>
->> However your patch has a slightly nicer description!
-> 
-> 
+
+ATB,
+
+Mark.
