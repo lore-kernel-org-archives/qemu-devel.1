@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1emGop-00071z-2F
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:31:11 -0500
+	(envelope-from <stefanha@redhat.com>) id 1emGvB-0002T1-9B
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:37:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1emGoj-0005zd-5J
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:31:11 -0500
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:33266)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1emGoi-0005xC-WD
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:31:05 -0500
-Received: by mail-wr0-x22e.google.com with SMTP id s5so2823663wra.0
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 02:31:04 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1emGvA-0001Lf-EV
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:37:45 -0500
+Date: Thu, 15 Feb 2018 10:37:21 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180215103721.GG23321@stefanha-x1.localdomain>
+References: <20180203061621.7033-1-stefanha@redhat.com>
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 15 Feb 2018 10:31:02 +0000
-Message-ID: <CAJSP0QUzvNDGV9CNA6-HxPY5eCcEO6Me4E0+NvuSfpD2szb0hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] GSoC project idea: iSCSI target in QEMU
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="3xoW37o/FfUZJwQG"
+Content-Disposition: inline
+In-Reply-To: <20180203061621.7033-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] block/iscsi: fix ioctl cancel
+ use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, ronnie sahlberg <ronniesahlberg@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Felipe Franciosi <felipe@nutanix.com>, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Paolo Bonzini <pbonzini@redhat.com>
 
-There is currently no way to test the block/iscsi.c block driver.
-Using a third-party iSCSI target isn't sufficient since we need fault
-injection and control over I/O request execution in order to exercise
-specific code paths in the initiator.
 
-Are you willing to co-mentor a Google Summer of Code project to
-implement an iSCSI target in QEMU?
+--3xoW37o/FfUZJwQG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-There are two goals:
-1. Runtime iSCSI target QMP commands to start/stop and add/remove LUNs.
-2. qemu-iscsi wrapper program for easy command-line launching.
+On Sat, Feb 03, 2018 at 07:16:18AM +0100, Stefan Hajnoczi wrote:
+> v2:
+>  * It was unnecessary to avoid duplicate iscsi_schedule_bh() calls since =
+this
+>    function already protects against duplicate calls internally [Stefan]
+>=20
+> Patches 1 & 2 are cleanups.
+>=20
+> Patch 3 fixes cancellation of ioctls.  Felipe showed me a trace where an =
+acb is
+> cancelled and then completes twice.  The second time around crashes QEMU.
+>=20
+> Compile-tested only.
+>=20
+> Felipe: Please let us know if this fixes the issue you are seeing.  Thank=
+s!
+>=20
+> Stefan Hajnoczi (3):
+>   block/iscsi: drop unused IscsiAIOCB->buf field
+>   block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
+>   block/iscsi: fix ioctl cancel use-after-free
+>=20
+>  block/iscsi.c | 33 ++++++++++++++++++++++-----------
+>  1 file changed, 22 insertions(+), 11 deletions(-)
 
-I think iSCSI target functionality will be useful beyond testing.  It
-will make it possible to attach disk images to physical machines or
-VMs using a widely implemented protocol.
+Thanks for the reviews, Paolo and Felipe.
 
-QEMU already has blkdebug for fault injection and a SCSI target.
-We're just missing the iSCSI wire protocol that wraps SCSI CDBs.  The
-basic idea is to implement a runtime iSCSI server (similar to the NBD
-server) that speaks the iSCSI protocol and passes SCSI requests to
-QEMU's SCSI target.
+Paolo: Please merge this, I'll send an additional patch that works
+around libiscsi's missing cancellation callback.
 
-I briefly looked at include/hw/scsi/scsi.h to check if this is
-feasible.  It looks like it's possible to instantiate a SCSIBus
-without a parent DeviceState.  The SCSI target is tied to device
-emulation since every LUN is a SCSIDevice and it's also tied to live
-migration.  But I don't think these things prevent iSCSI from reusing
-this code.
+--3xoW37o/FfUZJwQG
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The next step is to look at the iSCSI RFC to determine how feasible
-this would be:
-https://tools.ietf.org/html/rfc7143
+-----BEGIN PGP SIGNATURE-----
 
-Stefan
+iQEcBAEBAgAGBQJahWLhAAoJEJykq7OBq3PIrMYH/2muQ7ylIK54hZ93lv8V0fJJ
+9ShFauAjoxma9ah+ESI6ZmtXX8lwo/EtIS0nSER3HZlJP3e1Iizr7hisKPzcQwcl
+fFrSlfX0K6J3Q0mp3M6fnBuQy5nksjf+EzH5mxAidwU7Fk/slAnZZyMZ0qJIuuYn
+EuEeMzcZRO4KzRb1TT98W+hgRqBVIEtJiwlrP17G94X7FDod4WqTIFnNtBa6b+n+
+bMn/sfPuoJnn+UvtnHEjpsrQO+Bo6YOS+os+5VdGwhffrFbvS8RuZY0EwjP5edul
+xt7pUsFIk0s/Q64/dMWyub/hZJLUHP9GhEfA+mxy4nVIo74dXGk+iwghe4w+0hY=
+=qNBy
+-----END PGP SIGNATURE-----
+
+--3xoW37o/FfUZJwQG--
