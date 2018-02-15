@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emMo1-0002gN-S0
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 11:54:50 -0500
+	(envelope-from <imammedo@redhat.com>) id 1emN1Q-0006aQ-17
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:08:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emMnz-0007RP-AA
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 11:54:45 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:51235)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1emMny-0007Qw-VQ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 11:54:43 -0500
-References: <20180124130126.20871-1-f4bug@amsat.org>
-	<20180124130126.20871-2-f4bug@amsat.org>
-	<c11eca2b-abba-63cd-c0da-f4bdb04304d2@vivier.eu>
-	<cde5585e-a681-4eac-1777-b4850c191259@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <6216b4e1-923a-86f4-2726-b476d74f9393@vivier.eu>
-Date: Thu, 15 Feb 2018 17:54:38 +0100
+	(envelope-from <imammedo@redhat.com>) id 1emN1L-0002Yr-Rs
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:08:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58148 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emN1L-0002YZ-Mx
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:08:31 -0500
+Date: Thu, 15 Feb 2018 18:08:12 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180215180812.70dd05f4@redhat.com>
+In-Reply-To: <CAFEAcA-AfiDp5Y1MiveFHCZgTKgLPb3Qzu=RdhzNaD0yE4XscA@mail.gmail.com>
+References: <cover.1517532021.git.alistair.francis@xilinx.com>
+	<fa1d4990d897f61dd748ad7f10f6b88435e6cb46.1517532021.git.alistair.francis@xilinx.com>
+	<CAFEAcA_T4S8kU5GtatL+1Uos2oqBuYH-=GqhEWm=y3q4TmF+-w@mail.gmail.com>
+	<422117c4-4d0b-5db8-9c2a-4e85e2502694@amsat.org>
+	<CAFEAcA-AfiDp5Y1MiveFHCZgTKgLPb3Qzu=RdhzNaD0yE4XscA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <cde5585e-a681-4eac-1777-b4850c191259@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 01/11] linux-user/strace: dump
- AF_NETLINK sockaddr content
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] raspi: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-Le 15/02/2018 à 16:28, Philippe Mathieu-Daudé a écrit :
-> Hi Laurent,
-> 
-> On 02/15/2018 12:17 PM, Laurent Vivier wrote:
->> Le 24/01/2018 à 14:01, Philippe Mathieu-Daudé a écrit :
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>> please double check __pad and ntohl()
->>>
->>>  linux-user/syscall_defs.h |  7 +++++++
->>>  linux-user/strace.c       | 34 ++++++++++++++++++++++++++++++++++
->>>  2 files changed, 41 insertions(+)
->>>
->>> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
->>> index bec3680b94..550e7d2939 100644
->>> --- a/linux-user/syscall_defs.h
->>> +++ b/linux-user/syscall_defs.h
->>> @@ -151,6 +151,13 @@ struct target_sockaddr_un {
->>>      uint8_t sun_path[108];
->>>  };
->>>  
->>> +struct target_sockaddr_nl {
->>> +    uint16_t nl_family;     /* AF_NETLINK */
->>> +    int16_t __pad;
->>
->> netlink.h uses an unsigned type here.
-> 
-> This is padding, do you prefer char pad[2]?
+On Thu, 15 Feb 2018 13:17:50 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-kernel has:
+> On 15 February 2018 at 13:04, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> > Hi Peter,
+> >
+> > On 02/15/2018 08:29 AM, Peter Maydell wrote: =20
+> >> On 2 February 2018 at 00:42, Alistair Francis
+> >> <alistair.francis@xilinx.com> wrote: =20
+> >>> List all possible valid CPU options.
+> >>>
+> >>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >>> ---
+> >>>
+> >>> V5:
+> >>>  - Use cpu_model names
+> >>> V4:
+> >>>  - Remove spaces
+> >>> V3:
+> >>>  - Add static property
+> >>> V2:
+> >>>  - Fix the indentation
+> >>>
+> >>>  hw/arm/raspi.c | 7 +++++++
+> >>>  1 file changed, 7 insertions(+)
+> >>>
+> >>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> >>> index cd5fa8c3dc..745a880726 100644
+> >>> --- a/hw/arm/raspi.c
+> >>> +++ b/hw/arm/raspi.c
+> >>> @@ -158,6 +158,11 @@ static void raspi2_init(MachineState *machine)
+> >>>      setup_boot(machine, 2, machine->ram_size - vcram_size);
+> >>>  }
+> >>>
+> >>> +static const char *raspi2_valid_cpus[] =3D {
+> >>> +    "cortex-a7",
+> >>> +    NULL
+> >>> +}; =20
+> >>
+> >> Is this definitely right? Looking at the code, the raspi2 board
+> >> creates a TYPE_BCM2836, and that creates cortex-a15 CPUs... =20
+> >
+> > The BCM2836 use a cortex-a7 but this cpu was not available at the time
+> > of this commit (bad5623690b) and was added later in dcf578ed8ce "The A7
+> > is very similar to the A15."
+> >
+> > I can prepare a patch for it to apply before this series. =20
+>=20
+> I noticed after I'd written that comment that patch 3 in this
+> series does exactly the change to cortex-a7...
+anyways this series, needs not to depend MachineState::cpu_model,
+removal of which is queued in Eduardo's tree.
 
-struct sockaddr_nl {
-        __kernel_sa_family_t    nl_family;      /* AF_NETLINK   */
-        unsigned short  nl_pad;         /* zero         */
-        __u32           nl_pid;         /* port ID      */
-        __u32           nl_groups;      /* multicast groups mask */
-};
+It seems we can't find consensus on how to deal with cpu_model names
+in boards code [1/6].
 
-so I prefer "uint16_t", but as you say, it is padding, so sign is
-meaningless, if you prefer you can keep int16_t.
-
-Now, it would be good to use target_sockaddr_nl in
-host_to_target_sockaddr() as we define it.
-
-Thanks,
-Laurent
+>=20
+> thanks
+> -- PMM
