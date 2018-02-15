@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSb1-0007jE-H9
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:48 -0500
+	(envelope-from <alistair23@gmail.com>) id 1emSbj-0008O0-Eq
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:06:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSaw-0003SI-FY
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1emSaw-0003Rc-7c
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:38 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1FN5FlS128092
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:05:37 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5ke90abd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:05:37 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Thu, 15 Feb 2018 15:55:07 -0700
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Thu, 15 Feb 2018 17:54:28 -0500
-In-Reply-To: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1518735273-16089-8-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v6 07/12] s390-ccw: set up interactive boot
- menu parameters
+	(envelope-from <alistair23@gmail.com>) id 1emSbi-0003fO-IR
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:06:27 -0500
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:35002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1emSbi-0003f8-Ai
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:06:26 -0500
+Received: by mail-lf0-x242.google.com with SMTP id a204so1792784lfa.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 15:06:26 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <d131e24b911653a945e46ca2d8f90f572469e1dd.1517856214.git.alistair.francis@xilinx.com>
+References: <d131e24b911653a945e46ca2d8f90f572469e1dd.1517856214.git.alistair.francis@xilinx.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 15 Feb 2018 15:05:54 -0800
+Message-ID: <CAKmqyKOw-bced1cbcvJmJE_WM1_W5cEScOf8U+CaD3o9uyuXaw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] hw: register: Run post_write hook
+ on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,152 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-Reads boot menu flag and timeout values from the iplb and
-sets the respective fields for the menu.
+On Mon, Feb 5, 2018 at 10:44 AM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> Ensure that the post write hook is called during reset. This allows us
+> to rely on the post write functions instead of having to call them from
+> the reset() function.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/Makefile |  2 +-
- pc-bios/s390-ccw/main.c   | 24 ++++++++++++++++++++++++
- pc-bios/s390-ccw/menu.c   | 26 ++++++++++++++++++++++++++
- pc-bios/s390-ccw/menu.h   | 23 +++++++++++++++++++++++
- 4 files changed, 74 insertions(+), 1 deletion(-)
- create mode 100644 pc-bios/s390-ccw/menu.c
- create mode 100644 pc-bios/s390-ccw/menu.h
+Ping!
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 9f7904f..1712c2d 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- 
- .PHONY : all clean build-all
- 
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
-+OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index e41b264..c643a6b 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -11,6 +11,7 @@
- #include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
-+#include "menu.h"
- 
- char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- static SubChannelId blk_schid = { .one = 1 };
-@@ -18,6 +19,9 @@ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- 
-+#define LOADPARM_PROMPT "PROMPT  "
-+#define LOADPARM_EMPTY  "........"
-+
- /*
-  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
-  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
-@@ -74,6 +78,25 @@ static bool find_dev(Schib *schib, int dev_no)
-     return false;
- }
- 
-+static void menu_setup(void)
-+{
-+    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
-+        menu_set_parms(BOOT_MENU_FLAG_CMD_OPTS, 0);
-+        return;
-+    }
-+
-+    /* If loadparm was set to any other value, then do not enable menu */
-+    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
-+        return;
-+    }
-+
-+    switch (iplb.pbt) {
-+    case S390_IPL_TYPE_CCW:
-+        menu_set_parms(qipl.boot_menu_flags, qipl.boot_menu_timeout);
-+        return;
-+    }
-+}
-+
- static void virtio_setup(void)
- {
-     Schib schib;
-@@ -117,6 +140,7 @@ static void virtio_setup(void)
-         default:
-             panic("List-directed IPL not supported yet!\n");
-         }
-+        menu_setup();
-     } else {
-         for (ssid = 0; ssid < 0x3; ssid++) {
-             blk_schid.ssid = ssid;
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-new file mode 100644
-index 0000000..3056cfc
---- /dev/null
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -0,0 +1,26 @@
-+/*
-+ * QEMU S390 Interactive Boot Menu
-+ *
-+ * Copyright 2018 IBM Corp.
-+ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "menu.h"
-+
-+static uint8_t flags;
-+static uint64_t timeout;
-+
-+void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
-+{
-+    flags = boot_menu_flag;
-+    timeout = boot_menu_timeout;
-+}
-+
-+int menu_check_flags(uint8_t check_flags)
-+{
-+    return flags & check_flags;
-+}
-diff --git a/pc-bios/s390-ccw/menu.h b/pc-bios/s390-ccw/menu.h
-new file mode 100644
-index 0000000..7df4114
---- /dev/null
-+++ b/pc-bios/s390-ccw/menu.h
-@@ -0,0 +1,23 @@
-+/*
-+ * QEMU S390 Interactive Boot Menu
-+ *
-+ * Copyright 2018 IBM Corp.
-+ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef MENU_H
-+#define MENU_H
-+
-+#include "libc.h"
-+
-+#define BOOT_MENU_FLAG_CMD_OPTS  0x80
-+#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
-+
-+void menu_set_parms(uint8_t boot_menu_flags, uint32_t boot_menu_timeout);
-+bool menu_check_flags(uint8_t check_flags);
-+
-+#endif /* MENU_H */
--- 
-2.7.4
+> ---
+>
+> V2:
+>  - Update the header documentation
+>
+>  include/hw/register.h | 6 +++---
+>  hw/core/register.c    | 8 ++++++++
+>  2 files changed, 11 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/hw/register.h b/include/hw/register.h
+> index de2414e6b4..5796584588 100644
+> --- a/include/hw/register.h
+> +++ b/include/hw/register.h
+> @@ -34,7 +34,7 @@ typedef struct RegisterInfoArray RegisterInfoArray;
+>   * immediately before the actual write. The returned value is what is wr=
+itten,
+>   * giving the handler a chance to modify the written value.
+>   * @post_write: Post write callback. Passed the written value. Most writ=
+e side
+> - * effects should be implemented here.
+> + * effects should be implemented here. This is called during device rese=
+t.
+>   *
+>   * @post_read: Post read callback. Passes the value that is about to be =
+returned
+>   * for a read. The return value from this function is what is ultimately=
+ read,
+> @@ -135,8 +135,8 @@ uint64_t register_read(RegisterInfo *reg, uint64_t re=
+, const char* prefix,
+>                         bool debug);
+>
+>  /**
+> - * reset a register
+> - * @reg: register to reset
+> + * Resets a register. This will also call the post_write hook if it exis=
+ts.
+> + * @reg: The register to reset.
+>   */
+>
+>  void register_reset(RegisterInfo *reg);
+> diff --git a/hw/core/register.c b/hw/core/register.c
+> index 900294b9c4..0741a1af32 100644
+> --- a/hw/core/register.c
+> +++ b/hw/core/register.c
+> @@ -159,13 +159,21 @@ uint64_t register_read(RegisterInfo *reg, uint64_t =
+re, const char* prefix,
+>
+>  void register_reset(RegisterInfo *reg)
+>  {
+> +    const RegisterAccessInfo *ac;
+> +
+>      g_assert(reg);
+>
+>      if (!reg->data || !reg->access) {
+>          return;
+>      }
+>
+> +    ac =3D reg->access;
+> +
+>      register_write_val(reg, reg->access->reset);
+> +
+> +    if (ac->post_write) {
+> +        ac->post_write(reg, reg->access->reset);
+> +    }
+>  }
+>
+>  void register_init(RegisterInfo *reg)
+> --
+> 2.14.1
+>
