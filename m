@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emFpI-0000jV-ME
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:27:37 -0500
+	(envelope-from <stefanha@redhat.com>) id 1emFqV-0001rZ-R3
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emFpF-0002Hg-Cs
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:27:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54784 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1emFqS-0002un-Nf
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:28:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54800 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emFpF-0002H8-6X
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:27:33 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E1DF40FB64F
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 09:27:32 +0000 (UTC)
-Date: Thu, 15 Feb 2018 09:27:30 +0000
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emFqS-0002uf-Hh
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:28:48 -0500
+Date: Thu, 15 Feb 2018 09:28:31 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180215092730.GA23321@stefanha-x1.localdomain>
+Message-ID: <20180215092831.GB23321@stefanha-x1.localdomain>
 References: <20180213142102.14450-1-stefanha@redhat.com>
-	<20180213142102.14450-2-stefanha@redhat.com>
-	<73eb771d-ddcd-42e6-5895-23e6024ccc80@redhat.com>
-	<20180214140647.GC7545@stefanha-x1.localdomain>
-	<8894e9fa-8e3d-ecfe-07f4-61a465f4bf57@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
+	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
 Content-Disposition: inline
-In-Reply-To: <8894e9fa-8e3d-ecfe-07f4-61a465f4bf57@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] block: extract AIO_WAIT_WHILE()
- from BlockDriverState
+In-Reply-To: <20180213142102.14450-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] block: fix blk_aio_*() segfault
+ when blk->root == NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,57 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: John Snow <jsnow@redhat.com>, mark.kanda@oracle.com, Kevin Wolf <kwolf@redhat.com>
 
 
---YiEDa0DAkWCtVeE4
+--tjCHc7DPkfUGtrlw
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 14, 2018 at 04:31:45PM -0600, Eric Blake wrote:
-> On 02/14/2018 08:06 AM, Stefan Hajnoczi wrote:
-> > On Tue, Feb 13, 2018 at 10:01:06AM -0600, Eric Blake wrote:
-> > I hope this explains things!  The main issue that raised these questions
-> > was that aio_context_in_iothread() has a misleading name.  Shall we
-> > rename it?
+On Tue, Feb 13, 2018 at 02:20:58PM +0000, Stefan Hajnoczi wrote:
+> v2:
+>  * Introduce AIO_WAIT_WHILE() since aio_poll(ctx, true) is not allowed [P=
+aolo]
 >=20
-> Maybe, but that's a separate patch.  What name would we bikeshed, maybe
-> aio_context_correct_thread() (we are the correct thread if we are the
-> iothread that owns ctx, or if we are the main thread and have properly
-> acquired ctx)=20
+> Using bdrv_inc_in_flight(blk_bs(blk)) doesn't work since BlockBackend->ro=
+ot may
+> be NULL.
+>=20
+> This patch series solves the issue by adding an BlockBackend->in_flight c=
+ounter
+> so requests can be tracked even when there is no BlockDriverState.
+>=20
+> This should fix the IDE and virtio-blk segfaults that have been encounter=
+ed
+> when there is no BlockDriverState.
+>=20
+> The patch is based on work by Kevin Wolf.
+>=20
+> Kevin Wolf (1):
+>   block: test blk_aio_flush() with blk->root =3D=3D NULL
+>=20
+> Stefan Hajnoczi (3):
+>   block: extract AIO_WAIT_WHILE() from BlockDriverState
+>   block: add BlockBackend->in_flight counter
+>   Revert "IDE: Do not flush empty CDROM drives"
+>=20
+>  tests/Makefile.include     |   2 +
+>  util/Makefile.objs         |   2 +-
+>  include/block/aio-wait.h   | 116 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/block/block.h      |  40 +++-------------
+>  include/block/block_int.h  |   7 ++-
+>  block.c                    |   7 ++-
+>  block/block-backend.c      |  60 ++++++++++++++++++++---
+>  block/io.c                 |  10 +---
+>  hw/ide/core.c              |  10 +---
+>  tests/test-block-backend.c |  82 ++++++++++++++++++++++++++++++++
+>  util/aio-wait.c            |  40 ++++++++++++++++
+>  11 files changed, 313 insertions(+), 63 deletions(-)
+>  create mode 100644 include/block/aio-wait.h
+>  create mode 100644 tests/test-block-backend.c
+>  create mode 100644 util/aio-wait.c
 
-Having acquired the AioContext does not make this function return true.
-The semantics are:
-1. Current thread is the IOThread that runs the AioContext
-2. Current thread is the main loop and the AioContext is the global
-   AioContext.
+Eric has posted R-b for all patches.
 
-The function tests whether the current thread is the "native" or "home"
-thread for this AioContext.  Perhaps we could also call it the "poller"
-thread because only that thread is allowed to call aio_poll(ctx, true).
+Kevin or Paolo: Are you happy with this series?
 
-  if (aio_context_in_native_thread(ctx)) {
-      ...
-  } else {
-      ...
-  }
-
-What do you think?
-
---YiEDa0DAkWCtVeE4
+--tjCHc7DPkfUGtrlw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJahVKCAAoJEJykq7OBq3PI2qEIALsOIcVdEEq1j/xk6SMAn5PX
-V8HJASDshsNhq86Ov1Tsi5rjGAaJn9XQ/43yi4/igVNDKKHCwZjHpQYZ9AxMQJx8
-am/ukwJ7cgmwvoWkGIHB1NCeAxJjYDo6mRTlGeTIAZ6cK+w2xQNkASUxT8v+Jdvs
-yiRVInQ1yvxu3UEk9bW2wbYE/h2xvFs1G72p2YASTR1xhZ6YJRq5XRkOpACuo656
-QhtLnFEbfamqbSYLjCUmfw8kkiQGFgXFVCPPxUr8HNVZ9bLjpknjqPR4bXWLSbzV
-5FFqXQKb4F3Txg7raj8E7pLCxWlzqD6RvNPvmDVANM8GkB84GlBWa3tRtulsMC4=
-=Xou3
+iQEcBAEBAgAGBQJahVK/AAoJEJykq7OBq3PIqYkIAIWLaYph6bM3fdb14//zJxOV
+ri54yDkTPYTwnFMG59teJLwIVlWotwaRgA2no2swgMQlMJVVzb6UAy4AcLZDvCF/
+n4FRL0A4eRyJyw94DB7Eoxtnbk500iyc07Zqhyp/muvohoEJEbLgpFwMWvDnZQTd
+YEepq+mfxumvtHUwkY4kMEP35R4Hpn8rUhZ2OGpUkAaGda3Z6EINYPgHhsJGSOvD
+ppFv4oz1o9v0LpVPoiB3Fd42m78evq/7eU8QpGnvKuf9XmvkGaUDuT387ZEowl3I
+IR9iyCtOgHq+qlswHYnD+fUELHClBms7Bs5HBInY1vQLvPVq6xVHTvH0qaGrcmc=
+=ZctX
 -----END PGP SIGNATURE-----
 
---YiEDa0DAkWCtVeE4--
+--tjCHc7DPkfUGtrlw--
