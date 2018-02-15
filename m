@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1emSJk-0006xP-Kq
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:47:53 -0500
+	(envelope-from <alistair23@gmail.com>) id 1emSQb-0005i3-Jn
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:54:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1emSJj-0001Ct-NZ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:47:52 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:39746)
+	(envelope-from <alistair23@gmail.com>) id 1emSQa-0005O1-Ni
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:54:57 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:39781)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1emSJj-0001CQ-Fy
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:47:51 -0500
-Received: by mail-lf0-x241.google.com with SMTP id h78so1724709lfg.6
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:47:51 -0800 (PST)
+	id 1emSQa-0005LF-GL
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 17:54:56 -0500
+Received: by mail-lf0-x243.google.com with SMTP id h78so1743215lfg.6
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:54:56 -0800 (PST)
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180215221325.7611-13-f4bug@amsat.org>
+In-Reply-To: <20180215221325.7611-11-f4bug@amsat.org>
 References: <20180215221325.7611-1-f4bug@amsat.org>
-	<20180215221325.7611-13-f4bug@amsat.org>
+	<20180215221325.7611-11-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 15 Feb 2018 14:47:19 -0800
-Message-ID: <CAKmqyKO9AcdXkjHLhSPO9u_AdT1OeU0SN4_ngY9OtMnObkaH=g@mail.gmail.com>
+Date: Thu, 15 Feb 2018 14:54:24 -0800
+Message-ID: <CAKmqyKMPvYDu_m8O3LuAzMBm4y3YdXCTGHTUipo1KrLi8qt_ig@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 12/20] sdcard: handles more commands in
- SPI mode
+Subject: Re: [Qemu-devel] [PATCH v4 10/20] sdcard: handle the Security
+ Specification commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,82 +37,45 @@ Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell
 
 On Thu, Feb 15, 2018 at 2:13 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
+> returning sd_illegal, since they are not implemented.
+>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sd.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 30acd04ad7..0457f5214b 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -1551,6 +1551,17 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
+>          }
+>          break;
+>
+> +    case 18:    /* Reserved for SD security applications */
+> +    case 25:
+> +    case 26:
+> +    case 38:
+> +    case 43 ... 49:
+> +        /* Refer to the "SD Specifications Part3 Security Specification"=
+ for
+> +         * information about the SD Security Features */
+
+The */ should be on a new line.
+
+Otherwise:
 
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Alistair
 
-> ---
->  hw/sd/sd.c | 29 ++++++++++++++++++++++++++---
->  1 file changed, 26 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 4f82638735..0ecb446fdb 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -1390,9 +1390,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd=
-, SDRequest req)
->
->      /* Application specific commands (Class 8) */
->      case 55:   /* CMD55:  APP_CMD */
-> -        if (sd->rca !=3D rca)
-> -            return sd_r0;
-> -
-> +        if (!sd->spi) {
-> +            if (sd->rca !=3D rca) {
-> +                return sd_r0;
-> +            }
-> +        }
->          sd->expecting_acmd =3D true;
->          sd->card_status |=3D APP_CMD;
->          return sd_r1;
-> @@ -1412,6 +1414,18 @@ static sd_rsp_type_t sd_normal_command(SDState *sd=
-, SDRequest req)
->          }
->          break;
->
-> +    case 58:    /* CMD58:   READ_OCR (SPI) */
-> +        if (!sd->spi) {
-> +            goto bad_cmd;
-> +        }
-> +        return sd_r3;
+> +        qemu_log_mask(LOG_UNIMP, "SD: CMD%i Security not implemented\n",
+> +                      req.cmd);
+> +        return sd_illegal;
 > +
-> +    case 59:    /* CMD59:   CRC_ON_OFF (SPI) */
-> +        if (!sd->spi) {
-> +            goto bad_cmd;
-> +        }
-> +        goto unimplemented_spi_cmd;
-> +
->      default:
->      bad_cmd:
->          qemu_log_mask(LOG_GUEST_ERROR, "SD: Unknown CMD%i\n", req.cmd);
-> @@ -1436,6 +1450,9 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
->      sd->card_status |=3D APP_CMD;
->      switch (req.cmd) {
->      case 6:    /* ACMD6:  SET_BUS_WIDTH */
-> +        if (sd->spi) {
-> +            goto unimplemented_spi_cmd;
-> +        }
->          switch (sd->state) {
->          case sd_transfer_state:
->              sd->sd_status[0] &=3D 0x3f;
-> @@ -1569,6 +1586,12 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
 >      default:
 >          /* Fall back to standard commands.  */
 >          return sd_normal_command(sd, req);
-> +
-> +    unimplemented_spi_cmd:
-> +        /* Commands that are recognised but not yet implemented in SPI m=
-ode.  */
-> +        qemu_log_mask(LOG_UNIMP, "SD: CMD%i not implemented in SPI mode\=
-n",
-> +                      req.cmd);
-> +        return sd_illegal;
->      }
->
->      qemu_log_mask(LOG_GUEST_ERROR, "SD: ACMD%i in a wrong state\n", req.=
-cmd);
 > --
 > 2.16.1
 >
