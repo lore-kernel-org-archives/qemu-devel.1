@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emPIM-0002rU-6D
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:34:16 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1emPNt-0008My-8L
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emPIL-0003QP-Fj
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:34:14 -0500
-References: <20180208192328.16550-1-kwolf@redhat.com>
-	<20180208192328.16550-9-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fffdc547-0132-9ff1-5ae6-174a50774ade@redhat.com>
-Date: Thu, 15 Feb 2018 13:33:57 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1emPNs-0005sZ-5D
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:39:57 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:47062)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1emPNr-0005sC-VK
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:39:56 -0500
+Received: by mail-ot0-x242.google.com with SMTP id w10so747452ote.13
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:39:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180208192328.16550-9-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/27] util: Add
- qemu_opts_to_qdict_filtered()
+In-Reply-To: <5193436.NpsRQSl3SI@wirbelwind>
+References: <5193436.NpsRQSl3SI@wirbelwind>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 19:39:34 +0000
+Message-ID: <CAFEAcA_xHpd5_RVp4_Be3wOa_U6YTpN0wiKheMYApuSOkbtjHw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 01/02] fix issue where a branch to pc+4
+ confuses GDB because pc and npc are set to the same value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+To: steven.seeger@flightsystems.net
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 02/08/2018 01:23 PM, Kevin Wolf wrote:
-> This allows, given a QemuOpts for a QemuOptsList that was merged from
-> multiple QemuOptsList, to only consider those options that exist in one
-> specific list. Block drivers need this to separate format-layer create
-> options from protocol-level options.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On 15 February 2018 at 19:15, Steven Seeger
+<steven.seeger@flightsystems.net> wrote:
+> From ef3183a1648f45c705b55704de3755f84e9bcf80 Mon Sep 17 00:00:00 2001
+> From: Steven Seeger <steven.seeger@flightsystems.net>
+> Date: Thu, 15 Feb 2018 13:20:04 -0500
+> Subject: [PATCH 1/2] fix issue where a branch to pc+4 confuses GDB because pc
+>  and npc are set to the same value
+>
+> Signed-off-by: Steven Seeger <steven.seeger@flightsystems.net>
 > ---
->   include/qemu/option.h |  2 ++
->   util/qemu-option.c    | 37 ++++++++++++++++++++++++++++++++-----
->   2 files changed, 34 insertions(+), 5 deletions(-)
+>  target/sparc/translate.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+> index 71e0853e43..4c2272003d 100644
+> --- a/target/sparc/translate.c
+> +++ b/target/sparc/translate.c
+> @@ -1464,6 +1464,9 @@ static void do_branch(DisasContext *dc, int32_t offset,
+> uint32_t insn, int cc)
+>              dc->npc = dc->pc + 4;
+>          } else {
+>              dc->pc = dc->npc;
+> +            if (target == dc->pc) {
+> +                target += 4;
+> +            }
+>              dc->npc = target;
+>              tcg_gen_mov_tl(cpu_pc, cpu_npc);
+>          }
+> @@ -1504,6 +1507,9 @@ static void do_fbranch(DisasContext *dc, int32_t offset,
+> uint32_t insn, int cc)
+>              dc->npc = dc->pc + 4;
+>          } else {
+>              dc->pc = dc->npc;
+> +            if (target == dc->pc) {
+> +                target += 4;
+> +            }
+>              dc->npc = target;
+>              tcg_gen_mov_tl(cpu_pc, cpu_npc);
 
-Is there any unit test coverage we should be adding, beyond the default 
-we get when the list parameter is NULL?
+These changes look rather odd -- are you sure they're right?
+This is the code for unconditional taken branch, not annulled, and
+my copy of the sparc architecture manual says that in that case
+the new PC value should be the old nPC value, and the new
+nPC value should be the effective address of the branch target.
+There's nothing in there about branches into your own delay
+slot being a special case. Adding 4 to target like this will
+make the new nPC value be 4 further forward, which would mean
+we'd only execute the branch target instruction once, rather
+than twice (once for it being in the branch delay slot and
+once as the instruction target).
 
-But what you have looks sane;
-Reviewed-by: Eric Blake <eblake@redhat.com>
+It's a weird thing to do so I wouldn't be surprised if gdb
+mishandled it. Have you tested against real sparc hardware?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
