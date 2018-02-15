@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1emH7Q-000148-Ke
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:50:26 -0500
+	(envelope-from <thuth@redhat.com>) id 1emHNd-0000Qn-0A
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:07:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1emH7P-0006wv-3X
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:50:24 -0500
-References: <20180215103822.15179-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <867f5506-293c-43c6-d54b-b719f67607bb@redhat.com>
-Date: Thu, 15 Feb 2018 11:50:05 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180215103822.15179-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/tcg: add various alignment checks
+	(envelope-from <thuth@redhat.com>) id 1emHNY-0006SV-Tg
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:07:08 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50796 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1emHNY-0006S7-OC
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:07:04 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 15 Feb 2018 12:06:47 +0100
+Message-Id: <1518692807-25859-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Polish the version strings containing the
+ package version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,238 +22,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On 15.02.2018 11:38, David Hildenbrand wrote:
-> Let's add proper alignment checks for a handful of instructions that
-> require a SPECIFICATION exception in case alignment is violated.
-> 
-> Introduce new wout/in functions. As we are right now only using them for
-> privileged instructions, we have to add ugly ifdefs to silence
-> compilers.
-> 
-> Convert STORE CPU ID right away to make use of the wout function.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/insn-data.def | 16 ++++++++--------
->  target/s390x/mem_helper.c  | 25 +++++++++++++++++++++++++
->  target/s390x/translate.c   | 43 ++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 75 insertions(+), 9 deletions(-)
-> 
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 621e10d615..157619403d 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -1000,13 +1000,13 @@
->      /* ??? Not implemented - is it necessary? */
->      C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
->  /* SET CLOCK COMPARATOR */
-> -    C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
-> +    C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
->  /* SET CLOCK PROGRAMMABLE FIELD */
->      C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
->  /* SET CPU TIMER */
-> -    C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
-> +    C(0xb208, SPT,     S,     Z,   0, m2_64a, 0, 0, spt, 0)
->  /* SET PREFIX */
-> -    C(0xb210, SPX,     S,     Z,   0, m2_32u, 0, 0, spx, 0)
-> +    C(0xb210, SPX,     S,     Z,   0, m2_32ua, 0, 0, spx, 0)
->  /* SET PSW KEY FROM ADDRESS */
->      C(0xb20a, SPKA,    S,     Z,   0, a2, 0, 0, spka, 0)
->  /* SET STORAGE KEY EXTENDED */
-> @@ -1021,20 +1021,20 @@
->  /* STORE CLOCK EXTENDED */
->      C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
->  /* STORE CLOCK COMPARATOR */
-> -    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64, stckc, 0)
-> +    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0)
->  /* STORE CONTROL */
->      C(0xb600, STCTL,   RS_a,  Z,   0, a2, 0, 0, stctl, 0)
->      C(0xeb25, STCTG,   RSY_a, Z,   0, a2, 0, 0, stctg, 0)
->  /* STORE CPU ADDRESS */
-> -    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16, stap, 0)
-> +    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16a, stap, 0)
->  /* STORE CPU ID */
-> -    C(0xb202, STIDP,   S,     Z,   la2, 0, new, 0, stidp, 0)
-> +    C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64a, stidp, 0)
->  /* STORE CPU TIMER */
-> -    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
-> +    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64a, stpt, 0)
->  /* STORE FACILITY LIST */
->      C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
->  /* STORE PREFIX */
-> -    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32, stpx, 0)
-> +    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32a, stpx, 0)
->  /* STORE SYSTEM INFORMATION */
->      C(0xb27d, STSI,    S,     Z,   0, a2, 0, 0, stsi, 0)
->  /* STORE THEN AND SYSTEM MASK */
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 427b795a78..d5291b246e 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -693,6 +693,11 @@ void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->      uintptr_t ra = GETPC();
->      int i;
->  
-> +    if (a2 & 0x3) {
-> +        /* we either came here by lam or lamy, which have different lengths */
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
-> +    }
-> +
->      for (i = r1;; i = (i + 1) % 16) {
->          env->aregs[i] = cpu_ldl_data_ra(env, a2, ra);
->          a2 += 4;
-> @@ -709,6 +714,10 @@ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->      uintptr_t ra = GETPC();
->      int i;
->  
-> +    if (a2 & 0x3) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-> +    }
-> +
->      for (i = r1;; i = (i + 1) % 16) {
->          cpu_stl_data_ra(env, a2, env->aregs[i], ra);
->          a2 += 4;
-> @@ -1620,6 +1629,10 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->      uint64_t src = a2;
->      uint32_t i;
->  
-> +    if (src & 0x7) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
-> +    }
-> +
->      for (i = r1;; i = (i + 1) % 16) {
->          uint64_t val = cpu_ldq_data_ra(env, src, ra);
->          if (env->cregs[i] != val && i >= 9 && i <= 11) {
-> @@ -1650,6 +1663,10 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->      uint64_t src = a2;
->      uint32_t i;
->  
-> +    if (src & 0x3) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-> +    }
-> +
->      for (i = r1;; i = (i + 1) % 16) {
->          uint32_t val = cpu_ldl_data_ra(env, src, ra);
->          if ((uint32_t)env->cregs[i] != val && i >= 9 && i <= 11) {
-> @@ -1677,6 +1694,10 @@ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->      uint64_t dest = a2;
->      uint32_t i;
->  
-> +    if (dest & 0x7) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
-> +    }
-> +
->      for (i = r1;; i = (i + 1) % 16) {
->          cpu_stq_data_ra(env, dest, env->cregs[i], ra);
->          dest += sizeof(uint64_t);
-> @@ -1693,6 +1714,10 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->      uint64_t dest = a2;
->      uint32_t i;
->  
-> +    if (dest & 0x3) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-> +    }
-> +
->      for (i = r1;; i = (i + 1) % 16) {
->          cpu_stl_data_ra(env, dest, env->cregs[i], ra);
->          dest += sizeof(uint32_t);
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 5aea3bbca6..7d39ab350d 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -4062,7 +4062,6 @@ static ExitStatus op_stidp(DisasContext *s, DisasOps *o)
->  {
->      check_privileged(s);
->      tcg_gen_ld_i64(o->out, cpu_env, offsetof(CPUS390XState, cpuid));
-> -    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
->      return NO_EXIT;
->  }
->  
-> @@ -5220,18 +5219,42 @@ static void wout_m1_16(DisasContext *s, DisasFields *f, DisasOps *o)
->  }
->  #define SPEC_wout_m1_16 0
->  
-> +#ifndef CONFIG_USER_ONLY
-> +static void wout_m1_16a(DisasContext *s, DisasFields *f, DisasOps *o)
-> +{
-> +    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUW | MO_ALIGN);
-> +}
-> +#define SPEC_wout_m1_16a 0
-> +#endif
-> +
->  static void wout_m1_32(DisasContext *s, DisasFields *f, DisasOps *o)
->  {
->      tcg_gen_qemu_st32(o->out, o->addr1, get_mem_index(s));
->  }
->  #define SPEC_wout_m1_32 0
->  
-> +#ifndef CONFIG_USER_ONLY
-> +static void wout_m1_32a(DisasContext *s, DisasFields *f, DisasOps *o)
-> +{
-> +    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUL | MO_ALIGN);
-> +}
-> +#define SPEC_wout_m1_32a 0
-> +#endif
-> +
->  static void wout_m1_64(DisasContext *s, DisasFields *f, DisasOps *o)
->  {
->      tcg_gen_qemu_st64(o->out, o->addr1, get_mem_index(s));
->  }
->  #define SPEC_wout_m1_64 0
->  
-> +#ifndef CONFIG_USER_ONLY
-> +static void wout_m1_64a(DisasContext *s, DisasFields *f, DisasOps *o)
-> +{
-> +    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-> +}
-> +#define SPEC_wout_m1_64a 0
-> +#endif
-> +
->  static void wout_m2_32(DisasContext *s, DisasFields *f, DisasOps *o)
->  {
->      tcg_gen_qemu_st32(o->out, o->in2, get_mem_index(s));
-> @@ -5657,6 +5680,15 @@ static void in2_m2_32u(DisasContext *s, DisasFields *f, DisasOps *o)
->  }
->  #define SPEC_in2_m2_32u 0
->  
-> +#ifndef CONFIG_USER_ONLY
-> +static void in2_m2_32ua(DisasContext *s, DisasFields *f, DisasOps *o)
-> +{
-> +    in2_a2(s, f, o);
-> +    tcg_gen_qemu_ld_tl(o->in2, o->in2, get_mem_index(s), MO_TEUL | MO_ALIGN);
-> +}
-> +#define SPEC_in2_m2_32ua 0
-> +#endif
-> +
->  static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
->  {
->      in2_a2(s, f, o);
-> @@ -5664,6 +5696,15 @@ static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
->  }
->  #define SPEC_in2_m2_64 0
->  
-> +#ifndef CONFIG_USER_ONLY
-> +static void in2_m2_64a(DisasContext *s, DisasFields *f, DisasOps *o)
-> +{
-> +    in2_a2(s, f, o);
-> +    tcg_gen_qemu_ld_i64(o->in2, o->in2, get_mem_index(s), MO_TEQ | MO_ALIGN);
-> +}
-> +#define SPEC_in2_m2_64a 0
-> +#endif
-> +
->  static void in2_mri2_16u(DisasContext *s, DisasFields *f, DisasOps *o)
->  {
->      in2_ri2(s, f, o);
-> 
+Since commit 67a1de0d195a there is no space anymore between the
+version number and the parentheses when running configure with
+--with-pkgversion=foo :
 
-Conny, if there are no new comments, can you make sure to add Richard's
-r-b when applying? thanks!
+ $ qemu-system-s390x --version
+ QEMU emulator version 2.11.50(foo)
 
+But the space is included when building without that option
+when building from a git checkout:
+
+ $ qemu-system-s390x --version
+ QEMU emulator version 2.11.50 (v2.11.0-1494-gbec9c64-dirty)
+
+The same confusion exists with the "query-version" QMP command.
+Let's fix this by introducing a proper QEMU_FULL_VERSION definition
+that includes the space and parentheses, while the QEMU_PKGVERSION
+should just cleanly contain the package version string itself.
+Note that this also changes the behavior of the "query-version" QMP
+command (the space and parentheses are not included there anymore),
+but that's supposed to be OK since the strings there are not meant
+to be parsed by other tools.
+
+Fixes: 67a1de0d195a6185c39b436159c9ffc7720bf979
+Buglink: https://bugs.launchpad.net/qemu/+bug/1673373
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Makefile              | 20 +++++++++++---------
+ bsd-user/main.c       |  2 +-
+ configure             |  2 +-
+ linux-user/main.c     |  2 +-
+ qemu-img.c            |  2 +-
+ qemu-io.c             |  2 +-
+ qemu-nbd.c            |  2 +-
+ qga/main.c            |  2 +-
+ scsi/qemu-pr-helper.c |  2 +-
+ ui/cocoa.m            |  2 +-
+ vl.c                  |  2 +-
+ 11 files changed, 21 insertions(+), 19 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b5a6d60..e6afe5c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -367,21 +367,23 @@ all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
+ qemu-version.h: FORCE
+ 	$(call quiet-command, \
+ 		(cd $(SRC_PATH); \
+-		printf '#define QEMU_PKGVERSION '; \
+ 		if test -n "$(PKGVERSION)"; then \
+-			printf '"$(PKGVERSION)"\n'; \
++			pkgvers="$(PKGVERSION)"; \
+ 		else \
+ 			if test -d .git; then \
+-				printf '" ('; \
+-				git describe --match 'v*' 2>/dev/null | tr -d '\n'; \
++				pkgvers=$$(git describe --match 'v*' 2>/dev/null | tr -d '\n');\
+ 				if ! git diff-index --quiet HEAD &>/dev/null; then \
+-					printf -- '-dirty'; \
++					pkgvers="$${pkgvers}-dirty"; \
+ 				fi; \
+-				printf ')"\n'; \
+-			else \
+-				printf '""\n'; \
+ 			fi; \
+-		fi) > $@.tmp)
++		fi; \
++		printf "#define QEMU_PKGVERSION \"$${pkgvers}\"\n"; \
++		if test -n "$${pkgvers}"; then \
++			printf '#define QEMU_FULL_VERSION QEMU_VERSION " (" QEMU_PKGVERSION ")"\n'; \
++		else \
++			printf '#define QEMU_FULL_VERSION QEMU_VERSION\n'; \
++		fi; \
++		) > $@.tmp)
+ 	$(call quiet-command, if ! cmp -s $@ $@.tmp; then \
+ 	  mv $@.tmp $@; \
+ 	 else \
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index efef5ff..05aa559 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -649,7 +649,7 @@ void cpu_loop(CPUSPARCState *env)
+ 
+ static void usage(void)
+ {
+-    printf("qemu-" TARGET_NAME " version " QEMU_VERSION QEMU_PKGVERSION
++    printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
+            "\n" QEMU_COPYRIGHT "\n"
+            "usage: qemu-" TARGET_NAME " [options] program [arguments...]\n"
+            "BSD CPU emulator (compiled for %s emulation)\n"
+diff --git a/configure b/configure
+index 913e148..5be086a 100755
+--- a/configure
++++ b/configure
+@@ -1160,7 +1160,7 @@ for opt do
+   ;;
+   --disable-blobs) blobs="no"
+   ;;
+-  --with-pkgversion=*) pkgversion=" ($optarg)"
++  --with-pkgversion=*) pkgversion="$optarg"
+   ;;
+   --with-coroutine=*) coroutine="$optarg"
+   ;;
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 7de0e02..dfd4c98 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4068,7 +4068,7 @@ static void handle_arg_strace(const char *arg)
+ 
+ static void handle_arg_version(const char *arg)
+ {
+-    printf("qemu-" TARGET_NAME " version " QEMU_VERSION QEMU_PKGVERSION
++    printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
+            "\n" QEMU_COPYRIGHT "\n");
+     exit(EXIT_SUCCESS);
+ }
+diff --git a/qemu-img.c b/qemu-img.c
+index 56edc15..e56a15d 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -46,7 +46,7 @@
+ #include "crypto/init.h"
+ #include "trace/control.h"
+ 
+-#define QEMU_IMG_VERSION "qemu-img version " QEMU_VERSION QEMU_PKGVERSION \
++#define QEMU_IMG_VERSION "qemu-img version " QEMU_FULL_VERSION \
+                           "\n" QEMU_COPYRIGHT "\n"
+ 
+ typedef struct img_cmd_t {
+diff --git a/qemu-io.c b/qemu-io.c
+index f554ab6..b0efa96 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -534,7 +534,7 @@ int main(int argc, char **argv)
+             trace_file = trace_opt_parse(optarg);
+             break;
+         case 'V':
+-            printf("%s version " QEMU_VERSION QEMU_PKGVERSION "\n"
++            printf("%s version " QEMU_FULL_VERSION "\n"
+                    QEMU_COPYRIGHT "\n", progname);
+             exit(0);
+         case 'h':
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index ed5d9b5..0af0560 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -130,7 +130,7 @@ QEMU_HELP_BOTTOM "\n"
+ static void version(const char *name)
+ {
+     printf(
+-"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
++"%s " QEMU_FULL_VERSION "\n"
+ "Written by Anthony Liguori.\n"
+ "\n"
+ QEMU_COPYRIGHT "\n"
+diff --git a/qga/main.c b/qga/main.c
+index cb434d8..a877b30 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -218,7 +218,7 @@ static void usage(const char *cmd)
+ {
+     printf(
+ "Usage: %s [-m <method> -p <path>] [<options>]\n"
+-"QEMU Guest Agent " QEMU_VERSION QEMU_PKGVERSION "\n"
++"QEMU Guest Agent " QEMU_FULL_VERSION "\n"
+ QEMU_COPYRIGHT "\n"
+ "\n"
+ "  -m, --method      transport method: one of unix-listen, virtio-serial,\n"
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index 9fe615c..3facbba 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -102,7 +102,7 @@ QEMU_HELP_BOTTOM "\n"
+ static void version(const char *name)
+ {
+     printf(
+-"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
++"%s " QEMU_FULL_VERSION "\n"
+ "Written by Paolo Bonzini.\n"
+ "\n"
+ QEMU_COPYRIGHT "\n"
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 51db47c..a9e173a 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -1330,7 +1330,7 @@ QemuCocoaView *cocoaView;
+     /* Create the version string*/
+     NSString *version_string;
+     version_string = [[NSString alloc] initWithFormat:
+-    @"QEMU emulator version %s%s", QEMU_VERSION, QEMU_PKGVERSION];
++    @"QEMU emulator version %s", QEMU_FULL_VERSION];
+     [version_label setStringValue: version_string];
+     [superView addSubview: version_label];
+ 
+diff --git a/vl.c b/vl.c
+index 2187849..6740c27 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1942,7 +1942,7 @@ static void main_loop(void)
+ 
+ static void version(void)
+ {
+-    printf("QEMU emulator version " QEMU_VERSION QEMU_PKGVERSION "\n"
++    printf("QEMU emulator version " QEMU_FULL_VERSION "\n"
+            QEMU_COPYRIGHT "\n");
+ }
+ 
 -- 
-
-Thanks,
-
-David / dhildenb
+1.8.3.1
