@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emKOD-0004vQ-Q0
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:20:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1emKOK-00051C-PM
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:20:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emKO9-00072n-Pi
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:19:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41616)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1emKO9-00072D-Iz
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:19:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1emKO8-0004fU-9d
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:19:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3EDFC2E80CB
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:19:52 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1emKOG-00075P-Pe
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:20:04 -0500
+References: <1518690027-31318-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518690027-31318-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3b41b0f0-09cf-9e43-bfa4-617335d76584@redhat.com>
+Date: Thu, 15 Feb 2018 08:19:57 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Feb 2018 14:05:31 -0000
-From: sl1pkn07 <sl1pkn07@gmail.com>
-Reply-To: Bug 1589272 <1589272@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160605160649.12221.85115.malonedeb@soybean.canonical.com>
-Message-Id: <151870353162.8759.10302869694392654548.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1589272] Re: qemu-system-x86_64: There is no
- option group 'vnc'
+In-Reply-To: <1518690027-31318-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv3 2/4] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,115 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-This is fixed long time ago
+On 02/15/2018 04:20 AM, Viktor Mihajlovski wrote:
+> From: Luiz Capitulino <lcapitulino@redhat.com>
+> 
+> The query-cpus command has an extremely serious side effect:
+> it always interrupts all running vCPUs so that they can run
+> ioctl calls. This can cause a huge performance degradation for
+> some workloads. And most of the information retrieved by the
+> ioctl calls are not even used by query-cpus.
+> 
+> This commit introduces a replacement for query-cpus called
+> query-cpus-fast, which has the following features:
+> 
+>   o Never interrupt vCPUs threads. query-cpus-fast only returns
+>     vCPU information maintained by QEMU itself, which should be
+>     sufficient for most management software needs
+> 
+>   o Drop "halted" field as it can not retrieved in a fast
 
-Greetings
+s/can not retrieved/cannot be retrieved/
 
--- =
+>     way on most architectures
+> 
+>   o Drop irrelevant fields such as "current", "pc" and "arch"
+> 
+>   o Rename some fields for better clarification & proper naming
+>     standard
+> 
+> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Acked-by: Eric Blake <eblake@redhat.com>
+> ---
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1589272
+> +++ b/hmp-commands-info.hx
+> @@ -160,6 +160,20 @@ Show infos for each CPU.
 
-Title:
-  qemu-system-x86_64: There is no option group 'vnc'
+Pre-existing, but while we are here, it wouldn't hurt to do 
+s/infos/information/
 
-Status in QEMU:
-  Incomplete
+>   ETEXI
+>   
+>       {
+> +        .name       = "cpus_fast",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show information for each CPU without interrupting them",
+> +        .cmd        = hmp_info_cpus_fast,
+> +    },
+> +
+> +STEXI
+> +@item info cpus_fast
+> +@findex info cpus_fast
+> +Show infos for each CPU without performance penalty.
 
-Bug description:
-  build qemu from git (6b3532b20b787cbd697a68b383232f5c3b39bd1e)
+and again here, where you copied and pasted.
 
-  with this options:
+You know, we have no back-compat guarantees on HMP.  We could make 'info 
+cpu' just ALWAYS call query-cpus-fast, with no HMP counterpart for the 
+slower query-cpus, and without needing a deprecation period.  But I'll 
+leave that up to David if that makes more sense.
 
-  ./configure \
-      --python=3D/usr/bin/python2 \
-      --prefix=3D/usr \
-      --sysconfdir=3D/etc \
-      --localstatedir=3D/var \
-      --libexecdir=3D/usr/lib/qemu \
-      --target-list=3Di386-softmmu,x86_64-softmmu,i386-linux-user,x86_64-li=
-nux-user \
-      --audio-drv-list=3D'pa alsa' \
-      --enable-linux-aio \
-      --enable-seccomp \
-      --enable-tpm \
-      --enable-modules \
-      --disable-sdl \
-      --disable-gtk \
-      --disable-spice \
-      --disable-rbd \
-      --disable-libiscsi \
-      --disable-libnfs \
-      --disable-smartcard \
-      --disable-glusterfs \
-      --disable-docs \
-      --disable-vnc{,-sasl,-jpeg,-png} \
-      --disable-guest-agent
+> +++ b/hmp.c
+> @@ -410,6 +410,20 @@ void hmp_info_cpus(Monitor *mon, const QDict *qdict)
+>       qapi_free_CpuInfoList(cpu_list);
+>   }
+>   
+> +void hmp_info_cpus_fast(Monitor *mon, const QDict *qdict)
+> +{
+> +    CpuInfoFastList *head, *cpu;
+> +
+> +    head = qmp_query_cpus_fast(NULL);
+> +
+> +    for (cpu = head; cpu; cpu = cpu->next) {
+> +        monitor_printf(mon, "  CPU #%" PRId64 ":", cpu->value->cpu_index);
+> +        monitor_printf(mon, " thread-id=%" PRId64 "\n", cpu->value->thread_id);
+> +    }
 
-  i get:
+This is particularly true since your HMP implementation is not even 
+printing all the information returned by query-cpus-fast!
 
-  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=95=BC  qemu-system-x86_64
-  qemu-system-x86_64: There is no option group 'vnc'
-  Segment Fault (core dumped)
-
-  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=95=BC  coredumpctl info 12932
-             PID: 12932 (qemu-system-x86)
-             UID: 1000 (sl1pkn07)
-             GID: 100 (users)
-          Signal: 11 (SEGV)
-       Timestamp: dom 2016-06-05 18:05:51 CEST (17s ago)
-    Command Line: qemu-system-x86_64
-      Executable: /usr/bin/qemu-system-x86_64
-   Control Group: /user.slice/user-1000.slice/session-c1.scope
-            Unit: session-c1.scope
-           Slice: user-1000.slice
-         Session: c1
-       Owner UID: 1000 (sl1pkn07)
-         Boot ID: 5b205159fa6b4c25946fad7087bd366f
-      Machine ID: c20ee0c57658685bfedf50384b0e3ec0
-        Hostname: sL1pKn07
-        Coredump: /var/lib/systemd/coredump/core.qemu-system-x86.1000.5b205=
-159fa6b4c25946fad7087bd366f.12932.1465142751000000000000.lz4
-         Message: Process 12932 (qemu-system-x86) of user 1000 dumped core.
-                  =
-
-                  Stack trace of thread 12932:
-                  #0  0x000055b269c2e245 qemu_opts_foreach (qemu-system-x86=
-_64)
-                  #1  0x000055b2698fb6b5 main (qemu-system-x86_64)
-                  #2  0x00007fafc4e5a741 __libc_start_main (libc.so.6)
-                  #3  0x000055b269900eb9 _start (qemu-system-x86_64)
-                  =
-
-                  Stack trace of thread 12934:
-                  #0  0x00007fafc51e80af pthread_cond_wait@@GLIBC_2.3.2 (li=
-bpthread.so.0)
-                  #1  0x000055b269c21b19 qemu_cond_wait (qemu-system-x86_64)
-                  #2  0x000055b26992bff4 qemu_tcg_cpu_thread_fn (qemu-syste=
-m-x86_64)
-                  #3  0x00007fafc51e2484 start_thread (libpthread.so.0)
-                  #4  0x00007fafc4f216dd __clone (libc.so.6)
-                  =
-
-                  Stack trace of thread 12933:
-                  #0  0x00007fafc51eaebc __lll_lock_wait (libpthread.so.0)
-                  #1  0x00007fafc51e4b45 pthread_mutex_lock (libpthread.so.=
-0)
-                  #2  0x000055b269c21a39 qemu_mutex_lock (qemu-system-x86_6=
-4)
-                  #3  0x000055b26992bf51 qemu_mutex_lock_iothread (qemu-sys=
-tem-x86_64)
-                  #4  0x000055b269c30430 call_rcu_thread (qemu-system-x86_6=
-4)
-                  #5  0x00007fafc51e2484 start_thread (libpthread.so.0)
-                  #6  0x00007fafc4f216dd __clone (libc.so.6)
-
-  builded with GCC 6.1.1
-
-  greetings
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1589272/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
