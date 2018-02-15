@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1emLEh-00035d-Bg
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:14:14 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emLFD-0003SQ-IA
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:14:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1emLEg-0001NQ-Er
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:14:11 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1518664462-2960-1-git-send-email-cota@braap.org>
-	<1518664462-2960-3-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <8d09f7ec-c8de-d9fb-21c3-925e1c1a4247@twiddle.net>
-Date: Thu, 15 Feb 2018 07:13:48 -0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emLFA-0001YM-DA
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:14:43 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:46760)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emLFA-0001YE-7u
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:14:40 -0500
+Received: by mail-qk0-x243.google.com with SMTP id g129so16735787qkb.13
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 07:14:40 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180215042900.16078-1-f4bug@amsat.org>
+	<20180215042900.16078-16-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0498fd1e-c98c-f40e-bf8d-553bf3884b63@amsat.org>
+Date: Thu, 15 Feb 2018 12:14:36 -0300
 MIME-Version: 1.0
-In-Reply-To: <1518664462-2960-3-git-send-email-cota@braap.org>
+In-Reply-To: <20180215042900.16078-16-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] target/ppc: convert to DisasContextBase
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 15/30] hw/lm32: use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,26 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Michael Walle <michael@walle.cc>
 
-On 02/14/2018 07:14 PM, Emilio G. Cota wrote:
-> A couple of notes:
-> 
-> - removed ctx->nip in favour of base->pc_next. Yes, it is annoying,
->   but didn't want to waste its 4 bytes.
-> 
-> - ctx->singlestep_enabled does a lot more than
->   base.singlestep_enabled; this confused me at first.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+On 02/15/2018 01:28 AM, Philippe Mathieu-Daudé wrote:
+> It ease code review, unit is explicit.
+
+Forgot to add:
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  target/ppc/translate.c              | 129 +++++++++++++++++++-----------------
->  target/ppc/translate/dfp-impl.inc.c |  16 ++---
->  target/ppc/translate_init.c         |  32 ++++-----
->  3 files changed, 91 insertions(+), 86 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+>  hw/lm32/lm32_boards.c | 12 ++++++------
+>  hw/lm32/milkymist.c   |  8 ++++----
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+> index 527bcc229c..15315101be 100644
+> --- a/hw/lm32/lm32_boards.c
+> +++ b/hw/lm32/lm32_boards.c
+> @@ -88,10 +88,10 @@ static void lm32_evr_init(MachineState *machine)
+>  
+>      /* memory map */
+>      hwaddr flash_base  = 0x04000000;
+> -    size_t flash_sector_size       = 256 * 1024;
+> -    size_t flash_size              = 32 * 1024 * 1024;
+> +    size_t flash_sector_size       = 256 * K_BYTE;
+> +    size_t flash_size              = 32 * M_BYTE;
+>      hwaddr ram_base    = 0x08000000;
+> -    size_t ram_size                = 64 * 1024 * 1024;
+> +    size_t ram_size                = 64 * M_BYTE;
+>      hwaddr timer0_base = 0x80002000;
+>      hwaddr uart0_base  = 0x80006000;
+>      hwaddr timer1_base = 0x8000a000;
+> @@ -174,10 +174,10 @@ static void lm32_uclinux_init(MachineState *machine)
+>  
+>      /* memory map */
+>      hwaddr flash_base   = 0x04000000;
+> -    size_t flash_sector_size        = 256 * 1024;
+> -    size_t flash_size               = 32 * 1024 * 1024;
+> +    size_t flash_sector_size        = 256 * K_BYTE;
+> +    size_t flash_size               = 32 * M_BYTE;
+>      hwaddr ram_base     = 0x08000000;
+> -    size_t ram_size                 = 64 * 1024 * 1024;
+> +    size_t ram_size                 = 64 * M_BYTE;
+>      hwaddr uart0_base   = 0x80000000;
+>      hwaddr timer0_base  = 0x80002000;
+>      hwaddr timer1_base  = 0x80010000;
+> diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+> index c28379399f..b884b825bc 100644
+> --- a/hw/lm32/milkymist.c
+> +++ b/hw/lm32/milkymist.c
+> @@ -36,7 +36,7 @@
+>  
+>  #define BIOS_FILENAME    "mmone-bios.bin"
+>  #define BIOS_OFFSET      0x00860000
+> -#define BIOS_SIZE        (512*1024)
+> +#define BIOS_SIZE        (512 * K_BYTE)
+>  #define KERNEL_LOAD_ADDR 0x40000000
+>  
+>  typedef struct {
+> @@ -95,10 +95,10 @@ milkymist_init(MachineState *machine)
+>  
+>      /* memory map */
+>      hwaddr flash_base   = 0x00000000;
+> -    size_t flash_sector_size        = 128 * 1024;
+> -    size_t flash_size               = 32 * 1024 * 1024;
+> +    size_t flash_sector_size        = 128 * K_BYTE;
+> +    size_t flash_size               = 32 * M_BYTE;
+>      hwaddr sdram_base   = 0x40000000;
+> -    size_t sdram_size               = 128 * 1024 * 1024;
+> +    size_t sdram_size               = 128 * M_BYTE;
+>  
+>      hwaddr initrd_base  = sdram_base + 0x1002000;
+>      hwaddr cmdline_base = sdram_base + 0x1000000;
+> 
