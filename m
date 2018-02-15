@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1emKNu-0004Qf-Qg
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:19:39 -0500
+	(envelope-from <bounces@canonical.com>) id 1emKOD-0004vQ-Q0
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:20:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1emKNq-0006u7-Rv
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:19:38 -0500
-References: <20180214173102.9363-1-david@redhat.com>
-	<a3b2029e-a092-e7f7-8953-12d59b874736@twiddle.net>
-	<4c8b5c14-bef0-ef8a-1237-5146c3ee37b1@redhat.com>
-	<20180215104953.1fa574ba.cohuck@redhat.com>
-	<3145074e-025a-d1a0-8446-6e62010b970f@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <a208690f-6ab6-f2dd-f07e-620112420e32@redhat.com>
-Date: Thu, 15 Feb 2018 15:19:16 +0100
+	(envelope-from <bounces@canonical.com>) id 1emKO9-00072n-Pi
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:19:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1emKO9-00072D-Iz
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 09:19:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1emKO8-0004fU-9d
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:19:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3EDFC2E80CB
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:19:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <3145074e-025a-d1a0-8446-6e62010b970f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] s390x/tcg: add various
- alignment check
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Feb 2018 14:05:31 -0000
+From: sl1pkn07 <sl1pkn07@gmail.com>
+Reply-To: Bug 1589272 <1589272@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160605160649.12221.85115.malonedeb@soybean.canonical.com>
+Message-Id: <151870353162.8759.10302869694392654548.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1589272] Re: qemu-system-x86_64: There is no
+ option group 'vnc'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +37,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 15.02.2018 15:13, Eric Blake wrote:
-> On 02/15/2018 03:49 AM, Cornelia Huck wrote:
->> On Thu, 15 Feb 2018 10:47:45 +0100
->> David Hildenbrand <david@redhat.com> wrote:
->>
->>> On 14.02.2018 20:04, Richard Henderson wrote:
->>>> On 02/14/2018 09:31 AM, David Hildenbrand wrote:
->>>>> Let's add proper alignment checks for a handful of instructions that
->>>>> require a SPECIFICATION exception in case alignment is violated.
->>>>>
->>>>> Introduce new wout/in functions. Declare them as "static inline" to avoid
->>>>> warnings about not being used for CONFIG_USER_ONLY (as we are right
->>>>> now only using them for privileged instructions).
->>>>
->>>> Annoyingly, clang will still warn for this.
->>>>    
->>>
->>> Hm, so the only solution is to add nasty idfefs then :(
->>
->> Yup, very annoying indeed, but probably the only way to shut clang up...
-> 
-> Does marking the function __attribute__((unused)) shut up clang?
-> 
+This is fixed long time ago
 
-Guess so, seems to be used in tcg/tcg.c. But I don't think that's a
-major improvement, as these warnings can actually point you at bugs.
+Greetings
 
--- 
+-- =
 
-Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1589272
 
-David / dhildenb
+Title:
+  qemu-system-x86_64: There is no option group 'vnc'
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  build qemu from git (6b3532b20b787cbd697a68b383232f5c3b39bd1e)
+
+  with this options:
+
+  ./configure \
+      --python=3D/usr/bin/python2 \
+      --prefix=3D/usr \
+      --sysconfdir=3D/etc \
+      --localstatedir=3D/var \
+      --libexecdir=3D/usr/lib/qemu \
+      --target-list=3Di386-softmmu,x86_64-softmmu,i386-linux-user,x86_64-li=
+nux-user \
+      --audio-drv-list=3D'pa alsa' \
+      --enable-linux-aio \
+      --enable-seccomp \
+      --enable-tpm \
+      --enable-modules \
+      --disable-sdl \
+      --disable-gtk \
+      --disable-spice \
+      --disable-rbd \
+      --disable-libiscsi \
+      --disable-libnfs \
+      --disable-smartcard \
+      --disable-glusterfs \
+      --disable-docs \
+      --disable-vnc{,-sasl,-jpeg,-png} \
+      --disable-guest-agent
+
+  i get:
+
+  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=95=BC  qemu-system-x86_64
+  qemu-system-x86_64: There is no option group 'vnc'
+  Segment Fault (core dumped)
+
+  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=95=BC  coredumpctl info 12932
+             PID: 12932 (qemu-system-x86)
+             UID: 1000 (sl1pkn07)
+             GID: 100 (users)
+          Signal: 11 (SEGV)
+       Timestamp: dom 2016-06-05 18:05:51 CEST (17s ago)
+    Command Line: qemu-system-x86_64
+      Executable: /usr/bin/qemu-system-x86_64
+   Control Group: /user.slice/user-1000.slice/session-c1.scope
+            Unit: session-c1.scope
+           Slice: user-1000.slice
+         Session: c1
+       Owner UID: 1000 (sl1pkn07)
+         Boot ID: 5b205159fa6b4c25946fad7087bd366f
+      Machine ID: c20ee0c57658685bfedf50384b0e3ec0
+        Hostname: sL1pKn07
+        Coredump: /var/lib/systemd/coredump/core.qemu-system-x86.1000.5b205=
+159fa6b4c25946fad7087bd366f.12932.1465142751000000000000.lz4
+         Message: Process 12932 (qemu-system-x86) of user 1000 dumped core.
+                  =
+
+                  Stack trace of thread 12932:
+                  #0  0x000055b269c2e245 qemu_opts_foreach (qemu-system-x86=
+_64)
+                  #1  0x000055b2698fb6b5 main (qemu-system-x86_64)
+                  #2  0x00007fafc4e5a741 __libc_start_main (libc.so.6)
+                  #3  0x000055b269900eb9 _start (qemu-system-x86_64)
+                  =
+
+                  Stack trace of thread 12934:
+                  #0  0x00007fafc51e80af pthread_cond_wait@@GLIBC_2.3.2 (li=
+bpthread.so.0)
+                  #1  0x000055b269c21b19 qemu_cond_wait (qemu-system-x86_64)
+                  #2  0x000055b26992bff4 qemu_tcg_cpu_thread_fn (qemu-syste=
+m-x86_64)
+                  #3  0x00007fafc51e2484 start_thread (libpthread.so.0)
+                  #4  0x00007fafc4f216dd __clone (libc.so.6)
+                  =
+
+                  Stack trace of thread 12933:
+                  #0  0x00007fafc51eaebc __lll_lock_wait (libpthread.so.0)
+                  #1  0x00007fafc51e4b45 pthread_mutex_lock (libpthread.so.=
+0)
+                  #2  0x000055b269c21a39 qemu_mutex_lock (qemu-system-x86_6=
+4)
+                  #3  0x000055b26992bf51 qemu_mutex_lock_iothread (qemu-sys=
+tem-x86_64)
+                  #4  0x000055b269c30430 call_rcu_thread (qemu-system-x86_6=
+4)
+                  #5  0x00007fafc51e2484 start_thread (libpthread.so.0)
+                  #6  0x00007fafc4f216dd __clone (libc.so.6)
+
+  builded with GCC 6.1.1
+
+  greetings
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1589272/+subscriptions
