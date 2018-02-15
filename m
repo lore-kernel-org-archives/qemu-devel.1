@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emGkG-0003pC-LZ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:26:29 -0500
+	(envelope-from <stefanha@gmail.com>) id 1emGop-00071z-2F
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:31:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emGkC-0003pt-Ne
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:26:28 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52744 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emGkC-0003op-JM
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:26:24 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 00845818B10B
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 10:26:14 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 15 Feb 2018 10:26:02 +0000
-Message-Id: <20180215102602.10864-1-berrange@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1emGoj-0005zd-5J
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:31:11 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:33266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1emGoi-0005xC-WD
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:31:05 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id s5so2823663wra.0
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 02:31:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] vnc: remove bogus object_unref on client socket
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 15 Feb 2018 10:31:02 +0000
+Message-ID: <CAJSP0QUzvNDGV9CNA6-HxPY5eCcEO6Me4E0+NvuSfpD2szb0hw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] GSoC project idea: iSCSI target in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, ronnie sahlberg <ronniesahlberg@gmail.com>
 
-vnc_listen_io() does not own the reference on the 'cioc' parameter is it
-passed, so should not be unref'ing it.
+There is currently no way to test the block/iscsi.c block driver.
+Using a third-party iSCSI target isn't sufficient since we need fault
+injection and control over I/O request execution in order to exercise
+specific code paths in the initiator.
 
-Reported-by: Bandan Das <bsd@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- ui/vnc.c | 1 -
- 1 file changed, 1 deletion(-)
+Are you willing to co-mentor a Google Summer of Code project to
+implement an iSCSI target in QEMU?
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index c715bae1cf..b97769aa9e 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3152,7 +3152,6 @@ static void vnc_listen_io(QIONetListener *listener,
-                          isWebsock ? "vnc-ws-server" : "vnc-server");
-     qio_channel_set_delay(QIO_CHANNEL(cioc), false);
-     vnc_connect(vd, cioc, false, isWebsock);
--    object_unref(OBJECT(cioc));
- }
-=20
- static const DisplayChangeListenerOps dcl_ops =3D {
---=20
-2.14.3
+There are two goals:
+1. Runtime iSCSI target QMP commands to start/stop and add/remove LUNs.
+2. qemu-iscsi wrapper program for easy command-line launching.
+
+I think iSCSI target functionality will be useful beyond testing.  It
+will make it possible to attach disk images to physical machines or
+VMs using a widely implemented protocol.
+
+QEMU already has blkdebug for fault injection and a SCSI target.
+We're just missing the iSCSI wire protocol that wraps SCSI CDBs.  The
+basic idea is to implement a runtime iSCSI server (similar to the NBD
+server) that speaks the iSCSI protocol and passes SCSI requests to
+QEMU's SCSI target.
+
+I briefly looked at include/hw/scsi/scsi.h to check if this is
+feasible.  It looks like it's possible to instantiate a SCSIBus
+without a parent DeviceState.  The SCSI target is tied to device
+emulation since every LUN is a SCSIDevice and it's also tied to live
+migration.  But I don't think these things prevent iSCSI from reusing
+this code.
+
+The next step is to look at the iSCSI RFC to determine how feasible
+this would be:
+https://tools.ietf.org/html/rfc7143
+
+Stefan
