@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1emLe4-00040y-Vq
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:29 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1emLe8-000427-UF
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1emLe3-0003Kw-S3
+	(envelope-from <brijesh.singh@amd.com>) id 1emLe4-0003LH-QF
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:28 -0500
+Received: from mail-bn3nam01on0077.outbound.protection.outlook.com
+	([104.47.33.77]:10752
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1emLe4-0003Kg-8G
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:24 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:38468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1emLe3-0003Kj-HG
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:23 -0500
-Received: by mail-wr0-x235.google.com with SMTP id n7so81770wrn.5
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 07:40:23 -0800 (PST)
+From: Brijesh Singh <brijesh.singh@amd.com>
+Date: Thu, 15 Feb 2018 09:39:27 -0600
+Message-Id: <20180215153955.3253-2-brijesh.singh@amd.com>
+In-Reply-To: <20180215153955.3253-1-brijesh.singh@amd.com>
+References: <20180215153955.3253-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20180215042900.16078-29-f4bug@amsat.org>
-References: <20180215042900.16078-1-f4bug@amsat.org>
-	<20180215042900.16078-29-f4bug@amsat.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 15 Feb 2018 16:40:21 +0100
-Message-ID: <CAJ+F1CJnMqqFoDXV_qhamWfx8eq17MvWQ6xa2nmdXyCRaHDH4A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 28/30] ivshmem: use the BYTE-based
- definitions
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v9 01/29] memattrs: add debug attribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-On Thu, Feb 15, 2018 at 5:28 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> It ease code review, unit is explicit.
+Extend the MemTxAttrs to include 'debug' flag. The flag can be used as
+general indicator that operation was triggered by the debugger.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Later in the patch series we set the debug=1 when issuing a memory access
+from the gdbstub or HMP commands. This patch is prerequisite to support
+debugging the encrypted guest. If we see request with debug=1 then we
+will need to use encryption APIs to access the guest memory.
 
+Cc: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ include/exec/memattrs.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> ---
->  hw/misc/ivshmem.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> index 16f03701b7..9b3ad96471 100644
-> --- a/hw/misc/ivshmem.c
-> +++ b/hw/misc/ivshmem.c
-> @@ -1302,7 +1302,7 @@ static void ivshmem_realize(PCIDevice *dev, Error *=
-*errp)
->      }
->
->      if (s->sizearg =3D=3D NULL) {
-> -        s->legacy_size =3D 4 << 20; /* 4 MB default */
-> +        s->legacy_size =3D 4 * M_BYTE; /* 4 MB default */
->      } else {
->          int ret;
->          uint64_t size;
-> --
-> 2.16.1
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+index d4a16420984b..08099e4f7e72 100644
+--- a/include/exec/memattrs.h
++++ b/include/exec/memattrs.h
+@@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
+     unsigned int user:1;
+     /* Requester ID (for MSI for example) */
+     unsigned int requester_id:16;
++    /* Memory access request from the debugger */
++    unsigned int debug:1;
+ } MemTxAttrs;
+ 
+ /* Bus masters which don't specify any attributes will get this,
+-- 
+2.14.3
