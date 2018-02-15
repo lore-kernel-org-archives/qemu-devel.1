@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLf5-0004zi-TS
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1emLj7-0000Ae-AK
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:45:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLf0-0003hw-7X
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:27 -0500
-Received: from mail-cys01nam02on0064.outbound.protection.outlook.com
-	([104.47.37.64]:45466
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1emLez-0003hH-W6
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:22 -0500
-From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu, 15 Feb 2018 09:39:55 -0600
-Message-Id: <20180215153955.3253-30-brijesh.singh@amd.com>
-In-Reply-To: <20180215153955.3253-1-brijesh.singh@amd.com>
-References: <20180215153955.3253-1-brijesh.singh@amd.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1emLj6-0005hk-Io
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:45:37 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:35186)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1emLj6-0005hZ-CY
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:45:36 -0500
+Received: by mail-ot0-x244.google.com with SMTP id a2so92345otf.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 07:45:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 29/29] cpu/i386: populate CPUID 0x8000_001F
- when SEV is active
+In-Reply-To: <20180214153938.5410-1-dgilbert@redhat.com>
+References: <20180214153938.5410-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 15:45:14 +0000
+Message-ID: <CAFEAcA_dzzcxKVyoNm_wsSJmqsLj0=cKESW6HwYWsdZwMHx_Ug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/10] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Greg Kurz <groug@kaod.org>, Ross Lagerwall <ross.lagerwall@citrix.com>
 
-When SEV is enabled, CPUID 0x8000_001F should provide additional
-information regarding the feature (such as which page table bit is used
-to mark the pages as encrypted etc).
+On 14 February 2018 at 15:39, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit bec9c64ef7be8063f1192608b83877bc5c9ea217:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-02-13 18:24:08 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20180214a
+>
+> for you to fetch changes up to 3e0c8050ebba3f55dc2d92b3790a3cfb80786d07:
+>
+>   migration: pass MigrationState to migrate_init() (2018-02-14 10:37:09 +0000)
+>
+> ----------------------------------------------------------------
+> Migration pull 20180214
+>
+> Note that the 'Add test for migration to bad destination' displays
+> a 'Connection refused' during running, but still gives the correct exit
+> code and OK (It's checking that the source doesn't fail when
+> it can't connect, so that's the right error).
+> If it's particularly disliked that patch can be skipped individually.
+>
+> ----------------------------------------------------------------
 
-The details for memory encryption CPUID is available in AMD APM
-(https://support.amd.com/TechDocs/24594.pdf) Section E.4.17
+Hi. This fails 'make check' on aarch64 host:
+QTEST_QEMU_BINARY=hppa-softmmu/qemu-system-hppa
+QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((
+${RANDOM
+:-0} % 255 + 1))} gtester -k --verbose -m=quick tests/boot-serial-test
+tests/qmp-test tests/device-introspect-test test
+s/qom-test tests/test-hmp
+TEST: tests/boot-serial-test... (pid=2306)
+  /hppa/boot-serial/hppa:                                              **
+ERROR:/home/pm215/qemu/tests/boot-serial-test.c:137:check_guest_output:
+assertion failed: (output_ok)
+FAIL
+GTester: last random seed: R02S43359b02a322915508b897be44a0e9c6
+(pid=7220)
+FAIL: tests/boot-serial-test
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- target/i386/cpu.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b5e431e769da..6b8284ef9d7c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -25,6 +25,7 @@
- #include "sysemu/kvm.h"
- #include "sysemu/hvf.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/sev.h"
- #include "kvm_i386.h"
- 
- #include "qemu/error-report.h"
-@@ -3612,6 +3613,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         *ecx = 0;
-         *edx = 0;
-         break;
-+    case 0x8000001F:
-+        *eax = sev_enabled() ? 0x2 : 0;
-+        *ebx = sev_get_cbit_position();
-+        *ebx |= sev_get_reduced_phys_bits() << 6;
-+        *ecx = 0;
-+        *edx = 0;
-+        break;
-     default:
-         /* reserved values: zero */
-         *eax = 0;
-@@ -4041,6 +4049,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
-         }
-+
-+        /* SEV requires CPUID[0x8000001F] */
-+        if (sev_enabled()) {
-+            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
-+        }
-     }
- 
-     /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
--- 
-2.14.3
+thanks
+-- PMM
