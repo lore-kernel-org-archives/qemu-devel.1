@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emN1Q-0006aQ-17
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:08:36 -0500
+	(envelope-from <groug@kaod.org>) id 1emN2X-0007XA-Mc
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emN1L-0002Yr-Rs
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:08:35 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58148 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1emN2T-0003J7-G8
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:09:45 -0500
+Received: from 14.mo4.mail-out.ovh.net ([46.105.40.29]:59822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emN1L-0002YZ-Mx
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:08:31 -0500
-Date: Thu, 15 Feb 2018 18:08:12 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180215180812.70dd05f4@redhat.com>
-In-Reply-To: <CAFEAcA-AfiDp5Y1MiveFHCZgTKgLPb3Qzu=RdhzNaD0yE4XscA@mail.gmail.com>
-References: <cover.1517532021.git.alistair.francis@xilinx.com>
-	<fa1d4990d897f61dd748ad7f10f6b88435e6cb46.1517532021.git.alistair.francis@xilinx.com>
-	<CAFEAcA_T4S8kU5GtatL+1Uos2oqBuYH-=GqhEWm=y3q4TmF+-w@mail.gmail.com>
-	<422117c4-4d0b-5db8-9c2a-4e85e2502694@amsat.org>
-	<CAFEAcA-AfiDp5Y1MiveFHCZgTKgLPb3Qzu=RdhzNaD0yE4XscA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1emN2T-0003Gb-8U
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:09:41 -0500
+Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 8B16814E4A8
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:09:39 +0100 (CET)
+Date: Thu, 15 Feb 2018 18:09:32 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180215180932.67721e4f@bahia.lan>
+In-Reply-To: <20180215165418.GA24818@redhat.com>
+References: <151863720814.3003.4939908778788942974.stgit@bahia.lan>
+	<151863726311.3003.8227524786940828598.stgit@bahia.lan>
+	<20180215040818.GH5247@umbus.fritz.box>
+	<20180215170831.39645199@bahia.lan>
+	<20180215165418.GA24818@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] raspi: Specify the valid CPUs
+Subject: Re: [Qemu-devel] [PATCH 5/5] spapr: drop DIV_ROUND_UP() from
+ xics_max_server_number()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +34,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-On Thu, 15 Feb 2018 13:17:50 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Thu, 15 Feb 2018 16:54:18 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-> On 15 February 2018 at 13:04, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> > Hi Peter,
-> >
-> > On 02/15/2018 08:29 AM, Peter Maydell wrote: =20
-> >> On 2 February 2018 at 00:42, Alistair Francis
-> >> <alistair.francis@xilinx.com> wrote: =20
-> >>> List all possible valid CPU options.
-> >>>
-> >>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> >>> ---
-> >>>
-> >>> V5:
-> >>>  - Use cpu_model names
-> >>> V4:
-> >>>  - Remove spaces
-> >>> V3:
-> >>>  - Add static property
-> >>> V2:
-> >>>  - Fix the indentation
-> >>>
-> >>>  hw/arm/raspi.c | 7 +++++++
-> >>>  1 file changed, 7 insertions(+)
-> >>>
-> >>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> >>> index cd5fa8c3dc..745a880726 100644
-> >>> --- a/hw/arm/raspi.c
-> >>> +++ b/hw/arm/raspi.c
-> >>> @@ -158,6 +158,11 @@ static void raspi2_init(MachineState *machine)
-> >>>      setup_boot(machine, 2, machine->ram_size - vcram_size);
-> >>>  }
-> >>>
-> >>> +static const char *raspi2_valid_cpus[] =3D {
-> >>> +    "cortex-a7",
-> >>> +    NULL
-> >>> +}; =20
-> >>
-> >> Is this definitely right? Looking at the code, the raspi2 board
-> >> creates a TYPE_BCM2836, and that creates cortex-a15 CPUs... =20
-> >
-> > The BCM2836 use a cortex-a7 but this cpu was not available at the time
-> > of this commit (bad5623690b) and was added later in dcf578ed8ce "The A7
-> > is very similar to the A15."
-> >
-> > I can prepare a patch for it to apply before this series. =20
+> On Thu, Feb 15, 2018 at 05:08:57PM +0100, Greg Kurz wrote:
+> > On Thu, 15 Feb 2018 15:08:18 +1100
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >  =20
+> > > On Wed, Feb 14, 2018 at 08:41:03PM +0100, Greg Kurz wrote: =20
+> >=20
+> > <snip>
+> >  =20
+> > > >=20
+> > > > It breaks migration of pre-2.7 machine types with unusual CPU topol=
+ogies,
+> > > > but I guess this is an acceptable trade-off.   =20
+> > >=20
+> > > No, not really.  Weird topologies are still allowed on old machine
+> > > types for backwards compatibility, and we shouldn't break that.  I
+> > > like the idea of consolidating this calculation, but we can't do it by
+> > > just breaking the older machines (at least not until they're formally
+> > > deprecated).
+> > >  =20
+> >=20
+> > Heh, I had put this patch at the end because I was expecting you might
+> > nack it :)
+> >=20
+> > Per curiosity, when/how do we decide that an older machine type may be
+> > formally deprecated ? =20
 >=20
-> I noticed after I'd written that comment that patch 3 in this
-> series does exactly the change to cortex-a7...
-anyways this series, needs not to depend MachineState::cpu_model,
-removal of which is queued in Eduardo's tree.
-
-It seems we can't find consensus on how to deal with cpu_model names
-in boards code [1/6].
-
+> For versioned machine types we decided that we'd keep them around upstream
+> for as long as they were needed by a downstream vendor, *provided* that
+> downstream vendor is contributing to QEMU in order to mitigate the maint
+> burden it would entail.=20
 >=20
-> thanks
-> -- PMM
+
+Indeed I now remember having heard something like that in the past. Thanks
+for the details anyway. :)
+
+And, this is probably a dumb question, but do we have an up-to-date list
+of QEMU versions still needed by a contributing vendor ?
+
+> Regards,
+> Daniel
