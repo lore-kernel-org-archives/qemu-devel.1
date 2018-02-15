@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1emShD-0005gC-W6
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:12:09 -0500
+	(envelope-from <cota@braap.org>) id 1emSn3-0003bT-5N
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:18:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1emSh9-00075x-Us
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:12:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40620 helo=mx1.redhat.com)
+	(envelope-from <cota@braap.org>) id 1emSmz-0000kj-Gz
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:18:09 -0500
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:58953)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1emSh9-00075Q-OM
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:12:03 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EFFB6402291E
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 23:11:58 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-Date: Thu, 15 Feb 2018 18:11:27 -0500
-Message-Id: <20180215231129.14710-4-bsd@redhat.com>
-In-Reply-To: <20180215231129.14710-1-bsd@redhat.com>
-References: <20180215231129.14710-1-bsd@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/5] usb-mtp: Support delete of mtp objects
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1emSmz-0000kW-CX
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:18:05 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Thu, 15 Feb 2018 18:17:54 -0500
+Message-Id: <1518736676-5994-2-git-send-email-cota@braap.org>
+In-Reply-To: <1518736676-5994-1-git-send-email-cota@braap.org>
+References: <1518736676-5994-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 1/3] target/sparc: convert to DisasJumpType
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,202 +24,142 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+Cc: Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Write of existing objects by the initiator is acheived by
-making a temporary buffer with the new changes, deleting the
-old file and then writing a new file with the same name.
-
-Also, add a "readonly" property which needs to be set to false
-for deletion to work.
-
-Signed-off-by: Bandan Das <bsd@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/usb/dev-mtp.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+)
+ target/sparc/translate.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 63f8f3b90b..5ef77f3e9f 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -46,6 +46,7 @@ enum mtp_code {
-     CMD_GET_OBJECT_HANDLES         = 0x1007,
-     CMD_GET_OBJECT_INFO            = 0x1008,
-     CMD_GET_OBJECT                 = 0x1009,
-+    CMD_DELETE_OBJECT              = 0x100b,
-     CMD_GET_PARTIAL_OBJECT         = 0x101b,
-     CMD_GET_OBJECT_PROPS_SUPPORTED = 0x9801,
-     CMD_GET_OBJECT_PROP_DESC       = 0x9802,
-@@ -62,6 +63,8 @@ enum mtp_code {
-     RES_INVALID_STORAGE_ID         = 0x2008,
-     RES_INVALID_OBJECT_HANDLE      = 0x2009,
-     RES_INVALID_OBJECT_FORMAT_CODE = 0x200b,
-+    RES_STORE_READ_ONLY            = 0x200e,
-+    RES_PARTIAL_DELETE             = 0x2012,
-     RES_SPEC_BY_FORMAT_UNSUPPORTED = 0x2014,
-     RES_INVALID_PARENT_OBJECT      = 0x201a,
-     RES_INVALID_PARAMETER          = 0x201d,
-@@ -172,6 +175,7 @@ struct MTPState {
-     MTPControl   *result;
-     uint32_t     session;
-     uint32_t     next_handle;
-+    bool         readonly;
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index 71e0853..730e25d 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -30,6 +30,7 @@
+ #include "exec/helper-gen.h"
  
-     QTAILQ_HEAD(, MTPObject) objects;
- #ifdef CONFIG_INOTIFY1
-@@ -799,6 +803,7 @@ static MTPData *usb_mtp_get_device_info(MTPState *s, MTPControl *c)
-         CMD_GET_NUM_OBJECTS,
-         CMD_GET_OBJECT_HANDLES,
-         CMD_GET_OBJECT_INFO,
-+        CMD_DELETE_OBJECT,
-         CMD_GET_OBJECT,
-         CMD_GET_PARTIAL_OBJECT,
-         CMD_GET_OBJECT_PROPS_SUPPORTED,
-@@ -1113,6 +1118,116 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
-     return d;
+ #include "trace-tcg.h"
++#include "exec/translator.h"
+ #include "exec/log.h"
+ #include "asi.h"
+ 
+@@ -69,7 +70,7 @@ typedef struct DisasContext {
+     target_ulong pc;    /* current Program Counter: integer or DYNAMIC_PC */
+     target_ulong npc;   /* next PC: integer or DYNAMIC_PC or JUMP_PC */
+     target_ulong jump_pc[2]; /* used when JUMP_PC pc value is used */
+-    int is_br;
++    DisasJumpType is_jmp;
+     int mem_idx;
+     bool fpu_enabled;
+     bool address_mask_32bit;
+@@ -995,7 +996,7 @@ static void gen_branch_a(DisasContext *dc, target_ulong pc1)
+     gen_set_label(l1);
+     gen_goto_tb(dc, 1, npc + 4, npc + 8);
+ 
+-    dc->is_br = 1;
++    dc->is_jmp = DISAS_NORETURN;
  }
  
-+/* Return correct return code for a delete event */
-+enum {
-+    ALL_DELETE,
-+    PARTIAL_DELETE,
-+    READ_ONLY,
-+};
-+
-+/* Assumes that children, if any, have been already freed */
-+static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
-+{
-+#ifndef CONFIG_INOTIFY1
-+    assert(o->nchildren == 0);
-+    QTAILQ_REMOVE(&s->objects, o, next);
-+    g_free(o->name);
-+    g_free(o->path);
-+    g_free(o);
-+#endif
-+}
-+
-+static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
-+{
-+    MTPObject *iter, *iter2;
-+    bool partial_delete = false;
-+    bool success = false;
-+
-+    /*
-+     * TODO: Add support for Protection Status
-+     */
-+
-+    QLIST_FOREACH(iter, &o->children, list) {
-+        if (iter->format == FMT_ASSOCIATION) {
-+            QLIST_FOREACH(iter2, &iter->children, list) {
-+                usb_mtp_deletefn(s, iter2, trans);
-+            }
-+        }
-+    }
-+
-+    if (o->format == FMT_UNDEFINED_OBJECT) {
-+        if (remove(o->path)) {
-+            partial_delete = true;
-+        } else {
-+            usb_mtp_object_free_one(s, o);
-+            success = true;
-+        }
-+    }
-+
-+    if (o->format == FMT_ASSOCIATION) {
-+        if (rmdir(o->path)) {
-+            partial_delete = true;
-+        } else {
-+            usb_mtp_object_free_one(s, o);
-+            success = true;
-+        }
-+    }
-+
-+    if (success && partial_delete) {
-+        return PARTIAL_DELETE;
-+    }
-+    if (!success && partial_delete) {
-+        return READ_ONLY;
-+    }
-+    return ALL_DELETE;
-+}
-+
-+static void usb_mtp_object_delete(MTPState *s, uint32_t handle,
-+                                  uint32_t format_code, uint32_t trans)
-+{
-+    MTPObject *o;
-+    int ret;
-+
-+    /* Return error if store is read-only */
-+    if (!FLAG_SET(s, MTP_FLAG_WRITABLE)) {
-+        usb_mtp_queue_result(s, RES_STORE_READ_ONLY,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    }
-+
-+    if (format_code != 0) {
-+        usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    }
-+
-+    if (handle == 0xFFFFFFF) {
-+        o = QTAILQ_FIRST(&s->objects);
-+    } else {
-+        o = usb_mtp_object_lookup(s, handle);
-+    }
-+    if (o == NULL) {
-+        usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    }
-+
-+    ret = usb_mtp_deletefn(s, o, trans);
-+    if (ret == PARTIAL_DELETE) {
-+        usb_mtp_queue_result(s, RES_PARTIAL_DELETE,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    } else if (ret == READ_ONLY) {
-+        usb_mtp_queue_result(s, RES_STORE_READ_ONLY, trans,
-+                             0, 0, 0, 0);
-+        return;
-+    } else {
-+        usb_mtp_queue_result(s, RES_OK, trans,
-+                             0, 0, 0, 0);
-+        return;
-+    }
-+}
-+
- static void usb_mtp_command(MTPState *s, MTPControl *c)
- {
-     MTPData *data_in = NULL;
-@@ -1239,6 +1354,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-             return;
-         }
-         break;
-+    case CMD_DELETE_OBJECT:
-+        usb_mtp_object_delete(s, c->argv[0], c->argv[1], c->trans);
-+        return;
-     case CMD_GET_PARTIAL_OBJECT:
-         o = usb_mtp_object_lookup(s, c->argv[0]);
-         if (o == NULL) {
-@@ -1545,6 +1663,10 @@ static void usb_mtp_realize(USBDevice *dev, Error **errp)
-             return;
-         }
-         s->desc = strrchr(s->root, '/');
-+        /* Mark store as RW */
-+        if (!s->readonly) {
-+            s->flags |= (1 << MTP_FLAG_WRITABLE);
-+        }
-         if (s->desc && s->desc[0]) {
-             s->desc = g_strdup(s->desc + 1);
-         } else {
-@@ -1567,6 +1689,7 @@ static const VMStateDescription vmstate_usb_mtp = {
- static Property mtp_properties[] = {
-     DEFINE_PROP_STRING("x-root", MTPState, root),
-     DEFINE_PROP_STRING("desc", MTPState, desc),
-+    DEFINE_PROP_BOOL("readonly", MTPState, readonly, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
+ static void gen_branch_n(DisasContext *dc, target_ulong pc1)
+@@ -1078,7 +1079,7 @@ static void gen_exception(DisasContext *dc, int which)
+     t = tcg_const_i32(which);
+     gen_helper_raise_exception(cpu_env, t);
+     tcg_temp_free_i32(t);
+-    dc->is_br = 1;
++    dc->is_jmp = DISAS_NORETURN;
+ }
  
+ static void gen_check_align(TCGv addr, int mask)
+@@ -3346,7 +3347,7 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+ 
+                 if (cond == 8) {
+                     /* An unconditional trap ends the TB.  */
+-                    dc->is_br = 1;
++                    dc->is_jmp = DISAS_NORETURN;
+                     goto jmp_insn;
+                 } else {
+                     /* A conditional trap falls through to the next insn.  */
+@@ -4326,7 +4327,7 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 save_state(dc);
+                                 gen_op_next_insn();
+                                 tcg_gen_exit_tb(0);
+-                                dc->is_br = 1;
++                                dc->is_jmp = DISAS_NORETURN;
+                                 break;
+                             case 0x6: /* V9 wrfprs */
+                                 tcg_gen_xor_tl(cpu_tmp0, cpu_src1, cpu_src2);
+@@ -4335,7 +4336,7 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 save_state(dc);
+                                 gen_op_next_insn();
+                                 tcg_gen_exit_tb(0);
+-                                dc->is_br = 1;
++                                dc->is_jmp = DISAS_NORETURN;
+                                 break;
+                             case 0xf: /* V9 sir, nop if user */
+ #if !defined(CONFIG_USER_ONLY)
+@@ -4463,7 +4464,7 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                             save_state(dc);
+                             gen_op_next_insn();
+                             tcg_gen_exit_tb(0);
+-                            dc->is_br = 1;
++                            dc->is_jmp = DISAS_NORETURN;
+ #endif
+                         }
+                         break;
+@@ -4619,7 +4620,7 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 save_state(dc);
+                                 gen_op_next_insn();
+                                 tcg_gen_exit_tb(0);
+-                                dc->is_br = 1;
++                                dc->is_jmp = DISAS_NORETURN;
+                                 break;
+                             case 1: // htstate
+                                 // XXX gen_op_wrhtstate();
+@@ -5685,7 +5686,7 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+     } else if (dc->npc == JUMP_PC) {
+         /* we can do a static jump */
+         gen_branch2(dc, dc->jump_pc[0], dc->jump_pc[1], cpu_cond);
+-        dc->is_br = 1;
++        dc->is_jmp = DISAS_NORETURN;
+     } else {
+         dc->pc = dc->npc;
+         dc->npc = dc->npc + 4;
+@@ -5747,6 +5748,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
+     pc_start = tb->pc;
+     dc->pc = pc_start;
+     last_pc = dc->pc;
++    dc->is_jmp = DISAS_NEXT;
+     dc->npc = (target_ulong) tb->cs_base;
+     dc->cc_op = CC_OP_DYNAMIC;
+     dc->mem_idx = tb->flags & TB_FLAG_MMU_MASK;
+@@ -5791,7 +5793,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
+             }
+             gen_helper_debug(cpu_env);
+             tcg_gen_exit_tb(0);
+-            dc->is_br = 1;
++            dc->is_jmp = DISAS_NORETURN;
+             goto exit_gen_loop;
+         }
+ 
+@@ -5803,8 +5805,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
+ 
+         disas_sparc_insn(dc, insn);
+ 
+-        if (dc->is_br)
++        if (dc->is_jmp == DISAS_NORETURN) {
+             break;
++        }
+         /* if the next PC is different, we abort now */
+         if (dc->pc != (last_pc + 4))
+             break;
+@@ -5825,7 +5828,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
+     if (tb_cflags(tb) & CF_LAST_IO) {
+         gen_io_end();
+     }
+-    if (!dc->is_br) {
++    if (dc->is_jmp != DISAS_NORETURN) {
+         if (dc->pc != DYNAMIC_PC &&
+             (dc->npc != DYNAMIC_PC && dc->npc != JUMP_PC)) {
+             /* static PC and NPC: we can use direct chaining */
 -- 
-2.14.3
+2.7.4
