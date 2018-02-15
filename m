@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34527)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBU-0008B4-3f
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:13 -0500
+	id 1emBBL-0007zm-2q
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBT-0004GR-56
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:12 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36661)
+	id 1emBBK-00047G-7i
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:03 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:45465)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBT-0004FM-1c
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:11 -0500
-Received: by mail-qt0-x242.google.com with SMTP id q18so10489809qtl.3
-	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:30:10 -0800 (PST)
+	id 1emBBK-00047C-3t
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:02 -0500
+Received: by mail-qk0-x241.google.com with SMTP id g2so8417542qkd.12
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:30:02 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 01:28:51 -0300
-Message-Id: <20180215042900.16078-22-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 01:28:47 -0300
+Message-Id: <20180215042900.16078-18-f4bug@amsat.org>
 In-Reply-To: <20180215042900.16078-1-f4bug@amsat.org>
 References: <20180215042900.16078-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 21/30] hw/misc: use the BYTE-based definitions
+Subject: [Qemu-devel] [PATCH 17/30] hw/tricore: use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +35,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Jiri Slaby <jslaby@suse.cz>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
 It ease code review, unit is explicit.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/auxbus.c | 2 +-
- hw/misc/edu.c    | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/tricore/tricore_testboard.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index b4cacd664b..c78aaebcbe 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -68,7 +68,7 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboard.c
+index ac75eb2128..032bcc8efb 100644
+--- a/hw/tricore/tricore_testboard.c
++++ b/hw/tricore/tricore_testboard.c
+@@ -74,17 +74,17 @@ static void tricore_testboard_init(MachineState *machine, int board_id)
+     cpu = TRICORE_CPU(cpu_create(machine->cpu_type));
+     env = &cpu->env;
+     memory_region_init_ram(ext_cram, NULL, "powerlink_ext_c.ram",
+-                           2 * 1024 * 1024, &error_fatal);
++                           2 * M_BYTE, &error_fatal);
+     memory_region_init_ram(ext_dram, NULL, "powerlink_ext_d.ram",
+-                           4 * 1024 * 1024, &error_fatal);
+-    memory_region_init_ram(int_cram, NULL, "powerlink_int_c.ram", 48 * 1024,
++                           4 * M_BYTE, &error_fatal);
++    memory_region_init_ram(int_cram, NULL, "powerlink_int_c.ram", 48 * K_BYTE,
+                            &error_fatal);
+-    memory_region_init_ram(int_dram, NULL, "powerlink_int_d.ram", 48 * 1024,
++    memory_region_init_ram(int_dram, NULL, "powerlink_int_d.ram", 48 * K_BYTE,
+                            &error_fatal);
+     memory_region_init_ram(pcp_data, NULL, "powerlink_pcp_data.ram",
+-                           16 * 1024, &error_fatal);
++                           16 * K_BYTE, &error_fatal);
+     memory_region_init_ram(pcp_text, NULL, "powerlink_pcp_text.ram",
+-                           32 * 1024, &error_fatal);
++                           32 * K_BYTE, &error_fatal);
  
-     /* Memory related. */
-     bus->aux_io = g_malloc(sizeof(*bus->aux_io));
--    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", (1 << 20));
-+    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", 2 * M_BYTE);
-     address_space_init(&bus->aux_addr_space, bus->aux_io, "aux-io");
-     return bus;
- }
-diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index 34eb05d213..ce8235dfc4 100644
---- a/hw/misc/edu.c
-+++ b/hw/misc/edu.c
-@@ -357,7 +357,7 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
-                        edu, QEMU_THREAD_JOINABLE);
- 
-     memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
--                    "edu-mmio", 1 << 20);
-+                    "edu-mmio", 1 * M_BYTE);
-     pci_register_bar(pdev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &edu->mmio);
- }
- 
+     memory_region_add_subregion(sysmem, 0x80000000, ext_cram);
+     memory_region_add_subregion(sysmem, 0xa1000000, ext_dram);
 -- 
 2.16.1
