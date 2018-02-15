@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emDaj-0000Hb-IW
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 02:04:26 -0500
+	(envelope-from <thuth@redhat.com>) id 1emDc1-0001Gs-TB
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 02:05:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emDag-0005OM-EF
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 02:04:25 -0500
-References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1517864246-11101-12-git-send-email-walling@linux.vnet.ibm.com>
-	<8259c694-3f9a-ce9e-9d1d-252568f3e73a@redhat.com>
-	<ad1e16df-8ebe-5271-b62c-76924c758cbc@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1emDc1-00060e-49
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 02:05:45 -0500
+References: <20180215042900.16078-1-f4bug@amsat.org>
+	<20180215042900.16078-12-f4bug@amsat.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <30b25d5a-2525-c34c-a862-7b5bcbbcffe3@redhat.com>
-Date: Thu, 15 Feb 2018 08:04:01 +0100
+Message-ID: <ad3f0eda-f60f-1aa6-b587-87798970da59@redhat.com>
+Date: Thu, 15 Feb 2018 08:05:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <ad1e16df-8ebe-5271-b62c-76924c758cbc@linux.vnet.ibm.com>
+In-Reply-To: <20180215042900.16078-12-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 11/12] s390-ccw: clear
- pending irqs
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 11/30] hw/s390x: use the
+ BYTE-based definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, "open list:S390" <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On 14.02.2018 16:33, Collin L. Walling wrote:
-> On 02/14/2018 05:57 AM, David Hildenbrand wrote:
-[...]
->> 1. CKC interrupts can be cleared by resetting the CKC
->> 2. SCLP interrupts can be cleared only via delivery (apart from CPU
->> reset)
->>
->> So if you have CKC and SCLP pending at the same time, you get the CKC
->> delivered first and the SCLP remains pending.
->>
->> Now, the easiest way to clear that (if you don't know if any is
->> pending!) is to simply print a string. Then you know that you have
->> exactly one SCLP interrupt pending.
->>
->> So simply printing a string after potentially reading should be
->> sufficient to clear the SCLP interrupt deterministically :)
+On 15.02.2018 05:28, Philippe Mathieu-Daud=C3=A9 wrote:
+> It ease code review, unit is explicit.
 >=20
-> Perhaps it is due to my lack of understanding of how irqs are queued,
-> but is it
-> possible that we could still end up with service interrupts pending in
-> the SCLP?
-> Specifically if we're still accepting external interrupts from
-> keystrokes but we
-> aren't reading anything from the SCLP.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/s390x/sclp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> Let's say we have 1 service signal pending and we go to print something=
-.
-> This
-> executes the sclp service call instruction and generates a new service
-> signal.
-> The SCLP would consume one of the service interrupts and write to the
-> console.
-> We still have 1 interrupt pending that we need to deal with.
->=20
-> That 1 pending interrupt could have been generated at any time we're st=
-ill
-> listening to activity from the keyboard.
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 276972b59f..8537aa2688 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -526,8 +526,8 @@ static void sclp_realize(DeviceState *dev, Error **=
+errp)
+> =20
+>      ret =3D s390_set_memory_limit(machine->maxram_size, &hw_limit);
+>      if (ret =3D=3D -E2BIG) {
+> -        error_setg(&err, "host supports a maximum of %" PRIu64 " GB",
+> -                   hw_limit >> 30);
+> +        error_setg(&err, "host supports a maximum of %llu GB",
+> +                   hw_limit / G_BYTE);
+>      } else if (ret) {
+>          error_setg(&err, "setting the guest size failed");
+>      }
 
-There is no "queue" or something like this for service interrupts.
-Either one service interrupt is pending, or it is not. Have a look at
-arch/s390/kvm/interrupt.c in the Linux kernel sources and search for the
-functions __deliver_service() and __inject_service() for example.
-
-> In my next update to this patch, I setup the control program receive
-> mask in
-> the SCLP only when we need to get input from the user and then clear th=
-e
-> mask
-> when we're done. Doing so will make it so we generate an interrupt from
-> keystrokes ONLY when the mask is set. No external interrupts from
-> keystrokes
-> will be generated when the cp_receive mask is NOT set.
->=20
-> After I clear the cp_receive mask, we consume any leftover interrupts b=
-y
-> calling consume_sclp_int (I also fixup the patch to make sure we only e=
-nd
-> irq-clearing on a ckc interrupt -- oops).
-
-Not sure whether you really have to deal with the ckc here again to get
-rid of pending service interrupts... David's idea to simply print out
-something to clear the pending service interrupt sounds easier to me.
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
