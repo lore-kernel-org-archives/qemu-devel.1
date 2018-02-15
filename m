@@ -1,48 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1emI5K-0001lW-TB
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:52:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1emID5-0005vK-Ac
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 07:00:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1emI5H-0003mI-1R
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:52:18 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49694
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1emI5G-0003mA-Rm
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:52:14 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1FBmVJN052117
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 06:52:14 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g54c54ee5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 06:52:13 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 15 Feb 2018 06:52:12 -0500
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-5-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1e1dd3a3-7d87-38b1-cab3-5be375787896@linux.vnet.ibm.com>
-	<20180212204609.GB30111@morn.lan>
-	<b2725975-6823-8919-e937-56d8cb404372@linux.vnet.ibm.com>
-	<e8cf7f36-249f-a3cc-f414-fac4e8b56b51@redhat.com>
-	<20180213193758.GA21083@morn.lan>
-	<17e5dd66-e54d-56a3-7852-daf5bc11b741@redhat.com>
-	<ead467f1-ab61-6350-e0bf-66ce0cbb06a1@linux.vnet.ibm.com>
-	<20180214183935.GA11088@morn.lan>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 15 Feb 2018 06:52:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1emID1-0007lM-Dg
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 07:00:19 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34892)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1emID1-0007iQ-7q
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 07:00:15 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1emID0-0003ej-4Q
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 12:00:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C91382E804B
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 12:00:13 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180214183935.GA11088@morn.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <efa9101a-b44b-38fd-a693-31a6010d5d81@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] acpi: build TPM Physical Presence
- interface
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Feb 2018 11:49:01 -0000
+From: Thomas Huth <1589272@bugs.launchpad.net>
+Reply-To: Bug 1589272 <1589272@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160605160649.12221.85115.malonedeb@soybean.canonical.com>
+Message-Id: <151869534192.8964.5226295835110698318.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1589272] Re: qemu-system-x86_64: There is no
+ option group 'vnc'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,45 +37,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>
-Cc: Laszlo Ersek <lersek@redhat.com>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 02/14/2018 01:39 PM, Kevin O'Connor wrote:
-> On Tue, Feb 13, 2018 at 03:29:20PM -0500, Stefan Berger wrote:
-> [...]
->> In these 0x400 bytes we have 256 bytes that are used for configuration flags
->> describing the supported opcode as you previously described. This array
->> allows us to decouple the firmware implementation from the ACPI code and we
->> need not hard code what is supported in the firmware inside the ACPI code
->> (which would be difficult to do anyway since in QEMU we would not what
->> firmware will be started and what PPI opcodes are support) and the ppi sysfs
->> entries in Linux for example show exactly those PPI opcodes that are
->> supported. The firmware needs to set those flags and the firmware knows what
->> it supports.
->>
->> I hope we can settle that this device is the right path.
-> It seems that the primary purpose of the 0x400 virtual device is to
-> pass information from firmware to QEMU (specifically to pass the list
-> of supported PPI opcodes to the QEMU generated AML code).  Passing
-> information between firmware and QEMU is not new territory, and fw_cfg
-> was specifically built to do this.  I'd prefer to use fw_cfg if we
-> need to pass information between firmware and QEMU.
->
-> That said, I don't see why this list is needed - why not just
-> implement the same opcodes in both UEFI and SeaBIOS and be done with
-> it?  The spec defines 22 actions, and most of these are permutations
-> of 4 basic features (Enable, Activate, Clear, SetOwnerInstall).
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-... which may be a substantial amount of work to implement. There are 
-another 23 or so defined for TPM 2, some of which are optional.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
->
-> [...]
->> I initially had PPI SeaBIOS code write into the TPM TIS device's memory into
->> some custom addresses. I'd consider this a hack.
-> Well, sure, it could be considered a hack.  But, it seems to me the
-> whole PPI spec is a bit of a hack.  If elegance isn't an option,
-> settle for simplicity?
->
-> -Kevin
->
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1589272
+
+Title:
+  qemu-system-x86_64: There is no option group 'vnc'
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  build qemu from git (6b3532b20b787cbd697a68b383232f5c3b39bd1e)
+
+  with this options:
+
+  ./configure \
+      --python=3D/usr/bin/python2 \
+      --prefix=3D/usr \
+      --sysconfdir=3D/etc \
+      --localstatedir=3D/var \
+      --libexecdir=3D/usr/lib/qemu \
+      --target-list=3Di386-softmmu,x86_64-softmmu,i386-linux-user,x86_64-li=
+nux-user \
+      --audio-drv-list=3D'pa alsa' \
+      --enable-linux-aio \
+      --enable-seccomp \
+      --enable-tpm \
+      --enable-modules \
+      --disable-sdl \
+      --disable-gtk \
+      --disable-spice \
+      --disable-rbd \
+      --disable-libiscsi \
+      --disable-libnfs \
+      --disable-smartcard \
+      --disable-glusterfs \
+      --disable-docs \
+      --disable-vnc{,-sasl,-jpeg,-png} \
+      --disable-guest-agent
+
+  i get:
+
+  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=95=BC  qemu-system-x86_64
+  qemu-system-x86_64: There is no option group 'vnc'
+  Segment Fault (core dumped)
+
+  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=95=BC  coredumpctl info 12932
+             PID: 12932 (qemu-system-x86)
+             UID: 1000 (sl1pkn07)
+             GID: 100 (users)
+          Signal: 11 (SEGV)
+       Timestamp: dom 2016-06-05 18:05:51 CEST (17s ago)
+    Command Line: qemu-system-x86_64
+      Executable: /usr/bin/qemu-system-x86_64
+   Control Group: /user.slice/user-1000.slice/session-c1.scope
+            Unit: session-c1.scope
+           Slice: user-1000.slice
+         Session: c1
+       Owner UID: 1000 (sl1pkn07)
+         Boot ID: 5b205159fa6b4c25946fad7087bd366f
+      Machine ID: c20ee0c57658685bfedf50384b0e3ec0
+        Hostname: sL1pKn07
+        Coredump: /var/lib/systemd/coredump/core.qemu-system-x86.1000.5b205=
+159fa6b4c25946fad7087bd366f.12932.1465142751000000000000.lz4
+         Message: Process 12932 (qemu-system-x86) of user 1000 dumped core.
+                  =
+
+                  Stack trace of thread 12932:
+                  #0  0x000055b269c2e245 qemu_opts_foreach (qemu-system-x86=
+_64)
+                  #1  0x000055b2698fb6b5 main (qemu-system-x86_64)
+                  #2  0x00007fafc4e5a741 __libc_start_main (libc.so.6)
+                  #3  0x000055b269900eb9 _start (qemu-system-x86_64)
+                  =
+
+                  Stack trace of thread 12934:
+                  #0  0x00007fafc51e80af pthread_cond_wait@@GLIBC_2.3.2 (li=
+bpthread.so.0)
+                  #1  0x000055b269c21b19 qemu_cond_wait (qemu-system-x86_64)
+                  #2  0x000055b26992bff4 qemu_tcg_cpu_thread_fn (qemu-syste=
+m-x86_64)
+                  #3  0x00007fafc51e2484 start_thread (libpthread.so.0)
+                  #4  0x00007fafc4f216dd __clone (libc.so.6)
+                  =
+
+                  Stack trace of thread 12933:
+                  #0  0x00007fafc51eaebc __lll_lock_wait (libpthread.so.0)
+                  #1  0x00007fafc51e4b45 pthread_mutex_lock (libpthread.so.=
+0)
+                  #2  0x000055b269c21a39 qemu_mutex_lock (qemu-system-x86_6=
+4)
+                  #3  0x000055b26992bf51 qemu_mutex_lock_iothread (qemu-sys=
+tem-x86_64)
+                  #4  0x000055b269c30430 call_rcu_thread (qemu-system-x86_6=
+4)
+                  #5  0x00007fafc51e2484 start_thread (libpthread.so.0)
+                  #6  0x00007fafc4f216dd __clone (libc.so.6)
+
+  builded with GCC 6.1.1
+
+  greetings
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1589272/+subscriptions
