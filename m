@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slyfox@gentoo.org>) id 1emOAa-0003rQ-JM
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:22:09 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emOCp-0005gj-Fc
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slyfox@gentoo.org>) id 1emOAZ-0006tY-Nk
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:22:08 -0500
-Received: from mail.gentoo.org ([2001:470:ea4a:1:5054:ff:fec7:86e4]:41843
-	helo=smtp.gentoo.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slyfox@gentoo.org>) id 1emOAZ-0006t5-HN
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:22:07 -0500
-Date: Thu, 15 Feb 2018 18:21:53 +0000
-From: Sergei Trofimovich <slyfox@gentoo.org>
-Message-ID: <20180215182153.3696ad5f@sf>
-In-Reply-To: <20180215173539.11033-1-f4bug@amsat.org>
-References: <20180215173539.11033-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] capstone: fix building using system
- package
+	(envelope-from <pm215@archaic.org.uk>) id 1emOCo-0007t6-GB
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:24:27 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Feb 2018 18:24:21 +0000
+Message-Id: <20180215182421.23788-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm: Fix register definitions for VMIDR
+ and VMPIDR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +18,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Mike Frysinger <vapier@gentoo.org>, =?UTF-8?B?Wm9sdMOhbg==?= Mizsei <miqlas@gmail.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Thu, 15 Feb 2018 14:35:39 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+The register definitions for VMIDR and VMPIDR have separate
+reginfo structs for the AArch32 and AArch64 registers. However
+the 32-bit versions are wrong:
+ * they use offsetof instead of offsetoflow32 to mark where
+   the 32-bit value lives in the uint64_t CPU state field
+ * they don't mark themselves as ARM_CP_ALIAS
 
->  #else
-> +#include <capstone/capstone.h>
+In particular this means that if you try to use an Arm guest CPU
+which enables EL2 on a big-endian host it will assert at reset:
+ target/arm/cpu.c:114: cp_reg_check_reset: Assertion `oldvalue == newvalue' failed.
 
-I think it's incorrect. 'pkg-config' already reports 'capstone/' path:
-    $ pkg-config --cflags capstone
-    -I/usr/include/capstone
+because the reset of the 32-bit register writes to the top
+half of the uint64_t.
 
-    $ ls /usr/include/capstone/capstone.h
-    /usr/include/capstone/capstone.h
+Correct the errors in the structures.
 
-Thus I would guess
-    #include <capstone.h>
-is still correct for system include path as well (contradicts the example).
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This is necessary for 'make check' to pass on big endian
+systems with the 'raspi3' board enabled, which is the
+first board which has an EL2-enabled-by-default CPU.
+---
+ target/arm/helper.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-qemu just needs to use 'pkg-config' to discover the include path and
-libs. Maybe new capstone release has different pkgconfig setup?
-
---=20
-
-  Sergei
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index e7586fcf6c..e27957df38 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5068,8 +5068,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             { .name = "VPIDR", .state = ARM_CP_STATE_AA32,
+               .cp = 15, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 0,
+               .access = PL2_RW, .accessfn = access_el3_aa32ns,
+-              .resetvalue = cpu->midr,
+-              .fieldoffset = offsetof(CPUARMState, cp15.vpidr_el2) },
++              .resetvalue = cpu->midr, .type = ARM_CP_ALIAS,
++              .fieldoffset = offsetoflow32(CPUARMState, cp15.vpidr_el2) },
+             { .name = "VPIDR_EL2", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 0,
+               .access = PL2_RW, .resetvalue = cpu->midr,
+@@ -5077,8 +5077,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             { .name = "VMPIDR", .state = ARM_CP_STATE_AA32,
+               .cp = 15, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 5,
+               .access = PL2_RW, .accessfn = access_el3_aa32ns,
+-              .resetvalue = vmpidr_def,
+-              .fieldoffset = offsetof(CPUARMState, cp15.vmpidr_el2) },
++              .resetvalue = vmpidr_def, .type = ARM_CP_ALIAS,
++              .fieldoffset = offsetoflow32(CPUARMState, cp15.vmpidr_el2) },
+             { .name = "VMPIDR_EL2", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 5,
+               .access = PL2_RW,
+-- 
+2.16.1
