@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ollieparanoid@bitmessage.ch>) id 1em73M-0003Eh-V5
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 19:06:04 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1em7fm-0003W7-5t
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 19:45:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ollieparanoid@bitmessage.ch>) id 1em72f-0004cG-2a
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 19:05:32 -0500
-Received: from mail.bitmessage.ch ([146.228.112.252]:62657)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ollieparanoid@bitmessage.ch>)
-	id 1em72e-0004YX-Hg
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 19:04:49 -0500
-From: Oliver Smith <ollieparanoid@bitmessage.ch>
-Message-ID: <faca1d54-8c99-cece-b427-b994307516dd@bitmessage.ch>
-Date: Wed, 14 Feb 2018 23:33:00 +0000
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] syscall: fix special case of write(fd, NULL,
- 0)
+	(envelope-from <sjitindarsingh@gmail.com>) id 1em7fl-0005Q7-C0
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 19:45:14 -0500
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Thu, 15 Feb 2018 11:44:41 +1100
+Message-Id: <20180215004443.18013-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V3 1/3] ppc/spapr-caps: Change
+ migration macro to take full spapr-cap name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +18,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, carenas@sajinet.com.pe, laurent@vivier.eu, peter.maydell@linaro.org
-Cc: zhuoweizhang@yahoo.com
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Hello there,
+Change the macro that generates the vmstate migration field and the needed
+function for the spapr-caps to take the full spapr-cap name. This has
+the benefit of meaning this instance will be picked up when greping
+for the spapr-caps and making it more obvious what this macro is doing.
 
-I'm a little late to the party. But what is necessary to get this
-upstreamed, and how can I help?
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ hw/ppc/spapr_caps.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-PS: Sorry if I picked the wrong e-mail addresses, I wasn't subscribed to
-the ML at that point and used the addresses I could find for the people
-who answered to the original thread here:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg08073.html
-
-Thanks,
-Oliver
-
-
-From: Zhuowei Zhang <address@hidden>
-> Linux returns success for the special case of calling write with a
-> zero-length NULL buffer: compiling and running
->
-> ```
->
-> int main() {
->    ssize_t ret = write(STDOUT_FILENO, NULL, 0);
->    fprintf(stderr, "write returned %ld\n", ret);
->    return 0;
-> }
-> ```
-> gives "write returned 0" when run directly, but "write returned -1" in
-> QEMU.
->
-> This commit checks for this situation and returns success if found.
->
-> Signed-off-by: Zhuowei Zhang <address@hidden>
-> ---
->  linux-user/syscall.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 9b6364a..ecadf49 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7783,6 +7783,11 @@ abi_long do_syscall(void *cpu_env, int num,
-abi_long
-> arg1,
->          }
->          break;
->      case TARGET_NR_write:
-> +        if (arg2 == 0 && arg3 == 0) {
-> +            /* special case: write(fd, NULL, 0) returns success. */
-> +            ret = 0;
-> +            break;
-> +        }
->          if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
->              goto efault;
->          if (fd_trans_target_to_host_data(arg1)) {
-> --
-> 1.9.1
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 62efdaee38..e69d308560 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -350,34 +350,34 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
+ }
+ 
+ /* Used to generate the migration field and needed function for a spapr cap */
+-#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
+-static bool spapr_cap_##cap##_needed(void *opaque)      \
++#define SPAPR_CAP_MIG_STATE(sname, cap)                 \
++static bool spapr_cap_##sname##_needed(void *opaque)    \
+ {                                                       \
+     sPAPRMachineState *spapr = opaque;                  \
+                                                         \
+-    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
+-           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
+-            spapr->def.caps[SPAPR_CAP_##ccap]);         \
++    return spapr->cmd_line_caps[cap] &&                 \
++           (spapr->eff.caps[cap] !=                     \
++            spapr->def.caps[cap]);                      \
+ }                                                       \
+                                                         \
+-const VMStateDescription vmstate_spapr_cap_##cap = {    \
+-    .name = "spapr/cap/" #cap,                          \
++const VMStateDescription vmstate_spapr_cap_##sname = {  \
++    .name = "spapr/cap/" #sname,                        \
+     .version_id = 1,                                    \
+     .minimum_version_id = 1,                            \
+-    .needed = spapr_cap_##cap##_needed,                 \
++    .needed = spapr_cap_##sname##_needed,               \
+     .fields = (VMStateField[]) {                        \
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
++        VMSTATE_UINT8(mig.caps[cap],                    \
+                       sPAPRMachineState),               \
+         VMSTATE_END_OF_LIST()                           \
+     },                                                  \
+ }
+ 
+-SPAPR_CAP_MIG_STATE(htm, HTM);
+-SPAPR_CAP_MIG_STATE(vsx, VSX);
+-SPAPR_CAP_MIG_STATE(dfp, DFP);
+-SPAPR_CAP_MIG_STATE(cfpc, CFPC);
+-SPAPR_CAP_MIG_STATE(sbbc, SBBC);
+-SPAPR_CAP_MIG_STATE(ibs, IBS);
++SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_HTM);
++SPAPR_CAP_MIG_STATE(vsx, SPAPR_CAP_VSX);
++SPAPR_CAP_MIG_STATE(dfp, SPAPR_CAP_DFP);
++SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
++SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
++SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
+ 
+ void spapr_caps_reset(sPAPRMachineState *spapr)
+ {
+-- 
+2.13.6
