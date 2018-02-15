@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emJos-0002ob-2k
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:43:27 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1emJxR-0001oG-T2
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1emJoo-00023y-W0
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:43:26 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:38409)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1emJoo-00023T-MS
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:43:22 -0500
-References: <20180124211301.10095-1-laurent@vivier.eu>
-	<20180124211301.10095-5-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a16cbdb0-ecd2-3375-fb58-e6d63a117e8a@vivier.eu>
-Date: Thu, 15 Feb 2018 14:43:05 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1emJxN-0000w1-2y
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:52:17 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 15 Feb 2018 16:51:38 +0300
+Message-Id: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180124211301.10095-5-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] linux-user: MIPS set cpu to r6 CPU
- if binary is R6
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/9] nbd block status base:allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +19,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Aaron Sierra <asierra@xes-inc.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Le 24/01/2018 à 22:13, Laurent Vivier a écrit :
-> From: YunQiang Su <syq@debian.org>
-> 
-> So here we need to detect the version of binaries and set
-> cpu_model for it.
-> 
-> Signed-off-by: YunQiang Su <syq@debian.org>
-> [lv: original patch modified to move code into cpu_get_model()]
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/elf.h                  | 4 ++++
->  linux-user/mips/target_elf.h   | 3 +++
->  linux-user/mips64/target_elf.h | 3 +++
->  3 files changed, 10 insertions(+)
-> 
+Hi all.
 
-Applied to my 'linux-user-for-2.12' branch.
+Here is minimal realization of base:allocation context of NBD
+block-status extension, which allows to get block status through
+NBD.
 
-Thanks,
-Laurent
+Vladimir Sementsov-Ogievskiy (9):
+  nbd/server: add nbd_opt_invalid helper
+  nbd: change indenting in nbd.h
+  nbd: BLOCK_STATUS for standard get_block_status function: server part
+  block/nbd-client: save first fatal error in nbd_iter_error
+  nbd/client: fix error messages in nbd_handle_reply_err
+  nbd: BLOCK_STATUS for standard get_block_status function: client part
+  iotests.py: tiny refactor: move system imports up
+  iotests: add file_path helper
+  iotests: new test 206 for NBD BLOCK_STATUS
+
+ block/nbd-client.h            |   5 +
+ include/block/nbd.h           |  58 +++++--
+ block/nbd-client.c            | 143 ++++++++++++++++-
+ block/nbd.c                   |   3 +
+ nbd/client.c                  | 128 ++++++++++++++-
+ nbd/common.c                  |  10 ++
+ nbd/server.c                  | 360 ++++++++++++++++++++++++++++++++++++++++--
+ tests/qemu-iotests/140.out    |   2 +-
+ tests/qemu-iotests/143.out    |   2 +-
+ tests/qemu-iotests/205        |   3 +-
+ tests/qemu-iotests/206        |  34 ++++
+ tests/qemu-iotests/206.out    |   2 +
+ tests/qemu-iotests/group      |   1 +
+ tests/qemu-iotests/iotests.py |  37 ++++-
+ 14 files changed, 749 insertions(+), 39 deletions(-)
+ create mode 100644 tests/qemu-iotests/206
+ create mode 100644 tests/qemu-iotests/206.out
+
+-- 
+2.11.1
