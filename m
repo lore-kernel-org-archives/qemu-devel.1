@@ -1,38 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1emNxy-0002QR-Oa
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:09:08 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emO2u-0007qq-8f
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:14:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1emNxv-0005AL-Go
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:09:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45252
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1emNxv-0005AA-BG
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:09:03 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1FHsJjO123899
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 13:09:01 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5e07u4pp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 13:09:01 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 15 Feb 2018 11:09:00 -0700
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emO2q-0000ct-V8
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:14:12 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180215175707.15491-1-peter.maydell@linaro.org>
+	<20180215175707.15491-3-peter.maydell@linaro.org>
+	<CAFEAcA_UWVgwEsTq2Tebn+yL5Ckd_7_S_wUvsKMDZfEHxr9stQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <04e252ac-0f7f-d045-2484-8793399333cb@amsat.org>
+Date: Thu, 15 Feb 2018 15:14:04 -0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180212124008.8960-1-cohuck@redhat.com>
-References: <20180212124008.8960-1-cohuck@redhat.com>
-Date: Thu, 15 Feb 2018 12:08:49 -0600
-Message-Id: <151871812906.15399.7207601076155911374@sif>
-Subject: Re: [Qemu-devel] [PATCH v2] docs: document our stable process
+In-Reply-To: <CAFEAcA_UWVgwEsTq2Tebn+yL5Ckd_7_S_wUvsKMDZfEHxr9stQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/3] hw/arm/boot: Honour CPU's
+ address space for image loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,118 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>
 
-Quoting Cornelia Huck (2018-02-12 06:40:08)
-> Some pointers on how to get a patch into stable.
-> =
+On 02/15/2018 03:06 PM, Peter Maydell wrote:
+> On 15 February 2018 at 17:57, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Instead of loading kernels, device trees, and the like to
+>> the system address space, use the CPU's address space. This
+>> is important if we're trying to load the file to memory or
+>> via an alias memory region that is provided by an SoC
+>> object and thus not mapped into the system address space.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  hw/arm/boot.c | 119 +++++++++++++++++++++++++++++++++++++---------------------
+>>  1 file changed, 76 insertions(+), 43 deletions(-)
+>>
+>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>> index 9b174b982c..0eac655c98 100644
+>> --- a/hw/arm/boot.c
+>> +++ b/hw/arm/boot.c
+>> @@ -35,6 +35,25 @@
+>>  #define ARM64_TEXT_OFFSET_OFFSET    8
+>>  #define ARM64_MAGIC_OFFSET          56
+>>
+>> +static AddressSpace *arm_boot_addressspace(ARMCPU *cpu,
+>> +                                           const struct arm_boot_info *info)
+>> +{
+>> +    /* Return the address space to use for bootloader reads and writes.
+>> +     * We prefer the secure address space if the CPU has it and we're
+>> +     * going to boot the guest into it.
+>> +     */
+>> +    int asidx;
+>> +    CPUState *cs = CPU(cpu);
+>> +
+>> +    if (arm_feature(&cpu->env, ARM_FEATURE_EL3) && info->secure_boot) {
+>> +        asidx = ARMASIdx_S;
+>> +    } else {
+>> +        asidx = ARMASIdx_NS;
+>> +    }
+>> +
+>> +    return cpu_get_address_space(cs, asidx);
+>> +}
+>> +
+>>  typedef enum {
+>>      FIXUP_NONE = 0,     /* do nothing */
+>>      FIXUP_TERMINATOR,   /* end of insns */
+>> @@ -124,7 +143,8 @@ static const ARMInsnFixup smpboot[] = {
+>>  };
+>>
+>>  static void write_bootloader(const char *name, hwaddr addr,
+>> -                             const ARMInsnFixup *insns, uint32_t *fixupcontext)
+>> +                             const ARMInsnFixup *insns, uint32_t *fixupcontext,
+>> +                             AddressSpace *as)
+>>  {
+>>      /* Fix up the specified bootloader fragment and write it into
+>>       * guest memory using rom_add_blob_fixed(). fixupcontext is
+>> @@ -163,7 +183,7 @@ static void write_bootloader(const char *name, hwaddr addr,
+>>          code[i] = tswap32(insn);
+>>      }
+>>
+>> -    rom_add_blob_fixed(name, code, len * sizeof(uint32_t), addr);
+>> +    rom_add_blob_fixed_as(name, code, len * sizeof(uint32_t), addr, as);
+>>
+>>      g_free(code);
+>>  }
+>> @@ -172,6 +192,7 @@ static void default_write_secondary(ARMCPU *cpu,
+>>                                      const struct arm_boot_info *info)
+>>  {
+>>      uint32_t fixupcontext[FIXUP_MAX];
+>> +    AddressSpace *as = CPU(cpu)->as;
+> 
+> Oops. This should be
+>     AddressSpace *as = arm_boot_addressspace(cpu, info);
 
-> [contains some suggestions by mdroth]
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> RFC/D->v2: added mdroth's suggestions
-> ---
->  docs/stable-process.rst | 67 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 67 insertions(+)
->  create mode 100644 docs/stable-process.rst
-> =
+I was stuck there wondering why this one were using the CPU AS :)
 
-> diff --git a/docs/stable-process.rst b/docs/stable-process.rst
-> new file mode 100644
-> index 0000000000..c571204c9f
-> --- /dev/null
-> +++ b/docs/stable-process.rst
-> @@ -0,0 +1,67 @@
-> +QEMU and the stable process
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> +
-> +QEMU stable releases
-> +--------------------
-> +
-> +QEMU stable releases are based upon the last released QEMU version
-> +and marked by an additional version number, e.g. 2.10.1. Occasionally,
-> +a four-number version is released, if a single urgent fix needs to go
-> +on top.
-> +
-> +Usually, stable releases are only provided for the last major QEMU
-> +release. For example, when QEMU 2.11.0 is released, 2.11.x or 2.11.x.y
-> +stable releases are produced only until QEMU 2.12.0 is released, at
-> +which the stable process moves to producing 2.12.x/2.12.x.y releases.
+> 
+>>      fixupcontext[FIXUP_GIC_CPU_IF] = info->gic_cpu_if_addr;
+>>      fixupcontext[FIXUP_BOOTREG] = info->smp_bootreg_addr;
+>> @@ -182,13 +203,14 @@ static void default_write_secondary(ARMCPU *cpu,
+>>      }
+>>
+>>      write_bootloader("smpboot", info->smp_loader_start,
+>> -                     smpboot, fixupcontext);
+>> +                     smpboot, fixupcontext, as);
+>>  }
+>>
+>>  void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+>>                                              const struct arm_boot_info *info,
+>>                                              hwaddr mvbar_addr)
+>>  {
+>> +    AddressSpace *as = CPU(cpu)->as;
+> 
+> ...and so should this.
 
-"at which point"
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Sorry, looks like one of my errors slipped through :)
-
-With that and Eric's suggestions addressed:
-
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-> +
-> +What should go into a stable release?
-> +-------------------------------------
-> +
-> +Generally, the following patches are considered stable material:
-> +- Patches that fix severe issues, like fixes for CVEs
-> +- Patches that fix regressions
-> +
-> +If you think the patch would be important for users of the current relea=
-se
-> +(or for a distribution picking fixes), it is usually a good candidate
-> +for stable.
-> +
-> +
-> +How to get a patch into QEMU stable
-> +-----------------------------------
-> +
-> +There are various ways to get a patch into stable:
-> +
-> +* Preferred: Make sure that the stable maintainers are on copy when you =
-send
-> +  the patch by adding
-> +
-> +  .. code::
-> +
-> +     Cc: qemu-stable@nongnu.org
-> +
-> +  to the patch description. By default, this will send a copy of the  pa=
-tch
-> +  to ``qemu-stable@nongnu.org`` if you use git send-email, which is where
-> +  patches that are stable candidates are tracked by the maintainers.
-> +
-> +* You can also reply to a patch and put ``qemu-stable@nongnu.org`` on co=
-py
-> +  directly in your mail client if you think a previously submitted patch
-> +  should be considered for a stable release.
-> +
-> +* If a maintainer judges the patch appropriate for stable later on (or y=
-ou
-> +  notify them), they will add the same line to the patch, meaning that
-> +  the stable maintainers will be on copy on the maintainer's pull reques=
-t.
-> +
-> +* If you judge an already merged patch suitable for stable, send a mail
-> +  (preferably as a reply to the most recent patch submission) to
-> +  ``qemu-stable@nongnu.org`` along with ``qemu-devel@nongnu.org`` and
-> +  appropriate other people (like the patch author or the relevant mainta=
-iner)
-> +  on copy.
-> +
-> +Stable release process
-> +----------------------
-> +
-> +When the stable maintainers prepare a new stable release, they will prep=
-are
-> +a git branch with a release candidate and send the patches out to
-> +``qemu-devel@nongnu.org`` for review. If any of your patches are include=
-d,
-> +please verify that they look fine. You may also nominate other patches t=
-hat
-> +you think are suitable for inclusion. After review is complete (may invo=
-lve
-> +more release candidates), a new stable release is made available.
-> -- =
-
-> 2.13.6
->=20
+> 
+> thanks
+> -- PMM
+> 
