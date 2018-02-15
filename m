@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emOfl-0005SB-PA
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:54:23 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1emOoZ-0005W5-9f
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:03:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emOfk-0008TZ-Gc
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:54:21 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:46643)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emOfk-0008TS-B4
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 13:54:20 -0500
-Received: by mail-qt0-x242.google.com with SMTP id u6so868918qtg.13
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 10:54:20 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180123032135.28863-1-f4bug@amsat.org>
-	<20180123032135.28863-3-f4bug@amsat.org>
-	<CAKmqyKODDDKU0yjQrZC8a80MM2qPkMD-0uxc8LeGxUW8PWNpMg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c88b0e18-7f00-42b4-17ff-89dcc4acb5f9@amsat.org>
-Date: Thu, 15 Feb 2018 15:54:15 -0300
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1emOoV-0004u5-Ca
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:03:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53702
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1emOoV-0004ty-7T
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 14:03:23 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1FIt5dP037158
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:03:22 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g5dujx2s4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 14:03:21 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 15 Feb 2018 12:03:21 -0700
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKODDDKU0yjQrZC8a80MM2qPkMD-0uxc8LeGxUW8PWNpMg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 02/12] sdcard: replace DPRINTF() by
- trace events
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20180209013542.24516-1-chen_han_xiao@126.com>
+References: <20180209013542.24516-1-chen_han_xiao@126.com>
+Date: Thu, 15 Feb 2018 12:41:25 -0600
+Message-Id: <151872008505.15399.14198607718964730192@sif>
+Subject: Re: [Qemu-devel] [Resend][PATCH] qga: unset frozen state if no
+ mount points are frozen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,163 +42,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Chen Hanxiao <chen_han_xiao@126.com>
+Cc: qemu-devel@nongnu.org
 
-Hi Alistair,
+Quoting Chen Hanxiao (2018-02-08 19:35:42)
+> From: Chen Hanxiao <chenhanxiao@gmail.com>
+> =
 
-On 01/31/2018 01:12 PM, Alistair Francis wrote:
-> On Mon, Jan 22, 2018 at 7:21 PM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/sd/sd.c         | 33 ++++++++++++++++++++++++++-------
->>  hw/sd/trace-events |  6 ++++++
->>  2 files changed, 32 insertions(+), 7 deletions(-)
->>
->> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> index 55d2ba2dd7..f876973a2b 100644
->> --- a/hw/sd/sd.c
->> +++ b/hw/sd/sd.c
->> @@ -40,6 +40,7 @@
->>  #include "qemu/error-report.h"
->>  #include "qemu/timer.h"
->>  #include "qemu/log.h"
->> +#include "trace.h"
->>
->>  //#define DEBUG_SD 1
->>
->> @@ -132,6 +133,25 @@ struct SDState {
->>      bool cmd_line;
->>  };
->>
->> +static const char *sd_state_name(enum SDCardStates state)
->> +{
->> +    static const char *state_name[] = {
->> +        [sd_idle_state]             = "idle",
->> +        [sd_ready_state]            = "ready",
->> +        [sd_identification_state]   = "identification",
->> +        [sd_standby_state]          = "standby",
->> +        [sd_transfer_state]         = "transfer",
->> +        [sd_sendingdata_state]      = "sendingdata",
->> +        [sd_receivingdata_state]    = "receivingdata",
->> +        [sd_programming_state]      = "programming",
->> +        [sd_disconnect_state]       = "disconnect",
->> +    };
->> +    if (state == sd_inactive_state) {
->> +        return "inactive";
->> +    }
-> 
-> There should be an assert here to make sure we never go off the end of
-> this array.
+> If we set mountpoints to qmp_guest_fsfreeze_freeze_list,
+> we may got nothing to freeze as all mountpoints are
+> not valid.
+> Call ga_unset_frozen in this senario.
+> =
 
-This shouldn't happen since this function is local (static), but I'll
-add a check.
+> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+> ---
+> Rebase on master
+> =
 
-> 
-> Is this used in future? It seems like a lot of work for one caller.
+>  qga/commands-posix.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> =
 
-This resulted useful to me when tracing (in particular when using the
-MMC mode). Also note this code is only called when tracing is enabled.
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index e809e382eb..9fd51f1d7a 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -1273,6 +1273,12 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mo=
+untpoints,
+>      }
+> =
 
-http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02387.html
+>      free_fs_mount_list(&mounts);
+> +    /* We may not issue any FIFREEZE here when had mountpoints.
+> +     * Just unset ga_state here and ready for the next call.
+> +     */
+> +    if (has_mountpoints && i =3D=3D 0) {
+> +        ga_unset_frozen(ga_state);
+> +    }
 
-> 
->> +    return state_name[state];
->> +}
->> +
->>  static uint8_t sd_get_dat_lines(SDState *sd)
->>  {
->>      return sd->enable ? sd->dat_lines : 0;
->> @@ -776,6 +796,8 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->>      uint32_t rca = 0x0000;
->>      uint64_t addr = (sd->ocr & (1 << 30)) ? (uint64_t) req.arg << 9 : req.arg;
->>
->> +    trace_sdcard_normal_command(req.cmd, req.arg, sd_state_name(sd->state));
->> +
->>      /* Not interpreting this as an app command */
->>      sd->card_status &= ~APP_CMD;
->>
->> @@ -790,7 +812,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->>          sd->multi_blk_cnt = 0;
->>      }
->>
->> -    DPRINTF("CMD%d 0x%08x state %d\n", req.cmd, req.arg, sd->state);
->>      switch (req.cmd) {
->>      /* Basic commands (Class 0 and Class 1) */
->>      case 0:    /* CMD0:   GO_IDLE_STATE */
->> @@ -1310,8 +1331,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->>          return sd_r1;
->>
->>      case 56:   /* CMD56:  GEN_CMD */
->> -        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
->> -
->>          switch (sd->state) {
->>          case sd_transfer_state:
->>              sd->data_offset = 0;
->> @@ -1345,7 +1364,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->>  static sd_rsp_type_t sd_app_command(SDState *sd,
->>                                      SDRequest req)
->>  {
->> -    DPRINTF("ACMD%d 0x%08x\n", req.cmd, req.arg);
->> +    trace_sdcard_app_command(req.cmd, req.arg);
->>      sd->card_status |= APP_CMD;
->>      switch (req.cmd) {
->>      case 6:    /* ACMD6:  SET_BUS_WIDTH */
->> @@ -1594,7 +1613,7 @@ send_response:
->>          DPRINTF("Response:");
->>          for (i = 0; i < rsplen; i++)
->>              fprintf(stderr, " %02x", response[i]);
->> -        fprintf(stderr, " state %d\n", sd->state);
->> +        fputc('\n', stderr);
-> 
-> Why change this?
+It seems odd to special-case has_mountpoints. Wouldn't:
 
-Probably leftover when rebasing, since trace_sdcard_normal_command() now
-displays the state, I was not sure the best way to trace hexdump before
-removing this debug code.
+  if (i =3D=3D 0) {
+    ...
+  }
 
-> 
-> Alistair
-> 
->>      } else {
->>          DPRINTF("No response %d\n", sd->state);
->>      }
->> @@ -1605,8 +1624,7 @@ send_response:
->>
->>  static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
->>  {
->> -    DPRINTF("sd_blk_read: addr = 0x%08llx, len = %d\n",
->> -            (unsigned long long) addr, len);
->> +    trace_sdcard_read_block(addr, len);
->>      if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
->>          fprintf(stderr, "sd_blk_read: read error on host side\n");
->>      }
->> @@ -1614,6 +1632,7 @@ static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
->>
->>  static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
->>  {
->> +    trace_sdcard_write_block(addr, len);
->>      if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
->>          fprintf(stderr, "sd_blk_write: write error on host side\n");
->>      }
->> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
->> index 0f8536db32..75dac5a2cd 100644
->> --- a/hw/sd/trace-events
->> +++ b/hw/sd/trace-events
->> @@ -23,6 +23,12 @@ sdhci_read_dataport(uint16_t data_count) "all %u bytes of data have been read fr
->>  sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u bytes of data"
->>  sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
->>
->> +# hw/sd/sd.c
->> +sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD%d arg 0x%08x (state %s)"
->> +sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
->> +sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
->> +sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
->> +
->>  # hw/sd/milkymist-memcard.c
->>  milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
->>  milkymist_memcard_memory_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
->> --
->> 2.15.1
->>
->>
+be more consistent? Then management could infer i=3D=3D0 leaves qga in
+unfrozen state. Otherwise I'd rather just stick with expecting a
+gratuitous unfreeze() since it requires less special-casing on the
+management/ side.
+
+And if we do change this, we'd probably want to update
+qga/qapi-schema.json to reflect the behavior. I.e.:
+
+##
+# @guest-fsfreeze-freeze:
+#
+# Sync and freeze all freezable, local guest filesystems. If this
+# command succeeded, you may call @guest-fsfreeze-thaw later to
+# unfreeze.
+...
+# Returns: Number of file systems currently frozen. On error, all filesyste=
+ms
+-# will be thawed.
++# will be thawed. If no filesystems are frozen as a result of this call,
++# then @guest-fsfreeze-status will remain "thawed" and calling
++# @guest-fsfreeze-thaw is not necessary.
+
+
+>      return i;
+> =
+
+>  error:
+> -- =
+
+> 2.14.3
+>=20
