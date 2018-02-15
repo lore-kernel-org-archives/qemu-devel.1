@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emHpT-0000XP-Gm
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:35:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1emHzJ-0005Qc-CN
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:46:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emHpQ-00052A-Cn
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:35:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57196)
+	(envelope-from <bounces@canonical.com>) id 1emHzE-0001hS-Go
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:46:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59218)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1emHpQ-00051W-6d
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:35:52 -0500
+	id 1emHzE-0001h4-9L
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:46:00 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1emHpO-0000FH-6A
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:35:50 +0000
+	id 1emHzB-0001PW-Ru
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:45:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2CF6B2E80C8
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:35:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 034A92E80C8
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 11:45:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Feb 2018 11:27:07 -0000
-From: Thomas Huth <1726394@bugs.launchpad.net>
-Reply-To: Bug 1726394 <1726394@bugs.launchpad.net>
+Date: Thu, 15 Feb 2018 11:31:49 -0000
+From: Thomas Huth <1739413@bugs.launchpad.net>
+Reply-To: Bug 1739413 <1739413@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150876459007.17533.9812313883985505054.malonedeb@wampee.canonical.com>
-Message-Id: <151869402757.14271.11081915260444494831.malone@gac.canonical.com>
+References: <151377269069.19770.3703612061677458311.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151869431000.14307.13151210757958720707.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1726394] Re: Passes through prctl(PR_SET_SECCOMP,
- SECCOMP_MODE_FILTER, address)
+Subject: [Qemu-devel] [Bug 1739413] Re: Hotplugged vcpu does not guarantee
+ cpu compat mode(power8) on power9 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +39,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fix has been released with QEMU 2.11:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da8b154a637b586441b
+David's patch has been included here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D51f84465dd985fc21589b=
+2e
+
 
 ** Changed in: qemu
-       Status: In Progress =3D> Fix Released
+       Status: In Progress =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1726394
+https://bugs.launchpad.net/bugs/1739413
 
 Title:
-  Passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, address)
+  Hotplugged vcpu does not guarantee cpu compat mode(power8) on power9
+  host
 
 Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Won't Fix
-Status in qemu source package in Zesty:
-  Won't Fix
-Status in qemu source package in Artful:
-  Won't Fix
-Status in qemu package in Debian:
-  Confirmed
+  Fix Committed
 
 Bug description:
-  qemu-user passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER,
-  address) unmodified, but the third argument is an address to a BPF
-  filter, causing an EFAULT. Now, the filter is architecture-specifc, so
-  you can't just rewrite the addresses, so the safest bet is to just
-  return an error here.
+  ./ppc64-softmmu/qemu-system-ppc64 -version
+  QEMU emulator version 2.11.50 (v2.11.0-254-gaf35267)
 
-  I guess you should just return EINVAL, but not sure. I'd really like
-  something that can be identified, so seccomp errors can be ignored
-  when it's not supported.
+  1. Boot a power8 compat mode guest power9 HW.
+  ./ppc64-softmmu/qemu-system-ppc64 -machine pseries,accel=3Dkvm,max-cpu-co=
+mpat=3Dpower8 -m 4096 /home/sath/images/guest.qcow2 -smp 1,maxcpus=3D2 -ser=
+ial /dev/pts/8  -monitor stdio -vga none -nographic
+  QEMU 2.11.50 monitor - type 'help' for more information
+  (qemu) =
+
+
+  2. Check for cpuinfo
+
+  # cat /proc/cpuinfo =
+
+  processor	: 0
+  cpu		: POWER8 (architected), altivec supported
+  clock		: 2200.000000MHz
+  revision	: 2.1 (pvr 004e 1201)
+
+  timebase	: 512000000
+  platform	: pSeries
+  model		: IBM pSeries (emulated by qemu)
+  machine		: CHRP IBM pSeries (emulated by qemu)
+  MMU		: Hash
+
+  =
+
+  3. Run a small program invoking isa v3.0 instruction, it should complain =
+'Illegal instruction' as it is a power8 compat guest
+  # cat 1.c =
+
+  #include <stdio.h>
+  void main()
+      {
+      asm volatile (".long 0x7c0005e6");
+      }
+  # ./a.out =
+
+  [   59.352795] a.out[1741]: unhandled signal 4 at 0000000010000600 nip 00=
+00000010000600 lr 00007fffb4da5080 code 1
+  Illegal instruction =
+
+
+  4. Hotplug a vcpu
+  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
+  (qemu) info cpus
+  * CPU #0: nip=3D0xc0000000000de42c thread_id=3D113110
+    CPU #1: nip=3D0xc0000000000de42c thread_id=3D113348
+
+  5. Try running the same program in the hotplugged vcpu and it does not
+  complain as 'Illegal instruction'
+
+  #taskset -c 1 ./a.out ----------------------NOK
+  #  =
+
+
+  # taskset -c 0 ./a.out =
+
+  [  356.618031] a.out[1755]: unhandled signal 4 at 0000000010000600 nip 00=
+00000010000600 lr 00007fffae7f5080 code 1
+  Illegal instruction
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1726394/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1739413/+subscriptions
