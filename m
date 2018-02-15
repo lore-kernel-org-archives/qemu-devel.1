@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emDCX-0000dX-6e
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:39:26 -0500
+	(envelope-from <thuth@redhat.com>) id 1emDaj-0000Hb-IW
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 02:04:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emDCU-0005ts-3e
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:39:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1emDag-0005OM-EF
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 02:04:25 -0500
 References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1517864246-11101-7-git-send-email-walling@linux.vnet.ibm.com>
-	<a7e79b24-7baa-2a8b-0659-cb03c68c75fd@linux.vnet.ibm.com>
+	<1517864246-11101-12-git-send-email-walling@linux.vnet.ibm.com>
+	<8259c694-3f9a-ce9e-9d1d-252568f3e73a@redhat.com>
+	<ad1e16df-8ebe-5271-b62c-76924c758cbc@linux.vnet.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f97e6b7b-0765-c12b-b93d-a42470e470e2@redhat.com>
-Date: Thu, 15 Feb 2018 07:38:48 +0100
+Message-ID: <30b25d5a-2525-c34c-a862-7b5bcbbcffe3@redhat.com>
+Date: Thu, 15 Feb 2018 08:04:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <a7e79b24-7baa-2a8b-0659-cb03c68c75fd@linux.vnet.ibm.com>
+In-Reply-To: <ad1e16df-8ebe-5271-b62c-76924c758cbc@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 06/12] s390-ccw: parse and
- set boot menu options
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 11/12] s390-ccw: clear
+ pending irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-On 14.02.2018 18:46, Collin L. Walling wrote:
-> I'm beginning to like the usage of splash-time to represent a timeout
-> for the boot menu
-> less and less.=C2=A0 It is really meant for how long a _splash_ _image_
-> should appear during boot.
+On 14.02.2018 16:33, Collin L. Walling wrote:
+> On 02/14/2018 05:57 AM, David Hildenbrand wrote:
+[...]
+>> 1. CKC interrupts can be cleared by resetting the CKC
+>> 2. SCLP interrupts can be cleared only via delivery (apart from CPU
+>> reset)
+>>
+>> So if you have CKC and SCLP pending at the same time, you get the CKC
+>> delivered first and the SCLP remains pending.
+>>
+>> Now, the easiest way to clear that (if you don't know if any is
+>> pending!) is to simply print a string. Then you know that you have
+>> exactly one SCLP interrupt pending.
+>>
+>> So simply printing a string after potentially reading should be
+>> sufficient to clear the SCLP interrupt deterministically :)
 >=20
-> I'd like to suggest adding a new boot option "menu-timeout".=C2=A0 An
-> alternative would be
-> documenting in qemu-options.hx that s390 treats "splash-time" as the
-> menu-timeout.
+> Perhaps it is due to my lack of understanding of how irqs are queued,
+> but is it
+> possible that we could still end up with service interrupts pending in
+> the SCLP?
+> Specifically if we're still accepting external interrupts from
+> keystrokes but we
+> aren't reading anything from the SCLP.
 >=20
-> Thoughts?
+> Let's say we have 1 service signal pending and we go to print something=
+.
+> This
+> executes the sclp service call instruction and generates a new service
+> signal.
+> The SCLP would consume one of the service interrupts and write to the
+> console.
+> We still have 1 interrupt pending that we need to deal with.
+>=20
+> That 1 pending interrupt could have been generated at any time we're st=
+ill
+> listening to activity from the keyboard.
 
-I think you should keep splash-time and not introduce a new option.
-Libvirt seems to map the timeout from <bootmenu enable=3D'yes'
-timeout=3D'X'/> to the splash-time option, and according to the libvirt
-documentation: "Additional attribute timeout takes the number of
-milliseconds the boot menu should wait until it times out."
+There is no "queue" or something like this for service interrupts.
+Either one service interrupt is pending, or it is not. Have a look at
+arch/s390/kvm/interrupt.c in the Linux kernel sources and search for the
+functions __deliver_service() and __inject_service() for example.
 
-So it seems like splash-time is already expected to define the amount of
-time for the boot menu. We should not confuse libvirt or the users by
-introducing yet another option here.
+> In my next update to this patch, I setup the control program receive
+> mask in
+> the SCLP only when we need to get input from the user and then clear th=
+e
+> mask
+> when we're done. Doing so will make it so we generate an interrupt from
+> keystrokes ONLY when the mask is set. No external interrupts from
+> keystrokes
+> will be generated when the cp_receive mask is NOT set.
+>=20
+> After I clear the cp_receive mask, we consume any leftover interrupts b=
+y
+> calling consume_sclp_int (I also fixup the patch to make sure we only e=
+nd
+> irq-clearing on a ckc interrupt -- oops).
+
+Not sure whether you really have to deal with the ckc here again to get
+rid of pending service interrupts... David's idea to simply print out
+something to clear the pending service interrupt sounds easier to me.
 
  Thomas
-
-
-> On 02/05/2018 03:57 PM, Collin L. Walling wrote:
->> Set boot menu options for an s390 guest and store them in
->> the iplb. These options are set via the QEMU command line
->> option:
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 -boot menu=3Don|off[,splash-time=3DX]
->>
->> or via the libvirt domain xml:
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 <os>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <bootmenu enable=3D'yes|no' timeo=
-ut=3D'X'/>
->> =C2=A0=C2=A0=C2=A0=C2=A0 </os>
->>
->> Where X represents some positive integer representing
->> milliseconds.
->>
->> Any value set for loadparm will override all boot menu options.
->> If loadparm=3DPROMPT, then the menu will be enabled without a
->> timeout.
->>
->> The absence of any boot options on the command line will flag
->> to later use the zipl boot loader values.
->>
->> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> ---
->> [...]
