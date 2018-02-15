@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emJT9-0001Xs-H6
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:21:00 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emJVI-00033D-KS
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:23:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emJT8-0004T4-H2
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:20:59 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:43772)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emJVE-0005V6-FA
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:23:12 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:44058)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1emJT8-0004SZ-CD
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:20:58 -0500
-Received: by mail-ot0-x243.google.com with SMTP id q12so23333333otg.10
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 05:20:58 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emJVE-0005Ur-AF
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:23:08 -0500
+Received: by mail-qk0-x241.google.com with SMTP id l23so7054681qkk.11
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 05:23:08 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1517532021.git.alistair.francis@xilinx.com>
+	<e394130fdcf7e19abfc584db75720546980075bf.1517532021.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a704b7e6-7a50-5826-c45c-376b33f36608@amsat.org>
+Date: Thu, 15 Feb 2018 10:23:04 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180211205848.4568-7-richard.henderson@linaro.org>
-References: <20180211205848.4568-1-richard.henderson@linaro.org>
-	<20180211205848.4568-7-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Feb 2018 13:20:37 +0000
-Message-ID: <CAFEAcA_1wbQukD_rQzxMWMox7wtOopUd5sVPiyxsH0th_anA_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] linux-user: Support SVE in aarch64
- signal frames
+In-Reply-To: <e394130fdcf7e19abfc584db75720546980075bf.1517532021.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] bcm2836: Use the Cortex-A7 instead
+ of Cortex-A15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: peter.maydell@linaro.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, alistair23@gmail.com, ehabkost@redhat.com, marcel@redhat.com, imammedo@redhat.com
 
-On 11 February 2018 at 20:58, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Hi Peter,
+
+On 02/01/2018 09:42 PM, Alistair Francis wrote:
+> The BCM2836 uses a Cortex-A7 not a Cortex-A15. Update the device to use
+> the correct CPU.
+> https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/QA7_rev3.4.pdf
+
+Can you add these lines with reference to the commits?
+
+  When the BCM2836 was introduced (bad5623690b) the Cortex-A7 was not
+  available, so the very similar Cortex-A15 was used.
+
+  Since dcf578ed8ce we can model the correct core.
+
+Thanks!
+
+Phil.
+
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  linux-user/signal.c | 348 ++++++++++++++++++++++++++++++++++++++++++----------
->  1 file changed, 283 insertions(+), 65 deletions(-)
->
-> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> index 9a380b9e31..af953175db 100644
-> --- a/linux-user/signal.c
-> +++ b/linux-user/signal.c
-> @@ -1443,35 +1443,61 @@ struct target_fpsimd_context {
->      uint64_t vregs[32 * 2]; /* really uint128_t vregs[32] */
->  };
->
-> -/*
-> - * Auxiliary context saved in the sigcontext.__reserved array. Not exported to
-> - * user space as it will change with the addition of new context. User space
-> - * should check the magic/size information.
-> - */
-> -struct target_aux_context {
-> -    struct target_fpsimd_context fpsimd;
-> -    /* additional context to be added before "end" */
-> -    struct target_aarch64_ctx end;
-> +#define TARGET_EXTRA_MAGIC  0x45585401
-> +
-> +struct target_extra_context {
-> +    struct target_aarch64_ctx head;
-> +    uint64_t datap; /* 16-byte aligned pointer to extra space cast to __u64 */
-> +    uint32_t size; /* size in bytes of the extra space */
-> +    uint32_t reserved[3];
-> +};
-> +
-> +#define TARGET_SVE_MAGIC    0x53564501
-> +
-> +struct target_sve_context {
-> +    struct target_aarch64_ctx head;
-> +    uint16_t vl;
-> +    uint16_t reserved[3];
->  };
-
-I found this patch too hard to review. It looks like you've combined
-a refactoring of how we handle the AArch64 "bunch of extra auxiliary
-context records" sigframe information with the addition of the SVE
-context record. Could you split that into separate patches, please?
-A description of why the current code isn't sufficient would also
-be helpful.
-
-thanks
--- PMM
+> V3:
+>  - Use ARM_CPU_TYPE_NAME() macro
+> V2:
+>  - Fix the BCM2836 CPU
+> 
+>  hw/arm/bcm2836.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 8c43291112..c477772484 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -30,7 +30,7 @@ static void bcm2836_init(Object *obj)
+>  
+>      for (n = 0; n < BCM2836_NCPUS; n++) {
+>          object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
+> -                          "cortex-a15-" TYPE_ARM_CPU);
+> +                          ARM_CPU_TYPE_NAME("cortex-a7"));
+>          object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
+>                                    &error_abort);
+>      }
+> 
