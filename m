@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSan-0007T5-AK
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSan-0007Su-8k
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSai-0003Nl-70
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emSai-0003NV-2M
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:29 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52288)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58958)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1emSah-0003MZ-Jk
+	id 1emSah-0003MS-GS
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:05:23 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1FN31qG142577
+	w1FN4RPK109685
 	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:05:22 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5kea0ahh-1
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5kec0aef-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:05:22 -0500
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Thu, 15 Feb 2018 15:55:15 -0700
+	Thu, 15 Feb 2018 15:55:10 -0700
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Thu, 15 Feb 2018 17:54:32 -0500
+Date: Thu, 15 Feb 2018 17:54:29 -0500
 In-Reply-To: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1518735273-16089-12-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v6 11/12] s390-ccw: set cp_receive mask only
- when needed and consume pending service irqs
+Message-Id: <1518735273-16089-9-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 08/12] s390-ccw: read stage2 boot loader
+ data to find menu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,97 +41,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-It is possible while waiting for multiple types of external
-interrupts that we might have pending irqs remaining between
-irq consumption and irq-type disabling. Those interrupts
-could potentially propagate to the guest after IPL completes
-and cause unwanted behavior.
-
-As it is today, the SCLP will only recognize write events that
-are enabled by the control program's send and receive masks. To
-limit the window for, and prevent further irqs from, ASCII
-console events (specifically keystrokes), we should only enable
-the control program's receive mask when we need it.
-
-As an additional measure, once we've disabled/cleared the control
-program's receive mask, we will print an empty string in order
-to consume any pending service interrupt.
+Read the stage2 boot loader data block-by-block. We scan the
+current block for the string "zIPL" to detect the start of the
+boot menu banner. We then load the adjacent blocks (previous
+block and next block) to account for the possibility of menu
+data spanning multiple blocks.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/menu.c     |  5 +++++
- pc-bios/s390-ccw/s390-ccw.h |  1 +
- pc-bios/s390-ccw/sclp.c     | 10 ++++------
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ pc-bios/s390-ccw/bootmap.c | 94 +++++++++++++++++++++++++++++++++++++++++++---
+ pc-bios/s390-ccw/bootmap.h | 23 +++++++++++-
+ pc-bios/s390-ccw/menu.c    |  5 +++
+ pc-bios/s390-ccw/menu.h    |  1 +
+ 4 files changed, 116 insertions(+), 7 deletions(-)
 
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index a94638d..5358301 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -13,6 +13,7 @@
+ #include "bootmap.h"
+ #include "virtio.h"
+ #include "bswap.h"
++#include "menu.h"
+ 
+ #ifdef DEBUG
+ /* #define DEBUG_FALLBACK */
+@@ -83,6 +84,10 @@ static void jump_to_IPL_code(uint64_t address)
+ 
+ static unsigned char _bprs[8*1024]; /* guessed "max" ECKD sector size */
+ static const int max_bprs_entries = sizeof(_bprs) / sizeof(ExtEckdBlockPtr);
++static uint8_t _s2[MAX_SECTOR_SIZE * 3] __attribute__((__aligned__(PAGE_SIZE)));
++static void *s2_prev_blk = _s2;
++static void *s2_cur_blk = _s2 + MAX_SECTOR_SIZE;
++static void *s2_next_blk = _s2 + MAX_SECTOR_SIZE * 2;
+ 
+ static inline void verify_boot_info(BootInfo *bip)
+ {
+@@ -182,7 +187,76 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
+     return block_nr;
+ }
+ 
+-static void run_eckd_boot_script(block_number_t bmt_block_nr)
++static bool find_zipl_boot_menu_banner(int *offset)
++{
++    int i;
++
++    /* Menu banner starts with "zIPL" */
++    for (i = 0; i < virtio_get_block_size() - 4; i++) {
++        if (magic_match(s2_cur_blk + i, ZIPL_MAGIC_EBCDIC)) {
++            *offset = i;
++            return true;
++        }
++    }
++
++    return false;
++}
++
++static int eckd_get_boot_menu_index(block_number_t s1b_block_nr)
++{
++    block_number_t cur_block_nr;
++    block_number_t prev_block_nr = 0;
++    block_number_t next_block_nr = 0;
++    EckdStage1b *s1b = (void *)sec;
++    int offset;
++    int i;
++
++    /* Get Stage1b data */
++    memset(sec, FREE_SPACE_FILLER, sizeof(sec));
++    read_block(s1b_block_nr, s1b, "Cannot read stage1b boot loader");
++
++    memset(_s2, FREE_SPACE_FILLER, sizeof(_s2));
++
++    /* Get Stage2 data */
++    for (i = 0; i < STAGE2_BLK_CNT_MAX; i++) {
++        cur_block_nr = eckd_block_num(&s1b->seek[i].chs);
++
++        if (!cur_block_nr) {
++            break;
++        }
++
++        read_block(cur_block_nr, s2_cur_blk, "Cannot read stage2 boot loader");
++
++        if (find_zipl_boot_menu_banner(&offset)) {
++            /* Load the adjacent blocks to account for the
++             * possibility of menu data spanning multiple blocks.
++             */
++            if (prev_block_nr) {
++                read_block(prev_block_nr, s2_prev_blk,
++                           "Cannot read stage2 boot loader");
++            }
++
++            if (i + 1 < STAGE2_BLK_CNT_MAX) {
++                next_block_nr = eckd_block_num(&s1b->seek[i + 1].chs);
++            }
++
++            if (next_block_nr) {
++                read_block(next_block_nr, s2_next_blk,
++                           "Cannot read stage2 boot loader");
++            }
++
++            return menu_get_zipl_boot_index(s2_cur_blk, offset);
++        }
++
++        prev_block_nr = cur_block_nr;
++    }
++
++    sclp_print("No zipl boot menu data found. Booting default entry.");
++    return 0;
++}
++
++static void run_eckd_boot_script(block_number_t bmt_block_nr,
++                                 block_number_t s1b_block_nr)
+ {
+     int i;
+     unsigned int loadparm = get_loadparm_index();
+@@ -191,6 +265,10 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+     BootMapTable *bmt = (void *)sec;
+     BootMapScript *bms = (void *)sec;
+ 
++    if (menu_check_flags(BOOT_MENU_FLAG_CMD_OPTS | BOOT_MENU_FLAG_ZIPL_OPTS)) {
++        loadparm = eckd_get_boot_menu_index(s1b_block_nr);
++    }
++
+     debug_print_int("loadparm", loadparm);
+     IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
+                " maximum number of boot entries allowed");
+@@ -223,7 +301,7 @@ static void ipl_eckd_cdl(void)
+     XEckdMbr *mbr;
+     EckdCdlIpl2 *ipl2 = (void *)sec;
+     IplVolumeLabel *vlbl = (void *)sec;
+-    block_number_t bmt_block_nr;
++    block_number_t bmt_block_nr, s1b_block_nr;
+ 
+     /* we have just read the block #0 and recognized it as "IPL1" */
+     sclp_print("CDL\n");
+@@ -241,6 +319,9 @@ static void ipl_eckd_cdl(void)
+     /* save pointer to Boot Map Table */
+     bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
+ 
++    /* save pointer to Stage1b Data */
++    s1b_block_nr = eckd_block_num(&ipl2->stage1.seek[0].chs);
++
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(2, vlbl, "Cannot read Volume Label at block 2");
+     IPL_assert(magic_match(vlbl->key, VOL1_MAGIC),
+@@ -249,7 +330,7 @@ static void ipl_eckd_cdl(void)
+                "Invalid magic of volser block");
+     print_volser(vlbl->f.volser);
+ 
+-    run_eckd_boot_script(bmt_block_nr);
++    run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
+     /* no return */
+ }
+ 
+@@ -280,7 +361,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+ 
+ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+ {
+-    block_number_t bmt_block_nr;
++    block_number_t bmt_block_nr, s1b_block_nr;
+     EckdLdlIpl1 *ipl1 = (void *)sec;
+ 
+     if (mode != ECKD_LDL_UNLABELED) {
+@@ -302,7 +383,10 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+     /* save pointer to Boot Map Table */
+     bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
+ 
+-    run_eckd_boot_script(bmt_block_nr);
++    /* save pointer to Stage1b Data */
++    s1b_block_nr = eckd_block_num(&ipl1->stage1.seek[0].chs);
++
++    run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
+     /* no return */
+ }
+ 
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index 1ddc08f..9f873b5 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -88,6 +88,7 @@ typedef struct ScsiMbr {
+ } __attribute__ ((packed)) ScsiMbr;
+ 
+ #define ZIPL_MAGIC              "zIPL"
++#define ZIPL_MAGIC_EBCDIC       "\xa9\xc9\xd7\xd3"
+ #define IPL1_MAGIC "\xc9\xd7\xd3\xf1" /* == "IPL1" in EBCDIC */
+ #define IPL2_MAGIC "\xc9\xd7\xd3\xf2" /* == "IPL2" in EBCDIC */
+ #define VOL1_MAGIC "\xe5\xd6\xd3\xf1" /* == "VOL1" in EBCDIC */
+@@ -250,15 +251,33 @@ typedef struct EckdCdlIpl1 {
+     uint8_t data[24];
+ } __attribute__((packed)) EckdCdlIpl1;
+ 
++typedef struct EckdSeekArg {
++    uint16_t pad;
++    EckdCHS chs;
++    uint8_t pad2;
++} __attribute__ ((packed)) EckdSeekArg;
++
++typedef struct EckdStage1b {
++    uint8_t reserved[32 * STAGE2_BLK_CNT_MAX];
++    struct EckdSeekArg seek[STAGE2_BLK_CNT_MAX];
++    uint8_t unused[64];
++} __attribute__ ((packed)) EckdStage1b;
++
++typedef struct EckdStage1 {
++    uint8_t reserved[72];
++    struct EckdSeekArg seek[2];
++} __attribute__ ((packed)) EckdStage1;
++
+ typedef struct EckdCdlIpl2 {
+     uint8_t key[4]; /* == "IPL2" */
+-    uint8_t reserved0[88];
++    struct EckdStage1 stage1;
+     XEckdMbr mbr;
+     uint8_t reserved[24];
+ } __attribute__((packed)) EckdCdlIpl2;
+ 
+ typedef struct EckdLdlIpl1 {
+-    uint8_t reserved[112];
++    uint8_t reserved[24];
++    struct EckdStage1 stage1;
+     BootInfo bip; /* BootInfo is MBR for LDL */
+ } __attribute__((packed)) EckdLdlIpl1;
+ 
 diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 9601043..14410a8 100644
+index 3056cfc..5790e0c 100644
 --- a/pc-bios/s390-ccw/menu.c
 +++ b/pc-bios/s390-ccw/menu.c
-@@ -11,6 +11,7 @@
+@@ -14,6 +14,11 @@
+ static uint8_t flags;
+ static uint64_t timeout;
  
- #include "menu.h"
- #include "s390-ccw.h"
-+#include "sclp.h"
- 
- #define KEYCODE_NO_INP '\0'
- #define KEYCODE_ESCAPE '\033'
-@@ -117,8 +118,12 @@ static int get_index(void)
- 
-     memset(buf, 0, sizeof(buf));
- 
-+    sclp_set_write_mask(SCLP_EVENT_MASK_MSG_ASCII, SCLP_EVENT_MASK_MSG_ASCII);
-     len = read_prompt(buf, sizeof(buf));
- 
-+    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
-+    sclp_print(""); /* Clear any pending service int */
++int menu_get_zipl_boot_index(const void *stage2, int offset)
++{
++    return 0; /* implemented next patch */
++}
 +
-     /* If no input, boot default */
-     if (len == 0) {
-         return 0;
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index a7e6253..ebdcf86 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -69,6 +69,7 @@ unsigned int get_loadparm_index(void);
- 
- /* sclp.c */
- void sclp_print(const char *string);
-+void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask);
- void sclp_setup(void);
- void sclp_get_loadparm_ascii(char *loadparm);
- int sclp_read(char *str, size_t count);
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index abce139..21076f8 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -46,23 +46,21 @@ static int sclp_service_call(unsigned int command, void *sccb)
-         return 0;
- }
- 
--static void sclp_set_write_mask(void)
-+void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask)
+ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
  {
-     WriteEventMask *sccb = (void *)_sccb;
+     flags = boot_menu_flag;
+diff --git a/pc-bios/s390-ccw/menu.h b/pc-bios/s390-ccw/menu.h
+index 7df4114..c603de3 100644
+--- a/pc-bios/s390-ccw/menu.h
++++ b/pc-bios/s390-ccw/menu.h
+@@ -17,6 +17,7 @@
+ #define BOOT_MENU_FLAG_CMD_OPTS  0x80
+ #define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
  
-     sccb->h.length = sizeof(WriteEventMask);
-     sccb->mask_length = sizeof(unsigned int);
--    sccb->receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->cp_receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->send_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII;
-+    sccb->cp_receive_mask = receive_mask;
-+    sccb->cp_send_mask = send_mask;
++int menu_get_zipl_boot_index(const void *stage2, int offset);
+ void menu_set_parms(uint8_t boot_menu_flags, uint32_t boot_menu_timeout);
+ bool menu_check_flags(uint8_t check_flags);
  
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
- }
- 
- void sclp_setup(void)
- {
--    sclp_set_write_mask();
-+    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
- }
- 
- static int _strlen(const char *str)
 -- 
 2.7.4
