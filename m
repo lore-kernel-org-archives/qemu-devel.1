@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLeG-000479-DL
+	(envelope-from <brijesh.singh@amd.com>) id 1emLeE-00045y-L2
 	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLeC-0003Ou-PU
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:36 -0500
-Received: from mail-cys01nam02on0084.outbound.protection.outlook.com
-	([104.47.37.84]:12640
+	(envelope-from <brijesh.singh@amd.com>) id 1emLe8-0003NZ-OK
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:34 -0500
+Received: from mail-cys01nam02on0072.outbound.protection.outlook.com
+	([104.47.37.72]:1882
 	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1emLeC-0003OJ-HP
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:32 -0500
+	id 1emLe8-0003NC-FW
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:40:28 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu, 15 Feb 2018 09:39:31 -0600
-Message-Id: <20180215153955.3253-6-brijesh.singh@amd.com>
+Date: Thu, 15 Feb 2018 09:39:29 -0600
+Message-Id: <20180215153955.3253-4-brijesh.singh@amd.com>
 In-Reply-To: <20180215153955.3253-1-brijesh.singh@amd.com>
 References: <20180215153955.3253-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 05/29] machine: add -memory-encryption
- property
+Subject: [Qemu-devel] [PATCH v9 03/29] exec: add debug version of physical
+ memory read and write API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +30,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-When CPU supports memory encryption feature, the property can be used to
-specify the encryption object to use when launching an encrypted guest.
+Adds the following new APIs
+- cpu_physical_memory_read_debug
+- cpu_physical_memory_write_debug
+- cpu_physical_memory_rw_debug
+- ldl_phys_debug
+- ldq_phys_debug
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/machine.c   | 22 ++++++++++++++++++++++
- include/hw/boards.h |  1 +
- qemu-options.hx     |  2 ++
- 3 files changed, 25 insertions(+)
+ exec.c                    | 40 ++++++++++++++++++++++++++++++++++++++++
+ include/exec/cpu-common.h | 15 +++++++++++++++
+ 2 files changed, 55 insertions(+)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 5d445839e89e..414e6e71092d 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -334,6 +334,22 @@ static bool machine_get_enforce_config_section(Object *obj, Error **errp)
-     return ms->enforce_config_section;
- }
+diff --git a/exec.c b/exec.c
+index b1366f85b07b..bc7a63fbc2f4 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3592,6 +3592,46 @@ void address_space_cache_destroy(MemoryRegionCache *cache)
+ #define RCU_READ_UNLOCK()        rcu_read_unlock()
+ #include "memory_ldst.inc.c"
  
-+static char *machine_get_memory_encryption(Object *obj, Error **errp)
++uint32_t ldl_phys_debug(CPUState *cpu, hwaddr addr)
 +{
-+    MachineState *ms = MACHINE(obj);
++    MemTxAttrs attrs;
++    int asidx = cpu_asidx_from_attrs(cpu, attrs);
++    uint32_t val;
 +
-+    return g_strdup(ms->memory_encryption);
++    /* set debug attrs to indicate memory access is from the debugger */
++    attrs.debug = 1;
++
++    address_space_rw(cpu->cpu_ases[asidx].as, addr, attrs,
++                     (void *) &val, 4, 0);
++
++    return tswap32(val);
 +}
 +
-+static void machine_set_memory_encryption(Object *obj, const char *value,
-+                                        Error **errp)
++uint64_t ldq_phys_debug(CPUState *cpu, hwaddr addr)
 +{
-+    MachineState *ms = MACHINE(obj);
++    MemTxAttrs attrs;
++    int asidx = cpu_asidx_from_attrs(cpu, attrs);
++    uint64_t val;
 +
-+    g_free(ms->memory_encryption);
-+    ms->memory_encryption = g_strdup(value);
++    /* set debug attrs to indicate memory access is from the debugger */
++    attrs.debug = 1;
++
++    address_space_rw(cpu->cpu_ases[asidx].as, addr, attrs,
++                     (void *) &val, 8, 0);
++    return val;
 +}
 +
- void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type)
++void cpu_physical_memory_rw_debug(hwaddr addr, uint8_t *buf,
++                                  int len, int is_write)
++{
++    MemTxAttrs attrs;
++
++    /* set debug attrs to indicate memory access is from the debugger */
++    attrs.debug = 1;
++
++    address_space_rw(&address_space_memory, addr, attrs, buf, len, is_write);
++}
++
+ /* virtual memory access for debug (includes writing to ROM) */
+ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+                         uint8_t *buf, int len, int is_write)
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 74341b19d26a..fa01385d4f1b 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -77,11 +77,26 @@ size_t qemu_ram_pagesize_largest(void);
+ 
+ void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+                             int len, int is_write);
++void cpu_physical_memory_rw_debug(hwaddr addr, uint8_t *buf,
++                                  int len, int is_write);
+ static inline void cpu_physical_memory_read(hwaddr addr,
+                                             void *buf, int len)
  {
-     strList *item = g_new0(strList, 1);
-@@ -612,6 +628,12 @@ static void machine_class_init(ObjectClass *oc, void *data)
-         &error_abort);
-     object_class_property_set_description(oc, "enforce-config-section",
-         "Set on to enforce configuration section migration", &error_abort);
-+
-+    object_class_property_add_str(oc, "memory-encryption",
-+        machine_get_memory_encryption, machine_set_memory_encryption,
-+        &error_abort);
-+    object_class_property_set_description(oc, "memory-encryption",
-+        "Set memory encyption object to use", &error_abort);
+     cpu_physical_memory_rw(addr, buf, len, 0);
  }
- 
- static void machine_class_base_init(ObjectClass *oc, void *data)
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index efb0a9edfdf1..8ce9a7a21d3d 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -243,6 +243,7 @@ struct MachineState {
-     bool suppress_vmdesc;
-     bool enforce_config_section;
-     bool enable_graphics;
-+    char *memory_encryption;
- 
-     ram_addr_t ram_size;
-     ram_addr_t maxram_size;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5050a49a5e65..fcbe842c0653 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -110,6 +110,8 @@ code to send configuration section even if the machine-type sets the
- @option{migration.send-configuration} property to @var{off}.
- NOTE: this parameter is deprecated. Please use @option{-global}
- @option{migration.send-configuration}=@var{on|off} instead.
-+@item memory-encryption=@var{}
-+Memory encryption object to use. The default is none.
- @end table
- ETEXI
- 
++static inline void cpu_physical_memory_read_debug(hwaddr addr,
++                                                  void *buf, int len)
++{
++    cpu_physical_memory_rw_debug(addr, buf, len, 0);
++}
++static inline void cpu_physical_memory_write_debug(hwaddr addr,
++                                                   const void *buf, int len)
++{
++    cpu_physical_memory_rw_debug(addr, (void *)buf, len, 1);
++}
++uint32_t ldl_phys_debug(CPUState *cpu, hwaddr addr);
++uint64_t ldq_phys_debug(CPUState *cpu, hwaddr addr);
++
+ static inline void cpu_physical_memory_write(hwaddr addr,
+                                              const void *buf, int len)
+ {
 -- 
 2.14.3
