@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emLAD-0000HN-1R
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:09:33 -0500
+	(envelope-from <rth7680@gmail.com>) id 1emLAn-0000gd-OS
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:10:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emLAC-0007xq-1n
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:09:32 -0500
+	(envelope-from <rth7680@gmail.com>) id 1emLAn-0008Bd-0c
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:10:09 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1518664462-2960-1-git-send-email-cota@braap.org>
+	<1518664462-2960-2-git-send-email-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <6a46ae1c-0d64-48b6-c567-5e72b1ad009c@twiddle.net>
+Date: Thu, 15 Feb 2018 07:09:56 -0800
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <e86b9596-56a5-a41e-452b-7923d3d74bcf@redhat.com>
-References: <20180215042900.16078-1-f4bug@amsat.org>
-	<20180215042900.16078-17-f4bug@amsat.org>
-	<e86b9596-56a5-a41e-452b-7923d3d74bcf@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 12:09:30 -0300
-Message-ID: <CAAdtpL5xxiyhjrKw+WrfLEwdYhJ2Jaa3kmq8QuTZvTfhvGyQHA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 16/30] hw/sh4: use the BYTE-based
- definitions
+In-Reply-To: <1518664462-2960-2-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] translator: add retcode to
+ translator_loop_temp_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Magnus Damm <magnus.damm@gmail.com>, Max Reitz <mreitz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On Thu, Feb 15, 2018 at 11:43 AM, Eric Blake <eblake@redhat.com> wrote:
-> On 02/14/2018 10:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>
->> It ease code review, unit is explicit.
->
->
-> I noticed it here, then see it occurs throughout the series:
-> s/ease/eases/ in the commit message.
+On 02/14/2018 07:14 PM, Emilio G. Cota wrote:
+> -void translator_loop_temp_check(DisasContextBase *db);
+> +int translator_loop_temp_check(DisasContextBase *db);
+>  
 
-Oops, thanks Eric I'll fix in respin.
+bool.
 
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>   hw/block/tc58128.c | 2 +-
->>   hw/sh4/r2d.c       | 2 +-
->>   2 files changed, 2 insertions(+), 2 deletions(-)
->>
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+Although I don't see how this is helpful.  If you want to customize the output,
+surely you just use tcg_check_temp_count directly?
+
+
+r~
