@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emNgT-00022g-OM
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:02 -0500
+	(envelope-from <berrange@redhat.com>) id 1emNgU-00022v-5d
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1emNgP-0003KC-1P
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36400 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1emNgT-0003M0-Bq
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:02 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36404 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emNgO-0003Jd-Rl
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:50:56 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1emNgT-0003Ln-6d
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 12:51:01 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 15 Feb 2018 17:50:42 +0000
-Message-Id: <20180215175044.8159-6-berrange@redhat.com>
-In-Reply-To: <20180215175044.8159-1-berrange@redhat.com>
-References: <20180215175044.8159-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL 5/7] io: Add /dev/fdset/ support to
- QIOChannelFile
+Date: Thu, 15 Feb 2018 17:50:37 +0000
+Message-Id: <20180215175044.8159-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/7] Qio next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +25,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
+The following changes since commit 8c5e7bddc22dac9d4dc3526996babce4c7242d=
+9d:
 
-Add /dev/fdset/ support to QIOChannelFile by calling qemu_open() instead
-of open() and qemu_close() instead of close(). There is a subtle
-semantic change since qemu_open() automatically sets O_CLOEXEC, but this
-doesn't affect any of the users of the function.
+  Merge remote-tracking branch 'remotes/huth/tags/pull-request-2018-02-14=
+' into staging (2018-02-15 13:00:44 +0000)
 
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- io/channel-file.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+are available in the Git repository at:
 
-diff --git a/io/channel-file.c b/io/channel-file.c
-index 1f2f710bf9..db948abc3e 100644
---- a/io/channel-file.c
-+++ b/io/channel-file.c
-@@ -50,7 +50,7 @@ qio_channel_file_new_path(const char *path,
- 
-     ioc = QIO_CHANNEL_FILE(object_new(TYPE_QIO_CHANNEL_FILE));
- 
--    ioc->fd = open(path, flags, mode);
-+    ioc->fd = qemu_open(path, flags, mode);
-     if (ioc->fd < 0) {
-         object_unref(OBJECT(ioc));
-         error_setg_errno(errp, errno,
-@@ -74,7 +74,7 @@ static void qio_channel_file_finalize(Object *obj)
- {
-     QIOChannelFile *ioc = QIO_CHANNEL_FILE(obj);
-     if (ioc->fd != -1) {
--        close(ioc->fd);
-+        qemu_close(ioc->fd);
-         ioc->fd = -1;
-     }
- }
-@@ -173,7 +173,7 @@ static int qio_channel_file_close(QIOChannel *ioc,
- {
-     QIOChannelFile *fioc = QIO_CHANNEL_FILE(ioc);
- 
--    if (close(fioc->fd) < 0) {
-+    if (qemu_close(fioc->fd) < 0) {
-         error_setg_errno(errp, errno,
-                          "Unable to close file");
-         return -1;
--- 
+  ssh://git@github.com/berrange/qemu tags/qio-next-pull-request
+
+for you to fetch changes up to 6809df1df036840d41a0cc9ca77cc6a0214fb1b5:
+
+  allow to build with older sed (2018-02-15 16:54:57 +0000)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Edgar Kaziakhmedov (1):
+  io/channel-websock: handle continuous reads without any data
+
+Jan Beulich (1):
+  allow to build with older sed
+
+Paolo Bonzini (1):
+  io: fix QIONetListener memory leak
+
+Ross Lagerwall (3):
+  io: Fix QIOChannelFile when creating and opening read-write
+  io: Don't call close multiple times in QIOChannelFile
+  io: Add /dev/fdset/ support to QIOChannelFile
+
+Thomas Huth (1):
+  io/channel-command: Do not kill the child process after closing the
+    pipe
+
+ Makefile                     |  3 +--
+ include/io/channel-file.h    |  2 +-
+ io/channel-command.c         | 12 +++++++++++-
+ io/channel-file.c            | 11 ++++-------
+ io/channel-websock.c         |  7 +++++--
+ io/net-listener.c            |  1 +
+ tests/test-io-channel-file.c | 29 +++++++++++++++++++++++++----
+ 7 files changed, 48 insertions(+), 17 deletions(-)
+
+--=20
 2.14.3
