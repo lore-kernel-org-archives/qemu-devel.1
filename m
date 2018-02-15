@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Alan.Robinson@ts.fujitsu.com>) id 1emHHW-0005Tz-KD
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:00:56 -0500
+	(envelope-from <Alan.Robinson@ts.fujitsu.com>) id 1emJak-0007WR-Hw
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:28:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Alan.Robinson@ts.fujitsu.com>) id 1emHHR-0004RY-LN
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 06:00:50 -0500
-Date: Thu, 15 Feb 2018 12:00:16 +0100
-Message-ID: <20180215110016.GB23170@ts.fujitsu.com>
+	(envelope-from <Alan.Robinson@ts.fujitsu.com>) id 1emJae-0000nr-Ph
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 08:28:50 -0500
+Date: Thu, 15 Feb 2018 14:28:07 +0100
+Message-ID: <20180215132807.GB24676@ts.fujitsu.com>
 Reply-To: Alan.Robinson@ts.fujitsu.com
 References: <20180215042900.16078-1-f4bug@amsat.org>
 	<20180215042900.16078-31-f4bug@amsat.org>
+	<20180215110016.GB23170@ts.fujitsu.com>
+	<fd9024d9-be99-653a-2e88-2d2d21f47dbd@amsat.org>
 Mime-Version: 1.0
 Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
-	micalg=sha1; boundary="cmJC7u66zC7hs+87"
+	micalg=sha1; boundary="wac7ysb48OaltWcw"
 Content-Disposition: inline
-In-Reply-To: <20180215042900.16078-31-f4bug@amsat.org>
+In-Reply-To: <fd9024d9-be99-653a-2e88-2d2d21f47dbd@amsat.org>
 From: Alan.Robinson@ts.fujitsu.com (Alan Robinson)
 Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 30/30] xen: use the BYTE-based
  definitions
@@ -30,66 +32,24 @@ To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>
 
 
---cmJC7u66zC7hs+87
+--wac7ysb48OaltWcw
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi Philippe,
 
-On Thu, Feb 15, 2018 at 01:29:00AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Subject: [Xen-devel] [PATCH 30/30] xen: use the BYTE-based definitions
-> List-Id: Xen developer discussion <xen-devel.lists.xenproject.org>
+On Thu, Feb 15, 2018 at 09:23:52AM -0300, Philippe Mathieu-Daud=E9 wrote:
 >=20
-> It ease code review, unit is explicit.
+> Can I add your R-b tag once fixed? Respin will be:
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  hw/block/xen_disk.c        |  4 ++--
->  hw/xenpv/xen_domainbuild.c | 10 +++++-----
->  2 files changed, 7 insertions(+), 7 deletions(-)
+> +    xenstore_write_int(dom, "memory/target", ram_size / K_BYTE);
+> +    xenstore_write_int(vm, "memory",         ram_size / M_BYTE);
+> +    xenstore_write_int(vm, "maxmem",         ram_size / M_BYTE);
 >=20
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index f74fcd42d1..557005b5e5 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -1153,9 +1153,9 @@ static int blk_connect(struct XenDevice *xendev)
->      }
-> =20
->      xen_pv_printf(xendev, 1, "type \"%s\", fileproto \"%s\", filename \"=
-%s\","
-> -                  " size %" PRId64 " (%" PRId64 " MB)\n",
-> +                  " size %" PRId64 " (%llu MB)\n",
->                    blkdev->type, blkdev->fileproto, blkdev->filename,
-> -                  blkdev->file_size, blkdev->file_size >> 20);
-> +                  blkdev->file_size, blkdev->file_size / M_BYTE);
-> =20
->      /* Fill in number of sector size and number of sectors */
->      xenstore_write_be_int(&blkdev->xendev, "sector-size", blkdev->file_b=
-lk);
-> diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
-> index 027f76fad1..083fb80ee5 100644
-> --- a/hw/xenpv/xen_domainbuild.c
-> +++ b/hw/xenpv/xen_domainbuild.c
-> @@ -75,9 +75,9 @@ int xenstore_domain_init1(const char *kernel, const cha=
-r *ramdisk,
->      xenstore_write_str(dom, "vm",     vm);
-> =20
->      /* memory */
-> -    xenstore_write_int(dom, "memory/target", ram_size >> 10);  // kB
-> -    xenstore_write_int(vm, "memory",         ram_size >> 20);  // MB
-> -    xenstore_write_int(vm, "maxmem",         ram_size >> 20);  // MB
-> +    xenstore_write_int(dom, "memory/target", ram_size * K_BYTE);
-> +    xenstore_write_int(vm, "memory",         ram_size * M_BYTE);
-> +    xenstore_write_int(vm, "maxmem",         ram_size * M_BYTE);
+Yes - Alan
 
-These changes looks wrong, surely it must be 'ram_size / K_BYTE'...
-
-Alan
-
-
---cmJC7u66zC7hs+87
+--wac7ysb48OaltWcw
 Content-Type: application/x-pkcs7-signature
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -137,11 +97,11 @@ xRcRJp7ZMpaYZ3V/upkNTQAQKTDIV9GjeXVYTwDAD/JxDSdYRpPNSBvIM5KBwz0qCwrX3wJz
 YWAKob6wztsm12//cfkn9w0LswYN4aQdciTNyvH6EGkt7k6RSE33TKa3EMqyHZeCcNurP+r6
 SLNLIi1U6d8gMIDWqkEoMUkxggGXMIIBkwIBATA9MC8xLTArBgNVBAMTJEZ1aml0c3UgVGVj
 aG5vbG9neSBTb2x1dGlvbnMgVXNlciBDQQIKNgudswAAAAJUwzAJBgUrDgMCGgUAoIGxMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE4MDIxNTExMDAxNlow
-IwYJKoZIhvcNAQkEMRYEFM7zBao7OiR4hf9w1inrXORYQvm4MFIGCSqGSIb3DQEJDzFFMEMw
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE4MDIxNTEzMjgwN1ow
+IwYJKoZIhvcNAQkEMRYEFEp51imeOdSJegF/fbxC7kNgGZfbMFIGCSqGSIb3DQEJDzFFMEMw
 CgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0G
-CCqGSIb3DQMCAgEoMA0GCSqGSIb3DQEBAQUABIGAduGTzZpsSDFb33+/cgv63J0MXndK/5hm
-O04HYZeIRJJleiR9iqFRzovxiRkv5DfRJv1Mar7SP20GBMoLZycVh4whYYtwDtHPap4ttz/J
-1dh+44sepCGWqzYEk/dbIqQOvEanQM+xcJ/HcINgzx1XU+WEBME57LN7w8pjnO0dgaM=
+CCqGSIb3DQMCAgEoMA0GCSqGSIb3DQEBAQUABIGAK76EzbmGwNLqC4JPMdmzLKR+sNeTTT83
+EUfZ35gXlO1osvBbclxrL8DHMEORs3iDfRY1Jx6hTz2qPxRXnlwwg61oBijjvIGeVMFSHXgy
+OEygP7qRFJ7cwUm99AiNTHYV6q058liHbvJz8c/HUj4LyKQWnRpk+fo9SHjEMa8Aens=
 
---cmJC7u66zC7hs+87--
+--wac7ysb48OaltWcw--
