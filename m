@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emAiQ-0001Gk-PE
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:00:13 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emAiM-0004Ad-Uk
+	(envelope-from <dgibson@ozlabs.org>) id 1emAiO-0001GG-Aj
 	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:00:10 -0500
-Date: Thu, 15 Feb 2018 13:40:42 +1100
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1emAiM-0004AU-Sy
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:00:08 -0500
+Date: Thu, 15 Feb 2018 14:50:07 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180215024042.GC5247@umbus.fritz.box>
-References: <20180214063558.27331-1-lvivier@redhat.com>
+Message-ID: <20180215035007.GF5247@umbus.fritz.box>
+References: <151863720814.3003.4939908778788942974.stgit@bahia.lan>
+	<151863724465.3003.14485203815672867421.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="LwW0XdcUbUexiWVK"
+	protocol="application/pgp-signature"; boundary="dWYAkE0V1FpFQHQ3"
 Content-Disposition: inline
-In-Reply-To: <20180214063558.27331-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] hw/char: remove legacy interface
- escc_init()
+In-Reply-To: <151863724465.3003.14485203815672867421.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 3/5] spapr: rename spapr_vcpu_id() to
+ spapr_get_vcpu_id()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,703 +25,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, Laurent Vivier <lvivier@redhat.com>
 
 
---LwW0XdcUbUexiWVK
-Content-Type: text/plain; charset=iso-8859-1
+--dWYAkE0V1FpFQHQ3
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 14, 2018 at 07:35:58AM +0100, Laurent Vivier wrote:
-> Move necessary stuff in escc.h and update type names.
-> Remove slavio_serial_ms_kbd_init().
-> Fix code style problems reported by checkpatch.pl
-> Update mac_newworld, mac_oldworld and sun4m to use directly the
-> QDEV interface.
+On Wed, Feb 14, 2018 at 08:40:44PM +0100, Greg Kurz wrote:
+> The spapr_vcpu_id() function is an accessor actually. Let's rename it
+> for symmetry with the recently added spapr_set_vcpu_id() helper.
 >=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> The motivation behind this is that a later patch will consolidate
+> the VCPU id formula in a function and spapr_vcpu_id looks like an
+> appropriate name.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied, thanks.
+There's some minor details I'm not sure I like about this patch and
+the previous one, but nothing important enough to delay the later
+parts of the series.  So, applied.
 
 > ---
+>  hw/ppc/spapr.c         |   16 ++++++++--------
+>  include/hw/ppc/spapr.h |    2 +-
+>  2 files changed, 9 insertions(+), 9 deletions(-)
 >=20
-> Notes:
->     v4: rebase and add Mark's R-b
->     v3: in sun4m, move comments about Slavio TTY
->         above both qdev_create().
->     v2: in sun4m, move comments about Slavio TTY close to
->         their qdev_prop_set_chr()=B2
->=20
->  hw/char/escc.c         | 209 ++++++++++++++-----------------------------=
-------
->  hw/ppc/mac_newworld.c  |  19 ++++-
->  hw/ppc/mac_oldworld.c  |  19 ++++-
->  hw/sparc/sun4m.c       |  34 +++++++-
->  include/hw/char/escc.h |  54 +++++++++++--
->  5 files changed, 170 insertions(+), 165 deletions(-)
->=20
-> diff --git a/hw/char/escc.c b/hw/char/escc.c
-> index 449bf2fc63..628f5f81f7 100644
-> --- a/hw/char/escc.c
-> +++ b/hw/char/escc.c
-> @@ -26,10 +26,7 @@
->  #include "hw/hw.h"
->  #include "hw/sysbus.h"
->  #include "hw/char/escc.h"
-> -#include "chardev/char-fe.h"
-> -#include "chardev/char-serial.h"
->  #include "ui/console.h"
-> -#include "ui/input.h"
->  #include "trace.h"
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 30cc48fd5264..18ebc058acdd 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -209,7 +209,7 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offs=
+et, PowerPCCPU *cpu,
+>      int i, ret =3D 0;
+>      uint32_t servers_prop[smt_threads];
+>      uint32_t gservers_prop[smt_threads * 2];
+> -    int index =3D spapr_vcpu_id(cpu);
+> +    int index =3D spapr_get_vcpu_id(cpu);
 > =20
->  /*
-> @@ -64,53 +61,7 @@
->   *  2010-May-23  Artyom Tarasenko:  Reworked IUS logic
->   */
+>      if (cpu->compat_pvr) {
+>          ret =3D fdt_setprop_cell(fdt, offset, "cpu-version", cpu->compat=
+_pvr);
+> @@ -238,7 +238,7 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offs=
+et, PowerPCCPU *cpu,
 > =20
-> -typedef enum {
-> -    chn_a, chn_b,
-> -} ChnID;
-> -
-> -#define CHN_C(s) ((s)->chn =3D=3D chn_b? 'b' : 'a')
-> -
-> -typedef enum {
-> -    ser, kbd, mouse,
-> -} ChnType;
-> -
-> -#define SERIO_QUEUE_SIZE 256
-> -
-> -typedef struct {
-> -    uint8_t data[SERIO_QUEUE_SIZE];
-> -    int rptr, wptr, count;
-> -} SERIOQueue;
-> -
-> -#define SERIAL_REGS 16
-> -typedef struct ChannelState {
-> -    qemu_irq irq;
-> -    uint32_t rxint, txint, rxint_under_svc, txint_under_svc;
-> -    struct ChannelState *otherchn;
-> -    uint32_t reg;
-> -    uint8_t wregs[SERIAL_REGS], rregs[SERIAL_REGS];
-> -    SERIOQueue queue;
-> -    CharBackend chr;
-> -    int e0_mode, led_mode, caps_lock_mode, num_lock_mode;
-> -    int disabled;
-> -    int clock;
-> -    uint32_t vmstate_dummy;
-> -    ChnID chn; // this channel, A (base+4) or B (base+0)
-> -    ChnType type;
-> -    uint8_t rx, tx;
-> -    QemuInputHandlerState *hs;
-> -} ChannelState;
-> -
-> -#define ESCC(obj) OBJECT_CHECK(ESCCState, (obj), TYPE_ESCC)
-> -
-> -typedef struct ESCCState {
-> -    SysBusDevice parent_obj;
-> -
-> -    struct ChannelState chn[2];
-> -    uint32_t it_shift;
-> -    MemoryRegion mmio;
-> -    uint32_t disabled;
-> -    uint32_t frequency;
-> -} ESCCState;
-> +#define CHN_C(s) ((s)->chn =3D=3D escc_chn_b ? 'b' : 'a')
-> =20
->  #define SERIAL_CTRL 0
->  #define SERIAL_DATA 1
-> @@ -214,44 +165,47 @@ typedef struct ESCCState {
->  #define R_MISC1I 14
->  #define R_EXTINT 15
-> =20
-> -static void handle_kbd_command(ChannelState *s, int val);
-> +static void handle_kbd_command(ESCCChannelState *s, int val);
->  static int serial_can_receive(void *opaque);
-> -static void serial_receive_byte(ChannelState *s, int ch);
-> +static void serial_receive_byte(ESCCChannelState *s, int ch);
-> =20
->  static void clear_queue(void *opaque)
+>  static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cp=
+u)
 >  {
-> -    ChannelState *s =3D opaque;
-> -    SERIOQueue *q =3D &s->queue;
-> +    ESCCChannelState *s =3D opaque;
-> +    ESCCSERIOQueue *q =3D &s->queue;
->      q->rptr =3D q->wptr =3D q->count =3D 0;
+> -    int index =3D spapr_vcpu_id(cpu);
+> +    int index =3D spapr_get_vcpu_id(cpu);
+>      uint32_t associativity[] =3D {cpu_to_be32(0x5),
+>                                  cpu_to_be32(0x0),
+>                                  cpu_to_be32(0x0),
+> @@ -342,7 +342,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachine=
+State *spapr)
+>      CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>          DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+> -        int index =3D spapr_vcpu_id(cpu);
+> +        int index =3D spapr_get_vcpu_id(cpu);
+>          int compat_smt =3D MIN(smp_threads, ppc_compat_max_vthreads(cpu)=
+);
+> =20
+>          if (index % spapr->vsmt !=3D 0) {
+> @@ -492,7 +492,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
+*fdt, int offset,
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      CPUPPCState *env =3D &cpu->env;
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cs);
+> -    int index =3D spapr_vcpu_id(cpu);
+> +    int index =3D spapr_get_vcpu_id(cpu);
+>      uint32_t segs[] =3D {cpu_to_be32(28), cpu_to_be32(40),
+>                         0xffffffff, 0xffffffff};
+>      uint32_t tbfreq =3D kvm_enabled() ? kvmppc_get_tbfreq()
+> @@ -626,7 +626,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sP=
+APRMachineState *spapr)
+>       */
+>      CPU_FOREACH_REVERSE(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -        int index =3D spapr_vcpu_id(cpu);
+> +        int index =3D spapr_get_vcpu_id(cpu);
+>          DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+>          int offset;
+> =20
+> @@ -3234,7 +3234,7 @@ static void *spapr_populate_hotplug_cpu_dt(CPUState=
+ *cs, int *fdt_offset,
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+> -    int id =3D spapr_vcpu_id(cpu);
+> +    int id =3D spapr_get_vcpu_id(cpu);
+>      void *fdt;
+>      int offset, fdt_size;
+>      char *nodename;
+> @@ -3791,7 +3791,7 @@ static void spapr_pic_print_info(InterruptStatsProv=
+ider *obj,
+>      ics_pic_print_info(spapr->ics, mon);
 >  }
 > =20
->  static void put_queue(void *opaque, int b)
+> -int spapr_vcpu_id(PowerPCCPU *cpu)
+> +int spapr_get_vcpu_id(PowerPCCPU *cpu)
 >  {
-> -    ChannelState *s =3D opaque;
-> -    SERIOQueue *q =3D &s->queue;
-> +    ESCCChannelState *s =3D opaque;
-> +    ESCCSERIOQueue *q =3D &s->queue;
+>      CPUState *cs =3D CPU(cpu);
 > =20
->      trace_escc_put_queue(CHN_C(s), b);
-> -    if (q->count >=3D SERIO_QUEUE_SIZE)
-> +    if (q->count >=3D ESCC_SERIO_QUEUE_SIZE) {
->          return;
-> +    }
->      q->data[q->wptr] =3D b;
-> -    if (++q->wptr =3D=3D SERIO_QUEUE_SIZE)
-> +    if (++q->wptr =3D=3D ESCC_SERIO_QUEUE_SIZE) {
->          q->wptr =3D 0;
-> +    }
->      q->count++;
->      serial_receive_byte(s, 0);
->  }
+> @@ -3828,7 +3828,7 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
+>      CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
 > =20
->  static uint32_t get_queue(void *opaque)
->  {
-> -    ChannelState *s =3D opaque;
-> -    SERIOQueue *q =3D &s->queue;
-> +    ESCCChannelState *s =3D opaque;
-> +    ESCCSERIOQueue *q =3D &s->queue;
->      int val;
-> =20
->      if (q->count =3D=3D 0) {
->          return 0;
->      } else {
->          val =3D q->data[q->rptr];
-> -        if (++q->rptr =3D=3D SERIO_QUEUE_SIZE)
-> +        if (++q->rptr =3D=3D ESCC_SERIO_QUEUE_SIZE) {
->              q->rptr =3D 0;
-> +        }
->          q->count--;
->      }
->      trace_escc_get_queue(CHN_C(s), val);
-> @@ -260,7 +214,7 @@ static uint32_t get_queue(void *opaque)
->      return val;
->  }
-> =20
-> -static int escc_update_irq_chn(ChannelState *s)
-> +static int escc_update_irq_chn(ESCCChannelState *s)
->  {
->      if ((((s->wregs[W_INTR] & INTR_TXINT) && (s->txint =3D=3D 1)) ||
->           // tx ints enabled, pending
-> @@ -274,7 +228,7 @@ static int escc_update_irq_chn(ChannelState *s)
->      return 0;
->  }
-> =20
-> -static void escc_update_irq(ChannelState *s)
-> +static void escc_update_irq(ESCCChannelState *s)
->  {
->      int irq;
-> =20
-> @@ -285,12 +239,12 @@ static void escc_update_irq(ChannelState *s)
->      qemu_set_irq(s->irq, irq);
->  }
-> =20
-> -static void escc_reset_chn(ChannelState *s)
-> +static void escc_reset_chn(ESCCChannelState *s)
->  {
->      int i;
-> =20
->      s->reg =3D 0;
-> -    for (i =3D 0; i < SERIAL_REGS; i++) {
-> +    for (i =3D 0; i < ESCC_SERIAL_REGS; i++) {
->          s->rregs[i] =3D 0;
->          s->wregs[i] =3D 0;
->      }
-> @@ -322,13 +276,13 @@ static void escc_reset(DeviceState *d)
->      escc_reset_chn(&s->chn[1]);
->  }
-> =20
-> -static inline void set_rxint(ChannelState *s)
-> +static inline void set_rxint(ESCCChannelState *s)
->  {
->      s->rxint =3D 1;
-> -    /* XXX: missing daisy chainnig: chn_b rx should have a lower priority
-> +    /* XXX: missing daisy chainnig: escc_chn_b rx should have a lower pr=
-iority
->         than chn_a rx/tx/special_condition service*/
->      s->rxint_under_svc =3D 1;
-> -    if (s->chn =3D=3D chn_a) {
-> +    if (s->chn =3D=3D escc_chn_a) {
->          s->rregs[R_INTR] |=3D INTR_RXINTA;
->          if (s->wregs[W_MINTR] & MINTR_STATUSHI)
->              s->otherchn->rregs[R_IVEC] =3D IVEC_HIRXINTA;
-> @@ -344,12 +298,12 @@ static inline void set_rxint(ChannelState *s)
->      escc_update_irq(s);
->  }
-> =20
-> -static inline void set_txint(ChannelState *s)
-> +static inline void set_txint(ESCCChannelState *s)
->  {
->      s->txint =3D 1;
->      if (!s->rxint_under_svc) {
->          s->txint_under_svc =3D 1;
-> -        if (s->chn =3D=3D chn_a) {
-> +        if (s->chn =3D=3D escc_chn_a) {
->              if (s->wregs[W_INTR] & INTR_TXINT) {
->                  s->rregs[R_INTR] |=3D INTR_TXINTA;
->              }
-> @@ -367,11 +321,11 @@ static inline void set_txint(ChannelState *s)
->      }
->  }
-> =20
-> -static inline void clr_rxint(ChannelState *s)
-> +static inline void clr_rxint(ESCCChannelState *s)
->  {
->      s->rxint =3D 0;
->      s->rxint_under_svc =3D 0;
-> -    if (s->chn =3D=3D chn_a) {
-> +    if (s->chn =3D=3D escc_chn_a) {
->          if (s->wregs[W_MINTR] & MINTR_STATUSHI)
->              s->otherchn->rregs[R_IVEC] =3D IVEC_HINOINT;
->          else
-> @@ -389,11 +343,11 @@ static inline void clr_rxint(ChannelState *s)
->      escc_update_irq(s);
->  }
-> =20
-> -static inline void clr_txint(ChannelState *s)
-> +static inline void clr_txint(ESCCChannelState *s)
->  {
->      s->txint =3D 0;
->      s->txint_under_svc =3D 0;
-> -    if (s->chn =3D=3D chn_a) {
-> +    if (s->chn =3D=3D escc_chn_a) {
->          if (s->wregs[W_MINTR] & MINTR_STATUSHI)
->              s->otherchn->rregs[R_IVEC] =3D IVEC_HINOINT;
->          else
-> @@ -412,12 +366,12 @@ static inline void clr_txint(ChannelState *s)
->      escc_update_irq(s);
->  }
-> =20
-> -static void escc_update_parameters(ChannelState *s)
-> +static void escc_update_parameters(ESCCChannelState *s)
->  {
->      int speed, parity, data_bits, stop_bits;
->      QEMUSerialSetParams ssp;
-> =20
-> -    if (!qemu_chr_fe_backend_connected(&s->chr) || s->type !=3D ser)
-> +    if (!qemu_chr_fe_backend_connected(&s->chr) || s->type !=3D escc_ser=
-ial)
->          return;
-> =20
->      if (s->wregs[W_TXCTRL1] & TXCTRL1_PAREN) {
-> @@ -474,7 +428,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->                             uint64_t val, unsigned size)
->  {
->      ESCCState *serial =3D opaque;
-> -    ChannelState *s;
-> +    ESCCChannelState *s;
->      uint32_t saddr;
->      int newreg, channel;
-> =20
-> @@ -561,7 +515,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->                  /* XXX this blocks entire thread. Rewrite to use
->                   * qemu_chr_fe_write and background I/O callbacks */
->                  qemu_chr_fe_write_all(&s->chr, &s->tx, 1);
-> -            } else if (s->type =3D=3D kbd && !s->disabled) {
-> +            } else if (s->type =3D=3D escc_kbd && !s->disabled) {
->                  handle_kbd_command(s, val);
->              }
->          }
-> @@ -578,7 +532,7 @@ static uint64_t escc_mem_read(void *opaque, hwaddr ad=
-dr,
->                                unsigned size)
->  {
->      ESCCState *serial =3D opaque;
-> -    ChannelState *s;
-> +    ESCCChannelState *s;
->      uint32_t saddr;
->      uint32_t ret;
->      int channel;
-> @@ -595,10 +549,11 @@ static uint64_t escc_mem_read(void *opaque, hwaddr =
-addr,
->      case SERIAL_DATA:
->          s->rregs[R_STATUS] &=3D ~STATUS_RXAV;
->          clr_rxint(s);
-> -        if (s->type =3D=3D kbd || s->type =3D=3D mouse)
-> +        if (s->type =3D=3D escc_kbd || s->type =3D=3D escc_mouse) {
->              ret =3D get_queue(s);
-> -        else
-> +        } else {
->              ret =3D s->rx;
-> +        }
->          trace_escc_mem_readb_data(CHN_C(s), ret);
->          qemu_chr_fe_accept_input(&s->chr);
->          return ret;
-> @@ -620,7 +575,7 @@ static const MemoryRegionOps escc_mem_ops =3D {
-> =20
->  static int serial_can_receive(void *opaque)
->  {
-> -    ChannelState *s =3D opaque;
-> +    ESCCChannelState *s =3D opaque;
->      int ret;
-> =20
->      if (((s->wregs[W_RXCTRL] & RXCTRL_RXEN) =3D=3D 0) // Rx not enabled
-> @@ -632,7 +587,7 @@ static int serial_can_receive(void *opaque)
->      return ret;
->  }
-> =20
-> -static void serial_receive_byte(ChannelState *s, int ch)
-> +static void serial_receive_byte(ESCCChannelState *s, int ch)
->  {
->      trace_escc_serial_receive_byte(CHN_C(s), ch);
->      s->rregs[R_STATUS] |=3D STATUS_RXAV;
-> @@ -640,7 +595,7 @@ static void serial_receive_byte(ChannelState *s, int =
-ch)
->      set_rxint(s);
->  }
-> =20
-> -static void serial_receive_break(ChannelState *s)
-> +static void serial_receive_break(ESCCChannelState *s)
->  {
->      s->rregs[R_STATUS] |=3D STATUS_BRK;
->      escc_update_irq(s);
-> @@ -648,13 +603,13 @@ static void serial_receive_break(ChannelState *s)
-> =20
->  static void serial_receive1(void *opaque, const uint8_t *buf, int size)
->  {
-> -    ChannelState *s =3D opaque;
-> +    ESCCChannelState *s =3D opaque;
->      serial_receive_byte(s, buf[0]);
->  }
-> =20
->  static void serial_event(void *opaque, int event)
->  {
-> -    ChannelState *s =3D opaque;
-> +    ESCCChannelState *s =3D opaque;
->      if (event =3D=3D CHR_EVENT_BREAK)
->          serial_receive_break(s);
->  }
-> @@ -664,16 +619,16 @@ static const VMStateDescription vmstate_escc_chn =
-=3D {
->      .version_id =3D 2,
->      .minimum_version_id =3D 1,
->      .fields =3D (VMStateField[]) {
-> -        VMSTATE_UINT32(vmstate_dummy, ChannelState),
-> -        VMSTATE_UINT32(reg, ChannelState),
-> -        VMSTATE_UINT32(rxint, ChannelState),
-> -        VMSTATE_UINT32(txint, ChannelState),
-> -        VMSTATE_UINT32(rxint_under_svc, ChannelState),
-> -        VMSTATE_UINT32(txint_under_svc, ChannelState),
-> -        VMSTATE_UINT8(rx, ChannelState),
-> -        VMSTATE_UINT8(tx, ChannelState),
-> -        VMSTATE_BUFFER(wregs, ChannelState),
-> -        VMSTATE_BUFFER(rregs, ChannelState),
-> +        VMSTATE_UINT32(vmstate_dummy, ESCCChannelState),
-> +        VMSTATE_UINT32(reg, ESCCChannelState),
-> +        VMSTATE_UINT32(rxint, ESCCChannelState),
-> +        VMSTATE_UINT32(txint, ESCCChannelState),
-> +        VMSTATE_UINT32(rxint_under_svc, ESCCChannelState),
-> +        VMSTATE_UINT32(txint_under_svc, ESCCChannelState),
-> +        VMSTATE_UINT8(rx, ESCCChannelState),
-> +        VMSTATE_UINT8(tx, ESCCChannelState),
-> +        VMSTATE_BUFFER(wregs, ESCCChannelState),
-> +        VMSTATE_BUFFER(rregs, ESCCChannelState),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> @@ -684,44 +639,15 @@ static const VMStateDescription vmstate_escc =3D {
->      .minimum_version_id =3D 1,
->      .fields =3D (VMStateField[]) {
->          VMSTATE_STRUCT_ARRAY(chn, ESCCState, 2, 2, vmstate_escc_chn,
-> -                             ChannelState),
-> +                             ESCCChannelState),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> =20
-> -MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
-> -              Chardev *chrA, Chardev *chrB,
-> -              int clock, int it_shift)
-> -{
-> -    DeviceState *dev;
-> -    SysBusDevice *s;
-> -    ESCCState *d;
-> -
-> -    dev =3D qdev_create(NULL, TYPE_ESCC);
-> -    qdev_prop_set_uint32(dev, "disabled", 0);
-> -    qdev_prop_set_uint32(dev, "frequency", clock);
-> -    qdev_prop_set_uint32(dev, "it_shift", it_shift);
-> -    qdev_prop_set_chr(dev, "chrB", chrB);
-> -    qdev_prop_set_chr(dev, "chrA", chrA);
-> -    qdev_prop_set_uint32(dev, "chnBtype", ser);
-> -    qdev_prop_set_uint32(dev, "chnAtype", ser);
-> -    qdev_init_nofail(dev);
-> -    s =3D SYS_BUS_DEVICE(dev);
-> -    sysbus_connect_irq(s, 0, irqB);
-> -    sysbus_connect_irq(s, 1, irqA);
-> -    if (base) {
-> -        sysbus_mmio_map(s, 0, base);
-> -    }
-> -
-> -    d =3D ESCC(s);
-> -    return &d->mmio;
-> -}
-> -
-> -
->  static void sunkbd_handle_event(DeviceState *dev, QemuConsole *src,
->                                  InputEvent *evt)
->  {
-> -    ChannelState *s =3D (ChannelState *)dev;
-> +    ESCCChannelState *s =3D (ESCCChannelState *)dev;
->      int qcode, keycode;
->      InputKeyEvent *key;
-> =20
-> @@ -777,7 +703,7 @@ static QemuInputHandler sunkbd_handler =3D {
->      .event =3D sunkbd_handle_event,
->  };
-> =20
-> -static void handle_kbd_command(ChannelState *s, int val)
-> +static void handle_kbd_command(ESCCChannelState *s, int val)
->  {
->      trace_escc_kbd_command(val);
->      if (s->led_mode) { // Ignore led byte
-> @@ -808,7 +734,7 @@ static void handle_kbd_command(ChannelState *s, int v=
-al)
->  static void sunmouse_event(void *opaque,
->                                 int dx, int dy, int dz, int buttons_state)
->  {
-> -    ChannelState *s =3D opaque;
-> +    ESCCChannelState *s =3D opaque;
->      int ch;
-> =20
->      trace_escc_sunmouse_event(dx, dy, buttons_state);
-> @@ -847,27 +773,6 @@ static void sunmouse_event(void *opaque,
->      put_queue(s, 0);
->  }
-> =20
-> -void slavio_serial_ms_kbd_init(hwaddr base, qemu_irq irq,
-> -                               int disabled, int clock, int it_shift)
-> -{
-> -    DeviceState *dev;
-> -    SysBusDevice *s;
-> -
-> -    dev =3D qdev_create(NULL, TYPE_ESCC);
-> -    qdev_prop_set_uint32(dev, "disabled", disabled);
-> -    qdev_prop_set_uint32(dev, "frequency", clock);
-> -    qdev_prop_set_uint32(dev, "it_shift", it_shift);
-> -    qdev_prop_set_chr(dev, "chrB", NULL);
-> -    qdev_prop_set_chr(dev, "chrA", NULL);
-> -    qdev_prop_set_uint32(dev, "chnBtype", mouse);
-> -    qdev_prop_set_uint32(dev, "chnAtype", kbd);
-> -    qdev_init_nofail(dev);
-> -    s =3D SYS_BUS_DEVICE(dev);
-> -    sysbus_connect_irq(s, 0, irq);
-> -    sysbus_connect_irq(s, 1, irq);
-> -    sysbus_mmio_map(s, 0, base);
-> -}
-> -
->  static void escc_init1(Object *obj)
->  {
->      ESCCState *s =3D ESCC(obj);
-> @@ -904,11 +809,11 @@ static void escc_realize(DeviceState *dev, Error **=
-errp)
+> -        if (spapr_vcpu_id(cpu) =3D=3D vcpu_id) {
+> +        if (spapr_get_vcpu_id(cpu) =3D=3D vcpu_id) {
+>              return cpu;
 >          }
 >      }
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index af19320d2f8a..36942b378daa 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -766,7 +766,7 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_o=
+n_cpu_data arg);
 > =20
-> -    if (s->chn[0].type =3D=3D mouse) {
-> +    if (s->chn[0].type =3D=3D escc_mouse) {
->          qemu_add_mouse_event_handler(sunmouse_event, &s->chn[0], 0,
->                                       "QEMU Sun Mouse");
->      }
-> -    if (s->chn[1].type =3D=3D kbd) {
-> +    if (s->chn[1].type =3D=3D escc_kbd) {
->          s->chn[1].hs =3D qemu_input_handler_register((DeviceState *)(&s-=
->chn[1]),
->                                                     &sunkbd_handler);
->      }
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index b832417a56..4e1298ee50 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -369,8 +369,23 @@ static void ppc_core99_init(MachineState *machine)
->      }
+>  #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
 > =20
->      /* init basic PC hardware */
-> -    escc_mem =3D escc_init(0, pic[0x25], pic[0x24],
-> -                         serial_hds[0], serial_hds[1], ESCC_CLOCK, 4);
-> +
-> +    dev =3D qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", 0);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 4);
-> +    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> +    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> +    qdev_init_nofail(dev);
-> +
-> +    s =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, pic[0x24]);
-> +    sysbus_connect_irq(s, 1, pic[0x25]);
-> +
-> +    escc_mem =3D &ESCC(s)->mmio;
-> +
->      memory_region_init_alias(escc_bar, NULL, "escc-bar",
->                               escc_mem, 0, memory_region_size(escc_mem));
+> -int spapr_vcpu_id(PowerPCCPU *cpu);
+> +int spapr_get_vcpu_id(PowerPCCPU *cpu);
+>  void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp);
+>  PowerPCCPU *spapr_find_cpu(int vcpu_id);
 > =20
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index d1f4546613..d0d21d2392 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -104,6 +104,7 @@ static void ppc_heathrow_init(MachineState *machine)
->      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->      void *fw_cfg;
->      uint64_t tbfreq;
-> +    SysBusDevice *s;
-> =20
->      linux_boot =3D (kernel_filename !=3D NULL);
-> =20
-> @@ -264,8 +265,22 @@ static void ppc_heathrow_init(MachineState *machine)
->                                 get_system_io());
->      pci_vga_init(pci_bus);
-> =20
-> -    escc_mem =3D escc_init(0, pic[0x0f], pic[0x10], serial_hds[0],
-> -                               serial_hds[1], ESCC_CLOCK, 4);
-> +    dev =3D qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", 0);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 4);
-> +    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> +    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> +    qdev_init_nofail(dev);
-> +
-> +    s =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, pic[0x10]);
-> +    sysbus_connect_irq(s, 1, pic[0x0f]);
-> +
-> +    escc_mem =3D &ESCC(s)->mmio;
-> +
->      memory_region_init_alias(escc_bar, NULL, "escc-bar",
->                               escc_mem, 0, memory_region_size(escc_mem));
-> =20
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index f9892e38c3..61eb424bbc 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -818,6 +818,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
-wdef,
->      DriveInfo *fd[MAX_FD];
->      FWCfgState *fw_cfg;
->      unsigned int num_vsimms;
-> +    DeviceState *dev;
-> +    SysBusDevice *s;
-> =20
->      /* init CPUs */
->      for(i =3D 0; i < smp_cpus; i++) {
-> @@ -925,12 +927,36 @@ static void sun4m_hw_init(const struct sun4m_hwdef =
-*hwdef,
-> =20
->      slavio_timer_init_all(hwdef->counter_base, slavio_irq[19], slavio_cp=
-u_irq, smp_cpus);
-> =20
-> -    slavio_serial_ms_kbd_init(hwdef->ms_kb_base, slavio_irq[14],
-> -                              !machine->enable_graphics, ESCC_CLOCK, 1);
->      /* Slavio TTYA (base+4, Linux ttyS0) is the first QEMU serial device
->         Slavio TTYB (base+0, Linux ttyS1) is the second QEMU serial devic=
-e */
-> -    escc_init(hwdef->serial_base, slavio_irq[15], slavio_irq[15],
-> -              serial_hds[0], serial_hds[1], ESCC_CLOCK, 1);
-> +    dev =3D qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", !machine->enable_graphics);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 1);
-> +    qdev_prop_set_chr(dev, "chrB", NULL);
-> +    qdev_prop_set_chr(dev, "chrA", NULL);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_mouse);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_kbd);
-> +    qdev_init_nofail(dev);
-> +    s =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, slavio_irq[14]);
-> +    sysbus_connect_irq(s, 1, slavio_irq[14]);
-> +    sysbus_mmio_map(s, 0, hwdef->ms_kb_base);
-> +
-> +    dev =3D qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", 0);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 1);
-> +    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> +    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> +    qdev_init_nofail(dev);
-> +
-> +    s =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, slavio_irq[15]);
-> +    sysbus_connect_irq(s, 1,  slavio_irq[15]);
-> +    sysbus_mmio_map(s, 0, hwdef->serial_base);
-> =20
->      if (hwdef->apc_base) {
->          apc_init(hwdef->apc_base, qemu_allocate_irq(cpu_halt_signal, NUL=
-L, 0));
-> diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
-> index 08ae122386..42aca83611 100644
-> --- a/include/hw/char/escc.h
-> +++ b/include/hw/char/escc.h
-> @@ -1,14 +1,58 @@
->  #ifndef HW_ESCC_H
->  #define HW_ESCC_H
-> =20
-> +#include "chardev/char-fe.h"
-> +#include "chardev/char-serial.h"
-> +#include "ui/input.h"
-> +
->  /* escc.c */
->  #define TYPE_ESCC "escc"
->  #define ESCC_SIZE 4
-> -MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
-> -              Chardev *chrA, Chardev *chrB,
-> -              int clock, int it_shift);
-> =20
-> -void slavio_serial_ms_kbd_init(hwaddr base, qemu_irq irq,
-> -                               int disabled, int clock, int it_shift);
-> +#define ESCC(obj) OBJECT_CHECK(ESCCState, (obj), TYPE_ESCC)
-> +
-> +typedef enum {
-> +    escc_chn_a, escc_chn_b,
-> +} ESCCChnID;
-> +
-> +typedef enum {
-> +    escc_serial, escc_kbd, escc_mouse,
-> +} ESCCChnType;
-> +
-> +#define ESCC_SERIO_QUEUE_SIZE 256
-> +
-> +typedef struct {
-> +    uint8_t data[ESCC_SERIO_QUEUE_SIZE];
-> +    int rptr, wptr, count;
-> +} ESCCSERIOQueue;
-> +
-> +#define ESCC_SERIAL_REGS 16
-> +typedef struct ESCCChannelState {
-> +    qemu_irq irq;
-> +    uint32_t rxint, txint, rxint_under_svc, txint_under_svc;
-> +    struct ESCCChannelState *otherchn;
-> +    uint32_t reg;
-> +    uint8_t wregs[ESCC_SERIAL_REGS], rregs[ESCC_SERIAL_REGS];
-> +    ESCCSERIOQueue queue;
-> +    CharBackend chr;
-> +    int e0_mode, led_mode, caps_lock_mode, num_lock_mode;
-> +    int disabled;
-> +    int clock;
-> +    uint32_t vmstate_dummy;
-> +    ESCCChnID chn; /* this channel, A (base+4) or B (base+0) */
-> +    ESCCChnType type;
-> +    uint8_t rx, tx;
-> +    QemuInputHandlerState *hs;
-> +} ESCCChannelState;
-> +
-> +typedef struct ESCCState {
-> +    SysBusDevice parent_obj;
-> +
-> +    struct ESCCChannelState chn[2];
-> +    uint32_t it_shift;
-> +    MemoryRegion mmio;
-> +    uint32_t disabled;
-> +    uint32_t frequency;
-> +} ESCCState;
-> =20
->  #endif
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -728,24 +161,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---LwW0XdcUbUexiWVK
+--dWYAkE0V1FpFQHQ3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqE8ycACgkQbDjKyiDZ
-s5KNnw//YFCa8RIjmh/Zqtq33TKDDtf1HhxGuWCFs0s6CV5WbnciCGIC5O34BMpA
-rZ1CLsT4zDekxsYnigh6fjyPHYFFOEIPS/vCY8z8ogxpw7JLtRmDe+Ew7VaKJsXq
-BVjqHVlu0lgbZzQvFNTGrkrUNmSwSqRUUkM8J0yn2yTX/JYqB57BABb0dxIiHf23
-nnW0KNQ9DD31rjkm9bOE04AzHQ3Gx43pofkn7tKj3BPAvO75KpY1e3n+vCG9xaju
-28EnuOfcjJKZrL4i0eEABTUSQvlLxL3eiA8wUYP48zVHFKx+ZfiUtccq14S+5eVK
-VxOEPqwINwxyXbB6Bm8Yf/kJq/p59BJib7iUNNaHLmRpMrl2fNNsCsNudNJAl0+c
-oX05UNGgpVEE6VCGlr0JEdX9Hnzn9fWDphI/mUcIyyH89Ub3sqbbK+SY/ES4EF8J
-9L1xc8MH6FFBKjsaHQHbPmV19EsFT7FB4ezF62JriaDwN4EioHHHWoPMBAeF+HHP
-JYkr99Pw3SAnarDcQ8xppQGoKo9H0Z5kqmKbAcLr8VHZ6Yd7n/ptxTmUqDldGYt+
-ljsyNYsvBPsrI98RZa+ixX6zNGR8VGHQN+189X9Tqcl5YDhYD1O8zlx37WHdRgzn
-r2/zQdkG+tCFsOwabB7sD36d2wAy09fH0jIkTbGJwAg1B49hvoY=
-=V8ub
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqFA28ACgkQbDjKyiDZ
+s5J5dhAAjEgRQoMM/UK7kPDB23+3fUchyQL6tkH4F/iWu5UNI5miqIZ3SLBCXeVk
+Qsu//uVmAIDqQDDNS8FQJTuqaA9Ms7MMC3JoT53BvPFkfbkalNmbk+mtMvSgHj+h
+wytJKgVU9eFRa/kLT+9D+UySwRmKsIvlvFVRnVc4zB8vTwJFTBrTubKR6y7QyM/W
+aFlE8B9nXyd3g9bIRtKBZsYKa21rms1MKCpj58HeUvJaP2yTAy2/fCmb3jl5nWlr
+fYP3O5stlwF7Z7yTZGJK/y2uvUTTO9sY/1BzmD9f1S+QS47Kqsl1m22XhkvsF0BD
+bvJxhqwWmh0kTH2Gc/wxC9opHFGQeVHQdKiXOlVb6feD8PR5viQJTJr4syJnaIBf
+fl9j+kjTvRm41kP+Y2/MU8xDr/xn+hNpDeS5Orz3P9hXVB8JsfQSU7v5o+Fl4s2B
+Hcz2Y9mWr262IuAV6JVihO/P6WiGw1gKtvqDnKB50Guq/pnkUgzu6/jDVWM5k4HM
+hGudCP1mf48PLxUZPK1dcCzIi7IA3waw2VSArXjf7jZuZtg+cxG/aAvAp5bj/du6
+4qiiemQyp1hBycrnwRd3wTKtPKZY4eIVf1tzcAYWsxFLTFv+00eKTlDhoh2K6jqp
+IOyNInbFs58jqKoq7tQOdi6iWMSAlq4sp3dvb6AdxiQwjqWH/XE=
+=x9+W
 -----END PGP SIGNATURE-----
 
---LwW0XdcUbUexiWVK--
+--dWYAkE0V1FpFQHQ3--
