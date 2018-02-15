@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emGvB-0002T1-9B
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:37:46 -0500
+	(envelope-from <david@redhat.com>) id 1emGvq-0002x1-TV
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:38:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emGvA-0001Lf-EV
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:37:45 -0500
-Date: Thu, 15 Feb 2018 10:37:21 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180215103721.GG23321@stefanha-x1.localdomain>
-References: <20180203061621.7033-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="3xoW37o/FfUZJwQG"
-Content-Disposition: inline
-In-Reply-To: <20180203061621.7033-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] block/iscsi: fix ioctl cancel
- use-after-free
+	(envelope-from <david@redhat.com>) id 1emGvp-0001dw-8g
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 05:38:26 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 15 Feb 2018 11:38:22 +0100
+Message-Id: <20180215103822.15179-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] s390x/tcg: add various alignment checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +17,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Felipe Franciosi <felipe@nutanix.com>, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
 
+Let's add proper alignment checks for a handful of instructions that
+require a SPECIFICATION exception in case alignment is violated.
 
---3xoW37o/FfUZJwQG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Introduce new wout/in functions. As we are right now only using them for
+privileged instructions, we have to add ugly ifdefs to silence
+compilers.
 
-On Sat, Feb 03, 2018 at 07:16:18AM +0100, Stefan Hajnoczi wrote:
-> v2:
->  * It was unnecessary to avoid duplicate iscsi_schedule_bh() calls since =
-this
->    function already protects against duplicate calls internally [Stefan]
->=20
-> Patches 1 & 2 are cleanups.
->=20
-> Patch 3 fixes cancellation of ioctls.  Felipe showed me a trace where an =
-acb is
-> cancelled and then completes twice.  The second time around crashes QEMU.
->=20
-> Compile-tested only.
->=20
-> Felipe: Please let us know if this fixes the issue you are seeing.  Thank=
-s!
->=20
-> Stefan Hajnoczi (3):
->   block/iscsi: drop unused IscsiAIOCB->buf field
->   block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
->   block/iscsi: fix ioctl cancel use-after-free
->=20
->  block/iscsi.c | 33 ++++++++++++++++++++++-----------
->  1 file changed, 22 insertions(+), 11 deletions(-)
+Convert STORE CPU ID right away to make use of the wout function.
 
-Thanks for the reviews, Paolo and Felipe.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-data.def | 16 ++++++++--------
+ target/s390x/mem_helper.c  | 25 +++++++++++++++++++++++++
+ target/s390x/translate.c   | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 75 insertions(+), 9 deletions(-)
 
-Paolo: Please merge this, I'll send an additional patch that works
-around libiscsi's missing cancellation callback.
-
---3xoW37o/FfUZJwQG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJahWLhAAoJEJykq7OBq3PIrMYH/2muQ7ylIK54hZ93lv8V0fJJ
-9ShFauAjoxma9ah+ESI6ZmtXX8lwo/EtIS0nSER3HZlJP3e1Iizr7hisKPzcQwcl
-fFrSlfX0K6J3Q0mp3M6fnBuQy5nksjf+EzH5mxAidwU7Fk/slAnZZyMZ0qJIuuYn
-EuEeMzcZRO4KzRb1TT98W+hgRqBVIEtJiwlrP17G94X7FDod4WqTIFnNtBa6b+n+
-bMn/sfPuoJnn+UvtnHEjpsrQO+Bo6YOS+os+5VdGwhffrFbvS8RuZY0EwjP5edul
-xt7pUsFIk0s/Q64/dMWyub/hZJLUHP9GhEfA+mxy4nVIo74dXGk+iwghe4w+0hY=
-=qNBy
------END PGP SIGNATURE-----
-
---3xoW37o/FfUZJwQG--
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 621e10d615..157619403d 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1000,13 +1000,13 @@
+     /* ??? Not implemented - is it necessary? */
+     C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
+ /* SET CLOCK COMPARATOR */
+-    C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
++    C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
+ /* SET CLOCK PROGRAMMABLE FIELD */
+     C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
+ /* SET CPU TIMER */
+-    C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
++    C(0xb208, SPT,     S,     Z,   0, m2_64a, 0, 0, spt, 0)
+ /* SET PREFIX */
+-    C(0xb210, SPX,     S,     Z,   0, m2_32u, 0, 0, spx, 0)
++    C(0xb210, SPX,     S,     Z,   0, m2_32ua, 0, 0, spx, 0)
+ /* SET PSW KEY FROM ADDRESS */
+     C(0xb20a, SPKA,    S,     Z,   0, a2, 0, 0, spka, 0)
+ /* SET STORAGE KEY EXTENDED */
+@@ -1021,20 +1021,20 @@
+ /* STORE CLOCK EXTENDED */
+     C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
+ /* STORE CLOCK COMPARATOR */
+-    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64, stckc, 0)
++    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0)
+ /* STORE CONTROL */
+     C(0xb600, STCTL,   RS_a,  Z,   0, a2, 0, 0, stctl, 0)
+     C(0xeb25, STCTG,   RSY_a, Z,   0, a2, 0, 0, stctg, 0)
+ /* STORE CPU ADDRESS */
+-    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16, stap, 0)
++    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16a, stap, 0)
+ /* STORE CPU ID */
+-    C(0xb202, STIDP,   S,     Z,   la2, 0, new, 0, stidp, 0)
++    C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64a, stidp, 0)
+ /* STORE CPU TIMER */
+-    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
++    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64a, stpt, 0)
+ /* STORE FACILITY LIST */
+     C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
+ /* STORE PREFIX */
+-    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32, stpx, 0)
++    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32a, stpx, 0)
+ /* STORE SYSTEM INFORMATION */
+     C(0xb27d, STSI,    S,     Z,   0, a2, 0, 0, stsi, 0)
+ /* STORE THEN AND SYSTEM MASK */
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 427b795a78..d5291b246e 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -693,6 +693,11 @@ void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uintptr_t ra = GETPC();
+     int i;
+ 
++    if (a2 & 0x3) {
++        /* we either came here by lam or lamy, which have different lengths */
++        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         env->aregs[i] = cpu_ldl_data_ra(env, a2, ra);
+         a2 += 4;
+@@ -709,6 +714,10 @@ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uintptr_t ra = GETPC();
+     int i;
+ 
++    if (a2 & 0x3) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stl_data_ra(env, a2, env->aregs[i], ra);
+         a2 += 4;
+@@ -1620,6 +1629,10 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t src = a2;
+     uint32_t i;
+ 
++    if (src & 0x7) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         uint64_t val = cpu_ldq_data_ra(env, src, ra);
+         if (env->cregs[i] != val && i >= 9 && i <= 11) {
+@@ -1650,6 +1663,10 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t src = a2;
+     uint32_t i;
+ 
++    if (src & 0x3) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         uint32_t val = cpu_ldl_data_ra(env, src, ra);
+         if ((uint32_t)env->cregs[i] != val && i >= 9 && i <= 11) {
+@@ -1677,6 +1694,10 @@ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t dest = a2;
+     uint32_t i;
+ 
++    if (dest & 0x7) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stq_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint64_t);
+@@ -1693,6 +1714,10 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t dest = a2;
+     uint32_t i;
+ 
++    if (dest & 0x3) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stl_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint32_t);
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 5aea3bbca6..7d39ab350d 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4062,7 +4062,6 @@ static ExitStatus op_stidp(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
+     tcg_gen_ld_i64(o->out, cpu_env, offsetof(CPUS390XState, cpuid));
+-    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
+     return NO_EXIT;
+ }
+ 
+@@ -5220,18 +5219,42 @@ static void wout_m1_16(DisasContext *s, DisasFields *f, DisasOps *o)
+ }
+ #define SPEC_wout_m1_16 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void wout_m1_16a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUW | MO_ALIGN);
++}
++#define SPEC_wout_m1_16a 0
++#endif
++
+ static void wout_m1_32(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     tcg_gen_qemu_st32(o->out, o->addr1, get_mem_index(s));
+ }
+ #define SPEC_wout_m1_32 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void wout_m1_32a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUL | MO_ALIGN);
++}
++#define SPEC_wout_m1_32a 0
++#endif
++
+ static void wout_m1_64(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     tcg_gen_qemu_st64(o->out, o->addr1, get_mem_index(s));
+ }
+ #define SPEC_wout_m1_64 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void wout_m1_64a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
++}
++#define SPEC_wout_m1_64a 0
++#endif
++
+ static void wout_m2_32(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     tcg_gen_qemu_st32(o->out, o->in2, get_mem_index(s));
+@@ -5657,6 +5680,15 @@ static void in2_m2_32u(DisasContext *s, DisasFields *f, DisasOps *o)
+ }
+ #define SPEC_in2_m2_32u 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void in2_m2_32ua(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    in2_a2(s, f, o);
++    tcg_gen_qemu_ld_tl(o->in2, o->in2, get_mem_index(s), MO_TEUL | MO_ALIGN);
++}
++#define SPEC_in2_m2_32ua 0
++#endif
++
+ static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     in2_a2(s, f, o);
+@@ -5664,6 +5696,15 @@ static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
+ }
+ #define SPEC_in2_m2_64 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void in2_m2_64a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    in2_a2(s, f, o);
++    tcg_gen_qemu_ld_i64(o->in2, o->in2, get_mem_index(s), MO_TEQ | MO_ALIGN);
++}
++#define SPEC_in2_m2_64a 0
++#endif
++
+ static void in2_mri2_16u(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     in2_ri2(s, f, o);
+-- 
+2.14.3
