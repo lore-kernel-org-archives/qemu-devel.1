@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1emG09-0007XZ-HI
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:38:52 -0500
+	(envelope-from <stefanha@redhat.com>) id 1emG11-0008Ro-Np
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1emG05-0007Ge-1K
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:38:49 -0500
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f54b4793-308e-5835-1849-08724f0635f9@virtuozzo.com>
-Date: Thu, 15 Feb 2018 12:38:36 +0300
+	(envelope-from <stefanha@redhat.com>) id 1emG0x-0007fG-AC
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:39:43 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47032 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emG0x-0007eo-3p
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 04:39:39 -0500
+Date: Thu, 15 Feb 2018 09:39:22 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180215093922.GF23321@stefanha-x1.localdomain>
+References: <20180213173429.19501-1-stefanha@redhat.com>
+	<20180214004820.GA15103@lemon.usersys.redhat.com>
+	<20180214132508.GA7545@stefanha-x1.localdomain>
+	<CAK1Eb9kbSCzwrGzXA4Tp0N-F_82vD0tzz2V_QiYLG+AUoqYYfg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] ping Re: [PATCH v10 00/12] Dirty bitmaps postcopy
- migration
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="3oCie2+XPXTnK5a5"
+Content-Disposition: inline
+In-Reply-To: <CAK1Eb9kbSCzwrGzXA4Tp0N-F_82vD0tzz2V_QiYLG+AUoqYYfg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,396 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
-
-ping
-07.02.2018 18:58, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
->
-> There is a new version of dirty bitmap postcopy migration series.
->
-> Now it is based on Max's block tree: https://github.com/XanClic/qemu/commits/block,
-> where it needs only one patch: "block: maintain persistent disabled bitmaps",
-> but I hope it is near to be merged.
->
-> v10
->
-> clone: tag postcopy-v10 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v10
->
-> 01,02: r-b Fam
-> 03: adjust comments about locking
-> 04: fixed 124 iotest (was broken because of small mistake in block/dirty-bitmap.c)
-> 05: rebased on master, staff from migration_thread is moved to migration_iteration_run, so
->      drop r-b by John and Juan
-> 06: 2.11->2.12, r-b Fam
-> 07,08,09,: r-b Fam
->
-> 10: move to device names instead of node names, looks like libvirt don't care about
->      same node-names.
->      flag AUTOLOAD is ignored for now
->      use QEMU_ALIGN_UP and DIV_ROUND_UP
->      skip automatically inserted nodes, when search for dirty bitmaps
->      allow migration of no bitmaps (see in dirty_bitmap_load_header new logic
->                                     with nothing variable, which avoids extra errors)
->      handle return code of dirty_bitmap_load_header
->      avoid iteration if there are no bitmaps (see new .no_bitmaps field of
->                                               dirty_bitmap_mig_state)
->      call dirty_bitmap_mig_before_vm_start from process_incoming_migration_bh too,
->      to enable bitmaps in case of postcopy not actually started.
-> 11: not add r-b Fam
->      tiny reorganisation of do_test_migration parameters: remove useless default
->      values and make shared_storage to be the last
->      disable shared storage test for now, until it will be fixed (it will be separate
->      series, more related to qcow2 than to migration)
-> 12: r-b Fam
->
-> also, "iotests: add default node-name" is dropped, as not more needed.
->
->
-> v9
->
-> clone: tag postcopy-v9 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v9
->
-> 01: r-b John
-> 02: was incomplete, now add here bdrv_reclaim_dirty_bitmap fix
-> 03: new
-> 04: new
-> 05: r-b John
-> 07: fix type in commit message, r-b John
-> 09: add comment about is_active_iterate, r-b Snow and keep Juan's r-b, hope comment is ok
-> 10: change copyright to Virtuozzo
->      reword comment at the top of the file
->      rewrite init_dirty_bitmap_migration, to not do same things twice (John)
->        and skip _only_ unnamed bitmaps, error out for unnamed nodes (John)
->      use new "locked" state of bitmaps instead of frozen on source vm
->      do not support migrating bitmap to existent one with the same name,
->        keep only create-new-bitmap way
->      break loop in dirty_bitmap_load_complete when bitmap is found
->      use bitmap locking instead of context acquire
-> 12: rewrite, to add more cases. (note, that 169 iotest is also in my
->      "[PATCH v2 0/3] fix bitmaps migration through shared storage", which probably should
->      go to qemu-stable. So this patch should rewrite it, but here I make it like new patch,
->      to simplify review. When "[PATCH v2..." merged I'll rebase this on it), drop r-b
-> 13: move to separate test, drop r-b
->
->
-> v8.1
->
-> clone: tag postcopy-v8.1 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v8.1
->
-> 05: fix compilation, add new version for cmma_save_pending too.
->
->
-> v8
->
-> clone: tag postcopy-v8 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v8
->
-> - rebased on master
-> - patches 01-03 from v7 are already merged to master
-> - patch order is changed to make it possible to merge block/dirty-bitmap patches
->    in separate if is needed
-> 01: new patch
-> 03: fixed to use _locked version of bdrv_release_dirty_bitmap
-> 06: qapi-schema.json -> qapi/migration.json
->      2.9 -> 2.11
-> 10: protocol changed a bit:
->    instead of 1 byte "bitmap enabled flag" this byte becomes just "flags"
->    and have "enabled", "persistent" and "autoloading" flags inside.
->    also, make all migrated bitmaps to be not persistent (to prevent their
->    storing on source vm)
-> 14: new patch
->
->
-> patches status:
-> 01-04 - are only about block/dirty-bitmap and have no r-b. Fam, John, Paolo (about bitmap lock),
->      please look at. These patches are ok to be merged in separate (but before 05-14)
-> other patches are about migration
-> 05-09 has Juan's r-b (and some of them has John's and Eric's r-bs)
-> 10 - the main patch (dirty bitmaps migration), has no r-b.
-> 11 - preparation for tests, not related to migration directly, has Max's r-b, ok to be merged
->      separately (but before 12-14)
-> 12-14 - tests, 12 and 13 have Max's r-b, 14 is new
->
->
-> v7
->
-> clone: tag postcopy-v7 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v7
->
-> - rebased on dirty-bitmap byte-based interfaces
->      (based on git://repo.or.cz/qemu/ericb.git branch nbd-byte-dirty-v4)
-> - migration of persistent bitmaps should fail for shared storage migration for now,
->    as persistent dirty bitmaps are stored/load on inactivate/invalidate-cache.
->    also, even for non-shared storage migration there would be useless saving of dirty
->    bitmaps on source. This all will be optimized later.
->
-> 01: staff from include/migration/vmstate.h moved to include/migration/register.h (rebase)
-> 03: some structural changes due to rebase - drop r-b
-> 04: staff from include/migration/vmstate.h moved to include/migration/register.h (rebase)
->      staff from include/sysemu/sysemu.h moved to migration/savevm.h (rebase)
-> 05: fix patch header: block -> block/dirty-bitmap
->      add locking, drop r-b
-> 06: staff from include/migration/migration.h moved to migration/migration.h (rebase)
-> 07: add locking, drop r-b
-> 09: staff from include/migration/qemu-file.h moved to migration/qemu-file.h (rebase)
-> 10: staff from include/migration/vmstate.h moved to include/migration/register.h (rebase)
-> 11: new patch
-> 12: a lot of changes/fixes (mostly by Fam's comments) + rebase
->      header-definition movement
->      remove include <assert.h>
->      add some includes
->      fix/refactor bitmap flags send
->      byte-based interface for dirty bitmaps (rebase)
->      froze bitmaps on source
->      init_dirty_bitmap_migration can return error, if some of bitmaps are already
->        frozen
->      bdrv_ref drives with bitmaps
->      fprintf -> error_report
->      check version_id in _load function
->
-> v6:
->
-> clone: tag postcopy-v6 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v6
->
-> rebase on master.
->
-> 03 - tiny contextual change
->
-> 12 - little change, but it should be reviewed. Call of init_dirty_bitmap_incoming_migration()
->      (which only initialize mutex) moved from start of process_incoming_migration_co (it was
->      immediately after "mis = migration_incoming_state_new(f)") to migration_incoming_get_current()
->      to stay with initialization code.
->      I remove r-b's, but hope that this will not be a problem. The only change in this patch - is moved
->      call of init_dirty_bitmap_incoming_migration.
->      I do so because of recent
->
-> commit b4b076daf324894dd288cbdb67ff1e3c7434df7b
-> Author: Juan Quintela <quintela@redhat.com>
-> Date:   Mon Jan 23 22:32:06 2017 +0100
->
->      migration: create Migration Incoming State at init time
->
-> 15 - add Max's r-b
->
-> v5:
->
-> clone: tag postcopy-v5 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v5
->
-> - move 'signed-off' over 'reviewed-by' in patches.
->
-> 03,04 - add comments. Hope they will be ok for you, so add Juan's r-b.
->      If not ok - let me know and I'll resend.
->
-> 06,08,12 - add Max's r-b
-> 07,09,10,11,12 - add Juan's r-b
->
-> 14 - used last version of this patch from qcow2-bitmap series with
->       Max's r-b. It has contextual changes due to different base.
->
-> 15 - fix 041 iotest, add default node-name only if path is specified and
->       node-name is not specified
-> 16 - handle whitespaces
->         s/"exec: cat " + fifo/"exec: cat '" + fifo + "'"/
->       fix indentation
->       add Max's r-b
-> 17 - fix typos, wrong size in comment, s/md5/sha256/
->       add Max's r-b
->
-> v4:
->
-> clone: tag postcopy-v4 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v4
->
-> reroll, to fix "failed automatic build test"
->
-> rebase on master!
->
-> 07: since 2.8 -> since 2.9
-> 14: fix build of test-hbitmap
->      since 2.8 -> since 2.9 and small rewording of comment (this change was not done for
->      same patch in may parallels series about qcow2 bitmap extension)
->
-> v3:
->
-> rebased on Max's block branch: https://github.com/XanClic/qemu/commits/block
-> clone: tag postcopy-v3 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v3
->
-> 01  - r-b by Juan
-> 02  - r-b by Juan and David
-> 04  - fix indent
-> 07  - s/since 2.6/since 2.8/
-> 10  - change variable name s/buf/str/
-> 12  - improve copyright message and move it up
->        fix memory loss (thanks to Juan)
->        switch from DPRINTF to trace events
-> 14* - switch to sha256 and qcrypto_hash_*
->        separate qmp command x-debug-block-dirty-bitmap-sha256
-> 16  - use path_suffix for multi-vm test
->        fix indent
->        fix copyright
->        use x-debug-block-dirty-bitmap-sha256 instead of md5
-> 17  - use x-debug-block-dirty-bitmap-sha256 instead of md5
->        remove not existing 170 test from qemu-iotests/group
->
-> *Note: patch 14 is also used in my second series 'qcow2 persistent dirty bitmaps'
->
->
-> v2:
-> some bugs fixed, iotests a bit changed and merged into one test.
-> based on block-next (https://github.com/XanClic/qemu/commits/block-next)
-> clone: tag postcopy-v2 from https://src.openvz.org/scm/~vsementsov/qemu.git
-> online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fpostcopy-v2
->
-> v1:
->
-> These series are derived from my 'Dirty bitmaps migration' series. The
-> core idea is switch to postcopy migration and drop usage of meta
-> bitmaps.
->
-> These patches provide dirty bitmap postcopy migration feature. Only
-> named dirty bitmaps are to be migrated. Migration may be enabled using
-> migration capabilities.
->
-> The overall method (thanks to John Snow):
->
-> 1. migrate bitmaps meta data in .save_live_setup
->     - create/find related bitmaps on target
->     - disable them
->     - create successors (anonimous children) only for enabled migrated
->       bitmaps
-> 2. do nothing in precopy stage
-> 3. just before target vm start: enable successors, created in (1)
-> 4. migrate bitmap data
-> 5. reclaime bitmaps (merge successors to their parents)
-> 6. enable bitmaps (only bitmaps, which was enabled in source)
->
->
-> Some patches are unchnaged from (v7) of 'Dirty bitmaps migration'
-> (DBMv7). I've left Reviewed-by's for them, if you don't like it, say me
-> and I'll drop them in the following version.
->
-> So, relatively to last DBMv7:
->
-> 01-04: new patches, splitting common postcopy migration out of ram
->         postcopy migration
->     05: equal to DBMv7.05
->     06: new
->     07: equal to DBMv7.06
->     08: new
->     09: equal to DBMv7.07
->     10: new
->     11: derived from DBMv7.08, see below
-> 12-15: equal to DBMv7.09-12
->     16: derived from DBMv7.13
->         - switch from fifo to socket, as postcopy don't work with fifo
->           for now
->         - change parameters: size, granularity, regions
->         - add time.sleep, to wait for postcopy migration phase (bad
->           temporary solution.
->         - drop Reviewed-by
->     17: new
->
->     11: the core patch of the series, it is derived from
->         [DBMv7.08: migration: add migration_block-dirty-bitmap.c]
->         There are a lot of changes related to switching from precopy to
->         postcopy, but functions related to migration stream itself
->         (structs, send/load sequences) are mostly unchnaged.
->
->         So, changes, to switch from precopy to postcopy:
->         - removed all staff related to meta bitmaps and dirty phase!!!
->         - add dirty_bitmap_mig_enable_successors, and call it before
->           target vm start in loadvm_postcopy_handle_run
->         - add enabled_bitmaps list of bitmaps for
->           dirty_bitmap_mig_enable_successors
->
->         - enabled flag is send with start bitmap chunk instead of
->           completion chunk
->         - sectors_per_chunk is calculated directly from CHUNK_SIZE, not
->           using meta bitmap granularity
->
->         - dirty_bitmap_save_iterate: remove dirty_phase, move bulk_phase
->           to postcopy stage
->         - dirty_bitmap_save_pending: remove dirty phase related pending,
->           switch pending to non-postcopyable
->         - dirty_bitmap_load_start: get enabled flag and prepare
->           successors for enabled bitmaps, also add them to
->           enabled_bitmaps list
->         - dirty_bitmap_load_complete: for enabled bitmaps: merge them
->           with successors and enable
->
->         - savevm handlers:
->           * remove separate savevm_dirty_bitmap_live_iterate_handlers state
->             (it was bad idea, any way), and move its save_live_iterate to
->             savevm_dirty_bitmap_handlers
->           * add is_active_iterate savevm handler, which allows iterations
->             only in postcopy stage (after stopping source vm)
->           * add has_postcopy savevm handler. (ofcourse, just returning true)
->           * use save_live_complete_postcopy instead of
->             save_live_complete_precopy
->
->         Other changes:
->         - some debug output changed
->         - remove MIN_LIVE_SIZE, is_live_iterative and related staff (it
->           was needed to omit iterations if bitmap data is small, possibly
->           this should be reimplemented)
->
-> Vladimir Sementsov-Ogievskiy (12):
->    block/dirty-bitmap: add bdrv_dirty_bitmap_enable_successor()
->    block/dirty-bitmap: fix locking in bdrv_reclaim_dirty_bitmap
->    block/dirty-bitmap: add _locked version of bdrv_reclaim_dirty_bitmap
->    dirty-bitmap: add locked state
->    migration: introduce postcopy-only pending
->    qapi: add dirty-bitmaps migration capability
->    migration: include migrate_dirty_bitmaps in migrate_postcopy
->    migration/qemu-file: add qemu_put_counted_string()
->    migration: add is_active_iterate handler
->    migration: add postcopy migration of dirty bitmaps
->    iotests: add dirty bitmap migration test
->    iotests: add dirty bitmap postcopy test
->
->   qapi/block-core.json           |   5 +-
->   qapi/migration.json            |   6 +-
->   include/block/dirty-bitmap.h   |   7 +
->   include/migration/misc.h       |   3 +
->   include/migration/register.h   |  26 +-
->   migration/migration.h          |   4 +
->   migration/qemu-file.h          |   2 +
->   migration/savevm.h             |   5 +-
->   block/dirty-bitmap.c           | 123 +++++--
->   blockdev.c                     |  19 ++
->   hw/s390x/s390-stattrib.c       |   7 +-
->   migration/block-dirty-bitmap.c | 737 +++++++++++++++++++++++++++++++++++++++++
->   migration/block.c              |   7 +-
->   migration/migration.c          |  32 +-
->   migration/qemu-file.c          |  13 +
->   migration/ram.c                |   9 +-
->   migration/savevm.c             |  20 +-
->   vl.c                           |   1 +
->   migration/Makefile.objs        |   1 +
->   migration/trace-events         |  16 +-
->   tests/qemu-iotests/169         | 141 ++++++++
->   tests/qemu-iotests/169.out     |   5 +
->   tests/qemu-iotests/199         | 105 ++++++
->   tests/qemu-iotests/199.out     |   5 +
->   tests/qemu-iotests/group       |   2 +
->   tests/qemu-iotests/iotests.py  |   7 +-
->   26 files changed, 1242 insertions(+), 66 deletions(-)
->   create mode 100644 migration/block-dirty-bitmap.c
->   create mode 100755 tests/qemu-iotests/169
->   create mode 100644 tests/qemu-iotests/169.out
->   create mode 100755 tests/qemu-iotests/199
->   create mode 100644 tests/qemu-iotests/199.out
->
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
 
--- 
-Best regards,
-Vladimir
+--3oCie2+XPXTnK5a5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Feb 14, 2018 at 09:58:27PM +0800, Fam Zheng wrote:
+> On Wed, Feb 14, 2018 at 9:25 PM, Stefan Hajnoczi <stefanha@redhat.com> wr=
+ote:
+> > On Wed, Feb 14, 2018 at 08:48:20AM +0800, Fam Zheng wrote:
+> >> On Tue, 02/13 17:34, Stefan Hajnoczi wrote:
+> >> > The following changes since commit fb68096da3d35e64c88cd610c1fa42766=
+c58e92a:
+> >> >
+> >> >   Revert "tests: use memfd in vhost-user-test" (2018-02-13 09:51:52 =
++0000)
+> >> >
+> >> > are available in the Git repository at:
+> >> >
+> >> >   git://github.com/stefanha/qemu.git tags/block-pull-request
+> >> >
+> >> > for you to fetch changes up to 64b01feca991e5b19a5d750ef77cdca92b68b=
+dbb:
+> >> >
+> >> >   misc: fix spelling (2018-02-13 15:38:17 +0000)
+> >>
+> >> Did you mean "PULL" in the subject?
+> >
+> > git-publish is just obeying your profile settings:
+> >
+> > +[gitpublishprofile "default"]
+> > +base =3D master
+> > +prefix =3D PATCH
+> >  ^---- :)
+> >
+> > I used PULL myself in the past but am happy with using whatever we
+> > decide the standard should be.
+> >
+> > Shall we remove prefix from the profiles (it defaults to "PATCH" for
+> > regular patches and "PULL" for pull requests)?
+>=20
+> Yes, this is a bug. In my ~/.gitconfig I had "prefix =3D PATCH ..." for
+> all other qemu-* profiles but not the main one, "qemu". When I wrote
+> the patch I didn't realize it is so for a reason, and "fixed" it!
+
+Please resend your series once this email thread has run its course.
+
+I am dropping it from the pull request because I'd like to merge the
+other fixes in this pull request as soon as possible.
+
+Stefan
+
+--3oCie2+XPXTnK5a5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJahVVKAAoJEJykq7OBq3PIJNMH/3PTNAQ7JT1oTcBC/aaBnfiB
+cSZ+4N34WsJ+M0UhUTPIdSxkyaXgAC8XxhyiFEzWuaw13KHsi1BMtHU5VCLsbQNg
+4u4oKSolMsJhLGgOhQZI7VK8VCX4nSrrSjI+QjpA5DgYsmqCCncl7y5PDU/+nRK/
+WUkhUykvNIpkeHaftfxZwSyrMMvA/uJsQTjzd9LlHB1lPQ9PY4f2UeJ+MF4E5EhG
+wb+bRaJQ6iZy2IQaSvz41lyAzqDcaZx3PNFhtQBHZBnoF9Sw45HL83TdfHOHb06P
+DDMdfsgFLmFWA8jtcepGc3eyaFDKvdKCiBO/fYaY2AE7s0MvI0IrRoyk4aZ0lgE=
+=3FdU
+-----END PGP SIGNATURE-----
+
+--3oCie2+XPXTnK5a5--
