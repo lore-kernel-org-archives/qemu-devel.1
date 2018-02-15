@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emSY1-0004uA-UM
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:02:39 -0500
+	(envelope-from <alistair23@gmail.com>) id 1emSZN-0005nK-FK
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:04:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emSY0-0001Ic-UQ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:02:37 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-4-git-send-email-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ac33f176-0f15-107f-1c64-4fa3bac77520@redhat.com>
-Date: Thu, 15 Feb 2018 17:02:19 -0600
+	(envelope-from <alistair23@gmail.com>) id 1emSZL-0001eK-4E
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 18:04:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <1518702707-7077-4-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/9] nbd: BLOCK_STATUS for standard
- get_block_status function: server part
+Sender: alistair23@gmail.com
+In-Reply-To: <498cb203-1c0e-80fb-31f0-260d8eef5fd4@amsat.org>
+References: <20180215042900.16078-1-f4bug@amsat.org>
+	<20180215042900.16078-8-f4bug@amsat.org>
+	<CAKmqyKM6veqM7d=h+OKk9TpyJWFZuUGHnX5+gUcM3P6RAzYgHQ@mail.gmail.com>
+	<498cb203-1c0e-80fb-31f0-260d8eef5fd4@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 15 Feb 2018 15:03:26 -0800
+Message-ID: <CAKmqyKNtD_2mh=4PaN=TBwvnOgGTGpoRrXzx8ovTnVW9+CN4fQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 07/30] hw/arm: use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +27,510 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>
 
-On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Minimal realization: only one extent in server answer is supported.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   include/block/nbd.h |  33 ++++++
->   nbd/common.c        |  10 ++
->   nbd/server.c        | 310 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->   3 files changed, 352 insertions(+), 1 deletion(-)
-> 
+On Thu, Feb 15, 2018 at 2:39 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Hi Alistair,
+>
+> On 02/15/2018 07:31 PM, Alistair Francis wrote:
+>> On Wed, Feb 14, 2018 at 8:28 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
+t.org> wrote:
+>>> It ease code review, unit is explicit.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>
+>> The logic looks good.
+>>
+>> Did you do this automatically? If so you should include the commands
+>> in the commit message.
+>
+> I added in the cover:
+>
+>   Patches generated using:
+>
+>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/h=
+w/
+>
+>   and modified manually.
 
-> @@ -200,9 +227,15 @@ enum {
->   #define NBD_REPLY_TYPE_NONE          0
->   #define NBD_REPLY_TYPE_OFFSET_DATA   1
->   #define NBD_REPLY_TYPE_OFFSET_HOLE   2
-> +#define NBD_REPLY_TYPE_BLOCK_STATUS  5
+It should be in the commit message as well, that way it's forever in the tr=
+ee.
 
-Stale; see nbd.git commit 56c77720 which changed this to 3.
+>
+> I use the --cccmd scripts/get_maintainer.pl which select reviewer emails
+> for each patch but don't include them in the cover, this is annoying...
+>
+>>
+>> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+>
+> Thanks!
+>
+> There is one more use in "raspi: Add "raspi3" machine type" I'll
+> update/respin once Peter merged it:
+>
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> -    mc->default_ram_size =3D 1024 * 1024 * 1024;
+> +    mc->default_ram_size =3D 1 * G_BYTE;
 
-> +++ b/nbd/server.c
-> @@ -82,6 +82,15 @@ struct NBDExport {
->   
->   static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
->   
-> +/* NBDExportMetaContexts represents list of selected by
-> + * NBD_OPT_SET_META_CONTEXT contexts to be exported. */
+You can keep my Reveiwed-by with this change as well.
 
-represents a list of contexts to be exported, as selected by 
-NBD_OPT_SET_META_CONTEXT.
+Alistair
 
-> +typedef struct NBDExportMetaContexts {
-> +    char export_name[NBD_MAX_NAME_SIZE + 1];
-
-Would this work as const char * pointing at some other storage, instead 
-of having to copy into this storage?
-
-> +    bool valid; /* means that negotiation of the option finished without
-> +                   errors */
-> +    bool base_allocation; /* export base:allocation context (block status) */
-> +} NBDExportMetaContexts;
-> +
->   struct NBDClient {
-
-> @@ -636,6 +646,201 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
->       return QIO_CHANNEL(tioc);
->   }
->   
-> +/* nbd_alloc_read_size_string
-> + *
-> + * Read string in format
-> + *   uint32_t len
-> + *   len bytes string (not 0-terminated)
-> + * String is allocated and pointer returned as @buf
-> + *
-> + * Return -errno on I/O error, 0 if option was completely handled by
-> + * sending a reply about inconsistent lengths, or 1 on success. */
-> +static int nbd_alloc_read_size_string(NBDClient *client, char **buf,
-> +                                      Error **errp)
-> +{
-> +    int ret;
-> +    uint32_t len;
-> +
-> +    ret = nbd_opt_read(client, &len, sizeof(len), errp);
-> +    if (ret <= 0) {
-> +        return ret;
-> +    }
-> +    cpu_to_be32s(&len);
-> +
-> +    *buf = g_try_malloc(len + 1);
-
-I'd rather check that len is sane prior to trying to malloc.  Otherwise, 
-a malicious client can convince us to waste time/space doing a large 
-malloc before we finally realize that we can't read that many bytes 
-after all.  And in fact, if you check len in advance, you can probably 
-just use g_malloc() instead of g_try_malloc() (g_try_malloc() makes 
-sense on a 1M allocation, where we can still allocate smaller stuff in 
-reporting the error; but since NBD limits strings to 4k, if we fail at 
-allocating 4k, we are probably already so hosed that our attempts to 
-report the failure will also run out of memory and abort, so why not 
-just abort now).
-
-> +    if (*buf == NULL) {
-> +        error_setg(errp, "No memory");
-> +        return -ENOMEM;
-> +    }
-> +    (*buf)[len] = '\0';
-> +
-> +    ret = nbd_opt_read(client, *buf, len, errp);
-> +    if (ret <= 0) {
-> +        g_free(*buf);
-> +        *buf = NULL;
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +/* nbd_read_size_string
-
-Will resume review here...
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>
+>>
+>> Alistair
+>>
+>>> ---
+>>>  include/hw/arm/stm32f205_soc.h |  4 ++--
+>>>  hw/arm/boot.c                  |  6 +++---
+>>>  hw/arm/collie.c                |  4 ++--
+>>>  hw/arm/digic_boards.c          |  6 +++---
+>>>  hw/arm/gumstix.c               |  2 +-
+>>>  hw/arm/integratorcp.c          |  2 +-
+>>>  hw/arm/mainstone.c             |  2 +-
+>>>  hw/arm/musicpal.c              |  8 ++++----
+>>>  hw/arm/omap_sx1.c              |  8 ++++----
+>>>  hw/arm/raspi.c                 |  2 +-
+>>>  hw/arm/stellaris.c             |  4 ++--
+>>>  hw/arm/versatilepb.c           |  4 ++--
+>>>  hw/arm/vexpress.c              |  6 +++---
+>>>  hw/arm/virt.c                  |  4 ++--
+>>>  hw/arm/xilinx_zynq.c           |  4 ++--
+>>>  hw/misc/aspeed_sdmc.c          |  8 ++++----
+>>>  hw/misc/imx7_gpr.c             |  2 +-
+>>>  hw/misc/omap_gpmc.c            |  4 ++--
+>>>  hw/ssi/aspeed_smc.c            | 28 ++++++++++++++--------------
+>>>  19 files changed, 54 insertions(+), 54 deletions(-)
+>>>
+>>> diff --git a/include/hw/arm/stm32f205_soc.h b/include/hw/arm/stm32f205_=
+soc.h
+>>> index 922a733f88..e30ae33c65 100644
+>>> --- a/include/hw/arm/stm32f205_soc.h
+>>> +++ b/include/hw/arm/stm32f205_soc.h
+>>> @@ -43,9 +43,9 @@
+>>>  #define STM_NUM_SPIS 3
+>>>
+>>>  #define FLASH_BASE_ADDRESS 0x08000000
+>>> -#define FLASH_SIZE (1024 * 1024)
+>>> +#define FLASH_SIZE (1 * M_BYTE)
+>>>  #define SRAM_BASE_ADDRESS 0x20000000
+>>> -#define SRAM_SIZE (128 * 1024)
+>>> +#define SRAM_SIZE (128 * K_BYTE)
+>>>
+>>>  typedef struct STM32F205State {
+>>>      /*< private >*/
+>>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>>> index 05108bc42f..0552284d57 100644
+>>> --- a/hw/arm/boot.c
+>>> +++ b/hw/arm/boot.c
+>>> @@ -984,7 +984,7 @@ static void arm_load_kernel_notify(Notifier *notifi=
+er, void *data)
+>>>       * the initrd at 128MB.
+>>>       */
+>>>      info->initrd_start =3D info->loader_start +
+>>> -        MIN(info->ram_size / 2, 128 * 1024 * 1024);
+>>> +        MIN(info->ram_size / 2, 128 * M_BYTE);
+>>>
+>>>      /* Assume that raw images are linux kernels, and ELF images are no=
+t.  */
+>>>      kernel_size =3D arm_load_elf(info, &elf_entry, &elf_low_addr,
+>>> @@ -1069,13 +1069,13 @@ static void arm_load_kernel_notify(Notifier *no=
+tifier, void *data)
+>>>                   *
+>>>                   * Let's play safe and prealign it to 2MB to give us s=
+ome space.
+>>>                   */
+>>> -                align =3D 2 * 1024 * 1024;
+>>> +                align =3D 2 * M_BYTE;
+>>>              } else {
+>>>                  /*
+>>>                   * Some 32bit kernels will trash anything in the 4K pa=
+ge the
+>>>                   * initrd ends in, so make sure the DTB isn't caught u=
+p in that.
+>>>                   */
+>>> -                align =3D 4096;
+>>> +                align =3D 4 * K_BYTE;
+>>>              }
+>>>
+>>>              /* Place the DTB after the initrd in memory with alignment=
+. */
+>>> diff --git a/hw/arm/collie.c b/hw/arm/collie.c
+>>> index f8c566e2e5..1695863629 100644
+>>> --- a/hw/arm/collie.c
+>>> +++ b/hw/arm/collie.c
+>>> @@ -39,12 +39,12 @@ static void collie_init(MachineState *machine)
+>>>      dinfo =3D drive_get(IF_PFLASH, 0, 0);
+>>>      pflash_cfi01_register(SA_CS0, NULL, "collie.fl1", 0x02000000,
+>>>                      dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+>>> -                    (64 * 1024), 512, 4, 0x00, 0x00, 0x00, 0x00, 0);
+>>> +                    64 * K_BYTE, 512, 4, 0x00, 0x00, 0x00, 0x00, 0);
+>>>
+>>>      dinfo =3D drive_get(IF_PFLASH, 0, 1);
+>>>      pflash_cfi01_register(SA_CS1, NULL, "collie.fl2", 0x02000000,
+>>>                      dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+>>> -                    (64 * 1024), 512, 4, 0x00, 0x00, 0x00, 0x00, 0);
+>>> +                    64 * K_BYTE, 512, 4, 0x00, 0x00, 0x00, 0x00, 0);
+>>>
+>>>      sysbus_create_simple("scoop", 0x40800000, NULL);
+>>>
+>>> diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
+>>> index 9f11dcd11f..04e52e776f 100644
+>>> --- a/hw/arm/digic_boards.c
+>>> +++ b/hw/arm/digic_boards.c
+>>> @@ -126,8 +126,8 @@ static void digic_load_rom(DigicBoardState *s, hwad=
+dr addr,
+>>>  static void digic4_add_k8p3215uqb_rom(DigicBoardState *s, hwaddr addr,
+>>>                                        const char *def_filename)
+>>>  {
+>>> -#define FLASH_K8P3215UQB_SIZE (4 * 1024 * 1024)
+>>> -#define FLASH_K8P3215UQB_SECTOR_SIZE (64 * 1024)
+>>> +#define FLASH_K8P3215UQB_SIZE (4 * M_BYTE)
+>>> +#define FLASH_K8P3215UQB_SECTOR_SIZE (64 * K_BYTE)
+>>>
+>>>      pflash_cfi02_register(addr, NULL, "pflash", FLASH_K8P3215UQB_SIZE,
+>>>                            NULL, FLASH_K8P3215UQB_SECTOR_SIZE,
+>>> @@ -141,7 +141,7 @@ static void digic4_add_k8p3215uqb_rom(DigicBoardSta=
+te *s, hwaddr addr,
+>>>  }
+>>>
+>>>  static DigicBoard digic4_board_canon_a1100 =3D {
+>>> -    .ram_size =3D 64 * 1024 * 1024,
+>>> +    .ram_size =3D 64 * M_BYTE,
+>>>      .add_rom1 =3D digic4_add_k8p3215uqb_rom,
+>>>      .rom1_def_filename =3D "canon-a1100-rom1.bin",
+>>>  };
+>>> diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+>>> index ea2a3c532d..fc15df1d12 100644
+>>> --- a/hw/arm/gumstix.c
+>>> +++ b/hw/arm/gumstix.c
+>>> @@ -47,7 +47,7 @@
+>>>  #include "sysemu/qtest.h"
+>>>  #include "cpu.h"
+>>>
+>>> -static const int sector_len =3D 128 * 1024;
+>>> +static const int sector_len =3D 128 * K_BYTE;
+>>>
+>>>  static void connex_init(MachineState *machine)
+>>>  {
+>>> diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+>>> index e8303b83be..4e711194ef 100644
+>>> --- a/hw/arm/integratorcp.c
+>>> +++ b/hw/arm/integratorcp.c
+>>> @@ -609,7 +609,7 @@ static void integratorcp_init(MachineState *machine=
+)
+>>>      memory_region_add_subregion(address_space_mem, 0x80000000, ram_ali=
+as);
+>>>
+>>>      dev =3D qdev_create(NULL, TYPE_INTEGRATOR_CM);
+>>> -    qdev_prop_set_uint32(dev, "memsz", ram_size >> 20);
+>>> +    qdev_prop_set_uint32(dev, "memsz", ram_size / M_BYTE);
+>>>      qdev_init_nofail(dev);
+>>>      sysbus_mmio_map((SysBusDevice *)dev, 0, 0x10000000);
+>>>
+>>> diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
+>>> index 4215c025fc..37c21ed6d0 100644
+>>> --- a/hw/arm/mainstone.c
+>>> +++ b/hw/arm/mainstone.c
+>>> @@ -115,7 +115,7 @@ static void mainstone_common_init(MemoryRegion *add=
+ress_space_mem,
+>>>                                    MachineState *machine,
+>>>                                    enum mainstone_model_e model, int ar=
+m_id)
+>>>  {
+>>> -    uint32_t sector_len =3D 256 * 1024;
+>>> +    uint32_t sector_len =3D 256 * K_BYTE;
+>>>      hwaddr mainstone_flash_base[] =3D { MST_FLASH_0, MST_FLASH_1 };
+>>>      PXA2xxState *mpu;
+>>>      DeviceState *mst_irq;
+>>> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+>>> index 38d7322a19..d6d1ce75c5 100644
+>>> --- a/hw/arm/musicpal.c
+>>> +++ b/hw/arm/musicpal.c
+>>> @@ -62,8 +62,8 @@
+>>>  #define MP_SRAM_BASE            0xC0000000
+>>>  #define MP_SRAM_SIZE            0x00020000
+>>>
+>>> -#define MP_RAM_DEFAULT_SIZE     32*1024*1024
+>>> -#define MP_FLASH_SIZE_MAX       32*1024*1024
+>>> +#define MP_RAM_DEFAULT_SIZE     (32 * M_BYTE)
+>>> +#define MP_FLASH_SIZE_MAX       (32 * M_BYTE)
+>>>
+>>>  #define MP_TIMER1_IRQ           4
+>>>  #define MP_TIMER2_IRQ           5
+>>> @@ -1625,8 +1625,8 @@ static void musicpal_init(MachineState *machine)
+>>>          BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+>>>
+>>>          flash_size =3D blk_getlength(blk);
+>>> -        if (flash_size !=3D 8*1024*1024 && flash_size !=3D 16*1024*102=
+4 &&
+>>> -            flash_size !=3D 32*1024*1024) {
+>>> +        if (flash_size !=3D 8 * M_BYTE && flash_size !=3D 16 * M_BYTE =
+&&
+>>> +            flash_size !=3D 32 * M_BYTE) {
+>>>              error_report("Invalid flash image size");
+>>>              exit(1);
+>>>          }
+>>> diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+>>> index eccc19c77b..729af8bb80 100644
+>>> --- a/hw/arm/omap_sx1.c
+>>> +++ b/hw/arm/omap_sx1.c
+>>> @@ -88,10 +88,10 @@ static const MemoryRegionOps static_ops =3D {
+>>>  };
+>>>
+>>>  #define sdram_size     0x02000000
+>>> -#define sector_size    (128 * 1024)
+>>> -#define flash0_size    (16 * 1024 * 1024)
+>>> -#define flash1_size    ( 8 * 1024 * 1024)
+>>> -#define flash2_size    (32 * 1024 * 1024)
+>>> +#define sector_size (128 * K_BYTE)
+>>> +#define flash0_size (16 * M_BYTE)
+>>> +#define flash1_size (8 * M_BYTE)
+>>> +#define flash2_size (32 * M_BYTE)
+>>>  #define total_ram_v1   (sdram_size + flash0_size + flash1_size + OMAP1=
+5XX_SRAM_SIZE)
+>>>  #define total_ram_v2   (sdram_size + flash2_size + OMAP15XX_SRAM_SIZE)
+>>>
+>>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+>>> index cd5fa8c3dc..091d07ff86 100644
+>>> --- a/hw/arm/raspi.c
+>>> +++ b/hw/arm/raspi.c
+>>> @@ -169,7 +169,7 @@ static void raspi2_machine_init(MachineClass *mc)
+>>>      mc->max_cpus =3D BCM2836_NCPUS;
+>>>      mc->min_cpus =3D BCM2836_NCPUS;
+>>>      mc->default_cpus =3D BCM2836_NCPUS;
+>>> -    mc->default_ram_size =3D 1024 * 1024 * 1024;
+>>> +    mc->default_ram_size =3D 1 * G_BYTE;
+>>>      mc->ignore_memory_transaction_failures =3D true;
+>>>  };
+>>>  DEFINE_MACHINE("raspi2", raspi2_machine_init)
+>>> diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+>>> index de7c0fc4a6..8ff7567126 100644
+>>> --- a/hw/arm/stellaris.c
+>>> +++ b/hw/arm/stellaris.c
+>>> @@ -1284,8 +1284,8 @@ static void stellaris_init(MachineState *ms, stel=
+laris_board_info *board)
+>>>      MemoryRegion *flash =3D g_new(MemoryRegion, 1);
+>>>      MemoryRegion *system_memory =3D get_system_memory();
+>>>
+>>> -    flash_size =3D (((board->dc0 & 0xffff) + 1) << 1) * 1024;
+>>> -    sram_size =3D ((board->dc0 >> 18) + 1) * 1024;
+>>> +    flash_size =3D (((board->dc0 & 0xffff) + 1) << 1) * K_BYTE;
+>>> +    sram_size =3D ((board->dc0 >> 18) + 1) * K_BYTE;
+>>>
+>>>      /* Flash programming is done via the SCU, so pretend it is ROM.  *=
+/
+>>>      memory_region_init_ram(flash, NULL, "stellaris.flash", flash_size,
+>>> diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+>>> index 418792cd02..041f12beb7 100644
+>>> --- a/hw/arm/versatilepb.c
+>>> +++ b/hw/arm/versatilepb.c
+>>> @@ -26,8 +26,8 @@
+>>>  #include "hw/char/pl011.h"
+>>>
+>>>  #define VERSATILE_FLASH_ADDR 0x34000000
+>>> -#define VERSATILE_FLASH_SIZE (64 * 1024 * 1024)
+>>> -#define VERSATILE_FLASH_SECT_SIZE (256 * 1024)
+>>> +#define VERSATILE_FLASH_SIZE (64 * M_BYTE)
+>>> +#define VERSATILE_FLASH_SECT_SIZE (256 * K_BYTE)
+>>>
+>>>  /* Primary interrupt controller.  */
+>>>
+>>> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+>>> index dc5928ae1a..d48b6d60c6 100644
+>>> --- a/hw/arm/vexpress.c
+>>> +++ b/hw/arm/vexpress.c
+>>> @@ -44,8 +44,8 @@
+>>>  #include "hw/cpu/a15mpcore.h"
+>>>
+>>>  #define VEXPRESS_BOARD_ID 0x8e0
+>>> -#define VEXPRESS_FLASH_SIZE (64 * 1024 * 1024)
+>>> -#define VEXPRESS_FLASH_SECT_SIZE (256 * 1024)
+>>> +#define VEXPRESS_FLASH_SIZE (64 * M_BYTE)
+>>> +#define VEXPRESS_FLASH_SECT_SIZE (256 * K_BYTE)
+>>>
+>>>  /* Number of virtio transports to create (0..8; limited by
+>>>   * number of available IRQ lines).
+>>> @@ -354,7 +354,7 @@ static void a15_daughterboard_init(const VexpressMa=
+chineState *vms,
+>>>           * warning if we are on a host where ram_addr_t is 32 bits.
+>>>           */
+>>>          uint64_t rsz =3D ram_size;
+>>> -        if (rsz > (30ULL * 1024 * 1024 * 1024)) {
+>>> +        if (rsz > 30 * G_BYTE) {
+>>>              error_report("vexpress-a15: cannot model more than 30GB RA=
+M");
+>>>              exit(1);
+>>>          }
+>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>> index dbb3c8036a..8202a428e0 100644
+>>> --- a/hw/arm/virt.c
+>>> +++ b/hw/arm/virt.c
+>>> @@ -110,7 +110,7 @@ static ARMPlatformBusSystemParams platform_bus_para=
+ms;
+>>>   * terabyte of physical address space.)
+>>>   */
+>>>  #define RAMLIMIT_GB 255
+>>> -#define RAMLIMIT_BYTES (RAMLIMIT_GB * 1024ULL * 1024 * 1024)
+>>> +#define RAMLIMIT_BYTES (RAMLIMIT_GB * G_BYTE)
+>>>
+>>>  /* Addresses and sizes of our components.
+>>>   * 0..128MB is space for a flash device so we can run bootrom code suc=
+h as UEFI.
+>>> @@ -783,7 +783,7 @@ static void create_one_flash(const char *name, hwad=
+dr flashbase,
+>>>      DriveInfo *dinfo =3D drive_get_next(IF_PFLASH);
+>>>      DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
+>>>      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+>>> -    const uint64_t sectorlength =3D 256 * 1024;
+>>> +    const uint64_t sectorlength =3D 256 * K_BYTE;
+>>>
+>>>      if (dinfo) {
+>>>          qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
+>>> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+>>> index 0f76333770..7a68503e68 100644
+>>> --- a/hw/arm/xilinx_zynq.c
+>>> +++ b/hw/arm/xilinx_zynq.c
+>>> @@ -40,8 +40,8 @@
+>>>  #define NUM_QSPI_FLASHES 2
+>>>  #define NUM_QSPI_BUSSES 2
+>>>
+>>> -#define FLASH_SIZE (64 * 1024 * 1024)
+>>> -#define FLASH_SECTOR_SIZE (128 * 1024)
+>>> +#define FLASH_SIZE (64 * M_BYTE)
+>>> +#define FLASH_SECTOR_SIZE (128 * K_BYTE)
+>>>
+>>>  #define IRQ_OFFSET 32 /* pic interrupts start from index 32 */
+>>>
+>>> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+>>> index f0b3053fae..d312f67528 100644
+>>> --- a/hw/misc/aspeed_sdmc.c
+>>> +++ b/hw/misc/aspeed_sdmc.c
+>>> @@ -143,7 +143,7 @@ static const MemoryRegionOps aspeed_sdmc_ops =3D {
+>>>
+>>>  static int ast2400_rambits(AspeedSDMCState *s)
+>>>  {
+>>> -    switch (s->ram_size >> 20) {
+>>> +    switch (s->ram_size / M_BYTE) {
+>>>      case 64:
+>>>          return ASPEED_SDMC_DRAM_64MB;
+>>>      case 128:
+>>> @@ -159,13 +159,13 @@ static int ast2400_rambits(AspeedSDMCState *s)
+>>>      /* use a common default */
+>>>      warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 256M",
+>>>                  s->ram_size);
+>>> -    s->ram_size =3D 256 << 20;
+>>> +    s->ram_size =3D 256 * M_BYTE;
+>>>      return ASPEED_SDMC_DRAM_256MB;
+>>>  }
+>>>
+>>>  static int ast2500_rambits(AspeedSDMCState *s)
+>>>  {
+>>> -    switch (s->ram_size >> 20) {
+>>> +    switch (s->ram_size / M_BYTE) {
+>>>      case 128:
+>>>          return ASPEED_SDMC_AST2500_128MB;
+>>>      case 256:
+>>> @@ -181,7 +181,7 @@ static int ast2500_rambits(AspeedSDMCState *s)
+>>>      /* use a common default */
+>>>      warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 512M",
+>>>                  s->ram_size);
+>>> -    s->ram_size =3D 512 << 20;
+>>> +    s->ram_size =3D 512 * M_BYTE;
+>>>      return ASPEED_SDMC_AST2500_512MB;
+>>>  }
+>>>
+>>> diff --git a/hw/misc/imx7_gpr.c b/hw/misc/imx7_gpr.c
+>>> index c2a9df29c6..3d46bdbd09 100644
+>>> --- a/hw/misc/imx7_gpr.c
+>>> +++ b/hw/misc/imx7_gpr.c
+>>> @@ -98,7 +98,7 @@ static void imx7_gpr_init(Object *obj)
+>>>      IMX7GPRState *s =3D IMX7_GPR(obj);
+>>>
+>>>      memory_region_init_io(&s->mmio, obj, &imx7_gpr_ops, s,
+>>> -                          TYPE_IMX7_GPR, 64 * 1024);
+>>> +                          TYPE_IMX7_GPR, 64 * K_BYTE);
+>>>      sysbus_init_mmio(sd, &s->mmio);
+>>>  }
+>>>
+>>> diff --git a/hw/misc/omap_gpmc.c b/hw/misc/omap_gpmc.c
+>>> index 84f9e4c612..af6b620e3e 100644
+>>> --- a/hw/misc/omap_gpmc.c
+>>> +++ b/hw/misc/omap_gpmc.c
+>>> @@ -850,11 +850,11 @@ struct omap_gpmc_s *omap_gpmc_init(struct omap_mp=
+u_state_s *mpu,
+>>>                                &omap_nand_ops,
+>>>                                &s->cs_file[cs],
+>>>                                "omap-nand",
+>>> -                              256 * 1024 * 1024);
+>>> +                              256 * M_BYTE);
+>>>      }
+>>>
+>>>      memory_region_init_io(&s->prefetch.iomem, NULL, &omap_prefetch_ops=
+, s,
+>>> -                          "omap-gpmc-prefetch", 256 * 1024 * 1024);
+>>> +                          "omap-gpmc-prefetch", 256 * M_BYTE);
+>>>      return s;
+>>>  }
+>>>
+>>> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+>>> index 5059396bc6..b51cb6c0a9 100644
+>>> --- a/hw/ssi/aspeed_smc.c
+>>> +++ b/hw/ssi/aspeed_smc.c
+>>> @@ -149,35 +149,35 @@
+>>>   * Segment Address Registers.
+>>>   */
+>>>  static const AspeedSegments aspeed_segments_legacy[] =3D {
+>>> -    { 0x10000000, 32 * 1024 * 1024 },
+>>> +    { 0x10000000, 32 * M_BYTE },
+>>>  };
+>>>
+>>>  static const AspeedSegments aspeed_segments_fmc[] =3D {
+>>> -    { 0x20000000, 64 * 1024 * 1024 }, /* start address is readonly */
+>>> -    { 0x24000000, 32 * 1024 * 1024 },
+>>> -    { 0x26000000, 32 * 1024 * 1024 },
+>>> -    { 0x28000000, 32 * 1024 * 1024 },
+>>> -    { 0x2A000000, 32 * 1024 * 1024 }
+>>> +    { 0x20000000,  64 * M_BYTE }, /* start address is readonly */
+>>> +    { 0x24000000,  32 * M_BYTE },
+>>> +    { 0x26000000,  32 * M_BYTE },
+>>> +    { 0x28000000,  32 * M_BYTE },
+>>> +    { 0x2A000000,  32 * M_BYTE }
+>>>  };
+>>>
+>>>  static const AspeedSegments aspeed_segments_spi[] =3D {
+>>> -    { 0x30000000, 64 * 1024 * 1024 },
+>>> +    { 0x30000000,  64 * M_BYTE },
+>>>  };
+>>>
+>>>  static const AspeedSegments aspeed_segments_ast2500_fmc[] =3D {
+>>> -    { 0x20000000, 128 * 1024 * 1024 }, /* start address is readonly */
+>>> -    { 0x28000000,  32 * 1024 * 1024 },
+>>> -    { 0x2A000000,  32 * 1024 * 1024 },
+>>> +    { 0x20000000, 128 * M_BYTE }, /* start address is readonly */
+>>> +    { 0x28000000,  32 * M_BYTE },
+>>> +    { 0x2A000000,  32 * M_BYTE },
+>>>  };
+>>>
+>>>  static const AspeedSegments aspeed_segments_ast2500_spi1[] =3D {
+>>> -    { 0x30000000, 32 * 1024 * 1024 }, /* start address is readonly */
+>>> -    { 0x32000000, 96 * 1024 * 1024 }, /* end address is readonly */
+>>> +    { 0x30000000,  32 * M_BYTE }, /* start address is readonly */
+>>> +    { 0x32000000,  96 * M_BYTE }, /* end address is readonly */
+>>>  };
+>>>
+>>>  static const AspeedSegments aspeed_segments_ast2500_spi2[] =3D {
+>>> -    { 0x38000000, 32 * 1024 * 1024 }, /* start address is readonly */
+>>> -    { 0x3A000000, 96 * 1024 * 1024 }, /* end address is readonly */
+>>> +    { 0x38000000,  32 * M_BYTE }, /* start address is readonly */
+>>> +    { 0x3A000000,  96 * M_BYTE }, /* end address is readonly */
+>>>  };
+>>>
+>>>  static const AspeedSMCController controllers[] =3D {
+>>> --
+>>> 2.16.1
+>>>
+>>>
+>
