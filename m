@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1emEUv-00012J-IA
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 03:02:30 -0500
+	(envelope-from <berto@igalia.com>) id 1emFCu-0005gV-3c
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 03:47:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1emEUr-000161-MF
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 03:02:29 -0500
-Received: from fanzine.igalia.com ([91.117.99.155]:40989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1emEUr-0000tB-A7
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 03:02:25 -0500
+	(envelope-from <berto@igalia.com>) id 1emFCp-0002n5-Ay
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 03:47:56 -0500
 From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180215042900.16078-25-f4bug@amsat.org>
-References: <20180215042900.16078-1-f4bug@amsat.org>
-	<20180215042900.16078-25-f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 09:01:45 +0100
-Message-ID: <w51eflmk7fa.fsf@maestria.local.igalia.com>
+In-Reply-To: <20180213233324.5096-1-eblake@redhat.com>
+References: <20180213233324.5096-1-eblake@redhat.com>
+Date: Thu, 15 Feb 2018 09:47:48 +0100
+Message-ID: <w51bmgqk5aj.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 24/30] hw/ipack: use the BYTE-based
- definitions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] s/size/entries/ when dealing with
+ non-byte units
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,13 +22,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mreitz@redhat.com
 
-On Thu 15 Feb 2018 05:28:54 AM CET, Philippe Mathieu-Daud=C3=A9 wrote:
-> It ease code review, unit is explicit.
+On Wed 14 Feb 2018 12:33:22 AM CET, Eric Blake wrote:
+> I mentioned this while reviewing Berto's series on L2 slice handling;
+> this is a first cut at patches that I think are worth doing throughout
+> the qcow2 code base if we like the idea.
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Eric Blake (2):
+>   qcow2: Prefer 'entries' over 'size' for non-byte values in spec
+>   qcow2: Prefer 'entries' over 'size' during cache creation
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+I also like the idea. We'd need to change a lot of variables all over
+the place, but things will look much more readable.
 
 Berto
