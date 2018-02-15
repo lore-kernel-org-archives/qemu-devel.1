@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLex-0004pg-SE
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:20 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1emLf0-0004rt-Dx
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1emLet-0003fQ-VO
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:19 -0500
-Received: from mail-bn3nam01on0047.outbound.protection.outlook.com
-	([104.47.33.47]:24802
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1emLew-0003g9-Ge
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:22 -0500
+Received: from mail-cys01nam02on0058.outbound.protection.outlook.com
+	([104.47.37.58]:48924
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1emLet-0003fI-OV
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:15 -0500
+	id 1emLew-0003fq-7d
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 10:41:18 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu, 15 Feb 2018 09:39:52 -0600
-Message-ID: <20180215153955.3253-27-brijesh.singh@amd.com>
+Date: Thu, 15 Feb 2018 09:39:53 -0600
+Message-ID: <20180215153955.3253-28-brijesh.singh@amd.com>
 In-Reply-To: <20180215153955.3253-1-brijesh.singh@amd.com>
 References: <20180215153955.3253-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 26/29] qmp: add query-sev-launch-measure
- command
+Subject: [Qemu-devel] [PATCH v9 27/29] tests/qmp-test: blacklist
+ query-sev-launch-measure command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +33,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-The command can be used by libvirt to retrieve the measurement of SEV guest=
-.
-This measurement is a signature of the memory contents that was encrypted
-through the LAUNCH_UPDATE_DATA.
+The query-sev-launch-measure command returns a measurement of encrypted
+memory when SEV is enabled otherwise it returns an error. Blacklist the
+command in qmp-test to fix the 'make check' failure.
 
 Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- qapi-schema.json | 29 +++++++++++++++++++++++++++++
- qmp.c            | 17 +++++++++++++++++
- 2 files changed, 46 insertions(+)
+ tests/qmp-test.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 46f7a3c9ea83..1ae45a908369 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3246,3 +3246,32 @@
- #
- ##
- { 'command': 'query-sev', 'returns': 'SevInfo' }
-+
-+##
-+# @SevLaunchMeasureInfo:
-+#
-+# SEV Guest Launch measurement information
-+#
-+# @data: the measurement value encoded in base64
-+#
-+# Since: 2.12
-+#
-+##
-+{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
-+
-+##
-+# @query-sev-launch-measure:
-+#
-+# Query the SEV guest launch information.
-+#
-+# Returns: The @SevLaunchMeasureInfo for the guest
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "query-sev-launch-measure" }
-+# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
-+#
-+##
-+{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInfo'=
- }
-diff --git a/qmp.c b/qmp.c
-index 6860ae9ad6ea..7253720a2092 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -735,3 +735,20 @@ SevInfo *qmp_query_sev(Error **errp)
-=20
-     return info;
- }
-+
-+SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
-+{
-+    char *data;
-+    SevLaunchMeasureInfo *info;
-+
-+    data =3D sev_get_launch_measurement();
-+    if (!data) {
-+        error_setg(errp, "Measurement is not available");
-+        return NULL;
-+    }
-+
-+    info =3D g_malloc0(sizeof(*info));
-+    info->data =3D data;
-+
-+    return info;
-+}
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 580848307ad1..83ad949ec1d9 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -203,6 +203,8 @@ static bool query_is_blacklisted(const char *cmd)
+         "query-gic-capabilities", /* arm */
+         /* Success depends on target-specific build configuration: */
+         "query-pci",              /* CONFIG_PCI */
++        /* Success depends on launching SEV guest */
++        "query-sev-launch-measure",
+         NULL
+     };
+     int i;
 --=20
 2.14.3
