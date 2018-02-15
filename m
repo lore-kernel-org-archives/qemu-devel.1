@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1emChd-0005K0-Ta
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:07:31 -0500
+	(envelope-from <thuth@redhat.com>) id 1emChg-0005KR-43
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:07:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1emChb-0007dB-Ii
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:07:29 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60556 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1emChb-0007cc-D7
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:07:27 -0500
-From: Wei Huang <wei@redhat.com>
-Date: Thu, 15 Feb 2018 01:07:25 -0500
-Message-Id: <1518674845-6517-3-git-send-email-wei@redhat.com>
-In-Reply-To: <1518674845-6517-1-git-send-email-wei@redhat.com>
-References: <1518674845-6517-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V3 2/2] tests: Add migration test for aarch64
+	(envelope-from <thuth@redhat.com>) id 1emChf-0007f0-78
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 01:07:32 -0500
+References: <20180215042900.16078-1-f4bug@amsat.org>
+	<20180215042900.16078-4-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f021eed7-5613-6608-aaa9-951733f80c3f@redhat.com>
+Date: Thu, 15 Feb 2018 07:07:22 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180215042900.16078-4-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/30] hw/block/nvme: include the
+ "qemu/cutils.h" in the source file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,268 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-trivial@nongnu.org
 
-This patch adds migration test support for aarch64. The test code, which
-implements the same functionality as x86, is booted as a kernel in qemu.
-Here are the design choices we make for aarch64:
+On 15.02.2018 05:28, Philippe Mathieu-Daud=C3=A9 wrote:
+> where it is used.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/block/nvme.h | 1 -
+>  hw/block/nvme.c | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 8f3981121d..cabcf20c32 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -1,6 +1,5 @@
+>  #ifndef HW_NVME_H
+>  #define HW_NVME_H
+> -#include "qemu/cutils.h"
+>  #include "block/nvme.h"
+> =20
+>  typedef struct NvmeAsyncEvent {
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 85d2406400..811084b6a7 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -35,6 +35,7 @@
+>  #include "sysemu/block-backend.h"
+> =20
+>  #include "qemu/log.h"
+> +#include "qemu/cutils.h"
+>  #include "trace.h"
+>  #include "nvme.h"
 
- * We choose this -kernel approach because aarch64 QEMU doesn't provide a
-   built-in fw like x86 does. So instead of relying on a boot loader, we
-   use -kernel approach for aarch64.
- * The serial output is sent to PL011 directly.
- * The physical memory base for mach-virt machine is 0x40000000. We change
-   the start_address and end_address for aarch64.
-
-In addition to providing the binary, this patch also includes the source
-code and the build script in tests/migration/. So users can change the
-source and/or re-compile the binary as they wish.
-
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- tests/Makefile.include               |  1 +
- tests/migration-test.c               | 39 ++++++++++++++++---
- tests/migration/Makefile             | 12 +++++-
- tests/migration/aarch64-a-b-kernel.h | 19 +++++++++
- tests/migration/aarch64-a-b-kernel.s | 74 ++++++++++++++++++++++++++++++++++++
- 5 files changed, 137 insertions(+), 8 deletions(-)
- create mode 100644 tests/migration/aarch64-a-b-kernel.h
- create mode 100644 tests/migration/aarch64-a-b-kernel.s
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 278c13a..5b1605a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -372,6 +372,7 @@ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
- 
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
-+check-qtest-aarch64-y += tests/migration-test$(EXESUF)
- 
- check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
- 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 97fdb19..0b6ab5c 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -23,8 +23,8 @@
- 
- #define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
- 
--const unsigned start_address = 1024 * 1024;
--const unsigned end_address = 100 * 1024 * 1024;
-+unsigned start_address = 1024 * 1024;
-+unsigned end_address = 100 * 1024 * 1024;
- bool got_stop;
- 
- #if defined(__linux__)
-@@ -81,12 +81,13 @@ static const char *tmpfs;
-  * outputting a 'B' every so often if it's still running.
-  */
- #include "tests/migration/x86-a-b-bootblock.h"
-+#include "tests/migration/aarch64-a-b-kernel.h"
- 
--static void init_bootfile_x86(const char *bootpath)
-+static void init_bootfile(const char *bootpath, void *content)
- {
-     FILE *bootfile = fopen(bootpath, "wb");
- 
--    g_assert_cmpint(fwrite(x86_bootsect, 512, 1, bootfile), ==, 1);
-+    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
-     fclose(bootfile);
- }
- 
-@@ -392,7 +393,7 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-     got_stop = false;
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        init_bootfile_x86(bootpath);
-+        init_bootfile(bootpath, x86_bootsect);
-         cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial"
-@@ -421,6 +422,32 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-                                   " -serial file:%s/dest_serial"
-                                   " -incoming %s",
-                                   accel, tmpfs, uri);
-+    } else if (strcmp(arch, "aarch64") == 0) {
-+        const char *cpu;
-+
-+        if (access("/dev/kvm", F_OK)) {
-+            accel = "kvm";
-+            cpu = "host";
-+        } else {
-+            accel = "tcg";
-+            cpu = "cortex-a57";
-+        }
-+
-+        init_bootfile(bootpath, aarch64_kernel);
-+        cmd_src = g_strdup_printf("-machine virt,accel=%s -m 150M "
-+                                  "-name vmsource,debug-threads=on -cpu %s "
-+                                  "-serial file:%s/src_serial "
-+                                  "-kernel %s ",
-+                                  accel, cpu, tmpfs, bootpath);
-+        cmd_dst = g_strdup_printf("-machine virt,accel=%s -m 150M "
-+                                  "-name vmdest,debug-threads=on -cpu %s "
-+                                  "-serial file:%s/dest_serial "
-+                                  "-kernel %s "
-+                                  "-incoming %s ",
-+                                  accel, cpu, tmpfs, bootpath, uri);
-+        /* aarch64 virt machine physical memory starts at 0x40000000 */
-+        start_address += 0x40000000;
-+        end_address += 0x40000000;
-     } else {
-         g_assert_not_reached();
-     }
-@@ -502,7 +529,7 @@ static void test_deprecated(void)
- {
-     QTestState *from;
- 
--    from = qtest_start("");
-+    from = qtest_start("-machine none");
- 
-     deprecated_set_downtime(from, 0.12345);
-     deprecated_set_speed(from, "12345");
-diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-index e8e6026..00f854b 100644
---- a/tests/migration/Makefile
-+++ b/tests/migration/Makefile
-@@ -15,6 +15,7 @@ cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call cross-ld,$(1)))))
- find-cross-prefix = $(subst gcc,,$(notdir $(call cross-gcc,$(1))))
- 
- x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
-+aarch64_cross_prefix := $(call find-cross-prefix,aarch64)
- 
- export __note
- override define __note
-@@ -25,7 +26,7 @@ override define __note
-  */
- endef
- 
--all: x86-a-b-bootblock.h
-+all: x86-a-b-bootblock.h aarch64-a-b-kernel.h
- 
- x86-a-b-bootblock.h: x86-a-b-bootblock.s
- 	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
-@@ -34,5 +35,12 @@ x86-a-b-bootblock.h: x86-a-b-bootblock.s
- 	echo "$$__note" > $@
- 	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
- 
-+aarch64-a-b-kernel.h: aarch64-a-b-kernel.s
-+	$(aarch64_cross_prefix)gcc -o aarch64.elf -nostdlib \
-+		-Wl,--build-id=none,-Ttext=40080000 $<
-+	$(aarch64_cross_prefix)objcopy -O binary aarch64.elf aarch64.kernel
-+	echo "$$__note" > $@
-+	xxd -i aarch64.kernel | sed -e 's/.*int.*//' >> $@
-+
- clean:
--	rm -rf *.bootsect *.boot *.o
-+	rm -rf *.bootsect *.boot *.o *.elf *.kernel
-diff --git a/tests/migration/aarch64-a-b-kernel.h b/tests/migration/aarch64-a-b-kernel.h
-new file mode 100644
-index 0000000..d294cf8
---- /dev/null
-+++ b/tests/migration/aarch64-a-b-kernel.h
-@@ -0,0 +1,19 @@
-+/* This file is automatically generated from
-+ * tests/migration/aarch64-a-b-kernel.s, edit that and then run
-+ * "make aarch64-a-b-kernel.h" inside tests/migration to update,
-+ * and then remember to send both in your patch submission.
-+ */
-+unsigned char aarch64_kernel[] = {
-+  0x00, 0x10, 0x38, 0xd5, 0x00, 0xf8, 0x7f, 0x92, 0x00, 0x10, 0x18, 0xd5,
-+  0xdf, 0x3f, 0x03, 0xd5, 0x00, 0x02, 0xa8, 0xd2, 0x01, 0xc8, 0xa8, 0xd2,
-+  0x23, 0x08, 0x80, 0x52, 0x02, 0x20, 0xa1, 0xd2, 0x43, 0x00, 0x00, 0x39,
-+  0x03, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x83, 0x00, 0x00, 0x39,
-+  0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb, 0xad, 0xff, 0xff, 0x54,
-+  0x05, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x24, 0x7e, 0x0b, 0xd5,
-+  0x83, 0x00, 0x40, 0x39, 0x63, 0x04, 0x00, 0x11, 0x63, 0x1c, 0x00, 0x12,
-+  0x83, 0x00, 0x00, 0x39, 0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb,
-+  0x2b, 0xff, 0xff, 0x54, 0xa5, 0x04, 0x00, 0x11, 0xa5, 0x1c, 0x00, 0x12,
-+  0xbf, 0x00, 0x00, 0x71, 0x81, 0xfe, 0xff, 0x54, 0x43, 0x08, 0x80, 0x52,
-+  0x43, 0x00, 0x00, 0x39, 0xf1, 0xff, 0xff, 0x97
-+};
-+
-diff --git a/tests/migration/aarch64-a-b-kernel.s b/tests/migration/aarch64-a-b-kernel.s
-new file mode 100644
-index 0000000..713e7a8
---- /dev/null
-+++ b/tests/migration/aarch64-a-b-kernel.s
-@@ -0,0 +1,74 @@
-+#
-+# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-+#
-+# Author:
-+#   Wei Huang <wei@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+
-+.set ARM_MACH_VIRT_UART, 0x09000000
-+.set ARM_MACH_VIRT_PHYS_BASE, 0x40000000
-+.set ARM_MACH_VIRT_A_B_START, (0x40000000 + 1*1024*1024)
-+.set ARM_MACH_VIRT_A_B_END, (0x40000000 + 100*1024*1024)
-+
-+.section .text
-+
-+        .globl  _start
-+
-+_start:
-+        /* disable MMU to use phys mem address */
-+        mrs     x0, sctlr_el1
-+        bic     x0, x0, #(1<<0)
-+        msr     sctlr_el1, x0
-+        isb
-+
-+	/* traverse 1M-100M */
-+        mov     x0, ARM_MACH_VIRT_A_B_START
-+        mov     x1, ARM_MACH_VIRT_A_B_END
-+
-+        /* output char 'A' to PL011 */
-+        mov     w3, 'A'
-+        mov     x2, ARM_MACH_VIRT_UART
-+        strb    w3, [x2]
-+
-+        /* clean up memory */
-+        mov     w3, #0
-+        mov     x4, x0
-+clean:
-+        strb    w3, [x4]
-+        add     x4, x4, #(4096)
-+        cmp     x4, x1
-+        ble     clean
-+
-+        /* w5 keeps a counter so we can limit the output speed */
-+        mov     w5, #0
-+
-+        /* main body */
-+mainloop:
-+        mov     x4, x0
-+
-+innerloop:
-+        /* clean cache because el2 might still cache guest data under KVM */
-+        dc      civac, x4
-+
-+	/* increment the first byte of each 4KB page by 1 */
-+        ldrb    w3, [x4]
-+        add     w3, w3, #1
-+        and     w3, w3, #(0xff)
-+        strb    w3, [x4]
-+
-+        add     x4, x4, #(4096)
-+        cmp     x4, x1
-+        blt     innerloop
-+
-+        add     w5, w5, #1
-+        and     w5, w5, #(0xff)
-+        cmp     w5, #0
-+        bne     mainloop
-+
-+        /* output char 'B' to PL011 */
-+        mov     w3, 'B'
-+        strb    w3, [x2]
-+
-+        bl      mainloop
--- 
-1.8.3.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
