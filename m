@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34756)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBa-0008Fo-QE
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:21 -0500
+	id 1emBBf-0008LY-4Q
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emBBZ-0004Mt-Po
-	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:18 -0500
+	id 1emBBe-0004We-Bn
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:23 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35201)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emBBe-0004W8-4j
+	for qemu-devel@nongnu.org; Wed, 14 Feb 2018 23:30:22 -0500
+Received: by mail-qt0-x242.google.com with SMTP id g14so10490995qti.2
+	for <qemu-devel@nongnu.org>; Wed, 14 Feb 2018 20:30:22 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 01:28:53 -0300
-Message-Id: <20180215042900.16078-24-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 01:28:55 -0300
+Message-Id: <20180215042900.16078-26-f4bug@amsat.org>
 In-Reply-To: <20180215042900.16078-1-f4bug@amsat.org>
 References: <20180215042900.16078-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 23/30] hw/net: use the BYTE-based definitions
+Subject: [Qemu-devel] [PATCH 25/30] hw/scsi: use the BYTE-based definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +34,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Stefan Weil <sw@weilnetz.de>, Beniamino Galvani <b.galvani@gmail.com>, "open list:Allwinner-a10" <qemu-arm@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
 It ease code review, unit is explicit.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/net/allwinner_emac.h | 4 ++--
- hw/net/e1000e.c                 | 6 +++---
- hw/net/eepro100.c               | 6 ++----
- 3 files changed, 7 insertions(+), 9 deletions(-)
+ hw/scsi/scsi-disk.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner_emac.h
-index 4cc8aab7ec..93ec0e7067 100644
---- a/include/hw/net/allwinner_emac.h
-+++ b/include/hw/net/allwinner_emac.h
-@@ -125,8 +125,8 @@
- #define EMAC_INT_RX         (1 << 8)
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 49d2559d93..bfdb34a71c 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -44,13 +44,13 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
+ #include <scsi/sg.h>
+ #endif
  
- /* Due to lack of specifications, size of fifos is chosen arbitrarily */
--#define TX_FIFO_SIZE        (4 * 1024)
--#define RX_FIFO_SIZE        (32 * 1024)
-+#define TX_FIFO_SIZE        (4 * K_BYTE)
-+#define RX_FIFO_SIZE        (32 * K_BYTE)
+-#define SCSI_WRITE_SAME_MAX         524288
+-#define SCSI_DMA_BUF_SIZE           131072
++#define SCSI_WRITE_SAME_MAX         (512 * K_BYTE)
++#define SCSI_DMA_BUF_SIZE           (128 * K_BYTE)
+ #define SCSI_MAX_INQUIRY_LEN        256
+ #define SCSI_MAX_MODE_LEN           256
  
- #define NUM_TX_FIFOS        2
- #define RX_HDR_SIZE         8
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index 16a9417a85..767b35fca8 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -81,10 +81,10 @@ typedef struct E1000EState {
- #define E1000E_IO_IDX       2
- #define E1000E_MSIX_IDX     3
+-#define DEFAULT_DISCARD_GRANULARITY 4096
+-#define DEFAULT_MAX_UNMAP_SIZE      (1 << 30)   /* 1 GB */
++#define DEFAULT_DISCARD_GRANULARITY (4 * K_BYTE)
++#define DEFAULT_MAX_UNMAP_SIZE      (1 * G_BYTE)
+ #define DEFAULT_MAX_IO_SIZE         INT_MAX     /* 2 GB - 1 block */
  
--#define E1000E_MMIO_SIZE    (128 * 1024)
--#define E1000E_FLASH_SIZE   (128 * 1024)
-+#define E1000E_MMIO_SIZE    (128 * K_BYTE)
-+#define E1000E_FLASH_SIZE   (128 * K_BYTE)
- #define E1000E_IO_SIZE      (32)
--#define E1000E_MSIX_SIZE    (16 * 1024)
-+#define E1000E_MSIX_SIZE    (16 * K_BYTE)
- 
- #define E1000E_MSIX_TABLE   (0x0000)
- #define E1000E_MSIX_PBA     (0x2000)
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index a07a63247e..6fdeb05259 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -60,8 +60,6 @@
-  * changed to pad short packets itself. */
- #define CONFIG_PAD_RECEIVED_FRAMES
- 
--#define KiB 1024
--
- /* Debug EEPRO100 card. */
- #if 0
- # define DEBUG_EEPRO100
-@@ -104,9 +102,9 @@
- /* Use 64 word EEPROM. TODO: could be a runtime option. */
- #define EEPROM_SIZE     64
- 
--#define PCI_MEM_SIZE            (4 * KiB)
-+#define PCI_MEM_SIZE            (4 * K_BYTE)
- #define PCI_IO_SIZE             64
--#define PCI_FLASH_SIZE          (128 * KiB)
-+#define PCI_FLASH_SIZE          (128 * K_BYTE)
- 
- #define BITS(n, m) (((0xffffffffU << (31 - n)) >> (31 - n + m)) << m)
- 
+ #define TYPE_SCSI_DISK_BASE         "scsi-disk-base"
 -- 
 2.16.1
