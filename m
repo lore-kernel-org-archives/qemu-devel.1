@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60418)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVmv-0005dp-RD
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:15 -0500
+	id 1emVn4-0005oE-7L
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVms-0002b8-MQ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:13 -0500
+	id 1emVn1-0002fo-4b
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:22 -0500
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:37009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1emVn0-0002fg-VB
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:19 -0500
+Received: by mail-ua0-x241.google.com with SMTP id q8so1107839uae.4
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:30:18 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 23:29:30 -0300
-Message-Id: <20180216022933.10945-6-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 23:29:32 -0300
+Message-Id: <20180216022933.10945-8-f4bug@amsat.org>
 In-Reply-To: <20180216022933.10945-1-f4bug@amsat.org>
 References: <20180216022933.10945-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v3 5/7] hw/sd/pl181: expose a SDBus and
- connect the SDCard to it
+Subject: [Qemu-devel] [PATCH v3 7/7] hw/sd: move sdcard legacy API to
+ "hw/sd/sdcard_legacy.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,151 +34,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, Michael Walle <michael@walle.cc>, Stefan Weil <sw@weilnetz.de>, "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, Michael Walle <michael@walle.cc>, Stefan Weil <sw@weilnetz.de>
 
-using the sdbus_*() API.
+omap_mmc.c is the last user left.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
+ include/hw/sd/sd.h            | 16 --------------
+ include/hw/sd/sdcard_legacy.h | 50 +++++++++++++++++++++++++++++++++++++++++++
+ hw/sd/omap_mmc.c              |  2 +-
+ hw/sd/sd.c                    |  1 +
+ 4 files changed, 52 insertions(+), 17 deletions(-)
+ create mode 100644 include/hw/sd/sdcard_legacy.h
 
-RFC because how pl181_sdbus_create_inplace() doing class_init(SDBus) in
-realize(pl181) seems weird...
-
-from http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg01268.html:
-
-    I think you have to change that sd_set_cb() code now.
-    If you look at sd_cardchange() it uses "is this SD card
-    object on an SDBus" to determine whether to notify the
-    controller via the old-API IRQ lines, or using the
-    set_inserted() and set_readonly() callbacks on the SDBusClass.
-
-This previous series intended to enforce a cleaner OOP design, adding a
-TYPE_SD_BUS_MASTER_INTERFACE TypeInfo:
-
-http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02322.html
-http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02326.html
-http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02327.html
----
-
- hw/sd/pl181.c | 59 ++++++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 44 insertions(+), 15 deletions(-)
-
-diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-index 3ba1f7dd23..97e85e4a64 100644
---- a/hw/sd/pl181.c
-+++ b/hw/sd/pl181.c
-@@ -33,7 +33,7 @@ typedef struct PL181State {
-     SysBusDevice parent_obj;
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 4491db98de..58528b4d2c 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -131,22 +131,6 @@ typedef struct {
+     void (*set_readonly)(DeviceState *dev, bool readonly);
+ } SDBusClass;
  
-     MemoryRegion iomem;
--    SDState *card;
-+    SDBus sdbus;
-     uint32_t clock;
-     uint32_t power;
-     uint32_t cmdarg;
-@@ -179,7 +179,7 @@ static void pl181_send_command(PL181State *s)
-     request.cmd = s->cmd & PL181_CMD_INDEX;
-     request.arg = s->cmdarg;
-     DPRINTF("Command %d %08x\n", request.cmd, request.arg);
--    rlen = sd_do_command(s->card, &request, response);
-+    rlen = sdbus_do_command(&s->sdbus, &request, response);
-     if (rlen < 0)
-         goto error;
-     if (s->cmd & PL181_CMD_RESPONSE) {
-@@ -223,12 +223,12 @@ static void pl181_fifo_run(PL181State *s)
-     int is_read;
- 
-     is_read = (s->datactrl & PL181_DATA_DIRECTION) != 0;
--    if (s->datacnt != 0 && (!is_read || sd_data_ready(s->card))
-+    if (s->datacnt != 0 && (!is_read || sdbus_data_ready(&s->sdbus))
-             && !s->linux_hack) {
-         if (is_read) {
-             n = 0;
-             while (s->datacnt && s->fifo_len < PL181_FIFO_LEN) {
--                value |= (uint32_t)sd_read_data(s->card) << (n * 8);
-+                value |= (uint32_t)sdbus_read_data(&s->sdbus) << (n * 8);
-                 s->datacnt--;
-                 n++;
-                 if (n == 4) {
-@@ -249,7 +249,7 @@ static void pl181_fifo_run(PL181State *s)
-                 }
-                 n--;
-                 s->datacnt--;
--                sd_write_data(s->card, value & 0xff);
-+                sdbus_write_data(&s->sdbus, value & 0xff);
-                 value >>= 8;
-             }
-         }
-@@ -477,13 +477,6 @@ static void pl181_reset(DeviceState *d)
-     s->linux_hack = 0;
-     s->mask[0] = 0;
-     s->mask[1] = 0;
+-/* Legacy functions to be used only by non-qdevified callers */
+-SDState *sd_init(BlockBackend *bs, bool is_spi);
+-int sd_do_command(SDState *sd, SDRequest *req,
+-                  uint8_t *response);
+-void sd_write_data(SDState *sd, uint8_t value);
+-uint8_t sd_read_data(SDState *sd);
+-void sd_set_cb(SDState *sd, qemu_irq readonly, qemu_irq insert);
+-/* sd_enable should not be used -- it is only used on the nseries boards,
+- * where it is part of a broken implementation of the MMC card slot switch
+- * (there should be two card slots which are multiplexed to a single MMC
+- * controller, but instead we model it with one card and controller and
+- * disable the card when the second slot is selected, so it looks like the
+- * second slot is always empty).
+- */
+-void sd_enable(SDState *sd, bool enable);
 -
--    /* We can assume our GPIO outputs have been wired up now */
--    sd_set_cb(s->card, s->cardstatus[0], s->cardstatus[1]);
--    /* Since we're still using the legacy SD API the card is not plugged
--     * into any bus, and we must reset it manually.
--     */
--    device_reset(DEVICE(s->card));
- }
+ /* Functions to be used by qdevified callers (working via
+  * an SDBus rather than directly with SDState)
+  */
+diff --git a/include/hw/sd/sdcard_legacy.h b/include/hw/sd/sdcard_legacy.h
+new file mode 100644
+index 0000000000..8681f8089b
+--- /dev/null
++++ b/include/hw/sd/sdcard_legacy.h
+@@ -0,0 +1,50 @@
++/*
++ * SD Memory Card emulation (deprecated legacy API)
++ *
++ * Copyright (c) 2006 Andrzej Zaborowski  <balrog@zabor.org>
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
++ * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
++ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
++ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++#ifndef HW_SDCARD_LEGACY_H
++#define HW_SDCARD_LEGACY_H
++
++#include "hw/sd/sd.h"
++
++/* Legacy functions to be used only by non-qdevified callers */
++SDState *sd_init(BlockBackend *blk, bool is_spi);
++int sd_do_command(SDState *card, SDRequest *request, uint8_t *response);
++void sd_write_data(SDState *card, uint8_t value);
++uint8_t sd_read_data(SDState *card);
++void sd_set_cb(SDState *card, qemu_irq readonly, qemu_irq insert);
++
++/* sd_enable should not be used -- it is only used on the nseries boards,
++ * where it is part of a broken implementation of the MMC card slot switch
++ * (there should be two card slots which are multiplexed to a single MMC
++ * controller, but instead we model it with one card and controller and
++ * disable the card when the second slot is selected, so it looks like the
++ * second slot is always empty).
++ */
++void sd_enable(SDState *card, bool enable);
++
++#endif /* HW_SDCARD_LEGACY_H */
+diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
+index 5b47cadf11..be14ac4f40 100644
+--- a/hw/sd/omap_mmc.c
++++ b/hw/sd/omap_mmc.c
+@@ -19,7 +19,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/arm/omap.h"
+-#include "hw/sd/sd.h"
++#include "hw/sd/sdcard_legacy.h"
  
- static void pl181_init(Object *obj)
-@@ -499,16 +492,52 @@ static void pl181_init(Object *obj)
-     qdev_init_gpio_out(dev, s->cardstatus, 2);
- }
- 
-+static void pl181_set_readonly(DeviceState *dev, bool level)
-+{
-+    PL181State *s = (PL181State *)dev;
-+
-+    qemu_set_irq(s->cardstatus[0], level);
-+}
-+
-+static void pl181_set_inserted(DeviceState *dev, bool level)
-+{
-+    PL181State *s = (PL181State *)dev;
-+
-+    qemu_set_irq(s->cardstatus[1], level);
-+}
-+
-+static void pl181_sdbus_create_inplace(SDBus *sdbus, DeviceState *dev)
-+{
-+    SDBusClass *sbc;
-+
-+    qbus_create_inplace(sdbus, sizeof(SDBus), TYPE_SD_BUS, dev, "sd-bus");
-+
-+    /* pl181_sdbus_class_init */
-+    sbc = SD_BUS_GET_CLASS(sdbus);
-+    sbc->set_inserted = pl181_set_inserted;
-+    sbc->set_readonly = pl181_set_readonly;
-+}
-+
- static void pl181_realize(DeviceState *dev, Error **errp)
- {
-     PL181State *s = PL181(dev);
-+    DeviceState *carddev;
-     DriveInfo *dinfo;
-+    Error *err = NULL;
-+
-+    pl181_sdbus_create_inplace(&s->sdbus, dev);
- 
-+    /* Create and plug in the sd card */
-     /* FIXME use a qdev drive property instead of drive_get_next() */
-     dinfo = drive_get_next(IF_SD);
--    s->card = sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, false);
--    if (s->card == NULL) {
--        error_setg(errp, "sd_init failed");
-+    carddev = qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
-+    if (dinfo) {
-+        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
-+    }
-+    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
-+    if (err) {
-+        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
-+        return;
-     }
- }
- 
+ struct omap_mmc_s {
+     qemu_irq irq;
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 72d32f7845..ae2d915977 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -34,6 +34,7 @@
+ #include "hw/hw.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/sd/sd.h"
++#include "hw/sd/sdcard_legacy.h"
+ #include "qapi/error.h"
+ #include "qemu/bitmap.h"
+ #include "hw/qdev-properties.h"
 -- 
 2.16.1
