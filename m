@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benjamin.drung@profitbricks.com>) id 1emlk5-00078W-0p
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:32:22 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emm23-00069p-St
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benjamin.drung@profitbricks.com>) id 1emljz-0003SK-Vi
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:32:19 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:39831)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <benjamin.drung@profitbricks.com>)
-	id 1emljz-0003Re-Ib
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:32:15 -0500
-Received: by mail-wm0-x232.google.com with SMTP id b21so4943905wme.4
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:32:15 -0800 (PST)
-Message-ID: <1518809532.4749.87.camel@profitbricks.com>
-From: Benjamin Drung <benjamin.drung@profitbricks.com>
-Date: Fri, 16 Feb 2018 20:32:12 +0100
-In-Reply-To: <a23480b8-c914-6274-52ec-29911cb4d2a5@amsat.org>
-References: <ff0868d2-98c0-a0ee-8139-0367c29a03b1@redhat.com>
-	<20180216175507.17052-1-benjamin.drung@profitbricks.com>
-	<a23480b8-c914-6274-52ec-29911cb4d2a5@amsat.org>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-gehc3r9DLW0C6ZlsBTFh"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] slirp: Add domainname option to slirp's
- DHCP server
+	(envelope-from <dgilbert@redhat.com>) id 1emm1z-000757-3j
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:50:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60246 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emm1y-00074p-TL
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:50:51 -0500
+Date: Fri, 16 Feb 2018 19:50:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180216195041.GF2308@work-vm>
+References: <1518790115-13044-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20180216140847eucas1p2df2d02d4debc4b09a9eb5d2763c016c1@eucas1p2.samsung.com>
+	<1518790115-13044-2-git-send-email-a.perevalov@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1518790115-13044-2-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v3] migration: change blocktime type to
+ uint32_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,285 +29,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
 
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> Initially int64_t was used, but on PowerPC architecture,
+> clang doesn't have atomic_*_8 function, so it produces
+> link time error.
+> 
+> QEMU is working with time as with 64bit value, but by
+> fact 32 bit is enough with CLOCK_REALTIME. In this case
+> blocktime will keep only 1200 hours time interval.
 
---=-gehc3r9DLW0C6ZlsBTFh
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Alexey,
 
-Hi Philippe,
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> Acked-by: Eric Blake <eblake@redhat.com>
+> ---
+>  hmp.c                    |  4 ++--
+>  migration/postcopy-ram.c | 48 +++++++++++++++++++++++++++---------------------
+>  migration/trace-events   |  4 ++--
+>  qapi/migration.json      |  4 ++--
+>  4 files changed, 33 insertions(+), 27 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index c6bab53..3c376b3 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -265,7 +265,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>      }
+>  
+>      if (info->has_postcopy_blocktime) {
+> -        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
+> +        monitor_printf(mon, "postcopy blocktime: %u\n",
+>                         info->postcopy_blocktime);
+>      }
+>  
+> @@ -273,7 +273,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>          Visitor *v;
+>          char *str;
+>          v = string_output_visitor_new(false, &str);
+> -        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+> +        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>          visit_complete(v, &str);
+>          monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
+>          g_free(str);
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 7814da5..6694fd3 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -63,16 +63,17 @@ struct PostcopyDiscardState {
+>  
+>  typedef struct PostcopyBlocktimeContext {
+>      /* time when page fault initiated per vCPU */
+> -    int64_t *page_fault_vcpu_time;
+> +    uint32_t *page_fault_vcpu_time;
+>      /* page address per vCPU */
+>      uintptr_t *vcpu_addr;
+> -    int64_t total_blocktime;
+> +    uint32_t total_blocktime;
+>      /* blocktime per vCPU */
+> -    int64_t *vcpu_blocktime;
+> +    uint32_t *vcpu_blocktime;
+>      /* point in time when last page fault was initiated */
+> -    int64_t last_begin;
+> +    uint32_t last_begin;
+>      /* number of vCPU are suspended */
+>      int smp_cpus_down;
+> +    uint64_t start_time;
+>  
+>      /*
+>       * Handler for exit event, necessary for
+> @@ -99,22 +100,23 @@ static void migration_exit_cb(Notifier *n, void *data)
+>  static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>  {
+>      PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+> -    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
+> +    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
+>      ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
+> -    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
+> +    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
+>  
+>      ctx->exit_notifier.notify = migration_exit_cb;
+> +    ctx->start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>      qemu_add_exit_notifier(&ctx->exit_notifier);
+>      return ctx;
+>  }
+>  
+> -static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+> +static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>  {
+> -    int64List *list = NULL, *entry = NULL;
+> +    uint32List *list = NULL, *entry = NULL;
+>      int i;
+>  
+>      for (i = smp_cpus - 1; i >= 0; i--) {
+> -        entry = g_new0(int64List, 1);
+> +        entry = g_new0(uint32List, 1);
+>          entry->value = ctx->vcpu_blocktime[i];
+>          entry->next = list;
+>          list = entry;
+> @@ -145,7 +147,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
+>      info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
+>  }
+>  
+> -static uint64_t get_postcopy_total_blocktime(void)
+> +static uint32_t get_postcopy_total_blocktime(void)
+>  {
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
+> @@ -633,7 +635,8 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>      int cpu, already_received;
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+> -    int64_t now_ms;
+> +    int64_t start_time_offset;
+> +    uint32_t low_time_offset;
+>  
+>      if (!dc || ptid == 0) {
+>          return;
+> @@ -643,14 +646,15 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>          return;
+>      }
+>  
+> -    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) - dc->start_time;
+> +    low_time_offset = start_time_offset & UINT32_MAX;
 
-Am Freitag, den 16.02.2018, 16:23 -0300 schrieb Philippe Mathieu-Daud=C3=A9=
-:
-> Hi Benjamin,
->=20
-> On 02/16/2018 02:55 PM, Benjamin Drung wrote:
-> > This patch will allow the user to include the domainname option in
-> > replies from the built-in DHCP server.
-> >=20
-> > Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
-> > ---
-> >  net/slirp.c      | 7 ++++---
-> >  qapi/net.json    | 4 ++++
-> >  qemu-options.hx  | 7 +++++--
-> >  slirp/bootp.c    | 8 ++++++++
-> >  slirp/libslirp.h | 2 +-
-> >  slirp/slirp.c    | 4 +++-
-> >  slirp/slirp.h    | 1 +
-> >  7 files changed, 26 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/net/slirp.c b/net/slirp.c
-> > index 8991816bbf..9511ff3bb7 100644
-> > --- a/net/slirp.c
-> > +++ b/net/slirp.c
-> > @@ -157,7 +157,8 @@ static int net_slirp_init(NetClientState *peer,
-> > const char *model,
-> >                            const char *bootfile, const char
-> > *vdhcp_start,
-> >                            const char *vnameserver, const char
-> > *vnameserver6,
-> >                            const char *smb_export, const char
-> > *vsmbserver,
-> > -                          const char **dnssearch, Error **errp)
-> > +                          const char **dnssearch, const char
-> > *vdomainname,
-> > +                          Error **errp)
-> >  {
-> >      /* default settings according to historic slirp */
-> >      struct in_addr net  =3D { .s_addr =3D htonl(0x0a000200) }; /*
-> > 10.0.2.0 */
-> > @@ -371,7 +372,7 @@ static int net_slirp_init(NetClientState *peer,
-> > const char *model,
-> >      s->slirp =3D slirp_init(restricted, ipv4, net, mask, host,
-> >                            ipv6, ip6_prefix, vprefix6_len,
-> > ip6_host,
-> >                            vhostname, tftp_export, bootfile, dhcp,
-> > -                          dns, ip6_dns, dnssearch, s);
-> > +                          dns, ip6_dns, dnssearch, vdomainname,
-> > s);
-> >      QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
-> > =20
-> >      for (config =3D slirp_configs; config; config =3D config->next) {
-> > @@ -958,7 +959,7 @@ int net_init_slirp(const Netdev *netdev, const
-> > char *name,
-> >                           user->ipv6_host, user->hostname, user-
-> > >tftp,
-> >                           user->bootfile, user->dhcpstart,
-> >                           user->dns, user->ipv6_dns, user->smb,
-> > -                         user->smbserver, dnssearch, errp);
-> > +                         user->smbserver, dnssearch, user-
-> > >domainname, errp);
-> > =20
-> >      while (slirp_configs) {
-> >          config =3D slirp_configs;
-> > diff --git a/qapi/net.json b/qapi/net.json
-> > index 1238ba5de1..9dfd34cafa 100644
-> > --- a/qapi/net.json
-> > +++ b/qapi/net.json
-> > @@ -160,6 +160,9 @@
-> >  # @dnssearch: list of DNS suffixes to search, passed as DHCP
-> > option
-> >  #             to the guest
-> >  #
-> > +# @domainname: guest-visible domain name of the virtual nameserver
-> > +#              (since 2.12)
-> > +#
-> >  # @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
-> >  #               2.6). The network prefix is given in the usual
-> >  #               hexadecimal IPv6 address notation.
-> > @@ -197,6 +200,7 @@
-> >      '*dhcpstart': 'str',
-> >      '*dns':       'str',
-> >      '*dnssearch': ['String'],
-> > +    '*domainname': 'str',
-> >      '*ipv6-prefix':      'str',
-> >      '*ipv6-prefixlen':   'int',
-> >      '*ipv6-host':        'str',
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 5050a49a5e..06983db7be 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -1906,8 +1906,8 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-> >      "-netdev
-> > user,id=3Dstr[,ipv4[=3Don|off]][,net=3Daddr[/mask]][,host=3Daddr]\n"
-> >      "         [,ipv6[=3Don|off]][,ipv6-net=3Daddr[/int]][,ipv6-
-> > host=3Daddr]\n"
-> >      "         [,restrict=3Don|off][,hostname=3Dhost][,dhcpstart=3Daddr=
-]\
-> > n"
-> > -    "         [,dns=3Daddr][,ipv6-
-> > dns=3Daddr][,dnssearch=3Ddomain][,tftp=3Ddir]\n"
-> > -    "         [,bootfile=3Df][,hostfwd=3Drule][,guestfwd=3Drule]"
-> > +    "         [,dns=3Daddr][,ipv6-
-> > dns=3Daddr][,dnssearch=3Ddomain][,domainname=3Ddomain]\n"
-> > +    "         [,tftp=3Ddir][,bootfile=3Df][,hostfwd=3Drule][,guestfwd=
-=3Dru
-> > le]"
-> >  #ifndef _WIN32
-> >                                               "[,smb=3Ddir[,smbserver
-> > =3Daddr]]\n"
-> >  #endif
-> > @@ -2116,6 +2116,9 @@ Example:
-> >  qemu -net user,dnssearch=3Dmgmt.example.org,dnssearch=3Dexample.org
-> > [...]
-> >  @end example
-> > =20
-> > +@item domainname=3D@var{domain}
-> > +Specifies the client domain name reported by the built-in DHCP
-> > server.
-> > +
-> >  @item tftp=3D@var{dir}
-> >  When using the user mode network stack, activate a built-in TFTP
-> >  server. The files in @var{dir} will be exposed as the root of a
-> > TFTP server.
-> > diff --git a/slirp/bootp.c b/slirp/bootp.c
-> > index 5dd1a415b5..91896f7400 100644
-> > --- a/slirp/bootp.c
-> > +++ b/slirp/bootp.c
-> > @@ -298,6 +298,14 @@ static void bootp_reply(Slirp *slirp, const
-> > struct bootp_t *bp)
-> >              q +=3D val;
-> >          }
-> > =20
-> > +        if (*slirp->vdomainname) {
->=20
-> This is safe but harder to read/review...
+OK, I suggest you add a sanity check that start_time_offset >= 1 - to
+cover the cases where it was unusually quick to get to this point (and
+thus 0) or by ntp causing time jumps.  I suggest you just check if it's
+less than 1 and if it is use 1.
+I suggest you wrap it in a little function to get the offset and you can
+use it in the call below as well.
 
-I borrowed that logic from client_hostname.
+>      if (dc->vcpu_addr[cpu] == 0) {
+>          atomic_inc(&dc->smp_cpus_down);
+>      }
+>  
+> -    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+> -    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+> -    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+> +    atomic_xchg(&dc->last_begin, low_time_offset);
+> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
+> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
 
-> > +            val =3D strlen(slirp->vdomainname);
-> > +            *q++ =3D RFC1533_DOMAINNAME;
-> > +            *q++ =3D val;
-> > +            memcpy(q, slirp->vdomainname, val);
-> > +            q +=3D val;
-> > +        }
-> > +
-> >          if (slirp->vdnssearch) {
-> >              size_t spaceleft =3D sizeof(rbp->bp_vend) - (q - rbp-
-> > >bp_vend);
-> >              val =3D slirp->vdnssearch_len;
-> > diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-> > index 540b3e5903..740408a96e 100644
-> > --- a/slirp/libslirp.h
-> > +++ b/slirp/libslirp.h
-> > @@ -16,7 +16,7 @@ Slirp *slirp_init(int restricted, bool
-> > in_enabled, struct in_addr vnetwork,
-> >                    const char *tftp_path, const char *bootfile,
-> >                    struct in_addr vdhcp_start, struct in_addr
-> > vnameserver,
-> >                    struct in6_addr vnameserver6, const char
-> > **vdnssearch,
-> > -                  void *opaque);
-> > +                  const char *vdomainname, void *opaque);
-> >  void slirp_cleanup(Slirp *slirp);
-> > =20
-> >  void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
-> > diff --git a/slirp/slirp.c b/slirp/slirp.c
-> > index 1cb6b07004..4f29753444 100644
-> > --- a/slirp/slirp.c
-> > +++ b/slirp/slirp.c
-> > @@ -286,7 +286,7 @@ Slirp *slirp_init(int restricted, bool
-> > in_enabled, struct in_addr vnetwork,
-> >                    const char *tftp_path, const char *bootfile,
-> >                    struct in_addr vdhcp_start, struct in_addr
-> > vnameserver,
-> >                    struct in6_addr vnameserver6, const char
-> > **vdnssearch,
-> > -                  void *opaque)
-> > +                  const char *vdomainname, void *opaque)
-> >  {
-> >      Slirp *slirp =3D g_malloc0(sizeof(Slirp));
-> > =20
-> > @@ -317,6 +317,7 @@ Slirp *slirp_init(int restricted, bool
-> > in_enabled, struct in_addr vnetwork,
-> >      }
-> >      slirp->tftp_prefix =3D g_strdup(tftp_path);
-> >      slirp->bootp_filename =3D g_strdup(bootfile);
->=20
-> I'd use this check:
->=20
->    if (vdomainname) {
->        if (!*vdomainname) {
->            error_report("'domainname' parameter cannot be empty");
->            exit(EXIT_FAILURE);
->        }
+OK, and since addr is now a uintptr_t we should be safe for that.
 
-Do we want to bail out if domainname is set to empty instead of just
-ignoring an empty domainname?
+With that change suggested above can you repost it merged into the
+original patchset and then we can try again with it.
 
-> > +    slirp->vdomainname =3D g_strdup(vdomainname);
->=20
->    }
->=20
-> and simply check "if (slirp->vdomainname) { ..." in bootp_reply().
->=20
-> Regards,
->=20
-> Phil.
->=20
-> >      slirp->vdhcp_startaddr =3D vdhcp_start;
-> >      slirp->vnameserver_addr =3D vnameserver;
-> >      slirp->vnameserver_addr6 =3D vnameserver6;
-> > @@ -349,6 +350,7 @@ void slirp_cleanup(Slirp *slirp)
-> >      g_free(slirp->vdnssearch);
-> >      g_free(slirp->tftp_prefix);
-> >      g_free(slirp->bootp_filename);
-> > +    g_free(slirp->vdomainname);
-> >      g_free(slirp);
-> >  }
-> > =20
-> > diff --git a/slirp/slirp.h b/slirp/slirp.h
-> > index 06febfc78b..10b410898a 100644
-> > --- a/slirp/slirp.h
-> > +++ b/slirp/slirp.h
-> > @@ -193,6 +193,7 @@ struct Slirp {
-> >      char *bootp_filename;
-> >      size_t vdnssearch_len;
-> >      uint8_t *vdnssearch;
-> > +    char *vdomainname;
-> > =20
-> >      /* tcp states */
-> >      struct socket tcb;
-> >=20
->=20
->=20
---=20
-Benjamin Drung
-System Developer
-Debian & Ubuntu Developer
+Dave (out for a week)
 
-ProfitBricks GmbH
-Greifswalder Str. 207
-D - 10405 Berlin
-
-Email: benjamin.drung@profitbricks.com
-URL: https://www.profitbricks.de
-
-Sitz der Gesellschaft: Berlin
-Registergericht: Amtsgericht Charlottenburg, HRB 125506 B
-Gesch=C3=A4ftsf=C3=BChrer: Achim Weiss, Matthias Steinberg
---=-gehc3r9DLW0C6ZlsBTFh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAABCAAGBQJahzG8AAoJEN2M1aXejH56BwIP/2+sc8aBvF/JlOnn3zJO9SAC
-DwMy2kg2nWzgTo+GP56CdLvG+Z2ElRTCbuzPCyfdwBWIrEbEe5zBWyWauU/OyW31
-Vjx/cvcc8MsesFaS5aH2seY6gdei1uYe4fu33dyK2tY/NGETz5F1cHiLD7wVCKuz
-4B1dl4JKtFHKhLeQSSBH58o/xj09TPzPlT+HrahMB9nRynKLKKGvUFsZn2uOUAhr
-6zfPm6fv8Oh2KiPMLo8vQhpc4MXaChUMJjkQgWEeMB/LSaa06bjI9l0dcYETRR5L
-iv5MGTTFflI2z8KAEh1N9ZiXsQpv2ZSd4CcevPeEFdSnOl/R4euUeaAvdykuKAJP
-/1fsmzP/nPfC72Gy8pLwWIDJp00ekofqR3Ms7CR8z5h6A/JnSEXxVvHYUofsccpD
-14FzxAQlos9aJb5XIgiDHBWzxQilU2lyQYxmII3Jhp462Um8+rnl3Cz55ZVqhOKU
-Md4OB+/ntIXAO826Ot3RBZ73gILU4kUr1OIYX/0IbEUYq8aMEVpSp7hBnyDaV/c2
-0OnQx2oZhQSEhhIiX7kU9DVRa2HQSWVYy1slCCzQMF/5E9FViNS2mCjdgn1jV+wQ
-jMUVNlRSwpOJguX+l/0wnpnp5yz0TyFxSZ4BpudbthsMKTqiGfmHXoLkhuBQYyL0
-T6guWHOmC7H2lyP+42cb
-=BzPY
------END PGP SIGNATURE-----
-
---=-gehc3r9DLW0C6ZlsBTFh--
+>      /* check it here, not at the begining of the function,
+>       * due to, check could accur early than bitmap_set in
+> @@ -697,22 +701,23 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+>      int i, affected_cpu = 0;
+> -    int64_t now_ms;
+> +    int64_t start_time_offset;
+>      bool vcpu_total_blocktime = false;
+> -    int64_t read_vcpu_time;
+> +    uint32_t read_vcpu_time, low_time_offset;
+>  
+>      if (!dc) {
+>          return;
+>      }
+>  
+> -    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) - dc->start_time;
+> +    low_time_offset = start_time_offset & UINT32_MAX;
+>  
+>      /* lookup cpu, to clear it,
+>       * that algorithm looks straighforward, but it's not
+>       * optimal, more optimal algorithm is keeping tree or hash
+>       * where key is address value is a list of  */
+>      for (i = 0; i < smp_cpus; i++) {
+> -        uint64_t vcpu_blocktime = 0;
+> +        uint32_t vcpu_blocktime = 0;
+>  
+>          read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+>          if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
+> @@ -720,7 +725,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>              continue;
+>          }
+>          atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+> -        vcpu_blocktime = now_ms - read_vcpu_time;
+> +        vcpu_blocktime = low_time_offset - read_vcpu_time;
+>          affected_cpu += 1;
+>          /* we need to know is that mark_postcopy_end was due to
+>           * faulted page, another possible case it's prefetched
+> @@ -735,7 +740,8 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>  
+>      atomic_sub(&dc->smp_cpus_down, affected_cpu);
+>      if (vcpu_total_blocktime) {
+> -        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+> +        dc->total_blocktime += low_time_offset - atomic_fetch_add(
+> +                &dc->last_begin, 0);
+>      }
+>      trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
+>                                        affected_cpu);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 141e773..0defbc3 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> -mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
+> -mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
+> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
+> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 70e7b67..ee55d7c 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -175,8 +175,8 @@
+>             '*setup-time': 'int',
+>             '*cpu-throttle-percentage': 'int',
+>             '*error-desc': 'str',
+> -           '*postcopy-blocktime' : 'int64',
+> -           '*postcopy-vcpu-blocktime': ['int64']} }
+> +           '*postcopy-blocktime' : 'uint32',
+> +           '*postcopy-vcpu-blocktime': ['uint32']} }
+>  
+>  ##
+>  # @query-migrate:
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
