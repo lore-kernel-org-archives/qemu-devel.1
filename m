@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60366)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVml-0005RW-Jf
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:04 -0500
+	id 1emVmp-0005Tb-Gn
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVmk-0002Vq-Hy
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:03 -0500
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:35954)
+	id 1emVmo-0002Xt-8X
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:07 -0500
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:34091)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVmk-0002Vg-DQ
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:02 -0500
-Received: by mail-ua0-x241.google.com with SMTP id i15so1108168uak.3
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:30:02 -0800 (PST)
+	id 1emVmo-0002Xl-3k
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:06 -0500
+Received: by mail-ua0-x241.google.com with SMTP id m43so1117090uah.1
+	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:30:06 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 23:29:28 -0300
-Message-Id: <20180216022933.10945-4-f4bug@amsat.org>
+Date: Thu, 15 Feb 2018 23:29:29 -0300
+Message-Id: <20180216022933.10945-5-f4bug@amsat.org>
 In-Reply-To: <20180216022933.10945-1-f4bug@amsat.org>
 References: <20180216022933.10945-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 3/7] hw/sd/milkymist-memcard: expose a SDBus
- and connect the SDCard to it
+Subject: [Qemu-devel] [PATCH v3 4/7] hw/sd/ssi-sd: use the SDBus API,
+ connect the SDCard to the bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,104 +37,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, Michael Walle <michael@walle.cc>, Stefan Weil <sw@weilnetz.de>
 
-using the sdbus_*() API.
+On reset the bus will reset the card,
+we can now drop the device_reset() call.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Acked-by: Michael Walle <michael@walle.cc>
 ---
- hw/sd/milkymist-memcard.c | 38 +++++++++++++++++++++-----------------
- 1 file changed, 21 insertions(+), 17 deletions(-)
+ hw/sd/ssi-sd.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-index a8e65892c7..5570c1e9a0 100644
---- a/hw/sd/milkymist-memcard.c
-+++ b/hw/sd/milkymist-memcard.c
-@@ -69,7 +69,7 @@ struct MilkymistMemcardState {
-     SysBusDevice parent_obj;
- 
-     MemoryRegion regs_region;
--    SDState *card;
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index f88f509e0a..ae04b6641b 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -47,7 +47,7 @@ typedef struct {
+     int32_t arglen;
+     int32_t response_pos;
+     int32_t stopping;
+-    SDState *sd;
 +    SDBus sdbus;
+ } ssi_sd_state;
  
-     int command_write_ptr;
-     int response_read_ptr;
-@@ -105,7 +105,7 @@ static void memcard_sd_command(MilkymistMemcardState *s)
-     req.crc = s->command[5];
- 
-     s->response[0] = req.cmd;
--    s->response_len = sd_do_command(s->card, &req, s->response+1);
-+    s->response_len = sdbus_do_command(&s->sdbus, &req, s->response + 1);
-     s->response_read_ptr = 0;
- 
-     if (s->response_len == 16) {
-@@ -150,10 +150,10 @@ static uint64_t memcard_read(void *opaque, hwaddr addr,
-             r = 0xffffffff;
+ #define TYPE_SSI_SD "ssi-sd"
+@@ -100,7 +100,7 @@ static uint32_t ssi_sd_transfer(SSISlave *dev, uint32_t val)
+             request.arg = (s->cmdarg[0] << 24) | (s->cmdarg[1] << 16)
+                            | (s->cmdarg[2] << 8) | s->cmdarg[3];
+             DPRINTF("CMD%d arg 0x%08x\n", s->cmd, request.arg);
+-            s->arglen = sd_do_command(s->sd, &request, longresp);
++            s->arglen = sdbus_do_command(&s->sdbus, &request, longresp);
+             if (s->arglen <= 0) {
+                 s->arglen = 1;
+                 s->response[0] = 4;
+@@ -177,7 +177,7 @@ static uint32_t ssi_sd_transfer(SSISlave *dev, uint32_t val)
+             DPRINTF("Response 0x%02x\n", s->response[s->response_pos]);
+             return s->response[s->response_pos++];
+         }
+-        if (sd_data_ready(s->sd)) {
++        if (sdbus_data_ready(&s->sdbus)) {
+             DPRINTF("Data read\n");
+             s->mode = SSI_SD_DATA_START;
          } else {
-             r = 0;
--            r |= sd_read_data(s->card) << 24;
--            r |= sd_read_data(s->card) << 16;
--            r |= sd_read_data(s->card) << 8;
--            r |= sd_read_data(s->card);
-+            r |= sdbus_read_data(&s->sdbus) << 24;
-+            r |= sdbus_read_data(&s->sdbus) << 16;
-+            r |= sdbus_read_data(&s->sdbus) << 8;
-+            r |= sdbus_read_data(&s->sdbus);
+@@ -190,8 +190,8 @@ static uint32_t ssi_sd_transfer(SSISlave *dev, uint32_t val)
+         s->mode = SSI_SD_DATA_READ;
+         return 0xfe;
+     case SSI_SD_DATA_READ:
+-        val = sd_read_data(s->sd);
+-        if (!sd_data_ready(s->sd)) {
++        val = sdbus_read_data(&s->sdbus);
++        if (!sdbus_data_ready(&s->sdbus)) {
+             DPRINTF("Data read end\n");
+             s->mode = SSI_SD_CMD;
          }
-         break;
-     case R_CLK2XDIV:
-@@ -207,10 +207,10 @@ static void memcard_write(void *opaque, hwaddr addr, uint64_t value,
-         if (!s->enabled) {
-             break;
-         }
--        sd_write_data(s->card, (value >> 24) & 0xff);
--        sd_write_data(s->card, (value >> 16) & 0xff);
--        sd_write_data(s->card, (value >> 8) & 0xff);
--        sd_write_data(s->card, value & 0xff);
-+        sdbus_write_data(&s->sdbus, (value >> 24) & 0xff);
-+        sdbus_write_data(&s->sdbus, (value >> 16) & 0xff);
-+        sdbus_write_data(&s->sdbus, (value >> 8) & 0xff);
-+        sdbus_write_data(&s->sdbus, value & 0xff);
-         break;
-     case R_ENABLE:
-         s->regs[addr] = value;
-@@ -251,10 +251,6 @@ static void milkymist_memcard_reset(DeviceState *d)
-     for (i = 0; i < R_MAX; i++) {
-         s->regs[i] = 0;
-     }
--    /* Since we're still using the legacy SD API the card is not plugged
--     * into any bus, and we must reset it manually.
--     */
--    device_reset(DEVICE(s->card));
- }
- 
- static void milkymist_memcard_init(Object *obj)
-@@ -270,15 +266,23 @@ static void milkymist_memcard_init(Object *obj)
- static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+@@ -242,13 +242,24 @@ static const VMStateDescription vmstate_ssi_sd = {
+ static void ssi_sd_realize(SSISlave *d, Error **errp)
  {
-     MilkymistMemcardState *s = MILKYMIST_MEMCARD(dev);
+     ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
 +    DeviceState *carddev;
-     BlockBackend *blk;
      DriveInfo *dinfo;
 +    Error *err = NULL;
  
 +    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
-+                        dev, "sd-bus");
++                        DEVICE(d), "sd-bus");
 +
 +    /* Create and plug in the sd card */
      /* FIXME use a qdev drive property instead of drive_get_next() */
      dinfo = drive_get_next(IF_SD);
-     blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
--    s->card = sd_init(blk, false);
--    if (s->card == NULL) {
--        error_setg(errp, "failed to init SD card");
+-    s->sd = sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, true);
+-    if (s->sd == NULL) {
+-        error_setg(errp, "Device initialization failed.");
 +    carddev = qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
-+    qdev_prop_set_drive(carddev, "drive", blk, &err);
++    if (dinfo) {
++        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
++    }
++    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
 +    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
 +    if (err) {
 +        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
          return;
      }
-     s->enabled = blk && blk_is_inserted(blk);
+ }
+@@ -264,11 +275,6 @@ static void ssi_sd_reset(DeviceState *dev)
+     s->arglen = 0;
+     s->response_pos = 0;
+     s->stopping = 0;
+-
+-    /* Since we're still using the legacy SD API the card is not plugged
+-     * into any bus, and we must reset it manually.
+-     */
+-    device_reset(DEVICE(s->sd));
+ }
+ 
+ static void ssi_sd_class_init(ObjectClass *klass, void *data)
 -- 
 2.16.1
