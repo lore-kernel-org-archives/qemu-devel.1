@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuT-0001aV-Gc
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:32 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuV-0001bi-EY
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuQ-000565-9C
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuT-0005D1-0J
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:31 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 16 Feb 2018 21:06:03 +1100
-Message-Id: <20180216100617.25265-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/14] ppc-for-2.12 queue 20180216
+Date: Fri, 16 Feb 2018 21:06:11 +1100
+Message-Id: <20180216100617.25265-9-david@gibson.dropbear.id.au>
+In-Reply-To: <20180216100617.25265-1-david@gibson.dropbear.id.au>
+References: <20180216100617.25265-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 08/14] spapr: move VCPU calculation to core
+ machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, surajjs@au1.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit cc5a0ae03e0d011521ca5b32d3995a299b6b3a=
-d3:
+From: Greg Kurz <groug@kaod.org>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-80215-1' into staging (2018-02-15 18:37:46 +0000)
+The VCPU ids are currently computed and assigned to each individual
+CPU threads in spapr_cpu_core_realize(). But the numbering logic
+of VCPU ids is actually a machine-level concept, and many places
+in hw/ppc/spapr.c also have to compute VCPU ids out of CPU indexes.
 
-are available in the Git repository at:
+The current formula used in spapr_cpu_core_realize() is:
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180216
+    vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i
 
-for you to fetch changes up to 58d5b22bbd505dc942d137d5d3da89ad9bc16c0a:
+where:
 
-  ppc4xx: Add device models found in PPC440 core SoCs (2018-02-16 14:06:0=
-7 +1100)
+    cc->core_id is a multiple of smp_threads
+    cpu_index = cc->core_id + i
+    0 <= i < smp_threads
 
-----------------------------------------------------------------
-ppc patch queue 2018-02-16
+So we have:
 
-Highlights of this batch:
-  * Conversion to TranslatorOps (Emilio Cota)
-  * Further bugfixes and cleanups to vcpu id allocation for pseries
-    (Greg Kurz)
-  * Another bugfix for HPT resizing (Daniel Henrique-Barboza)
-  * Macintosh CUDA cleanups (Mark Cave-Ayland)
-  * Further tweaks to Spectre/Meltdown mitigations (Suraj Singh)
+    cpu_index % smp_threads == i
+    cc->core_id / smp_threads == cpu_index / smp_threads
 
-----------------------------------------------------------------
-BALATON Zoltan (1):
-      ppc4xx: Add device models found in PPC440 core SoCs
+hence:
 
-Daniel Henrique Barboza (1):
-      hw/ppc/spapr_hcall: set htab_shift after kvmppc_resize_hpt_commit
+    vcpu_id =
+        (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads;
 
-Emilio G. Cota (2):
-      target/ppc: convert to DisasContextBase
-      target/ppc: convert to TranslatorOps
+This formula was used before VSMT at the time VCPU ids where computed
+at the target emulation level. It has the advantage of being useable
+to derive a VPCU id out of a CPU index only. It is fitted for all the
+places where the machine code has to compute a VCPU id.
 
-Greg Kurz (4):
-      spapr: use spapr->vsmt to compute VCPU ids
-      spapr: move VCPU calculation to core machine code
-      spapr: rename spapr_vcpu_id() to spapr_get_vcpu_id()
-      spapr: consolidate the VCPU id numbering logic in a single place
+This patch introduces an accessor to set the VCPU id in a PowerPCCPU object
+using the above formula. It is a first step to consolidate all the VCPU id
+logic in a single place.
 
-Laurent Vivier (1):
-      hw/char: remove legacy interface escc_init()
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c          | 19 +++++++++++++++++++
+ hw/ppc/spapr_cpu_core.c |  9 ++-------
+ include/hw/ppc/spapr.h  |  1 +
+ 3 files changed, 22 insertions(+), 7 deletions(-)
 
-Mark Cave-Ayland (3):
-      cuda: convert to use the shared mos6522 device
-      ppc: move CUDAState and other CUDA-related definitions into separat=
-e cuda.h file
-      cuda: convert to trace-events
-
-Suraj Jitindar Singh (2):
-      ppc/spapr-caps: Change migration macro to take full spapr-cap name
-      ppc/spapr-caps: Disallow setting workaround for spapr-cap-ibs
-
- Makefile.objs                       |    1 +
- hw/char/escc.c                      |  209 ++-----
- hw/misc/macio/cuda.c                |  649 ++++++--------------
- hw/misc/macio/macio.c               |    1 +
- hw/misc/macio/trace-events          |   11 +
- hw/ppc/mac.h                        |   76 +--
- hw/ppc/mac_newworld.c               |   19 +-
- hw/ppc/mac_oldworld.c               |   19 +-
- hw/ppc/ppc440.h                     |   26 +
- hw/ppc/ppc440_uc.c                  | 1159 +++++++++++++++++++++++++++++=
-++++++
- hw/ppc/spapr.c                      |   75 ++-
- hw/ppc/spapr_caps.c                 |   36 +-
- hw/ppc/spapr_cpu_core.c             |    9 +-
- hw/ppc/spapr_hcall.c                |   12 +-
- hw/sparc/sun4m.c                    |   34 +-
- include/hw/char/escc.h              |   54 +-
- include/hw/misc/macio/cuda.h        |  107 ++++
- include/hw/pci/pcie_host.h          |    2 +-
- include/hw/ppc/spapr.h              |    3 +-
- target/ppc/translate.c              |  388 ++++++------
- target/ppc/translate/dfp-impl.inc.c |   16 +-
- target/ppc/translate_init.c         |   32 +-
- 22 files changed, 1960 insertions(+), 978 deletions(-)
- create mode 100644 hw/misc/macio/trace-events
- create mode 100644 hw/ppc/ppc440.h
- create mode 100644 hw/ppc/ppc440_uc.c
- create mode 100644 include/hw/misc/macio/cuda.h
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ea7429c92a..30cc48fd52 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3802,6 +3802,25 @@ int spapr_vcpu_id(PowerPCCPU *cpu)
+     }
+ }
+ 
++void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++    int vcpu_id;
++
++    vcpu_id =
++        (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads;
++
++    if (kvm_enabled() && !kvm_vcpu_id_is_valid(vcpu_id)) {
++        error_setg(errp, "Can't create CPU with id %d in KVM", vcpu_id);
++        error_append_hint(errp, "Adjust the number of cpus to %d "
++                          "or try to raise the number of threads per core\n",
++                          vcpu_id * smp_threads / spapr->vsmt);
++        return;
++    }
++
++    cpu->vcpu_id = vcpu_id;
++}
++
+ PowerPCCPU *spapr_find_cpu(int vcpu_id)
+ {
+     CPUState *cs;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 590d167b04..94afeb399e 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -172,13 +172,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+         cs = CPU(obj);
+         cpu = sc->threads[i] = POWERPC_CPU(obj);
+         cs->cpu_index = cc->core_id + i;
+-        cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
+-        if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
+-            error_setg(&local_err, "Can't create CPU with id %d in KVM",
+-                       cpu->vcpu_id);
+-            error_append_hint(&local_err, "Adjust the number of cpus to %d "
+-                              "or try to raise the number of threads per core\n",
+-                              cpu->vcpu_id * smp_threads / spapr->vsmt);
++        spapr_set_vcpu_id(cpu, cs->cpu_index, &local_err);
++        if (local_err) {
+             goto err;
+         }
+ 
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 62c077ac20..af19320d2f 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -767,6 +767,7 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+ #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+ 
+ int spapr_vcpu_id(PowerPCCPU *cpu);
++void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp);
+ PowerPCCPU *spapr_find_cpu(int vcpu_id);
+ 
+ int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
+-- 
+2.14.3
