@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emmuJ-0005Sj-A1
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:47:00 -0500
+	(envelope-from <jsnow@redhat.com>) id 1emn5u-00032R-Ku
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:58:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emmuI-0007T1-FP
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:46:59 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-9-git-send-email-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0739c439-4c1e-4c55-0c68-2c64978079eb@redhat.com>
-Date: Fri, 16 Feb 2018 14:46:35 -0600
+	(envelope-from <jsnow@redhat.com>) id 1emn5t-0004A3-RV
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:58:58 -0500
+References: <20180215212552.26997-1-marcandre.lureau@redhat.com>
+	<20180215212552.26997-6-marcandre.lureau@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7208f722-3738-4d4f-539c-6c0dd822b084@redhat.com>
+Date: Fri, 16 Feb 2018 15:58:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <1518702707-7077-9-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180215212552.26997-6-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/9] iotests: add file_path helper
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/6] ahci-test: fix opts leak of skip tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, Jeff Cody <jcody@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, "open list:IDE" <qemu-block@nongnu.org>
 
-On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Simple way to have auto generated filenames with auto clenup. Like
 
-s/clenup/cleanup/
 
-> FilePath but without using 'with' statement and without additional
-> indentation of the whole test.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 02/15/2018 04:25 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Fixes the following ASAN report:
+>=20
+> Direct leak of 128 byte(s) in 8 object(s) allocated from:
+>     #0 0x7fefce311850 in malloc (/lib64/libasan.so.4+0xde850)
+>     #1 0x7fefcdd5ef0c in g_malloc ../glib/gmem.c:94
+>     #2 0x559b976faff0 in create_ahci_io_test /home/elmarco/src/qemu/tes=
+ts/ahci-test.c:1810
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->   tests/qemu-iotests/iotests.py | 32 ++++++++++++++++++++++++++++++++
->   1 file changed, 32 insertions(+)
+>  tests/ahci-test.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+> index 7aa5af428c..1bd3cc7ca8 100644
+> --- a/tests/ahci-test.c
+> +++ b/tests/ahci-test.c
+> @@ -1822,6 +1822,7 @@ static void create_ahci_io_test(enum IOMode type,=
+ enum AddrMode addr,
+>      if ((addr =3D=3D ADDR_MODE_LBA48) && (offset =3D=3D OFFSET_HIGH) &=
+&
+>          (mb_to_sectors(test_image_size_mb) <=3D 0xFFFFFFF)) {
+>          g_test_message("%s: skipped; test image too small", name);
+> +        g_free(opts);
+>          g_free(name);
+>          return;
+>      }
+>=20
 
-Jeff, where do we stand on your iotests cleanups?  Is this something you 
-want to use?
+Whupps.
 
-> 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index c1302a2f9b..f2d05ca3fd 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -27,6 +27,7 @@ import struct
->   import json
->   import signal
->   import logging
-> +import atexit
->   
->   sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
->   import qtest
-> @@ -250,6 +251,37 @@ class FilePath(object):
->           return False
->   
->   
-> +def file_path_remover():
-> +    for path in reversed(file_path_remover.paths):
-> +        try:
-> +            os.remove(path)
-> +        except OSError:
-> +            pass
-> +
-> +
-> +def file_path(*names):
-> +    ''' Another way to get auto-generated filename that cleans itself up.
-> +
-> +    Use it as simple as:
-> +
-> +    img_a, img_b = file_path('a.img', 'b.img')
-> +    sock = file_path('socket')
-> +    '''
-> +
-> +    if not hasattr(file_path_remover, 'paths'):
-> +        file_path_remover.paths = []
-> +        atexit.register(file_path_remover)
-> +
-> +    paths = []
-> +    for name in names:
-> +        filename = '{0}-{1}'.format(os.getpid(), name)
-> +        path = os.path.join(test_dir, filename)
-> +        file_path_remover.paths.append(path)
-> +        paths.append(path)
-> +
-> +    return paths[0] if len(paths) == 1 else paths
-> +
-> +
->   class VM(qtest.QEMUQtestMachine):
->       '''A QEMU VM'''
->   
-> 
+Thanks.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+And, feel free to stage this in whomever's branch, it won't conflict
+with anything:
+
+Acked-by: John Snow <jsnow@redhat.com>
