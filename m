@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emZd0-0002l8-CG
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:36:15 -0500
+	(envelope-from <thuth@redhat.com>) id 1emZrR-00086D-Td
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1emZcx-0001Wp-9t
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:36:14 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1emZcx-0001Wf-3L
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:36:11 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1emZcv-0002yo-W1
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 06:36:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F155A2E8054
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 06:36:09 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1emZrO-0001j9-R1
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:51:09 -0500
+References: <cover.1518730026.git.balaton@eik.bme.hu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <dffa45c9-48a6-ef85-3b28-d8ce1daf72e4@redhat.com>
+Date: Fri, 16 Feb 2018 07:50:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <cover.1518730026.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Feb 2018 06:16:35 -0000
-From: Thomas Huth <1331334@bugs.launchpad.net>
-Reply-To: Bug 1331334 <1331334@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140618065216.24164.95192.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151876179525.13818.4826302308472422753.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1331334] Re: driftfix=none and migration on Win7
- guest causes time to go 10 times as fast
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Sam460ex emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Francois Revol <revol@free.fr>, David Gibson <david@gibson.dropbear.id.au>
 
-OK, thanks for checking again! So I'm closing this ticket now.
+On 15.02.2018 22:27, BALATON Zoltan wrote:
+> Remaining patches for Sam460ex emulation. The original cover letter
+> with more details is here:
+>=20
+> http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00112.html
+>=20
+> We'll need to also add binaries for firmware (customised u-boot
+> version) and dtb but I'm not sure how to submit those.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+For the dtb, I think you could simply provide a patch that adds the dts
+file to the pc-bios directory and another one that adds the dtb. Just
+like it is already done with pc-bios/bamboo.dts / pc-bios/bamboo.dtb.
 
--- =
+For u-boot, can you use the same upstream level as e500 ? I.e. check
+whether "git submodule status roms/u-boot" is fine for you? If that's
+ok, just do a "git submodule update roms/u-boot" and build uboot from
+that directory - you then can submit a binary patch with that file for
+pc-bios, too.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1331334
+In case you need another u-boot version, I think you've got to update
+the submodule to the newer upstream version first, and then also rebuild
+the e500 binary... Cumbersome, but that's necessary since we've got to
+ship the u-boot sources in the QEMU release tarballs, too, to be
+compliant with the GPL.
 
-Title:
-  driftfix=3Dnone and migration on Win7 guest causes time to go 10 times
-  as fast
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  With -rtc base=3Dlocaltime,clock=3Dhost,driftfix=3Dnone on a Win7 guest,
-  stopping it with migration and then starting it again about 1 hour
-  later makes the guest time go 10 times as fast as real time until
-  Windows is rebooted.  I have tried qith qemu-2.0.0 and the problem
-  still exists there.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1331334/+subscriptions
+ Thomas
