@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marmarek@invisiblethingslab.com>) id 1emnTa-0007yl-3w
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:23:27 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1emnzN-0006kA-9c
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:56:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marmarek@invisiblethingslab.com>) id 1emnTW-0007il-Tt
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:23:26 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:45589)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marmarek@invisiblethingslab.com>)
-	id 1emnTW-0007iV-N9
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:23:22 -0500
-Date: Fri, 16 Feb 2018 22:23:01 +0100
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?=
-	<marmarek@invisiblethingslab.com>
-Message-ID: <20180216212301.GL4302@mail-itl>
-References: <20180124141848.3969-1-marmarek@invisiblethingslab.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tBhgiDt8dP1efIIJ"
-Content-Disposition: inline
-In-Reply-To: <20180124141848.3969-1-marmarek@invisiblethingslab.com>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: allow updating FEADDR and
- FEUADDR with one 64bit write
+	(envelope-from <richard.henderson@linaro.org>) id 1emnzK-0007O8-8X
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:56:17 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:35027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1emnzK-0007Nf-22
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:56:14 -0500
+Received: by mail-pl0-x242.google.com with SMTP id bb3so2386300plb.2
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:56:13 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 16 Feb 2018 13:56:03 -0800
+Message-Id: <20180216215608.13227-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 0/5] target/arm: linux-user changes for sve
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +25,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org
+Cc: peter.maydell@linaro.org
+
+Changes since v2:
+  * 5 patches merged,
+  * The PR_SVE_SET/GET_VL patch is more specifically user-only.
+  * Split the signal frame patch into 4 parts.
 
 
---tBhgiDt8dP1efIIJ
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+r~
 
-On Wed, Jan 24, 2018 at 03:18:48PM +0100, Marek Marczykowski-G=C3=B3recki w=
-rote:
-> Allow updating those two adjacent 32bit fields with one 64bit write.
-> This fixes qemu crash when booting Xen inside.
->=20
-> See discussion on Xen side of the thing here:
-> http://xen.markmail.org/message/6mrmemrnmhxvaxba
 
-Bump.
+Richard Henderson (5):
+  linux-user: Implement aarch64 PR_SVE_SET/GET_VL
+  aarch64-linux-user: Split out helpers for guest signal handling
+  aarch64-linux-user: Remove struct target_aux_context
+  aarch64-linux-user: Add support for EXTRA signal frame records
+  aarch64-linux-user: Add support for SVE signal frame records
 
-> Signed-off-by: Marek Marczykowski-G=C3=B3recki <marmarek@invisiblethingsl=
-ab.com>
-> ---
->  hw/i386/intel_iommu.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 2e841cde27..d214dce277 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -2129,8 +2129,12 @@ static void vtd_mem_write(void *opaque, hwaddr add=
-r,
-> =20
->      /* Fault Event Address Register, 32-bit */
->      case DMAR_FEADDR_REG:
-> -        assert(size =3D=3D 4);
-> -        vtd_set_long(s, addr, val);
-> +        assert(size =3D=3D 4 || size =3D=3D 8);
-> +        if (size =3D=3D 4) {
-> +            vtd_set_long(s, addr, val);
-> +        } else {
-> +            vtd_set_quad(s, addr, val);
-> +        }
->          break;
-> =20
->      /* Fault Event Upper Address Register, 32-bit */
+ linux-user/aarch64/target_syscall.h |   3 +
+ target/arm/cpu.h                    |   1 +
+ linux-user/signal.c                 | 367 +++++++++++++++++++++++++++++-------
+ linux-user/syscall.c                |  27 +++
+ target/arm/cpu64.c                  |  41 ++++
+ 5 files changed, 372 insertions(+), 67 deletions(-)
 
---=20
-Best Regards,
-Marek Marczykowski-G=C3=B3recki
-Invisible Things Lab
-A: Because it messes up the order in which people normally read text.
-Q: Why is top-posting such a bad thing?
-
---tBhgiDt8dP1efIIJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAlqHS60ACgkQ24/THMrX
-1ywT5wf9FG0sbvRyUsOVYMYyzCMiU8yxaHXoDWhb25+Tyl8u0KZ36v3EB1zcxU0d
-mv46ApyqDd2QjdyA1jul1N9aatssZhPDfsxCkc6ipPgO1dVuSyDgeCme8BX9sr8Z
-dOz+VwuKJ/YdB2TJ3Q5jE4pn717iTmvfgccXerOsau98j1aizs8EWfgf3xzezWK0
-73iWKxrOWsmPxKhJns3s88nbEOHdffz1JxHr64SMUK+KbtW8jxzf5CeL5KlqDuWQ
-prBU47LmK92gaQeZsw28qnFuv8mTEpnKAxsU3T/JMzn9JF8un6BVRaI7GDYj9xAD
-jNS3dTFTUYUkXH0haO92zQ6KkdOkTQ==
-=LJpZ
------END PGP SIGNATURE-----
-
---tBhgiDt8dP1efIIJ--
+-- 
+2.14.3
