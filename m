@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emgbk-0000cw-7n
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:03:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1emgdc-0002G2-Hx
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:05:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emgbh-00032F-5O
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:03:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1emgdY-0004HQ-Bg
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:05:20 -0500
 References: <1518782691-1232-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<1518782691-1232-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518782691-1232-4-git-send-email-mihajlov@linux.vnet.ibm.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ceb7028a-6878-9a63-004e-bdf774bb2509@redhat.com>
-Date: Fri, 16 Feb 2018 08:03:17 -0600
+Message-ID: <dfd51042-b0a7-cee9-7de1-e2b8fc7d0b15@redhat.com>
+Date: Fri, 16 Feb 2018 08:05:12 -0600
 MIME-Version: 1.0
-In-Reply-To: <1518782691-1232-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+In-Reply-To: <1518782691-1232-4-git-send-email-mihajlov@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv4 2/4] qmp: add query-cpus-fast
+Subject: Re: [Qemu-devel] [PATCHv4 3/4] qmp: add architecture specific cpu
+ data for query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +29,37 @@ To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 Cc: agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
 On 02/16/2018 06:04 AM, Viktor Mihajlovski wrote:
-> From: Luiz Capitulino <lcapitulino@redhat.com>
+> The s390 CPU state can be retrieved without interrupting the
+> VM execution. Extendend the CpuInfoFast union with architecture
+
+s/Extendend/Extend/
+(And I mentioned this on my last review - it's no fun when new revisions 
+miss picking up fixes)
+
+> specific data and an implementation for s390.
 > 
-> The query-cpus command has an extremely serious side effect:
-> it always interrupts all running vCPUs so that they can run
-> ioctl calls. This can cause a huge performance degradation for
-> some workloads. And most of the information retrieved by the
-> ioctl calls are not even used by query-cpus.
+> Return data looks like this:
+>   [
+>     {"thread-id":64301,"props":{"core-id":0},
+>      "arch":"s390","cpu-state":"operating",
+>      "qom-path":"/machine/unattached/device[0]","cpu-index":0},
+>     {"thread-id":64302,"props":{"core-id":1},
+>      "arch":"s390","cpu-state":"operating",
+>      "qom-path":"/machine/unattached/device[1]","cpu-index":1}
+> ]
 > 
-> This commit introduces a replacement for query-cpus called
-> query-cpus-fast, which has the following features:
-> 
->   o Never interrupt vCPUs threads. query-cpus-fast only returns
->     vCPU information maintained by QEMU itself, which should be
->     sufficient for most management software needs
-> 
->   o Drop "halted" field as it can not be retrieved in a fast
->     way on most architectures
-> 
->   o Drop irrelevant fields such as "current", "pc" and "arch"
-> 
->   o Rename some fields for better clarification & proper naming
->     standard
-> 
-> Further, the HMP "info cpus" implementation is changed to
-> use the new QMP interface to avoid the side effects caused
-> by query-cpus. This means that only a reduced subset of cpu
-> information will be reported, which is acceptable as
-> the content of "info cpus" is not documented or guaranteed
-> to be stable.
-> 
-> Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
 > Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > Acked-by: Eric Blake <eblake@redhat.com>
-
-The HMP changes are non-trivial compared to v3, so I might have dropped 
-all R-b and Acked-by to ensure they are looked at again.
-
-In fact,...
-
 > ---
->   cpus.c           | 38 ++++++++++++++++++++++++++++++
->   hmp.c            | 46 +++++--------------------------------
->   qapi-schema.json | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 114 insertions(+), 40 deletions(-)
+>   cpus.c           | 10 ++++++++++
+>   qapi-schema.json | 25 ++++++++++++++++++-------
+>   2 files changed, 28 insertions(+), 7 deletions(-)
 > 
 
-> +++ b/hmp.c
-> @@ -360,50 +360,16 @@ void hmp_info_migrate_cache_size(Monitor *mon, const QDict *qdict)
->   
->   void hmp_info_cpus(Monitor *mon, const QDict *qdict)
->   {
-> -    CpuInfoList *cpu_list, *cpu;
-> +    CpuInfoFastList *head, *cpu;
->   
-> -    cpu_list = qmp_query_cpus(NULL);
-> +    head = qmp_query_cpus_fast(NULL);
->   
-> -    for (cpu = cpu_list; cpu; cpu = cpu->next) {
-> -        int active = ' ';
-> -
-> -        if (cpu->value->CPU == monitor_get_cpu_index()) {
-> -            active = '*';
-> -        }
+I've now gone through the entire patch, so you can upgrade my Acked-by into
 
-The old code was doing multiple things - it was telling you the current 
-HMP cpu (HMP has 'cpu' with no QMP counterpart, but if you are using 
-HMP, knowing which cpu is the active target for future HMP commands that 
-depend on the active target, this bit of information is important), as 
-well as...
-
-> -        monitor_printf(mon, "%c CPU #%" PRId64 ":", active, cpu->value->CPU);
-> -
-> -        switch (cpu->value->arch) {
-> -        case CPU_INFO_ARCH_X86:
-> -            monitor_printf(mon, " pc=0x%016" PRIx64, cpu->value->u.x86.pc);
-> -            break;
-
-...inundating you with the arch-specific slow stuff.  I'm in agreement 
-that dropping the slow stuff is okay, but...
-
-> +    for (cpu = head; cpu; cpu = cpu->next) {
-> +        monitor_printf(mon, "  CPU #%" PRId64 ":", cpu->value->cpu_index);
-
-...unilaterally dropping the '*' active indicator, which has no bearing 
-on the QMP changes, and thus is not an appropriate change for this patch.
-
-I've now gone through the entire patch (and not just the UI), so on the 
-next revision, I'll be prepared to give a full R-b, rather than just 
-Acked-by.  But I do think this means we need a v5.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
