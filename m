@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1emdLr-0000ry-GW
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:34:48 -0500
+	(envelope-from <thuth@redhat.com>) id 1emdTI-0005pF-4i
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:42:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1emdLn-00080P-EL
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:34:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58158 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1emdLn-000802-9h
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:34:43 -0500
-Date: Fri, 16 Feb 2018 11:34:24 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180216113424.54e980d0.cohuck@redhat.com>
-In-Reply-To: <CAFEAcA_JpeUeWoxyhTzzPAkH-Kc0OwV-r91LP=Mt27z1=icdQA@mail.gmail.com>
-References: <20180212124008.8960-1-cohuck@redhat.com>
-	<CAFEAcA_JpeUeWoxyhTzzPAkH-Kc0OwV-r91LP=Mt27z1=icdQA@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1emdTE-0005O1-6S
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:42:28 -0500
+References: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1518735273-16089-2-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <75373e6d-ceb5-f1e5-a535-34871837ca51@redhat.com>
+Date: Fri, 16 Feb 2018 11:42:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1518735273-16089-2-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] docs: document our stable process
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v6 01/12] s390-ccw: refactor
+ boot map table code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-On Thu, 15 Feb 2018 18:27:29 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> On 12 February 2018 at 12:40, Cornelia Huck <cohuck@redhat.com> wrote:
-> > Some pointers on how to get a patch into stable.
-> >
-> > [contains some suggestions by mdroth]
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> > RFC/D->v2: added mdroth's suggestions
-> > ---
-> >  docs/stable-process.rst | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 67 insertions(+)
-> >  create mode 100644 docs/stable-process.rst
-> >  
+On 15.02.2018 23:54, Collin L. Walling wrote:
+> Some ECKD bootmap code was using structs designed for SCSI.
+> Even though this works, it confuses readability. Add a new
+> BootMapTable struct to assist with readability in bootmap
+> entry code. Also:
 > 
-> Drive-by bikeshed comment: should this be in docs/devel ?
-> It's aimed at QEMU developers rather than users...
+> - replace ScsiMbr in ECKD code with appropriate structs
+> - fix read_block messages to reflect BootMapTable
+> - fixup ipl_scsi to use BootMapTable (referred to as Program Table)
+> - defined value for maximum table entries
+> 
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> ---
+>  pc-bios/s390-ccw/bootmap.c | 60 +++++++++++++++++++++-------------------------
+>  pc-bios/s390-ccw/bootmap.h | 14 +++++++++--
+>  2 files changed, 39 insertions(+), 35 deletions(-)
+[...]
+> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+> index cf99a4c..850b655 100644
+> --- a/pc-bios/s390-ccw/bootmap.h
+> +++ b/pc-bios/s390-ccw/bootmap.h
+> @@ -53,6 +53,15 @@ typedef union BootMapPointer {
+>      ExtEckdBlockPtr xeckd;
+>  } __attribute__ ((packed)) BootMapPointer;
+>  
+> +#define MAX_TABLE_ENTRIES  30
+> +
+> +/* aka Program Table */
+> +typedef struct BootMapTable {
+> +    uint8_t magic[4];
+> +    uint8_t reserved[12];
+> +    BootMapPointer entry[];
+> +} __attribute__ ((packed)) BootMapTable;
+> +
+>  typedef struct ComponentEntry {
+>      ScsiBlockPtr data;
+>      uint8_t pad[7];
+> @@ -69,8 +78,9 @@ typedef struct ComponentHeader {
+>  typedef struct ScsiMbr {
+>      uint8_t magic[4];
+>      uint32_t version_id;
+> -    uint8_t reserved[8];
+> -    ScsiBlockPtr blockptr[];
+> +    uint8_t reserved1[8];
+> +    ScsiBlockPtr pt;   /* block pointer to program table */
+> +    uint8_t reserved2[120];
 
-I don't mind moving the shed over to docs/devel/.
+Did you want to pad the struct to 512 bytes here? If so, I think that
+should have been "uint32_t" instead of "uint8_t" or "480" instead of "120" ?
 
-OK, I have merged the various comments and pushed the result to
+>  } __attribute__ ((packed)) ScsiMbr;
+>  
+>  #define ZIPL_MAGIC              "zIPL"
+> 
 
-git://github.com/cohuck/qemu stable-doc
-
-Who will merge this? I can send a pull request if needed.
+ Thomas
