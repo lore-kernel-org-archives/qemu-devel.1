@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emZHp-0005rE-Il
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:14:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1emZd0-0002l8-CG
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emZHo-0003bZ-C4
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:14:21 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54924 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1emZHo-0003bR-6J
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:14:20 -0500
-References: <20180214153938.5410-1-dgilbert@redhat.com>
-	<CAFEAcA_dzzcxKVyoNm_wsSJmqsLj0=cKESW6HwYWsdZwMHx_Ug@mail.gmail.com>
-	<20180215201919.GB2343@work-vm>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <79e69cbb-6ae5-532d-ea17-c0d044f8211a@redhat.com>
-Date: Fri, 16 Feb 2018 07:14:14 +0100
+	(envelope-from <bounces@canonical.com>) id 1emZcx-0001Wp-9t
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:36:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1emZcx-0001Wf-3L
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:36:11 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1emZcv-0002yo-W1
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 06:36:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F155A2E8054
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 06:36:09 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180215201919.GB2343@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/10] migration queue
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Feb 2018 06:16:35 -0000
+From: Thomas Huth <1331334@bugs.launchpad.net>
+Reply-To: Bug 1331334 <1331334@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140618065216.24164.95192.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151876179525.13818.4826302308472422753.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1331334] Re: driftfix=none and migration on Win7
+ guest causes time to go 10 times as fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 15.02.2018 21:19, Dr. David Alan Gilbert wrote:
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> On 14 February 2018 at 15:39, Dr. David Alan Gilbert (git)
->> <dgilbert@redhat.com> wrote:
->>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>
->>> The following changes since commit bec9c64ef7be8063f1192608b83877bc5c9ea217:
->>>
->>>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-02-13 18:24:08 +0000)
->>>
->>> are available in the Git repository at:
->>>
->>>   git://github.com/dagrh/qemu.git tags/pull-migration-20180214a
->>>
->>> for you to fetch changes up to 3e0c8050ebba3f55dc2d92b3790a3cfb80786d07:
->>>
->>>   migration: pass MigrationState to migrate_init() (2018-02-14 10:37:09 +0000)
->>>
->>> ----------------------------------------------------------------
->>> Migration pull 20180214
->>>
->>> Note that the 'Add test for migration to bad destination' displays
->>> a 'Connection refused' during running, but still gives the correct exit
->>> code and OK (It's checking that the source doesn't fail when
->>> it can't connect, so that's the right error).
->>> If it's particularly disliked that patch can be skipped individually.
->>>
->>> ----------------------------------------------------------------
->>
->> Hi. This fails 'make check' on aarch64 host:
->> QTEST_QEMU_BINARY=hppa-softmmu/qemu-system-hppa
->> QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((
->> ${RANDOM
->> :-0} % 255 + 1))} gtester -k --verbose -m=quick tests/boot-serial-test
->> tests/qmp-test tests/device-introspect-test test
->> s/qom-test tests/test-hmp
->> TEST: tests/boot-serial-test... (pid=2306)
->>   /hppa/boot-serial/hppa:                                              **
->> ERROR:/home/pm215/qemu/tests/boot-serial-test.c:137:check_guest_output:
->> assertion failed: (output_ok)
->> FAIL
->> GTester: last random seed: R02S43359b02a322915508b897be44a0e9c6
->> (pid=7220)
->> FAIL: tests/boot-serial-test
-> 
-> I can't obviously see a reason why it should in any way affect that
-> test; however I'll try and grab an aarch64 box tomorrow.
+OK, thanks for checking again! So I'm closing this ticket now.
 
-For the records: It's a bug in the boot-serial tester. I've just sent a
-mail with a fix: "tests/boot-serial-test: Fix problem with timeout due
-to dropped characters".
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
- Thomas
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1331334
+
+Title:
+  driftfix=3Dnone and migration on Win7 guest causes time to go 10 times
+  as fast
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  With -rtc base=3Dlocaltime,clock=3Dhost,driftfix=3Dnone on a Win7 guest,
+  stopping it with migration and then starting it again about 1 hour
+  later makes the guest time go 10 times as fast as real time until
+  Windows is rebooted.  I have tried qith qemu-2.0.0 and the problem
+  still exists there.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1331334/+subscriptions
