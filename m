@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emZGd-0005Ax-Hc
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:13:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1emZHp-0005rE-Il
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:14:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1emZGY-00039K-Gd
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:13:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54902 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1emZHo-0003bZ-C4
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:14:21 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54924 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1emZGY-000392-Bk
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:13:02 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1emZHo-0003bR-6J
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 01:14:20 -0500
+References: <20180214153938.5410-1-dgilbert@redhat.com>
+	<CAFEAcA_dzzcxKVyoNm_wsSJmqsLj0=cKESW6HwYWsdZwMHx_Ug@mail.gmail.com>
+	<20180215201919.GB2343@work-vm>
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 16 Feb 2018 07:12:44 +0100
-Message-Id: <1518761564-9899-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/boot-serial-test: Fix problem with
- timeout due to dropped characters
+Message-ID: <79e69cbb-6ae5-532d-ea17-c0d044f8211a@redhat.com>
+Date: Fri, 16 Feb 2018 07:14:14 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180215201919.GB2343@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/10] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Commit 92b540dac9fc3a5 introduce a counter to handle the timeouts in a
-better way. But in case ccnt reaches 512, the current read character is
-ignored - and if that character is part of the string that we are looking
-for, the test fails to match the string.
+On 15.02.2018 21:19, Dr. David Alan Gilbert wrote:
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>> On 14 February 2018 at 15:39, Dr. David Alan Gilbert (git)
+>> <dgilbert@redhat.com> wrote:
+>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>
+>>> The following changes since commit bec9c64ef7be8063f1192608b83877bc5c9ea217:
+>>>
+>>>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-02-13 18:24:08 +0000)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>   git://github.com/dagrh/qemu.git tags/pull-migration-20180214a
+>>>
+>>> for you to fetch changes up to 3e0c8050ebba3f55dc2d92b3790a3cfb80786d07:
+>>>
+>>>   migration: pass MigrationState to migrate_init() (2018-02-14 10:37:09 +0000)
+>>>
+>>> ----------------------------------------------------------------
+>>> Migration pull 20180214
+>>>
+>>> Note that the 'Add test for migration to bad destination' displays
+>>> a 'Connection refused' during running, but still gives the correct exit
+>>> code and OK (It's checking that the source doesn't fail when
+>>> it can't connect, so that's the right error).
+>>> If it's particularly disliked that patch can be skipped individually.
+>>>
+>>> ----------------------------------------------------------------
+>>
+>> Hi. This fails 'make check' on aarch64 host:
+>> QTEST_QEMU_BINARY=hppa-softmmu/qemu-system-hppa
+>> QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((
+>> ${RANDOM
+>> :-0} % 255 + 1))} gtester -k --verbose -m=quick tests/boot-serial-test
+>> tests/qmp-test tests/device-introspect-test test
+>> s/qom-test tests/test-hmp
+>> TEST: tests/boot-serial-test... (pid=2306)
+>>   /hppa/boot-serial/hppa:                                              **
+>> ERROR:/home/pm215/qemu/tests/boot-serial-test.c:137:check_guest_output:
+>> assertion failed: (output_ok)
+>> FAIL
+>> GTester: last random seed: R02S43359b02a322915508b897be44a0e9c6
+>> (pid=7220)
+>> FAIL: tests/boot-serial-test
+> 
+> I can't obviously see a reason why it should in any way affect that
+> test; however I'll try and grab an aarch64 box tomorrow.
 
-Almost all of the tests look for a string within the first 512 bytes of
-firmware output, so the problem never triggered there. But the hppa test
-that has been added recently looks for a longer string at the very end of
-a long output, thus there's a chance that we miss a character there so
-that the test fails unexpectedly. Fix it by *not* reading and dropping a
-character if the counter reaches 512.
+For the records: It's a bug in the boot-serial tester. I've just sent a
+mail with a fix: "tests/boot-serial-test: Fix problem with timeout due
+to dropped characters".
 
-Fixes: 92b540dac9fc3a572c7342edd0b073000f5a6abf
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- @Peter: Since this fixes the problem with running "make check", could
- you maybe apply this directly to the master branch? Thanks, and sorry
- for the inconvenience!
-
- tests/boot-serial-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index ea87a80..696f7a3 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -101,7 +101,7 @@ static void check_guest_output(const testdef_t *test, int fd)
-     /* Poll serial output... Wait at most 60 seconds */
-     for (i = 0; i < 6000; ++i) {
-         ccnt = 0;
--        while ((nbr = read(fd, &ch, 1)) == 1 && ccnt++ < 512) {
-+        while (ccnt++ < 512 && (nbr = read(fd, &ch, 1)) == 1) {
-             if (ch == test->expect[pos]) {
-                 pos += 1;
-                 if (test->expect[pos] == '\0') {
--- 
-1.8.3.1
+ Thomas
