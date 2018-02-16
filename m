@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emjDX-0002fe-G6
+	(envelope-from <stefanha@redhat.com>) id 1emjDX-0002fd-FB
 	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:50:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emjDU-0001KA-JL
+	(envelope-from <stefanha@redhat.com>) id 1emjDU-0001K3-Bc
 	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:50:35 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40152 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40154 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emjDU-0001J6-9t
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emjDU-0001J2-6y
 	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:50:32 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 16 Feb 2018 16:50:11 +0000
-Message-Id: <20180216165015.30715-2-stefanha@redhat.com>
+Date: Fri, 16 Feb 2018 16:50:14 +0000
+Message-Id: <20180216165015.30715-5-stefanha@redhat.com>
 In-Reply-To: <20180216165015.30715-1-stefanha@redhat.com>
 References: <20180216165015.30715-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/5] aio: rename aio_context_in_iothread()
- to in_aio_context_home_thread()
+Subject: [Qemu-devel] [PATCH v3 4/5] block: test blk_aio_flush() with
+ blk->root == NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: John Snow <jsnow@redhat.com>, mark.kanda@oracle.com, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The name aio_context_in_iothread() is misleading because it also return
-true when called on the main AioContext from the main loop thread, which
-is not an IOThread.
+From: Kevin Wolf <kwolf@redhat.com>
 
-This patch renames it to in_aio_context_home_thread() and expands the
-doc comment to make the semantics clearer.
+This patch adds test cases for the scenario where blk_aio_flush() is
+called on a BlockBackend with no root.  Calling drain afterwards should
+complete the requests with -ENOMEDIUM.
 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/aio.h   | 7 +++++--
- include/block/block.h | 2 +-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ tests/Makefile.include     |  2 ++
+ tests/test-block-backend.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
+ create mode 100644 tests/test-block-backend.c
 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index e9aeeaec94..fc14a2acda 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -534,11 +534,14 @@ void aio_co_enter(AioContext *ctx, struct Coroutine *co);
- AioContext *qemu_get_current_aio_context(void);
- 
- /**
-+ * in_aio_context_home_thread:
-  * @ctx: the aio context
-  *
-- * Return whether we are running in the I/O thread that manages @ctx.
-+ * Return whether we are running in the thread that normally runs @ctx.  Note
-+ * that acquiring/releasing ctx does not affect the outcome, each AioContext
-+ * still only has a one home thread that is responsible for running it.
-  */
--static inline bool aio_context_in_iothread(AioContext *ctx)
-+static inline bool in_aio_context_home_thread(AioContext *ctx)
- {
-     return ctx == qemu_get_current_aio_context();
- }
-diff --git a/include/block/block.h b/include/block/block.h
-index 19b3ab9cb5..d559419722 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -372,7 +372,7 @@ void bdrv_drain_all(void);
-     bool busy_ = true;                                     \
-     BlockDriverState *bs_ = (bs);                          \
-     AioContext *ctx_ = bdrv_get_aio_context(bs_);          \
--    if (aio_context_in_iothread(ctx_)) {                   \
-+    if (in_aio_context_home_thread(ctx_)) {                \
-         while ((cond) || busy_) {                          \
-             busy_ = aio_poll(ctx_, (cond));                \
-             waited_ |= !!(cond) | busy_;                   \
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index a1bcbffe12..c15cb2dca4 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -83,6 +83,7 @@ gcov-files-test-hbitmap-y = blockjob.c
+ check-unit-y += tests/test-bdrv-drain$(EXESUF)
+ check-unit-y += tests/test-blockjob$(EXESUF)
+ check-unit-y += tests/test-blockjob-txn$(EXESUF)
++check-unit-y += tests/test-block-backend$(EXESUF)
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ gcov-files-test-x86-cpuid-y =
+@@ -612,6 +613,7 @@ tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
+ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
++tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+diff --git a/tests/test-block-backend.c b/tests/test-block-backend.c
+new file mode 100644
+index 0000000000..fd59f02bd0
+--- /dev/null
++++ b/tests/test-block-backend.c
+@@ -0,0 +1,82 @@
++/*
++ * BlockBackend tests
++ *
++ * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++
++static void test_drain_aio_error_flush_cb(void *opaque, int ret)
++{
++    bool *completed = opaque;
++
++    g_assert(ret == -ENOMEDIUM);
++    *completed = true;
++}
++
++static void test_drain_aio_error(void)
++{
++    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    BlockAIOCB *acb;
++    bool completed = false;
++
++    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
++    g_assert(acb != NULL);
++    g_assert(completed == false);
++
++    blk_drain(blk);
++    g_assert(completed == true);
++
++    blk_unref(blk);
++}
++
++static void test_drain_all_aio_error(void)
++{
++    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    BlockAIOCB *acb;
++    bool completed = false;
++
++    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
++    g_assert(acb != NULL);
++    g_assert(completed == false);
++
++    blk_drain_all();
++    g_assert(completed == true);
++
++    blk_unref(blk);
++}
++
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
++
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/block-backend/drain_aio_error", test_drain_aio_error);
++    g_test_add_func("/block-backend/drain_all_aio_error",
++                    test_drain_all_aio_error);
++
++    return g_test_run();
++}
 -- 
 2.14.3
