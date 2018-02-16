@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emn9D-0004sg-O9
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:25 -0500
+	(envelope-from <alistair23@gmail.com>) id 1emn9e-0005BM-7r
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emn9C-000668-KX
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:23 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-10-git-send-email-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8e580b8b-1614-9c83-4ac9-48f5d3cff3dc@redhat.com>
-Date: Fri, 16 Feb 2018 15:02:15 -0600
+	(envelope-from <alistair23@gmail.com>) id 1emn9d-0006A0-Dn
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:50 -0500
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:45378)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1emn9d-00069U-7G
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:49 -0500
+Received: by mail-lf0-x242.google.com with SMTP id x196so5723695lfd.12
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:02:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1518702707-7077-10-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 9/9] iotests: new test 206 for NBD
- BLOCK_STATUS
+Sender: alistair23@gmail.com
+In-Reply-To: <20180216022933.10945-7-f4bug@amsat.org>
+References: <20180216022933.10945-1-f4bug@amsat.org>
+	<20180216022933.10945-7-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 16 Feb 2018 13:02:17 -0800
+Message-ID: <CAKmqyKMSb9hU7PHMF3JJ6=+Og64BkUFmpJ3Y+ffuuvWTQCZ=Ew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] hw/sd: make sd_data_ready() static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Walle <michael@walle.cc>
 
-On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Thu, Feb 15, 2018 at 6:29 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> It belongs to the legacy API (the last user has been converted).
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+
+Alistair
+
 > ---
->   tests/qemu-iotests/206     | 34 ++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/206.out |  2 ++
->   tests/qemu-iotests/group   |  1 +
->   3 files changed, 37 insertions(+)
->   create mode 100644 tests/qemu-iotests/206
->   create mode 100644 tests/qemu-iotests/206.out
-
-It's a race! Kevin already has test 206 and 207 claimed in his pending 
-series:
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02363.html
-Whoever loses gets to rebase and renumber (or the maintainer on their 
-behalf) ;)
-
-> 
-> diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
-> new file mode 100644
-
-Oops, you forgot to mark this executable.  And oops, I forgot to flag 
-that on test 205.  Other inconsistent tests: 096, 124, 129, 132, 136, 
-139, 148, 152, 163. Separate cleanup patch coming up soon.
-
-> index 0000000000..259e991ec6
-> --- /dev/null
-> +++ b/tests/qemu-iotests/206
-> @@ -0,0 +1,34 @@
-> +#!/usr/bin/env python
-> +#
-> +# Tests for NBD BLOCK_STATUS extension
-> +#
-
-> +import iotests
-> +from iotests import qemu_img_create, qemu_io, qemu_img_verbose, qemu_nbd, \
-> +                    file_path
-> +
-> +iotests.verify_image_format(supported_fmts=['qcow2'])
-
-Don't we also need to blacklist v2 files (and only operate on v3 or 
-newer), since the behavior of zero clusters is much worse on v2 images?
-
-> +
-> +disk, nbd_sock = file_path('disk', 'nbd-sock')
-> +nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
-> +
-> +qemu_img_create('-f', iotests.imgfmt, disk, '1M')
-> +qemu_io('-f', iotests.imgfmt, '-c', 'write 0 512K', disk)
-
-Hopefully large enough for all the major filesystems with sparse support 
-to show half-data, half-hole, and not run into any weird issues where 
-granularity differences between filesystems change the outcome.
-
-> +
-> +qemu_nbd('-k', nbd_sock, '-x', 'exp', '-f', iotests.imgfmt, disk)
-> +qemu_img_verbose('map', '-f', 'raw', '--output=json', nbd_uri)
-> diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
-> new file mode 100644
-> index 0000000000..0d29724e84
-> --- /dev/null
-> +++ b/tests/qemu-iotests/206.out
-> @@ -0,0 +1,2 @@
-> +[{ "start": 0, "length": 524288, "depth": 0, "zero": false, "data": true},
-> +{ "start": 524288, "length": 524288, "depth": 0, "zero": true, "data": false}]
-
-But definite evidence of getting block status over NBD! Progress!
-
-And kudos for producing an .out file that I can actually read and 
-reproduce without the aid of python (in contrast to the more 
-"unit-test"-y ones like 205, where we had a big long side-discussion 
-about that. No need to repeat it here).
-
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index a2dfe79d86..2c3925566a 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -202,3 +202,4 @@
->   203 rw auto
->   204 rw auto quick
->   205 rw auto quick
-> +206 rw auto quick
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>  include/hw/sd/sd.h | 1 -
+>  hw/sd/sd.c         | 2 +-
+>  2 files changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+> index bf1eb0713c..4491db98de 100644
+> --- a/include/hw/sd/sd.h
+> +++ b/include/hw/sd/sd.h
+> @@ -138,7 +138,6 @@ int sd_do_command(SDState *sd, SDRequest *req,
+>  void sd_write_data(SDState *sd, uint8_t value);
+>  uint8_t sd_read_data(SDState *sd);
+>  void sd_set_cb(SDState *sd, qemu_irq readonly, qemu_irq insert);
+> -bool sd_data_ready(SDState *sd);
+>  /* sd_enable should not be used -- it is only used on the nseries boards=
+,
+>   * where it is part of a broken implementation of the MMC card slot swit=
+ch
+>   * (there should be two card slots which are multiplexed to a single MMC
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 9ac9b63ff8..72d32f7845 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -1885,7 +1885,7 @@ uint8_t sd_read_data(SDState *sd)
+>      return ret;
+>  }
+>
+> -bool sd_data_ready(SDState *sd)
+> +static bool sd_data_ready(SDState *sd)
+>  {
+>      return sd->state =3D=3D sd_sendingdata_state;
+>  }
+> --
+> 2.16.1
+>
+>
