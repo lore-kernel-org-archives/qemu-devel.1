@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoAz-0006tW-2Z
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:22 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoB5-00072a-9x
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoAu-0005Mh-CY
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:17 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59178
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoB1-0005S7-Iy
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:23 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34500
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1emoAu-0005MN-6X
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:12 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1GM6TMp085959
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:11 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g63hs14gk-1
+	id 1emoB1-0005Rq-CS
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:19 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1GM5BJt047138
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:18 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g63kr98kh-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:11 -0500
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:17 -0500
 Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Fri, 16 Feb 2018 17:08:10 -0500
+	Fri, 16 Feb 2018 17:08:16 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 16 Feb 2018 17:07:52 -0500
+Date: Fri, 16 Feb 2018 17:07:58 -0500
 In-Reply-To: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1518818879-18608-6-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v7 05/12] s390-ccw: move auxiliary IPL data to
- separate location
+Message-Id: <1518818879-18608-12-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v7 11/12] s390-ccw: set cp_receive mask only
+ when needed and consume pending service irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,191 +42,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-The s390-ccw firmware needs some information in support of the
-boot process which is not available on the native machine.
-Examples are the netboot firmware load address and now the
-boot menu parameters.
+It is possible while waiting for multiple types of external
+interrupts that we might have pending irqs remaining between
+irq consumption and irq-type disabling. Those interrupts
+could potentially propagate to the guest after IPL completes
+and cause unwanted behavior.
 
-While storing that data in unused fields of the IPL parameter block
-works, that approach could create problems if the parameter block
-definition should change in the future. Because then a guest could
-overwrite these fields using the set IPLB diagnose.
+As it is today, the SCLP will only recognize write events that
+are enabled by the control program's send and receive masks. To
+limit the window for, and prevent further irqs from, ASCII
+console events (specifically keystrokes), we should only enable
+the control program's receive mask when we need it.
 
-In fact the data in question is of more global nature and not really
-tied to an IPL device, so separating it is rather logical.
+As an additional measure, once we've disabled/cleared the control
+program's receive mask, we will print an empty string in order
+to consume any pending service interrupt.
 
-This commit introduces a new structure to hold firmware relevant
-IPL parameters set by QEMU. The data is stored at location 204 (dec)
-and can contain up to 7 32-bit words. This area is available to
-programming in the z/Architecture Principles of Operation and
-can thus safely be used by the firmware until the IPL has completed.
-
-Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 ---
- hw/s390x/ipl.c          | 19 ++++++++++++++++++-
- hw/s390x/ipl.h          | 19 +++++++++++++++++--
- pc-bios/s390-ccw/iplb.h | 20 ++++++++++++++++++--
- pc-bios/s390-ccw/main.c |  6 +++++-
- 4 files changed, 58 insertions(+), 6 deletions(-)
+ pc-bios/s390-ccw/menu.c     |  5 +++++
+ pc-bios/s390-ccw/s390-ccw.h |  1 +
+ pc-bios/s390-ccw/sclp.c     | 10 ++++------
+ 3 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 0d06fc1..31565ce 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -399,6 +399,21 @@ void s390_reipl_request(void)
-     qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+index 9601043..14410a8 100644
+--- a/pc-bios/s390-ccw/menu.c
++++ b/pc-bios/s390-ccw/menu.c
+@@ -11,6 +11,7 @@
+ 
+ #include "menu.h"
+ #include "s390-ccw.h"
++#include "sclp.h"
+ 
+ #define KEYCODE_NO_INP '\0'
+ #define KEYCODE_ESCAPE '\033'
+@@ -117,8 +118,12 @@ static int get_index(void)
+ 
+     memset(buf, 0, sizeof(buf));
+ 
++    sclp_set_write_mask(SCLP_EVENT_MASK_MSG_ASCII, SCLP_EVENT_MASK_MSG_ASCII);
+     len = read_prompt(buf, sizeof(buf));
+ 
++    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
++    sclp_print(""); /* Clear any pending service int */
++
+     /* If no input, boot default */
+     if (len == 0) {
+         return 0;
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index a7e6253..ebdcf86 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -69,6 +69,7 @@ unsigned int get_loadparm_index(void);
+ 
+ /* sclp.c */
+ void sclp_print(const char *string);
++void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask);
+ void sclp_setup(void);
+ void sclp_get_loadparm_ascii(char *loadparm);
+ int sclp_read(char *str, size_t count);
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index a2f25eb..3836cb4 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -46,23 +46,21 @@ static int sclp_service_call(unsigned int command, void *sccb)
+         return 0;
  }
  
-+static void s390_ipl_prepare_qipl(S390CPU *cpu)
-+{
-+    S390IPLState *ipl = get_ipl_device();
-+    uint8_t *addr;
-+    uint64_t len = 4096;
-+
-+    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
-+    if (!addr || len < QIPL_ADDRESS + sizeof(QemuIplParameters)) {
-+        error_report("Cannot set QEMU IPL parameters");
-+        return;
-+    }
-+    memcpy(addr + QIPL_ADDRESS, &ipl->iplb.qipl, sizeof(QemuIplParameters));
-+    cpu_physical_memory_unmap(addr, len, 1, len);
-+}
-+
- void s390_ipl_prepare_cpu(S390CPU *cpu)
+-static void sclp_set_write_mask(void)
++void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask)
  {
-     S390IPLState *ipl = get_ipl_device();
-@@ -418,8 +433,10 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
-             error_report_err(err);
-             vm_stop(RUN_STATE_INTERNAL_ERROR);
-         }
--        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-+        ipl->iplb.qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-     }
-+    s390_ipl_prepare_qipl(cpu);
-+
+     WriteEventMask *sccb = (void *)_sccb;
+ 
+     sccb->h.length = sizeof(WriteEventMask);
+     sccb->mask_length = sizeof(unsigned int);
+-    sccb->receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
+-    sccb->cp_receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
+-    sccb->send_mask = SCLP_EVENT_MASK_MSG_ASCII;
+-    sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII;
++    sccb->cp_receive_mask = receive_mask;
++    sccb->cp_send_mask = send_mask;
+ 
+     sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
  }
  
- static void s390_ipl_reset(DeviceState *dev)
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 8a705e0..74469b1 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -16,8 +16,7 @@
- #include "cpu.h"
+ void sclp_setup(void)
+ {
+-    sclp_set_write_mask();
++    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
+ }
  
- struct IplBlockCcw {
--    uint64_t netboot_start_addr;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[85];
-     uint8_t  ssid;
-     uint16_t devno;
-     uint8_t  vm_flags;
-@@ -59,6 +58,21 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
- 
- #define DIAG308_FLAGS_LP_VALID 0x80
- 
-+#define QIPL_ADDRESS  0xcc
-+
-+/*
-+ * The QEMU IPL Parameters will be stored 32-bit word aligned.
-+ * Placement of data fields in this area must account for
-+ * their alignment needs.
-+ * The entire structure must not be larger than 28 bytes.
-+ */
-+struct QemuIplParameters {
-+    uint8_t  reserved1[4];
-+    uint64_t netboot_start_addr;
-+    uint8_t  reserved2[16];
-+} QEMU_PACKED;
-+typedef struct QemuIplParameters QemuIplParameters;
-+
- union IplParameterBlock {
-     struct {
-         uint32_t len;
-@@ -74,6 +88,7 @@ union IplParameterBlock {
-             IplBlockFcp fcp;
-             IplBlockQemuScsi scsi;
-         };
-+        QemuIplParameters qipl;
-     } QEMU_PACKED;
-     struct {
-         uint8_t  reserved1[110];
-diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-index 890aed9..a23237e 100644
---- a/pc-bios/s390-ccw/iplb.h
-+++ b/pc-bios/s390-ccw/iplb.h
-@@ -13,8 +13,7 @@
- #define IPLB_H
- 
- struct IplBlockCcw {
--    uint64_t netboot_start_addr;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[85];
-     uint8_t  ssid;
-     uint16_t devno;
-     uint8_t  vm_flags;
-@@ -73,6 +72,23 @@ typedef struct IplParameterBlock IplParameterBlock;
- 
- extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- 
-+#define QIPL_ADDRESS  0xcc
-+
-+/*
-+ * The QEMU IPL Parameters will be stored 32-bit word aligned.
-+ * Placement of data fields in this area must account for
-+ * their alignment needs.
-+ * The entire structure must not be larger than 28 bytes.
-+ */
-+struct QemuIplParameters {
-+    uint8_t  reserved1[4];
-+    uint64_t netboot_start_addr;
-+    uint8_t  reserved2[16];
-+} __attribute__ ((packed));
-+typedef struct QemuIplParameters QemuIplParameters;
-+
-+extern QemuIplParameters qipl;
-+
- #define S390_IPL_TYPE_FCP 0x00
- #define S390_IPL_TYPE_CCW 0x02
- #define S390_IPL_TYPE_QEMU_SCSI 0xff
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index e857ce4..e41b264 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- static SubChannelId blk_schid = { .one = 1 };
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-+QemuIplParameters qipl;
- 
- /*
-  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
-@@ -81,6 +82,7 @@ static void virtio_setup(void)
-     uint16_t dev_no;
-     char ldp[] = "LOADPARM=[________]\n";
-     VDev *vdev = virtio_get_device();
-+    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
- 
-     /*
-      * We unconditionally enable mss support. In every sane configuration,
-@@ -93,6 +95,8 @@ static void virtio_setup(void)
-     memcpy(ldp + 10, loadparm, 8);
-     sclp_print(ldp);
- 
-+    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-+
-     if (store_iplb(&iplb)) {
-         switch (iplb.pbt) {
-         case S390_IPL_TYPE_CCW:
-@@ -127,7 +131,7 @@ static void virtio_setup(void)
- 
-     if (virtio_get_device_type() == VIRTIO_ID_NET) {
-         sclp_print("Network boot device detected\n");
--        vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
-+        vdev->netboot_start_addr = qipl.netboot_start_addr;
-     } else {
-         virtio_blk_setup_device(blk_schid);
- 
+ long write(int fd, const void *str, size_t len)
 -- 
 2.7.4
