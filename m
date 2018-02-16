@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1embl2-0000nA-99
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:52:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1emc5T-0004GY-RH
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 04:13:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1embkz-00055h-5A
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:52:40 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55908 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1embky-00055U-W7
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:52:37 -0500
-Date: Fri, 16 Feb 2018 08:52:28 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180216085228.GA3181@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180215175044.8159-1-berrange@redhat.com>
-	<CAFEAcA8BsQFvki-rFu4+CWwFMw=YM6UBkEy4BYs-=C7Nr3MhvQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1emc5S-0001s1-VO
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 04:13:47 -0500
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:41998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1emc5S-0001rp-PI
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 04:13:46 -0500
+Received: by mail-ot0-x22e.google.com with SMTP id a7so2157701otk.9
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 01:13:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8BsQFvki-rFu4+CWwFMw=YM6UBkEy4BYs-=C7Nr3MhvQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/7] Qio next patches
+In-Reply-To: <6681bcc4-d9f9-8b14-4463-9e93ec422f06@redhat.com>
+References: <1518598187-27169-1-git-send-email-whois.zihan.yang@gmail.com>
+	<4f4fd107-e836-ad27-0778-aa13c9f93b23@redhat.com>
+	<CAKwiv-gm39NU0Y5sWaWHoKq6_LBo2FR1RopXLSoi0tC_Ray71w@mail.gmail.com>
+	<6681bcc4-d9f9-8b14-4463-9e93ec422f06@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Feb 2018 09:13:25 +0000
+Message-ID: <CAFEAcA8urY-pXDeZ5Hq33O2JOfWiVkdL2XRwWoCnXxSM6Q4B3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] RAMList: replace QemuMutex with
+ CompatGMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Zihan Yang <whois.zihan.yang@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Feb 15, 2018 at 07:43:39PM +0000, Peter Maydell wrote:
-> On 15 February 2018 at 17:50, Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com> wrote:
-> > The following changes since commit 8c5e7bddc22dac9d4dc3526996babce4c7=
-242d9d:
-> >
-> >   Merge remote-tracking branch 'remotes/huth/tags/pull-request-2018-0=
-2-14' into staging (2018-02-15 13:00:44 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   ssh://git@github.com/berrange/qemu tags/qio-next-pull-request
->=20
-> This isn't a publicly usable git reference; did you mean
->    git://github.com/berrange/qemu.git tags/qio-next-pull-request
->=20
-> ? (I'm testing the pullreq on the assumption that you did.)
+On 14 February 2018 at 12:11, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 14/02/2018 12:43, Zihan Yang wrote:
+>>
+>>> I'm not sure what is the advantage of this change.  QEMU is more or less
+>>> uniformly using QemuMutex and QemuCond.
+>>
+>> I see. QEMU uses some glib functions, like g_new, g_free, g_hash_table ,
+>> g_assert and g_poll, so I thought there was a trend for making more use
+>> of glib.
+>> I get the point now.
+>
+> There are some plans about using priority inheritance mutexes for
+> QemuMutex.  GLib does not support anymore pluggable thread functions, so
+> we are stuck with our own implementation.
 
-Sigh, yes. This is my first time trying git-publish, and I guess I missed
-some key config parameter, to distinguish the URL it must push too, vs
-the URL it must document in the cover letter.
+Should we remove the entry
+"Change QemuMutex and QemuCond to CompatGMutex and CompatGCond (these are
+ the same as GMutex and GCond, just with a different type). With this change,
+ qemu_mutex_init/qemu_cond_init becomes optional for global variables."
+from https://wiki.qemu.org/Contribute/BiteSizedTasks then?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+thanks
+-- PMM
