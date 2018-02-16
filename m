@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1embfs-0004YM-Jr
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1embl2-0000nA-99
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:52:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1embfr-0001R4-El
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:20 -0500
-Received: from mga17.intel.com ([192.55.52.151]:12665)
+	(envelope-from <berrange@redhat.com>) id 1embkz-00055h-5A
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:52:40 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55908 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1embfr-0001Da-2z
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:19 -0500
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Fri, 16 Feb 2018 16:46:15 +0800
-Message-Id: <20180216084615.26483-9-haozhong.zhang@intel.com>
-In-Reply-To: <20180216084615.26483-1-haozhong.zhang@intel.com>
-References: <20180216084615.26483-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v3 8/8] migration/ram: ensure write persistence
- on loading xbzrle pages to PMEM
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1embky-00055U-W7
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:52:37 -0500
+Date: Fri, 16 Feb 2018 08:52:28 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180216085228.GA3181@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180215175044.8159-1-berrange@redhat.com>
+	<CAFEAcA8BsQFvki-rFu4+CWwFMw=YM6UBkEy4BYs-=C7Nr3MhvQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8BsQFvki-rFu4+CWwFMw=YM6UBkEy4BYs-=C7Nr3MhvQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/7] Qio next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,137 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-When loading a xbzrle encoded page to persistent memory, load the data
-via libpmem function pmem_memcpy_nodrain() instead of memcpy().
-Combined with a call to pmem_drain() at the end of memory loading, we
-can guarantee those xbzrle encoded pages are persistently loaded to PMEM.
+On Thu, Feb 15, 2018 at 07:43:39PM +0000, Peter Maydell wrote:
+> On 15 February 2018 at 17:50, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> > The following changes since commit 8c5e7bddc22dac9d4dc3526996babce4c7=
+242d9d:
+> >
+> >   Merge remote-tracking branch 'remotes/huth/tags/pull-request-2018-0=
+2-14' into staging (2018-02-15 13:00:44 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   ssh://git@github.com/berrange/qemu tags/qio-next-pull-request
+>=20
+> This isn't a publicly usable git reference; did you mean
+>    git://github.com/berrange/qemu.git tags/qio-next-pull-request
+>=20
+> ? (I'm testing the pullreq on the assumption that you did.)
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
----
- migration/ram.c        | 6 +++---
- migration/xbzrle.c     | 8 ++++++--
- migration/xbzrle.h     | 3 ++-
- tests/Makefile.include | 2 +-
- tests/test-xbzrle.c    | 4 ++--
- 5 files changed, 14 insertions(+), 9 deletions(-)
+Sigh, yes. This is my first time trying git-publish, and I guess I missed
+some key config parameter, to distinguish the URL it must push too, vs
+the URL it must document in the cover letter.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 140f6886df..100083287c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2389,7 +2389,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-     }
- }
- 
--static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
-+static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host, bool is_pmem)
- {
-     unsigned int xh_len;
-     int xh_flags;
-@@ -2415,7 +2415,7 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
- 
-     /* decode RLE */
-     if (xbzrle_decode_buffer(loaded_data, xh_len, host,
--                             TARGET_PAGE_SIZE) == -1) {
-+                             TARGET_PAGE_SIZE, is_pmem) == -1) {
-         error_report("Failed to load XBZRLE page - decode error!");
-         return -1;
-     }
-@@ -2964,7 +2964,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-             break;
- 
-         case RAM_SAVE_FLAG_XBZRLE:
--            if (load_xbzrle(f, addr, host) < 0) {
-+            if (load_xbzrle(f, addr, host, is_pmem) < 0) {
-                 error_report("Failed to decompress XBZRLE page at "
-                              RAM_ADDR_FMT, addr);
-                 ret = -EINVAL;
-diff --git a/migration/xbzrle.c b/migration/xbzrle.c
-index 1ba482ded9..ca713c3697 100644
---- a/migration/xbzrle.c
-+++ b/migration/xbzrle.c
-@@ -12,6 +12,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qemu/cutils.h"
-+#include "qemu/pmem.h"
- #include "xbzrle.h"
- 
- /*
-@@ -126,11 +127,14 @@ int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
-     return d;
- }
- 
--int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
-+int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen,
-+                         bool is_pmem)
- {
-     int i = 0, d = 0;
-     int ret;
-     uint32_t count = 0;
-+    void *(*memcpy_func)(void *d, const void *s, size_t n) =
-+        is_pmem ? pmem_memcpy_nodrain : memcpy;
- 
-     while (i < slen) {
- 
-@@ -167,7 +171,7 @@ int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
-             return -1;
-         }
- 
--        memcpy(dst + d, src + i, count);
-+        memcpy_func(dst + d, src + i, count);
-         d += count;
-         i += count;
-     }
-diff --git a/migration/xbzrle.h b/migration/xbzrle.h
-index a0db507b9c..f18f679f47 100644
---- a/migration/xbzrle.h
-+++ b/migration/xbzrle.h
-@@ -17,5 +17,6 @@
- int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
-                          uint8_t *dst, int dlen);
- 
--int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen);
-+int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen,
-+                         bool is_pmem);
- #endif
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 9ffb0cf8eb..1005195cdc 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -616,7 +616,7 @@ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
- tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
--tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
-+tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o stubs/pmem.o $(test-util-obj-y)
- tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o $(test-util-obj-y)
- tests/test-int128$(EXESUF): tests/test-int128.o
- tests/rcutorture$(EXESUF): tests/rcutorture.o $(test-util-obj-y)
-diff --git a/tests/test-xbzrle.c b/tests/test-xbzrle.c
-index f5e08de91e..9afa0c4bcb 100644
---- a/tests/test-xbzrle.c
-+++ b/tests/test-xbzrle.c
-@@ -101,7 +101,7 @@ static void test_encode_decode_1_byte(void)
-                        PAGE_SIZE);
-     g_assert(dlen == (uleb128_encode_small(&buf[0], 4095) + 2));
- 
--    rc = xbzrle_decode_buffer(compressed, dlen, buffer, PAGE_SIZE);
-+    rc = xbzrle_decode_buffer(compressed, dlen, buffer, PAGE_SIZE, false);
-     g_assert(rc == PAGE_SIZE);
-     g_assert(memcmp(test, buffer, PAGE_SIZE) == 0);
- 
-@@ -156,7 +156,7 @@ static void encode_decode_range(void)
-     dlen = xbzrle_encode_buffer(test, buffer, PAGE_SIZE, compressed,
-                                 PAGE_SIZE);
- 
--    rc = xbzrle_decode_buffer(compressed, dlen, test, PAGE_SIZE);
-+    rc = xbzrle_decode_buffer(compressed, dlen, test, PAGE_SIZE, false);
-     g_assert(rc < PAGE_SIZE);
-     g_assert(memcmp(test, buffer, PAGE_SIZE) == 0);
- 
--- 
-2.16.1
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
