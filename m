@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emfFA-0002y4-R5
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:36:02 -0500
+	(envelope-from <imammedo@redhat.com>) id 1emfHx-0004Hz-GB
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emfF7-0002s3-L0
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:36:00 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34798 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1emfHv-0003X5-J2
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:53 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45236 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1emfF7-0002rx-Fw
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:35:57 -0500
-References: <20161214150840.10899-1-alex@alex.org.uk>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c2faa919-65c6-d5a3-508d-2f069f2ba61e@redhat.com>
-Date: Fri, 16 Feb 2018 06:35:47 -0600
-MIME-Version: 1.0
-In-Reply-To: <20161214150840.10899-1-alex@alex.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emfHv-0003Wt-E8
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:51 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Fri, 16 Feb 2018 13:37:13 +0100
+Message-Id: <1518784641-43151-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
+References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/9] numa: postpone options post-processing
+ till machine_run_board_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,133 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>, Wouter Verheist <w@uter.be>, nbd list <nbd@other.debian.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
-Reviving an old thread, to bring up questions based on a new push to 
-implement this extension in qemu.
+in preparation for numa options to being handled via QMP before
+machine_run_board_init(), move final numa configuration checks
+and processing to machine_run_board_init() so it could take into
+account both CLI (via parse_numa_opts()) and QMP input
 
-On 12/14/2016 09:08 AM, Alex Bligh wrote:
-> 
-> * Change NBD_OPT_LIST_METADATA etc. to explicitly send a list of queries
->    and add a count of queries so we can extend the command later (rather than
->    rely on the length of option)
-> 
-> * For NBD_OPT_LIST_METADATA make absence of any query (as opposed to zero
->    length query) list all contexts, as absence of any query is now simple.
-> 
-> * Move definition of namespaces in the document to somewhere more appopriate.
-> 
-> * Various other minor changes as discussed on the mailing list
-> 
-> Signed-off-by: Alex Bligh <alex@alex.org.uk>
-> ---
->   doc/proto.md | 179 +++++++++++++++++++++++++++++++++++++----------------------
->   1 file changed, 112 insertions(+), 67 deletions(-)
-> 
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  - remove duplicate qemu_opts_foreach() in numa_complete_configuration()
+    that was causing non explicitly IDed node "-numa node" parsed twice.
+---
+ include/sysemu/numa.h |  1 +
+ hw/core/machine.c     |  5 +++--
+ numa.c                | 13 ++++++++-----
+ 3 files changed, 12 insertions(+), 7 deletions(-)
 
->   
-> +Metadata contexts are identified by their names. The name MUST
-> +consist of a namespace, followed by a colon, followed by a leaf-name.
-> +The namespace and the leaf-name must each consist entirely of
-> +printable non-whitespace UTF-8 characters other than colons,
-> +and be non-empty. The entire name (namespace, colon and leaf-name)
-> +MUST NOT exceed 255 bytes (and therefore botht he namespace and
-> +leaf-name are guaranteed to be smaller than 255 bytes).
-> +
-> +Namespaces MUST be consist of one of the following:
-> +- `base`, for metadata contexts defined by this document;
-> +- `nbd-server`, for metadata contexts defined by the
-> +   implementation that accompanies this document (none
-> +   currently);
-> +- `x-*`, where `*` can be replaced by any random string not
-
-We're inconsistent on whether extensions are 'x-' or 'X-'; we should 
-tighten that up.  (No real impact to implementing things - a server 
-should just ignore namespaces it doesn't recognize, regardless of how 
-that unknown namespace was spelled).
-
-> +   containing colons, for local experiments. This SHOULD NOT be
-> +   used by metadata contexts that are expected to be widely used.
-> +- A third-party namespace from the list below.
-
-> @@ -932,51 +961,58 @@ of the newstyle negotiation.
-> +    If zero queries are sent, then the server MUST return all
-> +    the metadata contexts it knows about.
-> +
-> +    For details on the query string, see under `NBD_OPT_SET_META_CONTEXT`.
-> +
-> +    The server MUST either reply with an error (for instance `EINVAL`
-> +    if the option is not supported), or reply with a list of
-> +    `NBD_REP_META_CONTEXT` replies followed by `NBD_REP_ACK`.
-> +    The metadata context ID in these replies is reserved and SHOULD be
-> +    set to zero; clients MUST disregard it.
-
-The question came up whether the server is required/permitted to 
-diagnose bogus queries (a query for "bad" has no colon, and therefore 
-cannot represent any namespace - is that required to be an error, or can 
-the server silently ignore it and process the rest of the requests?  Can 
-the client rely on the server diagnosing bad requests, or must it be 
-prepared for the server to just ignore bad requests?).
-
-Here's my thinking:
-
-A server implementation may want to vet only the first 5 characters of a 
-request (because it only supports the namespace "base:").  If that 
-server encounters a client asks for context "X-longname:", that is a 
-valid request (so we should NOT reply with an error, but merely ignore 
-it as an unknown namespace); but if a client asks for namespace 
-"garbage", we have the option of whether to return an error.  But for 
-both of those client requests, there was no colon in the first 5 
-characters.  For a server to robustly distinguish between the two, we 
-have to read the entire request and search for a colon, to decide 
-whether the missing colon warrants an error reply.  But a client can 
-request a name up to 4k in length (the NBD maximum string) - so taking 
-the argument to an extreme, we have to manage a 4k string before making 
-our decision.  Reading 5 bytes fits easily into the stack, but reading 
-4k bytes onto the stack risks skipping the guard page on an OS with 4k 
-page sizes, for less-than-stellar handling on stack overflow; and 
-reading one byte at a time to check for colon is a pain compared to just 
-deciding after 5 bytes that the rest of the string is irrelevant and 
-skipping ahead in the data stream to the next point where any useful 
-work might be performed.  Thus, I'm arguing that for ease of server 
-implementation, we should permit, but not require, the server to 
-diagnose ill-formed requests that do not begin with namespace-colon; but 
-that we MUST require that the server ignores unknown but well-formed 
-requests rather than treating them as errors.
-
-But there is another alternative as well - instead of returning a 
-two-part string where colon is the separator, and where the server must 
-parse to locate the colon (or lack thereof), would it make sense to 
-instead change the NBD_OPT_{LIST,SET}_META_CONTEXT and 
-NBD_REP_META_CONTEXT field layout to have two separate length/strings 
-per context (first is length/string for namespace, second is 
-length/string for leaf name), where colon is no longer special (it is no 
-longer possible for a client to pass an ill-formed request that lacks 
-colon), and where the server can immediately tell that 'namespace_length 
-!= 5, therefore this is a request for a namespace I don't care about'?
-
-
-> -    These two fields MAY be repeated as much as is necessary to select all
-> -    metadata contexts the client is interested in.
-> +    - 32 bits, length of export name.
-> +    - String, name of export for which we wish to list metadata
-> +      contexts.
-> +    - 32 bits, number of queries
-> +    - Zero or more queries, each being:
-> +       - 32 bits, length of query
-> +       - String, query to select metadata contexts. The syntax of this
-> +         query is implementation-defined, except that it MUST start with a
-> +         namespace and a colon.
-> +
-
-Also, is 32 bits as the length of the query really necessary?  Given 
-that NBD strings are capped at 4k, a 16-bit length is sufficient.  It's 
-not like we have padding to get things to natural alignments (if it were 
-a matter of always sending 32-bit or 64-bit quantities on natural 
-alignments, we'd have padding in a lot more places).
-
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index d99e547..21713b7 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -23,6 +23,7 @@ struct NumaNodeMem {
+ 
+ extern NodeInfo numa_info[MAX_NODES];
+ void parse_numa_opts(MachineState *ms);
++void numa_complete_configuration(MachineState *ms);
+ void query_numa_node_mem(NumaNodeMem node_mem[]);
+ extern QemuOptsList qemu_numa_opts;
+ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 5d44583..7d014b0 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -715,7 +715,7 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
+     return g_string_free(s, false);
+ }
+ 
+-static void machine_numa_finish_init(MachineState *machine)
++static void machine_numa_finish_cpu_init(MachineState *machine)
+ {
+     int i;
+     bool default_mapping;
+@@ -770,7 +770,8 @@ void machine_run_board_init(MachineState *machine)
+     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
+ 
+     if (nb_numa_nodes) {
+-        machine_numa_finish_init(machine);
++        numa_complete_configuration(machine);
++        machine_numa_finish_cpu_init(machine);
+     }
+ 
+     /* If the machine supports the valid_cpu_types check and the user
+diff --git a/numa.c b/numa.c
+index 7e0e789..1b2820a 100644
+--- a/numa.c
++++ b/numa.c
+@@ -338,15 +338,11 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+     nodes[i].node_mem = size - usedmem;
+ }
+ 
+-void parse_numa_opts(MachineState *ms)
++void numa_complete_configuration(MachineState *ms)
+ {
+     int i;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+ 
+-    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+-        exit(1);
+-    }
+-
+     /*
+      * If memory hotplug is enabled (slots > 0) but without '-numa'
+      * options explicitly on CLI, guestes will break.
+@@ -433,6 +429,13 @@ void parse_numa_opts(MachineState *ms)
+     }
+ }
+ 
++void parse_numa_opts(MachineState *ms)
++{
++    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
++        exit(1);
++    }
++}
++
+ void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+ {
+     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.7.4
