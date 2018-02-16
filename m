@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoB1-0006yY-Te
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:25 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoAz-0006tW-2Z
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoAx-0005P1-BW
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41792
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoAu-0005Mh-CY
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:17 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59178
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1emoAx-0005OV-6U
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:15 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1emoAu-0005MN-6X
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:12 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1GM56Lg027121
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:14 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g642ng4w7-1
+	w1GM6TMp085959
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:11 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g63hs14gk-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:13 -0500
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:11 -0500
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Fri, 16 Feb 2018 17:08:12 -0500
+	Fri, 16 Feb 2018 17:08:10 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 16 Feb 2018 17:07:54 -0500
+Date: Fri, 16 Feb 2018 17:07:52 -0500
 In-Reply-To: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1518818879-18608-8-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v7 07/12] s390-ccw: set up interactive boot
- menu parameters
+Message-Id: <1518818879-18608-6-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v7 05/12] s390-ccw: move auxiliary IPL data to
+ separate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,149 +42,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Reads boot menu flag and timeout values from the iplb and
-sets the respective fields for the menu.
+The s390-ccw firmware needs some information in support of the
+boot process which is not available on the native machine.
+Examples are the netboot firmware load address and now the
+boot menu parameters.
 
+While storing that data in unused fields of the IPL parameter block
+works, that approach could create problems if the parameter block
+definition should change in the future. Because then a guest could
+overwrite these fields using the set IPLB diagnose.
+
+In fact the data in question is of more global nature and not really
+tied to an IPL device, so separating it is rather logical.
+
+This commit introduces a new structure to hold firmware relevant
+IPL parameters set by QEMU. The data is stored at location 204 (dec)
+and can contain up to 7 32-bit words. This area is available to
+programming in the z/Architecture Principles of Operation and
+can thus safely be used by the firmware until the IPL has completed.
+
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/Makefile |  2 +-
- pc-bios/s390-ccw/main.c   | 24 ++++++++++++++++++++++++
- pc-bios/s390-ccw/menu.c   | 26 ++++++++++++++++++++++++++
- pc-bios/s390-ccw/menu.h   | 23 +++++++++++++++++++++++
- 4 files changed, 74 insertions(+), 1 deletion(-)
- create mode 100644 pc-bios/s390-ccw/menu.c
- create mode 100644 pc-bios/s390-ccw/menu.h
+ hw/s390x/ipl.c          | 19 ++++++++++++++++++-
+ hw/s390x/ipl.h          | 19 +++++++++++++++++--
+ pc-bios/s390-ccw/iplb.h | 20 ++++++++++++++++++--
+ pc-bios/s390-ccw/main.c |  6 +++++-
+ 4 files changed, 58 insertions(+), 6 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 9f7904f..1712c2d 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- 
- .PHONY : all clean build-all
- 
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
-+OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index e41b264..c643a6b 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -11,6 +11,7 @@
- #include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
-+#include "menu.h"
- 
- char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- static SubChannelId blk_schid = { .one = 1 };
-@@ -18,6 +19,9 @@ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- 
-+#define LOADPARM_PROMPT "PROMPT  "
-+#define LOADPARM_EMPTY  "........"
-+
- /*
-  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
-  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
-@@ -74,6 +78,25 @@ static bool find_dev(Schib *schib, int dev_no)
-     return false;
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 0d06fc1..31565ce 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -399,6 +399,21 @@ void s390_reipl_request(void)
+     qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
  }
  
-+static void menu_setup(void)
++static void s390_ipl_prepare_qipl(S390CPU *cpu)
 +{
-+    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
-+        menu_set_parms(BOOT_MENU_FLAG_CMD_OPTS, 0);
-+        return;
-+    }
++    S390IPLState *ipl = get_ipl_device();
++    uint8_t *addr;
++    uint64_t len = 4096;
 +
-+    /* If loadparm was set to any other value, then do not enable menu */
-+    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
++    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
++    if (!addr || len < QIPL_ADDRESS + sizeof(QemuIplParameters)) {
++        error_report("Cannot set QEMU IPL parameters");
 +        return;
 +    }
-+
-+    switch (iplb.pbt) {
-+    case S390_IPL_TYPE_CCW:
-+        menu_set_parms(qipl.boot_menu_flags, qipl.boot_menu_timeout);
-+        return;
-+    }
++    memcpy(addr + QIPL_ADDRESS, &ipl->iplb.qipl, sizeof(QemuIplParameters));
++    cpu_physical_memory_unmap(addr, len, 1, len);
 +}
 +
- static void virtio_setup(void)
+ void s390_ipl_prepare_cpu(S390CPU *cpu)
  {
-     Schib schib;
-@@ -117,6 +140,7 @@ static void virtio_setup(void)
-         default:
-             panic("List-directed IPL not supported yet!\n");
+     S390IPLState *ipl = get_ipl_device();
+@@ -418,8 +433,10 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+             error_report_err(err);
+             vm_stop(RUN_STATE_INTERNAL_ERROR);
          }
-+        menu_setup();
+-        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
++        ipl->iplb.qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+     }
++    s390_ipl_prepare_qipl(cpu);
++
+ }
+ 
+ static void s390_ipl_reset(DeviceState *dev)
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 8a705e0..74469b1 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -16,8 +16,7 @@
+ #include "cpu.h"
+ 
+ struct IplBlockCcw {
+-    uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[85];
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -59,6 +58,21 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
+ 
+ #define DIAG308_FLAGS_LP_VALID 0x80
+ 
++#define QIPL_ADDRESS  0xcc
++
++/*
++ * The QEMU IPL Parameters will be stored 32-bit word aligned.
++ * Placement of data fields in this area must account for
++ * their alignment needs.
++ * The entire structure must not be larger than 28 bytes.
++ */
++struct QemuIplParameters {
++    uint8_t  reserved1[4];
++    uint64_t netboot_start_addr;
++    uint8_t  reserved2[16];
++} QEMU_PACKED;
++typedef struct QemuIplParameters QemuIplParameters;
++
+ union IplParameterBlock {
+     struct {
+         uint32_t len;
+@@ -74,6 +88,7 @@ union IplParameterBlock {
+             IplBlockFcp fcp;
+             IplBlockQemuScsi scsi;
+         };
++        QemuIplParameters qipl;
+     } QEMU_PACKED;
+     struct {
+         uint8_t  reserved1[110];
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 890aed9..a23237e 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -13,8 +13,7 @@
+ #define IPLB_H
+ 
+ struct IplBlockCcw {
+-    uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[85];
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -73,6 +72,23 @@ typedef struct IplParameterBlock IplParameterBlock;
+ 
+ extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ 
++#define QIPL_ADDRESS  0xcc
++
++/*
++ * The QEMU IPL Parameters will be stored 32-bit word aligned.
++ * Placement of data fields in this area must account for
++ * their alignment needs.
++ * The entire structure must not be larger than 28 bytes.
++ */
++struct QemuIplParameters {
++    uint8_t  reserved1[4];
++    uint64_t netboot_start_addr;
++    uint8_t  reserved2[16];
++} __attribute__ ((packed));
++typedef struct QemuIplParameters QemuIplParameters;
++
++extern QemuIplParameters qipl;
++
+ #define S390_IPL_TYPE_FCP 0x00
+ #define S390_IPL_TYPE_CCW 0x02
+ #define S390_IPL_TYPE_QEMU_SCSI 0xff
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index e857ce4..e41b264 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+ static SubChannelId blk_schid = { .one = 1 };
+ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
++QemuIplParameters qipl;
+ 
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+@@ -81,6 +82,7 @@ static void virtio_setup(void)
+     uint16_t dev_no;
+     char ldp[] = "LOADPARM=[________]\n";
+     VDev *vdev = virtio_get_device();
++    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+ 
+     /*
+      * We unconditionally enable mss support. In every sane configuration,
+@@ -93,6 +95,8 @@ static void virtio_setup(void)
+     memcpy(ldp + 10, loadparm, 8);
+     sclp_print(ldp);
+ 
++    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
++
+     if (store_iplb(&iplb)) {
+         switch (iplb.pbt) {
+         case S390_IPL_TYPE_CCW:
+@@ -127,7 +131,7 @@ static void virtio_setup(void)
+ 
+     if (virtio_get_device_type() == VIRTIO_ID_NET) {
+         sclp_print("Network boot device detected\n");
+-        vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
++        vdev->netboot_start_addr = qipl.netboot_start_addr;
      } else {
-         for (ssid = 0; ssid < 0x3; ssid++) {
-             blk_schid.ssid = ssid;
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-new file mode 100644
-index 0000000..3056cfc
---- /dev/null
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -0,0 +1,26 @@
-+/*
-+ * QEMU S390 Interactive Boot Menu
-+ *
-+ * Copyright 2018 IBM Corp.
-+ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "menu.h"
-+
-+static uint8_t flags;
-+static uint64_t timeout;
-+
-+void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
-+{
-+    flags = boot_menu_flag;
-+    timeout = boot_menu_timeout;
-+}
-+
-+int menu_check_flags(uint8_t check_flags)
-+{
-+    return flags & check_flags;
-+}
-diff --git a/pc-bios/s390-ccw/menu.h b/pc-bios/s390-ccw/menu.h
-new file mode 100644
-index 0000000..7df4114
---- /dev/null
-+++ b/pc-bios/s390-ccw/menu.h
-@@ -0,0 +1,23 @@
-+/*
-+ * QEMU S390 Interactive Boot Menu
-+ *
-+ * Copyright 2018 IBM Corp.
-+ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef MENU_H
-+#define MENU_H
-+
-+#include "libc.h"
-+
-+#define BOOT_MENU_FLAG_CMD_OPTS  0x80
-+#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
-+
-+void menu_set_parms(uint8_t boot_menu_flags, uint32_t boot_menu_timeout);
-+bool menu_check_flags(uint8_t check_flags);
-+
-+#endif /* MENU_H */
+         virtio_blk_setup_device(blk_schid);
+ 
 -- 
 2.7.4
