@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emiiV-00005E-0M
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:18:32 -0500
+	(envelope-from <thuth@redhat.com>) id 1emikC-0001KJ-TO
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emiiQ-0005XM-2W
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:18:30 -0500
-Date: Fri, 16 Feb 2018 16:18:07 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180216161806.GA22220@work-vm>
-References: <1513700253-10045-1-git-send-email-thuth@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1emik8-0006Z7-K6
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:20:16 -0500
+References: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1518735273-16089-7-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4ff97ab0-d848-05a4-9ac2-344bd67e73ef@redhat.com>
+Date: Fri, 16 Feb 2018 17:20:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1513700253-10045-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] monitor: Remove legacy "-mon default=on"
- parameter
+In-Reply-To: <1518735273-16089-7-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v6 06/12] s390-ccw: parse and
+ set boot menu options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> The "default" parameter of the "-mon" option is useless since
-> QEMU v2.4.0, and marked as deprecated since QEMU v2.8.0. That
-> should have been long enough to let people update their scripts,
-> so time to remove it now.
+On 15.02.2018 23:54, Collin L. Walling wrote:
+> Set boot menu options for an s390 guest and store them in
+> the iplb. These options are set via the QEMU command line
+> option:
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Queued for HMP (at last...)
-
-Dave
-
+>     -boot menu=on|off[,splash-time=X]
+> 
+> or via the libvirt domain xml:
+> 
+>     <os>
+>       <bootmenu enable='yes|no' timeout='X'/>
+>     </os>
+> 
+> Where X represents some positive integer representing
+> milliseconds.
+> 
+> Any value set for loadparm will override all boot menu options.
+> If loadparm=PROMPT, then the menu will be enabled without a
+> timeout.
+> 
+> The absence of any boot options on the command line will flag
+> to later use the zipl boot loader values.
+> 
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  monitor.c     | 3 ---
->  qemu-doc.texi | 9 ---------
->  vl.c          | 4 ----
->  3 files changed, 16 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index e36fb53..e53c6e1 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4141,9 +4141,6 @@ QemuOptsList qemu_mon_opts = {
->              .name = "chardev",
->              .type = QEMU_OPT_STRING,
->          },{
-> -            .name = "default",  /* deprecated */
-> -            .type = QEMU_OPT_BOOL,
-> -        },{
->              .name = "pretty",
->              .type = QEMU_OPT_BOOL,
->          },
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index d9861b3..6913b32 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2401,15 +2401,6 @@ setting ``-machine kernel_irqchip=off''.
->  The ``-no-kvm'' argument is now a synonym for setting
->  ``-machine accel=tcg''.
+>  hw/s390x/ipl.c          | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/ipl.h          |  9 +++++++--
+>  pc-bios/s390-ccw/iplb.h |  6 ++++--
+>  3 files changed, 59 insertions(+), 4 deletions(-)
+[....]
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index cab8a97..7c3cab8 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -60,10 +60,15 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
 >  
-> -@subsection -mon default=on (since 2.4.0)
-> -
-> -The ``default'' option to the ``-mon'' argument is
-> -now ignored. When multiple monitors were enabled, it
-> -indicated which monitor would receive log messages
-> -from the various subsystems. This feature is no longer
-> -required as messages are now only sent to the monitor
-> -in response to explicitly monitor commands.
-> -
->  @subsection -vnc tls (since 2.5.0)
+>  #define QIPL_ADDRESS  0xcc
 >  
->  The ``-vnc tls'' argument is now a synonym for setting
-> diff --git a/vl.c b/vl.c
-> index 2644400..4e7a7e4 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2438,10 +2438,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
->      if (qemu_opt_get_bool(opts, "pretty", 0))
->          flags |= MONITOR_USE_PRETTY;
->  
-> -    if (qemu_opt_get_bool(opts, "default", 0)) {
-> -        error_report("option 'default' does nothing and is deprecated");
-> -    }
-> -
->      chardev = qemu_opt_get(opts, "chardev");
->      chr = qemu_chr_find(chardev);
->      if (chr == NULL) {
-> -- 
-> 1.8.3.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +#define BOOT_MENU_FLAG_CMD_OPTS  0x80
+> +#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
+> +
+>  struct QemuIplParameters {
+> -    uint8_t  reserved1[4];
+> +    uint8_t  boot_menu_flags;
+> +    uint8_t  reserved1;
+> +    uint32_t boot_menu_timeout;
+>      uint64_t netboot_start_addr;
+
+The netboot_start_addr field is now never aligned anymore, neither on
+the host side, nor in guest memory. Not a big problem since the struct
+is declared with "QEMU_PACKED", but still ... it's always nicer to try
+to align fields to their natural boundaries. So maybe move
+boot_menu_flags and reserved1 after netboot_start_addr ?
+
+> -    uint8_t  reserved2[16];
+> +    uint8_t  reserved2[14];
+>  } QEMU_PACKED;
+>  typedef struct QemuIplParameters QemuIplParameters;
+
+ Thomas
