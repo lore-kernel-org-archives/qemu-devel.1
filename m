@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emfsQ-0001Ae-37
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:35 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emfsR-0001CT-Pd
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emfsP-0005aY-1U
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:34 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40598 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1emfsQ-0005bl-I4
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40600 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emfsO-0005aB-S2
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:32 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emfsQ-0005bQ-CR
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:34 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82C27EAE91
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:16:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0C2B2EAE91
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:16:34 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 16 Feb 2018 13:15:59 +0000
-Message-Id: <20180216131625.9639-4-dgilbert@redhat.com>
+Date: Fri, 16 Feb 2018 13:16:00 +0000
+Message-Id: <20180216131625.9639-5-dgilbert@redhat.com>
 In-Reply-To: <20180216131625.9639-1-dgilbert@redhat.com>
 References: <20180216131625.9639-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 03/29] postcopy: use UFFDIO_ZEROPAGE only
- when available
+Subject: [Qemu-devel] [PATCH v3 04/29] postcopy: Add notifier chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,98 +34,144 @@ Cc: quintela@redhat.com, aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Use a flag on the RAMBlock to state whether it has the
-UFFDIO_ZEROPAGE capability, use it when it's available.
+Add a notifier chain for postcopy with a 'reason' flag
+and an opportunity for a notifier member to return an error.
 
-This allows the use of postcopy on tmpfs as well as hugepage
-backed files.
+Call it when enabling postcopy.
+
+This will initially used to enable devices to declare they're unable
+to postcopy and later to notify of devices of stages within postcopy.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- exec.c                    | 15 +++++++++++++++
- include/exec/cpu-common.h |  3 +++
- migration/postcopy-ram.c  | 13 ++++++++++---
- 3 files changed, 28 insertions(+), 3 deletions(-)
+ migration/postcopy-ram.c | 36 ++++++++++++++++++++++++++++++++++++
+ migration/postcopy-ram.h | 26 ++++++++++++++++++++++++++
+ vl.c                     |  2 ++
+ 3 files changed, 64 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index 0ec73bc917..1dc15298c2 100644
---- a/exec.c
-+++ b/exec.c
-@@ -99,6 +99,11 @@ static MemoryRegion io_mem_unassigned;
-  */
- #define RAM_RESIZEABLE (1 << 2)
- 
-+/* UFFDIO_ZEROPAGE is available on this RAMBlock to atomically
-+ * zero the page and wake waiting processes.
-+ * (Set during postcopy)
-+ */
-+#define RAM_UF_ZEROPAGE (1 << 3)
- #endif
- 
- #ifdef TARGET_PAGE_BITS_VARY
-@@ -1767,6 +1772,16 @@ bool qemu_ram_is_shared(RAMBlock *rb)
-     return rb->flags & RAM_SHARED;
- }
- 
-+bool qemu_ram_is_uf_zeroable(RAMBlock *rb)
-+{
-+    return rb->flags & RAM_UF_ZEROPAGE;
-+}
-+
-+void qemu_ram_set_uf_zeroable(RAMBlock *rb)
-+{
-+    rb->flags |= RAM_UF_ZEROPAGE;
-+}
-+
- /* Called with iothread lock held.  */
- void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
- {
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 0d861a6289..24d335f95d 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -73,6 +73,9 @@ void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
- void qemu_ram_unset_idstr(RAMBlock *block);
- const char *qemu_ram_get_idstr(RAMBlock *rb);
- bool qemu_ram_is_shared(RAMBlock *rb);
-+bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
-+void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-+
- size_t qemu_ram_pagesize(RAMBlock *block);
- size_t qemu_ram_pagesize_largest(void);
- 
 diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index bec6c2c66b..6297979700 100644
+index 6297979700..fa98cf353b 100644
 --- a/migration/postcopy-ram.c
 +++ b/migration/postcopy-ram.c
-@@ -490,6 +490,10 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
-         error_report("%s userfault: Region doesn't support COPY", __func__);
-         return -1;
+@@ -23,6 +23,8 @@
+ #include "savevm.h"
+ #include "postcopy-ram.h"
+ #include "ram.h"
++#include "qapi/error.h"
++#include "qemu/notify.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/balloon.h"
+ #include "qemu/error-report.h"
+@@ -45,6 +47,33 @@ struct PostcopyDiscardState {
+     unsigned int nsentcmds;
+ };
+ 
++static NotifierWithReturnList postcopy_notifier_list;
++
++void postcopy_infrastructure_init(void)
++{
++    notifier_with_return_list_init(&postcopy_notifier_list);
++}
++
++void postcopy_add_notifier(NotifierWithReturn *nn)
++{
++    notifier_with_return_list_add(&postcopy_notifier_list, nn);
++}
++
++void postcopy_remove_notifier(NotifierWithReturn *n)
++{
++    notifier_with_return_remove(n);
++}
++
++int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
++{
++    struct PostcopyNotifyData pnd;
++    pnd.reason = reason;
++    pnd.errp = errp;
++
++    return notifier_with_return_list_notify(&postcopy_notifier_list,
++                                            &pnd);
++}
++
+ /* Postcopy needs to detect accesses to pages that haven't yet been copied
+  * across, and efficiently map new pages in, the techniques for doing this
+  * are target OS specific.
+@@ -215,6 +244,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+     struct uffdio_register reg_struct;
+     struct uffdio_range range_struct;
+     uint64_t feature_mask;
++    Error *local_err = NULL;
+ 
+     if (qemu_target_page_size() > pagesize) {
+         error_report("Target page size bigger than host page size");
+@@ -228,6 +258,12 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+         goto out;
      }
-+    if (reg_struct.ioctls & ((__u64)1 << _UFFDIO_ZEROPAGE)) {
-+        RAMBlock *rb = qemu_ram_block_by_name(block_name);
-+        qemu_ram_set_uf_zeroable(rb);
+ 
++    /* Give devices a chance to object */
++    if (postcopy_notify(POSTCOPY_NOTIFY_PROBE, &local_err)) {
++        error_report_err(local_err);
++        goto out;
 +    }
++
+     /* Version and features check */
+     if (!ufd_check_and_apply(ufd, mis)) {
+         goto out;
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 77ea0fd264..1eaf7975e9 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -114,4 +114,30 @@ PostcopyState postcopy_state_get(void);
+ /* Set the state and return the old state */
+ PostcopyState postcopy_state_set(PostcopyState new_state);
  
-     return 0;
- }
-@@ -699,11 +703,14 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-                              RAMBlock *rb)
- {
-+    size_t pagesize = qemu_ram_pagesize(rb);
-     trace_postcopy_place_page_zero(host);
++/*
++ * To be called once at the start before any device initialisation
++ */
++void postcopy_infrastructure_init(void);
++
++/* Add a notifier to a list to be called when checking whether the devices
++ * can support postcopy.
++ * It's data is a *PostcopyNotifyData
++ * It should return 0 if OK, or a negative value on failure.
++ * On failure it must set the data->errp to an error.
++ *
++ */
++enum PostcopyNotifyReason {
++    POSTCOPY_NOTIFY_PROBE = 0,
++};
++
++struct PostcopyNotifyData {
++    enum PostcopyNotifyReason reason;
++    Error **errp;
++};
++
++void postcopy_add_notifier(NotifierWithReturn *nn);
++void postcopy_remove_notifier(NotifierWithReturn *n);
++/* Call the notifier list set by postcopy_add_start_notifier */
++int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
++
+ #endif
+diff --git a/vl.c b/vl.c
+index 7a5554bc41..a092b3c6c6 100644
+--- a/vl.c
++++ b/vl.c
+@@ -94,6 +94,7 @@ int main(int argc, char **argv)
+ #include "audio/audio.h"
+ #include "sysemu/cpus.h"
+ #include "migration/colo.h"
++#include "migration/postcopy-ram.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
+ #include "qapi/qobject-input-visitor.h"
+@@ -3119,6 +3120,7 @@ int main(int argc, char **argv, char **envp)
+     module_call_init(MODULE_INIT_OPTS);
  
--    if (qemu_ram_pagesize(rb) == getpagesize()) {
--        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize(),
--                                rb)) {
-+    /* Normal RAMBlocks can zero a page using UFFDIO_ZEROPAGE
-+     * but it's not available for everything (e.g. hugetlbpages)
-+     */
-+    if (qemu_ram_is_uf_zeroable(rb)) {
-+        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, pagesize, rb)) {
-             int e = errno;
-             error_report("%s: %s zero host: %p",
-                          __func__, strerror(e), host);
+     runstate_init();
++    postcopy_infrastructure_init();
+ 
+     if (qcrypto_init(&err) < 0) {
+         error_reportf_err(err, "cannot initialize crypto: ");
 -- 
 2.14.3
