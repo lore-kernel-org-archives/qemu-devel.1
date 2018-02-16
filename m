@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1embey-0003nJ-2u
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:46:27 -0500
+	(envelope-from <clg@kaod.org>) id 1embf1-0003rm-CZ
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:46:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1embew-0000pK-QB
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:46:24 -0500
-Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:48566)
+	(envelope-from <clg@kaod.org>) id 1embez-0000rD-P4
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:46:27 -0500
+Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:53074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1embew-0000js-GT
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:46:22 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1embez-0000qd-Ir
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:46:25 -0500
 Received: from player778.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 7D13FAFFBD
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 09:46:12 +0100 (CET)
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 5091EAFFBA
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 09:46:24 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 16 Feb 2018 09:45:02 +0100
-Message-Id: <20180216084504.24958-2-clg@kaod.org>
+Date: Fri, 16 Feb 2018 09:45:04 +0100
+Message-Id: <20180216084504.24958-4-clg@kaod.org>
 In-Reply-To: <20180216084504.24958-1-clg@kaod.org>
 References: <20180216084504.24958-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/3] target/ppc: add basic support for PTCR
- on POWER9
+Subject: [Qemu-devel] [PATCH v2 3/3] target/ppc: generalize check on radix
+ when in HV mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,208 +33,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The Partition Table Control Register (PTCR) is a hypervisor privileged
-SPR. It contains the host real address of the Partition Table and its
-size.
+On a POWER9 processor, the first doubleword of the partition table
+entry (as pointed to by the PTCR) indicates whether the host uses HPT
+or Radix Tree translation for that partition. Use that bit to check
+for radix mode on pseries and powernv QEMU machines.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
-
  Changes since v1:
 
- - renamed partition table definitions to match ISA
- - moved definitions under mmu-book3s-v3.h
+ - fixed commit log
+ - introduced ppc64_v3_get_patbe0()
+ - renamed ppc64_radix() in ppc64_v3_radix()
 =20
- target/ppc/cpu.h            |  2 ++
- target/ppc/helper.h         |  1 +
- target/ppc/misc_helper.c    | 12 ++++++++++++
- target/ppc/mmu-book3s-v3.h  |  6 ++++++
- target/ppc/mmu_helper.c     | 28 ++++++++++++++++++++++++++++
- target/ppc/translate.c      |  3 +++
- target/ppc/translate_init.c | 18 ++++++++++++++++++
- 7 files changed, 70 insertions(+)
+ target/ppc/mmu-book3s-v3.c  | 16 +++++++++++++++-
+ target/ppc/mmu-book3s-v3.h  | 11 +++--------
+ target/ppc/mmu_helper.c     |  4 ++--
+ target/ppc/translate_init.c |  2 +-
+ 4 files changed, 21 insertions(+), 12 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 9f8cbbe7aa4d..53061229a0a8 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1314,6 +1314,7 @@ int ppc_cpu_handle_mmu_fault(CPUState *cpu, vaddr a=
-ddress, int size, int rw,
+diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
+index b60df4408f3b..9d05e07ef6bd 100644
+--- a/target/ppc/mmu-book3s-v3.c
++++ b/target/ppc/mmu-book3s-v3.c
+@@ -23,10 +23,24 @@
+ #include "mmu-book3s-v3.h"
+ #include "mmu-radix64.h"
 =20
- #if !defined(CONFIG_USER_ONLY)
- void ppc_store_sdr1 (CPUPPCState *env, target_ulong value);
-+void ppc_store_ptcr(CPUPPCState *env, target_ulong value);
- #endif /* !defined(CONFIG_USER_ONLY) */
- void ppc_store_msr (CPUPPCState *env, target_ulong value);
-=20
-@@ -1605,6 +1606,7 @@ void ppc_compat_add_property(Object *obj, const cha=
-r *name,
- #define SPR_BOOKE_GIVOR13     (0x1BC)
- #define SPR_BOOKE_GIVOR14     (0x1BD)
- #define SPR_TIR               (0x1BE)
-+#define SPR_PTCR              (0x1D0)
- #define SPR_BOOKE_SPEFSCR     (0x200)
- #define SPR_Exxx_BBEAR        (0x201)
- #define SPR_Exxx_BBTAR        (0x202)
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 5b739179b8b5..19453c68138a 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -709,6 +709,7 @@ DEF_HELPER_FLAGS_1(load_601_rtcu, TCG_CALL_NO_RWG, tl=
-, env)
- #if !defined(CONFIG_USER_ONLY)
- #if defined(TARGET_PPC64)
- DEF_HELPER_FLAGS_1(load_purr, TCG_CALL_NO_RWG, tl, env)
-+DEF_HELPER_2(store_ptcr, void, env, tl)
- #endif
- DEF_HELPER_2(store_sdr1, void, env, tl)
- DEF_HELPER_2(store_pidr, void, env, tl)
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index 0e4217821b8e..8c8cba5cc6f1 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -88,6 +88,18 @@ void helper_store_sdr1(CPUPPCState *env, target_ulong =
-val)
-     }
- }
-=20
-+#if defined(TARGET_PPC64)
-+void helper_store_ptcr(CPUPPCState *env, target_ulong val)
++bool ppc64_v3_radix(PowerPCCPU *cpu)
 +{
-+    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
++    CPUPPCState *env =3D &cpu->env;
 +
-+    if (env->spr[SPR_PTCR] !=3D val) {
-+        ppc_store_ptcr(env, val);
-+        tlb_flush(CPU(cpu));
++    if (msr_hv) {
++        return ppc64_v3_get_patbe0(cpu) & PATBE0_HR;
++    } else  {
++        PPCVirtualHypervisorClass *vhc =3D
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++
++        return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
 +    }
 +}
-+#endif /* defined(TARGET_PPC64) */
 +
- void helper_store_pidr(CPUPPCState *env, target_ulong val)
+ int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                               int mmu_idx)
  {
-     PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+-    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
++    if (ppc64_v3_radix(cpu)) { /* radix mode */
+         return ppc_radix64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
+     } else { /* Guest uses hash */
+         return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
 diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-index 56095dab522c..fdf80987d7b2 100644
+index a7ab580c3140..a12bb1e28b45 100644
 --- a/target/ppc/mmu-book3s-v3.h
 +++ b/target/ppc/mmu-book3s-v3.h
-@@ -22,6 +22,12 @@
-=20
- #ifndef CONFIG_USER_ONLY
-=20
-+/*
-+ * Partition table definitions
-+ */
-+#define PTCR_PATB               0x0FFFFFFFFFFFF000ULL /* Partition Table=
- Base */
-+#define PTCR_PATS               0x000000000000001FULL /* Partition Table=
+@@ -29,7 +29,8 @@
+ #define PTCR_PATS               0x000000000000001FULL /* Partition Table=
  Size */
-+
- /* Partition Table Entry Fields */
- #define PATBE1_GR 0x8000000000000000
 =20
+ /* Partition Table Entry Fields */
+-#define PATBE1_GR 0x8000000000000000
++#define PATBE0_HR               PPC_BIT(0)            /* 1:Host Radix 0:=
+HPT   */
++#define PATBE1_GR               PPC_BIT(0)            /* 1:Guest Radix 0=
+:HPT  */
+=20
+ /* Process Table Entry */
+ struct prtb_entry {
+@@ -43,13 +44,7 @@ static inline bool ppc64_use_proc_tbl(PowerPCCPU *cpu)
+     return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
+ }
+=20
+-static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
+-{
+-    PPCVirtualHypervisorClass *vhc =3D
+-        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+-
+-    return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
+-}
++bool ppc64_v3_radix(PowerPCCPU *cpu);
+=20
+ int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                               int mmu_idx);
 diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index 5568d1642b34..82e63552f617 100644
+index 82e63552f617..81a43982e421 100644
 --- a/target/ppc/mmu_helper.c
 +++ b/target/ppc/mmu_helper.c
-@@ -2028,6 +2028,34 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong=
- value)
-     env->spr[SPR_SDR1] =3D value;
- }
-=20
-+#if defined(TARGET_PPC64)
-+void ppc_store_ptcr(CPUPPCState *env, target_ulong value)
-+{
-+    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-+    qemu_log_mask(CPU_LOG_MMU, "%s: " TARGET_FMT_lx "\n", __func__, valu=
-e);
-+
-+    assert(!cpu->vhyp);
-+
-+    if (env->mmu_model & POWERPC_MMU_V3) {
-+        target_ulong ptcr_mask =3D PTCR_PATB | PTCR_PATS;
-+        target_ulong ptas =3D value & PTCR_PATS;
-+
-+        if (value & ~ptcr_mask) {
-+            error_report("Invalid bits 0x"TARGET_FMT_lx" set in PTCR",
-+                         value & ~ptcr_mask);
-+            value &=3D ptcr_mask;
-+        }
-+        if (ptas > 28) {
-+            error_report("Invalid PTAS 0x" TARGET_FMT_lx" stored in PTCR=
-",
-+                         ptas);
-+            return;
-+        }
-+    }
-+    env->spr[SPR_PTCR] =3D value;
-+}
-+
-+#endif /* defined(TARGET_PPC64) */
-+
- /* Segment registers load and store */
- target_ulong helper_load_sr(CPUPPCState *env, target_ulong sr_num)
- {
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 0a0c090c9978..58684d249ed9 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7131,6 +7131,9 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fpri=
-ntf_function cpu_fprintf,
-         if (env->spr_cb[SPR_SDR1].name) { /* SDR1 Exists */
-             cpu_fprintf(f, " SDR1 " TARGET_FMT_lx " ", env->spr[SPR_SDR1=
-]);
-         }
-+        if (env->spr_cb[SPR_PTCR].name) { /* PTCR Exists */
-+            cpu_fprintf(f, " PTCR " TARGET_FMT_lx " ", env->spr[SPR_PTCR=
-]);
-+        }
-         cpu_fprintf(f, "  DAR " TARGET_FMT_lx "  DSISR " TARGET_FMT_lx "=
-\n",
-                     env->spr[SPR_DAR], env->spr[SPR_DSISR]);
+@@ -1285,7 +1285,7 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprintf=
+, CPUPPCState *env)
+         dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
          break;
+     case POWERPC_MMU_VER_3_00:
+-        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
++        if (ppc64_v3_radix(ppc_env_get_cpu(env))) {
+             /* TODO - Unsupported */
+         } else {
+             dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+@@ -1431,7 +1431,7 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, va=
+ddr addr)
+     case POWERPC_MMU_VER_2_07:
+         return ppc_hash64_get_phys_page_debug(cpu, addr);
+     case POWERPC_MMU_VER_3_00:
+-        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
++        if (ppc64_v3_radix(ppc_env_get_cpu(env))) {
+             return ppc_radix64_get_phys_page_debug(cpu, addr);
+         } else {
+             return ppc_hash64_get_phys_page_debug(cpu, addr);
 diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index cbaa343e040d..c998ac2ee405 100644
+index c998ac2ee405..21d5dcd15386 100644
 --- a/target/ppc/translate_init.c
 +++ b/target/ppc/translate_init.c
-@@ -419,6 +419,11 @@ static void spr_write_hior(DisasContext *ctx, int sp=
-rn, int gprn)
-     tcg_gen_st_tl(t0, cpu_env, offsetof(CPUPPCState, excp_prefix));
-     tcg_temp_free(t0);
- }
-+static void spr_write_ptcr(DisasContext *ctx, int sprn, int gprn)
-+{
-+    gen_helper_store_ptcr(cpu_env, cpu_gpr[gprn]);
-+}
-+
- #endif
- #endif
-=20
-@@ -8166,6 +8171,18 @@ static void gen_spr_power8_rpr(CPUPPCState *env)
- #endif
- }
-=20
-+/* Page Table */
-+static void gen_spr_power9_ptcr(CPUPPCState *env)
-+{
-+#if !defined(CONFIG_USER_ONLY)
-+    spr_register_hv(env, SPR_PTCR, "PTCR",
-+                    SPR_NOACCESS, SPR_NOACCESS,
-+                    SPR_NOACCESS, SPR_NOACCESS,
-+                    &spr_read_generic, &spr_write_ptcr,
-+                    0x00000000);
-+#endif
-+}
-+
- static void init_proc_book3s_common(CPUPPCState *env)
- {
-     gen_spr_ne_601(env);
-@@ -8758,6 +8775,7 @@ static void init_proc_POWER9(CPUPPCState *env)
-     gen_spr_power8_ic(env);
-     gen_spr_power8_book4(env);
-     gen_spr_power8_rpr(env);
-+    gen_spr_power9_ptcr(env);
-=20
-     /* POWER9 Specific registers */
-     spr_register_kvm(env, SPR_TIDR, "TIDR", NULL, NULL,
+@@ -8967,7 +8967,7 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHy=
+pervisor *vhyp)
+          * KVM but not under TCG. Update the default LPCR to keep new
+          * CPUs in sync when radix is enabled.
+          */
+-        if (ppc64_radix_guest(cpu)) {
++        if (ppc64_v3_radix(cpu)) {
+             lpcr->default_value |=3D LPCR_UPRT | LPCR_GTSE;
+         } else {
+             lpcr->default_value &=3D ~(LPCR_UPRT | LPCR_GTSE);
 --=20
 2.13.6
