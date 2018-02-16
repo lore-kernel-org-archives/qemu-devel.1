@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emjvR-00081y-6Q
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:35:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1emjxK-0001Kr-P5
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1emjvQ-0004MU-AY
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:35:57 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-5-git-send-email-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <460473c8-8970-0bc3-0055-b50f60af2445@redhat.com>
-Date: Fri, 16 Feb 2018 11:35:41 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1emjxJ-00050I-VG
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:37:54 -0500
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:41272)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1emjxJ-000504-PT
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:37:53 -0500
+Received: by mail-oi0-x22e.google.com with SMTP id t145so2846984oif.8
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 09:37:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1518702707-7077-5-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/9] block/nbd-client: save first fatal
- error in nbd_iter_error
+In-Reply-To: <c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
+References: <20180216164620.GA53727@humpty.home.comstyle.com>
+	<c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Feb 2018 17:37:32 +0000
+Message-ID: <CAFEAcA9ZtLWzGZvF7O8WxJzoYghJwCa-EMMNqdk6YNpkvuaeEg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as a OpenBSD
+ maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +31,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Brad Smith <brad@comstyle.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> It is ok, that fatal error hides previous not fatal, but hiding
-> first fatal error is a bad feature.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/nbd-client.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+On 16 February 2018 at 17:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> But before announcing the host OS being supported again, I'd rather see
+> reproducible build/tests logs, in a (public - if possible) continuous
+> integration system. Else it is hard to notice when it get broken.
 
-Can this trigger in 2.11 clients with structured reads to the point 
-where we'd want to add qemu-stable in CC?  Or did you only hit it once 
-block_status was added to the mix?
+I do include OpenBSD in my set of build/tests for merges.
 
-Note that comparing 2.11 server with 2.11 client doesn't help - because 
-2.11 as server only sends a single chunk per structured read (as the 
-only structured reply); it wasn't until commit 418638d3 that we have a 
-qemu server that can send multiple chunks, and it looks like you need 
-multiple chunks before multiple errors becomes a possibility.
-
-At any rate,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
