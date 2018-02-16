@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1emn8y-0004kT-64
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1emn9D-0004sg-O9
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1emn8w-000648-U0
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:08 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:42809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1emn8w-00062c-HY
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:06 -0500
-Received: by mail-lf0-x244.google.com with SMTP id t204so3109215lff.9
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:02:06 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1emn9C-000668-KX
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 16:02:23 -0500
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<1518702707-7077-10-git-send-email-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8e580b8b-1614-9c83-4ac9-48f5d3cff3dc@redhat.com>
+Date: Fri, 16 Feb 2018 15:02:15 -0600
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180215220540.6556-3-f4bug@amsat.org>
-References: <20180215220540.6556-1-f4bug@amsat.org>
-	<20180215220540.6556-3-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 16 Feb 2018 13:01:34 -0800
-Message-ID: <CAKmqyKMdd+Qd-ejgAYSc5Fe0om+dZ_oK+A6xbSEV==4aY1onfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] sdcard: replace DPRINTF() by
- trace events
+In-Reply-To: <1518702707-7077-10-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 9/9] iotests: new test 206 for NBD
+ BLOCK_STATUS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,142 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Thu, Feb 15, 2018 at 2:05 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Alistair
-
+On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  hw/sd/sd.c         | 32 ++++++++++++++++++++++++++------
->  hw/sd/trace-events |  6 ++++++
->  2 files changed, 32 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index ce1f2fdf76..72e9b47e34 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -40,6 +40,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/timer.h"
->  #include "qemu/log.h"
-> +#include "trace.h"
->
->  //#define DEBUG_SD 1
->
-> @@ -132,6 +133,26 @@ struct SDState {
->      bool cmd_line;
->  };
->
-> +static const char *sd_state_name(enum SDCardStates state)
-> +{
-> +    static const char *state_name[] =3D {
-> +        [sd_idle_state]             =3D "idle",
-> +        [sd_ready_state]            =3D "ready",
-> +        [sd_identification_state]   =3D "identification",
-> +        [sd_standby_state]          =3D "standby",
-> +        [sd_transfer_state]         =3D "transfer",
-> +        [sd_sendingdata_state]      =3D "sendingdata",
-> +        [sd_receivingdata_state]    =3D "receivingdata",
-> +        [sd_programming_state]      =3D "programming",
-> +        [sd_disconnect_state]       =3D "disconnect",
-> +    };
-> +    if (state =3D=3D sd_inactive_state) {
-> +        return "inactive";
-> +    }
-> +    assert(state <=3D ARRAY_SIZE(state_name));
-> +    return state_name[state];
-> +}
+>   tests/qemu-iotests/206     | 34 ++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/206.out |  2 ++
+>   tests/qemu-iotests/group   |  1 +
+>   3 files changed, 37 insertions(+)
+>   create mode 100644 tests/qemu-iotests/206
+>   create mode 100644 tests/qemu-iotests/206.out
+
+It's a race! Kevin already has test 206 and 207 claimed in his pending 
+series:
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02363.html
+Whoever loses gets to rebase and renumber (or the maintainer on their 
+behalf) ;)
+
+> 
+> diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+> new file mode 100644
+
+Oops, you forgot to mark this executable.  And oops, I forgot to flag 
+that on test 205.  Other inconsistent tests: 096, 124, 129, 132, 136, 
+139, 148, 152, 163. Separate cleanup patch coming up soon.
+
+> index 0000000000..259e991ec6
+> --- /dev/null
+> +++ b/tests/qemu-iotests/206
+> @@ -0,0 +1,34 @@
+> +#!/usr/bin/env python
+> +#
+> +# Tests for NBD BLOCK_STATUS extension
+> +#
+
+> +import iotests
+> +from iotests import qemu_img_create, qemu_io, qemu_img_verbose, qemu_nbd, \
+> +                    file_path
 > +
->  static uint8_t sd_get_dat_lines(SDState *sd)
->  {
->      return sd->enable ? sd->dat_lines : 0;
-> @@ -776,6 +797,8 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->      uint32_t rca =3D 0x0000;
->      uint64_t addr =3D (sd->ocr & (1 << 30)) ? (uint64_t) req.arg << 9 : =
-req.arg;
->
-> +    trace_sdcard_normal_command(req.cmd, req.arg, sd_state_name(sd->stat=
-e));
+> +iotests.verify_image_format(supported_fmts=['qcow2'])
+
+Don't we also need to blacklist v2 files (and only operate on v3 or 
+newer), since the behavior of zero clusters is much worse on v2 images?
+
 > +
->      /* Not interpreting this as an app command */
->      sd->card_status &=3D ~APP_CMD;
->
-> @@ -790,7 +813,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->          sd->multi_blk_cnt =3D 0;
->      }
->
-> -    DPRINTF("CMD%d 0x%08x state %d\n", req.cmd, req.arg, sd->state);
->      switch (req.cmd) {
->      /* Basic commands (Class 0 and Class 1) */
->      case 0:    /* CMD0:   GO_IDLE_STATE */
-> @@ -1310,8 +1332,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->          return sd_r1;
->
->      case 56:   /* CMD56:  GEN_CMD */
-> -        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
-> -
->          switch (sd->state) {
->          case sd_transfer_state:
->              sd->data_offset =3D 0;
-> @@ -1345,7 +1365,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->  static sd_rsp_type_t sd_app_command(SDState *sd,
->                                      SDRequest req)
->  {
-> -    DPRINTF("ACMD%d 0x%08x\n", req.cmd, req.arg);
-> +    trace_sdcard_app_command(req.cmd, req.arg);
->      sd->card_status |=3D APP_CMD;
->      switch (req.cmd) {
->      case 6:    /* ACMD6:  SET_BUS_WIDTH */
-> @@ -1606,8 +1626,7 @@ send_response:
->
->  static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
->  {
-> -    DPRINTF("sd_blk_read: addr =3D 0x%08llx, len =3D %d\n",
-> -            (unsigned long long) addr, len);
-> +    trace_sdcard_read_block(addr, len);
->      if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
->          fprintf(stderr, "sd_blk_read: read error on host side\n");
->      }
-> @@ -1615,6 +1634,7 @@ static void sd_blk_read(SDState *sd, uint64_t addr,=
- uint32_t len)
->
->  static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
->  {
-> +    trace_sdcard_write_block(addr, len);
->      if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
->          fprintf(stderr, "sd_blk_write: write error on host side\n");
->      }
-> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-> index 0f8536db32..75dac5a2cd 100644
-> --- a/hw/sd/trace-events
-> +++ b/hw/sd/trace-events
-> @@ -23,6 +23,12 @@ sdhci_read_dataport(uint16_t data_count) "all %u bytes=
- of data have been read fr
->  sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u b=
-ytes of data"
->  sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
->
-> +# hw/sd/sd.c
-> +sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD=
-%d arg 0x%08x (state %s)"
-> +sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
-> +sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size =
-0x%x"
-> +sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size=
- 0x%x"
+> +disk, nbd_sock = file_path('disk', 'nbd-sock')
+> +nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
 > +
->  # hw/sd/milkymist-memcard.c
->  milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08=
-x value 0x%08x"
->  milkymist_memcard_memory_write(uint32_t addr, uint32_t value) "addr 0x%0=
-8x value 0x%08x"
-> --
-> 2.16.1
->
->
+> +qemu_img_create('-f', iotests.imgfmt, disk, '1M')
+> +qemu_io('-f', iotests.imgfmt, '-c', 'write 0 512K', disk)
+
+Hopefully large enough for all the major filesystems with sparse support 
+to show half-data, half-hole, and not run into any weird issues where 
+granularity differences between filesystems change the outcome.
+
+> +
+> +qemu_nbd('-k', nbd_sock, '-x', 'exp', '-f', iotests.imgfmt, disk)
+> +qemu_img_verbose('map', '-f', 'raw', '--output=json', nbd_uri)
+> diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
+> new file mode 100644
+> index 0000000000..0d29724e84
+> --- /dev/null
+> +++ b/tests/qemu-iotests/206.out
+> @@ -0,0 +1,2 @@
+> +[{ "start": 0, "length": 524288, "depth": 0, "zero": false, "data": true},
+> +{ "start": 524288, "length": 524288, "depth": 0, "zero": true, "data": false}]
+
+But definite evidence of getting block status over NBD! Progress!
+
+And kudos for producing an .out file that I can actually read and 
+reproduce without the aid of python (in contrast to the more 
+"unit-test"-y ones like 205, where we had a big long side-discussion 
+about that. No need to repeat it here).
+
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index a2dfe79d86..2c3925566a 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -202,3 +202,4 @@
+>   203 rw auto
+>   204 rw auto quick
+>   205 rw auto quick
+> +206 rw auto quick
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
