@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emmV2-0001NH-Jh
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:20:54 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1emmml-0000DR-J8
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:39:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emmV1-0008Tg-Cf
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:20:52 -0500
-Date: Fri, 16 Feb 2018 20:20:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180216202020.GG2308@work-vm>
-References: <20170919143829.GH2107@work-vm>
-	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
-	<20170919144130.GI2107@work-vm>
-	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
-	<20170921123625.GE2717@work-vm>
-	<b7f1d6ec-9511-ef3d-80d1-c52cf8adfc24@kamp.de>
-	<20171212170533.GG2409@work-vm>
-	<8ed6cb1e-4770-21ec-164e-7142e649eab3@kamp.de>
-	<20180207182930.GV2665@work-vm>
-	<66CC7380-04E1-4656-A9BF-F075FC109C94@kamp.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <66CC7380-04E1-4656-A9BF-F075FC109C94@kamp.de>
-Subject: Re: [Qemu-devel] Block Migration and CPU throttling
+	(envelope-from <programmingkidx@gmail.com>) id 1emmmi-0001y9-BJ
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:39:11 -0500
+Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:37603)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1emmmi-0001xl-3d
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:39:08 -0500
+Received: by mail-it0-x22a.google.com with SMTP id d10so3279159itj.2
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 12:39:07 -0800 (PST)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Fri, 16 Feb 2018 15:38:56 -0500
+Message-Id: <20180216203856.8645-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH v7] ui/cocoa.m: Add ability for user to specify
+ mouse ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,132 +25,532 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
+To: kraxel@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-* Peter Lieven (pl@kamp.de) wrote:
->=20
-> > Am 07.02.2018 um 19:29 schrieb Dr. David Alan Gilbert <dgilbert@redhat.=
-com>:
-> >=20
-> > * Peter Lieven (pl@kamp.de) wrote:
-> >> Am 12.12.2017 um 18:05 schrieb Dr. David Alan Gilbert:
-> >>> * Peter Lieven (pl@kamp.de) wrote:
-> >>>> Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
-> >>>>> * Peter Lieven (pl@kamp.de) wrote:
-> >>>>>> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
-> >>>>>>> * Peter Lieven (pl@kamp.de) wrote:
-> >>>>>>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
-> >>>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
-> >>>>>>>>>> Hi,
-> >>>>>>>>>>=20
-> >>>>>>>>>> I just noticed that CPU throttling and Block Migration don't w=
-ork together very well.
-> >>>>>>>>>> During block migration the throttling heuristic detects that w=
-e obviously make no progress
-> >>>>>>>>>> in ram transfer. But the reason is the running block migration=
- and not a too high dirty pages rate.
-> >>>>>>>>>>=20
-> >>>>>>>>>> The result is that any VM is throttled by 99% during block mig=
-ration.
-> >>>>>>>>> Hmm that's unfortunate; do you have a bandwidth set lower than =
-your
-> >>>>>>>>> actual network connection? I'm just wondering if it's actually =
-going
-> >>>>>>>>> between the block and RAM iterative sections or getting stuck i=
-n ne.
-> >>>>>>>> It happens also if source and dest are on the same machine and s=
-peed is set to 100G.
-> >>>>>>> But does it happen if they're not and the speed is set low?
-> >>>>>> Yes, it does. I noticed it in our test environment between differe=
-nt nodes with a 10G
-> >>>>>> link in between. But its totally clear why it happens. During bloc=
-k migration we transfer
-> >>>>>> all dirty memory pages in each round (if there is moderate memory =
-load), but all dirty
-> >>>>>> pages are obviously more than 50% of the transferred ram in that r=
-ound.
-> >>>>>> It is more exactly 100%. But the current logic triggers on this co=
-ndition.
-> >>>>>>=20
-> >>>>>> I think I will go forward and send a patch which disables auto con=
-verge during
-> >>>>>> block migration bulk stage.
-> >>>>> Yes, that's fair;  it probably would also make sense to throttle th=
-e RAM
-> >>>>> migration during the block migration bulk stage, since the chances =
-are
-> >>>>> it's not going to get far.  (I think in the nbd setup, the main
-> >>>>> migration process isn't started until the end of bulk).
-> >>>> Catching up with the idea of delaying ram migration until block bulk=
- has completed.
-> >>>> What do you think is the easiest way to achieve this?
-> >>> <excavates inbox, and notices I never replied>
-> >>>=20
-> >>> I think the answer depends whether we think this is a 'special' or we
-> >>> need a new general purpose mechanism.
-> >>>=20
-> >>> If it was really general then we'd probably want to split the iterati=
-ve
-> >>> stage in two somehow, and only do RAM in the second half.
-> >>>=20
-> >>> But I'm not sure it's worth it; I suspect the easiest way is:
-> >>>=20
-> >>>    a) Add a counter in migration/ram.c or in the RAM state somewhere
-> >>>    b) Make ram_save_inhibit increment the counter
-> >>>    c) Check the counter at the head of ram_save_iterate and just exit
-> >>>      if it's none 0
-> >>>    d) Call ram_save_inhibit from block_save_setup
-> >>>    e) Then release it when you've finished the bulk stage
-> >>>=20
-> >>> Make sure you still count the RAM in the pending totals, otherwise
-> >>> migration might think it's finished a bit early.
-> >>=20
-> >> Is there any culprit I don't see or is it as easy as this?
-> >=20
-> > Hmm, looks promising doesn't it;  might need an include or two tidied
-> > up, but looks worth a try.   Just be careful that there are no cases
-> > where block migration can't transfer data in that state, otherwise we'll
-> > keep coming back to here and spewing empty sections.
->=20
-> I already tested it and it actually works.
+Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
+This combination may not be very fun for the user to have to enter, so we
+now enable the user to specify their own key(s) as the ungrab key(s). The
+list of keys that can be used is found in the file qapi/ui.json under QKeyCode.
+The max number of keys that can be used is three.
 
-OK.
+Syntax: -display cocoa,hotkey-grab=<key-key-key>
 
-> What would you expect to be cleaned up before it would be a proper patch?
+Example usage:  -display cocoa,hotkey-grab=home
+	        -display cocoa,hotkey-grab=shift-ctrl
+		-display cocoa,hotkey-grab=ctrl-x
+		-display cocoa,hotkey-grab=pgup-pgdn
+		-display cocoa,hotkey-grab=kp_5-kp_6
+		-display cocoa,hotkey-grab=kp_4-kp_5-kp_6
+		-display cocoa,hotkey-grab=ctrl-alt
 
-It's simple enough so not much; maybe add a trace for when it does the
-exit just to make it easier to watch; I hadn't realised ram.c already
-included migration/block.h for the !bulk case.
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+v7 changes:
+- Prevent ungrab keys from being seen by guest.
 
-> Are there any implications with RDMA
+v6 changes:
+- changed ungrab command-line option to -display cocoa,hotkey-grab
+- Removed NSMutableSet code
+- Implemented C version of Set datatype
 
-Hmm; don't think so; it's mainly concerned with how the RAM is
-transferred; and the ram_control_* hooks are called after your test,
-and on the load side only once it's read the flags and got a block.
+v5 changes:
+- Removed ungrab detection code from keydown event in handleEvent.
+- Removed console_ungrab_sequence_length().
+- Removed ability to always use the default ctrl-alt-g ungrab key sequence.
+- Added ability to actually send keys to the guest that might overlap ungrab keys. 
+Example for -ungrab ctrl-alt:
+down(ctrl)
+down(alt)
+up(ctrl)
+up(alt)
+..ungrab activates..
 
-> and/or post copy migration?
+down(ctrl)
+down(alt)
+down(f1)
+up(ctrl)
+up(alt)
+up(f1)
+..no ungrab activates..
 
-Again I don't think so;  I think block migration always shows the
-outstanding amount of block storage, and so it won't flip into postcopy
-mode until the bulk of block migration is done.
-Also the 'ram_save_complete' does it's own scan of blocks and doesn't
-share the iterate code, so it won't be affected by your change.
+v4 changes:
+- Removed initialization code for key_value_array.
+- Added void keyword to console_ungrab_key_sequence(),
+  and console_ungrab_key_string() functions.
 
-> Is block migration possible at all with those?
+v3 changes:
+- Added the ability for any "sendkey supported" key to be used.
+- Added ability for one to three key sequences to be used.
 
-Yes I think so in both cases; with RDMA I'm pretty sure it is, and I
-think people have had it running with postcopy as well.   The postcopy
-case isn't great (because the actual block storage isn't postcopied)
-and there's work afoot to add other syncing mechanisms on top (see Max
-Reitz's series).
+v2 changes:
+- Removed the "int i" code from the for loops. 
 
-To be honest I don't use/test block migration much and hence know it
-less; but what you've got seems to make sense, but I would like a nod
-=66rom Fam to check from that side.
+ include/ui/console.h |  22 +++++++
+ qemu-options.hx      |   1 +
+ ui/cocoa.m           |  98 +++++++++++++++++++++++++----
+ ui/console.c         | 169 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ vl.c                 |  17 ++++++
+ 5 files changed, 295 insertions(+), 12 deletions(-)
 
-Dave
-
-> Peter
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 12fef80923..5664b4c087 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -508,4 +508,26 @@ static inline void early_gtk_display_init(int opengl)
+ /* egl-headless.c */
+ void egl_headless_init(void);
+ 
++/* console.c */
++/* max number of keys that can be used as the ungrab keys */
++#define MAX_UNGRAB_KEYS 3
++void set_ungrab_seq(const char *new_seq);
++int *console_ungrab_key_sequence(void);
++const char *console_ungrab_key_string(void);
++void use_default_ungrab_keys(void);
++void init_ungrab_keys(void);
++
++/* Set datatype related code */
++typedef struct Set_struct {
++    int size;   /* The size of the array */
++    int *array; /* The array used to store the set's values */
++} Set;
++
++Set *new_set(int max_size);
++void add_number(Set *the_set, int the_number);
++void remove_number(Set *the_set, int the_number);
++bool contains_number(Set *the_set, int the_number);
++void clear_set(Set *the_set);
++bool are_sets_equal(Set *set1, Set *set2);
++
+ #endif
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 5050a49a5e..4a613e4e9c 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1243,6 +1243,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
+     "            [,window_close=on|off][,gl=on|off]\n"
+     "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
+     "-display vnc=<display>[,<optargs>]\n"
++    "-display cocoa[hotkey-grab=<key(s)>]\n"
+     "-display curses\n"
+     "-display none"
+     "                select display type\n"
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 51db47cd71..a4b1f9b9f4 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -106,6 +106,8 @@
+ bool stretch_video;
+ NSTextField *pauseLabel;
+ NSArray * supportedImageFileTypes;
++Set *key_set, *ungrab_set;
++int ungrab_sequence_length;
+ 
+ // Mac to QKeyCode conversion
+ const int mac_to_qkeycode_map[] = {
+@@ -261,6 +263,15 @@ static void handleAnyDeviceErrors(Error * err)
+     }
+ }
+ 
++/* Sends any keys that were delayed because they were part of the ungrab set */
++static void send_key_if_delayed(Set *the_set, int keycode)
++{
++    if (contains_number(the_set, keycode)) {
++        qemu_input_event_send_key_qcode(dcl->con, keycode, true);
++        qemu_input_event_send_key_qcode(dcl->con, keycode, false);
++    }
++}
++
+ /*
+  ------------------------------------------------------
+     QemuCocoaView
+@@ -489,8 +500,6 @@ - (void) switchSurface:(DisplaySurface *)surface
+         [[fullScreenWindow contentView] setFrame:[[NSScreen mainScreen] frame]];
+         [normalWindow setFrame:NSMakeRect([normalWindow frame].origin.x, [normalWindow frame].origin.y - h + oldh, w, h + [normalWindow frame].size.height - oldh) display:NO animate:NO];
+     } else {
+-        if (qemu_name)
+-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s", qemu_name]];
+         [normalWindow setFrame:NSMakeRect([normalWindow frame].origin.x, [normalWindow frame].origin.y - h + oldh, w, h + [normalWindow frame].size.height - oldh) display:YES animate:NO];
+     }
+ 
+@@ -670,14 +679,31 @@ - (void) handleEvent:(NSEvent *)event
+                 if (keycode == Q_KEY_CODE_CAPS_LOCK ||
+                     keycode == Q_KEY_CODE_NUM_LOCK) {
+                     [self toggleStatefulModifier:keycode];
+-                } else if (qemu_console_is_graphic(NULL)) {
++                } else {
+                   [self toggleModifier:keycode];
+                 }
+             }
+ 
++            /*
++             * This code has to be here because the user might use a modifier
++             * key like shift as an ungrab key.
++             */
++            if (modifiers_state[keycode] == YES) { // if the key is down
++                [self check_key: keycode];
++            } else {                               // if the key is up
++                if (are_sets_equal(ungrab_set, key_set)) {
++                    [self ungrabMouse];
++                    clear_set(key_set);
++                    return;
++                }
++                remove_number(key_set, keycode);
++            }
+             break;
+         case NSEventTypeKeyDown:
+             keycode = cocoa_keycode_to_qemu([event keyCode]);
++            if ([self check_key: keycode]) {
++                return;
++            }
+ 
+             // forward command key combos to the host UI unless the mouse is grabbed
+             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
+@@ -687,7 +713,7 @@ - (void) handleEvent:(NSEvent *)event
+ 
+             // default
+ 
+-            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is reserved for QEMU)
++            // handle control + alt Key Combos (ctrl+alt+[1..9] is reserved for QEMU)
+             if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
+                 NSString *keychar = [event charactersIgnoringModifiers];
+                 if ([keychar length] == 1) {
+@@ -698,11 +724,6 @@ - (void) handleEvent:(NSEvent *)event
+                         case '1' ... '9':
+                             console_select(key - '0' - 1); /* ascii math */
+                             return;
+-
+-                        // release the mouse grab
+-                        case 'g':
+-                            [self ungrabMouse];
+-                            return;
+                     }
+                 }
+             }
+@@ -716,6 +737,14 @@ - (void) handleEvent:(NSEvent *)event
+         case NSEventTypeKeyUp:
+             keycode = cocoa_keycode_to_qemu([event keyCode]);
+ 
++            if (are_sets_equal(ungrab_set, key_set)) {
++                [self ungrabMouse];
++                clear_set(key_set);
++                return;
++            }
++            send_key_if_delayed(key_set, keycode);
++            remove_number(key_set, keycode);
++
+             // don't pass the guest a spurious key-up if we treated this
+             // command-key combo as a host UI action
+             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
+@@ -854,10 +883,13 @@ - (void) grabMouse
+     COCOA_DEBUG("QemuCocoaView: grabMouse\n");
+ 
+     if (!isFullscreen) {
++        NSString * message_string;
++        message_string = [NSString stringWithFormat: @"- (Press %s to release Mouse)", console_ungrab_key_string()];
++
+         if (qemu_name)
+-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
++            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %s %@", qemu_name, message_string]];
+         else
+-            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
++            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %@", message_string]];
+     }
+     [self hideCursor];
+     if (!isAbsoluteEnabled) {
+@@ -910,6 +942,23 @@ - (void) raiseAllKeys
+        }
+    }
+ }
++
++/*
++ * Check the keycode to see if it one of the ungrab keys
++ * Returns true if the keycode is part of the ungrab sequence
++ * and false if it isn't.
++ */
++- (int) check_key: (int) keycode
++{
++    if (contains_number(ungrab_set, keycode)) {
++        add_number(key_set, keycode);
++        return true;
++    } else {
++        clear_set(key_set);
++        return false;
++    }
++}
++
+ @end
+ 
+ 
+@@ -1401,7 +1450,7 @@ int main (int argc, const char * argv[]) {
+                 !strcmp(opt, "-nographic") ||
+                 !strcmp(opt, "-version") ||
+                 !strcmp(opt, "-curses") ||
+-                !strcmp(opt, "-display") ||
++                !strcmp(opt, "-display cocoa") ||
+                 !strcmp(opt, "-qtest")) {
+                 return qemu_main(gArgc, gArgv, *_NSGetEnviron());
+             }
+@@ -1683,6 +1732,29 @@ static void addRemovableDevicesMenuItems(void)
+     qapi_free_BlockInfoList(pointerToFree);
+ }
+ 
++/* initializes the mouse ungrab system */
++static void ungrab_init(void)
++{
++    key_set = new_set(MAX_UNGRAB_KEYS);
++    ungrab_set = new_set(MAX_UNGRAB_KEYS);
++    init_ungrab_keys();
++
++    /* determine length of the mouse ungrab sequence */
++    int index, *ungrab_seq;
++    ungrab_sequence_length = 0;
++    ungrab_seq = console_ungrab_key_sequence();
++    for (index = 0; index < MAX_UNGRAB_KEYS; index++) {
++        if (ungrab_seq[index] != 0) {
++            ungrab_sequence_length++;
++        }
++    }
++
++    /* make the ungrab set */
++    for (index = 0; index < ungrab_sequence_length; index++) {
++        add_number(ungrab_set, ungrab_seq[index]);
++    }
++}
++
+ void cocoa_display_init(DisplayState *ds, int full_screen)
+ {
+     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
+@@ -1712,4 +1784,6 @@ void cocoa_display_init(DisplayState *ds, int full_screen)
+      * find out what removable devices it has.
+      */
+     addRemovableDevicesMenuItems();
++
++    ungrab_init();
+ }
+diff --git a/ui/console.c b/ui/console.c
+index 36584d039e..34adb19f14 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -32,9 +32,13 @@
+ #include "chardev/char-fe.h"
+ #include "trace.h"
+ #include "exec/memory.h"
++#include <stdio.h>
++#include <memory.h>
++#include <stdbool.h>
+ 
+ #define DEFAULT_BACKSCROLL 512
+ #define CONSOLE_CURSOR_PERIOD 500
++#define EMPTY_VALUE -1
+ 
+ typedef struct TextAttributes {
+     uint8_t fgcol:4;
+@@ -65,6 +69,12 @@ typedef struct QEMUFIFO {
+     int count, wptr, rptr;
+ } QEMUFIFO;
+ 
++/* stores the ungrab keys' values */
++static int key_value_array[MAX_UNGRAB_KEYS + 1];
++
++/* stores the string that is returned by console_ungrab_key_string */
++static char *ungrab_key_string;
++
+ static int qemu_fifo_write(QEMUFIFO *f, const uint8_t *buf, int len1)
+ {
+     int l, len;
+@@ -2241,4 +2251,163 @@ static void register_types(void)
+     type_register_static(&qemu_console_info);
+ }
+ 
++/* Sets the mouse ungrab key sequence to what the user wants */
++void set_ungrab_seq(const char *new_seq)
++{
++    const char *separator = "-";  /* What the user places between keys */
++    gchar **key_array;
++    int key_value, count;
++
++    count = 0;
++    key_array = g_strsplit(new_seq, separator, -1);
++    ungrab_key_string = g_strdup(new_seq);
++
++    for (; *key_array; key_array++) {
++        key_value = index_from_key(*key_array, strlen(*key_array));
++        if (key_value == Q_KEY_CODE__MAX) {
++            error_report("-hotkey-grab: unknown key: %s", *key_array);
++            exit(EXIT_FAILURE);
++        }
++        key_value_array[count] = key_value;
++        count++;
++    }
++}
++
++/* Returns the user specified ungrab key sequence */
++int *console_ungrab_key_sequence(void)
++{
++    return key_value_array;
++}
++
++/* Returns the name of the user specified ungrab keys */
++const char *console_ungrab_key_string(void)
++{
++    return ungrab_key_string;
++}
++
++/* Sets the UI to use the default ungrab key sequence */
++void use_default_ungrab_keys(void)
++{
++    /* Default ungrab keys: Control Alt g */
++    ungrab_key_string = (char *) malloc(sizeof(char) * 14);
++    sprintf(ungrab_key_string, "%s", "ctrl-alt-g");
++    key_value_array[0] = Q_KEY_CODE_CTRL;
++    key_value_array[1] = Q_KEY_CODE_ALT;
++    key_value_array[2] = Q_KEY_CODE_G;
++}
++
++/*
++ * Initializes the ungrab key settings - should be called by the front-end on
++ * startup.
++ */
++void init_ungrab_keys(void)
++{
++    if (console_ungrab_key_string() == NULL) {
++        use_default_ungrab_keys();
++    }
++}
++
++/*
++ * Set implements a set datatype. It is a collection of numbers with no
++ * repeats.
++ */
++
++/* Creates a new Set object with a size of max_size */
++Set *new_set(int max_size)
++{
++    Set *new_set_obj;
++    new_set_obj = (Set *) malloc(sizeof(Set));
++
++    int *array_obj;
++    array_obj = (int *) malloc(sizeof(int) * max_size);
++    new_set_obj->array = array_obj;
++    new_set_obj->size = max_size;
++
++    /* initialize the array */
++    int index;
++    for (index = 0; index < max_size; index++) {
++        new_set_obj->array[index] = EMPTY_VALUE;
++    }
++
++    return new_set_obj;
++}
++
++/* Adds a number to a set */
++void add_number(Set *the_set, int the_number)
++{
++    int index;
++
++    /* Check if the number if already in the list */
++    for (index = 0; index < the_set->size; index++) {
++        if (the_set->array[index] == the_number) {
++            return;
++        }
++    }
++
++    /* Find an empty spot and place the number there */
++    for (index = 0; index < the_set->size; index++) {
++        if (the_set->array[index] == EMPTY_VALUE) {
++            the_set->array[index] = the_number;
++            return;
++        }
++    }
++    error_report("Failed to add number to set");
++}
++
++/* Removes a number from a set */
++void remove_number(Set *the_set, int the_number)
++{
++    int index;
++    for (index = 0; index < the_set->size; index++) {
++        if (the_set->array[index] == the_number) {
++            the_set->array[index] = EMPTY_VALUE;
++        }
++    }
++}
++
++/* Determines if a number is in a set */
++bool contains_number(Set *the_set, int the_number)
++{
++    int index;
++    for (index = 0; index < the_set->size; index++) {
++        if (the_set->array[index] == the_number) {
++            return true;
++        }
++    }
++    return false;
++}
++
++/* Clears a set of all values */
++void clear_set(Set *the_set)
++{
++    int index;
++    for (index = 0; index < the_set->size; index++) {
++        the_set->array[index] = EMPTY_VALUE;
++    }
++}
++
++/* Determines if two sets contain the same values */
++bool are_sets_equal(Set *set1, Set *set2)
++{
++    if (set1->size != set2->size) {
++        return false;
++    }
++
++    /* see if both sets contain the same numbers */
++    int index1, index2, found_value;
++    for (index1 = 0; index1 < set1->size; index1++) {
++        found_value = 0;
++        for (index2 = 0; index2 < set1->size; index2++) {
++            if (set1->array[index1] == set2->array[index2]) {
++                found_value = 1;
++                break;
++            }
++        }
++        if (found_value != 1) {
++            return false;
++        }
++    }
++    return true;
++}
++
+ type_init(register_types);
+diff --git a/vl.c b/vl.c
+index 7a5554bc41..a6c7b6f992 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2220,6 +2220,23 @@ static DisplayType select_display(const char *p)
+ #endif
+     } else if (strstart(p, "none", &opts)) {
+         display = DT_NONE;
++    } else if (strstart(p, "cocoa", &opts)) {
++#ifdef CONFIG_COCOA
++        display = DT_COCOA;
++        if (strstart(opts, ",hotkey-grab=", &opts)) {
++            if (strcmp(opts, "") == 0) {
++                error_report("Please add the key(s) argument");
++                exit(1);
++            }
++            set_ungrab_seq(opts);
++        } else {
++            error_report("invalid Cocoa option");
++            exit(1);
++        }
++#else
++        error_report("Cocoa support is disabled");
++        exit(1);
++#endif
+     } else {
+         error_report("unknown display type");
+         exit(1);
+-- 
+2.14.3 (Apple Git-98)
