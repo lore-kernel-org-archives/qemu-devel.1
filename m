@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVn4-0005oE-7L
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:23 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1emVqZ-0000rS-Kl
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:34:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVn1-0002fo-4b
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:22 -0500
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:37009)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emVn0-0002fg-VB
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:30:19 -0500
-Received: by mail-ua0-x241.google.com with SMTP id q8so1107839uae.4
-	for <qemu-devel@nongnu.org>; Thu, 15 Feb 2018 18:30:18 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 15 Feb 2018 23:29:32 -0300
-Message-Id: <20180216022933.10945-8-f4bug@amsat.org>
-In-Reply-To: <20180216022933.10945-1-f4bug@amsat.org>
-References: <20180216022933.10945-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 7/7] hw/sd: move sdcard legacy API to
- "hw/sd/sdcard_legacy.h"
+	(envelope-from <sjitindarsingh@gmail.com>) id 1emVqY-0004AR-Nu
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 21:33:59 -0500
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Fri, 16 Feb 2018 13:33:27 +1100
+Message-Id: <20180216023328.8407-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V4 1/2] ppc/spapr-caps: Disallow
+ setting workaround for spapr-cap-ibs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,127 +18,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, Michael Walle <michael@walle.cc>, Stefan Weil <sw@weilnetz.de>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-omap_mmc.c is the last user left.
+The spapr-cap cap-ibs can only have values broken or fixed as there is
+no explicit workaround required. Currently setting the value workaround
+for this cap will hit an assert if the guest makes the hcall
+h_get_cpu_characteristics.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Report an error when attempting to apply the setting with a more helpful
+error message.
+
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
 ---
- include/hw/sd/sd.h            | 16 --------------
- include/hw/sd/sdcard_legacy.h | 50 +++++++++++++++++++++++++++++++++++++++++++
- hw/sd/omap_mmc.c              |  2 +-
- hw/sd/sd.c                    |  1 +
- 4 files changed, 52 insertions(+), 17 deletions(-)
- create mode 100644 include/hw/sd/sdcard_legacy.h
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index 4491db98de..58528b4d2c 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -131,22 +131,6 @@ typedef struct {
-     void (*set_readonly)(DeviceState *dev, bool readonly);
- } SDBusClass;
- 
--/* Legacy functions to be used only by non-qdevified callers */
--SDState *sd_init(BlockBackend *bs, bool is_spi);
--int sd_do_command(SDState *sd, SDRequest *req,
--                  uint8_t *response);
--void sd_write_data(SDState *sd, uint8_t value);
--uint8_t sd_read_data(SDState *sd);
--void sd_set_cb(SDState *sd, qemu_irq readonly, qemu_irq insert);
--/* sd_enable should not be used -- it is only used on the nseries boards,
-- * where it is part of a broken implementation of the MMC card slot switch
-- * (there should be two card slots which are multiplexed to a single MMC
-- * controller, but instead we model it with one card and controller and
-- * disable the card when the second slot is selected, so it looks like the
-- * second slot is always empty).
-- */
--void sd_enable(SDState *sd, bool enable);
--
- /* Functions to be used by qdevified callers (working via
-  * an SDBus rather than directly with SDState)
-  */
-diff --git a/include/hw/sd/sdcard_legacy.h b/include/hw/sd/sdcard_legacy.h
-new file mode 100644
-index 0000000000..8681f8089b
---- /dev/null
-+++ b/include/hw/sd/sdcard_legacy.h
-@@ -0,0 +1,50 @@
-+/*
-+ * SD Memory Card emulation (deprecated legacy API)
-+ *
-+ * Copyright (c) 2006 Andrzej Zaborowski  <balrog@zabor.org>
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
-+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-+ * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR
-+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+#ifndef HW_SDCARD_LEGACY_H
-+#define HW_SDCARD_LEGACY_H
-+
-+#include "hw/sd/sd.h"
-+
-+/* Legacy functions to be used only by non-qdevified callers */
-+SDState *sd_init(BlockBackend *blk, bool is_spi);
-+int sd_do_command(SDState *card, SDRequest *request, uint8_t *response);
-+void sd_write_data(SDState *card, uint8_t value);
-+uint8_t sd_read_data(SDState *card);
-+void sd_set_cb(SDState *card, qemu_irq readonly, qemu_irq insert);
-+
-+/* sd_enable should not be used -- it is only used on the nseries boards,
-+ * where it is part of a broken implementation of the MMC card slot switch
-+ * (there should be two card slots which are multiplexed to a single MMC
-+ * controller, but instead we model it with one card and controller and
-+ * disable the card when the second slot is selected, so it looks like the
-+ * second slot is always empty).
-+ */
-+void sd_enable(SDState *card, bool enable);
-+
-+#endif /* HW_SDCARD_LEGACY_H */
-diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
-index 5b47cadf11..be14ac4f40 100644
---- a/hw/sd/omap_mmc.c
-+++ b/hw/sd/omap_mmc.c
-@@ -19,7 +19,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/arm/omap.h"
--#include "hw/sd/sd.h"
-+#include "hw/sd/sdcard_legacy.h"
- 
- struct omap_mmc_s {
-     qemu_irq irq;
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 72d32f7845..ae2d915977 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -34,6 +34,7 @@
- #include "hw/hw.h"
- #include "sysemu/block-backend.h"
- #include "hw/sd/sd.h"
-+#include "hw/sd/sdcard_legacy.h"
- #include "qapi/error.h"
- #include "qemu/bitmap.h"
- #include "hw/qdev-properties.h"
+V3 -> V4:
+ - Add this patch back from V1 to replace
+   "ppc/spapr-caps: Convert spapr-cap-ibs to be a boolean"
+   as this was deemed to be a better solution
+---
+ hw/ppc/spapr_caps.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index e69d308560..99a4b71d19 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -205,7 +205,9 @@ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
+ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+                                            uint8_t val, Error **errp)
+ {
+-    if (tcg_enabled() && val) {
++    if (val == SPAPR_CAP_WORKAROUND) { /* Can only be Broken or Fixed */
++        error_setg(errp, "Requested safe indirect branch capability level \"workaround\" not valid, try cap-ibs=fixed");
++    } else if (tcg_enabled() && val) {
+         /* TODO - for now only allow broken for TCG */
+         error_setg(errp, "Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
+     } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
+@@ -263,7 +265,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     },
+     [SPAPR_CAP_IBS] = {
+         .name = "ibs",
+-        .description = "Indirect Branch Serialisation" VALUE_DESC_TRISTATE,
++        .description = "Indirect Branch Serialisation (broken, fixed)",
+         .index = SPAPR_CAP_IBS,
+         .get = spapr_cap_get_tristate,
+         .set = spapr_cap_set_tristate,
 -- 
-2.16.1
+2.13.6
