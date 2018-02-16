@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1emdW2-0007RM-Pe
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:45:19 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1emdg5-0005BN-RI
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1emdVy-0001No-RW
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:45:18 -0500
-Date: Fri, 16 Feb 2018 11:45:12 +0100 (CET)
+	(envelope-from <balaton@eik.bme.hu>) id 1emdg2-0006Jw-Nu
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:55:41 -0500
+Date: Fri, 16 Feb 2018 11:55:36 +0100 (CET)
 From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180216031014.GD2074@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1802161143460.98686@zero.eik.bme.hu>
+In-Reply-To: <dffa45c9-48a6-ef85-3b28-d8ce1daf72e4@redhat.com>
+Message-ID: <alpine.BSF.2.21.1802161145230.98686@zero.eik.bme.hu>
 References: <cover.1518730026.git.balaton@eik.bme.hu>
-	<0d6dd5c0e5279896b29b140b198f2a9f6b2d87ba.1518730026.git.balaton@eik.bme.hu>
-	<20180216031014.GD2074@umbus.fritz.box>
+	<dffa45c9-48a6-ef85-3b28-d8ce1daf72e4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 3/3] ppc: Add aCube Sam460ex
- board
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Sam460ex emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +22,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, 16 Feb 2018, David Gibson wrote:
-> On Thu, Feb 15, 2018 at 10:27:06PM +0100, BALATON Zoltan wrote:
->> Add emulation of aCube Sam460ex board based on AMCC 460EX embedded SoC=
-.
->> This is not a complete implementation yet with a lot of components
->> still missing but enough for the U-Boot firmware to start and to boot
->> a Linux kernel or AROS.
+On Fri, 16 Feb 2018, Thomas Huth wrote:
+> On 15.02.2018 22:27, BALATON Zoltan wrote:
+>> Remaining patches for Sam460ex emulation. The original cover letter
+>> with more details is here:
 >>
->> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
+>> http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00112.html
 >>
->> v2:
->> - Rebased to latest changes on master
->> - Replaced printfs with error_report
+>> We'll need to also add binaries for firmware (customised u-boot
+>> version) and dtb but I'm not sure how to submit those.
 >
-> This has a conflict in hw/ppc/Makefile.objs.  Looks like it was based
-> on some other patch that added ppc440_pcix.o.  That's not there
-> upstream.
+> For the dtb, I think you could simply provide a patch that adds the dts
+> file to the pc-bios directory and another one that adds the dtb. Just
+> like it is already done with pc-bios/bamboo.dts / pc-bios/bamboo.dtb.
 
-That's patch 2/3 of this series. Have you missed that?
+OK thanks, I'll do that. Does it have to be two separate patches?
+
+> For u-boot, can you use the same upstream level as e500 ? I.e. check
+> whether "git submodule status roms/u-boot" is fine for you? If that's
+> ok, just do a "git submodule update roms/u-boot" and build uboot from
+> that directory - you then can submit a binary patch with that file for
+> pc-bios, too.
+>
+> In case you need another u-boot version, I think you've got to update
+> the submodule to the newer upstream version first, and then also rebuild
+> the e500 binary... Cumbersome, but that's necessary since we've got to
+> ship the u-boot sources in the QEMU release tarballs, too, to be
+> compliant with the GPL.
+
+Unfortunately we can't use the same u-boot as e500 because this board uses 
+a forked and patched version which is not in upstream u-boot and upstream 
+u-boot has even dropped support for this CPU in latest version so we 
+actually need an older version (with patches) and not a newer one.
+
+Therefore, it needs to be a binary built from a separate source so I think 
+a new submodule will need to be added for this. How to do that? Where to 
+host this git repo? Should I put it on github and refer to that as an 
+external repo or should it be hosted in qemu repo somehow?
 
 Regards,
 BALATON Zoltan
