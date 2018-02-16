@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoB4-00071U-40
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1emp6f-0002ND-CQ
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 18:07:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1emoAz-0005Qk-7s
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:22 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37710
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1emoAz-0005QJ-3X
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 17:08:17 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1GM5552018555
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:16 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g63tggskk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 17:08:15 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Fri, 16 Feb 2018 17:08:13 -0500
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 16 Feb 2018 17:07:56 -0500
-In-Reply-To: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1518818879-18608-10-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v7 09/12] s390-ccw: print zipl boot menu
+	(envelope-from <thuth@redhat.com>) id 1emp6b-0003wu-9t
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 18:07:53 -0500
+References: <cover.1518730026.git.balaton@eik.bme.hu>
+	<dffa45c9-48a6-ef85-3b28-d8ce1daf72e4@redhat.com>
+	<alpine.BSF.2.21.1802161145230.98686@zero.eik.bme.hu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5c7c64f7-90bd-7ddb-59f6-e3d7f4f8b21d@redhat.com>
+Date: Sat, 17 Feb 2018 00:07:34 +0100
+MIME-Version: 1.0
+In-Reply-To: <alpine.BSF.2.21.1802161145230.98686@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Sam460ex emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,94 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-When the boot menu options are present and the guest's
-disk has been configured by the zipl tool, then the user
-will be presented with an interactive boot menu with
-labeled entries. An example of what the menu might look
-like:
+On 16.02.2018 11:55, BALATON Zoltan wrote:
+> On Fri, 16 Feb 2018, Thomas Huth wrote:
+>> On 15.02.2018 22:27, BALATON Zoltan wrote:
+>>> Remaining patches for Sam460ex emulation. The original cover letter
+>>> with more details is here:
+>>>
+>>> http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00112.html
+>>>
+>>> We'll need to also add binaries for firmware (customised u-boot
+>>> version) and dtb but I'm not sure how to submit those.
+>>
+>> For the dtb, I think you could simply provide a patch that adds the dts
+>> file to the pc-bios directory and another one that adds the dtb. Just
+>> like it is already done with pc-bios/bamboo.dts / pc-bios/bamboo.dtb.
+> 
+> OK thanks, I'll do that. Does it have to be two separate patches?
 
-zIPL v1.37.1-build-20170714 interactive boot menu.
+I don't think so, I just thought that would be cleaner ... but one patch
+should be fine, too, I guess. David?
 
-  0. default (linux-4.13.0)
+>> For u-boot, can you use the same upstream level as e500 ? I.e. check
+>> whether "git submodule status roms/u-boot" is fine for you? If that's
+>> ok, just do a "git submodule update roms/u-boot" and build uboot from
+>> that directory - you then can submit a binary patch with that file for
+>> pc-bios, too.
+>>
+>> In case you need another u-boot version, I think you've got to update
+>> the submodule to the newer upstream version first, and then also rebuild
+>> the e500 binary... Cumbersome, but that's necessary since we've got to
+>> ship the u-boot sources in the QEMU release tarballs, too, to be
+>> compliant with the GPL.
+> 
+> Unfortunately we can't use the same u-boot as e500 because this board
+> uses a forked and patched version which is not in upstream u-boot and
+> upstream u-boot has even dropped support for this CPU in latest version
+> so we actually need an older version (with patches) and not a newer one.
 
-  1. linux-4.13.0
-  2. performance
-  3. kvm
+That's very unfortunate ... any chance that you could try to get that
+CPU activated in upstream u-boot again and get the patches included there?
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/menu.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 48 insertions(+), 1 deletion(-)
+> Therefore, it needs to be a binary built from a separate source so I
+> think a new submodule will need to be added for this. How to do that?
+> Where to host this git repo? Should I put it on github and refer to that
+> as an external repo or should it be hosted in qemu repo somehow?
 
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 5790e0c..9631ac0 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -10,13 +10,60 @@
-  */
- 
- #include "menu.h"
-+#include "s390-ccw.h"
-+
-+/* Offsets from zipl fields to zipl banner start */
-+#define ZIPL_TIMEOUT_OFFSET 138
-+#define ZIPL_FLAG_OFFSET    140
- 
- static uint8_t flags;
- static uint64_t timeout;
- 
-+static int get_boot_index(int entries)
-+{
-+    return 0; /* Implemented next patch */
-+}
-+
-+static void zipl_println(const char *data, size_t len)
-+{
-+    char buf[len + 2];
-+
-+    ebcdic_to_ascii(data, buf, len);
-+    buf[len] = '\n';
-+    buf[len + 1] = '\0';
-+
-+    sclp_print(buf);
-+}
-+
- int menu_get_zipl_boot_index(const void *stage2, int offset)
- {
--    return 0; /* implemented next patch */
-+    const char *data = stage2 + offset;
-+    uint16_t zipl_flag = *(uint16_t *)(data - ZIPL_FLAG_OFFSET);
-+    uint16_t zipl_timeout = *(uint16_t *)(data - ZIPL_TIMEOUT_OFFSET);
-+    size_t len;
-+    int ct;
-+
-+    if (flags & BOOT_MENU_FLAG_ZIPL_OPTS) {
-+        if (!zipl_flag) {
-+            return 0; /* Boot default */
-+        }
-+        timeout = zipl_timeout * 1000;
-+    }
-+
-+    /* Print and count all menu items, including the banner */
-+    for (ct = 0; *data; ct++) {
-+        len = strlen(data);
-+        zipl_println(data, len);
-+        data += len + 1;
-+
-+        if (ct < 2) {
-+            sclp_print("\n");
-+        }
-+    }
-+
-+    sclp_print("\n");
-+
-+    return get_boot_index(ct - 1);
- }
- 
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
--- 
-2.7.4
+No clue ... adding Stefan and Jeff to CC:, maybe they can recommend
+something here.
+
+ Thomas
