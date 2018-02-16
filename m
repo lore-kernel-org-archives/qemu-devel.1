@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuY-0001eO-24
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:37 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuZ-0001i4-OB
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuT-0005Ey-ME
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuU-0005Fc-06
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:35 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 16 Feb 2018 21:06:10 +1100
-Message-Id: <20180216100617.25265-8-david@gibson.dropbear.id.au>
+Date: Fri, 16 Feb 2018 21:06:15 +1100
+Message-Id: <20180216100617.25265-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180216100617.25265-1-david@gibson.dropbear.id.au>
 References: <20180216100617.25265-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/14] spapr: use spapr->vsmt to compute VCPU ids
+Subject: [Qemu-devel] [PULL 12/14] target/ppc: convert to TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,249 +20,415 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, surajjs@au1.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, surajjs@au1.ibm.com, "Emilio G. Cota" <cota@braap.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: "Emilio G. Cota" <cota@braap.org>
 
-Since the introduction of VSMT in 2.11, the spacing of VCPU ids
-between cores is controllable through a machine property instead
-of being only dictated by the SMT mode of the host:
+A few changes worth noting:
 
-    cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i
+- Didn't migrate ctx->exception to DISAS_* since the exception field is
+  in many cases architecturally relevant.
 
-Until recently, the machine code would try to change the SMT mode
-of the host to be equal to VSMT or exit. This allowed the rest of
-the code to assume that kvmppc_smt_threads() == spapr->vsmt is
-always true.
+- Moved the cross-page check from the end of translate_insn to tb_start.
 
-Recent commit "8904e5a75005 spapr: Adjust default VSMT value for
-better migration compatibility" relaxed the rule. If the VSMT
-mode cannot be set in KVM for some reasons, but the requested
-CPU topology is compatible with the current SMT mode, then we
-let the guest run with  kvmppc_smt_threads() != spapr->vsmt.
+- Removed the exit(1) after a TCG temp leak; changed the fprintf there to
+  qemu_log.
 
-This breaks quite a few places in the code, in particular when
-calculating DRC indexes.
-
-This is what happens on a POWER host with subcores-per-core=2 (ie,
-supports up to SMT4) when passing the following topology:
-
-    -smp threads=4,maxcpus=16 \
-    -device host-spapr-cpu-core,core-id=4,id=core1 \
-    -device host-spapr-cpu-core,core-id=8,id=core2
-
-qemu-system-ppc64: warning: Failed to set KVM's VSMT mode to 8 (errno -22)
-
-This is expected since KVM is limited to SMT4, but the guest is started
-anyway because this topology can run on SMT4 even with a VSMT8 spacing.
-
-But when we look at the DT, things get nastier:
-
-cpus {
-        ...
-        ibm,drc-indexes = <0x4 0x10000000 0x10000004 0x10000008 0x1000000c>;
-
-This means that we have the following association:
-
- CPU core device |     DRC    | VCPU id
------------------+------------+---------
-   boot core     | 0x10000000 | 0
-   core1         | 0x10000004 | 4
-   core2         | 0x10000008 | 8
-   core3         | 0x1000000c | 12
-
-But since the spacing of VCPU ids is 8, the DRC for core1 points to a
-VCPU that doesn't exist, the DRC for core2 points to the first VCPU of
-core1 and and so on...
-
-        ...
-
-        PowerPC,POWER8@0 {
-                ...
-                ibm,my-drc-index = <0x10000000>;
-                ...
-        };
-
-        PowerPC,POWER8@8 {
-                ...
-                ibm,my-drc-index = <0x10000008>;
-                ...
-        };
-
-        PowerPC,POWER8@10 {
-                ...
-
-No ibm,my-drc-index property for this core since 0x10000010 doesn't
-exist in ibm,drc-indexes above.
-
-                ...
-        };
-};
-
-...
-
-interrupt-controller {
-        ...
-        ibm,interrupt-server-ranges = <0x0 0x10>;
-
-With a spacing of 8, the highest VCPU id for the given topology should be:
-        16 * 8 / 4 = 32 and not 16
-
-        ...
-        linux,phandle = <0x7e7323b8>;
-        interrupt-controller;
-};
-
-And CPU hot-plug/unplug is broken:
-
-(qemu) device_del core1
-pseries-hotplug-cpu: Cannot find CPU (drc index 10000004) to remove
-
-(qemu) device_del core2
-cpu 4 (hwid 8) Ready to die...
-cpu 5 (hwid 9) Ready to die...
-cpu 6 (hwid 10) Ready to die...
-cpu 7 (hwid 11) Ready to die...
-
-These are the VCPU ids of core1 actually
-
-(qemu) device_add host-spapr-cpu-core,core-id=12,id=core3
-(qemu) device_del core3
-pseries-hotplug-cpu: Cannot find CPU (drc index 1000000c) to remove
-
-This patches all the code in hw/ppc/spapr.c to assume the VSMT
-spacing when manipulating VCPU ids.
-
-Fixes: 8904e5a75005
-Signed-off-by: Greg Kurz <groug@kaod.org>
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ target/ppc/translate.c | 329 +++++++++++++++++++++++++------------------------
+ 1 file changed, 167 insertions(+), 162 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9f29434819..ea7429c92a 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -160,9 +160,9 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int i)
-                        (void *)(uintptr_t) i);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 6e35daa0db..0a0c090c99 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7207,217 +7207,222 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+ #endif
  }
  
--static inline int xics_max_server_number(void)
-+static int xics_max_server_number(sPAPRMachineState *spapr)
+-/*****************************************************************************/
+-void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
++static int ppc_tr_init_disas_context(DisasContextBase *dcbase,
++                                     CPUState *cs, int max_insns)
  {
--    return DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
-+    return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUPPCState *env = cs->env_ptr;
+-    DisasContext ctx, *ctxp = &ctx;
+-    opc_handler_t **table, *handler;
+-    int max_insns;
+-
+-    ctx.base.singlestep_enabled = cs->singlestep_enabled;
+-    ctx.base.tb = tb;
+-    ctx.base.pc_first = tb->pc;
+-    ctx.base.pc_next = tb->pc; /* nip */
+-    ctx.base.num_insns = 0;
+-
+-    ctx.exception = POWERPC_EXCP_NONE;
+-    ctx.spr_cb = env->spr_cb;
+-    ctx.pr = msr_pr;
+-    ctx.mem_idx = env->dmmu_idx;
+-    ctx.dr = msr_dr;
++    int bound;
++
++    ctx->exception = POWERPC_EXCP_NONE;
++    ctx->spr_cb = env->spr_cb;
++    ctx->pr = msr_pr;
++    ctx->mem_idx = env->dmmu_idx;
++    ctx->dr = msr_dr;
+ #if !defined(CONFIG_USER_ONLY)
+-    ctx.hv = msr_hv || !env->has_hv_mode;
++    ctx->hv = msr_hv || !env->has_hv_mode;
+ #endif
+-    ctx.insns_flags = env->insns_flags;
+-    ctx.insns_flags2 = env->insns_flags2;
+-    ctx.access_type = -1;
+-    ctx.need_access_type = !(env->mmu_model & POWERPC_MMU_64B);
+-    ctx.le_mode = !!(env->hflags & (1 << MSR_LE));
+-    ctx.default_tcg_memop_mask = ctx.le_mode ? MO_LE : MO_BE;
++    ctx->insns_flags = env->insns_flags;
++    ctx->insns_flags2 = env->insns_flags2;
++    ctx->access_type = -1;
++    ctx->need_access_type = !(env->mmu_model & POWERPC_MMU_64B);
++    ctx->le_mode = !!(env->hflags & (1 << MSR_LE));
++    ctx->default_tcg_memop_mask = ctx->le_mode ? MO_LE : MO_BE;
+ #if defined(TARGET_PPC64)
+-    ctx.sf_mode = msr_is_64bit(env, env->msr);
+-    ctx.has_cfar = !!(env->flags & POWERPC_FLAG_CFAR);
++    ctx->sf_mode = msr_is_64bit(env, env->msr);
++    ctx->has_cfar = !!(env->flags & POWERPC_FLAG_CFAR);
+ #endif
+     if (env->mmu_model == POWERPC_MMU_32B ||
+         env->mmu_model == POWERPC_MMU_601 ||
+         (env->mmu_model & POWERPC_MMU_64B))
+-            ctx.lazy_tlb_flush = true;
++            ctx->lazy_tlb_flush = true;
+ 
+-    ctx.fpu_enabled = !!msr_fp;
++    ctx->fpu_enabled = !!msr_fp;
+     if ((env->flags & POWERPC_FLAG_SPE) && msr_spe)
+-        ctx.spe_enabled = !!msr_spe;
++        ctx->spe_enabled = !!msr_spe;
+     else
+-        ctx.spe_enabled = false;
++        ctx->spe_enabled = false;
+     if ((env->flags & POWERPC_FLAG_VRE) && msr_vr)
+-        ctx.altivec_enabled = !!msr_vr;
++        ctx->altivec_enabled = !!msr_vr;
+     else
+-        ctx.altivec_enabled = false;
++        ctx->altivec_enabled = false;
+     if ((env->flags & POWERPC_FLAG_VSX) && msr_vsx) {
+-        ctx.vsx_enabled = !!msr_vsx;
++        ctx->vsx_enabled = !!msr_vsx;
+     } else {
+-        ctx.vsx_enabled = false;
++        ctx->vsx_enabled = false;
+     }
+ #if defined(TARGET_PPC64)
+     if ((env->flags & POWERPC_FLAG_TM) && msr_tm) {
+-        ctx.tm_enabled = !!msr_tm;
++        ctx->tm_enabled = !!msr_tm;
+     } else {
+-        ctx.tm_enabled = false;
++        ctx->tm_enabled = false;
+     }
+ #endif
+-    ctx.gtse = !!(env->spr[SPR_LPCR] & LPCR_GTSE);
++    ctx->gtse = !!(env->spr[SPR_LPCR] & LPCR_GTSE);
+     if ((env->flags & POWERPC_FLAG_SE) && msr_se)
+-        ctx.singlestep_enabled = CPU_SINGLE_STEP;
++        ctx->singlestep_enabled = CPU_SINGLE_STEP;
+     else
+-        ctx.singlestep_enabled = 0;
++        ctx->singlestep_enabled = 0;
+     if ((env->flags & POWERPC_FLAG_BE) && msr_be)
+-        ctx.singlestep_enabled |= CPU_BRANCH_STEP;
+-    if (unlikely(ctx.base.singlestep_enabled)) {
+-        ctx.singlestep_enabled |= GDBSTUB_SINGLE_STEP;
++        ctx->singlestep_enabled |= CPU_BRANCH_STEP;
++    if (unlikely(ctx->base.singlestep_enabled)) {
++        ctx->singlestep_enabled |= GDBSTUB_SINGLE_STEP;
+     }
+ #if defined (DO_SINGLE_STEP) && 0
+     /* Single step trace mode */
+     msr_se = 1;
+ #endif
+-    ctx.base.num_insns = 0;
+-    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
+-    if (max_insns == 0) {
+-        max_insns = CF_COUNT_MASK;
+-    }
+-    if (max_insns > TCG_MAX_INSNS) {
+-        max_insns = TCG_MAX_INSNS;
+-    }
+-
+-    gen_tb_start(tb);
+-    tcg_clear_temp_count();
+-    /* Set env in case of segfault during code fetch */
+-    while (ctx.exception == POWERPC_EXCP_NONE && !tcg_op_buf_full()) {
+-        tcg_gen_insn_start(ctx.base.pc_next);
+-        ctx.base.num_insns++;
+-
+-        if (unlikely(cpu_breakpoint_test(cs, ctx.base.pc_next, BP_ANY))) {
+-            gen_debug_exception(ctxp);
+-            /* The address covered by the breakpoint must be included in
+-               [tb->pc, tb->pc + tb->size) in order to for it to be
+-               properly cleared -- thus we increment the PC here so that
+-               the logic setting tb->size below does the right thing.  */
+-            ctx.base.pc_next += 4;
+-            break;
+-        }
+ 
+-        LOG_DISAS("----------------\n");
+-        LOG_DISAS("nip=" TARGET_FMT_lx " super=%d ir=%d\n",
+-                  ctx.base.pc_next, ctx.mem_idx, (int)msr_ir);
+-        if (ctx.base.num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
+-            gen_io_start();
+-        }
+-        if (unlikely(need_byteswap(&ctx))) {
+-            ctx.opcode = bswap32(cpu_ldl_code(env, ctx.base.pc_next));
+-        } else {
+-            ctx.opcode = cpu_ldl_code(env, ctx.base.pc_next);
+-        }
+-        LOG_DISAS("translate opcode %08x (%02x %02x %02x %02x) (%s)\n",
+-                  ctx.opcode, opc1(ctx.opcode), opc2(ctx.opcode),
+-                  opc3(ctx.opcode), opc4(ctx.opcode),
+-                  ctx.le_mode ? "little" : "big");
+-        ctx.base.pc_next += 4;
+-        table = env->opcodes;
+-        handler = table[opc1(ctx.opcode)];
++    bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
++    return MIN(max_insns, bound);
++}
++
++static void ppc_tr_tb_start(DisasContextBase *db, CPUState *cs)
++{
++}
++
++static void ppc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
++{
++    tcg_gen_insn_start(dcbase->pc_next);
++}
++
++static bool ppc_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
++                                    const CPUBreakpoint *bp)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++
++    gen_debug_exception(ctx);
++    /* The address covered by the breakpoint must be included in
++       [tb->pc, tb->pc + tb->size) in order to for it to be
++       properly cleared -- thus we increment the PC here so that
++       the logic setting tb->size below does the right thing.  */
++    ctx->base.pc_next += 4;
++    return true;
++}
++
++static void ppc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++    CPUPPCState *env = cs->env_ptr;
++    opc_handler_t **table, *handler;
++
++    LOG_DISAS("----------------\n");
++    LOG_DISAS("nip=" TARGET_FMT_lx " super=%d ir=%d\n",
++              ctx->base.pc_next, ctx->mem_idx, (int)msr_ir);
++
++    if (unlikely(need_byteswap(ctx))) {
++        ctx->opcode = bswap32(cpu_ldl_code(env, ctx->base.pc_next));
++    } else {
++        ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
++    }
++    LOG_DISAS("translate opcode %08x (%02x %02x %02x %02x) (%s)\n",
++              ctx->opcode, opc1(ctx->opcode), opc2(ctx->opcode),
++              opc3(ctx->opcode), opc4(ctx->opcode),
++              ctx->le_mode ? "little" : "big");
++    ctx->base.pc_next += 4;
++    table = env->opcodes;
++    handler = table[opc1(ctx->opcode)];
++    if (is_indirect_opcode(handler)) {
++        table = ind_table(handler);
++        handler = table[opc2(ctx->opcode)];
+         if (is_indirect_opcode(handler)) {
+             table = ind_table(handler);
+-            handler = table[opc2(ctx.opcode)];
++            handler = table[opc3(ctx->opcode)];
+             if (is_indirect_opcode(handler)) {
+                 table = ind_table(handler);
+-                handler = table[opc3(ctx.opcode)];
+-                if (is_indirect_opcode(handler)) {
+-                    table = ind_table(handler);
+-                    handler = table[opc4(ctx.opcode)];
+-                }
++                handler = table[opc4(ctx->opcode)];
+             }
+         }
+-        /* Is opcode *REALLY* valid ? */
+-        if (unlikely(handler->handler == &gen_invalid)) {
+-            qemu_log_mask(LOG_GUEST_ERROR, "invalid/unsupported opcode: "
+-                          "%02x - %02x - %02x - %02x (%08x) "
+-                          TARGET_FMT_lx " %d\n",
+-                          opc1(ctx.opcode), opc2(ctx.opcode),
+-                          opc3(ctx.opcode), opc4(ctx.opcode),
+-                          ctx.opcode, ctx.base.pc_next - 4, (int)msr_ir);
+-        } else {
+-            uint32_t inval;
++    }
++    /* Is opcode *REALLY* valid ? */
++    if (unlikely(handler->handler == &gen_invalid)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "invalid/unsupported opcode: "
++                      "%02x - %02x - %02x - %02x (%08x) "
++                      TARGET_FMT_lx " %d\n",
++                      opc1(ctx->opcode), opc2(ctx->opcode),
++                      opc3(ctx->opcode), opc4(ctx->opcode),
++                      ctx->opcode, ctx->base.pc_next - 4, (int)msr_ir);
++    } else {
++        uint32_t inval;
+ 
+-            if (unlikely(handler->type & (PPC_SPE | PPC_SPE_SINGLE | PPC_SPE_DOUBLE) && Rc(ctx.opcode))) {
+-                inval = handler->inval2;
+-            } else {
+-                inval = handler->inval1;
+-            }
++        if (unlikely(handler->type & (PPC_SPE | PPC_SPE_SINGLE | PPC_SPE_DOUBLE)
++                     && Rc(ctx->opcode))) {
++            inval = handler->inval2;
++        } else {
++            inval = handler->inval1;
++        }
+ 
+-            if (unlikely((ctx.opcode & inval) != 0)) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "invalid bits: %08x for opcode: "
+-                              "%02x - %02x - %02x - %02x (%08x) "
+-                              TARGET_FMT_lx "\n", ctx.opcode & inval,
+-                              opc1(ctx.opcode), opc2(ctx.opcode),
+-                              opc3(ctx.opcode), opc4(ctx.opcode),
+-                              ctx.opcode, ctx.base.pc_next - 4);
+-                gen_inval_exception(ctxp, POWERPC_EXCP_INVAL_INVAL);
+-                break;
+-            }
++        if (unlikely((ctx->opcode & inval) != 0)) {
++            qemu_log_mask(LOG_GUEST_ERROR, "invalid bits: %08x for opcode: "
++                          "%02x - %02x - %02x - %02x (%08x) "
++                          TARGET_FMT_lx "\n", ctx->opcode & inval,
++                          opc1(ctx->opcode), opc2(ctx->opcode),
++                          opc3(ctx->opcode), opc4(ctx->opcode),
++                          ctx->opcode, ctx->base.pc_next - 4);
++            gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
++            ctx->base.is_jmp = DISAS_NORETURN;
++            return;
+         }
+-        (*(handler->handler))(&ctx);
++    }
++    (*(handler->handler))(ctx);
+ #if defined(DO_PPC_STATISTICS)
+-        handler->count++;
++    handler->count++;
+ #endif
+-        /* Check trace mode exceptions */
+-        if (unlikely(ctx.singlestep_enabled & CPU_SINGLE_STEP &&
+-                     (ctx.base.pc_next <= 0x100 || ctx.base.pc_next > 0xF00) &&
+-                     ctx.exception != POWERPC_SYSCALL &&
+-                     ctx.exception != POWERPC_EXCP_TRAP &&
+-                     ctx.exception != POWERPC_EXCP_BRANCH)) {
+-            gen_exception_nip(ctxp, POWERPC_EXCP_TRACE, ctx.base.pc_next);
+-        } else if (unlikely(((ctx.base.pc_next & (TARGET_PAGE_SIZE - 1))
+-                             == 0) ||
+-                            (ctx.base.singlestep_enabled) ||
+-                            singlestep ||
+-                            ctx.base.num_insns >= max_insns)) {
+-            /* if we reach a page boundary or are single stepping, stop
+-             * generation
+-             */
+-            break;
+-        }
+-        if (tcg_check_temp_count()) {
+-            fprintf(stderr, "Opcode %02x %02x %02x %02x (%08x) leaked "
+-                    "temporaries\n", opc1(ctx.opcode), opc2(ctx.opcode),
+-                    opc3(ctx.opcode), opc4(ctx.opcode), ctx.opcode);
+-            exit(1);
+-        }
++    /* Check trace mode exceptions */
++    if (unlikely(ctx->singlestep_enabled & CPU_SINGLE_STEP &&
++                 (ctx->base.pc_next <= 0x100 || ctx->base.pc_next > 0xF00) &&
++                 ctx->exception != POWERPC_SYSCALL &&
++                 ctx->exception != POWERPC_EXCP_TRAP &&
++                 ctx->exception != POWERPC_EXCP_BRANCH)) {
++        gen_exception_nip(ctx, POWERPC_EXCP_TRACE, ctx->base.pc_next);
++    }
++
++    if (tcg_check_temp_count()) {
++        qemu_log("Opcode %02x %02x %02x %02x (%08x) leaked "
++                 "temporaries\n", opc1(ctx->opcode), opc2(ctx->opcode),
++                 opc3(ctx->opcode), opc4(ctx->opcode), ctx->opcode);
+     }
+-    if (tb_cflags(tb) & CF_LAST_IO)
+-        gen_io_end();
+-    if (ctx.exception == POWERPC_EXCP_NONE) {
+-        gen_goto_tb(&ctx, 0, ctx.base.pc_next);
+-    } else if (ctx.exception != POWERPC_EXCP_BRANCH) {
+-        if (unlikely(ctx.base.singlestep_enabled)) {
+-            gen_debug_exception(ctxp);
++
++    ctx->base.is_jmp = ctx->exception == POWERPC_EXCP_NONE ?
++        DISAS_NEXT : DISAS_NORETURN;
++}
++
++static void ppc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++
++    if (ctx->exception == POWERPC_EXCP_NONE) {
++        gen_goto_tb(ctx, 0, ctx->base.pc_next);
++    } else if (ctx->exception != POWERPC_EXCP_BRANCH) {
++        if (unlikely(ctx->base.singlestep_enabled)) {
++            gen_debug_exception(ctx);
+         }
+         /* Generate the return instruction */
+         tcg_gen_exit_tb(0);
+     }
+-    gen_tb_end(tb, ctx.base.num_insns);
++}
++
++static void ppc_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
++{
++    qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
++    log_target_disas(cs, dcbase->pc_first, dcbase->tb->size);
++}
+ 
+-    tb->size = ctx.base.pc_next - ctx.base.pc_first;
+-    tb->icount = ctx.base.num_insns;
++static const TranslatorOps ppc_tr_ops = {
++    .init_disas_context = ppc_tr_init_disas_context,
++    .tb_start           = ppc_tr_tb_start,
++    .insn_start         = ppc_tr_insn_start,
++    .breakpoint_check   = ppc_tr_breakpoint_check,
++    .translate_insn     = ppc_tr_translate_insn,
++    .tb_stop            = ppc_tr_tb_stop,
++    .disas_log          = ppc_tr_disas_log,
++};
+ 
+-#if defined(DEBUG_DISAS)
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+-        && qemu_log_in_addr_range(ctx.base.pc_first)) {
+-        qemu_log_lock();
+-        qemu_log("IN: %s\n", lookup_symbol(ctx.base.pc_first));
+-        log_target_disas(cs, ctx.base.pc_first,
+-                         ctx.base.pc_next - ctx.base.pc_first);
+-        qemu_log("\n");
+-        qemu_log_unlock();
+-    }
+-#endif
++void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
++{
++    DisasContext ctx;
++
++    translator_loop(&ppc_tr_ops, &ctx.base, cs, tb);
  }
  
- static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-@@ -194,7 +194,7 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-     if (smc->pre_2_10_has_unused_icps) {
-         int i;
- 
--        for (i = 0; i < xics_max_server_number(); i++) {
-+        for (i = 0; i < xics_max_server_number(spapr); i++) {
-             /* Dummy entries get deregistered when real ICPState objects
-              * are registered during CPU core hotplug.
-              */
-@@ -337,7 +337,6 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-     int ret = 0, offset, cpus_offset;
-     CPUState *cs;
-     char cpu_model[32];
--    int smt = kvmppc_smt_threads();
-     uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
- 
-     CPU_FOREACH(cs) {
-@@ -346,7 +345,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-         int index = spapr_vcpu_id(cpu);
-         int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
- 
--        if ((index % smt) != 0) {
-+        if (index % spapr->vsmt != 0) {
-             continue;
-         }
- 
-@@ -614,7 +613,6 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-     CPUState *cs;
-     int cpus_offset;
-     char *nodename;
--    int smt = kvmppc_smt_threads();
- 
-     cpus_offset = fdt_add_subnode(fdt, 0, "cpus");
-     _FDT(cpus_offset);
-@@ -632,7 +630,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
-         int offset;
- 
--        if ((index % smt) != 0) {
-+        if (index % spapr->vsmt != 0) {
-             continue;
-         }
- 
-@@ -1131,7 +1129,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
-     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
- 
-     /* /interrupt controller */
--    spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
-+    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
- 
-     ret = spapr_populate_memory(spapr, fdt);
-     if (ret < 0) {
-@@ -2224,7 +2222,6 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
-     MachineState *machine = MACHINE(spapr);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const char *type = spapr_get_cpu_core_type(machine->cpu_type);
--    int smt = kvmppc_smt_threads();
-     const CPUArchIdList *possible_cpus;
-     int boot_cores_nr = smp_cpus / smp_threads;
-     int i;
-@@ -2254,7 +2251,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
- 
-         if (mc->has_hotpluggable_cpus) {
-             spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
--                                   (core_id / smp_threads) * smt);
-+                                   (core_id / smp_threads) * spapr->vsmt);
-         }
- 
-         if (i < boot_cores_nr) {
-@@ -3281,10 +3278,10 @@ static
- void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp)
- {
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
-     int index;
-     sPAPRDRConnector *drc;
-     CPUCore *cc = CPU_CORE(dev);
--    int smt = kvmppc_smt_threads();
- 
-     if (!spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index)) {
-         error_setg(errp, "Unable to find CPU core with core-id: %d",
-@@ -3296,7 +3293,7 @@ void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * smt);
-+    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
-     g_assert(drc);
- 
-     spapr_drc_detach(drc);
-@@ -3315,7 +3312,6 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     CPUState *cs = CPU(core->threads[0]);
-     sPAPRDRConnector *drc;
-     Error *local_err = NULL;
--    int smt = kvmppc_smt_threads();
-     CPUArchId *core_slot;
-     int index;
-     bool hotplugged = spapr_drc_hotplugged(dev);
-@@ -3326,7 +3322,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                    cc->core_id);
-         return;
-     }
--    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * smt);
-+    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
- 
-     g_assert(drc || !mc->has_hotpluggable_cpus);
- 
+ void restore_state_to_opc(CPUPPCState *env, TranslationBlock *tb,
 -- 
 2.14.3
