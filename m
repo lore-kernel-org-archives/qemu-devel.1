@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emXTk-0006VV-Kb
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 23:18:34 -0500
+	(envelope-from <thuth@redhat.com>) id 1emYxv-0000yb-IX
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 00:53:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emXTj-0002aW-6R
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 23:18:32 -0500
-Date: Fri, 16 Feb 2018 15:18:19 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180216041819.GG2074@umbus.fritz.box>
-References: <20180216023328.8407-1-sjitindarsingh@gmail.com>
-	<20180216023328.8407-2-sjitindarsingh@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1emYxr-00057f-MH
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 00:53:47 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51396 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1emYxr-00056T-HQ
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 00:53:43 -0500
+References: <20180204222356.14546-1-richard.henderson@linaro.org>
+	<20180204222356.14546-3-richard.henderson@linaro.org>
+	<3edd5d86-1c7c-1a32-4203-5ea4c432ad1f@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b1fc9805-a231-6f78-ed0d-318a3f1293bb@redhat.com>
+Date: Fri, 16 Feb 2018 06:53:21 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SdvjNjn6lL3tIsv0"
-Content-Disposition: inline
-In-Reply-To: <20180216023328.8407-2-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V4 2/2] ppc/spapr-caps: For
- pseries-2.12 change spapr-cap defaults
+In-Reply-To: <3edd5d86-1c7c-1a32-4203-5ea4c432ad1f@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 2/3] tests: Enable boot-serial-test for hppa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-
---SdvjNjn6lL3tIsv0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 16, 2018 at 01:33:28PM +1100, Suraj Jitindar Singh wrote:
-> For the pseries-2.12 machine type, make the spapr-caps SPAPR_CAP_CFPC
-> and SPAPR_CAP_SBBC default to workaround. Thus if the host is capable
-> the guest will be able to take advantage of these workarounds by default.
-> Otherwise if the host doesn't have these capabilities qemu will fail to
-> start and they will have to be explicitly disabled on the command line
-> with:
-> -machine pseries,cap-cfpc=3Dbroken,cap-sbbc=3Dbroken
+On 16.02.2018 00:55, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 02/04/2018 07:23 PM, Richard Henderson wrote:
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  tests/boot-serial-test.c | 1 +
+>>  tests/Makefile.include   | 2 ++
+>>  2 files changed, 3 insertions(+)
+>>
+>> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+>> index 418c5b92dc..ea87a80be7 100644
+>> --- a/tests/boot-serial-test.c
+>> +++ b/tests/boot-serial-test.c
+>> @@ -87,6 +87,7 @@ static testdef_t tests[] =3D {
+>>        sizeof(kernel_plml605), kernel_plml605 },
+>>      { "moxie", "moxiesim", "", "TT", sizeof(bios_moxiesim), 0, bios_m=
+oxiesim },
+>>      { "arm", "raspi2", "", "TT", sizeof(bios_raspi2), 0, bios_raspi2 =
+},
+>> +    { "hppa", "hppa", "", "SeaBIOS wants SYSTEM HALT" },
+>> =20
+>>      { NULL }
+>>  };
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index ca82e0c0cc..83def6994c 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -299,6 +299,8 @@ gcov-files-x86_64-y =3D $(subst i386-softmmu/,x86_=
+64-softmmu/,$(gcov-files-i386-y)
+>> =20
+>>  check-qtest-alpha-y =3D tests/boot-serial-test$(EXESUF)
+>> =20
+>> +check-qtest-hppa-y =3D tests/boot-serial-test$(EXESUF)
+>> +
+>>  check-qtest-m68k-y =3D tests/boot-serial-test$(EXESUF)
+>> =20
+>>  check-qtest-microblaze-y =3D tests/boot-serial-test$(EXESUF)
+>>
 >=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-
-I've decided to hold off on this for a little bit longer for two
-reasons: 1) I realised how badly it will break things for machines
-which don't yet updated firmware (both POWER8 and POWER9) which
-includes a very large proportion of test machines.  2) I've looked
-more closely at what x86 has done.  For themthe mitigations are
-controlled by CPU options, not machine level, but the "plain" types
-are still the unmitigated variants, with variants for the versions
-with microcode updated with mitigations.  See
-https://www.qemu.org/2018/02/14/qemu-2-11-1-and-spectre-update/
-
+> I got this failure in 2 different branches:
 >=20
-> ---
->=20
-> V2 -> V3:
->  - Set caps to workaround in the class default rather than the
->    pseries-2.12 initialiser.
-> ---
->  hw/ppc/spapr.c      |  6 ++++--
->  hw/ppc/spapr_caps.c | 10 ++++++++++
->  2 files changed, 14 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 83c9d66dd5..69f59aabf1 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3915,8 +3915,8 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
->      smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
->      smc->default_caps.caps[SPAPR_CAP_DFP] =3D SPAPR_CAP_ON;
-> -    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
-> -    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-> +    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_WORKAROUND;
-> +    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_WORKAROUND;
->      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
->      spapr_caps_add_properties(smc, &error_abort);
->  }
-> @@ -4000,6 +4000,8 @@ static void spapr_machine_2_11_class_options(Machin=
-eClass *mc)
-> =20
->      spapr_machine_2_12_class_options(mc);
->      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_ON;
-> +    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
-> +    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
->      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
->  }
-> =20
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 99a4b71d19..7b0ecb3eca 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -283,11 +283,21 @@ static sPAPRCapabilities default_caps_with_cpu(sPAP=
-RMachineState *spapr,
-> =20
->      caps =3D smc->default_caps;
-> =20
-> +    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
-> +                          0, spapr->max_compat_pvr)) {
-> +        caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
-> +    }
-> +
->      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
->                            0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
->      }
-> =20
-> +    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
-> +                          0, spapr->max_compat_pvr)) {
-> +        caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-> +    }
-> +
->      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
->                            0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_OFF;
+>   GTESTER check-qtest-hppa
+> **
+> ERROR:tests/boot-serial-test.c:137:check_guest_output: assertion failed=
+:
+> (output_ok)
+> GTester: last random seed: R02S55e7df877597841c1b3b62962e410123
+> make: *** [check-qtest-hppa] Error 1
+> make: *** Waiting for unfinished jobs....
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Uh, oh, I actually can also reproduce this on my laptop when putting a
+lot of load on the system (make -j10 in another window). I think I know
+what the problem is: I've introduced a counter in commit 92b540dac9fc3a5
+to handle the timeouts in a better way. But in case ccnt reaches 512,
+the current read character is ignored - and if that character is part of
+the string that we are looking for, the test fails to match the string.
 
---SdvjNjn6lL3tIsv0
-Content-Type: application/pgp-signature; name="signature.asc"
+Almost all of the tests look for a string within the first 512 bytes of
+firmware output, so the problem never triggered there. But the hppa test
+looks for a string at the very end of a long output, so that's likely
+the reason that the problem triggered here.
 
------BEGIN PGP SIGNATURE-----
+The fix is pretty simple:
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqGW4sACgkQbDjKyiDZ
-s5J2yBAAwtWG/DbM8qWTGpGqiKmgLCkxT65UetjbEL0mgeFPgmTdMLoCVY760WKE
-rLRGR7U/jzyIktIpPPI0umBts7ixvF8QkvAsqJ+ENpGLPTt0dU8cwgkAke86+EJX
-p7LpdAyHkHDUL5EQQZ5VywS7pQX7yOobbcaGdjOyskFcHY39VHh31WGoU/8tCQ1F
-nlkRcboXIOoPhPlJqwuUtK4rZpUSjUmHmYCm4dM7HDTBsdxIEpG49hywix7+sIPP
-z72AnzMxtv+iLhw3d3LYPKhtrUOh01dQGHiYKehk7/jPv7NGEkwrbE3/Tkb7I+lH
-IM/GNn0YrOu8RExldN6uZTG7lTMck1Zy5MHdZWE/3J76lKj2ueQvQjg5sfbK2Zrh
-d/CYc6MccZawzzDUrcM89Wfp2Yenody+GA9D/cPRcgIbpHrc0clDmL6Cxaowpd1P
-WWNZzAK63QLoG03QgslIrd1P4lSbm9qX0gy2eOQm20Xvo9Zhp2YYclLcA6SN5JhE
-qvXFafUGZsZvTzHYCHeNxHkDWY+YGRajFrBTg8oSSX53PI3z4ATkOaoke34lpzdw
-wx5ciA9Qc2eWENIUWBVOPVMsqPgNr/juzE50UFzX3RFg5nZtMNEXAXLM+Q8wHcSC
-CjXe/hI+bqy4hqH1YE2AhZUdW4R9sFCu2v4ubEO320kNeNbO2uI=
-=kEv5
------END PGP SIGNATURE-----
+diff a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -117,7 +117,7 @@ static void check_guest_output(const testdef_t
+*test, int fd)
+     /* Poll serial output... Wait at most 60 seconds */
+     for (i =3D 0; i < 6000; ++i) {
+         ccnt =3D 0;
+-        while ((nbr =3D read(fd, &ch, 1)) =3D=3D 1 && ccnt++ < 512) {
++        while (ccnt++ < 512 && (nbr =3D read(fd, &ch, 1)) =3D=3D 1) {
+             if (ch =3D=3D test->expect[pos]) {
+                 pos +=3D 1;
+                 if (test->expect[pos] =3D=3D '\0') {
 
---SdvjNjn6lL3tIsv0--
+I'll submit this as a proper patch...
+
+ Thomas
