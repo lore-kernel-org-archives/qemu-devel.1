@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emhFc-0000OY-3t
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:37 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1emhIC-0002RX-Cg
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:47:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emhFb-0003o5-1t
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43550 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1emhFa-0003nq-TO
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:34 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01D52EAEA4
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 14:44:23 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 16 Feb 2018 15:44:14 +0100
-Message-Id: <20180216144418.21986-2-kraxel@redhat.com>
-In-Reply-To: <20180216144418.21986-1-kraxel@redhat.com>
-References: <20180216144418.21986-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] keymap: make struct kbd_layout_t private
- to ui/keymaps.c
+	(envelope-from <programmingkidx@gmail.com>) id 1emhI9-0004d5-9p
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:47:16 -0500
+Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:50757)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1emhI9-0004ct-3h
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:47:13 -0500
+Received: by mail-it0-x229.google.com with SMTP id y16so2077519itc.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 06:47:12 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20180216131540.ioudb6rwf4y6qnxq@sirius.home.kraxel.org>
+Date: Fri, 16 Feb 2018 09:47:10 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <55E5910F-47CB-49BD-83F2-E867750F9BEA@gmail.com>
+References: <20180203171743.13612-1-programmingkidx@gmail.com>
+	<20180216131540.ioudb6rwf4y6qnxq@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v6] ui/cocoa.m: Add ability for user to
+ specify mouse ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,133 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Also use kbd_layout_t pointers instead of void pointers.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/keymaps.h | 28 +++++-----------------------
- ui/keymaps.c | 31 ++++++++++++++++++++++++-------
- 2 files changed, 29 insertions(+), 30 deletions(-)
+> On Feb 16, 2018, at 8:15 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>=20
+> On Sat, Feb 03, 2018 at 12:17:43PM -0500, John Arbuckle wrote:
+>> Currently the ungrab keys for the Cocoa and GTK interface are =
+Control-Alt-g.
+>> This combination may not be very fun for the user to have to enter, =
+so we
+>> now enable the user to specify their own key(s) as the ungrab key(s). =
+The
+>> list of keys that can be used is found in the file qapi/ui.json under =
+QKeyCode.
+>> The max number of keys that can be used is three.
+>>=20
+>> Syntax: -display cocoa,hotkey-grab=3D<key-key-key>
+>>=20
+>> Example usage:  -display cocoa,hotkey-grab=3Dhome
+>> 	        -display cocoa,hotkey-grab=3Dshift-ctrl
+>> 		-display cocoa,hotkey-grab=3Dctrl-x
+>> 		-display cocoa,hotkey-grab=3Dpgup-pgdn
+>> 		-display cocoa,hotkey-grab=3Dkp_5-kp_6
+>> 		-display cocoa,hotkey-grab=3Dkp_4-kp_5-kp_6
+>> 		-display cocoa,hotkey-grab=3Dctrl-alt
+>=20
+> Finally found the time for a closer look and some testing.
+>=20
+> Problem is the hotkeys are all forwarded to the guest.
+> So when using -- for example -- the pgup-pgdn hotkey
+> and you press the combination the guest will see it.
+>=20
+> I see basically two options to deal with that:
+>=20
+> (a) Make the code more clever.  On pgup keydown event
+>    the code has to figure this might be part of a hotkey
+>    sequence, hold back the event to see what comes next.
+>    - If the next event is pgup keyup -> ok, normal pgup
+>      keypress, forward both keydown and keyup to the guest.
+>    - If the next event is pgdn keydown -> hotkey found.
+>      So do hotkey action, don't forward keydown (and
+>      following keyup) events to the guest.
 
-diff --git a/ui/keymaps.h b/ui/keymaps.h
-index 8757465529..5c0898bfcf 100644
---- a/ui/keymaps.h
-+++ b/ui/keymaps.h
-@@ -32,25 +32,6 @@ typedef struct {
- 	int keysym;
- } name2keysym_t;
- 
--struct key_range {
--    int start;
--    int end;
--    struct key_range *next;
--};
--
--#define MAX_NORMAL_KEYCODE 512
--#define MAX_EXTRA_COUNT 256
--typedef struct {
--    uint16_t keysym2keycode[MAX_NORMAL_KEYCODE];
--    struct {
--	int keysym;
--	uint16_t keycode;
--    } keysym2keycode_extra[MAX_EXTRA_COUNT];
--    int extra_count;
--    struct key_range *keypad_range;
--    struct key_range *numlock_range;
--} kbd_layout_t;
--
- /* scancode without modifiers */
- #define SCANCODE_KEYMASK 0xff
- /* scancode without grey or up bit */
-@@ -69,10 +50,11 @@ typedef struct {
- #define SCANCODE_ALT    0x400
- #define SCANCODE_ALTGR  0x800
- 
-+typedef struct kbd_layout_t kbd_layout_t;
- 
--void *init_keyboard_layout(const name2keysym_t *table, const char *language);
--int keysym2scancode(void *kbd_layout, int keysym);
--int keycode_is_keypad(void *kbd_layout, int keycode);
--int keysym_is_numlock(void *kbd_layout, int keysym);
-+kbd_layout_t* init_keyboard_layout(const name2keysym_t *table, const char *language);
-+int keysym2scancode(kbd_layout_t *k, int keysym);
-+int keycode_is_keypad(kbd_layout_t *k, int keycode);
-+int keysym_is_numlock(kbd_layout_t *k, int keysym);
- 
- #endif /* QEMU_KEYMAPS_H */
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index f9762d1497..74d93dee63 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -28,6 +28,26 @@
- #include "trace.h"
- #include "qemu/error-report.h"
- 
-+#define MAX_NORMAL_KEYCODE 512
-+#define MAX_EXTRA_COUNT 256
-+
-+struct key_range {
-+    int start;
-+    int end;
-+    struct key_range *next;
-+};
-+
-+struct kbd_layout_t {
-+    uint16_t keysym2keycode[MAX_NORMAL_KEYCODE];
-+    struct {
-+	int keysym;
-+	uint16_t keycode;
-+    } keysym2keycode_extra[MAX_EXTRA_COUNT];
-+    int extra_count;
-+    struct key_range *keypad_range;
-+    struct key_range *numlock_range;
-+};
-+
- static int get_keysym(const name2keysym_t *table,
-                       const char *name)
- {
-@@ -186,15 +206,14 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
- }
- 
- 
--void *init_keyboard_layout(const name2keysym_t *table, const char *language)
-+kbd_layout_t* init_keyboard_layout(const name2keysym_t *table, const char *language)
- {
-     return parse_keyboard_layout(table, language, NULL);
- }
- 
- 
--int keysym2scancode(void *kbd_layout, int keysym)
-+int keysym2scancode(kbd_layout_t *k, int keysym)
- {
--    kbd_layout_t *k = kbd_layout;
-     if (keysym < MAX_NORMAL_KEYCODE) {
-         if (k->keysym2keycode[keysym] == 0) {
-             trace_keymap_unmapped(keysym);
-@@ -217,9 +236,8 @@ int keysym2scancode(void *kbd_layout, int keysym)
-     return 0;
- }
- 
--int keycode_is_keypad(void *kbd_layout, int keycode)
-+int keycode_is_keypad(kbd_layout_t *k, int keycode)
- {
--    kbd_layout_t *k = kbd_layout;
-     struct key_range *kr;
- 
-     for (kr = k->keypad_range; kr; kr = kr->next) {
-@@ -230,9 +248,8 @@ int keycode_is_keypad(void *kbd_layout, int keycode)
-     return 0;
- }
- 
--int keysym_is_numlock(void *kbd_layout, int keysym)
-+int keysym_is_numlock(kbd_layout_t *k, int keysym)
- {
--    kbd_layout_t *k = kbd_layout;
-     struct key_range *kr;
- 
-     for (kr = k->numlock_range; kr; kr = kr->next) {
--- 
-2.9.3
+Ok. I think this should be doable.
+
+>=20
+> (b) Restrict allowed hotkeys to modifier key(s) plus one
+>    non-modifier key.  Forwarding modifier keydown+keyup
+>    to the guest has typically effects inside the guest,
+>    so we only have to hold back that single non-modifier
+>    key.  That is alot easier to implement.
+
+Sorry but I was using this patch to make my ungrab key F15.
+This key is not used by anything and makes things so simple
+for me. Requiring a modifier key in the sequence seems unnecessary.=20
+
+Thank you.=
