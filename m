@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emWZ7-0004OW-FO
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 22:20:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emXTk-0006VV-Kb
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 23:18:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emWZ3-0003EM-Du
-	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 22:20:01 -0500
-Date: Fri, 16 Feb 2018 14:10:14 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1emXTj-0002aW-6R
+	for qemu-devel@nongnu.org; Thu, 15 Feb 2018 23:18:32 -0500
+Date: Fri, 16 Feb 2018 15:18:19 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180216031014.GD2074@umbus.fritz.box>
-References: <cover.1518730026.git.balaton@eik.bme.hu>
-	<0d6dd5c0e5279896b29b140b198f2a9f6b2d87ba.1518730026.git.balaton@eik.bme.hu>
+Message-ID: <20180216041819.GG2074@umbus.fritz.box>
+References: <20180216023328.8407-1-sjitindarsingh@gmail.com>
+	<20180216023328.8407-2-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="d01dLTUuW90fS44H"
+	protocol="application/pgp-signature"; boundary="SdvjNjn6lL3tIsv0"
 Content-Disposition: inline
-In-Reply-To: <0d6dd5c0e5279896b29b140b198f2a9f6b2d87ba.1518730026.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] ppc: Add aCube Sam460ex board
+In-Reply-To: <20180216023328.8407-2-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V4 2/2] ppc/spapr-caps: For
+ pseries-2.12 change spapr-cap defaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,717 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
 
 
---d01dLTUuW90fS44H
-Content-Type: text/plain; charset=iso-8859-1
+--SdvjNjn6lL3tIsv0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 15, 2018 at 10:27:06PM +0100, BALATON Zoltan wrote:
-> Add emulation of aCube Sam460ex board based on AMCC 460EX embedded SoC.
-> This is not a complete implementation yet with a lot of components
-> still missing but enough for the U-Boot firmware to start and to boot
-> a Linux kernel or AROS.
+On Fri, Feb 16, 2018 at 01:33:28PM +1100, Suraj Jitindar Singh wrote:
+> For the pseries-2.12 machine type, make the spapr-caps SPAPR_CAP_CFPC
+> and SPAPR_CAP_SBBC default to workaround. Thus if the host is capable
+> the guest will be able to take advantage of these workarounds by default.
+> Otherwise if the host doesn't have these capabilities qemu will fail to
+> start and they will have to be explicitly disabled on the command line
+> with:
+> -machine pseries,cap-cfpc=3Dbroken,cap-sbbc=3Dbroken
 >=20
-> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+I've decided to hold off on this for a little bit longer for two
+reasons: 1) I realised how badly it will break things for machines
+which don't yet updated firmware (both POWER8 and POWER9) which
+includes a very large proportion of test machines.  2) I've looked
+more closely at what x86 has done.  For themthe mitigations are
+controlled by CPU options, not machine level, but the "plain" types
+are still the unmitigated variants, with variants for the versions
+with microcode updated with mitigations.  See
+https://www.qemu.org/2018/02/14/qemu-2-11-1-and-spectre-update/
+
+>=20
 > ---
 >=20
-> v2:
-> - Rebased to latest changes on master
-> - Replaced printfs with error_report
-
-This has a conflict in hw/ppc/Makefile.objs.  Looks like it was based
-on some other patch that added ppc440_pcix.o.  That's not there
-upstream.
-
+> V2 -> V3:
+>  - Set caps to workaround in the class default rather than the
+>    pseries-2.12 initialiser.
+> ---
+>  hw/ppc/spapr.c      |  6 ++++--
+>  hw/ppc/spapr_caps.c | 10 ++++++++++
+>  2 files changed, 14 insertions(+), 2 deletions(-)
 >=20
->  default-configs/ppc-softmmu.mak    |   2 +
->  default-configs/ppcemb-softmmu.mak |   1 +
->  hw/ppc/Makefile.objs               |   3 +-
->  hw/ppc/sam460ex.c                  | 603 +++++++++++++++++++++++++++++++=
-++++++
->  4 files changed, 608 insertions(+), 1 deletion(-)
->  create mode 100644 hw/ppc/sam460ex.c
->=20
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
-u.mak
-> index 76e29cf..4d7be45 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -21,6 +21,8 @@ CONFIG_E500=3Dy
->  CONFIG_OPENPIC_KVM=3D$(call land,$(CONFIG_E500),$(CONFIG_KVM))
->  CONFIG_PLATFORM_BUS=3Dy
->  CONFIG_ETSEC=3Dy
-> +# For Sam460ex
-> +CONFIG_USB_EHCI_SYSBUS=3Dy
->  CONFIG_SM501=3Dy
->  CONFIG_IDE_SII3112=3Dy
->  CONFIG_I2C=3Dy
-> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-=
-softmmu.mak
-> index bc5e1b3..67d18b2 100644
-> --- a/default-configs/ppcemb-softmmu.mak
-> +++ b/default-configs/ppcemb-softmmu.mak
-> @@ -15,6 +15,7 @@ CONFIG_PTIMER=3Dy
->  CONFIG_I8259=3Dy
->  CONFIG_XILINX=3Dy
->  CONFIG_XILINX_ETHLITE=3Dy
-> +CONFIG_USB_EHCI_SYSBUS=3Dy
->  CONFIG_SM501=3Dy
->  CONFIG_IDE_SII3112=3Dy
->  CONFIG_I2C=3Dy
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index bddc742..86d82a6 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -13,7 +13,8 @@ endif
->  obj-$(CONFIG_PSERIES) +=3D spapr_rtas_ddw.o
->  # PowerPC 4xx boards
->  obj-y +=3D ppc4xx_devs.o ppc405_uc.o
-> -obj-$(CONFIG_PPC4XX) +=3D ppc4xx_pci.o ppc405_boards.o ppc440_bamboo.o p=
-pc440_pcix.o
-> +obj-$(CONFIG_PPC4XX) +=3D ppc4xx_pci.o ppc405_boards.o
-> +obj-$(CONFIG_PPC4XX) +=3D ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o sam4=
-60ex.o
->  # PReP
->  obj-$(CONFIG_PREP) +=3D prep.o
->  obj-$(CONFIG_PREP) +=3D prep_systemio.o
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> new file mode 100644
-> index 0000000..ff99cf9
-> --- /dev/null
-> +++ b/hw/ppc/sam460ex.c
-> @@ -0,0 +1,603 @@
-> +/*
-> + * QEMU aCube Sam460ex board emulation
-> + *
-> + * Copyright (c) 2012 Fran=E7ois Revol
-> + * Copyright (c) 2016-2018 BALATON Zoltan
-> + *
-> + * This file is derived from hw/ppc440_bamboo.c,
-> + * the copyright for that material belongs to the original owners.
-> + *
-> + * This work is licensed under the GNU GPL license version 2 or later.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/cutils.h"
-> +#include "qemu/error-report.h"
-> +#include "qapi/error.h"
-> +#include "hw/hw.h"
-> +#include "sysemu/blockdev.h"
-> +#include "hw/boards.h"
-> +#include "sysemu/kvm.h"
-> +#include "kvm_ppc.h"
-> +#include "sysemu/device_tree.h"
-> +#include "sysemu/block-backend.h"
-> +#include "hw/loader.h"
-> +#include "elf.h"
-> +#include "exec/address-spaces.h"
-> +#include "exec/memory.h"
-> +#include "hw/ppc/ppc440.h"
-> +#include "hw/ppc/ppc405.h"
-> +#include "hw/block/flash.h"
-> +#include "sysemu/sysemu.h"
-> +#include "sysemu/qtest.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/char/serial.h"
-> +#include "hw/i2c/ppc4xx_i2c.h"
-> +#include "hw/i2c/smbus.h"
-> +#include "hw/usb/hcd-ehci.h"
-> +
-> +#define BINARY_DEVICE_TREE_FILE "sam460ex.dtb"
-> +#define UBOOT_FILENAME "u-boot-sam460-20100605.bin"
-> +/* to extract the official U-Boot bin from the updater: */
-> +/* dd bs=3D1 skip=3D$(($(stat -c '%s' updater/updater-460) - 0x80000)) \
-> +     if=3Dupdater/updater-460 of=3Du-boot-sam460-20100605.bin */
-> +
-> +/* from Sam460 U-Boot include/configs/Sam460ex.h */
-> +#define FLASH_BASE             0xfff00000
-> +#define FLASH_BASE_H           0x4
-> +#define FLASH_SIZE             (1 << 20)
-> +#define UBOOT_LOAD_BASE        0xfff80000
-> +#define UBOOT_SIZE             0x00080000
-> +#define UBOOT_ENTRY            0xfffffffc
-> +
-> +/* from U-Boot */
-> +#define EPAPR_MAGIC           (0x45504150)
-> +#define KERNEL_ADDR           0x1000000
-> +#define FDT_ADDR              0x1800000
-> +#define RAMDISK_ADDR          0x1900000
-> +
-> +/* Sam460ex IRQ MAP:
-> +   IRQ0  =3D ETH_INT
-> +   IRQ1  =3D FPGA_INT
-> +   IRQ2  =3D PCI_INT (PCIA, PCIB, PCIC, PCIB)
-> +   IRQ3  =3D FPGA_INT2
-> +   IRQ11 =3D RTC_INT
-> +   IRQ12 =3D SM502_INT
-> +*/
-> +
-> +#define SDRAM_NR_BANKS 4
-> +
-> +/* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
-> +static const unsigned int ppc460ex_sdram_bank_sizes[] =3D {
-> +    1024 << 20, 512 << 20, 256 << 20, 128 << 20, 64 << 20, 32 << 20, 0
-> +};
-> +
-> +struct boot_info {
-> +    uint32_t dt_base;
-> +    uint32_t dt_size;
-> +    uint32_t entry;
-> +};
-> +
-> +/***********************************************************************=
-******/
-> +/* SPD eeprom content from mips_malta.c */
-> +
-> +struct _eeprom24c0x_t {
-> +  uint8_t tick;
-> +  uint8_t address;
-> +  uint8_t command;
-> +  uint8_t ack;
-> +  uint8_t scl;
-> +  uint8_t sda;
-> +  uint8_t data;
-> +  uint8_t contents[256];
-> +};
-> +
-> +typedef struct _eeprom24c0x_t eeprom24c0x_t;
-> +
-> +static eeprom24c0x_t spd_eeprom =3D {
-> +    .contents =3D {
-> +        /* 00000000: */ 0x80, 0x08, 0xFF, 0x0D, 0x0A, 0xFF, 0x40, 0x00,
-> +        /* 00000008: */ 0x04, 0x75, 0x54, 0x00, 0x82, 0x08, 0x00, 0x01,
-> +        /* 00000010: */ 0x8F, 0x04, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00,
-> +        /* 00000018: */ 0x00, 0x00, 0x00, 0x14, 0x0F, 0x14, 0x2D, 0xFF,
-> +        /* 00000020: */ 0x15, 0x08, 0x15, 0x08, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000028: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000030: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000038: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0xD0,
-> +        /* 00000040: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000048: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000050: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000058: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000060: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000068: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000070: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000078: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x64, 0xF4,
-> +    },
-> +};
-> +
-> +static void generate_eeprom_spd(uint8_t *eeprom, ram_addr_t ram_size)
-> +{
-> +    enum { SDR =3D 0x4, DDR1 =3D 0x7, DDR2 =3D 0x8 } type;
-> +    uint8_t *spd =3D spd_eeprom.contents;
-> +    uint8_t nbanks =3D 0;
-> +    uint16_t density =3D 0;
-> +    int i;
-> +
-> +    /* work in terms of MB */
-> +    ram_size >>=3D 20;
-> +
-> +    while ((ram_size >=3D 4) && (nbanks <=3D 2)) {
-> +        int sz_log2 =3D MIN(31 - clz32(ram_size), 14);
-> +        nbanks++;
-> +        density |=3D 1 << (sz_log2 - 2);
-> +        ram_size -=3D 1 << sz_log2;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 83c9d66dd5..69f59aabf1 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3915,8 +3915,8 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_DFP] =3D SPAPR_CAP_ON;
+> -    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
+> -    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
+> +    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_WORKAROUND;
+> +    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_WORKAROUND;
+>      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+>      spapr_caps_add_properties(smc, &error_abort);
+>  }
+> @@ -4000,6 +4000,8 @@ static void spapr_machine_2_11_class_options(Machin=
+eClass *mc)
+> =20
+>      spapr_machine_2_12_class_options(mc);
+>      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_ON;
+> +    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
+> +    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+>  }
+> =20
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 99a4b71d19..7b0ecb3eca 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -283,11 +283,21 @@ static sPAPRCapabilities default_caps_with_cpu(sPAP=
+RMachineState *spapr,
+> =20
+>      caps =3D smc->default_caps;
+> =20
+> +    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
+> +                          0, spapr->max_compat_pvr)) {
+> +        caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
 > +    }
 > +
-> +    /* split to 2 banks if possible */
-> +    if ((nbanks =3D=3D 1) && (density > 1)) {
-> +        nbanks++;
-> +        density >>=3D 1;
+>      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+>                            0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+>      }
+> =20
+> +    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
+> +                          0, spapr->max_compat_pvr)) {
+> +        caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
 > +    }
 > +
-> +    if (density & 0xff00) {
-> +        density =3D (density & 0xe0) | ((density >> 8) & 0x1f);
-> +        type =3D DDR2;
-> +    } else if (!(density & 0x1f)) {
-> +        type =3D DDR2;
-> +    } else {
-> +        type =3D SDR;
-> +    }
-> +
-> +    if (ram_size) {
-> +        warn_report("SPD cannot represent final " RAM_ADDR_FMT "MB"
-> +                    " of SDRAM", ram_size);
-> +    }
-> +
-> +    /* fill in SPD memory information */
-> +    spd[2] =3D type;
-> +    spd[5] =3D nbanks;
-> +    spd[31] =3D density;
-> +
-> +    /* XXX: this is totally random */
-> +    spd[9] =3D 0x10; /* CAS tcyc */
-> +    spd[18] =3D 0x20; /* CAS bit */
-> +    spd[23] =3D 0x10; /* CAS tcyc */
-> +    spd[25] =3D 0x10; /* CAS tcyc */
-> +
-> +    /* checksum */
-> +    spd[63] =3D 0;
-> +    for (i =3D 0; i < 63; i++) {
-> +        spd[63] +=3D spd[i];
-> +    }
-> +
-> +    /* copy for SMBUS */
-> +    memcpy(eeprom, spd, sizeof(spd_eeprom.contents));
-> +}
-> +
-> +static void generate_eeprom_serial(uint8_t *eeprom)
-> +{
-> +    int i, pos =3D 0;
-> +    uint8_t mac[6] =3D { 0x00 };
-> +    uint8_t sn[5] =3D { 0x01, 0x23, 0x45, 0x67, 0x89 };
-> +
-> +    /* version */
-> +    eeprom[pos++] =3D 0x01;
-> +
-> +    /* count */
-> +    eeprom[pos++] =3D 0x02;
-> +
-> +    /* MAC address */
-> +    eeprom[pos++] =3D 0x01; /* MAC */
-> +    eeprom[pos++] =3D 0x06; /* length */
-> +    memcpy(&eeprom[pos], mac, sizeof(mac));
-> +    pos +=3D sizeof(mac);
-> +
-> +    /* serial number */
-> +    eeprom[pos++] =3D 0x02; /* serial */
-> +    eeprom[pos++] =3D 0x05; /* length */
-> +    memcpy(&eeprom[pos], sn, sizeof(sn));
-> +    pos +=3D sizeof(sn);
-> +
-> +    /* checksum */
-> +    eeprom[pos] =3D 0;
-> +    for (i =3D 0; i < pos; i++) {
-> +        eeprom[pos] +=3D eeprom[i];
-> +    }
-> +}
-> +
-> +/***********************************************************************=
-******/
-> +
-> +static int sam460ex_load_uboot(void)
-> +{
-> +    DriveInfo *dinfo;
-> +    BlockBackend *blk =3D NULL;
-> +    hwaddr base =3D FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32);
-> +    long bios_size =3D FLASH_SIZE;
-> +    int fl_sectors;
-> +
-> +    dinfo =3D drive_get(IF_PFLASH, 0, 0);
-> +    if (dinfo) {
-> +        blk =3D blk_by_legacy_dinfo(dinfo);
-> +        bios_size =3D blk_getlength(blk);
-> +    }
-> +    fl_sectors =3D (bios_size + 65535) >> 16;
-> +
-> +    if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
-> +                               blk, (64 * 1024), fl_sectors,
-> +                               1, 0x89, 0x18, 0x0000, 0x0, 1)) {
-> +        error_report("qemu: Error registering flash memory.");
-> +        /* XXX: return an error instead? */
-> +        exit(1);
-> +    }
-> +
-> +    if (!blk) {
-> +        /*error_report("No flash image given with the 'pflash' parameter=
-,"
-> +                " using default u-boot image");*/
-> +        base =3D UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32);
-> +        rom_add_file_fixed(UBOOT_FILENAME, base, -1);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int sam460ex_load_device_tree(hwaddr addr,
-> +                                     uint32_t ramsize,
-> +                                     hwaddr initrd_base,
-> +                                     hwaddr initrd_size,
-> +                                     const char *kernel_cmdline)
-> +{
-> +    int ret =3D -1;
-> +    uint32_t mem_reg_property[] =3D { 0, 0, cpu_to_be32(ramsize) };
-> +    char *filename;
-> +    int fdt_size;
-> +    void *fdt;
-> +    uint32_t tb_freq =3D 400000000;
-> +    uint32_t clock_freq =3D 400000000;
-> +
-> +    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_=
-FILE);
-> +    if (!filename) {
-> +        goto out;
-> +    }
-> +    fdt =3D load_device_tree(filename, &fdt_size);
-> +    g_free(filename);
-> +    if (fdt =3D=3D NULL) {
-> +        goto out;
-> +    }
-> +
-> +    /* Manipulate device tree in memory. */
-> +
-> +    ret =3D qemu_fdt_setprop(fdt, "/memory", "reg", mem_reg_property,
-> +                               sizeof(mem_reg_property));
-> +    if (ret < 0) {
-> +        error_report("couldn't set /memory/reg");
-> +    }
-> +
-> +    /* default FDT doesn't have a /chosen node... */
-> +    qemu_fdt_add_subnode(fdt, "/chosen");
-> +
-> +    ret =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start",
-> +                                    initrd_base);
-> +    if (ret < 0) {
-> +        error_report("couldn't set /chosen/linux,initrd-start");
-> +    }
-> +
-> +    ret =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
-> +                                    (initrd_base + initrd_size));
-> +    if (ret < 0) {
-> +        error_report("couldn't set /chosen/linux,initrd-end");
-> +    }
-> +
-> +    ret =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
-> +                                      kernel_cmdline);
-> +    if (ret < 0) {
-> +        error_report("couldn't set /chosen/bootargs");
-> +    }
-> +
-> +    /* Copy data from the host device tree into the guest. Since the gue=
-st can
-> +     * directly access the timebase without host involvement, we must ex=
-pose
-> +     * the correct frequencies. */
-> +    if (kvm_enabled()) {
-> +        tb_freq =3D kvmppc_get_tbfreq();
-> +        clock_freq =3D kvmppc_get_clockfreq();
-> +    }
-> +
-> +    qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "clock-frequency",
-> +                              clock_freq);
-> +    qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "timebase-frequency",
-> +                              tb_freq);
-> +
-> +    rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
-> +    g_free(fdt);
-> +    ret =3D fdt_size;
-> +
-> +out:
-> +
-> +    return ret;
-> +}
-> +
-> +/* Create reset TLB entries for BookE, mapping only the flash memory.  */
-> +static void mmubooke_create_initial_mapping_uboot(CPUPPCState *env)
-> +{
-> +    ppcemb_tlb_t *tlb =3D &env->tlb.tlbe[0];
-> +
-> +    /* on reset the flash is mapped by a shadow TLB,
-> +     * but since we don't implement them we need to use
-> +     * the same values U-Boot will use to avoid a fault.
-> +     */
-> +    tlb->attr =3D 0;
-> +    tlb->prot =3D PAGE_VALID | ((PAGE_READ | PAGE_WRITE | PAGE_EXEC) << =
-4);
-> +    tlb->size =3D 0x10000000; /* up to 0xffffffff  */
-> +    tlb->EPN =3D 0xf0000000 & TARGET_PAGE_MASK;
-> +    tlb->RPN =3D (0xf0000000 & TARGET_PAGE_MASK) | 0x4;
-> +    tlb->PID =3D 0;
-> +}
-> +
-> +/* Create reset TLB entries for BookE, spanning the 32bit addr space.  */
-> +static void mmubooke_create_initial_mapping(CPUPPCState *env,
-> +                                     target_ulong va,
-> +                                     hwaddr pa)
-> +{
-> +    ppcemb_tlb_t *tlb =3D &env->tlb.tlbe[0];
-> +
-> +    tlb->attr =3D 0;
-> +    tlb->prot =3D PAGE_VALID | ((PAGE_READ | PAGE_WRITE | PAGE_EXEC) << =
-4);
-> +    tlb->size =3D 1 << 31; /* up to 0x80000000  */
-> +    tlb->EPN =3D va & TARGET_PAGE_MASK;
-> +    tlb->RPN =3D pa & TARGET_PAGE_MASK;
-> +    tlb->PID =3D 0;
-> +}
-> +
-> +static void main_cpu_reset(void *opaque)
-> +{
-> +    PowerPCCPU *cpu =3D opaque;
-> +    CPUPPCState *env =3D &cpu->env;
-> +    struct boot_info *bi =3D env->load_info;
-> +
-> +    cpu_reset(CPU(cpu));
-> +
-> +    /* either we have a kernel to boot or we jump to U-Boot */
-> +    if (bi->entry !=3D UBOOT_ENTRY) {
-> +        env->gpr[1] =3D (16 << 20) - 8;
-> +        env->gpr[3] =3D FDT_ADDR;
-> +        env->nip =3D bi->entry;
-> +
-> +        /* Create a mapping for the kernel.  */
-> +        mmubooke_create_initial_mapping(env, 0, 0);
-> +        env->gpr[6] =3D tswap32(EPAPR_MAGIC);
-> +        env->gpr[7] =3D (16 << 20) - 8; /*bi->ima_size;*/
-> +
-> +    } else {
-> +        env->nip =3D UBOOT_ENTRY;
-> +        mmubooke_create_initial_mapping_uboot(env);
-> +    }
-> +}
-> +
-> +static void sam460ex_init(MachineState *machine)
-> +{
-> +    MemoryRegion *address_space_mem =3D get_system_memory();
-> +    MemoryRegion *isa =3D g_new(MemoryRegion, 1);
-> +    MemoryRegion *ram_memories =3D g_new(MemoryRegion, SDRAM_NR_BANKS);
-> +    hwaddr ram_bases[SDRAM_NR_BANKS];
-> +    hwaddr ram_sizes[SDRAM_NR_BANKS];
-> +    MemoryRegion *l2cache_ram =3D g_new(MemoryRegion, 1);
-> +    qemu_irq *irqs, *uic[4];
-> +    PCIBus *pci_bus;
-> +    PowerPCCPU *cpu;
-> +    CPUPPCState *env;
-> +    PPC4xxI2CState *i2c[2];
-> +    hwaddr entry =3D UBOOT_ENTRY;
-> +    hwaddr loadaddr =3D 0;
-> +    target_long initrd_size =3D 0;
-> +    DeviceState *dev;
-> +    SysBusDevice *sbdev;
-> +    int success;
-> +    int i;
-> +    struct boot_info *boot_info;
-> +    const size_t smbus_eeprom_size =3D 8 * 256;
-> +    uint8_t *smbus_eeprom_buf =3D g_malloc0(smbus_eeprom_size);
-> +
-> +    cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
-> +    env =3D &cpu->env;
-> +    if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
-> +        error_report("Only MMU model BookE is supported by this machine.=
-");
-> +        exit(1);
-> +    }
-> +
-> +#ifdef TARGET_PPCEMB
-> +    if (!qtest_enabled()) {
-> +        warn_report("qemu-system-ppcemb is deprecated, "
-> +                    "please use qemu-system-ppc instead.");
-> +    }
-> +#endif
-> +
-> +    qemu_register_reset(main_cpu_reset, cpu);
-> +    boot_info =3D g_malloc0(sizeof(*boot_info));
-> +    env->load_info =3D boot_info;
-> +
-> +    ppc_booke_timers_init(cpu, 50000000, 0);
-> +    ppc_dcr_init(env, NULL, NULL);
-> +
-> +    /* PLB arbitrer */
-> +    ppc4xx_plb_init(env);
-> +
-> +    /* interrupt controllers */
-> +    irqs =3D g_malloc0(sizeof(*irqs) * PPCUIC_OUTPUT_NB);
-> +    irqs[PPCUIC_OUTPUT_INT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_INP=
-UT_INT];
-> +    irqs[PPCUIC_OUTPUT_CINT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_IN=
-PUT_CINT];
-> +    uic[0] =3D ppcuic_init(env, irqs, 0xc0, 0, 1);
-> +    uic[1] =3D ppcuic_init(env, &uic[0][30], 0xd0, 0, 1);
-> +    uic[2] =3D ppcuic_init(env, &uic[0][10], 0xe0, 0, 1);
-> +    uic[3] =3D ppcuic_init(env, &uic[0][16], 0xf0, 0, 1);
-> +
-> +    /* SDRAM controller */
-> +    memset(ram_bases, 0, sizeof(ram_bases));
-> +    memset(ram_sizes, 0, sizeof(ram_sizes));
-> +    /* put all RAM on first bank because board has one slot
-> +     * and firmware only checks that */
-> +    machine->ram_size =3D ppc4xx_sdram_adjust(machine->ram_size, 1,
-> +                                   ram_memories, ram_bases, ram_sizes,
-> +                                   ppc460ex_sdram_bank_sizes);
-> +
-> +    /* FIXME: does 460EX have ECC interrupts? */
-> +    ppc440_sdram_init(env, SDRAM_NR_BANKS, ram_memories,
-> +                      ram_bases, ram_sizes, 1);
-> +
-> +    /* generate SPD EEPROM data */
-> +    for (i =3D 0; i < SDRAM_NR_BANKS; i++) {
-> +        generate_eeprom_spd(&smbus_eeprom_buf[i * 256], ram_sizes[i]);
-> +    }
-> +    generate_eeprom_serial(&smbus_eeprom_buf[4 * 256]);
-> +    generate_eeprom_serial(&smbus_eeprom_buf[6 * 256]);
-> +
-> +    /* IIC controllers */
-> +    dev =3D sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600700, uic[0][2]=
-);
-> +    i2c[0] =3D PPC4xx_I2C(dev);
-> +    object_property_set_bool(OBJECT(dev), true, "realized", NULL);
-> +    smbus_eeprom_init(i2c[0]->bus, 8, smbus_eeprom_buf, smbus_eeprom_siz=
-e);
-> +    g_free(smbus_eeprom_buf);
-> +
-> +    dev =3D sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600800, uic[0][3]=
-);
-> +    i2c[1] =3D PPC4xx_I2C(dev);
-> +
-> +    /* External bus controller */
-> +    ppc405_ebc_init(env);
-> +
-> +    /* CPR */
-> +    ppc4xx_cpr_init(env);
-> +
-> +    /* PLB to AHB bridge */
-> +    ppc4xx_ahb_init(env);
-> +
-> +    /* System DCRs */
-> +    ppc4xx_sdr_init(env);
-> +
-> +    /* MAL */
-> +    ppc4xx_mal_init(env, 4, 16, &uic[2][3]);
-> +
-> +    /* 256K of L2 cache as memory */
-> +    ppc4xx_l2sram_init(env);
-> +    /* FIXME: remove this after fixing l2sram mapping in ppc440_uc.c? */
-> +    memory_region_init_ram(l2cache_ram, NULL, "ppc440.l2cache_ram", 256 =
-<< 10,
-> +                           &error_abort);
-> +    memory_region_add_subregion(address_space_mem, 0x400000000LL, l2cach=
-e_ram);
-> +
-> +    /* USB */
-> +    sysbus_create_simple(TYPE_PPC4xx_EHCI, 0x4bffd0400, uic[2][29]);
-> +    dev =3D qdev_create(NULL, "sysbus-ohci");
-> +    qdev_prop_set_string(dev, "masterbus", "usb-bus.0");
-> +    qdev_prop_set_uint32(dev, "num-ports", 6);
-> +    qdev_init_nofail(dev);
-> +    sbdev =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(sbdev, 0, 0x4bffd0000);
-> +    sysbus_connect_irq(sbdev, 0, uic[2][30]);
-> +    usb_create_simple(usb_bus_find(-1), "usb-kbd");
-> +    usb_create_simple(usb_bus_find(-1), "usb-mouse");
-> +
-> +    /* PCI bus */
-> +    ppc460ex_pcie_init(env);
-> +    /* FIXME: is this correct? */
-> +    dev =3D sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
-> +                                uic[1][0], uic[1][20], uic[1][21], uic[1=
-][22],
-> +                                NULL);
-> +    pci_bus =3D (PCIBus *)qdev_get_child_bus(dev, "pci.0");
-> +    if (!pci_bus) {
-> +        error_report("couldn't create PCI controller!");
-> +        exit(1);
-> +    }
-> +    memory_region_init_alias(isa, NULL, "isa_mmio", get_system_io(),
-> +                             0, 0x10000);
-> +    memory_region_add_subregion(get_system_memory(), 0xc08000000, isa);
-> +
-> +    /* PCI devices */
-> +    pci_create_simple(pci_bus, PCI_DEVFN(6, 0), "sm501");
-> +    /* SoC has a single SATA port but we don't emulate that yet
-> +     * However, firmware and usual clients have driver for SiI311x
-> +     * so add one for convenience by default */
-> +    if (defaults_enabled()) {
-> +        pci_create_simple(pci_bus, -1, "sii3112");
-> +    }
-> +
-> +    /* SoC has 4 UARTs
-> +     * but board has only one wired and two are present in fdt */
-> +    if (serial_hds[0] !=3D NULL) {
-> +        serial_mm_init(address_space_mem, 0x4ef600300, 0, uic[1][1],
-> +                       PPC_SERIAL_MM_BAUDBASE, serial_hds[0],
-> +                       DEVICE_BIG_ENDIAN);
-> +    }
-> +    if (serial_hds[1] !=3D NULL) {
-> +        serial_mm_init(address_space_mem, 0x4ef600400, 0, uic[0][1],
-> +                       PPC_SERIAL_MM_BAUDBASE, serial_hds[1],
-> +                       DEVICE_BIG_ENDIAN);
-> +    }
-> +
-> +    /* Load U-Boot image. */
-> +    if (!machine->kernel_filename) {
-> +        success =3D sam460ex_load_uboot();
-> +        if (success < 0) {
-> +            error_report("qemu: could not load firmware");
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    /* Load kernel. */
-> +    if (machine->kernel_filename) {
-> +        success =3D load_uimage(machine->kernel_filename, &entry, &loada=
-ddr,
-> +                              NULL, NULL, NULL);
-> +        if (success < 0) {
-> +            uint64_t elf_entry, elf_lowaddr;
-> +
-> +            success =3D load_elf(machine->kernel_filename, NULL, NULL, &=
-elf_entry,
-> +                               &elf_lowaddr, NULL, 1, PPC_ELF_MACHINE, 0=
-, 0);
-> +            entry =3D elf_entry;
-> +            loadaddr =3D elf_lowaddr;
-> +        }
-> +        /* XXX try again as binary */
-> +        if (success < 0) {
-> +            error_report("qemu: could not load kernel '%s'",
-> +                    machine->kernel_filename);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    /* Load initrd. */
-> +    if (machine->initrd_filename) {
-> +        initrd_size =3D load_image_targphys(machine->initrd_filename,
-> +                                          RAMDISK_ADDR,
-> +                                          machine->ram_size - RAMDISK_AD=
-DR);
-> +        if (initrd_size < 0) {
-> +            error_report("qemu: could not load ram disk '%s' at %x",
-> +                    machine->initrd_filename, RAMDISK_ADDR);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    /* If we're loading a kernel directly, we must load the device tree =
-too. */
-> +    if (machine->kernel_filename) {
-> +        int dt_size;
-> +
-> +        dt_size =3D sam460ex_load_device_tree(FDT_ADDR, machine->ram_siz=
-e,
-> +                                    RAMDISK_ADDR, initrd_size,
-> +                                    machine->kernel_cmdline);
-> +        if (dt_size < 0) {
-> +            error_report("couldn't load device tree");
-> +            exit(1);
-> +        }
-> +
-> +        boot_info->dt_base =3D FDT_ADDR;
-> +        boot_info->dt_size =3D dt_size;
-> +    }
-> +
-> +    boot_info->entry =3D entry;
-> +}
-> +
-> +static void sam460ex_machine_init(MachineClass *mc)
-> +{
-> +    mc->desc =3D "aCube Sam460ex";
-> +    mc->init =3D sam460ex_init;
-> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("460exb");
-> +    mc->default_ram_size =3D 512 * M_BYTE;
-> +}
-> +
-> +DEFINE_MACHINE("sam460ex", sam460ex_machine_init)
+>      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
+>                            0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_OFF;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -742,24 +126,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---d01dLTUuW90fS44H
+--SdvjNjn6lL3tIsv0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqGS5YACgkQbDjKyiDZ
-s5JiyA/8Cs7hrUHtSKnzLGp/vyhGr/DOekal4U2KA5hJMsT4Qpqx72DNfRSe3uyG
-aXX/VvZdbNX6l+ldrzrETB8qGpRjZJ2p4ddhm7OOD9xeOQBvu6RCR7eoLi/u5Hd6
-UlUpPUHWIxHHijfD+jtgmbPV1Bu5zCQ1fBhzWYflAdDIJnuSTJ9T12QStlWu/uQm
-zILxZeagEZrJ0/pT/21jCH81i4/j+9p/GpYsGg60Ngc6d5EykZLdyFM2RElCkqFQ
-dQPsWUL5Af5BFlfUktRyr0z4Hl2M7WkHnjjEH6R8I+mzxBrL1Vf2Unz26sTfZSGe
-a4V1v914VaVaXsPL+0XQj5YGheE6XTFngAVch8ZPnwUseCBqcCy1sYvCmajEPcZm
-peyh5wBttvbr8zbQebwdK8VFoD87aouKjk8A7qBNuCvWwLiosX1PlUFz7AHeIG9v
-MR/vw5k/KAKy/pcQe96g9j1leyO8GI/PkAZ6mQ0yKQTkyi/59hjWGa1T/y3en/sX
-Utl5JRxGrNN1bwEPkEy9GDEI7WgphBDxC8WHI9XesjL4bIT6154MLuQNxXRAIXiw
-NdbGipo2wpLhUYSrjas7GZzngEVd/vSKeHn0JmqL7ld9VOdhddiId14g5DYl+0Cg
-cmIMNT1ODTiphjUCuEHDEfm+4Mv9/+EoamBxBxDgeRDtsLqk+KQ=
-=jJt3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqGW4sACgkQbDjKyiDZ
+s5J2yBAAwtWG/DbM8qWTGpGqiKmgLCkxT65UetjbEL0mgeFPgmTdMLoCVY760WKE
+rLRGR7U/jzyIktIpPPI0umBts7ixvF8QkvAsqJ+ENpGLPTt0dU8cwgkAke86+EJX
+p7LpdAyHkHDUL5EQQZ5VywS7pQX7yOobbcaGdjOyskFcHY39VHh31WGoU/8tCQ1F
+nlkRcboXIOoPhPlJqwuUtK4rZpUSjUmHmYCm4dM7HDTBsdxIEpG49hywix7+sIPP
+z72AnzMxtv+iLhw3d3LYPKhtrUOh01dQGHiYKehk7/jPv7NGEkwrbE3/Tkb7I+lH
+IM/GNn0YrOu8RExldN6uZTG7lTMck1Zy5MHdZWE/3J76lKj2ueQvQjg5sfbK2Zrh
+d/CYc6MccZawzzDUrcM89Wfp2Yenody+GA9D/cPRcgIbpHrc0clDmL6Cxaowpd1P
+WWNZzAK63QLoG03QgslIrd1P4lSbm9qX0gy2eOQm20Xvo9Zhp2YYclLcA6SN5JhE
+qvXFafUGZsZvTzHYCHeNxHkDWY+YGRajFrBTg8oSSX53PI3z4ATkOaoke34lpzdw
+wx5ciA9Qc2eWENIUWBVOPVMsqPgNr/juzE50UFzX3RFg5nZtMNEXAXLM+Q8wHcSC
+CjXe/hI+bqy4hqH1YE2AhZUdW4R9sFCu2v4ubEO320kNeNbO2uI=
+=kEv5
 -----END PGP SIGNATURE-----
 
---d01dLTUuW90fS44H--
+--SdvjNjn6lL3tIsv0--
