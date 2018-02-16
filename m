@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emish-0007RZ-Ds
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:29:04 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1emj0A-00037J-6r
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:36:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emisd-0003dz-Dh
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:29:03 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41910 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emisd-0003dl-8I
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:28:59 -0500
-Date: Fri, 16 Feb 2018 17:28:41 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180216172841.2ec69b8a@redhat.com>
-In-Reply-To: <20180216134516.6269-2-peter.maydell@linaro.org>
-References: <20180216134516.6269-1-peter.maydell@linaro.org>
-	<20180216134516.6269-2-peter.maydell@linaro.org>
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1emj06-0000KX-7j
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:36:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1emj05-0000Jn-U6
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:36:42 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1GGa197070771
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:36:40 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g61xu3323-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:36:39 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Fri, 16 Feb 2018 16:36:37 -0000
+References: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1518735273-16089-7-git-send-email-walling@linux.vnet.ibm.com>
+	<4ff97ab0-d848-05a4-9ac2-344bd67e73ef@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Fri, 16 Feb 2018 17:36:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <4ff97ab0-d848-05a4-9ac2-344bd67e73ef@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/sysbus.h: New sysbus_init_child()
- helper function
+Message-Id: <10e144ef-cc5d-8958-adf1-03cc4ef13580@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v6 06/12] s390-ccw: parse and
+ set boot menu options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +44,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, patches@linaro.org
+To: Thomas Huth <thuth@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-On Fri, 16 Feb 2018 13:45:15 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> If you're using the increasingly-common QOM style of
-> having container devices create their child objects
-> in-place, you end up with a lot of boilerplate in the
-> container's init function:
+On 16.02.2018 17:20, Thomas Huth wrote:
+[...]
+>> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+>> index cab8a97..7c3cab8 100644
+>> --- a/hw/s390x/ipl.h
+>> +++ b/hw/s390x/ipl.h
+>> @@ -60,10 +60,15 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
+>>  
+>>  #define QIPL_ADDRESS  0xcc
+>>  
+>> +#define BOOT_MENU_FLAG_CMD_OPTS  0x80
+>> +#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
+>> +
+>>  struct QemuIplParameters {
+>> -    uint8_t  reserved1[4];
+>> +    uint8_t  boot_menu_flags;
+>> +    uint8_t  reserved1;
+>> +    uint32_t boot_menu_timeout;
+>>      uint64_t netboot_start_addr;
 > 
->   object_initialize() to init the child
->   object_property_add_child() to make the child a
->     child of the parent
->   qdev_set_parent_bus() to put the child on the
->     sysbus default bus
+> The netboot_start_addr field is now never aligned anymore, neither on
+> the host side, nor in guest memory. Not a big problem since the struct
+> is declared with "QEMU_PACKED", but still ... it's always nicer to try
+> to align fields to their natural boundaries. So maybe move
+> boot_menu_flags and reserved1 after netboot_start_addr ?
 > 
-> If you forget the second of these then things sort of
-> work but trying to add a child to the child will segfault;
-> if you forget the third then the device won't get reset.
+Good catch ... we probably should document the alignment needs and state
+that the ipl parameters starts on a word boundary (and that the block
+may not be larger than 28 bytes) in a comment block.
+>> -    uint8_t  reserved2[16];
+>> +    uint8_t  reserved2[14];
+>>  } QEMU_PACKED;
+>>  typedef struct QemuIplParameters QemuIplParameters;
 > 
-> Provide a helper function sysbus_init_child() which
-> does all these things for you, reducing the boilerplate
-> and making it harder to get wrong.
+>  Thomas
 > 
-> Code that used to look like this:
->     object_initialize(&s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
->     object_property_add_child(obj, "ic", OBJECT(&s->ic), NULL);
->     qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
-> can now look like this:
->     sysbus_init_child(obj, "ic", &s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/sysbus.h | 12 ++++++++++++
->  hw/core/sysbus.c    | 14 ++++++++++++++
->  2 files changed, 26 insertions(+)
-> 
-> diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-> index e88bb6dae0..6095e24e86 100644
-> --- a/include/hw/sysbus.h
-> +++ b/include/hw/sysbus.h
-> @@ -118,4 +118,16 @@ static inline DeviceState *sysbus_try_create_simple(const char *name,
->      return sysbus_try_create_varargs(name, addr, irq, NULL);
->  }
->  
-> +/**
-> + * sysbus_init_child: in-place initialize and parent a SysBus device
-> + * @parent: object to parent the device to
-> + * @childname: name to use as the child property name
-> + * @child: child object
-> + * @childsize: size of the storage for the object
-> + * @childtype: type name of the child
-> + */
-> +void sysbus_init_child(Object *parent, const char *childname,
-> +                       void *child, size_t childsize,
-> +                       const char *childtype);
-> +
->  #endif /* HW_SYSBUS_H */
-> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-> index 5d0887f499..acfa52dc68 100644
-> --- a/hw/core/sysbus.c
-> +++ b/hw/core/sysbus.c
-> @@ -21,6 +21,7 @@
->  #include "hw/sysbus.h"
->  #include "monitor/monitor.h"
->  #include "exec/address-spaces.h"
-> +#include "qapi/error.h"
->  
->  static void sysbus_dev_print(Monitor *mon, DeviceState *dev, int indent);
->  static char *sysbus_get_fw_dev_path(DeviceState *dev);
-> @@ -372,6 +373,19 @@ BusState *sysbus_get_default(void)
->      return main_system_bus;
->  }
->  
-> +void sysbus_init_child(Object *parent, const char *childname,
-> +                       void *child, size_t childsize,
-> +                       const char *childtype)
-> +{
 
 
-> +    object_initialize(child, childsize, childtype);
-> +    /* error_abort is fine here because this can only fail for
-> +     * programming-error reasons: child already parented, or
-> +     * parent already has a child with the given name.
-> +     */
-> +    object_property_add_child(parent, childname, OBJECT(child), &error_abort);
-It would be useful not only for sysbus devices.
-maybe we should extend object_initialize instead,
-something like this:
-   void object_initialize(void *data, size_t size, const char *typename,
-                          Object *parent, const char *name)
-and set parent in it.
-git counts about 152 uses, so it would be tree wide change
-but still not too much.
-
-
-> +    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
-and then assuming we don't create sysbus devices, nor should be able to,
-which are not attached to sysbus_get_default() this one can go sysbus' instance_init()
-
-then there won't be need for sysbus specific helper,
-inheritance will do the rest of the job.
-
-> +}
-> +
->  static void sysbus_register_types(void)
->  {
->      type_register_static(&system_bus_info);
+-- 
+Regards,
+ Viktor Mihajlovski
