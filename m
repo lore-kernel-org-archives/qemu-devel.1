@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1emmml-0000DR-J8
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:39:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1emmo3-0001DJ-Hj
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1emmmi-0001y9-BJ
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:39:11 -0500
-Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:37603)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1emmmi-0001xl-3d
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:39:08 -0500
-Received: by mail-it0-x22a.google.com with SMTP id d10so3279159itj.2
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 12:39:07 -0800 (PST)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Fri, 16 Feb 2018 15:38:56 -0500
-Message-Id: <20180216203856.8645-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH v7] ui/cocoa.m: Add ability for user to specify
- mouse ungrab key
+	(envelope-from <eblake@redhat.com>) id 1emmo1-0003db-5Q
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:40:31 -0500
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<1518702707-7077-7-git-send-email-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b570a199-9139-5652-5ad8-407820680620@redhat.com>
+Date: Fri, 16 Feb 2018 14:40:04 -0600
+MIME-Version: 1.0
+In-Reply-To: <1518702707-7077-7-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/9] nbd: BLOCK_STATUS for standard
+ get_block_status function: client part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,532 +25,469 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
-This combination may not be very fun for the user to have to enter, so we
-now enable the user to specify their own key(s) as the ungrab key(s). The
-list of keys that can be used is found in the file qapi/ui.json under QKeyCode.
-The max number of keys that can be used is three.
+On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Minimal realization: only one extent in server answer is supported.
+> Flag NBD_CMD_FLAG_REQ_ONE is used to force this behavior.
+> 
+> Tests 140, 147 and 205 are fixed due to now server failed on searching
+> export in context of NBD_OPT_SET_META_CONTEXT option negotiation.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-Syntax: -display cocoa,hotkey-grab=<key-key-key>
+> +++ b/block/nbd-client.c
+> @@ -228,6 +228,45 @@ static int nbd_parse_offset_hole_payload(NBDStructuredReplyChunk *chunk,
+>       return 0;
+>   }
+>   
+> +/* nbd_parse_blockstatus_payload
+> + * support only one extent in reply and only for
+> + * base:allocation context
 
-Example usage:  -display cocoa,hotkey-grab=home
-	        -display cocoa,hotkey-grab=shift-ctrl
-		-display cocoa,hotkey-grab=ctrl-x
-		-display cocoa,hotkey-grab=pgup-pgdn
-		-display cocoa,hotkey-grab=kp_5-kp_6
-		-display cocoa,hotkey-grab=kp_4-kp_5-kp_6
-		-display cocoa,hotkey-grab=ctrl-alt
+Reasonable, since the server should not be sending us contexts we did 
+not ask for during negotiation.
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
-v7 changes:
-- Prevent ungrab keys from being seen by guest.
+> + */
+> +static int nbd_parse_blockstatus_payload(NBDClientSession *client,
+> +                                         NBDStructuredReplyChunk *chunk,
+> +                                         uint8_t *payload, uint64_t orig_length,
+> +                                         NBDExtent *extent, Error **errp)
+> +{
+> +    uint32_t context_id;
+> +
+> +    if (chunk->length != sizeof(context_id) + sizeof(extent)) {
 
-v6 changes:
-- changed ungrab command-line option to -display cocoa,hotkey-grab
-- Removed NSMutableSet code
-- Implemented C version of Set datatype
+Okay as long as we use REQ_ONE to ensure exactly one extent per chunk.
 
-v5 changes:
-- Removed ungrab detection code from keydown event in handleEvent.
-- Removed console_ungrab_sequence_length().
-- Removed ability to always use the default ctrl-alt-g ungrab key sequence.
-- Added ability to actually send keys to the guest that might overlap ungrab keys. 
-Example for -ungrab ctrl-alt:
-down(ctrl)
-down(alt)
-up(ctrl)
-up(alt)
-..ungrab activates..
+> +        error_setg(errp, "Protocol error: invalid payload for "
+> +                         "NBD_REPLY_TYPE_BLOCK_STATUS");
+> +        return -EINVAL;
+> +    }
+> +
+> +    context_id = payload_advance32(&payload);
+> +    if (client->info.meta_base_allocation_id != context_id) {
+> +        error_setg(errp, "Protocol error: unexpected context id: %d for "
+> +                         "NBD_REPLY_TYPE_BLOCK_STATUS, when negotiated context "
+> +                         "id is %d", context_id,
+> +                         client->info.meta_base_allocation_id);
+> +        return -EINVAL;
+> +    }
+> +
+> +    memcpy(extent, payload, sizeof(*extent));
+> +    be32_to_cpus(&extent->length);
+> +    be32_to_cpus(&extent->flags);
 
-down(ctrl)
-down(alt)
-down(f1)
-up(ctrl)
-up(alt)
-up(f1)
-..no ungrab activates..
+Instead of doing a memcpy() and then in-place bit-swizzling, you could 
+do the swapping as part of assignment, for one less function call (and 
+make the code a bit easier to extend, if we later drop our REQ_ONE 
+limitation on only having one extent, because you'll advance payload as 
+needed):
 
-v4 changes:
-- Removed initialization code for key_value_array.
-- Added void keyword to console_ungrab_key_sequence(),
-  and console_ungrab_key_string() functions.
+extent->length = payload_advance32(&payload);
+extent->flags = payload_advance32(&payload);
 
-v3 changes:
-- Added the ability for any "sendkey supported" key to be used.
-- Added ability for one to three key sequences to be used.
+We should probably validate that the length field is a multiple of 
+min_block (if a server tells us that all operations must be 512-byte 
+aligned, then reports an extent that is smaller than 512 bytes, we have 
+no way to ask for the status of the second half of the sector). 
+Probably also something that needs to be explicitly stated in the NBD 
+spec. [1]
 
-v2 changes:
-- Removed the "int i" code from the for loops. 
+> +
+> +    if (extent->length > orig_length) {
+> +        error_setg(errp, "Protocol error: server sent chunk exceeding requested"
+> +                         " region");
+> +        return -EINVAL;
 
- include/ui/console.h |  22 +++++++
- qemu-options.hx      |   1 +
- ui/cocoa.m           |  98 +++++++++++++++++++++++++----
- ui/console.c         | 169 +++++++++++++++++++++++++++++++++++++++++++++++++++
- vl.c                 |  17 ++++++
- 5 files changed, 295 insertions(+), 12 deletions(-)
+That matches the current spec wording, but I'm not sure I agree with it 
+- what's wrong with a server providing a final extent that extends 
+beyond the request, if the information was already available for free 
+(the classic example: if the server never replies with HOLE or ZERO, 
+then the entire file has the same status, so all requests could 
+trivially be replied to by taking the starting offset to the end of the 
+file as the returned length, rather than just clamping at the requested 
+length).
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 12fef80923..5664b4c087 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -508,4 +508,26 @@ static inline void early_gtk_display_init(int opengl)
- /* egl-headless.c */
- void egl_headless_init(void);
- 
-+/* console.c */
-+/* max number of keys that can be used as the ungrab keys */
-+#define MAX_UNGRAB_KEYS 3
-+void set_ungrab_seq(const char *new_seq);
-+int *console_ungrab_key_sequence(void);
-+const char *console_ungrab_key_string(void);
-+void use_default_ungrab_keys(void);
-+void init_ungrab_keys(void);
-+
-+/* Set datatype related code */
-+typedef struct Set_struct {
-+    int size;   /* The size of the array */
-+    int *array; /* The array used to store the set's values */
-+} Set;
-+
-+Set *new_set(int max_size);
-+void add_number(Set *the_set, int the_number);
-+void remove_number(Set *the_set, int the_number);
-+bool contains_number(Set *the_set, int the_number);
-+void clear_set(Set *the_set);
-+bool are_sets_equal(Set *set1, Set *set2);
-+
- #endif
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5050a49a5e..4a613e4e9c 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1243,6 +1243,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
-     "            [,window_close=on|off][,gl=on|off]\n"
-     "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
-     "-display vnc=<display>[,<optargs>]\n"
-+    "-display cocoa[hotkey-grab=<key(s)>]\n"
-     "-display curses\n"
-     "-display none"
-     "                select display type\n"
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 51db47cd71..a4b1f9b9f4 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -106,6 +106,8 @@
- bool stretch_video;
- NSTextField *pauseLabel;
- NSArray * supportedImageFileTypes;
-+Set *key_set, *ungrab_set;
-+int ungrab_sequence_length;
- 
- // Mac to QKeyCode conversion
- const int mac_to_qkeycode_map[] = {
-@@ -261,6 +263,15 @@ static void handleAnyDeviceErrors(Error * err)
-     }
- }
- 
-+/* Sends any keys that were delayed because they were part of the ungrab set */
-+static void send_key_if_delayed(Set *the_set, int keycode)
-+{
-+    if (contains_number(the_set, keycode)) {
-+        qemu_input_event_send_key_qcode(dcl->con, keycode, true);
-+        qemu_input_event_send_key_qcode(dcl->con, keycode, false);
-+    }
-+}
-+
- /*
-  ------------------------------------------------------
-     QemuCocoaView
-@@ -489,8 +500,6 @@ - (void) switchSurface:(DisplaySurface *)surface
-         [[fullScreenWindow contentView] setFrame:[[NSScreen mainScreen] frame]];
-         [normalWindow setFrame:NSMakeRect([normalWindow frame].origin.x, [normalWindow frame].origin.y - h + oldh, w, h + [normalWindow frame].size.height - oldh) display:NO animate:NO];
-     } else {
--        if (qemu_name)
--            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s", qemu_name]];
-         [normalWindow setFrame:NSMakeRect([normalWindow frame].origin.x, [normalWindow frame].origin.y - h + oldh, w, h + [normalWindow frame].size.height - oldh) display:YES animate:NO];
-     }
- 
-@@ -670,14 +679,31 @@ - (void) handleEvent:(NSEvent *)event
-                 if (keycode == Q_KEY_CODE_CAPS_LOCK ||
-                     keycode == Q_KEY_CODE_NUM_LOCK) {
-                     [self toggleStatefulModifier:keycode];
--                } else if (qemu_console_is_graphic(NULL)) {
-+                } else {
-                   [self toggleModifier:keycode];
-                 }
-             }
- 
-+            /*
-+             * This code has to be here because the user might use a modifier
-+             * key like shift as an ungrab key.
-+             */
-+            if (modifiers_state[keycode] == YES) { // if the key is down
-+                [self check_key: keycode];
-+            } else {                               // if the key is up
-+                if (are_sets_equal(ungrab_set, key_set)) {
-+                    [self ungrabMouse];
-+                    clear_set(key_set);
-+                    return;
-+                }
-+                remove_number(key_set, keycode);
-+            }
-             break;
-         case NSEventTypeKeyDown:
-             keycode = cocoa_keycode_to_qemu([event keyCode]);
-+            if ([self check_key: keycode]) {
-+                return;
-+            }
- 
-             // forward command key combos to the host UI unless the mouse is grabbed
-             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
-@@ -687,7 +713,7 @@ - (void) handleEvent:(NSEvent *)event
- 
-             // default
- 
--            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is reserved for QEMU)
-+            // handle control + alt Key Combos (ctrl+alt+[1..9] is reserved for QEMU)
-             if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
-                 NSString *keychar = [event charactersIgnoringModifiers];
-                 if ([keychar length] == 1) {
-@@ -698,11 +724,6 @@ - (void) handleEvent:(NSEvent *)event
-                         case '1' ... '9':
-                             console_select(key - '0' - 1); /* ascii math */
-                             return;
--
--                        // release the mouse grab
--                        case 'g':
--                            [self ungrabMouse];
--                            return;
-                     }
-                 }
-             }
-@@ -716,6 +737,14 @@ - (void) handleEvent:(NSEvent *)event
-         case NSEventTypeKeyUp:
-             keycode = cocoa_keycode_to_qemu([event keyCode]);
- 
-+            if (are_sets_equal(ungrab_set, key_set)) {
-+                [self ungrabMouse];
-+                clear_set(key_set);
-+                return;
-+            }
-+            send_key_if_delayed(key_set, keycode);
-+            remove_number(key_set, keycode);
-+
-             // don't pass the guest a spurious key-up if we treated this
-             // command-key combo as a host UI action
-             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
-@@ -854,10 +883,13 @@ - (void) grabMouse
-     COCOA_DEBUG("QemuCocoaView: grabMouse\n");
- 
-     if (!isFullscreen) {
-+        NSString * message_string;
-+        message_string = [NSString stringWithFormat: @"- (Press %s to release Mouse)", console_ungrab_key_string()];
-+
-         if (qemu_name)
--            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
-+            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %s %@", qemu_name, message_string]];
-         else
--            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
-+            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %@", message_string]];
-     }
-     [self hideCursor];
-     if (!isAbsoluteEnabled) {
-@@ -910,6 +942,23 @@ - (void) raiseAllKeys
-        }
-    }
- }
-+
-+/*
-+ * Check the keycode to see if it one of the ungrab keys
-+ * Returns true if the keycode is part of the ungrab sequence
-+ * and false if it isn't.
-+ */
-+- (int) check_key: (int) keycode
-+{
-+    if (contains_number(ungrab_set, keycode)) {
-+        add_number(key_set, keycode);
-+        return true;
-+    } else {
-+        clear_set(key_set);
-+        return false;
-+    }
-+}
-+
- @end
- 
- 
-@@ -1401,7 +1450,7 @@ int main (int argc, const char * argv[]) {
-                 !strcmp(opt, "-nographic") ||
-                 !strcmp(opt, "-version") ||
-                 !strcmp(opt, "-curses") ||
--                !strcmp(opt, "-display") ||
-+                !strcmp(opt, "-display cocoa") ||
-                 !strcmp(opt, "-qtest")) {
-                 return qemu_main(gArgc, gArgv, *_NSGetEnviron());
-             }
-@@ -1683,6 +1732,29 @@ static void addRemovableDevicesMenuItems(void)
-     qapi_free_BlockInfoList(pointerToFree);
- }
- 
-+/* initializes the mouse ungrab system */
-+static void ungrab_init(void)
-+{
-+    key_set = new_set(MAX_UNGRAB_KEYS);
-+    ungrab_set = new_set(MAX_UNGRAB_KEYS);
-+    init_ungrab_keys();
-+
-+    /* determine length of the mouse ungrab sequence */
-+    int index, *ungrab_seq;
-+    ungrab_sequence_length = 0;
-+    ungrab_seq = console_ungrab_key_sequence();
-+    for (index = 0; index < MAX_UNGRAB_KEYS; index++) {
-+        if (ungrab_seq[index] != 0) {
-+            ungrab_sequence_length++;
-+        }
-+    }
-+
-+    /* make the ungrab set */
-+    for (index = 0; index < ungrab_sequence_length; index++) {
-+        add_number(ungrab_set, ungrab_seq[index]);
-+    }
-+}
-+
- void cocoa_display_init(DisplayState *ds, int full_screen)
- {
-     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
-@@ -1712,4 +1784,6 @@ void cocoa_display_init(DisplayState *ds, int full_screen)
-      * find out what removable devices it has.
-      */
-     addRemovableDevicesMenuItems();
-+
-+    ungrab_init();
- }
-diff --git a/ui/console.c b/ui/console.c
-index 36584d039e..34adb19f14 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -32,9 +32,13 @@
- #include "chardev/char-fe.h"
- #include "trace.h"
- #include "exec/memory.h"
-+#include <stdio.h>
-+#include <memory.h>
-+#include <stdbool.h>
- 
- #define DEFAULT_BACKSCROLL 512
- #define CONSOLE_CURSOR_PERIOD 500
-+#define EMPTY_VALUE -1
- 
- typedef struct TextAttributes {
-     uint8_t fgcol:4;
-@@ -65,6 +69,12 @@ typedef struct QEMUFIFO {
-     int count, wptr, rptr;
- } QEMUFIFO;
- 
-+/* stores the ungrab keys' values */
-+static int key_value_array[MAX_UNGRAB_KEYS + 1];
-+
-+/* stores the string that is returned by console_ungrab_key_string */
-+static char *ungrab_key_string;
-+
- static int qemu_fifo_write(QEMUFIFO *f, const uint8_t *buf, int len1)
- {
-     int l, len;
-@@ -2241,4 +2251,163 @@ static void register_types(void)
-     type_register_static(&qemu_console_info);
- }
- 
-+/* Sets the mouse ungrab key sequence to what the user wants */
-+void set_ungrab_seq(const char *new_seq)
-+{
-+    const char *separator = "-";  /* What the user places between keys */
-+    gchar **key_array;
-+    int key_value, count;
-+
-+    count = 0;
-+    key_array = g_strsplit(new_seq, separator, -1);
-+    ungrab_key_string = g_strdup(new_seq);
-+
-+    for (; *key_array; key_array++) {
-+        key_value = index_from_key(*key_array, strlen(*key_array));
-+        if (key_value == Q_KEY_CODE__MAX) {
-+            error_report("-hotkey-grab: unknown key: %s", *key_array);
-+            exit(EXIT_FAILURE);
-+        }
-+        key_value_array[count] = key_value;
-+        count++;
-+    }
-+}
-+
-+/* Returns the user specified ungrab key sequence */
-+int *console_ungrab_key_sequence(void)
-+{
-+    return key_value_array;
-+}
-+
-+/* Returns the name of the user specified ungrab keys */
-+const char *console_ungrab_key_string(void)
-+{
-+    return ungrab_key_string;
-+}
-+
-+/* Sets the UI to use the default ungrab key sequence */
-+void use_default_ungrab_keys(void)
-+{
-+    /* Default ungrab keys: Control Alt g */
-+    ungrab_key_string = (char *) malloc(sizeof(char) * 14);
-+    sprintf(ungrab_key_string, "%s", "ctrl-alt-g");
-+    key_value_array[0] = Q_KEY_CODE_CTRL;
-+    key_value_array[1] = Q_KEY_CODE_ALT;
-+    key_value_array[2] = Q_KEY_CODE_G;
-+}
-+
-+/*
-+ * Initializes the ungrab key settings - should be called by the front-end on
-+ * startup.
-+ */
-+void init_ungrab_keys(void)
-+{
-+    if (console_ungrab_key_string() == NULL) {
-+        use_default_ungrab_keys();
-+    }
-+}
-+
-+/*
-+ * Set implements a set datatype. It is a collection of numbers with no
-+ * repeats.
-+ */
-+
-+/* Creates a new Set object with a size of max_size */
-+Set *new_set(int max_size)
-+{
-+    Set *new_set_obj;
-+    new_set_obj = (Set *) malloc(sizeof(Set));
-+
-+    int *array_obj;
-+    array_obj = (int *) malloc(sizeof(int) * max_size);
-+    new_set_obj->array = array_obj;
-+    new_set_obj->size = max_size;
-+
-+    /* initialize the array */
-+    int index;
-+    for (index = 0; index < max_size; index++) {
-+        new_set_obj->array[index] = EMPTY_VALUE;
-+    }
-+
-+    return new_set_obj;
-+}
-+
-+/* Adds a number to a set */
-+void add_number(Set *the_set, int the_number)
-+{
-+    int index;
-+
-+    /* Check if the number if already in the list */
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == the_number) {
-+            return;
-+        }
-+    }
-+
-+    /* Find an empty spot and place the number there */
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == EMPTY_VALUE) {
-+            the_set->array[index] = the_number;
-+            return;
-+        }
-+    }
-+    error_report("Failed to add number to set");
-+}
-+
-+/* Removes a number from a set */
-+void remove_number(Set *the_set, int the_number)
-+{
-+    int index;
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == the_number) {
-+            the_set->array[index] = EMPTY_VALUE;
-+        }
-+    }
-+}
-+
-+/* Determines if a number is in a set */
-+bool contains_number(Set *the_set, int the_number)
-+{
-+    int index;
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == the_number) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+/* Clears a set of all values */
-+void clear_set(Set *the_set)
-+{
-+    int index;
-+    for (index = 0; index < the_set->size; index++) {
-+        the_set->array[index] = EMPTY_VALUE;
-+    }
-+}
-+
-+/* Determines if two sets contain the same values */
-+bool are_sets_equal(Set *set1, Set *set2)
-+{
-+    if (set1->size != set2->size) {
-+        return false;
-+    }
-+
-+    /* see if both sets contain the same numbers */
-+    int index1, index2, found_value;
-+    for (index1 = 0; index1 < set1->size; index1++) {
-+        found_value = 0;
-+        for (index2 = 0; index2 < set1->size; index2++) {
-+            if (set1->array[index1] == set2->array[index2]) {
-+                found_value = 1;
-+                break;
-+            }
-+        }
-+        if (found_value != 1) {
-+            return false;
-+        }
-+    }
-+    return true;
-+}
-+
- type_init(register_types);
-diff --git a/vl.c b/vl.c
-index 7a5554bc41..a6c7b6f992 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2220,6 +2220,23 @@ static DisplayType select_display(const char *p)
- #endif
-     } else if (strstart(p, "none", &opts)) {
-         display = DT_NONE;
-+    } else if (strstart(p, "cocoa", &opts)) {
-+#ifdef CONFIG_COCOA
-+        display = DT_COCOA;
-+        if (strstart(opts, ",hotkey-grab=", &opts)) {
-+            if (strcmp(opts, "") == 0) {
-+                error_report("Please add the key(s) argument");
-+                exit(1);
-+            }
-+            set_ungrab_seq(opts);
-+        } else {
-+            error_report("invalid Cocoa option");
-+            exit(1);
-+        }
-+#else
-+        error_report("Cocoa support is disabled");
-+        exit(1);
-+#endif
-     } else {
-         error_report("unknown display type");
-         exit(1);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>   /* nbd_parse_error_payload
+>    * on success @errp contains message describing nbd error reply
+>    */
+> @@ -642,6 +681,61 @@ static int nbd_co_receive_cmdread_reply(NBDClientSession *s, uint64_t handle,
+>       return iter.ret;
+>   }
+>   
+> +static int nbd_co_receive_blockstatus_reply(NBDClientSession *s,
+> +                                            uint64_t handle, uint64_t length,
+> +                                            NBDExtent *extent, Error **errp)
+> +{
+> +    NBDReplyChunkIter iter;
+> +    NBDReply reply;
+> +    void *payload = NULL;
+> +    Error *local_err = NULL;
+> +    bool received = false;
+> +
+> +    NBD_FOREACH_REPLY_CHUNK(s, iter, handle, s->info.structured_reply,
+> +                            NULL, &reply, &payload)
+> +    {
+> +        int ret;
+> +        NBDStructuredReplyChunk *chunk = &reply.structured;
+> +
+> +        assert(nbd_reply_is_structured(&reply));
+> +
+> +        switch (chunk->type) {
+> +        case NBD_REPLY_TYPE_BLOCK_STATUS:
+
+Depending on the outcome of the discussion on the NBD list, here's where 
+you could make a client easily listen to both your initial server (that 
+sent 5) and a server compliant to the current spec wording (where this 
+constant is 3); although it remains to be seen if that's the only 
+difference between your initial implementation and the NBD spec wording 
+that gets promoted to stable.
+
+> +            if (received) {
+> +                s->quit = true;
+> +                error_setg(&local_err, "Several BLOCK_STATUS chunks in reply");
+> +                nbd_iter_error(&iter, true, -EINVAL, &local_err);
+> +            }
+
+We may change this in the future to ask for more than one context at 
+once; but for now, this matches that we negotiated for only one context, 
+so it is fine to hang up on a server that disobeyed negotiation and sent 
+us too much stuff.
+
+> +            received = true;
+> +
+> +            ret = nbd_parse_blockstatus_payload(s, &reply.structured,
+> +                                                payload, length, extent,
+> +                                                &local_err);
+> +            if (ret < 0) {
+> +                s->quit = true;
+> +                nbd_iter_error(&iter, true, ret, &local_err);
+> +            }
+> +            break;
+> +        default:
+> +            if (!nbd_reply_type_is_error(chunk->type)) {
+> +                /* not allowed reply type */
+> +                s->quit = true;
+> +                error_setg(&local_err,
+> +                           "Unexpected reply type: %d (%s) "
+> +                           "for CMD_BLOCK_STATUS",
+> +                           chunk->type, nbd_reply_type_lookup(chunk->type));
+> +                nbd_iter_error(&iter, true, -EINVAL, &local_err);
+> +            }
+> +        }
+> +
+> +        g_free(payload);
+> +        payload = NULL;
+> +    }
+> +
+> +    error_propagate(errp, iter.err);
+> +    return iter.ret;
+> +}
+> +
+>   static int nbd_co_request(BlockDriverState *bs, NBDRequest *request,
+>                             QEMUIOVector *write_qiov)
+>   {
+> @@ -784,6 +878,50 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+>       return nbd_co_request(bs, &request, NULL);
+>   }
+>   
+> +int64_t coroutine_fn nbd_client_co_get_block_status(BlockDriverState *bs,
+> +                                                    int64_t sector_num,
+> +                                                    int nb_sectors, int *pnum,
+> +                                                    BlockDriverState **file)
+
+Needs rebasing on top of Kevin's block branch to use the byte-based 
+interface.  I also need to finish up my promised followups on that 
+series, as NBD (and other protocol drivers) should have consistent 
+behavior on what it means to report OFFSET_VALID (or whether that should 
+be limited to just format/filter drivers).
+
+> +{
+> +    int64_t ret;
+> +    NBDExtent extent;
+> +    NBDClientSession *client = nbd_get_client_session(bs);
+> +    Error *local_err = NULL;
+> +
+> +    uint64_t offset = sector_num << BDRV_SECTOR_BITS;
+> +    uint32_t bytes = nb_sectors << BDRV_SECTOR_BITS;
+> +
+> +    NBDRequest request = {
+> +        .type = NBD_CMD_BLOCK_STATUS,
+> +        .from = offset,
+> +        .len = bytes,
+> +        .flags = NBD_CMD_FLAG_REQ_ONE,
+> +    };
+> +
+> +    if (!client->info.base_allocation) {
+> +        *pnum = nb_sectors;
+> +        return BDRV_BLOCK_DATA;
+> +    }
+
+Hmm - you are not setting *file nor returning OFFSET_VALID - which goes 
+along with the way Kevin was asking me to clean up the other protocol 
+drivers ;)
+
+> +
+> +    ret = nbd_co_send_request(bs, &request, NULL);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    ret = nbd_co_receive_blockstatus_reply(client, request.handle, bytes,
+> +                                           &extent, &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +    }
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    *pnum = extent.length >> BDRV_SECTOR_BITS;
+
+[1] And now my above worry about a sub-sector reply from the server 
+(when the server supports min_block of 1 instead of 512) rears its head: 
+as long as we reply by sectors, we must NOT report a partial sector as a 
+hole if we are unable to report the tail of the sector as data, but must 
+instead report the entire sector as data.  Thankfully, all that goes 
+away once you rebase to use the byte-based interface, at which point 
+we're no longer rounding and risking a result on a partial sector being 
+portrayed as the wrong status of the entire sector.
+
+> +    return (extent.flags & NBD_STATE_HOLE ? 0 : BDRV_BLOCK_DATA) |
+> +           (extent.flags & NBD_STATE_ZERO ? BDRV_BLOCK_ZERO : 0);
+> +}
+> +
+>   void nbd_client_detach_aio_context(BlockDriverState *bs)
+>   {
+>       NBDClientSession *client = nbd_get_client_session(bs);
+> @@ -828,6 +966,7 @@ int nbd_client_init(BlockDriverState *bs,
+>   
+>       client->info.request_sizes = true;
+>       client->info.structured_reply = true;
+> +    client->info.base_allocation = true;
+
+Hmm - the combination structured_reply = false and base_allocation = 
+true is bogus.  Then again, these two fields are in-out; left false when 
+handing over to the kernel NBD transmission phase (since the kernel 
+module does not yet support structured replies let alone block status), 
+and true when requested with qemu as the transmission driver (since we 
+want to use it if available).  I don't know if having a single tri-state 
+enum is any better than two bools (on input, it is either all-or-none; 
+on output, it is either none (old server), structured reads only (qemu 
+2.11 server, for example), or all (this series' server).
+
+One of the obvious things that I will be testing is whether applying 
+your series in a different order (client first, then server) still works 
+well (the client requests, but fails to get, block status, but can still 
+use structured reads, when paired against a qemu 2.11 server).  (And now 
+you see why I suggested splitting the earlier patch that adds the 
+constants and lookup tables for the structured reply additions, so that 
+server and client can be backported independently)
+
+> +++ b/nbd/client.c
+> @@ -594,6 +594,108 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+>       return QIO_CHANNEL(tioc);
+>   }
+>   
+> +/* nbd_negotiate_simple_meta_context:
+> + * Set one meta context. Simple means that reply must contain zero (not
+> + * negotiated) or one (negotiated) contexts. More contexts would be considered
+> + * as a protocol error.
+> + * return 1 for successful negotiation, context_id is set
+> + *        0 if operation is unsupported,
+> + *        -errno with errp set for any other error
+> + */
+
+Good enough for our first use.  Will obviously need improvements if we 
+support base:allocation AND dirty bitmap exposure at the same time, in 
+future patches ;)
+
+> +static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+> +                                             const char *export,
+> +                                             const char *context,
+> +                                             uint32_t *context_id,
+> +                                             Error **errp)
+> +{
+> +    int ret;
+> +    NBDOptionReply reply;
+> +    uint32_t received_id;
+> +    bool received;
+> +    size_t export_len = strlen(export);
+> +    size_t context_len = strlen(context);
+> +    size_t data_len = 4 + export_len + 4 + 4 + context_len;
+
+Looks a bit like magic numbers; would some sizeof() constructs make this 
+any more obvious?
+
+> +
+> +    char *data = g_malloc(data_len);
+> +    char *p = data;
+> +
+> +    stl_be_p(p, export_len);
+> +    memcpy(p += 4, export, export_len);
+> +    stl_be_p(p += export_len, 1);
+> +    stl_be_p(p += 4, context_len);
+> +    memcpy(p += 4, context, context_len);
+> +
+> +    ret = nbd_send_option_request(ioc, NBD_OPT_SET_META_CONTEXT, data_len, data,
+
+So we don't even bother with LIST; either the SET works or we don't use 
+block status.  Fair enough.
+
+> +                                  errp);
+> +    g_free(data);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
+> +                                 errp) < 0)
+> +    {
+> +        return -1;
+> +    }
+> +
+> +    ret = nbd_handle_reply_err(ioc, &reply, errp);
+> +    if (ret <= 0) {
+> +        return ret;
+> +    }
+> +
+> +    if (reply.type == NBD_REP_META_CONTEXT) {
+> +        char *name;
+> +        size_t len;
+
+A bit odd that this isn't a loop; we'll have to revisit that when we can 
+start requesting more than one type of context at once.  But should work 
+for now - given our initial request, the server shouldn't send us more 
+than one response.
+
+> +
+> +        if (nbd_read(ioc, &received_id, sizeof(received_id), errp) < 0) {
+> +            return -EIO;
+> +        }
+> +        be32_to_cpus(&received_id);
+> +
+> +        len = reply.length - sizeof(received_id);
+> +        name = g_malloc(len + 1);
+> +        if (nbd_read(ioc, name, len, errp) < 0) {
+> +            g_free(name);
+> +            return -EIO;
+> +        }
+> +        name[len] = '\0';
+> +        if (strcmp(context, name)) {
+> +            error_setg(errp, "Failed to negotiate meta context '%s', server "
+> +                       "answered with different context '%s'", context,
+> +                       name);
+
+This check may not be valid for other context namespaces, but is correct 
+for "base:allocation".
+
+> +            g_free(name);
+> +            return -1;
+> +        }
+> +        g_free(name);
+> +
+> +        received = true;
+> +
+> +        /* receive NBD_REP_ACK */
+> +        if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
+> +                                     errp) < 0)
+> +        {
+> +            return -1;
+> +        }
+> +
+> +        ret = nbd_handle_reply_err(ioc, &reply, errp);
+> +        if (ret <= 0) {
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    if (reply.type != NBD_REP_ACK) {
+> +        error_setg(errp, "Unexpected reply type %" PRIx32 " expected %x",
+> +                   reply.type, NBD_REP_ACK);
+> +        return -1;
+> +    }
+> +
+> +    if (received) {
+> +        *context_id = received_id;
+> +        return 1;
+> +    }
+> +
+> +    return 0;
+> +}
+
+Looks good.
+
+>   
+>   int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>                             QCryptoTLSCreds *tlscreds, const char *hostname,
+> @@ -605,10 +707,12 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>       int rc;
+>       bool zeroes = true;
+>       bool structured_reply = info->structured_reply;
+> +    bool base_allocation = info->base_allocation;
+>   
+>       trace_nbd_receive_negotiate(tlscreds, hostname ? hostname : "<null>");
+>   
+>       info->structured_reply = false;
+> +    info->base_allocation = false;
+>       rc = -EINVAL;
+>   
+>       if (outioc) {
+> @@ -699,6 +803,16 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>                   info->structured_reply = result == 1;
+>               }
+>   
+> +            if (info->structured_reply && base_allocation) {
+> +                result = nbd_negotiate_simple_meta_context(
+> +                        ioc, name, "base:allocation",
+> +                        &info->meta_base_allocation_id, errp);
+> +                if (result < 0) {
+> +                    goto fail;
+> +                }
+> +                info->base_allocation = result == 1;
+> +            }
+> +
+>               /* Try NBD_OPT_GO first - if it works, we are done (it
+>                * also gives us a good message if the server requires
+>                * TLS).  If it is not available, fall back to
+
+Looks like the right place to ask.  This also gives us a good message if 
+the server doesn't recognize the export name (presumably the same 
+message we would also get under NBD_OPT_GO).
+
+> diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
+> index 7295b3d975..b083e2effd 100644
+> --- a/tests/qemu-iotests/140.out
+> +++ b/tests/qemu-iotests/140.out
+> @@ -8,7 +8,7 @@ wrote 65536/65536 bytes at offset 0
+>   read 65536/65536 bytes at offset 0
+>   64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>   {"return": {}}
+> -can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: Requested export not available
+> +can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: Invalid parameters for option 10 (set meta context)
+
+Ouch, that's a regression.  Should be fixed by having the server fixed 
+to send REP_ERR_UNKNOWN when an export name is not found (the same as we 
+used to get under NBD_OPT_GO); I mentioned this already while reviewing 
+the server side.
+
+It also means our test is rather sensitive to running qemu as both 
+client and server; other servers may send different error messages. 
+Maybe we need to consider sanitizing things to be more independent of 
+the server and only worry about the client under test - but that's not 
+your problem in this series (I may be doing some of that as part of my 
+work to get nbdkit to support structured replies, and finally have a 
+server other than qemu so I can actually do interop testing).
+
 -- 
-2.14.3 (Apple Git-98)
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
