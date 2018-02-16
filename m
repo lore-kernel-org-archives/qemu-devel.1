@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1emjHr-0006YR-1m
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:55:04 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emjNv-00082A-4j
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:01:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1emjHn-0003ct-Us
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:55:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1emjHn-0003cf-Lq
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:54:59 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1GGsQHK068309
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:54:58 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g62yvrkbk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:54:56 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Fri, 16 Feb 2018 16:54:54 -0000
-References: <1518735273-16089-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1518735273-16089-7-git-send-email-walling@linux.vnet.ibm.com>
-	<4ff97ab0-d848-05a4-9ac2-344bd67e73ef@redhat.com>
-	<10e144ef-cc5d-8958-adf1-03cc4ef13580@linux.vnet.ibm.com>
-	<0fbc3022-dc3f-7dbc-10e4-d7d75ff9742e@linux.vnet.ibm.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Fri, 16 Feb 2018 17:54:49 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1emjNq-0008Hi-Ba
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:01:19 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48174 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emjNq-0008HW-5u
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:01:14 -0500
+Date: Fri, 16 Feb 2018 17:01:07 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180216170106.GE2308@work-vm>
+References: <20180215153955.3253-1-brijesh.singh@amd.com>
+	<20180215153955.3253-15-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <0fbc3022-dc3f-7dbc-10e4-d7d75ff9742e@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Message-Id: <03975725-a290-143b-4066-83ee2ced75b5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180215153955.3253-15-brijesh.singh@amd.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v6 06/12] s390-ccw: parse and
- set boot menu options
+Subject: Re: [Qemu-devel] [PATCH v9 14/29] hmp: add 'info sev' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,65 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
 
-On 16.02.2018 17:44, Collin L. Walling wrote:
-> On 02/16/2018 11:36 AM, Viktor Mihajlovski wrote:
->> On 16.02.2018 17:20, Thomas Huth wrote:
->> [...]
->>>> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
->>>> index cab8a97..7c3cab8 100644
->>>> --- a/hw/s390x/ipl.h
->>>> +++ b/hw/s390x/ipl.h
->>>> @@ -60,10 +60,15 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi=
-;
->>>> =C2=A0 =C2=A0 #define QIPL_ADDRESS=C2=A0 0xcc
->>>> =C2=A0 +#define BOOT_MENU_FLAG_CMD_OPTS=C2=A0 0x80
->>>> +#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
->>>> +
->>>> =C2=A0 struct QemuIplParameters {
->>>> -=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 reserved1[4];
->>>> +=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 boot_menu_flags;
->>>> +=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 reserved1;
->>>> +=C2=A0=C2=A0=C2=A0 uint32_t boot_menu_timeout;
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t netboot_start_addr;
->>> The netboot_start_addr field is now never aligned anymore, neither on
->>> the host side, nor in guest memory. Not a big problem since the struc=
-t
->>> is declared with "QEMU_PACKED", but still ... it's always nicer to tr=
-y
->>> to align fields to their natural boundaries. So maybe move
->>> boot_menu_flags and reserved1 after netboot_start_addr ?
->>>
->> Good catch ... we probably should document the alignment needs and sta=
-te
->> that the ipl parameters starts on a word boundary (and that the block
->> may not be larger than 28 bytes) in a comment block.
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+> The command can be used to show the SEV information when memory
+> encryption is enabled on AMD platform.
 >=20
-> How does this sound?
->=20
-> /* word aligned and cannot exceed 28 bytes */
->=20
-Maybe:
-/*
- * The Qemu IPL Parameters will be stored 32-bit word aligned.
- * Placement of data fields in this area must account for
- * their alignment needs.
- * The entire structure must not be larger than 28 bytes.
- */
->=20
->>>> -=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 reserved2[16];
->>>> +=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 reserved2[14];
->>>> =C2=A0 } QEMU_PACKED;
->>>> =C2=A0 typedef struct QemuIplParameters QemuIplParameters;
->>> =C2=A0 Thomas
->>>
->>
->=20
->=20
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: "Daniel P. Berrang=E9" <berrange@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
+That's ok, you might like to add something to decode the policy into a
+human readable form.
 
---=20
-Regards,
- Viktor Mihajlovski
+You might also want to ifdef it for x86 (like info lapic).
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hmp-commands-info.hx | 14 ++++++++++++++
+>  hmp.c                | 19 +++++++++++++++++++
+>  hmp.h                |  1 +
+>  3 files changed, 34 insertions(+)
+>=20
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index ad590a4ffb2b..236811c465d2 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -865,6 +865,20 @@ STEXI
+>  @findex info memory_size_summary
+>  Display the amount of initially allocated and present hotpluggable (if
+>  enabled) memory in bytes.
+> +ETEXI
+> +
+> +    {
+> +        .name       =3D "sev",
+> +        .args_type  =3D "",
+> +        .params     =3D "",
+> +        .help       =3D "show SEV information",
+> +        .cmd        =3D hmp_info_sev,
+> +    },
+> +
+> +STEXI
+> +@item info sev
+> +@findex info sev
+> +Show SEV information.
+>  ETEXI
+> =20
+>  STEXI
+> diff --git a/hmp.c b/hmp.c
+> index 7870d6a3004e..f51a107a9be3 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -2924,3 +2924,22 @@ void hmp_info_memory_size_summary(Monitor *mon, =
+const QDict *qdict)
+>      }
+>      hmp_handle_error(mon, &err);
+>  }
+> +
+> +void hmp_info_sev(Monitor *mon, const QDict *qdict)
+> +{
+> +    SevInfo *info;
+> +
+> +    info =3D qmp_query_sev(NULL);
+> +    monitor_printf(mon, "sev support: ");
+> +    monitor_printf(mon, "%s\n", info->enabled ? "enabled" : "disabled"=
+);
+> +
+> +    if (info->enabled) {
+> +        monitor_printf(mon, "state: %s\n", SevState_str(info->state));
+> +        monitor_printf(mon, "policy: 0x%x\n", info->policy);
+> +        monitor_printf(mon, "build id: %u\n", info->build_id);
+> +        monitor_printf(mon, "api version: %u.%u\n",
+> +                       info->api_major, info->api_minor);
+> +    }
+> +
+> +    qapi_free_SevInfo(info);
+> +}
+> diff --git a/hmp.h b/hmp.h
+> index 1143db44a760..4ca1a77b2c1f 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -146,5 +146,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *q=
+dict);
+>  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+> +void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> =20
+>  #endif
+> --=20
+> 2.14.3
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
