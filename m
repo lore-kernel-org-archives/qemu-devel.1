@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emhum-00044T-Vu
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 10:27:10 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emi5f-0000GJ-1N
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 10:38:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emhum-0006iB-2q
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 10:27:08 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:45452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1emhul-0006hg-Sr
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 10:27:08 -0500
-Received: by mail-oi0-x244.google.com with SMTP id 23so2511648oip.12
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 07:27:07 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1emi5b-0005Yz-31
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 10:38:23 -0500
+Date: Fri, 16 Feb 2018 15:38:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180216153759.GB2308@work-vm>
+References: <1518782691-1232-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1518782691-1232-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<ceb7028a-6878-9a63-004e-bdf774bb2509@redhat.com>
+	<fb0e5ac4-4339-ea4c-2aea-3439a5e01bf4@linux.vnet.ibm.com>
+	<1389c7ab-a95b-9f5f-3bc1-434e521b946c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180216151318.GH3181@redhat.com>
-References: <20180216121810.56ed961e.cohuck@redhat.com>
-	<CAFEAcA8nRr6OgJ0OAgk6xL2dXQVrUMod5kMzPufykjVNj-yNug@mail.gmail.com>
-	<8b721785-5581-8936-2517-1fa00db3dabd@redhat.com>
-	<CAFEAcA82O0HpZCa_sHJmwn7sH4HYE4NUAg0ni_Z2n_+d4JMAWQ@mail.gmail.com>
-	<20180216151318.GH3181@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Feb 2018 15:26:46 +0000
-Message-ID: <CAFEAcA_PcFAVOB=ZnmOw=Uf6WiKEUH7kX6i7oagZkB5mKpmS6Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1389c7ab-a95b-9f5f-3bc1-434e521b946c@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Process] QEMU submaintainers and pull requests
+Subject: Re: [Qemu-devel] [PATCHv4 2/4] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-On 16 February 2018 at 15:13, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
-> On Fri, Feb 16, 2018 at 03:03:07PM +0000, Peter Maydell wrote:
->> On 16 February 2018 at 14:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> > On 16/02/2018 12:25, Peter Maydell wrote:
->> >> On 16 February 2018 at 11:18, Cornelia Huck <cohuck@redhat.com> wrote=
-:
->> >> The block folks are already doing this, so we should just
->> >> formalize what they're doing at the moment I guess. From my point
->> >> of view as long as there's something I can easily filter
->> >> in/out in the email body or subject so I don't get confused
->> >> (and which doesn't require me to update my filters every time
->> >> a new subsystem switches to using submaintainer pulls!)
->> >> I don't mind about the rest of it. Maybe a subject line with
->> >> 'PULL SUBSYSTEM s390x' (ditto block, etc etc) ?
->> >
->> > What about just requiring you to be in the "To" or "Cc" fields?  That
->> > works pretty well for Linux.
->>
->> It would require existing submaintainers to change their process,
->> though -- currently not all pull requests are to/cc me.
->
-> All this time I thought it was /already/ required to cc Peter on
-> pull requests !
+* Eric Blake (eblake@redhat.com) wrote:
+> On 02/16/2018 08:49 AM, Viktor Mihajlovski wrote:
+>=20
+> > >=20
+> > > The HMP changes are non-trivial compared to v3, so I might have dro=
+pped
+> > > all R-b and Acked-by to ensure they are looked at again.
+> > >=20
+> > > In fact,...
+> > >=20
+>=20
+> > > > -
+> > > > -=A0=A0=A0=A0=A0=A0=A0 if (cpu->value->CPU =3D=3D monitor_get_cpu=
+_index()) {
+> > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 active =3D '*';
+> > > > -=A0=A0=A0=A0=A0=A0=A0 }
+> > >=20
+> > > The old code was doing multiple things - it was telling you the cur=
+rent
+> > > HMP cpu (HMP has 'cpu' with no QMP counterpart, but if you are usin=
+g
+> > > HMP, knowing which cpu is the active target for future HMP commands=
+ that
+> > > depend on the active target, this bit of information is important),
+>=20
+> > >=20
+> > Thanks for the patience. I'll respin with the r/a-b's on patch 2/4
+> > removed, but want to verify first that I can get the active cpu witho=
+ut
+> > triggering cpu_synchronize_state via monitor_get_cpu_index...
+>=20
+> What does it matter?  HMP is not the time-critical interface like QMP, =
+so
+> even if it has to synchronize things, you're no worse off than you were
+> before when using HMP.
 
-The only thing I currently require is that the body text
-contains the appropriate magic words and that it goes to
-qemu-devel in to or cc.
+I guess it's not obvious that mon_get_cpu_index has that side effect;
+although I can see why it's there since it guarantees correctness of all
+the HMP data with one call; a comment might be nice to point it out.
 
-thanks
--- PMM
+But yes, I agree the performance cost there doesn't worry me for HMP.
+
+Dave
+
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
