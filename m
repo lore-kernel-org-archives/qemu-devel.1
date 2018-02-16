@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1emeSu-0005aq-NG
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:46:09 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1emeXF-0007yv-AC
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:50:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1emeSr-0006V0-FX
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:46:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57520
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1emeSr-0006Uc-Ah
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:46:05 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1GBiKCG118290
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 06:46:03 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g5t55tcjg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 06:46:03 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 16 Feb 2018 04:46:02 -0700
-References: <1518703835-10361-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1518703835-10361-3-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAMxuvaxg37M-mDQgMS89Cq_RdcXfi+DmnB7WAOdb36DPf5KYEw@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 16 Feb 2018 06:45:59 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1emeXA-0001Hv-7E
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:50:35 -0500
+References: <20180215032905.27146-1-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3600bf5d-a91e-337c-57bf-6edf1ee3766e@virtuozzo.com>
+Date: Fri, 16 Feb 2018 14:50:14 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAMxuvaxg37M-mDQgMS89Cq_RdcXfi+DmnB7WAOdb36DPf5KYEw@mail.gmail.com>
+In-Reply-To: <20180215032905.27146-1-eblake@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <71987b7d-21a0-6020-25bd-a742a15e19c2@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests: add test for TPM TIS device
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd: Honor server's advertised minimum
+ block size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,42 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 02/16/2018 05:18 AM, Marc-Andr=C3=A9 Lureau wrote:
-> On Thu, Feb 15, 2018 at 3:10 PM, Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->> Move the TPM TIS related register and flag #defines into
->> include/hw/acpi/tpm.h for access by the test case.
->>
->> Write a test case that covers the TIS functionality.
->>
->> Add the tests cases to the MAINTAINERS file.
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> ---
->>   MAINTAINERS            |   1 +
->>   hw/tpm/tpm_tis.c       | 101 ----------
->>   include/hw/acpi/tpm.h  | 105 +++++++++++
->>   tests/Makefile.include |   2 +
->>   tests/tpm-emu.c        |   7 +
->>   tests/tpm-tis-test.c   | 486 +++++++++++++++++++++++++++++++++++++++=
-++++++++++
->>   6 files changed, 601 insertions(+), 101 deletions(-)
->>   create mode 100644 tests/tpm-tis-test.c
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 57358a0..60a9ae9 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -1633,6 +1633,7 @@ F: include/hw/acpi/tpm.h
->>   F: include/sysemu/tpm*
->>   F: qapi/tpm.json
->>   F: backends/tpm.c
->> +F: tests/tpm-*-test
-> Doesnt' match tests/tpm-emu.c/.h
+15.02.2018 06:29, Eric Blake wrote:
+> Commit 79ba8c98 (v2.7) changed the setting of request_alignment
+> to occur only during bdrv_refresh_limits(), rather than at at
+> bdrv_open() time; but at the time, NBD was unaffected, because
+> it still used sector-based callbacks, so the block layer
+> defaulted NBD to use 512 request_alignment.
 >
-> Make it tests/*tpm* ?
+> Later, commit 70c4fb26 (also v2.7) changed NBD to use byte-based
+> callbacks, without setting request_alignment.  This resulted in
+> NBD using request_alignment of 1, which works great when the
+> server supports it (as is the case for qemu-nbd), but falls apart
+> miserably if the server requires alignment (but only if qemu
+> actually sends a sub-sector request; qemu-io can do it, but
+> most qemu operations still perform on sectors or larger).
+>
+> Even later, the NBD protocol was updated to document that clients
+> should learn the server's minimum alignment during NBD_OPT_GO;
+> and recommended that clients should assume a minimum size of 512
+> unless the server understands NBD_OPT_GO and replied with a smaller
+> size.  Commit 081dd1fe (v2.10) attempted to do that, by assigning
+> request_alignment to whatever was learned from the server; but
+> it has two flaws: the assignment is done during bdrv_open() so
+> it gets unconditionally wiped out back to 1 during any later
+> bdrv_refresh_limits(); and the code is not using a default of 512
+> when the server did not report a minimum size.
+>
+> Fix these issues by moving the assignment to request_alignment
+> to the right function, and by using a sane default when the
+> server does not advertise a minimum size.
+>
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>   block/nbd-client.c | 3 ---
+>   block/nbd.c        | 2 ++
+>   2 files changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index 9206652e45c..7b68499b76a 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -846,9 +846,6 @@ int nbd_client_init(BlockDriverState *bs,
+>       if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
+>           bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
+>       }
+> -    if (client->info.min_block > bs->bl.request_alignment) {
+> -        bs->bl.request_alignment = client->info.min_block;
+> -    }
+>
+>       qemu_co_mutex_init(&client->send_mutex);
+>       qemu_co_queue_init(&client->free_sema);
+> diff --git a/block/nbd.c b/block/nbd.c
+> index ef81a9f53ba..69b5fd5e8fa 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
+> @@ -474,8 +474,10 @@ static int nbd_co_flush(BlockDriverState *bs)
+>   static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
+>   {
+>       NBDClientSession *s = nbd_get_client_session(bs);
+> +    uint32_t min = s->info.min_block;
+>       uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
+>
+> +    bs->bl.request_alignment = min ? min : BDRV_SECTOR_SIZE;
+>       bs->bl.max_pdiscard = max;
+>       bs->bl.max_pwrite_zeroes = max;
+>       bs->bl.max_transfer = max;
 
-Did that. Thanks.
+Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+
+
+
+-- 
+Best regards,
+Vladimir
