@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emjDX-0002fd-FB
+	(envelope-from <stefanha@redhat.com>) id 1emjDX-0002fb-Ez
 	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:50:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1emjDU-0001K3-Bc
+	(envelope-from <stefanha@redhat.com>) id 1emjDU-0001Jm-89
 	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:50:35 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40154 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49700 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emjDU-0001J2-6y
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1emjDU-0001J5-1d
 	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:50:32 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 16 Feb 2018 16:50:14 +0000
-Message-Id: <20180216165015.30715-5-stefanha@redhat.com>
+Date: Fri, 16 Feb 2018 16:50:13 +0000
+Message-Id: <20180216165015.30715-4-stefanha@redhat.com>
 In-Reply-To: <20180216165015.30715-1-stefanha@redhat.com>
 References: <20180216165015.30715-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] block: test blk_aio_flush() with
- blk->root == NULL
+Subject: [Qemu-devel] [PATCH v3 3/5] block: add BlockBackend->in_flight
+ counter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,128 +27,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: John Snow <jsnow@redhat.com>, mark.kanda@oracle.com, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Kevin Wolf <kwolf@redhat.com>
+BlockBackend currently relies on BlockDriverState->in_flight to track
+requests for blk_drain().  There is a corner case where
+BlockDriverState->in_flight cannot be used though: blk->root can be NULL
+when there is no medium.  This results in a segfault when the NULL
+pointer is dereferenced.
 
-This patch adds test cases for the scenario where blk_aio_flush() is
-called on a BlockBackend with no root.  Calling drain afterwards should
-complete the requests with -ENOMEDIUM.
+Introduce a BlockBackend->in_flight counter for aio requests so it works
+even when blk->root == NULL.
+
+Based on a patch by Kevin Wolf <kwolf@redhat.com>.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/Makefile.include     |  2 ++
- tests/test-block-backend.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
- create mode 100644 tests/test-block-backend.c
+ block.c               |  2 +-
+ block/block-backend.c | 60 +++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 54 insertions(+), 8 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a1bcbffe12..c15cb2dca4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -83,6 +83,7 @@ gcov-files-test-hbitmap-y = blockjob.c
- check-unit-y += tests/test-bdrv-drain$(EXESUF)
- check-unit-y += tests/test-blockjob$(EXESUF)
- check-unit-y += tests/test-blockjob-txn$(EXESUF)
-+check-unit-y += tests/test-block-backend$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
- # all code tested by test-x86-cpuid is inside topology.h
- gcov-files-test-x86-cpuid-y =
-@@ -612,6 +613,7 @@ tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
- tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
-+tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
-diff --git a/tests/test-block-backend.c b/tests/test-block-backend.c
-new file mode 100644
-index 0000000000..fd59f02bd0
---- /dev/null
-+++ b/tests/test-block-backend.c
-@@ -0,0 +1,82 @@
-+/*
-+ * BlockBackend tests
-+ *
-+ * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+diff --git a/block.c b/block.c
+index 9e4da81213..a83037c2a5 100644
+--- a/block.c
++++ b/block.c
+@@ -4713,7 +4713,7 @@ out:
+ 
+ AioContext *bdrv_get_aio_context(BlockDriverState *bs)
+ {
+-    return bs->aio_context;
++    return bs ? bs->aio_context : qemu_get_aio_context();
+ }
+ 
+ AioWait *bdrv_get_aio_wait(BlockDriverState *bs)
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 0266ac990b..a775a3dd2f 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -73,6 +73,14 @@ struct BlockBackend {
+     int quiesce_counter;
+     VMChangeStateEntry *vmsh;
+     bool force_allow_inactivate;
 +
-+#include "qemu/osdep.h"
-+#include "block/block.h"
-+#include "sysemu/block-backend.h"
-+#include "qapi/error.h"
-+
-+static void test_drain_aio_error_flush_cb(void *opaque, int ret)
++    /* Number of in-flight aio requests.  BlockDriverState also counts
++     * in-flight requests but aio requests can exist even when blk->root is
++     * NULL, so we cannot rely on its counter for that case.
++     * Accessed with atomic ops.
++     */
++    unsigned int in_flight;
++    AioWait wait;
+ };
+ 
+ typedef struct BlockBackendAIOCB {
+@@ -1225,11 +1233,22 @@ int blk_make_zero(BlockBackend *blk, BdrvRequestFlags flags)
+     return bdrv_make_zero(blk->root, flags);
+ }
+ 
++static void blk_inc_in_flight(BlockBackend *blk)
 +{
-+    bool *completed = opaque;
-+
-+    g_assert(ret == -ENOMEDIUM);
-+    *completed = true;
++    atomic_inc(&blk->in_flight);
 +}
 +
-+static void test_drain_aio_error(void)
++static void blk_dec_in_flight(BlockBackend *blk)
 +{
-+    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    BlockAIOCB *acb;
-+    bool completed = false;
-+
-+    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
-+    g_assert(acb != NULL);
-+    g_assert(completed == false);
-+
-+    blk_drain(blk);
-+    g_assert(completed == true);
-+
-+    blk_unref(blk);
++    atomic_dec(&blk->in_flight);
++    aio_wait_kick(&blk->wait);
 +}
 +
-+static void test_drain_all_aio_error(void)
-+{
-+    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    BlockAIOCB *acb;
-+    bool completed = false;
+ static void error_callback_bh(void *opaque)
+ {
+     struct BlockBackendAIOCB *acb = opaque;
+ 
+-    bdrv_dec_in_flight(acb->common.bs);
++    blk_dec_in_flight(acb->blk);
+     acb->common.cb(acb->common.opaque, acb->ret);
+     qemu_aio_unref(acb);
+ }
+@@ -1240,7 +1259,7 @@ BlockAIOCB *blk_abort_aio_request(BlockBackend *blk,
+ {
+     struct BlockBackendAIOCB *acb;
+ 
+-    bdrv_inc_in_flight(blk_bs(blk));
++    blk_inc_in_flight(blk);
+     acb = blk_aio_get(&block_backend_aiocb_info, blk, cb, opaque);
+     acb->blk = blk;
+     acb->ret = ret;
+@@ -1263,7 +1282,7 @@ static const AIOCBInfo blk_aio_em_aiocb_info = {
+ static void blk_aio_complete(BlkAioEmAIOCB *acb)
+ {
+     if (acb->has_returned) {
+-        bdrv_dec_in_flight(acb->common.bs);
++        blk_dec_in_flight(acb->rwco.blk);
+         acb->common.cb(acb->common.opaque, acb->rwco.ret);
+         qemu_aio_unref(acb);
+     }
+@@ -1284,7 +1303,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
+     BlkAioEmAIOCB *acb;
+     Coroutine *co;
+ 
+-    bdrv_inc_in_flight(blk_bs(blk));
++    blk_inc_in_flight(blk);
+     acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
+     acb->rwco = (BlkRwCo) {
+         .blk    = blk,
+@@ -1521,14 +1540,41 @@ int blk_flush(BlockBackend *blk)
+ 
+ void blk_drain(BlockBackend *blk)
+ {
+-    if (blk_bs(blk)) {
+-        bdrv_drain(blk_bs(blk));
++    BlockDriverState *bs = blk_bs(blk);
 +
-+    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
-+    g_assert(acb != NULL);
-+    g_assert(completed == false);
++    if (bs) {
++        bdrv_drained_begin(bs);
++    }
 +
-+    blk_drain_all();
-+    g_assert(completed == true);
++    /* We may have -ENOMEDIUM completions in flight */
++    AIO_WAIT_WHILE(&blk->wait,
++            blk_get_aio_context(blk),
++            atomic_mb_read(&blk->in_flight) > 0);
 +
-+    blk_unref(blk);
-+}
++    if (bs) {
++        bdrv_drained_end(bs);
+     }
+ }
+ 
+ void blk_drain_all(void)
+ {
+-    bdrv_drain_all();
++    BlockBackend *blk = NULL;
 +
-+int main(int argc, char **argv)
-+{
-+    bdrv_init();
-+    qemu_init_main_loop(&error_abort);
++    bdrv_drain_all_begin();
 +
-+    g_test_init(&argc, &argv, NULL);
++    while ((blk = blk_all_next(blk)) != NULL) {
++        AioContext *ctx = blk_get_aio_context(blk);
 +
-+    g_test_add_func("/block-backend/drain_aio_error", test_drain_aio_error);
-+    g_test_add_func("/block-backend/drain_all_aio_error",
-+                    test_drain_all_aio_error);
++        aio_context_acquire(ctx);
 +
-+    return g_test_run();
-+}
++        /* We may have -ENOMEDIUM completions in flight */
++        AIO_WAIT_WHILE(&blk->wait, ctx,
++                atomic_mb_read(&blk->in_flight) > 0);
++
++        aio_context_release(ctx);
++    }
++
++    bdrv_drain_all_end();
+ }
+ 
+ void blk_set_on_error(BlockBackend *blk, BlockdevOnError on_read_error,
 -- 
 2.14.3
