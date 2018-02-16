@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emeFf-00081r-WF
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:32:28 -0500
+	(envelope-from <berto@igalia.com>) id 1emeJO-0001qh-V5
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:36:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emeFc-0000VF-2X
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:32:28 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60670 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1emeFb-0000Ut-U1
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:32:24 -0500
-Date: Fri, 16 Feb 2018 12:32:07 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180216113207.37toqwjlua25zqx4@sirius.home.kraxel.org>
-References: <20180205133228.25082-1-anatoly.trosinenko@gmail.com>
-	<CAE5jQCewU3WcjA=CKA_33tSJzvV5Ov_ATNi17soCUHSH6fPAGg@mail.gmail.com>
+	(envelope-from <berto@igalia.com>) id 1emeJL-0001Xs-2k
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:36:18 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <4f824a36-5d4f-267d-2bcb-04e118117abe@virtuozzo.com>
+References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516366207-109842-8-git-send-email-anton.nefedov@virtuozzo.com>
+	<w51y3k4u97c.fsf@maestria.local.igalia.com>
+	<4f824a36-5d4f-267d-2bcb-04e118117abe@virtuozzo.com>
+Date: Fri, 16 Feb 2018 12:36:11 +0100
+Message-ID: <w51tvuhkvys.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAE5jQCewU3WcjA=CKA_33tSJzvV5Ov_ATNi17soCUHSH6fPAGg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] sdl: restore optimized redraw
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 7/8] file-posix: account
+ discard operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On Wed, Feb 14, 2018 at 09:47:19PM +0300, Anatoly Trosinenko wrote:
-> Ping.
-> Patchwork link: http://patchwork.ozlabs.org/patch/869283/
+On Mon 12 Feb 2018 05:19:57 PM CET, Anton Nefedov wrote:
+>>> @@ -158,6 +158,11 @@ typedef struct BDRVRawState {
+>>>       bool page_cache_inconsistent:1;
+>>>       bool has_fallocate;
+>>>       bool needs_alignment;
+>>> +    struct {
+>>> +        int64_t discard_nb_ok;
+>>> +        int64_t discard_nb_failed;
+>>> +        int64_t discard_bytes_ok;
+>>> +    } stats;
+>> 
+>> Shouldn't this new structure be defined in a header file so other
+>> drivers can use it? Or did you define it here because you don't see that
+>> happening soon?
+>> 
+>
+> I guess there's no reason to burden the common header files as long as
+> it's not really used anywhere else.
 
-No review comments, patch is perfect ;)
+Fair enough,
 
-Sorry for the delay, was busy with other stuff.
-Preparing new UI pull request atm, queued the patch.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-thanks,
-  Gerd
+Berto
