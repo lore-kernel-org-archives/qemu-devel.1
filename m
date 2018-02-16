@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eme2G-0007Yk-9p
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:18:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eme3H-0008Ro-Mq
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:19:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eme2B-00006u-6D
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:18:36 -0500
-Date: Fri, 16 Feb 2018 12:18:10 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180216121810.56ed961e.cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eme3G-0002HE-U8
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:19:39 -0500
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:45506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eme3G-0002FX-NS
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:19:38 -0500
+Received: by mail-ot0-x22a.google.com with SMTP id m15so2380647otf.12
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 03:19:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [Process] QEMU submaintainers and pull requests
+In-Reply-To: <5660fbb9-6998-e659-fcc2-6cd1bba1804b@redhat.com>
+References: <1518761564-9899-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA_s1C3md4Vw6fQu2GLy=hZBLDSrvnHppQswL8+K1giLwg@mail.gmail.com>
+	<5660fbb9-6998-e659-fcc2-6cd1bba1804b@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Feb 2018 11:19:17 +0000
+Message-ID: <CAFEAcA_Pam6j22400oY7_N2LpAPkAofB-_j0Ym7Ln-_ZHcuSvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tests/boot-serial-test: Fix problem with
+ timeout due to dropped characters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,29 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi,
+On 16 February 2018 at 10:25, Thomas Huth <thuth@redhat.com> wrote:
+> PS: I think the OpenBSD compiler is wrong here, nbr should get
+> initialized at least once before the g_assert(nbr >= 0) check ...
 
-for 2.13 (or whatever it will be called), I'd like to switch to a
-submaintainer model for s390x, where maintainers for a certain s390x
-area (including myself) send me pull requests that I integrate into
-s390-next resp. s390-fixes, for which I send a pull request to merge
-into master.
+Yes, I agree, but it does require some intelligence on the
+part of the compiler to figure out that the ccnt++ < 512
+condition can't trigger first time round the loop. (It's
+a gcc 4.9.3, so presumably newer gcc are indeed smarter.)
 
-The problem here is that I don't want these sub pull requests to be
-picked up by Peter's scripts, generating confusion. So far, my ideas
-have been:
+Applied to master.
 
-- Post s390 pull requests only to qemu-s390x@nongnu.org. This sucks, as
-  it makes part of the process intransparent to any QEMU developer not
-  subscribed to that mailing list.
-- Put a certain marker into the subject, like "PULL *s390x*" or so. I'm
-  not sure how robust that is.
-- Ditch the pull request idea, keep applying patches. This is not quite
-  as bad as it sounds, as I have the infrastructure to apply patches
-  anyway, but it hides the real workflow (and simply pulling is likely
-  less work for me in the long run.)
-
-Thoughts? Ideas?
+thanks
+-- PMM
