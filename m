@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emjqc-0003li-Nm
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:31:00 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emjqv-0003x0-03
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emjqZ-0000an-Ke
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:30:58 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35628)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emjqZ-0000aG-Gk
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:30:55 -0500
-Received: by mail-qt0-x242.google.com with SMTP id g14so4701930qti.2
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 09:30:55 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180216164620.GA53727@humpty.home.comstyle.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
-Date: Fri, 16 Feb 2018 14:30:51 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180216164620.GA53727@humpty.home.comstyle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as a OpenBSD
- maintainer
+	(envelope-from <dgilbert@redhat.com>) id 1emjqr-0001C2-Q2
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:31:16 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50826 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emjqr-0001BC-KQ
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:31:13 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri, 16 Feb 2018 17:31:11 +0000
+Message-Id: <20180216173111.10270-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] cuda.h: Fix multiple typedef
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +21,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk
 
-Hi Brad,
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 02/16/2018 01:46 PM, Brad Smith wrote:
-> Add myself as an OpenBSD maintainer and add OpenBSD as maintained.
-> 
-> Signed-off-by: Brad Smith <brad@comstyle.com>
-> 
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 57358a08e2..86329e274f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -386,6 +386,12 @@ M: Kamil Rytarowski <kamil@netbsd.org>
->  S: Maintained
->  K: ^Subject:.*(?i)NetBSD
->  
-> +OPENBSD
-> +L: qemu-devel@nongnu.org
-> +M: Brad Smith <brad@comstyle.com>
-> +S: Maintained
-> +K: ^Subject:.*(?i)OpenBSD
-> +
+RHEL6's compilers don't like the repeated typedef.
 
-No problem here,
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ include/hw/misc/macio/cuda.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->  W32, W64
->  L: qemu-devel@nongnu.org
->  M: Stefan Weil <sw@weilnetz.de>
-> diff --git a/configure b/configure
-> index 913e14839d..850c46ebac 100755
-> --- a/configure
-> +++ b/configure
-> @@ -760,6 +760,7 @@ OpenBSD)
->    audio_drv_list="sdl"
->    audio_possible_drivers="sdl"
->    HOST_VARIANT_DIR="openbsd"
-> +  supported_os="yes"
-
-But before announcing the host OS being supported again, I'd rather see
-reproducible build/tests logs, in a (public - if possible) continuous
-integration system. Else it is hard to notice when it get broken.
-
->  ;;
->  Darwin)
->    bsd="yes"
-> 
-
-Regards,
-
-Phil.
+diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
+index 6afbdd13ee..494b709579 100644
+--- a/include/hw/misc/macio/cuda.h
++++ b/include/hw/misc/macio/cuda.h
+@@ -93,12 +93,12 @@ typedef struct CUDAState {
+ } CUDAState;
+ 
+ /* MOS6522 CUDA */
+-typedef struct MOS6522CUDAState {
++struct MOS6522CUDAState {
+     /*< private >*/
+     MOS6522State parent_obj;
+ 
+     CUDAState *cuda;
+-} MOS6522CUDAState;
++};
+ 
+ #define TYPE_MOS6522_CUDA "mos6522-cuda"
+ #define MOS6522_CUDA(obj) OBJECT_CHECK(MOS6522CUDAState, (obj), \
+-- 
+2.14.3
