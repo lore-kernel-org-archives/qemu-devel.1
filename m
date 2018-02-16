@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emfsT-0001E8-DL
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emfsX-0001Gc-KR
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emfsR-0005d2-VU
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34846 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1emfsW-0005ia-Hn
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:41 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44938 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emfsR-0005cc-Q4
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:35 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emfsW-0005hz-Bj
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:40 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71F58407519B
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:16:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07261404085A
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:16:40 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 16 Feb 2018 13:16:01 +0000
-Message-Id: <20180216131625.9639-6-dgilbert@redhat.com>
+Date: Fri, 16 Feb 2018 13:16:04 +0000
+Message-Id: <20180216131625.9639-9-dgilbert@redhat.com>
 In-Reply-To: <20180216131625.9639-1-dgilbert@redhat.com>
 References: <20180216131625.9639-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 05/29] postcopy: Add vhost-user flag for
- postcopy and check it
+Subject: [Qemu-devel] [PATCH v3 08/29] libvhost-user: Open userfaultfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,151 +34,95 @@ Cc: quintela@redhat.com, aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a vhost feature flag for postcopy support, and
-use the postcopy notifier to check it before allowing postcopy.
+Open a userfaultfd (on a postcopy_advise) and send it back in
+the reply to the qemu for it to monitor.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.h |  1 +
- docs/interop/vhost-user.txt           | 10 +++++++++
- hw/virtio/vhost-user.c                | 41 ++++++++++++++++++++++++++++++++++-
- 3 files changed, 51 insertions(+), 1 deletion(-)
+ contrib/libvhost-user/libvhost-user.c | 45 +++++++++++++++++++++++++++++++----
+ contrib/libvhost-user/libvhost-user.h |  3 +++
+ 2 files changed, 44 insertions(+), 4 deletions(-)
 
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index eb0ab9338c..0b563fc5ae 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -26,9 +26,20 @@
+ #include <sys/socket.h>
+ #include <sys/eventfd.h>
+ #include <sys/mman.h>
++#include "qemu/compiler.h"
++
++#if defined(__linux__)
++#include <sys/syscall.h>
++#include <fcntl.h>
++#include <sys/ioctl.h>
+ #include <linux/vhost.h>
+ 
+-#include "qemu/compiler.h"
++#ifdef __NR_userfaultfd
++#include <linux/userfaultfd.h>
++#endif
++
++#endif
++
+ #include "qemu/atomic.h"
+ 
+ #include "libvhost-user.h"
+@@ -888,11 +899,37 @@ vu_set_config(VuDev *dev, VhostUserMsg *vmsg)
+ static bool
+ vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
+ {
+-    /* TODO: Open ufd, pass it back in the request
+-     * TODO: Add addresses
+-     */
++    dev->postcopy_ufd = -1;
++#ifdef UFFDIO_API
++    struct uffdio_api api_struct;
++
++    dev->postcopy_ufd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
++    /* TODO: Add addresses */
+     vmsg->payload.u64 = 0xcafe;
+     vmsg->size = sizeof(vmsg->payload.u64);
++#endif
++
++    if (dev->postcopy_ufd == -1) {
++        vu_panic(dev, "Userfaultfd not available: %s", strerror(errno));
++        goto out;
++    }
++
++#ifdef UFFDIO_API
++    api_struct.api = UFFD_API;
++    api_struct.features = 0;
++    if (ioctl(dev->postcopy_ufd, UFFDIO_API, &api_struct)) {
++        vu_panic(dev, "Failed UFFDIO_API: %s", strerror(errno));
++        close(dev->postcopy_ufd);
++        dev->postcopy_ufd = -1;
++        goto out;
++    }
++    /* TODO: Stash feature flags somewhere */
++#endif
++
++out:
++    /* Return a ufd to the QEMU */
++    vmsg->fd_num = 1;
++    vmsg->fds[0] = dev->postcopy_ufd;
+     return true; /* = send a reply */
+ }
+ 
 diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index 18f95f65d7..a0dcc97c73 100644
+index 9c3a180777..bb33b33f3b 100644
 --- a/contrib/libvhost-user/libvhost-user.h
 +++ b/contrib/libvhost-user/libvhost-user.h
-@@ -48,6 +48,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
-     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
-+    VHOST_USER_PROTOCOL_F_PAGEFAULT = 7,
- 
-     VHOST_USER_PROTOCOL_F_MAX
- };
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index 9fcf48d611..e95cd82677 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -290,6 +290,15 @@ Once the source has finished migration, rings will be stopped by
- the source. No further update must be done before rings are
- restarted.
- 
-+In postcopy migration the slave is started before all the memory has been
-+received from the source host, and care must be taken to avoid accessing pages
-+that have yet to be received.  The slave opens a 'userfault'-fd and registers
-+the memory with it; this fd is then passed back over to the master.
-+The master services requests on the userfaultfd for pages that are accessed
-+and when the page is available it performs WAKE ioctl's on the userfaultfd
-+to wake the stalled slave.  The client indicates support for this via the
-+VHOST_USER_PROTOCOL_F_PAGEFAULT feature.
+@@ -279,6 +279,9 @@ struct VuDev {
+      * re-initialize */
+     vu_panic_cb panic;
+     const VuDevIface *iface;
 +
- Memory access
- -------------
- 
-@@ -368,6 +377,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_MTU            4
- #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
- #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
-+#define VHOST_USER_PROTOCOL_F_PAGEFAULT      7
- 
- Master message types
- --------------------
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 6eb97980ad..d60f89cc16 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -17,6 +17,8 @@
- #include "sysemu/kvm.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-+#include "migration/migration.h"
-+#include "migration/postcopy-ram.h"
- 
- #include <sys/ioctl.h>
- #include <sys/socket.h>
-@@ -39,7 +41,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
-     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
--
-+    VHOST_USER_PROTOCOL_F_PAGEFAULT = 7,
-     VHOST_USER_PROTOCOL_F_MAX
++    /* Postcopy data */
++    int postcopy_ufd;
  };
  
-@@ -148,8 +150,10 @@ static VhostUserMsg m __attribute__ ((unused));
- #define VHOST_USER_VERSION    (0x1)
- 
- struct vhost_user {
-+    struct vhost_dev *dev;
-     CharBackend *chr;
-     int slave_fd;
-+    NotifierWithReturn postcopy_notifier;
- };
- 
- static bool ioeventfd_enabled(void)
-@@ -775,6 +779,33 @@ out:
-     return ret;
- }
- 
-+static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-+                                        void *opaque)
-+{
-+    struct PostcopyNotifyData *pnd = opaque;
-+    struct vhost_user *u = container_of(notifier, struct vhost_user,
-+                                         postcopy_notifier);
-+    struct vhost_dev *dev = u->dev;
-+
-+    switch (pnd->reason) {
-+    case POSTCOPY_NOTIFY_PROBE:
-+        if (!virtio_has_feature(dev->protocol_features,
-+                                VHOST_USER_PROTOCOL_F_PAGEFAULT)) {
-+            /* TODO: Get the device name into this error somehow */
-+            error_setg(pnd->errp,
-+                       "vhost-user backend not capable of postcopy");
-+            return -ENOENT;
-+        }
-+        break;
-+
-+    default:
-+        /* We ignore notifications we don't know */
-+        break;
-+    }
-+
-+    return 0;
-+}
-+
- static int vhost_user_init(struct vhost_dev *dev, void *opaque)
- {
-     uint64_t features, protocol_features;
-@@ -786,6 +817,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-     u = g_new0(struct vhost_user, 1);
-     u->chr = opaque;
-     u->slave_fd = -1;
-+    u->dev = dev;
-     dev->opaque = u;
- 
-     err = vhost_user_get_features(dev, &features);
-@@ -842,6 +874,9 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-         return err;
-     }
- 
-+    u->postcopy_notifier.notify = vhost_user_postcopy_notifier;
-+    postcopy_add_notifier(&u->postcopy_notifier);
-+
-     return 0;
- }
- 
-@@ -852,6 +887,10 @@ static int vhost_user_cleanup(struct vhost_dev *dev)
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
- 
-     u = dev->opaque;
-+    if (u->postcopy_notifier.notify) {
-+        postcopy_remove_notifier(&u->postcopy_notifier);
-+        u->postcopy_notifier.notify = NULL;
-+    }
-     if (u->slave_fd >= 0) {
-         qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
-         close(u->slave_fd);
+ typedef struct VuVirtqElement {
 -- 
 2.14.3
