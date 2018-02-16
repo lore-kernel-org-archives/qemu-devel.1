@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1embfc-0004JM-KY
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:05 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1embfd-0004K2-5y
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1embfZ-0001EZ-Ec
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:04 -0500
-Received: from mga03.intel.com ([134.134.136.65]:9959)
+	(envelope-from <haozhong.zhang@intel.com>) id 1embfa-0001FS-Jk
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:05 -0500
+Received: from mga17.intel.com ([192.55.52.151]:12665)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1embfZ-0001Bl-3Y
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:01 -0500
+	id 1embfa-0001Da-5S
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 03:47:02 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Fri, 16 Feb 2018 16:46:07 +0800
-Message-Id: <20180216084615.26483-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v3 0/8] nvdimm: guarantee persistence of QEMU
- writes to persistent memory
+Date: Fri, 16 Feb 2018 16:46:09 +0800
+Message-Id: <20180216084615.26483-3-haozhong.zhang@intel.com>
+In-Reply-To: <20180216084615.26483-1-haozhong.zhang@intel.com>
+References: <20180216084615.26483-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v3 2/8] hostmem-file: add the 'pmem' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +27,218 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
-live migration. If the backend is on the persistent memory, QEMU needs
-to take proper operations to ensure its writes persistent on the
-persistent memory. Otherwise, a host power failure may result in the
-loss the guest data on the persistent memory.
+When QEMU emulates vNVDIMM labels and migrates vNVDIMM devices, it
+needs to know whether the backend storage is a real persistent memory,
+in order to decide whether special operations should be performed to
+ensure the data persistence.
 
-This v3 patch series is based on Marcel's patch "mem: add share
-parameter to memory-backend-ram" [1] because of the changes in patch 1.
+This boolean option 'pmem' allows users to specify whether the backend
+storage of memory-backend-file is a real persistent memory. If
+'pmem=on', QEMU will set the flag RAM_PMEM in the RAM block of the
+corresponding memory region.
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+---
+ backends/hostmem-file.c | 26 +++++++++++++++++++++++++-
+ docs/nvdimm.txt         | 14 ++++++++++++++
+ exec.c                  | 16 +++++++++++++++-
+ include/exec/memory.h   |  2 ++
+ include/exec/ram_addr.h |  3 +++
+ qemu-options.hx         |  9 ++++++++-
+ 6 files changed, 67 insertions(+), 3 deletions(-)
 
-Previous versions can be found at
-v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
-v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
-
-Changes in v3:
- * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
-   PMEM writes in it, so we don't need the _common function.
- * (Patch 6) Expose qemu_get_buffer_common so we can remove the
-   unnecessary qemu_get_buffer_to_pmem wrapper.
- * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
-   PMEM writes in it, so we can remove the unnecessary
-   xbzrle_decode_buffer_{common, to_pmem}.
- * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
-   of test-{xbzrle,vmstate}.c.
-
-Changes in v2:
- * (Patch 1) Use a flags parameter in file ram allocation functions.
- * (Patch 2) Add a new option 'pmem' to hostmem-file.
- * (Patch 3) Use libpmem to operate on the persistent memory, rather
-   than re-implementing those operations in QEMU.
- * (Patch 5-8) Consider the write persistence in the migration path.
-
-Haozhong Zhang (8):
-  [1/8] memory, exec: switch file ram allocation functions to 'flags' parameters
-  [2/8] hostmem-file: add the 'pmem' option
-  [3/8] configure: add libpmem support
-  [4/8] mem/nvdimm: ensure write persistence to PMEM in label emulation
-  [5/8] migration/ram: ensure write persistence on loading zero pages to PMEM
-  [6/8] migration/ram: ensure write persistence on loading normal pages to PMEM
-  [7/8] migration/ram: ensure write persistence on loading compressed pages to PMEM
-  [8/8] migration/ram: ensure write persistence on loading xbzrle pages to PMEM
-
- backends/hostmem-file.c             | 27 +++++++++++++++++++-
- configure                           | 35 ++++++++++++++++++++++++++
- docs/nvdimm.txt                     | 14 +++++++++++
- exec.c                              | 23 ++++++++++++++---
- hw/mem/nvdimm.c                     |  9 ++++++-
- include/exec/memory.h               | 12 +++++++--
- include/exec/ram_addr.h             | 28 +++++++++++++++++++--
- include/migration/qemu-file-types.h |  2 ++
- include/qemu/pmem.h                 | 27 ++++++++++++++++++++
- memory.c                            |  8 +++---
- migration/qemu-file.c               | 29 ++++++++++++++--------
- migration/ram.c                     | 49 +++++++++++++++++++++++++++----------
- migration/ram.h                     |  2 +-
- migration/rdma.c                    |  2 +-
- migration/xbzrle.c                  |  8 ++++--
- migration/xbzrle.h                  |  3 ++-
- numa.c                              |  2 +-
- qemu-options.hx                     |  9 ++++++-
- stubs/Makefile.objs                 |  1 +
- stubs/pmem.c                        | 37 ++++++++++++++++++++++++++++
- tests/Makefile.include              |  4 +--
- tests/test-xbzrle.c                 |  4 +--
- 22 files changed, 288 insertions(+), 47 deletions(-)
- create mode 100644 include/qemu/pmem.h
- create mode 100644 stubs/pmem.c
-
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 30df843d90..5d706d471f 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -34,6 +34,7 @@ struct HostMemoryBackendFile {
+     bool discard_data;
+     char *mem_path;
+     uint64_t align;
++    bool is_pmem;
+ };
+ 
+ static void
+@@ -59,7 +60,8 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+                                  path,
+                                  backend->size, fb->align,
+-                                 backend->share ? QEMU_RAM_SHARE : 0,
++                                 (backend->share ? QEMU_RAM_SHARE : 0) |
++                                 (fb->is_pmem ? QEMU_RAM_PMEM : 0),
+                                  fb->mem_path, errp);
+         g_free(path);
+     }
+@@ -131,6 +133,25 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+     error_propagate(errp, local_err);
+ }
+ 
++static bool file_memory_backend_get_pmem(Object *o, Error **errp)
++{
++    return MEMORY_BACKEND_FILE(o)->is_pmem;
++}
++
++static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
++{
++    HostMemoryBackend *backend = MEMORY_BACKEND(o);
++    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
++
++    if (host_memory_backend_mr_inited(backend)) {
++        error_setg(errp, "cannot change property 'pmem' of %s '%s'",
++                   object_get_typename(o), backend->id);
++        return;
++    }
++
++    fb->is_pmem = value;
++}
++
+ static void file_backend_unparent(Object *obj)
+ {
+     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+@@ -162,6 +183,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
+         file_memory_backend_get_align,
+         file_memory_backend_set_align,
+         NULL, NULL, &error_abort);
++    object_class_property_add_bool(oc, "pmem",
++        file_memory_backend_get_pmem, file_memory_backend_set_pmem,
++        &error_abort);
+ }
+ 
+ static void file_backend_instance_finalize(Object *o)
+diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+index e903d8bb09..bcb2032672 100644
+--- a/docs/nvdimm.txt
++++ b/docs/nvdimm.txt
+@@ -153,3 +153,17 @@ guest NVDIMM region mapping structure.  This unarmed flag indicates
+ guest software that this vNVDIMM device contains a region that cannot
+ accept persistent writes. In result, for example, the guest Linux
+ NVDIMM driver, marks such vNVDIMM device as read-only.
++
++If the vNVDIMM backend is on the host persistent memory that can be
++accessed in SNIA NVM Programming Model [1] (e.g., Intel NVDIMM), it's
++suggested to set the 'pmem' option of memory-backend-file to 'on'. When
++'pmem=on' and QEMU is built with libpmem [2] support (configured with
++--enable-libpmem), QEMU will take necessary operations to guarantee
++the persistence of its own writes to the vNVDIMM backend (e.g., in
++vNVDIMM label emulation and live migration).
++
++References
++----------
++
++[1] SNIA NVM Programming Model: https://www.snia.org/sites/default/files/technical_work/final/NVMProgrammingModel_v1.2.pdf
++[2] PMDK: http://pmem.io/pmdk/
+diff --git a/exec.c b/exec.c
+index 537bf12412..4b9b4678cf 100644
+--- a/exec.c
++++ b/exec.c
+@@ -99,6 +99,9 @@ static MemoryRegion io_mem_unassigned;
+  */
+ #define RAM_RESIZEABLE (1 << 2)
+ 
++/* RAM is backed by the persistent memory. */
++#define RAM_PMEM       (1 << 3)
++
+ #endif
+ 
+ #ifdef TARGET_PAGE_BITS_VARY
+@@ -2007,6 +2010,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     Error *local_err = NULL;
+     int64_t file_size;
+     bool share = flags & QEMU_RAM_SHARE;
++    bool is_pmem = flags & QEMU_RAM_PMEM;
+ 
+     if (xen_enabled()) {
+         error_setg(errp, "-mem-path not supported with Xen");
+@@ -2043,7 +2047,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     new_block->mr = mr;
+     new_block->used_length = size;
+     new_block->max_length = size;
+-    new_block->flags = share ? RAM_SHARED : 0;
++    new_block->flags = (share ? RAM_SHARED : 0) |
++                       (is_pmem ? RAM_PMEM : 0);
+     new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
+     if (!new_block->host) {
+         g_free(new_block);
+@@ -3847,3 +3852,12 @@ void mtree_print_dispatch(fprintf_function mon, void *f,
+ }
+ 
+ #endif
++
++bool ramblock_is_pmem(RAMBlock *rb)
++{
++#if !defined(CONFIG_USER_ONLY)
++    return rb->flags & RAM_PMEM;
++#else
++    return false;
++#endif
++}
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 0fc9d23a48..b0b49a7a60 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -489,6 +489,7 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+ #ifdef __linux__
+ 
+ #define QEMU_RAM_SHARE      (1UL << 0)
++#define QEMU_RAM_PMEM       (1UL << 1)
+ 
+ /**
+  * memory_region_init_ram_from_file:  Initialize RAM memory region with a
+@@ -504,6 +505,7 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+  * @flags: specify properties of this memory region, which can be one or bit-or
+  *         of following values:
+  *         - QEMU_RAM_SHARE: memory must be mmaped with the MAP_SHARED flag
++ *         - QEMU_RAM_PMEM: the backend @path is persistent memory
+  *         Other bits are ignored.
+  * @path: the path in which to allocate the RAM.
+  * @errp: pointer to Error*, to store an error if it happens.
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index b8b01d1eb9..f8d8614e4d 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -70,6 +70,8 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
+     return host_addr_offset >> TARGET_PAGE_BITS;
+ }
+ 
++bool ramblock_is_pmem(RAMBlock *rb);
++
+ long qemu_getrampagesize(void);
+ unsigned long last_ram_page(void);
+ 
+@@ -84,6 +86,7 @@ unsigned long last_ram_page(void);
+  *  @flags: specify the properties of the ram block, which can be one
+  *          or bit-or of following values
+  *          - QEMU_RAM_SHARE: mmap the back file or device with MAP_SHARED
++ *          - QEMU_RAM_PMEM: the backend @mem_path or @fd is persistent memory
+  *          Other bits are ignored.
+  *  @mem_path or @fd: specify the back file or device
+  *  @errp: pointer to Error*, to store an error if it happens
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 8ccd5dcaa6..62c7afe567 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3957,7 +3957,7 @@ property must be set.  These objects are placed in the
+ 
+ @table @option
+ 
+-@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
++@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align},pmem=@var{on|off}
+ 
+ Creates a memory file backend object, which can be used to back
+ the guest RAM with huge pages.
+@@ -4025,6 +4025,13 @@ requires an alignment different than the default one used by QEMU, eg
+ the device DAX /dev/dax0.0 requires 2M alignment rather than 4K. In
+ such cases, users can specify the required alignment via this option.
+ 
++The @option{pmem} option specifies whether the backend store specified
++by @option{mem-path} is on the persistent memory that can be accessed
++in the SNIA NVM programming model (e.g. Intel NVDIMM).
++If @option{pmem}=@var{on}, QEMU will take necessary operations to
++guarantee the persistence of its own writes to @option{mem-path}
++(e.g. in vNVDIMM label emulation and live migration).
++
+ @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+ 
+ Creates a memory backend object, which can be used to back the guest RAM.
 -- 
 2.16.1
