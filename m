@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emhFb-0000OH-T8
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:37 -0500
+	(envelope-from <kraxel@redhat.com>) id 1emhFZ-0000MA-Mz
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emhFb-0003oA-2F
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:35 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43548 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1emhFW-0003lO-JM
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:33 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37301 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1emhFa-0003nm-Th
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:35 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1emhFW-0003l1-DX
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 09:44:30 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B6AE5EAEA0
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 14:44:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C29B440FB647
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 14:44:25 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 16 Feb 2018 15:44:16 +0100
-Message-Id: <20180216144418.21986-4-kraxel@redhat.com>
+Date: Fri, 16 Feb 2018 15:44:15 +0100
+Message-Id: <20180216144418.21986-3-kraxel@redhat.com>
 In-Reply-To: <20180216144418.21986-1-kraxel@redhat.com>
 References: <20180216144418.21986-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] keymap: numpad keysyms and keycodes are
- fixed
+Subject: [Qemu-devel] [PATCH 2/5] keymap: use glib hash for kbd_layout_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,115 +32,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-No need to figure them at runtime from the keymap.
+Drop home-grown lookup code, which is a strange mix of a lookup table
+and a list.  Use standard glib hash instead.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/keymaps.c | 62 +++++++++---------------------------------------------------
- 1 file changed, 9 insertions(+), 53 deletions(-)
+ ui/keymaps.c    | 80 ++++++++++++++++++++++++++-------------------------------
+ ui/trace-events |  2 +-
+ 2 files changed, 38 insertions(+), 44 deletions(-)
 
 diff --git a/ui/keymaps.c b/ui/keymaps.c
-index 2260219e0a..4dd92edc7d 100644
+index 74d93dee63..2260219e0a 100644
 --- a/ui/keymaps.c
 +++ b/ui/keymaps.c
-@@ -28,20 +28,12 @@
+@@ -28,26 +28,28 @@
  #include "trace.h"
  #include "qemu/error-report.h"
  
--struct key_range {
--    int start;
--    int end;
--    struct key_range *next;
--};
+-#define MAX_NORMAL_KEYCODE 512
+-#define MAX_EXTRA_COUNT 256
 -
- struct keysym2code {
-     uint16_t keycode;
+ struct key_range {
+     int start;
+     int end;
+     struct key_range *next;
  };
  
++struct keysym2code {
++    uint16_t keycode;
++};
++
  struct kbd_layout_t {
-     GHashTable *hash;
--    struct key_range *keypad_range;
--    struct key_range *numlock_range;
+-    uint16_t keysym2keycode[MAX_NORMAL_KEYCODE];
+-    struct {
+-	int keysym;
+-	uint16_t keycode;
+-    } keysym2keycode_extra[MAX_EXTRA_COUNT];
+-    int extra_count;
++    GHashTable *hash;
+     struct key_range *keypad_range;
+     struct key_range *numlock_range;
  };
  
- static inline gpointer hashkey(int keysym)
-@@ -70,29 +62,6 @@ static int get_keysym(const name2keysym_t *table,
++static inline gpointer hashkey(int keysym)
++{
++    intptr_t ptr = keysym;
++    return (gpointer)(ptr);
++}
++
+ static int get_keysym(const name2keysym_t *table,
+                       const char *name)
+ {
+@@ -91,23 +93,18 @@ static void add_to_key_range(struct key_range **krp, int code) {
+     }
  }
  
- 
--static void add_to_key_range(struct key_range **krp, int code) {
--    struct key_range *kr;
--    for (kr = *krp; kr; kr = kr->next) {
--        if (code >= kr->start && code <= kr->end) {
--            break;
--        }
--        if (code == kr->start - 1) {
--            kr->start--;
--            break;
--        }
--        if (code == kr->end + 1) {
--            kr->end++;
--            break;
--        }
--    }
--    if (kr == NULL) {
--        kr = g_malloc0(sizeof(*kr));
--        kr->start = kr->end = code;
--        kr->next = *krp;
--        *krp = kr;
--    }
--}
--
- static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
- {
-     struct keysym2code *keysym2code;
-@@ -165,13 +134,6 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-                     const char *rest = line + offset + 1;
-                     int keycode = strtol(rest, NULL, 0);
- 
--                    if (strstr(rest, "numlock")) {
--                        add_to_key_range(&k->keypad_range, keycode);
--                        add_to_key_range(&k->numlock_range, keysym);
--                        /* fprintf(stderr, "keypad keysym %04x keycode %d\n",
--                                   keysym, keycode); */
--                    }
--
-                     if (strstr(rest, "shift")) {
-                         keycode |= SCANCODE_SHIFT;
-                     }
-@@ -232,24 +194,18 @@ int keysym2scancode(kbd_layout_t *k, int keysym)
- 
- int keycode_is_keypad(kbd_layout_t *k, int keycode)
- {
--    struct key_range *kr;
--
--    for (kr = k->keypad_range; kr; kr = kr->next) {
--        if (keycode >= kr->start && keycode <= kr->end) {
--            return 1;
+-static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k) {
+-    if (keysym < MAX_NORMAL_KEYCODE) {
+-        trace_keymap_add("normal", keysym, keycode, line);
+-        k->keysym2keycode[keysym] = keycode;
+-    } else {
+-        if (k->extra_count >= MAX_EXTRA_COUNT) {
+-            warn_report("Could not assign keysym %s (0x%x)"
+-                        " because of memory constraints.", line, keysym);
+-        } else {
+-            trace_keymap_add("extra", keysym, keycode, line);
+-            k->keysym2keycode_extra[k->extra_count].
+-            keysym = keysym;
+-            k->keysym2keycode_extra[k->extra_count].
+-            keycode = keycode;
+-            k->extra_count++;
 -        }
 -    }
--    return 0;
-+    if (keycode >= 0x47 && keycode <= 0x53)
-+        return true;
-+    return false;
++static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
++{
++    struct keysym2code *keysym2code;
++
++    keysym2code = g_hash_table_lookup(k->hash, hashkey(keysym));
++    if (keysym2code)
++        return;
++
++    keysym2code = g_new0(struct keysym2code, 1);
++    keysym2code->keycode = keycode;
++    g_hash_table_replace(k->hash, hashkey(keysym), keysym2code);
++    trace_keymap_add(keysym, keycode, line);
  }
  
- int keysym_is_numlock(kbd_layout_t *k, int keysym)
+ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+@@ -131,6 +128,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+ 
+     if (!k) {
+         k = g_new0(kbd_layout_t, 1);
++        k->hash = g_hash_table_new(NULL, NULL);
+     }
+ 
+     for(;;) {
+@@ -214,26 +212,22 @@ kbd_layout_t* init_keyboard_layout(const name2keysym_t *table, const char *langu
+ 
+ int keysym2scancode(kbd_layout_t *k, int keysym)
  {
--    struct key_range *kr;
--
--    for (kr = k->numlock_range; kr; kr = kr->next) {
--        if (keysym >= kr->start && keysym <= kr->end) {
--            return 1;
+-    if (keysym < MAX_NORMAL_KEYCODE) {
+-        if (k->keysym2keycode[keysym] == 0) {
+-            trace_keymap_unmapped(keysym);
+-            warn_report("no scancode found for keysym %d", keysym);
 -        }
-+    switch (keysym) {
-+    case 0xffb0 ... 0xffb9:  /* KP_0 .. KP_9 */
-+    case 0xffac:             /* KP_Separator */
-+    case 0xffae:             /* KP_Decimal   */
-+        return true;
+-        return k->keysym2keycode[keysym];
+-    } else {
+-        int i;
++    struct keysym2code *keysym2code;
++
+ #ifdef XK_ISO_Left_Tab
+-        if (keysym == XK_ISO_Left_Tab) {
+-            keysym = XK_Tab;
+-        }
++    if (keysym == XK_ISO_Left_Tab) {
++        keysym = XK_Tab;
++    }
+ #endif
+-        for (i = 0; i < k->extra_count; i++) {
+-            if (k->keysym2keycode_extra[i].keysym == keysym) {
+-                return k->keysym2keycode_extra[i].keycode;
+-            }
+-        }
++
++    keysym2code = g_hash_table_lookup(k->hash, hashkey(keysym));
++    if (!keysym2code) {
++        trace_keymap_unmapped(keysym);
++        warn_report("no scancode found for keysym %d", keysym);
++        return 0;
      }
 -    return 0;
-+    return false;
++
++    return keysym2code->keycode;
  }
+ 
+ int keycode_is_keypad(kbd_layout_t *k, int keycode)
+diff --git a/ui/trace-events b/ui/trace-events
+index 34229e6747..861b68a305 100644
+--- a/ui/trace-events
++++ b/ui/trace-events
+@@ -78,7 +78,7 @@ qemu_spice_create_update(uint32_t left, uint32_t right, uint32_t top, uint32_t b
+ 
+ # ui/keymaps.c
+ keymap_parse(const char *file) "file %s"
+-keymap_add(const char *type, int sym, int code, const char *line) "%-6s sym=0x%04x code=0x%04x (line: %s)"
++keymap_add(int sym, int code, const char *line) "sym=0x%04x code=0x%04x (line: %s)"
+ keymap_unmapped(int sym) "sym=0x%04x"
+ 
+ # ui/x_keymap.c
 -- 
 2.9.3
