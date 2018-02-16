@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1emdg5-0005BN-RI
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:55:42 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1emdtT-0002Ao-34
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:09:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1emdg2-0006Jw-Nu
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:55:41 -0500
-Date: Fri, 16 Feb 2018 11:55:36 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <dffa45c9-48a6-ef85-3b28-d8ce1daf72e4@redhat.com>
-Message-ID: <alpine.BSF.2.21.1802161145230.98686@zero.eik.bme.hu>
-References: <cover.1518730026.git.balaton@eik.bme.hu>
-	<dffa45c9-48a6-ef85-3b28-d8ce1daf72e4@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1emdtR-0002DZ-D1
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:09:31 -0500
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<1518702707-7077-4-git-send-email-vsementsov@virtuozzo.com>
+	<ac33f176-0f15-107f-1c64-4fa3bac77520@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2b30632c-4028-2726-fd61-81ae3893cfd4@virtuozzo.com>
+Date: Fri, 16 Feb 2018 14:09:13 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Sam460ex emulation
+In-Reply-To: <ac33f176-0f15-107f-1c64-4fa3bac77520@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/9] nbd: BLOCK_STATUS for standard
+ get_block_status function: server part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,46 +26,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, David Gibson <david@gibson.dropbear.id.au>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Fri, 16 Feb 2018, Thomas Huth wrote:
-> On 15.02.2018 22:27, BALATON Zoltan wrote:
->> Remaining patches for Sam460ex emulation. The original cover letter
->> with more details is here:
+16.02.2018 02:02, Eric Blake wrote:
+> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Minimal realization: only one extent in server answer is supported.
 >>
->> http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00112.html
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/nbd.h |  33 ++++++
+>>   nbd/common.c        |  10 ++
+>>   nbd/server.c        | 310 
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>   3 files changed, 352 insertions(+), 1 deletion(-)
 >>
->> We'll need to also add binaries for firmware (customised u-boot
->> version) and dtb but I'm not sure how to submit those.
 >
-> For the dtb, I think you could simply provide a patch that adds the dts
-> file to the pc-bios directory and another one that adds the dtb. Just
-> like it is already done with pc-bios/bamboo.dts / pc-bios/bamboo.dtb.
-
-OK thanks, I'll do that. Does it have to be two separate patches?
-
-> For u-boot, can you use the same upstream level as e500 ? I.e. check
-> whether "git submodule status roms/u-boot" is fine for you? If that's
-> ok, just do a "git submodule update roms/u-boot" and build uboot from
-> that directory - you then can submit a binary patch with that file for
-> pc-bios, too.
+>> @@ -200,9 +227,15 @@ enum {
+>>   #define NBD_REPLY_TYPE_NONE          0
+>>   #define NBD_REPLY_TYPE_OFFSET_DATA   1
+>>   #define NBD_REPLY_TYPE_OFFSET_HOLE   2
+>> +#define NBD_REPLY_TYPE_BLOCK_STATUS  5
 >
-> In case you need another u-boot version, I think you've got to update
-> the submodule to the newer upstream version first, and then also rebuild
-> the e500 binary... Cumbersome, but that's necessary since we've got to
-> ship the u-boot sources in the QEMU release tarballs, too, to be
-> compliant with the GPL.
+> Stale; see nbd.git commit 56c77720 which changed this to 3.
 
-Unfortunately we can't use the same u-boot as e500 because this board uses 
-a forked and patched version which is not in upstream u-boot and upstream 
-u-boot has even dropped support for this CPU in latest version so we 
-actually need an older version (with patches) and not a newer one.
+Very unpleasant surprise. I understand that this is still experimental 
+extension, but actually we use it =5 in production about one year. Can 
+we revert it to 5?
 
-Therefore, it needs to be a binary built from a separate source so I think 
-a new submodule will need to be added for this. How to do that? Where to 
-host this git repo? Should I put it on github and refer to that as an 
-external repo or should it be hosted in qemu repo somehow?
+>
+>> +++ b/nbd/server.c
+>> @@ -82,6 +82,15 @@ struct NBDExport {
+>>     static QTAILQ_HEAD(, NBDExport) exports = 
+>> QTAILQ_HEAD_INITIALIZER(exports);
+>>   +/* NBDExportMetaContexts represents list of selected by
+>> + * NBD_OPT_SET_META_CONTEXT contexts to be exported. */
+>
+> represents a list of contexts to be exported, as selected by 
+> NBD_OPT_SET_META_CONTEXT.
+>
+>> +typedef struct NBDExportMetaContexts {
+>> +    char export_name[NBD_MAX_NAME_SIZE + 1];
+>
+> Would this work as const char * pointing at some other storage, 
+> instead of having to copy into this storage?
 
-Regards,
-BALATON Zoltan
+I'll think about
+
+>
+>> +    bool valid; /* means that negotiation of the option finished 
+>> without
+>> +                   errors */
+>> +    bool base_allocation; /* export base:allocation context (block 
+>> status) */
+>> +} NBDExportMetaContexts;
+>> +
+>>   struct NBDClient {
+>
+>> @@ -636,6 +646,201 @@ static QIOChannel 
+>> *nbd_negotiate_handle_starttls(NBDClient *client,
+>>       return QIO_CHANNEL(tioc);
+>>   }
+>>   +/* nbd_alloc_read_size_string
+>> + *
+>> + * Read string in format
+>> + *   uint32_t len
+>> + *   len bytes string (not 0-terminated)
+>> + * String is allocated and pointer returned as @buf
+>> + *
+>> + * Return -errno on I/O error, 0 if option was completely handled by
+>> + * sending a reply about inconsistent lengths, or 1 on success. */
+>> +static int nbd_alloc_read_size_string(NBDClient *client, char **buf,
+>> +                                      Error **errp)
+>> +{
+>> +    int ret;
+>> +    uint32_t len;
+>> +
+>> +    ret = nbd_opt_read(client, &len, sizeof(len), errp);
+>> +    if (ret <= 0) {
+>> +        return ret;
+>> +    }
+>> +    cpu_to_be32s(&len);
+>> +
+>> +    *buf = g_try_malloc(len + 1);
+>
+> I'd rather check that len is sane prior to trying to malloc. 
+> Otherwise, a malicious client can convince us to waste time/space 
+> doing a large malloc before we finally realize that we can't read that 
+> many bytes after all.  And in fact, if you check len in advance, you 
+> can probably just use g_malloc() instead of g_try_malloc() 
+> (g_try_malloc() makes sense on a 1M allocation, where we can still 
+> allocate smaller stuff in reporting the error; but since NBD limits 
+> strings to 4k, if we fail at allocating 4k, we are probably already so 
+> hosed that our attempts to report the failure will also run out of 
+> memory and abort, so why not just abort now).
+
+reasonable, will do
+
+>
+>> +    if (*buf == NULL) {
+>> +        error_setg(errp, "No memory");
+>> +        return -ENOMEM;
+>> +    }
+>> +    (*buf)[len] = '\0';
+>> +
+>> +    ret = nbd_opt_read(client, *buf, len, errp);
+>> +    if (ret <= 0) {
+>> +        g_free(*buf);
+>> +        *buf = NULL;
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +/* nbd_read_size_string
+>
+> Will resume review here...
+>
+
+
+-- 
+Best regards,
+Vladimir
