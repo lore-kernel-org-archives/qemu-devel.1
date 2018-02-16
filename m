@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emfrs-0000rx-OU
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:01 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emfsN-00018i-BT
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1emfrp-0005LC-HV
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:00 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40584 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1emfsK-0005WC-4G
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:31 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46358 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1emfrp-0005Kt-Ct
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:15:57 -0500
-Date: Fri, 16 Feb 2018 14:15:40 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180216131540.ioudb6rwf4y6qnxq@sirius.home.kraxel.org>
-References: <20180203171743.13612-1-programmingkidx@gmail.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emfsJ-0005Vy-VP
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:28 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96D1E7D85D
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 13:16:27 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri, 16 Feb 2018 13:15:56 +0000
+Message-Id: <20180216131625.9639-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180203171743.13612-1-programmingkidx@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6] ui/cocoa.m: Add ability for user to
- specify mouse ungrab key
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/29] postcopy+vhost-user/shared ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, imammedo@redhat.com, mst@redhat.com
+Cc: quintela@redhat.com, aarcange@redhat.com
 
-On Sat, Feb 03, 2018 at 12:17:43PM -0500, John Arbuckle wrote:
-> Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
-> This combination may not be very fun for the user to have to enter, so we
-> now enable the user to specify their own key(s) as the ungrab key(s). The
-> list of keys that can be used is found in the file qapi/ui.json under QKeyCode.
-> The max number of keys that can be used is three.
-> 
-> Syntax: -display cocoa,hotkey-grab=<key-key-key>
-> 
-> Example usage:  -display cocoa,hotkey-grab=home
-> 	        -display cocoa,hotkey-grab=shift-ctrl
-> 		-display cocoa,hotkey-grab=ctrl-x
-> 		-display cocoa,hotkey-grab=pgup-pgdn
-> 		-display cocoa,hotkey-grab=kp_5-kp_6
-> 		-display cocoa,hotkey-grab=kp_4-kp_5-kp_6
-> 		-display cocoa,hotkey-grab=ctrl-alt
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Finally found the time for a closer look and some testing.
+Hi,
+  This is the first non-RFC version of this patch set that
+enables postcopy migration with shared memory to a vhost user process.
+It's based off current head.
 
-Problem is the hotkeys are all forwarded to the guest.
-So when using -- for example -- the pgup-pgdn hotkey
-and you press the combination the guest will see it.
+I've tested with vhost-user-bridge and a modified dpdk; both very
+lightly.
 
-I see basically two options to deal with that:
+Compared to v2 we're now using the just-merged reworks to the vhost
+code (suggested by Igor), so that the huge page region merging is now a l=
+ot simpler
+in this series. The handshake between the client and the qemu for the
+set-mem-table is now a bit more complex to resolve a previous race where
+the client would start sending requests to the qemu prior to the qemu
+being ready to accept them.
 
-(a) Make the code more clever.  On pgup keydown event
-    the code has to figure this might be part of a hotkey
-    sequence, hold back the event to see what comes next.
-    - If the next event is pgup keyup -> ok, normal pgup
-      keypress, forward both keydown and keyup to the guest.
-    - If the next event is pgdn keydown -> hotkey found.
-      So do hotkey action, don't forward keydown (and
-      following keyup) events to the guest.
+Dave
 
-(b) Restrict allowed hotkeys to modifier key(s) plus one
-    non-modifier key.  Forwarding modifier keydown+keyup
-    to the guest has typically effects inside the guest,
-    so we only have to hold back that single non-modifier
-    key.  That is alot easier to implement.
+Dr. David Alan Gilbert (29):
+  migrate: Update ram_block_discard_range for shared
+  qemu_ram_block_host_offset
+  postcopy: use UFFDIO_ZEROPAGE only when available
+  postcopy: Add notifier chain
+  postcopy: Add vhost-user flag for postcopy and check it
+  vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
+  libvhost-user: Support sending fds back to qemu
+  libvhost-user: Open userfaultfd
+  postcopy: Allow registering of fd handler
+  vhost+postcopy: Register shared ufd with postcopy
+  vhost+postcopy: Transmit 'listen' to client
+  postcopy+vhost-user: Split set_mem_table for postcopy
+  migration/ram: ramblock_recv_bitmap_test_byte_offset
+  libvhost-user+postcopy: Register new regions with the ufd
+  vhost+postcopy: Send address back to qemu
+  vhost+postcopy: Stash RAMBlock and offset
+  vhost+postcopy: Send requests to source for shared pages
+  vhost+postcopy: Resolve client address
+  postcopy: wake shared
+  postcopy: postcopy_notify_shared_wake
+  vhost+postcopy: Add vhost waker
+  vhost+postcopy: Call wakeups
+  libvhost-user: mprotect & madvises for postcopy
+  vhost-user: Add VHOST_USER_POSTCOPY_END message
+  vhost+postcopy: Wire up POSTCOPY_END notify
+  vhost: Huge page align and merge
+  postcopy: Allow shared memory
+  libvhost-user: Claim support for postcopy
+  postcopy shared docs
 
-cheers,
-  Gerd
+ contrib/libvhost-user/libvhost-user.c | 303 ++++++++++++++++++++++++-
+ contrib/libvhost-user/libvhost-user.h |   8 +
+ docs/devel/migration.rst              |  41 ++++
+ docs/interop/vhost-user.txt           |  42 ++++
+ exec.c                                |  85 +++++--
+ hw/virtio/trace-events                |  16 +-
+ hw/virtio/vhost-user.c                | 411 ++++++++++++++++++++++++++++=
++++++-
+ hw/virtio/vhost.c                     |  66 +++++-
+ include/exec/cpu-common.h             |   4 +
+ migration/migration.c                 |   6 +
+ migration/migration.h                 |   4 +
+ migration/postcopy-ram.c              | 350 +++++++++++++++++++++++-----=
+-
+ migration/postcopy-ram.h              |  69 ++++++
+ migration/ram.c                       |   5 +
+ migration/ram.h                       |   1 +
+ migration/savevm.c                    |  13 ++
+ migration/trace-events                |   6 +
+ trace-events                          |   3 +-
+ vl.c                                  |   2 +
+ 19 files changed, 1337 insertions(+), 98 deletions(-)
+
+--=20
+2.14.3
