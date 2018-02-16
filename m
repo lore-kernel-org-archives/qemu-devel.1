@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emfHy-0004Ih-1v
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:55 -0500
+	(envelope-from <imammedo@redhat.com>) id 1emfI0-0004LI-RK
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emfHx-0003Y8-2m
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:54 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45242 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1emfI0-0003Zf-1d
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:56 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45248 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emfHw-0003Xv-Td
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:53 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emfHz-0003ZW-To
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:55 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 16 Feb 2018 13:37:14 +0100
-Message-Id: <1518784641-43151-3-git-send-email-imammedo@redhat.com>
+Date: Fri, 16 Feb 2018 13:37:16 +0100
+Message-Id: <1518784641-43151-5-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
 References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/9] numa: split out NumaOptions parsing
- into parse_NumaOptions()
+Subject: [Qemu-devel] [PATCH v3 4/9] HMP: disable monitor in preconfig state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +26,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
-it will allow to reuse parse_NumaOptions() for parsing
-configuration commands received via QMP interface
+Ban it for now, if someone would need it to work early,
+one would have to implement checks if HMP command is valid
+at preconfig state.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/sysemu/numa.h |  1 +
- numa.c                | 48 +++++++++++++++++++++++++++++-------------------
- 2 files changed, 30 insertions(+), 19 deletions(-)
+---
+ monitor.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 21713b7..7a0ae75 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -22,6 +22,7 @@ struct NumaNodeMem {
- };
+diff --git a/monitor.c b/monitor.c
+index f499250..fcb5386 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3097,6 +3097,10 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
  
- extern NodeInfo numa_info[MAX_NODES];
-+int parse_numa(void *opaque, QemuOpts *opts, Error **errp);
- void parse_numa_opts(MachineState *ms);
- void numa_complete_configuration(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[]);
-diff --git a/numa.c b/numa.c
-index 1b2820a..04e34eb 100644
---- a/numa.c
-+++ b/numa.c
-@@ -169,28 +169,11 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
-     have_numa_distance = true;
- }
+     trace_handle_hmp_command(mon, cmdline);
  
--static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-+static
-+void parse_NumaOptions(MachineState *ms, NumaOptions *object, Error **errp)
- {
--    NumaOptions *object = NULL;
--    MachineState *ms = opaque;
-     Error *err = NULL;
- 
--    {
--        Visitor *v = opts_visitor_new(opts);
--        visit_type_NumaOptions(v, NULL, &object, &err);
--        visit_free(v);
--    }
--
--    if (err) {
--        goto end;
--    }
--
--    /* Fix up legacy suffix-less format */
--    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
--        const char *mem_str = qemu_opt_get(opts, "mem");
--        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
--    }
--
-     switch (object->type) {
-     case NUMA_OPTIONS_TYPE_NODE:
-         parse_numa_node(ms, &object->u.node, &err);
-@@ -224,6 +207,33 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-     }
- 
- end:
-+    if (err) {
-+        error_propagate(errp, err);
-+    }
-+}
-+
-+int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    NumaOptions *object = NULL;
-+    MachineState *ms = MACHINE(opaque);
-+    Error *err = NULL;
-+    Visitor *v = opts_visitor_new(opts);
-+
-+    visit_type_NumaOptions(v, NULL, &object, &err);
-+    visit_free(v);
-+    if (err) {
-+        goto end;
++    if (runstate_check(RUN_STATE_PRECONFIG)) {
++        monitor_printf(mon, "HMP not available in precofig state\n");
 +    }
 +
-+    /* Fix up legacy suffix-less format */
-+    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
-+        const char *mem_str = qemu_opt_get(opts, "mem");
-+        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
-+    }
-+
-+    parse_NumaOptions(ms, object, &err);
-+
-+end:
-     qapi_free_NumaOptions(object);
-     if (err) {
-         error_report_err(err);
+     cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
+     if (!cmd) {
+         return;
 -- 
 2.7.4
