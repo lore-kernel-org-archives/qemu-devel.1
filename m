@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emgKG-0001BU-SB
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:45:22 -0500
+	(envelope-from <berrange@redhat.com>) id 1emgSJ-000169-GD
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:53:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1emgKF-0005Nu-SE
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:45:20 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1emgKF-0005NW-Hn
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:45:19 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Feb 2018 13:45:15 +0000
-Message-Id: <20180216134516.6269-2-peter.maydell@linaro.org>
-In-Reply-To: <20180216134516.6269-1-peter.maydell@linaro.org>
-References: <20180216134516.6269-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/2] hw/sysbus.h: New sysbus_init_child()
- helper function
+	(envelope-from <berrange@redhat.com>) id 1emgSI-0001FJ-GK
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:53:39 -0500
+Date: Fri, 16 Feb 2018 13:53:12 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180216135312.GD3181@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180118103143.11780-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180118103143.11780-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: implement the bdrv_reopen_prepare
+ helper for LUKS driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +25,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-If you're using the increasingly-common QOM style of
-having container devices create their child objects
-in-place, you end up with a lot of boilerplate in the
-container's init function:
+Ping, can this be queued in the block tree, since it appears the no-op impl
+is ok ?
 
-  object_initialize() to init the child
-  object_property_add_child() to make the child a
-    child of the parent
-  qdev_set_parent_bus() to put the child on the
-    sysbus default bus
+On Thu, Jan 18, 2018 at 10:31:43AM +0000, Daniel P. Berrange wrote:
+> If the bdrv_reopen_prepare helper isn't provided, the qemu-img commit
+> command fails to re-open the base layer after committing changes into
+> it. Provide a no-op implementation for the LUKS driver, since there
+> is not any custom work that needs doing to re-open it.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 60ddf8623e..bb9a8f5376 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -382,6 +382,12 @@ static void block_crypto_close(BlockDriverState *bs)
+>      qcrypto_block_free(crypto->block);
+>  }
+>  
+> +static int block_crypto_reopen_prepare(BDRVReopenState *state,
+> +                                       BlockReopenQueue *queue, Error **errp)
+> +{
+> +    /* nothing needs checking */
+> +    return 0;
+> +}
+>  
+>  /*
+>   * 1 MB bounce buffer gives good performance / memory tradeoff
+> @@ -620,6 +626,7 @@ BlockDriver bdrv_crypto_luks = {
+>      .bdrv_truncate      = block_crypto_truncate,
+>      .create_opts        = &block_crypto_create_opts_luks,
+>  
+> +    .bdrv_reopen_prepare = block_crypto_reopen_prepare,
+>      .bdrv_refresh_limits = block_crypto_refresh_limits,
+>      .bdrv_co_preadv     = block_crypto_co_preadv,
+>      .bdrv_co_pwritev    = block_crypto_co_pwritev,
+> -- 
+> 2.14.3
+> 
 
-If you forget the second of these then things sort of
-work but trying to add a child to the child will segfault;
-if you forget the third then the device won't get reset.
-
-Provide a helper function sysbus_init_child() which
-does all these things for you, reducing the boilerplate
-and making it harder to get wrong.
-
-Code that used to look like this:
-    object_initialize(&s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
-    object_property_add_child(obj, "ic", OBJECT(&s->ic), NULL);
-    qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
-can now look like this:
-    sysbus_init_child(obj, "ic", &s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/sysbus.h | 12 ++++++++++++
- hw/core/sysbus.c    | 14 ++++++++++++++
- 2 files changed, 26 insertions(+)
-
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index e88bb6dae0..6095e24e86 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -118,4 +118,16 @@ static inline DeviceState *sysbus_try_create_simple(const char *name,
-     return sysbus_try_create_varargs(name, addr, irq, NULL);
- }
- 
-+/**
-+ * sysbus_init_child: in-place initialize and parent a SysBus device
-+ * @parent: object to parent the device to
-+ * @childname: name to use as the child property name
-+ * @child: child object
-+ * @childsize: size of the storage for the object
-+ * @childtype: type name of the child
-+ */
-+void sysbus_init_child(Object *parent, const char *childname,
-+                       void *child, size_t childsize,
-+                       const char *childtype);
-+
- #endif /* HW_SYSBUS_H */
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 5d0887f499..acfa52dc68 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -21,6 +21,7 @@
- #include "hw/sysbus.h"
- #include "monitor/monitor.h"
- #include "exec/address-spaces.h"
-+#include "qapi/error.h"
- 
- static void sysbus_dev_print(Monitor *mon, DeviceState *dev, int indent);
- static char *sysbus_get_fw_dev_path(DeviceState *dev);
-@@ -372,6 +373,19 @@ BusState *sysbus_get_default(void)
-     return main_system_bus;
- }
- 
-+void sysbus_init_child(Object *parent, const char *childname,
-+                       void *child, size_t childsize,
-+                       const char *childtype)
-+{
-+    object_initialize(child, childsize, childtype);
-+    /* error_abort is fine here because this can only fail for
-+     * programming-error reasons: child already parented, or
-+     * parent already has a child with the given name.
-+     */
-+    object_property_add_child(parent, childname, OBJECT(child), &error_abort);
-+    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
-+}
-+
- static void sysbus_register_types(void)
- {
-     type_register_static(&system_bus_info);
+Regards,
+Daniel
 -- 
-2.16.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
