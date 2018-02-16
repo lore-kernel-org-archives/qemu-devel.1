@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
-	id 1emg7i-0006Qf-VX
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:32:24 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1emgKG-0001BU-SB
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:45:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
-	id 1emg7h-0007QH-Mq
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:32:23 -0500
-Received: from mx1.profitbricks.com ([46.16.72.21]:47030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
-	id 1emg7h-0007Q3-C3
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:32:21 -0500
-Received: from mail.pb.local (mail.pb.local [192.168.178.100])
-	by mx1.profitbricks.com (Postfix) with ESMTP id 8EC9B5F7C0
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 12:55:22 +0000 (UTC)
-From: Benjamin Drung <benjamin.drung@profitbricks.com>
-Date: Fri, 16 Feb 2018 13:55:04 +0100
-Message-Id: <20180216125504.25955-2-benjamin.drung@profitbricks.com>
-In-Reply-To: <20180216125504.25955-1-benjamin.drung@profitbricks.com>
-References: <20180216125504.25955-1-benjamin.drung@profitbricks.com>
-Subject: [Qemu-devel] [PATCH 1/1] slirp: Add domainname option to slirp's
- DHCP server
+	(envelope-from <pm215@archaic.org.uk>) id 1emgKF-0005Nu-SE
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:45:20 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1emgKF-0005NW-Hn
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:45:19 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Feb 2018 13:45:15 +0000
+Message-Id: <20180216134516.6269-2-peter.maydell@linaro.org>
+In-Reply-To: <20180216134516.6269-1-peter.maydell@linaro.org>
+References: <20180216134516.6269-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/2] hw/sysbus.h: New sysbus_init_child()
+ helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,173 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
-Cc: qemu-devel@nongnu.org, Benjamin Drung <benjamin.drung@profitbricks.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This patch will allow the user to include the domainname option in
-replies from the built-in DHCP server.
+If you're using the increasingly-common QOM style of
+having container devices create their child objects
+in-place, you end up with a lot of boilerplate in the
+container's init function:
 
-Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
+  object_initialize() to init the child
+  object_property_add_child() to make the child a
+    child of the parent
+  qdev_set_parent_bus() to put the child on the
+    sysbus default bus
+
+If you forget the second of these then things sort of
+work but trying to add a child to the child will segfault;
+if you forget the third then the device won't get reset.
+
+Provide a helper function sysbus_init_child() which
+does all these things for you, reducing the boilerplate
+and making it harder to get wrong.
+
+Code that used to look like this:
+    object_initialize(&s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
+    object_property_add_child(obj, "ic", OBJECT(&s->ic), NULL);
+    qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
+can now look like this:
+    sysbus_init_child(obj, "ic", &s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- net/slirp.c      | 7 ++++---
- qapi/net.json    | 3 +++
- qemu-options.hx  | 7 +++++--
- slirp/bootp.c    | 8 ++++++++
- slirp/libslirp.h | 2 +-
- slirp/slirp.c    | 4 +++-
- slirp/slirp.h    | 1 +
- 7 files changed, 25 insertions(+), 7 deletions(-)
+ include/hw/sysbus.h | 12 ++++++++++++
+ hw/core/sysbus.c    | 14 ++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 8991816bbf..9511ff3bb7 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -157,7 +157,8 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-                           const char *bootfile, const char *vdhcp_start,
-                           const char *vnameserver, const char *vnameserver6,
-                           const char *smb_export, const char *vsmbserver,
--                          const char **dnssearch, Error **errp)
-+                          const char **dnssearch, const char *vdomainname,
-+                          Error **errp)
- {
-     /* default settings according to historic slirp */
-     struct in_addr net  = { .s_addr = htonl(0x0a000200) }; /* 10.0.2.0 */
-@@ -371,7 +372,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-     s->slirp = slirp_init(restricted, ipv4, net, mask, host,
-                           ipv6, ip6_prefix, vprefix6_len, ip6_host,
-                           vhostname, tftp_export, bootfile, dhcp,
--                          dns, ip6_dns, dnssearch, s);
-+                          dns, ip6_dns, dnssearch, vdomainname, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
- 
-     for (config = slirp_configs; config; config = config->next) {
-@@ -958,7 +959,7 @@ int net_init_slirp(const Netdev *netdev, const char *name,
-                          user->ipv6_host, user->hostname, user->tftp,
-                          user->bootfile, user->dhcpstart,
-                          user->dns, user->ipv6_dns, user->smb,
--                         user->smbserver, dnssearch, errp);
-+                         user->smbserver, dnssearch, user->domainname, errp);
- 
-     while (slirp_configs) {
-         config = slirp_configs;
-diff --git a/qapi/net.json b/qapi/net.json
-index 1238ba5de1..5a93fe6856 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -160,6 +160,8 @@
- # @dnssearch: list of DNS suffixes to search, passed as DHCP option
- #             to the guest
- #
-+# @domainname: guest-visible domain name of the virtual nameserver
-+#
- # @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
- #               2.6). The network prefix is given in the usual
- #               hexadecimal IPv6 address notation.
-@@ -197,6 +199,7 @@
-     '*dhcpstart': 'str',
-     '*dns':       'str',
-     '*dnssearch': ['String'],
-+    '*domainname': 'str',
-     '*ipv6-prefix':      'str',
-     '*ipv6-prefixlen':   'int',
-     '*ipv6-host':        'str',
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5050a49a5e..06983db7be 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1906,8 +1906,8 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-     "-netdev user,id=str[,ipv4[=on|off]][,net=addr[/mask]][,host=addr]\n"
-     "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-host=addr]\n"
-     "         [,restrict=on|off][,hostname=host][,dhcpstart=addr]\n"
--    "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,tftp=dir]\n"
--    "         [,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
-+    "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,domainname=domain]\n"
-+    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
- #ifndef _WIN32
-                                              "[,smb=dir[,smbserver=addr]]\n"
- #endif
-@@ -2116,6 +2116,9 @@ Example:
- qemu -net user,dnssearch=mgmt.example.org,dnssearch=example.org [...]
- @end example
- 
-+@item domainname=@var{domain}
-+Specifies the client domain name reported by the built-in DHCP server.
-+
- @item tftp=@var{dir}
- When using the user mode network stack, activate a built-in TFTP
- server. The files in @var{dir} will be exposed as the root of a TFTP server.
-diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 5dd1a415b5..91896f7400 100644
---- a/slirp/bootp.c
-+++ b/slirp/bootp.c
-@@ -298,6 +298,14 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
-             q += val;
-         }
- 
-+        if (*slirp->vdomainname) {
-+            val = strlen(slirp->vdomainname);
-+            *q++ = RFC1533_DOMAINNAME;
-+            *q++ = val;
-+            memcpy(q, slirp->vdomainname, val);
-+            q += val;
-+        }
-+
-         if (slirp->vdnssearch) {
-             size_t spaceleft = sizeof(rbp->bp_vend) - (q - rbp->bp_vend);
-             val = slirp->vdnssearch_len;
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 540b3e5903..740408a96e 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -16,7 +16,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  void *opaque);
-+                  const char *vdomainname, void *opaque);
- void slirp_cleanup(Slirp *slirp);
- 
- void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 1cb6b07004..4f29753444 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -286,7 +286,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  void *opaque)
-+                  const char *vdomainname, void *opaque)
- {
-     Slirp *slirp = g_malloc0(sizeof(Slirp));
- 
-@@ -317,6 +317,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-     }
-     slirp->tftp_prefix = g_strdup(tftp_path);
-     slirp->bootp_filename = g_strdup(bootfile);
-+    slirp->vdomainname = g_strdup(vdomainname);
-     slirp->vdhcp_startaddr = vdhcp_start;
-     slirp->vnameserver_addr = vnameserver;
-     slirp->vnameserver_addr6 = vnameserver6;
-@@ -349,6 +350,7 @@ void slirp_cleanup(Slirp *slirp)
-     g_free(slirp->vdnssearch);
-     g_free(slirp->tftp_prefix);
-     g_free(slirp->bootp_filename);
-+    g_free(slirp->vdomainname);
-     g_free(slirp);
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index e88bb6dae0..6095e24e86 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -118,4 +118,16 @@ static inline DeviceState *sysbus_try_create_simple(const char *name,
+     return sysbus_try_create_varargs(name, addr, irq, NULL);
  }
  
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 06febfc78b..10b410898a 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -193,6 +193,7 @@ struct Slirp {
-     char *bootp_filename;
-     size_t vdnssearch_len;
-     uint8_t *vdnssearch;
-+    char *vdomainname;
++/**
++ * sysbus_init_child: in-place initialize and parent a SysBus device
++ * @parent: object to parent the device to
++ * @childname: name to use as the child property name
++ * @child: child object
++ * @childsize: size of the storage for the object
++ * @childtype: type name of the child
++ */
++void sysbus_init_child(Object *parent, const char *childname,
++                       void *child, size_t childsize,
++                       const char *childtype);
++
+ #endif /* HW_SYSBUS_H */
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 5d0887f499..acfa52dc68 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -21,6 +21,7 @@
+ #include "hw/sysbus.h"
+ #include "monitor/monitor.h"
+ #include "exec/address-spaces.h"
++#include "qapi/error.h"
  
-     /* tcp states */
-     struct socket tcb;
+ static void sysbus_dev_print(Monitor *mon, DeviceState *dev, int indent);
+ static char *sysbus_get_fw_dev_path(DeviceState *dev);
+@@ -372,6 +373,19 @@ BusState *sysbus_get_default(void)
+     return main_system_bus;
+ }
+ 
++void sysbus_init_child(Object *parent, const char *childname,
++                       void *child, size_t childsize,
++                       const char *childtype)
++{
++    object_initialize(child, childsize, childtype);
++    /* error_abort is fine here because this can only fail for
++     * programming-error reasons: child already parented, or
++     * parent already has a child with the given name.
++     */
++    object_property_add_child(parent, childname, OBJECT(child), &error_abort);
++    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
++}
++
+ static void sysbus_register_types(void)
+ {
+     type_register_static(&system_bus_info);
 -- 
-2.14.1
+2.16.1
