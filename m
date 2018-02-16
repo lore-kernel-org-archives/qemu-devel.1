@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emfI6-0004SQ-7M
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:39:03 -0500
+	(envelope-from <imammedo@redhat.com>) id 1emfI7-0004TH-5w
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:39:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1emfI3-0003af-5C
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:39:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45254 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1emfI6-0003bW-6m
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:39:03 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33986 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emfI3-0003aV-16
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:38:59 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1emfI6-0003bP-2L
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:39:02 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 16 Feb 2018 13:37:18 +0100
-Message-Id: <1518784641-43151-7-git-send-email-imammedo@redhat.com>
+Date: Fri, 16 Feb 2018 13:37:20 +0100
+Message-Id: <1518784641-43151-9-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
 References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 6/9] tests: extend qmp test with pereconfig
- checks
+Subject: [Qemu-devel] [PATCH v3 8/9] QMP: add set-numa-node command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +26,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
-Add permission checks for commands in 'preconfig' state.
-
-It should work for all targets, but won't work with
-machine 'none' as it's limited to -smp 1 only.
-So use PC machine for testing preconfig and 'runstate'
-parameter.
+Command is allowed to run only in preconfig stage and
+will allow to configure numa mapping for CPUs depending
+on possible CPUs layout (query-hotpluggable-cpus) for
+given machine instance.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/qmp-test.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ numa.c           |  5 +++++
+ qapi-schema.json | 14 ++++++++++++++
+ tests/qmp-test.c |  6 ++++++
+ 3 files changed, 25 insertions(+)
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 5808483..3adc485 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -304,8 +304,54 @@ static void add_query_tests(QmpSchema *schema)
+diff --git a/numa.c b/numa.c
+index 04e34eb..e3b7f15 100644
+--- a/numa.c
++++ b/numa.c
+@@ -446,6 +446,11 @@ void parse_numa_opts(MachineState *ms)
      }
  }
  
-+static bool is_err(QDict *rsp)
++void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
 +{
-+    const char *desc = NULL;
-+    QDict *error = qdict_get_qdict(rsp, "error");
-+    if (error) {
-+        desc = qdict_get_try_str(error, "desc");
-+    }
-+    QDECREF(rsp);
-+    return !!desc;
++    parse_NumaOptions(MACHINE(qdev_get_machine()), cmd, errp);
 +}
 +
-+static void test_qmp_preconfig(void)
-+{
-+    QDict *rsp, *ret;
-+    QTestState *qs = qtest_startf("-nodefaults -preconfig -smp 2");
-+
-+    /* preconfig state */
-+    /* enabled commands, no error expected  */
-+    g_assert(!is_err(qtest_qmp(qs, "{ 'execute': 'query-commands' }")));
-+
-+    /* forbidden commands, expected error */
-+    g_assert(is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
-+
-+    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
-+    ret = qdict_get_qdict(rsp, "return");
-+    g_assert(ret);
-+    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "preconfig");
-+    QDECREF(rsp);
-+
-+    /* exit preconfig state */
-+    g_assert(!is_err(qtest_qmp(qs, "{ 'execute': 'cont' }")));
-+    qtest_qmp_eventwait(qs, "RESUME");
-+
-+    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
-+    ret = qdict_get_qdict(rsp, "return");
-+    g_assert(ret);
-+    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "running");
-+    QDECREF(rsp);
-+
-+    /* enabled commands, no error expected  */
-+    g_assert(!is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
-+
-+    qtest_quit(qs);
-+}
-+
- int main(int argc, char *argv[])
+ void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
  {
-+    const char *arch = qtest_get_arch();
-     QmpSchema schema;
-     int ret;
+     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 4365dfe..a96c31f 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3201,3 +3201,17 @@
+ # Since: 2.11
+ ##
+ { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
++
++##
++# @set-numa-node:
++#
++# Runtime equivalent of '-numa' CLI option, available at
++# preconfigure stage to configure numa mapping before initializing
++# machine.
++#
++# Since 2.12
++##
++{ 'command': 'set-numa-node', 'boxed': true,
++  'data': 'NumaOptions',
++  'runstates': [ 'preconfig' ]
++}
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 4ab0b7c..b0de2b1 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -324,6 +324,8 @@ static void test_qmp_preconfig(void)
+     /* enabled commands, no error expected  */
+     g_assert(!is_err(qtest_qmp(qs, "{ 'execute': 'query-commands' }")));
+     g_assert(!is_err(qtest_qmp(qs, "{ 'execute': 'query-hotpluggable-cpus'}")));
++    g_assert(!is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
  
-@@ -314,6 +360,9 @@ int main(int argc, char *argv[])
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-     qmp_schema_init(&schema);
-     add_query_tests(&schema);
-+    if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
-+        qtest_add_func("qmp/preconfig", test_qmp_preconfig);
-+    }
+     /* forbidden commands, expected error */
+     g_assert(is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
+@@ -347,6 +349,10 @@ static void test_qmp_preconfig(void)
+     /* enabled commands, no error expected  */
+     g_assert(!is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
  
-     ret = g_test_run();
++    /* forbidden commands, expected error */
++    g_assert(is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
++
+     qtest_quit(qs);
+ }
  
 -- 
 2.7.4
