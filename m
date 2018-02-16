@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emg1L-0000c7-W8
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:25:49 -0500
+	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
+	id 1emg7i-0006Pf-0P
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:32:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1emg1H-0003mf-9Y
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:25:47 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180215182421.23788-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <118274a7-3fc2-3245-55fb-5ddfde7b4f59@amsat.org>
-Date: Fri, 16 Feb 2018 10:25:38 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180215182421.23788-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target/arm: Fix register
- definitions for VMIDR and VMPIDR
+	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
+	id 1emg7d-0007Ou-Em
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:32:22 -0500
+Received: from mx1.profitbricks.com ([46.16.72.21]:47028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
+	id 1emg7d-0007OC-6q
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:32:17 -0500
+Received: from mail.pb.local (mail.pb.local [192.168.178.100])
+	by mx1.profitbricks.com (Postfix) with ESMTP id 0A0675F606
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 12:55:19 +0000 (UTC)
+From: Benjamin Drung <benjamin.drung@profitbricks.com>
+Date: Fri, 16 Feb 2018 13:55:03 +0100
+Message-Id: <20180216125504.25955-1-benjamin.drung@profitbricks.com>
+Subject: [Qemu-devel] [PATCH 0/1] slirp: Add domainname option to slirp's
+ DHCP server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
+Cc: qemu-devel@nongnu.org, Benjamin Drung <benjamin.drung@profitbricks.com>
 
-On 02/15/2018 03:24 PM, Peter Maydell wrote:
-> The register definitions for VMIDR and VMPIDR have separate
-> reginfo structs for the AArch32 and AArch64 registers. However
-> the 32-bit versions are wrong:
->  * they use offsetof instead of offsetoflow32 to mark where
->    the 32-bit value lives in the uint64_t CPU state field
+Hi,
 
-Maybe we can replace all offsetof() by offsetof64() and forbid the use
-of offsetof() in this file, this will make A32 endian/alignment errors
-more apparent.
+The DHCP server in QEMU does neither support specifying a domainname nor
+a classless static route option [1]. I implemented the former (which was easy),
+but I am not sure if and how to implement the classless static route option.
 
->  * they don't mark themselves as ARM_CP_ALIAS
-> 
-> In particular this means that if you try to use an Arm guest CPU
-> which enables EL2 on a big-endian host it will assert at reset:
->  target/arm/cpu.c:114: cp_reg_check_reset: Assertion `oldvalue == newvalue' failed.
-> 
-> because the reset of the 32-bit register writes to the top
-> half of the uint64_t.
-> 
-> Correct the errors in the structures.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This is necessary for 'make check' to pass on big endian
-> systems with the 'raspi3' board enabled, which is the
-> first board which has an EL2-enabled-by-default CPU.
-> ---
->  target/arm/helper.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index e7586fcf6c..e27957df38 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5068,8 +5068,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              { .name = "VPIDR", .state = ARM_CP_STATE_AA32,
->                .cp = 15, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 0,
->                .access = PL2_RW, .accessfn = access_el3_aa32ns,
-> -              .resetvalue = cpu->midr,
-> -              .fieldoffset = offsetof(CPUARMState, cp15.vpidr_el2) },
-> +              .resetvalue = cpu->midr, .type = ARM_CP_ALIAS,
-> +              .fieldoffset = offsetoflow32(CPUARMState, cp15.vpidr_el2) },
->              { .name = "VPIDR_EL2", .state = ARM_CP_STATE_AA64,
->                .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 0,
->                .access = PL2_RW, .resetvalue = cpu->midr,
-> @@ -5077,8 +5077,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              { .name = "VMPIDR", .state = ARM_CP_STATE_AA32,
->                .cp = 15, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 5,
->                .access = PL2_RW, .accessfn = access_el3_aa32ns,
-> -              .resetvalue = vmpidr_def,
-> -              .fieldoffset = offsetof(CPUARMState, cp15.vmpidr_el2) },
-> +              .resetvalue = vmpidr_def, .type = ARM_CP_ALIAS,
-> +              .fieldoffset = offsetoflow32(CPUARMState, cp15.vmpidr_el2) },
->              { .name = "VMPIDR_EL2", .state = ARM_CP_STATE_AA64,
->                .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 5,
->                .access = PL2_RW,
-> 
+An example classless static route option configured in ISC's DHCP server look
+like
 
-After enjoying scrolling a 6666p specs,
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  option rfc3442-classless-static-routes 24, 10, 0, 2, 10, 0, 2, 2, 16, 192, 168, 10, 0, 2, 2;
+
+This translates to the routes:
+
+10.0.2.0/24 via 10.0.2.2
+192.168.0.0/16 via 10.0.2.2
+
+Should the command line option just behave like the ISC's DHCP server and
+allow specifying the byte stream passed to the client? E.g.
+
+  -net staticroutes=24.10.0.2.10.0.2.2.16.192.168.10.0.2.2
+
+Or should the command line option be simpler, but how should it be specified
+then? Maybe
+
+  -net staticroute=10.0.2.0/24via10.0.2.2,staticroute=192.168.0.0/16via10.0.2.2
+
+I am open for your ideas.
+
+[1] https://tools.ietf.org/html/rfc3442
+
+Benjamin Drung (1):
+  slirp: Add domainname option to slirp's DHCP server
+
+ net/slirp.c      | 7 ++++---
+ qapi/net.json    | 3 +++
+ qemu-options.hx  | 7 +++++--
+ slirp/bootp.c    | 8 ++++++++
+ slirp/libslirp.h | 2 +-
+ slirp/slirp.c    | 4 +++-
+ slirp/slirp.h    | 1 +
+ 7 files changed, 25 insertions(+), 7 deletions(-)
+
+-- 
+2.14.1
