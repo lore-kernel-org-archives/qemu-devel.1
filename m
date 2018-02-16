@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1emeXF-0007yv-AC
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:50:38 -0500
+	(envelope-from <kraxel@redhat.com>) id 1emeao-0001dQ-Qr
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1emeXA-0001Hv-7E
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:50:35 -0500
-References: <20180215032905.27146-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <3600bf5d-a91e-337c-57bf-6edf1ee3766e@virtuozzo.com>
-Date: Fri, 16 Feb 2018 14:50:14 +0300
+	(envelope-from <kraxel@redhat.com>) id 1emeal-0003fK-IP
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:54:18 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33712 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1emeal-0003eN-Co
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 06:54:15 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 621244022931
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:54:12 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 16 Feb 2018 12:54:07 +0100
+Message-Id: <20180216115410.27287-7-kraxel@redhat.com>
+In-Reply-To: <20180216115410.27287-1-kraxel@redhat.com>
+References: <20180216115410.27287-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180215032905.27146-1-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] nbd: Honor server's advertised minimum
- block size
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 6/9] ui: avoid risk of 32-bit int overflow in
+ VNC buffer check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-15.02.2018 06:29, Eric Blake wrote:
-> Commit 79ba8c98 (v2.7) changed the setting of request_alignment
-> to occur only during bdrv_refresh_limits(), rather than at at
-> bdrv_open() time; but at the time, NBD was unaffected, because
-> it still used sector-based callbacks, so the block layer
-> defaulted NBD to use 512 request_alignment.
->
-> Later, commit 70c4fb26 (also v2.7) changed NBD to use byte-based
-> callbacks, without setting request_alignment.  This resulted in
-> NBD using request_alignment of 1, which works great when the
-> server supports it (as is the case for qemu-nbd), but falls apart
-> miserably if the server requires alignment (but only if qemu
-> actually sends a sub-sector request; qemu-io can do it, but
-> most qemu operations still perform on sectors or larger).
->
-> Even later, the NBD protocol was updated to document that clients
-> should learn the server's minimum alignment during NBD_OPT_GO;
-> and recommended that clients should assume a minimum size of 512
-> unless the server understands NBD_OPT_GO and replied with a smaller
-> size.  Commit 081dd1fe (v2.10) attempted to do that, by assigning
-> request_alignment to whatever was learned from the server; but
-> it has two flaws: the assignment is done during bdrv_open() so
-> it gets unconditionally wiped out back to 1 during any later
-> bdrv_refresh_limits(); and the code is not using a default of 512
-> when the server did not report a minimum size.
->
-> Fix these issues by moving the assignment to request_alignment
-> to the right function, and by using a sane default when the
-> server does not advertise a minimum size.
->
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->   block/nbd-client.c | 3 ---
->   block/nbd.c        | 2 ++
->   2 files changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/block/nbd-client.c b/block/nbd-client.c
-> index 9206652e45c..7b68499b76a 100644
-> --- a/block/nbd-client.c
-> +++ b/block/nbd-client.c
-> @@ -846,9 +846,6 @@ int nbd_client_init(BlockDriverState *bs,
->       if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
->           bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
->       }
-> -    if (client->info.min_block > bs->bl.request_alignment) {
-> -        bs->bl.request_alignment = client->info.min_block;
-> -    }
->
->       qemu_co_mutex_init(&client->send_mutex);
->       qemu_co_queue_init(&client->free_sema);
-> diff --git a/block/nbd.c b/block/nbd.c
-> index ef81a9f53ba..69b5fd5e8fa 100644
-> --- a/block/nbd.c
-> +++ b/block/nbd.c
-> @@ -474,8 +474,10 @@ static int nbd_co_flush(BlockDriverState *bs)
->   static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
->   {
->       NBDClientSession *s = nbd_get_client_session(bs);
-> +    uint32_t min = s->info.min_block;
->       uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
->
-> +    bs->bl.request_alignment = min ? min : BDRV_SECTOR_SIZE;
->       bs->bl.max_pdiscard = max;
->       bs->bl.max_pwrite_zeroes = max;
->       bs->bl.max_transfer = max;
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+For very large framebuffers, it is theoretically possible for the result
+of 'vs->throttle_output_offset * VNC_THROTTLE_OUTPUT_LIMIT_SCALE' to
+exceed the size of a 32-bit int. For this to happen in practice, the
+video RAM would have to be set to a large enough value, which is not
+likely today. None the less we can be paranoid against future growth by
+using division instead of multiplication when checking the limits.
 
+Reported-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20180205114938.15784-2-berrange@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/vnc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
--- 
-Best regards,
-Vladimir
+diff --git a/ui/vnc.c b/ui/vnc.c
+index e371710f4f..746293ddfa 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1579,8 +1579,8 @@ void vnc_write(VncState *vs, const void *data, size=
+_t len)
+      * handshake, or from the job thread's VncState clone
+      */
+     if (vs->throttle_output_offset !=3D 0 &&
+-        vs->output.offset > (vs->throttle_output_offset *
+-                             VNC_THROTTLE_OUTPUT_LIMIT_SCALE)) {
++        (vs->output.offset / VNC_THROTTLE_OUTPUT_LIMIT_SCALE) >
++        vs->throttle_output_offset) {
+         trace_vnc_client_output_limit(vs, vs->ioc, vs->output.offset,
+                                       vs->throttle_output_offset);
+         vnc_disconnect_start(vs);
+--=20
+2.9.3
