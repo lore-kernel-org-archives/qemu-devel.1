@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@de.ibm.com>) id 1emiZB-0000pw-VZ
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:08:55 -0500
+	(envelope-from <mihajlov@de.ibm.com>) id 1emiZD-0000r8-Dd
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:08:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@de.ibm.com>) id 1emiZ8-000060-K5
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:08:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50842)
+	(envelope-from <mihajlov@de.ibm.com>) id 1emiZC-00007Q-0d
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:08:55 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52868
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@de.ibm.com>) id 1emiZ8-00005j-B1
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:08:50 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1GG6WsL108251
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:08:49 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5y75gwcw-1
+	(Exim 4.71) (envelope-from <mihajlov@de.ibm.com>) id 1emiZB-000074-SS
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 11:08:53 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1GG75U0075825
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:08:51 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g5yuc7kxb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:08:49 -0500
+	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 11:08:50 -0500
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mihajlov@de.ibm.com>;
-	Fri, 16 Feb 2018 16:08:46 -0000
+	Fri, 16 Feb 2018 16:08:48 -0000
 From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Fri, 16 Feb 2018 17:08:36 +0100
-Message-Id: <1518797321-28356-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCHv5 0/5] add query-cpu-fast and related s390
- changes
+Date: Fri, 16 Feb 2018 17:08:38 +0100
+In-Reply-To: <1518797321-28356-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+References: <1518797321-28356-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+Message-Id: <1518797321-28356-3-git-send-email-mihajlov@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCHv5 2/5] qmp: add query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,133 +40,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, cohuck@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com
 
-v5 synopsis: Split out HMP changes from Patch 2 into Patch 5. Please
-   	     re-review, as I've removed the a-b/r-b from Patch 2
-	     as well.
+From: Luiz Capitulino <lcapitulino@redhat.com>
 
-This series consolidates patches around a performance issue
-caused by the usage of QMP query-cpus.
+The query-cpus command has an extremely serious side effect:
+it always interrupts all running vCPUs so that they can run
+ioctl calls. This can cause a huge performance degradation for
+some workloads. And most of the information retrieved by the
+ioctl calls are not even used by query-cpus.
 
-A performance issue was found in an OpenStack environment, where
-ceilometer was collecting domain statistics with libvirt. The domain
-statistics reported by libvirt include the vCPU halted state, which 
-in turn is retrieved with QMP query-cpus.
+This commit introduces a replacement for query-cpus called
+query-cpus-fast, which has the following features:
 
-This causes two issues:
-1. Performance: on most architectures query-cpus needs to issue a KVM ioctl
-   to find out whether a vCPU was halted. This is not the case for s390
-   but query-cpus is always causing the vCPU to exit the VM.
+ o Never interrupt vCPUs threads. query-cpus-fast only returns
+   vCPU information maintained by QEMU itself, which should be
+   sufficient for most management software needs
 
-2. Semantics: on x86 and other architectures, halted is a highly transient
-   state, which is likely to have already changed shortly after the state
-   information has been retrieved. This is not the case for s390, where
-   halted is an indication that the vCPU is stopped, meaning its not
-   available to the guest operating system until it has been restarted.
+ o Drop "halted" field as it can not be retrieved in a fast
+   way on most architectures
 
-The following patches help to alleviate the issues:
+ o Drop irrelevant fields such as "current", "pc" and "arch"
 
-Patch 1/5:
-  Adds architecture specific data to the QMP CpuInfo type, exposing
-  the existing s390 cpu-state in QMP. The cpu-state is a representation
-  more adequate than the ambiguous 'halted' condition.
+ o Rename some fields for better clarification & proper naming
+   standard
 
-Patch 2/5:
-  Adds a new QMP function query-cpus-fast, which will only retrieve
-  vCPU information that can be obtained without interrupting the
-  vCPUs of a running VM. It introduces a new return type CpuInfoFast
-  with the subset of fields meeting this condition. Specifically, the
-  halted state is not part of CpuInfoFast. QMP clients like libvirt
-  are encouraged to switch to the new API for vCPU information.
+Signed-off-by: Luiz Capitulino <lcapitulino@redhat.com>
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+---
+ cpus.c           | 38 ++++++++++++++++++++++++++++++
+ qapi-schema.json | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 108 insertions(+)
 
-Patch 3/5:
-  Adds the s390-specific cpu state to CpuInfoFast, allowing management
-  apps to find out whether a vCPU is in the stopped state. This extension
-  leads to a partial duplication of field definitions from CpuInfo
-  to CpuInfoFast. This should be tolerable if CpuInfo is deprecated and
-  eventually removed.
-
-Patch 4/5:
-  Starts the deprecation of query-cpus.
-
-Patch 5/5 (NEW):
-  Changes HMP 'info cpus' to use query-cpus-fast. Was part of 2/5
-  initially.
-
-Series v4 -> v5:
-Overall: Updated r-b's and moved HMP changes into a seperate patch.
-
-Patch 1/5:
-  o Updated commit message to clarify why no HMP change
-
-Patch 2/5:
-  o Split out HMP changes
-  o Removed r-b cohuck, a-b eblake
-
-Series v3 -> v4:
-Overall: Instead of adding a new HMP 'info cpus_fast', changed
-	 'info cpus' to use query-cpus-fast directly.
-
-Patch 1/4:
-  o Don't report s390-specific data in HMP 'info cpus'
-
-Patch 2/4:
-  o Change HMP 'info cpus' to use query-cpus-fast and
-    to return only basic information (no arch-specific data)
-  o Drop HMP 'info cpus_fast'
-  o Fixed typo in commit message
-
-Patch 3/4:
-  o Drop HMP-related changes
-
-Patch 4/4:
-  o Drop HMP-related changes
-
-Series v2 -> v3:
-Overall: Added r-b's and a-b's.
-
-Patch 2/4:
-  o Fixed commit message with respect to the halted field
-    disposition.
-  o Fixed grammar in qapi-schema documentation.
-
-Patch 3/4:
-  o Use CpuInfoS390 type for both query-cpus and query-cpus-fast per
-    Eric Blake's comment.
-  o Dropped 'duplication blurb' from commit message as it doesn't
-    provide relevant information other than query-cpus should be
-    deprecated, which is done in the next patch now.
-
-Series v1 -> v2:
-Patch 2/3:
-  o Changed formatting of hmp info cpus_fast to match that of
-    info cpus. This makes it easier for clients to switch to
-    the fast call.
-
-Patch 3/3:
-  o Same formatting change for info cpus_fast as in 2/3, only
-    for s390-specific cpu state.
-
-Luiz Capitulino (1):
-  qmp: add query-cpus-fast
-
-Viktor Mihajlovski (4):
-  qmp: expose s390-specific CPU info
-  qmp: add architecture specific cpu data for query-cpus-fast
-  qemu-doc: deprecate query-cpus
-  hmp: change hmp_info_cpus to use query-cpus-fast
-
- cpus.c                     |  54 +++++++++++++++++++++
- hmp.c                      |  41 +++-------------
- hw/intc/s390_flic.c        |   4 +-
- hw/s390x/s390-virtio-ccw.c |   2 +-
- monitor.c                  |  13 +++--
- qapi-schema.json           | 115 ++++++++++++++++++++++++++++++++++++++++++++-
- qemu-doc.texi              |   4 ++
- target/s390x/cpu.c         |  24 +++++-----
- target/s390x/cpu.h         |   7 +--
- target/s390x/kvm.c         |   8 ++--
- target/s390x/sigp.c        |  38 +++++++--------
- 11 files changed, 228 insertions(+), 82 deletions(-)
-
+diff --git a/cpus.c b/cpus.c
+index 6006931..6df6660 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2156,6 +2156,44 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+     return head;
+ }
+ 
++/*
++ * fast means: we NEVER interrupt vCPU threads to retrieve
++ * information from KVM.
++ */
++CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
++{
++    MachineState *ms = MACHINE(qdev_get_machine());
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    CpuInfoFastList *head = NULL, *cur_item = NULL;
++    CPUState *cpu;
++
++    CPU_FOREACH(cpu) {
++        CpuInfoFastList *info = g_malloc0(sizeof(*info));
++        info->value = g_malloc0(sizeof(*info->value));
++
++        info->value->cpu_index = cpu->cpu_index;
++        info->value->qom_path = object_get_canonical_path(OBJECT(cpu));
++        info->value->thread_id = cpu->thread_id;
++
++        info->value->has_props = !!mc->cpu_index_to_instance_props;
++        if (info->value->has_props) {
++            CpuInstanceProperties *props;
++            props = g_malloc0(sizeof(*props));
++            *props = mc->cpu_index_to_instance_props(ms, cpu->cpu_index);
++            info->value->props = props;
++        }
++
++        if (!cur_item) {
++            head = cur_item = info;
++        } else {
++            cur_item->next = info;
++            cur_item = info;
++        }
++    }
++
++    return head;
++}
++
+ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
+                  bool has_cpu, int64_t cpu_index, Error **errp)
+ {
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 94d560e..815f072 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -552,6 +552,12 @@
+ #
+ # Returns a list of information about each virtual CPU.
+ #
++# This command causes vCPU threads to exit to userspace, which causes
++# a small interruption to guest CPU execution. This will have a negative
++# impact on realtime guests and other latency sensitive guest workloads.
++# It is recommended to use @query-cpus-fast instead of this command to
++# avoid the vCPU interruption.
++#
+ # Returns: a list of @CpuInfo for each virtual CPU
+ #
+ # Since: 0.14.0
+@@ -585,6 +591,70 @@
+ { 'command': 'query-cpus', 'returns': ['CpuInfo'] }
+ 
+ ##
++# @CpuInfoFast:
++#
++# Information about a virtual CPU
++#
++# @cpu-index: index of the virtual CPU
++#
++# @qom-path: path to the CPU object in the QOM tree
++#
++# @thread-id: ID of the underlying host thread
++#
++# @props: properties describing to which node/socket/core/thread
++#         virtual CPU belongs to, provided if supported by board
++#
++# Since: 2.12
++#
++##
++{ 'struct': 'CpuInfoFast',
++  'data': {'cpu-index': 'int', 'qom-path': 'str',
++           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
++
++##
++# @query-cpus-fast:
++#
++# Returns information about all virtual CPUs. This command does not
++# incur a performance penalty and should be used in production
++# instead of query-cpus.
++#
++# Returns: list of @CpuInfoFast
++#
++# Notes: The CPU architecture name is not returned by query-cpus-fast.
++#        Use query-target to retrieve that information.
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-cpus-fast" }
++# <- { "return": [
++#         {
++#             "thread-id": 25627,
++#             "props": {
++#                 "core-id": 0,
++#                 "thread-id": 0,
++#                 "socket-id": 0
++#             },
++#             "qom-path": "/machine/unattached/device[0]",
++#             "cpu-index": 0
++#         },
++#         {
++#             "thread-id": 25628,
++#             "props": {
++#                 "core-id": 0,
++#                 "thread-id": 0,
++#                 "socket-id": 1
++#             },
++#             "qom-path": "/machine/unattached/device[2]",
++#             "cpu-index": 1
++#         }
++#     ]
++# }
++##
++{ 'command': 'query-cpus-fast', 'returns': [ 'CpuInfoFast' ] }
++
++##
+ # @IOThreadInfo:
+ #
+ # Information about an iothread
 -- 
 1.9.1
