@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emjxK-0001Kr-P5
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:37:55 -0500
+	(envelope-from <eblake@redhat.com>) id 1emjy9-0001zM-C8
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:38:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1emjxJ-00050I-VG
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:37:54 -0500
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:41272)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1emjxJ-000504-PT
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:37:53 -0500
-Received: by mail-oi0-x22e.google.com with SMTP id t145so2846984oif.8
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 09:37:53 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1emjy8-0005IV-IN
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 12:38:45 -0500
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6f4c0fa6-78f5-13a9-bdd7-d24da479fc72@redhat.com>
+Date: Fri, 16 Feb 2018 11:38:38 -0600
 MIME-Version: 1.0
-In-Reply-To: <c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
-References: <20180216164620.GA53727@humpty.home.comstyle.com>
-	<c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Feb 2018 17:37:32 +0000
-Message-ID: <CAFEAcA9ZtLWzGZvF7O8WxJzoYghJwCa-EMMNqdk6YNpkvuaeEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as a OpenBSD
- maintainer
+In-Reply-To: <1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/9] nbd/client: fix error messages in
+ nbd_handle_reply_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Brad Smith <brad@comstyle.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 16 February 2018 at 17:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> But before announcing the host OS being supported again, I'd rather see
-> reproducible build/tests logs, in a (public - if possible) continuous
-> integration system. Else it is hard to notice when it get broken.
+On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 1. NBD_REP_ERR_INVALID is not only about length, so, make message more
+>     general
+> 
+> 2. hex format is not very good: it's hard to read something like
+>     "option a (set meta context)", so switch to dec.
 
-I do include OpenBSD in my set of build/tests for merges.
+It would be okay as option 0xa; I also want to be sure we match the 
+output in server traces with the output in client traces; for example, I 
+found:
 
-thanks
--- PMM
+nbd/server.c-                error_setg(errp, "Unsupported option 0x%" 
+PRIx32 " (%s)",
+nbd/server.c:                           option, nbd_opt_lookup(option));
+
+So we want consistency through all the call sites, before this patch is 
+ready to go, although I agree we need it.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
