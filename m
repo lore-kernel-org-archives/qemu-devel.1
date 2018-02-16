@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emm23-00069p-St
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:50:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1emmV2-0001NH-Jh
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1emm1z-000757-3j
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:50:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60246 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1emm1y-00074p-TL
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 14:50:51 -0500
-Date: Fri, 16 Feb 2018 19:50:41 +0000
+	(envelope-from <dgilbert@redhat.com>) id 1emmV1-0008Tg-Cf
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 15:20:52 -0500
+Date: Fri, 16 Feb 2018 20:20:21 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180216195041.GF2308@work-vm>
-References: <1518790115-13044-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20180216140847eucas1p2df2d02d4debc4b09a9eb5d2763c016c1@eucas1p2.samsung.com>
-	<1518790115-13044-2-git-send-email-a.perevalov@samsung.com>
+Message-ID: <20180216202020.GG2308@work-vm>
+References: <20170919143829.GH2107@work-vm>
+	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
+	<20170919144130.GI2107@work-vm>
+	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
+	<20170921123625.GE2717@work-vm>
+	<b7f1d6ec-9511-ef3d-80d1-c52cf8adfc24@kamp.de>
+	<20171212170533.GG2409@work-vm>
+	<8ed6cb1e-4770-21ec-164e-7142e649eab3@kamp.de>
+	<20180207182930.GV2665@work-vm>
+	<66CC7380-04E1-4656-A9BF-F075FC109C94@kamp.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1518790115-13044-2-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v3] migration: change blocktime type to
- uint32_t
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <66CC7380-04E1-4656-A9BF-F075FC109C94@kamp.de>
+Subject: Re: [Qemu-devel] Block Migration and CPU throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,239 +32,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> Initially int64_t was used, but on PowerPC architecture,
-> clang doesn't have atomic_*_8 function, so it produces
-> link time error.
-> 
-> QEMU is working with time as with 64bit value, but by
-> fact 32 bit is enough with CLOCK_REALTIME. In this case
-> blocktime will keep only 1200 hours time interval.
+* Peter Lieven (pl@kamp.de) wrote:
+>=20
+> > Am 07.02.2018 um 19:29 schrieb Dr. David Alan Gilbert <dgilbert@redhat.=
+com>:
+> >=20
+> > * Peter Lieven (pl@kamp.de) wrote:
+> >> Am 12.12.2017 um 18:05 schrieb Dr. David Alan Gilbert:
+> >>> * Peter Lieven (pl@kamp.de) wrote:
+> >>>> Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
+> >>>>> * Peter Lieven (pl@kamp.de) wrote:
+> >>>>>> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
+> >>>>>>> * Peter Lieven (pl@kamp.de) wrote:
+> >>>>>>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
+> >>>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
+> >>>>>>>>>> Hi,
+> >>>>>>>>>>=20
+> >>>>>>>>>> I just noticed that CPU throttling and Block Migration don't w=
+ork together very well.
+> >>>>>>>>>> During block migration the throttling heuristic detects that w=
+e obviously make no progress
+> >>>>>>>>>> in ram transfer. But the reason is the running block migration=
+ and not a too high dirty pages rate.
+> >>>>>>>>>>=20
+> >>>>>>>>>> The result is that any VM is throttled by 99% during block mig=
+ration.
+> >>>>>>>>> Hmm that's unfortunate; do you have a bandwidth set lower than =
+your
+> >>>>>>>>> actual network connection? I'm just wondering if it's actually =
+going
+> >>>>>>>>> between the block and RAM iterative sections or getting stuck i=
+n ne.
+> >>>>>>>> It happens also if source and dest are on the same machine and s=
+peed is set to 100G.
+> >>>>>>> But does it happen if they're not and the speed is set low?
+> >>>>>> Yes, it does. I noticed it in our test environment between differe=
+nt nodes with a 10G
+> >>>>>> link in between. But its totally clear why it happens. During bloc=
+k migration we transfer
+> >>>>>> all dirty memory pages in each round (if there is moderate memory =
+load), but all dirty
+> >>>>>> pages are obviously more than 50% of the transferred ram in that r=
+ound.
+> >>>>>> It is more exactly 100%. But the current logic triggers on this co=
+ndition.
+> >>>>>>=20
+> >>>>>> I think I will go forward and send a patch which disables auto con=
+verge during
+> >>>>>> block migration bulk stage.
+> >>>>> Yes, that's fair;  it probably would also make sense to throttle th=
+e RAM
+> >>>>> migration during the block migration bulk stage, since the chances =
+are
+> >>>>> it's not going to get far.  (I think in the nbd setup, the main
+> >>>>> migration process isn't started until the end of bulk).
+> >>>> Catching up with the idea of delaying ram migration until block bulk=
+ has completed.
+> >>>> What do you think is the easiest way to achieve this?
+> >>> <excavates inbox, and notices I never replied>
+> >>>=20
+> >>> I think the answer depends whether we think this is a 'special' or we
+> >>> need a new general purpose mechanism.
+> >>>=20
+> >>> If it was really general then we'd probably want to split the iterati=
+ve
+> >>> stage in two somehow, and only do RAM in the second half.
+> >>>=20
+> >>> But I'm not sure it's worth it; I suspect the easiest way is:
+> >>>=20
+> >>>    a) Add a counter in migration/ram.c or in the RAM state somewhere
+> >>>    b) Make ram_save_inhibit increment the counter
+> >>>    c) Check the counter at the head of ram_save_iterate and just exit
+> >>>      if it's none 0
+> >>>    d) Call ram_save_inhibit from block_save_setup
+> >>>    e) Then release it when you've finished the bulk stage
+> >>>=20
+> >>> Make sure you still count the RAM in the pending totals, otherwise
+> >>> migration might think it's finished a bit early.
+> >>=20
+> >> Is there any culprit I don't see or is it as easy as this?
+> >=20
+> > Hmm, looks promising doesn't it;  might need an include or two tidied
+> > up, but looks worth a try.   Just be careful that there are no cases
+> > where block migration can't transfer data in that state, otherwise we'll
+> > keep coming back to here and spewing empty sections.
+>=20
+> I already tested it and it actually works.
 
-Hi Alexey,
+OK.
 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> Acked-by: Eric Blake <eblake@redhat.com>
-> ---
->  hmp.c                    |  4 ++--
->  migration/postcopy-ram.c | 48 +++++++++++++++++++++++++++---------------------
->  migration/trace-events   |  4 ++--
->  qapi/migration.json      |  4 ++--
->  4 files changed, 33 insertions(+), 27 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index c6bab53..3c376b3 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -265,7 +265,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->      }
->  
->      if (info->has_postcopy_blocktime) {
-> -        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
-> +        monitor_printf(mon, "postcopy blocktime: %u\n",
->                         info->postcopy_blocktime);
->      }
->  
-> @@ -273,7 +273,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->          Visitor *v;
->          char *str;
->          v = string_output_visitor_new(false, &str);
-> -        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
-> +        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
->          visit_complete(v, &str);
->          monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
->          g_free(str);
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 7814da5..6694fd3 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -63,16 +63,17 @@ struct PostcopyDiscardState {
->  
->  typedef struct PostcopyBlocktimeContext {
->      /* time when page fault initiated per vCPU */
-> -    int64_t *page_fault_vcpu_time;
-> +    uint32_t *page_fault_vcpu_time;
->      /* page address per vCPU */
->      uintptr_t *vcpu_addr;
-> -    int64_t total_blocktime;
-> +    uint32_t total_blocktime;
->      /* blocktime per vCPU */
-> -    int64_t *vcpu_blocktime;
-> +    uint32_t *vcpu_blocktime;
->      /* point in time when last page fault was initiated */
-> -    int64_t last_begin;
-> +    uint32_t last_begin;
->      /* number of vCPU are suspended */
->      int smp_cpus_down;
-> +    uint64_t start_time;
->  
->      /*
->       * Handler for exit event, necessary for
-> @@ -99,22 +100,23 @@ static void migration_exit_cb(Notifier *n, void *data)
->  static struct PostcopyBlocktimeContext *blocktime_context_new(void)
->  {
->      PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
-> -    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
-> +    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
->      ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
-> -    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
-> +    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
->  
->      ctx->exit_notifier.notify = migration_exit_cb;
-> +    ctx->start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      qemu_add_exit_notifier(&ctx->exit_notifier);
->      return ctx;
->  }
->  
-> -static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
-> +static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
->  {
-> -    int64List *list = NULL, *entry = NULL;
-> +    uint32List *list = NULL, *entry = NULL;
->      int i;
->  
->      for (i = smp_cpus - 1; i >= 0; i--) {
-> -        entry = g_new0(int64List, 1);
-> +        entry = g_new0(uint32List, 1);
->          entry->value = ctx->vcpu_blocktime[i];
->          entry->next = list;
->          list = entry;
-> @@ -145,7 +147,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
->      info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
->  }
->  
-> -static uint64_t get_postcopy_total_blocktime(void)
-> +static uint32_t get_postcopy_total_blocktime(void)
->  {
->      MigrationIncomingState *mis = migration_incoming_get_current();
->      PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
-> @@ -633,7 +635,8 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
->      int cpu, already_received;
->      MigrationIncomingState *mis = migration_incoming_get_current();
->      PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-> -    int64_t now_ms;
-> +    int64_t start_time_offset;
-> +    uint32_t low_time_offset;
->  
->      if (!dc || ptid == 0) {
->          return;
-> @@ -643,14 +646,15 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
->          return;
->      }
->  
-> -    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +    start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) - dc->start_time;
-> +    low_time_offset = start_time_offset & UINT32_MAX;
+> What would you expect to be cleaned up before it would be a proper patch?
 
-OK, I suggest you add a sanity check that start_time_offset >= 1 - to
-cover the cases where it was unusually quick to get to this point (and
-thus 0) or by ntp causing time jumps.  I suggest you just check if it's
-less than 1 and if it is use 1.
-I suggest you wrap it in a little function to get the offset and you can
-use it in the call below as well.
+It's simple enough so not much; maybe add a trace for when it does the
+exit just to make it easier to watch; I hadn't realised ram.c already
+included migration/block.h for the !bulk case.
 
->      if (dc->vcpu_addr[cpu] == 0) {
->          atomic_inc(&dc->smp_cpus_down);
->      }
->  
-> -    atomic_xchg__nocheck(&dc->last_begin, now_ms);
-> -    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
-> -    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
-> +    atomic_xchg(&dc->last_begin, low_time_offset);
-> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
-> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
+> Are there any implications with RDMA
 
-OK, and since addr is now a uintptr_t we should be safe for that.
+Hmm; don't think so; it's mainly concerned with how the RAM is
+transferred; and the ram_control_* hooks are called after your test,
+and on the load side only once it's read the flags and got a block.
 
-With that change suggested above can you repost it merged into the
-original patchset and then we can try again with it.
+> and/or post copy migration?
 
-Dave (out for a week)
+Again I don't think so;  I think block migration always shows the
+outstanding amount of block storage, and so it won't flip into postcopy
+mode until the bulk of block migration is done.
+Also the 'ram_save_complete' does it's own scan of blocks and doesn't
+share the iterate code, so it won't be affected by your change.
 
->      /* check it here, not at the begining of the function,
->       * due to, check could accur early than bitmap_set in
-> @@ -697,22 +701,23 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
->      MigrationIncomingState *mis = migration_incoming_get_current();
->      PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
->      int i, affected_cpu = 0;
-> -    int64_t now_ms;
-> +    int64_t start_time_offset;
->      bool vcpu_total_blocktime = false;
-> -    int64_t read_vcpu_time;
-> +    uint32_t read_vcpu_time, low_time_offset;
->  
->      if (!dc) {
->          return;
->      }
->  
-> -    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +    start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) - dc->start_time;
-> +    low_time_offset = start_time_offset & UINT32_MAX;
->  
->      /* lookup cpu, to clear it,
->       * that algorithm looks straighforward, but it's not
->       * optimal, more optimal algorithm is keeping tree or hash
->       * where key is address value is a list of  */
->      for (i = 0; i < smp_cpus; i++) {
-> -        uint64_t vcpu_blocktime = 0;
-> +        uint32_t vcpu_blocktime = 0;
->  
->          read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
->          if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
-> @@ -720,7 +725,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
->              continue;
->          }
->          atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
-> -        vcpu_blocktime = now_ms - read_vcpu_time;
-> +        vcpu_blocktime = low_time_offset - read_vcpu_time;
->          affected_cpu += 1;
->          /* we need to know is that mark_postcopy_end was due to
->           * faulted page, another possible case it's prefetched
-> @@ -735,7 +740,8 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
->  
->      atomic_sub(&dc->smp_cpus_down, affected_cpu);
->      if (vcpu_total_blocktime) {
-> -        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
-> +        dc->total_blocktime += low_time_offset - atomic_fetch_add(
-> +                &dc->last_begin, 0);
->      }
->      trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
->                                        affected_cpu);
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 141e773..0defbc3 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
->  process_incoming_migration_co_postcopy_end_main(void) ""
->  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
->  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
-> -mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
-> -mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
-> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
-> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
->  
->  # migration/rdma.c
->  qemu_rdma_accept_incoming_migration(void) ""
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 70e7b67..ee55d7c 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -175,8 +175,8 @@
->             '*setup-time': 'int',
->             '*cpu-throttle-percentage': 'int',
->             '*error-desc': 'str',
-> -           '*postcopy-blocktime' : 'int64',
-> -           '*postcopy-vcpu-blocktime': ['int64']} }
-> +           '*postcopy-blocktime' : 'uint32',
-> +           '*postcopy-vcpu-blocktime': ['uint32']} }
->  
->  ##
->  # @query-migrate:
-> -- 
-> 2.7.4
-> 
+> Is block migration possible at all with those?
+
+Yes I think so in both cases; with RDMA I'm pretty sure it is, and I
+think people have had it running with postcopy as well.   The postcopy
+case isn't great (because the actual block storage isn't postcopied)
+and there's work afoot to add other syncing mechanisms on top (see Max
+Reitz's series).
+
+To be honest I don't use/test block migration much and hence know it
+less; but what you've got seems to make sense, but I would like a nod
+=66rom Fam to check from that side.
+
+Dave
+
+> Peter
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
