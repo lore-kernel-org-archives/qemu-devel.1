@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuc-0001lO-20
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuf-0001pY-8v
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuQ-00058b-T8
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuW-0005KY-F8
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:41 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 16 Feb 2018 21:06:04 +1100
-Message-Id: <20180216100617.25265-2-david@gibson.dropbear.id.au>
+Date: Fri, 16 Feb 2018 21:06:17 +1100
+Message-Id: <20180216100617.25265-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20180216100617.25265-1-david@gibson.dropbear.id.au>
 References: <20180216100617.25265-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/14] cuda: convert to use the shared mos6522
- device
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 14/14] ppc4xx: Add device models found in PPC440
+ core SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,939 +24,1261 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, surajjs@au1.ibm.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, surajjs@au1.ibm.com, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-Add the relevant hooks as required for the MacOS timer calibration and delayed
-SR interrupt.
+These devices are found in newer SoCs based on 440 core e.g. the 460EX
+(http://www.embeddeddeveloper.com/assets/processors/amcc/datasheets/
+PP460EX_DS2063.pdf)
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/cuda.c | 606 ++++++++++++++-------------------------------------
- hw/ppc/mac.h         |  87 ++++----
- 2 files changed, 204 insertions(+), 489 deletions(-)
+ hw/ppc/ppc440.h            |   26 +
+ hw/ppc/ppc440_uc.c         | 1159 ++++++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/pci/pcie_host.h |    2 +-
+ 3 files changed, 1186 insertions(+), 1 deletion(-)
+ create mode 100644 hw/ppc/ppc440.h
+ create mode 100644 hw/ppc/ppc440_uc.c
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index a185252144..54c02aeffb 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -26,15 +26,14 @@
- #include "hw/hw.h"
- #include "hw/ppc/mac.h"
- #include "hw/input/adb.h"
-+#include "hw/misc/mos6522.h"
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- 
--/* XXX: implement all timer modes */
--
--/* debug CUDA */
--//#define DEBUG_CUDA
-+/* debug CUDA packets */
-+//#define DEBUG_CUDA_PACKET
- 
- /* debug CUDA packets */
- //#define DEBUG_CUDA_PACKET
-@@ -47,426 +46,114 @@
- #endif
- 
- /* Bits in B data register: all active low */
--#define TREQ		0x08		/* Transfer request (input) */
--#define TACK		0x10		/* Transfer acknowledge (output) */
--#define TIP		0x20		/* Transfer in progress (output) */
--
--/* Bits in ACR */
--#define SR_CTRL		0x1c		/* Shift register control bits */
--#define SR_EXT		0x0c		/* Shift on external clock */
--#define SR_OUT		0x10		/* Shift out if 1 */
--
--/* Bits in IFR and IER */
--#define IER_SET		0x80		/* set bits in IER */
--#define IER_CLR		0		/* clear bits in IER */
--#define SR_INT		0x04		/* Shift register full/empty */
--#define SR_DATA_INT	0x08
--#define SR_CLOCK_INT	0x10
--#define T1_INT          0x40            /* Timer 1 interrupt */
--#define T2_INT          0x20            /* Timer 2 interrupt */
--
--/* Bits in ACR */
--#define T1MODE          0xc0            /* Timer 1 mode */
--#define T1MODE_CONT     0x40            /*  continuous interrupts */
-+#define TREQ            0x08    /* Transfer request (input) */
-+#define TACK            0x10    /* Transfer acknowledge (output) */
-+#define TIP             0x20    /* Transfer in progress (output) */
- 
- /* commands (1st byte) */
--#define ADB_PACKET	0
--#define CUDA_PACKET	1
--#define ERROR_PACKET	2
--#define TIMER_PACKET	3
--#define POWER_PACKET	4
--#define MACIIC_PACKET	5
--#define PMU_PACKET	6
--
--
--/* CUDA commands (2nd byte) */
--#define CUDA_WARM_START			0x0
--#define CUDA_AUTOPOLL			0x1
--#define CUDA_GET_6805_ADDR		0x2
--#define CUDA_GET_TIME			0x3
--#define CUDA_GET_PRAM			0x7
--#define CUDA_SET_6805_ADDR		0x8
--#define CUDA_SET_TIME			0x9
--#define CUDA_POWERDOWN			0xa
--#define CUDA_POWERUP_TIME		0xb
--#define CUDA_SET_PRAM			0xc
--#define CUDA_MS_RESET			0xd
--#define CUDA_SEND_DFAC			0xe
--#define CUDA_BATTERY_SWAP_SENSE		0x10
--#define CUDA_RESET_SYSTEM		0x11
--#define CUDA_SET_IPL			0x12
--#define CUDA_FILE_SERVER_FLAG		0x13
--#define CUDA_SET_AUTO_RATE		0x14
--#define CUDA_GET_AUTO_RATE		0x16
--#define CUDA_SET_DEVICE_LIST		0x19
--#define CUDA_GET_DEVICE_LIST		0x1a
--#define CUDA_SET_ONE_SECOND_MODE	0x1b
--#define CUDA_SET_POWER_MESSAGES		0x21
--#define CUDA_GET_SET_IIC		0x22
--#define CUDA_WAKEUP			0x23
--#define CUDA_TIMER_TICKLE		0x24
--#define CUDA_COMBINED_FORMAT_IIC	0x25
-+#define ADB_PACKET      0
-+#define CUDA_PACKET     1
-+#define ERROR_PACKET    2
-+#define TIMER_PACKET    3
-+#define POWER_PACKET    4
-+#define MACIIC_PACKET   5
-+#define PMU_PACKET      6
- 
- #define CUDA_TIMER_FREQ (4700000 / 6)
- 
- /* CUDA returns time_t's offset from Jan 1, 1904, not 1970 */
- #define RTC_OFFSET                      2082844800
- 
--/* CUDA registers */
--#define CUDA_REG_B       0x00
--#define CUDA_REG_A       0x01
--#define CUDA_REG_DIRB    0x02
--#define CUDA_REG_DIRA    0x03
--#define CUDA_REG_T1CL    0x04
--#define CUDA_REG_T1CH    0x05
--#define CUDA_REG_T1LL    0x06
--#define CUDA_REG_T1LH    0x07
--#define CUDA_REG_T2CL    0x08
--#define CUDA_REG_T2CH    0x09
--#define CUDA_REG_SR      0x0a
--#define CUDA_REG_ACR     0x0b
--#define CUDA_REG_PCR     0x0c
--#define CUDA_REG_IFR     0x0d
--#define CUDA_REG_IER     0x0e
--#define CUDA_REG_ANH     0x0f
--
--static void cuda_update(CUDAState *s);
- static void cuda_receive_packet_from_host(CUDAState *s,
-                                           const uint8_t *data, int len);
--static void cuda_timer_update(CUDAState *s, CUDATimer *ti,
--                              int64_t current_time);
- 
--static void cuda_update_irq(CUDAState *s)
--{
--    if (s->ifr & s->ier & (SR_INT | T1_INT | T2_INT)) {
--        qemu_irq_raise(s->irq);
--    } else {
--        qemu_irq_lower(s->irq);
--    }
--}
-+/* MacOS uses timer 1 for calibration on startup, so we use
-+ * the timebase frequency and cuda_get_counter_value() with
-+ * cuda_get_load_time() to steer MacOS to calculate calibrate its timers
-+ * correctly for both TCG and KVM (see commit b981289c49 "PPC: Cuda: Use cuda
-+ * timer to expose tbfreq to guest" for more information) */
- 
--static uint64_t get_counter_value(CUDAState *s, CUDATimer *ti)
-+static uint64_t cuda_get_counter_value(MOS6522State *s, MOS6522Timer *ti)
- {
-+    MOS6522CUDAState *mcs = container_of(s, MOS6522CUDAState, parent_obj);
-+    CUDAState *cs = mcs->cuda;
+diff --git a/hw/ppc/ppc440.h b/hw/ppc/ppc440.h
+new file mode 100644
+index 0000000000..ad27db12e4
+--- /dev/null
++++ b/hw/ppc/ppc440.h
+@@ -0,0 +1,26 @@
++/*
++ * QEMU PowerPC 440 shared definitions
++ *
++ * Copyright (c) 2012 Fran=C3=A7ois Revol
++ * Copyright (c) 2016-2018 BALATON Zoltan
++ *
++ * This work is licensed under the GNU GPL license version 2 or later.
++ *
++ */
 +
-     /* Reverse of the tb calculation algorithm that Mac OS X uses on bootup */
-     uint64_t tb_diff = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                                s->tb_frequency, NANOSECONDS_PER_SECOND) -
-+                                cs->tb_frequency, NANOSECONDS_PER_SECOND) -
-                            ti->load_time;
- 
--    return (tb_diff * 0xBF401675E5DULL) / (s->tb_frequency << 24);
-+    return (tb_diff * 0xBF401675E5DULL) / (cs->tb_frequency << 24);
- }
- 
--static uint64_t get_counter_load_time(CUDAState *s, CUDATimer *ti)
-+static uint64_t cuda_get_load_time(MOS6522State *s, MOS6522Timer *ti)
- {
-+    MOS6522CUDAState *mcs = container_of(s, MOS6522CUDAState, parent_obj);
-+    CUDAState *cs = mcs->cuda;
++#ifndef PPC440_H
++#define PPC440_H
 +
-     uint64_t load_time = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                                  s->tb_frequency, NANOSECONDS_PER_SECOND);
-+                                  cs->tb_frequency, NANOSECONDS_PER_SECOND);
-     return load_time;
- }
- 
--static unsigned int get_counter(CUDAState *s, CUDATimer *ti)
--{
--    int64_t d;
--    unsigned int counter;
--
--    d = get_counter_value(s, ti);
--
--    if (ti->index == 0) {
--        /* the timer goes down from latch to -1 (period of latch + 2) */
--        if (d <= (ti->counter_value + 1)) {
--            counter = (ti->counter_value - d) & 0xffff;
--        } else {
--            counter = (d - (ti->counter_value + 1)) % (ti->latch + 2);
--            counter = (ti->latch - counter) & 0xffff;
--        }
--    } else {
--        counter = (ti->counter_value - d) & 0xffff;
--    }
--    return counter;
--}
--
--static void set_counter(CUDAState *s, CUDATimer *ti, unsigned int val)
--{
--    CUDA_DPRINTF("T%d.counter=%d\n", 1 + ti->index, val);
--    ti->load_time = get_counter_load_time(s, ti);
--    ti->counter_value = val;
--    cuda_timer_update(s, ti, ti->load_time);
--}
--
--static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
--{
--    int64_t d, next_time;
--    unsigned int counter;
--
--    /* current counter value */
--    d = muldiv64(current_time - ti->load_time,
--                 ti->frequency, NANOSECONDS_PER_SECOND);
--    /* the timer goes down from latch to -1 (period of latch + 2) */
--    if (d <= (ti->counter_value + 1)) {
--        counter = (ti->counter_value - d) & 0xffff;
--    } else {
--        counter = (d - (ti->counter_value + 1)) % (ti->latch + 2);
--        counter = (ti->latch - counter) & 0xffff;
--    }
--
--    /* Note: we consider the irq is raised on 0 */
--    if (counter == 0xffff) {
--        next_time = d + ti->latch + 1;
--    } else if (counter == 0) {
--        next_time = d + ti->latch + 2;
--    } else {
--        next_time = d + counter;
--    }
--    CUDA_DPRINTF("latch=%d counter=%" PRId64 " delta_next=%" PRId64 "\n",
--                 ti->latch, d, next_time - d);
--    next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, ti->frequency) +
--                         ti->load_time;
--    if (next_time <= current_time) {
--        next_time = current_time + 1;
--    }
--    return next_time;
--}
--
--static void cuda_timer_update(CUDAState *s, CUDATimer *ti,
--                              int64_t current_time)
--{
--    if (!ti->timer)
--        return;
--    if (ti->index == 0 && (s->acr & T1MODE) != T1MODE_CONT) {
--        timer_del(ti->timer);
--    } else {
--        ti->next_irq_time = get_next_irq_time(ti, current_time);
--        timer_mod(ti->timer, ti->next_irq_time);
--    }
--}
--
--static void cuda_timer1(void *opaque)
--{
--    CUDAState *s = opaque;
--    CUDATimer *ti = &s->timers[0];
--
--    cuda_timer_update(s, ti, ti->next_irq_time);
--    s->ifr |= T1_INT;
--    cuda_update_irq(s);
--}
--
--static void cuda_timer2(void *opaque)
--{
--    CUDAState *s = opaque;
--    CUDATimer *ti = &s->timers[1];
--
--    cuda_timer_update(s, ti, ti->next_irq_time);
--    s->ifr |= T2_INT;
--    cuda_update_irq(s);
--}
--
- static void cuda_set_sr_int(void *opaque)
- {
-     CUDAState *s = opaque;
-+    MOS6522CUDAState *mcs = s->mos6522_cuda;
-+    MOS6522State *ms = MOS6522(mcs);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
- 
--    CUDA_DPRINTF("CUDA: %s:%d\n", __func__, __LINE__);
--    s->ifr |= SR_INT;
--    cuda_update_irq(s);
-+    mdc->set_sr_int(ms);
- }
- 
- static void cuda_delay_set_sr_int(CUDAState *s)
- {
-+    MOS6522CUDAState *mcs = s->mos6522_cuda;
-+    MOS6522State *ms = MOS6522(mcs);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-     int64_t expire;
- 
--    if (s->dirb == 0xff) {
--        /* Not in Mac OS, fire the IRQ directly */
--        cuda_set_sr_int(s);
-+    if (ms->dirb == 0xff || s->sr_delay_ns == 0) {
-+        /* Disabled or not in Mac OS, fire the IRQ directly */
-+        mdc->set_sr_int(ms);
-         return;
-     }
- 
-     CUDA_DPRINTF("CUDA: %s:%d\n", __func__, __LINE__);
- 
--    expire = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 300 * SCALE_US;
-+    expire = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->sr_delay_ns;
-     timer_mod(s->sr_delay_timer, expire);
- }
- 
--static uint64_t cuda_read(void *opaque, hwaddr addr, unsigned size)
--{
--    CUDAState *s = opaque;
--    uint32_t val;
--
--    addr = (addr >> 9) & 0xf;
--    switch(addr) {
--    case CUDA_REG_B:
--        val = s->b;
--        break;
--    case CUDA_REG_A:
--        val = s->a;
--        break;
--    case CUDA_REG_DIRB:
--        val = s->dirb;
--        break;
--    case CUDA_REG_DIRA:
--        val = s->dira;
--        break;
--    case CUDA_REG_T1CL:
--        val = get_counter(s, &s->timers[0]) & 0xff;
--        s->ifr &= ~T1_INT;
--        cuda_update_irq(s);
--        break;
--    case CUDA_REG_T1CH:
--        val = get_counter(s, &s->timers[0]) >> 8;
--        cuda_update_irq(s);
--        break;
--    case CUDA_REG_T1LL:
--        val = s->timers[0].latch & 0xff;
--        break;
--    case CUDA_REG_T1LH:
--        /* XXX: check this */
--        val = (s->timers[0].latch >> 8) & 0xff;
--        break;
--    case CUDA_REG_T2CL:
--        val = get_counter(s, &s->timers[1]) & 0xff;
--        s->ifr &= ~T2_INT;
--        cuda_update_irq(s);
--        break;
--    case CUDA_REG_T2CH:
--        val = get_counter(s, &s->timers[1]) >> 8;
--        break;
--    case CUDA_REG_SR:
--        val = s->sr;
--        s->ifr &= ~(SR_INT | SR_CLOCK_INT | SR_DATA_INT);
--        cuda_update_irq(s);
--        break;
--    case CUDA_REG_ACR:
--        val = s->acr;
--        break;
--    case CUDA_REG_PCR:
--        val = s->pcr;
--        break;
--    case CUDA_REG_IFR:
--        val = s->ifr;
--        if (s->ifr & s->ier) {
--            val |= 0x80;
--        }
--        break;
--    case CUDA_REG_IER:
--        val = s->ier | 0x80;
--        break;
--    default:
--    case CUDA_REG_ANH:
--        val = s->anh;
--        break;
--    }
--    if (addr != CUDA_REG_IFR || val != 0) {
--        CUDA_DPRINTF("read: reg=0x%x val=%02x\n", (int)addr, val);
--    }
--
--    return val;
--}
--
--static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
--{
--    CUDAState *s = opaque;
--
--    addr = (addr >> 9) & 0xf;
--    CUDA_DPRINTF("write: reg=0x%x val=%02x\n", (int)addr, val);
--
--    switch(addr) {
--    case CUDA_REG_B:
--        s->b = (s->b & ~s->dirb) | (val & s->dirb);
--        cuda_update(s);
--        break;
--    case CUDA_REG_A:
--        s->a = (s->a & ~s->dira) | (val & s->dira);
--        break;
--    case CUDA_REG_DIRB:
--        s->dirb = val;
--        break;
--    case CUDA_REG_DIRA:
--        s->dira = val;
--        break;
--    case CUDA_REG_T1CL:
--        s->timers[0].latch = (s->timers[0].latch & 0xff00) | val;
--        cuda_timer_update(s, &s->timers[0], qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
--        break;
--    case CUDA_REG_T1CH:
--        s->timers[0].latch = (s->timers[0].latch & 0xff) | (val << 8);
--        s->ifr &= ~T1_INT;
--        set_counter(s, &s->timers[0], s->timers[0].latch);
--        break;
--    case CUDA_REG_T1LL:
--        s->timers[0].latch = (s->timers[0].latch & 0xff00) | val;
--        cuda_timer_update(s, &s->timers[0], qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
--        break;
--    case CUDA_REG_T1LH:
--        s->timers[0].latch = (s->timers[0].latch & 0xff) | (val << 8);
--        s->ifr &= ~T1_INT;
--        cuda_timer_update(s, &s->timers[0], qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
--        break;
--    case CUDA_REG_T2CL:
--        s->timers[1].latch = (s->timers[1].latch & 0xff00) | val;
--        break;
--    case CUDA_REG_T2CH:
--        /* To ensure T2 generates an interrupt on zero crossing with the
--           common timer code, write the value directly from the latch to
--           the counter */
--        s->timers[1].latch = (s->timers[1].latch & 0xff) | (val << 8);
--        s->ifr &= ~T2_INT;
--        set_counter(s, &s->timers[1], s->timers[1].latch);
--        break;
--    case CUDA_REG_SR:
--        s->sr = val;
--        break;
--    case CUDA_REG_ACR:
--        s->acr = val;
--        cuda_timer_update(s, &s->timers[0], qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
--        break;
--    case CUDA_REG_PCR:
--        s->pcr = val;
--        break;
--    case CUDA_REG_IFR:
--        /* reset bits */
--        s->ifr &= ~val;
--        cuda_update_irq(s);
--        break;
--    case CUDA_REG_IER:
--        if (val & IER_SET) {
--            /* set bits */
--            s->ier |= val & 0x7f;
--        } else {
--            /* reset bits */
--            s->ier &= ~val;
--        }
--        cuda_update_irq(s);
--        break;
--    default:
--    case CUDA_REG_ANH:
--        s->anh = val;
--        break;
--    }
--}
--
- /* NOTE: TIP and TREQ are negated */
- static void cuda_update(CUDAState *s)
- {
-+    MOS6522CUDAState *mcs = s->mos6522_cuda;
-+    MOS6522State *ms = MOS6522(mcs);
-     int packet_received, len;
- 
-     packet_received = 0;
--    if (!(s->b & TIP)) {
-+    if (!(ms->b & TIP)) {
-         /* transfer requested from host */
- 
--        if (s->acr & SR_OUT) {
-+        if (ms->acr & SR_OUT) {
-             /* data output */
--            if ((s->b & (TACK | TIP)) != (s->last_b & (TACK | TIP))) {
-+            if ((ms->b & (TACK | TIP)) != (s->last_b & (TACK | TIP))) {
-                 if (s->data_out_index < sizeof(s->data_out)) {
--                    CUDA_DPRINTF("send: %02x\n", s->sr);
--                    s->data_out[s->data_out_index++] = s->sr;
-+                    CUDA_DPRINTF("send: %02x\n", ms->sr);
-+                    s->data_out[s->data_out_index++] = ms->sr;
-                     cuda_delay_set_sr_int(s);
-                 }
-             }
-         } else {
-             if (s->data_in_index < s->data_in_size) {
-                 /* data input */
--                if ((s->b & (TACK | TIP)) != (s->last_b & (TACK | TIP))) {
--                    s->sr = s->data_in[s->data_in_index++];
--                    CUDA_DPRINTF("recv: %02x\n", s->sr);
-+                if ((ms->b & (TACK | TIP)) != (s->last_b & (TACK | TIP))) {
-+                    ms->sr = s->data_in[s->data_in_index++];
-+                    CUDA_DPRINTF("recv: %02x\n", ms->sr);
-                     /* indicate end of transfer */
-                     if (s->data_in_index >= s->data_in_size) {
--                        s->b = (s->b | TREQ);
-+                        ms->b = (ms->b | TREQ);
-                     }
-                     cuda_delay_set_sr_int(s);
-                 }
-@@ -474,12 +161,13 @@ static void cuda_update(CUDAState *s)
-         }
-     } else {
-         /* no transfer requested: handle sync case */
--        if ((s->last_b & TIP) && (s->b & TACK) != (s->last_b & TACK)) {
-+        if ((s->last_b & TIP) && (ms->b & TACK) != (s->last_b & TACK)) {
-             /* update TREQ state each time TACK change state */
--            if (s->b & TACK)
--                s->b = (s->b | TREQ);
--            else
--                s->b = (s->b & ~TREQ);
-+            if (ms->b & TACK) {
-+                ms->b = (ms->b | TREQ);
-+            } else {
-+                ms->b = (ms->b & ~TREQ);
-+            }
-             cuda_delay_set_sr_int(s);
-         } else {
-             if (!(s->last_b & TIP)) {
-@@ -490,13 +178,13 @@ static void cuda_update(CUDAState *s)
-             }
-             /* signal if there is data to read */
-             if (s->data_in_index < s->data_in_size) {
--                s->b = (s->b & ~TREQ);
-+                ms->b = (ms->b & ~TREQ);
-             }
-         }
-     }
- 
--    s->last_acr = s->acr;
--    s->last_b = s->b;
-+    s->last_acr = ms->acr;
-+    s->last_b = ms->b;
- 
-     /* NOTE: cuda_receive_packet_from_host() can call cuda_update()
-        recursively */
-@@ -538,9 +226,8 @@ static void cuda_adb_poll(void *opaque)
-         obuf[1] = 0x40; /* polled data */
-         cuda_send_packet_to_host(s, obuf, olen + 2);
-     }
--    timer_mod(s->adb_poll_timer,
--                   qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--                   (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
-+    timer_mod(s->adb_poll_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+              (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
- }
- 
- /* description of commands */
-@@ -787,35 +474,35 @@ static void cuda_receive_packet_from_host(CUDAState *s,
-     }
- }
- 
--static const MemoryRegionOps cuda_ops = {
--    .read = cuda_read,
--    .write = cuda_write,
--    .endianness = DEVICE_BIG_ENDIAN,
--    .valid = {
--        .min_access_size = 1,
--        .max_access_size = 1,
--    },
--};
-+static uint64_t mos6522_cuda_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    CUDAState *s = opaque;
-+    MOS6522CUDAState *mcs = s->mos6522_cuda;
-+    MOS6522State *ms = MOS6522(mcs);
- 
--static bool cuda_timer_exist(void *opaque, int version_id)
-+    addr = (addr >> 9) & 0xf;
-+    return mos6522_read(ms, addr, size);
-+}
++#include "hw/ppc/ppc.h"
 +
-+static void mos6522_cuda_write(void *opaque, hwaddr addr, uint64_t val,
-+                               unsigned size)
- {
--    CUDATimer *s = opaque;
-+    CUDAState *s = opaque;
-+    MOS6522CUDAState *mcs = s->mos6522_cuda;
-+    MOS6522State *ms = MOS6522(mcs);
- 
--    return s->timer != NULL;
-+    addr = (addr >> 9) & 0xf;
-+    mos6522_write(ms, addr, val, size);
- }
- 
--static const VMStateDescription vmstate_cuda_timer = {
--    .name = "cuda_timer",
--    .version_id = 0,
--    .minimum_version_id = 0,
--    .fields = (VMStateField[]) {
--        VMSTATE_UINT16(latch, CUDATimer),
--        VMSTATE_UINT16(counter_value, CUDATimer),
--        VMSTATE_INT64(load_time, CUDATimer),
--        VMSTATE_INT64(next_irq_time, CUDATimer),
--        VMSTATE_TIMER_PTR_TEST(timer, CUDATimer, cuda_timer_exist),
--        VMSTATE_END_OF_LIST()
--    }
-+static const MemoryRegionOps mos6522_cuda_ops = {
-+    .read = mos6522_cuda_read,
-+    .write = mos6522_cuda_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
- };
- 
- static const VMStateDescription vmstate_cuda = {
-@@ -823,18 +510,8 @@ static const VMStateDescription vmstate_cuda = {
-     .version_id = 4,
-     .minimum_version_id = 4,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT8(a, CUDAState),
--        VMSTATE_UINT8(b, CUDAState),
-         VMSTATE_UINT8(last_b, CUDAState),
--        VMSTATE_UINT8(dira, CUDAState),
--        VMSTATE_UINT8(dirb, CUDAState),
--        VMSTATE_UINT8(sr, CUDAState),
--        VMSTATE_UINT8(acr, CUDAState),
-         VMSTATE_UINT8(last_acr, CUDAState),
--        VMSTATE_UINT8(pcr, CUDAState),
--        VMSTATE_UINT8(ifr, CUDAState),
--        VMSTATE_UINT8(ier, CUDAState),
--        VMSTATE_UINT8(anh, CUDAState),
-         VMSTATE_INT32(data_in_size, CUDAState),
-         VMSTATE_INT32(data_in_index, CUDAState),
-         VMSTATE_INT32(data_out_index, CUDAState),
-@@ -844,8 +521,6 @@ static const VMStateDescription vmstate_cuda = {
-         VMSTATE_BUFFER(data_in, CUDAState),
-         VMSTATE_BUFFER(data_out, CUDAState),
-         VMSTATE_UINT32(tick_offset, CUDAState),
--        VMSTATE_STRUCT_ARRAY(timers, CUDAState, 2, 1,
--                             vmstate_cuda_timer, CUDATimer),
-         VMSTATE_TIMER_PTR(adb_poll_timer, CUDAState),
-         VMSTATE_TIMER_PTR(sr_delay_timer, CUDAState),
-         VMSTATE_END_OF_LIST()
-@@ -856,61 +531,48 @@ static void cuda_reset(DeviceState *dev)
- {
-     CUDAState *s = CUDA(dev);
- 
--    s->b = 0;
--    s->a = 0;
--    s->dirb = 0xff;
--    s->dira = 0;
--    s->sr = 0;
--    s->acr = 0;
--    s->pcr = 0;
--    s->ifr = 0;
--    s->ier = 0;
--    //    s->ier = T1_INT | SR_INT;
--    s->anh = 0;
-     s->data_in_size = 0;
-     s->data_in_index = 0;
-     s->data_out_index = 0;
-     s->autopoll = 0;
--
--    s->timers[0].latch = 0xffff;
--    set_counter(s, &s->timers[0], 0xffff);
--
--    s->timers[1].latch = 0xffff;
--
--    s->sr_delay_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_set_sr_int, s);
- }
- 
--static void cuda_realizefn(DeviceState *dev, Error **errp)
-+static void cuda_realize(DeviceState *dev, Error **errp)
- {
-     CUDAState *s = CUDA(dev);
-+    SysBusDevice *sbd;
-+    MOS6522State *ms;
-+    DeviceState *d;
-     struct tm tm;
- 
--    s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer1, s);
--    s->timers[0].frequency = CUDA_TIMER_FREQ;
--    s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer2, s);
--    s->timers[1].frequency = (SCALE_US * 6000) / 4700;
-+    d = qdev_create(NULL, TYPE_MOS6522_CUDA);
-+    object_property_set_link(OBJECT(d), OBJECT(s), "cuda", errp);
-+    qdev_init_nofail(d);
-+    s->mos6522_cuda = MOS6522_CUDA(d);
++void ppc4xx_l2sram_init(CPUPPCState *env);
++void ppc4xx_cpr_init(CPUPPCState *env);
++void ppc4xx_sdr_init(CPUPPCState *env);
++void ppc440_sdram_init(CPUPPCState *env, int nbanks,
++                       MemoryRegion *ram_memories,
++                       hwaddr *ram_bases, hwaddr *ram_sizes,
++                       int do_init);
++void ppc4xx_ahb_init(CPUPPCState *env);
++void ppc460ex_pcie_init(CPUPPCState *env);
 +
-+    /* Pass IRQ from 6522 */
-+    ms = MOS6522(d);
-+    sbd = SYS_BUS_DEVICE(s);
-+    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
- 
-     qemu_get_timedate(&tm, 0);
-     s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
- 
-+    s->sr_delay_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_set_sr_int, s);
-+    s->sr_delay_ns = 300 * SCALE_US;
++#endif /* PPC440_H */
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+new file mode 100644
+index 0000000000..4e2523a64f
+--- /dev/null
++++ b/hw/ppc/ppc440_uc.c
+@@ -0,0 +1,1159 @@
++/*
++ * QEMU PowerPC 440 embedded processors emulation
++ *
++ * Copyright (c) 2012 Fran=C3=A7ois Revol
++ * Copyright (c) 2016-2018 BALATON Zoltan
++ *
++ * This work is licensed under the GNU GPL license version 2 or later.
++ *
++ */
 +
-     s->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_adb_poll, s);
--    s->autopoll_rate_ms = 20;
-     s->adb_poll_mask = 0xffff;
-+    s->autopoll_rate_ms = 20;
- }
- 
--static void cuda_initfn(Object *obj)
-+static void cuda_init(Object *obj)
- {
--    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-     CUDAState *s = CUDA(obj);
--    int i;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
- 
--    memory_region_init_io(&s->mem, obj, &cuda_ops, s, "cuda", 0x2000);
--    sysbus_init_mmio(d, &s->mem);
--    sysbus_init_irq(d, &s->irq);
--
--    for (i = 0; i < ARRAY_SIZE(s->timers); i++) {
--        s->timers[i].index = i;
--    }
-+    memory_region_init_io(&s->mem, obj, &mos6522_cuda_ops, s, "cuda", 0x2000);
-+    sysbus_init_mmio(sbd, &s->mem);
- 
-     qbus_create_inplace(&s->adb_bus, sizeof(s->adb_bus), TYPE_ADB_BUS,
-                         DEVICE(obj), "adb.0");
-@@ -925,7 +587,7 @@ static void cuda_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
--    dc->realize = cuda_realizefn;
-+    dc->realize = cuda_realize;
-     dc->reset = cuda_reset;
-     dc->vmsd = &vmstate_cuda;
-     dc->props = cuda_properties;
-@@ -936,12 +598,62 @@ static const TypeInfo cuda_type_info = {
-     .name = TYPE_CUDA,
-     .parent = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(CUDAState),
--    .instance_init = cuda_initfn,
-+    .instance_init = cuda_init,
-     .class_init = cuda_class_init,
- };
- 
-+static void mos6522_cuda_portB_write(MOS6522State *s)
-+{
-+    MOS6522CUDAState *mcs = container_of(s, MOS6522CUDAState, parent_obj);
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/cutils.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "exec/address-spaces.h"
++#include "exec/memory.h"
++#include "hw/ppc/ppc.h"
++#include "hw/pci/pci.h"
++#include "sysemu/block-backend.h"
++#include "hw/ppc/ppc440.h"
 +
-+    cuda_update(mcs->cuda);
-+}
-+
-+static void mos6522_cuda_realize(DeviceState *dev, Error **errp)
-+{
-+    MOS6522State *ms = MOS6522(dev);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-+
-+    mdc->parent_realize(dev, errp);
-+
-+    ms->timers[0].frequency = CUDA_TIMER_FREQ;
-+    ms->timers[1].frequency = (SCALE_US * 6000) / 4700;
-+}
-+
-+static void mos6522_cuda_init(Object *obj)
-+{
-+    MOS6522CUDAState *s = MOS6522_CUDA(obj);
-+
-+    object_property_add_link(obj, "cuda", TYPE_CUDA,
-+                             (Object **) &s->cuda,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             0, NULL);
-+}
-+
-+static void mos6522_cuda_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->realize = mos6522_cuda_realize;
-+    mdc->portB_write = mos6522_cuda_portB_write;
-+    mdc->get_timer1_counter_value = cuda_get_counter_value;
-+    mdc->get_timer2_counter_value = cuda_get_counter_value;
-+    mdc->get_timer1_load_time = cuda_get_load_time;
-+    mdc->get_timer2_load_time = cuda_get_load_time;
-+}
-+
-+static const TypeInfo mos6522_cuda_type_info = {
-+    .name = TYPE_MOS6522_CUDA,
-+    .parent = TYPE_MOS6522,
-+    .instance_size = sizeof(MOS6522CUDAState),
-+    .instance_init = mos6522_cuda_init,
-+    .class_init = mos6522_cuda_class_init,
++/***********************************************************************=
+******/
++/* L2 Cache as SRAM */
++/* FIXME:fix names */
++enum {
++    DCR_L2CACHE_BASE  =3D 0x30,
++    DCR_L2CACHE_CFG   =3D DCR_L2CACHE_BASE,
++    DCR_L2CACHE_CMD,
++    DCR_L2CACHE_ADDR,
++    DCR_L2CACHE_DATA,
++    DCR_L2CACHE_STAT,
++    DCR_L2CACHE_CVER,
++    DCR_L2CACHE_SNP0,
++    DCR_L2CACHE_SNP1,
++    DCR_L2CACHE_END   =3D DCR_L2CACHE_SNP1,
 +};
 +
- static void cuda_register_types(void)
- {
-+    type_register_static(&mos6522_cuda_type_info);
-     type_register_static(&cuda_type_info);
- }
- 
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index fa78115c95..3e9f13d9b4 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -30,6 +30,7 @@
- #include "hw/sysbus.h"
- #include "hw/ide/internal.h"
- #include "hw/input/adb.h"
-+#include "hw/misc/mos6522.h"
- 
- /* SMP is not enabled, for now */
- #define MAX_CPUS 1
-@@ -44,59 +45,48 @@
- 
- #define ESCC_CLOCK 3686400
- 
-+/* CUDA commands (2nd byte) */
-+#define CUDA_WARM_START                0x0
-+#define CUDA_AUTOPOLL                  0x1
-+#define CUDA_GET_6805_ADDR             0x2
-+#define CUDA_GET_TIME                  0x3
-+#define CUDA_GET_PRAM                  0x7
-+#define CUDA_SET_6805_ADDR             0x8
-+#define CUDA_SET_TIME                  0x9
-+#define CUDA_POWERDOWN                 0xa
-+#define CUDA_POWERUP_TIME              0xb
-+#define CUDA_SET_PRAM                  0xc
-+#define CUDA_MS_RESET                  0xd
-+#define CUDA_SEND_DFAC                 0xe
-+#define CUDA_BATTERY_SWAP_SENSE        0x10
-+#define CUDA_RESET_SYSTEM              0x11
-+#define CUDA_SET_IPL                   0x12
-+#define CUDA_FILE_SERVER_FLAG          0x13
-+#define CUDA_SET_AUTO_RATE             0x14
-+#define CUDA_GET_AUTO_RATE             0x16
-+#define CUDA_SET_DEVICE_LIST           0x19
-+#define CUDA_GET_DEVICE_LIST           0x1a
-+#define CUDA_SET_ONE_SECOND_MODE       0x1b
-+#define CUDA_SET_POWER_MESSAGES        0x21
-+#define CUDA_GET_SET_IIC               0x22
-+#define CUDA_WAKEUP                    0x23
-+#define CUDA_TIMER_TICKLE              0x24
-+#define CUDA_COMBINED_FORMAT_IIC       0x25
++/* base is 460ex-specific, cf. U-Boot, ppc4xx-isram.h */
++enum {
++    DCR_ISRAM0_BASE   =3D 0x20,
++    DCR_ISRAM0_SB0CR  =3D DCR_ISRAM0_BASE,
++    DCR_ISRAM0_SB1CR,
++    DCR_ISRAM0_SB2CR,
++    DCR_ISRAM0_SB3CR,
++    DCR_ISRAM0_BEAR,
++    DCR_ISRAM0_BESR0,
++    DCR_ISRAM0_BESR1,
++    DCR_ISRAM0_PMEG,
++    DCR_ISRAM0_CID,
++    DCR_ISRAM0_REVID,
++    DCR_ISRAM0_DPC,
++    DCR_ISRAM0_END    =3D DCR_ISRAM0_DPC
++};
 +
- /* Cuda */
- #define TYPE_CUDA "cuda"
- #define CUDA(obj) OBJECT_CHECK(CUDAState, (obj), TYPE_CUDA)
- 
--/**
-- * CUDATimer:
-- * @counter_value: counter value at load time
-- */
--typedef struct CUDATimer {
--    int index;
--    uint16_t latch;
--    uint16_t counter_value;
--    int64_t load_time;
--    int64_t next_irq_time;
--    uint64_t frequency;
--    QEMUTimer *timer;
--} CUDATimer;
--
--/**
-- * CUDAState:
-- * @b: B-side data
-- * @a: A-side data
-- * @dirb: B-side direction (1=output)
-- * @dira: A-side direction (1=output)
-- * @sr: Shift register
-- * @acr: Auxiliary control register
-- * @pcr: Peripheral control register
-- * @ifr: Interrupt flag register
-- * @ier: Interrupt enable register
-- * @anh: A-side data, no handshake
-- * @last_b: last value of B register
-- * @last_acr: last value of ACR register
-- */
-+typedef struct MOS6522CUDAState MOS6522CUDAState;
++enum {
++    DCR_ISRAM1_BASE   =3D 0xb0,
++    DCR_ISRAM1_SB0CR  =3D DCR_ISRAM1_BASE,
++    /* single bank */
++    DCR_ISRAM1_BEAR   =3D DCR_ISRAM1_BASE + 0x04,
++    DCR_ISRAM1_BESR0,
++    DCR_ISRAM1_BESR1,
++    DCR_ISRAM1_PMEG,
++    DCR_ISRAM1_CID,
++    DCR_ISRAM1_REVID,
++    DCR_ISRAM1_DPC,
++    DCR_ISRAM1_END    =3D DCR_ISRAM1_DPC
++};
 +
- typedef struct CUDAState {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
--
-     MemoryRegion mem;
--    /* cuda registers */
--    uint8_t b;
--    uint8_t a;
--    uint8_t dirb;
--    uint8_t dira;
--    uint8_t sr;
--    uint8_t acr;
--    uint8_t pcr;
--    uint8_t ifr;
--    uint8_t ier;
--    uint8_t anh;
- 
-     ADBBusState adb_bus;
--    CUDATimer timers[2];
-+    MOS6522CUDAState *mos6522_cuda;
- 
-     uint32_t tick_offset;
-     uint64_t tb_frequency;
-@@ -105,6 +95,7 @@ typedef struct CUDAState {
-     uint8_t last_acr;
- 
-     /* MacOS 9 is racy and requires a delay upon setting the SR_INT bit */
-+    uint64_t sr_delay_ns;
-     QEMUTimer *sr_delay_timer;
- 
-     int data_in_size;
-@@ -120,6 +111,18 @@ typedef struct CUDAState {
-     QEMUTimer *adb_poll_timer;
- } CUDAState;
- 
-+/* MOS6522 CUDA */
-+typedef struct MOS6522CUDAState {
-+    /*< private >*/
-+    MOS6522State parent_obj;
++typedef struct ppc4xx_l2sram_t {
++    MemoryRegion bank[4];
++    uint32_t l2cache[8];
++    uint32_t isram0[11];
++} ppc4xx_l2sram_t;
 +
-+    CUDAState *cuda;
-+} MOS6522CUDAState;
++#ifdef MAP_L2SRAM
++static void l2sram_update_mappings(ppc4xx_l2sram_t *l2sram,
++                                   uint32_t isarc, uint32_t isacntl,
++                                   uint32_t dsarc, uint32_t dsacntl)
++{
++    if (l2sram->isarc !=3D isarc ||
++        (l2sram->isacntl & 0x80000000) !=3D (isacntl & 0x80000000)) {
++        if (l2sram->isacntl & 0x80000000) {
++            /* Unmap previously assigned memory region */
++            memory_region_del_subregion(get_system_memory(),
++                                        &l2sram->isarc_ram);
++        }
++        if (isacntl & 0x80000000) {
++            /* Map new instruction memory region */
++            memory_region_add_subregion(get_system_memory(), isarc,
++                                        &l2sram->isarc_ram);
++        }
++    }
++    if (l2sram->dsarc !=3D dsarc ||
++        (l2sram->dsacntl & 0x80000000) !=3D (dsacntl & 0x80000000)) {
++        if (l2sram->dsacntl & 0x80000000) {
++            /* Beware not to unmap the region we just mapped */
++            if (!(isacntl & 0x80000000) || l2sram->dsarc !=3D isarc) {
++                /* Unmap previously assigned memory region */
++                memory_region_del_subregion(get_system_memory(),
++                                            &l2sram->dsarc_ram);
++            }
++        }
++        if (dsacntl & 0x80000000) {
++            /* Beware not to remap the region we just mapped */
++            if (!(isacntl & 0x80000000) || dsarc !=3D isarc) {
++                /* Map new data memory region */
++                memory_region_add_subregion(get_system_memory(), dsarc,
++                                            &l2sram->dsarc_ram);
++            }
++        }
++    }
++}
++#endif
 +
-+#define TYPE_MOS6522_CUDA "mos6522-cuda"
-+#define MOS6522_CUDA(obj) OBJECT_CHECK(MOS6522CUDAState, (obj), \
-+                                       TYPE_MOS6522_CUDA)
++static uint32_t dcr_read_l2sram(void *opaque, int dcrn)
++{
++    ppc4xx_l2sram_t *l2sram =3D opaque;
++    uint32_t ret =3D 0;
 +
- /* MacIO */
- #define TYPE_OLDWORLD_MACIO "macio-oldworld"
- #define TYPE_NEWWORLD_MACIO "macio-newworld"
--- 
++    switch (dcrn) {
++    case DCR_L2CACHE_CFG:
++    case DCR_L2CACHE_CMD:
++    case DCR_L2CACHE_ADDR:
++    case DCR_L2CACHE_DATA:
++    case DCR_L2CACHE_STAT:
++    case DCR_L2CACHE_CVER:
++    case DCR_L2CACHE_SNP0:
++    case DCR_L2CACHE_SNP1:
++        ret =3D l2sram->l2cache[dcrn - DCR_L2CACHE_BASE];
++        break;
++
++    case DCR_ISRAM0_SB0CR:
++    case DCR_ISRAM0_SB1CR:
++    case DCR_ISRAM0_SB2CR:
++    case DCR_ISRAM0_SB3CR:
++    case DCR_ISRAM0_BEAR:
++    case DCR_ISRAM0_BESR0:
++    case DCR_ISRAM0_BESR1:
++    case DCR_ISRAM0_PMEG:
++    case DCR_ISRAM0_CID:
++    case DCR_ISRAM0_REVID:
++    case DCR_ISRAM0_DPC:
++        ret =3D l2sram->isram0[dcrn - DCR_ISRAM0_BASE];
++        break;
++
++    default:
++        break;
++    }
++
++    return ret;
++}
++
++static void dcr_write_l2sram(void *opaque, int dcrn, uint32_t val)
++{
++    /*ppc4xx_l2sram_t *l2sram =3D opaque;*/
++    /* FIXME: Actually handle L2 cache mapping */
++
++    switch (dcrn) {
++    case DCR_L2CACHE_CFG:
++    case DCR_L2CACHE_CMD:
++    case DCR_L2CACHE_ADDR:
++    case DCR_L2CACHE_DATA:
++    case DCR_L2CACHE_STAT:
++    case DCR_L2CACHE_CVER:
++    case DCR_L2CACHE_SNP0:
++    case DCR_L2CACHE_SNP1:
++        /*l2sram->l2cache[dcrn - DCR_L2CACHE_BASE] =3D val;*/
++        break;
++
++    case DCR_ISRAM0_SB0CR:
++    case DCR_ISRAM0_SB1CR:
++    case DCR_ISRAM0_SB2CR:
++    case DCR_ISRAM0_SB3CR:
++    case DCR_ISRAM0_BEAR:
++    case DCR_ISRAM0_BESR0:
++    case DCR_ISRAM0_BESR1:
++    case DCR_ISRAM0_PMEG:
++    case DCR_ISRAM0_CID:
++    case DCR_ISRAM0_REVID:
++    case DCR_ISRAM0_DPC:
++        /*l2sram->isram0[dcrn - DCR_L2CACHE_BASE] =3D val;*/
++        break;
++
++    case DCR_ISRAM1_SB0CR:
++    case DCR_ISRAM1_BEAR:
++    case DCR_ISRAM1_BESR0:
++    case DCR_ISRAM1_BESR1:
++    case DCR_ISRAM1_PMEG:
++    case DCR_ISRAM1_CID:
++    case DCR_ISRAM1_REVID:
++    case DCR_ISRAM1_DPC:
++        /*l2sram->isram1[dcrn - DCR_L2CACHE_BASE] =3D val;*/
++        break;
++    }
++    /*l2sram_update_mappings(l2sram, isarc, isacntl, dsarc, dsacntl);*/
++}
++
++static void l2sram_reset(void *opaque)
++{
++    ppc4xx_l2sram_t *l2sram =3D opaque;
++
++    memset(l2sram->l2cache, 0, sizeof(l2sram->l2cache));
++    l2sram->l2cache[DCR_L2CACHE_STAT - DCR_L2CACHE_BASE] =3D 0x80000000;
++    memset(l2sram->isram0, 0, sizeof(l2sram->isram0));
++    /*l2sram_update_mappings(l2sram, isarc, isacntl, dsarc, dsacntl);*/
++}
++
++void ppc4xx_l2sram_init(CPUPPCState *env)
++{
++    ppc4xx_l2sram_t *l2sram;
++
++    l2sram =3D g_malloc0(sizeof(*l2sram));
++    /* XXX: Size is 4*64kB for 460ex, cf. U-Boot, ppc4xx-isram.h */
++    memory_region_init_ram(&l2sram->bank[0], NULL, "ppc4xx.l2sram_bank0"=
+,
++                           64 * K_BYTE, &error_abort);
++    memory_region_init_ram(&l2sram->bank[1], NULL, "ppc4xx.l2sram_bank1"=
+,
++                           64 * K_BYTE, &error_abort);
++    memory_region_init_ram(&l2sram->bank[2], NULL, "ppc4xx.l2sram_bank2"=
+,
++                           64 * K_BYTE, &error_abort);
++    memory_region_init_ram(&l2sram->bank[3], NULL, "ppc4xx.l2sram_bank3"=
+,
++                           64 * K_BYTE, &error_abort);
++    qemu_register_reset(&l2sram_reset, l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_CFG,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_CMD,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_ADDR,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_DATA,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_STAT,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_CVER,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_SNP0,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_L2CACHE_SNP1,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++
++    ppc_dcr_register(env, DCR_ISRAM0_SB0CR,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_ISRAM0_SB1CR,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_ISRAM0_SB2CR,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_ISRAM0_SB3CR,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_ISRAM0_PMEG,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_ISRAM0_DPC,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++
++    ppc_dcr_register(env, DCR_ISRAM1_SB0CR,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_ISRAM1_PMEG,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++    ppc_dcr_register(env, DCR_ISRAM1_DPC,
++                     l2sram, &dcr_read_l2sram, &dcr_write_l2sram);
++}
++
++/***********************************************************************=
+******/
++/* Clocking Power on Reset */
++enum {
++    CPR0_CFGADDR =3D 0xC,
++    CPR0_CFGDATA =3D 0xD,
++
++    CPR0_PLLD =3D 0x060,
++    CPR0_PLBED =3D 0x080,
++    CPR0_OPBD =3D 0x0C0,
++    CPR0_PERD =3D 0x0E0,
++    CPR0_AHBD =3D 0x100,
++};
++
++typedef struct ppc4xx_cpr_t {
++    uint32_t addr;
++} ppc4xx_cpr_t;
++
++static uint32_t dcr_read_cpr(void *opaque, int dcrn)
++{
++    ppc4xx_cpr_t *cpr =3D opaque;
++    uint32_t ret =3D 0;
++
++    switch (dcrn) {
++    case CPR0_CFGADDR:
++        ret =3D cpr->addr;
++        break;
++    case CPR0_CFGDATA:
++        switch (cpr->addr) {
++        case CPR0_PLLD:
++            ret =3D (0xb5 << 24) | (1 << 16) | (9 << 8);
++            break;
++        case CPR0_PLBED:
++            ret =3D (5 << 24);
++            break;
++        case CPR0_OPBD:
++            ret =3D (2 << 24);
++            break;
++        case CPR0_PERD:
++        case CPR0_AHBD:
++            ret =3D (1 << 24);
++            break;
++        default:
++            break;
++        }
++        break;
++    default:
++        break;
++    }
++
++    return ret;
++}
++
++static void dcr_write_cpr(void *opaque, int dcrn, uint32_t val)
++{
++    ppc4xx_cpr_t *cpr =3D opaque;
++
++    switch (dcrn) {
++    case CPR0_CFGADDR:
++        cpr->addr =3D val;
++        break;
++    case CPR0_CFGDATA:
++        break;
++    default:
++        break;
++    }
++}
++
++static void ppc4xx_cpr_reset(void *opaque)
++{
++    ppc4xx_cpr_t *cpr =3D opaque;
++
++    cpr->addr =3D 0;
++}
++
++void ppc4xx_cpr_init(CPUPPCState *env)
++{
++    ppc4xx_cpr_t *cpr;
++
++    cpr =3D g_malloc0(sizeof(*cpr));
++    ppc_dcr_register(env, CPR0_CFGADDR, cpr, &dcr_read_cpr, &dcr_write_c=
+pr);
++    ppc_dcr_register(env, CPR0_CFGDATA, cpr, &dcr_read_cpr, &dcr_write_c=
+pr);
++    qemu_register_reset(ppc4xx_cpr_reset, cpr);
++}
++
++/***********************************************************************=
+******/
++/* System DCRs */
++typedef struct ppc4xx_sdr_t ppc4xx_sdr_t;
++struct ppc4xx_sdr_t {
++    uint32_t addr;
++};
++
++enum {
++    SDR0_CFGADDR =3D 0x00e,
++    SDR0_CFGDATA,
++    SDR0_STRP0 =3D 0x020,
++    SDR0_STRP1,
++    SDR0_102 =3D 0x66,
++    SDR0_103,
++    SDR0_128 =3D 0x80,
++    SDR0_ECID3 =3D 0x083,
++    SDR0_DDR0 =3D 0x0e1,
++    SDR0_USB0 =3D 0x320,
++};
++
++enum {
++    PESDR0_LOOP =3D 0x303,
++    PESDR0_RCSSET,
++    PESDR0_RCSSTS,
++    PESDR0_RSTSTA =3D 0x310,
++    PESDR1_LOOP =3D 0x343,
++    PESDR1_RCSSET,
++    PESDR1_RCSSTS,
++    PESDR1_RSTSTA =3D 0x365,
++};
++
++#define SDR0_DDR0_DDRM_ENCODE(n)  ((((unsigned long)(n)) & 0x03) << 29)
++#define SDR0_DDR0_DDRM_DDR1       0x20000000
++#define SDR0_DDR0_DDRM_DDR2       0x40000000
++
++static uint32_t dcr_read_sdr(void *opaque, int dcrn)
++{
++    ppc4xx_sdr_t *sdr =3D opaque;
++    uint32_t ret =3D 0;
++
++    switch (dcrn) {
++    case SDR0_CFGADDR:
++        ret =3D sdr->addr;
++        break;
++    case SDR0_CFGDATA:
++        switch (sdr->addr) {
++        case SDR0_STRP0:
++            /* FIXME: Is this correct? This breaks timing in U-Boot */
++            ret =3D 0; /*(0xb5 << 8) | (1 << 4) | 9 */
++            break;
++        case SDR0_STRP1:
++            ret =3D (5 << 29) | (2 << 26) | (1 << 24);
++            break;
++        case SDR0_ECID3:
++            ret =3D 1 << 20; /* No Security/Kasumi support */
++            break;
++        case SDR0_DDR0:
++            ret =3D SDR0_DDR0_DDRM_ENCODE(1) | SDR0_DDR0_DDRM_DDR1;
++            break;
++        case PESDR0_RCSSET:
++        case PESDR1_RCSSET:
++            ret =3D (1 << 24) | (1 << 16);
++            break;
++        case PESDR0_RCSSTS:
++        case PESDR1_RCSSTS:
++            ret =3D (1 << 16) | (1 << 12);
++            break;
++        case PESDR0_RSTSTA:
++        case PESDR1_RSTSTA:
++            ret =3D 1;
++            break;
++        case PESDR0_LOOP:
++        case PESDR1_LOOP:
++            ret =3D 1 << 12;
++            break;
++        default:
++            break;
++        }
++        break;
++    default:
++        break;
++    }
++
++    return ret;
++}
++
++static void dcr_write_sdr(void *opaque, int dcrn, uint32_t val)
++{
++    ppc4xx_sdr_t *sdr =3D opaque;
++
++    switch (dcrn) {
++    case SDR0_CFGADDR:
++        sdr->addr =3D val;
++        break;
++    case SDR0_CFGDATA:
++        switch (sdr->addr) {
++        case 0x00: /* B0CR */
++            break;
++        default:
++            break;
++        }
++        break;
++    default:
++        break;
++    }
++}
++
++static void sdr_reset(void *opaque)
++{
++    ppc4xx_sdr_t *sdr =3D opaque;
++
++    sdr->addr =3D 0;
++}
++
++void ppc4xx_sdr_init(CPUPPCState *env)
++{
++    ppc4xx_sdr_t *sdr;
++
++    sdr =3D g_malloc0(sizeof(*sdr));
++    qemu_register_reset(&sdr_reset, sdr);
++    ppc_dcr_register(env, SDR0_CFGADDR,
++                     sdr, &dcr_read_sdr, &dcr_write_sdr);
++    ppc_dcr_register(env, SDR0_CFGDATA,
++                     sdr, &dcr_read_sdr, &dcr_write_sdr);
++    ppc_dcr_register(env, SDR0_102,
++                     sdr, &dcr_read_sdr, &dcr_write_sdr);
++    ppc_dcr_register(env, SDR0_103,
++                     sdr, &dcr_read_sdr, &dcr_write_sdr);
++    ppc_dcr_register(env, SDR0_128,
++                     sdr, &dcr_read_sdr, &dcr_write_sdr);
++    ppc_dcr_register(env, SDR0_USB0,
++                     sdr, &dcr_read_sdr, &dcr_write_sdr);
++}
++
++/***********************************************************************=
+******/
++/* SDRAM controller */
++typedef struct ppc4xx_sdram_t {
++    uint32_t addr;
++    int nbanks;
++    MemoryRegion containers[4]; /* used for clipping */
++    MemoryRegion *ram_memories;
++    hwaddr ram_bases[4];
++    hwaddr ram_sizes[4];
++    uint32_t bcr[4];
++} ppc4xx_sdram_t;
++
++enum {
++    SDRAM0_CFGADDR =3D 0x10,
++    SDRAM0_CFGDATA,
++    SDRAM_R0BAS =3D 0x40,
++    SDRAM_R1BAS,
++    SDRAM_R2BAS,
++    SDRAM_R3BAS,
++    SDRAM_CONF1HB =3D 0x45,
++    SDRAM_PLBADDULL =3D 0x4a,
++    SDRAM_CONF1LL =3D 0x4b,
++    SDRAM_CONFPATHB =3D 0x4f,
++    SDRAM_PLBADDUHB =3D 0x50,
++};
++
++/* XXX: TOFIX: some patches have made this code become inconsistent:
++ *      there are type inconsistencies, mixing hwaddr, target_ulong
++ *      and uint32_t
++ */
++static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
++{
++    uint32_t bcr;
++
++    switch (ram_size) {
++    case (8 * M_BYTE):
++        bcr =3D 0xffc0;
++        break;
++    case (16 * M_BYTE):
++        bcr =3D 0xff80;
++        break;
++    case (32 * M_BYTE):
++        bcr =3D 0xff00;
++        break;
++    case (64 * M_BYTE):
++        bcr =3D 0xfe00;
++        break;
++    case (128 * M_BYTE):
++        bcr =3D 0xfc00;
++        break;
++    case (256 * M_BYTE):
++        bcr =3D 0xf800;
++        break;
++    case (512 * M_BYTE):
++        bcr =3D 0xf000;
++        break;
++    case (1 * G_BYTE):
++        bcr =3D 0xe000;
++        break;
++    default:
++        error_report("invalid RAM size " TARGET_FMT_plx, ram_size);
++        return 0;
++    }
++    bcr |=3D ram_base & 0xFF800000;
++    bcr |=3D 1;
++
++    return bcr;
++}
++
++static inline hwaddr sdram_base(uint32_t bcr)
++{
++    return bcr & 0xFF800000;
++}
++
++static target_ulong sdram_size(uint32_t bcr)
++{
++    target_ulong size;
++    int sh;
++
++    sh =3D 1024 - ((bcr >> 6) & 0x3ff);
++    if (sh =3D=3D 0) {
++        size =3D -1;
++    } else {
++        size =3D 8 * M_BYTE * sh;
++    }
++
++    return size;
++}
++
++static void sdram_set_bcr(ppc4xx_sdram_t *sdram,
++                          uint32_t *bcrp, uint32_t bcr, int enabled)
++{
++    unsigned n =3D bcrp - sdram->bcr;
++
++    if (*bcrp & 1) {
++        /* Unmap RAM */
++        memory_region_del_subregion(get_system_memory(),
++                                    &sdram->containers[n]);
++        memory_region_del_subregion(&sdram->containers[n],
++                                    &sdram->ram_memories[n]);
++        object_unparent(OBJECT(&sdram->containers[n]));
++    }
++    *bcrp =3D bcr & 0xFFDEE001;
++    if (enabled && (bcr & 1)) {
++        memory_region_init(&sdram->containers[n], NULL, "sdram-container=
+s",
++                           sdram_size(bcr));
++        memory_region_add_subregion(&sdram->containers[n], 0,
++                                    &sdram->ram_memories[n]);
++        memory_region_add_subregion(get_system_memory(),
++                                    sdram_base(bcr),
++                                    &sdram->containers[n]);
++    }
++}
++
++static void sdram_map_bcr(ppc4xx_sdram_t *sdram)
++{
++    int i;
++
++    for (i =3D 0; i < sdram->nbanks; i++) {
++        if (sdram->ram_sizes[i] !=3D 0) {
++            sdram_set_bcr(sdram,
++                          &sdram->bcr[i],
++                          sdram_bcr(sdram->ram_bases[i], sdram->ram_size=
+s[i]),
++                          1);
++        } else {
++            sdram_set_bcr(sdram, &sdram->bcr[i], 0, 0);
++        }
++    }
++}
++
++static uint32_t dcr_read_sdram(void *opaque, int dcrn)
++{
++    ppc4xx_sdram_t *sdram =3D opaque;
++    uint32_t ret =3D 0;
++
++    switch (dcrn) {
++    case SDRAM_R0BAS:
++    case SDRAM_R1BAS:
++    case SDRAM_R2BAS:
++    case SDRAM_R3BAS:
++        ret =3D sdram_bcr(sdram->ram_bases[dcrn - SDRAM_R0BAS],
++                        sdram->ram_sizes[dcrn - SDRAM_R0BAS]);
++        break;
++    case SDRAM_CONF1HB:
++    case SDRAM_CONF1LL:
++    case SDRAM_CONFPATHB:
++    case SDRAM_PLBADDULL:
++    case SDRAM_PLBADDUHB:
++        break;
++    case SDRAM0_CFGADDR:
++        ret =3D sdram->addr;
++        break;
++    case SDRAM0_CFGDATA:
++        switch (sdram->addr) {
++        case 0x14: /* SDRAM_MCSTAT (405EX) */
++        case 0x1F:
++            ret =3D 0x80000000;
++            break;
++        case 0x21: /* SDRAM_MCOPT2 */
++            ret =3D 0x08000000;
++            break;
++        case 0x40: /* SDRAM_MB0CF */
++            ret =3D 0x00008001;
++            break;
++        case 0x7A: /* SDRAM_DLCR */
++            ret =3D 0x02000000;
++            break;
++        case 0xE1: /* SDR0_DDR0 */
++            ret =3D SDR0_DDR0_DDRM_ENCODE(1) | SDR0_DDR0_DDRM_DDR1;
++            break;
++        default:
++            break;
++        }
++        break;
++    default:
++        break;
++    }
++
++    return ret;
++}
++
++static void dcr_write_sdram(void *opaque, int dcrn, uint32_t val)
++{
++    ppc4xx_sdram_t *sdram =3D opaque;
++
++    switch (dcrn) {
++    case SDRAM_R0BAS:
++    case SDRAM_R1BAS:
++    case SDRAM_R2BAS:
++    case SDRAM_R3BAS:
++    case SDRAM_CONF1HB:
++    case SDRAM_CONF1LL:
++    case SDRAM_CONFPATHB:
++    case SDRAM_PLBADDULL:
++    case SDRAM_PLBADDUHB:
++        break;
++    case SDRAM0_CFGADDR:
++        sdram->addr =3D val;
++        break;
++    case SDRAM0_CFGDATA:
++        switch (sdram->addr) {
++        case 0x00: /* B0CR */
++            break;
++        default:
++            break;
++        }
++        break;
++    default:
++        break;
++    }
++}
++
++static void sdram_reset(void *opaque)
++{
++    ppc4xx_sdram_t *sdram =3D opaque;
++
++    sdram->addr =3D 0;
++}
++
++void ppc440_sdram_init(CPUPPCState *env, int nbanks,
++                       MemoryRegion *ram_memories,
++                       hwaddr *ram_bases, hwaddr *ram_sizes,
++                       int do_init)
++{
++    ppc4xx_sdram_t *sdram;
++
++    sdram =3D g_malloc0(sizeof(*sdram));
++    sdram->nbanks =3D nbanks;
++    sdram->ram_memories =3D ram_memories;
++    memcpy(sdram->ram_bases, ram_bases, nbanks * sizeof(hwaddr));
++    memcpy(sdram->ram_sizes, ram_sizes, nbanks * sizeof(hwaddr));
++    qemu_register_reset(&sdram_reset, sdram);
++    ppc_dcr_register(env, SDRAM0_CFGADDR,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM0_CFGDATA,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    if (do_init) {
++        sdram_map_bcr(sdram);
++    }
++
++    ppc_dcr_register(env, SDRAM_R0BAS,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_R1BAS,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_R2BAS,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_R3BAS,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_CONF1HB,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_PLBADDULL,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_CONF1LL,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_CONFPATHB,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++    ppc_dcr_register(env, SDRAM_PLBADDUHB,
++                     sdram, &dcr_read_sdram, &dcr_write_sdram);
++}
++
++/***********************************************************************=
+******/
++/* PLB to AHB bridge */
++enum {
++    AHB_TOP    =3D 0xA4,
++    AHB_BOT    =3D 0xA5,
++};
++
++typedef struct ppc4xx_ahb_t {
++    uint32_t top;
++    uint32_t bot;
++} ppc4xx_ahb_t;
++
++static uint32_t dcr_read_ahb(void *opaque, int dcrn)
++{
++    ppc4xx_ahb_t *ahb =3D opaque;
++    uint32_t ret =3D 0;
++
++    switch (dcrn) {
++    case AHB_TOP:
++        ret =3D ahb->top;
++        break;
++    case AHB_BOT:
++        ret =3D ahb->bot;
++        break;
++    default:
++        break;
++    }
++
++    return ret;
++}
++
++static void dcr_write_ahb(void *opaque, int dcrn, uint32_t val)
++{
++    ppc4xx_ahb_t *ahb =3D opaque;
++
++    switch (dcrn) {
++    case AHB_TOP:
++        ahb->top =3D val;
++        break;
++    case AHB_BOT:
++        ahb->bot =3D val;
++        break;
++    }
++}
++
++static void ppc4xx_ahb_reset(void *opaque)
++{
++    ppc4xx_ahb_t *ahb =3D opaque;
++
++    /* No error */
++    ahb->top =3D 0;
++    ahb->bot =3D 0;
++}
++
++void ppc4xx_ahb_init(CPUPPCState *env)
++{
++    ppc4xx_ahb_t *ahb;
++
++    ahb =3D g_malloc0(sizeof(*ahb));
++    ppc_dcr_register(env, AHB_TOP, ahb, &dcr_read_ahb, &dcr_write_ahb);
++    ppc_dcr_register(env, AHB_BOT, ahb, &dcr_read_ahb, &dcr_write_ahb);
++    qemu_register_reset(ppc4xx_ahb_reset, ahb);
++}
++
++/***********************************************************************=
+******/
++/* PCI Express controller */
++/* FIXME: This is not complete and does not work, only implemented parti=
+ally
++ * to allow firmware and guests to find an empty bus. Cards should use P=
+CI.
++ */
++#include "hw/pci/pcie_host.h"
++
++#define TYPE_PPC460EX_PCIE_HOST "ppc460ex-pcie-host"
++#define PPC460EX_PCIE_HOST(obj) \
++    OBJECT_CHECK(PPC460EXPCIEState, (obj), TYPE_PPC460EX_PCIE_HOST)
++
++typedef struct PPC460EXPCIEState {
++    PCIExpressHost host;
++
++    MemoryRegion iomem;
++    qemu_irq irq[4];
++    int32_t dcrn_base;
++
++    uint64_t cfg_base;
++    uint32_t cfg_mask;
++    uint64_t msg_base;
++    uint32_t msg_mask;
++    uint64_t omr1_base;
++    uint64_t omr1_mask;
++    uint64_t omr2_base;
++    uint64_t omr2_mask;
++    uint64_t omr3_base;
++    uint64_t omr3_mask;
++    uint64_t reg_base;
++    uint32_t reg_mask;
++    uint32_t special;
++    uint32_t cfg;
++} PPC460EXPCIEState;
++
++#define DCRN_PCIE0_BASE 0x100
++#define DCRN_PCIE1_BASE 0x120
++
++enum {
++    PEGPL_CFGBAH =3D 0x0,
++    PEGPL_CFGBAL,
++    PEGPL_CFGMSK,
++    PEGPL_MSGBAH,
++    PEGPL_MSGBAL,
++    PEGPL_MSGMSK,
++    PEGPL_OMR1BAH,
++    PEGPL_OMR1BAL,
++    PEGPL_OMR1MSKH,
++    PEGPL_OMR1MSKL,
++    PEGPL_OMR2BAH,
++    PEGPL_OMR2BAL,
++    PEGPL_OMR2MSKH,
++    PEGPL_OMR2MSKL,
++    PEGPL_OMR3BAH,
++    PEGPL_OMR3BAL,
++    PEGPL_OMR3MSKH,
++    PEGPL_OMR3MSKL,
++    PEGPL_REGBAH,
++    PEGPL_REGBAL,
++    PEGPL_REGMSK,
++    PEGPL_SPECIAL,
++    PEGPL_CFG,
++};
++
++static uint32_t dcr_read_pcie(void *opaque, int dcrn)
++{
++    PPC460EXPCIEState *state =3D opaque;
++    uint32_t ret =3D 0;
++
++    switch (dcrn - state->dcrn_base) {
++    case PEGPL_CFGBAH:
++        ret =3D state->cfg_base >> 32;
++        break;
++    case PEGPL_CFGBAL:
++        ret =3D state->cfg_base;
++        break;
++    case PEGPL_CFGMSK:
++        ret =3D state->cfg_mask;
++        break;
++    case PEGPL_MSGBAH:
++        ret =3D state->msg_base >> 32;
++        break;
++    case PEGPL_MSGBAL:
++        ret =3D state->msg_base;
++        break;
++    case PEGPL_MSGMSK:
++        ret =3D state->msg_mask;
++        break;
++    case PEGPL_OMR1BAH:
++        ret =3D state->omr1_base >> 32;
++        break;
++    case PEGPL_OMR1BAL:
++        ret =3D state->omr1_base;
++        break;
++    case PEGPL_OMR1MSKH:
++        ret =3D state->omr1_mask >> 32;
++        break;
++    case PEGPL_OMR1MSKL:
++        ret =3D state->omr1_mask;
++        break;
++    case PEGPL_OMR2BAH:
++        ret =3D state->omr2_base >> 32;
++        break;
++    case PEGPL_OMR2BAL:
++        ret =3D state->omr2_base;
++        break;
++    case PEGPL_OMR2MSKH:
++        ret =3D state->omr2_mask >> 32;
++        break;
++    case PEGPL_OMR2MSKL:
++        ret =3D state->omr3_mask;
++        break;
++    case PEGPL_OMR3BAH:
++        ret =3D state->omr3_base >> 32;
++        break;
++    case PEGPL_OMR3BAL:
++        ret =3D state->omr3_base;
++        break;
++    case PEGPL_OMR3MSKH:
++        ret =3D state->omr3_mask >> 32;
++        break;
++    case PEGPL_OMR3MSKL:
++        ret =3D state->omr3_mask;
++        break;
++    case PEGPL_REGBAH:
++        ret =3D state->reg_base >> 32;
++        break;
++    case PEGPL_REGBAL:
++        ret =3D state->reg_base;
++        break;
++    case PEGPL_REGMSK:
++        ret =3D state->reg_mask;
++        break;
++    case PEGPL_SPECIAL:
++        ret =3D state->special;
++        break;
++    case PEGPL_CFG:
++        ret =3D state->cfg;
++        break;
++    }
++
++    return ret;
++}
++
++static void dcr_write_pcie(void *opaque, int dcrn, uint32_t val)
++{
++    PPC460EXPCIEState *s =3D opaque;
++    uint64_t size;
++
++    switch (dcrn - s->dcrn_base) {
++    case PEGPL_CFGBAH:
++        s->cfg_base =3D ((uint64_t)val << 32) | (s->cfg_base & 0xfffffff=
+f);
++        break;
++    case PEGPL_CFGBAL:
++        s->cfg_base =3D (s->cfg_base & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_CFGMSK:
++        s->cfg_mask =3D val;
++        size =3D ~(val & 0xfffffffe) + 1;
++        qemu_mutex_lock_iothread();
++        pcie_host_mmcfg_update(PCIE_HOST_BRIDGE(s), val & 1, s->cfg_base=
+, size);
++        qemu_mutex_unlock_iothread();
++        break;
++    case PEGPL_MSGBAH:
++        s->msg_base =3D ((uint64_t)val << 32) | (s->msg_base & 0xfffffff=
+f);
++        break;
++    case PEGPL_MSGBAL:
++        s->msg_base =3D (s->msg_base & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_MSGMSK:
++        s->msg_mask =3D val;
++        break;
++    case PEGPL_OMR1BAH:
++        s->omr1_base =3D ((uint64_t)val << 32) | (s->omr1_base & 0xfffff=
+fff);
++        break;
++    case PEGPL_OMR1BAL:
++        s->omr1_base =3D (s->omr1_base & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_OMR1MSKH:
++        s->omr1_mask =3D ((uint64_t)val << 32) | (s->omr1_mask & 0xfffff=
+fff);
++        break;
++    case PEGPL_OMR1MSKL:
++        s->omr1_mask =3D (s->omr1_mask & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_OMR2BAH:
++        s->omr2_base =3D ((uint64_t)val << 32) | (s->omr2_base & 0xfffff=
+fff);
++        break;
++    case PEGPL_OMR2BAL:
++        s->omr2_base =3D (s->omr2_base & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_OMR2MSKH:
++        s->omr2_mask =3D ((uint64_t)val << 32) | (s->omr2_mask & 0xfffff=
+fff);
++        break;
++    case PEGPL_OMR2MSKL:
++        s->omr2_mask =3D (s->omr2_mask & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_OMR3BAH:
++        s->omr3_base =3D ((uint64_t)val << 32) | (s->omr3_base & 0xfffff=
+fff);
++        break;
++    case PEGPL_OMR3BAL:
++        s->omr3_base =3D (s->omr3_base & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_OMR3MSKH:
++        s->omr3_mask =3D ((uint64_t)val << 32) | (s->omr3_mask & 0xfffff=
+fff);
++        break;
++    case PEGPL_OMR3MSKL:
++        s->omr3_mask =3D (s->omr3_mask & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_REGBAH:
++        s->reg_base =3D ((uint64_t)val << 32) | (s->reg_base & 0xfffffff=
+f);
++        break;
++    case PEGPL_REGBAL:
++        s->reg_base =3D (s->reg_base & 0xffffffff00000000ULL) | val;
++        break;
++    case PEGPL_REGMSK:
++        s->reg_mask =3D val;
++        /* FIXME: how is size encoded? */
++        size =3D (val =3D=3D 0x7001 ? 4096 : ~(val & 0xfffffffe) + 1);
++        break;
++    case PEGPL_SPECIAL:
++        s->special =3D val;
++        break;
++    case PEGPL_CFG:
++        s->cfg =3D val;
++        break;
++    }
++}
++
++static void ppc460ex_set_irq(void *opaque, int irq_num, int level)
++{
++       PPC460EXPCIEState *s =3D opaque;
++       qemu_set_irq(s->irq[irq_num], level);
++}
++
++static void ppc460ex_pcie_realize(DeviceState *dev, Error **errp)
++{
++    PPC460EXPCIEState *s =3D PPC460EX_PCIE_HOST(dev);
++    PCIHostState *pci =3D PCI_HOST_BRIDGE(dev);
++    int i, id;
++    char buf[16];
++
++    switch (s->dcrn_base) {
++    case DCRN_PCIE0_BASE:
++        id =3D 0;
++        break;
++    case DCRN_PCIE1_BASE:
++        id =3D 1;
++        break;
++    }
++    snprintf(buf, sizeof(buf), "pcie%d-io", id);
++    memory_region_init(&s->iomem, OBJECT(s), buf, UINT64_MAX);
++    for (i =3D 0; i < 4; i++) {
++        sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq[i]);
++    }
++    snprintf(buf, sizeof(buf), "pcie.%d", id);
++    pci->bus =3D pci_register_root_bus(DEVICE(s), buf, ppc460ex_set_irq,
++                                pci_swizzle_map_irq_fn, s, &s->iomem,
++                                get_system_io(), 0, 4, TYPE_PCIE_BUS);
++}
++
++static Property ppc460ex_pcie_props[] =3D {
++    DEFINE_PROP_INT32("dcrn-base", PPC460EXPCIEState, dcrn_base, -1),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void ppc460ex_pcie_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++    dc->realize =3D ppc460ex_pcie_realize;
++    dc->props =3D ppc460ex_pcie_props;
++    dc->hotpluggable =3D false;
++}
++
++static const TypeInfo ppc460ex_pcie_host_info =3D {
++    .name =3D TYPE_PPC460EX_PCIE_HOST,
++    .parent =3D TYPE_PCIE_HOST_BRIDGE,
++    .instance_size =3D sizeof(PPC460EXPCIEState),
++    .class_init =3D ppc460ex_pcie_class_init,
++};
++
++static void ppc460ex_pcie_register(void)
++{
++    type_register_static(&ppc460ex_pcie_host_info);
++}
++
++type_init(ppc460ex_pcie_register)
++
++static void ppc460ex_pcie_register_dcrs(PPC460EXPCIEState *s, CPUPPCStat=
+e *env)
++{
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_CFGBAH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_CFGBAL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_CFGMSK, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_MSGBAH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_MSGBAL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_MSGMSK, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR1BAH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR1BAL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR1MSKH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR1MSKL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR2BAH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR2BAL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR2MSKH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR2MSKL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR3BAH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR3BAL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR3MSKH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_OMR3MSKL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_REGBAH, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_REGBAL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_REGMSK, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_SPECIAL, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++    ppc_dcr_register(env, s->dcrn_base + PEGPL_CFG, s,
++                     &dcr_read_pcie, &dcr_write_pcie);
++}
++
++void ppc460ex_pcie_init(CPUPPCState *env)
++{
++    DeviceState *dev;
++
++    dev =3D qdev_create(NULL, TYPE_PPC460EX_PCIE_HOST);
++    qdev_prop_set_int32(dev, "dcrn-base", DCRN_PCIE0_BASE);
++    qdev_init_nofail(dev);
++    object_property_set_bool(OBJECT(dev), true, "realized", NULL);
++    ppc460ex_pcie_register_dcrs(PPC460EX_PCIE_HOST(dev), env);
++
++    dev =3D qdev_create(NULL, TYPE_PPC460EX_PCIE_HOST);
++    qdev_prop_set_int32(dev, "dcrn-base", DCRN_PCIE1_BASE);
++    qdev_init_nofail(dev);
++    object_property_set_bool(OBJECT(dev), true, "realized", NULL);
++    ppc460ex_pcie_register_dcrs(PPC460EX_PCIE_HOST(dev), env);
++}
+diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
+index 4d23c80759..3f7b9886d1 100644
+--- a/include/hw/pci/pcie_host.h
++++ b/include/hw/pci/pcie_host.h
+@@ -65,7 +65,7 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
+  * bit 12 - 14: function number
+  * bit  0 - 11: offset in configuration space of a given device
+  */
+-#define PCIE_MMCFG_SIZE_MAX             (1ULL << 28)
++#define PCIE_MMCFG_SIZE_MAX             (1ULL << 29)
+ #define PCIE_MMCFG_SIZE_MIN             (1ULL << 20)
+ #define PCIE_MMCFG_BUS_BIT              20
+ #define PCIE_MMCFG_BUS_MASK             0x1ff
+--=20
 2.14.3
