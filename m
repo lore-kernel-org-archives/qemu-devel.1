@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuT-0001aU-GJ
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:32 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuW-0001cK-Ex
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1emcuQ-00056A-8y
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1emcuT-0005F8-OH
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 05:06:32 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 16 Feb 2018 21:06:07 +1100
-Message-Id: <20180216100617.25265-5-david@gibson.dropbear.id.au>
+Date: Fri, 16 Feb 2018 21:06:16 +1100
+Message-Id: <20180216100617.25265-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20180216100617.25265-1-david@gibson.dropbear.id.au>
 References: <20180216100617.25265-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/14] hw/ppc/spapr_hcall: set htab_shift after
- kvmppc_resize_hpt_commit
+Subject: [Qemu-devel] [PULL 13/14] ppc/spapr-caps: Disallow setting
+ workaround for spapr-cap-ibs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +21,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, surajjs@au1.ibm.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, surajjs@au1.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Newer kernels have a htab resize capability when adding or remove
-memory. At these situations, the guest kernel might reallocate its
-htab to a more suitable size based on the resulting memory.
+The spapr-cap cap-ibs can only have values broken or fixed as there is
+no explicit workaround required. Currently setting the value workaround
+for this cap will hit an assert if the guest makes the hcall
+h_get_cpu_characteristics.
 
-However, we're not setting the new value back into the machine state
-when a KVM guest resizes its htab. At first this doesn't seem harmful,
-but when migrating or saving the guest state (via virsh managedsave,
-for instance) this mismatch between the htab size of QEMU and the
-kernel makes the guest hangs when trying to load its state.
+Report an error when attempting to apply the setting with a more helpful
+error message.
 
-Inside h_resize_hpt_commit, the hypercall that commits the hash page
-resize changes, let's set spapr->htab_shift to the new value if we're
-sure that kvmppc_resize_hpt_commit were successful.
-
-While we're here, add a "not RADIX" sanity check as it is already done
-in the related hypercall h_resize_hpt_prepare.
-
-Fixes: https://github.com/open-power-host-os/qemu/issues/28
 Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ hw/ppc/spapr_caps.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 76422cfac1..1986560480 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -731,11 +731,21 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
-         return H_AUTHORITY;
-     }
- 
-+    if (!spapr->htab_shift) {
-+        /* Radix guest, no HPT */
-+        return H_NOT_AVAILABLE;
-+    }
-+
-     trace_spapr_h_resize_hpt_commit(flags, shift);
- 
-     rc = kvmppc_resize_hpt_commit(cpu, flags, shift);
-     if (rc != -ENOSYS) {
--        return resize_hpt_convert_rc(rc);
-+        rc = resize_hpt_convert_rc(rc);
-+        if (rc == H_SUCCESS) {
-+            /* Need to set the new htab_shift in the machine state */
-+            spapr->htab_shift = shift;
-+        }
-+        return rc;
-     }
- 
-     if (flags != 0) {
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index e69d308560..99a4b71d19 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -205,7 +205,9 @@ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
+ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+                                            uint8_t val, Error **errp)
+ {
+-    if (tcg_enabled() && val) {
++    if (val == SPAPR_CAP_WORKAROUND) { /* Can only be Broken or Fixed */
++        error_setg(errp, "Requested safe indirect branch capability level \"workaround\" not valid, try cap-ibs=fixed");
++    } else if (tcg_enabled() && val) {
+         /* TODO - for now only allow broken for TCG */
+         error_setg(errp, "Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
+     } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
+@@ -263,7 +265,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     },
+     [SPAPR_CAP_IBS] = {
+         .name = "ibs",
+-        .description = "Indirect Branch Serialisation" VALUE_DESC_TRISTATE,
++        .description = "Indirect Branch Serialisation (broken, fixed)",
+         .index = SPAPR_CAP_IBS,
+         .get = spapr_cap_get_tristate,
+         .set = spapr_cap_set_tristate,
 -- 
 2.14.3
