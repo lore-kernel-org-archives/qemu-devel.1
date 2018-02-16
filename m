@@ -1,37 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1emfUX-0006Yj-3V
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:51:54 -0500
+	(envelope-from <kraxel@redhat.com>) id 1emfrs-0000rx-OU
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1emfUS-0001OP-6b
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:51:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47188
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
-	id 1emfUR-0001Nj-ON
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 07:51:48 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1GCnq53023281
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 07:51:45 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g5y6kh42g-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Feb 2018 07:51:45 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
-	Fri, 16 Feb 2018 05:51:44 -0700
-From: Farhan Ali <alifm@linux.vnet.ibm.com>
-Date: Fri, 16 Feb 2018 07:51:40 -0500
+	(envelope-from <kraxel@redhat.com>) id 1emfrp-0005LC-HV
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:16:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40584 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1emfrp-0005Kt-Ct
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 08:15:57 -0500
+Date: Fri, 16 Feb 2018 14:15:40 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180216131540.ioudb6rwf4y6qnxq@sirius.home.kraxel.org>
+References: <20180203171743.13612-1-programmingkidx@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <d8d33338-c04b-899d-602b-19b6c059dee6@linux.vnet.ibm.com>
-Subject: [Qemu-devel] QEMU on s390 segfaults with co-routine error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180203171743.13612-1-programmingkidx@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6] ui/cocoa.m: Add ability for user to
+ specify mouse ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,84 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Jeff Cody <jcody@redhat.com>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+To: John Arbuckle <programmingkidx@gmail.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Hi,
+On Sat, Feb 03, 2018 at 12:17:43PM -0500, John Arbuckle wrote:
+> Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
+> This combination may not be very fun for the user to have to enter, so we
+> now enable the user to specify their own key(s) as the ungrab key(s). The
+> list of keys that can be used is found in the file qapi/ui.json under QKeyCode.
+> The max number of keys that can be used is three.
+> 
+> Syntax: -display cocoa,hotkey-grab=<key-key-key>
+> 
+> Example usage:  -display cocoa,hotkey-grab=home
+> 	        -display cocoa,hotkey-grab=shift-ctrl
+> 		-display cocoa,hotkey-grab=ctrl-x
+> 		-display cocoa,hotkey-grab=pgup-pgdn
+> 		-display cocoa,hotkey-grab=kp_5-kp_6
+> 		-display cocoa,hotkey-grab=kp_4-kp_5-kp_6
+> 		-display cocoa,hotkey-grab=ctrl-alt
 
-I have noticed a QEMU crash with one of my tests. And the qemu log file 
-states the guest crashed with the following error message:
+Finally found the time for a closer look and some testing.
 
-aio_co_schedule: Co-routine was already scheduled in 'aio_co_schedule'
+Problem is the hotkeys are all forwarded to the guest.
+So when using -- for example -- the pgup-pgdn hotkey
+and you press the combination the guest will see it.
 
+I see basically two options to deal with that:
 
-Investigating a little more, it looks like the error message was 
-introduced by the following commit:
+(a) Make the code more clever.  On pgup keydown event
+    the code has to figure this might be part of a hotkey
+    sequence, hold back the event to see what comes next.
+    - If the next event is pgup keyup -> ok, normal pgup
+      keypress, forward both keydown and keyup to the guest.
+    - If the next event is pgdn keydown -> hotkey found.
+      So do hotkey action, don't forward keydown (and
+      following keyup) events to the guest.
 
-commit 6133b39f3c36623425a6ede9e89d93175fde15cd
-Author: Jeff Cody <jcody@redhat.com>
-Date:   Fri Nov 17 22:27:09 2017 -0500
+(b) Restrict allowed hotkeys to modifier key(s) plus one
+    non-modifier key.  Forwarding modifier keydown+keyup
+    to the guest has typically effects inside the guest,
+    so we only have to hold back that single non-modifier
+    key.  That is alot easier to implement.
 
-     coroutine: abort if we try to schedule or enter a pending coroutine
-
-     The previous patch fixed a race condition, in which there were
-     coroutines being executing doubly, or after coroutine deletion.
-
-     We can detect common scenarios when this happens, and print an error
-     message and abort before we corrupt memory / data, or segfault.
-
-     This patch will abort if an attempt to enter a coroutine is made while
-     it is currently pending execution, either in a specific AioContext bh,
-     or pending execution via a timer.  It will also abort if a coroutine
-     is scheduled, before a prior scheduled run has occurred.
-
-     We cannot rely on the existing co->caller check for recursive re-entry
-     to catch this, as the coroutine may run and exit with
-     COROUTINE_TERMINATE before the scheduled coroutine executes.
-
-     (This is the scenario that was occurring and fixed in the previous
-     patch).
-
-     This patch also re-orders the Coroutine struct elements in an 
-attempt to
-     optimize caching.
-
-     Signed-off-by: Jeff Cody <jcody@redhat.com>
-     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-
-
-Here is the qemu command line:
-
-LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin 
-QEMU_AUDIO_DRV=none /usr/bin/qemu-kvm -name guest=vm_2,debug-threads=on 
--S -object 
-secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-4-vm_2/master-key.aes 
--machine s390-ccw-virtio-2.12,accel=kvm,usb=off,dump-guest-core=off -m 
-1024 -realtime mlock=off -smp 2,sockets=2,cores=1,threads=1 -object 
-iothread,id=iothread1 -uuid f1359d37-bcfb-439f-a6c2-79bf9859e701 
--display none -no-user-config -nodefaults -chardev 
-socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-4-vm_2/monitor.sock,server,nowait 
--mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc 
--no-shutdown -boot strict=on -drive 
-file=/dev/mapper/360050763998b0883980000001500001c,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native 
--device 
-virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0001,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 
--drive 
-file=/dev/mapper/360050763998b0883980000001b000022,format=raw,if=none,id=drive-virtio-disk1,cache=none,aio=native 
--device 
-virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0002,drive=drive-virtio-disk1,id=virtio-disk1 
--netdev tap,fd=27,id=hostnet0,vhost=on,vhostfd=29 -device 
-virtio-net-ccw,netdev=hostnet0,id=net0,mac=02:75:b0:55:2a:b1,devno=fe.0.0000 
--chardev pty,id=charconsole0 -device 
-sclpconsole,chardev=charconsole0,id=console0 -device 
-virtio-balloon-ccw,id=balloon0,devno=fe.3.ffba -msg timestamp=on
-
-
-I remember some time ago we had similar segfaults with coroutines and 
-iothreads. I have only hit this error once, and I have not been able to 
-reproduce it consistently.
-
-
-Thank you
-Farhan
+cheers,
+  Gerd
