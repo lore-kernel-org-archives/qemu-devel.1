@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en99L-0000GB-4I
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:32:01 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en99L-0000GA-41
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:32:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en99J-0000op-Gs
+	(envelope-from <richard.henderson@linaro.org>) id 1en99H-0000oD-V5
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:59 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:45792)
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:45794)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en99J-0000oi-8n
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:57 -0500
-Received: by mail-pl0-x241.google.com with SMTP id p5so3525982plo.12
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 12:31:57 -0800 (PST)
+	id 1en99H-0000o0-Ko
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:55 -0500
+Received: by mail-pl0-x244.google.com with SMTP id p5so3525963plo.12
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 12:31:55 -0800 (PST)
 Received: from cloudburst.twiddle.net ([50.0.192.64])
 	by smtp.gmail.com with ESMTPSA id
-	y7sm48203797pfe.26.2018.02.17.12.31.54 for <qemu-devel@nongnu.org>
+	y7sm48203797pfe.26.2018.02.17.12.31.52 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 17 Feb 2018 12:31:54 -0800 (PST)
+	Sat, 17 Feb 2018 12:31:53 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 12:31:25 -0800
-Message-Id: <20180217203132.31780-13-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 12:31:24 -0800
+Message-Id: <20180217203132.31780-12-richard.henderson@linaro.org>
 In-Reply-To: <20180217203132.31780-1-richard.henderson@linaro.org>
 References: <20180217203132.31780-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 12/19] target/hppa: Convert direct and indirect
- branches
+Subject: [Qemu-devel] [PATCH 11/19] target/hppa: Convert shift, extract,
+ deposit insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,301 +36,417 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c  | 125 ++++++++++++-----------------------------------
- target/hppa/insns.decode |  34 ++++++++++++-
- 2 files changed, 63 insertions(+), 96 deletions(-)
+ target/hppa/translate.c  | 217 ++++++++++++++++++-----------------------------
+ target/hppa/insns.decode |  15 ++++
+ 2 files changed, 96 insertions(+), 136 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index e01a28c70c..5df5b8dba4 100644
+index 361a20b733..e01a28c70c 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -901,15 +901,6 @@ static target_sreg assemble_16a(uint32_t insn)
-     return x << 2;
+@@ -3293,26 +3293,21 @@ static void trans_movbi(DisasContext *ctx, arg_movbi *a, uint32_t insn)
+     do_cbranch(ctx, a->disp, a->n, &cond);
  }
  
--static target_sreg assemble_17(uint32_t insn)
--{
--    target_ureg x = -(target_ureg)(insn & 1);
--    x = (x <<  5) | extract32(insn, 16, 5);
--    x = (x <<  1) | extract32(insn, 2, 1);
--    x = (x << 10) | extract32(insn, 3, 10);
--    return x << 2;
--}
--
- static target_sreg assemble_21(uint32_t insn)
+-static void trans_shrpw_sar(DisasContext *ctx, uint32_t insn,
+-                            const DisasInsn *di)
++static void trans_shrpw_sar(DisasContext *ctx, arg_shrpw_sar *a, uint32_t insn)
  {
-     target_ureg x = -(target_ureg)(insn & 1);
-@@ -920,15 +911,6 @@ static target_sreg assemble_21(uint32_t insn)
-     return x << 11;
- }
- 
--static target_sreg assemble_22(uint32_t insn)
--{
--    target_ureg x = -(target_ureg)(insn & 1);
--    x = (x << 10) | extract32(insn, 16, 10);
--    x = (x <<  1) | extract32(insn, 2, 1);
--    x = (x << 10) | extract32(insn, 3, 10);
--    return x << 2;
--}
--
- /* The parisc documentation describes only the general interpretation of
-    the conditions, without describing their exact implementation.  The
-    interpretations do not stand up well when considering ADD,C and SUB,B.
-@@ -3549,11 +3531,8 @@ static void trans_depwi_sar(DisasContext *ctx, arg_depwi_sar *a, uint32_t insn)
-     tcg_temp_free(i);
- }
- 
--static void trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
-+static void trans_be(DisasContext *ctx, arg_be *a, uint32_t insn)
- {
--    unsigned n = extract32(insn, 1, 1);
--    unsigned b = extract32(insn, 21, 5);
--    target_sreg disp = assemble_17(insn);
-     TCGv_reg tmp;
- 
- #ifdef CONFIG_USER_ONLY
-@@ -3565,29 +3544,28 @@ static void trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
-     /* Since we don't implement spaces, just branch.  Do notice the special
-        case of "be disp(*,r0)" using a direct branch to disp, so that we can
-        goto_tb to the TB containing the syscall.  */
--    if (b == 0) {
--        return do_dbranch(ctx, disp, is_l ? 31 : 0, n);
-+    if (a->b == 0) {
-+        return do_dbranch(ctx, a->disp, a->l, a->n);
-     }
- #else
--    int sp = assemble_sr3(insn);
-     nullify_over(ctx);
- #endif
- 
-     tmp = get_temp(ctx);
--    tcg_gen_addi_reg(tmp, load_gpr(ctx, b), disp);
-+    tcg_gen_addi_reg(tmp, load_gpr(ctx, a->b), a->disp);
-     tmp = do_ibranch_priv(ctx, tmp);
- 
- #ifdef CONFIG_USER_ONLY
--    do_ibranch(ctx, tmp, is_l ? 31 : 0, n);
-+    do_ibranch(ctx, tmp, a->l, a->n);
- #else
-     TCGv_i64 new_spc = tcg_temp_new_i64();
- 
--    load_spr(ctx, new_spc, sp);
--    if (is_l) {
-+    load_spr(ctx, new_spc, a->sp);
-+    if (a->l) {
-         copy_iaoq_entry(cpu_gr[31], ctx->iaoq_n, ctx->iaoq_n_var);
-         tcg_gen_mov_i64(cpu_sr[0], cpu_iasq_f);
-     }
--    if (n && use_nullify_skip(ctx)) {
-+    if (a->n && use_nullify_skip(ctx)) {
-         tcg_gen_mov_reg(cpu_iaoq_f, tmp);
-         tcg_gen_addi_reg(cpu_iaoq_b, cpu_iaoq_f, 4);
-         tcg_gen_mov_i64(cpu_iasq_f, new_spc);
-@@ -3599,7 +3577,7 @@ static void trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
-         }
-         tcg_gen_mov_reg(cpu_iaoq_b, tmp);
-         tcg_gen_mov_i64(cpu_iasq_b, new_spc);
--        nullify_set(ctx, n);
-+        nullify_set(ctx, a->n);
-     }
-     tcg_temp_free_i64(new_spc);
-     tcg_gen_lookup_and_goto_ptr();
-@@ -3608,21 +3586,14 @@ static void trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
- #endif
- }
- 
--static void trans_bl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static void trans_bl(DisasContext *ctx, arg_bl *a, uint32_t insn)
- {
--    unsigned n = extract32(insn, 1, 1);
--    unsigned link = extract32(insn, 21, 5);
--    target_sreg disp = assemble_17(insn);
--
--    do_dbranch(ctx, iaoq_dest(ctx, disp), link, n);
-+    do_dbranch(ctx, iaoq_dest(ctx, a->disp), a->l, a->n);
- }
- 
--static void trans_b_gate(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static void trans_b_gate(DisasContext *ctx, arg_b_gate *a, uint32_t insn)
- {
--    unsigned n = extract32(insn, 1, 1);
--    unsigned link = extract32(insn, 21, 5);
--    target_sreg disp = assemble_17(insn);
--    target_ureg dest = iaoq_dest(ctx, disp);
-+    target_ureg dest = iaoq_dest(ctx, a->disp);
- 
-     /* Make sure the caller hasn't done something weird with the queue.
-      * ??? This is not quite the same as the PSW[B] bit, which would be
-@@ -3661,61 +3632,44 @@ static void trans_b_gate(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-     }
- #endif
- 
--    do_dbranch(ctx, dest, link, n);
-+    do_dbranch(ctx, dest, a->l, a->n);
- }
- 
--static void trans_bl_long(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static void trans_blr(DisasContext *ctx, arg_blr *a, uint32_t insn)
- {
--    unsigned n = extract32(insn, 1, 1);
--    target_sreg disp = assemble_22(insn);
--
--    do_dbranch(ctx, iaoq_dest(ctx, disp), 2, n);
--}
--
--static void trans_blr(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
--{
--    unsigned n = extract32(insn, 1, 1);
--    unsigned rx = extract32(insn, 16, 5);
--    unsigned link = extract32(insn, 21, 5);
-     TCGv_reg tmp = get_temp(ctx);
- 
--    tcg_gen_shli_reg(tmp, load_gpr(ctx, rx), 3);
-+    tcg_gen_shli_reg(tmp, load_gpr(ctx, a->x), 3);
-     tcg_gen_addi_reg(tmp, tmp, ctx->iaoq_f + 8);
-     /* The computation here never changes privilege level.  */
--    do_ibranch(ctx, tmp, link, n);
-+    do_ibranch(ctx, tmp, a->l, a->n);
- }
- 
--static void trans_bv(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static void trans_bv(DisasContext *ctx, arg_bv *a, uint32_t insn)
- {
--    unsigned n = extract32(insn, 1, 1);
--    unsigned rx = extract32(insn, 16, 5);
--    unsigned rb = extract32(insn, 21, 5);
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned c = extract32(insn, 13, 3);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned r2 = extract32(insn, 21, 5);
      TCGv_reg dest;
  
--    if (rx == 0) {
--        dest = load_gpr(ctx, rb);
-+    if (a->x == 0) {
-+        dest = load_gpr(ctx, a->b);
-     } else {
-         dest = get_temp(ctx);
--        tcg_gen_shli_reg(dest, load_gpr(ctx, rx), 3);
--        tcg_gen_add_reg(dest, dest, load_gpr(ctx, rb));
-+        tcg_gen_shli_reg(dest, load_gpr(ctx, a->x), 3);
-+        tcg_gen_add_reg(dest, dest, load_gpr(ctx, a->b));
+-    if (c) {
++    if (a->c) {
+         nullify_over(ctx);
      }
-     dest = do_ibranch_priv(ctx, dest);
--    do_ibranch(ctx, dest, 0, n);
-+    do_ibranch(ctx, dest, 0, a->n);
- }
  
--static void trans_bve(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static void trans_bve(DisasContext *ctx, arg_bve *a, uint32_t insn)
- {
--    unsigned n = extract32(insn, 1, 1);
--    unsigned rb = extract32(insn, 21, 5);
--    unsigned link = extract32(insn, 13, 1) ? 2 : 0;
-     TCGv_reg dest;
+-    dest = dest_gpr(ctx, rt);
+-    if (r1 == 0) {
+-        tcg_gen_ext32u_reg(dest, load_gpr(ctx, r2));
++    dest = dest_gpr(ctx, a->t);
++    if (a->r1 == 0) {
++        tcg_gen_ext32u_reg(dest, load_gpr(ctx, a->r2));
+         tcg_gen_shr_reg(dest, dest, cpu_sar);
+-    } else if (r1 == r2) {
++    } else if (a->r1 == a->r2) {
+         TCGv_i32 t32 = tcg_temp_new_i32();
+-        tcg_gen_trunc_reg_i32(t32, load_gpr(ctx, r2));
++        tcg_gen_trunc_reg_i32(t32, load_gpr(ctx, a->r2));
+         tcg_gen_rotr_i32(t32, t32, cpu_sar);
+         tcg_gen_extu_i32_reg(dest, t32);
+         tcg_temp_free_i32(t32);
+@@ -3320,7 +3315,7 @@ static void trans_shrpw_sar(DisasContext *ctx, uint32_t insn,
+         TCGv_i64 t = tcg_temp_new_i64();
+         TCGv_i64 s = tcg_temp_new_i64();
  
- #ifdef CONFIG_USER_ONLY
--    dest = do_ibranch_priv(ctx, load_gpr(ctx, rb));
--    do_ibranch(ctx, dest, link, n);
-+    dest = do_ibranch_priv(ctx, load_gpr(ctx, a->b));
-+    do_ibranch(ctx, dest, a->l, a->n);
- #else
-     nullify_over(ctx);
--    dest = do_ibranch_priv(ctx, load_gpr(ctx, rb));
-+    dest = do_ibranch_priv(ctx, load_gpr(ctx, a->b));
- 
-     copy_iaoq_entry(cpu_iaoq_f, ctx->iaoq_b, cpu_iaoq_b);
-     if (ctx->iaoq_b == -1) {
-@@ -3723,25 +3677,16 @@ static void trans_bve(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+-        tcg_gen_concat_reg_i64(t, load_gpr(ctx, r2), load_gpr(ctx, r1));
++        tcg_gen_concat_reg_i64(t, load_gpr(ctx, a->r2), load_gpr(ctx, a->r1));
+         tcg_gen_extu_reg_i64(s, cpu_sar);
+         tcg_gen_shr_i64(t, t, s);
+         tcg_gen_trunc_i64_reg(dest, t);
+@@ -3328,79 +3323,67 @@ static void trans_shrpw_sar(DisasContext *ctx, uint32_t insn,
+         tcg_temp_free_i64(t);
+         tcg_temp_free_i64(s);
      }
-     copy_iaoq_entry(cpu_iaoq_b, -1, dest);
-     tcg_gen_mov_i64(cpu_iasq_b, space_select(ctx, 0, dest));
--    if (link) {
--        copy_iaoq_entry(cpu_gr[link], ctx->iaoq_n, ctx->iaoq_n_var);
-+    if (a->l) {
-+        copy_iaoq_entry(cpu_gr[a->l], ctx->iaoq_n, ctx->iaoq_n_var);
+-    save_gpr(ctx, rt, dest);
++    save_gpr(ctx, a->t, dest);
+ 
+     /* Install the new nullification.  */
+     cond_free(&ctx->null_cond);
+-    if (c) {
+-        ctx->null_cond = do_sed_cond(c, dest);
++    if (a->c) {
++        ctx->null_cond = do_sed_cond(a->c, dest);
      }
--    nullify_set(ctx, n);
-+    nullify_set(ctx, a->n);
-     tcg_gen_lookup_and_goto_ptr();
-     ctx->base.is_jmp = DISAS_NORETURN;
      nullify_end(ctx);
- #endif
  }
  
--static const DisasInsn table_branch[] = {
--    { 0xe8000000u, 0xfc006000u, trans_bl }, /* B,L and B,L,PUSH */
--    { 0xe800a000u, 0xfc00e000u, trans_bl_long },
--    { 0xe8004000u, 0xfc00fffdu, trans_blr },
--    { 0xe800c000u, 0xfc00fffdu, trans_bv },
--    { 0xe800d000u, 0xfc00dffcu, trans_bve },
--    { 0xe8002000u, 0xfc00e000u, trans_b_gate },
+-static void trans_shrpw_imm(DisasContext *ctx, uint32_t insn,
+-                            const DisasInsn *di)
++static void trans_shrpw_imm(DisasContext *ctx, arg_shrpw_imm *a, uint32_t insn)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned cpos = extract32(insn, 5, 5);
+-    unsigned c = extract32(insn, 13, 3);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned sa = 31 - cpos;
++    unsigned sa = 31 - a->cpos;
+     TCGv_reg dest, t2;
+ 
+-    if (c) {
++    if (a->c) {
+         nullify_over(ctx);
+     }
+ 
+-    dest = dest_gpr(ctx, rt);
+-    t2 = load_gpr(ctx, r2);
+-    if (r1 == r2) {
++    dest = dest_gpr(ctx, a->t);
++    t2 = load_gpr(ctx, a->r2);
++    if (a->r1 == a->r2) {
+         TCGv_i32 t32 = tcg_temp_new_i32();
+         tcg_gen_trunc_reg_i32(t32, t2);
+         tcg_gen_rotri_i32(t32, t32, sa);
+         tcg_gen_extu_i32_reg(dest, t32);
+         tcg_temp_free_i32(t32);
+-    } else if (r1 == 0) {
++    } else if (a->r1 == 0) {
+         tcg_gen_extract_reg(dest, t2, sa, 32 - sa);
+     } else {
+         TCGv_reg t0 = tcg_temp_new();
+         tcg_gen_extract_reg(t0, t2, sa, 32 - sa);
+-        tcg_gen_deposit_reg(dest, t0, cpu_gr[r1], 32 - sa, sa);
++        tcg_gen_deposit_reg(dest, t0, cpu_gr[a->r1], 32 - sa, sa);
+         tcg_temp_free(t0);
+     }
+-    save_gpr(ctx, rt, dest);
++    save_gpr(ctx, a->t, dest);
+ 
+     /* Install the new nullification.  */
+     cond_free(&ctx->null_cond);
+-    if (c) {
+-        ctx->null_cond = do_sed_cond(c, dest);
++    if (a->c) {
++        ctx->null_cond = do_sed_cond(a->c, dest);
+     }
+     nullify_end(ctx);
+ }
+ 
+-static void trans_extrw_sar(DisasContext *ctx, uint32_t insn,
+-                            const DisasInsn *di)
++static void trans_extrw_sar(DisasContext *ctx, arg_extrw_sar *a, uint32_t insn)
+ {
+-    unsigned clen = extract32(insn, 0, 5);
+-    unsigned is_se = extract32(insn, 10, 1);
+-    unsigned c = extract32(insn, 13, 3);
+-    unsigned rt = extract32(insn, 16, 5);
+-    unsigned rr = extract32(insn, 21, 5);
+-    unsigned len = 32 - clen;
++    unsigned len = 32 - a->clen;
+     TCGv_reg dest, src, tmp;
+ 
+-    if (c) {
++    if (a->c) {
+         nullify_over(ctx);
+     }
+ 
+-    dest = dest_gpr(ctx, rt);
+-    src = load_gpr(ctx, rr);
++    dest = dest_gpr(ctx, a->t);
++    src = load_gpr(ctx, a->r);
+     tmp = tcg_temp_new();
+ 
+     /* Recall that SAR is using big-endian bit numbering.  */
+     tcg_gen_xori_reg(tmp, cpu_sar, TARGET_REGISTER_BITS - 1);
+-    if (is_se) {
++    if (a->se) {
+         tcg_gen_sar_reg(dest, src, tmp);
+         tcg_gen_sextract_reg(dest, dest, 0, len);
+     } else {
+@@ -3408,83 +3391,62 @@ static void trans_extrw_sar(DisasContext *ctx, uint32_t insn,
+         tcg_gen_extract_reg(dest, dest, 0, len);
+     }
+     tcg_temp_free(tmp);
+-    save_gpr(ctx, rt, dest);
++    save_gpr(ctx, a->t, dest);
+ 
+     /* Install the new nullification.  */
+     cond_free(&ctx->null_cond);
+-    if (c) {
+-        ctx->null_cond = do_sed_cond(c, dest);
++    if (a->c) {
++        ctx->null_cond = do_sed_cond(a->c, dest);
+     }
+     nullify_end(ctx);
+ }
+ 
+-static void trans_extrw_imm(DisasContext *ctx, uint32_t insn,
+-                            const DisasInsn *di)
++static void trans_extrw_imm(DisasContext *ctx, arg_extrw_imm *a, uint32_t insn)
+ {
+-    unsigned clen = extract32(insn, 0, 5);
+-    unsigned pos = extract32(insn, 5, 5);
+-    unsigned is_se = extract32(insn, 10, 1);
+-    unsigned c = extract32(insn, 13, 3);
+-    unsigned rt = extract32(insn, 16, 5);
+-    unsigned rr = extract32(insn, 21, 5);
+-    unsigned len = 32 - clen;
+-    unsigned cpos = 31 - pos;
++    unsigned len = 32 - a->clen;
++    unsigned cpos = 31 - a->pos;
+     TCGv_reg dest, src;
+ 
+-    if (c) {
++    if (a->c) {
+         nullify_over(ctx);
+     }
+ 
+-    dest = dest_gpr(ctx, rt);
+-    src = load_gpr(ctx, rr);
+-    if (is_se) {
++    dest = dest_gpr(ctx, a->t);
++    src = load_gpr(ctx, a->r);
++    if (a->se) {
+         tcg_gen_sextract_reg(dest, src, cpos, len);
+     } else {
+         tcg_gen_extract_reg(dest, src, cpos, len);
+     }
+-    save_gpr(ctx, rt, dest);
++    save_gpr(ctx, a->t, dest);
+ 
+     /* Install the new nullification.  */
+     cond_free(&ctx->null_cond);
+-    if (c) {
+-        ctx->null_cond = do_sed_cond(c, dest);
++    if (a->c) {
++        ctx->null_cond = do_sed_cond(a->c, dest);
+     }
+     nullify_end(ctx);
+ }
+ 
+-static const DisasInsn table_sh_ex[] = {
+-    { 0xd0000000u, 0xfc001fe0u, trans_shrpw_sar },
+-    { 0xd0000800u, 0xfc001c00u, trans_shrpw_imm },
+-    { 0xd0001000u, 0xfc001be0u, trans_extrw_sar },
+-    { 0xd0001800u, 0xfc001800u, trans_extrw_imm },
 -};
 -
- static void trans_fop_wew_0c(DisasContext *ctx, uint32_t insn,
-                              const DisasInsn *di)
+-static void trans_depw_imm_c(DisasContext *ctx, uint32_t insn,
+-                             const DisasInsn *di)
++static void trans_depwi_imm(DisasContext *ctx, arg_depwi_imm *a, uint32_t insn)
  {
-@@ -4408,16 +4353,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+-    unsigned clen = extract32(insn, 0, 5);
+-    unsigned cpos = extract32(insn, 5, 5);
+-    unsigned nz = extract32(insn, 10, 1);
+-    unsigned c = extract32(insn, 13, 3);
+-    target_sreg val = low_sextract(insn, 16, 5);
+-    unsigned rt = extract32(insn, 21, 5);
+-    unsigned len = 32 - clen;
++    unsigned len = 32 - a->clen;
+     target_sreg mask0, mask1;
+     TCGv_reg dest;
+ 
+-    if (c) {
++    if (a->c) {
+         nullify_over(ctx);
+     }
+-    if (cpos + len > 32) {
+-        len = 32 - cpos;
++    if (a->cpos + len > 32) {
++        len = 32 - a->cpos;
+     }
+ 
+-    dest = dest_gpr(ctx, rt);
+-    mask0 = deposit64(0, cpos, len, val);
+-    mask1 = deposit64(-1, cpos, len, val);
++    dest = dest_gpr(ctx, a->t);
++    mask0 = deposit64(0, a->cpos, len, a->i);
++    mask1 = deposit64(-1, a->cpos, len, a->i);
+ 
+-    if (nz) {
+-        TCGv_reg src = load_gpr(ctx, rt);
++    if (a->nz) {
++        TCGv_reg src = load_gpr(ctx, a->t);
+         if (mask1 != -1) {
+             tcg_gen_andi_reg(dest, src, mask1);
+             src = dest;
+@@ -3493,75 +3455,58 @@ static void trans_depw_imm_c(DisasContext *ctx, uint32_t insn,
+     } else {
+         tcg_gen_movi_reg(dest, mask0);
+     }
+-    save_gpr(ctx, rt, dest);
++    save_gpr(ctx, a->t, dest);
+ 
+     /* Install the new nullification.  */
+     cond_free(&ctx->null_cond);
+-    if (c) {
+-        ctx->null_cond = do_sed_cond(c, dest);
++    if (a->c) {
++        ctx->null_cond = do_sed_cond(a->c, dest);
+     }
+     nullify_end(ctx);
+ }
+ 
+-static void trans_depw_imm(DisasContext *ctx, uint32_t insn,
+-                           const DisasInsn *di)
++static void trans_depw_imm(DisasContext *ctx, arg_depw_imm *a, uint32_t insn)
+ {
+-    unsigned clen = extract32(insn, 0, 5);
+-    unsigned cpos = extract32(insn, 5, 5);
+-    unsigned nz = extract32(insn, 10, 1);
+-    unsigned c = extract32(insn, 13, 3);
+-    unsigned rr = extract32(insn, 16, 5);
+-    unsigned rt = extract32(insn, 21, 5);
+-    unsigned rs = nz ? rt : 0;
+-    unsigned len = 32 - clen;
++    unsigned rs = a->nz ? a->t : 0;
++    unsigned len = 32 - a->clen;
+     TCGv_reg dest, val;
+ 
+-    if (c) {
++    if (a->c) {
+         nullify_over(ctx);
+     }
+-    if (cpos + len > 32) {
+-        len = 32 - cpos;
++    if (a->cpos + len > 32) {
++        len = 32 - a->cpos;
+     }
+ 
+-    dest = dest_gpr(ctx, rt);
+-    val = load_gpr(ctx, rr);
++    dest = dest_gpr(ctx, a->t);
++    val = load_gpr(ctx, a->r);
+     if (rs == 0) {
+-        tcg_gen_deposit_z_reg(dest, val, cpos, len);
++        tcg_gen_deposit_z_reg(dest, val, a->cpos, len);
+     } else {
+-        tcg_gen_deposit_reg(dest, cpu_gr[rs], val, cpos, len);
++        tcg_gen_deposit_reg(dest, cpu_gr[rs], val, a->cpos, len);
+     }
+-    save_gpr(ctx, rt, dest);
++    save_gpr(ctx, a->t, dest);
+ 
+     /* Install the new nullification.  */
+     cond_free(&ctx->null_cond);
+-    if (c) {
+-        ctx->null_cond = do_sed_cond(c, dest);
++    if (a->c) {
++        ctx->null_cond = do_sed_cond(a->c, dest);
+     }
+     nullify_end(ctx);
+ }
+ 
+-static void trans_depw_sar(DisasContext *ctx, uint32_t insn,
+-                           const DisasInsn *di)
++static void do_depw_sar(DisasContext *ctx, unsigned rt, unsigned c,
++                        unsigned nz, unsigned clen, TCGv_reg val)
+ {
+-    unsigned clen = extract32(insn, 0, 5);
+-    unsigned nz = extract32(insn, 10, 1);
+-    unsigned i = extract32(insn, 12, 1);
+-    unsigned c = extract32(insn, 13, 3);
+-    unsigned rt = extract32(insn, 21, 5);
+     unsigned rs = nz ? rt : 0;
+     unsigned len = 32 - clen;
+-    TCGv_reg val, mask, tmp, shift, dest;
++    TCGv_reg mask, tmp, shift, dest;
+     unsigned msb = 1U << (len - 1);
+ 
+     if (c) {
+         nullify_over(ctx);
+     }
+ 
+-    if (i) {
+-        val = load_const(ctx, low_sextract(insn, 16, 5));
+-    } else {
+-        val = load_gpr(ctx, extract32(insn, 16, 5));
+-    }
+     dest = dest_gpr(ctx, rt);
+     shift = tcg_temp_new();
+     tmp = tcg_temp_new();
+@@ -3592,11 +3537,17 @@ static void trans_depw_sar(DisasContext *ctx, uint32_t insn,
+     nullify_end(ctx);
+ }
+ 
+-static const DisasInsn table_depw[] = {
+-    { 0xd4000000u, 0xfc000be0u, trans_depw_sar },
+-    { 0xd4000800u, 0xfc001800u, trans_depw_imm },
+-    { 0xd4001800u, 0xfc001800u, trans_depw_imm_c },
+-};
++static void trans_depw_sar(DisasContext *ctx, arg_depw_sar *a, uint32_t insn)
++{
++    do_depw_sar(ctx, a->t, a->c, a->nz, a->clen, load_gpr(ctx, a->r));
++}
++
++static void trans_depwi_sar(DisasContext *ctx, arg_depwi_sar *a, uint32_t insn)
++{
++    TCGv_reg i = tcg_const_reg(a->i);
++    do_depw_sar(ctx, a->t, a->c, a->nz, a->clen, i);
++    tcg_temp_free(i);
++}
+ 
+ static void trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
+ {
+@@ -4457,12 +4408,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
          translate_table(ctx, insn, table_fp_fused);
          return;
  
--    case 0x38:
--        trans_be(ctx, insn, false);
+-    case 0x34:
+-        translate_table(ctx, insn, table_sh_ex);
 -        return;
--    case 0x39:
--        trans_be(ctx, insn, true);
+-    case 0x35:
+-        translate_table(ctx, insn, table_depw);
 -        return;
--    case 0x3A:
--        translate_table(ctx, insn, table_branch);
--        return;
--
-     case 0x04: /* spopn */
-     case 0x05: /* diag */
-     case 0x0F: /* product specific */
+     case 0x38:
+         trans_be(ctx, insn, false);
+         return;
 diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index ed0b5fe9d7..3bd19f8a28 100644
+index e916dc9d30..ed0b5fe9d7 100644
 --- a/target/hppa/insns.decode
 +++ b/target/hppa/insns.decode
-@@ -24,7 +24,9 @@
- %assemble_sr3	13:1 14:2
- %assemble_sr3x	13:1 14:2 !function=expand_sr3x
- 
--%assemble_12	0:s1 2:1 3:10  !function=expand_shl2
-+%assemble_12	0:s1 2:1 3:10        !function=expand_shl2
-+%assemble_17	0:s1 16:5 2:1 3:10   !function=expand_shl2
-+%assemble_22	0:s1 16:10 2:1 3:10  !function=expand_shl2
- 
- %sm_imm		16:10 !function=expand_sm_imm
- 
-@@ -208,3 +210,33 @@ depw_sar	110101 t:5 r:5   c:3 00 nz:1 00000  clen:5
- depw_imm	110101 t:5 r:5   c:3 01 nz:1 cpos:5 clen:5
- depwi_sar	110101 t:5 ..... c:3 10 nz:1 00000  clen:5	i=%im5_16
- depwi_imm	110101 t:5 ..... c:3 11 nz:1 cpos:5 clen:5	i=%im5_16
+@@ -193,3 +193,18 @@ addb		101000 ..... ..... ... ........... . .	@rrb_cf f=0
+ addb		101010 ..... ..... ... ........... . .	@rrb_cf f=1
+ addbi		101001 ..... ..... ... ........... . .	@rib_cf f=0
+ addbi		101011 ..... ..... ... ........... . .	@rib_cf f=1
 +
 +####
-+# Branch External
++# Shift, Extract, Deposit
 +####
 +
-+&be		b l n disp sp
-+@be		...... b:5 ..... ... ........... n:1 .	\
-+		&be disp=%assemble_17 sp=%assemble_sr3
++shrpw_sar	110100 r2:5 r1:5 c:3 00 0    00000  t:5
++shrpw_imm	110100 r2:5 r1:5 c:3 01 0    cpos:5 t:5
 +
-+be		111000 ..... ..... ... ........... . .	@be l=0
-+be		111001 ..... ..... ... ........... . .  @be l=31
++extrw_sar	110100 r:5  t:5  c:3 10 se:1 00000  clen:5
++extrw_imm	110100 r:5  t:5  c:3 11 se:1 pos:5  clen:5
 +
-+####
-+# Branch
-+####
-+
-+&bl		l n disp
-+@bl		...... l:5 ..... ... ........... n:1 .  &bl disp=%assemble_17
-+
-+# B,L and B,L,PUSH
-+bl		111010 ..... ..... 000 ........... .   .	@bl
-+bl		111010 ..... ..... 100 ........... .   .	@bl
-+# B,L (long displacement)
-+bl		111010 ..... ..... 101 ........... n:1 .	&bl l=2 \
-+		disp=%assemble_22
-+b_gate		111010 ..... ..... 001 ........... .   .	@bl
-+blr		111010 l:5   x:5   010 00000000000 n:1 0
-+bv		111010 b:5   x:5   110 00000000000 n:1 0
-+bve		111010 b:5   00000 110 10000000000 n:1 -	l=0
-+bve		111010 b:5   00000 111 10000000000 n:1 -	l=2
++depw_sar	110101 t:5 r:5   c:3 00 nz:1 00000  clen:5
++depw_imm	110101 t:5 r:5   c:3 01 nz:1 cpos:5 clen:5
++depwi_sar	110101 t:5 ..... c:3 10 nz:1 00000  clen:5	i=%im5_16
++depwi_imm	110101 t:5 ..... c:3 11 nz:1 cpos:5 clen:5	i=%im5_16
 -- 
 2.14.3
