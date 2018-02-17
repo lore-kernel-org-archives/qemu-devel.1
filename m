@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79O-0000VJ-7U
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:55 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en79V-0000cH-Nv
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79M-0001dX-QY
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:54 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:44552)
+	(envelope-from <richard.henderson@linaro.org>) id 1en79U-0001hY-Hj
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:01 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:47051)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en79M-0001dF-JA
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:52 -0500
-Received: by mail-pl0-x243.google.com with SMTP id w21so3426484plp.11
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:23:52 -0800 (PST)
+	id 1en79U-0001hC-AC
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:00 -0500
+Received: by mail-pf0-x242.google.com with SMTP id z24so587774pfh.13
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:00 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:31 -0800
-Message-Id: <20180217182323.25885-16-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:22:36 -0800
+Message-Id: <20180217182323.25885-21-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 15/67] target/arm: Implement SVE Integer
- Multiply-Add Group
+Subject: [Qemu-devel] [PATCH v2 20/67] target/arm: Implement SVE Compute
+ Vector Address Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,192 +32,156 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 18 ++++++++++++++
- target/arm/sve_helper.c    | 58 +++++++++++++++++++++++++++++++++++++++++++++-
- target/arm/translate-sve.c | 31 +++++++++++++++++++++++++
- target/arm/sve.decode      | 17 ++++++++++++++
- 4 files changed, 123 insertions(+), 1 deletion(-)
+ target/arm/helper-sve.h    |  5 +++++
+ target/arm/sve_helper.c    | 40 ++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 33 +++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      | 12 ++++++++++++
+ 4 files changed, 90 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 11644125d1..b31d497f31 100644
+index 00e3cd48bb..5280d375f9 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -345,6 +345,24 @@ DEF_HELPER_FLAGS_4(sve_neg_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_neg_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_neg_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -380,6 +380,11 @@ DEF_HELPER_FLAGS_4(sve_lsl_zzw_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_lsl_zzw_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_lsl_zzw_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_6(sve_mla_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_mla_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_mla_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_mla_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_mls_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_mls_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_mls_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_mls_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_adr_p32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_adr_p64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_adr_s32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_adr_u32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index e11823a727..4b08a38ce8 100644
+index 4c6e2713fa..a290a58c02 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -932,6 +932,62 @@ DO_ZPZI_D(sve_asrd_d, int64_t, DO_ASRD)
- #undef DO_SHR
- #undef DO_SHL
- #undef DO_ASRD
--
- #undef DO_ZPZI
- #undef DO_ZPZI_D
+@@ -1061,3 +1061,43 @@ void HELPER(sve_index_d)(void *vd, uint64_t start,
+         d[i] = start + i * incr;
+     }
+ }
 +
-+/* Fully general four-operand expander, controlled by a predicate.
-+ */
-+#define DO_ZPZZZ(NAME, TYPE, H, OP)                           \
-+void HELPER(NAME)(void *vd, void *va, void *vn, void *vm,     \
-+                  void *vg, uint32_t desc)                    \
-+{                                                             \
-+    intptr_t i, opr_sz = simd_oprsz(desc);                    \
-+    for (i = 0; i < opr_sz; ) {                               \
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));       \
-+        do {                                                  \
-+            if (pg & 1) {                                     \
-+                TYPE nn = *(TYPE *)(vn + H(i));               \
-+                TYPE mm = *(TYPE *)(vm + H(i));               \
-+                TYPE aa = *(TYPE *)(va + H(i));               \
-+                *(TYPE *)(vd + H(i)) = OP(aa, nn, mm);        \
-+            }                                                 \
-+            i += sizeof(TYPE), pg >>= sizeof(TYPE);           \
-+        } while (i & 15);                                     \
-+    }                                                         \
++void HELPER(sve_adr_p32)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 4;
++    uint32_t sh = simd_data(desc);
++    uint32_t *d = vd, *n = vn, *m = vm;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[i] + (m[i] << sh);
++    }
 +}
 +
-+/* Similarly, specialized for 64-bit operands.  */
-+#define DO_ZPZZZ_D(NAME, TYPE, OP)                            \
-+void HELPER(NAME)(void *vd, void *va, void *vn, void *vm,     \
-+                  void *vg, uint32_t desc)                    \
-+{                                                             \
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;                \
-+    TYPE *d = vd, *a = va, *n = vn, *m = vm;                  \
-+    uint8_t *pg = vg;                                         \
-+    for (i = 0; i < opr_sz; i += 1) {                         \
-+        if (pg[H1(i)] & 1) {                                  \
-+            TYPE aa = a[i], nn = n[i], mm = m[i];             \
-+            d[i] = OP(aa, nn, mm);                            \
-+        }                                                     \
-+    }                                                         \
++void HELPER(sve_adr_p64)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t sh = simd_data(desc);
++    uint64_t *d = vd, *n = vn, *m = vm;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[i] + (m[i] << sh);
++    }
 +}
 +
-+#define DO_MLA(A, N, M)  (A + N * M)
-+#define DO_MLS(A, N, M)  (A - N * M)
++void HELPER(sve_adr_s32)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t sh = simd_data(desc);
++    uint64_t *d = vd, *n = vn, *m = vm;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[i] + ((uint64_t)(int32_t)m[i] << sh);
++    }
++}
 +
-+DO_ZPZZZ(sve_mla_b, uint8_t, H1, DO_MLA)
-+DO_ZPZZZ(sve_mls_b, uint8_t, H1, DO_MLS)
-+
-+DO_ZPZZZ(sve_mla_h, uint16_t, H1_2, DO_MLA)
-+DO_ZPZZZ(sve_mls_h, uint16_t, H1_2, DO_MLS)
-+
-+DO_ZPZZZ(sve_mla_s, uint32_t, H1_4, DO_MLA)
-+DO_ZPZZZ(sve_mls_s, uint32_t, H1_4, DO_MLS)
-+
-+DO_ZPZZZ_D(sve_mla_d, uint64_t, DO_MLA)
-+DO_ZPZZZ_D(sve_mls_d, uint64_t, DO_MLS)
-+
-+#undef DO_MLA
-+#undef DO_MLS
-+#undef DO_ZPZZZ
-+#undef DO_ZPZZZ_D
++void HELPER(sve_adr_u32)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t sh = simd_data(desc);
++    uint64_t *d = vd, *n = vn, *m = vm;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[i] + ((uint64_t)(uint32_t)m[i] << sh);
++    }
++}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index dce8ba8dc0..b956d87636 100644
+index 43e9f1ad08..34cc8c2773 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -609,6 +609,37 @@ DO_ZPZW(LSL, lsl)
- 
- #undef DO_ZPZW
+@@ -847,6 +847,39 @@ static void trans_RDVL(DisasContext *s, arg_RDVL *a, uint32_t insn)
+     tcg_gen_movi_i64(reg, a->imm * vec_full_reg_size(s));
+ }
  
 +/*
-+ *** SVE Integer Multiply-Add Group
++ *** SVE Compute Vector Address Group
 + */
 +
-+static void do_zpzzz_ool(DisasContext *s, arg_rprrr_esz *a,
-+                         gen_helper_gvec_5 *fn)
++static void do_adr(DisasContext *s, arg_rrri *a, gen_helper_gvec_3 *fn)
 +{
 +    unsigned vsz = vec_full_reg_size(s);
-+    tcg_gen_gvec_5_ool(vec_full_reg_offset(s, a->rd),
-+                       vec_full_reg_offset(s, a->ra),
++    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
 +                       vec_full_reg_offset(s, a->rn),
 +                       vec_full_reg_offset(s, a->rm),
-+                       pred_full_reg_offset(s, a->pg),
-+                       vsz, vsz, 0, fn);
++                       vsz, vsz, a->imm, fn);
 +}
 +
-+#define DO_ZPZZZ(NAME, name) \
-+static void trans_##NAME(DisasContext *s, arg_rprrr_esz *a, uint32_t insn) \
-+{                                                                    \
-+    static gen_helper_gvec_5 * const fns[4] = {                      \
-+        gen_helper_sve_##name##_b, gen_helper_sve_##name##_h,        \
-+        gen_helper_sve_##name##_s, gen_helper_sve_##name##_d,        \
-+    };                                                               \
-+    do_zpzzz_ool(s, a, fns[a->esz]);                                 \
++static void trans_ADR_p32(DisasContext *s, arg_rrri *a, uint32_t insn)
++{
++    do_adr(s, a, gen_helper_sve_adr_p32);
 +}
 +
-+DO_ZPZZZ(MLA, mla)
-+DO_ZPZZZ(MLS, mls)
++static void trans_ADR_p64(DisasContext *s, arg_rrri *a, uint32_t insn)
++{
++    do_adr(s, a, gen_helper_sve_adr_p64);
++}
 +
-+#undef DO_ZPZZZ
++static void trans_ADR_s32(DisasContext *s, arg_rrri *a, uint32_t insn)
++{
++    do_adr(s, a, gen_helper_sve_adr_s32);
++}
++
++static void trans_ADR_u32(DisasContext *s, arg_rrri *a, uint32_t insn)
++{
++    do_adr(s, a, gen_helper_sve_adr_u32);
++}
 +
  /*
   *** SVE Predicate Logical Operations Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index b875501475..68a1823b72 100644
+index f71ea1b60d..6ec1f94832 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -48,6 +48,7 @@
+@@ -49,6 +49,7 @@
+ 
+ &rr_esz		rd rn esz
+ &rri		rd rn imm
++&rrri		rd rn rm imm
+ &rri_esz	rd rn imm esz
+ &rrr_esz	rd rn rm esz
  &rpr_esz	rd pg rn esz
- &rprr_s		rd pg rn rm s
- &rprr_esz	rd pg rn rm esz
-+&rprrr_esz	rd pg rn rm ra esz
- &rpri_esz	rd pg rn imm esz
- &ptrue		rd esz pat s
+@@ -77,6 +78,9 @@
+ # Three operand, vector element size
+ @rd_rn_rm	........ esz:2 . rm:5  ... ...  rn:5 rd:5	&rrr_esz
  
-@@ -73,6 +74,12 @@
- @rdm_pg_rn	........ esz:2 ... ... ... pg:3 rn:5 rd:5 \
- 		&rprr_esz rm=%reg_movprfx
- 
-+# Three register operand, with governing predicate, vector element size
-+@rda_pg_rn_rm	........ esz:2 . rm:5  ... pg:3 rn:5 rd:5 \
-+		&rprrr_esz ra=%reg_movprfx
-+@rdn_pg_ra_rm	........ esz:2 . rm:5  ... pg:3 ra:5 rd:5 \
-+		&rprrr_esz rn=%reg_movprfx
++# Three operand with "memory" size, aka immediate left shift
++@rd_rn_msz_rm	........ ... rm:5 .... imm:2 rn:5 rd:5		&rrri
 +
- # One register operand, with governing predicate, vector element size
- @rd_pg_rn	........ esz:2 ... ... ... pg:3 rn:5 rd:5	&rpr_esz
+ # Two register operand, with governing predicate, vector element size
+ @rdn_pg_rm	........ esz:2 ... ... ... pg:3 rm:5 rd:5 \
+ 		&rprr_esz rn=%reg_movprfx
+@@ -278,6 +282,14 @@ ASR_zzw		00000100 .. 1 ..... 1000 00 ..... .....		@rd_rn_rm
+ LSR_zzw		00000100 .. 1 ..... 1000 01 ..... .....		@rd_rn_rm
+ LSL_zzw		00000100 .. 1 ..... 1000 11 ..... .....		@rd_rn_rm
  
-@@ -188,6 +195,16 @@ UXTH		00000100 .. 010 011 101 ... ..... .....		@rd_pg_rn
- SXTW		00000100 .. 010 100 101 ... ..... .....		@rd_pg_rn
- UXTW		00000100 .. 010 101 101 ... ..... .....		@rd_pg_rn
++### SVE Compute Vector Address Group
++
++# SVE vector address generation
++ADR_s32		00000100 00 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
++ADR_u32		00000100 01 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
++ADR_p32		00000100 10 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
++ADR_p64		00000100 11 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
++
+ ### SVE Predicate Logical Operations Group
  
-+### SVE Integer Multiply-Add Group
-+
-+# SVE integer multiply-add writing addend (predicated)
-+MLA		00000100 .. 0 ..... 010 ... ..... .....   @rda_pg_rn_rm
-+MLS		00000100 .. 0 ..... 011 ... ..... .....   @rda_pg_rn_rm
-+
-+# SVE integer multiply-add writing multiplicand (predicated)
-+MLA		00000100 .. 0 ..... 110 ... ..... .....   @rdn_pg_ra_rm # MAD
-+MLS		00000100 .. 0 ..... 111 ... ..... .....   @rdn_pg_ra_rm # MSB
-+
- ### SVE Logical - Unpredicated Group
- 
- # SVE bitwise logical operations (unpredicated)
+ # SVE predicate logical operations
 -- 
 2.14.3
