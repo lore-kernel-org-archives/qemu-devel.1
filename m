@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1en7Wa-0003ld-I8
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:47:54 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1en7Wa-0003n5-Si
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:47:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1en7WZ-0003X3-0j
+	(envelope-from <eric.auger@redhat.com>) id 1en7WY-0003WY-VS
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:47:52 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Sat, 17 Feb 2018 19:46:56 +0100
-Message-Id: <1518893216-9983-15-git-send-email-eric.auger@redhat.com>
+Date: Sat, 17 Feb 2018 19:46:54 +0100
+Message-Id: <1518893216-9983-13-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
 References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 14/14] hw/arm/virt: Handle iommu in 2.12
- machine type
+Subject: [Qemu-devel] [PATCH v9 12/14] hw/arm/virt: Add SMMUv3 to the virt
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +23,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com
 Cc: tn@semihalf.com, mst@redhat.com, christoffer.dall@linaro.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, edgar.iglesias@gmail.com, linuc.decode@gmail.com, peterx@redhat.com
 
-The new machine type exposes a new "iommu" virt machine option.
-The SMMUv3 IOMMU is instantiated using -machine virt,iommu=smmuv3.
+From: Prem Mallappa <prem.mallappa@broadcom.com>
 
+Add code to instantiate an smmuv3 in virt machine. A new iommu
+integer member is introduced in VirtMachineState to store the type
+of the iommu in use.
+
+Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v7 -> v8:
-- Revert to machine option, now dubbed "iommu", preparing for virtio
-  instantiation.
+- integer iommu member
+- add primary-bus property
 
-v5 -> v6: machine 2_11
+v4 -> v5:
+- add dma-coherent property
 
-Another alternative would be to use the -device option as
-done on x86. As the smmu is a sysbus device, we would need to
-use the platform bus framework.
+v2 -> v3:
+- vbi was removed. Use vms instead
+- migrate to new smmu binding format (iommu-map)
+- don't use appendprop anymore
+- add vms->smmu and guard instantiation with this latter
+- interrupts type changed to edge
+
+Conflicts:
+	hw/arm/smmuv3.c
 ---
- hw/arm/virt.c         | 45 +++++++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 46 insertions(+)
+ hw/arm/virt.c         | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/arm/virt.h | 10 ++++++++
+ 2 files changed, 73 insertions(+), 1 deletion(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index e9dca0d..607c7e1 100644
+index dbb3c80..e9dca0d 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1547,6 +1547,34 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
-     }
+@@ -58,6 +58,7 @@
+ #include "hw/smbios/smbios.h"
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
++#include "hw/arm/smmuv3.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -141,6 +142,7 @@ static const MemMapEntry a15memmap[] = {
+     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
+     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
++    [VIRT_SMMU] =               { 0x09050000, 0x00020000 }, /* 128K, needed */
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -161,6 +163,7 @@ static const int a15irqmap[] = {
+     [VIRT_SECURE_UART] = 8,
+     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
+     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
++    [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
+     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+ };
+ 
+@@ -941,7 +944,57 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                            0x7           /* PCI irq */);
  }
  
-+static char *virt_get_iommu(Object *obj, Error **errp)
+-static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
++static void create_smmu(const VirtMachineState *vms, qemu_irq *pic,
++                        PCIBus *bus)
 +{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
++    char *node;
++    const char compat[] = "arm,smmu-v3";
++    int irq =  vms->irqmap[VIRT_SMMU];
++    int i;
++    hwaddr base = vms->memmap[VIRT_SMMU].base;
++    hwaddr size = vms->memmap[VIRT_SMMU].size;
++    const char irq_names[] = "eventq\0priq\0cmdq-sync\0gerror";
++    DeviceState *dev;
 +
-+    switch (vms->iommu) {
-+    case VIRT_IOMMU_NONE:
-+        return g_strdup("none");
-+    case VIRT_IOMMU_SMMUV3:
-+        return g_strdup("smmuv3");
-+    default:
-+        return g_strdup("none");
++    if (vms->iommu != VIRT_IOMMU_SMMUV3 || !vms->iommu_phandle) {
++        return;
 +    }
++
++    dev = qdev_create(NULL, "arm-smmuv3");
++
++    object_property_set_link(OBJECT(dev), OBJECT(bus), "primary-bus",
++                             &error_abort);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
++    for (i = 0; i < NUM_SMMU_IRQS; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
++    }
++
++    node = g_strdup_printf("/smmuv3@%" PRIx64, base);
++    qemu_fdt_add_subnode(vms->fdt, node);
++    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
++    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg", 2, base, 2, size);
++
++    qemu_fdt_setprop_cells(vms->fdt, node, "interrupts",
++            GIC_FDT_IRQ_TYPE_SPI, irq    , GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 1, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 2, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 3, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
++
++    qemu_fdt_setprop(vms->fdt, node, "interrupt-names", irq_names,
++                     sizeof(irq_names));
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "clocks", vms->clock_phandle);
++    qemu_fdt_setprop_string(vms->fdt, node, "clock-names", "apb_pclk");
++    qemu_fdt_setprop(vms->fdt, node, "dma-coherent", NULL, 0);
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
++    g_free(node);
 +}
 +
-+static void virt_set_iommu(Object *obj, const char *value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    if (!strcmp(value, "smmuv3")) {
-+        vms->iommu = VIRT_IOMMU_SMMUV3;
-+    } else if (!strcmp(value, "none")) {
-+        vms->iommu = VIRT_IOMMU_NONE;
-+    } else {
-+        error_setg(errp, "Invalid iommu value");
-+        error_append_hint(errp, "Valid value are none, smmuv3\n");
-+    }
-+}
-+
- static CpuInstanceProperties
- virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
++static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
  {
-@@ -1679,6 +1707,19 @@ static void virt_2_12_instance_init(Object *obj)
-                                         NULL);
-     }
+     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
+@@ -1054,6 +1107,15 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
+     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
  
-+    if (vmc->no_iommu) {
-+        vms->iommu = VIRT_IOMMU_NONE;
-+    } else {
-+        /* Default disallows smmu instantiation */
-+        vms->iommu = VIRT_IOMMU_NONE;
-+        object_property_add_str(obj, "iommu", virt_get_iommu,
-+                                 virt_set_iommu, NULL);
-+        object_property_set_description(obj, "iommu",
-+                                        "Set the IOMMU model among "
-+                                        "none, smmuv3 (default none)",
-+                                        NULL);
++    if (vms->iommu) {
++        vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
++
++        create_smmu(vms, pic, pci->bus);
++
++        qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
++                               0x0, vms->iommu_phandle, 0x0, 0x10000);
 +    }
 +
-     vms->memmap = a15memmap;
-     vms->irqmap = a15irqmap;
+     g_free(nodename);
  }
-@@ -1698,8 +1739,12 @@ static void virt_2_11_instance_init(Object *obj)
- 
- static void virt_machine_2_11_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_2_12_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_11);
-+
-+    vmc->no_iommu = true;
- }
- DEFINE_VIRT_MACHINE(2, 11)
  
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 13d3724..3a92fc3 100644
+index 33b0ff3..13d3724 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -92,6 +92,7 @@ typedef struct {
-     bool disallow_affinity_adjustment;
-     bool no_its;
-     bool no_pmu;
-+    bool no_iommu;
-     bool claim_edge_triggered_timers;
- } VirtMachineClass;
+@@ -38,6 +38,7 @@
+ 
+ #define NUM_GICV2M_SPIS       64
+ #define NUM_VIRTIO_TRANSPORTS 32
++#define NUM_SMMU_IRQS          4
+ 
+ #define ARCH_GICV3_MAINT_IRQ  9
+ 
+@@ -59,6 +60,7 @@ enum {
+     VIRT_GIC_V2M,
+     VIRT_GIC_ITS,
+     VIRT_GIC_REDIST,
++    VIRT_SMMU,
+     VIRT_UART,
+     VIRT_MMIO,
+     VIRT_RTC,
+@@ -74,6 +76,12 @@ enum {
+     VIRT_SECURE_MEM,
+ };
+ 
++enum {
++    VIRT_IOMMU_NONE,
++    VIRT_IOMMU_SMMUV3,
++    VIRT_IOMMU_VIRTIO,
++};
++
+ typedef struct MemMapEntry {
+     hwaddr base;
+     hwaddr size;
+@@ -96,6 +104,7 @@ typedef struct {
+     bool its;
+     bool virt;
+     int32_t gic_version;
++    int32_t iommu;
+     struct arm_boot_info bootinfo;
+     const MemMapEntry *memmap;
+     const int *irqmap;
+@@ -105,6 +114,7 @@ typedef struct {
+     uint32_t clock_phandle;
+     uint32_t gic_phandle;
+     uint32_t msi_phandle;
++    uint32_t iommu_phandle;
+     int psci_conduit;
+ } VirtMachineState;
  
 -- 
 2.5.5
