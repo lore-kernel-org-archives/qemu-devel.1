@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1emroi-0004Ml-VY
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:01:33 -0500
+	(envelope-from <vapier@gentoo.org>) id 1emrpi-0005Dx-Nq
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1emroi-0003Ft-5E
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:01:33 -0500
-Received: from mail.gentoo.org ([2001:470:ea4a:1:5054:ff:fec7:86e4]:56681
+	(envelope-from <vapier@gentoo.org>) id 1emrpi-0003UO-2t
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:02:34 -0500
+Received: from mail.gentoo.org ([2001:470:ea4a:1:5054:ff:fec7:86e4]:41779
 	helo=smtp.gentoo.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vapier@gentoo.org>) id 1emroh-0003FL-JB
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:01:32 -0500
+	(Exim 4.71) (envelope-from <vapier@gentoo.org>) id 1emrph-0003Tw-SY
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:02:34 -0500
 From: Mike Frysinger <vapier@gentoo.org>
-Date: Fri, 16 Feb 2018 21:01:22 -0500
-Message-Id: <20180217020122.1469-1-vapier@gentoo.org>
-Subject: [Qemu-devel] [PATCH] linux-user: make getcpu optional
+Date: Fri, 16 Feb 2018 21:02:30 -0500
+Message-Id: <20180217020230.1759-1-vapier@gentoo.org>
+In-Reply-To: <20180217020122.1469-1-vapier@gentoo.org>
+References: <20180217020122.1469-1-vapier@gentoo.org>
+Subject: [Qemu-devel] [PATCH v2] linux-user: make getcpu optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,9 +32,8 @@ Add ifdef logic to disable it when not available.
 
 Signed-off-by: Mike Frysinger <vapier@gentoo.org>
 ---
- linux-user/syscall.c    | 4 ++++
- target/bfin/op_helper.c | 4 ++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ linux-user/syscall.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
 index 799c8e2800ea..a9904fac791f 100644
@@ -65,20 +66,5 @@ index 799c8e2800ea..a9904fac791f 100644
      case TARGET_NR_sched_setparam:
          {
              struct sched_param *target_schp;
-diff --git a/target/bfin/op_helper.c b/target/bfin/op_helper.c
-index 5b80aea23bc6..abb3e9301814 100644
---- a/target/bfin/op_helper.c
-+++ b/target/bfin/op_helper.c
-@@ -18,8 +18,8 @@
-    NULL, it means that the function was called in C code (i.e. not
-    from generated code or from helper.c) */
- /* XXX: fix it to restore all registers */
--void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
--              int mmu_idx, uintptr_t retaddr)
-+void tlb_fill(CPUState *cs, target_ulong addr, int size,
-+              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
- {
-     int ret;
- 
 -- 
 2.16.1
