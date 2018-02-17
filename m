@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en791-0008W9-P5
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:32 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en791-0008WA-PP
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en78z-0001Qv-JB
+	(envelope-from <richard.henderson@linaro.org>) id 1en78y-0001QF-ER
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:31 -0500
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:34788)
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:38164)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en78z-0001QV-DD
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:29 -0500
-Received: by mail-pl0-x242.google.com with SMTP id bd10so3449349plb.1
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:23:29 -0800 (PST)
+	id 1en78y-0001Pu-5q
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:28 -0500
+Received: by mail-pl0-x241.google.com with SMTP id h10so3438734plt.5
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:23:28 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:17 -0800
-Message-Id: <20180217182323.25885-2-richard.henderson@linaro.org>
-In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 01/67] target/arm: Enable SVE for
- aarch64-linux-user
+Date: Sat, 17 Feb 2018 10:22:16 -0800
+Message-Id: <20180217182323.25885-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 00/67] target/arm: Scalable Vector Extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +27,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-Enable ARM_FEATURE_SVE for the generic "any" cpu.
+This is 99% of the instruction set.  There are a few things missing,
+notably first-fault and non-fault loads (even these are decoded, but
+simply treated as normal loads for now).
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.c   | 7 +++++++
- target/arm/cpu64.c | 1 +
- 2 files changed, 8 insertions(+)
+The patch set is dependant on at least 3 other branches.
+A fully composed tree is available as
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 1b3ae62db6..10843994c3 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -150,6 +150,13 @@ static void arm_cpu_reset(CPUState *s)
-         env->cp15.sctlr_el[1] |= SCTLR_UCT | SCTLR_UCI | SCTLR_DZE;
-         /* and to the FP/Neon instructions */
-         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 20, 2, 3);
-+        /* and to the SVE instructions */
-+        env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 16, 2, 3);
-+        env->cp15.cptr_el[3] |= CPTR_EZ;
-+        /* with maximum vector length */
-+        env->vfp.zcr_el[1] = ARM_MAX_VQ - 1;
-+        env->vfp.zcr_el[2] = ARM_MAX_VQ - 1;
-+        env->vfp.zcr_el[3] = ARM_MAX_VQ - 1;
- #else
-         /* Reset into the highest available EL */
-         if (arm_feature(env, ARM_FEATURE_EL3)) {
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index efc519b49b..36ef9e9d9d 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -231,6 +231,7 @@ static void aarch64_any_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-     set_feature(&cpu->env, ARM_FEATURE_CRC);
-     set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
-+    set_feature(&cpu->env, ARM_FEATURE_SVE);
-     cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
-     cpu->dcz_blocksize = 7; /*  512 bytes */
- }
+  git://github.com/rth7680/qemu.git tgt-arm-sve-7
+
+There are a few checkpatch errors due to macros and typedefs, but
+nothing that isn't be obvious as a false positive.
+
+This is able to run SVE enabled Himeno and LULESH benchmarks as
+compiled by last week's gcc-8:
+
+$ ./aarch64-linux-user/qemu-aarch64 ~/himeno-advsimd
+mimax = 129 mjmax = 65 mkmax = 65
+imax = 128 jmax = 64 kmax =64
+cpu : 67.028643 sec.
+Loop executed for 200 times
+Gosa : 1.688752e-03 
+MFLOPS measured : 49.136295
+Score based on MMX Pentium 200MHz : 1.522662
+
+$ ./aarch64-linux-user/qemu-aarch64 ~/himeno-sve 
+mimax = 129 mjmax = 65 mkmax = 65
+imax = 128 jmax = 64 kmax =64
+cpu : 43.481213 sec.
+Loop executed for 200 times
+Gosa : 3.830036e-06 
+MFLOPS measured : 75.746259
+Score based on MMX Pentium 200MHz : 2.347266
+
+Hopefully the size of the patch set isn't too daunting...
+
+
+r~
+
+
+Richard Henderson (67):
+  target/arm: Enable SVE for aarch64-linux-user
+  target/arm: Introduce translate-a64.h
+  target/arm: Add SVE decode skeleton
+  target/arm: Implement SVE Bitwise Logical - Unpredicated Group
+  target/arm: Implement SVE load vector/predicate
+  target/arm: Implement SVE predicate test
+  target/arm: Implement SVE Predicate Logical Operations Group
+  target/arm: Implement SVE Predicate Misc Group
+  target/arm: Implement SVE Integer Binary Arithmetic - Predicated Group
+  target/arm: Implement SVE Integer Reduction Group
+  target/arm: Implement SVE bitwise shift by immediate (predicated)
+  target/arm: Implement SVE bitwise shift by vector (predicated)
+  target/arm: Implement SVE bitwise shift by wide elements (predicated)
+  target/arm: Implement SVE Integer Arithmetic - Unary Predicated Group
+  target/arm: Implement SVE Integer Multiply-Add Group
+  target/arm: Implement SVE Integer Arithmetic - Unpredicated Group
+  target/arm: Implement SVE Index Generation Group
+  target/arm: Implement SVE Stack Allocation Group
+  target/arm: Implement SVE Bitwise Shift - Unpredicated Group
+  target/arm: Implement SVE Compute Vector Address Group
+  target/arm: Implement SVE floating-point exponential accelerator
+  target/arm: Implement SVE floating-point trig select coefficient
+  target/arm: Implement SVE Element Count Group
+  target/arm: Implement SVE Bitwise Immediate Group
+  target/arm: Implement SVE Integer Wide Immediate - Predicated Group
+  target/arm: Implement SVE Permute - Extract Group
+  target/arm: Implement SVE Permute - Unpredicated Group
+  target/arm: Implement SVE Permute - Predicates Group
+  target/arm: Implement SVE Permute - Interleaving Group
+  target/arm: Implement SVE compress active elements
+  target/arm: Implement SVE conditionally broadcast/extract element
+  target/arm: Implement SVE copy to vector (predicated)
+  target/arm: Implement SVE reverse within elements
+  target/arm: Implement SVE vector splice (predicated)
+  target/arm: Implement SVE Select Vectors Group
+  target/arm: Implement SVE Integer Compare - Vectors Group
+  target/arm: Implement SVE Integer Compare - Immediate Group
+  target/arm: Implement SVE Partition Break Group
+  target/arm: Implement SVE Predicate Count Group
+  target/arm: Implement SVE Integer Compare - Scalars Group
+  target/arm: Implement FDUP/DUP
+  target/arm: Implement SVE Integer Wide Immediate - Unpredicated Group
+  target/arm: Implement SVE Floating Point Arithmetic - Unpredicated
+    Group
+  target/arm: Implement SVE Memory Contiguous Load Group
+  target/arm: Implement SVE Memory Contiguous Store Group
+  target/arm: Implement SVE load and broadcast quadword
+  target/arm: Implement SVE integer convert to floating-point
+  target/arm: Implement SVE floating-point arithmetic (predicated)
+  target/arm: Implement SVE FP Multiply-Add Group
+  target/arm: Implement SVE Floating Point Accumulating Reduction Group
+  target/arm: Implement SVE load and broadcast element
+  target/arm: Implement SVE store vector/predicate register
+  target/arm: Implement SVE scatter stores
+  target/arm: Implement SVE prefetches
+  target/arm: Implement SVE gather loads
+  target/arm: Implement SVE scatter store vector immediate
+  target/arm: Implement SVE floating-point compare vectors
+  target/arm: Implement SVE floating-point arithmetic with immediate
+  target/arm: Implement SVE Floating Point Multiply Indexed Group
+  target/arm: Implement SVE FP Fast Reduction Group
+  target/arm: Implement SVE Floating Point Unary Operations -
+    Unpredicated Group
+  target/arm: Implement SVE FP Compare with Zero Group
+  target/arm: Implement SVE floating-point trig multiply-add coefficient
+  target/arm: Implement SVE floating-point convert precision
+  target/arm: Implement SVE floating-point convert to integer
+  target/arm: Implement SVE floating-point round to integral value
+  target/arm: Implement SVE floating-point unary operations
+
+ target/arm/cpu.h           |    7 +-
+ target/arm/helper-sve.h    | 1285 ++++++++++++
+ target/arm/helper.h        |   42 +
+ target/arm/translate-a64.h |  110 ++
+ target/arm/cpu.c           |    7 +
+ target/arm/cpu64.c         |    1 +
+ target/arm/sve_helper.c    | 4051 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c |  112 +-
+ target/arm/translate-sve.c | 4626 ++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/vec_helper.c    |  178 ++
+ .gitignore                 |    1 +
+ target/arm/Makefile.objs   |   12 +-
+ target/arm/sve.decode      | 1067 ++++++++++
+ 13 files changed, 11408 insertions(+), 91 deletions(-)
+ create mode 100644 target/arm/helper-sve.h
+ create mode 100644 target/arm/translate-a64.h
+ create mode 100644 target/arm/sve_helper.c
+ create mode 100644 target/arm/translate-sve.c
+ create mode 100644 target/arm/vec_helper.c
+ create mode 100644 target/arm/sve.decode
+
 -- 
 2.14.3
