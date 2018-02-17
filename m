@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79l-0000uS-Bg
+	(envelope-from <richard.henderson@linaro.org>) id 1en79k-0000sp-6u
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79k-0001r8-AB
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:17 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:37119)
+	(envelope-from <richard.henderson@linaro.org>) id 1en79h-0001pf-Gj
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:16 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:32803)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en79k-0001qY-1h
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:16 -0500
-Received: by mail-pg0-x241.google.com with SMTP id o1so4353677pgn.4
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:15 -0800 (PST)
+	id 1en79h-0001pG-0e
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:13 -0500
+Received: by mail-pf0-x241.google.com with SMTP id b8so525376pfh.0
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:12 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:46 -0800
-Message-Id: <20180217182323.25885-31-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:22:44 -0800
+Message-Id: <20180217182323.25885-29-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 30/67] target/arm: Implement SVE compress
- active elements
+Subject: [Qemu-devel] [PATCH v2 28/67] target/arm: Implement SVE Permute -
+ Predicates Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +32,470 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  3 +++
- target/arm/sve_helper.c    | 34 ++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 12 ++++++++++++
- target/arm/sve.decode      |  6 ++++++
- 4 files changed, 55 insertions(+)
+ target/arm/helper-sve.h    |   6 +
+ target/arm/sve_helper.c    | 280 +++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 110 ++++++++++++++++++
+ target/arm/sve.decode      |  18 +++
+ 4 files changed, 414 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index bab20345c6..d977aea00d 100644
+index 0c9aad575e..ff958fcebd 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -460,6 +460,9 @@ DEF_HELPER_FLAGS_4(sve_trn_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_trn_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_trn_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -439,6 +439,12 @@ DEF_HELPER_FLAGS_3(sve_uunpk_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_uunpk_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_uunpk_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_4(sve_compact_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_compact_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_zip_p, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_uzp_p, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_trn_p, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_rev_p, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_punpk_p, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 +
  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 62982bd099..87a1a32232 100644
+index 466a209c1e..c3a2706a16 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -2016,3 +2016,37 @@ DO_TRN(sve_trn_d, uint64_t, )
- #undef DO_ZIP
- #undef DO_UZP
- #undef DO_TRN
+@@ -1664,3 +1664,283 @@ DO_UNPK(sve_uunpk_s, uint32_t, uint16_t, H4, H2)
+ DO_UNPK(sve_uunpk_d, uint64_t, uint32_t, , H4)
+ 
+ #undef DO_UNPK
 +
-+void HELPER(sve_compact_s)(void *vd, void *vn, void *vg, uint32_t desc)
++static const uint64_t expand_bit_data[5][2] = {
++    { 0x1111111111111111ull, 0x2222222222222222ull },
++    { 0x0303030303030303ull, 0x0c0c0c0c0c0c0c0cull },
++    { 0x000f000f000f000full, 0x00f000f000f000f0ull },
++    { 0x000000ff000000ffull, 0x0000ff000000ff00ull },
++    { 0x000000000000ffffull, 0x00000000ffff0000ull }
++};
++
++/* Expand units of 2**N bits to units of 2**(N+1) bits,
++   with the higher bits zero.  */
++static uint64_t expand_bits(uint64_t x, int n)
 +{
-+    intptr_t i, j, opr_sz = simd_oprsz(desc) / 4;
-+    uint32_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
-+
-+    for (i = j = 0; i < opr_sz; i++) {
-+        if (pg[H1(i / 2)] & (i & 1 ? 0x10 : 0x01)) {
-+            d[H4(j)] = n[H4(i)];
-+            j++;
-+        }
++    int i, sh;
++    for (i = 4, sh = 16; i >= n; i--, sh >>= 1) {
++        x = ((x & expand_bit_data[i][1]) << sh) | (x & expand_bit_data[i][0]);
 +    }
-+    for (; j < opr_sz; j++) {
-+        d[H4(j)] = 0;
++    return x;
++}
++
++/* Compress units of 2**(N+1) bits to units of 2**N bits.  */
++static uint64_t compress_bits(uint64_t x, int n)
++{
++    int i, sh;
++    for (i = n, sh = 1 << n; i <= 4; i++, sh <<= 1) {
++        x = ((x >> sh) & expand_bit_data[i][1]) | (x & expand_bit_data[i][0]);
++    }
++    return x;
++}
++
++void HELPER(sve_zip_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    int esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
++    intptr_t high = extract32(pred_desc, SIMD_DATA_SHIFT + 2, 1);
++    uint64_t *d = vd;
++    intptr_t i;
++
++    if (oprsz <= 8) {
++        uint64_t nn = *(uint64_t *)vn;
++        uint64_t mm = *(uint64_t *)vm;
++        int half = 4 * oprsz;
++
++        nn = extract64(nn, high * half, half);
++        mm = extract64(mm, high * half, half);
++        nn = expand_bits(nn, esz);
++        mm = expand_bits(mm, esz);
++        d[0] = nn + (mm << (1 << esz));
++    } else {
++        ARMPredicateReg tmp_n, tmp_m;
++
++        /* We produce output faster than we consume input.
++           Therefore we must be mindful of possible overlap.  */
++        if ((vn - vd) < (uintptr_t)oprsz) {
++            vn = memcpy(&tmp_n, vn, oprsz);
++        }
++        if ((vm - vd) < (uintptr_t)oprsz) {
++            vm = memcpy(&tmp_m, vm, oprsz);
++        }
++        if (high) {
++            high = oprsz >> 1;
++        }
++
++        if ((high & 3) == 0) {
++            uint32_t *n = vn, *m = vm;
++            high >>= 2;
++
++            for (i = 0; i < DIV_ROUND_UP(oprsz, 8); i++) {
++                uint64_t nn = n[H4(high + i)];
++                uint64_t mm = m[H4(high + i)];
++
++                nn = expand_bits(nn, esz);
++                mm = expand_bits(mm, esz);
++                d[i] = nn + (mm << (1 << esz));
++            }
++        } else {
++            uint8_t *n = vn, *m = vm;
++            uint16_t *d16 = vd;
++
++            for (i = 0; i < oprsz / 2; i++) {
++                uint16_t nn = n[H1(high + i)];
++                uint16_t mm = m[H1(high + i)];
++
++                nn = expand_bits(nn, esz);
++                mm = expand_bits(mm, esz);
++                d16[H2(i)] = nn + (mm << (1 << esz));
++            }
++        }
 +    }
 +}
 +
-+void HELPER(sve_compact_d)(void *vd, void *vn, void *vg, uint32_t desc)
++void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
 +{
-+    intptr_t i, j, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    int esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
++    int odd = extract32(pred_desc, SIMD_DATA_SHIFT + 2, 1) << esz;
++    uint64_t *d = vd, *n = vn, *m = vm;
++    uint64_t l, h;
++    intptr_t i;
 +
-+    for (i = j = 0; i < opr_sz; i++) {
-+        if (pg[H1(i)] & 1) {
-+            d[j] = n[i];
-+            j++;
++    if (oprsz <= 8) {
++        l = compress_bits(n[0] >> odd, esz);
++        h = compress_bits(m[0] >> odd, esz);
++        d[0] = extract64(l + (h << (4 * oprsz)), 0, 8 * oprsz);
++    } else {
++        ARMPredicateReg tmp_m;
++        intptr_t oprsz_16 = oprsz / 16;
++
++        if ((vm - vd) < (uintptr_t)oprsz) {
++            m = memcpy(&tmp_m, vm, oprsz);
++        }
++
++        for (i = 0; i < oprsz_16; i++) {
++            l = n[2 * i + 0];
++            h = n[2 * i + 1];
++            l = compress_bits(l >> odd, esz);
++            h = compress_bits(h >> odd, esz);
++            d[i] = l + (h << 32);
++        }
++
++        /* For VL which is not a power of 2, the results from M do not
++           align nicely with the uint64_t for D.  Put the aligned results
++           from M into TMP_M and then copy it into place afterward.  */
++        if (oprsz & 15) {
++            d[i] = compress_bits(n[2 * i] >> odd, esz);
++
++            for (i = 0; i < oprsz_16; i++) {
++                l = m[2 * i + 0];
++                h = m[2 * i + 1];
++                l = compress_bits(l >> odd, esz);
++                h = compress_bits(h >> odd, esz);
++                tmp_m.p[i] = l + (h << 32);
++            }
++            tmp_m.p[i] = compress_bits(m[2 * i] >> odd, esz);
++
++            swap_memmove(vd + oprsz / 2, &tmp_m, oprsz / 2);
++        } else {
++            for (i = 0; i < oprsz_16; i++) {
++                l = m[2 * i + 0];
++                h = m[2 * i + 1];
++                l = compress_bits(l >> odd, esz);
++                h = compress_bits(h >> odd, esz);
++                d[oprsz_16 + i] = l + (h << 32);
++            }
 +        }
 +    }
-+    for (; j < opr_sz; j++) {
-+        d[j] = 0;
++}
++
++static const uint64_t even_bit_esz_masks[4] = {
++    0x5555555555555555ull,
++    0x3333333333333333ull,
++    0x0f0f0f0f0f0f0f0full,
++    0x00ff00ff00ff00ffull
++};
++
++void HELPER(sve_trn_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    uintptr_t esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
++    bool odd = extract32(pred_desc, SIMD_DATA_SHIFT + 2, 1);
++    uint64_t *d = vd, *n = vn, *m = vm;
++    uint64_t mask;
++    int shr, shl;
++    intptr_t i;
++
++    shl = 1 << esz;
++    shr = 0;
++    mask = even_bit_esz_masks[esz];
++    if (odd) {
++        mask <<= shl;
++        shr = shl;
++        shl = 0;
++    }
++
++    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); i++) {
++        uint64_t nn = (n[i] & mask) >> shr;
++        uint64_t mm = (m[i] & mask) << shl;
++        d[i] = nn + mm;
++    }
++}
++
++/* Reverse units of 2**N bits.  */
++static uint64_t reverse_bits_64(uint64_t x, int n)
++{
++    int i, sh;
++
++    x = bswap64(x);
++    for (i = 2, sh = 4; i >= n; i--, sh >>= 1) {
++        uint64_t mask = even_bit_esz_masks[i];
++        x = ((x & mask) << sh) | ((x >> sh) & mask);
++    }
++    return x;
++}
++
++static uint8_t reverse_bits_8(uint8_t x, int n)
++{
++    static const uint8_t mask[3] = { 0x55, 0x33, 0x0f };
++    int i, sh;
++
++    for (i = 2, sh = 4; i >= n; i--, sh >>= 1) {
++        x = ((x & mask[i]) << sh) | ((x >> sh) & mask[i]);
++    }
++    return x;
++}
++
++void HELPER(sve_rev_p)(void *vd, void *vn, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    int esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
++    intptr_t i, oprsz_2 = oprsz / 2;
++
++    if (oprsz <= 8) {
++        uint64_t l = *(uint64_t *)vn;
++        l = reverse_bits_64(l << (64 - 8 * oprsz), esz);
++        *(uint64_t *)vd = l;
++    } else if ((oprsz & 15) == 0) {
++        for (i = 0; i < oprsz_2; i += 8) {
++            intptr_t ih = oprsz - 8 - i;
++            uint64_t l = reverse_bits_64(*(uint64_t *)(vn + i), esz);
++            uint64_t h = reverse_bits_64(*(uint64_t *)(vn + ih), esz);
++            *(uint64_t *)(vd + i) = h;
++            *(uint64_t *)(vd + ih) = l;
++        }
++    } else {
++        for (i = 0; i < oprsz_2; i += 1) {
++            intptr_t il = H1(i);
++            intptr_t ih = H1(oprsz - 1 - i);
++            uint8_t l = reverse_bits_8(*(uint8_t *)(vn + il), esz);
++            uint8_t h = reverse_bits_8(*(uint8_t *)(vn + ih), esz);
++            *(uint8_t *)(vd + il) = h;
++            *(uint8_t *)(vd + ih) = l;
++        }
++    }
++}
++
++void HELPER(sve_punpk_p)(void *vd, void *vn, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    intptr_t high = extract32(pred_desc, SIMD_DATA_SHIFT + 2, 1);
++    uint64_t *d = vd;
++    intptr_t i;
++
++    if (oprsz <= 8) {
++        uint64_t nn = *(uint64_t *)vn;
++        int half = 4 * oprsz;
++
++        nn = extract64(nn, high * half, half);
++        nn = expand_bits(nn, 0);
++        d[0] = nn;
++    } else {
++        ARMPredicateReg tmp_n;
++
++        /* We produce output faster than we consume input.
++           Therefore we must be mindful of possible overlap.  */
++        if ((vn - vd) < (uintptr_t)oprsz) {
++            vn = memcpy(&tmp_n, vn, oprsz);
++        }
++        if (high) {
++            high = oprsz >> 1;
++        }
++
++        if ((high & 3) == 0) {
++            uint32_t *n = vn;
++            high >>= 2;
++
++            for (i = 0; i < DIV_ROUND_UP(oprsz, 8); i++) {
++                uint64_t nn = n[H4(high + i)];
++                d[i] = expand_bits(nn, 0);
++            }
++        } else {
++            uint16_t *d16 = vd;
++            uint8_t *n = vn;
++
++            for (i = 0; i < oprsz / 2; i++) {
++                uint16_t nn = n[H1(high + i)];
++                d16[H2(i)] = expand_bits(nn, 0);
++            }
++        }
 +    }
 +}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 09ac955a36..21531b259c 100644
+index 3724f6290c..45e1ea87bf 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -2111,6 +2111,18 @@ static void trans_TRN2_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
-     do_zzz_data_ool(s, a, 1 << a->esz, trn_fns[a->esz]);
+@@ -1932,6 +1932,116 @@ static void trans_UNPK(DisasContext *s, arg_UNPK *a, uint32_t insn)
+                        vsz, vsz, 0, fns[a->esz][a->u]);
  }
  
 +/*
-+ *** SVE Permute Vector - Predicated Group
++ *** SVE Permute - Predicates Group
 + */
 +
-+static void trans_COMPACT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void do_perm_pred3(DisasContext *s, arg_rrr_esz *a, bool high_odd,
++                          gen_helper_gvec_3 *fn)
 +{
-+    static gen_helper_gvec_3 * const fns[4] = {
-+        NULL, NULL, gen_helper_sve_compact_s, gen_helper_sve_compact_d
-+    };
-+    do_zpz_ool(s, a, fns[a->esz]);
++    unsigned vsz = pred_full_reg_size(s);
++
++    /* Predicate sizes may be smaller and cannot use simd_desc.
++       We cannot round up, as we do elsewhere, because we need
++       the exact size for ZIP2 and REV.  We retain the style for
++       the other helpers for consistency.  */
++    TCGv_ptr t_d = tcg_temp_new_ptr();
++    TCGv_ptr t_n = tcg_temp_new_ptr();
++    TCGv_ptr t_m = tcg_temp_new_ptr();
++    TCGv_i32 t_desc;
++    int desc;
++
++    desc = vsz - 2;
++    desc = deposit32(desc, SIMD_DATA_SHIFT, 2, a->esz);
++    desc = deposit32(desc, SIMD_DATA_SHIFT + 2, 2, high_odd);
++
++    tcg_gen_addi_ptr(t_d, cpu_env, pred_full_reg_offset(s, a->rd));
++    tcg_gen_addi_ptr(t_n, cpu_env, pred_full_reg_offset(s, a->rn));
++    tcg_gen_addi_ptr(t_m, cpu_env, pred_full_reg_offset(s, a->rm));
++    t_desc = tcg_const_i32(desc);
++
++    fn(t_d, t_n, t_m, t_desc);
++
++    tcg_temp_free_ptr(t_d);
++    tcg_temp_free_ptr(t_n);
++    tcg_temp_free_ptr(t_m);
++    tcg_temp_free_i32(t_desc);
++}
++
++static void do_perm_pred2(DisasContext *s, arg_rr_esz *a, bool high_odd,
++                          gen_helper_gvec_2 *fn)
++{
++    unsigned vsz = pred_full_reg_size(s);
++    TCGv_ptr t_d = tcg_temp_new_ptr();
++    TCGv_ptr t_n = tcg_temp_new_ptr();
++    TCGv_i32 t_desc;
++    int desc;
++
++    tcg_gen_addi_ptr(t_d, cpu_env, pred_full_reg_offset(s, a->rd));
++    tcg_gen_addi_ptr(t_n, cpu_env, pred_full_reg_offset(s, a->rn));
++
++    /* Predicate sizes may be smaller and cannot use simd_desc.
++       We cannot round up, as we do elsewhere, because we need
++       the exact size for ZIP2 and REV.  We retain the style for
++       the other helpers for consistency.  */
++
++    desc = vsz - 2;
++    desc = deposit32(desc, SIMD_DATA_SHIFT, 2, a->esz);
++    desc = deposit32(desc, SIMD_DATA_SHIFT + 2, 2, high_odd);
++    t_desc = tcg_const_i32(desc);
++
++    fn(t_d, t_n, t_desc);
++
++    tcg_temp_free_i32(t_desc);
++    tcg_temp_free_ptr(t_d);
++    tcg_temp_free_ptr(t_n);
++}
++
++static void trans_ZIP1_p(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    do_perm_pred3(s, a, 0, gen_helper_sve_zip_p);
++}
++
++static void trans_ZIP2_p(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    do_perm_pred3(s, a, 1, gen_helper_sve_zip_p);
++}
++
++static void trans_UZP1_p(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    do_perm_pred3(s, a, 0, gen_helper_sve_uzp_p);
++}
++
++static void trans_UZP2_p(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    do_perm_pred3(s, a, 1, gen_helper_sve_uzp_p);
++}
++
++static void trans_TRN1_p(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    do_perm_pred3(s, a, 0, gen_helper_sve_trn_p);
++}
++
++static void trans_TRN2_p(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    do_perm_pred3(s, a, 1, gen_helper_sve_trn_p);
++}
++
++static void trans_REV_p(DisasContext *s, arg_rr_esz *a, uint32_t insn)
++{
++    do_perm_pred2(s, a, 0, gen_helper_sve_rev_p);
++}
++
++static void trans_PUNPKLO(DisasContext *s, arg_PUNPKLO *a, uint32_t insn)
++{
++    do_perm_pred2(s, a, 0, gen_helper_sve_punpk_p);
++}
++
++static void trans_PUNPKHI(DisasContext *s, arg_PUNPKHI *a, uint32_t insn)
++{
++    do_perm_pred2(s, a, 1, gen_helper_sve_punpk_p);
 +}
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 2efa3773fc..a89bd37eeb 100644
+index 8af47ad27b..bcbe84c3a6 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -425,6 +425,12 @@ UZP2_z		00000101 .. 1 ..... 011 011 ..... .....		@rd_rn_rm
- TRN1_z		00000101 .. 1 ..... 011 100 ..... .....		@rd_rn_rm
- TRN2_z		00000101 .. 1 ..... 011 101 ..... .....		@rd_rn_rm
+@@ -87,6 +87,7 @@
  
-+### SVE Permute - Predicated Group
+ # Three operand, vector element size
+ @rd_rn_rm	........ esz:2 . rm:5 ... ... rn:5 rd:5		&rrr_esz
++@pd_pn_pm	........ esz:2 .. rm:4 ....... rn:4 . rd:4	&rrr_esz
+ @rdn_rm		........ esz:2 ...... ...... rm:5 rd:5 \
+ 		&rrr_esz rn=%reg_movprfx
+ 
+@@ -397,6 +398,23 @@ TBL		00000101 .. 1 ..... 001100 ..... .....		@rd_rn_rm
+ # SVE unpack vector elements
+ UNPK		00000101 esz:2 1100 u:1 h:1 001110 rn:5 rd:5
+ 
++### SVE Permute - Predicates Group
 +
-+# SVE compress active elements
-+# Note esz >= 2
-+COMPACT		00000101 .. 100001 100 ... ..... .....		@rd_pg_rn
++# SVE permute predicate elements
++ZIP1_p		00000101 .. 10 .... 010 000 0 .... 0 ....	@pd_pn_pm
++ZIP2_p		00000101 .. 10 .... 010 001 0 .... 0 ....	@pd_pn_pm
++UZP1_p		00000101 .. 10 .... 010 010 0 .... 0 ....	@pd_pn_pm
++UZP2_p		00000101 .. 10 .... 010 011 0 .... 0 ....	@pd_pn_pm
++TRN1_p		00000101 .. 10 .... 010 100 0 .... 0 ....	@pd_pn_pm
++TRN2_p		00000101 .. 10 .... 010 101 0 .... 0 ....	@pd_pn_pm
++
++# SVE reverse predicate elements
++REV_p		00000101 .. 11 0100 010 000 0 .... 0 ....	@pd_pn
++
++# SVE unpack predicate elements
++PUNPKLO		00000101 00 11 0000 010 000 0 .... 0 ....	@pd_pn_e0
++PUNPKHI		00000101 00 11 0001 010 000 0 .... 0 ....	@pd_pn_e0
 +
  ### SVE Predicate Logical Operations Group
  
