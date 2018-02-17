@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79z-00019v-Ok
+	(envelope-from <richard.henderson@linaro.org>) id 1en79z-00019t-Of
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79y-0001y1-1K
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:31 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:40420)
+	(envelope-from <richard.henderson@linaro.org>) id 1en79w-0001xS-M4
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:30 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:41329)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en79x-0001xk-Pk
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:29 -0500
-Received: by mail-pl0-x241.google.com with SMTP id g18so3435581plo.7
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:29 -0800 (PST)
+	id 1en79w-0001ws-EP
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:28 -0500
+Received: by mail-pl0-x243.google.com with SMTP id k8so3438744pli.8
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:28 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:55 -0800
-Message-Id: <20180217182323.25885-40-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:22:54 -0800
+Message-Id: <20180217182323.25885-39-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 39/67] target/arm: Implement SVE Predicate
- Count Group
+Subject: [Qemu-devel] [PATCH v2 38/67] target/arm: Implement SVE Partition
+ Break Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,233 +32,440 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |   2 +
- target/arm/sve_helper.c    |  14 ++++++
- target/arm/translate-sve.c | 116 +++++++++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  27 +++++++++++
- 4 files changed, 159 insertions(+)
+ target/arm/helper-sve.h    |  18 ++++
+ target/arm/sve_helper.c    | 247 +++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c |  96 ++++++++++++++++++
+ target/arm/sve.decode      |  19 ++++
+ 4 files changed, 380 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index f0a3ed3414..dd4f8f754d 100644
+index ae38c0a4be..f0a3ed3414 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -676,3 +676,5 @@ DEF_HELPER_FLAGS_4(sve_brkbs_m, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
- 
- DEF_HELPER_FLAGS_4(sve_brkn, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_brkns, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
+@@ -658,3 +658,21 @@ DEF_HELPER_FLAGS_5(sve_orn_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_nor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_nand_pppp, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_3(sve_cntp, TCG_CALL_NO_RWG, i64, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpa, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpb, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpas, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpbs, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(sve_brka_z, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkb_z, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brka_m, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkb_m, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(sve_brkas_z, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkbs_z, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkas_m, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkbs_m, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(sve_brkn, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkns, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index d6d2220f8b..dd884bdd1c 100644
+index b74db681f2..d6d2220f8b 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -2702,3 +2702,17 @@ uint32_t HELPER(sve_brkns)(void *vd, void *vn, void *vg, uint32_t pred_desc)
-         return do_zero(vd, oprsz);
-     }
- }
+@@ -2455,3 +2455,250 @@ DO_CMP_PPZI_D(sve_cmpls_ppzi_d, uint64_t, <=)
+ #undef DO_CMP_PPZI_S
+ #undef DO_CMP_PPZI_D
+ #undef DO_CMP_PPZI
 +
-+uint64_t HELPER(sve_cntp)(void *vn, void *vg, uint32_t pred_desc)
++/* Similar to the ARM LastActive pseudocode function.  */
++static bool last_active_pred(void *vd, void *vg, intptr_t oprsz)
 +{
-+    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
-+    intptr_t esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
-+    uint64_t *n = vn, *g = vg, sum = 0, mask = pred_esz_masks[esz];
++    intptr_t i;
++
++    for (i = QEMU_ALIGN_UP(oprsz, 8) - 8; i >= 0; i -= 8) {
++        uint64_t pg = *(uint64_t *)(vg + i);
++        if (pg) {
++            return (pow2floor(pg) & *(uint64_t *)(vd + i)) != 0;
++        }
++    }
++    return 0;
++}
++
++/* Compute a mask into RETB that is true for all G, up to and including
++ * (if after) or excluding (if !after) the first G & N.
++ * Return true if BRK found.
++ */
++static bool compute_brk(uint64_t *retb, uint64_t n, uint64_t g,
++                        bool brk, bool after)
++{
++    uint64_t b;
++
++    if (brk) {
++        b = 0;
++    } else if ((g & n) == 0) {
++        /* For all G, no N are set; break not found.  */
++        b = g;
++    } else {
++        /* Break somewhere in N.  Locate it.  */
++        b = g & n;            /* guard true, pred true*/
++        b = b & -b;           /* first such */
++        if (after) {
++            b = b | (b - 1);  /* break after same */
++        } else {
++            b = b - 1;        /* break before same */
++        }
++        brk = true;
++    }
++
++    *retb = b;
++    return brk;
++}
++
++/* Compute a zeroing BRK.  */
++static void compute_brk_z(uint64_t *d, uint64_t *n, uint64_t *g,
++                          intptr_t oprsz, bool after)
++{
++    bool brk = false;
 +    intptr_t i;
 +
 +    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
-+        uint64_t t = n[i] & g[i] & mask;
-+        sum += ctpop64(t);
++        uint64_t this_b, this_g = g[i];
++
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = this_b & this_g;
 +    }
-+    return sum;
++}
++
++/* Likewise, but also compute flags.  */
++static uint32_t compute_brks_z(uint64_t *d, uint64_t *n, uint64_t *g,
++                               intptr_t oprsz, bool after)
++{
++    uint32_t flags = PREDTEST_INIT;
++    bool brk = false;
++    intptr_t i;
++
++    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
++        uint64_t this_b, this_d, this_g = g[i];
++
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = this_d = this_b & this_g;
++        flags = iter_predtest_fwd(this_d, this_g, flags);
++    }
++    return flags;
++}
++
++/* Given a computation function, compute a merging BRK.  */
++static void compute_brk_m(uint64_t *d, uint64_t *n, uint64_t *g,
++                          intptr_t oprsz, bool after)
++{
++    bool brk = false;
++    intptr_t i;
++
++    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
++        uint64_t this_b, this_g = g[i];
++
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = (this_b & this_g) | (d[i] & ~this_g);
++    }
++}
++
++/* Likewise, but also compute flags.  */
++static uint32_t compute_brks_m(uint64_t *d, uint64_t *n, uint64_t *g,
++                               intptr_t oprsz, bool after)
++{
++    uint32_t flags = PREDTEST_INIT;
++    bool brk = false;
++    intptr_t i;
++
++    for (i = 0; i < oprsz / 8; ++i) {
++        uint64_t this_b, this_d = d[i], this_g = g[i];
++
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = this_d = (this_b & this_g) | (this_d & ~this_g);
++        flags = iter_predtest_fwd(this_d, this_g, flags);
++    }
++    return flags;
++}
++
++static uint32_t do_zero(ARMPredicateReg *d, intptr_t oprsz)
++{
++    /* It is quicker to zero the whole predicate than loop on OPRSZ.
++       The compiler should turn this into 4 64-bit integer stores.  */
++    memset(d, 0, sizeof(ARMPredicateReg));
++    return PREDTEST_INIT;
++}
++
++void HELPER(sve_brkpa)(void *vd, void *vn, void *vm, void *vg,
++                       uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        compute_brk_z(vd, vm, vg, oprsz, true);
++    } else {
++        do_zero(vd, oprsz);
++    }
++}
++
++uint32_t HELPER(sve_brkpas)(void *vd, void *vn, void *vm, void *vg,
++                            uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        return compute_brks_z(vd, vm, vg, oprsz, true);
++    } else {
++        return do_zero(vd, oprsz);
++    }
++}
++
++void HELPER(sve_brkpb)(void *vd, void *vn, void *vm, void *vg,
++                       uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        compute_brk_z(vd, vm, vg, oprsz, false);
++    } else {
++        do_zero(vd, oprsz);
++    }
++}
++
++uint32_t HELPER(sve_brkpbs)(void *vd, void *vn, void *vm, void *vg,
++                            uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        return compute_brks_z(vd, vm, vg, oprsz, false);
++    } else {
++        return do_zero(vd, oprsz);
++    }
++}
++
++void HELPER(sve_brka_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_z(vd, vn, vg, oprsz, true);
++}
++
++uint32_t HELPER(sve_brkas_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_z(vd, vn, vg, oprsz, true);
++}
++
++void HELPER(sve_brkb_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_z(vd, vn, vg, oprsz, false);
++}
++
++uint32_t HELPER(sve_brkbs_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_z(vd, vn, vg, oprsz, false);
++}
++
++void HELPER(sve_brka_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_m(vd, vn, vg, oprsz, true);
++}
++
++uint32_t HELPER(sve_brkas_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_m(vd, vn, vg, oprsz, true);
++}
++
++void HELPER(sve_brkb_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_m(vd, vn, vg, oprsz, false);
++}
++
++uint32_t HELPER(sve_brkbs_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_m(vd, vn, vg, oprsz, false);
++}
++
++void HELPER(sve_brkn)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++
++    if (!last_active_pred(vn, vg, oprsz)) {
++        do_zero(vd, oprsz);
++    }
++}
++
++/* As if PredTest(Ones(PL), D, esz).  */
++static uint32_t predtest_ones(ARMPredicateReg *d, intptr_t oprsz,
++                              uint64_t esz_mask)
++{
++    uint32_t flags = PREDTEST_INIT;
++    intptr_t i;
++
++    for (i = 0; i < oprsz / 8; i++) {
++        flags = iter_predtest_fwd(d->p[i], esz_mask, flags);
++    }
++    if (oprsz & 7) {
++        uint64_t mask = ~(-1ULL << (8 * (oprsz & 7)));
++        flags = iter_predtest_fwd(d->p[i], esz_mask & mask, flags);
++    }
++    return flags;
++}
++
++uint32_t HELPER(sve_brkns)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++
++    if (last_active_pred(vn, vg, oprsz)) {
++        return predtest_ones(vd, oprsz, -1);
++    } else {
++        return do_zero(vd, oprsz);
++    }
 +}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index dc95d68867..038800cc86 100644
+index a7eeb122e3..dc95d68867 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -36,6 +36,8 @@
- typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
- typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t,
-                          int64_t, uint32_t, uint32_t);
-+typedef void GVecGen2sFn(unsigned, uint32_t, uint32_t,
-+                         TCGv_i64, uint32_t, uint32_t);
- typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
-                         uint32_t, uint32_t, uint32_t);
+@@ -2635,6 +2635,102 @@ DO_PPZI(CMPLS, cmpls)
  
-@@ -2731,6 +2733,120 @@ void trans_BRKN(DisasContext *s, arg_rpr_s *a, uint32_t insn)
-     do_brk2(s, a, gen_helper_sve_brkn, gen_helper_sve_brkns);
- }
+ #undef DO_PPZI
  
 +/*
-+ *** SVE Predicate Count Group
++ *** SVE Partition Break Group
 + */
 +
-+static void do_cntp(DisasContext *s, TCGv_i64 val, int esz, int pn, int pg)
++static void do_brk3(DisasContext *s, arg_rprr_s *a,
++                    gen_helper_gvec_4 *fn, gen_helper_gvec_flags_4 *fn_s)
 +{
-+    unsigned psz = pred_full_reg_size(s);
++    unsigned vsz = pred_full_reg_size(s);
 +
-+    if (psz <= 8) {
-+        uint64_t psz_mask;
++    /* Predicate sizes may be smaller and cannot use simd_desc.  */
++    TCGv_ptr d = tcg_temp_new_ptr();
++    TCGv_ptr n = tcg_temp_new_ptr();
++    TCGv_ptr m = tcg_temp_new_ptr();
++    TCGv_ptr g = tcg_temp_new_ptr();
++    TCGv_i32 t = tcg_const_i32(vsz - 2);
 +
-+        tcg_gen_ld_i64(val, cpu_env, pred_full_reg_offset(s, pn));
-+        if (pn != pg) {
-+            TCGv_i64 g = tcg_temp_new_i64();
-+            tcg_gen_ld_i64(g, cpu_env, pred_full_reg_offset(s, pg));
-+            tcg_gen_and_i64(val, val, g);
-+            tcg_temp_free_i64(g);
-+        }
++    tcg_gen_addi_ptr(d, cpu_env, pred_full_reg_offset(s, a->rd));
++    tcg_gen_addi_ptr(n, cpu_env, pred_full_reg_offset(s, a->rn));
++    tcg_gen_addi_ptr(m, cpu_env, pred_full_reg_offset(s, a->rm));
++    tcg_gen_addi_ptr(g, cpu_env, pred_full_reg_offset(s, a->pg));
 +
-+        /* Reduce the pred_esz_masks value simply to reduce the
-+           size of the code generated here.  */
-+        psz_mask = deposit64(0, 0, psz * 8, -1);
-+        tcg_gen_andi_i64(val, val, pred_esz_masks[esz] & psz_mask);
-+
-+        tcg_gen_ctpop_i64(val, val);
++    if (a->s) {
++        fn_s(t, d, n, m, g, t);
++        do_pred_flags(t);
 +    } else {
-+        TCGv_ptr t_pn = tcg_temp_new_ptr();
-+        TCGv_ptr t_pg = tcg_temp_new_ptr();
-+        unsigned desc;
-+        TCGv_i32 t_desc;
-+
-+        desc = psz - 2;
-+        desc = deposit32(desc, SIMD_DATA_SHIFT, 2, esz);
-+
-+        tcg_gen_addi_ptr(t_pn, cpu_env, pred_full_reg_offset(s, pn));
-+        tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
-+        t_desc = tcg_const_i32(desc);
-+
-+        gen_helper_sve_cntp(val, t_pn, t_pg, t_desc);
-+        tcg_temp_free_ptr(t_pn);
-+        tcg_temp_free_ptr(t_pg);
-+        tcg_temp_free_i32(t_desc);
++        fn(d, n, m, g, t);
 +    }
++    tcg_temp_free_ptr(d);
++    tcg_temp_free_ptr(n);
++    tcg_temp_free_ptr(m);
++    tcg_temp_free_ptr(g);
++    tcg_temp_free_i32(t);
 +}
 +
-+static void trans_CNTP(DisasContext *s, arg_CNTP *a, uint32_t insn)
++static void do_brk2(DisasContext *s, arg_rpr_s *a,
++                    gen_helper_gvec_3 *fn, gen_helper_gvec_flags_3 *fn_s)
 +{
-+    do_cntp(s, cpu_reg(s, a->rd), a->esz, a->rn, a->pg);
-+}
++    unsigned vsz = pred_full_reg_size(s);
 +
-+static void trans_INCDECP_r(DisasContext *s, arg_incdec_pred *a,
-+                            uint32_t insn)
-+{
-+    TCGv_i64 reg = cpu_reg(s, a->rd);
-+    TCGv_i64 val = tcg_temp_new_i64();
++    /* Predicate sizes may be smaller and cannot use simd_desc.  */
++    TCGv_ptr d = tcg_temp_new_ptr();
++    TCGv_ptr n = tcg_temp_new_ptr();
++    TCGv_ptr g = tcg_temp_new_ptr();
++    TCGv_i32 t = tcg_const_i32(vsz - 2);
 +
-+    do_cntp(s, val, a->esz, a->pg, a->pg);
-+    if (a->d) {
-+        tcg_gen_sub_i64(reg, reg, val);
++    tcg_gen_addi_ptr(d, cpu_env, pred_full_reg_offset(s, a->rd));
++    tcg_gen_addi_ptr(n, cpu_env, pred_full_reg_offset(s, a->rn));
++    tcg_gen_addi_ptr(g, cpu_env, pred_full_reg_offset(s, a->pg));
++
++    if (a->s) {
++        fn_s(t, d, n, g, t);
++        do_pred_flags(t);
 +    } else {
-+        tcg_gen_add_i64(reg, reg, val);
++        fn(d, n, g, t);
 +    }
-+    tcg_temp_free_i64(val);
++    tcg_temp_free_ptr(d);
++    tcg_temp_free_ptr(n);
++    tcg_temp_free_ptr(g);
++    tcg_temp_free_i32(t);
 +}
 +
-+static void trans_INCDECP_z(DisasContext *s, arg_incdec2_pred *a,
-+                            uint32_t insn)
++void trans_BRKPA(DisasContext *s, arg_rprr_s *a, uint32_t insn)
 +{
-+    unsigned vsz = vec_full_reg_size(s);
-+    TCGv_i64 val = tcg_temp_new_i64();
-+    GVecGen2sFn *gvec_fn = a->d ? tcg_gen_gvec_subs : tcg_gen_gvec_adds;
-+
-+    if (a->esz == 0) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+    do_cntp(s, val, a->esz, a->pg, a->pg);
-+    gvec_fn(a->esz, vec_full_reg_offset(s, a->rd),
-+            vec_full_reg_offset(s, a->rn), val, vsz, vsz);
++    do_brk3(s, a, gen_helper_sve_brkpa, gen_helper_sve_brkpas);
 +}
 +
-+static void trans_SINCDECP_r_32(DisasContext *s, arg_incdec_pred *a,
-+                                uint32_t insn)
++void trans_BRKPB(DisasContext *s, arg_rprr_s *a, uint32_t insn)
 +{
-+    TCGv_i64 reg = cpu_reg(s, a->rd);
-+    TCGv_i64 val = tcg_temp_new_i64();
-+
-+    do_cntp(s, val, a->esz, a->pg, a->pg);
-+    do_sat_addsub_32(reg, val, a->u, a->d);
++    do_brk3(s, a, gen_helper_sve_brkpb, gen_helper_sve_brkpbs);
 +}
 +
-+static void trans_SINCDECP_r_64(DisasContext *s, arg_incdec_pred *a,
-+                                uint32_t insn)
++void trans_BRKA_m(DisasContext *s, arg_rpr_s *a, uint32_t insn)
 +{
-+    TCGv_i64 reg = cpu_reg(s, a->rd);
-+    TCGv_i64 val = tcg_temp_new_i64();
-+
-+    do_cntp(s, val, a->esz, a->pg, a->pg);
-+    do_sat_addsub_64(reg, val, a->u, a->d);
++    do_brk2(s, a, gen_helper_sve_brka_m, gen_helper_sve_brkas_m);
 +}
 +
-+static void trans_SINCDECP_z(DisasContext *s, arg_incdec2_pred *a,
-+                             uint32_t insn)
++void trans_BRKB_m(DisasContext *s, arg_rpr_s *a, uint32_t insn)
 +{
-+    TCGv_i64 val = tcg_temp_new_i64();
++    do_brk2(s, a, gen_helper_sve_brkb_m, gen_helper_sve_brkbs_m);
++}
 +
-+    if (a->esz == 0) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+    do_cntp(s, val, a->esz, a->pg, a->pg);
-+    do_sat_addsub_vec(s, a->esz, a->rd, a->rn, val, a->u, a->d);
++void trans_BRKA_z(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    do_brk2(s, a, gen_helper_sve_brka_z, gen_helper_sve_brkas_z);
++}
++
++void trans_BRKB_z(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    do_brk2(s, a, gen_helper_sve_brkb_z, gen_helper_sve_brkbs_z);
++}
++
++void trans_BRKN(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    do_brk2(s, a, gen_helper_sve_brkn, gen_helper_sve_brkns);
 +}
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 1c19129e55..76c084d43e 100644
+index 0e317d7d48..1c19129e55 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -68,6 +68,8 @@
- &ptrue		rd esz pat s
- &incdec_cnt	rd pat esz imm d u
- &incdec2_cnt	rd rn pat esz imm d u
-+&incdec_pred	rd pg esz d u
-+&incdec2_pred	rd rn pg esz d u
+@@ -60,6 +60,7 @@
+ &rri_esz	rd rn imm esz
+ &rrr_esz	rd rn rm esz
+ &rpr_esz	rd pg rn esz
++&rpr_s		rd pg rn s
+ &rprr_s		rd pg rn rm s
+ &rprr_esz	rd pg rn rm esz
+ &rprrr_esz	rd pg rn rm ra esz
+@@ -79,6 +80,9 @@
+ @pd_pn		........ esz:2 .. .... ....... rn:4 . rd:4	&rr_esz
+ @rd_rn		........ esz:2 ...... ...... rn:5 rd:5		&rr_esz
  
- ###########################################################################
- # Named instruction formats.  These are generally used to
-@@ -114,6 +116,7 @@
++# Two operand with governing predicate, flags setting
++@pd_pg_pn_s	........ . s:1 ...... .. pg:4 . rn:4 . rd:4	&rpr_s
++
+ # Three operand with unused vector element size
+ @rd_rn_rm_e0	........ ... rm:5 ... ... rn:5 rd:5		&rrr_esz esz=0
  
- # One register operand, with governing predicate, vector element size
- @rd_pg_rn	........ esz:2 ... ... ... pg:3 rn:5 rd:5	&rpr_esz
-+@rd_pg4_pn	........ esz:2 ... ... .. pg:4 . rn:4 rd:5	&rpr_esz
+@@ -568,6 +572,21 @@ PFIRST		00100101 01 011 000 11000 00 .... 0 ....	@pd_pn_e0
+ # SVE predicate next active
+ PNEXT		00100101 .. 011 001 11000 10 .... 0 ....	@pd_pn
  
- # Two register operands with a 6-bit signed immediate.
- @rd_rn_i6	........ ... rn:5 ..... imm:s6 rd:5		&rri
-@@ -154,6 +157,12 @@
- @incdec2_cnt	........ esz:2 .. .... ...... pat:5 rd:5 \
- 		&incdec2_cnt imm=%imm4_16_p1 rn=%reg_movprfx
- 
-+# One register, predicate.
-+# User must fill in U and D.
-+@incdec_pred	........ esz:2 .... .. ..... .. pg:4 rd:5	&incdec_pred
-+@incdec2_pred	........ esz:2 .... .. ..... .. pg:4 rd:5 \
-+		&incdec2_pred rn=%reg_movprfx
++### SVE Partition Break Group
 +
- ###########################################################################
- # Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
- 
-@@ -587,6 +596,24 @@ BRKB_m		00100101 1. 01000001 .... 0 .... 1 ....		@pd_pg_pn_s
- # SVE propagate break to next partition
- BRKN		00100101 0. 01100001 .... 0 .... 0 ....		@pd_pg_pn_s
- 
-+### SVE Predicate Count Group
++# SVE propagate break from previous partition
++BRKPA		00100101 0. 00 .... 11 .... 0 .... 0 ....	@pd_pg_pn_pm_s
++BRKPB		00100101 0. 00 .... 11 .... 0 .... 1 ....	@pd_pg_pn_pm_s
 +
-+# SVE predicate count
-+CNTP		00100101 .. 100 000 10 .... 0 .... .....	@rd_pg4_pn
++# SVE partition break condition
++BRKA_z		00100101 0. 01000001 .... 0 .... 0 ....		@pd_pg_pn_s
++BRKB_z		00100101 1. 01000001 .... 0 .... 0 ....		@pd_pg_pn_s
++BRKA_m		00100101 0. 01000001 .... 0 .... 1 ....		@pd_pg_pn_s
++BRKB_m		00100101 1. 01000001 .... 0 .... 1 ....		@pd_pg_pn_s
 +
-+# SVE inc/dec register by predicate count
-+INCDECP_r	00100101 .. 10110 d:1 10001 00 .... .....     @incdec_pred u=1
-+
-+# SVE inc/dec vector by predicate count
-+INCDECP_z	00100101 .. 10110 d:1 10000 00 .... .....    @incdec2_pred u=1
-+
-+# SVE saturating inc/dec register by predicate count
-+SINCDECP_r_32	00100101 .. 1010 d:1 u:1 10001 00 .... .....	@incdec_pred
-+SINCDECP_r_64	00100101 .. 1010 d:1 u:1 10001 10 .... .....	@incdec_pred
-+
-+# SVE saturating inc/dec vector by predicate count
-+SINCDECP_z	00100101 .. 1010 d:1 u:1 10000 00 .... .....	@incdec2_pred
++# SVE propagate break to next partition
++BRKN		00100101 0. 01100001 .... 0 .... 0 ....		@pd_pg_pn_s
 +
  ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
  
