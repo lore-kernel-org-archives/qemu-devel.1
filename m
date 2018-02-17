@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1emrpi-0005Dx-Nq
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:02:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1emu4Z-0001Q2-2j
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 23:26:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1emrpi-0003UO-2t
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:02:34 -0500
-Received: from mail.gentoo.org ([2001:470:ea4a:1:5054:ff:fec7:86e4]:41779
-	helo=smtp.gentoo.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vapier@gentoo.org>) id 1emrph-0003Tw-SY
-	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 21:02:34 -0500
-From: Mike Frysinger <vapier@gentoo.org>
-Date: Fri, 16 Feb 2018 21:02:30 -0500
-Message-Id: <20180217020230.1759-1-vapier@gentoo.org>
-In-Reply-To: <20180217020122.1469-1-vapier@gentoo.org>
-References: <20180217020122.1469-1-vapier@gentoo.org>
-Subject: [Qemu-devel] [PATCH v2] linux-user: make getcpu optional
+	(envelope-from <bounces@canonical.com>) id 1emu4V-0005yS-Vl
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 23:26:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1emu4V-0005vr-Q6
+	for qemu-devel@nongnu.org; Fri, 16 Feb 2018 23:25:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1emu4S-0002UO-5j
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 04:25:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AA6682E817B
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 04:25:53 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 17 Feb 2018 04:17:24 -0000
+From: Launchpad Bug Tracker <1731588@bugs.launchpad.net>
+Reply-To: Bug 1731588 <1731588@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151036051040.28255.9617838387199487085.malonedeb@gac.canonical.com>
+Message-Id: <151884104420.16257.10953217934870616569.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1731588] Re: qemu-system-arm black screen and
+ keyboard not detected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
-Cc: samuel.thibault@ens-lyon.org
+To: qemu-devel@nongnu.org
 
-Not all arches implement this, and the kernel doesn't require them to.
-Add ifdef logic to disable it when not available.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
----
- linux-user/syscall.c | 4 ++++
- 1 file changed, 4 insertions(+)
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 799c8e2800ea..a9904fac791f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -290,8 +290,10 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
- #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
- _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
-           unsigned long *, user_mask_ptr);
-+#ifdef TARGET_NR_getcpu
- #define __NR_sys_getcpu __NR_getcpu
- _syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
-+#endif
- _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
-           void *, arg);
- _syscall2(int, capget, struct __user_cap_header_struct *, header,
-@@ -10595,6 +10597,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-             ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
-         }
-         break;
-+#ifdef TARGET_NR_getcpu
-     case TARGET_NR_getcpu:
-         {
-             unsigned cpu, node;
-@@ -10612,6 +10615,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         break;
-+#endif
-     case TARGET_NR_sched_setparam:
-         {
-             struct sched_param *target_schp;
--- 
-2.16.1
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1731588
+
+Title:
+  qemu-system-arm black screen and keyboard not detected
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Hi guys,
+
+  I try to emulate FreeRTOS with this guide : http://wiki.csie.ncku.edu.tw/=
+embedded/Lab32
+  But, the keys on my keyboard are not taken into account. =
+
+   - Command line : qemu_stm32/arm-softmmu/qemu-system-arm -M stm32-p103 -m=
+onitor stdio -kernel build/main.bin -semihosting
+  If I try to add usb flag with : qemu_stm32/arm-softmmu/qemu-system-arm -M=
+ stm32-p103 -monitor stdio -kernel build/main.bin -usb -device usb-host,hos=
+tbus=3D1,hostaddr=3D1 -show-curso
+  I obtain this message "qemu-system-arm: -device usb-host,hostbus=3D1,host=
+addr=3D1: 'usb-host' is not a valid device model name"
+
+  My second option is try with the latest version of qemu with this
+  command line : "qemu-system-arm -M lm3s6965evb -monitor stdio -kernel
+  build/main.bin -semihosting" but I obtain a black screen.
+
+  Could someone guide me on this problem ?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1731588/+subscriptions
