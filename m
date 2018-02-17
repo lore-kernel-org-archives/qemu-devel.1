@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1en2SO-0008OU-EM
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 08:23:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1en2X7-0002BT-DH
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 08:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1en2SL-00022A-7b
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 08:23:12 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:40282)
+	(envelope-from <alex.bennee@linaro.org>) id 1en2X4-00043x-9P
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 08:28:05 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52541)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1en2SK-00021q-PZ
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 08:23:09 -0500
-Received: by mail-wr0-x235.google.com with SMTP id o76so5369263wrb.7
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 05:23:07 -0800 (PST)
-References: <20180206164815.10084-1-alex.bennee@linaro.org>
-	<CAFEAcA8kq5PekaZVm5VpgLwa+VJYVX8pC5fE8RK8QiC9qA-aYw@mail.gmail.com>
+	id 1en2X4-00043P-1Q
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 08:28:02 -0500
+Received: by mail-wm0-x244.google.com with SMTP id t3so7665717wmc.2
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 05:28:01 -0800 (PST)
+References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
+	<1487255507-106654-10-git-send-email-pbonzini@redhat.com>
+	<3f632c5b-56b8-340c-02bd-f66abccd9473@web.de>
+	<acaf7f74-5a87-2bd5-a7f9-e40add3a7077@web.de>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8kq5PekaZVm5VpgLwa+VJYVX8pC5fE8RK8QiC9qA-aYw@mail.gmail.com>
-Date: Sat, 17 Feb 2018 13:23:04 +0000
-Message-ID: <87lgfr7nt3.fsf@linaro.org>
+In-reply-to: <acaf7f74-5a87-2bd5-a7f9-e40add3a7077@web.de>
+Date: Sat, 17 Feb 2018 13:27:59 +0000
+Message-ID: <87k1vb7nkw.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/22] re-factor softfloat and add fp16
- functions
+Subject: Re: [Qemu-devel] [PULL 09/23] gdbstub: Fix vCont behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,132 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Jan Kiszka <jan.kiszka@web.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Jan Kiszka <jan.kiszka@web.de> writes:
 
-> On 6 February 2018 at 16:47, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->> Hi,
+> On 2018-02-17 09:56, Jan Kiszka wrote:
+>> On 2017-02-16 15:31, Paolo Bonzini wrote:
+>>> From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+>>>
+>>> When GDB issues a "vCont", QEMU was not handling it correctly when
+>>> multiple VCPUs are active.
+>>> For vCont, for each thread (VCPU), it can be specified whether to
+>>> single step, continue or stop that thread. The default is to stop a
+>>> thread.
+>>> However, when (for example) "vCont;s:2" is issued, all VCPUs continue
+>>> to run, although all but VCPU nr 2 are to be stopped.
+>>>
+>>> This patch completely rewrites the vCont parsing code.
+>>>
+>>> Please note that this improvement only works in system emulation mode,
+>>> when in userspace emulation mode the old behaviour is preserved.
+>>>
+>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+>>> Message-Id: <1487092068-16562-3-git-send-email-imbrenda@linux.vnet.ibm.=
+com>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>  gdbstub.c | 209 ++++++++++++++++++++++++++++++++++++++++++++++++------=
+--------
+>>>  1 file changed, 162 insertions(+), 47 deletions(-)
+>>>
+<snip>
 >>
->> The main change is applying the __attribute__((flatten)) to some of
->> the public functions that show up in Emilio's dbt-benchmark. This
->> seems to be a cleaner solution that squashing inlines higher up the
->> chain and still leaves the chance for re-use for the less widely used
->> functions. The results are an improvement over v3 by some margin:
+>> Seems like no one is doing guest debugging with kvm on x86 except me,
+>> and I'm only doing it too infrequently now: This one broke that use case
+>> for SMP guests long ago. How was it tested?
 >>
->>                          NBench score; higher is better
->>
->>     5 +-+-----------+-------------+------------+-------------+----------=
--+-+
->>       |                     ****### %%%%  +++                           =
-   |
->>   4.5 +-+...................*..*..#.%..%..****##..%%%%+ system-2.5      =
- +-+
->>       |                     *  *  # %  %  *  * #  %  %      master      =
-   |
->>     4 +-+...................*..*..#.%..%..*..*.#..%..%softfloat-v3      =
- +-+
->>   3.5 +-+...................*..*..#.%..%..*..*.#..%..%softfloat-%%%%....=
-.+-+
->>       |                     *  *  # %  %  *  * #  %  %  * *  #  %  %    =
-   |
->>     3 +-+...................*..*..#.%..%..*..*.#..%..%..*.*..#..%..%....=
-.+-+
->>       |                     *  *  #+%  %  *  * #$$$  %  * *  #  %  %    =
-   |
->>   2.5 +-+........####.......*..*..#$$..%..*..*.#..$..%..*.*..#..%..%....=
-.+-+
->>       |       ****  #  %%%  *  *  # $  %  *  * #  $  %  * *  #$$$  %    =
-   |
->>     2 +-+.....*..*..#..%.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%....=
-.+-+
->>       |       *  *  #  % %  *  *  # $  %  *  * #  $  %  * *  #  $  %    =
-   |
->>   1.5 +-+.....*..*..#$$$.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%....=
-.+-+
->>     1 +-+.....*..*..#..$.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%....=
-.+-+
->>       |       *  *  #  $ %  *  *  # $  %  *  * #  $  %  * *  #  $  %    =
-   |
->>   0.5 +-+.....*..*..#..$.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%....=
-.+-+
->>       |       *  *  #  $ %  *  *  # $  %  *  * #  $  %  * *  #  $  %    =
-   |
->>     0 +-+-----****###$$$%%--****###$$%%%--****##$$$%%%--***###$$$%%%----=
--+-+
->>                  FOURIER     NEURAL NETLU DECOMPOSITION    gmean
->>
->> Slightly easier to read PNG:
->>
->>     https://i.imgur.com/XEeL0bC.png
->>
->> I think it's pretty ready for a merge. Shall I submit a pull myself or
->> does it make sense going via someone else? According to MAINTAINERS
->> Peter and Aurelien are responsible for this code...
->>
->> Alex Benn=C3=A9e (22):
->>   fpu/softfloat: implement float16_squash_input_denormal
->>   include/fpu/softfloat: remove USE_SOFTFLOAT_STRUCT_TYPES
->>   fpu/softfloat-types: new header to prevent excessive re-builds
->>   target/*/cpu.h: remove softfloat.h
->>   include/fpu/softfloat: implement float16_abs helper
->>   include/fpu/softfloat: implement float16_chs helper
->>   include/fpu/softfloat: implement float16_set_sign helper
->>   include/fpu/softfloat: add some float16 constants
->>   fpu/softfloat: improve comments on ARM NaN propagation
->>   fpu/softfloat: move the extract functions to the top of the file
->>   fpu/softfloat: define decompose structures
->>   fpu/softfloat: re-factor add/sub
->>   fpu/softfloat: re-factor mul
->>   fpu/softfloat: re-factor div
->>   fpu/softfloat: re-factor muladd
->>   fpu/softfloat: re-factor round_to_int
->>   fpu/softfloat: re-factor float to int/uint
->>   fpu/softfloat: re-factor int/uint to float
->>   fpu/softfloat: re-factor scalbn
->>   fpu/softfloat: re-factor minmax
->>   fpu/softfloat: re-factor compare
->>   fpu/softfloat: re-factor sqrt
->
-> If you persuade git to use the --minimal, --patience or --histogram
-> git diff option when generating these patches you'll find that it
-> doesn't produce unreadable patches that provoke all the checkpatch
-> warnings.
+>> To reproduce the bug: set up an x86-64 guest kernel with > 1 core, break
+>> on some prominent syscall entry (e.g. sys_execve), continue the guest on
+>> hit and it will quickly lock up, even after disabling the breakpoint
+>> again. Kernel version doesn't matter (was my first guess), gdb is
+>> 7.7.50.20140604-cvs (OpenSUSE) here.
 
-I think this is patchew getting confused as I generated the patches
-with:
+I thought I fixed this with 5a6a1ad181c658b810041d852b290ac836965aca
 
-  [diff]
-        algorithm =3D minimal
+FWIW I do periodically test ARM TCG and KVM guest debug using:
 
-In my qemu.git/.git/config
+  tests/guest-debug/test-gdbstub.py
 
-> That in turn will let you find the genuine warning that
-> got lost in all the spurious ones:
->
-> Checking PATCH 16/22: fpu/softfloat: re-factor round_to_int...
-> WARNING: line over 80 characters
-> #127: FILE: fpu/softfloat.c:1261:
-> +                inc =3D ((a.frac & roundeven_mask) !=3D frac_lsbm1 ?
-> frac_lsbm1 : 0);
-
-Yeah that was in the release but the one character over is the ; and it
-seemed nicer keeping all the logic on the same line.
-
-> As far as I can tell from a quick search, the 'histogram'
-> algorithm is reckoned to be about as fast as the default but
-> much less likely to produce terrible diffs.
->
->   git config --global diff.algorithm histogram
->
-> should set it up as the default for all diff-producing purposes
-> including generating patches for email.
->
-> thanks
-> -- PMM
+But we are missing a nice integration to get an appropriate guest image
+to automate this process. If we can fix that we should be able to turn
+on the test as part of make check.
 
 
 --
