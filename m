@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7Aj-00026p-48
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:19 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1en7E0-0004oQ-UE
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7Ah-0002OR-NX
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:17 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:44408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en7Ah-0002O2-Ft
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:15 -0500
-Received: by mail-pf0-x242.google.com with SMTP id 17so591534pfw.11
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:25:15 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:23:23 -0800
-Message-Id: <20180217182323.25885-68-richard.henderson@linaro.org>
-In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 67/67] target/arm: Implement SVE
- floating-point unary operations
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1en7Dz-0003Kv-SJ
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:28:40 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180217140051.22731-1-linus.walleij@linaro.org>
+	<20180217140051.22731-3-linus.walleij@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3f009bb2-fb39-36ff-b3ed-a9b8c63db081@amsat.org>
+Date: Sat, 17 Feb 2018 15:28:29 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180217140051.22731-3-linus.walleij@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] arm/vexpress: Add proper display
+ connector emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Linus Walleij <linus.walleij@linaro.org>, qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper-sve.h    | 14 ++++++++++++++
- target/arm/sve_helper.c    |  8 ++++++++
- target/arm/translate-sve.c | 28 ++++++++++++++++++++++++++++
- target/arm/sve.decode      |  4 ++++
- 4 files changed, 54 insertions(+)
+Hi Linus,
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 749bab0b38..5cebc9121d 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -999,6 +999,20 @@ DEF_HELPER_FLAGS_5(sve_frintx_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(sve_frintx_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_5(sve_frecpx_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_frecpx_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_frecpx_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_fsqrt_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fsqrt_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fsqrt_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 7950710be7..4f0985a29e 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -3208,6 +3208,14 @@ DO_ZPZ_FP(sve_frintx_h, uint16_t, H1_2, float16_round_to_int)
- DO_ZPZ_FP(sve_frintx_s, uint32_t, H1_4, float32_round_to_int)
- DO_ZPZ_FP_D(sve_frintx_d, uint64_t, float64_round_to_int)
- 
-+DO_ZPZ_FP(sve_frecpx_h, uint16_t, H1_2, helper_frecpx_f16)
-+DO_ZPZ_FP(sve_frecpx_s, uint32_t, H1_4, helper_frecpx_f32)
-+DO_ZPZ_FP_D(sve_frecpx_d, uint64_t, helper_frecpx_f64)
-+
-+DO_ZPZ_FP(sve_fsqrt_h, uint16_t, H1_2, float16_sqrt)
-+DO_ZPZ_FP(sve_fsqrt_s, uint32_t, H1_4, float32_sqrt)
-+DO_ZPZ_FP_D(sve_fsqrt_d, uint64_t, float64_sqrt)
-+
- DO_ZPZ_FP(sve_scvt_hh, uint16_t, H1_2, int16_to_float16)
- DO_ZPZ_FP(sve_scvt_sh, uint32_t, H1_4, int32_to_float16)
- DO_ZPZ_FP(sve_scvt_ss, uint32_t, H1_4, int32_to_float32)
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 5f1c4984b8..f1ff033333 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3831,6 +3831,34 @@ static void trans_FRINTA(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-     do_frint_mode(s, a, float_round_ties_away);
- }
- 
-+static void trans_FRECPX(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    static gen_helper_gvec_3_ptr * const fns[3] = {
-+        gen_helper_sve_frecpx_h,
-+        gen_helper_sve_frecpx_s,
-+        gen_helper_sve_frecpx_d
-+    };
-+    if (a->esz == 0) {
-+        unallocated_encoding(s);
-+    } else {
-+        do_zpz_ptr(s, a->rd, a->rn, a->pg, a->esz == MO_16, fns[a->esz - 1]);
-+    }
-+}
-+
-+static void trans_FSQRT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    static gen_helper_gvec_3_ptr * const fns[3] = {
-+        gen_helper_sve_fsqrt_h,
-+        gen_helper_sve_fsqrt_s,
-+        gen_helper_sve_fsqrt_d
-+    };
-+    if (a->esz == 0) {
-+        unallocated_encoding(s);
-+    } else {
-+        do_zpz_ptr(s, a->rd, a->rn, a->pg, a->esz == MO_16, fns[a->esz - 1]);
-+    }
-+}
-+
- static void trans_SCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
- {
-     do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_hh);
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index e06c0c5279..fbd9cf1384 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -857,6 +857,10 @@ FRINTA		01100101 .. 000 100 101 ... ..... .....		@rd_pg_rn
- FRINTX		01100101 .. 000 110 101 ... ..... .....		@rd_pg_rn
- FRINTI		01100101 .. 000 111 101 ... ..... .....		@rd_pg_rn
- 
-+# SVE floating-point unary operations
-+FRECPX		01100101 .. 001 100 101 ... ..... .....		@rd_pg_rn
-+FSQRT		01100101 .. 001 101 101 ... ..... .....		@rd_pg_rn
-+
- # SVE integer convert to floating-point
- SCVTF_hh	01100101 01 010 01 0 101 ... ..... .....	@rd_pg_rn_e0
- SCVTF_sh	01100101 01 010 10 0 101 ... ..... .....	@rd_pg_rn_e0
--- 
-2.14.3
+On 02/17/2018 11:00 AM, Linus Walleij wrote:
+> This adds the SiI9022 and EDID I2C devices to the ARM Versatile
+> Express machine, and selects the two I2C devices necessary in the
+> arm-softmmy.mak configuration so everything will build smoothly.
+> 
+> I am implementing proper handling of the graphics in the Linux
+> kernel and adding proper emulation of SiI9022 and EDID makes the
+> driver probe as nicely as before, retrieveing the resolutions
+> supported by the "QEMU monitor" and overall just working nice.
+> 
+> The assignment of the SiI9022 at address 0x39 and the EDID
+> DDC I2C at address 0x50 is not strictly correct: the DDC I2C
+> is there all the time but in the actual component it only
+> appears once activated inside the SiI9022, so ideally it should
+> be added and removed to the bus by the SiI9022. However for this
+> purpose it works fine to just have it around.
+
+This seems easier to just do it now rather than postpone :)
+
+In your patch #2:
+
+static void sii9022_realize(DeviceState *dev, Error **errp)
+{
+    I2CBus *bus;
+
+    bus = I2C_BUS(qdev_get_parent_bus(dev));
+    i2c_create_slave(bus, TYPE_I2CDDC, 0x50);
+}
+
+static void sii9022_class_init(ObjectClass *klass, void *data)
+{
+    DeviceClass *dc = DEVICE_CLASS(klass);
+
+...
+    dc->realize = sii9022_realize;
+}
+
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  default-configs/arm-softmmu.mak | 2 ++
+>  hw/arm/vexpress.c               | 7 ++++++-
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index ca34cf446242..54f855d07206 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -21,6 +21,8 @@ CONFIG_STELLARIS_INPUT=y
+>  CONFIG_STELLARIS_ENET=y
+>  CONFIG_SSD0303=y
+>  CONFIG_SSD0323=y
+> +CONFIG_DDC=y
+> +CONFIG_SII9022=y
+>  CONFIG_ADS7846=y
+>  CONFIG_MAX111X=y
+>  CONFIG_SSI=y
+> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+> index dc5928ae1ab5..d6c912c97684 100644
+> --- a/hw/arm/vexpress.c
+> +++ b/hw/arm/vexpress.c
+> @@ -29,6 +29,7 @@
+>  #include "hw/arm/arm.h"
+>  #include "hw/arm/primecell.h"
+>  #include "hw/devices.h"
+> +#include "hw/i2c/i2c.h"
+>  #include "net/net.h"
+>  #include "sysemu/sysemu.h"
+>  #include "hw/boards.h"
+> @@ -537,6 +538,7 @@ static void vexpress_common_init(MachineState *machine)
+>      uint32_t sys_id;
+>      DriveInfo *dinfo;
+>      pflash_t *pflash0;
+> +    I2CBus *i2c;
+>      ram_addr_t vram_size, sram_size;
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *vram = g_new(MemoryRegion, 1);
+> @@ -628,7 +630,10 @@ static void vexpress_common_init(MachineState *machine)
+>      sysbus_create_simple("sp804", map[VE_TIMER01], pic[2]);
+>      sysbus_create_simple("sp804", map[VE_TIMER23], pic[3]);
+>  
+> -    /* VE_SERIALDVI: not modelled */
+> +    dev = sysbus_create_simple("versatile_i2c", map[VE_SERIALDVI], NULL);
+> +    i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
+> +    i2c_create_slave(i2c, "sii9022", 0x39);
+> +    i2c_create_slave(i2c, "i2c-ddc", 0x50);
+>  
+>      sysbus_create_simple("pl031", map[VE_RTC], pic[4]); /* RTC */
+>  
+> 
