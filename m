@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1en6Dq-0001NX-7n
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 12:24:27 -0500
+	(envelope-from <laurent@vivier.eu>) id 1en6Fg-0002WT-Ly
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 12:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1en6Dm-0004GN-AQ
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 12:24:26 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:52373)
+	(envelope-from <laurent@vivier.eu>) id 1en6Fc-0006an-Mc
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 12:26:20 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:56661)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1en6Dl-0004EL-Vt
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 12:24:22 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1en6Fc-0006XV-CE
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 12:26:16 -0500
 References: <20180124130126.20871-1-f4bug@amsat.org>
-	<20180124130126.20871-8-f4bug@amsat.org>
+	<20180124130126.20871-7-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <08c8b196-0548-ce5c-998c-cf34545298be@vivier.eu>
-Date: Sat, 17 Feb 2018 18:24:10 +0100
+Message-ID: <37f08596-8de0-9fd9-9318-063056350cf5@vivier.eu>
+Date: Sat, 17 Feb 2018 18:26:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180124130126.20871-8-f4bug@amsat.org>
+In-Reply-To: <20180124130126.20871-7-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] linux-user/strace: improve bind()
+Subject: Re: [Qemu-devel] [PATCH 06/11] linux-user/strace: improve recvmsg()
  output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,28 +35,22 @@ Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
 Le 24/01/2018 à 14:01, Philippe Mathieu-Daudé a écrit :
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  linux-user/strace.c    | 13 +++++++++++++
->  linux-user/strace.list |  2 +-
->  2 files changed, 14 insertions(+), 1 deletion(-)
+>  linux-user/strace.list | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 70ecb1fc98..4b8ab6bcfb 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -1935,6 +1935,19 @@ print_socketcall(const struct syscallname *name,
->  }
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index 947ff04eab..ae6dc8fecf 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -1107,7 +1107,7 @@
+>  { TARGET_NR_recvmmsg, "recvmmsg" , NULL, NULL, NULL },
 >  #endif
->  
-> +#if defined(TARGET_NR_bind)
-> +static void
-> +print_bind(const struct syscallname *name,
-> +           abi_long arg0, abi_long arg1, abi_long arg2,
-> +           abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_raw_param(TARGET_ABI_FMT_ld, arg0, 0);
+>  #ifdef TARGET_NR_recvmsg
+> -{ TARGET_NR_recvmsg, "recvmsg" , NULL, NULL, NULL },
+> +{ TARGET_NR_recvmsg, "recvmsg" , "%s(%d,%p,%#x)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_remap_file_pages
+>  { TARGET_NR_remap_file_pages, "remap_file_pages" , NULL, NULL, NULL },
+> 
 
-Other functions use "%d" for fd.
-
-Thanks,
-Laurent
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
