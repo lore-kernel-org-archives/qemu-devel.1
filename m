@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79A-0000Dw-Ee
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:42 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en79C-0000GF-7v
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en797-0001Ut-Uh
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:40 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:42012)
+	(envelope-from <richard.henderson@linaro.org>) id 1en799-0001We-NK
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:42 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:43776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en797-0001UV-MW
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:37 -0500
-Received: by mail-pg0-x243.google.com with SMTP id y8so4342796pgr.9
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:23:37 -0800 (PST)
+	id 1en799-0001WB-EU
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:39 -0500
+Received: by mail-pg0-x244.google.com with SMTP id f6so4342749pgs.10
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:23:39 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:22 -0800
-Message-Id: <20180217182323.25885-7-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:22:23 -0800
+Message-Id: <20180217182323.25885-8-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 06/67] target/arm: Implement SVE predicate
- test
+Subject: [Qemu-devel] [PATCH v2 07/67] target/arm: Implement SVE Predicate
+ Logical Operations Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,241 +32,507 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 21 +++++++++++++
- target/arm/helper.h        |  1 +
- target/arm/sve_helper.c    | 77 ++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 62 +++++++++++++++++++++++++++++++++++++
- target/arm/Makefile.objs   |  2 +-
- target/arm/sve.decode      |  5 +++
- 6 files changed, 167 insertions(+), 1 deletion(-)
- create mode 100644 target/arm/helper-sve.h
- create mode 100644 target/arm/sve_helper.c
+ target/arm/cpu.h           |   4 +-
+ target/arm/helper-sve.h    |  10 ++
+ target/arm/sve_helper.c    |  39 ++++++
+ target/arm/translate-sve.c | 338 ++++++++++++++++++++++++++++++++++++++++++++-
+ target/arm/sve.decode      |  16 +++
+ 5 files changed, 405 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-new file mode 100644
-index 0000000000..b6e91539ae
---- /dev/null
-+++ b/target/arm/helper-sve.h
-@@ -0,0 +1,21 @@
-+/*
-+ *  AArch64 SVE specific helper definitions
-+ *
-+ *  Copyright (c) 2018 Linaro, Ltd
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+DEF_HELPER_FLAGS_2(sve_predtest1, TCG_CALL_NO_WG, i32, i64, i64)
-+DEF_HELPER_FLAGS_3(sve_predtest, TCG_CALL_NO_WG, i32, ptr, ptr, i32)
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 6dd8504ec3..be3c2fcdc0 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -567,4 +567,5 @@ DEF_HELPER_FLAGS_2(neon_pmull_64_hi, TCG_CALL_NO_RWG_SE, i64, i64, i64)
- 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 70e05f00fe..8befe43a01 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -527,6 +527,8 @@ typedef struct CPUARMState {
  #ifdef TARGET_AARCH64
- #include "helper-a64.h"
-+#include "helper-sve.h"
+         /* Store FFR as pregs[16] to make it easier to treat as any other.  */
+         ARMPredicateReg pregs[17];
++        /* Scratch space for aa64 sve predicate temporary.  */
++        ARMPredicateReg preg_tmp;
  #endif
+ 
+         uint32_t xregs[16];
+@@ -534,7 +536,7 @@ typedef struct CPUARMState {
+         int vec_len;
+         int vec_stride;
+ 
+-        /* scratch space when Tn are not sufficient.  */
++        /* Scratch space for aa32 neon expansion.  */
+         uint32_t scratch[8];
+ 
+         /* There are a number of distinct float control structures:
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index b6e91539ae..57adc4d912 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -19,3 +19,13 @@
+ 
+ DEF_HELPER_FLAGS_2(sve_predtest1, TCG_CALL_NO_WG, i32, i64, i64)
+ DEF_HELPER_FLAGS_3(sve_predtest, TCG_CALL_NO_WG, i32, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_sel_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_orr_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_orn_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_nor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_nand_pppp, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-new file mode 100644
-index 0000000000..7d13fd40ed
---- /dev/null
+index 7d13fd40ed..b63e7cc90e 100644
+--- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -0,0 +1,77 @@
-+/*
-+ *  ARM SVE Operations
-+ *
-+ *  Copyright (c) 2018 Linaro
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
+@@ -75,3 +75,42 @@ uint32_t HELPER(sve_predtest)(void *vd, void *vg, uint32_t words)
+ 
+     return flags;
+ }
 +
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/helper-proto.h"
-+#include "tcg/tcg-gvec-desc.h"
-+
-+
-+/* Return a value for NZCV as per the ARM PredTest pseudofunction.
-+ *
-+ * The return value has bit 31 set if N is set, bit 1 set if Z is clear,
-+ * and bit 0 set if C is set.
-+ *
-+ * This is an iterative function, called for each Pd and Pg word
-+ * moving forward.
-+ */
-+
-+/* For no G bits set, NZCV = C.  */
-+#define PREDTEST_INIT  1
-+
-+static uint32_t iter_predtest_fwd(uint64_t d, uint64_t g, uint32_t flags)
-+{
-+    if (g) {
-+        /* Compute N from first D & G.
-+           Use bit 2 to signal first G bit seen.  */
-+        if (!(flags & 4)) {
-+            flags |= ((d & (g & -g)) != 0) << 31;
-+            flags |= 4;
-+        }
-+
-+        /* Accumulate Z from each D & G.  */
-+        flags |= ((d & g) != 0) << 1;
-+
-+        /* Compute C from last !(D & G).  Replace previous.  */
-+        flags = deposit32(flags, 0, 1, (d & pow2floor(g)) == 0);
-+    }
-+    return flags;
++#define LOGICAL_PPPP(NAME, FUNC) \
++void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)  \
++{                                                                         \
++    uintptr_t opr_sz = simd_oprsz(desc);                                  \
++    uint64_t *d = vd, *n = vn, *m = vm, *g = vg;                          \
++    uintptr_t i;                                                          \
++    for (i = 0; i < opr_sz / 8; ++i) {                                    \
++        d[i] = FUNC(n[i], m[i], g[i]);                                    \
++    }                                                                     \
 +}
 +
-+/* The same for a single word predicate.  */
-+uint32_t HELPER(sve_predtest1)(uint64_t d, uint64_t g)
-+{
-+    return iter_predtest_fwd(d, g, PREDTEST_INIT);
-+}
++#define DO_AND(N, M, G)  (((N) & (M)) & (G))
++#define DO_BIC(N, M, G)  (((N) & ~(M)) & (G))
++#define DO_EOR(N, M, G)  (((N) ^ (M)) & (G))
++#define DO_ORR(N, M, G)  (((N) | (M)) & (G))
++#define DO_ORN(N, M, G)  (((N) | ~(M)) & (G))
++#define DO_NOR(N, M, G)  (~((N) | (M)) & (G))
++#define DO_NAND(N, M, G) (~((N) & (M)) & (G))
++#define DO_SEL(N, M, G)  (((N) & (G)) | ((M) & ~(G)))
 +
-+/* The same for a multi-word predicate.  */
-+uint32_t HELPER(sve_predtest)(void *vd, void *vg, uint32_t words)
-+{
-+    uint32_t flags = PREDTEST_INIT;
-+    uint64_t *d = vd, *g = vg;
-+    uintptr_t i = 0;
++LOGICAL_PPPP(sve_and_pppp, DO_AND)
++LOGICAL_PPPP(sve_bic_pppp, DO_BIC)
++LOGICAL_PPPP(sve_eor_pppp, DO_EOR)
++LOGICAL_PPPP(sve_sel_pppp, DO_SEL)
++LOGICAL_PPPP(sve_orr_pppp, DO_ORR)
++LOGICAL_PPPP(sve_orn_pppp, DO_ORN)
++LOGICAL_PPPP(sve_nor_pppp, DO_NOR)
++LOGICAL_PPPP(sve_nand_pppp, DO_NAND)
 +
-+    do {
-+        flags = iter_predtest_fwd(d[i], g[i], flags);
-+    } while (++i < words);
-+
-+    return flags;
-+}
++#undef DO_ADD
++#undef DO_BIC
++#undef DO_EOR
++#undef DO_ORR
++#undef DO_ORN
++#undef DO_NOR
++#undef DO_NAND
++#undef DO_SEL
++#undef LOGICAL_PPPP
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index c0cccfda6f..c2e7fac938 100644
+index c2e7fac938..405f9397a1 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -83,6 +83,43 @@ static void do_mov_z(DisasContext *s, int rd, int rn)
+@@ -59,6 +59,24 @@ static inline int pred_full_reg_size(DisasContext *s)
+     return s->sve_len >> 3;
+ }
+ 
++/* Round up the size of a predicate register to a size allowed by
++ * the tcg vector infrastructure.  Any operation which uses this
++ * size may assume that the bits above pred_full_reg_size are zero,
++ * and must leave them the same way.
++ *
++ * Note that this is not needed for the vector registers as they
++ * are always properly sized for tcg vectors.
++ */
++static int pred_gvec_reg_size(DisasContext *s)
++{
++    int size = pred_full_reg_size(s);
++    if (size <= 8) {
++        return 8;
++    } else {
++        return QEMU_ALIGN_UP(size, 16);
++    }
++}
++
+ /* Invoke a vector expander on two Zregs.  */
+ static void do_vector2_z(DisasContext *s, GVecGen2Fn *gvec_fn,
+                          int esz, int rd, int rn)
+@@ -83,6 +101,40 @@ static void do_mov_z(DisasContext *s, int rd, int rn)
      do_vector2_z(s, tcg_gen_gvec_mov, 0, rd, rn);
  }
  
-+/* Set the cpu flags as per a return from an SVE helper.  */
-+static void do_pred_flags(TCGv_i32 t)
++/* Invoke a vector expander on two Pregs.  */
++static void do_vector2_p(DisasContext *s, GVecGen2Fn *gvec_fn,
++                         int esz, int rd, int rn)
 +{
-+    tcg_gen_mov_i32(cpu_NF, t);
-+    tcg_gen_andi_i32(cpu_ZF, t, 2);
-+    tcg_gen_andi_i32(cpu_CF, t, 1);
-+    tcg_gen_movi_i32(cpu_VF, 0);
++    unsigned psz = pred_gvec_reg_size(s);
++    gvec_fn(esz, pred_full_reg_offset(s, rd),
++            pred_full_reg_offset(s, rn), psz, psz);
 +}
 +
-+/* Subroutines computing the ARM PredTest psuedofunction.  */
-+static void do_predtest1(TCGv_i64 d, TCGv_i64 g)
++/* Invoke a vector expander on three Pregs.  */
++static void do_vector3_p(DisasContext *s, GVecGen3Fn *gvec_fn,
++                         int esz, int rd, int rn, int rm)
 +{
-+    TCGv_i32 t = tcg_temp_new_i32();
-+
-+    gen_helper_sve_predtest1(t, d, g);
-+    do_pred_flags(t);
-+    tcg_temp_free_i32(t);
++    unsigned psz = pred_gvec_reg_size(s);
++    gvec_fn(esz, pred_full_reg_offset(s, rd), pred_full_reg_offset(s, rn),
++            pred_full_reg_offset(s, rm), psz, psz);
 +}
 +
-+static void do_predtest(DisasContext *s, int dofs, int gofs, int words)
++/* Invoke a vector operation on four Pregs.  */
++static void do_vecop4_p(DisasContext *s, const GVecGen4 *gvec_op,
++                        int rd, int rn, int rm, int rg)
 +{
-+    TCGv_ptr dptr = tcg_temp_new_ptr();
-+    TCGv_ptr gptr = tcg_temp_new_ptr();
-+    TCGv_i32 t;
-+
-+    tcg_gen_addi_ptr(dptr, cpu_env, dofs);
-+    tcg_gen_addi_ptr(gptr, cpu_env, gofs);
-+    t = tcg_const_i32(words);
-+
-+    gen_helper_sve_predtest(t, dptr, gptr, t);
-+    tcg_temp_free_ptr(dptr);
-+    tcg_temp_free_ptr(gptr);
-+
-+    do_pred_flags(t);
-+    tcg_temp_free_i32(t);
++    unsigned psz = pred_gvec_reg_size(s);
++    tcg_gen_gvec_4(pred_full_reg_offset(s, rd), pred_full_reg_offset(s, rn),
++                   pred_full_reg_offset(s, rm), pred_full_reg_offset(s, rg),
++                   psz, psz, gvec_op);
 +}
 +
- /*
-  *** SVE Logical - Unpredicated Group
-  */
-@@ -111,6 +148,31 @@ static void trans_BIC_zzz(DisasContext *s, arg_BIC_zzz *a, uint32_t insn)
++/* Invoke a vector move on two Pregs.  */
++static void do_mov_p(DisasContext *s, int rd, int rn)
++{
++    do_vector2_p(s, tcg_gen_gvec_mov, 0, rd, rn);
++}
++
+ /* Set the cpu flags as per a return from an SVE helper.  */
+ static void do_pred_flags(TCGv_i32 t)
+ {
+@@ -148,11 +200,295 @@ static void trans_BIC_zzz(DisasContext *s, arg_BIC_zzz *a, uint32_t insn)
      do_vector3_z(s, tcg_gen_gvec_andc, 0, a->rd, a->rn, a->rm);
  }
  
 +/*
-+ *** SVE Predicate Misc Group
++ *** SVE Predicate Logical Operations Group
 + */
 +
-+void trans_PTEST(DisasContext *s, arg_PTEST *a, uint32_t insn)
++static void do_pppp_flags(DisasContext *s, arg_rprr_s *a,
++                          const GVecGen4 *gvec_op)
 +{
++    unsigned psz = pred_gvec_reg_size(s);
++    int dofs = pred_full_reg_offset(s, a->rd);
 +    int nofs = pred_full_reg_offset(s, a->rn);
++    int mofs = pred_full_reg_offset(s, a->rm);
 +    int gofs = pred_full_reg_offset(s, a->pg);
-+    int words = DIV_ROUND_UP(pred_full_reg_size(s), 8);
 +
-+    if (words == 1) {
++    if (psz == 8) {
++        /* Do the operation and the flags generation in temps.  */
++        TCGv_i64 pd = tcg_temp_new_i64();
 +        TCGv_i64 pn = tcg_temp_new_i64();
++        TCGv_i64 pm = tcg_temp_new_i64();
 +        TCGv_i64 pg = tcg_temp_new_i64();
 +
 +        tcg_gen_ld_i64(pn, cpu_env, nofs);
++        tcg_gen_ld_i64(pm, cpu_env, mofs);
 +        tcg_gen_ld_i64(pg, cpu_env, gofs);
-+        do_predtest1(pn, pg);
 +
++        gvec_op->fni8(pd, pn, pm, pg);
++        tcg_gen_st_i64(pd, cpu_env, dofs);
++
++        do_predtest1(pd, pg);
++
++        tcg_temp_free_i64(pd);
 +        tcg_temp_free_i64(pn);
++        tcg_temp_free_i64(pm);
 +        tcg_temp_free_i64(pg);
 +    } else {
-+        do_predtest(s, nofs, gofs, words);
++        /* The operation and flags generation is large.  The computation
++         * of the flags depends on the original contents of the guarding
++         * predicate.  If the destination overwrites the guarding predicate,
++         * then the easiest way to get this right is to save a copy.
++          */
++        int tofs = gofs;
++        if (a->rd == a->pg) {
++            tofs = offsetof(CPUARMState, vfp.preg_tmp);
++            tcg_gen_gvec_mov(0, tofs, gofs, psz, psz);
++        }
++
++        tcg_gen_gvec_4(dofs, nofs, mofs, gofs, psz, psz, gvec_op);
++        do_predtest(s, dofs, tofs, psz / 8);
++    }
++}
++
++static void gen_and_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_and_i64(pd, pn, pm);
++    tcg_gen_and_i64(pd, pd, pg);
++}
++
++static void gen_and_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_and_vec(vece, pd, pn, pm);
++    tcg_gen_and_vec(vece, pd, pd, pg);
++}
++
++static void trans_AND_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_and_pg_i64,
++        .fniv = gen_and_pg_vec,
++        .fno = gen_helper_sve_and_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        do_pppp_flags(s, a, &op);
++    } else if (a->pg == a->rn && a->rn == a->rm) {
++        do_mov_p(s, a->rd, a->rn);
++    } else if (a->pg == a->rn || a->pg == a->rm) {
++        do_vector3_p(s, tcg_gen_gvec_and, 0, a->rd, a->rn, a->rm);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
++    }
++}
++
++static void gen_bic_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_andc_i64(pd, pn, pm);
++    tcg_gen_and_i64(pd, pd, pg);
++}
++
++static void gen_bic_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_andc_vec(vece, pd, pn, pm);
++    tcg_gen_and_vec(vece, pd, pd, pg);
++}
++
++static void trans_BIC_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_bic_pg_i64,
++        .fniv = gen_bic_pg_vec,
++        .fno = gen_helper_sve_bic_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        do_pppp_flags(s, a, &op);
++    } else if (a->pg == a->rn) {
++        do_vector3_p(s, tcg_gen_gvec_andc, 0, a->rd, a->rn, a->rm);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
++    }
++}
++
++static void gen_eor_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_xor_i64(pd, pn, pm);
++    tcg_gen_and_i64(pd, pd, pg);
++}
++
++static void gen_eor_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_xor_vec(vece, pd, pn, pm);
++    tcg_gen_and_vec(vece, pd, pd, pg);
++}
++
++static void trans_EOR_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_eor_pg_i64,
++        .fniv = gen_eor_pg_vec,
++        .fno = gen_helper_sve_eor_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        do_pppp_flags(s, a, &op);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
++    }
++}
++
++static void gen_sel_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_and_i64(pn, pn, pg);
++    tcg_gen_andc_i64(pm, pm, pg);
++    tcg_gen_or_i64(pd, pn, pm);
++}
++
++static void gen_sel_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_and_vec(vece, pn, pn, pg);
++    tcg_gen_andc_vec(vece, pm, pm, pg);
++    tcg_gen_or_vec(vece, pd, pn, pm);
++}
++
++static void trans_SEL_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_sel_pg_i64,
++        .fniv = gen_sel_pg_vec,
++        .fno = gen_helper_sve_sel_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        unallocated_encoding(s);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
++    }
++}
++
++static void gen_orr_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_or_i64(pd, pn, pm);
++    tcg_gen_and_i64(pd, pd, pg);
++}
++
++static void gen_orr_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_or_vec(vece, pd, pn, pm);
++    tcg_gen_and_vec(vece, pd, pd, pg);
++}
++
++static void trans_ORR_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_orr_pg_i64,
++        .fniv = gen_orr_pg_vec,
++        .fno = gen_helper_sve_orr_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        do_pppp_flags(s, a, &op);
++    } else if (a->pg == a->rn && a->rn == a->rm) {
++        do_mov_p(s, a->rd, a->rn);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
++    }
++}
++
++static void gen_orn_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_orc_i64(pd, pn, pm);
++    tcg_gen_and_i64(pd, pd, pg);
++}
++
++static void gen_orn_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_orc_vec(vece, pd, pn, pm);
++    tcg_gen_and_vec(vece, pd, pd, pg);
++}
++
++static void trans_ORN_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_orn_pg_i64,
++        .fniv = gen_orn_pg_vec,
++        .fno = gen_helper_sve_orn_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        do_pppp_flags(s, a, &op);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
++    }
++}
++
++static void gen_nor_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_or_i64(pd, pn, pm);
++    tcg_gen_andc_i64(pd, pg, pd);
++}
++
++static void gen_nor_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_or_vec(vece, pd, pn, pm);
++    tcg_gen_andc_vec(vece, pd, pg, pd);
++}
++
++static void trans_NOR_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_nor_pg_i64,
++        .fniv = gen_nor_pg_vec,
++        .fno = gen_helper_sve_nor_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        do_pppp_flags(s, a, &op);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
++    }
++}
++
++static void gen_nand_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
++{
++    tcg_gen_and_i64(pd, pn, pm);
++    tcg_gen_andc_i64(pd, pg, pd);
++}
++
++static void gen_nand_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
++                           TCGv_vec pm, TCGv_vec pg)
++{
++    tcg_gen_and_vec(vece, pd, pn, pm);
++    tcg_gen_andc_vec(vece, pd, pg, pd);
++}
++
++static void trans_NAND_pppp(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    static const GVecGen4 op = {
++        .fni8 = gen_nand_pg_i64,
++        .fniv = gen_nand_pg_vec,
++        .fno = gen_helper_sve_nand_pppp,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++    };
++    if (a->s) {
++        do_pppp_flags(s, a, &op);
++    } else {
++        do_vecop4_p(s, &op, a->rd, a->rn, a->rm, a->pg);
 +    }
 +}
 +
  /*
-  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
+  *** SVE Predicate Misc Group
   */
-diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-index 9934cf1d4d..452ac6f453 100644
---- a/target/arm/Makefile.objs
-+++ b/target/arm/Makefile.objs
-@@ -19,4 +19,4 @@ target/arm/decode-sve.inc.c: $(SRC_PATH)/target/arm/sve.decode $(DECODETREE)
- 	  "GEN", $(TARGET_DIR)$@)
  
- target/arm/translate-sve.o: target/arm/decode-sve.inc.c
--obj-$(TARGET_AARCH64) += translate-sve.o
-+obj-$(TARGET_AARCH64) += translate-sve.o sve_helper.o
+-void trans_PTEST(DisasContext *s, arg_PTEST *a, uint32_t insn)
++static void trans_PTEST(DisasContext *s, arg_PTEST *a, uint32_t insn)
+ {
+     int nofs = pred_full_reg_offset(s, a->rn);
+     int gofs = pred_full_reg_offset(s, a->pg);
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 0c6a7ba34d..7efaa8fe8e 100644
+index 7efaa8fe8e..d92886127a 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -56,6 +56,11 @@ ORR_zzz		00000100 01 1 ..... 001 100 ..... .....		@rd_rn_rm_e0
+@@ -31,6 +31,7 @@
+ 
+ &rri		rd rn imm
+ &rrr_esz	rd rn rm esz
++&rprr_s		rd pg rn rm s
+ 
+ ###########################################################################
+ # Named instruction formats.  These are generally used to
+@@ -39,6 +40,9 @@
+ # Three operand with unused vector element size
+ @rd_rn_rm_e0	........ ... rm:5 ... ... rn:5 rd:5		&rrr_esz esz=0
+ 
++# Three prediate operand, with governing predicate, flag setting
++@pd_pg_pn_pm_s	........ . s:1 .. rm:4 .. pg:4 . rn:4 . rd:4	&rprr_s
++
+ # Basic Load/Store with 9-bit immediate offset
+ @pd_rn_i9	........ ........ ...... rn:5 . rd:4	\
+ 		&rri imm=%imm9_16_10
+@@ -56,6 +60,18 @@ ORR_zzz		00000100 01 1 ..... 001 100 ..... .....		@rd_rn_rm_e0
  EOR_zzz		00000100 10 1 ..... 001 100 ..... .....		@rd_rn_rm_e0
  BIC_zzz		00000100 11 1 ..... 001 100 ..... .....		@rd_rn_rm_e0
  
-+### SVE Predicate Misc Group
++### SVE Predicate Logical Operations Group
 +
-+# SVE predicate test
-+PTEST		00100101 01010000 11 pg:4 0 rn:4 00000
++# SVE predicate logical operations
++AND_pppp	00100101 0. 00 .... 01 .... 0 .... 0 ....	@pd_pg_pn_pm_s
++BIC_pppp	00100101 0. 00 .... 01 .... 0 .... 1 ....	@pd_pg_pn_pm_s
++EOR_pppp	00100101 0. 00 .... 01 .... 1 .... 0 ....	@pd_pg_pn_pm_s
++SEL_pppp	00100101 0. 00 .... 01 .... 1 .... 1 ....	@pd_pg_pn_pm_s
++ORR_pppp	00100101 1. 00 .... 01 .... 0 .... 0 ....	@pd_pg_pn_pm_s
++ORN_pppp	00100101 1. 00 .... 01 .... 0 .... 1 ....	@pd_pg_pn_pm_s
++NOR_pppp	00100101 1. 00 .... 01 .... 1 .... 0 ....	@pd_pg_pn_pm_s
++NAND_pppp	00100101 1. 00 .... 01 .... 1 .... 1 ....	@pd_pg_pn_pm_s
 +
- ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
+ ### SVE Predicate Misc Group
  
- # SVE load predicate register
+ # SVE predicate test
 -- 
 2.14.3
