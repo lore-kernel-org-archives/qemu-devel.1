@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7Ag-00024M-QM
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en7Ai-00025v-8T
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7Af-0002NF-8w
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:14 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35234)
+	(envelope-from <richard.henderson@linaro.org>) id 1en7Ag-0002Nl-Rc
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:16 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:39714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en7Ae-0002MW-Ok
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:13 -0500
-Received: by mail-pf0-x243.google.com with SMTP id a6so592302pfi.2
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:25:12 -0800 (PST)
+	id 1en7Ag-0002NM-6v
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:25:14 -0500
+Received: by mail-pg0-x241.google.com with SMTP id w17so4356781pgv.6
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:25:14 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:23:21 -0800
-Message-Id: <20180217182323.25885-66-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:23:22 -0800
+Message-Id: <20180217182323.25885-67-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 65/67] target/arm: Implement SVE
- floating-point convert to integer
+Subject: [Qemu-devel] [PATCH v2 66/67] target/arm: Implement SVE
+ floating-point round to integral value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,184 +32,163 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 30 ++++++++++++++++++++
- target/arm/sve_helper.c    | 16 +++++++++++
- target/arm/translate-sve.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 16 +++++++++++
- 4 files changed, 132 insertions(+)
+ target/arm/helper-sve.h    | 14 ++++++++
+ target/arm/sve_helper.c    |  8 +++++
+ target/arm/translate-sve.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |  9 ++++++
+ 4 files changed, 111 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index bac4bfdc60..0f5fea9045 100644
+index 0f5fea9045..749bab0b38 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -955,6 +955,36 @@ DEF_HELPER_FLAGS_5(sve_fcvt_hd, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(sve_fcvt_sd, TCG_CALL_NO_RWG,
+@@ -985,6 +985,20 @@ DEF_HELPER_FLAGS_5(sve_fcvtzu_sd, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(sve_fcvtzu_dd, TCG_CALL_NO_RWG,
                     void, ptr, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_5(sve_fcvtzs_hh, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(sve_frint_h, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzs_hs, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(sve_frint_s, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzs_ss, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzs_ds, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzs_hd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzs_sd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzs_dd, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(sve_frint_d, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_5(sve_fcvtzu_hh, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(sve_frintx_h, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzu_hs, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(sve_frintx_s, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzu_ss, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzu_ds, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzu_hd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzu_sd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fcvtzu_dd, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(sve_frintx_d, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
 +
  DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
                     void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 9db01ac2f2..09f5c77254 100644
+index 09f5c77254..7950710be7 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -3184,6 +3184,22 @@ DO_ZPZ_FP_D(sve_fcvt_hd, uint64_t, float16_to_float64_ieee)
- DO_ZPZ_FP_D(sve_fcvt_ds, uint64_t, float64_to_float32)
- DO_ZPZ_FP_D(sve_fcvt_sd, uint64_t, float32_to_float64)
+@@ -3200,6 +3200,14 @@ DO_ZPZ_FP_D(sve_fcvtzu_sd, uint64_t, float32_to_uint64_round_to_zero)
+ DO_ZPZ_FP_D(sve_fcvtzu_ds, uint64_t, float64_to_uint32_round_to_zero)
+ DO_ZPZ_FP_D(sve_fcvtzu_dd, uint64_t, float64_to_uint64_round_to_zero)
  
-+DO_ZPZ_FP(sve_fcvtzs_hh, uint16_t, H1_2, float16_to_int16_round_to_zero)
-+DO_ZPZ_FP(sve_fcvtzs_hs, uint32_t, H1_4, float16_to_int32_round_to_zero)
-+DO_ZPZ_FP(sve_fcvtzs_ss, uint32_t, H1_4, float32_to_int32_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzs_hd, uint64_t, float16_to_int64_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzs_sd, uint64_t, float32_to_int64_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzs_ds, uint64_t, float64_to_int32_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzs_dd, uint64_t, float64_to_int64_round_to_zero)
++DO_ZPZ_FP(sve_frint_h, uint16_t, H1_2, helper_advsimd_rinth)
++DO_ZPZ_FP(sve_frint_s, uint32_t, H1_4, helper_rints)
++DO_ZPZ_FP_D(sve_frint_d, uint64_t, helper_rintd)
 +
-+DO_ZPZ_FP(sve_fcvtzu_hh, uint16_t, H1_2, float16_to_uint16_round_to_zero)
-+DO_ZPZ_FP(sve_fcvtzu_hs, uint32_t, H1_4, float16_to_uint32_round_to_zero)
-+DO_ZPZ_FP(sve_fcvtzu_ss, uint32_t, H1_4, float32_to_uint32_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzu_hd, uint64_t, float16_to_uint64_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzu_sd, uint64_t, float32_to_uint64_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzu_ds, uint64_t, float64_to_uint32_round_to_zero)
-+DO_ZPZ_FP_D(sve_fcvtzu_dd, uint64_t, float64_to_uint64_round_to_zero)
++DO_ZPZ_FP(sve_frintx_h, uint16_t, H1_2, float16_round_to_int)
++DO_ZPZ_FP(sve_frintx_s, uint32_t, H1_4, float32_round_to_int)
++DO_ZPZ_FP_D(sve_frintx_d, uint64_t, float64_round_to_int)
 +
  DO_ZPZ_FP(sve_scvt_hh, uint16_t, H1_2, int16_to_float16)
  DO_ZPZ_FP(sve_scvt_sh, uint32_t, H1_4, int32_to_float16)
  DO_ZPZ_FP(sve_scvt_ss, uint32_t, H1_4, int32_to_float32)
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 361d545965..bc865dfd15 100644
+index bc865dfd15..5f1c4984b8 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3681,6 +3681,76 @@ static void trans_FCVT_sd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-     do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvt_sd);
+@@ -3751,6 +3751,86 @@ static void trans_FCVTZU_dd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+     do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzu_dd);
  }
  
-+static void trans_FCVTZS_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static gen_helper_gvec_3_ptr * const frint_fns[3] = {
++    gen_helper_sve_frint_h,
++    gen_helper_sve_frint_s,
++    gen_helper_sve_frint_d
++};
++
++static void trans_FRINTI(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_fcvtzs_hh);
++    if (a->esz == 0) {
++        unallocated_encoding(s);
++    } else {
++        do_zpz_ptr(s, a->rd, a->rn, a->pg, a->esz == MO_16,
++                   frint_fns[a->esz - 1]);
++    }
 +}
 +
-+static void trans_FCVTZU_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void trans_FRINTX(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_fcvtzu_hh);
++    static gen_helper_gvec_3_ptr * const fns[3] = {
++        gen_helper_sve_frintx_h,
++        gen_helper_sve_frintx_s,
++        gen_helper_sve_frintx_d
++    };
++    if (a->esz == 0) {
++        unallocated_encoding(s);
++    } else {
++        do_zpz_ptr(s, a->rd, a->rn, a->pg, a->esz == MO_16, fns[a->esz - 1]);
++    }
 +}
 +
-+static void trans_FCVTZS_hs(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void do_frint_mode(DisasContext *s, arg_rpr_esz *a, int mode)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_fcvtzs_hs);
++    unsigned vsz = vec_full_reg_size(s);
++    TCGv_i32 tmode;
++    TCGv_ptr status;
++
++    if (a->esz == 0) {
++        unallocated_encoding(s);
++        return;
++    }
++
++    tmode = tcg_const_i32(mode);
++    status = get_fpstatus_ptr(a->esz == MO_16);
++    gen_helper_set_rmode(tmode, tmode, status);
++
++    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, a->rd),
++                       vec_full_reg_offset(s, a->rn),
++                       pred_full_reg_offset(s, a->pg),
++                       status, vsz, vsz, 0, frint_fns[a->esz - 1]);
++
++    gen_helper_set_rmode(tmode, tmode, status);
++    tcg_temp_free_i32(tmode);
++    tcg_temp_free_ptr(status);
 +}
 +
-+static void trans_FCVTZU_hs(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void trans_FRINTN(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_fcvtzu_hs);
++    do_frint_mode(s, a, float_round_nearest_even);
 +}
 +
-+static void trans_FCVTZS_hd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void trans_FRINTP(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_fcvtzs_hd);
++    do_frint_mode(s, a, float_round_up);
 +}
 +
-+static void trans_FCVTZU_hd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void trans_FRINTM(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_fcvtzu_hd);
++    do_frint_mode(s, a, float_round_down);
 +}
 +
-+static void trans_FCVTZS_ss(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void trans_FRINTZ(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzs_ss);
++    do_frint_mode(s, a, float_round_to_zero);
 +}
 +
-+static void trans_FCVTZU_ss(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static void trans_FRINTA(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzu_ss);
-+}
-+
-+static void trans_FCVTZS_sd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzs_sd);
-+}
-+
-+static void trans_FCVTZU_sd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzu_sd);
-+}
-+
-+static void trans_FCVTZS_ds(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzs_ds);
-+}
-+
-+static void trans_FCVTZU_ds(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzu_ds);
-+}
-+
-+static void trans_FCVTZS_dd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzs_dd);
-+}
-+
-+static void trans_FCVTZU_dd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_fcvtzu_dd);
++    do_frint_mode(s, a, float_round_ties_away);
 +}
 +
  static void trans_SCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
  {
      do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_hh);
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index d44cf17fc8..92dda3a241 100644
+index 92dda3a241..e06c0c5279 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -832,6 +832,22 @@ FCVT_hd		01100101 11 0010 01 101 ... ..... .....		@rd_pg_rn_e0
- FCVT_ds		01100101 11 0010 10 101 ... ..... .....		@rd_pg_rn_e0
- FCVT_sd		01100101 11 0010 11 101 ... ..... .....		@rd_pg_rn_e0
+@@ -848,6 +848,15 @@ FCVTZU_sd	01100101 11 011 10 1 101 ... ..... .....	@rd_pg_rn_e0
+ FCVTZS_dd	01100101 11 011 11 0 101 ... ..... .....	@rd_pg_rn_e0
+ FCVTZU_dd	01100101 11 011 11 1 101 ... ..... .....	@rd_pg_rn_e0
  
-+# SVE floating-point convert to integer
-+FCVTZS_hh	01100101 01 011 01 0 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZU_hh	01100101 01 011 01 1 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZS_hs	01100101 01 011 10 0 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZU_hs	01100101 01 011 10 1 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZS_hd	01100101 01 011 11 0 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZU_hd	01100101 01 011 11 1 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZS_ss	01100101 10 011 10 0 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZU_ss	01100101 10 011 10 1 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZS_ds	01100101 11 011 00 0 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZU_ds	01100101 11 011 00 1 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZS_sd	01100101 11 011 10 0 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZU_sd	01100101 11 011 10 1 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZS_dd	01100101 11 011 11 0 101 ... ..... .....	@rd_pg_rn_e0
-+FCVTZU_dd	01100101 11 011 11 1 101 ... ..... .....	@rd_pg_rn_e0
++# SVE floating-point round to integral value
++FRINTN		01100101 .. 000 000 101 ... ..... .....		@rd_pg_rn
++FRINTP		01100101 .. 000 001 101 ... ..... .....		@rd_pg_rn
++FRINTM		01100101 .. 000 010 101 ... ..... .....		@rd_pg_rn
++FRINTZ		01100101 .. 000 011 101 ... ..... .....		@rd_pg_rn
++FRINTA		01100101 .. 000 100 101 ... ..... .....		@rd_pg_rn
++FRINTX		01100101 .. 000 110 101 ... ..... .....		@rd_pg_rn
++FRINTI		01100101 .. 000 111 101 ... ..... .....		@rd_pg_rn
 +
  # SVE integer convert to floating-point
  SCVTF_hh	01100101 01 010 01 0 101 ... ..... .....	@rd_pg_rn_e0
