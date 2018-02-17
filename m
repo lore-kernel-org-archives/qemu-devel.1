@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7AC-0001On-Mi
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:46 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en7AK-0001YK-6W
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7AA-00025r-UN
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:44 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:38170)
+	(envelope-from <richard.henderson@linaro.org>) id 1en7AH-000292-3g
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:52 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:41329)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en7AA-00025S-Lt
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:42 -0500
-Received: by mail-pl0-x241.google.com with SMTP id h10so3439633plt.5
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:42 -0800 (PST)
+	id 1en7AG-00028c-SX
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:49 -0500
+Received: by mail-pl0-x241.google.com with SMTP id k8so3439026pli.8
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:48 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:23:03 -0800
-Message-Id: <20180217182323.25885-48-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:23:07 -0800
+Message-Id: <20180217182323.25885-52-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 47/67] target/arm: Implement SVE integer
- convert to floating-point
+Subject: [Qemu-devel] [PATCH v2 51/67] target/arm: Implement SVE load and
+ broadcast element
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,258 +32,184 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 30 +++++++++++++++
- target/arm/sve_helper.c    | 52 ++++++++++++++++++++++++++
- target/arm/translate-sve.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 22 +++++++++++
- 4 files changed, 196 insertions(+)
+ target/arm/helper-sve.h    |  5 +++++
+ target/arm/sve_helper.c    | 43 ++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 55 +++++++++++++++++++++++++++++++++++++++++++++-
+ target/arm/sve.decode      |  5 +++++
+ 4 files changed, 107 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 74c2d642a3..fb7609f9ef 100644
+index c4502256d5..6c640a92ff 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -720,6 +720,36 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
+@@ -274,6 +274,11 @@ DEF_HELPER_FLAGS_3(sve_clr_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_clr_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_clr_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_dh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_ss, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_sd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_ds, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_dd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_clri_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_clri_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_clri_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_clri_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_5(sve_ucvt_hh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_sh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_dh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_ss, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_sd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_ds, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_dd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_asr_zpzi_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_asr_zpzi_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_asr_zpzi_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index e259e910de..a1e0ceb5fb 100644
+index 0e2b3091b0..a7dc6f6164 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -2789,6 +2789,58 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
-     return predtest_ones(d, oprsz, esz_mask);
+@@ -994,6 +994,49 @@ void HELPER(sve_clr_d)(void *vd, void *vg, uint32_t desc)
+     }
  }
  
-+/* Fully general two-operand expander, controlled by a predicate,
-+ * With the extra float_status parameter.
-+ */
-+#define DO_ZPZ_FP(NAME, TYPE, H, OP)                            \
-+void HELPER(NAME)(void *vd, void *vn, void *vg, void *status, uint32_t desc) \
-+{                                                               \
-+    intptr_t i, opr_sz = simd_oprsz(desc);                      \
-+    for (i = 0; i < opr_sz; ) {                                 \
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));         \
-+        do {                                                    \
-+            if (pg & 1) {                                       \
-+                TYPE nn = *(TYPE *)(vn + H(i));                 \
-+                *(TYPE *)(vd + H(i)) = OP(nn, status);          \
-+            }                                                   \
-+            i += sizeof(TYPE), pg >>= sizeof(TYPE);             \
-+        } while (i & 15);                                       \
-+    }                                                           \
++/* Store zero into every inactive element of Zd.  */
++void HELPER(sve_clri_b)(void *vd, void *vg, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] &= expand_pred_b(pg[H1(i)]);
++    }
 +}
 +
-+/* Similarly, specialized for 64-bit operands.  */
-+#define DO_ZPZ_FP_D(NAME, TYPE, OP)                             \
-+void HELPER(NAME)(void *vd, void *vn, void *vg, void *status, uint32_t desc) \
-+{                                                               \
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;                  \
-+    TYPE *d = vd, *n = vn;                                      \
-+    uint8_t *pg = vg;                                           \
-+    for (i = 0; i < opr_sz; i += 1) {                           \
-+        if (pg[H1(i)] & 1) {                                    \
-+            d[i] = OP(n[i], status);                            \
-+        }                                                       \
-+    }                                                           \
++void HELPER(sve_clri_h)(void *vd, void *vg, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] &= expand_pred_h(pg[H1(i)]);
++    }
 +}
 +
-+DO_ZPZ_FP(sve_scvt_hh, uint16_t, H1_2, int16_to_float16)
-+DO_ZPZ_FP(sve_scvt_sh, uint32_t, H1_4, int32_to_float16)
-+DO_ZPZ_FP(sve_scvt_ss, uint32_t, H1_4, int32_to_float32)
-+DO_ZPZ_FP_D(sve_scvt_sd, uint64_t, int32_to_float64)
-+DO_ZPZ_FP_D(sve_scvt_dh, uint64_t, int64_to_float16)
-+DO_ZPZ_FP_D(sve_scvt_ds, uint64_t, int64_to_float32)
-+DO_ZPZ_FP_D(sve_scvt_dd, uint64_t, int64_to_float64)
++void HELPER(sve_clri_s)(void *vd, void *vg, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] &= expand_pred_s(pg[H1(i)]);
++    }
++}
 +
-+DO_ZPZ_FP(sve_ucvt_hh, uint16_t, H1_2, uint16_to_float16)
-+DO_ZPZ_FP(sve_ucvt_sh, uint32_t, H1_4, uint32_to_float16)
-+DO_ZPZ_FP(sve_ucvt_ss, uint32_t, H1_4, uint32_to_float32)
-+DO_ZPZ_FP_D(sve_ucvt_sd, uint64_t, uint32_to_float64)
-+DO_ZPZ_FP_D(sve_ucvt_dh, uint64_t, uint64_to_float16)
-+DO_ZPZ_FP_D(sve_ucvt_ds, uint64_t, uint64_to_float32)
-+DO_ZPZ_FP_D(sve_ucvt_dd, uint64_t, uint64_to_float64)
++void HELPER(sve_clri_d)(void *vd, void *vg, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++    for (i = 0; i < opr_sz; i += 1) {
++        if (!(pg[H1(i)] & 1)) {
++            d[i] = 0;
++        }
++    }
++}
 +
-+#undef DO_ZPZ_FP
-+#undef DO_ZPZ_FP_D
-+
- /*
-  * Load contiguous data, protected by a governing predicate.
+ /* Three-operand expander, immediate operand, controlled by a predicate.
   */
+ #define DO_ZPZI(NAME, TYPE, H, OP)                              \
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 7b21102b7e..05c684222e 100644
+index 32f0340738..b000a2482e 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3161,6 +3161,98 @@ DO_FP3(FRSQRTS, rsqrts)
+@@ -584,6 +584,19 @@ static void do_clr_zp(DisasContext *s, int rd, int pg, int esz)
+                        vsz, vsz, 0, fns[esz]);
+ }
  
- #undef DO_FP3
++/* Store zero into every inactive element of Zd.  */
++static void do_clr_inactive_zp(DisasContext *s, int rd, int pg, int esz)
++{
++    static gen_helper_gvec_2 * const fns[4] = {
++        gen_helper_sve_clri_b, gen_helper_sve_clri_h,
++        gen_helper_sve_clri_s, gen_helper_sve_clri_d,
++    };
++    unsigned vsz = vec_full_reg_size(s);
++    tcg_gen_gvec_2_ool(vec_full_reg_offset(s, rd),
++                       pred_full_reg_offset(s, pg),
++                       vsz, vsz, 0, fns[esz]);
++}
++
+ static void do_zpzi_ool(DisasContext *s, arg_rpri_esz *a,
+                         gen_helper_gvec_3 *fn)
+ {
+@@ -3506,7 +3519,7 @@ static void trans_LDR_pri(DisasContext *s, arg_rri *a, uint32_t insn)
+  *** SVE Memory - Contiguous Load Group
+  */
  
-+
-+/*
-+ *** SVE Floating Point Unary Operations Prediated Group
-+ */
-+
-+static void do_zpz_ptr(DisasContext *s, int rd, int rn, int pg,
-+                       bool is_fp16, gen_helper_gvec_3_ptr *fn)
+-/* The memory element size of dtype.  */
++/* The memory mode of the dtype.  */
+ static const TCGMemOp dtype_mop[16] = {
+     MO_UB, MO_UB, MO_UB, MO_UB,
+     MO_SL, MO_UW, MO_UW, MO_UW,
+@@ -3671,6 +3684,46 @@ static void trans_LD1RQ_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+     do_ldrq(s, a->rd, a->pg, addr, dtype_msz(a->dtype));
+ }
+ 
++/* Load and broadcast element.  */
++static void trans_LD1R_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
 +{
 +    unsigned vsz = vec_full_reg_size(s);
-+    TCGv_ptr status;
++    unsigned psz = pred_full_reg_size(s);
++    unsigned esz = dtype_esz[a->dtype];
++    TCGLabel *over = gen_new_label();
++    TCGv_i64 temp;
 +
-+    if (fn == NULL) {
-+        unallocated_encoding(s);
-+        return;
++    /* If the guarding predicate has no bits set, no load occurs.  */
++    if (psz <= 8) {
++        temp = tcg_temp_new_i64();
++        tcg_gen_ld_i64(temp, cpu_env, pred_full_reg_offset(s, a->pg));
++        tcg_gen_andi_i64(temp, temp,
++                         deposit64(0, 0, psz * 8, pred_esz_masks[esz]));
++        tcg_gen_brcondi_i64(TCG_COND_EQ, temp, 0, over);
++        tcg_temp_free_i64(temp);
++    } else {
++        TCGv_i32 t32 = tcg_temp_new_i32();
++        find_last_active(s, t32, esz, a->pg);
++        tcg_gen_brcondi_i32(TCG_COND_LT, t32, 0, over);
++        tcg_temp_free_i32(t32);
 +    }
-+    status = get_fpstatus_ptr(is_fp16);
-+    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-+                       vec_full_reg_offset(s, rn),
-+                       pred_full_reg_offset(s, pg),
-+                       status, vsz, vsz, 0, fn);
++
++    /* Load the data.  */
++    temp = tcg_temp_new_i64();
++    tcg_gen_addi_i64(temp, cpu_reg_sp(s, a->rn), a->imm);
++    tcg_gen_qemu_ld_i64(temp, temp, get_mem_index(s),
++                        s->be_data | dtype_mop[a->dtype]);
++
++    /* Broadcast to *all* elements.  */
++    tcg_gen_gvec_dup_i64(esz, vec_full_reg_offset(s, a->rd),
++                         vsz, vsz, temp);
++    tcg_temp_free_i64(temp);
++
++    /* Zero the inactive elements.  */
++    gen_set_label(over);
++    do_clr_inactive_zp(s, a->rd, a->pg, esz);
 +}
 +
-+static void trans_SCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_hh);
-+}
-+
-+static void trans_SCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_sh);
-+}
-+
-+static void trans_SCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_dh);
-+}
-+
-+static void trans_SCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_ss);
-+}
-+
-+static void trans_SCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_ds);
-+}
-+
-+static void trans_SCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_sd);
-+}
-+
-+static void trans_SCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_dd);
-+}
-+
-+static void trans_UCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_hh);
-+}
-+
-+static void trans_UCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_sh);
-+}
-+
-+static void trans_UCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_dh);
-+}
-+
-+static void trans_UCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_ss);
-+}
-+
-+static void trans_UCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_ds);
-+}
-+
-+static void trans_UCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_sd);
-+}
-+
-+static void trans_UCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_dd);
-+}
-+
- /*
-  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
-  */
+ static void do_st_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+                       int msz, int esz, int nreg)
+ {
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 6c906e25e9..b571b70050 100644
+index 95a290aed0..3e30985a09 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -134,6 +134,9 @@
- @rd_pg_rn	........ esz:2 ... ... ... pg:3 rn:5 rd:5	&rpr_esz
- @rd_pg4_pn	........ esz:2 ... ... .. pg:4 . rn:4 rd:5	&rpr_esz
+@@ -29,6 +29,7 @@
+ %imm9_16_10	16:s6 10:3
+ %preg4_5	5:4
+ %size_23	23:2
++%dtype_23_13	23:2 13:2
  
-+# One register operand, with governing predicate, no vector element size
-+@rd_pg_rn_e0	........ .. ... ... ... pg:3 rn:5 rd:5		&rpr_esz esz=0
-+
- # Two register operands with a 6-bit signed immediate.
- @rd_rn_i6	........ ... rn:5 ..... imm:s6 rd:5		&rri
+ # A combination of tsz:imm3 -- extract esize.
+ %tszimm_esz	22:2 5:5 !function=tszimm_esz
+@@ -758,6 +759,10 @@ LDR_pri		10000101 10 ...... 000 ... ..... 0 ....		@pd_rn_i9
+ # SVE load vector register
+ LDR_zri		10000101 10 ...... 010 ... ..... .....		@rd_rn_i9
  
-@@ -689,6 +692,25 @@ FTSMUL		01100101 .. 0 ..... 000 011 ..... .....		@rd_rn_rm
- FRECPS		01100101 .. 0 ..... 000 110 ..... .....		@rd_rn_rm
- FRSQRTS		01100101 .. 0 ..... 000 111 ..... .....		@rd_rn_rm
++# SVE load and broadcast element
++LD1R_zpri	1000010 .. 1 imm:6 1.. pg:3 rn:5 rd:5 \
++		&rpri_load dtype=%dtype_23_13 nreg=0
++
+ ### SVE Memory Contiguous Load Group
  
-+### SVE FP Unary Operations Predicated Group
-+
-+# SVE integer convert to floating-point
-+SCVTF_hh	01100101 01 010 01 0 101 ... ..... .....	@rd_pg_rn_e0
-+SCVTF_sh	01100101 01 010 10 0 101 ... ..... .....	@rd_pg_rn_e0
-+SCVTF_dh	01100101 01 010 11 0 101 ... ..... .....	@rd_pg_rn_e0
-+SCVTF_ss	01100101 10 010 10 0 101 ... ..... .....	@rd_pg_rn_e0
-+SCVTF_sd	01100101 11 010 00 0 101 ... ..... .....	@rd_pg_rn_e0
-+SCVTF_ds	01100101 11 010 10 0 101 ... ..... .....	@rd_pg_rn_e0
-+SCVTF_dd	01100101 11 010 11 0 101 ... ..... .....	@rd_pg_rn_e0
-+
-+UCVTF_hh	01100101 01 010 01 1 101 ... ..... .....	@rd_pg_rn_e0
-+UCVTF_sh	01100101 01 010 10 1 101 ... ..... .....	@rd_pg_rn_e0
-+UCVTF_dh	01100101 01 010 11 1 101 ... ..... .....	@rd_pg_rn_e0
-+UCVTF_ss	01100101 10 010 10 1 101 ... ..... .....	@rd_pg_rn_e0
-+UCVTF_sd	01100101 11 010 00 1 101 ... ..... .....	@rd_pg_rn_e0
-+UCVTF_ds	01100101 11 010 10 1 101 ... ..... .....	@rd_pg_rn_e0
-+UCVTF_dd	01100101 11 010 11 1 101 ... ..... .....	@rd_pg_rn_e0
-+
- ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
- 
- # SVE load predicate register
+ # SVE contiguous load (scalar plus scalar)
 -- 
 2.14.3
