@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1en3yi-0005V3-82
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 10:00:41 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en5Xa-0005OP-J5
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 11:40:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1en3yb-0003qT-Pz
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 10:00:38 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:37356
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1en3yb-0003hg-Iw
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 10:00:33 -0500
-References: <20180216173111.10270-1-dgilbert@redhat.com>
-	<CAFEAcA_0PBYwP_vCTT6dOYVoEwo0XGkGc_-ah5K+JSmewDpFOg@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <6e6dbd27-205e-c8df-f735-f5f042c56733@ilande.co.uk>
-Date: Sat, 17 Feb 2018 15:00:11 +0000
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_0PBYwP_vCTT6dOYVoEwo0XGkGc_-ah5K+JSmewDpFOg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cuda.h: Fix multiple typedef
+	(envelope-from <richard.henderson@linaro.org>) id 1en5XX-0001j7-GC
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 11:40:46 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:34483)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1en5XX-0001ip-98
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 11:40:43 -0500
+Received: by mail-pl0-x244.google.com with SMTP id bd10so3365713plb.1
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 08:40:43 -0800 (PST)
+Received: from cloudburst.twiddle.net ([50.0.192.64])
+	by smtp.gmail.com with ESMTPSA id
+	a6sm29152324pfi.99.2018.02.17.08.40.39 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sat, 17 Feb 2018 08:40:40 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 08:40:35 -0800
+Message-Id: <20180217164037.15727-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] tcg: tcg_can_emit_vec_op cleanup+fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 16/02/18 18:38, Peter Maydell wrote:
+While rearranging/rebasing my SVE patch set, I triggered an
+assert in tcg_gen_mul_vec.  Turns out we should not have gone
+down that path, due to a missing tcg_can_emit_vec_op check.
 
-> On 16 February 2018 at 17:31, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
->> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>
->> RHEL6's compilers don't like the repeated typedef.
->>
->> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->>   include/hw/misc/macio/cuda.h | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
->> index 6afbdd13ee..494b709579 100644
->> --- a/include/hw/misc/macio/cuda.h
->> +++ b/include/hw/misc/macio/cuda.h
->> @@ -93,12 +93,12 @@ typedef struct CUDAState {
->>   } CUDAState;
->>
->>   /* MOS6522 CUDA */
->> -typedef struct MOS6522CUDAState {
->> +struct MOS6522CUDAState {
->>       /*< private >*/
->>       MOS6522State parent_obj;
->>
->>       CUDAState *cuda;
->> -} MOS6522CUDAState;
->> +};
->>
->>   #define TYPE_MOS6522_CUDA "mos6522-cuda"
->>   #define MOS6522_CUDA(obj) OBJECT_CHECK(MOS6522CUDAState, (obj), \
->> --
-> 
-> Thanks; applied to master as a  buildfix.
-
-Thanks both. Apologies I got caught up later than expected yesterday.
+Tidy the usage of tcg_can_emit_vec_op to avoid code clutter.
 
 
-ATB,
+r~
 
-Mark.
+
+Richard Henderson (2):
+  tcg: Fold unspecified opcode test into tcg_can_emit_vec_op
+  tcg: Add missing tcg_can_emit_vec_op check in tcg_gen_gvec_2s
+
+ tcg/aarch64/tcg-target.inc.c |  4 ++++
+ tcg/i386/tcg-target.inc.c    |  4 ++++
+ tcg/tcg-op-gvec.c            | 37 ++++++++++++++++++-------------------
+ 3 files changed, 26 insertions(+), 19 deletions(-)
+
+-- 
+2.14.3
