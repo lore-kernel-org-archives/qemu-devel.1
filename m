@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79b-0000hM-OU
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:09 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en79f-0000mM-37
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79a-0001lB-MY
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:07 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:43777)
+	(envelope-from <richard.henderson@linaro.org>) id 1en79d-0001mo-PN
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:11 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en79a-0001ks-Gz
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:06 -0500
-Received: by mail-pg0-x243.google.com with SMTP id f6so4342993pgs.10
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:06 -0800 (PST)
+	id 1en79d-0001mK-HR
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:09 -0500
+Received: by mail-pl0-x241.google.com with SMTP id s13so3436999plq.6
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:09 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:40 -0800
-Message-Id: <20180217182323.25885-25-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:22:42 -0800
+Message-Id: <20180217182323.25885-27-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 24/67] target/arm: Implement SVE Bitwise
- Immediate Group
+Subject: [Qemu-devel] [PATCH v2 26/67] target/arm: Implement SVE Permute -
+ Extract Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,119 +32,181 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-sve.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 17 ++++++++++++++++
- 2 files changed, 67 insertions(+)
+ target/arm/helper-sve.h    |  2 ++
+ target/arm/sve_helper.c    | 81 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 29 +++++++++++++++++
+ target/arm/sve.decode      |  9 +++++-
+ 4 files changed, 120 insertions(+), 1 deletion(-)
 
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index 79493ab647..94f4356ce9 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -414,6 +414,8 @@ DEF_HELPER_FLAGS_4(sve_cpy_z_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+ DEF_HELPER_FLAGS_4(sve_cpy_z_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+ DEF_HELPER_FLAGS_4(sve_cpy_z_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+ 
++DEF_HELPER_FLAGS_4(sve_ext, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 6a95d1ec48..fb3f54300b 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -1469,3 +1469,84 @@ void HELPER(sve_cpy_z_d)(void *vd, void *vg, uint64_t val, uint32_t desc)
+         d[i] = (pg[H1(i)] & 1 ? val : 0);
+     }
+ }
++
++/* Big-endian hosts need to frob the byte indicies.  If the copy
++ * happens to be 8-byte aligned, then no frobbing necessary.
++ */
++static void swap_memmove(void *vd, void *vs, size_t n)
++{
++    uintptr_t d = (uintptr_t)vd;
++    uintptr_t s = (uintptr_t)vs;
++    uintptr_t o = (d | s | n) & 7;
++    size_t i;
++
++#ifndef HOST_WORDS_BIGENDIAN
++    o = 0;
++#endif
++    switch (o) {
++    case 0:
++        memmove(vd, vs, n);
++        break;
++
++    case 4:
++        if (d < s || d >= s + n) {
++            for (i = 0; i < n; i += 4) {
++                *(uint32_t *)H1_4(d + i) = *(uint32_t *)H1_4(s + i);
++            }
++        } else {
++            for (i = n; i > 0; ) {
++                i -= 4;
++                *(uint32_t *)H1_4(d + i) = *(uint32_t *)H1_4(s + i);
++            }
++        }
++        break;
++
++    case 2:
++    case 6:
++        if (d < s || d >= s + n) {
++            for (i = 0; i < n; i += 2) {
++                *(uint16_t *)H1_2(d + i) = *(uint16_t *)H1_2(s + i);
++            }
++        } else {
++            for (i = n; i > 0; ) {
++                i -= 2;
++                *(uint16_t *)H1_2(d + i) = *(uint16_t *)H1_2(s + i);
++            }
++        }
++        break;
++
++    default:
++        if (d < s || d >= s + n) {
++            for (i = 0; i < n; i++) {
++                *(uint8_t *)H1(d + i) = *(uint8_t *)H1(s + i);
++            }
++        } else {
++            for (i = n; i > 0; ) {
++                i -= 1;
++                *(uint8_t *)H1(d + i) = *(uint8_t *)H1(s + i);
++            }
++        }
++        break;
++    }
++}
++
++void HELPER(sve_ext)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t opr_sz = simd_oprsz(desc);
++    size_t n_ofs = simd_data(desc);
++    size_t n_siz = opr_sz - n_ofs;
++
++    if (vd != vm) {
++        swap_memmove(vd, vn + n_ofs, n_siz);
++        swap_memmove(vd + n_siz, vm, n_ofs);
++    } else if (vd != vn) {
++        swap_memmove(vd + n_siz, vd, n_ofs);
++        swap_memmove(vd, vn + n_ofs, n_siz);
++    } else {
++        /* vd == vn == vm.  Need temp space.  */
++        ARMVectorReg tmp;
++        swap_memmove(&tmp, vm, n_ofs);
++        swap_memmove(vd, vd + n_ofs, n_siz);
++        memcpy(vd + n_siz, &tmp, n_ofs);
++    }
++}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 702f20e97b..21b1e4df85 100644
+index dd085b084b..07a5eac092 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -34,6 +34,8 @@
- #include "translate-a64.h"
- 
- typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
-+typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t,
-+                         int64_t, uint32_t, uint32_t);
- typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
-                         uint32_t, uint32_t, uint32_t);
- 
-@@ -1648,6 +1650,54 @@ static void trans_SINCDEC_v(DisasContext *s, arg_incdec2_cnt *a,
-     }
+@@ -1790,6 +1790,35 @@ static void trans_CPY_z_i(DisasContext *s, arg_CPY_z_i *a, uint32_t insn)
+     tcg_temp_free_i64(t_imm);
  }
  
 +/*
-+ *** SVE Bitwise Immediate Group
++ *** SVE Permute Extract Group
 + */
 +
-+static void do_zz_dbm(DisasContext *s, arg_rr_dbm *a, GVecGen2iFn *gvec_fn)
++static void trans_EXT(DisasContext *s, arg_EXT *a, uint32_t insn)
 +{
-+    unsigned vsz;
-+    uint64_t imm;
++    unsigned vsz = vec_full_reg_size(s);
++    unsigned n_ofs = a->imm >= vsz ? 0 : a->imm;
++    unsigned n_siz = vsz - n_ofs;
++    unsigned d = vec_full_reg_offset(s, a->rd);
++    unsigned n = vec_full_reg_offset(s, a->rn);
++    unsigned m = vec_full_reg_offset(s, a->rm);
 +
-+    if (!logic_imm_decode_wmask(&imm, extract32(a->dbm, 12, 1),
-+                                extract32(a->dbm, 0, 6),
-+                                extract32(a->dbm, 6, 6))) {
-+        unallocated_encoding(s);
++    /* Use host vector move insns if we have appropriate sizes
++       and no unfortunate overlap.  */
++    if (m != d
++        && n_ofs == size_for_gvec(n_ofs)
++        && n_siz == size_for_gvec(n_siz)
++        && (d != n || n_siz <= n_ofs)) {
++        tcg_gen_gvec_mov(0, d, n + n_ofs, n_siz, n_siz);
++        if (n_ofs != 0) {
++            tcg_gen_gvec_mov(0, d + n_siz, m, n_ofs, n_ofs);
++        }
 +        return;
 +    }
 +
-+    vsz = vec_full_reg_size(s);
-+    gvec_fn(MO_64, vec_full_reg_offset(s, a->rd),
-+            vec_full_reg_offset(s, a->rn), imm, vsz, vsz);
-+}
-+
-+static void trans_AND_zzi(DisasContext *s, arg_rr_dbm *a, uint32_t insn)
-+{
-+    do_zz_dbm(s, a, tcg_gen_gvec_andi);
-+}
-+
-+static void trans_ORR_zzi(DisasContext *s, arg_rr_dbm *a, uint32_t insn)
-+{
-+    do_zz_dbm(s, a, tcg_gen_gvec_ori);
-+}
-+
-+static void trans_EOR_zzi(DisasContext *s, arg_rr_dbm *a, uint32_t insn)
-+{
-+    do_zz_dbm(s, a, tcg_gen_gvec_xori);
-+}
-+
-+static void trans_DUPM(DisasContext *s, arg_DUPM *a, uint32_t insn)
-+{
-+    uint64_t imm;
-+    if (!logic_imm_decode_wmask(&imm, extract32(a->dbm, 12, 1),
-+                                extract32(a->dbm, 0, 6),
-+                                extract32(a->dbm, 6, 6))) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+    do_dupi_z(s, a->rd, imm);
++    tcg_gen_gvec_3_ool(d, n, m, vsz, vsz, n_ofs, gen_helper_sve_ext);
 +}
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 5690b5fcb9..0990d135f4 100644
+index e6e10a4f84..5e3a9839d4 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -50,6 +50,7 @@
+@@ -22,8 +22,9 @@
+ ###########################################################################
+ # Named fields.  These are primarily for disjoint fields.
  
- &rr_esz		rd rn esz
- &rri		rd rn imm
-+&rr_dbm		rd rn dbm
- &rrri		rd rn rm imm
- &rri_esz	rd rn imm esz
- &rrr_esz	rd rn rm esz
-@@ -112,6 +113,10 @@
- @rd_rn_tszimm	........ .. ... ... ...... rn:5 rd:5 \
- 		&rri_esz esz=%tszimm16_esz
+-%imm4_16_p1             16:4 !function=plus1
++%imm4_16_p1	16:4 !function=plus1
+ %imm6_22_5	22:1 5:5
++%imm8_16_10	16:5 10:3
+ %imm9_16_10	16:s6 10:3
+ %preg4_5	5:4
  
-+# Two register operand, one encoded bitmask.
-+@rdn_dbm	........ .. .... dbm:13 rd:5 \
-+		&rr_dbm rn=%reg_movprfx
-+
- # Basic Load/Store with 9-bit immediate offset
- @pd_rn_i9	........ ........ ...... rn:5 . rd:4	\
- 		&rri imm=%imm9_16_10
-@@ -331,6 +336,18 @@ INCDEC_v	00000100 .. 1 1 .... 1100 0 d:1 ..... .....    @incdec2_cnt u=1
- # Note these require esz != 0.
- SINCDEC_v	00000100 .. 1 0 .... 1100 d:1 u:1 ..... .....	@incdec2_cnt
+@@ -363,6 +364,12 @@ FCPY		00000101 .. 01 .... 110 imm:8 .....		@rdn_pg4
+ CPY_m_i		00000101 .. 01 .... 01 . ........ .....   @rdn_pg4 imm=%sh8_i8s
+ CPY_z_i		00000101 .. 01 .... 00 . ........ .....   @rdn_pg4 imm=%sh8_i8s
  
-+### SVE Bitwise Immediate Group
++### SVE Permute - Extract Group
 +
-+# SVE bitwise logical with immediate (unpredicated)
-+ORR_zzi		00000101 00 0000 ............. .....		@rdn_dbm
-+EOR_zzi		00000101 01 0000 ............. .....		@rdn_dbm
-+AND_zzi		00000101 10 0000 ............. .....		@rdn_dbm
++# SVE extract vector (immediate offset)
++EXT		00000101 001 ..... 000 ... rm:5 rd:5 \
++		&rrri rn=%reg_movprfx imm=%imm8_16_10
 +
-+# SVE broadcast bitmask immediate
-+DUPM		00000101 11 0000 dbm:13 rd:5
-+
-+### SVE Predicate Logical Operations Group
-+
+ ### SVE Predicate Logical Operations Group
+ 
  # SVE predicate logical operations
- AND_pppp	00100101 0. 00 .... 01 .... 0 .... 0 ....	@pd_pg_pn_pm_s
- BIC_pppp	00100101 0. 00 .... 01 .... 0 .... 1 ....	@pd_pg_pn_pm_s
 -- 
 2.14.3
