@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7A5-0001IC-LM
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en7A8-0001Kq-4T
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en7A3-00021Q-VE
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:37 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:34489)
+	(envelope-from <richard.henderson@linaro.org>) id 1en7A5-00022D-PJ
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:40 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:35793)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en7A3-000214-NV
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:35 -0500
-Received: by mail-pg0-x243.google.com with SMTP id m19so4360482pgn.1
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:35 -0800 (PST)
+	id 1en7A5-00021n-H0
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:37 -0500
+Received: by mail-pl0-x243.google.com with SMTP id bb3so3441299plb.2
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:59 -0800
-Message-Id: <20180217182323.25885-44-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:23:00 -0800
+Message-Id: <20180217182323.25885-45-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 43/67] target/arm: Implement SVE Floating
- Point Arithmetic - Unpredicated Group
+Subject: [Qemu-devel] [PATCH v2 44/67] target/arm: Implement SVE Memory
+ Contiguous Load Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,252 +32,523 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 14 +++++++
- target/arm/helper.h        | 19 ++++++++++
- target/arm/translate-sve.c | 41 ++++++++++++++++++++
- target/arm/vec_helper.c    | 94 ++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/Makefile.objs   |  2 +-
- target/arm/sve.decode      | 10 +++++
- 6 files changed, 179 insertions(+), 1 deletion(-)
- create mode 100644 target/arm/vec_helper.c
+ target/arm/helper-sve.h    |  35 +++++++
+ target/arm/sve_helper.c    | 235 +++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 130 +++++++++++++++++++++++++
+ target/arm/sve.decode      |  44 ++++++++-
+ 4 files changed, 442 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 97bfe0f47b..2e76084992 100644
+index 2e76084992..fcc9ba5f50 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -705,3 +705,17 @@ DEF_HELPER_FLAGS_4(sve_umini_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(sve_umini_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(sve_umini_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(sve_umini_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+@@ -719,3 +719,38 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_5(gvec_recps_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_recps_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_recps_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
 +
-+DEF_HELPER_FLAGS_5(gvec_rsqrts_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index be3c2fcdc0..f3ce58e276 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -565,6 +565,25 @@ DEF_HELPER_2(dc_zva, void, env, i64)
- DEF_HELPER_FLAGS_2(neon_pmull_64_lo, TCG_CALL_NO_RWG_SE, i64, i64, i64)
- DEF_HELPER_FLAGS_2(neon_pmull_64_hi, TCG_CALL_NO_RWG_SE, i64, i64, i64)
++DEF_HELPER_FLAGS_4(sve_ld1hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1bhu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1bsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1bdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1bhs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1bss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1bds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1hsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1sdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 4f45f11bff..e542725113 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -2788,3 +2788,238 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
  
-+DEF_HELPER_FLAGS_5(gvec_fadd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fadd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fadd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+     return predtest_ones(d, oprsz, esz_mask);
+ }
 +
-+DEF_HELPER_FLAGS_5(gvec_fsub_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fsub_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fsub_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++/*
++ * Load contiguous data, protected by a governing predicate.
++ */
++#define DO_LD1(NAME, FN, TYPEE, TYPEM, H)                  \
++void HELPER(NAME)(CPUARMState *env, void *vg,              \
++                  target_ulong addr, uint32_t desc)        \
++{                                                          \
++    intptr_t i, oprsz = simd_oprsz(desc);                  \
++    intptr_t ra = GETPC();                                 \
++    unsigned rd = simd_data(desc);                         \
++    void *vd = &env->vfp.zregs[rd];                        \
++    for (i = 0; i < oprsz; ) {                             \
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
++        do {                                               \
++            TYPEM m = 0;                                   \
++            if (pg & 1) {                                  \
++                m = FN(env, addr, ra);                     \
++            }                                              \
++            *(TYPEE *)(vd + H(i)) = m;                     \
++            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
++            addr += sizeof(TYPEM);                         \
++        } while (i & 15);                                  \
++    }                                                      \
++}
 +
-+DEF_HELPER_FLAGS_5(gvec_fmul_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fmul_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fmul_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++#define DO_LD1_D(NAME, FN, TYPEM)                          \
++void HELPER(NAME)(CPUARMState *env, void *vg,              \
++                  target_ulong addr, uint32_t desc)        \
++{                                                          \
++    intptr_t i, oprsz = simd_oprsz(desc) / 8;              \
++    intptr_t ra = GETPC();                                 \
++    unsigned rd = simd_data(desc);                         \
++    uint64_t *d = &env->vfp.zregs[rd].d[0];                \
++    uint8_t *pg = vg;                                      \
++    for (i = 0; i < oprsz; i += 1) {                       \
++        TYPEM m = 0;                                       \
++        if (pg[H1(i)] & 1) {                               \
++            m = FN(env, addr, ra);                         \
++        }                                                  \
++        d[i] = m;                                          \
++        addr += sizeof(TYPEM);                             \
++    }                                                      \
++}
 +
-+DEF_HELPER_FLAGS_5(gvec_ftsmul_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_ftsmul_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_ftsmul_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
++#define DO_LD2(NAME, FN, TYPEE, TYPEM, H)                  \
++void HELPER(NAME)(CPUARMState *env, void *vg,              \
++                  target_ulong addr, uint32_t desc)        \
++{                                                          \
++    intptr_t i, oprsz = simd_oprsz(desc);                  \
++    intptr_t ra = GETPC();                                 \
++    unsigned rd = simd_data(desc);                         \
++    void *d1 = &env->vfp.zregs[rd];                        \
++    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
++    for (i = 0; i < oprsz; ) {                             \
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
++        do {                                               \
++            TYPEM m1 = 0, m2 = 0;                          \
++            if (pg & 1) {                                  \
++                m1 = FN(env, addr, ra);                    \
++                m2 = FN(env, addr + sizeof(TYPEM), ra);    \
++            }                                              \
++            *(TYPEE *)(d1 + H(i)) = m1;                    \
++            *(TYPEE *)(d2 + H(i)) = m2;                    \
++            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
++            addr += 2 * sizeof(TYPEM);                     \
++        } while (i & 15);                                  \
++    }                                                      \
++}
 +
- #ifdef TARGET_AARCH64
- #include "helper-a64.h"
- #include "helper-sve.h"
++#define DO_LD3(NAME, FN, TYPEE, TYPEM, H)                  \
++void HELPER(NAME)(CPUARMState *env, void *vg,              \
++                  target_ulong addr, uint32_t desc)        \
++{                                                          \
++    intptr_t i, oprsz = simd_oprsz(desc);                  \
++    intptr_t ra = GETPC();                                 \
++    unsigned rd = simd_data(desc);                         \
++    void *d1 = &env->vfp.zregs[rd];                        \
++    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
++    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
++    for (i = 0; i < oprsz; ) {                             \
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
++        do {                                               \
++            TYPEM m1 = 0, m2 = 0, m3 = 0;                  \
++            if (pg & 1) {                                  \
++                m1 = FN(env, addr, ra);                    \
++                m2 = FN(env, addr + sizeof(TYPEM), ra);    \
++                m3 = FN(env, addr + 2 * sizeof(TYPEM), ra); \
++            }                                              \
++            *(TYPEE *)(d1 + H(i)) = m1;                    \
++            *(TYPEE *)(d2 + H(i)) = m2;                    \
++            *(TYPEE *)(d3 + H(i)) = m3;                    \
++            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
++            addr += 3 * sizeof(TYPEM);                     \
++        } while (i & 15);                                  \
++    }                                                      \
++}
++
++#define DO_LD4(NAME, FN, TYPEE, TYPEM, H)                  \
++void HELPER(NAME)(CPUARMState *env, void *vg,              \
++                  target_ulong addr, uint32_t desc)        \
++{                                                          \
++    intptr_t i, oprsz = simd_oprsz(desc);                  \
++    intptr_t ra = GETPC();                                 \
++    unsigned rd = simd_data(desc);                         \
++    void *d1 = &env->vfp.zregs[rd];                        \
++    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
++    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
++    void *d4 = &env->vfp.zregs[(rd + 3) & 31];             \
++    for (i = 0; i < oprsz; ) {                             \
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
++        do {                                               \
++            TYPEM m1 = 0, m2 = 0, m3 = 0, m4 = 0;          \
++            if (pg & 1) {                                  \
++                m1 = FN(env, addr, ra);                    \
++                m2 = FN(env, addr + sizeof(TYPEM), ra);    \
++                m3 = FN(env, addr + 2 * sizeof(TYPEM), ra); \
++                m4 = FN(env, addr + 3 * sizeof(TYPEM), ra); \
++            }                                              \
++            *(TYPEE *)(d1 + H(i)) = m1;                    \
++            *(TYPEE *)(d2 + H(i)) = m2;                    \
++            *(TYPEE *)(d3 + H(i)) = m3;                    \
++            *(TYPEE *)(d4 + H(i)) = m4;                    \
++            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
++            addr += 4 * sizeof(TYPEM);                     \
++        } while (i & 15);                                  \
++    }                                                      \
++}
++
++DO_LD1(sve_ld1bhu_r, cpu_ldub_data_ra, uint16_t, uint8_t, H1_2)
++DO_LD1(sve_ld1bhs_r, cpu_ldsb_data_ra, uint16_t, int8_t, H1_2)
++DO_LD1(sve_ld1bsu_r, cpu_ldub_data_ra, uint32_t, uint8_t, H1_4)
++DO_LD1(sve_ld1bss_r, cpu_ldsb_data_ra, uint32_t, int8_t, H1_4)
++DO_LD1_D(sve_ld1bdu_r, cpu_ldub_data_ra, uint8_t)
++DO_LD1_D(sve_ld1bds_r, cpu_ldsb_data_ra, int8_t)
++
++DO_LD1(sve_ld1hsu_r, cpu_lduw_data_ra, uint32_t, uint16_t, H1_4)
++DO_LD1(sve_ld1hss_r, cpu_ldsw_data_ra, uint32_t, int8_t, H1_4)
++DO_LD1_D(sve_ld1hdu_r, cpu_lduw_data_ra, uint16_t)
++DO_LD1_D(sve_ld1hds_r, cpu_ldsw_data_ra, int16_t)
++
++DO_LD1_D(sve_ld1sdu_r, cpu_ldl_data_ra, uint32_t)
++DO_LD1_D(sve_ld1sds_r, cpu_ldl_data_ra, int32_t)
++
++DO_LD1(sve_ld1bb_r, cpu_ldub_data_ra, uint8_t, uint8_t, H1)
++DO_LD2(sve_ld2bb_r, cpu_ldub_data_ra, uint8_t, uint8_t, H1)
++DO_LD3(sve_ld3bb_r, cpu_ldub_data_ra, uint8_t, uint8_t, H1)
++DO_LD4(sve_ld4bb_r, cpu_ldub_data_ra, uint8_t, uint8_t, H1)
++
++DO_LD1(sve_ld1hh_r, cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
++DO_LD2(sve_ld2hh_r, cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
++DO_LD3(sve_ld3hh_r, cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
++DO_LD4(sve_ld4hh_r, cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
++
++DO_LD1(sve_ld1ss_r, cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
++DO_LD2(sve_ld2ss_r, cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
++DO_LD3(sve_ld3ss_r, cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
++DO_LD4(sve_ld4ss_r, cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
++
++DO_LD1_D(sve_ld1dd_r, cpu_ldq_data_ra, uint64_t)
++
++void HELPER(sve_ld2dd_r)(CPUARMState *env, void *vg,
++                         target_ulong addr, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc) / 8;
++    intptr_t ra = GETPC();
++    unsigned rd = simd_data(desc);
++    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
++    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
++    uint8_t *pg = vg;
++
++    for (i = 0; i < oprsz; i += 1) {
++        uint64_t m1 = 0, m2 = 0;
++        if (pg[H1(i)] & 1) {
++            m1 = cpu_ldq_data_ra(env, addr, ra);
++            m2 = cpu_ldq_data_ra(env, addr + 8, ra);
++        }
++        d1[i] = m1;
++        d2[i] = m2;
++        addr += 2 * 8;
++    }
++}
++
++void HELPER(sve_ld3dd_r)(CPUARMState *env, void *vg,
++                         target_ulong addr, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc) / 8;
++    intptr_t ra = GETPC();
++    unsigned rd = simd_data(desc);
++    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
++    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
++    uint64_t *d3 = &env->vfp.zregs[(rd + 2) & 31].d[0];
++    uint8_t *pg = vg;
++
++    for (i = 0; i < oprsz; i += 1) {
++        uint64_t m1 = 0, m2 = 0, m3 = 0;
++        if (pg[H1(i)] & 1) {
++            m1 = cpu_ldq_data_ra(env, addr, ra);
++            m2 = cpu_ldq_data_ra(env, addr + 8, ra);
++            m3 = cpu_ldq_data_ra(env, addr + 16, ra);
++        }
++        d1[i] = m1;
++        d2[i] = m2;
++        d3[i] = m3;
++        addr += 3 * 8;
++    }
++}
++
++void HELPER(sve_ld4dd_r)(CPUARMState *env, void *vg,
++                         target_ulong addr, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc) / 8;
++    intptr_t ra = GETPC();
++    unsigned rd = simd_data(desc);
++    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
++    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
++    uint64_t *d3 = &env->vfp.zregs[(rd + 2) & 31].d[0];
++    uint64_t *d4 = &env->vfp.zregs[(rd + 3) & 31].d[0];
++    uint8_t *pg = vg;
++
++    for (i = 0; i < oprsz; i += 1) {
++        uint64_t m1 = 0, m2 = 0, m3 = 0, m4 = 0;
++        if (pg[H1(i)] & 1) {
++            m1 = cpu_ldq_data_ra(env, addr, ra);
++            m2 = cpu_ldq_data_ra(env, addr + 8, ra);
++            m3 = cpu_ldq_data_ra(env, addr + 16, ra);
++            m4 = cpu_ldq_data_ra(env, addr + 24, ra);
++        }
++        d1[i] = m1;
++        d2[i] = m2;
++        d3[i] = m3;
++        d4[i] = m4;
++        addr += 4 * 8;
++    }
++}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 72abcb543a..f9a3ad1434 100644
+index f9a3ad1434..aa8bfd2ae7 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3109,6 +3109,47 @@ DO_ZZI(UMIN, umin)
+@@ -46,6 +46,8 @@ typedef void gen_helper_gvec_flags_3(TCGv_i32, TCGv_ptr, TCGv_ptr,
+ typedef void gen_helper_gvec_flags_4(TCGv_i32, TCGv_ptr, TCGv_ptr,
+                                      TCGv_ptr, TCGv_ptr, TCGv_i32);
  
- #undef DO_ZZI
++typedef void gen_helper_gvec_mem(TCGv_env, TCGv_ptr, TCGv_i64, TCGv_i32);
++
+ /*
+  * Helpers for extracting complex instruction fields.
+  */
+@@ -86,6 +88,15 @@ static inline int expand_imm_sh8u(int x)
+     return (uint8_t)x << (x & 0x100 ? 8 : 0);
+ }
  
++/* Convert a 2-bit memory size (msz) to a 4-bit data type (dtype)
++ * with unsigned data.  C.f. SVE Memory Contiguous Load Group.
++ */
++static inline int msz_dtype(int msz)
++{
++    static const uint8_t dtype[4] = { 0, 5, 10, 15 };
++    return dtype[msz];
++}
++
+ /*
+  * Include the generated decoder.
+  */
+@@ -3268,3 +3279,122 @@ static void trans_LDR_pri(DisasContext *s, arg_rri *a, uint32_t insn)
+     int size = pred_full_reg_size(s);
+     do_ldr(s, pred_full_reg_offset(s, a->rd), size, a->rn, a->imm * size);
+ }
++
 +/*
-+ *** SVE Floating Point Arithmetic - Unpredicated Group
++ *** SVE Memory - Contiguous Load Group
 + */
 +
-+static void do_zzz_fp(DisasContext *s, arg_rrr_esz *a,
-+                      gen_helper_gvec_3_ptr *fn)
++/* The memory element size of dtype.  */
++static const TCGMemOp dtype_mop[16] = {
++    MO_UB, MO_UB, MO_UB, MO_UB,
++    MO_SL, MO_UW, MO_UW, MO_UW,
++    MO_SW, MO_SW, MO_UL, MO_UL,
++    MO_SB, MO_SB, MO_SB, MO_Q
++};
++
++#define dtype_msz(x)  (dtype_mop[x] & MO_SIZE)
++
++/* The vector element size of dtype.  */
++static const uint8_t dtype_esz[16] = {
++    0, 1, 2, 3,
++    3, 1, 2, 3,
++    3, 2, 2, 3,
++    3, 2, 1, 3
++};
++
++static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
++                       gen_helper_gvec_mem *fn)
 +{
 +    unsigned vsz = vec_full_reg_size(s);
-+    TCGv_ptr status;
++    TCGv_ptr t_pg;
++    TCGv_i32 desc;
 +
-+    if (fn == NULL) {
++    /* For e.g. LD4, there are not enough arguments to pass all 4
++       registers as pointers, so encode the regno into the data field.
++       For consistency, do this even for LD1.  */
++    desc = tcg_const_i32(simd_desc(vsz, vsz, zt));
++    t_pg = tcg_temp_new_ptr();
++
++    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
++    fn(cpu_env, t_pg, addr, desc);
++
++    tcg_temp_free_ptr(t_pg);
++    tcg_temp_free_i32(desc);
++    tcg_temp_free_i64(addr);
++}
++
++static void do_ld_zpa(DisasContext *s, int zt, int pg,
++                      TCGv_i64 addr, int dtype, int nreg)
++{
++    static gen_helper_gvec_mem * const fns[16][4] = {
++        { gen_helper_sve_ld1bb_r, gen_helper_sve_ld2bb_r,
++          gen_helper_sve_ld3bb_r, gen_helper_sve_ld4bb_r },
++        { gen_helper_sve_ld1bhu_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1bsu_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1bdu_r, NULL, NULL, NULL },
++
++        { gen_helper_sve_ld1sds_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1hh_r, gen_helper_sve_ld2hh_r,
++          gen_helper_sve_ld3hh_r, gen_helper_sve_ld4hh_r },
++        { gen_helper_sve_ld1hsu_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1hdu_r, NULL, NULL, NULL },
++
++        { gen_helper_sve_ld1hds_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1hss_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1ss_r, gen_helper_sve_ld2ss_r,
++          gen_helper_sve_ld3ss_r, gen_helper_sve_ld4ss_r },
++        { gen_helper_sve_ld1sdu_r, NULL, NULL, NULL },
++
++        { gen_helper_sve_ld1bds_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1bss_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1bhs_r, NULL, NULL, NULL },
++        { gen_helper_sve_ld1dd_r, gen_helper_sve_ld2dd_r,
++          gen_helper_sve_ld3dd_r, gen_helper_sve_ld4dd_r },
++    };
++    gen_helper_gvec_mem *fn = fns[dtype][nreg];
++
++    /* While there are holes in the table, they are not
++       accessible via the instruction encoding.  */
++    assert(fn != NULL);
++    do_mem_zpa(s, zt, pg, addr, fn);
++}
++
++static void trans_LD_zprr(DisasContext *s, arg_rprr_load *a, uint32_t insn)
++{
++    TCGv_i64 addr;
++
++    if (a->rm == 31) {
 +        unallocated_encoding(s);
 +        return;
 +    }
-+    status = get_fpstatus_ptr(a->esz == MO_16);
-+    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, a->rd),
-+                       vec_full_reg_offset(s, a->rn),
-+                       vec_full_reg_offset(s, a->rm),
-+                       status, vsz, vsz, 0, fn);
++
++    addr = tcg_temp_new_i64();
++    tcg_gen_muli_i64(addr, cpu_reg(s, a->rm),
++                     (a->nreg + 1) << dtype_msz(a->dtype));
++    tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
++    do_ld_zpa(s, a->rd, a->pg, addr, a->dtype, a->nreg);
 +}
 +
-+
-+#define DO_FP3(NAME, name) \
-+static void trans_##NAME(DisasContext *s, arg_rrr_esz *a, uint32_t insn) \
-+{                                                                   \
-+    static gen_helper_gvec_3_ptr * const fns[4] = {                 \
-+        NULL, gen_helper_gvec_##name##_h,                           \
-+        gen_helper_gvec_##name##_s, gen_helper_gvec_##name##_d      \
-+    };                                                              \
-+    do_zzz_fp(s, a, fns[a->esz]);                                   \
-+}
-+
-+DO_FP3(FADD_zzz, fadd)
-+DO_FP3(FSUB_zzz, fsub)
-+DO_FP3(FMUL_zzz, fmul)
-+DO_FP3(FTSMUL, ftsmul)
-+DO_FP3(FRECPS, recps)
-+DO_FP3(FRSQRTS, rsqrts)
-+
-+#undef DO_FP3
-+
- /*
-  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
-  */
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-new file mode 100644
-index 0000000000..ad5c29cdd5
---- /dev/null
-+++ b/target/arm/vec_helper.c
-@@ -0,0 +1,94 @@
-+/*
-+ * ARM Shared AdvSIMD / SVE Operations
-+ *
-+ * Copyright (c) 2018 Linaro
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/helper-proto.h"
-+#include "tcg/tcg-gvec-desc.h"
-+#include "fpu/softfloat.h"
-+
-+
-+/* Floating-point trigonometric starting value.
-+ * See the ARM ARM pseudocode function FPTrigSMul.
-+ */
-+static float16 float16_ftsmul(float16 op1, uint16_t op2, float_status *stat)
++static void trans_LD_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
 +{
-+    float16 result = float16_mul(op1, op1, stat);
-+    if (!float16_is_any_nan(result)) {
-+        result = float16_set_sign(result, op2 & 1);
-+    }
-+    return result;
++    unsigned vsz = vec_full_reg_size(s);
++    unsigned elements = vsz >> dtype_esz[a->dtype];
++    TCGv_i64 addr = tcg_temp_new_i64();
++
++    tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn),
++                     (a->imm * elements * (a->nreg + 1))
++                     << dtype_msz(a->dtype));
++    do_ld_zpa(s, a->rd, a->pg, addr, a->dtype, a->nreg);
 +}
 +
-+static float32 float32_ftsmul(float32 op1, uint32_t op2, float_status *stat)
++static void trans_LDFF1_zprr(DisasContext *s, arg_rprr_load *a, uint32_t insn)
 +{
-+    float32 result = float32_mul(op1, op1, stat);
-+    if (!float32_is_any_nan(result)) {
-+        result = float32_set_sign(result, op2 & 1);
-+    }
-+    return result;
++    /* FIXME */
++    trans_LD_zprr(s, a, insn);
 +}
 +
-+static float64 float64_ftsmul(float64 op1, uint64_t op2, float_status *stat)
++static void trans_LDNF1_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
 +{
-+    float64 result = float64_mul(op1, op1, stat);
-+    if (!float64_is_any_nan(result)) {
-+        result = float64_set_sign(result, op2 & 1);
-+    }
-+    return result;
++    /* FIXME */
++    trans_LD_zpri(s, a, insn);
 +}
-+
-+#define DO_3OP(NAME, FUNC, TYPE) \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
-+{                                                                          \
-+    intptr_t i, oprsz = simd_oprsz(desc);                                  \
-+    TYPE *d = vd, *n = vn, *m = vm;                                        \
-+    for (i = 0; i < oprsz / sizeof(TYPE); i++) {                           \
-+        d[i] = FUNC(n[i], m[i], stat);                                     \
-+    }                                                                      \
-+}
-+
-+DO_3OP(gvec_fadd_h, float16_add, float16)
-+DO_3OP(gvec_fadd_s, float32_add, float32)
-+DO_3OP(gvec_fadd_d, float64_add, float64)
-+
-+DO_3OP(gvec_fsub_h, float16_sub, float16)
-+DO_3OP(gvec_fsub_s, float32_sub, float32)
-+DO_3OP(gvec_fsub_d, float64_sub, float64)
-+
-+DO_3OP(gvec_fmul_h, float16_mul, float16)
-+DO_3OP(gvec_fmul_s, float32_mul, float32)
-+DO_3OP(gvec_fmul_d, float64_mul, float64)
-+
-+DO_3OP(gvec_ftsmul_h, float16_ftsmul, float16)
-+DO_3OP(gvec_ftsmul_s, float32_ftsmul, float32)
-+DO_3OP(gvec_ftsmul_d, float64_ftsmul, float64)
-+
-+#ifdef TARGET_AARCH64
-+
-+DO_3OP(gvec_recps_h, helper_recpsf_f16, float16)
-+DO_3OP(gvec_recps_s, helper_recpsf_f32, float32)
-+DO_3OP(gvec_recps_d, helper_recpsf_f64, float64)
-+
-+DO_3OP(gvec_rsqrts_h, helper_rsqrtsf_f16, float16)
-+DO_3OP(gvec_rsqrts_s, helper_rsqrtsf_f32, float32)
-+DO_3OP(gvec_rsqrts_d, helper_rsqrtsf_f64, float64)
-+
-+#endif
-+#undef DO_3OP
-diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-index 452ac6f453..50a521876d 100644
---- a/target/arm/Makefile.objs
-+++ b/target/arm/Makefile.objs
-@@ -8,7 +8,7 @@ obj-y += translate.o op_helper.o helper.o cpu.o
- obj-y += neon_helper.o iwmmxt_helper.o
- obj-y += gdbstub.o
- obj-$(TARGET_AARCH64) += cpu64.o translate-a64.o helper-a64.o gdbstub64.o
--obj-y += crypto_helper.o
-+obj-y += crypto_helper.o vec_helper.o
- obj-$(CONFIG_SOFTMMU) += arm-powerctl.o
- 
- DECODETREE = $(SRC_PATH)/scripts/decodetree.py
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 1ede152360..42d14994a1 100644
+index 42d14994a1..d2b3869c58 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -656,6 +656,16 @@ UMIN_zzi	00100101 .. 101 011 110 ........ .....		@rdn_i8u
- # SVE integer multiply immediate (unpredicated)
- MUL_zzi		00100101 .. 110 000 110 ........ .....		@rdn_i8s
+@@ -42,9 +42,12 @@
+ %tszimm16_shl	22:2 16:5 !function=tszimm_shl
  
-+### SVE Floating Point Arithmetic - Unpredicated Group
+ # Signed 8-bit immediate, optionally shifted left by 8.
+-%sh8_i8s		5:9 !function=expand_imm_sh8s
++%sh8_i8s	5:9 !function=expand_imm_sh8s
+ # Unsigned 8-bit immediate, optionally shifted left by 8.
+-%sh8_i8u		5:9 !function=expand_imm_sh8u
++%sh8_i8u	5:9 !function=expand_imm_sh8u
 +
-+# SVE floating-point arithmetic (unpredicated)
-+FADD_zzz	01100101 .. 0 ..... 000 000 ..... .....		@rd_rn_rm
-+FSUB_zzz	01100101 .. 0 ..... 000 001 ..... .....		@rd_rn_rm
-+FMUL_zzz	01100101 .. 0 ..... 000 010 ..... .....		@rd_rn_rm
-+FTSMUL		01100101 .. 0 ..... 000 011 ..... .....		@rd_rn_rm
-+FRECPS		01100101 .. 0 ..... 000 110 ..... .....		@rd_rn_rm
-+FRSQRTS		01100101 .. 0 ..... 000 111 ..... .....		@rd_rn_rm
-+
- ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
++# Unsigned load of msz into esz=2, represented as a dtype.
++%msz_dtype	23:2 !function=msz_dtype
  
- # SVE load predicate register
+ # Either a copy of rd (at bit 0), or a different source
+ # as propagated via the MOVPRFX instruction.
+@@ -72,6 +75,8 @@
+ &incdec2_cnt	rd rn pat esz imm d u
+ &incdec_pred	rd pg esz d u
+ &incdec2_pred	rd rn pg esz d u
++&rprr_load	rd pg rn rm dtype nreg
++&rpri_load	rd pg rn imm dtype nreg
+ 
+ ###########################################################################
+ # Named instruction formats.  These are generally used to
+@@ -171,6 +176,15 @@
+ @incdec2_pred	........ esz:2 .... .. ..... .. pg:4 rd:5 \
+ 		&incdec2_pred rn=%reg_movprfx
+ 
++# Loads; user must fill in NREG.
++@rprr_load_dt	....... dtype:4 rm:5 ... pg:3 rn:5 rd:5		&rprr_load
++@rpri_load_dt	....... dtype:4 . imm:s4 ... pg:3 rn:5 rd:5	&rpri_load
++
++@rprr_load_msz	....... .... rm:5 ... pg:3 rn:5 rd:5 \
++		&rprr_load dtype=%msz_dtype
++@rpri_load_msz	....... .... . imm:s4 ... pg:3 rn:5 rd:5 \
++		&rpri_load dtype=%msz_dtype
++
+ ###########################################################################
+ # Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
+ 
+@@ -673,3 +687,29 @@ LDR_pri		10000101 10 ...... 000 ... ..... 0 ....		@pd_rn_i9
+ 
+ # SVE load vector register
+ LDR_zri		10000101 10 ...... 010 ... ..... .....		@rd_rn_i9
++
++### SVE Memory Contiguous Load Group
++
++# SVE contiguous load (scalar plus scalar)
++LD_zprr		1010010 .... ..... 010 ... ..... .....    @rprr_load_dt nreg=0
++
++# SVE contiguous first-fault load (scalar plus scalar)
++LDFF1_zprr	1010010 .... ..... 011 ... ..... .....	  @rprr_load_dt nreg=0
++
++# SVE contiguous load (scalar plus immediate)
++LD_zpri		1010010 .... 0.... 101 ... ..... .....    @rpri_load_dt nreg=0
++
++# SVE contiguous non-fault load (scalar plus immediate)
++LDNF1_zpri	1010010 .... 1.... 101 ... ..... .....    @rpri_load_dt nreg=0
++
++# SVE contiguous non-temporal load (scalar plus scalar)
++# LDNT1B, LDNT1H, LDNT1W, LDNT1D
++# SVE load multiple structures (scalar plus scalar)
++# LD2B, LD2H, LD2W, LD2D; etc.
++LD_zprr		1010010 .. nreg:2 ..... 110 ... ..... .....	@rprr_load_msz
++
++# SVE contiguous non-temporal load (scalar plus immediate)
++# LDNT1B, LDNT1H, LDNT1W, LDNT1D
++# SVE load multiple structures (scalar plus immediate)
++# LD2B, LD2H, LD2W, LD2D; etc.
++LD_zpri		1010010 .. nreg:2 0.... 111 ... ..... .....	@rpri_load_msz
 -- 
 2.14.3
