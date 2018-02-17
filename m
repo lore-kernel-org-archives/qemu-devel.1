@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en994-0008Oy-Qd
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:44 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en996-0008QM-HW
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en993-0000jZ-Hb
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:42 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:41651)
+	(envelope-from <richard.henderson@linaro.org>) id 1en995-0000kH-53
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:44 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:43013)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en993-0000jB-Aq
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:41 -0500
-Received: by mail-pg0-x241.google.com with SMTP id t4so4412657pgp.8
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 12:31:41 -0800 (PST)
+	id 1en994-0000jz-Tk
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 15:31:43 -0500
+Received: by mail-pg0-x242.google.com with SMTP id f6so4407645pgs.10
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 12:31:42 -0800 (PST)
 Received: from cloudburst.twiddle.net ([50.0.192.64])
 	by smtp.gmail.com with ESMTPSA id
-	y7sm48203797pfe.26.2018.02.17.12.31.38 for <qemu-devel@nongnu.org>
+	y7sm48203797pfe.26.2018.02.17.12.31.40 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 17 Feb 2018 12:31:38 -0800 (PST)
+	Sat, 17 Feb 2018 12:31:40 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 12:31:15 -0800
-Message-Id: <20180217203132.31780-3-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 12:31:16 -0800
+Message-Id: <20180217203132.31780-4-richard.henderson@linaro.org>
 In-Reply-To: <20180217203132.31780-1-richard.henderson@linaro.org>
 References: <20180217203132.31780-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 02/19] target/hppa: Begin using
- scripts/decodetree.py
+Subject: [Qemu-devel] [PATCH 03/19] target/hppa: Convert move to/from system
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,108 +34,195 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Convert the BREAK instruction to start.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c   | 14 +++++++++++---
- target/hppa/Makefile.objs |  8 ++++++++
- target/hppa/insns.decode  | 24 ++++++++++++++++++++++++
- 3 files changed, 43 insertions(+), 3 deletions(-)
- create mode 100644 target/hppa/insns.decode
+ target/hppa/translate.c  | 57 +++++++++++++++++++++---------------------------
+ target/hppa/insns.decode | 15 +++++++++++++
+ 2 files changed, 40 insertions(+), 32 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index f72bc84873..a503ae38d4 100644
+index a503ae38d4..9b2de2fa2a 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -290,6 +290,9 @@ typedef struct DisasContext {
-     bool psw_n_nonzero;
- } DisasContext;
+@@ -844,7 +844,7 @@ static unsigned assemble_rc64(uint32_t insn)
+     return r2 * 32 + r1 * 4 + r0;
+ }
  
-+/* Include the auto-generated decoder.  */
-+#include "decode.inc.c"
-+
- /* We are not using a goto_tb (for whatever reason), but have updated
-    the iaq (for whatever reason), so don't do it again on exit.  */
- #define DISAS_IAQ_N_UPDATED  DISAS_TARGET_0
-@@ -1997,7 +2000,7 @@ static void trans_nop(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+-static unsigned assemble_sr3(uint32_t insn)
++static inline unsigned assemble_sr3(uint32_t insn)
+ {
+     unsigned s2 = extract32(insn, 13, 1);
+     unsigned s0 = extract32(insn, 14, 2);
+@@ -2015,9 +2015,9 @@ static void trans_sync(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
      cond_free(&ctx->null_cond);
  }
  
--static void trans_break(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static void trans_break(DisasContext *ctx, arg_break *a, uint32_t insn)
+-static void trans_mfia(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static void trans_mfia(DisasContext *ctx, arg_mfia *a, uint32_t insn)
  {
+-    unsigned rt = extract32(insn, 0, 5);
++    unsigned rt = a->t;
+     TCGv_reg tmp = dest_gpr(ctx, rt);
+     tcg_gen_movi_reg(tmp, ctx->iaoq_f);
+     save_gpr(ctx, rt, tmp);
+@@ -2025,10 +2025,10 @@ static void trans_mfia(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     cond_free(&ctx->null_cond);
+ }
+ 
+-static void trans_mfsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static void trans_mfsp(DisasContext *ctx, arg_mfsp *a, uint32_t insn)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned rs = assemble_sr3(insn);
++    unsigned rt = a->t;
++    unsigned rs = a->sp;
+     TCGv_i64 t0 = tcg_temp_new_i64();
+     TCGv_reg t1 = tcg_temp_new();
+ 
+@@ -2043,16 +2043,16 @@ static void trans_mfsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     cond_free(&ctx->null_cond);
+ }
+ 
+-static void trans_mfctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static void trans_mfctl(DisasContext *ctx, arg_mfctl *a, uint32_t insn)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned ctl = extract32(insn, 21, 5);
++    unsigned rt = a->t;
++    unsigned ctl = a->r;
+     TCGv_reg tmp;
+ 
+     switch (ctl) {
+     case CR_SAR:
+ #ifdef TARGET_HPPA64
+-        if (extract32(insn, 14, 1) == 0) {
++        if (a->e == 0) {
+             /* MFSAR without ,W masks low 5 bits.  */
+             tmp = dest_gpr(ctx, rt);
+             tcg_gen_andi_reg(tmp, cpu_sar, 31);
+@@ -2094,10 +2094,10 @@ static void trans_mfctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     cond_free(&ctx->null_cond);
+ }
+ 
+-static void trans_mtsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static void trans_mtsp(DisasContext *ctx, arg_mtsp *a, uint32_t insn)
+ {
+-    unsigned rr = extract32(insn, 16, 5);
+-    unsigned rs = assemble_sr3(insn);
++    unsigned rr = a->r;
++    unsigned rs = a->sp;
+     TCGv_i64 t64;
+ 
+     if (rs >= 5) {
+@@ -2120,11 +2120,10 @@ static void trans_mtsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     nullify_end(ctx);
+ }
+ 
+-static void trans_mtctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static void trans_mtctl(DisasContext *ctx, arg_mtctl *a, uint32_t insn)
+ {
+-    unsigned rin = extract32(insn, 16, 5);
+-    unsigned ctl = extract32(insn, 21, 5);
+-    TCGv_reg reg = load_gpr(ctx, rin);
++    unsigned ctl = a->t;
++    TCGv_reg reg = load_gpr(ctx, a->r);
+     TCGv_reg tmp;
+ 
+     if (ctl == CR_SAR) {
+@@ -2176,12 +2175,11 @@ static void trans_mtctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+ #endif
+ }
+ 
+-static void trans_mtsarcm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static void trans_mtsarcm(DisasContext *ctx, arg_mtsarcm *a, uint32_t insn)
+ {
+-    unsigned rin = extract32(insn, 16, 5);
+     TCGv_reg tmp = tcg_temp_new();
+ 
+-    tcg_gen_not_reg(tmp, load_gpr(ctx, rin));
++    tcg_gen_not_reg(tmp, load_gpr(ctx, a->r));
+     tcg_gen_andi_reg(tmp, tmp, TARGET_REGISTER_BITS - 1);
+     save_or_nullify(ctx, cpu_sar, tmp);
+     tcg_temp_free(tmp);
+@@ -2267,24 +2265,26 @@ static void trans_ssm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
+     nullify_end(ctx);
+ }
++#endif /* !CONFIG_USER_ONLY */
+ 
+-static void trans_mtsm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static void trans_mtsm(DisasContext *ctx, arg_mtsm *a, uint32_t insn)
+ {
+-    unsigned rr = extract32(insn, 16, 5);
+-    TCGv_reg tmp, reg;
+-
+     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++#ifndef CONFIG_USER_ONLY
++    TCGv_reg tmp, reg;
      nullify_over(ctx);
-     gen_excp_iir(ctx, EXCP_BREAK);
-@@ -2320,7 +2323,6 @@ static void gen_hlt(DisasContext *ctx, int reset)
+ 
+-    reg = load_gpr(ctx, rr);
++    reg = load_gpr(ctx, a->r);
+     tmp = get_temp(ctx);
+     gen_helper_swap_system_mask(tmp, cpu_env, reg);
+ 
+     /* Exit the TB to recognize new interrupts.  */
+     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
+     nullify_end(ctx);
++#endif
+ }
+ 
++#ifndef CONFIG_USER_ONLY
+ static void trans_rfi(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+ {
+     unsigned comp = extract32(insn, 5, 4);
+@@ -2323,19 +2323,12 @@ static void gen_hlt(DisasContext *ctx, int reset)
  #endif /* !CONFIG_USER_ONLY */
  
  static const DisasInsn table_system[] = {
--    { 0x00000000u, 0xfc001fe0u, trans_break },
-     { 0x00001820u, 0xffe01fffu, trans_mtsp },
-     { 0x00001840u, 0xfc00ffffu, trans_mtctl },
-     { 0x016018c0u, 0xffe0ffffu, trans_mtsarcm },
-@@ -4508,8 +4510,14 @@ static void translate_table_int(DisasContext *ctx, uint32_t insn,
- 
- static void translate_one(DisasContext *ctx, uint32_t insn)
- {
--    uint32_t opc = extract32(insn, 26, 6);
-+    uint32_t opc;
- 
-+    /* Transition to the auto-generated decoder.  */
-+    if (decode(ctx, insn)) {
-+        return;
-+    }
-+
-+    opc = extract32(insn, 26, 6);
-     switch (opc) {
-     case 0x00: /* system op */
-         translate_table(ctx, insn, table_system);
-diff --git a/target/hppa/Makefile.objs b/target/hppa/Makefile.objs
-index 3359da5341..174f50a96c 100644
---- a/target/hppa/Makefile.objs
-+++ b/target/hppa/Makefile.objs
-@@ -1,3 +1,11 @@
- obj-y += translate.o helper.o cpu.o op_helper.o gdbstub.o mem_helper.o
- obj-y += int_helper.o
- obj-$(CONFIG_SOFTMMU) += machine.o
-+
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+
-+target/hppa/decode.inc.c: $(SRC_PATH)/target/hppa/insns.decode $(DECODETREE)
-+	$(call quiet-command,\
-+	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
-+
-+target/hppa/translate.o: target/hppa/decode.inc.c
+-    { 0x00001820u, 0xffe01fffu, trans_mtsp },
+-    { 0x00001840u, 0xfc00ffffu, trans_mtctl },
+-    { 0x016018c0u, 0xffe0ffffu, trans_mtsarcm },
+-    { 0x000014a0u, 0xffffffe0u, trans_mfia },
+-    { 0x000004a0u, 0xffff1fe0u, trans_mfsp },
+-    { 0x000008a0u, 0xfc1fbfe0u, trans_mfctl },
+     { 0x00000400u, 0xffffffffu, trans_sync },  /* sync */
+     { 0x00100400u, 0xffffffffu, trans_sync },  /* syncdma */
+     { 0x000010a0u, 0xfc1f3fe0u, trans_ldsid },
+ #ifndef CONFIG_USER_ONLY
+     { 0x00000e60u, 0xfc00ffe0u, trans_rsm },
+     { 0x00000d60u, 0xfc00ffe0u, trans_ssm },
+-    { 0x00001860u, 0xffe0ffffu, trans_mtsm },
+     { 0x00000c00u, 0xfffffe1fu, trans_rfi },
+ #endif
+ };
 diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-new file mode 100644
-index 0000000000..6c2d3a3a52
---- /dev/null
+index 6c2d3a3a52..01b8a52ca5 100644
+--- a/target/hppa/insns.decode
 +++ b/target/hppa/insns.decode
-@@ -0,0 +1,24 @@
-+#
-+# HPPA instruction decode definitions.
-+#
-+# Copyright (c) 2018 Richard Henderson <rth@twiddle.net>
-+#
-+# This library is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU Lesser General Public
-+# License as published by the Free Software Foundation; either
-+# version 2 of the License, or (at your option) any later version.
-+#
-+# This library is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+# Lesser General Public License for more details.
-+#
-+# You should have received a copy of the GNU Lesser General Public
-+# License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+#
-+
+@@ -17,8 +17,23 @@
+ # License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ #
+ 
 +####
-+# System
++# Field definitions
 +####
 +
-+break		000000 ----- ----- --- 00000000 -----
++%assemble_sr3	13:1 14:2
++
+ ####
+ # System
+ ####
+ 
+ break		000000 ----- ----- --- 00000000 -----
++
++mtsp		000000 ----- r:5   ... 11000001 00000	sp=%assemble_sr3
++mtctl		000000 t:5   r:5   --- 11000010 00000
++mtsarcm		000000 01011 r:5   --- 11000110 00000
++mtsm		000000 00000 r:5   000 11000011 00000
++
++mfia		000000 ----- 00000 ---   10100101 t:5
++mfsp		000000 ----- 00000 ...   00100101 t:5	sp=%assemble_sr3
++mfctl		000000 r:5   00000- e:1 -01000101 t:5
 -- 
 2.14.3
