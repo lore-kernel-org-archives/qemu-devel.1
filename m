@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79V-0000cH-Nv
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:04 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1en79P-0000Ws-Jx
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1en79U-0001hY-Hj
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:01 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:47051)
+	(envelope-from <richard.henderson@linaro.org>) id 1en79O-0001eU-EZ
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:55 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:45434)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1en79U-0001hC-AC
-	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:24:00 -0500
-Received: by mail-pf0-x242.google.com with SMTP id z24so587774pfh.13
-	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:24:00 -0800 (PST)
+	id 1en79O-0001eA-AO
+	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 13:23:54 -0500
+Received: by mail-pl0-x243.google.com with SMTP id p5so3428335plo.12
+	for <qemu-devel@nongnu.org>; Sat, 17 Feb 2018 10:23:54 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 17 Feb 2018 10:22:36 -0800
-Message-Id: <20180217182323.25885-21-richard.henderson@linaro.org>
+Date: Sat, 17 Feb 2018 10:22:32 -0800
+Message-Id: <20180217182323.25885-17-richard.henderson@linaro.org>
 In-Reply-To: <20180217182323.25885-1-richard.henderson@linaro.org>
 References: <20180217182323.25885-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 20/67] target/arm: Implement SVE Compute
- Vector Address Group
+Subject: [Qemu-devel] [PATCH v2 16/67] target/arm: Implement SVE Integer
+ Arithmetic - Unpredicated Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,156 +32,113 @@ Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  5 +++++
- target/arm/sve_helper.c    | 40 ++++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 33 +++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 12 ++++++++++++
- 4 files changed, 90 insertions(+)
+ target/arm/translate-sve.c | 41 ++++++++++++++++++++++++++++++++++++++---
+ target/arm/sve.decode      | 13 +++++++++++++
+ 2 files changed, 51 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 00e3cd48bb..5280d375f9 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -380,6 +380,11 @@ DEF_HELPER_FLAGS_4(sve_lsl_zzw_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_lsl_zzw_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_lsl_zzw_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(sve_adr_p32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_adr_p64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_adr_s32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_adr_u32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 4c6e2713fa..a290a58c02 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -1061,3 +1061,43 @@ void HELPER(sve_index_d)(void *vd, uint64_t start,
-         d[i] = start + i * incr;
-     }
- }
-+
-+void HELPER(sve_adr_p32)(void *vd, void *vn, void *vm, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 4;
-+    uint32_t sh = simd_data(desc);
-+    uint32_t *d = vd, *n = vn, *m = vm;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[i] + (m[i] << sh);
-+    }
-+}
-+
-+void HELPER(sve_adr_p64)(void *vd, void *vn, void *vm, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t sh = simd_data(desc);
-+    uint64_t *d = vd, *n = vn, *m = vm;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[i] + (m[i] << sh);
-+    }
-+}
-+
-+void HELPER(sve_adr_s32)(void *vd, void *vn, void *vm, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t sh = simd_data(desc);
-+    uint64_t *d = vd, *n = vn, *m = vm;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[i] + ((uint64_t)(int32_t)m[i] << sh);
-+    }
-+}
-+
-+void HELPER(sve_adr_u32)(void *vd, void *vn, void *vm, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t sh = simd_data(desc);
-+    uint64_t *d = vd, *n = vn, *m = vm;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[i] + ((uint64_t)(uint32_t)m[i] << sh);
-+    }
-+}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 43e9f1ad08..34cc8c2773 100644
+index b956d87636..8baec6c674 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -847,6 +847,39 @@ static void trans_RDVL(DisasContext *s, arg_RDVL *a, uint32_t insn)
-     tcg_gen_movi_i64(reg, a->imm * vec_full_reg_size(s));
+@@ -235,6 +235,40 @@ static void trans_BIC_zzz(DisasContext *s, arg_BIC_zzz *a, uint32_t insn)
+     do_vector3_z(s, tcg_gen_gvec_andc, 0, a->rd, a->rn, a->rm);
  }
  
 +/*
-+ *** SVE Compute Vector Address Group
++ *** SVE Integer Arithmetic - Unpredicated Group
 + */
 +
-+static void do_adr(DisasContext *s, arg_rrri *a, gen_helper_gvec_3 *fn)
++static void trans_ADD_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
 +{
-+    unsigned vsz = vec_full_reg_size(s);
-+    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
-+                       vec_full_reg_offset(s, a->rn),
-+                       vec_full_reg_offset(s, a->rm),
-+                       vsz, vsz, a->imm, fn);
++    do_vector3_z(s, tcg_gen_gvec_add, a->esz, a->rd, a->rn, a->rm);
 +}
 +
-+static void trans_ADR_p32(DisasContext *s, arg_rrri *a, uint32_t insn)
++static void trans_SUB_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
 +{
-+    do_adr(s, a, gen_helper_sve_adr_p32);
++    do_vector3_z(s, tcg_gen_gvec_sub, a->esz, a->rd, a->rn, a->rm);
 +}
 +
-+static void trans_ADR_p64(DisasContext *s, arg_rrri *a, uint32_t insn)
++static void trans_SQADD_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
 +{
-+    do_adr(s, a, gen_helper_sve_adr_p64);
++    do_vector3_z(s, tcg_gen_gvec_ssadd, a->esz, a->rd, a->rn, a->rm);
 +}
 +
-+static void trans_ADR_s32(DisasContext *s, arg_rrri *a, uint32_t insn)
++static void trans_SQSUB_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
 +{
-+    do_adr(s, a, gen_helper_sve_adr_s32);
++    do_vector3_z(s, tcg_gen_gvec_sssub, a->esz, a->rd, a->rn, a->rm);
 +}
 +
-+static void trans_ADR_u32(DisasContext *s, arg_rrri *a, uint32_t insn)
++static void trans_UQADD_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
 +{
-+    do_adr(s, a, gen_helper_sve_adr_u32);
++    do_vector3_z(s, tcg_gen_gvec_usadd, a->esz, a->rd, a->rn, a->rm);
++}
++
++static void trans_UQSUB_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    do_vector3_z(s, tcg_gen_gvec_ussub, a->esz, a->rd, a->rn, a->rm);
 +}
 +
  /*
-  *** SVE Predicate Logical Operations Group
+  *** SVE Integer Arithmetic - Binary Predicated Group
   */
+@@ -254,7 +288,8 @@ static void do_zpzz_ool(DisasContext *s, arg_rprr_esz *a, gen_helper_gvec_4 *fn)
+ }
+ 
+ #define DO_ZPZZ(NAME, name) \
+-void trans_##NAME##_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn) \
++static void trans_##NAME##_zpzz(DisasContext *s, arg_rprr_esz *a,         \
++                                uint32_t insn)                            \
+ {                                                                         \
+     static gen_helper_gvec_4 * const fns[4] = {                           \
+         gen_helper_sve_##name##_zpzz_b, gen_helper_sve_##name##_zpzz_h,   \
+@@ -286,7 +321,7 @@ DO_ZPZZ(ASR, asr)
+ DO_ZPZZ(LSR, lsr)
+ DO_ZPZZ(LSL, lsl)
+ 
+-void trans_SDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
++static void trans_SDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
+ {
+     static gen_helper_gvec_4 * const fns[4] = {
+         NULL, NULL, gen_helper_sve_sdiv_zpzz_s, gen_helper_sve_sdiv_zpzz_d
+@@ -294,7 +329,7 @@ void trans_SDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
+     do_zpzz_ool(s, a, fns[a->esz]);
+ }
+ 
+-void trans_UDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
++static void trans_UDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
+ {
+     static gen_helper_gvec_4 * const fns[4] = {
+         NULL, NULL, gen_helper_sve_udiv_zpzz_s, gen_helper_sve_udiv_zpzz_d
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index f71ea1b60d..6ec1f94832 100644
+index 68a1823b72..b40d7dc9a2 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -49,6 +49,7 @@
+@@ -68,6 +68,9 @@
+ # Three prediate operand, with governing predicate, flag setting
+ @pd_pg_pn_pm_s	........ . s:1 .. rm:4 .. pg:4 . rn:4 . rd:4	&rprr_s
  
- &rr_esz		rd rn esz
- &rri		rd rn imm
-+&rrri		rd rn rm imm
- &rri_esz	rd rn imm esz
- &rrr_esz	rd rn rm esz
- &rpr_esz	rd pg rn esz
-@@ -77,6 +78,9 @@
- # Three operand, vector element size
- @rd_rn_rm	........ esz:2 . rm:5  ... ...  rn:5 rd:5	&rrr_esz
- 
-+# Three operand with "memory" size, aka immediate left shift
-+@rd_rn_msz_rm	........ ... rm:5 .... imm:2 rn:5 rd:5		&rrri
++# Three operand, vector element size
++@rd_rn_rm	........ esz:2 . rm:5  ... ...  rn:5 rd:5	&rrr_esz
 +
  # Two register operand, with governing predicate, vector element size
  @rdn_pg_rm	........ esz:2 ... ... ... pg:3 rm:5 rd:5 \
  		&rprr_esz rn=%reg_movprfx
-@@ -278,6 +282,14 @@ ASR_zzw		00000100 .. 1 ..... 1000 00 ..... .....		@rd_rn_rm
- LSR_zzw		00000100 .. 1 ..... 1000 01 ..... .....		@rd_rn_rm
- LSL_zzw		00000100 .. 1 ..... 1000 11 ..... .....		@rd_rn_rm
+@@ -205,6 +208,16 @@ MLS		00000100 .. 0 ..... 011 ... ..... .....   @rda_pg_rn_rm
+ MLA		00000100 .. 0 ..... 110 ... ..... .....   @rdn_pg_ra_rm # MAD
+ MLS		00000100 .. 0 ..... 111 ... ..... .....   @rdn_pg_ra_rm # MSB
  
-+### SVE Compute Vector Address Group
++### SVE Integer Arithmetic - Unpredicated Group
 +
-+# SVE vector address generation
-+ADR_s32		00000100 00 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
-+ADR_u32		00000100 01 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
-+ADR_p32		00000100 10 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
-+ADR_p64		00000100 11 1 ..... 1010 .. ..... .....		@rd_rn_msz_rm
++# SVE integer add/subtract vectors (unpredicated)
++ADD_zzz		00000100 .. 1 ..... 000 000 ..... .....		@rd_rn_rm
++SUB_zzz		00000100 .. 1 ..... 000 001 ..... .....		@rd_rn_rm
++SQADD_zzz	00000100 .. 1 ..... 000 100 ..... .....		@rd_rn_rm
++UQADD_zzz	00000100 .. 1 ..... 000 101 ..... .....		@rd_rn_rm
++SQSUB_zzz	00000100 .. 1 ..... 000 110 ..... .....		@rd_rn_rm
++UQSUB_zzz	00000100 .. 1 ..... 000 111 ..... .....		@rd_rn_rm
 +
- ### SVE Predicate Logical Operations Group
+ ### SVE Logical - Unpredicated Group
  
- # SVE predicate logical operations
+ # SVE bitwise logical operations (unpredicated)
 -- 
 2.14.3
