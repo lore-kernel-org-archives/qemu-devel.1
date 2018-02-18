@@ -1,40 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHl-0002Y1-5H
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHl-0002Y4-5h
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHi-0003oB-PB
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHi-0003o3-Oa
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45478
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57782
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1enrHi-0003mU-Hr
+	id 1enrHi-0003mW-Hn
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:34 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1JJcfo3131158
+	w1JJccgC133105
 	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 14:39:33 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g840atccd-1
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g7yv964ee-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 14:39:33 -0500
 Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 19 Feb 2018 12:39:31 -0700
+	Mon, 19 Feb 2018 12:39:32 -0700
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180211093607.27351-11-armbru@redhat.com>
+In-Reply-To: <20180211093607.27351-12-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-11-armbru@redhat.com>
-Date: Sun, 18 Feb 2018 16:43:54 -0600
-Message-Id: <151899383495.12376.8016627258791627753@sif>
-Subject: Re: [Qemu-devel] [PATCH v2 10/29] qapi: Touch generated files only
- when they change
+	<20180211093607.27351-12-armbru@redhat.com>
+Date: Sun, 18 Feb 2018 17:11:07 -0600
+Message-Id: <151899546730.12376.3600771281473777700@sif>
+Subject: Re: [Qemu-devel] [PATCH v2 11/29] qapi: Improve include file name
+ reporting in error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,56 +46,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com
 
-Quoting Markus Armbruster (2018-02-11 03:35:48)
-> A massive number of objects depends on QAPI-generated headers.  In my
-> "build everything" tree, it's roughly 4800 out of 5100.  This is
-> particularly annoying when only some of the generated files change,
-> say for a doc fix.
+Quoting Markus Armbruster (2018-02-11 03:35:49)
+> Error messages print absolute file names of included files even if the
+> user gave a relative one on the command line:
 > =
 
-> Improve qapi-gen.py to touch its output files only if they actually
-> change.  Rebuild time for a QAPI doc fix drops from many minutes to a
-> few seconds.  Rebuilds get faster for certain code changes, too.  For
-> instance, adding a simple QMP event now recompiles less than 200
-> instead of 4800 objects.  But adding a QAPI type is as bad as ever;
-> we've clearly got more work to do.
+>     $ PYTHONPATH=3Dscripts python -B tests/qapi-schema/test-qapi.py tests=
+/qapi-schema/include-cycle.json
+>     In file included from tests/qapi-schema/include-cycle.json:1:
+>     In file included from /work/armbru/qemu/tests/qapi-schema/include-cyc=
+le-b.json:1:
+>     /work/armbru/qemu/tests/qapi-schema/include-cycle-c.json:1: Inclusion=
+ loop for include-cycle.json
+> =
+
+> Improve this to
+> =
+
+>     In file included from tests/qapi-schema/include-cycle.json:1:
+>     In file included from tests/qapi-schema/include-cycle-b.json:1:
+>     tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for include-=
+cycle.json
+> =
+
+> The error message when an include file can't be opened prints the
+> include directive's file name, which is relative to the including
+> file.  Change this to print the file name relative to the working
+> directory.  Visible in tests/qapi-schema/include-no-file.err.
 > =
 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
 > ---
->  scripts/qapi/common.py | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+>  scripts/qapi/common.py                | 12 ++++++------
+>  tests/qapi-schema/include-no-file.err |  2 +-
+>  2 files changed, 7 insertions(+), 7 deletions(-)
 > =
 
 > diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 8290795dc1..2e58573a39 100644
+> index 2e58573a39..3e92b38ade 100644
 > --- a/scripts/qapi/common.py
 > +++ b/scripts/qapi/common.py
-> @@ -1951,9 +1951,16 @@ class QAPIGen(object):
->              except os.error as e:
->                  if e.errno !=3D errno.EEXIST:
->                      raise
-> -        f =3D open(os.path.join(output_dir, fname), 'w')
-> -        f.write(self._top(fname) + self._preamble + self._body
-> +        fd =3D os.open(os.path.join(output_dir, fname),
-> +                     os.O_RDWR | os.O_CREAT, 0666)
-> +        f =3D os.fdopen(fd, 'r+')
-> +        text =3D (self._top(fname) + self._preamble + self._body
->                  + self._bottom(fname))
-> +        oldtext =3D f.read(len(text) + 1)
-> +        if text !=3D oldtext:
-> +            f.seek(0)
-> +            f.truncate(0)
-> +            f.write(text)
->          f.close()
+> @@ -259,9 +259,8 @@ class QAPIDoc(object):
+>  class QAPISchemaParser(object):
 > =
 
+>      def __init__(self, fp, previously_included=3D[], incl_info=3DNone):
+> -        abs_fname =3D os.path.abspath(fp.name)
+>          self.fname =3D fp.name
+> -        previously_included.append(abs_fname)
+> +        previously_included.append(os.path.abspath(fp.name))
+>          self.incl_info =3D incl_info
+>          self.src =3D fp.read()
+>          if self.src =3D=3D '' or self.src[-1] !=3D '\n':
+> @@ -292,7 +291,7 @@ class QAPISchemaParser(object):
+>                  if not isinstance(include, str):
+>                      raise QAPISemError(info,
+>                                         "Value of 'include' must be a str=
+ing")
+> -                self._include(include, info, os.path.dirname(abs_fname),
+> +                self._include(include, info, os.path.dirname(self.fname),
+>                                previously_included)
+>              elif "pragma" in expr:
+>                  self.reject_expr_doc(cur_doc)
+> @@ -325,7 +324,8 @@ class QAPISchemaParser(object):
+>                  % doc.symbol)
 > =
 
+>      def _include(self, include, info, base_dir, previously_included):
+> -        incl_abs_fname =3D os.path.join(base_dir, include)
+> +        incl_fname =3D os.path.join(base_dir, include)
+> +        incl_abs_fname =3D os.path.abspath(incl_fname)
+>          # catch inclusion cycle
+>          inf =3D info
+>          while inf:
+> @@ -337,9 +337,9 @@ class QAPISchemaParser(object):
+>          if incl_abs_fname in previously_included:
+>              return
+>          try:
+> -            fobj =3D open(incl_abs_fname, 'r')
+> +            fobj =3D open(incl_fname, 'r')
+>          except IOError as e:
+> -            raise QAPISemError(info, '%s: %s' % (e.strerror, include))
+> +            raise QAPISemError(info, '%s: %s' % (e.strerror, incl_fname))
+>          exprs_include =3D QAPISchemaParser(fobj, previously_included, in=
+fo)
+>          self.exprs.extend(exprs_include.exprs)
+>          self.docs.extend(exprs_include.docs)
+> diff --git a/tests/qapi-schema/include-no-file.err b/tests/qapi-schema/in=
+clude-no-file.err
+> index d5b9b22d85..e42bcf4bc1 100644
+> --- a/tests/qapi-schema/include-no-file.err
+> +++ b/tests/qapi-schema/include-no-file.err
+> @@ -1 +1 @@
+> -tests/qapi-schema/include-no-file.json:1: No such file or directory: inc=
+lude-no-file-sub.json
+> +tests/qapi-schema/include-no-file.json:1: No such file or directory: tes=
+ts/qapi-schema/include-no-file-sub.json
 > -- =
 
 > 2.13.6
