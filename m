@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1enOBq-0004QI-LC
-	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 07:35:36 -0500
+	(envelope-from <bounces@canonical.com>) id 1enOBq-0004QJ-Lc
+	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 07:35:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1enOBn-0004HH-FC
+	(envelope-from <bounces@canonical.com>) id 1enOBn-0004HB-Ek
 	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 07:35:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47328)
+Received: from indium.canonical.com ([91.189.90.7]:47314)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1enOBn-0004Gp-5j
+	id 1enOBn-0004Gm-5d
 	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 07:35:31 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1enOBl-0001e2-VT
-	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 12:35:30 +0000
+	id 1enOBl-0001fI-KK
+	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 12:35:29 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EA4E72E8054
+	by loganberry.canonical.com (Postfix) with ESMTP id 84BEE2E80C7
 	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 12:35:29 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 18 Feb 2018 12:26:27 -0000
+Date: Sun, 18 Feb 2018 12:26:01 -0000
 From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
 Reply-To: Bug 1750229 <1750229@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151895395027.16252.6709701353823193410.malonedeb@wampee.canonical.com>
-Message-Id: <151895678744.9147.9572961563132707796.malone@chaenomeles.canonical.com>
+Message-Id: <151895676126.9179.11445904436158393603.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1750229] Re: virtio-blk-pci regression: softlock
  in guest kernel at module loading
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: ".build.initrd.kvm"
-   https://bugs.launchpad.net/qemu/+bug/1750229/+attachment/5057654/+files/=
-.build.initrd.kvm
+** Attachment added: ".build.kernel.kvm"
+   https://bugs.launchpad.net/qemu/+bug/1750229/+attachment/5057653/+files/=
+.build.kernel.kvm
 
 -- =
 
