@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1enGcj-0007FJ-KB
+	(envelope-from <bounces@canonical.com>) id 1enGcj-0007FI-Js
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 23:30:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1enGcg-0000TI-HM
+	(envelope-from <bounces@canonical.com>) id 1enGcg-0000TC-GD
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 23:30:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:32956)
+Received: from indium.canonical.com ([91.189.90.7]:32914)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1enGcg-0000SR-B1
+	id 1enGcg-0000S6-Af
 	for qemu-devel@nongnu.org; Sat, 17 Feb 2018 23:30:46 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1enGce-0008Jy-M4
-	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 04:30:44 +0000
+	id 1enGcd-0008IS-SL
+	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 04:30:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7E14C2E80D0
-	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 04:30:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D50E82E80C7
+	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 04:30:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Date: Sun, 18 Feb 2018 04:17:35 -0000
-From: Launchpad Bug Tracker <1211910@bugs.launchpad.net>
-Reply-To: Bug 1211910 <1211910@bugs.launchpad.net>
+From: Launchpad Bug Tracker <1299858@bugs.launchpad.net>
+Reply-To: Bug 1299858 <1299858@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130813175222.16219.80463.malonedeb@gac.canonical.com>
-Message-Id: <151892745532.17410.3487852293402755993.malone@loganberry.canonical.com>
+References: <20140330182810.9542.11623.malonedeb@soybean.canonical.com>
+Message-Id: <151892745609.17410.10446117631897084423.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1211910] Re: Logical to linear address
- translation is wrong for 32-bit guests on a 64-bit hypervisor
+Subject: [Qemu-devel] [Bug 1299858] Re: qemu all apps crash on OS X 10.6.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,35 +47,28 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1211910
+https://bugs.launchpad.net/bugs/1299858
 
 Title:
-  Logical to linear address translation is wrong for 32-bit guests on a
-  64-bit hypervisor
+  qemu all apps crash on OS X 10.6.8
 
 Status in QEMU:
   Expired
 
 Bug description:
-  I run a 64-bit hypervisor in qemu-system-x86_64 (without KVM) and on top =
-of that I have a 32-bit guest. The guest configures the code-segment to hav=
-e a base of 0x4000_0000 and a limit of 0xFFFF_FFFF with paging disabled. Th=
-us, if a logical address of e.g. 0xC000_0000 is used, it should be translat=
-ed to 0x0000_0000 (linear and physical), because of the overflow that happe=
-ns.
-  But this does not happen with the described setup. Instead, qemu seems to=
- calculate the logical to linear translation with 64-bit addresses so that =
-no overflow happens. Consequently, the resulting address is 0x1_0000_0000 a=
-nd this gets written to exitinfo2 in the VMCB structure. This causes troubl=
-e for hypervisors that expect the upper 32 bits of exitinfo2 to be 0 for 32=
--bit guests.
+  qemu-2.0.0-rc0 (and 1.7.1) crashes with SIGABORT in all apps when
+  configured with --with-coroutine=3Dsigaltstack (which is what configure
+  selects by default) but all  run fine if configured with --with-
+  coroutine=3Dgthread.
 
-  Note also that the exact same setup runs fine on real AMD machines
-  with SVM. That is, the upper 32 bits in exitinfo2 are always 0 because
-  of the overflow.
+  Crash is at line 253 (last line of Coroutine
+  *qemu_coroutine_new(void)) in coroutine-sigaltstack.c in 2.0.0-rc0
+  tarball.
 
-  I've tested that with the latest development version of QEMU (commit
-  328465fd9f3a628ab320b5959d68d3d49df58fa6).
+  Platform is OS X 10.6.8 (Darwin Kernel Version 10.8.0), compiler gcc
+  4.2.1
+
+  Sorry for the sparse report but I'm short on time today.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1211910/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1299858/+subscriptions
