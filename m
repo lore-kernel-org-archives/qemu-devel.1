@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1enOBq-0004QJ-Lc
-	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 07:35:35 -0500
+	(envelope-from <bernat@luffy.cx>) id 1enQ8r-0004qN-FQ
+	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 09:40:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1enOBn-0004HB-Ek
-	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 07:35:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1enOBn-0004Gm-5d
-	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 07:35:31 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1enOBl-0001fI-KK
-	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 12:35:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 84BEE2E80C7
-	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 12:35:29 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 18 Feb 2018 12:26:01 -0000
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Reply-To: Bug 1750229 <1750229@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151895395027.16252.6709701353823193410.malonedeb@wampee.canonical.com>
-Message-Id: <151895676126.9179.11445904436158393603.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1750229] Re: virtio-blk-pci regression: softlock
- in guest kernel at module loading
+	(envelope-from <bernat@luffy.cx>) id 1enQ8m-00080I-Ap
+	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 09:40:37 -0500
+Received: from bart.luffy.cx ([78.47.78.131]:41145)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bernat@luffy.cx>) id 1enQ8l-0007zc-MG
+	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 09:40:32 -0500
+From: Vincent Bernat <vincent@bernat.im>
+Date: Sun, 18 Feb 2018 15:40:21 +0100
+Message-Id: <20180218144021.11641-1-vincent@bernat.im>
+Subject: [Qemu-devel] [RFC, PATCH,
+ v1] hw/audio/opl2lpt: add support for OPL2LPT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,155 +22,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Vincent Bernat <vincent@bernat.im>
 
-** Attachment added: ".build.kernel.kvm"
-   https://bugs.launchpad.net/qemu/+bug/1750229/+attachment/5057653/+files/=
-.build.kernel.kvm
+OPL2LPT is an OPL2 chip on the parallel port. It can be programmed
+mostly like an OPL2 chip, except it is write-only. Timers are
+therefore not usable and we emulate a simplified version of them: they
+expire immediately (in the future, this could be updated to properly
+emulate them). Timers are usually only used to detect the card.
 
--- =
+The driver needs a parallel port to be usable:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1750229
+    -chardev parport,id=parport0,path=/dev/parport0
+    -device opl2lpt,chardev=parport0
 
-Title:
-  virtio-blk-pci regression: softlock in guest kernel at module loading
+>From a timing perspective, usleep() is used to ensure to give enough
+time to OPL2 to react properly. Ideally, the timing should be handled
+by the game, but testing with Indy3, this didn't work. I have also
+tried to be smarter by sleeping less depending on the current clock
+but a few glitches were still present. With the current approach,
+Indy3 is able to use the sound card without a glitch. The DOS driver
+doesn't add delays (but it doesn't work on QEMU either due to similar
+issues, so it may be a clue).
 
-Status in QEMU:
-  New
+On shutdown, the OPL2 chip should be reset to not continue sustaining
+a note. I was unable to find the appropriate function to
+register (unrealize callback is not called on shutdown and
+qemu_register() isn't always called on shutdown either). The user has
+to reset the VM, then stop it if they don't want to reset the OPL2LPT
+manually.
 
-Bug description:
-  Hello,
+Signed-off-by: Vincent Bernat <vincent@bernat.im>
+---
+ default-configs/sound.mak |   1 +
+ hw/audio/Makefile.objs    |   1 +
+ hw/audio/opl2lpt.c        | 211 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/audio/soundhw.c        |   2 +-
+ 4 files changed, 214 insertions(+), 1 deletion(-)
+ create mode 100644 hw/audio/opl2lpt.c
 
-  I am running qemu from master git branch on x86_64 host with kernel is
-  4.4.114. I've found that commit
-
-      9a4c0e220d8a "hw/virtio-pci: fix virtio behaviour"
-
-  introduces an regression with the following command:
-
-      qemu-system-x86_64 -enable-kvm -nodefaults -no-reboot -nographic
-  -vga none -runas qemu -kernel .build.kernel.kvm -initrd
-  .build.initrd.kvm -append 'panic=3D1 softlockup_panic=3D1 no-kvmclock
-  nmi_watchdog=3D0 console=3DttyS0 root=3D/dev/disk/by-id/virtio-0' -m 2048
-  -drive file=3D./root,format=3Draw,if=3Dnone,id=3Ddisk,serial=3D0,cache=3D=
-unsafe
-  -device virtio-blk-pci,drive=3Ddisk -serial stdio -smp 2
-
-  Starting from this commit to master the following happens with a wide
-  variety of guest kernels (4.4 to 4.15):
-
-  [   62.428107] BUG: workqueue lockup - pool cpus=3D0 node=3D0 flags=3D0x0=
- nice=3D-20 stuck for 59s!
-  [   62.437426] Showing busy workqueues and worker pools:
-  [   62.443117] workqueue events: flags=3D0x0
-  [   62.447512]   pwq 0: cpus=3D0 node=3D0 flags=3D0x0 nice=3D0 active=3D1=
-/256
-  [   62.448161]     pending: check_corruption
-  [   62.458570] workqueue kblockd: flags=3D0x18
-  [   62.463082]   pwq 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 active=
-=3D3/256
-  [   62.463082]     in-flight: 4:blk_mq_run_work_fn
-  [   62.463082]     pending: blk_mq_run_work_fn, blk_mq_timeout_work
-  [   62.474831] pool 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 hung=3D59=
-s workers=3D2 idle: 214
-  [   62.492121] INFO: rcu_preempt detected stalls on CPUs/tasks:
-  [   62.492121]  Tasks blocked on level-0 rcu_node (CPUs 0-1): P4
-  [   62.492121]  (detected by 0, t=3D15002 jiffies, g=3D-130, c=3D-131, q=
-=3D32)
-  [   62.492121] kworker/0:0H    R  running task        0     4      2 0x80=
-000000
-  [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
-  [   62.492121] Call Trace:
-  [   62.492121]  <IRQ>
-  [   62.492121]  sched_show_task+0xdf/0x100
-  [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
-  [   62.492121]  rcu_check_callbacks+0x93d/0x9d0
-  [   62.492121]  ? tick_sched_do_timer+0x40/0x40
-  [   62.492121]  update_process_times+0x28/0x50
-  [   62.492121]  tick_sched_handle+0x22/0x70
-  [   62.492121]  tick_sched_timer+0x34/0x70
-  [   62.492121]  __hrtimer_run_queues+0xcc/0x250
-  [   62.492121]  hrtimer_interrupt+0xab/0x1f0
-  [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
-  [   62.492121]  apic_timer_interrupt+0xa2/0xb0
-  [   62.492121]  </IRQ>
-  [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
-  [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: ffff=
-ffffffffff11
-  [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 000000000=
-0000001
-  [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 000000000=
-0000000
-  [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 000000000=
-1080020
-  [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 000000000=
-0000000
-  [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff92a1f=
-8e1aa80
-  [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
-  [   62.492121]  vp_notify+0x12/0x20
-  [   62.492121]  virtqueue_notify+0x18/0x30
-  [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
-  [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
-  [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
-  [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
-  [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
-  [   62.492121]  process_one_work+0x1e3/0x420
-  [   62.492121]  worker_thread+0x2b/0x3d0
-  [   62.492121]  ? process_one_work+0x420/0x420
-  [   62.492121]  kthread+0x113/0x130
-  [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
-  [   62.492121]  ret_from_fork+0x3a/0x50
-  [   62.492121] kworker/0:0H    R  running task        0     4      2 0x80=
-000000
-  [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
-  [   62.492121] Call Trace:
-  [   62.492121]  <IRQ>
-  [   62.492121]  sched_show_task+0xdf/0x100
-  [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
-  [   62.492121]  rcu_check_callbacks+0x972/0x9d0
-  [   62.492121]  ? tick_sched_do_timer+0x40/0x40
-  [   62.492121]  update_process_times+0x28/0x50
-  [   62.492121]  tick_sched_handle+0x22/0x70
-  [   62.492121]  tick_sched_timer+0x34/0x70
-  [   62.492121]  __hrtimer_run_queues+0xcc/0x250
-  [   62.492121]  hrtimer_interrupt+0xab/0x1f0
-  [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
-  [   62.492121]  apic_timer_interrupt+0xa2/0xb0
-  [   62.492121]  </IRQ>
-  [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
-  [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: ffff=
-ffffffffff11
-  [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 000000000=
-0000001
-  [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 000000000=
-0000000
-  [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 000000000=
-1080020
-  [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 000000000=
-0000000
-  [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff92a1f=
-8e1aa80
-  [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
-  [   62.492121]  vp_notify+0x12/0x20
-  [   62.492121]  virtqueue_notify+0x18/0x30
-  [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
-  [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
-  [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
-  [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
-  [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
-  [   62.492121]  process_one_work+0x1e3/0x420
-  [   62.492121]  worker_thread+0x2b/0x3d0
-  [   62.492121]  ? process_one_work+0x420/0x420
-  [   62.492121]  kthread+0x113/0x130
-  [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
-  [   62.492121]  ret_from_fork+0x3a/0x50
-
-  Another important thing is that the commit works well on other
-  hardware with the same setup (same host kernel, same qemu command line
-  and host kernel binaries). How could I try to find the issue reason?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1750229/+subscriptions
+diff --git a/default-configs/sound.mak b/default-configs/sound.mak
+index 4f22c34b5dac..d18725a1ea30 100644
+--- a/default-configs/sound.mak
++++ b/default-configs/sound.mak
+@@ -1,4 +1,5 @@
+ CONFIG_SB16=y
+ CONFIG_ADLIB=y
++CONFIG_OPL2LPT=y
+ CONFIG_GUS=y
+ CONFIG_CS4231A=y
+diff --git a/hw/audio/Makefile.objs b/hw/audio/Makefile.objs
+index 63db383709a1..274d5faa504a 100644
+--- a/hw/audio/Makefile.objs
++++ b/hw/audio/Makefile.objs
+@@ -3,6 +3,7 @@ common-obj-$(CONFIG_SB16) += sb16.o
+ common-obj-$(CONFIG_ES1370) += es1370.o
+ common-obj-$(CONFIG_AC97) += ac97.o
+ common-obj-$(CONFIG_ADLIB) += fmopl.o adlib.o
++common-obj-$(CONFIG_OPL2LPT) += opl2lpt.o
+ common-obj-$(CONFIG_GUS) += gus.o gusemu_hal.o gusemu_mixer.o
+ common-obj-$(CONFIG_CS4231A) += cs4231a.o
+ common-obj-$(CONFIG_HDA) += intel-hda.o hda-codec.o
+diff --git a/hw/audio/opl2lpt.c b/hw/audio/opl2lpt.c
+new file mode 100644
+index 000000000000..53286504c8cd
+--- /dev/null
++++ b/hw/audio/opl2lpt.c
+@@ -0,0 +1,211 @@
++/*
++ * QEMU Proxy for OPL2LPT
++ *
++ * Copyright (c) 2018 Vincent Bernat
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++/* TODO: emulate timers */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/hw.h"
++#include "hw/audio/soundhw.h"
++#include "audio/audio.h"
++#include "hw/isa/isa.h"
++#include "chardev/char-parallel.h"
++#include "chardev/char-fe.h"
++
++#define DEBUG
++
++#define OPL2LPT_DESC "OPL2LPT (Yamaha YM3812 over parallel port)"
++
++#define dolog(...) AUD_log("opl2lpt", __VA_ARGS__)
++#ifdef DEBUG
++#define ldebug(...) dolog(__VA_ARGS__)
++#else
++#define ldebug(...)
++#endif
++
++#define TYPE_OPL2LPT "opl2lpt"
++#define OPL2LPT(obj) OBJECT_CHECK(Opl2lptState, (obj), TYPE_OPL2LPT)
++
++#define PP_NOT_STROBE  0x1
++#define PP_NOT_AUTOFD  0x2
++#define PP_INIT        0x4
++#define PP_NOT_SELECT  0x8
++
++typedef struct {
++    ISADevice parent_obj;
++
++    uint8_t address;
++    uint8_t timer_reg;
++    int64_t last_clock;
++    PortioList port_list;
++    CharBackend chr;
++} Opl2lptState;
++
++static void opl2lpt_lpt_write(Opl2lptState *s, uint8_t d, uint8_t c)
++{
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_PP_WRITE_DATA, &d);
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_PP_WRITE_CONTROL, &c);
++    c ^= PP_INIT;
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_PP_WRITE_CONTROL, &c);
++    c ^= PP_INIT;
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_PP_WRITE_CONTROL, &c);
++}
++
++static void opl2lpt_write(void *opaque, uint32_t nport, uint32_t val)
++{
++    Opl2lptState *s = opaque;
++    int a = nport & 1;
++    uint8_t v = val & 0xff;
++    uint8_t c = 0;
++#ifdef DEBUG
++    int64_t last_clock = get_clock();
++    uint64_t diff = last_clock - s->last_clock;
++    s->last_clock = last_clock;
++#endif
++
++    switch (a) {
++    case 0:
++        /* address port */
++        ldebug("[%10" PRIu64 "]: write 0x%" PRIx32 " (address) = %" PRIx8 "\n",
++               diff/1000, nport, v);
++        s->address = v;
++        c = PP_INIT | PP_NOT_SELECT | PP_NOT_STROBE;
++        opl2lpt_lpt_write(s, v, c);
++        usleep(3);
++        break;
++    case 1:
++        /* data port */
++        if (s->address == 4) {
++            /* Timer Control Byte register */
++            s->timer_reg = v;
++        }
++        ldebug("[%10" PRIu64 "]: write 0x%" PRIx32 " (data) = %d\n",
++               diff/1000, nport, v);
++        c = PP_INIT | PP_NOT_SELECT;
++        opl2lpt_lpt_write(s, v, c);
++        usleep(23);
++        break;
++    default:
++        assert(0);
++    }
++}
++
++static uint32_t opl2lpt_read(void *opaque, uint32_t nport)
++{
++    Opl2lptState *s = opaque;
++    int a = nport & 1;
++    uint8_t v = 0;
++
++    switch (a) {
++    case 0:
++        /* address port: only emulate timers. They expire
++         * instantaneously: they are generally not used for anything
++         * else than a detection feature. */
++        if ((s->timer_reg & 0xC1) == 1) {
++            v |= 0xC0;
++        }
++        if ((s->timer_reg & 0xA2) == 2) {
++            v |= 0xA0;
++        }
++        v |= 0x06;              /* Value stolen from opl2lpt DOS driver */
++
++        ldebug("read 0x%" PRIx32 " (address) = 0x%" PRIx8 "\n", nport, v);
++        break;
++    case 1:
++        /* data port: write-only */
++        ldebug("read 0x%" PRIx32 " (data) = 0\n", nport);
++        break;
++    }
++    return v;
++}
++
++static MemoryRegionPortio opl2lpt_portio_list[] = {
++    { 0x388, 2, 1, .read = opl2lpt_read, .write = opl2lpt_write, },
++    PORTIO_END_OF_LIST(),
++};
++
++static void opl2lpt_reset(DeviceState *dev)
++{
++    Opl2lptState *s = OPL2LPT(dev);
++
++    ldebug("reset OPL2 chip\n");
++    for (int i = 0; i < 256; i ++) {
++        opl2lpt_lpt_write(s, i, PP_INIT | PP_NOT_STROBE | PP_NOT_SELECT);
++        usleep(4);
++        opl2lpt_lpt_write(s, 0, PP_INIT | PP_NOT_SELECT);
++        usleep(23);
++    }
++
++    s->last_clock = get_clock();
++}
++
++static void opl2lpt_realize(DeviceState *dev, Error **errp)
++{
++    Opl2lptState *s = OPL2LPT(dev);
++
++    if (!qemu_chr_fe_backend_connected(&s->chr)) {
++        error_setg(errp, "Can't create OPL2LPT device, empty char device");
++        return;
++    }
++
++    portio_list_init(&s->port_list, OBJECT(s), opl2lpt_portio_list, s, "opl2lpt");
++    portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj), 0);
++}
++
++static Property opl2lpt_properties[] = {
++    DEFINE_PROP_CHR("chardev", Opl2lptState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void opl2lpt_class_initfn(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = opl2lpt_realize;
++    dc->reset = opl2lpt_reset;
++    set_bit(DEVICE_CATEGORY_SOUND, dc->categories);
++    dc->desc = OPL2LPT_DESC;
++    dc->props = opl2lpt_properties;
++}
++
++static const TypeInfo opl2lpt_info = {
++    .name          = TYPE_OPL2LPT,
++    .parent        = TYPE_ISA_DEVICE,
++    .instance_size = sizeof(Opl2lptState),
++    .class_init    = opl2lpt_class_initfn,
++};
++
++static int Opl2lpt_init(ISABus *bus)
++{
++    isa_create_simple(bus, TYPE_OPL2LPT);
++    return 0;
++}
++
++static void opl2lpt_register_types(void)
++{
++    type_register_static(&opl2lpt_info);
++    isa_register_soundhw("opl2lpt", OPL2LPT_DESC, Opl2lpt_init);
++}
++
++type_init(opl2lpt_register_types)
+diff --git a/hw/audio/soundhw.c b/hw/audio/soundhw.c
+index e698909d348b..1e318c869c52 100644
+--- a/hw/audio/soundhw.c
++++ b/hw/audio/soundhw.c
+@@ -41,7 +41,7 @@ struct soundhw {
+     } init;
+ };
+ 
+-static struct soundhw soundhw[9];
++static struct soundhw soundhw[10];
+ static int soundhw_count;
+ 
+ void isa_register_soundhw(const char *name, const char *descr,
+-- 
+2.16.1
