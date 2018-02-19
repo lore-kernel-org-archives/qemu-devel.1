@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1enslL-0002YH-LL
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 16:14:16 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1entk5-00019X-Jk
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 17:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1enslI-0000Rq-9U
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 16:14:15 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:59443)
+	(envelope-from <alex.williamson@redhat.com>) id 1entk1-0007zx-It
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 17:17:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48372)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1enslI-0000RP-39
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 16:14:12 -0500
-Date: Mon, 19 Feb 2018 16:14:09 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180219211409.GA24054@flamenco>
-References: <1518751105-17211-1-git-send-email-cota@braap.org>
-	<1518751105-17211-2-git-send-email-cota@braap.org>
-	<f8f48954-e803-c8ba-9b84-5ebb68da006d@linaro.org>
-	<c86f8b84-b056-0669-ef01-dc72e25d0efa@linaro.org>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1entk1-0007zd-9y
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 17:16:57 -0500
+Date: Mon, 19 Feb 2018 15:16:49 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180219151649.13a197f9@w520.home>
+In-Reply-To: <20180219111458.25983-1-kraxel@redhat.com>
+References: <20180219111458.25983-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c86f8b84-b056-0669-ef01-dc72e25d0efa@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] translator: pass max_insns to tb_start
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>
 
-On Mon, Feb 19, 2018 at 11:34:52 -0800, Richard Henderson wrote:
-> On 02/19/2018 11:31 AM, Richard Henderson wrote:
-> > On 02/15/2018 07:18 PM, Emilio G. Cota wrote:
-> >> sh4 will need it.
-> >>
-> >> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> >> ---
-> >>  accel/tcg/translator.c     | 2 +-
-> >>  include/exec/translator.h  | 3 ++-
-> >>  target/alpha/translate.c   | 3 ++-
-> >>  target/arm/translate-a64.c | 4 +++-
-> >>  target/arm/translate.c     | 4 +++-
-> >>  target/hppa/translate.c    | 4 +++-
-> >>  target/i386/translate.c    | 3 ++-
-> >>  7 files changed, 16 insertions(+), 7 deletions(-)
-> > 
-> > There is another possibility, which is to move max_insns into DisasContextBase
-> > where it can be modified.  This would allow the gusa sequence to be handled
-> > differently as an instance of the translate_insn hook, which would allow a
-> > breakpoint to be placed on the first insn of a gusa sequence.
-> > 
-> > I guess I don't have strong feelings either way.
+On Mon, 19 Feb 2018 12:14:51 +0100
+Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+> This series adds support for a vgpu display to the qemu vfio code.
+> For now only regions are supported, dmabufs will follow later.
 > 
-> Thinking some more, I *do* prefer max_insns in DisasContextBase.
+> This version adds a patch to allow devices disable hotplugging, which
+> will be used by vfio display support.  Also fixed issues Alex found in
+> review.
+
+Looks ok to me, if this is to go through my tree I'll need a qdev ack
+for 4/7.  If you want to go a different route, for 5-7:
+
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+
+I'm still a bit confused though, what's preventing us from adding
+dmabuf support now?  It's strange to provide the implementation for the
+proprietary, unavailable vendor driver implementation first.  Is GVT-g
+broken, lagging?  Thanks,
+
+Alex
+
+
+> Gerd Hoffmann (7):
+>   linux-headers: update to 4.16-rc1
+>   standard-headers: add drm/drm_fourcc.h
+>   ui/pixman: add qemu_drm_format_to_pixman()
+>   qdev: add hotpluggable to DeviceState
+>   vfio/common: cleanup in vfio_region_finalize
+>   vfio/display: core & wireup
+>   vfio/display: adding region support
 > 
-> For ARM SVE, implementing MOVPRFX, I would like to be able to tell if we intend
-> to break the TB between MOVPRFX and the instruction being prefixed.  I can't do
-> that if the data is private to translator.c.
-
-Will move to DisasContextBase. Will also remove its passing to
-insn_disas_context, since base.max_insns will be accessible.
-
-Thanks,
-
-		E.
+>  hw/vfio/pci.h                                      |   4 +
+>  include/hw/qdev-core.h                             |   1 +
+>  include/hw/vfio/vfio-common.h                      |   8 +
+>  include/standard-headers/drm/drm_fourcc.h          | 411 +++++++++++++++++++++
+>  include/standard-headers/linux/input-event-codes.h |   1 +
+>  include/standard-headers/linux/input.h             |  11 +
+>  include/standard-headers/linux/pci_regs.h          |  30 +-
+>  include/standard-headers/linux/virtio_net.h        |  13 +
+>  include/ui/qemu-pixman.h                           |   5 +
+>  linux-headers/asm-powerpc/kvm.h                    |   2 +
+>  linux-headers/asm-powerpc/unistd.h                 |   3 +
+>  linux-headers/asm-s390/unistd.h                    | 401 +-------------------
+>  linux-headers/asm-s390/unistd_32.h                 | 364 ++++++++++++++++++
+>  linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++++++++++
+>  linux-headers/asm-x86/kvm_para.h                   |   4 +
+>  linux-headers/linux/kvm.h                          |  90 +++++
+>  linux-headers/linux/psci.h                         |   3 +
+>  linux-headers/linux/vfio.h                         |  72 ++++
+>  hw/core/qdev.c                                     |   5 +-
+>  hw/vfio/common.c                                   |   7 +
+>  hw/vfio/display.c                                  | 152 ++++++++
+>  hw/vfio/pci.c                                      |   9 +
+>  ui/qemu-pixman.c                                   |  22 ++
+>  hw/vfio/Makefile.objs                              |   2 +-
+>  scripts/update-linux-headers.sh                    |   7 +
+>  25 files changed, 1545 insertions(+), 413 deletions(-)
+>  create mode 100644 include/standard-headers/drm/drm_fourcc.h
+>  create mode 100644 linux-headers/asm-s390/unistd_32.h
+>  create mode 100644 linux-headers/asm-s390/unistd_64.h
+>  create mode 100644 hw/vfio/display.c
+> 
