@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1enhY6-0000tj-Ah
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:51 -0500
+	(envelope-from <thuth@redhat.com>) id 1enhY6-0000uT-RY
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1enhY3-00033L-3O
+	(envelope-from <thuth@redhat.com>) id 1enhY5-00033r-C7
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55850 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57788 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1enhY2-00033D-UE
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:47 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1enhY5-00033m-6k
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:49 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 994D77D85D
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:15:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D551F813F6A5
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:15:48 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 19 Feb 2018 10:15:26 +0100
-Message-Id: <1519031728-9850-7-git-send-email-thuth@redhat.com>
+Date: Mon, 19 Feb 2018 10:15:27 +0100
+Message-Id: <1519031728-9850-8-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519031728-9850-1-git-send-email-thuth@redhat.com>
 References: <1519031728-9850-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 6/8] net: Remove the deprecated
- 'host_net_add' and 'host_net_remove' HMP commands
+Subject: [Qemu-devel] [PATCH v1 7/8] net: Add a new convenience option "-n"
+ to configure default/on-board NICs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,296 +33,231 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-They are deprecated since QEMU v2.10, and so far nobody complained that
-these commands are still necessary for any reason - and since you can use
-'netdev_add' and 'netdev_remove' instead, there also should not be any
-real reason. Since they are also standing in the way for the upcoming
-'vlan' clean-up, it's now time to remove them.
+The legacy "-net" option can be quite confusing for the users since most
+people do not expect to get a "vlan" hub between their emulated guest
+hardware and the host backend. But so far, we are also not able to get
+rid of "-net" completely, since it is the only way to configure on-board
+NICs that can not be instantiated via "-device" yet. It's also a little
+bit shorter to type "-net nic -net tap" instead of "-device xyz,netdev=n1
+-netdev tap,id=n1".
+
+So what we need is a new convenience option that is shorter to type than
+the full -device + -netdev stuff, and which can be used to configure the
+on-board NICs that can not be handled via -device yet. Thus this patch now
+provides such a new option "-n": It adds an entry in the nd_table to
+configure a on-board / default NIC, creates a host backend and connects
+the two directly, without a confusing "vlan" hub inbetween.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hmp-commands.hx  | 30 ------------------
- hmp.h            |  3 --
- monitor.c        | 61 ------------------------------------
- net/net.c        | 94 --------------------------------------------------------
- qemu-doc.texi    | 10 ------
- tests/test-hmp.c |  2 --
- 6 files changed, 200 deletions(-)
+ include/sysemu/sysemu.h |  1 +
+ net/net.c               | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx         | 40 +++++++++++++++++++++----
+ vl.c                    |  7 +++++
+ 4 files changed, 120 insertions(+), 6 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index d26eb41..964eb51 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1291,36 +1291,6 @@ Inject PCIe AER error
- ETEXI
- 
-     {
--        .name       = "host_net_add",
--        .args_type  = "device:s,opts:s?",
--        .params     = "tap|user|socket|vde|netmap|bridge|vhost-user|dump [options]",
--        .help       = "add host VLAN client (deprecated, use netdev_add instead)",
--        .cmd        = hmp_host_net_add,
--        .command_completion = host_net_add_completion,
--    },
--
--STEXI
--@item host_net_add
--@findex host_net_add
--Add host VLAN client. Deprecated, please use @code{netdev_add} instead.
--ETEXI
--
--    {
--        .name       = "host_net_remove",
--        .args_type  = "vlan_id:i,device:s",
--        .params     = "vlan_id name",
--        .help       = "remove host VLAN client (deprecated, use netdev_del instead)",
--        .cmd        = hmp_host_net_remove,
--        .command_completion = host_net_remove_completion,
--    },
--
--STEXI
--@item host_net_remove
--@findex host_net_remove
--Remove host VLAN client. Deprecated, please use @code{netdev_del} instead.
--ETEXI
--
--    {
-         .name       = "netdev_add",
-         .args_type  = "netdev:O",
-         .params     = "[user|tap|socket|vde|bridge|hubport|netmap|vhost-user],id=str[,prop=value][,...]",
-diff --git a/hmp.h b/hmp.h
-index 1143db4..b897338 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -132,9 +132,6 @@ void migrate_set_capability_completion(ReadLineState *rs, int nb_args,
-                                        const char *str);
- void migrate_set_parameter_completion(ReadLineState *rs, int nb_args,
-                                       const char *str);
--void host_net_add_completion(ReadLineState *rs, int nb_args, const char *str);
--void host_net_remove_completion(ReadLineState *rs, int nb_args,
--                                const char *str);
- void delvm_completion(ReadLineState *rs, int nb_args, const char *str);
- void loadvm_completion(ReadLineState *rs, int nb_args, const char *str);
- void hmp_rocker(Monitor *mon, const QDict *qdict);
-diff --git a/monitor.c b/monitor.c
-index f499250..4fcfc2e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3574,67 +3574,6 @@ void migrate_set_parameter_completion(ReadLineState *rs, int nb_args,
-     }
- }
- 
--void host_net_add_completion(ReadLineState *rs, int nb_args, const char *str)
--{
--    int i;
--    size_t len;
--    if (nb_args != 2) {
--        return;
--    }
--    len = strlen(str);
--    readline_set_completion_index(rs, len);
--    for (i = 0; host_net_devices[i]; i++) {
--        if (!strncmp(host_net_devices[i], str, len)) {
--            readline_add_completion(rs, host_net_devices[i]);
--        }
--    }
--}
--
--void host_net_remove_completion(ReadLineState *rs, int nb_args, const char *str)
--{
--    NetClientState *ncs[MAX_QUEUE_NUM];
--    int count, i, len;
--
--    len = strlen(str);
--    readline_set_completion_index(rs, len);
--    if (nb_args == 2) {
--        count = qemu_find_net_clients_except(NULL, ncs,
--                                             NET_CLIENT_DRIVER_NONE,
--                                             MAX_QUEUE_NUM);
--        for (i = 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
--            int id;
--            char name[16];
--
--            if (net_hub_id_for_client(ncs[i], &id)) {
--                continue;
--            }
--            snprintf(name, sizeof(name), "%d", id);
--            if (!strncmp(str, name, len)) {
--                readline_add_completion(rs, name);
--            }
--        }
--        return;
--    } else if (nb_args == 3) {
--        count = qemu_find_net_clients_except(NULL, ncs,
--                                             NET_CLIENT_DRIVER_NIC,
--                                             MAX_QUEUE_NUM);
--        for (i = 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
--            int id;
--            const char *name;
--
--            if (ncs[i]->info->type == NET_CLIENT_DRIVER_HUBPORT ||
--                net_hub_id_for_client(ncs[i], &id)) {
--                continue;
--            }
--            name = ncs[i]->name;
--            if (!strncmp(str, name, len)) {
--                readline_add_completion(rs, name);
--            }
--        }
--        return;
--    }
--}
--
- static void vm_completion(ReadLineState *rs, const char *str)
- {
-     size_t len;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 77bb3da..46ec1bf 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -197,6 +197,7 @@ extern QemuOptsList bdrv_runtime_opts;
+ extern QemuOptsList qemu_chardev_opts;
+ extern QemuOptsList qemu_device_opts;
+ extern QemuOptsList qemu_netdev_opts;
++extern QemuOptsList qemu_n_opts;
+ extern QemuOptsList qemu_net_opts;
+ extern QemuOptsList qemu_global_opts;
+ extern QemuOptsList qemu_mon_opts;
 diff --git a/net/net.c b/net/net.c
-index af0b3e7..fe29cfa 100644
+index fe29cfa..ffd52c6 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -60,25 +60,6 @@
- static VMChangeStateEntry *net_change_state_entry;
- static QTAILQ_HEAD(, NetClientState) net_clients;
- 
--const char *host_net_devices[] = {
--    "tap",
--    "socket",
--#ifdef CONFIG_NET_BRIDGE
--    "bridge",
--#endif
--#ifdef CONFIG_NETMAP
--    "netmap",
--#endif
--#ifdef CONFIG_SLIRP
--    "user",
--#endif
--#ifdef CONFIG_VDE
--    "vde",
--#endif
--    "vhost-user",
--    NULL,
--};
--
- /***********************************************************/
- /* network device redirectors */
- 
-@@ -1174,81 +1155,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
-     return ret;
+@@ -1457,6 +1457,67 @@ static int net_init_client(void *dummy, QemuOpts *opts, Error **errp)
+     return net_client_init(opts, false, errp);
  }
  
--
--static int net_host_check_device(const char *device)
--{
--    int i;
--    for (i = 0; host_net_devices[i]; i++) {
--        if (!strncmp(host_net_devices[i], device,
--                     strlen(host_net_devices[i]))) {
--            return 1;
--        }
--    }
--
--    return 0;
--}
--
--void hmp_host_net_add(Monitor *mon, const QDict *qdict)
--{
--    const char *device = qdict_get_str(qdict, "device");
--    const char *opts_str = qdict_get_try_str(qdict, "opts");
--    Error *local_err = NULL;
--    QemuOpts *opts;
--    static bool warned;
--
--    if (!warned && !qtest_enabled()) {
--        error_report("host_net_add is deprecated, use netdev_add instead");
--        warned = true;
--    }
--
--    if (!net_host_check_device(device)) {
--        monitor_printf(mon, "invalid host network device %s\n", device);
--        return;
--    }
--
--    opts = qemu_opts_parse_noisily(qemu_find_opts("net"),
--                                   opts_str ? opts_str : "", false);
--    if (!opts) {
--        return;
--    }
--
--    qemu_opt_set(opts, "type", device, &error_abort);
--
--    net_client_init(opts, false, &local_err);
--    if (local_err) {
--        error_report_err(local_err);
--        monitor_printf(mon, "adding host network device %s failed\n", device);
--    }
--}
--
--void hmp_host_net_remove(Monitor *mon, const QDict *qdict)
--{
--    NetClientState *nc;
--    int vlan_id = qdict_get_int(qdict, "vlan_id");
--    const char *device = qdict_get_str(qdict, "device");
--    static bool warned;
--
--    if (!warned && !qtest_enabled()) {
--        error_report("host_net_remove is deprecated, use netdev_del instead");
--        warned = true;
--    }
--
--    nc = net_hub_find_client_by_name(vlan_id, device);
--    if (!nc) {
--        error_report("Host network device '%s' on hub '%d' not found",
--                     device, vlan_id);
--        return;
--    }
--    if (nc->info->type == NET_CLIENT_DRIVER_NIC) {
--        error_report("invalid host network device '%s'", device);
--        return;
--    }
--
--    qemu_del_net_client(nc->peer);
--    qemu_del_net_client(nc);
--    qemu_opts_del(qemu_opts_find(qemu_find_opts("net"), device));
--}
--
- void netdev_add(QemuOpts *opts, Error **errp)
++/* For the convenience "-n" parameter */
++static int net_init_n(void *dummy, QemuOpts *opts, Error **errp)
++{
++    char *mac, *nd_id;
++    int idx, ret;
++    NICInfo *ni;
++    const char *type;
++
++    type = qemu_opt_get(opts, "type");
++    if (type && g_str_equal(type, "none")) {
++        return 0;    /* Nothing to do, default_net is cleared in vl.c */
++    }
++
++    idx = nic_get_free_idx();
++    if (idx == -1 || nb_nics >= MAX_NICS) {
++        error_setg(errp, "no more on-board/default NIC slots available");
++        return -1;
++    }
++
++    if (!type) {
++        qemu_opt_set(opts, "type", "user", &error_abort);
++    }
++
++    ni = &nd_table[idx];
++    memset(ni, 0, sizeof(*ni));
++    ni->model = qemu_opt_get_del(opts, "model");
++
++    /* Create an ID if the user did not specify one */
++    nd_id = g_strdup(qemu_opts_id(opts));
++    if (!nd_id) {
++        nd_id = g_strdup_printf("__org.qemu.nic%i\n", idx);
++        qemu_opts_set_id(opts, nd_id);
++    }
++
++    /* Handle MAC address */
++    mac = qemu_opt_get_del(opts, "mac");
++    if (mac) {
++        ret = net_parse_macaddr(ni->macaddr.a, mac);
++        g_free(mac);
++        if (ret) {
++            error_setg(errp, "invalid syntax for ethernet address");
++            return -1;
++        }
++        if (is_multicast_ether_addr(ni->macaddr.a)) {
++            error_setg(errp, "NIC cannot have multicast MAC address");
++            return -1;
++        }
++    }
++    qemu_macaddr_default_if_unset(&ni->macaddr);
++
++    ret = net_client_init(opts, true, errp);
++    if (ret == 0) {
++        ni->netdev = qemu_find_netdev(nd_id);
++        ni->used = true;
++        nb_nics++;
++    }
++
++    g_free(nd_id);
++    return ret;
++}
++
+ static int net_init_netdev(void *dummy, QemuOpts *opts, Error **errp)
  {
-     net_client_init(opts, true, errp);
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 55954b0..865160d 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2758,16 +2758,6 @@ by the ``convert -l snapshot_param'' argument instead.
- "autoload" parameter is now ignored. All bitmaps are automatically loaded
- from qcow2 images.
+     return net_client_init(opts, true, errp);
+@@ -1474,6 +1535,10 @@ int net_init_clients(Error **errp)
+         return -1;
+     }
  
--@section System emulator human monitor commands
--
--@subsection host_net_add (since 2.10.0)
--
--The ``host_net_add'' command is replaced by the ``netdev_add'' command.
--
--@subsection host_net_remove (since 2.10.0)
--
--The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
--
- @section System emulator devices
++    if (qemu_opts_foreach(qemu_find_opts("n"), net_init_n, NULL, errp)) {
++        return -1;
++    }
++
+     if (qemu_opts_foreach(qemu_find_opts("net"), net_init_client, NULL, errp)) {
+         return -1;
+     }
+@@ -1549,6 +1614,19 @@ QemuOptsList qemu_netdev_opts = {
+     },
+ };
  
- @subsection ivshmem (since 2.6.0)
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 5b7e447..5352c9c 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -37,10 +37,8 @@ static const char *hmp_cmds[] = {
-     "dump-guest-memory /dev/null 0 4096",
-     "dump-guest-memory /dev/null",
-     "gdbserver",
--    "host_net_add user id=net0",
-     "hostfwd_add tcp::43210-:43210",
-     "hostfwd_remove tcp::43210-:43210",
--    "host_net_remove 0 net0",
-     "i /w 0",
-     "log all",
-     "log none",
++QemuOptsList qemu_n_opts = {
++    .name = "n",
++    .implied_opt_name = "type",
++    .head = QTAILQ_HEAD_INITIALIZER(qemu_n_opts.head),
++    .desc = {
++        /*
++         * no elements => accept any params
++         * validation will happen later
++         */
++        { /* end of list */ }
++    },
++};
++
+ QemuOptsList qemu_net_opts = {
+     .name = "net",
+     .implied_opt_name = "type",
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f6172e5..5e4c64d 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2004,13 +2004,34 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+ #endif
+     "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
+     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
++DEF("n", HAS_ARG, QEMU_OPTION_n,
++    "-n [tap|bridge|"
++#ifdef CONFIG_SLIRP
++    "user|"
++#endif
++#ifdef __linux__
++    "l2tpv3|"
++#endif
++#ifdef CONFIG_VDE
++    "vde|"
++#endif
++#ifdef CONFIG_NETMAP
++    "netmap|"
++#endif
++#ifdef CONFIG_POSIX
++    "vhost-user|"
++#endif
++    "socket][,option][,...][mac=macaddr]\n"
++    "                initialize an on-board / default host NIC (using MAC address\n"
++    "                macaddr) and connect it to the given host network backend\n"
++    "-n none         use it alone to have zero network devices (the default is to\n"
++    "                provided a 'user' network connection)\n",
++    QEMU_ARCH_ALL)
+ DEF("net", HAS_ARG, QEMU_OPTION_net,
+     "-net nic[,vlan=n][,netdev=nd][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
+     "                configure or create an on-board (or machine default) NIC and\n"
+     "                connect it either to VLAN 'n' or the netdev 'nd' (for pluggable\n"
+     "                NICs please use '-device devtype,netdev=nd' instead)\n"
+-    "-net none       use it alone to have zero network devices. If no -net option\n"
+-    "                is provided, the default is '-net nic -net user'\n"
+     "-net ["
+ #ifdef CONFIG_SLIRP
+     "user|"
+@@ -2456,10 +2477,17 @@ qemu -m 512 -object memory-backend-file,id=mem,size=512M,mem-path=/hugetlbfs,sha
+      -device virtio-net-pci,netdev=net0
+ @end example
+ 
+-@item -net none
+-Indicate that no network devices should be configured. It is used to
+-override the default configuration (@option{-net nic -net user}) which
+-is activated if no @option{-net} options are provided.
++@item -n [tap|bridge|user|l2tpv3|vde|netmap|vhost-user|socket][,...][,mac=macaddr]
++
++This option is a shortcut for setting both, the on-board (default) guest NIC
++hardware and the host network backend in one go. The host backend options are
++the same as with the corresponding @option{--netdev} option. The guest NIC
++hardware MAC address can be set with @option{mac=@var{macaddr}}.
++
++@item -n none
++Indicate that no network devices should be configured. It is used to override
++the default configuration (default NIC with @option{--net user} backend) which
++is activated if no other networking options are provided.
+ ETEXI
+ 
+ STEXI
+diff --git a/vl.c b/vl.c
+index 7e95711..b84c702 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3094,6 +3094,7 @@ int main(int argc, char **argv, char **envp)
+     qemu_add_opts(&qemu_chardev_opts);
+     qemu_add_opts(&qemu_device_opts);
+     qemu_add_opts(&qemu_netdev_opts);
++    qemu_add_opts(&qemu_n_opts);
+     qemu_add_opts(&qemu_net_opts);
+     qemu_add_opts(&qemu_rtc_opts);
+     qemu_add_opts(&qemu_global_opts);
+@@ -3314,6 +3315,12 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++            case QEMU_OPTION_n:
++                default_net = 0;
++                if (net_client_parse(qemu_find_opts("n"), optarg) == -1) {
++                    exit(1);
++                }
++                break;
+             case QEMU_OPTION_net:
+                 default_net = 0;
+                 if (net_client_parse(qemu_find_opts("net"), optarg) == -1) {
 -- 
 1.8.3.1
