@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1enoNl-0005Ji-Rf
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:33:38 -0500
+	(envelope-from <thuth@redhat.com>) id 1enoS3-0007Hu-9G
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:38:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1enoNj-0006yM-8q
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:33:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51886 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1enoS0-0000oi-Lr
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:38:03 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47586 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1enoNj-0006y1-2H
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:33:35 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1enoS0-0000oY-He
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:38:00 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A7A5A40FB64A
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 16:33:34 +0000 (UTC)
-Date: Mon, 19 Feb 2018 16:33:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180219163332.GZ11516@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180219163131.31153-1-kchamart@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 120C1402314E
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 16:37:49 +0000 (UTC)
+References: <1519031728-9850-1-git-send-email-thuth@redhat.com>
+	<1519031728-9850-8-git-send-email-thuth@redhat.com>
+	<7c298a4a-97cd-4b7a-d170-b70ab2970aac@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f5a42ed6-a52a-7220-46f2-7cbbb7863e21@redhat.com>
+Date: Mon, 19 Feb 2018 17:37:41 +0100
 MIME-Version: 1.0
+In-Reply-To: <7c298a4a-97cd-4b7a-d170-b70ab2970aac@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180219163131.31153-1-kchamart@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] docs: pcie: Spell out machine type
- needs for PCIe features
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 7/8] net: Add a new convenience option
+ "-n" to configure default/on-board NICs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Feb 19, 2018 at 05:31:31PM +0100, Kashyap Chamarthy wrote:
-> PCIe features are available only via the 'q35' machine type for x86 and
-> the 'virt' machine type for AArch64 architecture.
->=20
-> Mention that explicitly.
->=20
-> Thanks: Daniel Berrang=C3=A9
->=20
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> ---
->  docs/pcie.txt | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->=20
-> diff --git a/docs/pcie.txt b/docs/pcie.txt
-> index 8d3694970e..89e3502075 100644
-> --- a/docs/pcie.txt
-> +++ b/docs/pcie.txt
-> @@ -3,8 +3,13 @@ PCI EXPRESS GUIDELINES
-> =20
->  1. Introduction
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> -The doc proposes best practices on how to use PCI Express/PCI device
-> -in PCI Express based machines and explains the reasoning behind them.
-> +The doc proposes best practices on how to use PCI Express (PCIe) / PCI
-> +devices in PCI Express based machines and explains the reasoning behin=
-d
-> +them.
-> +
-> +Note that the PCIe features are available only when using the 'q35'
-> +machine type on x86 architecture and the 'virt' machine type on AArch6=
-4.
-> +Other machine types do not use PCIe at this time.
-> =20
->  The following presentations accompany this document:
->   (1) Q35 overview.
+On 19.02.2018 17:20, Paolo Bonzini wrote:
+> On 19/02/2018 10:15, Thomas Huth wrote:
+>> The legacy "-net" option can be quite confusing for the users since most
+>> people do not expect to get a "vlan" hub between their emulated guest
+>> hardware and the host backend. But so far, we are also not able to get
+>> rid of "-net" completely, since it is the only way to configure on-board
+>> NICs that can not be instantiated via "-device" yet. It's also a little
+>> bit shorter to type "-net nic -net tap" instead of "-device xyz,netdev=n1
+>> -netdev tap,id=n1".
+>>
+>> So what we need is a new convenience option that is shorter to type than
+>> the full -device + -netdev stuff, and which can be used to configure the
+>> on-board NICs that can not be handled via -device yet. Thus this patch now
+>> provides such a new option "-n": It adds an entry in the nd_table to
+>> configure a on-board / default NIC, creates a host backend and connects
+>> the two directly, without a confusing "vlan" hub inbetween.
+> 
+> Sorry for the bikeshedding, but... perhaps "-n" is a bit bold.  While I
+> initially couldn't come up with a better one, after putting some thought
+> into it "-nic" came to mind.  There's precedent in naming the option for
+> the *front-end* device that it creates, whereas the arguments define
+> either the front-end (e.g. "model") or the back-end; see for example
+> "-drive".  "-nic tap,model=e1000" and "-nic none" both make nice sense.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Actually, I like the idea with "--nic", that indeed makes sense here and
+is still quite short to type. I'll use that in v2 (but I'll wait one or
+two more days for some more review comments before sending that out).
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+ Thomas
