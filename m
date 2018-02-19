@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1enm97-0004uM-3F
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 09:10:22 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1enmC0-00065x-Bo
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 09:13:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1enm96-0002W9-3v
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 09:10:21 -0500
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:51918)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
-	id 1enm95-0002UW-UR
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 09:10:20 -0500
-Received: by mail-it0-x241.google.com with SMTP id o9so5249244itc.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 06:10:19 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <3f009bb2-fb39-36ff-b3ed-a9b8c63db081@amsat.org>
-References: <20180217140051.22731-1-linus.walleij@linaro.org>
-	<20180217140051.22731-3-linus.walleij@linaro.org>
-	<3f009bb2-fb39-36ff-b3ed-a9b8c63db081@amsat.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 19 Feb 2018 15:10:18 +0100
-Message-ID: <CACRpkda9B=frmS0QF429p-q+KoCKG=5NON-kQ0Rt-nba2powRA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] arm/vexpress: Add proper display
- connector emulation
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1enmBx-0003Z0-6C
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 09:13:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1enmBw-0003Xj-Si
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 09:13:17 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1JECSJ9139799
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:13:14 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g7yp21fw6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:13:13 -0500
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Mon, 19 Feb 2018 07:13:11 -0700
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Mon, 19 Feb 2018 11:12:57 -0300
+Message-Id: <20180219141259.26526-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 0/2] qmp: 'wakeup-suspend-support' in
+ query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-On Sat, Feb 17, 2018 at 7:28 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On 02/17/2018 11:00 AM, Linus Walleij wrote:
+v5:
+- removed a paragraph in the recently added qemu_register_wakeup_notifier
+comment that was added. That paragraph was adding too much in-depth
+information about the current design of the system_wakeup, making it
+harder to understand the whole point (suggested by Mike Roth).
+- previous version link:
+https://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg00879.html 
 
->> The assignment of the SiI9022 at address 0x39 and the EDID
->> DDC I2C at address 0x50 is not strictly correct: the DDC I2C
->> is there all the time but in the actual component it only
->> appears once activated inside the SiI9022, so ideally it should
->> be added and removed to the bus by the SiI9022. However for this
->> purpose it works fine to just have it around.
->
-> This seems easier to just do it now rather than postpone :)
->
-> In your patch #2:
->
-> static void sii9022_realize(DeviceState *dev, Error **errp)
-> {
->     I2CBus *bus;
->
->     bus =3D I2C_BUS(qdev_get_parent_bus(dev));
->     i2c_create_slave(bus, TYPE_I2CDDC, 0x50);
-> }
+v4:
+- added a comment in 'qemu_register_wakeup_notifier' about the effects
+of adding a wakeup notifier without proper suspend/wakeup support in the
+logic of the new wakeup-suspend-support flag, as suggested by Mike Roth
+- previous version link:
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg00358.html
 
-I tried an approach like this but the I2C_BUS() macro was not
-publicly visible in any header file and trying to pry it out just
-brought along a lot of refactoring in the i2c core.c file that
-scared me away...
+v3:
+- added a "(since 2.12)" notation in the new flag, as suggested by
+Eric Blake
+- added a "backwards compatible" note in the commit msg
+- previous version link:
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg00093.html
 
-Has someone else fixed it already?
+v2:
+- changed the approach based on v1 discussions: instead of a new API, add
+the required flag in QMP query-target
+- dropped patch 2 since query-target does not have an HMP counterpart
+- previous version link:
+https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00889.html
 
-Yours,
-Linus Walleij
+
+Daniel Henrique Barboza (2):
+  qmp: adding 'wakeup-suspend-support' in query-target
+  qga: update guest-suspend-ram and guest-suspend-hybrid descriptions
+
+ arch_init.c             |  1 +
+ include/sysemu/sysemu.h |  1 +
+ qapi-schema.json        |  4 +++-
+ qga/qapi-schema.json    | 14 ++++++++++----
+ vl.c                    | 21 +++++++++++++++++++++
+ 5 files changed, 36 insertions(+), 5 deletions(-)
+
+-- 
+2.14.3
