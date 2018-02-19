@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ennzd-0007Kw-Hh
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:08:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eno1d-0000Fq-5V
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ennzZ-0001hf-FD
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:08:41 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49464 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1eno1Z-0003NB-2u
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:10:45 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40044 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ennzZ-0001hQ-9M
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:08:37 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eno1Y-0003Mi-SS
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:10:40 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F158B8D742
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 16:08:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 887B1EAE9B
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 16:10:40 +0000 (UTC)
 References: <1519031728-9850-1-git-send-email-thuth@redhat.com>
-	<1519031728-9850-3-git-send-email-thuth@redhat.com>
+	<1519031728-9850-4-git-send-email-thuth@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c180c02b-878e-4277-1851-ece19b8f8d27@redhat.com>
-Date: Mon, 19 Feb 2018 17:08:33 +0100
+Message-ID: <0e671980-590e-827b-78de-6049874a54d3@redhat.com>
+Date: Mon, 19 Feb 2018 17:10:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519031728-9850-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1519031728-9850-4-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/8] net: List available netdevs with
- "-netdev help"
+Subject: Re: [Qemu-devel] [PATCH v1 3/8] net: Only show vhost-user in the
+ help text if CONFIG_POSIX is defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,74 +39,34 @@ To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@
 Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 On 19/02/2018 10:15, Thomas Huth wrote:
-> Other options like "-chardev" or "-device" feature a nice help text
-> with the available devices when being called with "help" or "?".
-> Since it is quite useful, especially if you want to see which network
-> backends have been compiled into the QEMU binary, let's provide such
-> a help text for "-netdev", too.
+> According to net/Makefile.objs we only link in the vhost-user code
+> if CONFIG_POSIX has been set. So the help screen should also only
+> show this information if CONFIG_POSIX has been defined.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  net/net.c | 37 ++++++++++++++++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
+>  qemu-options.hx | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/net/net.c b/net/net.c
-> index e213a61..08049d9 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -1086,6 +1086,38 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
->      return 0;
->  }
->  
-> +static void show_netdevs(void)
-> +{
-> +    int idx;
-> +    const char *available_netdevs[] = {
-> +        "socket",
-> +        "hubport",
-> +        "tap",
-> +#ifdef CONFIG_SLIRP
-> +        "user",
-> +#endif
-> +#ifdef CONFIG_L2TPV3
-> +        "l2tpv3",
-> +#endif
-> +#ifdef CONFIG_VDE
-> +        "vde",
-> +#endif
-> +#ifdef CONFIG_NET_BRIDGE
-> +        "bridge",
-> +#endif
-> +#ifdef CONFIG_NETMAP
-> +        "netmap",
-> +#endif
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 5050a49..b81b53b 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1998,8 +1998,10 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+>      "                VALE port (created on the fly) called 'name' ('nmname' is name of the \n"
+>      "                netmap device, defaults to '/dev/netmap')\n"
+>  #endif
 > +#ifdef CONFIG_POSIX
-> +        "vhost-user",
+>      "-netdev vhost-user,id=str,chardev=dev[,vhostforce=on|off]\n"
+>      "                configure a vhost-user network, backed by a chardev 'dev'\n"
 > +#endif
-> +    };
-> +
-> +    printf("Available netdev backend types:\n");
-> +    for (idx = 0; idx < ARRAY_SIZE(available_netdevs); idx++) {
-> +        puts(available_netdevs[idx]);
-> +    }
-> +}
->  
->  int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
->  {
-> @@ -1094,7 +1126,10 @@ int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
->      int ret = -1;
->      Visitor *v = opts_visitor_new(opts);
->  
-> -    {
-> +    if (is_netdev && is_help_option(qemu_opt_get(opts, "type"))) {
-> +        show_netdevs();
-> +        exit(1);
-> +    } else {
->          /* Parse convenience option format ip6-net=fec0::0[/64] */
->          const char *ip6_net = qemu_opt_get(opts, "ipv6-net");
->  
+>      "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
+>      "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
+>  DEF("net", HAS_ARG, QEMU_OPTION_net,
 > 
+
+
+I would have thought that #ifdef is not allowed within macro arguments,
+but there is an obvious precedent right in the context, so:
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Paolo
