@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1enhXx-0000os-8V
+	(envelope-from <thuth@redhat.com>) id 1enhXx-0000oq-8P
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1enhXu-0002vr-7G
+	(envelope-from <thuth@redhat.com>) id 1enhXw-0002wQ-8V
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:41 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53256 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46642 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1enhXu-0002vW-3U
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:38 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1enhXw-0002wI-3y
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:40 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BEB2C4023113
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:15:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9221EAE83
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:15:39 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 19 Feb 2018 10:15:22 +0100
-Message-Id: <1519031728-9850-3-git-send-email-thuth@redhat.com>
+Date: Mon, 19 Feb 2018 10:15:23 +0100
+Message-Id: <1519031728-9850-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519031728-9850-1-git-send-email-thuth@redhat.com>
 References: <1519031728-9850-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 2/8] net: List available netdevs with
- "-netdev help"
+Subject: [Qemu-devel] [PATCH v1 3/8] net: Only show vhost-user in the help
+ text if CONFIG_POSIX is defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +33,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Other options like "-chardev" or "-device" feature a nice help text
-with the available devices when being called with "help" or "?".
-Since it is quite useful, especially if you want to see which network
-backends have been compiled into the QEMU binary, let's provide such
-a help text for "-netdev", too.
+According to net/Makefile.objs we only link in the vhost-user code
+if CONFIG_POSIX has been set. So the help screen should also only
+show this information if CONFIG_POSIX has been defined.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- net/net.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+ qemu-options.hx | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/net.c b/net/net.c
-index e213a61..08049d9 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1086,6 +1086,38 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-     return 0;
- }
- 
-+static void show_netdevs(void)
-+{
-+    int idx;
-+    const char *available_netdevs[] = {
-+        "socket",
-+        "hubport",
-+        "tap",
-+#ifdef CONFIG_SLIRP
-+        "user",
-+#endif
-+#ifdef CONFIG_L2TPV3
-+        "l2tpv3",
-+#endif
-+#ifdef CONFIG_VDE
-+        "vde",
-+#endif
-+#ifdef CONFIG_NET_BRIDGE
-+        "bridge",
-+#endif
-+#ifdef CONFIG_NETMAP
-+        "netmap",
-+#endif
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 5050a49..b81b53b 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1998,8 +1998,10 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+     "                VALE port (created on the fly) called 'name' ('nmname' is name of the \n"
+     "                netmap device, defaults to '/dev/netmap')\n"
+ #endif
 +#ifdef CONFIG_POSIX
-+        "vhost-user",
+     "-netdev vhost-user,id=str,chardev=dev[,vhostforce=on|off]\n"
+     "                configure a vhost-user network, backed by a chardev 'dev'\n"
 +#endif
-+    };
-+
-+    printf("Available netdev backend types:\n");
-+    for (idx = 0; idx < ARRAY_SIZE(available_netdevs); idx++) {
-+        puts(available_netdevs[idx]);
-+    }
-+}
- 
- int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
- {
-@@ -1094,7 +1126,10 @@ int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
-     int ret = -1;
-     Visitor *v = opts_visitor_new(opts);
- 
--    {
-+    if (is_netdev && is_help_option(qemu_opt_get(opts, "type"))) {
-+        show_netdevs();
-+        exit(1);
-+    } else {
-         /* Parse convenience option format ip6-net=fec0::0[/64] */
-         const char *ip6_net = qemu_opt_get(opts, "ipv6-net");
- 
+     "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
+     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
+ DEF("net", HAS_ARG, QEMU_OPTION_net,
 -- 
 1.8.3.1
