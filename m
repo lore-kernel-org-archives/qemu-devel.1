@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1eng9V-0006Dt-1W
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 02:46:22 -0500
+	(envelope-from <hsp.cat7@gmail.com>) id 1engLd-0008Qv-LN
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 02:58:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1eng9Q-0005tB-1C
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 02:46:21 -0500
-Received: from mout.web.de ([212.227.15.4]:42057)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1eng9P-0005t3-MB
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 02:46:15 -0500
-Received: from [167.87.1.128] ([95.157.57.47]) by smtp.web.de (mrweb001
-	[213.165.67.108]) with ESMTPSA (Nemesis) id 0MeScR-1f8P8M3nJP-00QF3o
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 08:46:14 +0100
-From: Jan Kiszka <jan.kiszka@web.de>
-References: <92b4111d-9151-6f5e-58e3-094cf06011a0@web.de>
-Message-ID: <9a15951e-168c-c8f2-123b-e4bfed37f584@web.de>
-Date: Mon, 19 Feb 2018 08:46:09 +0100
+	(envelope-from <hsp.cat7@gmail.com>) id 1engLc-0003yR-R7
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 02:58:53 -0500
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:36346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1engLc-0003y7-M9
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 02:58:52 -0500
+Received: by mail-ot0-x229.google.com with SMTP id b15so1803787otf.3
+	for <qemu-devel@nongnu.org>; Sun, 18 Feb 2018 23:58:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <92b4111d-9151-6f5e-58e3-094cf06011a0@web.de>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="buW8YJRwtNjHEoYpypQfoDfeGyrXUH1ym"
-Subject: Re: [Qemu-devel] e1000e: MSI-X problem with recent Linux drivers
+In-Reply-To: <ab4612a8-5c82-5abf-cbc3-d5ec47cd9498@tuxfamily.org>
+References: <CABLmASGFPBQV8y1Omm+S53P92Dew_aWBBbDoap+c2b2PVxeLzg@mail.gmail.com>
+	<ab4612a8-5c82-5abf-cbc3-d5ec47cd9498@tuxfamily.org>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Mon, 19 Feb 2018 08:58:51 +0100
+Message-ID: <CABLmASFG_cT768zVJwKwrOAB=xhbhvzLa_wvJ4qjRkE6GoZvrA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Qemu SDL2 bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---buW8YJRwtNjHEoYpypQfoDfeGyrXUH1ym
-From: Jan Kiszka <jan.kiszka@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <9a15951e-168c-c8f2-123b-e4bfed37f584@web.de>
-Subject: Re: e1000e: MSI-X problem with recent Linux drivers
-References: <92b4111d-9151-6f5e-58e3-094cf06011a0@web.de>
-In-Reply-To: <92b4111d-9151-6f5e-58e3-094cf06011a0@web.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Feb 19, 2018 at 8:09 AM, Thomas Huth <huth@tuxfamily.org> wrote:
+> On 18.02.2018 11:11, Howard Spoelstra wrote:
+>> Hi,
+>>
+>> I'd like to report a bug when using the SDL2 GUI in both Linux and
+>> Windows, which can be observed with in my case latest qemu-system-ppc
+>> running parallel instances of OSX 10.4 and 10.3.
+>>
+>> After switching back and forth between GUIs, dragging becomes copying,
+>> keyboard starts using a strange character set.
+>> An additional "Alt" key press is needed to restore normal behaviour.
+>
+>  Hi,
+>
+> how do you switch back and forth between GUIs? Using the mouse or a
+> keystroke? I guess the latter ... sounds like the Alt key could be
+> "stuck" in the guest?
+>
+>  Thomas
 
-On 2018-02-18 21:54, Jan Kiszka wrote:
-> Hi,
->=20
-> I've just noticed that the e1000e model does not work with its recent
-> Linux kernel driver. This is my test matrix:
->=20
-> Kernel		INTx (IntMode=3D0)	MSI-X
-> 4.4		OK			OK
-> 4.14		OK			no link
-> master		OK			no link
+Hi,
 
-FWIW: 4.9 (Debian kernel) is fine as well.
+With SDL, unlike GTK, the mouse does not move outside the window. So I
+have to use Ctrl-Alt-G to release focus and then click in the other
+window. After two switches the reported issue occurs. Indeed, the Alt
+key seems to go into a state in which it is stuck. When trying to
+exclude my own keyboard being at fault, I've also noticed the right
+Alt key on my keyboard cannot be used for the release.
 
->=20
-> In MSI-X mode, there are few interrupts arriving:
-> [...]
->  25:          0          0          0          0  IR-PCI-MSI 32768-edge=
-      enp0s2-rx-0
->  26:          0          0          0          0  IR-PCI-MSI 32769-edge=
-      enp0s2-tx-0
->  27:          0          2          0          0  IR-PCI-MSI 32770-edge=
-      enp0s2
->=20
-> QEMU versions tested without differences: v2.8, v2.9, master.
->=20
-> Any ideas what could go wrong, and where?
->=20
-> Jan
->=20
-
-
-
---buW8YJRwtNjHEoYpypQfoDfeGyrXUH1ym
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlqKgMQACgkQitSsb3rl5xQJcQCfS7AUThgFyaK3QkoJMTqBrGBh
-W9gAn0qeLtdTDYBNCnTf518u7jNZBN4J
-=CagC
------END PGP SIGNATURE-----
-
---buW8YJRwtNjHEoYpypQfoDfeGyrXUH1ym--
+Best,
+Howard
