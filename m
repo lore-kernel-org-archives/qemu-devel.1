@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david.brenken@efs-auto.org>) id 1eneny-0002VG-98
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 01:20:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1enlVb-0004lx-3v
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 08:29:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david.brenken@efs-auto.org>) id 1enenv-0007cc-5J
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 01:20:02 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:46959)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <david.brenken@efs-auto.org>)
-	id 1enenu-0007an-RS
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 01:19:59 -0500
-From: David Brenken <david.brenken@efs-auto.org>
-Date: Mon, 19 Feb 2018 07:18:27 +0100
-Message-Id: <20180219061827.2112-6-david.brenken@efs-auto.org>
-In-Reply-To: <20180219061827.2112-1-david.brenken@efs-auto.org>
-References: <20180219061827.2112-1-david.brenken@efs-auto.org>
-Subject: [Qemu-devel] [PATCH 5/5] tricore: fixed wrong shifting of PCXI PIE
+	(envelope-from <eblake@redhat.com>) id 1enlVX-0001k3-6B
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 08:29:31 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55258 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1enlVX-0001jv-0A
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 08:29:27 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C6F6B40363B6
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 13:29:14 +0000 (UTC)
+References: <1519031728-9850-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <544057ea-8e87-3aea-e2e0-8225212a7d9b@redhat.com>
+Date: Mon, 19 Feb 2018 07:29:09 -0600
+MIME-Version: 1.0
+In-Reply-To: <1519031728-9850-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/8] Improvements and clean-ups related
+ to -net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +34,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kbastian@mail.uni-paderborn.de, David Brenken <david.brenken@efs-auto.de>, Georg Hofstetter <georg.hofstetter@efs-auto.de>, Florian Artmeier <florian.artmeier@efs-auto.de>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: David Brenken <david.brenken@efs-auto.de>
+On 02/19/2018 03:15 AM, Thomas Huth wrote:
 
-Signed-off-by: David Brenken <david.brenken@efs-auto.de>
-Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
-Signed-off-by: Florian Artmeier <florian.artmeier@efs-auto.de>
----
- target/tricore/op_helper.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> The last patch finally makes "-net" less prominent in our qemu docs,
+> e.g. by replacing the examples that contain "-net" with "-netdev".
 
-diff --git a/target/tricore/op_helper.c b/target/tricore/op_helper.c
-index 7af202c..491f97d 100644
---- a/target/tricore/op_helper.c
-+++ b/target/tricore/op_helper.c
-@@ -2605,7 +2605,8 @@ void helper_rfe(CPUTriCoreState *env)
-     }
-     env->PC = env->gpr_a[11] & ~0x1;
-     /* ICR.IE = PCXI.PIE; */
--    env->ICR = (env->ICR & ~MASK_ICR_IE) + ((env->PCXI & MASK_PCXI_PIE) >> 15);
-+    env->ICR = (env->ICR & ~MASK_ICR_IE)
-+            | ((env->PCXI & MASK_PCXI_PIE) >> (21 - 15));
-     /* ICR.CCPN = PCXI.PCPN; */
-     env->ICR = (env->ICR & ~MASK_ICR_CCPN) +
-                ((env->PCXI & MASK_PCXI_PCPN) >> 24);
+Minor request: while doing this, can we update the documentation to 
+mention "--netdev" and "--n" everywhere we touch things?  See this for 
+rationale:
+https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation
+
 -- 
-2.7.4
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
