@@ -1,41 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1enkjw-0006if-Mg
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 07:40:18 -0500
+	(envelope-from <tgolembi@redhat.com>) id 1enknQ-0007jz-7Y
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 07:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1enkjq-0002vd-Lr
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 07:40:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1enkjq-0002uc-Dl
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 07:40:10 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1JCdwca127005
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 07:40:09 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g7wp5jtkc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 07:40:07 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Mon, 19 Feb 2018 12:39:47 -0000
-References: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1518818879-18608-7-git-send-email-walling@linux.vnet.ibm.com>
-	<ce6141a7-5071-ea5a-01b8-f432672e2f77@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Mon, 19 Feb 2018 13:39:44 +0100
+	(envelope-from <tgolembi@redhat.com>) id 1enknM-0005M4-AM
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 07:43:52 -0500
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:38830)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1enknM-0005LB-3p
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 07:43:48 -0500
+Received: by mail-wr0-f195.google.com with SMTP id n7so9492950wrn.5
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 04:43:47 -0800 (PST)
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Date: Mon, 19 Feb 2018 13:43:44 +0100
+Message-Id: <12c223afbafb402d6e6602a5888e5dca2953dbfc.1519044214.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ce6141a7-5071-ea5a-01b8-f432672e2f77@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <aebd3bd2-2380-134d-afad-cc0614282491@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v7 06/12] s390-ccw: parse and
- set boot menu options
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] docs: document virtio-balloon stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,84 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
+To: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: Wei Wang <wei.w.wang@intel.com>, Jonathan Helman <jonathan.helman@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-On 17.02.2018 09:26, Thomas Huth wrote:
-[...]
->>  struct QemuIplParameters {
->> -    uint8_t  reserved1[4];
->> +    uint8_t  boot_menu_flags;
->> +    uint8_t  reserved1[3];
->> +    uint32_t boot_menu_timeout;
->>      uint64_t netboot_start_addr;
->> -    uint8_t  reserved2[16];
->> +    uint8_t  reserved2[12];
->>  } __attribute__ ((packed));
->>  typedef struct QemuIplParameters QemuIplParameters;
-> 
-> I think Victor's original intention was to get netboot_start_addr
-> aligned in the lowcore memory. Now it's rather aligned in the host
-> memory. Quite confusing, but I think I'd rather prefer Victor's idea to
-> keep it aligned in the lowcore (since that's the "architected" part).
-> 
-> Maybe it's better if we do not declare this as a packed struct at all,
-> and then instead of doing a memcpy of the whole struct, we set the
-> fields manually one by one on the host side into the lowcore, and read
-> the fields manually one by one on the guest side? That's more
-> cumbersome, but avoids future confusion about the alignments here...
-> 
->  Thomas
-> 
+Document statistics added in commits
 
-Hm ... I would prefer to keep it all together and perhaps come up with
-better comments (for the fields). BTW: I think it would make sense to
-reserve the last 8 bytes 'seriously': in case more global configuration
-data is needed in the future, we should have the possibility to install
-a pointer to an extension block in there.
+    commit a0d06486b445985b8d128df172daefbae205bffd
+    Author: Denis V. Lunev <den@openvz.org>
+    Date:   Wed Feb 24 10:50:48 2016 +0300
 
-Anyway, here's the follup squash-in for a qipl-free IPLB.
+        virtio-balloon: add 'available' counter
 
+and
+
+    commit bf1e7140ef0b3a149860ab9f05b36665133238f6
+    Author: Tomáš Golembiovský <tgolembi@redhat.com>
+    Date:   Tue Dec 5 13:14:46 2017 +0100
+
+        virtio-balloon: include statistics of disk/file caches
+
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 ---
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 3c6a411..fe70008 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -222,7 +222,7 @@ static Property s390_ipl_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static void s390_ipl_set_boot_menu(IplParameterBlock *iplb)
-+static void s390_ipl_set_boot_menu(S390IPLState *ipl)
- {
-     QemuOptsList *plist = qemu_find_opts("boot-opts");
-     QemuOpts *opts = QTAILQ_FIRST(&plist->head);
-@@ -231,11 +231,11 @@ static void s390_ipl_set_boot_menu(IplParameterBlock *iplb)
-     const char *tmp;
-     unsigned long splash_time = 0;
- 
--    switch (iplb->pbt) {
-+    switch (ipl->iplb.pbt) {
-     case S390_IPL_TYPE_CCW:
-     case S390_IPL_TYPE_QEMU_SCSI:
--        flags = &iplb->qipl.boot_menu_flags;
--        timeout = &iplb->qipl.boot_menu_timeout;
-+        flags = &ipl->qipl.boot_menu_flags;
-+        timeout = &ipl->qipl.boot_menu_timeout;
-         break;
-     default:
-         error_report("boot menu is not supported for this device type.");
-@@ -482,7 +482,7 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
-         }
-         ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-     }
--    s390_ipl_set_boot_menu(&ipl->iplb);
-+    s390_ipl_set_boot_menu(ipl);
-     s390_ipl_prepare_qipl(cpu);
- 
- }
+ docs/virtio-balloon-stats.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
-
+diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+index edff5f22a8..7a66d25da5 100644
+--- a/docs/virtio-balloon-stats.txt
++++ b/docs/virtio-balloon-stats.txt
+@@ -32,6 +32,8 @@ which will return a dictionary containing:
+       - stat-minor-faults
+       - stat-free-memory
+       - stat-total-memory
++      - stat-available-memory
++      - stat-disk-caches
+ 
+   o A key named last-update, which contains the last stats update
+     timestamp in seconds. Since this timestamp is generated by the host,
 -- 
-Regards,
- Viktor Mihajlovski
+2.16.1
