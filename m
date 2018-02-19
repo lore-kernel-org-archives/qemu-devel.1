@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1enns8-0003dE-9N
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:00:57 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ennvD-0005OD-Pl
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1enns4-00044I-Av
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:00:56 -0500
-References: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1518818879-18608-5-git-send-email-walling@linux.vnet.ibm.com>
-	<3528cfd5-c1e4-1252-5ea4-ed9b255afd91@redhat.com>
-	<564c2c0c-7264-bdf9-b034-e87622137914@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6e9e7a07-db5e-1130-bad7-83953cfea7c8@redhat.com>
-Date: Mon, 19 Feb 2018 17:00:30 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1ennv9-00064A-NF
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:04:07 -0500
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:40216)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ennv9-00063m-Ew
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:04:03 -0500
+Received: by mail-wr0-x232.google.com with SMTP id o76so10148726wrb.7
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 08:04:03 -0800 (PST)
+References: <20180206164815.10084-1-alex.bennee@linaro.org>
+	<20180206164815.10084-14-alex.bennee@linaro.org>
+	<CAFEAcA_+hYx=-CPaLe3ZVGs8KF2zkb=dRta+A=C6jDteu--EcA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_+hYx=-CPaLe3ZVGs8KF2zkb=dRta+A=C6jDteu--EcA@mail.gmail.com>
+Date: Mon, 19 Feb 2018 16:04:00 +0000
+Message-ID: <87po519dan.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <564c2c0c-7264-bdf9-b034-e87622137914@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v7 04/12] s390-ccw: update libc
+Subject: Re: [Qemu-devel] [PATCH v4 13/22] fpu/softfloat: re-factor mul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 19.02.2018 16:40, Collin L. Walling wrote:
-> On 02/17/2018 02:48 AM, Thomas Huth wrote:
->> On 16.02.2018 23:07, Collin L. Walling wrote:
->> [...]
->>> +/**
->>> + * uitoa:
->>> + * @num: an integer (base 10) to be converted.
->>> + * @str: a pointer to a string to store the conversion.
->>> + * @len: the length of the passed string.
->>> + *
->>> + * Given an integer @num, convert it to a string. The string @str
->>> must be
->>> + * allocated beforehand. The resulting string will be null
->>> terminated and
->>> + * returned. This function only handles numbers between 0 and
->>> UINT64_MAX
->>> + * inclusive.
->>> + *
->>> + * Returns: the string @str of the converted integer @num
->>> + */
->>> +char *uitoa(uint64_t num, char *str, size_t len)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 size_t num_idx =3D 0;
->>> +=C2=A0=C2=A0=C2=A0 uint64_t tmp =3D num;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 IPL_assert(str !=3D NULL, "uitoa: no space alloca=
-ted to store
->>> string");
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* Get index to ones place */
->>> +=C2=A0=C2=A0=C2=A0 while ((tmp /=3D 10) !=3D 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_idx++;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* Check if we have enough space for num and null=
- */
->>> +=C2=A0=C2=A0=C2=A0 IPL_assert(len > num_idx, "uitoa: array too small=
- for conversion");
->> Well, in v5 of this patch you've had "len >=3D num_idx + 1" where we
->> agreed that it was wrong. Now you have "len > num_idx" which is pretty
->> much the same. WTF?
->> I still think you need "len > num_idx + 1" here to properly take the
->> trailing NUL-byte into account properly. Please fix it!
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 6 February 2018 at 16:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>> We can now add float16_mul and use the common decompose and
+>> canonicalize functions to have a single implementation for
+>> float16/32/64 versions.
 >>
->> =C2=A0 Thomas
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 >>
-> You're correct, and my apologies for not correcting the true problem he=
-re:
-> I messed up the value of num_idx.=C2=A0 It is off by one, but initializ=
-ing the
-> value to 1 instead of 0 should fix this. I must've accounted for this i=
-n
-> my test file but forgot to update it in the actual source code.
+>> ---
+>> v3
+>
+>> +/*
+>> + * Returns the result of multiplying the floating-point values `a' and
+>> + * `b'. The operation is performed according to the IEC/IEEE Standard
+>> + * for Binary Floating-Point Arithmetic.
+>> + */
+>> +
+>> +static FloatParts mul_floats(FloatParts a, FloatParts b, float_status *=
+s)
+>> +{
+>> +    bool sign =3D a.sign ^ b.sign;
+>> +
+>> +    if (a.cls =3D=3D float_class_normal && b.cls =3D=3D float_class_nor=
+mal) {
+>> +        uint64_t hi, lo;
+>> +        int exp =3D a.exp + b.exp;
+>> +
+>> +        mul64To128(a.frac, b.frac, &hi, &lo);
+>
+> It seems a shame that we previously were able to use a
+> 32x32->64 multiply for the float32 case, and now we have to
+> do an expensive 64x64->128 multiply regardless...
 
-Are you sure that initializing it to 1 is right? Unless you also change
-the final while loop in this function, this will put the character into
-the wrong location ("str[num_idx] =3D num % 10 + '0';"). Imagine a number
-that only consists of one digit ... the digit will be placed in str[1]
-which sounds wrong to me...?
+Actually for mul the hit isn't too bad. When we do a div however you do
+notice a bit of a gulf:
 
- Thomas
+ https://i.imgur.com/KMWceo8.png
+
+We could start passing &floatN_params to the functions much like the
+sqrt function and be a bit smarter when we do our multiply and let the
+compiler figure it out as we go.
+
+Another avenue worth exploring is ensuring we use native Int128 support
+where we can so these wide operations can use wide registers where
+available.
+
+However both of these things for future optimisations given it doesn't
+show up in dbt-bench timings.
+
+>
+> Regardless
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
