@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2c-0006jw-1e
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 13:19:55 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2f-0006mx-5R
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 13:19:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2a-0007lm-Na
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 13:19:53 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2c-0007p3-EV
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 13:19:57 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon, 19 Feb 2018 18:19:15 +0000
-Message-Id: <20180219181922.21586-5-mark.cave-ayland@ilande.co.uk>
+Date: Mon, 19 Feb 2018 18:19:19 +0000
+Message-Id: <20180219181922.21586-9-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
 References: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 04/11] heathrow: convert to trace-events
+Subject: [Qemu-devel] [PATCH 08/11] openpic: move OpenPIC state and related
+ definitions to openpic.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,103 +22,384 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
+This is to faciliate access to OpenPICState when wiring up the PIC to the macio
+controller.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/intc/heathrow_pic.c         | 31 ++++++++++++-------------------
- hw/intc/trace-events           |  5 +++++
- include/hw/intc/heathrow_pic.h |  1 +
- 3 files changed, 18 insertions(+), 19 deletions(-)
+ hw/intc/openpic.c        | 157 ----------------------------------------------
+ include/hw/ppc/openpic.h | 160 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 159 insertions(+), 158 deletions(-)
 
-diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-index 7bf44e0d86..afe0b08cbb 100644
---- a/hw/intc/heathrow_pic.c
-+++ b/hw/intc/heathrow_pic.c
-@@ -26,16 +26,7 @@
- #include "hw/hw.h"
- #include "hw/ppc/mac.h"
- #include "hw/intc/heathrow_pic.h"
--
--/* debug PIC */
--//#define DEBUG_PIC
--
--#ifdef DEBUG_PIC
--#define PIC_DPRINTF(fmt, ...)                                   \
--    do { printf("PIC: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define PIC_DPRINTF(fmt, ...)
--#endif
-+#include "trace.h"
+diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
+index 9159a06f07..811cee9b26 100644
+--- a/hw/intc/openpic.c
++++ b/hw/intc/openpic.c
+@@ -63,10 +63,6 @@ static int get_current_cpu(void);
+         } \
+     } while (0)
  
- static inline int heathrow_check_irq(HeathrowPICState *pic)
- {
-@@ -61,7 +52,7 @@ static void heathrow_write(void *opaque, hwaddr addr,
-     unsigned int n;
+-#define MAX_CPU     32
+-#define MAX_MSI     8
+-#define VID         0x03 /* MPIC version ID */
+-
+ /* OpenPIC capability flags */
+ #define OPENPIC_FLAG_IDR_CRIT     (1 << 0)
+ #define OPENPIC_FLAG_ILR          (2 << 0)
+@@ -85,35 +81,6 @@ static int get_current_cpu(void);
+ #define OPENPIC_CPU_REG_START        0x20000
+ #define OPENPIC_CPU_REG_SIZE         0x100 + ((MAX_CPU - 1) * 0x1000)
  
-     n = ((addr & 0xfff) - 0x10) >> 4;
--    PIC_DPRINTF("writel: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
-+    trace_heathrow_write(addr, n, value);
-     if (n >= 2)
-         return;
-     pic = &s->pics[n];
-@@ -109,7 +100,7 @@ static uint64_t heathrow_read(void *opaque, hwaddr addr,
-             break;
-         }
-     }
--    PIC_DPRINTF("readl: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
-+    trace_heathrow_read(addr, n, value);
-     return value;
+-/* Raven */
+-#define RAVEN_MAX_CPU      2
+-#define RAVEN_MAX_EXT     48
+-#define RAVEN_MAX_IRQ     64
+-#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
+-#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
+-
+-/* KeyLargo */
+-#define KEYLARGO_MAX_CPU  4
+-#define KEYLARGO_MAX_EXT  64
+-#define KEYLARGO_MAX_IPI  4
+-#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
+-#define KEYLARGO_MAX_TMR  0
+-#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
+-/* Timers don't exist but this makes the code happy... */
+-#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
+-
+-/* Interrupt definitions */
+-#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
+-#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
+-#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
+-#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
+-/* First doorbell IRQ */
+-#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
+-
+-typedef struct FslMpicInfo {
+-    int max_ext;
+-} FslMpicInfo;
+-
+ static FslMpicInfo fsl_mpic_20 = {
+     .max_ext = 12,
+ };
+@@ -211,55 +178,6 @@ static void openpic_cpu_write_internal(void *opaque, hwaddr addr,
+                                        uint32_t val, int idx);
+ static void openpic_reset(DeviceState *d);
+ 
+-typedef enum IRQType {
+-    IRQ_TYPE_NORMAL = 0,
+-    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
+-    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
+-} IRQType;
+-
+-/* Round up to the nearest 64 IRQs so that the queue length
+- * won't change when moving between 32 and 64 bit hosts.
+- */
+-#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
+-
+-typedef struct IRQQueue {
+-    unsigned long *queue;
+-    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
+-    int next;
+-    int priority;
+-} IRQQueue;
+-
+-typedef struct IRQSource {
+-    uint32_t ivpr;  /* IRQ vector/priority register */
+-    uint32_t idr;   /* IRQ destination register */
+-    uint32_t destmask; /* bitmap of CPU destinations */
+-    int last_cpu;
+-    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
+-    int pending;    /* TRUE if IRQ is pending */
+-    IRQType type;
+-    bool level:1;   /* level-triggered */
+-    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
+-} IRQSource;
+-
+-#define IVPR_MASK_SHIFT       31
+-#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
+-#define IVPR_ACTIVITY_SHIFT   30
+-#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
+-#define IVPR_MODE_SHIFT       29
+-#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
+-#define IVPR_POLARITY_SHIFT   23
+-#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
+-#define IVPR_SENSE_SHIFT      22
+-#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
+-
+-#define IVPR_PRIORITY_MASK     (0xFU << 16)
+-#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
+-#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
+-
+-/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
+-#define IDR_EP      0x80000000  /* external pin */
+-#define IDR_CI      0x40000000  /* critical interrupt */
+-
+ /* Convert between openpic clock ticks and nanosecs.  In the hardware the clock
+    frequency is driven by board inputs to the PIC which the PIC would then
+    divide by 4 or 8.  For now hard code to 25MZ.
+@@ -275,81 +193,6 @@ static inline uint64_t ticks_to_ns(uint64_t ticks)
+     return ticks * OPENPIC_TIMER_NS_PER_TICK;
  }
  
-@@ -124,16 +115,18 @@ static void heathrow_set_irq(void *opaque, int num, int level)
-     HeathrowState *s = opaque;
-     HeathrowPICState *pic;
-     unsigned int irq_bit;
-+    int last_level = (s->last_levels & (num << 1UL)) ? 1 : 0;
+-typedef struct OpenPICTimer {
+-    uint32_t tccr;  /* Global timer current count register */
+-    uint32_t tbcr;  /* Global timer base count register */
+-    int                   n_IRQ;
+-    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
+-    struct QEMUTimer     *qemu_timer;
+-    struct OpenPICState  *opp;          /* Device timer is part of. */
+-    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
+-       current_count written or read, only defined if qemu_timer_active. */
+-    uint64_t              origin_time;
+-} OpenPICTimer;
+-
+-typedef struct OpenPICMSI {
+-    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
+-} OpenPICMSI;
+-
+-typedef struct IRQDest {
+-    int32_t ctpr; /* CPU current task priority */
+-    IRQQueue raised;
+-    IRQQueue servicing;
+-    qemu_irq *irqs;
+-
+-    /* Count of IRQ sources asserting on non-INT outputs */
+-    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
+-} IRQDest;
+-
+-#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
+-
+-typedef struct OpenPICState {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-    /*< public >*/
+-
+-    MemoryRegion mem;
+-
+-    /* Behavior control */
+-    FslMpicInfo *fsl;
+-    uint32_t model;
+-    uint32_t flags;
+-    uint32_t nb_irqs;
+-    uint32_t vid;
+-    uint32_t vir; /* Vendor identification register */
+-    uint32_t vector_mask;
+-    uint32_t tfrr_reset;
+-    uint32_t ivpr_reset;
+-    uint32_t idr_reset;
+-    uint32_t brr1;
+-    uint32_t mpic_mode_mask;
+-
+-    /* Sub-regions */
+-    MemoryRegion sub_io_mem[6];
+-
+-    /* Global registers */
+-    uint32_t frr; /* Feature reporting register */
+-    uint32_t gcr; /* Global configuration register  */
+-    uint32_t pir; /* Processor initialization register */
+-    uint32_t spve; /* Spurious vector register */
+-    uint32_t tfrr; /* Timer frequency reporting register */
+-    /* Source registers */
+-    IRQSource src[OPENPIC_MAX_IRQ];
+-    /* Local registers per output pin */
+-    IRQDest dst[MAX_CPU];
+-    uint32_t nb_cpus;
+-    /* Timer registers */
+-    OpenPICTimer timers[OPENPIC_MAX_TMR];
+-    uint32_t max_tmr;
+-
+-    /* Shared MSI registers */
+-    OpenPICMSI msi[MAX_MSI];
+-    uint32_t max_irq;
+-    uint32_t irq_ipi0;
+-    uint32_t irq_tim0;
+-    uint32_t irq_msi;
+-} OpenPICState;
+-
+ static inline void IRQ_setbit(IRQQueue *q, int n_IRQ)
+ {
+     set_bit(n_IRQ, q->queue);
+diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
+index e55ce546aa..366a98794e 100644
+--- a/include/hw/ppc/openpic.h
++++ b/include/hw/ppc/openpic.h
+@@ -2,10 +2,13 @@
+ #define OPENPIC_H
  
--#if defined(DEBUG)
--    {
--        static int last_level[64];
--        if (last_level[num] != level) {
--            PIC_DPRINTF("set_irq: num=0x%02x level=%d\n", num, level);
--            last_level[num] = level;
-+    if (last_level != level) {
-+        trace_heathrow_set_irq(num, level);
-+
-+        if (level) {
-+            s->last_levels |= (num << 1UL);
-+        } else {
-+            s->last_levels &= ~(num << 1UL);
-         }
-     }
--#endif
-+
-     pic = &s->pics[1 - (num >> 5)];
-     irq_bit = 1 << (num & 0x1f);
-     if (level) {
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 4092d2825e..55e8c2570c 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -186,3 +186,8 @@ nvic_complete_irq(int irq, bool secure) "NVIC complete IRQ %d (secure %d)"
- nvic_set_irq_level(int irq, int level) "NVIC external irq %d level set to %d"
- nvic_sysreg_read(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
- nvic_sysreg_write(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
-+
-+# hw/intc/heathrow_pic.c
-+heathrow_write(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
-+heathrow_read(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
-+heathrow_set_irq(int num, int level) "set_irq: num=0x%02x level=%d"
-diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pic.h
-index bc3ffaab87..878a0f7cdb 100644
---- a/include/hw/intc/heathrow_pic.h
-+++ b/include/hw/intc/heathrow_pic.h
-@@ -42,6 +42,7 @@ typedef struct HeathrowState {
-     MemoryRegion mem;
-     HeathrowPICState pics[2];
-     qemu_irq *irqs;
-+    uint64_t last_levels;
- } HeathrowState;
+ #include "qemu-common.h"
++#include "hw/sysbus.h"
+ #include "hw/qdev-core.h"
+ #include "qom/cpu.h"
  
- #define HEATHROW_NUM_IRQS 64
+-#define TYPE_OPENPIC "openpic"
++#define MAX_CPU     32
++#define MAX_MSI     8
++#define VID         0x03 /* MPIC version ID */
+ 
+ /* OpenPIC have 5 outputs per CPU connected and one IRQ out single output */
+ enum {
+@@ -28,6 +31,161 @@ enum {
+ #define OPENPIC_MAX_IRQ     (OPENPIC_MAX_SRC + OPENPIC_MAX_IPI + \
+                              OPENPIC_MAX_TMR)
+ 
++/* Raven */
++#define RAVEN_MAX_CPU      2
++#define RAVEN_MAX_EXT     48
++#define RAVEN_MAX_IRQ     64
++#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
++#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
++
++/* KeyLargo */
++#define KEYLARGO_MAX_CPU  4
++#define KEYLARGO_MAX_EXT  64
++#define KEYLARGO_MAX_IPI  4
++#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
++#define KEYLARGO_MAX_TMR  0
++#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
++/* Timers don't exist but this makes the code happy... */
++#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
++
++/* Interrupt definitions */
++#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
++#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
++#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
++#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
++/* First doorbell IRQ */
++#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
++
++typedef struct FslMpicInfo {
++    int max_ext;
++} FslMpicInfo;
++
++typedef enum IRQType {
++    IRQ_TYPE_NORMAL = 0,
++    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
++    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
++} IRQType;
++
++/* Round up to the nearest 64 IRQs so that the queue length
++ * won't change when moving between 32 and 64 bit hosts.
++ */
++#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
++
++typedef struct IRQQueue {
++    unsigned long *queue;
++    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
++    int next;
++    int priority;
++} IRQQueue;
++
++typedef struct IRQSource {
++    uint32_t ivpr;  /* IRQ vector/priority register */
++    uint32_t idr;   /* IRQ destination register */
++    uint32_t destmask; /* bitmap of CPU destinations */
++    int last_cpu;
++    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
++    int pending;    /* TRUE if IRQ is pending */
++    IRQType type;
++    bool level:1;   /* level-triggered */
++    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
++} IRQSource;
++
++#define IVPR_MASK_SHIFT       31
++#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
++#define IVPR_ACTIVITY_SHIFT   30
++#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
++#define IVPR_MODE_SHIFT       29
++#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
++#define IVPR_POLARITY_SHIFT   23
++#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
++#define IVPR_SENSE_SHIFT      22
++#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
++
++#define IVPR_PRIORITY_MASK     (0xFU << 16)
++#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
++#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
++
++/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
++#define IDR_EP      0x80000000  /* external pin */
++#define IDR_CI      0x40000000  /* critical interrupt */
++
++typedef struct OpenPICTimer {
++    uint32_t tccr;  /* Global timer current count register */
++    uint32_t tbcr;  /* Global timer base count register */
++    int                   n_IRQ;
++    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
++    struct QEMUTimer     *qemu_timer;
++    struct OpenPICState  *opp;          /* Device timer is part of. */
++    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
++       current_count written or read, only defined if qemu_timer_active. */
++    uint64_t              origin_time;
++} OpenPICTimer;
++
++typedef struct OpenPICMSI {
++    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
++} OpenPICMSI;
++
++typedef struct IRQDest {
++    int32_t ctpr; /* CPU current task priority */
++    IRQQueue raised;
++    IRQQueue servicing;
++    qemu_irq *irqs;
++
++    /* Count of IRQ sources asserting on non-INT outputs */
++    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
++} IRQDest;
++
++#define TYPE_OPENPIC "openpic"
++#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
++
++typedef struct OpenPICState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    MemoryRegion mem;
++
++    /* Behavior control */
++    FslMpicInfo *fsl;
++    uint32_t model;
++    uint32_t flags;
++    uint32_t nb_irqs;
++    uint32_t vid;
++    uint32_t vir; /* Vendor identification register */
++    uint32_t vector_mask;
++    uint32_t tfrr_reset;
++    uint32_t ivpr_reset;
++    uint32_t idr_reset;
++    uint32_t brr1;
++    uint32_t mpic_mode_mask;
++
++    /* Sub-regions */
++    MemoryRegion sub_io_mem[6];
++
++    /* Global registers */
++    uint32_t frr; /* Feature reporting register */
++    uint32_t gcr; /* Global configuration register  */
++    uint32_t pir; /* Processor initialization register */
++    uint32_t spve; /* Spurious vector register */
++    uint32_t tfrr; /* Timer frequency reporting register */
++    /* Source registers */
++    IRQSource src[OPENPIC_MAX_IRQ];
++    /* Local registers per output pin */
++    IRQDest dst[MAX_CPU];
++    uint32_t nb_cpus;
++    /* Timer registers */
++    OpenPICTimer timers[OPENPIC_MAX_TMR];
++    uint32_t max_tmr;
++
++    /* Shared MSI registers */
++    OpenPICMSI msi[MAX_MSI];
++    uint32_t max_irq;
++    uint32_t irq_ipi0;
++    uint32_t irq_tim0;
++    uint32_t irq_msi;
++} OpenPICState;
++
++
+ #define TYPE_KVM_OPENPIC "kvm-openpic"
+ int kvm_openpic_connect_vcpu(DeviceState *d, CPUState *cs);
+ 
 -- 
 2.11.0
