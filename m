@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1enoAm-0004Vg-2b
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:20:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1enoAo-0004Z7-PF
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:20:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1enoAk-0002xz-C7
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:20:12 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40410 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1enoAn-00036k-Qg
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:20:14 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49996 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1enoAk-0002ws-7K
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:20:10 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1enoAn-00034U-29
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:20:13 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 19 Feb 2018 16:19:55 +0000
-Message-Id: <20180219161955.29572-4-stefanha@redhat.com>
-In-Reply-To: <20180219161955.29572-1-stefanha@redhat.com>
-References: <20180219161955.29572-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] trace: avoid SystemTap "char const" warnings
+Date: Mon, 19 Feb 2018 16:19:52 +0000
+Message-Id: <20180219161955.29572-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 0/3] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +22,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-SystemTap's dtrace(1) produces the following warning when it encounters
-"char const" instead of "const char":
+The following changes since commit e5ecc287a7bd24a1364e23e263cb60cfc8d21eb5:
 
-  Warning: /usr/bin/dtrace:trace-dtrace-root.dtrace:66: syntax error near:
-  probe flatview_destroy_rcu
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20180216' into staging (2018-02-16 18:39:05 +0000)
 
-  Warning: Proceeding as if --no-pyparsing was given.
+are available in the Git repository at:
 
-This is a limitation in current SystemTap releases.  I have sent a patch
-upstream to accept "char const" since it is valid C:
+  git://github.com/stefanha/qemu.git tags/tracing-pull-request
 
-  https://sourceware.org/ml/systemtap/2018-q1/msg00017.html
+for you to fetch changes up to 7f1d87ab0fd94cef5086e2879716958303281054:
 
-In QEMU we still wish to avoid warnings in the current SystemTap
-release.  It's simple enough to replace "char const" with "const char".
+  trace: avoid SystemTap "char const" warnings (2018-02-19 13:09:44 +0000)
 
-I'm not changing the documentation or implementing checks to prevent
-this from occurring again in the future.  The next release of SystemTap
-will hopefully resolve this issue.
+----------------------------------------------------------------
 
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20180201162625.4276-1-stefanha@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/block/trace-events |  4 ++--
- trace-events          | 12 ++++++------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+----------------------------------------------------------------
 
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 5acd495207..6b9e733412 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -17,7 +17,7 @@ nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
- nvme_irq_pin(void) "pulsing IRQ pin"
- nvme_irq_masked(void) "IRQ is masked"
- nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64""
--nvme_rw(char const *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
-+nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
- nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
- nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
- nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
-@@ -25,7 +25,7 @@ nvme_del_cq(uint16_t cqid) "deleted completion queue, sqid=%"PRIu16""
- nvme_identify_ctrl(void) "identify controller"
- nvme_identify_ns(uint16_t ns) "identify namespace, nsid=%"PRIu16""
- nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=%"PRIu16""
--nvme_getfeat_vwcache(char const* result) "get feature volatile write cache, result=%s"
-+nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
- nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
- nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
- nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
-diff --git a/trace-events b/trace-events
-index ec95e67089..89fcad0fd1 100644
---- a/trace-events
-+++ b/trace-events
-@@ -73,13 +73,13 @@ flatview_destroy(FlatView *view, MemoryRegion *root) "%p (root %p)"
- flatview_destroy_rcu(FlatView *view, MemoryRegion *root) "%p (root %p)"
- 
- # gdbstub.c
--gdbstub_op_start(char const *device) "Starting gdbstub using device %s"
-+gdbstub_op_start(const char *device) "Starting gdbstub using device %s"
- gdbstub_op_exiting(uint8_t code) "notifying exit with code=0x%02x"
- gdbstub_op_continue(void) "Continuing all CPUs"
- gdbstub_op_continue_cpu(int cpu_index) "Continuing CPU %d"
- gdbstub_op_stepping(int cpu_index) "Stepping CPU %d"
--gdbstub_op_extra_info(char const *info) "Thread extra info: %s"
--gdbstub_hit_watchpoint(char const *type, int cpu_gdb_index, uint64_t vaddr) "Watchpoint hit, type=\"%s\" cpu=%d, vaddr=0x%" PRIx64 ""
-+gdbstub_op_extra_info(const char *info) "Thread extra info: %s"
-+gdbstub_hit_watchpoint(const char *type, int cpu_gdb_index, uint64_t vaddr) "Watchpoint hit, type=\"%s\" cpu=%d, vaddr=0x%" PRIx64 ""
- gdbstub_hit_internal_error(void) "RUN_STATE_INTERNAL_ERROR"
- gdbstub_hit_break(void) "RUN_STATE_DEBUG"
- gdbstub_hit_paused(void) "RUN_STATE_PAUSED"
-@@ -87,9 +87,9 @@ gdbstub_hit_shutdown(void) "RUN_STATE_SHUTDOWN"
- gdbstub_hit_io_error(void) "RUN_STATE_IO_ERROR"
- gdbstub_hit_watchdog(void) "RUN_STATE_WATCHDOG"
- gdbstub_hit_unknown(int state) "Unknown run state=0x%x"
--gdbstub_io_reply(char const *message) "Sent: %s"
--gdbstub_io_binaryreply(size_t ofs, char const *line) "0x%04zx: %s"
--gdbstub_io_command(char const *command) "Received: %s"
-+gdbstub_io_reply(const char *message) "Sent: %s"
-+gdbstub_io_binaryreply(size_t ofs, const char *line) "0x%04zx: %s"
-+gdbstub_io_command(const char *command) "Received: %s"
- gdbstub_io_got_ack(void) "Got ACK"
- gdbstub_io_got_unexpected(uint8_t ch) "Got 0x%02x when expecting ACK/NACK"
- gdbstub_err_got_nack(void) "Got NACK, retransmitting"
+Jon Emil Jahren (2):
+  tracetool: Update argument format regex to non-greedy star
+  tracetool: For ust trace bool type as ctf_integer
+
+Stefan Hajnoczi (1):
+  trace: avoid SystemTap "char const" warnings
+
+ hw/block/trace-events                    |  4 ++--
+ scripts/tracetool/__init__.py            |  5 +++--
+ scripts/tracetool/format/ust_events_h.py |  3 ++-
+ trace-events                             | 12 ++++++------
+ 4 files changed, 13 insertions(+), 11 deletions(-)
+
 -- 
 2.14.3
