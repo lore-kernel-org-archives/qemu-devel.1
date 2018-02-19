@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1enpSY-0004xI-OX
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:42:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1enpei-0008GE-3j
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:55:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1enpSU-0004t7-HV
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:42:38 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 19 Feb 2018 18:42:31 +0100
-Message-Id: <20180219174231.10874-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug support
+	(envelope-from <eblake@redhat.com>) id 1enpee-0006hl-Fd
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:55:12 -0500
+References: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1518818879-18608-5-git-send-email-walling@linux.vnet.ibm.com>
+	<3528cfd5-c1e4-1252-5ea4-ed9b255afd91@redhat.com>
+	<564c2c0c-7264-bdf9-b034-e87622137914@linux.vnet.ibm.com>
+	<6e9e7a07-db5e-1130-bad7-83953cfea7c8@redhat.com>
+	<06328b8c-4aa2-e791-9bcc-f83c2ac49964@linux.vnet.ibm.com>
+	<26604847-20b0-3d62-8967-d520b599aaa8@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b6895416-521b-d428-4e8e-166f5b5388ba@redhat.com>
+Date: Mon, 19 Feb 2018 11:54:49 -0600
+MIME-Version: 1.0
+In-Reply-To: <26604847-20b0-3d62-8967-d520b599aaa8@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v7 04/12] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,505 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com
 
->From an architecture point of view, nothing can be mapped into the address
-space on s390x. All there is is memory. Therefore there is also not really
-an interface to communicate such information to the guest. All we can do is
-specify the maximum ram address and guests can probe in that range if
-memory is available and usable (TPROT).
+On 02/19/2018 11:17 AM, Collin L. Walling wrote:
 
-Also memory hotplug is strange. The guest can decide at some point in
-time to add / remove memory in some range. And nobody can really hinder it
-from doing so. So if we specify right now e.g.
-    -m 2G,slots=2,maxmem=20G
-An ordinary fedora guest will happily online (hotplug) all memory,
-resulting in a guest consuming 20G. So it really behaves rather like
-    -m 22G
-There is no way to hotplug memory from the outside like on other
-architectures. This is of course bad for upper management layers.
+> How is this for a compromise?
+>=20
+>  =C2=A0=C2=A0=C2=A0 - start num_idx at 1, provide comment as for why
+>  =C2=A0=C2=A0=C2=A0 - change while loop comment to explain we are "coun=
+ting the=20
+> _indices_ _of_ _num_"
+>  =C2=A0=C2=A0=C2=A0 - str[num_idx] is assigned \0, and we also decremen=
+t num_idx in one=20
+> line
+>  =C2=A0=C2=A0=C2=A0 - in conversion loop, post decrement num_idx as it =
+is used
+>=20
+> char *uitoa(int num, char *str, int len)
+> {
+>  =C2=A0 int num_idx =3D 1; /* account for NULL */
 
-As the guest can create/delete memory regions while it is running, of
-course migration support is not available and tricky to implement.
+The single-byte character is named NUL (while NULL refers to the 8- or=20
+4-byte pointer value).
 
-With virtualization, it is different. We might want to map something
-into guest address space (e.g. fake DAX devices) and not detect it
-automatically as memory. So we really want to use the maxmem and slots
-parameter just like on all other architectures. Such devices will have
-to expose the applicable memory range themselves. To finally be able to
-provide memory hotplug to guests, we will need a new paravirtualized
-interface to do that (e.g. something into the direction of virtio-mem).
+>  =C2=A0 int tmp =3D num;
+>=20
+>  =C2=A0 assert(str !=3D NULL, "uitoa: no space allocated to store strin=
+g");
+>=20
+>  =C2=A0 /* Count indices of num */
+>  =C2=A0 while ((tmp /=3D 10) !=3D 0)
+>  =C2=A0=C2=A0=C2=A0 num_idx++;
+>=20
+>  =C2=A0 /* Check if we have enough space for num and null */
 
-This implies, that maxmem cannot be used for s390x memory hotplug
-anymore and has to go. This simplifies the code quite a bit.
+and again
 
-As migration support is not working, this change cannot really break
-migration as guests without slots and maxmem don't see the SCLP
-features. Also, the ram size calcualtion does not change.
+>  =C2=A0 assert(len > num_idx, "uitoa: array too small for conversion");
+>=20
+>  =C2=A0 str[num_idx--] =3D '\0';
+>=20
+>  =C2=A0 /* Convert int to string */
+>  =C2=A0 while (num_idx >=3D 0) {
+>  =C2=A0=C2=A0=C2=A0 str[num_idx--] =3D num % 10 + '0';
+>  =C2=A0=C2=A0=C2=A0 num /=3D 10;
+>  =C2=A0 }
+>=20
+>  =C2=A0 return str;
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/sclp.c         | 310 +-----------------------------------------------
- include/hw/s390x/sclp.h |  25 ----
- target/s390x/cpu.h      |   1 -
- 3 files changed, 5 insertions(+), 331 deletions(-)
+Otherwise, it seems readable to me.
 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 276972b59f..047d577313 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -15,9 +15,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "cpu.h"
--#include "exec/memory.h"
- #include "sysemu/sysemu.h"
--#include "exec/address-spaces.h"
- #include "hw/boards.h"
- #include "hw/s390x/sclp.h"
- #include "hw/s390x/event-facility.h"
-@@ -57,10 +55,8 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
- {
-     ReadInfo *read_info = (ReadInfo *) sccb;
-     MachineState *machine = MACHINE(qdev_get_machine());
--    sclpMemoryHotplugDev *mhd = get_sclp_memory_hotplug_dev();
-     int cpu_count;
-     int rnsize, rnmax;
--    int slots = MIN(machine->ram_slots, s390_get_memslot_count());
-     IplParameterBlock *ipib = s390_ipl_get_iplb();
- 
-     /* CPU information */
-@@ -80,36 +76,6 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     read_info->facilities = cpu_to_be64(SCLP_HAS_CPU_INFO |
-                                         SCLP_HAS_IOA_RECONFIG);
- 
--    /* Memory Hotplug is only supported for the ccw machine type */
--    if (mhd) {
--        mhd->standby_subregion_size = MEM_SECTION_SIZE;
--        /* Deduct the memory slot already used for core */
--        if (slots > 0) {
--            while ((mhd->standby_subregion_size * (slots - 1)
--                    < mhd->standby_mem_size)) {
--                mhd->standby_subregion_size = mhd->standby_subregion_size << 1;
--            }
--        }
--        /*
--         * Initialize mapping of guest standby memory sections indicating which
--         * are and are not online. Assume all standby memory begins offline.
--         */
--        if (mhd->standby_state_map == 0) {
--            if (mhd->standby_mem_size % mhd->standby_subregion_size) {
--                mhd->standby_state_map = g_malloc0((mhd->standby_mem_size /
--                                             mhd->standby_subregion_size + 1) *
--                                             (mhd->standby_subregion_size /
--                                             MEM_SECTION_SIZE));
--            } else {
--                mhd->standby_state_map = g_malloc0(mhd->standby_mem_size /
--                                                   MEM_SECTION_SIZE);
--            }
--        }
--        mhd->padded_ram_size = ram_size + mhd->pad_size;
--        mhd->rzm = 1 << mhd->increment_size;
--
--        read_info->facilities |= cpu_to_be64(SCLP_FC_ASSIGN_ATTACH_READ_STOR);
--    }
-     read_info->mha_pow = s390_get_mha_pow();
-     read_info->hmfai = cpu_to_be32(s390_get_hmfai());
- 
-@@ -121,7 +87,8 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-         read_info->rnsize2 = cpu_to_be32(rnsize);
-     }
- 
--    rnmax = machine->maxram_size >> sclp->increment_size;
-+    /* we don't support standby memory, maxram_size is never exposed */
-+    rnmax = machine->ram_size >> sclp->increment_size;
-     if (rnmax < 0x10000) {
-         read_info->rnmax = cpu_to_be16(rnmax);
-     } else {
-@@ -139,195 +106,6 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_READ_COMPLETION);
- }
- 
--static void read_storage_element0_info(SCLPDevice *sclp, SCCB *sccb)
--{
--    int i, assigned;
--    int subincrement_id = SCLP_STARTING_SUBINCREMENT_ID;
--    ReadStorageElementInfo *storage_info = (ReadStorageElementInfo *) sccb;
--    sclpMemoryHotplugDev *mhd = get_sclp_memory_hotplug_dev();
--
--    if (!mhd) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
--        return;
--    }
--
--    if ((ram_size >> mhd->increment_size) >= 0x10000) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
--        return;
--    }
--
--    /* Return information regarding core memory */
--    storage_info->max_id = cpu_to_be16(mhd->standby_mem_size ? 1 : 0);
--    assigned = ram_size >> mhd->increment_size;
--    storage_info->assigned = cpu_to_be16(assigned);
--
--    for (i = 0; i < assigned; i++) {
--        storage_info->entries[i] = cpu_to_be32(subincrement_id);
--        subincrement_id += SCLP_INCREMENT_UNIT;
--    }
--    sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_READ_COMPLETION);
--}
--
--static void read_storage_element1_info(SCLPDevice *sclp, SCCB *sccb)
--{
--    ReadStorageElementInfo *storage_info = (ReadStorageElementInfo *) sccb;
--    sclpMemoryHotplugDev *mhd = get_sclp_memory_hotplug_dev();
--
--    if (!mhd) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
--        return;
--    }
--
--    if ((mhd->standby_mem_size >> mhd->increment_size) >= 0x10000) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
--        return;
--    }
--
--    /* Return information regarding standby memory */
--    storage_info->max_id = cpu_to_be16(mhd->standby_mem_size ? 1 : 0);
--    storage_info->assigned = cpu_to_be16(mhd->standby_mem_size >>
--                                         mhd->increment_size);
--    storage_info->standby = cpu_to_be16(mhd->standby_mem_size >>
--                                        mhd->increment_size);
--    sccb->h.response_code = cpu_to_be16(SCLP_RC_STANDBY_READ_COMPLETION);
--}
--
--static void attach_storage_element(SCLPDevice *sclp, SCCB *sccb,
--                                   uint16_t element)
--{
--    int i, assigned, subincrement_id;
--    AttachStorageElement *attach_info = (AttachStorageElement *) sccb;
--    sclpMemoryHotplugDev *mhd = get_sclp_memory_hotplug_dev();
--
--    if (!mhd) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
--        return;
--    }
--
--    if (element != 1) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
--        return;
--    }
--
--    assigned = mhd->standby_mem_size >> mhd->increment_size;
--    attach_info->assigned = cpu_to_be16(assigned);
--    subincrement_id = ((ram_size >> mhd->increment_size) << 16)
--                      + SCLP_STARTING_SUBINCREMENT_ID;
--    for (i = 0; i < assigned; i++) {
--        attach_info->entries[i] = cpu_to_be32(subincrement_id);
--        subincrement_id += SCLP_INCREMENT_UNIT;
--    }
--    sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_COMPLETION);
--}
--
--static void assign_storage(SCLPDevice *sclp, SCCB *sccb)
--{
--    MemoryRegion *mr = NULL;
--    uint64_t this_subregion_size;
--    AssignStorage *assign_info = (AssignStorage *) sccb;
--    sclpMemoryHotplugDev *mhd = get_sclp_memory_hotplug_dev();
--    ram_addr_t assign_addr;
--    MemoryRegion *sysmem = get_system_memory();
--
--    if (!mhd) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
--        return;
--    }
--    assign_addr = (be16_to_cpu(assign_info->rn) - 1) * mhd->rzm;
--
--    if ((assign_addr % MEM_SECTION_SIZE == 0) &&
--        (assign_addr >= mhd->padded_ram_size)) {
--        /* Re-use existing memory region if found */
--        mr = memory_region_find(sysmem, assign_addr, 1).mr;
--        memory_region_unref(mr);
--        if (!mr) {
--
--            MemoryRegion *standby_ram = g_new(MemoryRegion, 1);
--
--            /* offset to align to standby_subregion_size for allocation */
--            ram_addr_t offset = assign_addr -
--                                (assign_addr - mhd->padded_ram_size)
--                                % mhd->standby_subregion_size;
--
--            /* strlen("standby.ram") + 4 (Max of KVM_MEMORY_SLOTS) +  NULL */
--            char id[16];
--            snprintf(id, 16, "standby.ram%d",
--                     (int)((offset - mhd->padded_ram_size) /
--                     mhd->standby_subregion_size) + 1);
--
--            /* Allocate a subregion of the calculated standby_subregion_size */
--            if (offset + mhd->standby_subregion_size >
--                mhd->padded_ram_size + mhd->standby_mem_size) {
--                this_subregion_size = mhd->padded_ram_size +
--                  mhd->standby_mem_size - offset;
--            } else {
--                this_subregion_size = mhd->standby_subregion_size;
--            }
--
--            memory_region_init_ram(standby_ram, NULL, id, this_subregion_size,
--                                   &error_fatal);
--            /* This is a hack to make memory hotunplug work again. Once we have
--             * subdevices, we have to unparent them when unassigning memory,
--             * instead of doing it via the ref count of the MemoryRegion. */
--            object_ref(OBJECT(standby_ram));
--            object_unparent(OBJECT(standby_ram));
--            memory_region_add_subregion(sysmem, offset, standby_ram);
--        }
--        /* The specified subregion is no longer in standby */
--        mhd->standby_state_map[(assign_addr - mhd->padded_ram_size)
--                               / MEM_SECTION_SIZE] = 1;
--    }
--    sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_COMPLETION);
--}
--
--static void unassign_storage(SCLPDevice *sclp, SCCB *sccb)
--{
--    MemoryRegion *mr = NULL;
--    AssignStorage *assign_info = (AssignStorage *) sccb;
--    sclpMemoryHotplugDev *mhd = get_sclp_memory_hotplug_dev();
--    ram_addr_t unassign_addr;
--    MemoryRegion *sysmem = get_system_memory();
--
--    if (!mhd) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
--        return;
--    }
--    unassign_addr = (be16_to_cpu(assign_info->rn) - 1) * mhd->rzm;
--
--    /* if the addr is a multiple of 256 MB */
--    if ((unassign_addr % MEM_SECTION_SIZE == 0) &&
--        (unassign_addr >= mhd->padded_ram_size)) {
--        mhd->standby_state_map[(unassign_addr -
--                           mhd->padded_ram_size) / MEM_SECTION_SIZE] = 0;
--
--        /* find the specified memory region and destroy it */
--        mr = memory_region_find(sysmem, unassign_addr, 1).mr;
--        memory_region_unref(mr);
--        if (mr) {
--            int i;
--            int is_removable = 1;
--            ram_addr_t map_offset = (unassign_addr - mhd->padded_ram_size -
--                                     (unassign_addr - mhd->padded_ram_size)
--                                     % mhd->standby_subregion_size);
--            /* Mark all affected subregions as 'standby' once again */
--            for (i = 0;
--                 i < (mhd->standby_subregion_size / MEM_SECTION_SIZE);
--                 i++) {
--
--                if (mhd->standby_state_map[i + map_offset / MEM_SECTION_SIZE]) {
--                    is_removable = 0;
--                    break;
--                }
--            }
--            if (is_removable) {
--                memory_region_del_subregion(sysmem, mr);
--                object_unref(OBJECT(mr));
--            }
--        }
--    }
--    sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_COMPLETION);
--}
--
- /* Provide information about the CPU */
- static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
- {
-@@ -390,22 +168,6 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
-     case SCLP_CMDW_READ_CPU_INFO:
-         sclp_c->read_cpu_info(sclp, sccb);
-         break;
--    case SCLP_READ_STORAGE_ELEMENT_INFO:
--        if (code & 0xff00) {
--            sclp_c->read_storage_element1_info(sclp, sccb);
--        } else {
--            sclp_c->read_storage_element0_info(sclp, sccb);
--        }
--        break;
--    case SCLP_ATTACH_STORAGE_ELEMENT:
--        sclp_c->attach_storage_element(sclp, sccb, (code & 0xff00) >> 8);
--        break;
--    case SCLP_ASSIGN_STORAGE:
--        sclp_c->assign_storage(sclp, sccb);
--        break;
--    case SCLP_UNASSIGN_STORAGE:
--        sclp_c->unassign_storage(sclp, sccb);
--        break;
-     case SCLP_CMDW_CONFIGURE_IOA:
-         sclp_configure_io_adapter(sclp, sccb, true);
-         break;
-@@ -540,9 +302,6 @@ static void sclp_memory_init(SCLPDevice *sclp)
- {
-     MachineState *machine = MACHINE(qdev_get_machine());
-     ram_addr_t initial_mem = machine->ram_size;
--    ram_addr_t max_mem = machine->maxram_size;
--    ram_addr_t standby_mem = max_mem - initial_mem;
--    ram_addr_t pad_mem = 0;
-     int increment_size = 20;
- 
-     /* The storage increment size is a multiple of 1M and is a power of 2.
-@@ -552,34 +311,14 @@ static void sclp_memory_init(SCLPDevice *sclp)
-     while ((initial_mem >> increment_size) > MAX_STORAGE_INCREMENTS) {
-         increment_size++;
-     }
--    if (machine->ram_slots) {
--        while ((standby_mem >> increment_size) > MAX_STORAGE_INCREMENTS) {
--            increment_size++;
--        }
--    }
-     sclp->increment_size = increment_size;
- 
--    /* The core and standby memory areas need to be aligned with
--     * the increment size.  In effect, this can cause the
--     * user-specified memory size to be rounded down to align
--     * with the nearest increment boundary. */
-+    /* The core memory area needs to be aligned with the increment size.
-+     * In effect, this can cause the user-specified memory size to be rounded
-+     * down to align with the nearest increment boundary. */
-     initial_mem = initial_mem >> increment_size << increment_size;
--    standby_mem = standby_mem >> increment_size << increment_size;
--
--    /* If the size of ram is not on a MEM_SECTION_SIZE boundary,
--       calculate the pad size necessary to force this boundary. */
--    if (machine->ram_slots && standby_mem) {
--        sclpMemoryHotplugDev *mhd = init_sclp_memory_hotplug_dev();
- 
--        if (initial_mem % MEM_SECTION_SIZE) {
--            pad_mem = MEM_SECTION_SIZE - initial_mem % MEM_SECTION_SIZE;
--        }
--        mhd->increment_size = increment_size;
--        mhd->pad_size = pad_mem;
--        mhd->standby_mem_size = standby_mem;
--    }
-     machine->ram_size = initial_mem;
--    machine->maxram_size = initial_mem + pad_mem + standby_mem;
-     /* let's propagate the changed ram size into the global variable. */
-     ram_size = initial_mem;
- }
-@@ -613,11 +352,6 @@ static void sclp_class_init(ObjectClass *oc, void *data)
-     dc->user_creatable = false;
- 
-     sc->read_SCP_info = read_SCP_info;
--    sc->read_storage_element0_info = read_storage_element0_info;
--    sc->read_storage_element1_info = read_storage_element1_info;
--    sc->attach_storage_element = attach_storage_element;
--    sc->assign_storage = assign_storage;
--    sc->unassign_storage = unassign_storage;
-     sc->read_cpu_info = sclp_read_cpu_info;
-     sc->execute = sclp_execute;
-     sc->service_interrupt = service_interrupt;
-@@ -632,42 +366,8 @@ static TypeInfo sclp_info = {
-     .class_size = sizeof(SCLPDeviceClass),
- };
- 
--sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(void)
--{
--    DeviceState *dev;
--    dev = qdev_create(NULL, TYPE_SCLP_MEMORY_HOTPLUG_DEV);
--    object_property_add_child(qdev_get_machine(),
--                              TYPE_SCLP_MEMORY_HOTPLUG_DEV,
--                              OBJECT(dev), NULL);
--    qdev_init_nofail(dev);
--    return SCLP_MEMORY_HOTPLUG_DEV(object_resolve_path(
--                                   TYPE_SCLP_MEMORY_HOTPLUG_DEV, NULL));
--}
--
--sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void)
--{
--    return SCLP_MEMORY_HOTPLUG_DEV(object_resolve_path(
--                                   TYPE_SCLP_MEMORY_HOTPLUG_DEV, NULL));
--}
--
--static void sclp_memory_hotplug_dev_class_init(ObjectClass *klass,
--                                               void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--
--    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
--}
--
--static TypeInfo sclp_memory_hotplug_dev_info = {
--    .name = TYPE_SCLP_MEMORY_HOTPLUG_DEV,
--    .parent = TYPE_SYS_BUS_DEVICE,
--    .instance_size = sizeof(sclpMemoryHotplugDev),
--    .class_init = sclp_memory_hotplug_dev_class_init,
--};
--
- static void register_types(void)
- {
--    type_register_static(&sclp_memory_hotplug_dev_info);
-     type_register_static(&sclp_info);
- }
- type_init(register_types);
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index 847ff32f85..476cbf78f2 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -202,12 +202,6 @@ typedef struct SCLPDeviceClass {
-     /* private */
-     DeviceClass parent_class;
-     void (*read_SCP_info)(SCLPDevice *sclp, SCCB *sccb);
--    void (*read_storage_element0_info)(SCLPDevice *sclp, SCCB *sccb);
--    void (*read_storage_element1_info)(SCLPDevice *sclp, SCCB *sccb);
--    void (*attach_storage_element)(SCLPDevice *sclp, SCCB *sccb,
--                                   uint16_t element);
--    void (*assign_storage)(SCLPDevice *sclp, SCCB *sccb);
--    void (*unassign_storage)(SCLPDevice *sclp, SCCB *sccb);
-     void (*read_cpu_info)(SCLPDevice *sclp, SCCB *sccb);
- 
-     /* public */
-@@ -215,23 +209,6 @@ typedef struct SCLPDeviceClass {
-     void (*service_interrupt)(SCLPDevice *sclp, uint32_t sccb);
- } SCLPDeviceClass;
- 
--typedef struct sclpMemoryHotplugDev sclpMemoryHotplugDev;
--
--#define TYPE_SCLP_MEMORY_HOTPLUG_DEV "sclp-memory-hotplug-dev"
--#define SCLP_MEMORY_HOTPLUG_DEV(obj) \
--  OBJECT_CHECK(sclpMemoryHotplugDev, (obj), TYPE_SCLP_MEMORY_HOTPLUG_DEV)
--
--struct sclpMemoryHotplugDev {
--    SysBusDevice parent;
--    ram_addr_t standby_mem_size;
--    ram_addr_t padded_ram_size;
--    ram_addr_t pad_size;
--    ram_addr_t standby_subregion_size;
--    ram_addr_t rzm;
--    int increment_size;
--    char *standby_state_map;
--};
--
- static inline int sccb_data_len(SCCB *sccb)
- {
-     return be16_to_cpu(sccb->h.length) - sizeof(sccb->h);
-@@ -239,8 +216,6 @@ static inline int sccb_data_len(SCCB *sccb)
- 
- 
- void s390_sclp_init(void);
--sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(void);
--sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
- void sclp_service_interrupt(uint32_t sccb);
- void raise_irq_cpu_hotplug(void);
- int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 14abcada31..80a0b49116 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -627,7 +627,6 @@ QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
- #define SIGP_ORDER_MASK 0x000000ff
- 
- /* from s390-virtio-ccw */
--#define MEM_SECTION_SIZE             0x10000000UL
- #define MAX_AVAIL_SLOTS              32
- 
- /* machine check interruption code */
--- 
-2.14.3
+> }
+>=20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
