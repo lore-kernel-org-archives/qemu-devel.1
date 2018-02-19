@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1enrDJ-0000fZ-E2
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:35:02 -0500
+	(envelope-from <rth7680@gmail.com>) id 1enrEu-0001Qh-0b
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1enrDF-0000ir-Hi
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:35:01 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:39463)
+	(envelope-from <rth7680@gmail.com>) id 1enrEq-0001M2-4x
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:36:40 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:38580)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1enrDF-0000ia-Ao
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:34:57 -0500
-Received: by mail-pg0-x242.google.com with SMTP id w17so6232875pgv.6
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 11:34:57 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <1518751105-17211-1-git-send-email-cota@braap.org>
-	<1518751105-17211-2-git-send-email-cota@braap.org>
-	<f8f48954-e803-c8ba-9b84-5ebb68da006d@linaro.org>
-Message-ID: <c86f8b84-b056-0669-ef01-dc72e25d0efa@linaro.org>
-Date: Mon, 19 Feb 2018 11:34:52 -0800
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1enrEp-0001Lm-Uy
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:36:36 -0500
+Received: by mail-pf0-x244.google.com with SMTP id i3so2527600pfe.5
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 11:36:35 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1518663946-2326-1-git-send-email-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <15810185-a5ba-0493-362f-f701e2427c80@twiddle.net>
+Date: Mon, 19 Feb 2018 11:36:30 -0800
 MIME-Version: 1.0
-In-Reply-To: <f8f48954-e803-c8ba-9b84-5ebb68da006d@linaro.org>
+In-Reply-To: <1518663946-2326-1-git-send-email-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] translator: pass max_insns to tb_start
+Subject: Re: [Qemu-devel] [PATCH] target/hppa: use tb_cflags() to access
+ tb->cflags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +32,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-On 02/19/2018 11:31 AM, Richard Henderson wrote:
-> On 02/15/2018 07:18 PM, Emilio G. Cota wrote:
->> sh4 will need it.
->>
->> Signed-off-by: Emilio G. Cota <cota@braap.org>
->> ---
->>  accel/tcg/translator.c     | 2 +-
->>  include/exec/translator.h  | 3 ++-
->>  target/alpha/translate.c   | 3 ++-
->>  target/arm/translate-a64.c | 4 +++-
->>  target/arm/translate.c     | 4 +++-
->>  target/hppa/translate.c    | 4 +++-
->>  target/i386/translate.c    | 3 ++-
->>  7 files changed, 16 insertions(+), 7 deletions(-)
+On 02/14/2018 07:05 PM, Emilio G. Cota wrote:
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  target/hppa/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> There is another possibility, which is to move max_insns into DisasContextBase
-> where it can be modified.  This would allow the gusa sequence to be handled
-> differently as an instance of the translate_insn hook, which would allow a
-> breakpoint to be placed on the first insn of a gusa sequence.
-> 
-> I guess I don't have strong feelings either way.
+> diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+> index 6499b39..b4b74a8 100644
+> --- a/target/hppa/translate.c
+> +++ b/target/hppa/translate.c
+> @@ -2075,7 +2075,7 @@ static DisasJumpType trans_mfctl(DisasContext *ctx, uint32_t insn,
+>          /* FIXME: Respect PSW_S bit.  */
+>          nullify_over(ctx);
+>          tmp = dest_gpr(ctx, rt);
+> -        if (ctx->base.tb->cflags & CF_USE_ICOUNT) {
+> +        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
 
-Thinking some more, I *do* prefer max_insns in DisasContextBase.
-
-For ARM SVE, implementing MOVPRFX, I would like to be able to tell if we intend
-to break the TB between MOVPRFX and the instruction being prefixed.  I can't do
-that if the data is private to translator.c.
+Applied to tgt-hppa.  Thanks.
 
 
 r~
