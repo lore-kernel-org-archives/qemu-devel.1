@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1enhb1-0003Ii-Mk
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:18:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eni2T-0002uA-3F
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:47:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1enhb0-0004SC-Ea
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:18:51 -0500
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:39020)
+	(envelope-from <peter.maydell@linaro.org>) id 1eni2S-0006W0-9n
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:47:13 -0500
+Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:41639)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1enhb0-0004S1-8I
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:18:50 -0500
-Received: by mail-ot0-x229.google.com with SMTP id f18so7894302otf.6
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 01:18:50 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eni2S-0006Vh-49
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:47:12 -0500
+Received: by mail-oi0-x22d.google.com with SMTP id e10so3300453oiy.8
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 01:47:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180219085648.kgkeo36adbk2tp6g@sirius.home.kraxel.org>
-References: <CABLmASGFPBQV8y1Omm+S53P92Dew_aWBBbDoap+c2b2PVxeLzg@mail.gmail.com>
-	<ab4612a8-5c82-5abf-cbc3-d5ec47cd9498@tuxfamily.org>
-	<CABLmASFG_cT768zVJwKwrOAB=xhbhvzLa_wvJ4qjRkE6GoZvrA@mail.gmail.com>
-	<20180219085648.kgkeo36adbk2tp6g@sirius.home.kraxel.org>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Mon, 19 Feb 2018 10:18:49 +0100
-Message-ID: <CABLmASFgZaV3OgFMykpSi3Ok46+xQ+FW0GNTM+0-wgZyhh8qNw@mail.gmail.com>
+In-Reply-To: <20180216174640.21765-1-dgilbert@redhat.com>
+References: <20180216174640.21765-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Feb 2018 09:46:50 +0000
+Message-ID: <CAFEAcA96Edf=LmVrg1PBcM=xSEZcHVvb=0AZ_AMfWfs4gGY_TQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu SDL2 bug
+Subject: Re: [Qemu-devel] [PULL 0/2] hmp queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <huth@tuxfamily.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, t.pagef.lt@gmail.com
 
-On Mon, Feb 19, 2018 at 9:56 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> On Mon, Feb 19, 2018 at 08:58:51AM +0100, Howard Spoelstra wrote:
->> On Mon, Feb 19, 2018 at 8:09 AM, Thomas Huth <huth@tuxfamily.org> wrote:
->> > On 18.02.2018 11:11, Howard Spoelstra wrote:
->> >> Hi,
->> >>
->> >> I'd like to report a bug when using the SDL2 GUI in both Linux and
->> >> Windows, which can be observed with in my case latest qemu-system-ppc
->> >> running parallel instances of OSX 10.4 and 10.3.
->> >>
->> >> After switching back and forth between GUIs, dragging becomes copying,
->> >> keyboard starts using a strange character set.
->> >> An additional "Alt" key press is needed to restore normal behaviour.
->> >
->> >  Hi,
->> >
->> > how do you switch back and forth between GUIs? Using the mouse or a
->> > keystroke? I guess the latter ... sounds like the Alt key could be
->> > "stuck" in the guest?
->> >
->> >  Thomas
->>
->> Hi,
->>
->> With SDL, unlike GTK, the mouse does not move outside the window. So I
->> have to use Ctrl-Alt-G to release focus and then click in the other
->> window. After two switches the reported issue occurs. Indeed, the Alt
->> key seems to go into a state in which it is stuck. When trying to
->> exclude my own keyboard being at fault, I've also noticed the right
->> Alt key on my keyboard cannot be used for the release.
+On 16 February 2018 at 17:46, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Which qemu version?  There have been a bunch of SDL2 fixes in the 2.12
-> devel cycle already, so if you are on 2.11 still please try git master
-> and see whenever that improves things.
+> The following changes since commit 5e8d6a12d643a38b82a0a713a77d1192117dbdca:
 >
-> cheers,
->   Gerd
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180216-pull-request' into staging (2018-02-16 15:55:45 +0000)
 >
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-hmp-20180216
+>
+> for you to fetch changes up to bf67f1c0b16c0de43b8a10cb53808dd62b0cdc04:
+>
+>   monitor.c: Fix infinite loop in monitor's auto-complete (2018-02-16 17:36:16 +0000)
+>
+> ----------------------------------------------------------------
+> HMP pull 2018-02-16
+>
+> ----------------------------------------------------------------
+> Dr. David Alan Gilbert (1):
+>       monitor.c: Fix infinite loop in monitor's auto-complete
+>
+> Thomas Huth (1):
+>       monitor: Remove legacy "-mon default=on" parameter
 
-Hi.
+Applied, thanks.
 
-This was with my own qemu master builds as of yesterday.
-
-Best,
-Howard
+-- PMM
