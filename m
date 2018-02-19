@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eniDb-0006ZF-Mn
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:58:44 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eniN4-0000pZ-BD
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 05:08:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eniDY-0003RU-JE
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:58:43 -0500
-References: <1518824446-20235-1-git-send-email-cota@braap.org>
-	<1518824446-20235-2-git-send-email-cota@braap.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <143c1ee0-2315-388d-26a3-d4f96a4f3bb9@redhat.com>
-Date: Mon, 19 Feb 2018 10:58:24 +0100
-MIME-Version: 1.0
-In-Reply-To: <1518824446-20235-2-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/s390x: convert to DisasJumpType
+	(envelope-from <cohuck@redhat.com>) id 1eniN1-0001ID-3n
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 05:08:30 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35422 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eniN0-0001HH-Vj
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 05:08:27 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 19 Feb 2018 11:08:11 +0100
+Message-Id: <20180219100812.12860-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] stable process documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +21,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
->      switch (status) {
-> -    case EXIT_GOTO_TB:
-> -    case EXIT_NORETURN:
-> +    case DISAS_GOTO_TB:
-> +    case DISAS_NORETURN:
->          break;
-> -    case EXIT_PC_STALE:
-> -    case EXIT_PC_STALE_NOCHAIN:
-> +    case DISAS_TOO_MANY:
-> +    case DISAS_PC_STALE:
-> +    case DISAS_PC_STALE_NOCHAIN:
->          update_psw_addr(&dc);
+The following changes since commit e5ecc287a7bd24a1364e23e263cb60cfc8d21eb5:
 
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20180216' into staging (2018-02-16 18:39:05 +0000)
 
-Not sure if this is really the right thing to do for DISAS_TOO_MANY but
-it seems to work for now :)
+are available in the git repository at:
 
->          /* FALLTHRU */
-> -    case EXIT_PC_UPDATED:
-> +    case DISAS_PC_UPDATED:
->          /* Next TB starts off with CC_OP_DYNAMIC, so make sure the
->             cc op type is in env */
->          update_cc_op(&dc);
->          /* FALLTHRU */
-> -    case EXIT_PC_CC_UPDATED:
-> +    case DISAS_PC_CC_UPDATED:
->          /* Exit the TB, either by raising a debug exception or by retu=
-rn.  */
->          if (do_debug) {
->              gen_exception(EXCP_DEBUG);
-> -        } else if (use_exit_tb(&dc) || status =3D=3D EXIT_PC_STALE_NOC=
-HAIN) {
-> +        } else if (use_exit_tb(&dc) || status =3D=3D DISAS_PC_STALE_NO=
-CHAIN) {
->              tcg_gen_exit_tb(0);
->          } else {
->              tcg_gen_lookup_and_goto_ptr();
->=20
+  git://github.com/cohuck/qemu tags/stable-doc-20180219
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+for you to fetch changes up to 7aa54229cfd24935d5d7bcc48534fe01934f3f52:
 
---=20
+  docs: document our stable process (2018-02-19 10:51:16 +0100)
 
-Thanks,
+----------------------------------------------------------------
+Add some doc for the stable process.
 
-David / dhildenb
+----------------------------------------------------------------
+
+Cornelia Huck (1):
+  docs: document our stable process
+
+ docs/devel/stable-process.rst | 69 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
+ create mode 100644 docs/devel/stable-process.rst
+
+-- 
+2.13.6
