@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1enowA-0003U0-Mh
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:09:11 -0500
+	(envelope-from <laurent@vivier.eu>) id 1enoxq-0004tp-0H
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1enow7-0003vn-BW
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:09:10 -0500
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44059)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1enow7-0003vS-4o
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:09:07 -0500
-Received: by mail-pl0-x242.google.com with SMTP id w21so5928127plp.11
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:09:07 -0800 (PST)
-References: <1518824446-20235-1-git-send-email-cota@braap.org>
-	<1518824446-20235-2-git-send-email-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4aa94d2a-a548-76b0-79a3-2cbaf8306596@linaro.org>
-Date: Mon, 19 Feb 2018 09:09:02 -0800
+	(envelope-from <laurent@vivier.eu>) id 1enoxm-0005QF-K4
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:53 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:51455)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1enoxm-0005PG-8w
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:50 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 19 Feb 2018 18:10:29 +0100
+Message-Id: <20180219171037.24539-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <1518824446-20235-2-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/s390x: convert to DisasJumpType
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/8] Linux user for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +24,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On 02/16/2018 03:40 PM, Emilio G. Cota wrote:
-> The only non-trivial modification is the use of DISAS_TOO_MANY
-> in the same way is used by the generic translation loop.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/s390x/translate.c | 1267 +++++++++++++++++++++++-----------------------
->  1 file changed, 632 insertions(+), 635 deletions(-)
+The following changes since commit f0fa81767555fe2c4b5f8c9e0725a80eac1d7f56:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+  cuda.h: Fix multiple typedef (2018-02-16 18:38:21 +0000)
 
+are available in the Git repository at:
 
-r~
+  git://github.com/vivier/qemu.git tags/linux-user-for-2.12-pull-request
+
+for you to fetch changes up to f352a021329f73d0219018cdfb39369687e8cadd:
+
+  linux-user: MIPS set cpu to r6 CPU if binary is R6 (2018-02-18 18:52:32 +0100)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Andreas Schwab (1):
+  linux-user: Implement ioctl cmd TIOCGPTPEER
+
+Guido Günther (1):
+  linux-user: Fix register used for 6th and 7th syscall argument on
+    aarch64
+
+Laurent Vivier (2):
+  linux-user: Move CPU type name selection to a function
+  linux-user, m68k: select CPU according to ELF header values
+
+Peter Maydell (1):
+  linux-user: Remove THREAD macro
+
+Samuel Thibault (1):
+  linux-user: Fix sched_getaffinity mask size
+
+YunQiang Su (2):
+  linux-user: introduce functions to detect CPU type
+  linux-user: MIPS set cpu to r6 CPU if binary is R6
+
+ include/elf.h                              | 32 ++++++++++++++++
+ linux-user/aarch64/target_elf.h            | 14 +++++++
+ linux-user/aarch64/termbits.h              |  2 +
+ linux-user/alpha/target_elf.h              | 14 +++++++
+ linux-user/alpha/termbits.h                |  1 +
+ linux-user/arm/target_elf.h                | 14 +++++++
+ linux-user/arm/termbits.h                  |  1 +
+ linux-user/cris/target_elf.h               | 14 +++++++
+ linux-user/cris/termbits.h                 |  1 +
+ linux-user/elfload.c                       | 35 +++++++++++++++++
+ linux-user/host/aarch64/safe-syscall.inc.S |  6 +--
+ linux-user/hppa/target_elf.h               | 14 +++++++
+ linux-user/hppa/termbits.h                 |  2 +
+ linux-user/i386/target_elf.h               | 14 +++++++
+ linux-user/i386/termbits.h                 |  1 +
+ linux-user/ioctls.h                        |  3 ++
+ linux-user/m68k/target_elf.h               | 20 ++++++++++
+ linux-user/m68k/termbits.h                 |  1 +
+ linux-user/main.c                          | 61 ++++++------------------------
+ linux-user/microblaze/target_elf.h         | 14 +++++++
+ linux-user/microblaze/termbits.h           |  1 +
+ linux-user/mips/target_elf.h               | 17 +++++++++
+ linux-user/mips/termbits.h                 |  1 +
+ linux-user/mips64/target_elf.h             | 17 +++++++++
+ linux-user/nios2/target_elf.h              | 14 +++++++
+ linux-user/nios2/termbits.h                |  2 +
+ linux-user/openrisc/target_elf.h           | 14 +++++++
+ linux-user/openrisc/termbits.h             |  2 +
+ linux-user/ppc/target_elf.h                | 18 +++++++++
+ linux-user/ppc/termbits.h                  |  1 +
+ linux-user/qemu.h                          |  5 +--
+ linux-user/s390x/target_elf.h              | 14 +++++++
+ linux-user/s390x/termbits.h                |  1 +
+ linux-user/sh4/target_elf.h                | 14 +++++++
+ linux-user/sh4/termbits.h                  |  1 +
+ linux-user/sparc/target_elf.h              | 14 +++++++
+ linux-user/sparc/termbits.h                |  1 +
+ linux-user/sparc64/target_elf.h            | 14 +++++++
+ linux-user/sparc64/termbits.h              |  1 +
+ linux-user/syscall.c                       | 13 ++++++-
+ linux-user/tilegx/target_elf.h             | 14 +++++++
+ linux-user/tilegx/termbits.h               |  1 +
+ linux-user/unicore32/target_elf.h          | 14 +++++++
+ linux-user/x86_64/target_elf.h             | 14 +++++++
+ linux-user/x86_64/termbits.h               |  1 +
+ 45 files changed, 417 insertions(+), 56 deletions(-)
+ create mode 100644 linux-user/aarch64/target_elf.h
+ create mode 100644 linux-user/alpha/target_elf.h
+ create mode 100644 linux-user/arm/target_elf.h
+ create mode 100644 linux-user/cris/target_elf.h
+ create mode 100644 linux-user/hppa/target_elf.h
+ create mode 100644 linux-user/i386/target_elf.h
+ create mode 100644 linux-user/m68k/target_elf.h
+ create mode 100644 linux-user/microblaze/target_elf.h
+ create mode 100644 linux-user/mips/target_elf.h
+ create mode 100644 linux-user/mips64/target_elf.h
+ create mode 100644 linux-user/nios2/target_elf.h
+ create mode 100644 linux-user/openrisc/target_elf.h
+ create mode 100644 linux-user/ppc/target_elf.h
+ create mode 100644 linux-user/s390x/target_elf.h
+ create mode 100644 linux-user/sh4/target_elf.h
+ create mode 100644 linux-user/sparc/target_elf.h
+ create mode 100644 linux-user/sparc64/target_elf.h
+ create mode 100644 linux-user/tilegx/target_elf.h
+ create mode 100644 linux-user/unicore32/target_elf.h
+ create mode 100644 linux-user/x86_64/target_elf.h
+
+-- 
+2.14.3
