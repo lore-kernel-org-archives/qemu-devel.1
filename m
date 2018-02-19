@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1enjSo-00048s-FQ
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 06:18:31 -0500
+	(envelope-from <marcel@redhat.com>) id 1enjrM-00054u-9K
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 06:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1enjSn-0005gk-II
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 06:18:30 -0500
-Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:41060)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1enjSn-0005gQ-Dg
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 06:18:29 -0500
-Received: by mail-ot0-x235.google.com with SMTP id w38so8153485ota.8
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 03:18:29 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180219100812.12860-1-cohuck@redhat.com>
-References: <20180219100812.12860-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Feb 2018 11:18:08 +0000
-Message-ID: <CAFEAcA_wNaeZEZcT-pijkHhcZOzTx8mRDqZMUTRv8Pw84X1fwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] stable process documentation
+	(envelope-from <marcel@redhat.com>) id 1enjrJ-0002YB-Le
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 06:43:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40052 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1enjrJ-0002Y1-Ft
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 06:43:49 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Mon, 19 Feb 2018 13:43:25 +0200
+Message-Id: <20180219114332.70443-4-marcel@redhat.com>
+In-Reply-To: <20180219114332.70443-1-marcel@redhat.com>
+References: <20180219114332.70443-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH PULL v2 03/10] scripts/update-linux-headers:
+ import pvrdma headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, yuval.shaia@oracle.com, marcel@redhat.com
 
-On 19 February 2018 at 10:08, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit e5ecc287a7bd24a1364e23e263cb60cfc8d21eb5:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20180216' into staging (2018-02-16 18:39:05 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/cohuck/qemu tags/stable-doc-20180219
->
-> for you to fetch changes up to 7aa54229cfd24935d5d7bcc48534fe01934f3f52:
->
->   docs: document our stable process (2018-02-19 10:51:16 +0100)
->
-> ----------------------------------------------------------------
-> Add some doc for the stable process.
->
-> ----------------------------------------------------------------
->
-> Cornelia Huck (1):
->   docs: document our stable process
->
->  docs/devel/stable-process.rst | 69 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 69 insertions(+)
->  create mode 100644 docs/devel/stable-process.rst
->
+Modify the script to import the headers used by the pvrdma device.
+Part of them are interfaces between the guest driver and the device,
+import them under include/standart-headers/drivers/infiniband/... .
 
+Remove the unused functions from pvrdma_verbs.h avoiding the
+unnecessary import of several infiniband/networking/other headers.
 
-Applied, thanks.
+Reviewed-by: Gal Hammer <ghammer@redhat.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+---
+ scripts/update-linux-headers.sh | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
--- PMM
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 135a10d96a..be065704df 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -38,6 +38,7 @@ cp_portable() {
+                                      -e 'linux/if_ether' \
+                                      -e 'input-event-codes' \
+                                      -e 'sys/' \
++                                     -e 'pvrdma_verbs' \
+                                      > /dev/null
+     then
+         echo "Unexpected #include in input file $f".
+@@ -46,6 +47,7 @@ cp_portable() {
+ 
+     header=$(basename "$f");
+     sed -e 's/__u\([0-9][0-9]*\)/uint\1_t/g' \
++        -e 's/u\([0-9][0-9]*\)/uint\1_t/g' \
+         -e 's/__s\([0-9][0-9]*\)/int\1_t/g' \
+         -e 's/__le\([0-9][0-9]*\)/uint\1_t/g' \
+         -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
+@@ -56,6 +58,7 @@ cp_portable() {
+         -e 's/__inline__/inline/' \
+         -e '/sys\/ioctl.h/d' \
+         -e 's/SW_MAX/SW_MAX_/' \
++        -e 's/atomic_t/int/' \
+         "$f" > "$to/$header";
+ }
+ 
+@@ -147,6 +150,33 @@ for i in "$tmpdir"/include/linux/*virtio*.h "$tmpdir/include/linux/input.h" \
+     cp_portable "$i" "$output/include/standard-headers/linux"
+ done
+ 
++rm -rf "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma"
++mkdir -p "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma"
++
++# Remove the unused functions from pvrdma_verbs.h avoiding the unnecessary
++# import of several infiniband/networking/other headers
++tmp_pvrdma_verbs="$tmpdir/pvrdma_verbs.h"
++# Parse the entire file instead of single lines to match
++# function declarations expanding over multiple lines
++# and strip the declarations starting with pvrdma prefix.
++sed  -e '1h;2,$H;$!d;g'  -e 's/[^};]*pvrdma[^(| ]*([^)]*);//g' \
++    "$linux/drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h" > \
++    "$tmp_pvrdma_verbs";
++
++for i in "$linux/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h" \
++         "$linux/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h" \
++         "$tmp_pvrdma_verbs"; do \
++    cp_portable "$i" \
++         "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/"
++done
++
++rm -rf "$output/include/standard-headers/rdma/"
++mkdir -p "$output/include/standard-headers/rdma/"
++for i in "$tmpdir/include/rdma/vmw_pvrdma-abi.h"; do
++    cp_portable "$i" \
++         "$output/include/standard-headers/rdma/"
++done
++
+ cat <<EOF >$output/include/standard-headers/linux/types.h
+ /* For QEMU all types are already defined via osdep.h, so this
+  * header does not need to do anything.
+-- 
+2.13.5
