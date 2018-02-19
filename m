@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHX-0002KH-F0
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHY-0002LP-GD
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHV-0003SD-Ar
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45650)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1enrHU-0003Qk-Jl
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39756)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1enrHV-0003QZ-1z
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:21 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	id 1enrHU-0003Pf-Bb
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 14:39:20 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1JJcuI2106727
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 14:39:20 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g7wp63ryt-1
+	w1JJd0uB136510
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 14:39:19 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g80r1k6kt-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 14:39:19 -0500
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 19 Feb 2018 12:39:19 -0700
+	Mon, 19 Feb 2018 12:39:18 -0700
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180211093607.27351-21-armbru@redhat.com>
+In-Reply-To: <20180211093607.27351-26-armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-21-armbru@redhat.com>
-Date: Mon, 19 Feb 2018 13:30:47 -0600
-Message-Id: <151906864738.12376.15342930198076328876@sif>
-Subject: Re: [Qemu-devel] [PATCH v2 20/29] qapi/types qapi/visit: Generate
- built-in stuff into separate files
+	<20180211093607.27351-26-armbru@redhat.com>
+Date: Mon, 19 Feb 2018 13:33:49 -0600
+Message-Id: <151906882920.12376.9104203813206448298@sif>
+Subject: Re: [Qemu-devel] [PATCH v2 25/29] docs/devel/writing-qmp-commands:
+ Update for modular QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,38 +45,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com
 
-Quoting Markus Armbruster (2018-02-11 03:35:58)
-> Linking code from multiple separate QAPI schemata into the same
-> program is possible, but involves some weirdness around built-in
-> types:
-> =
-
-> * We generate code for built-in types into .c only with option
->   --builtins.  The user is responsible for generating code for exactly
->   one QAPI schema per program with --builtins.
-> =
-
-> * We generate code for built-in types into .h regardless of
->   --builtins, but guarded by #ifndef QAPI_VISIT_BUILTIN.  Because all
->   copies of this code are exactly the same, including any combination
->   of these headers works.
-> =
-
-> Replace this contraption by something more conventional: generate code
-> for built-in types into their very own files: qapi-builtin-types.c,
-> qapi-builtin-visit.c, qapi-builtin-types.h, qapi-builtin-visit.h, but
-> only with --builtins.  Obey --output-dir, but ignore --prefix for
-> them.
-> =
-
-> Make qapi-types.h include qapi-builtin-types.h.  With multiple
-> schemata you now have multiple qapi-types.[ch], but only one
-> qapi-builtin-types.[ch].  Same for qapi-visit.[ch] and
-> qapi-builtin-visit.[ch].
-> =
-
-> Bonus: if all you need is built-in stuff, you can include a much
-> smaller header.  To be exploited shortly.
+Quoting Markus Armbruster (2018-02-11 03:36:03)
+> With modular code generation, putting stuff right into
+> qapi-schema.json is a bad idea.  Update writing-qmp-commands.txt
+> accordingly.
 > =
 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
@@ -84,405 +56,75 @@ Quoting Markus Armbruster (2018-02-11 03:35:58)
 Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
 > ---
->  .gitignore             |  2 ++
->  Makefile               | 13 ++++++----
->  Makefile.objs          |  2 ++
->  scripts/qapi/common.py | 61 ++++++++++++++++++++++++++++++++++++++++----=
----
->  scripts/qapi/types.py  | 61 +++++++++++++++++++-------------------------=
----
->  scripts/qapi/visit.py  | 64 +++++++++++++++++++++-----------------------=
-------
->  6 files changed, 116 insertions(+), 87 deletions(-)
+>  docs/devel/writing-qmp-commands.txt | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > =
 
-> diff --git a/.gitignore b/.gitignore
-> index 7d783e6e66..9477a08b6b 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -29,6 +29,8 @@
->  /qga/qapi-generated
->  /qapi-generated
->  /qapi-gen-timestamp
-> +/qapi-builtin-types.[ch]
-> +/qapi-builtin-visit.[ch]
->  /qapi-types.[ch]
->  /qapi-visit.[ch]
->  /qapi-event.[ch]
-> diff --git a/Makefile b/Makefile
-> index 164a38578e..60ddc9c945 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -90,10 +90,13 @@ endif
->  include $(SRC_PATH)/rules.mak
+> diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp=
+-commands.txt
+> index 4f5b24c0c4..776b3b41ca 100644
+> --- a/docs/devel/writing-qmp-commands.txt
+> +++ b/docs/devel/writing-qmp-commands.txt
+> @@ -15,8 +15,8 @@ start with docs/interop/qmp-intro.txt.
+>  Generally speaking, the following steps should be taken in order to writ=
+e a
+>  new QMP command.
 > =
 
->  GENERATED_FILES =3D qemu-version.h config-host.h qemu-options.def
-> -GENERATED_FILES +=3D qmp-commands.h qapi-types.h qapi-visit.h qapi-event=
-.h
-> -GENERATED_FILES +=3D qmp-commands.c qapi-types.c qapi-visit.c qapi-event=
-.c
-> -GENERATED_FILES +=3D qmp-introspect.h
-> -GENERATED_FILES +=3D qmp-introspect.c
-> +GENERATED_FILES +=3D qapi-builtin-types.h qapi-builtin-types.c
-> +GENERATED_FILES +=3D qapi-types.h qapi-types.c
-> +GENERATED_FILES +=3D qapi-builtin-visit.h qapi-builtin-visit.c
-> +GENERATED_FILES +=3D qapi-visit.h qapi-visit.c
-> +GENERATED_FILES +=3D qmp-commands.h qmp-commands.c
-> +GENERATED_FILES +=3D qapi-event.h qapi-event.c
-> +GENERATED_FILES +=3D qmp-introspect.c qmp-introspect.h
->  GENERATED_FILES +=3D qapi-doc.texi
+> -1. Write the command's and type(s) specification in the QAPI schema file
+> -   (qapi-schema.json in the root source directory)
+> +1. Define the command and any types it needs in the appropriate QAPI
+> +   schema module.
 > =
 
->  GENERATED_FILES +=3D trace/generated-tcg-tracers.h
-> @@ -520,7 +523,9 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
-ATH)/qapi/common.json \
->                 $(SRC_PATH)/qapi/transaction.json \
->                 $(SRC_PATH)/qapi/ui.json
+>  2. Write the QMP command itself, which is a regular C function. Preferab=
+ly,
+>     the command should be exported by some QEMU subsystem. But it can als=
+o be
+> @@ -88,8 +88,9 @@ command carries some meaningful action in QEMU but here=
+ it will just print
+>  Our command will be called "hello-world". It takes no arguments, nor doe=
+s it
+>  return any data.
 > =
 
-> +qapi-builtin-types.c qapi-builtin-types.h \
->  qapi-types.c qapi-types.h \
-> +qapi-builtin-visit.c qapi-builtin-visit.h \
->  qapi-visit.c qapi-visit.h \
->  qmp-commands.h qmp-commands.c \
->  qapi-event.c qapi-event.h \
-> diff --git a/Makefile.objs b/Makefile.objs
-> index d255aaf194..2813e984fd 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -2,6 +2,8 @@
->  # Common libraries for tools and emulators
->  stub-obj-y =3D stubs/ crypto/
->  util-obj-y =3D util/ qobject/ qapi/
-> +util-obj-y +=3D qapi-builtin-types.o
-> +util-obj-y +=3D qapi-builtin-visit.o
->  util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
+> -The first step is to add the following line to the bottom of the
+> -qapi-schema.json file:
+> +The first step is defining the command in the appropriate QAPI schema
+> +module.  We pick module qapi/misc.json, and add the following line at
+> +the bottom:
 > =
 
->  chardev-obj-y =3D chardev/
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 31d2f73e7e..de12f8469a 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -1531,11 +1531,10 @@ class QAPISchema(object):
+>  { 'command': 'hello-world' }
 > =
 
->      def _def_builtin_type(self, name, json_type, c_type):
->          self._def_entity(QAPISchemaBuiltinType(name, json_type, c_type))
-> -        # TODO As long as we have QAPI_TYPES_BUILTIN to share multiple
-> -        # qapi-types.h from a single .c, all arrays of builtins must be
-> -        # declared in the first file whether or not they are used.  Nicer
-> -        # would be to use lazy instantiation, while figuring out how to
-> -        # avoid compilation issues with multiple qapi-types.h.
-> +        # Instantiating only the arrays that are actually used would
-> +        # be nice, but we can't as long as their generated code
-> +        # (qapi-builtin-types.[ch]) may be shared by some other
-> +        # schema.
->          self._make_array_type(name, None)
+> @@ -245,7 +246,7 @@ This is very important. No QMP command will be accept=
+ed in QEMU without proper
+>  documentation.
 > =
 
->      def _def_predefineds(self):
-> @@ -1992,14 +1991,15 @@ class QAPIGen(object):
->          return ''
+>  There are many examples of such documentation in the schema file already=
+, but
+> -here goes "hello-world"'s new entry for the qapi-schema.json file:
+> +here goes "hello-world"'s new entry for qapi/misc.json:
 > =
 
->      def write(self, output_dir, fname):
-> -        if output_dir:
-> +        pathname =3D os.path.join(output_dir, fname)
-> +        dir =3D os.path.dirname(pathname)
-> +        if dir:
->              try:
-> -                os.makedirs(output_dir)
-> +                os.makedirs(dir)
->              except os.error as e:
->                  if e.errno !=3D errno.EEXIST:
->                      raise
-> -        fd =3D os.open(os.path.join(output_dir, fname),
-> -                     os.O_RDWR | os.O_CREAT, 0666)
-> +        fd =3D os.open(pathname, os.O_RDWR | os.O_CREAT, 0666)
->          f =3D os.fdopen(fd, 'r+')
->          text =3D (self._top(fname) + self._preamble + self._body
->                  + self._bottom(fname))
-> @@ -2046,6 +2046,7 @@ class QAPIGenH(QAPIGenC):
+>  ##
+>  # @hello-world
+> @@ -425,8 +426,7 @@ There are a number of things to be noticed:
+>     allocated by the implementation. This is so because the QAPI also gen=
+erates
+>     a function to free its types and it cannot distinguish between dynami=
+cally
+>     or statically allocated strings
+> -6. You have to include the "qmp-commands.h" header file in qemu-timer.c,
+> -   otherwise qemu won't build
+> +6. You have to include "qapi/qmp-commands-misc.h" in qemu-timer.c
 > =
 
-> =
-
->  class QAPIGenDoc(QAPIGen):
-> +
->      def _top(self, fname):
->          return (QAPIGen._top(self, fname)
->                  + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
-> @@ -2062,3 +2063,45 @@ class QAPISchemaMonolithicCVisitor(QAPISchemaVisit=
-or):
->      def write(self, output_dir):
->          self._genc.write(output_dir, self._prefix + self._what + '.c')
->          self._genh.write(output_dir, self._prefix + self._what + '.h')
-> +
-> +
-> +class QAPISchemaModularCVisitor(QAPISchemaVisitor):
-> +
-> +    def __init__(self, prefix, what, blurb, pydoc):
-> +        self._prefix =3D prefix
-> +        self._what =3D what
-> +        self._blurb =3D blurb
-> +        self._pydoc =3D pydoc
-> +        self._module =3D {}
-> +
-> +    def _module_basename(self, what, name):
-> +        if name is None:
-> +            return re.sub(r'-', '-builtin-', what)
-> +        return self._prefix + what
-> +
-> +    def _add_module(self, name, blurb):
-> +        genc =3D QAPIGenC(blurb, self._pydoc)
-> +        genh =3D QAPIGenH(blurb, self._pydoc)
-> +        self._module[name] =3D (genc, genh)
-> +        self._set_module(name)
-> +
-> +    def _set_module(self, name):
-> +        self._genc, self._genh =3D self._module[name]
-> +
-> +    def write(self, output_dir, opt_builtins):
-> +        for name in self._module:
-> +            if name is None and not opt_builtins:
-> +                continue
-> +            basename =3D self._module_basename(self._what, name)
-> +            (genc, genh) =3D self._module[name]
-> +            genc.write(output_dir, basename + '.c')
-> +            genh.write(output_dir, basename + '.h')
-> +
-> +    def _begin_module(self, name):
-> +        pass
-> +
-> +    def visit_module(self, name):
-> +        if len(self._module) !=3D 1:
-> +            return
-> +        self._add_module(name, self._blurb)
-> +        self._begin_module(name)
-> diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-> index d2b8423479..59826b1162 100644
-> --- a/scripts/qapi/types.py
-> +++ b/scripts/qapi/types.py
-> @@ -167,64 +167,51 @@ void qapi_free_%(c_name)s(%(c_name)s *obj)
->      return ret
-> =
-
-> =
-
-> -class QAPISchemaGenTypeVisitor(QAPISchemaMonolithicCVisitor):
-> +class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
-> =
-
-> -    def __init__(self, prefix, opt_builtins):
-> -        QAPISchemaMonolithicCVisitor.__init__(
-> +    def __init__(self, prefix):
-> +        QAPISchemaModularCVisitor.__init__(
->              self, prefix, 'qapi-types', ' * Schema-defined QAPI types',
->              __doc__)
-> -        self._opt_builtins =3D opt_builtins
-> +        self._add_module(None, ' * Built-in QAPI types')
-> +        self._genc.preamble_add(mcgen('''
-> +#include "qemu/osdep.h"
-> +#include "qapi/dealloc-visitor.h"
-> +#include "qapi-builtin-types.h"
-> +#include "qapi-builtin-visit.h"
-> +'''))
-> +        self._genh.preamble_add(mcgen('''
-> +#include "qapi/util.h"
-> +'''))
-> +
-> +    def _begin_module(self, name):
->          self._genc.preamble_add(mcgen('''
->  #include "qemu/osdep.h"
->  #include "qapi/dealloc-visitor.h"
->  #include "%(prefix)sqapi-types.h"
->  #include "%(prefix)sqapi-visit.h"
->  ''',
-> -                                      prefix=3Dprefix))
-> +                                      prefix=3Dself._prefix))
->          self._genh.preamble_add(mcgen('''
-> -#include "qapi/util.h"
-> +#include "qapi-builtin-types.h"
->  '''))
-> -        self._btin =3D '\n' + guardstart('QAPI_TYPES_BUILTIN')
-> =
-
->      def visit_begin(self, schema):
->          # gen_object() is recursive, ensure it doesn't visit the empty t=
-ype
->          objects_seen.add(schema.the_empty_object_type.name)
-> =
-
-> -    def visit_end(self):
-> -        # To avoid header dependency hell, we always generate
-> -        # declarations for built-in types in our header files and
-> -        # simply guard them.  See also opt_builtins (command line
-> -        # option -b).
-> -        self._btin +=3D guardend('QAPI_TYPES_BUILTIN')
-> -        self._genh.preamble_add(self._btin)
-> -        self._btin =3D None
-> -
->      def _gen_type_cleanup(self, name):
->          self._genh.add(gen_type_cleanup_decl(name))
->          self._genc.add(gen_type_cleanup(name))
-> =
-
->      def visit_enum_type(self, name, info, values, prefix):
-> -        # Special case for our lone builtin enum type
-> -        # TODO use something cleaner than existence of info
-> -        if not info:
-> -            self._btin +=3D gen_enum(name, values, prefix)
-> -            if self._opt_builtins:
-> -                self._genc.add(gen_enum_lookup(name, values, prefix))
-> -        else:
-> -            self._genh.preamble_add(gen_enum(name, values, prefix))
-> -            self._genc.add(gen_enum_lookup(name, values, prefix))
-> +        self._genh.preamble_add(gen_enum(name, values, prefix))
-> +        self._genc.add(gen_enum_lookup(name, values, prefix))
-> =
-
->      def visit_array_type(self, name, info, element_type):
-> -        if isinstance(element_type, QAPISchemaBuiltinType):
-> -            self._btin +=3D gen_fwd_object_or_array(name)
-> -            self._btin +=3D gen_array(name, element_type)
-> -            self._btin +=3D gen_type_cleanup_decl(name)
-> -            if self._opt_builtins:
-> -                self._genc.add(gen_type_cleanup(name))
-> -        else:
-> -            self._genh.preamble_add(gen_fwd_object_or_array(name))
-> -            self._genh.add(gen_array(name, element_type))
-> -            self._gen_type_cleanup(name)
-> +        self._genh.preamble_add(gen_fwd_object_or_array(name))
-> +        self._genh.add(gen_array(name, element_type))
-> +        self._gen_type_cleanup(name)
-> =
-
->      def visit_object_type(self, name, info, base, members, variants):
->          # Nothing to do for the special empty builtin
-> @@ -248,6 +235,6 @@ class QAPISchemaGenTypeVisitor(QAPISchemaMonolithicCV=
-isitor):
-> =
-
-> =
-
->  def gen_types(schema, output_dir, prefix, opt_builtins):
-> -    vis =3D QAPISchemaGenTypeVisitor(prefix, opt_builtins)
-> +    vis =3D QAPISchemaGenTypeVisitor(prefix)
->      schema.visit(vis)
-> -    vis.write(output_dir)
-> +    vis.write(output_dir, opt_builtins)
-> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-> index 3d09d44265..9b678e7263 100644
-> --- a/scripts/qapi/visit.py
-> +++ b/scripts/qapi/visit.py
-> @@ -263,13 +263,27 @@ out:
->                   c_name=3Dc_name(name))
-> =
-
-> =
-
-> -class QAPISchemaGenVisitVisitor(QAPISchemaMonolithicCVisitor):
-> +class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisitor):
-> =
-
-> -    def __init__(self, prefix, opt_builtins):
-> -        QAPISchemaMonolithicCVisitor.__init__(
-> +    def __init__(self, prefix):
-> +        QAPISchemaModularCVisitor.__init__(
->              self, prefix, 'qapi-visit', ' * Schema-defined QAPI visitors=
-',
->              __doc__)
-> -        self._opt_builtins =3D opt_builtins
-> +        self._add_module(None, ' * Built-in QAPI visitors')
-> +        self._genc.preamble_add(mcgen('''
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qapi/error.h"
-> +#include "qapi-builtin-visit.h"
-> +'''))
-> +        self._genh.preamble_add(mcgen('''
-> +#include "qapi/visitor.h"
-> +#include "qapi-builtin-types.h"
-> +
-> +''',
-> +                                      prefix=3Dprefix))
-> +
-> +    def _begin_module(self, name):
->          self._genc.preamble_add(mcgen('''
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
-> @@ -277,45 +291,21 @@ class QAPISchemaGenVisitVisitor(QAPISchemaMonolithi=
-cCVisitor):
->  #include "qapi/qmp/qerror.h"
->  #include "%(prefix)sqapi-visit.h"
->  ''',
-> -                                      prefix=3Dprefix))
-> +                                      prefix=3Dself._prefix))
->          self._genh.preamble_add(mcgen('''
-> -#include "qapi/visitor.h"
-> +#include "qapi-builtin-visit.h"
->  #include "%(prefix)sqapi-types.h"
-> =
-
->  ''',
-> -                                      prefix=3Dprefix))
-> -        self._btin =3D guardstart('QAPI_VISIT_BUILTIN')
-> -
-> -    def visit_end(self):
-> -        # To avoid header dependency hell, we always generate
-> -        # declarations for built-in types in our header files and
-> -        # simply guard them.  See also opt_builtins (command line
-> -        # option -b).
-> -        self._btin +=3D guardend('QAPI_VISIT_BUILTIN')
-> -        self._genh.preamble_add(self._btin)
-> -        self._btin =3D None
-> +                                      prefix=3Dself._prefix))
-> =
-
->      def visit_enum_type(self, name, info, values, prefix):
-> -        # Special case for our lone builtin enum type
-> -        # TODO use something cleaner than existence of info
-> -        if not info:
-> -            self._btin +=3D gen_visit_decl(name, scalar=3DTrue)
-> -            if self._opt_builtins:
-> -                self._genc.add(gen_visit_enum(name))
-> -        else:
-> -            self._genh.add(gen_visit_decl(name, scalar=3DTrue))
-> -            self._genc.add(gen_visit_enum(name))
-> +        self._genh.add(gen_visit_decl(name, scalar=3DTrue))
-> +        self._genc.add(gen_visit_enum(name))
-> =
-
->      def visit_array_type(self, name, info, element_type):
-> -        decl =3D gen_visit_decl(name)
-> -        defn =3D gen_visit_list(name, element_type)
-> -        if isinstance(element_type, QAPISchemaBuiltinType):
-> -            self._btin +=3D decl
-> -            if self._opt_builtins:
-> -                self._genc.add(defn)
-> -        else:
-> -            self._genh.add(decl)
-> -            self._genc.add(defn)
-> +        self._genh.add(gen_visit_decl(name))
-> +        self._genc.add(gen_visit_list(name, element_type))
-> =
-
->      def visit_object_type(self, name, info, base, members, variants):
->          # Nothing to do for the special empty builtin
-> @@ -336,6 +326,6 @@ class QAPISchemaGenVisitVisitor(QAPISchemaMonolithicC=
-Visitor):
-> =
-
-> =
-
->  def gen_visit(schema, output_dir, prefix, opt_builtins):
-> -    vis =3D QAPISchemaGenVisitVisitor(prefix, opt_builtins)
-> +    vis =3D QAPISchemaGenVisitVisitor(prefix)
->      schema.visit(vis)
-> -    vis.write(output_dir)
-> +    vis.write(output_dir, opt_builtins)
+>  Time to test the new command. Build qemu, run it as described in the "Te=
+sting"
+>  section and try this:
 > -- =
 
 > 2.13.6
