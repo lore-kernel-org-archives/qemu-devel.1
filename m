@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:41558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1enhFm-0006Jd-Oh
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 03:56:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1enhXx-0000ot-8f
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1enhFj-0008KO-OA
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 03:56:54 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43294 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1enhXu-0002vb-3F
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:41 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46640 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1enhFj-0008KA-KB
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 03:56:51 -0500
-Date: Mon, 19 Feb 2018 09:56:48 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180219085648.kgkeo36adbk2tp6g@sirius.home.kraxel.org>
-References: <CABLmASGFPBQV8y1Omm+S53P92Dew_aWBBbDoap+c2b2PVxeLzg@mail.gmail.com>
-	<ab4612a8-5c82-5abf-cbc3-d5ec47cd9498@tuxfamily.org>
-	<CABLmASFG_cT768zVJwKwrOAB=xhbhvzLa_wvJ4qjRkE6GoZvrA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABLmASFG_cT768zVJwKwrOAB=xhbhvzLa_wvJ4qjRkE6GoZvrA@mail.gmail.com>
-Subject: Re: [Qemu-devel] Qemu SDL2 bug
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1enhXt-0002vG-Ti
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 04:15:38 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C6A26EAE83
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 09:15:35 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 19 Feb 2018 10:15:21 +0100
+Message-Id: <1519031728-9850-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1519031728-9850-1-git-send-email-thuth@redhat.com>
+References: <1519031728-9850-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 1/8] net: Move error reporting from
+ net_init_client/netdev to the calling site
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Howard Spoelstra <hsp.cat7@gmail.com>
-Cc: Thomas Huth <huth@tuxfamily.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Feb 19, 2018 at 08:58:51AM +0100, Howard Spoelstra wrote:
-> On Mon, Feb 19, 2018 at 8:09 AM, Thomas Huth <huth@tuxfamily.org> wrote:
-> > On 18.02.2018 11:11, Howard Spoelstra wrote:
-> >> Hi,
-> >>
-> >> I'd like to report a bug when using the SDL2 GUI in both Linux and
-> >> Windows, which can be observed with in my case latest qemu-system-ppc
-> >> running parallel instances of OSX 10.4 and 10.3.
-> >>
-> >> After switching back and forth between GUIs, dragging becomes copying,
-> >> keyboard starts using a strange character set.
-> >> An additional "Alt" key press is needed to restore normal behaviour.
-> >
-> >  Hi,
-> >
-> > how do you switch back and forth between GUIs? Using the mouse or a
-> > keystroke? I guess the latter ... sounds like the Alt key could be
-> > "stuck" in the guest?
-> >
-> >  Thomas
-> 
-> Hi,
-> 
-> With SDL, unlike GTK, the mouse does not move outside the window. So I
-> have to use Ctrl-Alt-G to release focus and then click in the other
-> window. After two switches the reported issue occurs. Indeed, the Alt
-> key seems to go into a state in which it is stuck. When trying to
-> exclude my own keyboard being at fault, I've also noticed the right
-> Alt key on my keyboard cannot be used for the release.
+It looks strange that net_init_client() and net_init_netdev() both
+take an "Error **errp" parameter, but then do the error reporting
+with "error_report_err(local_err)" on their own. Let's move the
+error reporting to the calling site instead to simplify this code
+a little bit.
 
-Which qemu version?  There have been a bunch of SDL2 fixes in the 2.12
-devel cycle already, so if you are on 2.11 still please try git master
-and see whenever that improves things.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/net/net.h |  2 +-
+ net/net.c         | 29 +++++------------------------
+ vl.c              |  3 ++-
+ 3 files changed, 8 insertions(+), 26 deletions(-)
 
-cheers,
-  Gerd
+diff --git a/include/net/net.h b/include/net/net.h
+index 3fc48e4..bdd4d9f 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -206,7 +206,7 @@ extern const char *legacy_bootp_filename;
+ 
+ int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp);
+ int net_client_parse(QemuOptsList *opts_list, const char *str);
+-int net_init_clients(void);
++int net_init_clients(Error **errp);
+ void net_check_clients(void);
+ void net_cleanup(void);
+ void hmp_host_net_add(Monitor *mon, const QDict *qdict);
+diff --git a/net/net.c b/net/net.c
+index 7d42925..e213a61 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1520,46 +1520,27 @@ void net_check_clients(void)
+ 
+ static int net_init_client(void *dummy, QemuOpts *opts, Error **errp)
+ {
+-    Error *local_err = NULL;
+-
+-    net_client_init(opts, false, &local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        return -1;
+-    }
+-
+-    return 0;
++    return net_client_init(opts, false, errp);
+ }
+ 
+ static int net_init_netdev(void *dummy, QemuOpts *opts, Error **errp)
+ {
+-    Error *local_err = NULL;
+-    int ret;
+-
+-    ret = net_client_init(opts, true, &local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        return -1;
+-    }
+-
+-    return ret;
++    return net_client_init(opts, true, errp);
+ }
+ 
+-int net_init_clients(void)
++int net_init_clients(Error **errp)
+ {
+-    QemuOptsList *net = qemu_find_opts("net");
+-
+     net_change_state_entry =
+         qemu_add_vm_change_state_handler(net_vm_change_state_handler, NULL);
+ 
+     QTAILQ_INIT(&net_clients);
+ 
+     if (qemu_opts_foreach(qemu_find_opts("netdev"),
+-                          net_init_netdev, NULL, NULL)) {
++                          net_init_netdev, NULL, errp)) {
+         return -1;
+     }
+ 
+-    if (qemu_opts_foreach(net, net_init_client, NULL, NULL)) {
++    if (qemu_opts_foreach(qemu_find_opts("net"), net_init_client, NULL, errp)) {
+         return -1;
+     }
+ 
+diff --git a/vl.c b/vl.c
+index 7a5554b..7e95711 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4487,7 +4487,8 @@ int main(int argc, char **argv, char **envp)
+ 
+     colo_info_init();
+ 
+-    if (net_init_clients() < 0) {
++    if (net_init_clients(&err) < 0) {
++        error_report_err(err);
+         exit(1);
+     }
+ 
+-- 
+1.8.3.1
