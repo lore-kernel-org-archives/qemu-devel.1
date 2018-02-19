@@ -1,32 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eno4P-0001w5-4O
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:13:38 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1enoAY-0004L4-9K
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:20:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eno4L-0006d4-Nr
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:13:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49600 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eno4L-0006cT-HA
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:13:33 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3284C818AAEB
-	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 16:13:33 +0000 (UTC)
-References: <1519031728-9850-1-git-send-email-thuth@redhat.com>
-	<1519031728-9850-7-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <01822ab0-ce23-f722-733f-40ef85ff23dc@redhat.com>
-Date: Mon, 19 Feb 2018 17:13:26 +0100
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1enoAU-0002kc-W3
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:19:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45868
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1enoAU-0002jc-Qv
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 11:19:54 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1JGBPAR116955
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 11:19:54 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g7yv8xu9w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 11:19:53 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Mon, 19 Feb 2018 11:19:52 -0500
+References: <1518818879-18608-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1518818879-18608-5-git-send-email-walling@linux.vnet.ibm.com>
+	<3528cfd5-c1e4-1252-5ea4-ed9b255afd91@redhat.com>
+	<564c2c0c-7264-bdf9-b034-e87622137914@linux.vnet.ibm.com>
+	<6e9e7a07-db5e-1130-bad7-83953cfea7c8@redhat.com>
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Mon, 19 Feb 2018 11:19:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <1519031728-9850-7-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <6e9e7a07-db5e-1130-bad7-83953cfea7c8@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 6/8] net: Remove the deprecated
- 'host_net_add' and 'host_net_remove' HMP commands
+Message-Id: <06328b8c-4aa2-e791-9bcc-f83c2ac49964@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v7 04/12] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,303 +46,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-On 19/02/2018 10:15, Thomas Huth wrote:
-> They are deprecated since QEMU v2.10, and so far nobody complained that
-> these commands are still necessary for any reason - and since you can use
-> 'netdev_add' and 'netdev_remove' instead, there also should not be any
-> real reason. Since they are also standing in the way for the upcoming
-> 'vlan' clean-up, it's now time to remove them.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 02/19/2018 11:00 AM, Thomas Huth wrote:
+> On 19.02.2018 16:40, Collin L. Walling wrote:
+>> On 02/17/2018 02:48 AM, Thomas Huth wrote:
+>>> On 16.02.2018 23:07, Collin L. Walling wrote:
+>>> [...]
+>>>> +/**
+>>>> + * uitoa:
+>>>> + * @num: an integer (base 10) to be converted.
+>>>> + * @str: a pointer to a string to store the conversion.
+>>>> + * @len: the length of the passed string.
+>>>> + *
+>>>> + * Given an integer @num, convert it to a string. The string @str
+>>>> must be
+>>>> + * allocated beforehand. The resulting string will be null
+>>>> terminated and
+>>>> + * returned. This function only handles numbers between 0 and
+>>>> UINT64_MAX
+>>>> + * inclusive.
+>>>> + *
+>>>> + * Returns: the string @str of the converted integer @num
+>>>> + */
+>>>> +char *uitoa(uint64_t num, char *str, size_t len)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 size_t num_idx =3D 0;
+>>>> +=C2=A0=C2=A0=C2=A0 uint64_t tmp =3D num;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 IPL_assert(str !=3D NULL, "uitoa: no space alloc=
+ated to store
+>>>> string");
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 /* Get index to ones place */
+>>>> +=C2=A0=C2=A0=C2=A0 while ((tmp /=3D 10) !=3D 0) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_idx++;
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 /* Check if we have enough space for num and nul=
+l */
+>>>> +=C2=A0=C2=A0=C2=A0 IPL_assert(len > num_idx, "uitoa: array too smal=
+l for conversion");
+>>> Well, in v5 of this patch you've had "len >=3D num_idx + 1" where we
+>>> agreed that it was wrong. Now you have "len > num_idx" which is prett=
+y
+>>> much the same. WTF?
+>>> I still think you need "len > num_idx + 1" here to properly take the
+>>> trailing NUL-byte into account properly. Please fix it!
+>>>
+>>>  =C2=A0 Thomas
+>>>
+>> You're correct, and my apologies for not correcting the true problem h=
+ere:
+>> I messed up the value of num_idx.=C2=A0 It is off by one, but initiali=
+zing the
+>> value to 1 instead of 0 should fix this. I must've accounted for this =
+in
+>> my test file but forgot to update it in the actual source code.
+> Are you sure that initializing it to 1 is right? Unless you also change
+> the final while loop in this function, this will put the character into
+> the wrong location ("str[num_idx] =3D num % 10 + '0';"). Imagine a numb=
+er
+> that only consists of one digit ... the digit will be placed in str[1]
+> which sounds wrong to me...?
+>
+>   Thomas
+>
+There's that, which we can solve by decrementing num_idx at the start of=20
+the loop.
+We also have to change the line str[num_idx + 1] =3D '\0'; to no longer a=
+dd 1.
+It all boils down to "which way reads better", which I often struggle and
+bounce back-and-forth with (way) too much...
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Maybe I should also rename num_idx to just "idx" and let the comments=20
+explain
+everything?
 
-
-> ---
->  hmp-commands.hx  | 30 ------------------
->  hmp.h            |  3 --
->  monitor.c        | 61 ------------------------------------
->  net/net.c        | 94 --------------------------------------------------------
->  qemu-doc.texi    | 10 ------
->  tests/test-hmp.c |  2 --
->  6 files changed, 200 deletions(-)
-> 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index d26eb41..964eb51 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1291,36 +1291,6 @@ Inject PCIe AER error
->  ETEXI
->  
->      {
-> -        .name       = "host_net_add",
-> -        .args_type  = "device:s,opts:s?",
-> -        .params     = "tap|user|socket|vde|netmap|bridge|vhost-user|dump [options]",
-> -        .help       = "add host VLAN client (deprecated, use netdev_add instead)",
-> -        .cmd        = hmp_host_net_add,
-> -        .command_completion = host_net_add_completion,
-> -    },
-> -
-> -STEXI
-> -@item host_net_add
-> -@findex host_net_add
-> -Add host VLAN client. Deprecated, please use @code{netdev_add} instead.
-> -ETEXI
-> -
-> -    {
-> -        .name       = "host_net_remove",
-> -        .args_type  = "vlan_id:i,device:s",
-> -        .params     = "vlan_id name",
-> -        .help       = "remove host VLAN client (deprecated, use netdev_del instead)",
-> -        .cmd        = hmp_host_net_remove,
-> -        .command_completion = host_net_remove_completion,
-> -    },
-> -
-> -STEXI
-> -@item host_net_remove
-> -@findex host_net_remove
-> -Remove host VLAN client. Deprecated, please use @code{netdev_del} instead.
-> -ETEXI
-> -
-> -    {
->          .name       = "netdev_add",
->          .args_type  = "netdev:O",
->          .params     = "[user|tap|socket|vde|bridge|hubport|netmap|vhost-user],id=str[,prop=value][,...]",
-> diff --git a/hmp.h b/hmp.h
-> index 1143db4..b897338 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -132,9 +132,6 @@ void migrate_set_capability_completion(ReadLineState *rs, int nb_args,
->                                         const char *str);
->  void migrate_set_parameter_completion(ReadLineState *rs, int nb_args,
->                                        const char *str);
-> -void host_net_add_completion(ReadLineState *rs, int nb_args, const char *str);
-> -void host_net_remove_completion(ReadLineState *rs, int nb_args,
-> -                                const char *str);
->  void delvm_completion(ReadLineState *rs, int nb_args, const char *str);
->  void loadvm_completion(ReadLineState *rs, int nb_args, const char *str);
->  void hmp_rocker(Monitor *mon, const QDict *qdict);
-> diff --git a/monitor.c b/monitor.c
-> index f499250..4fcfc2e 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -3574,67 +3574,6 @@ void migrate_set_parameter_completion(ReadLineState *rs, int nb_args,
->      }
->  }
->  
-> -void host_net_add_completion(ReadLineState *rs, int nb_args, const char *str)
-> -{
-> -    int i;
-> -    size_t len;
-> -    if (nb_args != 2) {
-> -        return;
-> -    }
-> -    len = strlen(str);
-> -    readline_set_completion_index(rs, len);
-> -    for (i = 0; host_net_devices[i]; i++) {
-> -        if (!strncmp(host_net_devices[i], str, len)) {
-> -            readline_add_completion(rs, host_net_devices[i]);
-> -        }
-> -    }
-> -}
-> -
-> -void host_net_remove_completion(ReadLineState *rs, int nb_args, const char *str)
-> -{
-> -    NetClientState *ncs[MAX_QUEUE_NUM];
-> -    int count, i, len;
-> -
-> -    len = strlen(str);
-> -    readline_set_completion_index(rs, len);
-> -    if (nb_args == 2) {
-> -        count = qemu_find_net_clients_except(NULL, ncs,
-> -                                             NET_CLIENT_DRIVER_NONE,
-> -                                             MAX_QUEUE_NUM);
-> -        for (i = 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
-> -            int id;
-> -            char name[16];
-> -
-> -            if (net_hub_id_for_client(ncs[i], &id)) {
-> -                continue;
-> -            }
-> -            snprintf(name, sizeof(name), "%d", id);
-> -            if (!strncmp(str, name, len)) {
-> -                readline_add_completion(rs, name);
-> -            }
-> -        }
-> -        return;
-> -    } else if (nb_args == 3) {
-> -        count = qemu_find_net_clients_except(NULL, ncs,
-> -                                             NET_CLIENT_DRIVER_NIC,
-> -                                             MAX_QUEUE_NUM);
-> -        for (i = 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
-> -            int id;
-> -            const char *name;
-> -
-> -            if (ncs[i]->info->type == NET_CLIENT_DRIVER_HUBPORT ||
-> -                net_hub_id_for_client(ncs[i], &id)) {
-> -                continue;
-> -            }
-> -            name = ncs[i]->name;
-> -            if (!strncmp(str, name, len)) {
-> -                readline_add_completion(rs, name);
-> -            }
-> -        }
-> -        return;
-> -    }
-> -}
-> -
->  static void vm_completion(ReadLineState *rs, const char *str)
->  {
->      size_t len;
-> diff --git a/net/net.c b/net/net.c
-> index af0b3e7..fe29cfa 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -60,25 +60,6 @@
->  static VMChangeStateEntry *net_change_state_entry;
->  static QTAILQ_HEAD(, NetClientState) net_clients;
->  
-> -const char *host_net_devices[] = {
-> -    "tap",
-> -    "socket",
-> -#ifdef CONFIG_NET_BRIDGE
-> -    "bridge",
-> -#endif
-> -#ifdef CONFIG_NETMAP
-> -    "netmap",
-> -#endif
-> -#ifdef CONFIG_SLIRP
-> -    "user",
-> -#endif
-> -#ifdef CONFIG_VDE
-> -    "vde",
-> -#endif
-> -    "vhost-user",
-> -    NULL,
-> -};
-> -
->  /***********************************************************/
->  /* network device redirectors */
->  
-> @@ -1174,81 +1155,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
->      return ret;
->  }
->  
-> -
-> -static int net_host_check_device(const char *device)
-> -{
-> -    int i;
-> -    for (i = 0; host_net_devices[i]; i++) {
-> -        if (!strncmp(host_net_devices[i], device,
-> -                     strlen(host_net_devices[i]))) {
-> -            return 1;
-> -        }
-> -    }
-> -
-> -    return 0;
-> -}
-> -
-> -void hmp_host_net_add(Monitor *mon, const QDict *qdict)
-> -{
-> -    const char *device = qdict_get_str(qdict, "device");
-> -    const char *opts_str = qdict_get_try_str(qdict, "opts");
-> -    Error *local_err = NULL;
-> -    QemuOpts *opts;
-> -    static bool warned;
-> -
-> -    if (!warned && !qtest_enabled()) {
-> -        error_report("host_net_add is deprecated, use netdev_add instead");
-> -        warned = true;
-> -    }
-> -
-> -    if (!net_host_check_device(device)) {
-> -        monitor_printf(mon, "invalid host network device %s\n", device);
-> -        return;
-> -    }
-> -
-> -    opts = qemu_opts_parse_noisily(qemu_find_opts("net"),
-> -                                   opts_str ? opts_str : "", false);
-> -    if (!opts) {
-> -        return;
-> -    }
-> -
-> -    qemu_opt_set(opts, "type", device, &error_abort);
-> -
-> -    net_client_init(opts, false, &local_err);
-> -    if (local_err) {
-> -        error_report_err(local_err);
-> -        monitor_printf(mon, "adding host network device %s failed\n", device);
-> -    }
-> -}
-> -
-> -void hmp_host_net_remove(Monitor *mon, const QDict *qdict)
-> -{
-> -    NetClientState *nc;
-> -    int vlan_id = qdict_get_int(qdict, "vlan_id");
-> -    const char *device = qdict_get_str(qdict, "device");
-> -    static bool warned;
-> -
-> -    if (!warned && !qtest_enabled()) {
-> -        error_report("host_net_remove is deprecated, use netdev_del instead");
-> -        warned = true;
-> -    }
-> -
-> -    nc = net_hub_find_client_by_name(vlan_id, device);
-> -    if (!nc) {
-> -        error_report("Host network device '%s' on hub '%d' not found",
-> -                     device, vlan_id);
-> -        return;
-> -    }
-> -    if (nc->info->type == NET_CLIENT_DRIVER_NIC) {
-> -        error_report("invalid host network device '%s'", device);
-> -        return;
-> -    }
-> -
-> -    qemu_del_net_client(nc->peer);
-> -    qemu_del_net_client(nc);
-> -    qemu_opts_del(qemu_opts_find(qemu_find_opts("net"), device));
-> -}
-> -
->  void netdev_add(QemuOpts *opts, Error **errp)
->  {
->      net_client_init(opts, true, errp);
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 55954b0..865160d 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2758,16 +2758,6 @@ by the ``convert -l snapshot_param'' argument instead.
->  "autoload" parameter is now ignored. All bitmaps are automatically loaded
->  from qcow2 images.
->  
-> -@section System emulator human monitor commands
-> -
-> -@subsection host_net_add (since 2.10.0)
-> -
-> -The ``host_net_add'' command is replaced by the ``netdev_add'' command.
-> -
-> -@subsection host_net_remove (since 2.10.0)
-> -
-> -The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
-> -
->  @section System emulator devices
->  
->  @subsection ivshmem (since 2.6.0)
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> index 5b7e447..5352c9c 100644
-> --- a/tests/test-hmp.c
-> +++ b/tests/test-hmp.c
-> @@ -37,10 +37,8 @@ static const char *hmp_cmds[] = {
->      "dump-guest-memory /dev/null 0 4096",
->      "dump-guest-memory /dev/null",
->      "gdbserver",
-> -    "host_net_add user id=net0",
->      "hostfwd_add tcp::43210-:43210",
->      "hostfwd_remove tcp::43210-:43210",
-> -    "host_net_remove 0 net0",
->      "i /w 0",
->      "log all",
->      "log none",
-> 
+--=20
+- Collin L Walling
