@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ennEu-0003CD-F7
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 10:20:28 -0500
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1ennGD-00042w-DJ
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 10:21:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ennEo-0008Uk-E6
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 10:20:24 -0500
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Mon, 19 Feb 2018 09:20:06 -0600
-Message-Id: <1519053606-9817-3-git-send-email-minyard@acm.org>
-In-Reply-To: <1519053606-9817-1-git-send-email-minyard@acm.org>
-References: <CACRpkda9B=frmS0QF429p-q+KoCKG=5NON-kQ0Rt-nba2powRA@mail.gmail.com>
-	<1519053606-9817-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 2/2] i2c: Move the bus class to i2c.h
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1ennGB-0000ul-Gg
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 10:21:45 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anatoly.trosinenko@gmail.com>)
+	id 1ennGB-0000uG-A6
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 10:21:43 -0500
+Received: by mail-ot0-x242.google.com with SMTP id b15so2801213otf.3
+	for <qemu-devel@nongnu.org>; Mon, 19 Feb 2018 07:21:42 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAE5jQCfxjM9ykBCes0oDhrc0B6g8AC5Se39sXBsbZo=-dKQpyg@mail.gmail.com>
+References: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
+	<20180127134908.24095-2-anatoly.trosinenko@gmail.com>
+	<aab013fb-5ada-6ee5-d038-0277d8ef0b24@weilnetz.de>
+	<CAE5jQCfxjM9ykBCes0oDhrc0B6g8AC5Se39sXBsbZo=-dKQpyg@mail.gmail.com>
+From: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Date: Mon, 19 Feb 2018 17:26:45 +0300
+Message-ID: <CAE5jQCcceAQ9qMVAATOc+yYp2gAGXwec5kegs2sX74efVVuirg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/1] tci: eliminate UB due to unaligned
+ reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,81 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Corey Minyard <cminyard@mvista.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>
 
-From: Corey Minyard <cminyard@mvista.com>
+Ping.
+Patchwork link: http://patchwork.ozlabs.org/patch/866732/
+Patchew link: http://patchew.org/QEMU/20180127134908.24095-1-
+anatoly.trosinenko@gmail.com/
 
-Some devices need access to it.
+Original cover letter:
+The code in tcg/tci.c reads some data from TCI bytecode through
+pointer dereferencing. As far as I know unaligned reads in such a way are
+undefined behavior and compiling with -fsanitize=undefined enumerated
+them as such at run-time.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/i2c/core.c        | 17 -----------------
- include/hw/i2c/i2c.h | 17 +++++++++++++++++
- 2 files changed, 17 insertions(+), 17 deletions(-)
+I have replaced such reads with invocations of ld{l,q}_he_p.
+A comment in include/qemu/bswap.h:310 suggests they should be properly
+translated by the compiler. I didn't added signed/unsigned casts
+since bswap.h does contain separate signed/unsigned versions
+for 16-bit integers but does not for 32- and 64-bit ones, so I supposed
+the developers of the bswap.h already arranged everything so
+integer promotions don't mess things up. I can add casts in case I'm
+not right about it.
+http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg06516.html
 
-diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-index 9a54b61..cfccefc 100644
---- a/hw/i2c/core.c
-+++ b/hw/i2c/core.c
-@@ -10,30 +10,13 @@
- #include "qemu/osdep.h"
- #include "hw/i2c/i2c.h"
- 
--typedef struct I2CNode I2CNode;
--
--struct I2CNode {
--    I2CSlave *elt;
--    QLIST_ENTRY(I2CNode) next;
--};
--
- #define I2C_BROADCAST 0x00
- 
--struct I2CBus {
--    BusState qbus;
--    QLIST_HEAD(, I2CNode) current_devs;
--    uint8_t saved_address;
--    bool broadcast;
--};
--
- static Property i2c_props[] = {
-     DEFINE_PROP_UINT8("address", struct I2CSlave, address, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--#define TYPE_I2C_BUS "i2c-bus"
--#define I2C_BUS(obj) OBJECT_CHECK(I2CBus, (obj), TYPE_I2C_BUS)
--
- static const TypeInfo i2c_bus_info = {
-     .name = TYPE_I2C_BUS,
-     .parent = TYPE_BUS,
-diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-index 8fd449f..d727379 100644
---- a/include/hw/i2c/i2c.h
-+++ b/include/hw/i2c/i2c.h
-@@ -56,6 +56,23 @@ struct I2CSlave {
-     uint8_t address;
- };
- 
-+#define TYPE_I2C_BUS "i2c-bus"
-+#define I2C_BUS(obj) OBJECT_CHECK(I2CBus, (obj), TYPE_I2C_BUS)
-+
-+typedef struct I2CNode I2CNode;
-+
-+struct I2CNode {
-+    I2CSlave *elt;
-+    QLIST_ENTRY(I2CNode) next;
-+};
-+
-+struct I2CBus {
-+    BusState qbus;
-+    QLIST_HEAD(, I2CNode) current_devs;
-+    uint8_t saved_address;
-+    bool broadcast;
-+};
-+
- I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
- void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
- int i2c_bus_busy(I2CBus *bus);
--- 
-2.7.4
+
+2018-01-28 9:42 GMT+03:00 Anatoly Trosinenko <anatoly.trosinenko@gmail.com>:
+
+> My patch is kind of trivial quick fix that just eliminates these unaligned
+> reads and doesn't seem to require complicated testing supposing my code
+> properly handles integer promotion (and hope it will not slow the
+> interpreter down).
+>
+> Aligning everything, on the other hand, can not only remove the UB but
+> also speed things up, but if I get it right, requires O(opcode count)
+> manual work and subsequent less trivial testing that every opcode's
+> argument layout match on generation and interpretation side (errors should
+> be significantly localized due to present assertion on operation size,
+> though). So my patch may be considered as temporary solution.
+>
+> In fact, I had to similarly make these unaligned reads explicit when
+> porting QEMU to JavaScript because Emscripten hugely relies on absence of
+> some kinds of UB such as "implicit" unaligned accesses, and such fix seemed
+> to resolve this issue for me on "host with special alignment requirement".
+>
+>
+> 2018-01-27 19:38 GMT+03:00 Stefan Weil <sw@weilnetz.de>:
+>
+>> Am 27.01.2018 um 14:49 schrieb Anatoly Trosinenko:
+>> > Use ldl_he_p / ldq_he_p functions instead of a plain memory access
+>> > through pointer.
+>> >
+>> > Signed-off-by: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+>> > ---
+>> >  tcg/tci.c | 16 +++++++++++-----
+>> >  1 file changed, 11 insertions(+), 5 deletions(-)
+>>
+>> A better alternative might be aligning the relevant data when generating
+>> the bytecode. See also my comment on alignment in tcg/tci/README.
+>>
+>> Stefan
+>>
+>>
