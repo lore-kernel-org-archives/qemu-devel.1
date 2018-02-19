@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2b-0006hZ-60
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 13:19:54 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2c-0006jw-1e
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 13:19:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2Z-0007jx-JZ
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enq2a-0007lm-Na
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 13:19:53 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon, 19 Feb 2018 18:19:14 +0000
-Message-Id: <20180219181922.21586-4-mark.cave-ayland@ilande.co.uk>
+Date: Mon, 19 Feb 2018 18:19:15 +0000
+Message-Id: <20180219181922.21586-5-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
 References: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 03/11] heathrow: QOMify heathrow PIC
+Subject: [Qemu-devel] [PATCH 04/11] heathrow: convert to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,291 +23,101 @@ To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/intc/heathrow_pic.c         | 126 +++++++++++++++++++++++------------------
- include/hw/intc/heathrow_pic.h |  49 ++++++++++++++++
- 2 files changed, 119 insertions(+), 56 deletions(-)
- create mode 100644 include/hw/intc/heathrow_pic.h
+ hw/intc/heathrow_pic.c         | 31 ++++++++++++-------------------
+ hw/intc/trace-events           |  5 +++++
+ include/hw/intc/heathrow_pic.h |  1 +
+ 3 files changed, 18 insertions(+), 19 deletions(-)
 
 diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-index 171f5ed814..7bf44e0d86 100644
+index 7bf44e0d86..afe0b08cbb 100644
 --- a/hw/intc/heathrow_pic.c
 +++ b/hw/intc/heathrow_pic.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
+@@ -26,16 +26,7 @@
  #include "hw/hw.h"
  #include "hw/ppc/mac.h"
-+#include "hw/intc/heathrow_pic.h"
- 
- /* debug PIC */
- //#define DEBUG_PIC
-@@ -36,39 +37,27 @@
- #define PIC_DPRINTF(fmt, ...)
- #endif
- 
--typedef struct HeathrowPIC {
--    uint32_t events;
--    uint32_t mask;
--    uint32_t levels;
--    uint32_t level_triggered;
--} HeathrowPIC;
+ #include "hw/intc/heathrow_pic.h"
 -
--typedef struct HeathrowPICS {
--    MemoryRegion mem;
--    HeathrowPIC pics[2];
--    qemu_irq *irqs;
--} HeathrowPICS;
+-/* debug PIC */
+-//#define DEBUG_PIC
 -
--static inline int check_irq(HeathrowPIC *pic)
-+static inline int heathrow_check_irq(HeathrowPICState *pic)
- {
-     return (pic->events | (pic->levels & pic->level_triggered)) & pic->mask;
- }
+-#ifdef DEBUG_PIC
+-#define PIC_DPRINTF(fmt, ...)                                   \
+-    do { printf("PIC: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define PIC_DPRINTF(fmt, ...)
+-#endif
++#include "trace.h"
  
- /* update the CPU irq state */
--static void heathrow_pic_update(HeathrowPICS *s)
-+static void heathrow_update_irq(HeathrowState *s)
+ static inline int heathrow_check_irq(HeathrowPICState *pic)
  {
--    if (check_irq(&s->pics[0]) || check_irq(&s->pics[1])) {
-+    if (heathrow_check_irq(&s->pics[0]) ||
-+            heathrow_check_irq(&s->pics[1])) {
-         qemu_irq_raise(s->irqs[0]);
-     } else {
-         qemu_irq_lower(s->irqs[0]);
-     }
- }
- 
--static void pic_write(void *opaque, hwaddr addr,
--                      uint64_t value, unsigned size)
-+static void heathrow_write(void *opaque, hwaddr addr,
-+                           uint64_t value, unsigned size)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
+@@ -61,7 +52,7 @@ static void heathrow_write(void *opaque, hwaddr addr,
      unsigned int n;
  
      n = ((addr & 0xfff) - 0x10) >> 4;
-@@ -79,24 +68,24 @@ static void pic_write(void *opaque, hwaddr addr,
-     switch(addr & 0xf) {
-     case 0x04:
-         pic->mask = value;
--        heathrow_pic_update(s);
-+        heathrow_update_irq(s);
-         break;
-     case 0x08:
-         /* do not reset level triggered IRQs */
-         value &= ~pic->level_triggered;
-         pic->events &= ~value;
--        heathrow_pic_update(s);
-+        heathrow_update_irq(s);
-         break;
-     default:
-         break;
+-    PIC_DPRINTF("writel: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
++    trace_heathrow_write(addr, n, value);
+     if (n >= 2)
+         return;
+     pic = &s->pics[n];
+@@ -109,7 +100,7 @@ static uint64_t heathrow_read(void *opaque, hwaddr addr,
+             break;
+         }
      }
- }
- 
--static uint64_t pic_read(void *opaque, hwaddr addr,
--                         unsigned size)
-+static uint64_t heathrow_read(void *opaque, hwaddr addr,
-+                              unsigned size)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
-     unsigned int n;
-     uint32_t value;
- 
-@@ -124,16 +113,16 @@ static uint64_t pic_read(void *opaque, hwaddr addr,
+-    PIC_DPRINTF("readl: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
++    trace_heathrow_read(addr, n, value);
      return value;
  }
  
--static const MemoryRegionOps heathrow_pic_ops = {
--    .read = pic_read,
--    .write = pic_write,
-+static const MemoryRegionOps heathrow_ops = {
-+    .read = heathrow_read,
-+    .write = heathrow_write,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
--static void heathrow_pic_set_irq(void *opaque, int num, int level)
-+static void heathrow_set_irq(void *opaque, int num, int level)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
+@@ -124,16 +115,18 @@ static void heathrow_set_irq(void *opaque, int num, int level)
+     HeathrowState *s = opaque;
+     HeathrowPICState *pic;
      unsigned int irq_bit;
++    int last_level = (s->last_levels & (num << 1UL)) ? 1 : 0;
  
- #if defined(DEBUG)
-@@ -153,7 +142,7 @@ static void heathrow_pic_set_irq(void *opaque, int num, int level)
-     } else {
-         pic->levels &= ~irq_bit;
+-#if defined(DEBUG)
+-    {
+-        static int last_level[64];
+-        if (last_level[num] != level) {
+-            PIC_DPRINTF("set_irq: num=0x%02x level=%d\n", num, level);
+-            last_level[num] = level;
++    if (last_level != level) {
++        trace_heathrow_set_irq(num, level);
++
++        if (level) {
++            s->last_levels |= (num << 1UL);
++        } else {
++            s->last_levels &= ~(num << 1UL);
+         }
      }
--    heathrow_pic_update(s);
-+    heathrow_update_irq(s);
- }
- 
- static const VMStateDescription vmstate_heathrow_pic_one = {
-@@ -161,54 +150,79 @@ static const VMStateDescription vmstate_heathrow_pic_one = {
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(events, HeathrowPIC),
--        VMSTATE_UINT32(mask, HeathrowPIC),
--        VMSTATE_UINT32(levels, HeathrowPIC),
--        VMSTATE_UINT32(level_triggered, HeathrowPIC),
-+        VMSTATE_UINT32(events, HeathrowPICState),
-+        VMSTATE_UINT32(mask, HeathrowPICState),
-+        VMSTATE_UINT32(levels, HeathrowPICState),
-+        VMSTATE_UINT32(level_triggered, HeathrowPICState),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
--static const VMStateDescription vmstate_heathrow_pic = {
-+static const VMStateDescription vmstate_heathrow = {
-     .name = "heathrow_pic",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_STRUCT_ARRAY(pics, HeathrowPICS, 2, 1,
--                             vmstate_heathrow_pic_one, HeathrowPIC),
-+        VMSTATE_STRUCT_ARRAY(pics, HeathrowState, 2, 1,
-+                             vmstate_heathrow_pic_one, HeathrowPICState),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
--static void heathrow_pic_reset_one(HeathrowPIC *s)
-+static void heathrow_reset(DeviceState *d)
- {
--    memset(s, '\0', sizeof(HeathrowPIC));
-+    HeathrowState *s = HEATHROW(d);
+-#endif
 +
-+    s->pics[0].level_triggered = 0;
-+    s->pics[1].level_triggered = 0x1ff00000;
- }
- 
--static void heathrow_pic_reset(void *opaque)
-+static void heathrow_init(Object *obj)
- {
--    HeathrowPICS *s = opaque;
--
--    heathrow_pic_reset_one(&s->pics[0]);
--    heathrow_pic_reset_one(&s->pics[1]);
-+    HeathrowState *s = HEATHROW(obj);
- 
--    s->pics[0].level_triggered = 0;
--    s->pics[1].level_triggered = 0x1ff00000;
-+    memory_region_init_io(&s->mem, OBJECT(s), &heathrow_ops, s,
-+                          "heathrow-pic", 0x1000);
- }
- 
- qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
-                             int nb_cpus, qemu_irq **irqs)
- {
--    HeathrowPICS *s;
-+    DeviceState *d;
-+    HeathrowState *s;
- 
--    s = g_malloc0(sizeof(HeathrowPICS));
-+    d = qdev_create(NULL, TYPE_HEATHROW);
-+    qdev_init_nofail(d);
+     pic = &s->pics[1 - (num >> 5)];
+     irq_bit = 1 << (num & 0x1f);
+     if (level) {
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index 4092d2825e..55e8c2570c 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -186,3 +186,8 @@ nvic_complete_irq(int irq, bool secure) "NVIC complete IRQ %d (secure %d)"
+ nvic_set_irq_level(int irq, int level) "NVIC external irq %d level set to %d"
+ nvic_sysreg_read(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ nvic_sysreg_write(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
 +
-+    s = HEATHROW(d);
-     /* only 1 CPU */
-     s->irqs = irqs[0];
--    memory_region_init_io(&s->mem, NULL, &heathrow_pic_ops, s,
--                          "heathrow-pic", 0x1000);
-+
-     *pmem = &s->mem;
- 
--    vmstate_register(NULL, -1, &vmstate_heathrow_pic, s);
--    qemu_register_reset(heathrow_pic_reset, s);
--    return qemu_allocate_irqs(heathrow_pic_set_irq, s, 64);
-+    return qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_IRQS);
-+}
-+
-+static void heathrow_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->reset = heathrow_reset;
-+    dc->vmsd = &vmstate_heathrow;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
-+
-+static const TypeInfo heathrow_type_info = {
-+    .name = TYPE_HEATHROW,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(HeathrowState),
-+    .instance_init = heathrow_init,
-+    .class_init = heathrow_class_init,
-+};
-+
-+static void heathrow_register_types(void)
-+{
-+    type_register_static(&heathrow_type_info);
-+}
-+
-+type_init(heathrow_register_types)
++# hw/intc/heathrow_pic.c
++heathrow_write(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
++heathrow_read(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
++heathrow_set_irq(int num, int level) "set_irq: num=0x%02x level=%d"
 diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pic.h
-new file mode 100644
-index 0000000000..bc3ffaab87
---- /dev/null
+index bc3ffaab87..878a0f7cdb 100644
+--- a/include/hw/intc/heathrow_pic.h
 +++ b/include/hw/intc/heathrow_pic.h
-@@ -0,0 +1,49 @@
-+/*
-+ * Heathrow PIC support (OldWorld PowerMac)
-+ *
-+ * Copyright (c) 2005-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HEATHROW_H
-+#define HEATHROW_H
-+
-+#define TYPE_HEATHROW "heathrow"
-+#define HEATHROW(obj) OBJECT_CHECK(HeathrowState, (obj), TYPE_HEATHROW)
-+
-+typedef struct HeathrowPICState {
-+    uint32_t events;
-+    uint32_t mask;
-+    uint32_t levels;
-+    uint32_t level_triggered;
-+} HeathrowPICState;
-+
-+typedef struct HeathrowState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mem;
-+    HeathrowPICState pics[2];
-+    qemu_irq *irqs;
-+} HeathrowState;
-+
-+#define HEATHROW_NUM_IRQS 64
-+
-+#endif /* HEATHROW_H */
+@@ -42,6 +42,7 @@ typedef struct HeathrowState {
+     MemoryRegion mem;
+     HeathrowPICState pics[2];
+     qemu_irq *irqs;
++    uint64_t last_levels;
+ } HeathrowState;
+ 
+ #define HEATHROW_NUM_IRQS 64
 -- 
 2.11.0
