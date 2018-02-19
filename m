@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1enoxs-0004u3-Oe
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:57 -0500
+	(envelope-from <laurent@vivier.eu>) id 1enoxu-0004vL-5P
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1enoxo-0005Rq-Ql
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:56 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:41507)
+	(envelope-from <laurent@vivier.eu>) id 1enoxt-0005Vb-27
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:58 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:60235)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1enoxo-0005Qv-Gd
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:52 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1enoxs-0005Uu-PC
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 12:10:56 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 19 Feb 2018 18:10:31 +0100
-Message-Id: <20180219171037.24539-3-laurent@vivier.eu>
+Date: Mon, 19 Feb 2018 18:10:37 +0100
+Message-Id: <20180219171037.24539-9-laurent@vivier.eu>
 In-Reply-To: <20180219171037.24539-1-laurent@vivier.eu>
 References: <20180219171037.24539-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 2/8] linux-user: Fix register used for 6th and
- 7th syscall argument on aarch64
+Subject: [Qemu-devel] [PULL 8/8] linux-user: MIPS set cpu to r6 CPU if
+ binary is R6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +25,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, YunQiang Su <syq@debian.org>, Laurent Vivier <laurent@vivier.eu>
 
-From: Guido Günther <agx@sigxcpu.org>
+From: YunQiang Su <syq@debian.org>
 
-This unbreaks the testcase from
+So here we need to detect the version of binaries and set
+cpu_model for it.
 
-    http://lists.nongnu.org/archive/html/qemu-arm/2018-01/msg00514.html
-
-Thanks to Laurent Vivier for spotting the 7th one.
-
-Signed-off-by: Guido Günther <agx@sigxcpu.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Suggested-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <671eaa99f4e0bf3a58f76f9151f7cfa24662227f.1517565566.git.agx@sigxcpu.org>
+Signed-off-by: YunQiang Su <syq@debian.org>
+[lv: original patch modified to move code into cpu_get_model()]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180124211301.10095-5-laurent@vivier.eu>
 ---
- linux-user/host/aarch64/safe-syscall.inc.S | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/elf.h                  | 4 ++++
+ linux-user/mips/target_elf.h   | 3 +++
+ linux-user/mips64/target_elf.h | 3 +++
+ 3 files changed, 10 insertions(+)
 
-diff --git a/linux-user/host/aarch64/safe-syscall.inc.S b/linux-user/host/aarch64/safe-syscall.inc.S
-index 58a2329b37..bc1f5a9792 100644
---- a/linux-user/host/aarch64/safe-syscall.inc.S
-+++ b/linux-user/host/aarch64/safe-syscall.inc.S
-@@ -36,7 +36,7 @@ safe_syscall_base:
- 	 *               and return the result in x0
- 	 * and the syscall instruction needs
- 	 *               x8 == syscall number
--	 *               x0 ... x7 == syscall arguments
-+	 *               x0 ... x6 == syscall arguments
- 	 *               and returns the result in x0
- 	 * Shuffle everything around appropriately.
- 	 */
-@@ -47,8 +47,8 @@ safe_syscall_base:
- 	mov	x2, x4
- 	mov	x3, x5
- 	mov	x4, x6
--	mov	x6, x7
--	ldr	x7, [sp]
-+	mov	x5, x7
-+	ldr	x6, [sp]
+diff --git a/include/elf.h b/include/elf.h
+index ca9a419043..746b6d393b 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -40,6 +40,10 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_ARCH_5		0x40000000	/* -mips5 code.  */
+ #define EF_MIPS_ARCH_32		0x50000000	/* MIPS32 code.  */
+ #define EF_MIPS_ARCH_64		0x60000000	/* MIPS64 code.  */
++#define EF_MIPS_ARCH_32R2       0x70000000      /* MIPS32r2 code.  */
++#define EF_MIPS_ARCH_64R2       0x80000000      /* MIPS64r2 code.  */
++#define EF_MIPS_ARCH_32R6       0x90000000      /* MIPS32r6 code.  */
++#define EF_MIPS_ARCH_64R6       0xa0000000      /* MIPS64r6 code.  */
  
- 	/* This next sequence of code works in conjunction with the
- 	 * rewind_if_safe_syscall_function(). If a signal is taken
+ /* The ABI of a file. */
+ #define EF_MIPS_ABI_O32		0x00001000	/* O32 ABI.  */
+diff --git a/linux-user/mips/target_elf.h b/linux-user/mips/target_elf.h
+index bed0b43259..14b53d7469 100644
+--- a/linux-user/mips/target_elf.h
++++ b/linux-user/mips/target_elf.h
+@@ -9,6 +9,9 @@
+ #define MIPS_TARGET_ELF_H
+ static inline const char *cpu_get_model(uint32_t eflags)
+ {
++    if (eflags & EF_MIPS_ARCH_32R6) {
++        return "mips32r6-generic";
++    }
+     return "24Kf";
+ }
+ #endif
+diff --git a/linux-user/mips64/target_elf.h b/linux-user/mips64/target_elf.h
+index 5b6f4692e0..ae14b38bfa 100644
+--- a/linux-user/mips64/target_elf.h
++++ b/linux-user/mips64/target_elf.h
+@@ -9,6 +9,9 @@
+ #define MIPS64_TARGET_ELF_H
+ static inline const char *cpu_get_model(uint32_t eflags)
+ {
++    if (eflags & EF_MIPS_ARCH_64R6) {
++        return "I6400";
++    }
+     return "5KEf";
+ }
+ #endif
 -- 
 2.14.3
