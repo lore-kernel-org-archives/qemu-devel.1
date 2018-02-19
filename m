@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1enb3V-0003oo-Fz
-	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 21:19:50 -0500
+	(envelope-from <shea@shealevy.com>) id 1enbT6-0001UJ-Fa
+	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 21:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1enb3U-0008AZ-7S
-	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 21:19:49 -0500
-Date: Mon, 19 Feb 2018 13:19:18 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180219021918.GF1109@umbus.fritz.box>
-References: <cover.1518730026.git.balaton@eik.bme.hu>
-	<dffa45c9-48a6-ef85-3b28-d8ce1daf72e4@redhat.com>
-	<alpine.BSF.2.21.1802161145230.98686@zero.eik.bme.hu>
-	<5c7c64f7-90bd-7ddb-59f6-e3d7f4f8b21d@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XIiC+We3v3zHqZ6Z"
-Content-Disposition: inline
-In-Reply-To: <5c7c64f7-90bd-7ddb-59f6-e3d7f4f8b21d@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Sam460ex emulation
+	(envelope-from <shea@shealevy.com>) id 1enbT2-0002je-Ib
+	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 21:46:16 -0500
+Received: from smtprelay0113.hostedemail.com ([216.40.44.113]:46239
+	helo=smtprelay.hostedemail.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shea@shealevy.com>) id 1enbT2-0002jR-Di
+	for qemu-devel@nongnu.org; Sun, 18 Feb 2018 21:46:12 -0500
+From: Shea Levy <shea@shealevy.com>
+Date: Sun, 18 Feb 2018 21:45:55 -0500
+Message-Id: <20180219024555.26467-1-shea@shealevy.com>
+In-Reply-To: <20180218190050.19517-1-shea@shealevy.com>
+References: <20180218190050.19517-1-shea@shealevy.com>
+Subject: [Qemu-devel] [PATCH v2] linux-user: Support f_flags in statfs when
+ available.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +25,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Shea Levy <shea@shealevy.com>
 
+Signed-off-by: Shea Levy <shea@shealevy.com>
+---
+ configure                 | 20 ++++++++++++++++++
+ linux-user/syscall.c      |  3 +++
+ linux-user/syscall_defs.h | 53 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+)
 
---XIiC+We3v3zHqZ6Z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Feb 17, 2018 at 12:07:34AM +0100, Thomas Huth wrote:
-> On 16.02.2018 11:55, BALATON Zoltan wrote:
-> > On Fri, 16 Feb 2018, Thomas Huth wrote:
-> >> On 15.02.2018 22:27, BALATON Zoltan wrote:
-> >>> Remaining patches for Sam460ex emulation. The original cover letter
-> >>> with more details is here:
-> >>>
-> >>> http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00112.html
-> >>>
-> >>> We'll need to also add binaries for firmware (customised u-boot
-> >>> version) and dtb but I'm not sure how to submit those.
-> >>
-> >> For the dtb, I think you could simply provide a patch that adds the dts
-> >> file to the pc-bios directory and another one that adds the dtb. Just
-> >> like it is already done with pc-bios/bamboo.dts / pc-bios/bamboo.dtb.
-> >=20
-> > OK thanks, I'll do that. Does it have to be two separate patches?
->=20
-> I don't think so, I just thought that would be cleaner ... but one patch
-> should be fine, too, I guess. David?
-
-I'd actually prefer them both in one patch.
-
->=20
-> >> For u-boot, can you use the same upstream level as e500 ? I.e. check
-> >> whether "git submodule status roms/u-boot" is fine for you? If that's
-> >> ok, just do a "git submodule update roms/u-boot" and build uboot from
-> >> that directory - you then can submit a binary patch with that file for
-> >> pc-bios, too.
-> >>
-> >> In case you need another u-boot version, I think you've got to update
-> >> the submodule to the newer upstream version first, and then also rebui=
-ld
-> >> the e500 binary... Cumbersome, but that's necessary since we've got to
-> >> ship the u-boot sources in the QEMU release tarballs, too, to be
-> >> compliant with the GPL.
-> >=20
-> > Unfortunately we can't use the same u-boot as e500 because this board
-> > uses a forked and patched version which is not in upstream u-boot and
-> > upstream u-boot has even dropped support for this CPU in latest version
-> > so we actually need an older version (with patches) and not a newer one.
->=20
-> That's very unfortunate ... any chance that you could try to get that
-> CPU activated in upstream u-boot again and get the patches included there?
->=20
-> > Therefore, it needs to be a binary built from a separate source so I
-> > think a new submodule will need to be added for this. How to do that?
-> > Where to host this git repo? Should I put it on github and refer to that
-> > as an external repo or should it be hosted in qemu repo somehow?
->=20
-> No clue ... adding Stefan and Jeff to CC:, maybe they can recommend
-> something here.
->=20
->  Thomas
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---XIiC+We3v3zHqZ6Z
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqKNCMACgkQbDjKyiDZ
-s5JpixAAxKAieezVoh3RhSFClhfqeWNNqATcFGk7IKfD7H1iLgljgzM7+qjk+pz4
-av6Q+WLeiEUIe0c1m9LEwJ8yopjniBS1JNcKrmlgsN/d3Fq+BUl94o19dNXRnfel
-TqW3ukiH49pelLwPkBDC2vwillMdH7YH3064jGrnpPq1i5kfRV9r3kHNXWNqJ/Dw
-c5CBO/PMSbd2tTjSPWdeQuVIi9edEB3ADFQvvcT/WMGiqxSP1C7dWmYJQc3VQUs9
-d+n3Jlr+UEl6CVwHxJDBvX/NhA/rQVN+i9y6v68++pB5Ze7ueaOiN9cuTCnStWP/
-Qw3XJQl7vCo1jFUhzojmbRLqCi6/0NBvXupPx49i1Bfz98ugDy5UNbjT+SOvB9A1
-PLDD/OECmc1u5NV4y+3GcavgcTuT2q32KYpJJF/rac/nZhjN5km6mBv68e+wxf6T
-LvKG+ZMpfpr9K27jsJA1LdlzbR0lSeVGh+AXye6oEmQwrdJr9LYdb18g0xdcYs2T
-zAJou49yx+Fky7QBO1165LRjRuVYRW7LA8gme1QzDaWQ03dcbMlWHUoufl/elet/
-2jK4tgJHlTo248/WNPbeWvvYmYcfhUnNuTvdoEPwKOxlqlCKSrIPaTT5usDTL/7V
-sq+4PskvKH13ikRZnw4ZXBuR6rRUXZ3eA7kBZncRvf5CaFXcyE8=
-=Wb0O
------END PGP SIGNATURE-----
-
---XIiC+We3v3zHqZ6Z--
+diff --git a/configure b/configure
+index 913e14839d..52fe2bf941 100755
+--- a/configure
++++ b/configure
+@@ -5303,6 +5303,22 @@ if compile_prog "" "" ; then
+     have_utmpx=yes
+ fi
+ 
++##########################################
++# Check for newer fields of struct statfs on Linux
++
++if test "$linux_user" = "yes"; then
++  cat > $TMPC <<EOF
++#include <sys/vfs.h>
++
++int main(void) {
++  struct statfs fs;
++  fs.f_flags = 0;
++}
++EOF
++  if compile_object ; then
++      have_statfs_flags=yes
++  fi
++fi
+ ##########################################
+ # checks for sanitizers
+ 
+@@ -6518,6 +6534,10 @@ if test "$have_utmpx" = "yes" ; then
+   echo "HAVE_UTMPX=y" >> $config_host_mak
+ fi
+ 
++if test "$have_statfs_flags" = "yes" ; then
++  echo "HAVE_STATFS_FLAGS=y" >> $config_host_mak
++fi
++
+ if test "$ivshmem" = "yes" ; then
+   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
+ fi
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 82b35a6bdf..77481eca2c 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -9534,6 +9534,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             __put_user(stfs.f_fsid.__val[1], &target_stfs->f_fsid.val[1]);
+             __put_user(stfs.f_namelen, &target_stfs->f_namelen);
+             __put_user(stfs.f_frsize, &target_stfs->f_frsize);
++#ifdef HAVE_STATFS_FLAGS
++            __put_user(stfs.f_flags, &target_stfs->f_flags);
++#endif
+             memset(target_stfs->f_spare, 0, sizeof(target_stfs->f_spare));
+             unlock_user_struct(target_stfs, arg2, 1);
+         }
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index a35c52a60a..64aa49d3c5 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -362,7 +362,14 @@ struct kernel_statfs {
+ 	int f_ffree;
+         kernel_fsid_t f_fsid;
+ 	int f_namelen;
++#ifdef HAVE_STATFS_FLAGS
++	int f_frsize;
++	int f_flags;
++	int f_spare[4];
++#else
+ 	int f_spare[6];
++#endif
++
+ };
+ 
+ struct target_dirent {
+@@ -2223,7 +2230,12 @@ struct target_statfs {
+ 	/* Linux specials */
+ 	target_fsid_t		f_fsid;
+ 	int32_t			f_namelen;
++#ifdef HAVE_STATFS_FLAGS
++	int32_t			f_flags;
++	int32_t			f_spare[5];
++#else
+ 	int32_t			f_spare[6];
++#endif
+ };
+ #else
+ struct target_statfs {
+@@ -2239,7 +2251,12 @@ struct target_statfs {
+ 	/* Linux specials */
+ 	target_fsid_t		f_fsid;
+ 	abi_long		f_namelen;
++#ifdef HAVE_STATFS_FLAGS
++	abi_long		f_flags;
++	abi_long		f_spare[5];
++#else
+ 	abi_long		f_spare[6];
++#endif
+ };
+ #endif
+ 
+@@ -2255,7 +2272,12 @@ struct target_statfs64 {
+ 	uint64_t	f_bavail;
+ 	target_fsid_t	f_fsid;
+ 	uint32_t	f_namelen;
++#ifdef HAVE_STATFS_FLAGS
++	uint32_t	f_flags;
++	uint32_t	f_spare[5];
++#else
+ 	uint32_t	f_spare[6];
++#endif
+ };
+ #elif (defined(TARGET_PPC64) || defined(TARGET_X86_64) || \
+        defined(TARGET_SPARC64) || defined(TARGET_AARCH64)) && \
+@@ -2271,7 +2293,12 @@ struct target_statfs {
+ 	target_fsid_t f_fsid;
+ 	abi_long f_namelen;
+ 	abi_long f_frsize;
++#ifdef HAVE_STATFS_FLAGS
++	abi_long f_flags;
++	abi_long f_spare[4];
++#else
+ 	abi_long f_spare[5];
++#endif
+ };
+ 
+ struct target_statfs64 {
+@@ -2285,7 +2312,12 @@ struct target_statfs64 {
+ 	target_fsid_t f_fsid;
+ 	abi_long f_namelen;
+ 	abi_long f_frsize;
++#ifdef HAVE_STATFS_FLAGS
++	abi_long f_flags;
++	abi_long f_spare[4];
++#else
+ 	abi_long f_spare[5];
++#endif
+ };
+ #elif defined(TARGET_S390X)
+ struct target_statfs {
+@@ -2299,7 +2331,13 @@ struct target_statfs {
+     kernel_fsid_t f_fsid;
+     int32_t  f_namelen;
+     int32_t  f_frsize;
++#ifdef HAVE_STATFS_FLAGS
++    int32_t  f_flags;
++    int32_t  f_spare[4];
++#else
+     int32_t  f_spare[5];
++#endif
++
+ };
+ 
+ struct target_statfs64 {
+@@ -2313,7 +2351,12 @@ struct target_statfs64 {
+     kernel_fsid_t f_fsid;
+     int32_t  f_namelen;
+     int32_t  f_frsize;
++#ifdef HAVE_STATFS_FLAGS
++    int32_t  f_flags;
++    int32_t  f_spare[4];
++#else
+     int32_t  f_spare[5];
++#endif
+ };
+ #else
+ struct target_statfs {
+@@ -2327,7 +2370,12 @@ struct target_statfs {
+ 	target_fsid_t f_fsid;
+ 	uint32_t f_namelen;
+ 	uint32_t f_frsize;
++#ifdef HAVE_STATFS_FLAGS
++	uint32_t f_flags;
++	uint32_t f_spare[4];
++#else
+ 	uint32_t f_spare[5];
++#endif
+ };
+ 
+ struct target_statfs64 {
+@@ -2341,7 +2389,12 @@ struct target_statfs64 {
+ 	target_fsid_t f_fsid;
+         uint32_t f_namelen;
+ 	uint32_t f_frsize;
++#ifdef HAVE_STATFS_FLAGS
++	uint32_t f_flags;
++	uint32_t f_spare[4];
++#else
+ 	uint32_t f_spare[5];
++#endif
+ };
+ #endif
+ 
+-- 
+2.16.1
