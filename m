@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1enyc5-0001LM-Bp
+	(envelope-from <dgibson@ozlabs.org>) id 1enyc6-0001LP-Eh
 	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 22:29:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1enyc3-0006TR-9q
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 22:29:05 -0500
-Date: Tue, 20 Feb 2018 14:28:47 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1enyc3-0006TL-8z
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 22:29:06 -0500
+Date: Tue, 20 Feb 2018 14:28:35 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180220032847.GK1109@umbus.fritz.box>
+Message-ID: <20180220032835.GJ1109@umbus.fritz.box>
 References: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
-	<20180219181922.21586-3-mark.cave-ayland@ilande.co.uk>
+	<20180219181922.21586-2-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="OX2aLCKeO1apYW07"
+	protocol="application/pgp-signature"; boundary="ed/6oDxOLijJh8b0"
 Content-Disposition: inline
-In-Reply-To: <20180219181922.21586-3-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 02/11] macio: move ESCC device within the
- macio device
+In-Reply-To: <20180219181922.21586-2-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 01/11] macio: embed DBDMA device directly
+ within macio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,340 +29,77 @@ To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---OX2aLCKeO1apYW07
+--ed/6oDxOLijJh8b0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 19, 2018 at 06:19:13PM +0000, Mark Cave-Ayland wrote:
-> Now that the ESCC device is instantiated directly via qdev, move it to wi=
-thin
-> the macio device and wire up the IRQs and memory regions using the sysbus=
- API.
->=20
-> This enables to remove the now-obsolete escc_mem parameter to the macio_i=
-nit()
-> function.
->=20
-> (Note this patch also contains small touch-ups to the formatting in
-> macio_escc_legacy_setup() and ppc_heathrow_init() in order to keep checkp=
-atch
-> happy)
+On Mon, Feb 19, 2018 at 06:19:12PM +0000, Mark Cave-Ayland wrote:
+> The current recommendation is to embed subdevices directly within their c=
+ontainer
+> device, so do this for the DBDMA device.
 >=20
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 Applied, thanks.
 
 > ---
->  hw/misc/macio/macio.c | 60 ++++++++++++++++++++++++++++++++++++---------=
-------
->  hw/ppc/mac.h          |  3 +--
->  hw/ppc/mac_newworld.c | 37 ++++++++-----------------------
->  hw/ppc/mac_oldworld.c | 38 +++++++++-----------------------
->  4 files changed, 63 insertions(+), 75 deletions(-)
+>  hw/misc/macio/macio.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
 >=20
 > diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index 7174135c8b..1c10d8a1d7 100644
+> index 024f8557ab..7174135c8b 100644
 > --- a/hw/misc/macio/macio.c
 > +++ b/hw/misc/macio/macio.c
-> @@ -43,8 +43,8 @@ typedef struct MacIOState
+> @@ -42,7 +42,7 @@ typedef struct MacIOState
+> =20
 >      MemoryRegion bar;
 >      CUDAState cuda;
->      DBDMAState dbdma;
-> +    ESCCState escc;
+> -    DBDMAState *dbdma;
+> +    DBDMAState dbdma;
 >      MemoryRegion *pic_mem;
-> -    MemoryRegion *escc_mem;
+>      MemoryRegion *escc_mem;
 >      uint64_t frequency;
->  } MacIOState;
+> @@ -129,12 +129,12 @@ static void macio_common_realize(PCIDevice *d, Erro=
+r **errp)
+>      SysBusDevice *sysbus_dev;
+>      Error *err =3D NULL;
 > =20
-> @@ -56,7 +56,7 @@ typedef struct OldWorldMacIOState {
->      MacIOState parent_obj;
->      /*< public >*/
-> =20
-> -    qemu_irq irqs[5];
-> +    qemu_irq irqs[7];
-> =20
->      MacIONVRAMState nvram;
->      MACIOIDEState ide[2];
-> @@ -69,7 +69,7 @@ typedef struct NewWorldMacIOState {
->      /*< private >*/
->      MacIOState parent_obj;
->      /*< public >*/
-> -    qemu_irq irqs[5];
-> +    qemu_irq irqs[7];
->      MACIOIDEState ide[2];
->  } NewWorldMacIOState;
-> =20
-> @@ -84,10 +84,12 @@ typedef struct NewWorldMacIOState {
->   *
->   * Reference: ftp://ftp.software.ibm.com/rs6000/technology/spec/chrp/inw=
-ork/CHRP_IORef_1.0.pdf
->   */
-> -static void macio_escc_legacy_setup(MacIOState *macio_state)
-> +static void macio_escc_legacy_setup(MacIOState *s)
->  {
-> +    ESCCState *escc =3D ESCC(&s->escc);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(escc);
->      MemoryRegion *escc_legacy =3D g_new(MemoryRegion, 1);
-> -    MemoryRegion *bar =3D &macio_state->bar;
-> +    MemoryRegion *bar =3D &s->bar;
->      int i;
->      static const int maps[] =3D {
->          0x00, 0x00, /* Command B */
-> @@ -102,25 +104,26 @@ static void macio_escc_legacy_setup(MacIOState *mac=
-io_state)
->          0xb0, 0xb0, /* Detect AB */
->      };
-> =20
-> -    memory_region_init(escc_legacy, OBJECT(macio_state), "escc-legacy", =
-256);
-> +    memory_region_init(escc_legacy, OBJECT(s), "escc-legacy", 256);
->      for (i =3D 0; i < ARRAY_SIZE(maps); i +=3D 2) {
->          MemoryRegion *port =3D g_new(MemoryRegion, 1);
-> -        memory_region_init_alias(port, OBJECT(macio_state), "escc-legacy=
--port",
-> -                                 macio_state->escc_mem, maps[i+1], 0x2);
-> +        memory_region_init_alias(port, OBJECT(s), "escc-legacy-port",
-> +                                 sysbus_mmio_get_region(sbd, 0),
-> +                                 maps[i + 1], 0x2);
->          memory_region_add_subregion(escc_legacy, maps[i], port);
->      }
-> =20
->      memory_region_add_subregion(bar, 0x12000, escc_legacy);
->  }
-> =20
-> -static void macio_bar_setup(MacIOState *macio_state)
-> +static void macio_bar_setup(MacIOState *s)
->  {
-> -    MemoryRegion *bar =3D &macio_state->bar;
-> +    ESCCState *escc =3D ESCC(&s->escc);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(escc);
-> +    MemoryRegion *bar =3D &s->bar;
-> =20
-> -    if (macio_state->escc_mem) {
-> -        memory_region_add_subregion(bar, 0x13000, macio_state->escc_mem);
-> -        macio_escc_legacy_setup(macio_state);
-> -    }
-> +    memory_region_add_subregion(bar, 0x13000, sysbus_mmio_get_region(sbd=
-, 0));
-> +    macio_escc_legacy_setup(s);
->  }
-> =20
->  static void macio_common_realize(PCIDevice *d, Error **errp)
-> @@ -147,6 +150,12 @@ static void macio_common_realize(PCIDevice *d, Error=
- **errp)
->      memory_region_add_subregion(&s->bar, 0x16000,
->                                  sysbus_mmio_get_region(sysbus_dev, 0));
-> =20
-> +    object_property_set_bool(OBJECT(&s->escc), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
->      macio_bar_setup(s);
->      pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->bar);
->  }
-> @@ -185,6 +194,10 @@ static void macio_oldworld_realize(PCIDevice *d, Err=
-or **errp)
->      sysbus_dev =3D SYS_BUS_DEVICE(&s->cuda);
->      sysbus_connect_irq(sysbus_dev, 0, os->irqs[cur_irq++]);
-> =20
-> +    sysbus_dev =3D SYS_BUS_DEVICE(&s->escc);
-> +    sysbus_connect_irq(sysbus_dev, 0, os->irqs[cur_irq++]);
-> +    sysbus_connect_irq(sysbus_dev, 1, os->irqs[cur_irq++]);
-> +
->      object_property_set_bool(OBJECT(&os->nvram), true, "realized", &err);
+> -    object_property_set_bool(OBJECT(s->dbdma), true, "realized", &err);
+> +    object_property_set_bool(OBJECT(&s->dbdma), true, "realized", &err);
 >      if (err) {
 >          error_propagate(errp, err);
-> @@ -297,6 +310,10 @@ static void macio_newworld_realize(PCIDevice *d, Err=
-or **errp)
->      sysbus_dev =3D SYS_BUS_DEVICE(&s->cuda);
->      sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
+>          return;
+>      }
+> -    sysbus_dev =3D SYS_BUS_DEVICE(s->dbdma);
+> +    sysbus_dev =3D SYS_BUS_DEVICE(&s->dbdma);
+>      memory_region_add_subregion(&s->bar, 0x08000,
+>                                  sysbus_mmio_get_region(sysbus_dev, 0));
 > =20
-> +    sysbus_dev =3D SYS_BUS_DEVICE(&s->escc);
-> +    sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
-> +    sysbus_connect_irq(sysbus_dev, 1, ns->irqs[cur_irq++]);
-> +
->      if (s->pic_mem) {
->          /* OpenPIC */
->          memory_region_add_subregion(&s->bar, 0x40000, s->pic_mem);
-> @@ -347,6 +364,17 @@ static void macio_instance_init(Object *obj)
->      object_initialize(&s->dbdma, sizeof(s->dbdma), TYPE_MAC_DBDMA);
->      qdev_set_parent_bus(DEVICE(&s->dbdma), sysbus_get_default());
->      object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
-> +
-> +    object_initialize(&s->escc, sizeof(s->escc), TYPE_ESCC);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
-> +    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hds[0]);
-> +    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hds[1]);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
-> +    qdev_set_parent_bus(DEVICE(&s->escc), sysbus_get_default());
-> +    object_property_add_child(obj, "escc", OBJECT(&s->escc), NULL);
+> @@ -161,7 +161,7 @@ static void macio_realize_ide(MacIOState *s, MACIOIDE=
+State *ide,
+>      sysbus_connect_irq(sysbus_dev, 0, irq0);
+>      sysbus_connect_irq(sysbus_dev, 1, irq1);
+>      qdev_prop_set_uint32(DEVICE(ide), "channel", dmaid);
+> -    object_property_set_link(OBJECT(ide), OBJECT(s->dbdma), "dbdma", err=
+p);
+> +    object_property_set_link(OBJECT(ide), OBJECT(&s->dbdma), "dbdma", er=
+rp);
+>      macio_ide_register_dma(ide);
+> =20
+>      object_property_set_bool(OBJECT(ide), true, "realized", errp);
+> @@ -344,8 +344,9 @@ static void macio_instance_init(Object *obj)
+>      qdev_set_parent_bus(DEVICE(&s->cuda), sysbus_get_default());
+>      object_property_add_child(obj, "cuda", OBJECT(&s->cuda), NULL);
+> =20
+> -    s->dbdma =3D MAC_DBDMA(object_new(TYPE_MAC_DBDMA));
+> -    object_property_add_child(obj, "dbdma", OBJECT(s->dbdma), NULL);
+> +    object_initialize(&s->dbdma, sizeof(s->dbdma), TYPE_MAC_DBDMA);
+> +    qdev_set_parent_bus(DEVICE(&s->dbdma), sysbus_get_default());
+> +    object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
 >  }
 > =20
 >  static const VMStateDescription vmstate_macio_oldworld =3D {
-> @@ -444,13 +472,11 @@ static void macio_register_types(void)
->  type_init(macio_register_types)
-> =20
->  void macio_init(PCIDevice *d,
-> -                MemoryRegion *pic_mem,
-> -                MemoryRegion *escc_mem)
-> +                MemoryRegion *pic_mem)
->  {
->      MacIOState *macio_state =3D MACIO(d);
-> =20
->      macio_state->pic_mem =3D pic_mem;
-> -    macio_state->escc_mem =3D escc_mem;
->      /* Note: this code is strongly inspirated from the corresponding code
->         in PearPC */
->      qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "timebase-frequency=
-",
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index 4702194f3f..261b519aa5 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -76,8 +76,7 @@ void macio_ide_init_drives(MACIOIDEState *ide, DriveInf=
-o **hd_table);
->  void macio_ide_register_dma(MACIOIDEState *ide);
-> =20
->  void macio_init(PCIDevice *dev,
-> -                MemoryRegion *pic_mem,
-> -                MemoryRegion *escc_mem);
-> +                MemoryRegion *pic_mem);
-> =20
->  /* Heathrow PIC */
->  qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 4e1298ee50..5e82158759 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -159,8 +159,7 @@ static void ppc_core99_init(MachineState *machine)
->      MacIONVRAMState *nvr;
->      int bios_size, ndrv_size;
->      uint8_t *ndrv_file;
-> -    MemoryRegion *pic_mem, *escc_mem;
-> -    MemoryRegion *escc_bar =3D g_new(MemoryRegion, 1);
-> +    MemoryRegion *pic_mem;
->      int ppc_boot_device;
->      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->      void *fw_cfg;
-> @@ -368,36 +367,18 @@ static void ppc_core99_init(MachineState *machine)
->          tbfreq =3D TBFREQ;
->      }
-> =20
-> -    /* init basic PC hardware */
-> -
-> -    dev =3D qdev_create(NULL, TYPE_ESCC);
-> -    qdev_prop_set_uint32(dev, "disabled", 0);
-> -    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> -    qdev_prop_set_uint32(dev, "it_shift", 4);
-> -    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> -    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> -    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> -    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> -    qdev_init_nofail(dev);
-> -
-> -    s =3D SYS_BUS_DEVICE(dev);
-> -    sysbus_connect_irq(s, 0, pic[0x24]);
-> -    sysbus_connect_irq(s, 1, pic[0x25]);
-> -
-> -    escc_mem =3D &ESCC(s)->mmio;
-> -
-> -    memory_region_init_alias(escc_bar, NULL, "escc-bar",
-> -                             escc_mem, 0, memory_region_size(escc_mem));
-> -
-> +    /* MacIO */
->      macio =3D pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
->      dev =3D DEVICE(macio);
->      qdev_connect_gpio_out(dev, 0, pic[0x19]); /* CUDA */
-> -    qdev_connect_gpio_out(dev, 1, pic[0x0d]); /* IDE */
-> -    qdev_connect_gpio_out(dev, 2, pic[0x02]); /* IDE DMA */
-> -    qdev_connect_gpio_out(dev, 3, pic[0x0e]); /* IDE */
-> -    qdev_connect_gpio_out(dev, 4, pic[0x03]); /* IDE DMA */
-> +    qdev_connect_gpio_out(dev, 1, pic[0x24]); /* ESCC-B */
-> +    qdev_connect_gpio_out(dev, 2, pic[0x25]); /* ESCC-A */
-> +    qdev_connect_gpio_out(dev, 3, pic[0x0d]); /* IDE */
-> +    qdev_connect_gpio_out(dev, 4, pic[0x02]); /* IDE DMA */
-> +    qdev_connect_gpio_out(dev, 5, pic[0x0e]); /* IDE */
-> +    qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE DMA */
->      qdev_prop_set_uint64(dev, "frequency", tbfreq);
-> -    macio_init(macio, pic_mem, escc_bar);
-> +    macio_init(macio, pic_mem);
-> =20
->      /* We only emulate 2 out of 3 IDE controllers for now */
->      ide_drive_get(hd, ARRAY_SIZE(hd));
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index d0d21d2392..4401ce5af2 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -99,12 +99,10 @@ static void ppc_heathrow_init(MachineState *machine)
->      int bios_size, ndrv_size;
->      uint8_t *ndrv_file;
->      MemoryRegion *pic_mem;
-> -    MemoryRegion *escc_mem, *escc_bar =3D g_new(MemoryRegion, 1);
->      uint16_t ppc_boot_device;
->      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->      void *fw_cfg;
->      uint64_t tbfreq;
-> -    SysBusDevice *s;
-> =20
->      linux_boot =3D (kernel_filename !=3D NULL);
-> =20
-> @@ -265,40 +263,24 @@ static void ppc_heathrow_init(MachineState *machine)
->                                 get_system_io());
->      pci_vga_init(pci_bus);
-> =20
-> -    dev =3D qdev_create(NULL, TYPE_ESCC);
-> -    qdev_prop_set_uint32(dev, "disabled", 0);
-> -    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> -    qdev_prop_set_uint32(dev, "it_shift", 4);
-> -    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> -    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> -    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> -    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> -    qdev_init_nofail(dev);
-> -
-> -    s =3D SYS_BUS_DEVICE(dev);
-> -    sysbus_connect_irq(s, 0, pic[0x10]);
-> -    sysbus_connect_irq(s, 1, pic[0x0f]);
-> -
-> -    escc_mem =3D &ESCC(s)->mmio;
-> -
-> -    memory_region_init_alias(escc_bar, NULL, "escc-bar",
-> -                             escc_mem, 0, memory_region_size(escc_mem));
-> -
-> -    for(i =3D 0; i < nb_nics; i++)
-> +    for (i =3D 0; i < nb_nics; i++) {
->          pci_nic_init_nofail(&nd_table[i], pci_bus, "ne2k_pci", NULL);
-> -
-> +    }
-> =20
->      ide_drive_get(hd, ARRAY_SIZE(hd));
-> =20
-> +    /* MacIO */
->      macio =3D pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
->      dev =3D DEVICE(macio);
->      qdev_connect_gpio_out(dev, 0, pic[0x12]); /* CUDA */
-> -    qdev_connect_gpio_out(dev, 1, pic[0x0D]); /* IDE-0 */
-> -    qdev_connect_gpio_out(dev, 2, pic[0x02]); /* IDE-0 DMA */
-> -    qdev_connect_gpio_out(dev, 3, pic[0x0E]); /* IDE-1 */
-> -    qdev_connect_gpio_out(dev, 4, pic[0x03]); /* IDE-1 DMA */
-> +    qdev_connect_gpio_out(dev, 1, pic[0x10]); /* ESCC-B */
-> +    qdev_connect_gpio_out(dev, 2, pic[0x0F]); /* ESCC-A */
-> +    qdev_connect_gpio_out(dev, 3, pic[0x0D]); /* IDE-0 */
-> +    qdev_connect_gpio_out(dev, 4, pic[0x02]); /* IDE-0 DMA */
-> +    qdev_connect_gpio_out(dev, 5, pic[0x0E]); /* IDE-1 */
-> +    qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE-1 DMA */
->      qdev_prop_set_uint64(dev, "frequency", tbfreq);
-> -    macio_init(macio, pic_mem, escc_bar);
-> +    macio_init(macio, pic_mem);
-> =20
->      macio_ide =3D MACIO_IDE(object_resolve_path_component(OBJECT(macio),
->                                                          "ide[0]"));
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -370,24 +107,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---OX2aLCKeO1apYW07
+--ed/6oDxOLijJh8b0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqLle8ACgkQbDjKyiDZ
-s5Kb1g//WMWFcP2zaf0PtSXu6o7UE38/MnRKCtoV7wYPa33nwxK1Pks0HQ9BY4a6
-rakYsiWHEslH75uBD/0rO+azooSkQwJBOas09ArmShwPxSHN3/IQfkkT5PPaBC50
-biwJi4iAkLZXk8RC4B8Njl+2mRH3Pppyt8wFmiEDksa4gk9vgBF9gltmSPqBssMc
-FEpE2xuUo0Hgux6nWAtu1OoVQ9CKO04WitZh0ulasFwz+EynO3KTBA7O/PCHf0DH
-jYKH8dhAnSYi2Jru6opNA1bEnosSGPAi3rHdBZVXLsmPQo0EuwBqGP6aozL74jD1
-75RBjhmJN3M/TABqvxWzmD1fD//Oo9BQ2MsutahkaFDwEP6xFuH2UwPndR25jBtf
-1ly7JgGpIa+lto3lV1kmZNkmZ9y6gKG6KOXOd0o3lBjtgJz3XesB2Q1Z8FLvHd5d
-h1ijwnZwi7XStbY6ffkrWrCNsncKTBNYLuqOYNcJu1IAfYzG1lQMEUBpFF2HegRT
-1EMY4J1CvHfcsEAqtGey9YjS0HJ9nG8QNNedICpIwCvqYE3d/HsOHrUh0mWaeOz3
-V8oqStwRw3KR6xSx2zB6OQ2zdpRwq23znSbA48UNBzyrnovsjIIZqs4zVvv2gJT+
-r5w3Tl1Iey1PF+tixphDfG17XGw4uW7YLcEUJrE/dm8L1AhpCPs=
-=6hTn
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqLleMACgkQbDjKyiDZ
+s5INtBAAsbFn8KHo9qQc9ORG/jvwFBI0ulNeP/QG7XGzlmAzYesOynfem735GrJY
+InF++POcNLiNTld19IrkIdkTuI2/NGURQ3Zqt/m2TiQa0D15g/WGgfHFzxeB4Br5
+faTsnLzSjd6pBAoXqLSbgCdnRdpMg/jCTzTZ3hPIQ7Pb+gryks01TceqrjQy0Pvb
+NTlPgRP27WRNbOe2DVA1XepUC4a44ckUbDSp6q0ShcN8ww0ox0DcOpGHnxoeOgGG
+gEcmYdDLHclM1LbeXd0GVYyrRmmzzTPgT5DZJmK9PJY4iW1cUFkcZicE6b4hmzmp
+KRsVBEG/ewtzMIqGsA5AhWCUKiAZ7lUEAE7u8Xm9+yKH88lRTZF0XbqOTRdBfn2P
+txUMOLi0Cyu2P28t/xozPshdOS9yaLB00F6g88jg/uTnc4cKBpZH7gUKJ4vCjOsC
+eAX/fs1vCcr8B42sYC4k0Ylw1NlvrCx/OfOKNLiH7YMp+GNHr66+xaqYynT5/ixT
+OYJx+aHwS5OTiujcIAs48OP1s3bka1vhVh53zEyIkR7ZF4BZ14Z0hcRyt32N96y9
+gJNeKKMV1Yoh0SiMiwo0+ZCvg0kyHWtI3EdawyroNLCiRgkTIUE6OD9GrhY1CPBj
+Fm+rLke97R88um5KrTCqlOFTUi7d4x7ON5zihP+xNgO/uupok/0=
+=vhVw
 -----END PGP SIGNATURE-----
 
---OX2aLCKeO1apYW07--
+--ed/6oDxOLijJh8b0--
