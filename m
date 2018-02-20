@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1enzRn-000525-Gy
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:22:32 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enzj2-0000Ga-0h
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1enzRm-0006u3-8H
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:22:31 -0500
-Date: Tue, 20 Feb 2018 15:22:18 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180220042218.GM1109@umbus.fritz.box>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enziy-0003kY-O5
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:40:19 -0500
 References: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
-	<20180219181922.21586-6-mark.cave-ayland@ilande.co.uk>
+	<20180219181922.21586-5-mark.cave-ayland@ilande.co.uk>
+	<20180220042057.GL1109@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <78f5a679-b3eb-2188-d0d1-957a23cf44b0@ilande.co.uk>
+Date: Tue, 20 Feb 2018 04:40:07 +0000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pFpMklMRdxwSC3Yi"
-Content-Disposition: inline
-In-Reply-To: <20180219181922.21586-6-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 05/11] heathrow: change heathrow_pic_init()
- to return the heathrow device
+In-Reply-To: <20180220042057.GL1109@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/11] heathrow: convert to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,148 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+
+On 20/02/18 04:20, David Gibson wrote:
+
+> On Mon, Feb 19, 2018 at 06:19:15PM +0000, Mark Cave-Ayland wrote:
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>   hw/intc/heathrow_pic.c         | 31 ++++++++++++-------------------
+>>   hw/intc/trace-events           |  5 +++++
+>>   include/hw/intc/heathrow_pic.h |  1 +
+>>   3 files changed, 18 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
+>> index 7bf44e0d86..afe0b08cbb 100644
+>> --- a/hw/intc/heathrow_pic.c
+>> +++ b/hw/intc/heathrow_pic.c
+>> @@ -26,16 +26,7 @@
+>>   #include "hw/hw.h"
+>>   #include "hw/ppc/mac.h"
+>>   #include "hw/intc/heathrow_pic.h"
+>> -
+>> -/* debug PIC */
+>> -//#define DEBUG_PIC
+>> -
+>> -#ifdef DEBUG_PIC
+>> -#define PIC_DPRINTF(fmt, ...)                                   \
+>> -    do { printf("PIC: " fmt , ## __VA_ARGS__); } while (0)
+>> -#else
+>> -#define PIC_DPRINTF(fmt, ...)
+>> -#endif
+>> +#include "trace.h"
+>>   
+>>   static inline int heathrow_check_irq(HeathrowPICState *pic)
+>>   {
+>> @@ -61,7 +52,7 @@ static void heathrow_write(void *opaque, hwaddr addr,
+>>       unsigned int n;
+>>   
+>>       n = ((addr & 0xfff) - 0x10) >> 4;
+>> -    PIC_DPRINTF("writel: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
+>> +    trace_heathrow_write(addr, n, value);
+>>       if (n >= 2)
+>>           return;
+>>       pic = &s->pics[n];
+>> @@ -109,7 +100,7 @@ static uint64_t heathrow_read(void *opaque, hwaddr addr,
+>>               break;
+>>           }
+>>       }
+>> -    PIC_DPRINTF("readl: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
+>> +    trace_heathrow_read(addr, n, value);
+>>       return value;
+>>   }
+>>   
+>> @@ -124,16 +115,18 @@ static void heathrow_set_irq(void *opaque, int num, int level)
+>>       HeathrowState *s = opaque;
+>>       HeathrowPICState *pic;
+>>       unsigned int irq_bit;
+>> +    int last_level = (s->last_levels & (num << 1UL)) ? 1 : 0;
+>>   
+>> -#if defined(DEBUG)
+>> -    {
+>> -        static int last_level[64];
+>> -        if (last_level[num] != level) {
+>> -            PIC_DPRINTF("set_irq: num=0x%02x level=%d\n", num, level);
+>> -            last_level[num] = level;
+>> +    if (last_level != level) {
+>> +        trace_heathrow_set_irq(num, level);
+>> +
+>> +        if (level) {
+>> +            s->last_levels |= (num << 1UL);
+>> +        } else {
+>> +            s->last_levels &= ~(num << 1UL);
+> 
+> Cleaning up this last_level stuff is a good idea, but is a bit more
+> involved than merely converting to trace-events.
+> 
+> It's also not really the "last" level - it's effectively maintaining
+> the current level of the input irqs.  .. and isn't that information
+> already within the HeathrowPICState structure?
+
+Yeah actually you're right here - I was so focused on converting the 
+code as-is that I didn't really look at what was happening at the end of 
+heathrow_set_irq(). The motivation was that without this hack the trace 
+output is always outputting the IRQ status, presumably because we have a 
+level-triggered interrupt being asserted.
+
+Let me rework this patch to use the last state information from 
+HeathrowPICState instead.
 
 
---pFpMklMRdxwSC3Yi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ATB,
 
-On Mon, Feb 19, 2018 at 06:19:16PM +0000, Mark Cave-Ayland wrote:
-> This enables the device to be made available during the setup of the Old =
-World
-> machine. In order to pass back the previous set of IRQs we temporarily in=
-troduce
-> a new pic_irqs parameter until it can be removed.
->=20
-> An additional benefit of this change is that it is also possible to remov=
-e the
-> pic_mem pointer used for macio by accessing the memory region via sysbus.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/intc/heathrow_pic.c | 10 ++++++----
->  hw/ppc/mac.h           |  4 ++--
->  hw/ppc/mac_oldworld.c  |  9 +++++----
->  3 files changed, 13 insertions(+), 10 deletions(-)
->=20
-> diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-> index afe0b08cbb..1cf4db1e79 100644
-> --- a/hw/intc/heathrow_pic.c
-> +++ b/hw/intc/heathrow_pic.c
-> @@ -173,13 +173,15 @@ static void heathrow_reset(DeviceState *d)
->  static void heathrow_init(Object *obj)
->  {
->      HeathrowState *s =3D HEATHROW(obj);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> =20
->      memory_region_init_io(&s->mem, OBJECT(s), &heathrow_ops, s,
->                            "heathrow-pic", 0x1000);
-> +    sysbus_init_mmio(sbd, &s->mem);
->  }
-> =20
-> -qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
-> -                            int nb_cpus, qemu_irq **irqs)
-> +DeviceState *heathrow_pic_init(int nb_cpus, qemu_irq **irqs,
-> +                               qemu_irq **pic_irqs)
->  {
->      DeviceState *d;
->      HeathrowState *s;
-> @@ -191,9 +193,9 @@ qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
->      /* only 1 CPU */
->      s->irqs =3D irqs[0];
-> =20
-> -    *pmem =3D &s->mem;
-> +    *pic_irqs =3D qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_I=
-RQS);
-> =20
-> -    return qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_IRQS);
-> +    return d;
->  }
-> =20
->  static void heathrow_class_init(ObjectClass *oc, void *data)
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index 261b519aa5..5b5fffdff3 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -79,8 +79,8 @@ void macio_init(PCIDevice *dev,
->                  MemoryRegion *pic_mem);
-> =20
->  /* Heathrow PIC */
-> -qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
-> -                            int nb_cpus, qemu_irq **irqs);
-> +DeviceState *heathrow_pic_init(int nb_cpus, qemu_irq **irqs,
-> +                               qemu_irq **pic_irqs);
-> =20
->  /* Grackle PCI */
->  #define TYPE_GRACKLE_PCI_HOST_BRIDGE "grackle-pcihost"
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index 4401ce5af2..06a61220cb 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -94,11 +94,11 @@ static void ppc_heathrow_init(MachineState *machine)
->      PCIBus *pci_bus;
->      PCIDevice *macio;
->      MACIOIDEState *macio_ide;
-> -    DeviceState *dev;
-> +    DeviceState *dev, *pic_dev;
-> +    SysBusDevice *sbd;
->      BusState *adb_bus;
->      int bios_size, ndrv_size;
->      uint8_t *ndrv_file;
-> -    MemoryRegion *pic_mem;
->      uint16_t ppc_boot_device;
->      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->      void *fw_cfg;
-> @@ -257,7 +257,7 @@ static void ppc_heathrow_init(MachineState *machine)
->          error_report("Only 6xx bus is supported on heathrow machine");
->          exit(1);
->      }
-> -    pic =3D heathrow_pic_init(&pic_mem, 1, heathrow_irqs);
-> +    pic_dev =3D heathrow_pic_init(1, heathrow_irqs, &pic);
->      pci_bus =3D pci_grackle_init(0xfec00000, pic,
->                                 get_system_memory(),
->                                 get_system_io());
-> @@ -280,7 +280,8 @@ static void ppc_heathrow_init(MachineState *machine)
->      qdev_connect_gpio_out(dev, 5, pic[0x0E]); /* IDE-1 */
->      qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE-1 DMA */
->      qdev_prop_set_uint64(dev, "frequency", tbfreq);
-> -    macio_init(macio, pic_mem);
-> +    sbd =3D SYS_BUS_DEVICE(pic_dev);
-> +    macio_init(macio, sysbus_mmio_get_region(sbd, 0));
-> =20
->      macio_ide =3D MACIO_IDE(object_resolve_path_component(OBJECT(macio),
->                                                          "ide[0]"));
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---pFpMklMRdxwSC3Yi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqLonoACgkQbDjKyiDZ
-s5J4yBAAh8ns2GniFIICJSdasmAP/+2JX1tq4HrLWYDF6eYk1eLYxbv2GGQMrOSq
-bTC/AW1l9Yqp0MoGSNmDE1H6TLoY9tLld/uwsRDXWTOnxeUiQxf2Ocis6Q/d+tkb
-5NdSlkLg1QuMJUsp21r53q4f73blUwBj9nUDDcbXnqMez1URUPoE1kozPX1aGoSl
-3oCJcL89Pqm5B5HScSjg9iadYpg2X0eZLAVeat0cU8Jy4CnKqovru15vlYuDoM1A
-S1plkx+hWPAYAOf5PCEuIWETLXN9LBCGE7P/ZoiiKmaTN40PTAugl1CZDF/JxyQF
-VCpnBR4bf3iN2OFEA7yr4H/1FSUkTddMjgLJNsbpkjvWgKcw9QvUZLo3BmCy50kW
-rHQpzEJeTdnP2Lnl+g20uCt31tsE00daQp1kJcbsK6FkjVXAjXjaUleyAinCFp6Z
-uM0LGAtkCwenVea85+jtVxy7aa8MhwGY7F4IbkydmoSR44VWvpCC9wvTkp7lCfAl
-u2I0NZrhKaAOSFKdmnfwAaPMyn58V+R/kIErFO+1Vs5XoGzsS+aVQRDzgI7A4LNS
-hPZ2OfTdKzvRhHGvDxXeFz4ZhobcpRROUbFTVqkOq42O4yH3KKwEEsRU4fHjHKCU
-eOw7TNwqVWKmTSSPmsh/K8H+J69PGIs03TbhfitHeqalv8X4G9Q=
-=4MEG
------END PGP SIGNATURE-----
-
---pFpMklMRdxwSC3Yi--
+Mark.
