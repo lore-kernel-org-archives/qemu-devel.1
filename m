@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoBuE-0002Wg-By
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1eoBuK-0002cK-Am
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoBuC-0000dm-Up
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:42 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39596 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1eoBuH-0000hX-1d
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:48 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51588 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoBuC-0000dT-PD
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:40 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoBuG-0000hC-Ro
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:44 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53FEC4023EDE
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 17:40:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BD8D407244E
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 17:40:44 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 20 Feb 2018 18:40:05 +0100
-Message-Id: <1519148406-15006-8-git-send-email-thuth@redhat.com>
+Date: Tue, 20 Feb 2018 18:40:06 +0100
+Message-Id: <1519148406-15006-9-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519148406-15006-1-git-send-email-thuth@redhat.com>
 References: <1519148406-15006-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/8] net: Add a new convenience option
- "--nic" to configure default/on-board NICs
+Subject: [Qemu-devel] [PATCH v2 8/8] qemu-doc: Make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,231 +32,358 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The legacy "-net" option can be quite confusing for the users since most
-people do not expect to get a "vlan" hub between their emulated guest
-hardware and the host backend. But so far, we are also not able to get
-rid of "-net" completely, since it is the only way to configure on-board
-NICs that can not be instantiated via "-device" yet. It's also a little
-bit shorter to type "-net nic -net tap" instead of "-device xyz,netdev=n1
--netdev tap,id=n1".
-
-So what we need is a new convenience option that is shorter to type than
-the full -device + -netdev stuff, and which can be used to configure the
-on-board NICs that can not be handled via -device yet. Thus this patch now
-provides such a new option "--nic": It adds an entry in the nd_table to
-configure a on-board / default NIC, creates a host backend and connects
-the two directly, without a confusing "vlan" hub inbetween.
+"-net" is clearly a legacy option. Yet we still use it in almost all
+examples in the qemu documentation, and many other spots in the network
+chapter. We should make it less prominent that users are not lured into
+using it so often anymore. So instead of starting the network chapter with
+"-net nic" and documenting "-net <backend>" below "-netdev <backend>"
+everywhere, all the "-net" related documentation is now moved to the end
+of the chapter. And the examples are changed to use the "--device" and
+"--netdev" options instead of "-net nic -net <backend>".
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/sysemu/sysemu.h |  1 +
- net/net.c               | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx         | 40 +++++++++++++++++++++----
- vl.c                    |  7 +++++
- 4 files changed, 120 insertions(+), 6 deletions(-)
+ qemu-options.hx | 176 +++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 86 insertions(+), 90 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 77bb3da..66f0761 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -197,6 +197,7 @@ extern QemuOptsList bdrv_runtime_opts;
- extern QemuOptsList qemu_chardev_opts;
- extern QemuOptsList qemu_device_opts;
- extern QemuOptsList qemu_netdev_opts;
-+extern QemuOptsList qemu_nic_opts;
- extern QemuOptsList qemu_net_opts;
- extern QemuOptsList qemu_global_opts;
- extern QemuOptsList qemu_mon_opts;
-diff --git a/net/net.c b/net/net.c
-index 2d05808..0bab269 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1462,6 +1462,67 @@ static int net_init_netdev(void *dummy, QemuOpts *opts, Error **errp)
-     return net_client_init(opts, true, errp);
- }
- 
-+/* For the convenience "--nic" parameter */
-+static int net_param_nic(void *dummy, QemuOpts *opts, Error **errp)
-+{
-+    char *mac, *nd_id;
-+    int idx, ret;
-+    NICInfo *ni;
-+    const char *type;
-+
-+    type = qemu_opt_get(opts, "type");
-+    if (type && g_str_equal(type, "none")) {
-+        return 0;    /* Nothing to do, default_net is cleared in vl.c */
-+    }
-+
-+    idx = nic_get_free_idx();
-+    if (idx == -1 || nb_nics >= MAX_NICS) {
-+        error_setg(errp, "no more on-board/default NIC slots available");
-+        return -1;
-+    }
-+
-+    if (!type) {
-+        qemu_opt_set(opts, "type", "user", &error_abort);
-+    }
-+
-+    ni = &nd_table[idx];
-+    memset(ni, 0, sizeof(*ni));
-+    ni->model = qemu_opt_get_del(opts, "model");
-+
-+    /* Create an ID if the user did not specify one */
-+    nd_id = g_strdup(qemu_opts_id(opts));
-+    if (!nd_id) {
-+        nd_id = g_strdup_printf("__org.qemu.nic%i\n", idx);
-+        qemu_opts_set_id(opts, nd_id);
-+    }
-+
-+    /* Handle MAC address */
-+    mac = qemu_opt_get_del(opts, "mac");
-+    if (mac) {
-+        ret = net_parse_macaddr(ni->macaddr.a, mac);
-+        g_free(mac);
-+        if (ret) {
-+            error_setg(errp, "invalid syntax for ethernet address");
-+            return -1;
-+        }
-+        if (is_multicast_ether_addr(ni->macaddr.a)) {
-+            error_setg(errp, "NIC cannot have multicast MAC address");
-+            return -1;
-+        }
-+    }
-+    qemu_macaddr_default_if_unset(&ni->macaddr);
-+
-+    ret = net_client_init(opts, true, errp);
-+    if (ret == 0) {
-+        ni->netdev = qemu_find_netdev(nd_id);
-+        ni->used = true;
-+        nb_nics++;
-+    }
-+
-+    g_free(nd_id);
-+    return ret;
-+}
-+
- int net_init_clients(Error **errp)
- {
-     net_change_state_entry =
-@@ -1474,6 +1535,10 @@ int net_init_clients(Error **errp)
-         return -1;
-     }
- 
-+    if (qemu_opts_foreach(qemu_find_opts("nic"), net_param_nic, NULL, errp)) {
-+        return -1;
-+    }
-+
-     if (qemu_opts_foreach(qemu_find_opts("net"), net_init_client, NULL, errp)) {
-         return -1;
-     }
-@@ -1549,6 +1614,19 @@ QemuOptsList qemu_netdev_opts = {
-     },
- };
- 
-+QemuOptsList qemu_nic_opts = {
-+    .name = "nic",
-+    .implied_opt_name = "type",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_nic_opts.head),
-+    .desc = {
-+        /*
-+         * no elements => accept any params
-+         * validation will happen later
-+         */
-+        { /* end of list */ }
-+    },
-+};
-+
- QemuOptsList qemu_net_opts = {
-     .name = "net",
-     .implied_opt_name = "type",
 diff --git a/qemu-options.hx b/qemu-options.hx
-index a9249b6..399905e 100644
+index 399905e..ff5da07 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -2004,13 +2004,34 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
- #endif
-     "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
-     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
-+DEF("nic", HAS_ARG, QEMU_OPTION_nic,
-+    "--nic [tap|bridge|"
-+#ifdef CONFIG_SLIRP
-+    "user|"
-+#endif
-+#ifdef __linux__
-+    "l2tpv3|"
-+#endif
-+#ifdef CONFIG_VDE
-+    "vde|"
-+#endif
-+#ifdef CONFIG_NETMAP
-+    "netmap|"
-+#endif
-+#ifdef CONFIG_POSIX
-+    "vhost-user|"
-+#endif
-+    "socket][,option][,...][mac=macaddr]\n"
-+    "                initialize an on-board / default host NIC (using MAC address\n"
-+    "                macaddr) and connect it to the given host network backend\n"
-+    "--nic none      use it alone to have zero network devices (the default is to\n"
-+    "                provided a 'user' network connection)\n",
-+    QEMU_ARCH_ALL)
- DEF("net", HAS_ARG, QEMU_OPTION_net,
-     "-net nic[,vlan=n][,netdev=nd][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
-     "                configure or create an on-board (or machine default) NIC and\n"
-     "                connect it either to VLAN 'n' or the netdev 'nd' (for pluggable\n"
-     "                NICs please use '-device devtype,netdev=nd' instead)\n"
--    "-net none       use it alone to have zero network devices. If no -net option\n"
--    "                is provided, the default is '-net nic -net user'\n"
-     "-net ["
- #ifdef CONFIG_SLIRP
-     "user|"
-@@ -2456,10 +2477,17 @@ qemu -m 512 -object memory-backend-file,id=mem,size=512M,mem-path=/hugetlbfs,sha
-      -device virtio-net-pci,netdev=net0
+@@ -2048,41 +2048,18 @@ DEF("net", HAS_ARG, QEMU_OPTION_net,
+     "                old way to initialize a host network interface\n"
+     "                (use the -netdev option if possible instead)\n", QEMU_ARCH_ALL)
+ STEXI
+-@item -net nic[,vlan=@var{n}][,netdev=@var{nd}][,macaddr=@var{mac}][,model=@var{type}] [,name=@var{name}][,addr=@var{addr}][,vectors=@var{v}]
+-@findex -net
+-Configure or create an on-board (or machine default) Network Interface Card
+-(NIC) and connect it either to VLAN @var{n} (@var{n} = 0 is the default), or
+-to the netdev @var{nd}. The NIC is an e1000 by default on the PC
+-target. Optionally, the MAC address can be changed to @var{mac}, the
+-device address set to @var{addr} (PCI cards only),
+-and a @var{name} can be assigned for use in monitor commands.
+-Optionally, for PCI cards, you can specify the number @var{v} of MSI-X vectors
+-that the card should have; this option currently only affects virtio cards; set
+-@var{v} = 0 to disable MSI-X. If no @option{-net} option is specified, a single
+-NIC is created.  QEMU can emulate several different models of network card.
+-Valid values for @var{type} are
+-@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559er},
+-@code{ne2k_pci}, @code{ne2k_isa}, @code{pcnet}, @code{rtl8139},
+-@code{e1000}, @code{smc91c111}, @code{lance} and @code{mcf_fec}.
+-Not all devices are supported on all targets.  Use @code{-net nic,model=help}
+-for a list of available devices for your target.
+-
+-@item -netdev user,id=@var{id}[,@var{option}][,@var{option}][,...]
+-@findex -netdev
+-@item -net user[,@var{option}][,@var{option}][,...]
+-Use the user mode network stack which requires no administrator
++@item --netdev user,id=@var{id}[,@var{option}][,@var{option}][,...]
++@findex --netdev
++Configure user mode host network backend which requires no administrator
+ privilege to run. Valid options are:
+ 
+ @table @option
+-@item vlan=@var{n}
+-Connect user mode stack to VLAN @var{n} (@var{n} = 0 is the default).
+-
+ @item id=@var{id}
+-@itemx name=@var{name}
+ Assign symbolic name for use in monitor commands.
+ 
+-@option{ipv4} and @option{ipv6} specify that either IPv4 or IPv6 must
+-be enabled.  If neither is specified both protocols are enabled.
++@item ipv4=on|off and ipv6=on|off
++Specify that either IPv4 or IPv6 must be enabled. If neither is specified
++both protocols are enabled.
+ 
+ @item net=@var{addr}[/@var{mask}]
+ Set IP network address the guest will see. Optionally specify the netmask,
+@@ -2134,7 +2111,7 @@ can not be resolved.
+ 
+ Example:
+ @example
+-qemu -net user,dnssearch=mgmt.example.org,dnssearch=example.org [...]
++qemu-system-i386 --device e1000,netdev=n1 --netdev user,id=n1,dnssearch=mgmt.example.org,dnssearch=example.org [...]
  @end example
  
--@item -net none
--Indicate that no network devices should be configured. It is used to
--override the default configuration (@option{-net nic -net user}) which
--is activated if no @option{-net} options are provided.
-+@item --nic [tap|bridge|user|l2tpv3|vde|netmap|vhost-user|socket][,...][,mac=macaddr]
+ @item tftp=@var{dir}
+@@ -2150,7 +2127,8 @@ a guest from a local directory.
+ 
+ Example (using pxelinux):
+ @example
+-qemu-system-i386 -hda linux.img -boot n -net user,tftp=/path/to/tftp/files,bootfile=/pxelinux.0
++qemu-system-i386 --hda linux.img --boot n --device e1000,netdev=n1 \
++    --netdev user,id=n1,tftp=/path/to/tftp/files,bootfile=/pxelinux.0
+ @end example
+ 
+ @item smb=@var{dir}[,smbserver=@var{addr}]
+@@ -2185,7 +2163,7 @@ screen 0, use the following:
+ 
+ @example
+ # on the host
+-qemu-system-i386 -net user,hostfwd=tcp:127.0.0.1:6001-:6000 [...]
++qemu-system-i386 --device virtio-net-pci,netdev=n1 --netdev user,id=n1,hostfwd=tcp:127.0.0.1:6001-:6000 [...]
+ # this host xterm should open in the guest X11 server
+ xterm -display :1
+ @end example
+@@ -2195,7 +2173,7 @@ the guest, use the following:
+ 
+ @example
+ # on the host
+-qemu-system-i386 -net user,hostfwd=tcp::5555-:23 [...]
++qemu-system-i386 --device e1000,netdev=n1 --netdev user,id=n1,hostfwd=tcp::5555-:23 [...]
+ telnet localhost 5555
+ @end example
+ 
+@@ -2214,7 +2192,7 @@ lifetime, like in the following example:
+ @example
+ # open 10.10.1.1:4321 on bootup, connect 10.0.2.100:1234 to it whenever
+ # the guest accesses it
+-qemu -net user,guestfwd=tcp:10.0.2.100:1234-tcp:10.10.1.1:4321 [...]
++qemu-system-i386 --device e1000,netdev=n1 --netdev user,id=n1,guestfwd=tcp:10.0.2.100:1234-tcp:10.10.1.1:4321 [...]
+ @end example
+ 
+ Or you can execute a command on every TCP connection established by the guest,
+@@ -2223,7 +2201,7 @@ so that QEMU behaves similar to an inetd process for that virtual server:
+ @example
+ # call "netcat 10.10.1.1 4321" on every TCP connection to 10.0.2.100:1234
+ # and connect the TCP stream to its stdin/stdout
+-qemu -net 'user,guestfwd=tcp:10.0.2.100:1234-cmd:netcat 10.10.1.1 4321'
++qemu-system-i386 --device e1000,netdev=n1 --netdev 'user,id=n1,guestfwd=tcp:10.0.2.100:1234-cmd:netcat 10.10.1.1 4321'
+ @end example
+ 
+ @end table
+@@ -2233,9 +2211,8 @@ processed and applied to -net user. Mixing them with the new configuration
+ syntax gives undefined results. Their use for new applications is discouraged
+ as they will be removed from future versions.
+ 
+-@item -netdev tap,id=@var{id}[,fd=@var{h}][,ifname=@var{name}][,script=@var{file}][,downscript=@var{dfile}][,br=@var{bridge}][,helper=@var{helper}]
+-@itemx -net tap[,vlan=@var{n}][,name=@var{name}][,fd=@var{h}][,ifname=@var{name}][,script=@var{file}][,downscript=@var{dfile}][,br=@var{bridge}][,helper=@var{helper}]
+-Connect the host TAP network interface @var{name} to VLAN @var{n}.
++@item --netdev tap,id=@var{id}[,fd=@var{h}][,ifname=@var{name}][,script=@var{file}][,downscript=@var{dfile}][,br=@var{bridge}][,helper=@var{helper}]
++Configure a host TAP network backend with ID @var{id}.
+ 
+ Use the network script @var{file} to configure it and the network script
+ @var{dfile} to deconfigure it. If @var{name} is not provided, the OS
+@@ -2256,7 +2233,7 @@ Examples:
+ 
+ @example
+ #launch a QEMU instance with the default network script
+-qemu-system-i386 linux.img -net nic -net tap
++qemu-system-i386 linux.img --netdev tap,id=n1 --device virtio-net-pci,netdev=n1
+ @end example
+ 
+ @example
+@@ -2270,12 +2247,11 @@ qemu-system-i386 linux.img \
+ @example
+ #launch a QEMU instance with the default network helper to
+ #connect a TAP device to bridge br0
+-qemu-system-i386 linux.img \
+-                 -net nic -net tap,"helper=/path/to/qemu-bridge-helper"
++qemu-system-i386 linux.img --device e1000,netdev=n1 \
++        --netdev tap,id=n1,"helper=/path/to/qemu-bridge-helper"
+ @end example
+ 
+-@item -netdev bridge,id=@var{id}[,br=@var{bridge}][,helper=@var{helper}]
+-@itemx -net bridge[,vlan=@var{n}][,name=@var{name}][,br=@var{bridge}][,helper=@var{helper}]
++@item --netdev bridge,id=@var{id}[,br=@var{bridge}][,helper=@var{helper}]
+ Connect a host TAP network interface to a host bridge device.
+ 
+ Use the network helper @var{helper} to configure the TAP interface and
+@@ -2288,21 +2264,20 @@ Examples:
+ @example
+ #launch a QEMU instance with the default network helper to
+ #connect a TAP device to bridge br0
+-qemu-system-i386 linux.img -net bridge -net nic,model=virtio
++qemu-system-i386 linux.img --netdev bridge,id=n1 --device virtio-net,netdev=n1
+ @end example
+ 
+ @example
+ #launch a QEMU instance with the default network helper to
+ #connect a TAP device to bridge qemubr0
+-qemu-system-i386 linux.img -net bridge,br=qemubr0 -net nic,model=virtio
++qemu-system-i386 linux.img --netdev bridge,br=qemubr0,id=n1 --device virtio-net,netdev=n1
+ @end example
+ 
+-@item -netdev socket,id=@var{id}[,fd=@var{h}][,listen=[@var{host}]:@var{port}][,connect=@var{host}:@var{port}]
+-@itemx -net socket[,vlan=@var{n}][,name=@var{name}][,fd=@var{h}] [,listen=[@var{host}]:@var{port}][,connect=@var{host}:@var{port}]
++@item --netdev socket,id=@var{id}[,fd=@var{h}][,listen=[@var{host}]:@var{port}][,connect=@var{host}:@var{port}]
+ 
+-Connect the VLAN @var{n} to a remote VLAN in another QEMU virtual
+-machine using a TCP socket connection. If @option{listen} is
+-specified, QEMU waits for incoming connections on @var{port}
++This host network backend can be used to connect the guest's network to
++another QEMU virtual machine using a TCP socket connection. If @option{listen}
++is specified, QEMU waits for incoming connections on @var{port}
+ (@var{host} is optional). @option{connect} is used to connect to
+ another QEMU instance using the @option{listen} option. @option{fd}=@var{h}
+ specifies an already opened TCP socket.
+@@ -2311,21 +2286,19 @@ Example:
+ @example
+ # launch a first QEMU instance
+ qemu-system-i386 linux.img \
+-                 -net nic,macaddr=52:54:00:12:34:56 \
+-                 -net socket,listen=:1234
+-# connect the VLAN 0 of this instance to the VLAN 0
+-# of the first instance
++                 --device e1000,netdev=n1,mac=52:54:00:12:34:56 \
++                 --netdev socket,id=n1,listen=:1234
++# connect the network of this instance to the network of the first instance
+ qemu-system-i386 linux.img \
+-                 -net nic,macaddr=52:54:00:12:34:57 \
+-                 -net socket,connect=127.0.0.1:1234
++                 --device e1000,netdev=n2,mac=52:54:00:12:34:57 \
++                 --netdev socket,id=n2,connect=127.0.0.1:1234
+ @end example
+ 
+-@item -netdev socket,id=@var{id}[,fd=@var{h}][,mcast=@var{maddr}:@var{port}[,localaddr=@var{addr}]]
+-@itemx -net socket[,vlan=@var{n}][,name=@var{name}][,fd=@var{h}][,mcast=@var{maddr}:@var{port}[,localaddr=@var{addr}]]
++@item --netdev socket,id=@var{id}[,fd=@var{h}][,mcast=@var{maddr}:@var{port}[,localaddr=@var{addr}]]
+ 
+-Create a VLAN @var{n} shared with another QEMU virtual
+-machines using a UDP multicast socket, effectively making a bus for
+-every QEMU with same multicast address @var{maddr} and @var{port}.
++Configure a socket host network backend to shared the guest's network traffic
++with another QEMU virtual machines using a UDP multicast socket, effectively
++making a bus for every QEMU with same multicast address @var{maddr} and @var{port}.
+ NOTES:
+ @enumerate
+ @item
+@@ -2342,25 +2315,24 @@ Example:
+ @example
+ # launch one QEMU instance
+ qemu-system-i386 linux.img \
+-                 -net nic,macaddr=52:54:00:12:34:56 \
+-                 -net socket,mcast=230.0.0.1:1234
++                 --device e1000,netdev=n1,mac=52:54:00:12:34:56 \
++                 --netdev socket,id=n1,mcast=230.0.0.1:1234
+ # launch another QEMU instance on same "bus"
+ qemu-system-i386 linux.img \
+-                 -net nic,macaddr=52:54:00:12:34:57 \
+-                 -net socket,mcast=230.0.0.1:1234
++                 --device e1000,netdev=n2,mac=52:54:00:12:34:57 \
++                 --netdev socket,id=n2,mcast=230.0.0.1:1234
+ # launch yet another QEMU instance on same "bus"
+ qemu-system-i386 linux.img \
+-                 -net nic,macaddr=52:54:00:12:34:58 \
+-                 -net socket,mcast=230.0.0.1:1234
++                 --device e1000,netdev=n3,macaddr=52:54:00:12:34:58 \
++                 --netdev socket,id=n3,mcast=230.0.0.1:1234
+ @end example
+ 
+ Example (User Mode Linux compat.):
+ @example
+-# launch QEMU instance (note mcast address selected
+-# is UML's default)
++# launch QEMU instance (note mcast address selected is UML's default)
+ qemu-system-i386 linux.img \
+-                 -net nic,macaddr=52:54:00:12:34:56 \
+-                 -net socket,mcast=239.192.168.1:1102
++                 --device e1000,netdev=n1,mac=52:54:00:12:34:56 \
++                 --netdev socket,id=n1,mcast=239.192.168.1:1102
+ # launch UML
+ /path/to/linux ubd0=/path/to/root_fs eth0=mcast
+ @end example
+@@ -2368,14 +2340,13 @@ qemu-system-i386 linux.img \
+ Example (send packets from host's 1.2.3.4):
+ @example
+ qemu-system-i386 linux.img \
+-                 -net nic,macaddr=52:54:00:12:34:56 \
+-                 -net socket,mcast=239.192.168.1:1102,localaddr=1.2.3.4
++                 --device e1000,netdev=n1,mac=52:54:00:12:34:56 \
++                 --netdev socket,id=n1,mcast=239.192.168.1:1102,localaddr=1.2.3.4
+ @end example
+ 
+-@item -netdev l2tpv3,id=@var{id},src=@var{srcaddr},dst=@var{dstaddr}[,srcport=@var{srcport}][,dstport=@var{dstport}],txsession=@var{txsession}[,rxsession=@var{rxsession}][,ipv6][,udp][,cookie64][,counter][,pincounter][,txcookie=@var{txcookie}][,rxcookie=@var{rxcookie}][,offset=@var{offset}]
+-@itemx -net l2tpv3[,vlan=@var{n}][,name=@var{name}],src=@var{srcaddr},dst=@var{dstaddr}[,srcport=@var{srcport}][,dstport=@var{dstport}],txsession=@var{txsession}[,rxsession=@var{rxsession}][,ipv6][,udp][,cookie64][,counter][,pincounter][,txcookie=@var{txcookie}][,rxcookie=@var{rxcookie}][,offset=@var{offset}]
+-Connect VLAN @var{n} to L2TPv3 pseudowire. L2TPv3 (RFC3391) is a popular
+-protocol to transport Ethernet (and other Layer 2) data frames between
++@item --netdev l2tpv3,id=@var{id},src=@var{srcaddr},dst=@var{dstaddr}[,srcport=@var{srcport}][,dstport=@var{dstport}],txsession=@var{txsession}[,rxsession=@var{rxsession}][,ipv6][,udp][,cookie64][,counter][,pincounter][,txcookie=@var{txcookie}][,rxcookie=@var{rxcookie}][,offset=@var{offset}]
++Configure a L2TPv3 pseudowire host network backend. L2TPv3 (RFC3391) is a
++popular protocol to transport Ethernet (and other Layer 2) data frames between
+ two systems. It is present in routers, firewalls and the Linux kernel
+ (from version 3.3 onwards).
+ 
+@@ -2428,14 +2399,13 @@ brctl addif br-lan vmtunnel0
+ # on 4.3.2.1
+ # launch QEMU instance - if your network has reorder or is very lossy add ,pincounter
+ 
+-qemu-system-i386 linux.img -net nic -net l2tpv3,src=4.2.3.1,dst=1.2.3.4,udp,srcport=16384,dstport=16384,rxsession=0xffffffff,txsession=0xffffffff,counter
+-
++qemu-system-i386 linux.img --device e1000,netdev=n1 \
++    --netdev l2tpv3,id=n1,src=4.2.3.1,dst=1.2.3.4,udp,srcport=16384,dstport=16384,rxsession=0xffffffff,txsession=0xffffffff,counter
+ 
+ @end example
+ 
+-@item -netdev vde,id=@var{id}[,sock=@var{socketpath}][,port=@var{n}][,group=@var{groupname}][,mode=@var{octalmode}]
+-@itemx -net vde[,vlan=@var{n}][,name=@var{name}][,sock=@var{socketpath}] [,port=@var{n}][,group=@var{groupname}][,mode=@var{octalmode}]
+-Connect VLAN @var{n} to PORT @var{n} of a vde switch running on host and
++@item --netdev vde,id=@var{id}[,sock=@var{socketpath}][,port=@var{n}][,group=@var{groupname}][,mode=@var{octalmode}]
++Configure VDE backend to connect to PORT @var{n} of a vde switch running on host and
+ listening for incoming connections on @var{socketpath}. Use GROUP @var{groupname}
+ and MODE @var{octalmode} to change default ownership and permissions for
+ communication port. This option is only available if QEMU has been compiled
+@@ -2446,20 +2416,21 @@ Example:
+ # launch vde switch
+ vde_switch -F -sock /tmp/myswitch
+ # launch QEMU instance
+-qemu-system-i386 linux.img -net nic -net vde,sock=/tmp/myswitch
++qemu-system-i386 linux.img --device e1000,netdev=n1 --netdev vde,id=n1,sock=/tmp/myswitch
+ @end example
+ 
+-@item -netdev hubport,id=@var{id},hubid=@var{hubid}[,netdev=@var{nd}]
++@item --netdev hubport,id=@var{id},hubid=@var{hubid}[,netdev=@var{nd}]
+ 
+-Create a hub port on QEMU "vlan" @var{hubid}.
++Create a hub port on the emulated hub with ID @var{hubid}.
+ 
+-The hubport netdev lets you connect a NIC to a QEMU "vlan" instead of a single
+-netdev.  @code{-net} and @code{-device} with parameter @option{vlan} create the
+-required hub automatically. Alternatively, you can also connect the hubport
+-to another netdev with ID @var{nd} by using the @option{netdev=@var{nd}}
++The hubport netdev lets you connect a NIC to a QEMU emulated hub instead of a
++single netdev. @code{--net} and @code{--device} with the parameter @option{vlan}
++(deprecated), or @code{--nic hubport} can also be used to connect a
++network device or a NIC to a hub. Alternatively, you can also connect the
++hubport to another netdev with ID @var{nd} by using the @option{netdev=@var{nd}}
+ option.
+ 
+-@item -netdev vhost-user,chardev=@var{id}[,vhostforce=on|off][,queues=n]
++@item --netdev vhost-user,chardev=@var{id}[,vhostforce=on|off][,queues=n]
+ 
+ Establish a vhost-user netdev, backed by a chardev @var{id}. The chardev should
+ be a unix domain socket backed one. The vhost-user uses a specifically defined
+@@ -2488,6 +2459,31 @@ hardware MAC address can be set with @option{mac=@var{macaddr}}.
+ Indicate that no network devices should be configured. It is used to override
+ the default configuration (default NIC with @option{--net user} backend) which
+ is activated if no other networking options are provided.
 +
-+This option is a shortcut for setting both, the on-board (default) guest NIC
-+hardware and the host network backend in one go. The host backend options are
-+the same as with the corresponding @option{--netdev} option. The guest NIC
-+hardware MAC address can be set with @option{mac=@var{macaddr}}.
++@item -net nic[,vlan=@var{n}][,netdev=@var{nd}][,macaddr=@var{mac}][,model=@var{type}] [,name=@var{name}][,addr=@var{addr}][,vectors=@var{v}]
++@findex -net
++Legacy option to configure or create an on-board (or machine default) Network
++Interface Card(NIC) and connect it either to the emulated hub port ("vlan")
++with number @var{n} (@var{n} = 0 is the default), or to the netdev @var{nd}.
++The NIC is an e1000 by default on the PC target. Optionally, the MAC address
++can be changed to @var{mac}, the device address set to @var{addr} (PCI cards
++only), and a @var{name} can be assigned for use in monitor commands.
++Optionally, for PCI cards, you can specify the number @var{v} of MSI-X vectors
++that the card should have; this option currently only affects virtio cards; set
++@var{v} = 0 to disable MSI-X. If no @option{-net} option is specified, a single
++NIC is created.  QEMU can emulate several different models of network card.
++Valid values for @var{type} are
++@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559er},
++@code{ne2k_pci}, @code{ne2k_isa}, @code{pcnet}, @code{rtl8139},
++@code{e1000}, @code{smc91c111}, @code{lance} and @code{mcf_fec}.
++Not all devices are supported on all targets.  Use @code{-net nic,model=help}
++for a list of available devices for your target.
 +
-+@item --nic none
-+Indicate that no network devices should be configured. It is used to override
-+the default configuration (default NIC with @option{--net user} backend) which
-+is activated if no other networking options are provided.
++@item -net user|tap|bridge|socket|l2tpv3|vde[,...][,vlan=@var{n}][,name=@var{name}]
++Configure a host network backend (with the options corresponding to the same
++@option{--netdev} option) and connect it to the emulated hub ("vlan") with the
++number @var{n} (default is number 0). Use @var{name} to specify the name of the
++hub port.
  ETEXI
  
  STEXI
-diff --git a/vl.c b/vl.c
-index 698b681..59ffadb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3078,6 +3078,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_add_opts(&qemu_chardev_opts);
-     qemu_add_opts(&qemu_device_opts);
-     qemu_add_opts(&qemu_netdev_opts);
-+    qemu_add_opts(&qemu_nic_opts);
-     qemu_add_opts(&qemu_net_opts);
-     qemu_add_opts(&qemu_rtc_opts);
-     qemu_add_opts(&qemu_global_opts);
-@@ -3298,6 +3299,12 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
-+            case QEMU_OPTION_nic:
-+                default_net = 0;
-+                if (net_client_parse(qemu_find_opts("nic"), optarg) == -1) {
-+                    exit(1);
-+                }
-+                break;
-             case QEMU_OPTION_net:
-                 default_net = 0;
-                 if (net_client_parse(qemu_find_opts("net"), optarg) == -1) {
 -- 
 1.8.3.1
