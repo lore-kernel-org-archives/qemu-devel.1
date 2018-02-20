@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eoCrv-00054W-V7
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:42:25 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eoCrw-00054q-Un
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:42:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eoCru-0000V6-65
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:42:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eoCrv-0000Vv-Bf
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:42:24 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue, 20 Feb 2018 18:41:51 +0000
-Message-Id: <20180220184159.16483-4-mark.cave-ayland@ilande.co.uk>
+Date: Tue, 20 Feb 2018 18:41:55 +0000
+Message-Id: <20180220184159.16483-8-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180220184159.16483-1-mark.cave-ayland@ilande.co.uk>
 References: <20180220184159.16483-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv2 03/11] heathrow: QOMify heathrow PIC
+Subject: [Qemu-devel] [PATCHv2 07/11] mac_oldworld: use object link to pass
+ heathrow PIC object to macio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,293 +22,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/intc/heathrow_pic.c         | 126 +++++++++++++++++++++++------------------
- include/hw/intc/heathrow_pic.h |  49 ++++++++++++++++
- 2 files changed, 119 insertions(+), 56 deletions(-)
- create mode 100644 include/hw/intc/heathrow_pic.h
+Also switch macio_oldworld_realize() over to use it rather than using the pic_mem
+memory region directly.
 
-diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-index 171f5ed814..7bf44e0d86 100644
---- a/hw/intc/heathrow_pic.c
-+++ b/hw/intc/heathrow_pic.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/ppc/mac.h"
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/misc/macio/macio.c         | 14 ++++++++++----
+ hw/ppc/mac_oldworld.c         |  8 +++++---
+ include/hw/misc/macio/macio.h |  2 ++
+ 3 files changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 4e502ede2e..d4c1d190c4 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -31,6 +31,7 @@
+ #include "hw/ppc/mac_dbdma.h"
+ #include "hw/char/escc.h"
+ #include "hw/misc/macio/macio.h"
 +#include "hw/intc/heathrow_pic.h"
  
- /* debug PIC */
- //#define DEBUG_PIC
-@@ -36,39 +37,27 @@
- #define PIC_DPRINTF(fmt, ...)
- #endif
+ /*
+  * The mac-io has two interfaces to the ESCC. One is called "escc-legacy",
+@@ -167,10 +168,10 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
+                                 sysbus_mmio_get_region(sysbus_dev, 0));
+     pmac_format_nvram_partition(&os->nvram, os->nvram.size);
  
--typedef struct HeathrowPIC {
--    uint32_t events;
--    uint32_t mask;
--    uint32_t levels;
--    uint32_t level_triggered;
--} HeathrowPIC;
--
--typedef struct HeathrowPICS {
--    MemoryRegion mem;
--    HeathrowPIC pics[2];
--    qemu_irq *irqs;
--} HeathrowPICS;
--
--static inline int check_irq(HeathrowPIC *pic)
-+static inline int heathrow_check_irq(HeathrowPICState *pic)
- {
-     return (pic->events | (pic->levels & pic->level_triggered)) & pic->mask;
- }
+-    if (s->pic_mem) {
+-        /* Heathrow PIC */
+-        memory_region_add_subregion(&s->bar, 0x00000, s->pic_mem);
+-    }
++    /* Heathrow PIC */
++    sysbus_dev = SYS_BUS_DEVICE(os->pic);
++    memory_region_add_subregion(&s->bar, 0x0,
++                                sysbus_mmio_get_region(sysbus_dev, 0));
  
- /* update the CPU irq state */
--static void heathrow_pic_update(HeathrowPICS *s)
-+static void heathrow_update_irq(HeathrowState *s)
- {
--    if (check_irq(&s->pics[0]) || check_irq(&s->pics[1])) {
-+    if (heathrow_check_irq(&s->pics[0]) ||
-+            heathrow_check_irq(&s->pics[1])) {
-         qemu_irq_raise(s->irqs[0]);
-     } else {
-         qemu_irq_lower(s->irqs[0]);
-     }
- }
+     /* IDE buses */
+     for (i = 0; i < ARRAY_SIZE(os->ide); i++) {
+@@ -208,6 +209,11 @@ static void macio_oldworld_init(Object *obj)
  
--static void pic_write(void *opaque, hwaddr addr,
--                      uint64_t value, unsigned size)
-+static void heathrow_write(void *opaque, hwaddr addr,
-+                           uint64_t value, unsigned size)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
-     unsigned int n;
+     qdev_init_gpio_out(DEVICE(obj), os->irqs, ARRAY_SIZE(os->irqs));
  
-     n = ((addr & 0xfff) - 0x10) >> 4;
-@@ -79,24 +68,24 @@ static void pic_write(void *opaque, hwaddr addr,
-     switch(addr & 0xf) {
-     case 0x04:
-         pic->mask = value;
--        heathrow_pic_update(s);
-+        heathrow_update_irq(s);
-         break;
-     case 0x08:
-         /* do not reset level triggered IRQs */
-         value &= ~pic->level_triggered;
-         pic->events &= ~value;
--        heathrow_pic_update(s);
-+        heathrow_update_irq(s);
-         break;
-     default:
-         break;
-     }
- }
- 
--static uint64_t pic_read(void *opaque, hwaddr addr,
--                         unsigned size)
-+static uint64_t heathrow_read(void *opaque, hwaddr addr,
-+                              unsigned size)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
-     unsigned int n;
-     uint32_t value;
- 
-@@ -124,16 +113,16 @@ static uint64_t pic_read(void *opaque, hwaddr addr,
-     return value;
- }
- 
--static const MemoryRegionOps heathrow_pic_ops = {
--    .read = pic_read,
--    .write = pic_write,
-+static const MemoryRegionOps heathrow_ops = {
-+    .read = heathrow_read,
-+    .write = heathrow_write,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
--static void heathrow_pic_set_irq(void *opaque, int num, int level)
-+static void heathrow_set_irq(void *opaque, int num, int level)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
-     unsigned int irq_bit;
- 
- #if defined(DEBUG)
-@@ -153,7 +142,7 @@ static void heathrow_pic_set_irq(void *opaque, int num, int level)
-     } else {
-         pic->levels &= ~irq_bit;
-     }
--    heathrow_pic_update(s);
-+    heathrow_update_irq(s);
- }
- 
- static const VMStateDescription vmstate_heathrow_pic_one = {
-@@ -161,54 +150,79 @@ static const VMStateDescription vmstate_heathrow_pic_one = {
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(events, HeathrowPIC),
--        VMSTATE_UINT32(mask, HeathrowPIC),
--        VMSTATE_UINT32(levels, HeathrowPIC),
--        VMSTATE_UINT32(level_triggered, HeathrowPIC),
-+        VMSTATE_UINT32(events, HeathrowPICState),
-+        VMSTATE_UINT32(mask, HeathrowPICState),
-+        VMSTATE_UINT32(levels, HeathrowPICState),
-+        VMSTATE_UINT32(level_triggered, HeathrowPICState),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
--static const VMStateDescription vmstate_heathrow_pic = {
-+static const VMStateDescription vmstate_heathrow = {
-     .name = "heathrow_pic",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_STRUCT_ARRAY(pics, HeathrowPICS, 2, 1,
--                             vmstate_heathrow_pic_one, HeathrowPIC),
-+        VMSTATE_STRUCT_ARRAY(pics, HeathrowState, 2, 1,
-+                             vmstate_heathrow_pic_one, HeathrowPICState),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
--static void heathrow_pic_reset_one(HeathrowPIC *s)
-+static void heathrow_reset(DeviceState *d)
- {
--    memset(s, '\0', sizeof(HeathrowPIC));
-+    HeathrowState *s = HEATHROW(d);
++    object_property_add_link(obj, "pic", TYPE_HEATHROW,
++                             (Object **) &os->pic,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
 +
-+    s->pics[0].level_triggered = 0;
-+    s->pics[1].level_triggered = 0x1ff00000;
- }
+     object_initialize(&os->nvram, sizeof(os->nvram), TYPE_MACIO_NVRAM);
+     dev = DEVICE(&os->nvram);
+     qdev_prop_set_uint32(dev, "size", 0x2000);
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 5903ff47d3..3ac5b19073 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -93,7 +93,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+     PCIBus *pci_bus;
+-    PCIDevice *macio;
++    OldWorldMacIOState *macio;
+     MACIOIDEState *macio_ide;
+     DeviceState *dev, *pic_dev;
+     SysBusDevice *sbd;
+@@ -271,7 +271,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     ide_drive_get(hd, ARRAY_SIZE(hd));
  
--static void heathrow_pic_reset(void *opaque)
-+static void heathrow_init(Object *obj)
- {
--    HeathrowPICS *s = opaque;
--
--    heathrow_pic_reset_one(&s->pics[0]);
--    heathrow_pic_reset_one(&s->pics[1]);
-+    HeathrowState *s = HEATHROW(obj);
+     /* MacIO */
+-    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
++    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
+     dev = DEVICE(macio);
+     qdev_connect_gpio_out(dev, 0, pic[0x12]); /* CUDA */
+     qdev_connect_gpio_out(dev, 1, pic[0x10]); /* ESCC-B */
+@@ -281,8 +281,10 @@ static void ppc_heathrow_init(MachineState *machine)
+     qdev_connect_gpio_out(dev, 5, pic[0x0E]); /* IDE-1 */
+     qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE-1 DMA */
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
++    object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
++                             &error_abort);
+     sbd = SYS_BUS_DEVICE(pic_dev);
+-    macio_init(macio, sysbus_mmio_get_region(sbd, 0));
++    macio_init(PCI_DEVICE(macio), sysbus_mmio_get_region(sbd, 0));
  
--    s->pics[0].level_triggered = 0;
--    s->pics[1].level_triggered = 0x1ff00000;
-+    memory_region_init_io(&s->mem, OBJECT(s), &heathrow_ops, s,
-+                          "heathrow-pic", 0x1000);
- }
+     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
+                                                         "ide[0]"));
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+index e1e249f898..843c114c07 100644
+--- a/include/hw/misc/macio/macio.h
++++ b/include/hw/misc/macio/macio.h
+@@ -26,6 +26,7 @@
+ #ifndef MACIO_H
+ #define MACIO_H
  
- qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
-                             int nb_cpus, qemu_irq **irqs)
- {
--    HeathrowPICS *s;
-+    DeviceState *d;
-+    HeathrowState *s;
++#include "hw/intc/heathrow_pic.h"
+ #include "hw/misc/macio/cuda.h"
+ #include "hw/ppc/mac_dbdma.h"
  
--    s = g_malloc0(sizeof(HeathrowPICS));
-+    d = qdev_create(NULL, TYPE_HEATHROW);
-+    qdev_init_nofail(d);
-+
-+    s = HEATHROW(d);
-     /* only 1 CPU */
-     s->irqs = irqs[0];
--    memory_region_init_io(&s->mem, NULL, &heathrow_pic_ops, s,
--                          "heathrow-pic", 0x1000);
-+
-     *pmem = &s->mem;
+@@ -54,6 +55,7 @@ typedef struct OldWorldMacIOState {
+     MacIOState parent_obj;
+     /*< public >*/
  
--    vmstate_register(NULL, -1, &vmstate_heathrow_pic, s);
--    qemu_register_reset(heathrow_pic_reset, s);
--    return qemu_allocate_irqs(heathrow_pic_set_irq, s, 64);
-+    return qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_IRQS);
-+}
-+
-+static void heathrow_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->reset = heathrow_reset;
-+    dc->vmsd = &vmstate_heathrow;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
-+
-+static const TypeInfo heathrow_type_info = {
-+    .name = TYPE_HEATHROW,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(HeathrowState),
-+    .instance_init = heathrow_init,
-+    .class_init = heathrow_class_init,
-+};
-+
-+static void heathrow_register_types(void)
-+{
-+    type_register_static(&heathrow_type_info);
-+}
-+
-+type_init(heathrow_register_types)
-diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pic.h
-new file mode 100644
-index 0000000000..bc3ffaab87
---- /dev/null
-+++ b/include/hw/intc/heathrow_pic.h
-@@ -0,0 +1,49 @@
-+/*
-+ * Heathrow PIC support (OldWorld PowerMac)
-+ *
-+ * Copyright (c) 2005-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HEATHROW_H
-+#define HEATHROW_H
-+
-+#define TYPE_HEATHROW "heathrow"
-+#define HEATHROW(obj) OBJECT_CHECK(HeathrowState, (obj), TYPE_HEATHROW)
-+
-+typedef struct HeathrowPICState {
-+    uint32_t events;
-+    uint32_t mask;
-+    uint32_t levels;
-+    uint32_t level_triggered;
-+} HeathrowPICState;
-+
-+typedef struct HeathrowState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mem;
-+    HeathrowPICState pics[2];
-+    qemu_irq *irqs;
-+} HeathrowState;
-+
-+#define HEATHROW_NUM_IRQS 64
-+
-+#endif /* HEATHROW_H */
++    HeathrowState *pic;
+     qemu_irq irqs[7];
+ 
+     MacIONVRAMState nvram;
 -- 
 2.11.0
