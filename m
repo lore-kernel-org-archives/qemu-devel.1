@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eoFtK-0000ii-46
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:56:03 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eoFyP-0004bY-RL
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 17:01:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eoFtG-00065q-VP
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:56:02 -0500
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:35123)
+	(envelope-from <pbonzini@redhat.com>) id 1eoFyM-00015r-PC
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 17:01:17 -0500
+Received: from mail-wr0-f174.google.com ([209.85.128.174]:42696)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eoFtG-000654-Nt
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:55:58 -0500
-Received: by mail-wr0-f195.google.com with SMTP id l43so18613176wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:55:58 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eoFyM-00014e-Ic
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 17:01:14 -0500
+Received: by mail-wr0-f174.google.com with SMTP id k9so18616573wre.9
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 14:01:14 -0800 (PST)
 References: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
-	<alpine.BSF.2.21.1802202225190.89213@zero.eik.bme.hu>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <58983aec-d7c4-c10d-e2b0-dfc6c0fe3fbf@redhat.com>
-Date: Tue, 20 Feb 2018 22:55:55 +0100
+Message-ID: <5059119b-6ec4-88e9-6d92-5edb7c22fbb8@redhat.com>
+Date: Tue, 20 Feb 2018 23:01:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1802202225190.89213@zero.eik.bme.hu>
+In-Reply-To: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] Moving seabios-hppa git submodule to use a
  qemu.org mirror
 List-Id: <qemu-devel.nongnu.org>
@@ -31,38 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Jeff Cody <jcody@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>
 
-On 20/02/2018 22:41, BALATON Zoltan wrote:
-> On Tue, 20 Feb 2018, Peter Maydell wrote:
->> I just noticed that we seem to have acquired another git
->> submodule that isn't pointing to a qemu.org git url:
->>
->> [submodule "roms/seabios-hppa"]
->>        path = roms/seabios-hppa
->>        url = git://github.com/hdeller/seabios-hppa.git
+On 20/02/2018 19:43, Peter Maydell wrote:
+> I just noticed that we seem to have acquired another git
+> submodule that isn't pointing to a qemu.org git url:
 > 
-> And there's also
+> [submodule "roms/seabios-hppa"]
+>         path = roms/seabios-hppa
+>         url = git://github.com/hdeller/seabios-hppa.git
 > 
-> [submodule "roms/qemu-palcode"]
->         path = roms/qemu-palcode
->         url = git://github.com/rth7680/qemu-palcode.git
-> 
-> if that matters.
+> Jeff, could we set up so we can mirror this repo on qemu.org?
+> Then we can send a patch to update the .gitmodules to point to it.
 
-That already exists at https://github.com/qemu/qemu-palcode, it's just
-not pointed to by .gitmodules.
+This is a fork of SeaBIOS, perhaps we should add "branch = hppa" and
+pull it into the existing SeaBIOS repo of qemu.git.
 
-> I don't mind either way and don't expect to change this u-boot source
-> too much in the future so if you just copy it to the qemu repo without
-> mirroring my repo that's fine as well. (If any change will be needed I
-> can submit patches for it like for other QEMU parts but this should not
-> be needed too frequently as this firmware is not developed any further
-> by upstream so only changes may be bugfixes from QEMU contributors.) But
-> I can't do that myself so I need help with that. All I could do is to
-> provide my own repo and refer to that for all else I need your help.
-
-Out of curiosity, why is it not upstream?
+However, I am worried that any bugfixes are never going to be applied to
+the HPPA version.  How much forked is the fork?
 
 Paolo
