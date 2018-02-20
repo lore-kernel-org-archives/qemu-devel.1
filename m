@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eo5Ur-000150-A8
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:50:06 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eo5j8-0005pd-3t
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:04:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eo5Um-0000ws-BZ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:50:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eo5Um-0000qC-2k
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:50:00 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1KAmu4Y112268
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 05:49:52 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g8hmshkk9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 05:49:51 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 20 Feb 2018 10:49:49 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 20 Feb 2018 11:49:41 +0100
-In-Reply-To: <20180220104942.14531-1-groug@kaod.org>
-References: <20180220104942.14531-1-groug@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20180220104942.14531-2-groug@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] 9p: v9fs_path_copy() readability
+	(envelope-from <kraxel@redhat.com>) id 1eo5j4-00083s-9W
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:04:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56076 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo5j4-00083g-5Z
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:04:46 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 36AB84023150
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 11:04:43 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 20 Feb 2018 12:04:30 +0100
+Message-Id: <20180220110433.20353-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] opengl: some dmabuf support updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,54 +28,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+This series updates the UI interface for dmabug cursors.  Splits the
+callback into two, so we have a separate call for cursor moves.  Also
+adds hotspot information.  Series also includes two small fixes in egl
+code.
 
-lhs/rhs doesn't tell much about how argument are handled, dst/src is
-and const arguments is clearer in my mind. Use g_memdup() while at it.
+Gerd Hoffmann (3):
+  console/opengl: split up dpy_gl_cursor ops
+  egl-headless: cursor_dmabuf: handle NULL cursor
+  egl-helpers: add alpha channel to texture format
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p.c | 9 ++++-----
- hw/9pfs/9p.h | 2 +-
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ include/ui/console.h | 13 ++++++++-----
+ ui/console.c         | 18 ++++++++++++++----
+ ui/egl-headless.c    | 30 ++++++++++++++++++++----------
+ ui/egl-helpers.c     |  2 +-
+ 4 files changed, 43 insertions(+), 20 deletions(-)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 85a1ed8171a4..48fa48e72074 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -190,12 +190,11 @@ v9fs_path_sprintf(V9fsPath *path, const char *fmt, =
-...)
-     va_end(ap);
- }
-=20
--void v9fs_path_copy(V9fsPath *lhs, V9fsPath *rhs)
-+void v9fs_path_copy(V9fsPath *dst, const V9fsPath *src)
- {
--    v9fs_path_free(lhs);
--    lhs->data =3D g_malloc(rhs->size);
--    memcpy(lhs->data, rhs->data, rhs->size);
--    lhs->size =3D rhs->size;
-+    v9fs_path_free(dst);
-+    dst->size =3D src->size;
-+    dst->data =3D g_memdup(src->data, src->size);
- }
-=20
- int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index 5ced427d861b..bad8ee719c4b 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -343,7 +343,7 @@ void coroutine_fn v9fs_reclaim_fd(V9fsPDU *pdu);
- void v9fs_path_init(V9fsPath *path);
- void v9fs_path_free(V9fsPath *path);
- void v9fs_path_sprintf(V9fsPath *path, const char *fmt, ...);
--void v9fs_path_copy(V9fsPath *lhs, V9fsPath *rhs);
-+void v9fs_path_copy(V9fsPath *dst, const V9fsPath *src);
- int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
-                       const char *name, V9fsPath *path);
- int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
---=20
-2.13.6
+-- 
+2.9.3
