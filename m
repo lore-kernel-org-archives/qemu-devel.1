@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1eoFRx-0000jw-7o
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:27:46 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1eoFfP-0005J0-Nh
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1eoFRs-0005e1-AK
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:27:45 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57454 helo=mx1.redhat.com)
+	(envelope-from <balaton@eik.bme.hu>) id 1eoFfL-0004O3-Pw
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:41:39 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:49575)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1eoFRs-0005dH-5t
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:27:40 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5997A404085A
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 21:27:28 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-References: <20180220152843.26464-1-kraxel@redhat.com>
-	<20180220152843.26464-5-kraxel@redhat.com>
-	<869a9977-cc4d-1638-53f7-5966f6e3be52@redhat.com>
-Date: Tue, 20 Feb 2018 16:27:21 -0500
-In-Reply-To: <869a9977-cc4d-1638-53f7-5966f6e3be52@redhat.com> (Eric Blake's
-	message of "Tue, 20 Feb 2018 14:47:33 -0600")
-Message-ID: <jpgtvub9wsm.fsf@linux.bootlegged.copy>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1eoFfL-0004Mz-Ey
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:41:35 -0500
+Date: Tue, 20 Feb 2018 22:41:33 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.1802202225190.89213@zero.eik.bme.hu>
+References: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 4/5] usb-mtp: Introduce write support for
- MTP objects
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: Re: [Qemu-devel] Moving seabios-hppa git submodule to use a
+ qemu.org mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,71 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-Eric Blake <eblake@redhat.com> writes:
+On Tue, 20 Feb 2018, Peter Maydell wrote:
+> I just noticed that we seem to have acquired another git
+> submodule that isn't pointing to a qemu.org git url:
+>
+> [submodule "roms/seabios-hppa"]
+>        path = roms/seabios-hppa
+>        url = git://github.com/hdeller/seabios-hppa.git
 
-> On 02/20/2018 09:28 AM, Gerd Hoffmann wrote:
->> From: Bandan Das <bsd@redhat.com>
->>
->> Allow write operations on behalf of the initiator. The
->> precursor to write is the sending of the write metadata
->> that consists of the ObjectInfo dataset. This patch introduces
->> a flag that is set when the responder is ready to receive
->> write data based on a previous SendObjectInfo operation by
->> the initiator (The SendObjectInfo implementation is in a
->> later patch)
->>
->> Signed-off-by: Bandan Das <bsd@redhat.com>
->> Message-id: 20180215231129.14710-5-bsd@redhat.com
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> ---
->>   hw/usb/dev-mtp.c | 159 +++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++-
->>   1 file changed, 157 insertions(+), 2 deletions(-)
->>
->
->> @@ -1472,12 +1492,133 @@ static void usb_mtp_cancel_packet(USBDevice *de=
-v, USBPacket *p)
->>       fprintf(stderr, "%s\n", __func__);
->>   }
->>   +mode_t getumask(void)
->> +{
->> +    mode_t mask =3D umask(0);
->> +    umask(mask);
->> +    return mask;
->> +}
->
-> This is dangerous.  'man getumask' on my Fedora machine states:
+And there's also
 
-Thanks for the pointer, Eric. Indeed, this doesn't look right.
-I am inclined to just set the default
-permission of created files to 0644 for the mtp share
-and not implement a thread safe getumask.
+[submodule "roms/qemu-palcode"]
+         path = roms/qemu-palcode
+         url = git://github.com/rth7680/qemu-palcode.git
 
-Bandan
+if that matters.
 
-> CONFORMING TO
->        This is a vaporware GNU extension.
+> Jeff, could we set up so we can mirror this repo on qemu.org?
+> Then we can send a patch to update the .gitmodules to point to it.
 >
-> NOTES
->        This  function is documented in the glibc manual, but, as at
-> glibc ver=E2=80=90
->        sion 2.24, it is not implemented on Linux.  (See umask(2) for a
-> thread-
->        safe method of discovering a process's umask.)
->
->
-> and 'man 2 umask' concurs:
->
->        It  is  impossible to use umask() to fetch a process's umask
-> without at
->        the same time changing it.  A second call  to  umask()  would
-> then  be
->        needed  to restore the umask.  The nonatomicity of these two
-> steps pro=E2=80=90
->        vides the potential for races in multithreaded programs.
->
-> It is ONLY safe to grab umask() prior to spawning threads, cache that
-> value, and refer to the cache at all later points.
+> (There's also a patchset on list that wants to add a
+> submodule for git://github.com/zbalaton/u-boot-sam460ex
+> but I don't know if that will go in or not yet. Should
+
+I think the patches that add the board are queued in the PPC tree and may 
+be in next pull request (unless they have to be dropped for some reason) 
+so it would be nice if this firmware could go in with that as well for the 
+board to be usable without getting the firmware binary separately.
+
+> we insist that we set up the mirror first for new
+> submodules, or allow them in and fix things up after?
+> By default we're doing the latter at the moment; the
+> former seems cleaner but makes it more painful for
+> contributors to get things added which need new
+> submodules.)
+
+I don't mind either way and don't expect to change this u-boot source too 
+much in the future so if you just copy it to the qemu repo without 
+mirroring my repo that's fine as well. (If any change will be needed I can 
+submit patches for it like for other QEMU parts but this should not be 
+needed too frequently as this firmware is not developed any further by 
+upstream so only changes may be bugfixes from QEMU contributors.) But I 
+can't do that myself so I need help with that. All I could do is to 
+provide my own repo and refer to that for all else I need your help.
+
+Thank you,
+BALATON Zoltan
