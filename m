@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoBDn-0006WK-23
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:56:51 -0500
+	(envelope-from <berto@igalia.com>) id 1eoBJP-0001B6-3j
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:02:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoBDj-00047z-90
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:56:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52850 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoBDj-00047V-41
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:56:47 -0500
-Date: Tue, 20 Feb 2018 16:56:34 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180220165634.GA12161@stefanha-x1.localdomain>
-References: <12c223afbafb402d6e6602a5888e5dca2953dbfc.1519044214.git.tgolembi@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Qxx1br4bt0+wmkIi"
-Content-Disposition: inline
-In-Reply-To: <12c223afbafb402d6e6602a5888e5dca2953dbfc.1519044214.git.tgolembi@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH] docs: document virtio-balloon
- stats
+	(envelope-from <berto@igalia.com>) id 1eoBJJ-0000R3-VK
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:02:39 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue, 20 Feb 2018 19:01:35 +0200
+Message-Id: <20180220170135.5299-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2] specs/qcow2: Fix documentation of the
+ compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +18,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Wei Wang <wei.w.wang@intel.com>, Jonathan Helman <jonathan.helman@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
+The documentation claims that the cluster descriptor contains the
+number of sectors used to store the compressed data, but what it
+actually contains is the number of sectors *minus one*.
 
---Qxx1br4bt0+wmkIi
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+That can be easily seen in qcow2_decompress_cluster(), that adds one
+to the value stored in that field:
 
-On Mon, Feb 19, 2018 at 01:43:44PM +0100, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
- wrote:
-> Document statistics added in commits
->=20
->     commit a0d06486b445985b8d128df172daefbae205bffd
->     Author: Denis V. Lunev <den@openvz.org>
->     Date:   Wed Feb 24 10:50:48 2016 +0300
->=20
->         virtio-balloon: add 'available' counter
->=20
-> and
->=20
->     commit bf1e7140ef0b3a149860ab9f05b36665133238f6
->     Author: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
->     Date:   Tue Dec 5 13:14:46 2017 +0100
->=20
->         virtio-balloon: include statistics of disk/file caches
->=20
-> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-> ---
->  docs/virtio-balloon-stats.txt | 2 ++
->  1 file changed, 2 insertions(+)
+  nb_csectors = ((cluster_offset >> s->csize_shift) & s->csize_mask) + 1;
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+In addition to that this patch clarifies where the actual compressed
+data is located.
 
---Qxx1br4bt0+wmkIi
-Content-Type: application/pgp-signature; name="signature.asc"
+Although the size of the data is specified in sectors, the offset is
+not necessarily aligned to a sector boundary, so the actual data goes
+from the specified offset until the end of the last sector, leaving
+the initial bytes of the first sector (if any) unused.
 
------BEGIN PGP SIGNATURE-----
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
 
-iQEcBAEBAgAGBQJajFNBAAoJEJykq7OBq3PIYmoIAJCqyVBCOddyRe7A+xIDRaoh
-enFTqfHEJ82tLaq4Tebw/aONy2UdklNg43kdVjUFHOmk4aELRq1psQhOmPvSq/Wb
-/2v/KuySJaigGGrbjzeQ0YjJcqWLdgTXvoBvEyCP999/3FHx6vJvH4zlVcc68i8g
-BU+RfjZMGqjs1l9WcMwkco4bNmVhL6AohBozJK6TPyN2gn/UZwPnneqdOP0ysL2W
-uTzo4uqekm4n9wZhmT4WlkhIcA7g54G7vkHkBScbM/QhiFRSj2Bq7olBjygQqfZW
-nv8x6LCOaK5ZRD5CfyIH3iSYvMLCPbwryteYQAIfwf43rxWvN4C8Sa8vSFycxfM=
-=cmwu
------END PGP SIGNATURE-----
+v2: I realized that the documentation is not completely clear about
+    the exact location and size of the compressed data, so I updated
+    the patch to clarify this.
 
---Qxx1br4bt0+wmkIi--
+---
+ docs/interop/qcow2.txt | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index d7fdb1fee3..dc2b9cefb2 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -427,9 +427,17 @@ Standard Cluster Descriptor:
+ Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
+ 
+     Bit  0 -  x:    Host cluster offset. This is usually _not_ aligned to a
+-                    cluster boundary!
++                    cluster or sector boundary!
+ 
+-       x+1 - 61:    Compressed size of the images in sectors of 512 bytes
++       x+1 - 61:    Number of 512-byte sectors used for the compressed data,
++                    minus one (that is, a value of n here means n+1 sectors).
++
++                    The actual compressed data is located at the end of this
++                    region, from the offset indicated in the previous field
++                    until the end of the last sector.
++
++                    The initial bytes of this region are therefore unused if
++                    the offset is not aligned to a sector boundary.
+ 
+ If a cluster is unallocated, read requests shall read the data from the backing
+ file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
+-- 
+2.11.0
