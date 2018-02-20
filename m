@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eo8iB-0002Ap-On
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:16:05 -0500
+	(envelope-from <hlandau@devever.net>) id 1eo8m2-0003FG-Cm
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:20:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eo8i6-0005Cr-57
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:16:03 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 20 Feb 2018 16:15:31 +0200
-Message-Id: <20180220141531.11770-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH] specs/qcow2: Fix documentation of the
- compressed cluster descriptor
+	(envelope-from <hlandau@devever.net>) id 1eo8lx-00087L-FT
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:20:02 -0500
+Received: from umbriel.devever.net ([149.202.51.241]:34742)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hlandau@devever.net>) id 1eo8lx-00086X-63
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:19:57 -0500
+Date: Tue, 20 Feb 2018 14:19:54 +0000
+From: Hugo Landau <hlandau@devever.net>
+Message-ID: <20180220141954.GA5614@axminster>
+References: <20180220132627.4163-1-hlandau@devever.net>
+	<e13f6f08-c29a-2202-014c-1911181671e2@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e13f6f08-c29a-2202-014c-1911181671e2@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] Fix ast2500 protection register emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,36 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-devel@nongnu.org
 
-The documentation claims that the cluster descriptor contains the
-number of sectors used to store the compressed data, but what it
-actually contains is the number of sectors *minus one*.
+> I also gave it a test on an OpenBMC romulus image. Looks fine, but that's 
+> an old custom U-Boot. Which defconfig did you use for U-Boot HEAD ? 
+evb-ast2500_defconfig.
 
-That can be easily seen in qcow2_decompress_cluster(), that adds one
-to the value stored in that field:
+FYI, these changes are necessary, but not sufficient to get u-boot HEAD
+(or for that matter u-boot 2017.11, another version tested) running.
 
-  nb_csectors = ((cluster_offset >> s->csize_shift) & s->csize_mask) + 1;
+The other issues were
+  - the tests
+      while (!(readl(&regs->ecc_test_ctrl) & SDRAM_TEST_DONE));
+    and
+      while (!(readl(&info->regs->config) & SDRAM_CONF_CACHE_INIT_DONE));
+    which appear in various places in the u-boot source and which spin
+    forever. I made u-boot work by commenting these out in u-boot rather
+    than patching qemu, not familiar enough with qemu to implement this.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- docs/interop/qcow2.txt | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  - the call to reset_assert in ast2500_sdrammc_probe seems to actually
+    reset the machine rather than just initialize SDRAM as it is
+    apparently supposed to, leading to an infinite cycle of resets.
+    Couldn't quite figure out how it was supposed to work, so I
+    commented this out, since obviously qemu doesn't actually have SDRAM
+    initialization requirements.
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index d7fdb1fee3..b12972be82 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -429,7 +429,8 @@ Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
-     Bit  0 -  x:    Host cluster offset. This is usually _not_ aligned to a
-                     cluster boundary!
- 
--       x+1 - 61:    Compressed size of the images in sectors of 512 bytes
-+       x+1 - 61:    Size of the compressed data in sectors of 512 bytes,
-+                    minus one (that is, a value of n here means n+1 sectors).
- 
- If a cluster is unallocated, read requests shall read the data from the backing
- file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
--- 
-2.11.0
+The above changes plus this patch allowed u-boot to get to the u-boot
+CLI. Haven't tried booting anything with it yet though.
