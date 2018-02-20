@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eo6xi-0007qr-OO
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:23:59 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eo7GH-0003kL-Hr
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:43:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eo6xe-0000Ng-QQ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:23:58 -0500
-Date: Tue, 20 Feb 2018 13:23:29 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180220132329.39d8b759.cohuck@redhat.com>
-In-Reply-To: <1518797321-28356-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-References: <1518797321-28356-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1eo7GB-0004Y6-Dy
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:43:09 -0500
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:37791)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eo7GB-0004XN-38
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:43:03 -0500
+Received: by mail-wr0-x230.google.com with SMTP id z12so7815191wrg.4
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 04:43:02 -0800 (PST)
+References: <20180206164815.10084-1-alex.bennee@linaro.org>
+	<CAFEAcA9ZVrXbzTHHjMRpEadBjFLecgxwKvsN4gtWuR0NMP5xWQ@mail.gmail.com>
+	<579a7106-ecdb-984e-97b5-bd23d0625156@vivier.eu>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <579a7106-ecdb-984e-97b5-bd23d0625156@vivier.eu>
+Date: Tue, 20 Feb 2018 12:43:00 +0000
+Message-ID: <87mv03al2j.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv5 0/5] add query-cpu-fast and related s390
- changes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 00/22] re-factor softfloat and add fp16
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +32,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, david@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 16 Feb 2018 17:08:36 +0100
-Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
 
-> v5 synopsis: Split out HMP changes from Patch 2 into Patch 5. Please
->    	     re-review, as I've removed the a-b/r-b from Patch 2
-> 	     as well.
-> 
-> This series consolidates patches around a performance issue
-> caused by the usage of QMP query-cpus.
-> 
-> A performance issue was found in an OpenStack environment, where
-> ceilometer was collecting domain statistics with libvirt. The domain
-> statistics reported by libvirt include the vCPU halted state, which 
-> in turn is retrieved with QMP query-cpus.
-> 
-> This causes two issues:
-> 1. Performance: on most architectures query-cpus needs to issue a KVM ioctl
->    to find out whether a vCPU was halted. This is not the case for s390
->    but query-cpus is always causing the vCPU to exit the VM.
-> 
-> 2. Semantics: on x86 and other architectures, halted is a highly transient
->    state, which is likely to have already changed shortly after the state
->    information has been retrieved. This is not the case for s390, where
->    halted is an indication that the vCPU is stopped, meaning its not
->    available to the guest operating system until it has been restarted.
+Laurent Vivier <laurent@vivier.eu> writes:
 
-Thanks, queued to s390-next.
+> Le 13/02/2018 =C3=A0 16:51, Peter Maydell a =C3=A9crit:
+>> On 6 February 2018 at 16:47, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>> Hi,
+>>>
+>>> The main change is applying the __attribute__((flatten)) to some of
+>>> the public functions that show up in Emilio's dbt-benchmark. This
+>>> seems to be a cleaner solution that squashing inlines higher up the
+>>> chain and still leaves the chance for re-use for the less widely used
+>>> functions. The results are an improvement over v3 by some margin:
+>>>
+>>>                          NBench score; higher is better
+>>>
+>>>     5 +-+-----------+-------------+------------+-------------+---------=
+--+-+
+>>>       |                     ****### %%%%  +++                          =
+    |
+>>>   4.5 +-+...................*..*..#.%..%..****##..%%%%+ system-2.5     =
+  +-+
+>>>       |                     *  *  # %  %  *  * #  %  %      master     =
+    |
+>>>     4 +-+...................*..*..#.%..%..*..*.#..%..%softfloat-v3     =
+  +-+
+>>>   3.5 +-+...................*..*..#.%..%..*..*.#..%..%softfloat-%%%%...=
+..+-+
+>>>       |                     *  *  # %  %  *  * #  %  %  * *  #  %  %   =
+    |
+>>>     3 +-+...................*..*..#.%..%..*..*.#..%..%..*.*..#..%..%...=
+..+-+
+>>>       |                     *  *  #+%  %  *  * #$$$  %  * *  #  %  %   =
+    |
+>>>   2.5 +-+........####.......*..*..#$$..%..*..*.#..$..%..*.*..#..%..%...=
+..+-+
+>>>       |       ****  #  %%%  *  *  # $  %  *  * #  $  %  * *  #$$$  %   =
+    |
+>>>     2 +-+.....*..*..#..%.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%...=
+..+-+
+>>>       |       *  *  #  % %  *  *  # $  %  *  * #  $  %  * *  #  $  %   =
+    |
+>>>   1.5 +-+.....*..*..#$$$.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%...=
+..+-+
+>>>     1 +-+.....*..*..#..$.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%...=
+..+-+
+>>>       |       *  *  #  $ %  *  *  # $  %  *  * #  $  %  * *  #  $  %   =
+    |
+>>>   0.5 +-+.....*..*..#..$.%..*..*..#.$..%..*..*.#..$..%..*.*..#..$..%...=
+..+-+
+>>>       |       *  *  #  $ %  *  *  # $  %  *  * #  $  %  * *  #  $  %   =
+    |
+>>>     0 +-+-----****###$$$%%--****###$$%%%--****##$$$%%%--***###$$$%%%---=
+--+-+
+>>>                  FOURIER     NEURAL NETLU DECOMPOSITION    gmean
+>>>
+>>> Slightly easier to read PNG:
+>>>
+>>>     https://i.imgur.com/XEeL0bC.png
+>>>
+>>> I think it's pretty ready for a merge. Shall I submit a pull myself or
+>>> does it make sense going via someone else? According to MAINTAINERS
+>>> Peter and Aurelien are responsible for this code...
+>>
+>> I had some nits but I think the best thing to do is if you fix those
+>> and then just send a pull request for this.
+>
+> Just to be sure no one has missed that:
+>
+> https://bellard.org/libbf/
+>
+> I'm wondering if it can help for this work.
+
+I did have a brief look through to get a sense of how it works. The
+first thing it is missing however is half-precision. It only seems to
+deal in 32 and 64 bit floats. The code is also fairly sparse in its
+commenting.
+
+The main approach seems to be somewhere between rth's glibc macro fest
+and what we have now. It makes extensive use of every QEMU developers
+favourite glue macro to instantiate code from a "template". This allows
+some better usage of size appropriate types in each instantiation where
+we just do most things at the highest precision.
+
+However I think it also suffers the same problem as SoftFloat3 as in
+it is not an upstream project so it is just another lump of code to
+import into out code base. Based on that I favour our re-factor more as
+I think it is easier to follow and hopefully will be easier to maintain.
+
+I think we can address the inefficiencies in our mul/div code by passing
+FloatFmt in and letting the compiler deal with it in each flattened
+implementation. I prototyped mul:
+
+  http://ix.io/MYw
+
+However unless we are super worried about these inefficiencies I'm
+proposing we merge what we have and deal with these in a later round.
+
+>
+> Thanks,
+> Laurent
+
+
+--
+Alex Benn=C3=A9e
