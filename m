@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo5A4-0003LJ-8y
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:28:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eo5Gd-0005QL-NA
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:35:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo59z-0003iT-EV
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:28:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37142 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo59z-0003iC-9H
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:28:31 -0500
-Date: Tue, 20 Feb 2018 11:28:14 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
-References: <20180219111458.25983-1-kraxel@redhat.com>
-	<20180219151649.13a197f9@w520.home>
+	(envelope-from <peter.maydell@linaro.org>) id 1eo5Gc-0007kO-T7
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:35:23 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:35888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eo5Gc-0007js-MA
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 05:35:22 -0500
+Received: by mail-ot0-x230.google.com with SMTP id b15so5034282otf.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 02:35:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180219151649.13a197f9@w520.home>
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
+In-Reply-To: <20180220091640.10875-1-laurent@vivier.eu>
+References: <20180220091640.10875-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Feb 2018 10:34:56 +0000
+Message-ID: <CAFEAcA8ttZYUXu5O+0Pv0aKf-54aYWXO6WiP9GhiE55K6htR6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] Linux user for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On Mon, Feb 19, 2018 at 03:16:49PM -0700, Alex Williamson wrote:
-> On Mon, 19 Feb 2018 12:14:51 +0100
-> Gerd Hoffmann <kraxel@redhat.com> wrote:
-> 
-> > This series adds support for a vgpu display to the qemu vfio code.
-> > For now only regions are supported, dmabufs will follow later.
-> > 
-> > This version adds a patch to allow devices disable hotplugging, which
-> > will be used by vfio display support.  Also fixed issues Alex found in
-> > review.
-> 
-> Looks ok to me, if this is to go through my tree I'll need a qdev ack
-> for 4/7.  If you want to go a different route, for 5-7:
-> 
-> Acked-by: Alex Williamson <alex.williamson@redhat.com>
-> 
-> I'm still a bit confused though, what's preventing us from adding
-> dmabuf support now?  It's strange to provide the implementation for the
-> proprietary, unavailable vendor driver implementation first.  Is GVT-g
-> broken, lagging?  Thanks,
+On 20 February 2018 at 09:16, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit f0fa81767555fe2c4b5f8c9e0725a80eac1d7f56:
+>
+>   cuda.h: Fix multiple typedef (2018-02-16 18:38:21 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/linux-user-for-2.12-pull-request
+>
+> for you to fetch changes up to b44316fb3610972e40849ec5710aeb42dfeba19d:
+>
+>   linux-user: Remove THREAD macro (2018-02-18 18:52:32 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
 
-A bit more complicated because it depends on user interface changes ...
 
-Sneak preview at https://www.kraxel.org/cgit/qemu/log/?h=work/intel-vgpu
-Note: branch is a moving target ;)
+Applied, thanks.
 
-State:
-  vfio:  Working, needs some cleanups though (drop debug logging, ...).
-  gtk:   Working, needs some minor cleanups too.
-  spice: Partly working (no mouse ptr yet).
-  sdl:   Not working.  Need to figure how I get a egl context (instead
-         of glx).  Possibly requires SDL 2.2.  Tina looked at this a
-         while back, need to look at some old mails ...
-
-Current plan:
-  (1) fix/complete spice support.
-  (2) cleanup patches, send them out.
-  (3) look at the SDL issues.
+-- PMM
