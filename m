@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eo9Tq-0000Oq-O0
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:05:22 -0500
+	(envelope-from <david@redhat.com>) id 1eo9UX-0000zV-K8
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eo9Tp-0007U5-Nj
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:05:18 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47956 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eo9Tp-0007Tu-Gl
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:05:17 -0500
-References: <1519138892-12836-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b24c0bd-c90c-3835-48b0-c38be4a75983@redhat.com>
-Date: Tue, 20 Feb 2018 16:05:15 +0100
+	(envelope-from <david@redhat.com>) id 1eo9US-0007j8-Mi
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:06:01 -0500
+References: <20180219174231.10874-1-david@redhat.com>
+	<493dbfb3-086b-cc89-2d8d-4298345c6bb2@de.ibm.com>
+	<ef55dc18-971f-b012-40cc-0c32f24664cf@redhat.com>
+	<20180220155759.17dfd955.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <aeb36cb1-aadf-6146-9e59-549998538db1@redhat.com>
+Date: Tue, 20 Feb 2018 16:05:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519138892-12836-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20180220155759.17dfd955.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Document --rtc-td-hack,
- --localtime and --startdate as deprecated
+Subject: Re: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Daniel P Berrange <berrange@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-On 20/02/2018 16:01, Thomas Huth wrote:
-> These options have been marked in a comment in qemu-options.hx as
-> deprecated in 2009 already (see commit 1ed2fc1fa35fadc0d6), but we
-> never informed the users about these deprecations. Let's catch up
-> on that omission now.
+On 20.02.2018 15:57, Cornelia Huck wrote:
+> On Tue, 20 Feb 2018 13:16:37 +0100
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  qemu-doc.texi | 13 +++++++++++++
->  vl.c          |  5 +++++
->  2 files changed, 18 insertions(+)
+>> On 20.02.2018 13:05, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 02/19/2018 06:42 PM, David Hildenbrand wrote:  
+>>>> From an architecture point of view, nothing can be mapped into the address
+>>>> space on s390x. All there is is memory. Therefore there is also not really
+>>>> an interface to communicate such information to the guest. All we can do is
+>>>> specify the maximum ram address and guests can probe in that range if
+>>>> memory is available and usable (TPROT).  
+>>>
+>>> In fact there is an interface in SCLP that describes the memory sizes (maximum in 
+>>> read scp info) and the details (read_storage_element0_info).  I am asking myself
+>>> if we should re-introduce read_storage_element_info and use that to avoid tprot  
+>>
+>> Yes, we could do that (basically V1 of this patch) but have to glue it
+>> to the a compatibility machine then.
 > 
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 2f19980..7494042 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2736,6 +2736,19 @@ filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
->  which is not the recommended way to run QEMU. This backend should not be
->  used and it will be removed with no replacement.
->  
-> +@subsection -rtc-td-hack (since 2.12.0)
-> +
-> +The @code{--rtc-td-hack} option has been replaced by
-> +@code{--rtc driftfix=slew}.
-> +
-> +@subsection -localtime (since 2.12.0)
-> +
-> +The @code{--localtime} option has been replaced by @code{--rtc localtime}.
-> +
-> +@subsection -startdate (since 2.12.0)
-> +
-> +The @code{--startdate} option has been replaced by @code{--rtc @var{date}}.
-> +
->  @section qemu-img command line arguments
->  
->  @subsection convert -s (since 2.0.0)
-> diff --git a/vl.c b/vl.c
-> index 0feaca7..84121bf 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3417,6 +3417,8 @@ int main(int argc, char **argv, char **envp)
->                  break;
->              case QEMU_OPTION_localtime:
->                  rtc_utc = 0;
-> +                warn_report("This option is deprecated, "
-> +                            "use '--rtc localtime' instead.");
->                  break;
->              case QEMU_OPTION_vga:
->                  vga_model = optarg;
-> @@ -3672,6 +3674,8 @@ int main(int argc, char **argv, char **envp)
->                  };
->  
->                  qdev_prop_register_global(&slew_lost_ticks);
-> +                warn_report("This option is deprecated, "
-> +                            "use '--rtc driftfix=slew' instead.");
->                  break;
->              }
->              case QEMU_OPTION_acpitable:
-> @@ -3876,6 +3880,7 @@ int main(int argc, char **argv, char **envp)
->                   */
->                  break;
->              case QEMU_OPTION_startdate:
-> +                warn_report("This option is deprecated, use '--rtc' instead.");
->                  configure_rtc_date_offset(optarg, 1);
->                  break;
->              case QEMU_OPTION_rtc:
-> 
+> Actually, this makes quite a bit of sense (introduce the interface for
+> everyone in 2.12 and turn it off in compat machines).
 
-Queued, thanks.
+Jup, either 2.12 or 2.13, no need to hurry.
 
-paolo
+> 
+> Does real hardware have configurations where you can get the memory
+> sizes, but not the attach/deattach support? (Hardware with the feature,
+> but no standby memory defined?)
+
+I would guess that "0" for standby memory is valid but only people with
+access to documentation can answer that :)
+
+>> Interesting, didn't know about that. Will rephrase then to
+>>
+>> "While the hypervisor can deny to online an increment, all increments
+>> have to be predefined and there is no way of telling the guest about a
+>> newly "hotplugged" increment."
+> 
+> Rephrase which part? :)
+
+"And nobody can really hinder it from doing so."
+
+Thanks!
+
+-- 
+
+Thanks,
+
+David / dhildenb
