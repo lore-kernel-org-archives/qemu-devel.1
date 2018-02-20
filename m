@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eoBnM-0006kn-1O
+	(envelope-from <laurent@vivier.eu>) id 1eoBnL-0006kl-Rf
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eoBnJ-0003u4-4H
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:36 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:50853)
+	(envelope-from <laurent@vivier.eu>) id 1eoBnI-0003ta-MH
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:35 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:42157)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eoBnI-0003tE-RJ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:33 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eoBnI-0003t0-Bt
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:32 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 20 Feb 2018 18:33:07 +0100
-Message-Id: <20180220173307.25125-5-laurent@vivier.eu>
+Date: Tue, 20 Feb 2018 18:33:05 +0100
+Message-Id: <20180220173307.25125-3-laurent@vivier.eu>
 In-Reply-To: <20180220173307.25125-1-laurent@vivier.eu>
 References: <20180220173307.25125-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v5 4/4] linux-user: MIPS set cpu to r6 CPU if
- binary is R6
+Subject: [Qemu-devel] [PATCH v5 2/4] linux-user: introduce functions to
+ detect CPU type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,120 @@ Cc: Aaron Sierra <asierra@xes-inc.com>, Richard Henderson <richard.henderson@lin
 
 From: YunQiang Su <syq@debian.org>
 
-So here we need to detect the version of binaries and set
-cpu_model for it.
+Add a function to return ELF e_flags and use it
+to select the CPU model.
 
 Signed-off-by: YunQiang Su <syq@debian.org>
-[lv: original patch modified to move code into cpu_get_model()]
+[lv: split the patch and some cleanup in get_elf_eflags()]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
 
 Notes:
-    v5: Use EF_MIPS_ARCH mask to read MIPS architecture flags
-        -> removed Richard's R-b because of this change
     v4: add YunQiang Su's Signed-off-by
-    v3: fix code indent problem reported by patchew
-        remove useless "!= 0"
     v2: call cpu_get_model() with the result of get_elf_eflags()
 
- include/elf.h                  | 7 +++++++
- linux-user/mips/target_elf.h   | 3 +++
- linux-user/mips64/target_elf.h | 3 +++
- 3 files changed, 13 insertions(+)
+ linux-user/elfload.c | 35 +++++++++++++++++++++++++++++++++++
+ linux-user/main.c    | 20 ++++++++++----------
+ linux-user/qemu.h    |  1 +
+ 3 files changed, 46 insertions(+), 10 deletions(-)
 
-diff --git a/include/elf.h b/include/elf.h
-index ca9a419043..943ee21171 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -33,6 +33,9 @@ typedef int64_t  Elf64_Sxword;
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 8bb9a2c3e8..0208022445 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2396,6 +2396,41 @@ give_up:
+     g_free(syms);
+ }
  
- /* Flags in the e_flags field of the header */
- /* MIPS architecture level. */
-+#define EF_MIPS_ARCH            0xf0000000
++uint32_t get_elf_eflags(int fd)
++{
++    struct elfhdr ehdr;
++    off_t offset;
++    int ret;
 +
-+/* Legal values for MIPS architecture level.  */
- #define EF_MIPS_ARCH_1		0x00000000	/* -mips1 code.  */
- #define EF_MIPS_ARCH_2		0x10000000	/* -mips2 code.  */
- #define EF_MIPS_ARCH_3		0x20000000	/* -mips3 code.  */
-@@ -40,6 +43,10 @@ typedef int64_t  Elf64_Sxword;
- #define EF_MIPS_ARCH_5		0x40000000	/* -mips5 code.  */
- #define EF_MIPS_ARCH_32		0x50000000	/* MIPS32 code.  */
- #define EF_MIPS_ARCH_64		0x60000000	/* MIPS64 code.  */
-+#define EF_MIPS_ARCH_32R2       0x70000000      /* MIPS32r2 code.  */
-+#define EF_MIPS_ARCH_64R2       0x80000000      /* MIPS64r2 code.  */
-+#define EF_MIPS_ARCH_32R6       0x90000000      /* MIPS32r6 code.  */
-+#define EF_MIPS_ARCH_64R6       0xa0000000      /* MIPS64r6 code.  */
++    /* Read ELF header */
++    offset = lseek(fd, 0, SEEK_SET);
++    if (offset == (off_t) -1) {
++        return 0;
++    }
++    ret = read(fd, &ehdr, sizeof(ehdr));
++    if (ret < sizeof(ehdr)) {
++        return 0;
++    }
++    offset = lseek(fd, offset, SEEK_SET);
++    if (offset == (off_t) -1) {
++        return 0;
++    }
++
++    /* Check ELF signature */
++    if (!elf_check_ident(&ehdr)) {
++        return 0;
++    }
++
++    /* check header */
++    bswap_ehdr(&ehdr);
++    if (!elf_check_ehdr(&ehdr)) {
++        return 0;
++    }
++
++    /* return architecture id */
++    return ehdr.e_flags;
++}
++
+ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
+ {
+     struct image_info interp_info;
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 24ecef3607..bab5bbcfb1 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4344,8 +4344,17 @@ int main(int argc, char **argv, char **envp)
  
- /* The ABI of a file. */
- #define EF_MIPS_ABI_O32		0x00001000	/* O32 ABI.  */
-diff --git a/linux-user/mips/target_elf.h b/linux-user/mips/target_elf.h
-index bed0b43259..fa5d30bf99 100644
---- a/linux-user/mips/target_elf.h
-+++ b/linux-user/mips/target_elf.h
-@@ -9,6 +9,9 @@
- #define MIPS_TARGET_ELF_H
- static inline const char *cpu_get_model(uint32_t eflags)
- {
-+    if ((eflags & EF_MIPS_ARCH) == EF_MIPS_ARCH_32R6) {
-+        return "mips32r6-generic";
+     init_qemu_uname_release();
+ 
++    execfd = qemu_getauxval(AT_EXECFD);
++    if (execfd == 0) {
++        execfd = open(filename, O_RDONLY);
++        if (execfd < 0) {
++            printf("Error while loading %s: %s\n", filename, strerror(errno));
++            _exit(EXIT_FAILURE);
++        }
 +    }
-     return "24Kf";
- }
- #endif
-diff --git a/linux-user/mips64/target_elf.h b/linux-user/mips64/target_elf.h
-index 5b6f4692e0..ec55d8542a 100644
---- a/linux-user/mips64/target_elf.h
-+++ b/linux-user/mips64/target_elf.h
-@@ -9,6 +9,9 @@
- #define MIPS64_TARGET_ELF_H
- static inline const char *cpu_get_model(uint32_t eflags)
- {
-+    if ((eflags & EF_MIPS_ARCH) == EF_MIPS_ARCH_64R6) {
-+        return "I6400";
-+    }
-     return "5KEf";
- }
- #endif
++
+     if (cpu_model == NULL) {
+-        cpu_model = cpu_get_model(0);
++        cpu_model = cpu_get_model(get_elf_eflags(execfd));
+     }
+     tcg_exec_init(0);
+     /* NOTE: we need to init the CPU at this stage to get
+@@ -4438,15 +4447,6 @@ int main(int argc, char **argv, char **envp)
+     cpu->opaque = ts;
+     task_settid(ts);
+ 
+-    execfd = qemu_getauxval(AT_EXECFD);
+-    if (execfd == 0) {
+-        execfd = open(filename, O_RDONLY);
+-        if (execfd < 0) {
+-            printf("Error while loading %s: %s\n", filename, strerror(errno));
+-            _exit(EXIT_FAILURE);
+-        }
+-    }
+-
+     ret = loader_exec(execfd, filename, target_argv, target_environ, regs,
+         info, &bprm);
+     if (ret != 0) {
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 4edd7d0c08..47ca71159c 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -188,6 +188,7 @@ int loader_exec(int fdexec, const char *filename, char **argv, char **envp,
+              struct target_pt_regs * regs, struct image_info *infop,
+              struct linux_binprm *);
+ 
++uint32_t get_elf_eflags(int fd);
+ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info);
+ int load_flt_binary(struct linux_binprm *bprm, struct image_info *info);
+ 
 -- 
 2.14.3
