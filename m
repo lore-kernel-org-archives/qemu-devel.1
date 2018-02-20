@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eoCdD-0003xK-77
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:27:12 -0500
+	(envelope-from <berrange@redhat.com>) id 1eoCgg-00078W-Tu
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eoCd9-0008TS-FQ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:27:11 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180220180325.29818-1-peter.maydell@linaro.org>
-	<20180220180325.29818-10-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9d59a47f-9b5b-f49d-c19b-7c10a7b8e8cc@amsat.org>
-Date: Tue, 20 Feb 2018 15:27:04 -0300
+	(envelope-from <berrange@redhat.com>) id 1eoCgd-0002hV-Mt
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:30:46 -0500
+Date: Tue, 20 Feb 2018 18:30:22 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180220183022.GQ6021@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <cover.1519150239.git.balaton@eik.bme.hu>
+	<7fa4ce574074b3baf702b628a7e1fce647305ce1.1519150239.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <20180220180325.29818-10-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 09/19] hw/misc/unimp: Move
- struct to header file
+Content-Disposition: inline
+In-Reply-To: <7fa4ce574074b3baf702b628a7e1fce647305ce1.1519150239.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 2/2] pc-bios: Added u-boot-sam460 firmware
+ binary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-On 02/20/2018 03:03 PM, Peter Maydell wrote:
-> Move the definition of the struct for the unimplemented-device
-> from unimp.c to unimp.h, so that users can embed the struct
-> in their own device structs if they prefer.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On Tue, Feb 20, 2018 at 06:57:43PM +0100, BALATON Zoltan wrote:
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  include/hw/misc/unimp.h | 10 ++++++++++
->  hw/misc/unimp.c         | 10 ----------
->  2 files changed, 10 insertions(+), 10 deletions(-)
+>  Makefile                           |   2 +-
+>  pc-bios/u-boot-sam460-20100605.bin | Bin 0 -> 524288 bytes
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+>  create mode 100755 pc-bios/u-boot-sam460-20100605.bin
 > 
-> diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
-> index 52e068ec3e..2a291ca42d 100644
-> --- a/include/hw/misc/unimp.h
-> +++ b/include/hw/misc/unimp.h
-> @@ -12,6 +12,16 @@
->  
->  #define TYPE_UNIMPLEMENTED_DEVICE "unimplemented-device"
->  
-> +#define UNIMPLEMENTED_DEVICE(obj) \
-> +    OBJECT_CHECK(UnimplementedDeviceState, (obj), TYPE_UNIMPLEMENTED_DEVICE)
-> +
-> +typedef struct {
-> +    SysBusDevice parent_obj;
-> +    MemoryRegion iomem;
-> +    char *name;
-> +    uint64_t size;
-> +} UnimplementedDeviceState;
-> +
->  /**
->   * create_unimplemented_device: create and map a dummy device
->   * @name: name of the device for debug logging
-> diff --git a/hw/misc/unimp.c b/hw/misc/unimp.c
-> index bcbb585888..1c0ba2f0a7 100644
-> --- a/hw/misc/unimp.c
-> +++ b/hw/misc/unimp.c
-> @@ -18,16 +18,6 @@
->  #include "qemu/log.h"
->  #include "qapi/error.h"
->  
-> -#define UNIMPLEMENTED_DEVICE(obj) \
-> -    OBJECT_CHECK(UnimplementedDeviceState, (obj), TYPE_UNIMPLEMENTED_DEVICE)
-> -
-> -typedef struct {
-> -    SysBusDevice parent_obj;
-> -    MemoryRegion iomem;
-> -    char *name;
-> -    uint64_t size;
-> -} UnimplementedDeviceState;
-> -
->  static uint64_t unimp_read(void *opaque, hwaddr offset, unsigned size)
->  {
->      UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(opaque);
-> 
+> diff --git a/Makefile b/Makefile
+> index 6434d6c..b0c16b3 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -661,7 +661,7 @@ multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin \
+>  s390-ccw.img s390-netboot.img \
+>  spapr-rtas.bin slof.bin skiboot.lid \
+>  palcode-clipper \
+> -u-boot.e500 \
+> +u-boot.e500 u-boot-sam460-20100605.bin \
+>  qemu_vga.ndrv \
+>  hppa-firmware.img
+>  else
+> diff --git a/pc-bios/u-boot-sam460-20100605.bin b/pc-bios/u-boot-sam460-20100605.bin
+> new file mode 100755
+
+IIUC, you also need to provide glue in roms/Makefile to build the
+u-boot-sam460-20100605.bin from the submodule content. Presumably
+you can largely copy what's done for u-boot.e500 there.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
