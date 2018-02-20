@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eo5xE-0006YX-Ez
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:19:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1eo69H-0000cE-St
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:31:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eo5x9-00074D-Ub
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:19:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58502)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eo5x9-00072I-LU
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:19:19 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1KBJ7vo100245
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 06:19:18 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g8hnq2nwj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 06:19:18 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 20 Feb 2018 11:19:16 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20180219174231.10874-1-david@redhat.com>
-	<39db6736-b5c5-832f-ffef-1d0a59b85ac2@de.ibm.com>
-Date: Tue, 20 Feb 2018 12:19:11 +0100
+	(envelope-from <thuth@redhat.com>) id 1eo69E-00041q-Q4
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:31:51 -0500
+References: <cover.1519036465.git.balaton@eik.bme.hu>
+	<cfba6d194787f7c136b29be47d0c221c99d77ab1.1519036465.git.balaton@eik.bme.hu>
+	<20180220024009.GH1109@umbus.fritz.box>
+	<alpine.BSF.2.21.1802201055030.91792@zero.eik.bme.hu>
+	<8487b26a-77b0-1f00-8338-45575b72ff2f@suse.de>
+	<alpine.BSF.2.21.1802201204490.13607@zero.eik.bme.hu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6c5cd396-cbaa-642d-4bb4-f9fb2ad9f39c@redhat.com>
+Date: Tue, 20 Feb 2018 12:31:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <39db6736-b5c5-832f-ffef-1d0a59b85ac2@de.ibm.com>
+In-Reply-To: <alpine.BSF.2.21.1802201204490.13607@zero.eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <a26b3e3c-d4ef-e389-34f8-2c0df754eeb4@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug
- support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 2/2] ppc: Add aCube Sam460ex
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,78 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, Alexander Graf <agraf@suse.de>
+Cc: Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+On 20.02.2018 12:16, BALATON Zoltan wrote:
+> On Tue, 20 Feb 2018, Alexander Graf wrote:
+>> On 02/20/2018 11:09 AM, BALATON Zoltan wrote:
+>>> On Tue, 20 Feb 2018, David Gibson wrote:
+>>>> On Mon, Feb 19, 2018 at 11:34:25AM +0100, BALATON Zoltan wrote:
+>>>> 1;5002;0c> Add emulation of aCube Sam460ex board based on AMCC 460EX
+>>>> embedded SoC.
+>>>>> This is not a complete implementation yet with a lot of components
+>>>>> still missing but enough for the U-Boot firmware to start and to bo=
+ot
+>>>>> a Linux kernel or AROS.
+>>>>>
+>>>>> Signed-off-by: Fran=C3=A7ois Revol <revol@free.fr>
+>>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>>
+>>>> I'm not thrilled with having a machine type that can't be used witho=
+ut
+>>>> extracting a bootloader image from somewhere, but from the other
+>>>> thread that's not easy to fix.
+>>>
+>>> This is not meant to be like that and I'd like to also submit the
+>>> u-boot image once we figure out how to do it. Especially because the
+>>> boot loader one can extract from the updater is buggy but here's a
+>>> fixed binary that works here: http://zero.eik.bme.hu/~balaton/qemu/
+>>>
+>>> U-Boot is GPL so we would need to include the source as well (the
+>>> README in the link above contain the source URL and the patches
+>>> needed are there as well). If there's no easy way to host it in the
+>>> QEMU repo I could put it in my own git repo and submit a patch to use
+>>> that as a submodule if that's acceptable. It seems there are some
+>>> firmware images that reference external git repos already but not
+>>> sure what's the preferred way.
+>>
+>> IMHO the preferred way would be to integrate sam460ex support in
+>> upstream U-Boot and just build it from there. We already mirror U-Boot
+>> on git.qemu.org and package up that tree, so packaging up one more
+>> target from there would be trivial.
+>=20
+> As discussed in other thread that's not really feasible. Upstream U-Boo=
+t
+> has removed support for this CPU and the board code was never upstreame=
+d
+> by the hardware vendor. I'm not willing to take the task of porting thi=
+s
+> to latest U-Boot, re-adding all necessary CPU support to latest U-Boot
+> and then take on supporting all this in future versions. So it has to b=
+e
+> a separate source or you'd have to downgrade U-Boot on git.qemu.org to
+> the older version where the patch applies (but that's not desired as
+> this old version has some bugs which are fixed in later U-Boot
+> versions). We also cannot omit the vendor patches to U-Boot and use
+> latest upstream U-Boot for this board because guests rely on these
+> firmware modifications to boot. So I see no way to have one U-Boot
+> version to be used by both e500 and sam460ex even if it means adding
+> another U-Boot source (but this source is fairly static, I don't expect
+> many changes to it so it won't diverge more than it is now and we mainl=
+y
+> need to add it to satisfy GPL so we can bundle the binary).
 
+Not sure, but would it maybe be possible to simply include a diff patch
+file between the version of u-boot that we ship in QEMU and the version
+that is required for the sam460ex in the roms/ directory?
 
-On 02/20/2018 12:18 PM, Christian Borntraeger wrote:
-> Given that we have trouble modeling this properly I somewhat like the idea.
-> We should have never folded this into the common code memory hotplug 
-> infrastructure as it is different. Instead we really should have provided
-> a different interface and we should have build it with migration support. 
-> 
-> If we need it again in the future, we can certainly add it back via an 
-> s390 specific interface.
-> 
-> 
-> On 02/19/2018 06:42 PM, David Hildenbrand wrote:
->> From an architecture point of view, nothing can be mapped into the address
->> space on s390x. All there is is memory. Therefore there is also not really
->> an interface to communicate such information to the guest. All we can do is
->> specify the maximum ram address and guests can probe in that range if
->> memory is available and usable (TPROT).
->>
->> Also memory hotplug is strange. The guest can decide at some point in
->> time to add / remove memory in some range. And nobody can really hinder it
->> from doing so. So if we specify right now e.g.
->>     -m 2G,slots=2,maxmem=20G
->> An ordinary fedora guest will happily online (hotplug) all memory,
->> resulting in a guest consuming 20G. So it really behaves rather like
->>     -m 22G
->> There is no way to hotplug memory from the outside like on other
->> architectures. This is of course bad for upper management layers.
->>
->> As the guest can create/delete memory regions while it is running, of
->> course migration support is not available and tricky to implement.
->>
->> With virtualization, it is different. We might want to map something
->> into guest address space (e.g. fake DAX devices) and not detect it
->> automatically as memory. So we really want to use the maxmem and slots
->> parameter just like on all other architectures. Such devices will have
->> to expose the applicable memory range themselves. To finally be able to
->> provide memory hotplug to guests, we will need a new paravirtualized
->> interface to do that (e.g. something into the direction of virtio-mem).
->>
->> This implies, that maxmem cannot be used for s390x memory hotplug
->> anymore and has to go. This simplifies the code quite a bit.
->>
->> As migration support is not working, this change cannot really break
->> migration as guests without slots and maxmem don't see the SCLP
->> features. Also, the ram size calcualtion does not change.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> [...]
-> 
-> looks mostly sane. Give me some more time to review. 
-> 
->> @@ -540,9 +302,6 @@ static void sclp_memory_init(SCLPDevice *sclp)
->>  {
->>      MachineState *machine = MACHINE(qdev_get_machine());
->>      ram_addr_t initial_mem = machine->ram_size;
->> -    ram_addr_t max_mem = machine->maxram_size;
->> -    ram_addr_t standby_mem = max_mem - initial_mem;
->> -    ram_addr_t pad_mem = 0;
->>      int increment_size = 20;
->>
->>      /* The storage increment size is a multiple of 1M and is a power of 2.
->> @@ -552,34 +311,14 @@ static void sclp_memory_init(SCLPDevice *sclp)
->>      while ((initial_mem >> increment_size) > MAX_STORAGE_INCREMENTS) {
->>          increment_size++;
->>      }
-> 
-> 
-> In theory we could now be more fine grained (as we no longer expose the increments)
-> but this would break migration so better try now to be clever. (e.g. with
-> compat machines)
-> 					try NOT of course.
+ Thomas
