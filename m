@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGe-0008Ie-4u
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:54 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGf-0008Ku-If
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGb-0001lk-MW
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:52 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGd-0001n1-Kz
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:53 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Feb 2018 18:03:22 +0000
-Message-Id: <20180220180325.29818-17-peter.maydell@linaro.org>
+Date: Tue, 20 Feb 2018 18:03:08 +0000
+Message-Id: <20180220180325.29818-3-peter.maydell@linaro.org>
 In-Reply-To: <20180220180325.29818-1-peter.maydell@linaro.org>
 References: <20180220180325.29818-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 16/19] hw/misc/iotkit-secctl: Add handling for
- PPCs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 02/19] hw/arm/boot: Honour CPU's address space
+ for image loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,529 +26,366 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The IoTKit Security Controller includes various registers
-that expose to software the controls for the Peripheral
-Protection Controllers in the system. Implement these.
+Instead of loading kernels, device trees, and the like to
+the system address space, use the CPU's address space. This
+is important if we're trying to load the file to memory or
+via an alias memory region that is provided by an SoC
+object and thus not mapped into the system address space.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/misc/iotkit-secctl.h |  64 +++++++++-
- hw/misc/iotkit-secctl.c         | 270 +++++++++++++++++++++++++++++++++++++---
- 2 files changed, 315 insertions(+), 19 deletions(-)
+Function name changed to arm_boot_address_space()
+rather than arm_boot_addressspace(), following irc
+conversation...
+---
+ hw/arm/boot.c | 119 +++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 76 insertions(+), 43 deletions(-)
 
-diff --git a/include/hw/misc/iotkit-secctl.h b/include/hw/misc/iotkit-secctl.h
-index 872f652f8d..ea3d62967f 100644
---- a/include/hw/misc/iotkit-secctl.h
-+++ b/include/hw/misc/iotkit-secctl.h
-@@ -16,6 +16,28 @@
-  * QEMU interface:
-  *  + sysbus MMIO region 0 is the "secure privilege control block" registers
-  *  + sysbus MMIO region 1 is the "non-secure privilege control block" registers
-+ *  + named GPIO output "sec_resp_cfg" indicating whether blocked accesses
-+ *    should RAZ/WI or bus error
-+ * Controlling the 2 APB PPCs in the IoTKit:
-+ *  + named GPIO outputs apb_ppc0_nonsec[0..2] and apb_ppc1_nonsec
-+ *  + named GPIO outputs apb_ppc0_ap[0..2] and apb_ppc1_ap
-+ *  + named GPIO outputs apb_ppc{0,1}_irq_enable
-+ *  + named GPIO outputs apb_ppc{0,1}_irq_clear
-+ *  + named GPIO inputs apb_ppc{0,1}_irq_status
-+ * Controlling each of the 4 expansion APB PPCs which a system using the IoTKit
-+ * might provide:
-+ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
-+ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_ap[0..15]
-+ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_irq_enable
-+ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_irq_clear
-+ *  + named GPIO inputs apb_ppcexp{0,1,2,3}_irq_status
-+ * Controlling each of the 4 expansion AHB PPCs which a system using the IoTKit
-+ * might provide:
-+ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_nonsec[0..15]
-+ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_ap[0..15]
-+ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_enable
-+ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_clear
-+ *  + named GPIO inputs ahb_ppcexp{0,1,2,3}_irq_status
-  */
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 05108bc42f..6d0c92ab88 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -36,6 +36,25 @@
+ #define ARM64_TEXT_OFFSET_OFFSET    8
+ #define ARM64_MAGIC_OFFSET          56
  
- #ifndef IOTKIT_SECCTL_H
-@@ -26,14 +48,52 @@
- #define TYPE_IOTKIT_SECCTL "iotkit-secctl"
- #define IOTKIT_SECCTL(obj) OBJECT_CHECK(IoTKitSecCtl, (obj), TYPE_IOTKIT_SECCTL)
- 
--typedef struct IoTKitSecCtl {
-+#define IOTS_APB_PPC0_NUM_PORTS 3
-+#define IOTS_APB_PPC1_NUM_PORTS 1
-+#define IOTS_PPC_NUM_PORTS 16
-+#define IOTS_NUM_APB_PPC 2
-+#define IOTS_NUM_APB_EXP_PPC 4
-+#define IOTS_NUM_AHB_EXP_PPC 4
++static AddressSpace *arm_boot_address_space(ARMCPU *cpu,
++                                            const struct arm_boot_info *info)
++{
++    /* Return the address space to use for bootloader reads and writes.
++     * We prefer the secure address space if the CPU has it and we're
++     * going to boot the guest into it.
++     */
++    int asidx;
++    CPUState *cs = CPU(cpu);
 +
-+typedef struct IoTKitSecCtl IoTKitSecCtl;
++    if (arm_feature(&cpu->env, ARM_FEATURE_EL3) && info->secure_boot) {
++        asidx = ARMASIdx_S;
++    } else {
++        asidx = ARMASIdx_NS;
++    }
 +
-+/* State and IRQ lines relating to a PPC. For the
-+ * PPCs in the IoTKit not all the IRQ lines are used.
-+ */
-+typedef struct IoTKitSecCtlPPC {
-+    qemu_irq nonsec[IOTS_PPC_NUM_PORTS];
-+    qemu_irq ap[IOTS_PPC_NUM_PORTS];
-+    qemu_irq irq_enable;
-+    qemu_irq irq_clear;
++    return cpu_get_address_space(cs, asidx);
++}
 +
-+    uint32_t ns;
-+    uint32_t sp;
-+    uint32_t nsp;
-+
-+    /* Number of ports actually present */
-+    int numports;
-+    /* Offset of this PPC's interrupt bits in SECPPCINTSTAT */
-+    int irq_bit_offset;
-+    IoTKitSecCtl *parent;
-+} IoTKitSecCtlPPC;
-+
-+struct IoTKitSecCtl {
-     /*< private >*/
-     SysBusDevice parent_obj;
- 
-     /*< public >*/
-+    qemu_irq sec_resp_cfg;
- 
-     MemoryRegion s_regs;
-     MemoryRegion ns_regs;
--} IoTKitSecCtl;
-+
-+    uint32_t secppcintstat;
-+    uint32_t secppcinten;
-+    uint32_t secrespcfg;
-+
-+    IoTKitSecCtlPPC apb[IOTS_NUM_APB_PPC];
-+    IoTKitSecCtlPPC apbexp[IOTS_NUM_APB_EXP_PPC];
-+    IoTKitSecCtlPPC ahbexp[IOTS_NUM_APB_EXP_PPC];
-+};
- 
- #endif
-diff --git a/hw/misc/iotkit-secctl.c b/hw/misc/iotkit-secctl.c
-index 5da52e4706..7e1ca184ab 100644
---- a/hw/misc/iotkit-secctl.c
-+++ b/hw/misc/iotkit-secctl.c
-@@ -92,12 +92,41 @@ static const uint8_t iotkit_secctl_ns_idregs[] = {
-     0x0d, 0xf0, 0x05, 0xb1,
+ typedef enum {
+     FIXUP_NONE = 0,     /* do nothing */
+     FIXUP_TERMINATOR,   /* end of insns */
+@@ -125,7 +144,8 @@ static const ARMInsnFixup smpboot[] = {
  };
  
-+/* The register sets for the various PPCs (AHB internal, APB internal,
-+ * AHB expansion, APB expansion) are all set up so that they are
-+ * in 16-aligned blocks so offsets 0xN0, 0xN4, 0xN8, 0xNC are PPCs
-+ * 0, 1, 2, 3 of that type, so we can convert a register address offset
-+ * into an an index into a PPC array easily.
-+ */
-+static inline int offset_to_ppc_idx(uint32_t offset)
-+{
-+    return extract32(offset, 2, 2);
-+}
-+
-+typedef void PerPPCFunction(IoTKitSecCtlPPC *ppc);
-+
-+static void foreach_ppc(IoTKitSecCtl *s, PerPPCFunction *fn)
-+{
-+    int i;
-+
-+    for (i = 0; i < IOTS_NUM_APB_PPC; i++) {
-+        fn(&s->apb[i]);
-+    }
-+    for (i = 0; i < IOTS_NUM_APB_EXP_PPC; i++) {
-+        fn(&s->apbexp[i]);
-+    }
-+    for (i = 0; i < IOTS_NUM_AHB_EXP_PPC; i++) {
-+        fn(&s->ahbexp[i]);
-+    }
-+}
-+
- static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
-                                         uint64_t *pdata,
-                                         unsigned size, MemTxAttrs attrs)
+ static void write_bootloader(const char *name, hwaddr addr,
+-                             const ARMInsnFixup *insns, uint32_t *fixupcontext)
++                             const ARMInsnFixup *insns, uint32_t *fixupcontext,
++                             AddressSpace *as)
  {
-     uint64_t r;
-     uint32_t offset = addr & ~0x3;
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
- 
-     switch (offset) {
-     case A_AHBNSPPC0:
-@@ -105,34 +134,52 @@ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
-         r = 0;
-         break;
-     case A_SECRESPCFG:
--    case A_NSCCFG:
--    case A_SECMPCINTSTATUS:
-+        r = s->secrespcfg;
-+        break;
-     case A_SECPPCINTSTAT:
-+        r = s->secppcintstat;
-+        break;
-     case A_SECPPCINTEN:
--    case A_SECMSCINTSTAT:
--    case A_SECMSCINTEN:
--    case A_BRGINTSTAT:
--    case A_BRGINTEN:
-+        r = s->secppcinten;
-+        break;
-     case A_AHBNSPPCEXP0:
-     case A_AHBNSPPCEXP1:
-     case A_AHBNSPPCEXP2:
-     case A_AHBNSPPCEXP3:
-+        r = s->ahbexp[offset_to_ppc_idx(offset)].ns;
-+        break;
-     case A_APBNSPPC0:
-     case A_APBNSPPC1:
-+        r = s->apb[offset_to_ppc_idx(offset)].ns;
-+        break;
-     case A_APBNSPPCEXP0:
-     case A_APBNSPPCEXP1:
-     case A_APBNSPPCEXP2:
-     case A_APBNSPPCEXP3:
-+        r = s->apbexp[offset_to_ppc_idx(offset)].ns;
-+        break;
-     case A_AHBSPPPCEXP0:
-     case A_AHBSPPPCEXP1:
-     case A_AHBSPPPCEXP2:
-     case A_AHBSPPPCEXP3:
-+        r = s->apbexp[offset_to_ppc_idx(offset)].sp;
-+        break;
-     case A_APBSPPPC0:
-     case A_APBSPPPC1:
-+        r = s->apb[offset_to_ppc_idx(offset)].sp;
-+        break;
-     case A_APBSPPPCEXP0:
-     case A_APBSPPPCEXP1:
-     case A_APBSPPPCEXP2:
-     case A_APBSPPPCEXP3:
-+        r = s->apbexp[offset_to_ppc_idx(offset)].sp;
-+        break;
-+    case A_NSCCFG:
-+    case A_SECMPCINTSTATUS:
-+    case A_SECMSCINTSTAT:
-+    case A_SECMSCINTEN:
-+    case A_BRGINTSTAT:
-+    case A_BRGINTEN:
-     case A_NSMSCEXP:
-         qemu_log_mask(LOG_UNIMP,
-                       "IoTKit SecCtl S block read: "
-@@ -181,11 +228,66 @@ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
-     return MEMTX_OK;
- }
- 
-+static void iotkit_secctl_update_ppc_ap(IoTKitSecCtlPPC *ppc)
-+{
-+    int i;
-+
-+    for (i = 0; i < ppc->numports; i++) {
-+        bool v;
-+
-+        if (extract32(ppc->ns, i, 1)) {
-+            v = extract32(ppc->nsp, i, 1);
-+        } else {
-+            v = extract32(ppc->sp, i, 1);
-+        }
-+        qemu_set_irq(ppc->ap[i], v);
-+    }
-+}
-+
-+static void iotkit_secctl_ppc_ns_write(IoTKitSecCtlPPC *ppc, uint32_t value)
-+{
-+    int i;
-+
-+    ppc->ns = value & MAKE_64BIT_MASK(0, ppc->numports);
-+    for (i = 0; i < ppc->numports; i++) {
-+        qemu_set_irq(ppc->nonsec[i], extract32(ppc->ns, i, 1));
-+    }
-+    iotkit_secctl_update_ppc_ap(ppc);
-+}
-+
-+static void iotkit_secctl_ppc_sp_write(IoTKitSecCtlPPC *ppc, uint32_t value)
-+{
-+    ppc->sp = value & MAKE_64BIT_MASK(0, ppc->numports);
-+    iotkit_secctl_update_ppc_ap(ppc);
-+}
-+
-+static void iotkit_secctl_ppc_nsp_write(IoTKitSecCtlPPC *ppc, uint32_t value)
-+{
-+    ppc->nsp = value & MAKE_64BIT_MASK(0, ppc->numports);
-+    iotkit_secctl_update_ppc_ap(ppc);
-+}
-+
-+static void iotkit_secctl_ppc_update_irq_clear(IoTKitSecCtlPPC *ppc)
-+{
-+    uint32_t value = ppc->parent->secppcintstat;
-+
-+    qemu_set_irq(ppc->irq_clear, extract32(value, ppc->irq_bit_offset, 1));
-+}
-+
-+static void iotkit_secctl_ppc_update_irq_enable(IoTKitSecCtlPPC *ppc)
-+{
-+    uint32_t value = ppc->parent->secppcinten;
-+
-+    qemu_set_irq(ppc->irq_enable, extract32(value, ppc->irq_bit_offset, 1));
-+}
-+
- static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
-                                          uint64_t value,
-                                          unsigned size, MemTxAttrs attrs)
- {
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
-     uint32_t offset = addr;
-+    IoTKitSecCtlPPC *ppc;
- 
-     trace_iotkit_secctl_s_write(offset, value, size);
- 
-@@ -198,33 +300,61 @@ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
- 
-     switch (offset) {
-     case A_SECRESPCFG:
--    case A_NSCCFG:
-+        value &= 1;
-+        s->secrespcfg = value;
-+        qemu_set_irq(s->sec_resp_cfg, s->secrespcfg);
-+        break;
-     case A_SECPPCINTCLR:
-+        value &= 0x00f000f3;
-+        foreach_ppc(s, iotkit_secctl_ppc_update_irq_clear);
-+        break;
-     case A_SECPPCINTEN:
--    case A_SECMSCINTCLR:
--    case A_SECMSCINTEN:
--    case A_BRGINTCLR:
--    case A_BRGINTEN:
-+        s->secppcinten = value & 0x00f000f3;
-+        foreach_ppc(s, iotkit_secctl_ppc_update_irq_enable);
-+        break;
-     case A_AHBNSPPCEXP0:
-     case A_AHBNSPPCEXP1:
-     case A_AHBNSPPCEXP2:
-     case A_AHBNSPPCEXP3:
-+        ppc = &s->ahbexp[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_ns_write(ppc, value);
-+        break;
-     case A_APBNSPPC0:
-     case A_APBNSPPC1:
-+        ppc = &s->apb[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_ns_write(ppc, value);
-+        break;
-     case A_APBNSPPCEXP0:
-     case A_APBNSPPCEXP1:
-     case A_APBNSPPCEXP2:
-     case A_APBNSPPCEXP3:
-+        ppc = &s->apbexp[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_ns_write(ppc, value);
-+        break;
-     case A_AHBSPPPCEXP0:
-     case A_AHBSPPPCEXP1:
-     case A_AHBSPPPCEXP2:
-     case A_AHBSPPPCEXP3:
-+        ppc = &s->ahbexp[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_sp_write(ppc, value);
-+        break;
-     case A_APBSPPPC0:
-     case A_APBSPPPC1:
-+        ppc = &s->apb[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_sp_write(ppc, value);
-+        break;
-     case A_APBSPPPCEXP0:
-     case A_APBSPPPCEXP1:
-     case A_APBSPPPCEXP2:
-     case A_APBSPPPCEXP3:
-+        ppc = &s->apbexp[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_sp_write(ppc, value);
-+        break;
-+    case A_NSCCFG:
-+    case A_SECMSCINTCLR:
-+    case A_SECMSCINTEN:
-+    case A_BRGINTCLR:
-+    case A_BRGINTEN:
-         qemu_log_mask(LOG_UNIMP,
-                       "IoTKit SecCtl S block write: "
-                       "unimplemented offset 0x%x\n", offset);
-@@ -266,6 +396,7 @@ static MemTxResult iotkit_secctl_ns_read(void *opaque, hwaddr addr,
-                                          uint64_t *pdata,
-                                          unsigned size, MemTxAttrs attrs)
- {
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
-     uint64_t r;
-     uint32_t offset = addr & ~0x3;
- 
-@@ -277,15 +408,17 @@ static MemTxResult iotkit_secctl_ns_read(void *opaque, hwaddr addr,
-     case A_AHBNSPPPCEXP1:
-     case A_AHBNSPPPCEXP2:
-     case A_AHBNSPPPCEXP3:
-+        r = s->ahbexp[offset_to_ppc_idx(offset)].nsp;
-+        break;
-     case A_APBNSPPPC0:
-     case A_APBNSPPPC1:
-+        r = s->apb[offset_to_ppc_idx(offset)].nsp;
-+        break;
-     case A_APBNSPPPCEXP0:
-     case A_APBNSPPPCEXP1:
-     case A_APBNSPPPCEXP2:
-     case A_APBNSPPPCEXP3:
--        qemu_log_mask(LOG_UNIMP,
--                      "IoTKit SecCtl NS block read: "
--                      "unimplemented offset 0x%x\n", offset);
-+        r = s->apbexp[offset_to_ppc_idx(offset)].nsp;
-         break;
-     case A_PID4:
-     case A_PID5:
-@@ -326,7 +459,9 @@ static MemTxResult iotkit_secctl_ns_write(void *opaque, hwaddr addr,
-                                           uint64_t value,
-                                           unsigned size, MemTxAttrs attrs)
- {
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
-     uint32_t offset = addr;
-+    IoTKitSecCtlPPC *ppc;
- 
-     trace_iotkit_secctl_ns_write(offset, value, size);
- 
-@@ -342,15 +477,20 @@ static MemTxResult iotkit_secctl_ns_write(void *opaque, hwaddr addr,
-     case A_AHBNSPPPCEXP1:
-     case A_AHBNSPPPCEXP2:
-     case A_AHBNSPPPCEXP3:
-+        ppc = &s->ahbexp[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_nsp_write(ppc, value);
-+        break;
-     case A_APBNSPPPC0:
-     case A_APBNSPPPC1:
-+        ppc = &s->apb[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_nsp_write(ppc, value);
-+        break;
-     case A_APBNSPPPCEXP0:
-     case A_APBNSPPPCEXP1:
-     case A_APBNSPPPCEXP2:
-     case A_APBNSPPPCEXP3:
--        qemu_log_mask(LOG_UNIMP,
--                      "IoTKit SecCtl NS block write: "
--                      "unimplemented offset 0x%x\n", offset);
-+        ppc = &s->apbexp[offset_to_ppc_idx(offset)];
-+        iotkit_secctl_ppc_nsp_write(ppc, value);
-         break;
-     case A_AHBNSPPPC0:
-     case A_PID4:
-@@ -399,15 +539,90 @@ static const MemoryRegionOps iotkit_secctl_ns_ops = {
-     .impl.max_access_size = 4,
- };
- 
-+static void iotkit_secctl_reset_ppc(IoTKitSecCtlPPC *ppc)
-+{
-+    ppc->ns = 0;
-+    ppc->sp = 0;
-+    ppc->nsp = 0;
-+}
-+
- static void iotkit_secctl_reset(DeviceState *dev)
- {
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(dev);
- 
-+    s->secppcintstat = 0;
-+    s->secppcinten = 0;
-+    s->secrespcfg = 0;
-+
-+    foreach_ppc(s, iotkit_secctl_reset_ppc);
-+}
-+
-+static void iotkit_secctl_ppc_irqstatus(void *opaque, int n, int level)
-+{
-+    IoTKitSecCtlPPC *ppc = opaque;
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(ppc->parent);
-+    int irqbit = ppc->irq_bit_offset + n;
-+
-+    s->secppcintstat = deposit32(s->secppcintstat, irqbit, 1, level);
-+}
-+
-+static void iotkit_secctl_init_ppc(IoTKitSecCtl *s,
-+                                   IoTKitSecCtlPPC *ppc,
-+                                   const char *name,
-+                                   int numports,
-+                                   int irq_bit_offset)
-+{
-+    char *gpioname;
-+    DeviceState *dev = DEVICE(s);
-+
-+    ppc->numports = numports;
-+    ppc->irq_bit_offset = irq_bit_offset;
-+    ppc->parent = s;
-+
-+    gpioname = g_strdup_printf("%s_nonsec", name);
-+    qdev_init_gpio_out_named(dev, ppc->nonsec, gpioname, numports);
-+    g_free(gpioname);
-+    gpioname = g_strdup_printf("%s_ap", name);
-+    qdev_init_gpio_out_named(dev, ppc->ap, gpioname, numports);
-+    g_free(gpioname);
-+    gpioname = g_strdup_printf("%s_irq_enable", name);
-+    qdev_init_gpio_out_named(dev, &ppc->irq_enable, gpioname, 1);
-+    g_free(gpioname);
-+    gpioname = g_strdup_printf("%s_irq_clear", name);
-+    qdev_init_gpio_out_named(dev, &ppc->irq_clear, gpioname, 1);
-+    g_free(gpioname);
-+    gpioname = g_strdup_printf("%s_irq_status", name);
-+    qdev_init_gpio_in_named_with_opaque(dev, iotkit_secctl_ppc_irqstatus,
-+                                        ppc, gpioname, 1);
-+    g_free(gpioname);
- }
- 
- static void iotkit_secctl_init(Object *obj)
- {
-     IoTKitSecCtl *s = IOTKIT_SECCTL(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    DeviceState *dev = DEVICE(obj);
-+    int i;
-+
-+    iotkit_secctl_init_ppc(s, &s->apb[0], "apb_ppc0",
-+                           IOTS_APB_PPC0_NUM_PORTS, 0);
-+    iotkit_secctl_init_ppc(s, &s->apb[1], "apb_ppc1",
-+                           IOTS_APB_PPC1_NUM_PORTS, 1);
-+
-+    for (i = 0; i < IOTS_NUM_APB_EXP_PPC; i++) {
-+        IoTKitSecCtlPPC *ppc = &s->apbexp[i];
-+        char *ppcname = g_strdup_printf("apb_ppcexp%d", i);
-+        iotkit_secctl_init_ppc(s, ppc, ppcname, IOTS_PPC_NUM_PORTS, 4 + i);
-+        g_free(ppcname);
-+    }
-+    for (i = 0; i < IOTS_NUM_AHB_EXP_PPC; i++) {
-+        IoTKitSecCtlPPC *ppc = &s->ahbexp[i];
-+        char *ppcname = g_strdup_printf("ahb_ppcexp%d", i);
-+        iotkit_secctl_init_ppc(s, ppc, ppcname, IOTS_PPC_NUM_PORTS, 20 + i);
-+        g_free(ppcname);
-+    }
-+
-+    qdev_init_gpio_out_named(dev, &s->sec_resp_cfg, "sec_resp_cfg", 1);
- 
-     memory_region_init_io(&s->s_regs, obj, &iotkit_secctl_s_ops,
-                           s, "iotkit-secctl-s-regs", 0x1000);
-@@ -417,11 +632,32 @@ static void iotkit_secctl_init(Object *obj)
-     sysbus_init_mmio(sbd, &s->ns_regs);
- }
- 
-+static const VMStateDescription iotkit_secctl_ppc_vmstate = {
-+    .name = "iotkit-secctl-ppc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(ns, IoTKitSecCtlPPC),
-+        VMSTATE_UINT32(sp, IoTKitSecCtlPPC),
-+        VMSTATE_UINT32(nsp, IoTKitSecCtlPPC),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription iotkit_secctl_vmstate = {
-     .name = "iotkit-secctl",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(secppcintstat, IoTKitSecCtl),
-+        VMSTATE_UINT32(secppcinten, IoTKitSecCtl),
-+        VMSTATE_UINT32(secrespcfg, IoTKitSecCtl),
-+        VMSTATE_STRUCT_ARRAY(apb, IoTKitSecCtl, IOTS_NUM_APB_PPC, 1,
-+                             iotkit_secctl_ppc_vmstate, IoTKitSecCtlPPC),
-+        VMSTATE_STRUCT_ARRAY(apbexp, IoTKitSecCtl, IOTS_NUM_APB_EXP_PPC, 1,
-+                             iotkit_secctl_ppc_vmstate, IoTKitSecCtlPPC),
-+        VMSTATE_STRUCT_ARRAY(ahbexp, IoTKitSecCtl, IOTS_NUM_AHB_EXP_PPC, 1,
-+                             iotkit_secctl_ppc_vmstate, IoTKitSecCtlPPC),
-         VMSTATE_END_OF_LIST()
+     /* Fix up the specified bootloader fragment and write it into
+      * guest memory using rom_add_blob_fixed(). fixupcontext is
+@@ -164,7 +184,7 @@ static void write_bootloader(const char *name, hwaddr addr,
+         code[i] = tswap32(insn);
      }
- };
+ 
+-    rom_add_blob_fixed(name, code, len * sizeof(uint32_t), addr);
++    rom_add_blob_fixed_as(name, code, len * sizeof(uint32_t), addr, as);
+ 
+     g_free(code);
+ }
+@@ -173,6 +193,7 @@ static void default_write_secondary(ARMCPU *cpu,
+                                     const struct arm_boot_info *info)
+ {
+     uint32_t fixupcontext[FIXUP_MAX];
++    AddressSpace *as = arm_boot_address_space(cpu, info);
+ 
+     fixupcontext[FIXUP_GIC_CPU_IF] = info->gic_cpu_if_addr;
+     fixupcontext[FIXUP_BOOTREG] = info->smp_bootreg_addr;
+@@ -183,13 +204,14 @@ static void default_write_secondary(ARMCPU *cpu,
+     }
+ 
+     write_bootloader("smpboot", info->smp_loader_start,
+-                     smpboot, fixupcontext);
++                     smpboot, fixupcontext, as);
+ }
+ 
+ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+                                             const struct arm_boot_info *info,
+                                             hwaddr mvbar_addr)
+ {
++    AddressSpace *as = arm_boot_address_space(cpu, info);
+     int n;
+     uint32_t mvbar_blob[] = {
+         /* mvbar_addr: secure monitor vectors
+@@ -227,22 +249,23 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+     for (n = 0; n < ARRAY_SIZE(mvbar_blob); n++) {
+         mvbar_blob[n] = tswap32(mvbar_blob[n]);
+     }
+-    rom_add_blob_fixed("board-setup-mvbar", mvbar_blob, sizeof(mvbar_blob),
+-                       mvbar_addr);
++    rom_add_blob_fixed_as("board-setup-mvbar", mvbar_blob, sizeof(mvbar_blob),
++                          mvbar_addr, as);
+ 
+     for (n = 0; n < ARRAY_SIZE(board_setup_blob); n++) {
+         board_setup_blob[n] = tswap32(board_setup_blob[n]);
+     }
+-    rom_add_blob_fixed("board-setup", board_setup_blob,
+-                       sizeof(board_setup_blob), info->board_setup_addr);
++    rom_add_blob_fixed_as("board-setup", board_setup_blob,
++                          sizeof(board_setup_blob), info->board_setup_addr, as);
+ }
+ 
+ static void default_reset_secondary(ARMCPU *cpu,
+                                     const struct arm_boot_info *info)
+ {
++    AddressSpace *as = arm_boot_address_space(cpu, info);
+     CPUState *cs = CPU(cpu);
+ 
+-    address_space_stl_notdirty(&address_space_memory, info->smp_bootreg_addr,
++    address_space_stl_notdirty(as, info->smp_bootreg_addr,
+                                0, MEMTXATTRS_UNSPECIFIED, NULL);
+     cpu_set_pc(cs, info->smp_loader_start);
+ }
+@@ -253,12 +276,12 @@ static inline bool have_dtb(const struct arm_boot_info *info)
+ }
+ 
+ #define WRITE_WORD(p, value) do { \
+-    address_space_stl_notdirty(&address_space_memory, p, value, \
++    address_space_stl_notdirty(as, p, value, \
+                                MEMTXATTRS_UNSPECIFIED, NULL);  \
+     p += 4;                       \
+ } while (0)
+ 
+-static void set_kernel_args(const struct arm_boot_info *info)
++static void set_kernel_args(const struct arm_boot_info *info, AddressSpace *as)
+ {
+     int initrd_size = info->initrd_size;
+     hwaddr base = info->loader_start;
+@@ -289,8 +312,9 @@ static void set_kernel_args(const struct arm_boot_info *info)
+         int cmdline_size;
+ 
+         cmdline_size = strlen(info->kernel_cmdline);
+-        cpu_physical_memory_write(p + 8, info->kernel_cmdline,
+-                                  cmdline_size + 1);
++        address_space_write(as, p + 8, MEMTXATTRS_UNSPECIFIED,
++                            (const uint8_t *)info->kernel_cmdline,
++                            cmdline_size + 1);
+         cmdline_size = (cmdline_size >> 2) + 1;
+         WRITE_WORD(p, cmdline_size + 2);
+         WRITE_WORD(p, 0x54410009);
+@@ -304,7 +328,8 @@ static void set_kernel_args(const struct arm_boot_info *info)
+         atag_board_len = (info->atag_board(info, atag_board_buf) + 3) & ~3;
+         WRITE_WORD(p, (atag_board_len + 8) >> 2);
+         WRITE_WORD(p, 0x414f4d50);
+-        cpu_physical_memory_write(p, atag_board_buf, atag_board_len);
++        address_space_write(as, p, MEMTXATTRS_UNSPECIFIED,
++                            atag_board_buf, atag_board_len);
+         p += atag_board_len;
+     }
+     /* ATAG_END */
+@@ -312,7 +337,8 @@ static void set_kernel_args(const struct arm_boot_info *info)
+     WRITE_WORD(p, 0);
+ }
+ 
+-static void set_kernel_args_old(const struct arm_boot_info *info)
++static void set_kernel_args_old(const struct arm_boot_info *info,
++                                AddressSpace *as)
+ {
+     hwaddr p;
+     const char *s;
+@@ -380,7 +406,8 @@ static void set_kernel_args_old(const struct arm_boot_info *info)
+     }
+     s = info->kernel_cmdline;
+     if (s) {
+-        cpu_physical_memory_write(p, s, strlen(s) + 1);
++        address_space_write(as, p, MEMTXATTRS_UNSPECIFIED,
++                            (const uint8_t *)s, strlen(s) + 1);
+     } else {
+         WRITE_WORD(p, 0);
+     }
+@@ -454,6 +481,7 @@ static void fdt_add_psci_node(void *fdt)
+  * @addr:       the address to load the image at
+  * @binfo:      struct describing the boot environment
+  * @addr_limit: upper limit of the available memory area at @addr
++ * @as:         address space to load image to
+  *
+  * Load a device tree supplied by the machine or by the user  with the
+  * '-dtb' command line option, and put it at offset @addr in target
+@@ -470,7 +498,7 @@ static void fdt_add_psci_node(void *fdt)
+  * Note: Must not be called unless have_dtb(binfo) is true.
+  */
+ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+-                    hwaddr addr_limit)
++                    hwaddr addr_limit, AddressSpace *as)
+ {
+     void *fdt = NULL;
+     int size, rc;
+@@ -616,7 +644,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+     /* Put the DTB into the memory map as a ROM image: this will ensure
+      * the DTB is copied again upon reset, even if addr points into RAM.
+      */
+-    rom_add_blob_fixed("dtb", fdt, size, addr);
++    rom_add_blob_fixed_as("dtb", fdt, size, addr, as);
+ 
+     g_free(fdt);
+ 
+@@ -703,13 +731,15 @@ static void do_cpu_reset(void *opaque)
+             }
+ 
+             if (cs == first_cpu) {
++                AddressSpace *as = arm_boot_address_space(cpu, info);
++
+                 cpu_set_pc(cs, info->loader_start);
+ 
+                 if (!have_dtb(info)) {
+                     if (old_param) {
+-                        set_kernel_args_old(info);
++                        set_kernel_args_old(info, as);
+                     } else {
+-                        set_kernel_args(info);
++                        set_kernel_args(info, as);
+                     }
+                 }
+             } else {
+@@ -784,7 +814,7 @@ static int do_arm_linux_init(Object *obj, void *opaque)
+ 
+ static uint64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
+                              uint64_t *lowaddr, uint64_t *highaddr,
+-                             int elf_machine)
++                             int elf_machine, AddressSpace *as)
+ {
+     bool elf_is64;
+     union {
+@@ -827,9 +857,9 @@ static uint64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
+         }
+     }
+ 
+-    ret = load_elf(info->kernel_filename, NULL, NULL,
+-                   pentry, lowaddr, highaddr, big_endian, elf_machine,
+-                   1, data_swab);
++    ret = load_elf_as(info->kernel_filename, NULL, NULL,
++                      pentry, lowaddr, highaddr, big_endian, elf_machine,
++                      1, data_swab, as);
+     if (ret <= 0) {
+         /* The header loaded but the image didn't */
+         exit(1);
+@@ -839,7 +869,7 @@ static uint64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
+ }
+ 
+ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
+-                                   hwaddr *entry)
++                                   hwaddr *entry, AddressSpace *as)
+ {
+     hwaddr kernel_load_offset = KERNEL64_LOAD_ADDR;
+     uint8_t *buffer;
+@@ -874,7 +904,7 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
+     }
+ 
+     *entry = mem_base + kernel_load_offset;
+-    rom_add_blob_fixed(filename, buffer, size, *entry);
++    rom_add_blob_fixed_as(filename, buffer, size, *entry, as);
+ 
+     g_free(buffer);
+ 
+@@ -896,6 +926,7 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+     ARMCPU *cpu = n->cpu;
+     struct arm_boot_info *info =
+         container_of(n, struct arm_boot_info, load_kernel_notifier);
++    AddressSpace *as = arm_boot_address_space(cpu, info);
+ 
+     /* The board code is not supposed to set secure_board_setup unless
+      * running its code in secure mode is actually possible, and KVM
+@@ -913,7 +944,7 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+              * the kernel is supposed to be loaded by the bootloader), copy the
+              * DTB to the base of RAM for the bootloader to pick up.
+              */
+-            if (load_dtb(info->loader_start, info, 0) < 0) {
++            if (load_dtb(info->loader_start, info, 0, as) < 0) {
+                 exit(1);
+             }
+         }
+@@ -988,7 +1019,7 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+ 
+     /* Assume that raw images are linux kernels, and ELF images are not.  */
+     kernel_size = arm_load_elf(info, &elf_entry, &elf_low_addr,
+-                               &elf_high_addr, elf_machine);
++                               &elf_high_addr, elf_machine, as);
+     if (kernel_size > 0 && have_dtb(info)) {
+         /* If there is still some room left at the base of RAM, try and put
+          * the DTB there like we do for images loaded with -bios or -pflash.
+@@ -1001,25 +1032,26 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+             if (elf_low_addr < info->loader_start) {
+                 elf_low_addr = 0;
+             }
+-            if (load_dtb(info->loader_start, info, elf_low_addr) < 0) {
++            if (load_dtb(info->loader_start, info, elf_low_addr, as) < 0) {
+                 exit(1);
+             }
+         }
+     }
+     entry = elf_entry;
+     if (kernel_size < 0) {
+-        kernel_size = load_uimage(info->kernel_filename, &entry, NULL,
+-                                  &is_linux, NULL, NULL);
++        kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
++                                     &is_linux, NULL, NULL, as);
+     }
+     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
+         kernel_size = load_aarch64_image(info->kernel_filename,
+-                                         info->loader_start, &entry);
++                                         info->loader_start, &entry, as);
+         is_linux = 1;
+     } else if (kernel_size < 0) {
+         /* 32-bit ARM */
+         entry = info->loader_start + KERNEL_LOAD_ADDR;
+-        kernel_size = load_image_targphys(info->kernel_filename, entry,
+-                                          info->ram_size - KERNEL_LOAD_ADDR);
++        kernel_size = load_image_targphys_as(info->kernel_filename, entry,
++                                             info->ram_size - KERNEL_LOAD_ADDR,
++                                             as);
+         is_linux = 1;
+     }
+     if (kernel_size < 0) {
+@@ -1031,15 +1063,16 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+         uint32_t fixupcontext[FIXUP_MAX];
+ 
+         if (info->initrd_filename) {
+-            initrd_size = load_ramdisk(info->initrd_filename,
+-                                       info->initrd_start,
+-                                       info->ram_size -
+-                                       info->initrd_start);
++            initrd_size = load_ramdisk_as(info->initrd_filename,
++                                          info->initrd_start,
++                                          info->ram_size - info->initrd_start,
++                                          as);
+             if (initrd_size < 0) {
+-                initrd_size = load_image_targphys(info->initrd_filename,
+-                                                  info->initrd_start,
+-                                                  info->ram_size -
+-                                                  info->initrd_start);
++                initrd_size = load_image_targphys_as(info->initrd_filename,
++                                                     info->initrd_start,
++                                                     info->ram_size -
++                                                     info->initrd_start,
++                                                     as);
+             }
+             if (initrd_size < 0) {
+                 error_report("could not load initrd '%s'",
+@@ -1080,7 +1113,7 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+ 
+             /* Place the DTB after the initrd in memory with alignment. */
+             dtb_start = QEMU_ALIGN_UP(info->initrd_start + initrd_size, align);
+-            if (load_dtb(dtb_start, info, 0) < 0) {
++            if (load_dtb(dtb_start, info, 0, as) < 0) {
+                 exit(1);
+             }
+             fixupcontext[FIXUP_ARGPTR] = dtb_start;
+@@ -1096,7 +1129,7 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+         fixupcontext[FIXUP_ENTRYPOINT] = entry;
+ 
+         write_bootloader("bootloader", info->loader_start,
+-                         primary_loader, fixupcontext);
++                         primary_loader, fixupcontext, as);
+ 
+         if (info->nb_cpus > 1) {
+             info->write_secondary_boot(cpu, info);
 -- 
 2.16.1
