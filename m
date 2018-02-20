@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eoFtI-0000hs-Mm
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:56:01 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eoFtK-0000ii-46
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eoFtF-00064X-B0
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:56:00 -0500
-Date: Tue, 20 Feb 2018 22:55:54 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180220183022.GQ6021@redhat.com>
-Message-ID: <alpine.BSF.2.21.1802202243460.89213@zero.eik.bme.hu>
-References: <cover.1519150239.git.balaton@eik.bme.hu>
-	<7fa4ce574074b3baf702b628a7e1fce647305ce1.1519150239.git.balaton@eik.bme.hu>
-	<20180220183022.GQ6021@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eoFtG-00065q-VP
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:56:02 -0500
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:35123)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eoFtG-000654-Nt
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:55:58 -0500
+Received: by mail-wr0-f195.google.com with SMTP id l43so18613176wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:55:58 -0800 (PST)
+References: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
+	<alpine.BSF.2.21.1802202225190.89213@zero.eik.bme.hu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <58983aec-d7c4-c10d-e2b0-dfc6c0fe3fbf@redhat.com>
+Date: Tue, 20 Feb 2018 22:55:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] pc-bios: Added u-boot-sam460 firmware
- binary
+In-Reply-To: <alpine.BSF.2.21.1802202225190.89213@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Moving seabios-hppa git submodule to use a
+ qemu.org mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: BALATON Zoltan <balaton@eik.bme.hu>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Jeff Cody <jcody@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, 20 Feb 2018, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Feb 20, 2018 at 06:57:43PM +0100, BALATON Zoltan wrote:
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>  Makefile                           |   2 +-
->>  pc-bios/u-boot-sam460-20100605.bin | Bin 0 -> 524288 bytes
->>  2 files changed, 1 insertion(+), 1 deletion(-)
->>  create mode 100755 pc-bios/u-boot-sam460-20100605.bin
+On 20/02/2018 22:41, BALATON Zoltan wrote:
+> On Tue, 20 Feb 2018, Peter Maydell wrote:
+>> I just noticed that we seem to have acquired another git
+>> submodule that isn't pointing to a qemu.org git url:
 >>
->> diff --git a/Makefile b/Makefile
->> index 6434d6c..b0c16b3 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -661,7 +661,7 @@ multiboot.bin linuxboot.bin linuxboot_dma.bin kvmv=
-apic.bin \
->>  s390-ccw.img s390-netboot.img \
->>  spapr-rtas.bin slof.bin skiboot.lid \
->>  palcode-clipper \
->> -u-boot.e500 \
->> +u-boot.e500 u-boot-sam460-20100605.bin \
->>  qemu_vga.ndrv \
->>  hppa-firmware.img
->>  else
->> diff --git a/pc-bios/u-boot-sam460-20100605.bin b/pc-bios/u-boot-sam46=
-0-20100605.bin
->> new file mode 100755
->
-> IIUC, you also need to provide glue in roms/Makefile to build the
-> u-boot-sam460-20100605.bin from the submodule content. Presumably
-> you can largely copy what's done for u-boot.e500 there.
+>> [submodule "roms/seabios-hppa"]
+>>        path = roms/seabios-hppa
+>>        url = git://github.com/hdeller/seabios-hppa.git
+> 
+> And there's also
+> 
+> [submodule "roms/qemu-palcode"]
+>         path = roms/qemu-palcode
+>         url = git://github.com/rth7680/qemu-palcode.git
+> 
+> if that matters.
 
-Yes, it seems we can do the same (except stripping the result) and build=20
-the Sam460ex_config from the appropriate source that should generate the=20
-binary (but I'm not sure about the cross compiler setup in that Makefile,=
-=20
-my cross compiler is called powerpc-elf-gcc and after briefly looking at=20
-it I'm not sure it will be found by that make magic).
+That already exists at https://github.com/qemu/qemu-palcode, it's just
+not pointed to by .gitmodules.
 
-Once the patch to add the sources is cleared I can send a v2 of this with=
-=20
-the roms/Makefile changes to also add a new target for this binary.
+> I don't mind either way and don't expect to change this u-boot source
+> too much in the future so if you just copy it to the qemu repo without
+> mirroring my repo that's fine as well. (If any change will be needed I
+> can submit patches for it like for other QEMU parts but this should not
+> be needed too frequently as this firmware is not developed any further
+> by upstream so only changes may be bugfixes from QEMU contributors.) But
+> I can't do that myself so I need help with that. All I could do is to
+> provide my own repo and refer to that for all else I need your help.
 
-Regards,
-BALATON Zoltan
+Out of curiosity, why is it not upstream?
+
+Paolo
