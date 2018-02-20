@@ -1,23 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rdelobel@gmail.com>) id 1eoA2J-0004w3-E7
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:40:56 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eoAPD-0005Tn-6n
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:04:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rdelobel@gmail.com>) id 1eoA2F-0005Ls-7V
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:40:55 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rdelobel@gmail.com>) id 1eoA2F-0005LR-0M
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:40:51 -0500
-Received: by mail-ot0-x244.google.com with SMTP id 41so6648488otd.13
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 07:40:50 -0800 (PST)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eoAP7-0000GK-HG
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:04:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eoAP7-0000DD-9K
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:04:29 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1KFxtlQ132897
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 11:04:26 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g8m3xg67y-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 11:04:25 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 20 Feb 2018 16:04:23 -0000
+References: <20180220150713.6056-1-pasic@linux.vnet.ibm.com>
+	<20180220165323.02898d8a.cohuck@redhat.com>
+	<c836fb0b-4af8-d5c0-a20d-194990f38326@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 20 Feb 2018 17:04:19 +0100
 MIME-Version: 1.0
-From: Ronald Delobel <rdelobel@gmail.com>
-Date: Tue, 20 Feb 2018 16:40:49 +0100
-Message-ID: <CAMyPS3QVbV2FPNfE-Y_-kgpcpOTWr9zFWED50oCkJaBjJ3XtRg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] make error
+In-Reply-To: <c836fb0b-4af8-d5c0-a20d-194990f38326@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <437eecac-036e-bbdd-a275-31dc0c812f32@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/1] 390x/cpumodel: document
+ S390FeatDef.bit not applicable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +44,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Hello,
-
-This is the error I get when building qemu-2.11.[0-1] with
-gcc-7.3.0/glibc-2.27, removing the static attribute suffice to finnish the
-build using the glibc provided memfd_create and qemu don't crash, but I
-miss some knowledge here about what a static function really is, a kind of
-private one? Shouldn't it be renamed instead and stay as static?
-
-Just to report it.
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
 
-  CC      util/qemu-thread-posix.o
-  CC      util/memfd.o
-util/memfd.c:40:12: error: la d=C3=A9claration statique de =C2=AB memfd_cre=
-ate =C2=BB suit
-une d=C3=A9claration non statique
- static int memfd_create(const char *name, unsigned int flags)
-            ^~~~~~~~~~~~
-In file included from /usr/include/bits/mman-linux.h:115:0,
-                 from /usr/include/bits/mman.h:45,
-                 from /usr/include/sys/mman.h:41,
-                 from
-/usr/local/src/qemu-2.11.1/include/sysemu/os-posix.h:29,
-                 from /usr/local/src/qemu-2.11.1/include/qemu/osdep.h:104,
-                 from util/memfd.c:28:
-/usr/include/bits/mman-shared.h:46:5: note: la d=C3=A9claration pr=C3=A9c=
-=C3=A9dente de
-=C2=AB memfd_create =C2=BB =C3=A9tait ici
- int memfd_create (const char *__name, unsigned int __flags) __THROW;
-     ^~~~~~~~~~~~
-make: *** [/usr/local/src/qemu-2.11.1/rules.mak:66: util/memfd.o] Error 1
+
+On 02/20/2018 04:55 PM, David Hildenbrand wrote:
+> On 20.02.2018 16:53, Cornelia Huck wrote:
+>> On Tue, 20 Feb 2018 16:07:13 +0100
+>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>
+>>> The 'bit' field of the 'S390FeatDef' structure is not applicable to all
+>>> it's instances. Currently a this field is not applicable, and remains
+>>
+>> s/it's/its/
+>>
+>> s/a this/this/
+>>
+>>> unused, iff the feature is of type S390_FEAT_TYPE_MISC. Having the value 0
+>>> specified for multiple such feature definition  was a little confusing,
+>>> as it's a perfectly legit bit value, and as usually the value of the bit
+>>> field is ought to be unique for each feature.
+>>>
+>>> Let's document this, and hopefully reduce the potential for confusion.
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>> ---
+>>>
+>>> Hi!
+>>>
+>>> This may be an overkill. A comment where the misc features
+>>> are defined would do to, but I think this is nicer. So
+>>> I decided to try it with this approach first.
+>>
+>> Is there likely to be anything else than FEAT_MISC _not_ using .bit? If
+>> not, would it be better to at a comment to the FEAT_MISC definition?
+> 
+> Doubt it right now. I would sign the "overkill" part :)
+
+I can cconfirm that this code caused some questions and it took me some
+minutes to remember why 0 and 0 was ok. So I certainly want to have a comment
+of some form.
