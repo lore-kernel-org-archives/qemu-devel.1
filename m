@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enzj2-0000Ga-0h
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:40:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1enzou-0001fQ-VR
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:46:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1enziy-0003kY-O5
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:40:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1enzot-0000W6-En
+	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:46:25 -0500
+Date: Tue, 20 Feb 2018 15:40:07 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180220044007.GO1109@umbus.fritz.box>
 References: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
-	<20180219181922.21586-5-mark.cave-ayland@ilande.co.uk>
-	<20180220042057.GL1109@umbus.fritz.box>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <78f5a679-b3eb-2188-d0d1-957a23cf44b0@ilande.co.uk>
-Date: Tue, 20 Feb 2018 04:40:07 +0000
+	<20180219181922.21586-7-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20180220042057.GL1109@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/11] heathrow: convert to trace-events
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="JWJEtCrVvH5hpatL"
+Content-Disposition: inline
+In-Reply-To: <20180219181922.21586-7-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 06/11] macio: move macio related structures
+ and defines into separate macio.h file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +25,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-
-On 20/02/18 04:20, David Gibson wrote:
-
-> On Mon, Feb 19, 2018 at 06:19:15PM +0000, Mark Cave-Ayland wrote:
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>   hw/intc/heathrow_pic.c         | 31 ++++++++++++-------------------
->>   hw/intc/trace-events           |  5 +++++
->>   include/hw/intc/heathrow_pic.h |  1 +
->>   3 files changed, 18 insertions(+), 19 deletions(-)
->>
->> diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
->> index 7bf44e0d86..afe0b08cbb 100644
->> --- a/hw/intc/heathrow_pic.c
->> +++ b/hw/intc/heathrow_pic.c
->> @@ -26,16 +26,7 @@
->>   #include "hw/hw.h"
->>   #include "hw/ppc/mac.h"
->>   #include "hw/intc/heathrow_pic.h"
->> -
->> -/* debug PIC */
->> -//#define DEBUG_PIC
->> -
->> -#ifdef DEBUG_PIC
->> -#define PIC_DPRINTF(fmt, ...)                                   \
->> -    do { printf("PIC: " fmt , ## __VA_ARGS__); } while (0)
->> -#else
->> -#define PIC_DPRINTF(fmt, ...)
->> -#endif
->> +#include "trace.h"
->>   
->>   static inline int heathrow_check_irq(HeathrowPICState *pic)
->>   {
->> @@ -61,7 +52,7 @@ static void heathrow_write(void *opaque, hwaddr addr,
->>       unsigned int n;
->>   
->>       n = ((addr & 0xfff) - 0x10) >> 4;
->> -    PIC_DPRINTF("writel: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
->> +    trace_heathrow_write(addr, n, value);
->>       if (n >= 2)
->>           return;
->>       pic = &s->pics[n];
->> @@ -109,7 +100,7 @@ static uint64_t heathrow_read(void *opaque, hwaddr addr,
->>               break;
->>           }
->>       }
->> -    PIC_DPRINTF("readl: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
->> +    trace_heathrow_read(addr, n, value);
->>       return value;
->>   }
->>   
->> @@ -124,16 +115,18 @@ static void heathrow_set_irq(void *opaque, int num, int level)
->>       HeathrowState *s = opaque;
->>       HeathrowPICState *pic;
->>       unsigned int irq_bit;
->> +    int last_level = (s->last_levels & (num << 1UL)) ? 1 : 0;
->>   
->> -#if defined(DEBUG)
->> -    {
->> -        static int last_level[64];
->> -        if (last_level[num] != level) {
->> -            PIC_DPRINTF("set_irq: num=0x%02x level=%d\n", num, level);
->> -            last_level[num] = level;
->> +    if (last_level != level) {
->> +        trace_heathrow_set_irq(num, level);
->> +
->> +        if (level) {
->> +            s->last_levels |= (num << 1UL);
->> +        } else {
->> +            s->last_levels &= ~(num << 1UL);
-> 
-> Cleaning up this last_level stuff is a good idea, but is a bit more
-> involved than merely converting to trace-events.
-> 
-> It's also not really the "last" level - it's effectively maintaining
-> the current level of the input irqs.  .. and isn't that information
-> already within the HeathrowPICState structure?
-
-Yeah actually you're right here - I was so focused on converting the 
-code as-is that I didn't really look at what was happening at the end of 
-heathrow_set_irq(). The motivation was that without this hack the trace 
-output is always outputting the IRQ status, presumably because we have a 
-level-triggered interrupt being asserted.
-
-Let me rework this patch to use the last state information from 
-HeathrowPICState instead.
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
-ATB,
+--JWJEtCrVvH5hpatL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Mark.
+On Mon, Feb 19, 2018 at 06:19:17PM +0000, Mark Cave-Ayland wrote:
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/misc/macio/macio.c         | 43 +------------------------
+>  hw/ppc/mac.h                  |  3 --
+>  hw/ppc/mac_newworld.c         |  1 +
+>  hw/ppc/mac_oldworld.c         |  1 +
+>  include/hw/misc/macio/macio.h | 75 +++++++++++++++++++++++++++++++++++++=
+++++++
+>  5 files changed, 78 insertions(+), 45 deletions(-)
+>  create mode 100644 include/hw/misc/macio/macio.h
+>=20
+> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+> index 1c10d8a1d7..4e502ede2e 100644
+> --- a/hw/misc/macio/macio.c
+> +++ b/hw/misc/macio/macio.c
+> @@ -30,48 +30,7 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/ppc/mac_dbdma.h"
+>  #include "hw/char/escc.h"
+> -
+> -#define TYPE_MACIO "macio"
+> -#define MACIO(obj) OBJECT_CHECK(MacIOState, (obj), TYPE_MACIO)
+> -
+> -typedef struct MacIOState
+> -{
+> -    /*< private >*/
+> -    PCIDevice parent;
+> -    /*< public >*/
+> -
+> -    MemoryRegion bar;
+> -    CUDAState cuda;
+> -    DBDMAState dbdma;
+> -    ESCCState escc;
+> -    MemoryRegion *pic_mem;
+> -    uint64_t frequency;
+> -} MacIOState;
+> -
+> -#define OLDWORLD_MACIO(obj) \
+> -    OBJECT_CHECK(OldWorldMacIOState, (obj), TYPE_OLDWORLD_MACIO)
+> -
+> -typedef struct OldWorldMacIOState {
+> -    /*< private >*/
+> -    MacIOState parent_obj;
+> -    /*< public >*/
+> -
+> -    qemu_irq irqs[7];
+> -
+> -    MacIONVRAMState nvram;
+> -    MACIOIDEState ide[2];
+> -} OldWorldMacIOState;
+> -
+> -#define NEWWORLD_MACIO(obj) \
+> -    OBJECT_CHECK(NewWorldMacIOState, (obj), TYPE_NEWWORLD_MACIO)
+> -
+> -typedef struct NewWorldMacIOState {
+> -    /*< private >*/
+> -    MacIOState parent_obj;
+> -    /*< public >*/
+> -    qemu_irq irqs[7];
+> -    MACIOIDEState ide[2];
+> -} NewWorldMacIOState;
+> +#include "hw/misc/macio/macio.h"
+> =20
+>  /*
+>   * The mac-io has two interfaces to the ESCC. One is called "escc-legacy=
+",
+> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+> index 5b5fffdff3..a02f797598 100644
+> --- a/hw/ppc/mac.h
+> +++ b/hw/ppc/mac.h
+> @@ -47,9 +47,6 @@
+> =20
+> =20
+>  /* MacIO */
+> -#define TYPE_OLDWORLD_MACIO "macio-oldworld"
+> -#define TYPE_NEWWORLD_MACIO "macio-newworld"
+> -
+>  #define TYPE_MACIO_IDE "macio-ide"
+>  #define MACIO_IDE(obj) OBJECT_CHECK(MACIOIDEState, (obj), TYPE_MACIO_IDE)
+> =20
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 5e82158759..396216954e 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -60,6 +60,7 @@
+>  #include "hw/boards.h"
+>  #include "hw/nvram/fw_cfg.h"
+>  #include "hw/char/escc.h"
+> +#include "hw/misc/macio/macio.h"
+>  #include "hw/ppc/openpic.h"
+>  #include "hw/ide.h"
+>  #include "hw/loader.h"
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 06a61220cb..5903ff47d3 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -37,6 +37,7 @@
+>  #include "hw/boards.h"
+>  #include "hw/nvram/fw_cfg.h"
+>  #include "hw/char/escc.h"
+> +#include "hw/misc/macio/macio.h"
+>  #include "hw/ide.h"
+>  #include "hw/loader.h"
+>  #include "elf.h"
+> diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+> new file mode 100644
+> index 0000000000..e1e249f898
+> --- /dev/null
+> +++ b/include/hw/misc/macio/macio.h
+> @@ -0,0 +1,75 @@
+> +/*
+> + * PowerMac MacIO device emulation
+> + *
+> + * Copyright (c) 2005-2007 Fabrice Bellard
+> + * Copyright (c) 2007 Jocelyn Mayer
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef MACIO_H
+> +#define MACIO_H
+> +
+> +#include "hw/misc/macio/cuda.h"
+> +#include "hw/ppc/mac_dbdma.h"
+> +
+> +#define TYPE_MACIO "macio"
+> +#define MACIO(obj) OBJECT_CHECK(MacIOState, (obj), TYPE_MACIO)
+> +
+> +typedef struct MacIOState {
+> +    /*< private >*/
+> +    PCIDevice parent;
+> +    /*< public >*/
+> +
+> +    MemoryRegion bar;
+> +    CUDAState cuda;
+> +    DBDMAState dbdma;
+> +    ESCCState escc;
+> +    MemoryRegion *pic_mem;
+> +    uint64_t frequency;
+> +} MacIOState;
+> +
+> +#define TYPE_OLDWORLD_MACIO "macio-oldworld"
+> +#define OLDWORLD_MACIO(obj) \
+> +    OBJECT_CHECK(OldWorldMacIOState, (obj), TYPE_OLDWORLD_MACIO)
+> +
+> +typedef struct OldWorldMacIOState {
+> +    /*< private >*/
+> +    MacIOState parent_obj;
+> +    /*< public >*/
+> +
+> +    qemu_irq irqs[7];
+> +
+> +    MacIONVRAMState nvram;
+> +    MACIOIDEState ide[2];
+> +} OldWorldMacIOState;
+> +
+> +#define TYPE_NEWWORLD_MACIO "macio-newworld"
+> +#define NEWWORLD_MACIO(obj) \
+> +    OBJECT_CHECK(NewWorldMacIOState, (obj), TYPE_NEWWORLD_MACIO)
+> +
+> +typedef struct NewWorldMacIOState {
+> +    /*< private >*/
+> +    MacIOState parent_obj;
+> +    /*< public >*/
+> +    qemu_irq irqs[7];
+> +    MACIOIDEState ide[2];
+> +} NewWorldMacIOState;
+> +
+> +#endif /* MACIO_H */
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--JWJEtCrVvH5hpatL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqLpqYACgkQbDjKyiDZ
+s5IIfxAAlzac/1FSuxy0cjp1RWUicqZcna8p3WwzN62WpjfxOjMoxl4fdpjM4Thj
+7LPqroDVAxBesvb5+zGWTge4CuC/1ZyDUax1R09sNAec+hAbxumCExLvwxPoyUhk
+492FnxUanU/mw+MvhuYX9Z3smwf5LnbICgvgQzX/PxdfvRzcSbNuqFcc8sV9KLim
+M6Ehq8JDwBpra/LO39xx25Q9JXWbknYh70qSh5ZsZEt/NcaxwZbrYeTW/cTtHnnl
+nREysjATgu08QKB8Z07mh4LA5cogfgV1fVBXuqWY7wpfeqQgZ4K5GwIiub/CiPKF
+PfagmAHk0z1zjeTmAUvlfSniNkwL0+OXCeoT/xoDOwtkwCGgrlRReixJxiP2ivY7
++34gscSsMwxX8ecKCuQPMSwaTDwhtN8kG8tgReB5bXylCVykvqNkVeAMwIFIdZU8
+hTRkgYtGQ/mxHkl4g9ywRRinxjIpirRvqlWRdhHzEt5SUU4qarJ7ll4M5ULEVBW4
+qCrJXGI277lSvdwKZCdoOJjcG+wdhSA8kHoOOURpuxjLIG0rJgA4Ioo5kLqTZw+2
+gex6zvCejt2mCW8XfhTKum6JZcPUFZ/s2HS6gO/mkL0zdlHs8+Bfpfpor+EV2fA+
+3tcVFZNMtCcIs9ojzV67LF5KBAYyL3bqrDODFwv2Y0lyX3MQGT8=
+=j/Xe
+-----END PGP SIGNATURE-----
+
+--JWJEtCrVvH5hpatL--
