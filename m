@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoChX-0007ph-Dz
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:31:40 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eoCnb-0002uF-VW
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:37:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoChW-0003Ep-H1
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:31:39 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:35281)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eoChW-0003EN-BK
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:31:38 -0500
-Received: by mail-ot0-x243.google.com with SMTP id p8so9462167otf.2
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 10:31:38 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1eoCnZ-00069H-DK
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:37:56 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47994 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eoCnZ-00067w-8q
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:37:53 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C11CB818532A
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 18:37:36 +0000 (UTC)
+References: <1519148406-15006-1-git-send-email-thuth@redhat.com>
+	<1519148406-15006-9-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <55a10378-b99f-f73c-3162-55dcf023453b@redhat.com>
+Date: Tue, 20 Feb 2018 19:37:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <cover.1519150239.git.balaton@eik.bme.hu>
-References: <cover.1519150239.git.balaton@eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Feb 2018 18:31:17 +0000
-Message-ID: <CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] Firmware blob and git submodule for
- Sam460ex
+In-Reply-To: <1519148406-15006-9-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] qemu-doc: Make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 20 February 2018 at 18:10, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> I've created a git repo for the Sam460ex u-boot sources and this adds
-> that as a submodule and a separate patch to add the binary built from
-> these sources. Feel free to keep this as two patches, squash them into
-> one patch or take the git repo and commit the content under the QEMU
-> repo and use that as a submodule as you see fit (or let me know if any
-> changes are needed for these patches).
->
-> BALATON Zoltan (2):
->   roms: Added git submodule for u-boot-sam460 (firmware for sam460ex)
->   pc-bios: Added u-boot-sam460 firmware binary
+On 20/02/2018 18:40, Thomas Huth wrote:
+> "-net" is clearly a legacy option. Yet we still use it in almost all
+> examples in the qemu documentation, and many other spots in the network
+> chapter. We should make it less prominent that users are not lured into
+> using it so often anymore. So instead of starting the network chapter with
+> "-net nic" and documenting "-net <backend>" below "-netdev <backend>"
+> everywhere, all the "-net" related documentation is now moved to the end
+> of the chapter. And the examples are changed to use the "--device" and
+> "--netdev" options instead of "-net nic -net <backend>".
 
-We already have a submodule for u-boot. Is it not possible to
-build this bios blob from those upstream u-boot sources?
+Do we want to change them to "-nic" instead?  The proof is in the
+pudding, they say, :) and "-nic" is way easier to learn than "-device
+-netdev".
 
-thanks
--- PMM
+And maybe we *should* go the extra mile and deprecate "-net" altogether.
+ The only case where the newer syntax is a bit more uncomfortable is for
+"-net nic -net nic -net tap|user", which however does work with "-nic
+hubport -nic hubport -netdev tap|user,id=x -netdev hubport,netdev=x".
+
+For now I suggest dropping this patch.
+
+Paolo
