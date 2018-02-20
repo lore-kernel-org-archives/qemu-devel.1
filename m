@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoBtz-0002LN-EG
+	(envelope-from <thuth@redhat.com>) id 1eoBtz-0002LO-Eo
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoBtx-0000RG-B0
+	(envelope-from <thuth@redhat.com>) id 1eoBtw-0000Pp-0p
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:27 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45660 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39576 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoBtw-0000Q9-M4
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:24 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoBtv-0000OM-IQ
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:23 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4120C80401C1
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 17:40:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFE5340FB639
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 17:40:20 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 20 Feb 2018 18:40:00 +0100
-Message-Id: <1519148406-15006-3-git-send-email-thuth@redhat.com>
+Date: Tue, 20 Feb 2018 18:39:59 +0100
+Message-Id: <1519148406-15006-2-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519148406-15006-1-git-send-email-thuth@redhat.com>
 References: <1519148406-15006-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/8] net: List available netdevs with
- "-netdev help"
+Subject: [Qemu-devel] [PATCH v2 1/8] net: Move error reporting from
+ net_init_client/netdev to the calling site
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +33,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Other options like "-chardev" or "-device" feature a nice help text
-with the available devices when being called with "help" or "?".
-Since it is quite useful, especially if you want to see which network
-backends have been compiled into the QEMU binary, let's provide such
-a help text for "-netdev", too.
+It looks strange that net_init_client() and net_init_netdev() both
+take an "Error **errp" parameter, but then do the error reporting
+with "error_report_err(local_err)" on their own. Let's move the
+error reporting to the calling site instead to simplify this code
+a little bit.
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- net/net.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+ include/net/net.h |  2 +-
+ net/net.c         | 29 +++++------------------------
+ vl.c              |  3 ++-
+ 3 files changed, 8 insertions(+), 26 deletions(-)
 
+diff --git a/include/net/net.h b/include/net/net.h
+index 3fc48e4..bdd4d9f 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -206,7 +206,7 @@ extern const char *legacy_bootp_filename;
+ 
+ int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp);
+ int net_client_parse(QemuOptsList *opts_list, const char *str);
+-int net_init_clients(void);
++int net_init_clients(Error **errp);
+ void net_check_clients(void);
+ void net_cleanup(void);
+ void hmp_host_net_add(Monitor *mon, const QDict *qdict);
 diff --git a/net/net.c b/net/net.c
-index e213a61..cf07e15 100644
+index 7d42925..e213a61 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -1086,6 +1086,38 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-     return 0;
+@@ -1520,46 +1520,27 @@ void net_check_clients(void)
+ 
+ static int net_init_client(void *dummy, QemuOpts *opts, Error **errp)
+ {
+-    Error *local_err = NULL;
+-
+-    net_client_init(opts, false, &local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        return -1;
+-    }
+-
+-    return 0;
++    return net_client_init(opts, false, errp);
  }
  
-+static void show_netdevs(void)
-+{
-+    int idx;
-+    const char *available_netdevs[] = {
-+        "socket",
-+        "hubport",
-+        "tap",
-+#ifdef CONFIG_SLIRP
-+        "user",
-+#endif
-+#ifdef CONFIG_L2TPV3
-+        "l2tpv3",
-+#endif
-+#ifdef CONFIG_VDE
-+        "vde",
-+#endif
-+#ifdef CONFIG_NET_BRIDGE
-+        "bridge",
-+#endif
-+#ifdef CONFIG_NETMAP
-+        "netmap",
-+#endif
-+#ifdef CONFIG_POSIX
-+        "vhost-user",
-+#endif
-+    };
-+
-+    printf("Available netdev backend types:\n");
-+    for (idx = 0; idx < ARRAY_SIZE(available_netdevs); idx++) {
-+        puts(available_netdevs[idx]);
-+    }
-+}
- 
- int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+ static int net_init_netdev(void *dummy, QemuOpts *opts, Error **errp)
  {
-@@ -1094,7 +1126,10 @@ int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
-     int ret = -1;
-     Visitor *v = opts_visitor_new(opts);
+-    Error *local_err = NULL;
+-    int ret;
+-
+-    ret = net_client_init(opts, true, &local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        return -1;
+-    }
+-
+-    return ret;
++    return net_client_init(opts, true, errp);
+ }
  
--    {
-+    if (is_netdev && is_help_option(qemu_opt_get(opts, "type"))) {
-+        show_netdevs();
-+        exit(0);
-+    } else {
-         /* Parse convenience option format ip6-net=fec0::0[/64] */
-         const char *ip6_net = qemu_opt_get(opts, "ipv6-net");
+-int net_init_clients(void)
++int net_init_clients(Error **errp)
+ {
+-    QemuOptsList *net = qemu_find_opts("net");
+-
+     net_change_state_entry =
+         qemu_add_vm_change_state_handler(net_vm_change_state_handler, NULL);
+ 
+     QTAILQ_INIT(&net_clients);
+ 
+     if (qemu_opts_foreach(qemu_find_opts("netdev"),
+-                          net_init_netdev, NULL, NULL)) {
++                          net_init_netdev, NULL, errp)) {
+         return -1;
+     }
+ 
+-    if (qemu_opts_foreach(net, net_init_client, NULL, NULL)) {
++    if (qemu_opts_foreach(qemu_find_opts("net"), net_init_client, NULL, errp)) {
+         return -1;
+     }
+ 
+diff --git a/vl.c b/vl.c
+index 9e7235d..698b681 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4476,7 +4476,8 @@ int main(int argc, char **argv, char **envp)
+ 
+     colo_info_init();
+ 
+-    if (net_init_clients() < 0) {
++    if (net_init_clients(&err) < 0) {
++        error_report_err(err);
+         exit(1);
+     }
  
 -- 
 1.8.3.1
