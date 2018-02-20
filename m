@@ -1,36 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoCuo-0007u0-De
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:45:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eoCvt-0000NG-QJ
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:46:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoCuh-0002X0-TV
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:45:22 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43378
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1eoCuh-0002WJ-Nf
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:45:15 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1KIj0FE012735
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:45:12 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g8qefck11-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:45:11 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Tue, 20 Feb 2018 18:45:09 -0000
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Tue, 20 Feb 2018 19:45:02 +0100
-In-Reply-To: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-References: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-Message-Id: <1519152302-19079-4-git-send-email-imbrenda@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 3/3] s390x/sclp: extend SCLP event masks to
- 64 bits
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eoCvt-0003Ny-14
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:46:29 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Tue, 20 Feb 2018 18:41:58 +0000
+Message-Id: <20180220184159.16483-11-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180220184159.16483-1-mark.cave-ayland@ilande.co.uk>
+References: <20180220184159.16483-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCHv2 10/11] macio: move setting of CUDA timebase
+ frequency to macio_common_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,129 +20,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm390-list@tuxmaker.boeblingen.de.ibm.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Extend the SCLP event masks to 64 bits. This will make us future proof
-against future extensions of the architecture.
+This removes the last of the functionality from macio_init() in preparation
+for its subsequent removal.
 
-Notice that using any of the new bits results in a state that cannot be
-migrated to an older version.
-
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/s390x/event-facility.c         | 43 +++++++++++++++++++++++++++++++++------
- include/hw/s390x/event-facility.h |  2 +-
- 2 files changed, 38 insertions(+), 7 deletions(-)
+ hw/misc/macio/macio.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index f6f28fd..e71302a 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -30,7 +30,10 @@ struct SCLPEventFacility {
-     SysBusDevice parent_obj;
-     SCLPEventsBus sbus;
-     /* guest' receive mask */
--    sccb_mask_t receive_mask;
-+    union {
-+        uint32_t receive_mask_compat32;
-+        sccb_mask_t receive_mask;
-+    };
-     /*
-      * when false, we keep the same broken, backwards compatible behaviour as
-      * before; when true, we implement the architecture correctly. Needed for
-@@ -261,7 +264,7 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
-     case SCLP_SELECTIVE_READ:
-         copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
-                   sizeof(sclp_active_selection_mask), ef->mask_length);
--        sclp_active_selection_mask = be32_to_cpu(sclp_active_selection_mask);
-+        sclp_active_selection_mask = be64_to_cpu(sclp_active_selection_mask);
-         if (!sclp_cp_receive_mask ||
-             (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
-             sccb->h.response_code =
-@@ -301,13 +304,13 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
-     /* keep track of the guest's capability masks */
-     copy_mask((uint8_t *)&tmp_mask, WEM_CP_RECEIVE_MASK(we_mask, mask_length),
-               sizeof(tmp_mask), mask_length);
--    ef->receive_mask = be32_to_cpu(tmp_mask);
-+    ef->receive_mask = be64_to_cpu(tmp_mask);
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index e5288f1084..f71ed61819 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -101,6 +101,8 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
+     memory_region_add_subregion(&s->bar, 0x08000,
+                                 sysbus_mmio_get_region(sysbus_dev, 0));
  
-     /* return the SCLP's capability masks to the guest */
--    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-+    tmp_mask = cpu_to_be64(get_host_receive_mask(ef));
-     copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-               mask_length, sizeof(tmp_mask));
--    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-+    tmp_mask = cpu_to_be64(get_host_send_mask(ef));
-     copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-               mask_length, sizeof(tmp_mask));
- 
-@@ -368,6 +371,21 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
-     }
- }
- 
-+static bool vmstate_event_facility_mask64_needed(void *opaque)
-+{
-+    SCLPEventFacility *ef = opaque;
-+
-+    return (ef->receive_mask & 0xFFFFFFFF) != 0;
-+}
-+
-+static int vmstate_event_facility_mask64_pre_load(void *opaque)
-+{
-+    SCLPEventFacility *ef = opaque;
-+
-+    ef->receive_mask &= ~0xFFFFFFFFULL;
-+    return 0;
-+}
-+
- static bool vmstate_event_facility_mask_length_needed(void *opaque)
++    qdev_prop_set_uint64(DEVICE(&s->cuda), "timebase-frequency",
++                         s->frequency);
+     object_property_set_bool(OBJECT(&s->cuda), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+@@ -444,12 +446,7 @@ type_init(macio_register_types)
+ void macio_init(PCIDevice *d,
+                 MemoryRegion *pic_mem)
  {
-     SCLPEventFacility *ef = opaque;
-@@ -383,6 +401,18 @@ static int vmstate_event_facility_mask_length_pre_load(void *opaque)
-     return 0;
+-    MacIOState *macio_state = MACIO(d);
+-
+     /* Note: this code is strongly inspirated from the corresponding code
+        in PearPC */
+-    qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "timebase-frequency",
+-                         macio_state->frequency);
+-
+     qdev_init_nofail(DEVICE(d));
  }
- 
-+static const VMStateDescription vmstate_event_facility_mask64 = {
-+    .name = "vmstate-event-facility/mask64",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .needed = vmstate_event_facility_mask64_needed,
-+    .pre_load = vmstate_event_facility_mask64_pre_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(receive_mask, SCLPEventFacility),
-+        VMSTATE_END_OF_LIST()
-+     }
-+};
-+
- static const VMStateDescription vmstate_event_facility_mask_length = {
-     .name = "vmstate-event-facility/mask_length",
-     .version_id = 0,
-@@ -401,10 +431,11 @@ static const VMStateDescription vmstate_event_facility = {
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(receive_mask, SCLPEventFacility),
-+        VMSTATE_UINT32(receive_mask_compat32, SCLPEventFacility),
-         VMSTATE_END_OF_LIST()
-      },
-     .subsections = (const VMStateDescription * []) {
-+        &vmstate_event_facility_mask64,
-         &vmstate_event_facility_mask_length,
-         NULL
-      }
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-index 0a8b47a..e40c85f 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -73,7 +73,7 @@ typedef struct WriteEventMask {
- #define WEM_RECEIVE_MASK(wem, mask_len) ((wem)->masks + 2 * (mask_len))
- #define WEM_SEND_MASK(wem, mask_len) ((wem)->masks + 3 * (mask_len))
- 
--typedef uint32_t sccb_mask_t;
-+typedef uint64_t sccb_mask_t;
- 
- typedef struct EventBufferHeader {
-     uint16_t length;
 -- 
-2.7.4
+2.11.0
