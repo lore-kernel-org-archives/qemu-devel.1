@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoCgg-00078W-Tu
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:30:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eoChX-0007ph-Dz
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoCgd-0002hV-Mt
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:30:46 -0500
-Date: Tue, 20 Feb 2018 18:30:22 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180220183022.GQ6021@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <cover.1519150239.git.balaton@eik.bme.hu>
-	<7fa4ce574074b3baf702b628a7e1fce647305ce1.1519150239.git.balaton@eik.bme.hu>
+	(envelope-from <peter.maydell@linaro.org>) id 1eoChW-0003Ep-H1
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:31:39 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:35281)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eoChW-0003EN-BK
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:31:38 -0500
+Received: by mail-ot0-x243.google.com with SMTP id p8so9462167otf.2
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 10:31:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7fa4ce574074b3baf702b628a7e1fce647305ce1.1519150239.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 2/2] pc-bios: Added u-boot-sam460 firmware
- binary
+In-Reply-To: <cover.1519150239.git.balaton@eik.bme.hu>
+References: <cover.1519150239.git.balaton@eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Feb 2018 18:31:17 +0000
+Message-ID: <CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/2] Firmware blob and git submodule for
+ Sam460ex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +30,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, Feb 20, 2018 at 06:57:43PM +0100, BALATON Zoltan wrote:
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  Makefile                           |   2 +-
->  pc-bios/u-boot-sam460-20100605.bin | Bin 0 -> 524288 bytes
->  2 files changed, 1 insertion(+), 1 deletion(-)
->  create mode 100755 pc-bios/u-boot-sam460-20100605.bin
-> 
-> diff --git a/Makefile b/Makefile
-> index 6434d6c..b0c16b3 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -661,7 +661,7 @@ multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin \
->  s390-ccw.img s390-netboot.img \
->  spapr-rtas.bin slof.bin skiboot.lid \
->  palcode-clipper \
-> -u-boot.e500 \
-> +u-boot.e500 u-boot-sam460-20100605.bin \
->  qemu_vga.ndrv \
->  hppa-firmware.img
->  else
-> diff --git a/pc-bios/u-boot-sam460-20100605.bin b/pc-bios/u-boot-sam460-20100605.bin
-> new file mode 100755
+On 20 February 2018 at 18:10, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> I've created a git repo for the Sam460ex u-boot sources and this adds
+> that as a submodule and a separate patch to add the binary built from
+> these sources. Feel free to keep this as two patches, squash them into
+> one patch or take the git repo and commit the content under the QEMU
+> repo and use that as a submodule as you see fit (or let me know if any
+> changes are needed for these patches).
+>
+> BALATON Zoltan (2):
+>   roms: Added git submodule for u-boot-sam460 (firmware for sam460ex)
+>   pc-bios: Added u-boot-sam460 firmware binary
 
-IIUC, you also need to provide glue in roms/Makefile to build the
-u-boot-sam460-20100605.bin from the submodule content. Presumably
-you can largely copy what's done for u-boot.e500 there.
+We already have a submodule for u-boot. Is it not possible to
+build this bios blob from those upstream u-boot sources?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
