@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37510)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1eo9ao-0006nS-Vy
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:12:31 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38287)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1eo9e4-0001D7-L7
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1eo9ak-00027J-1O
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:12:30 -0500
-Received: from mx01.kamp.de ([82.141.2.16]:50867)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eo9aj-00026r-NA
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:12:25 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:12:21 +0100
-References: <20180215111526.2464-1-stefanha@redhat.com>
-	<ecc44671-4f09-5c52-57ea-4818b351795d@kamp.de>
-	<20180215172714.GD8367@stefanha-x1.localdomain>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <0f7b3bc8-544f-ac52-9486-5a9b697ef2a3@kamp.de>
-Date: Tue, 20 Feb 2018 16:12:22 +0100
+	(envelope-from <eblake@redhat.com>) id 1eo9dz-0003Wd-VH
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:15:52 -0500
+References: <20180205151835.20812-1-mreitz@redhat.com>
+	<20180205151835.20812-19-mreitz@redhat.com>
+	<b9fa2031-a042-165a-47fd-e0d4b4a24738@redhat.com>
+	<b937024c-5fbb-1250-a02c-f187f1522594@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8d179b9b-363d-8b89-073f-72599db43f1f@redhat.com>
+Date: Tue, 20 Feb 2018 09:15:30 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180215172714.GD8367@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <b937024c-5fbb-1250-a02c-f187f1522594@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] block/iscsi: cancel libiscsi task when
- ABORT TASK TMF completes
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 18/26] block: Add sgfnt_runtime_opts to
+ BlockDriver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Felipe Franciosi <felipe@nutanix.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-Am 15.02.2018 um 18:27 schrieb Stefan Hajnoczi:
-> On Thu, Feb 15, 2018 at 03:24:54PM +0100, Peter Lieven wrote:
->> Am 15.02.2018 um 12:15 schrieb Stefan Hajnoczi:
->>> The libiscsi iscsi_task_mgmt_async() API documentation says:
+On 02/20/2018 08:51 AM, Max Reitz wrote:
+> On 2018-02-06 20:43, Eric Blake wrote:
+>> On 02/05/2018 09:18 AM, Max Reitz wrote:
+>>> This new field can be set by block drivers to list the runtime option=
+s
+>>> they accept that may influence the contents of the respective BDS. As=
+ of
+>>> a follow-up patch, this list will be used by the common
+>>> bdrv_refresh_filename() implementation to decide which options to put
+>>> into BDS.full_open_options (and consequently whether a JSON filename =
+has
+>>> to be created), thus freeing the drivers of having to implement that
+>>> logic themselves.
 >>>
->>>     abort_task will also cancel the scsi task. The callback for the scsi
->>>     task will be invoked with SCSI_STATUS_CANCELLED
+>>> Additionally, this patch adds the field to all of the block drivers t=
+hat
+>>> need it and sets it accordingly.
 >>>
->>> The libiscsi implementation does not fulfil this promise.  The task's
->>> callback is not invoked and its struct iscsi_pdu remains in the internal
->>> list (effectively leaked).
->> If that contract is fixed in libiscsi, will the Qemu iSCSI driver still work?
-> In
->
-> +    /* If the command callback hasn't been called yet, drop the task */
-> +    if (!acb->bh) {
->
-> and
->
-> +    if (status == SCSI_STATUS_CANCELLED) {
-> +        if (!acb->bh) {
->
-> we're mindful of the fact that the callback may have been invoked by
-> libiscsi already.  There is no risk of double-completion.
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>
+>>> +=C2=A0=C2=A0=C2=A0 /* Pointer to a NULL-terminated array of names of=
+ significant
+>>> options that
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * can be specified for bdrv_open(). A signi=
+ficant option is one
+>>> that
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * changes the data of a BDS.
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * If this pointer is NULL, the array is con=
+sidered empty.
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * "filename" and "driver" are always consid=
+ered significant. */
+>>> +=C2=A0=C2=A0=C2=A0 const char *const *sgfnt_runtime_opts;
+>>
+>> Warning: Bikeshedding follows:
+>>
+>> s/sgfnt/vital/
+>>
+>> might read easier (same number of letters, but has some vowels rthr th=
+n
+>> bng crptc bbrvtn).
+>=20
+> So, did we reach any verdict on this? :-)
+>=20
+> To sum up IRC (as far as I've understood), I don't quite like "vital" o=
+r
+> "needed" because they sound like those options would be required; but
+> they usually have defaults so they are not.
+>=20
+> I preferred "strong", but you said that might mean something else
+> (although I still don't know what exactly :-)).
+>=20
+> So...?
 
-Hi Stefan,
+major?  apt?
 
-thanks for the clarification. I am fine with this change. I will check with Ronnie for the
-libiscsi fix.
+(the thesaurus mentions other words like meaningful or influential, but=20
+those don't buy you any length reduction or easier abbreviations)
 
-Peter
+I don't recall what (if anything) I said against strong, so I'm also=20
+fine if that's what you choose.
+
+At the end of the day, it's all bikeshedding - pick a term, and I'll=20
+live with it ;)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
