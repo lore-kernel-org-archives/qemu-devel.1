@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eoBnN-0006kr-72
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:38 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eoBnM-0003vo-8R
+	(envelope-from <laurent@vivier.eu>) id 1eoBnL-0006kg-JM
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:37 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:46447)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1eoBnI-0003tM-DM
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:35 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:52095)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eoBnL-0003v2-Ut
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:36 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eoBnI-0003sd-34
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:33:32 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 20 Feb 2018 18:33:06 +0100
-Message-Id: <20180220173307.25125-4-laurent@vivier.eu>
-In-Reply-To: <20180220173307.25125-1-laurent@vivier.eu>
-References: <20180220173307.25125-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v5 3/4] linux-user,
- m68k: select CPU according to ELF header values
+Date: Tue, 20 Feb 2018 18:33:03 +0100
+Message-Id: <20180220173307.25125-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 0/4] linux-user: select CPU type according
+ ELF header values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +28,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aaron Sierra <asierra@xes-inc.com>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, YunQiang Su <syq@debian.org>, Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-M680x0 doesn't support the same set of instructions
-as ColdFire, so we can't use "any" CPU type to execute
-m68020 instructions.
-We select CPU type ("m68040" or "any" for ColdFire)
-according to the ELF header. If we can't, we
-use by default the value used until now: "any".
+This idea has been suggested to me before by Philippe
+Mathieu-Daudé, and recently YunQiang Su has proposed a
+patch to manage the MIPS r6 case.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
+Based on this, this series tries to clean-up the original
+patch, and introduces the use for m68k architecture and
+port the patch from YunQiang Su.
 
-Notes:
-    v3: check for EF_M68K_M68000
-        add EF_M68K_* flags in elf.h
-        set 680x0 default CPU to m68040
-    v2: call cpu_get_model() with the result of get_elf_eflags()
+v5: Use EF_MIPS_ARCH mask to read MIPS architecture flags
+    -> removed Richard's R-b because of this change
+    Some architectures like sparc32plus are
+    32bit architectures using 64bit processors.
+    We need to select the CPU according to the
+    TARGET_ABI ("sparc" path to target_elf.h)
+    and the TARGET_ARCH ("sparc64").
+    (Reported by Peter Maydell)
+v4: Add YunQiang Su's S-o-b
+    I don't use cpu type as suggested by Igor because
+    his latest series "generalize parsing of cpu_model (part 4)" v3
+    doesn't seem to need this anymore (use of parse_cpu_model())
+v3: fix code indent problem reported by patchew
+    remove useless "!= 0"
+    check for EF_M68K_M68000
+    add EF_M68K_* flags in elf.h
+    set 680x0 default CPU to m68040
+    change "#if ... #endif" structure for ppc
+v2: move cpu_model selection to linux-user/*/target_elf.h
+    provide eflags to cpu_get_model() instead of fd
+    (and modify other patches accordingly)
 
- include/elf.h                | 28 ++++++++++++++++++++++++++++
- linux-user/m68k/target_elf.h |  6 ++++++
- 2 files changed, 34 insertions(+)
+Laurent Vivier (2):
+  linux-user: Move CPU type name selection to a function
+  linux-user,m68k: select CPU according to ELF header values
 
-diff --git a/include/elf.h b/include/elf.h
-index e8a515ce3d..ca9a419043 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -537,6 +537,34 @@ typedef struct {
- #define HWCAP_S390_HIGH_GPRS    512
- #define HWCAP_S390_TE           1024
- 
-+/* M68K specific definitions. */
-+/* We use the top 24 bits to encode information about the
-+   architecture variant.  */
-+#define EF_M68K_CPU32    0x00810000
-+#define EF_M68K_M68000   0x01000000
-+#define EF_M68K_CFV4E    0x00008000
-+#define EF_M68K_FIDO     0x02000000
-+#define EF_M68K_ARCH_MASK                                               \
-+  (EF_M68K_M68000 | EF_M68K_CPU32 | EF_M68K_CFV4E | EF_M68K_FIDO)
-+
-+/* We use the bottom 8 bits to encode information about the
-+   coldfire variant.  If we use any of these bits, the top 24 bits are
-+   either 0 or EF_M68K_CFV4E.  */
-+#define EF_M68K_CF_ISA_MASK     0x0F  /* Which ISA */
-+#define EF_M68K_CF_ISA_A_NODIV  0x01  /* ISA A except for div */
-+#define EF_M68K_CF_ISA_A        0x02
-+#define EF_M68K_CF_ISA_A_PLUS   0x03
-+#define EF_M68K_CF_ISA_B_NOUSP  0x04  /* ISA_B except for USP */
-+#define EF_M68K_CF_ISA_B        0x05
-+#define EF_M68K_CF_ISA_C        0x06
-+#define EF_M68K_CF_ISA_C_NODIV  0x07  /* ISA C except for div */
-+#define EF_M68K_CF_MAC_MASK     0x30
-+#define EF_M68K_CF_MAC          0x10  /* MAC */
-+#define EF_M68K_CF_EMAC         0x20  /* EMAC */
-+#define EF_M68K_CF_EMAC_B       0x30  /* EMAC_B */
-+#define EF_M68K_CF_FLOAT        0x40  /* Has float insns */
-+#define EF_M68K_CF_MASK         0xFF
-+
- /*
-  * 68k ELF relocation types
-  */
-diff --git a/linux-user/m68k/target_elf.h b/linux-user/m68k/target_elf.h
-index df375ad5d3..998fe0fe2f 100644
---- a/linux-user/m68k/target_elf.h
-+++ b/linux-user/m68k/target_elf.h
-@@ -9,6 +9,12 @@
- #define M68K_TARGET_ELF_H
- static inline const char *cpu_get_model(uint32_t eflags)
- {
-+    if (eflags == 0 || (eflags & EF_M68K_M68000)) {
-+        /* 680x0 */
-+        return "m68040";
-+    }
-+
-+    /* Coldfire */
-     return "any";
- }
- #endif
+YunQiang Su (2):
+  linux-user: introduce functions to detect CPU type
+  linux-user: MIPS set cpu to r6 CPU if binary is R6
+
+ include/elf.h                      | 35 ++++++++++++++++++++++
+ linux-user/aarch64/target_elf.h    | 14 +++++++++
+ linux-user/alpha/target_elf.h      | 14 +++++++++
+ linux-user/arm/target_elf.h        | 14 +++++++++
+ linux-user/cris/target_elf.h       | 14 +++++++++
+ linux-user/elfload.c               | 35 ++++++++++++++++++++++
+ linux-user/hppa/target_elf.h       | 14 +++++++++
+ linux-user/i386/target_elf.h       | 14 +++++++++
+ linux-user/m68k/target_elf.h       | 20 +++++++++++++
+ linux-user/main.c                  | 59 +++++++-------------------------------
+ linux-user/microblaze/target_elf.h | 14 +++++++++
+ linux-user/mips/target_elf.h       | 17 +++++++++++
+ linux-user/mips64/target_elf.h     | 17 +++++++++++
+ linux-user/nios2/target_elf.h      | 14 +++++++++
+ linux-user/openrisc/target_elf.h   | 14 +++++++++
+ linux-user/ppc/target_elf.h        | 18 ++++++++++++
+ linux-user/qemu.h                  |  1 +
+ linux-user/s390x/target_elf.h      | 14 +++++++++
+ linux-user/sh4/target_elf.h        | 14 +++++++++
+ linux-user/sparc/target_elf.h      | 18 ++++++++++++
+ linux-user/sparc64/target_elf.h    | 14 +++++++++
+ linux-user/tilegx/target_elf.h     | 14 +++++++++
+ linux-user/unicore32/target_elf.h  | 14 +++++++++
+ linux-user/x86_64/target_elf.h     | 14 +++++++++
+ 24 files changed, 382 insertions(+), 48 deletions(-)
+ create mode 100644 linux-user/aarch64/target_elf.h
+ create mode 100644 linux-user/alpha/target_elf.h
+ create mode 100644 linux-user/arm/target_elf.h
+ create mode 100644 linux-user/cris/target_elf.h
+ create mode 100644 linux-user/hppa/target_elf.h
+ create mode 100644 linux-user/i386/target_elf.h
+ create mode 100644 linux-user/m68k/target_elf.h
+ create mode 100644 linux-user/microblaze/target_elf.h
+ create mode 100644 linux-user/mips/target_elf.h
+ create mode 100644 linux-user/mips64/target_elf.h
+ create mode 100644 linux-user/nios2/target_elf.h
+ create mode 100644 linux-user/openrisc/target_elf.h
+ create mode 100644 linux-user/ppc/target_elf.h
+ create mode 100644 linux-user/s390x/target_elf.h
+ create mode 100644 linux-user/sh4/target_elf.h
+ create mode 100644 linux-user/sparc/target_elf.h
+ create mode 100644 linux-user/sparc64/target_elf.h
+ create mode 100644 linux-user/tilegx/target_elf.h
+ create mode 100644 linux-user/unicore32/target_elf.h
+ create mode 100644 linux-user/x86_64/target_elf.h
+
 -- 
 2.14.3
