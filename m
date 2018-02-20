@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoD4a-0007vi-E4
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:55:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1eoDmn-0005bB-6s
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 14:41:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoD4W-0001iE-Bf
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:55:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1eoD4V-0001gL-Tb
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:55:24 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1KIseaI059149
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:55:22 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g8rmmsu51-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:55:21 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Tue, 20 Feb 2018 18:45:08 -0000
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Tue, 20 Feb 2018 19:45:01 +0100
-In-Reply-To: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-References: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-Message-Id: <1519152302-19079-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 2/3] s390x/sclp: clean up sclp masks
+	(envelope-from <eblake@redhat.com>) id 1eoDml-0005D7-Ki
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 14:41:09 -0500
+References: <20180220170135.5299-1-berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2d9713f2-87c1-12ba-3f46-a9a476279cda@redhat.com>
+Date: Tue, 20 Feb 2018 13:40:43 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180220170135.5299-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] specs/qcow2: Fix documentation of the
+ compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,220 +24,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm390-list@tuxmaker.boeblingen.de.ibm.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Clean up SCLP masks: introduce an sccb_mask_t to be used for SCLP event
-masks instead of just unsigned int or uint32_t. This will allow later
-to extend the mask with more ease.
+On 02/20/2018 11:01 AM, Alberto Garcia wrote:
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
----
- hw/char/sclpconsole-lm.c          |  4 ++--
- hw/char/sclpconsole.c             |  4 ++--
- hw/s390x/event-facility.c         | 18 +++++++++---------
- hw/s390x/sclpcpu.c                |  4 ++--
- hw/s390x/sclpquiesce.c            |  4 ++--
- include/hw/s390x/event-facility.h | 22 +++++++++++++---------
- 6 files changed, 30 insertions(+), 26 deletions(-)
+tl:dr; I think we need a v3 with even more clarification.
 
-diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-index c500bda..cc4d70a 100644
---- a/hw/char/sclpconsole-lm.c
-+++ b/hw/char/sclpconsole-lm.c
-@@ -102,12 +102,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_MESSAGE || type == SCLP_EVENT_PMSGCMD;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_OP_CMD | SCLP_EVENT_MASK_PMSGCMD;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG | SCLP_EVENT_MASK_PMSGCMD;
- }
-diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-index d0265df..ec9db13 100644
---- a/hw/char/sclpconsole.c
-+++ b/hw/char/sclpconsole.c
-@@ -83,12 +83,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_ASCII_CONSOLE_DATA;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG_ASCII;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG_ASCII;
- }
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 2414614..f6f28fd 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -30,7 +30,7 @@ struct SCLPEventFacility {
-     SysBusDevice parent_obj;
-     SCLPEventsBus sbus;
-     /* guest' receive mask */
--    unsigned int receive_mask;
-+    sccb_mask_t receive_mask;
-     /*
-      * when false, we keep the same broken, backwards compatible behaviour as
-      * before; when true, we implement the architecture correctly. Needed for
-@@ -60,9 +60,9 @@ static bool event_pending(SCLPEventFacility *ef)
-     return false;
- }
- 
--static unsigned int get_host_send_mask(SCLPEventFacility *ef)
-+static sccb_mask_t get_host_send_mask(SCLPEventFacility *ef)
- {
--    unsigned int mask;
-+    sccb_mask_t mask;
-     BusChild *kid;
-     SCLPEventClass *child;
- 
-@@ -76,9 +76,9 @@ static unsigned int get_host_send_mask(SCLPEventFacility *ef)
-     return mask;
- }
- 
--static unsigned int get_host_receive_mask(SCLPEventFacility *ef)
-+static sccb_mask_t get_host_receive_mask(SCLPEventFacility *ef)
- {
--    unsigned int mask;
-+    sccb_mask_t mask;
-     BusChild *kid;
-     SCLPEventClass *child;
- 
-@@ -188,7 +188,7 @@ out:
- }
- 
- static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
--                                        unsigned int mask)
-+                                        sccb_mask_t mask)
- {
-     uint16_t rc;
-     int slen;
-@@ -241,8 +241,8 @@ static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
- 
- static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
- {
--    unsigned int sclp_active_selection_mask;
--    unsigned int sclp_cp_receive_mask;
-+    sccb_mask_t sclp_active_selection_mask = 0;
-+    sccb_mask_t sclp_cp_receive_mask;
- 
-     ReadEventData *red = (ReadEventData *) sccb;
- 
-@@ -284,7 +284,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
- {
-     WriteEventMask *we_mask = (WriteEventMask *) sccb;
-     uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
--    uint32_t tmp_mask;
-+    sccb_mask_t tmp_mask = 0;
- 
-     if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
-         ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
-diff --git a/hw/s390x/sclpcpu.c b/hw/s390x/sclpcpu.c
-index 3ee890b..50c021b 100644
---- a/hw/s390x/sclpcpu.c
-+++ b/hw/s390x/sclpcpu.c
-@@ -37,12 +37,12 @@ void raise_irq_cpu_hotplug(void)
-     sclp_service_interrupt(0);
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_CONFIG_MGT_DATA;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return 0;
- }
-diff --git a/hw/s390x/sclpquiesce.c b/hw/s390x/sclpquiesce.c
-index 0241643..1c8f5c9 100644
---- a/hw/s390x/sclpquiesce.c
-+++ b/hw/s390x/sclpquiesce.c
-@@ -28,12 +28,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_SIGNAL_QUIESCE;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_SIGNAL_QUIESCE;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return 0;
- }
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-index 5119b9b..0a8b47a 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -28,12 +28,14 @@
- #define SCLP_EVENT_SIGNAL_QUIESCE               0x1d
- 
- /* SCLP event masks */
--#define SCLP_EVENT_MASK_SIGNAL_QUIESCE          0x00000008
--#define SCLP_EVENT_MASK_MSG_ASCII               0x00000040
--#define SCLP_EVENT_MASK_CONFIG_MGT_DATA         0x10000000
--#define SCLP_EVENT_MASK_OP_CMD                  0x80000000
--#define SCLP_EVENT_MASK_MSG                     0x40000000
--#define SCLP_EVENT_MASK_PMSGCMD                 0x00800000
-+#define SCLPEVMSK(T)  (1ULL << (sizeof(sccb_mask_t) * 8 - (T)))
-+
-+#define SCLP_EVENT_MASK_OP_CMD          SCLPEVMSK(SCLP_EVENT_OPRTNS_COMMAND)
-+#define SCLP_EVENT_MASK_MSG             SCLPEVMSK(SCLP_EVENT_MESSAGE)
-+#define SCLP_EVENT_MASK_CONFIG_MGT_DATA SCLPEVMSK(SCLP_EVENT_CONFIG_MGT_DATA)
-+#define SCLP_EVENT_MASK_PMSGCMD         SCLPEVMSK(SCLP_EVENT_PMSGCMD)
-+#define SCLP_EVENT_MASK_MSG_ASCII       SCLPEVMSK(SCLP_EVENT_ASCII_CONSOLE_DATA)
-+#define SCLP_EVENT_MASK_SIGNAL_QUIESCE  SCLPEVMSK(SCLP_EVENT_SIGNAL_QUIESCE)
- 
- #define SCLP_UNCONDITIONAL_READ                 0x00
- #define SCLP_SELECTIVE_READ                     0x01
-@@ -71,6 +73,8 @@ typedef struct WriteEventMask {
- #define WEM_RECEIVE_MASK(wem, mask_len) ((wem)->masks + 2 * (mask_len))
- #define WEM_SEND_MASK(wem, mask_len) ((wem)->masks + 3 * (mask_len))
- 
-+typedef uint32_t sccb_mask_t;
-+
- typedef struct EventBufferHeader {
-     uint16_t length;
-     uint8_t  type;
-@@ -160,7 +164,7 @@ typedef struct WriteEventData {
- typedef struct ReadEventData {
-     SCCBHeader h;
-     union {
--        uint32_t mask;
-+        sccb_mask_t mask;
-         EventBufferHeader ebh;
-     };
- } QEMU_PACKED ReadEventData;
-@@ -177,10 +181,10 @@ typedef struct SCLPEventClass {
-     int (*exit)(SCLPEvent *event);
- 
-     /* get SCLP's send mask */
--    unsigned int (*get_send_mask)(void);
-+    sccb_mask_t (*get_send_mask)(void);
- 
-     /* get SCLP's receive mask */
--    unsigned int (*get_receive_mask)(void);
-+    sccb_mask_t (*get_receive_mask)(void);
- 
-     int (*read_event_data)(SCLPEvent *event, EventBufferHeader *evt_buf_hdr,
-                            int *slen);
+
+> The documentation claims that the cluster descriptor contains the
+> number of sectors used to store the compressed data, but what it
+> actually contains is the number of sectors *minus one*.
+> 
+> That can be easily seen in qcow2_decompress_cluster(), that adds one
+> to the value stored in that field:
+> 
+>    nb_csectors = ((cluster_offset >> s->csize_shift) & s->csize_mask) + 1;
+
+This is misleading.  It says how we take what is in the qcow2 file on 
+reading in order to decompress, but still doesn't show how we generated 
+that number.  Let's also compare it as well to what we WRITE into the 
+qcow2 file:
+
+     nb_csectors = ((cluster_offset + compressed_size - 1) >> 9) -
+                   (cluster_offset >> 9);
+
+I'm also making an additional observationn: Due to the pigeonhole 
+principle and the fact that the compression stream adds metadata, we 
+KNOW that there are some (rare) cases where attempting to compress data 
+will actually result in an INCREASE in size ('man gzip' backs up this 
+claim, calling out a worst case -0.015% compression ratio, or 15 bytes 
+added for every 1000 bytes of input, on uncompressible data).  So 
+presumably, we should state that a cluster can only be written in 
+compressed form IF it occupies less space than the uncompressed cluster 
+(we could also allow a compressed form that occupies the same length as 
+the uncompressed cluster, but that's a waste of CPU cycles).
+
+Once we have that restriction stated, then it becomes obvious that a 
+compressed cluster should never REQUIRE using more than one host cluster 
+(and this is backed up by qcow2_alloc_bytes() asserting that size <= 
+s->cluster_size).  Where things get interesting, though, is whether we 
+PERMIT a compressed cluster to overlap a host cluster boundary. 
+Technically, it might be possible, but qemu does NOT do that (again, 
+looking at qcow2_alloc_bytes() - we loop if free_in_cluster < size) - so 
+we may want to be explicit about this point to prevent OTHER 
+implementations from creating a compressed cluster that crosses host 
+cluster boundaries (right now, I can't see qcow2_decompress_cluster() 
+validating it, though - YIKES).
+
+> 
+> In addition to that this patch clarifies where the actual compressed
+> data is located.
+> 
+> Although the size of the data is specified in sectors, the offset is
+> not necessarily aligned to a sector boundary, so the actual data goes
+> from the specified offset until the end of the last sector, leaving
+> the initial bytes of the first sector (if any) unused.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+> 
+> v2: I realized that the documentation is not completely clear about
+>      the exact location and size of the compressed data, so I updated
+>      the patch to clarify this.
+> 
+> ---
+>   docs/interop/qcow2.txt | 12 ++++++++++--
+>   1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+> index d7fdb1fee3..dc2b9cefb2 100644
+> --- a/docs/interop/qcow2.txt
+> +++ b/docs/interop/qcow2.txt
+> @@ -427,9 +427,17 @@ Standard Cluster Descriptor:
+>   Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
+>   
+
+I'm looking at how this works for different cluster sizes.  If we have 
+512-byte clusters, x is 61, and we DON'T have the 'number sectors' field 
+at all!  But that still makes sense, provided that all consecutive host 
+sectors used to hold a compressed guest cluster lie within a single host 
+cluster.  If we ever allowed a compressed cluster to spill across two 
+host clusters, it would cause mayhem in trying to track refcounts and 
+other things.  So you can have two 512-byte guest clusters that manage 
+to compress into the same host cluster, but must never have a single 
+guest cluster that spills over a host cluster boundary.
+
+For all other cluster sizes, the value of x leaves us exactly 
+log2(cluster_size / 512) bits for the 'number sectors' field.  For 
+example, with 64k clusters, x is 54, leaving 7 bits (64k/512 == 128, and 
+2^7 covers the number of sectors in a 64k host cluster).  Whether all of 
+these sectors should lie within the same host cluster should be stated 
+(as I argued above, this is how qemu does it, so it SHOULD be part of 
+the spec to prevent refcount and other confusion if some other 
+implementation created images violating that).
+
+>       Bit  0 -  x:    Host cluster offset. This is usually _not_ aligned to a
+> -                    cluster boundary!
+> +                    cluster or sector boundary!
+>   
+> -       x+1 - 61:    Compressed size of the images in sectors of 512 bytes
+> +       x+1 - 61:    Number of 512-byte sectors used for the compressed data,
+> +                    minus one (that is, a value of n here means n+1 sectors).
+> +
+> +                    The actual compressed data is located at the end of this
+> +                    region, from the offset indicated in the previous field
+> +                    until the end of the last sector.
+> +
+> +                    The initial bytes of this region are therefore unused if
+> +                    the offset is not aligned to a sector boundary.
+
+So, to make sure I understand, visually, suppose we have three 64k 
+clusters that we compress; A which compresses to 224 bytes, B which 
+compresses to 1120 bytes, and C which also compresses to 224 bytes 
+(these numbers are reasonable, since 'printf "%*d" $((64*1024)) 1 | gzip 
+-c | wc' compresses to 64k to 99 bytes) (the observant will notice I 
+picked multiples of 32 bytes, for display purposes, but that in reality 
+we have full byte granularity for both starting location and length of a 
+compressed cluster).
+
++----------------+----------------+----------------+----------------+
++0x00020000      +0x00020200      +0x00020400      +0x00020600      +
++AAAAAAABBBBBBBBB+BBBBBBBBBBBBBBBB+BBBBBBBBBBCCCCCC+C...............+
+
+We achieve the following layout by compressing cluster A into the start 
+of the cluster at 0x00020000 until it finishes, then cluster B into the 
+unused tail of that sector until it finishes (starting at 0x000200e0), 
+and cluster C into the tail of the sector started by B (starting at 
+0x00020540, ending at 0x0002061f).  Another interesting thing to note is 
+that our choice of compression algorithm carries enough state that we 
+can ALWAYS choose to feed too much to the decompression engine; but the 
+trailing data will be ignored because we stop once we've decompressed 
+64k of material.  So our real question is figuring out the bare minimum 
+that we can feed to the engine and still decompress everything we need.
+
+The number of sectors used for cluster A is pretty obviously 0 (you do 
+not have to read any additional sectors to decompress A).  So the L2 
+entry for A would be 0x40000000_00020000.  On decompression, we read the 
+sector starting at that offset, 0 additional sectors, and although we 
+feed the decompressor 512 bytes, it only needs to read 224 bytes before 
+we are done reconstituting 64k bytes.
+
+The value written in the number of sectors field for cluster B is 2. 
+Yes, floor(1120/512) == 2, but more importantly, our decompression HAS 
+to read two additional sectors beyond the starting offset in order to 
+feed enough data to the engine.  That is, the L2 entry is 
+0x41000000_000200e0), and we feed the decompressor 1312 bytes even 
+though it only needs 1120.
+
+But the value of the field for cluster C is 1, not 0, EVEN THOUGH it was 
+the same compressed size as cluster A!  On write, we compute the sector 
+containing the last byte, which is one greater than the sector 
+containing the first byte.  The L2 entry is 0x40800000_00020540; and we 
+feed the decompressor 704 bytes even though it only needs 224.
+
+So if I may suggest:
+
+    x+1 - 61:    Number of additional 512-byte sectors used for the
+                 compressed data, beyond the sector containing the
+                 offset in the previous field.  These sectors must fit
+                 within the same host cluster.  Note that the compressed
+                 data does not necessarily occupy all of the bytes in
+                 the final sector; rather, decompression stops when it
+                 has produced a cluster of data.  Another compressed
+                 cluster may map to the tail of the final sector used
+                 by this compressed cluster.
+
 -- 
-2.7.4
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
