@@ -1,23 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eo5uK-0004dK-K2
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:16:25 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eo5w8-0005sQ-RU
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:18:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eo5uF-0005BK-Kr
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:16:24 -0500
-Date: Tue, 20 Feb 2018 12:16:09 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <8487b26a-77b0-1f00-8338-45575b72ff2f@suse.de>
-Message-ID: <alpine.BSF.2.21.1802201204490.13607@zero.eik.bme.hu>
-References: <cover.1519036465.git.balaton@eik.bme.hu>
-	<cfba6d194787f7c136b29be47d0c221c99d77ab1.1519036465.git.balaton@eik.bme.hu>
-	<20180220024009.GH1109@umbus.fritz.box>
-	<alpine.BSF.2.21.1802201055030.91792@zero.eik.bme.hu>
-	<8487b26a-77b0-1f00-8338-45575b72ff2f@suse.de>
+	(envelope-from <borntraeger@de.ibm.com>) id 1eo5w4-0005vz-4t
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:18:16 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eo5w3-0005uT-SM
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 06:18:12 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1KBFDHK088779
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 06:18:10 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g8hnq2mws-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 06:18:09 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 20 Feb 2018 11:18:07 -0000
+References: <20180219174231.10874-1-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 20 Feb 2018 12:18:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] ppc: Add aCube Sam460ex board
+In-Reply-To: <20180219174231.10874-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <39db6736-b5c5-832f-ffef-1d0a59b85ac2@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +42,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>
 
-On Tue, 20 Feb 2018, Alexander Graf wrote:
-> On 02/20/2018 11:09 AM, BALATON Zoltan wrote:
->> On Tue, 20 Feb 2018, David Gibson wrote:
->>> On Mon, Feb 19, 2018 at 11:34:25AM +0100, BALATON Zoltan wrote:
->>> 1;5002;0c> Add emulation of aCube Sam460ex board based on AMCC 460EX=20
->>> embedded SoC.
->>>> This is not a complete implementation yet with a lot of components
->>>> still missing but enough for the U-Boot firmware to start and to boo=
-t
->>>> a Linux kernel or AROS.
->>>>=20
->>>> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
->>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>>=20
->>> I'm not thrilled with having a machine type that can't be used withou=
-t
->>> extracting a bootloader image from somewhere, but from the other
->>> thread that's not easy to fix.
->>=20
->> This is not meant to be like that and I'd like to also submit the u-bo=
-ot=20
->> image once we figure out how to do it. Especially because the boot loa=
-der=20
->> one can extract from the updater is buggy but here's a fixed binary th=
-at=20
->> works here: http://zero.eik.bme.hu/~balaton/qemu/
->>=20
->> U-Boot is GPL so we would need to include the source as well (the READ=
-ME in=20
->> the link above contain the source URL and the patches needed are there=
- as=20
->> well). If there's no easy way to host it in the QEMU repo I could put =
-it in=20
->> my own git repo and submit a patch to use that as a submodule if that'=
-s=20
->> acceptable. It seems there are some firmware images that reference ext=
-ernal=20
->> git repos already but not sure what's the preferred way.
->
-> IMHO the preferred way would be to integrate sam460ex support in upstre=
-am=20
-> U-Boot and just build it from there. We already mirror U-Boot on git.qe=
-mu.org=20
-> and package up that tree, so packaging up one more target from there wo=
-uld be=20
-> trivial.
+Given that we have trouble modeling this properly I somewhat like the idea.
+We should have never folded this into the common code memory hotplug 
+infrastructure as it is different. Instead we really should have provided
+a different interface and we should have build it with migration support. 
 
-As discussed in other thread that's not really feasible. Upstream U-Boot=20
-has removed support for this CPU and the board code was never upstreamed=20
-by the hardware vendor. I'm not willing to take the task of porting this=20
-to latest U-Boot, re-adding all necessary CPU support to latest U-Boot an=
-d=20
-then take on supporting all this in future versions. So it has to be a=20
-separate source or you'd have to downgrade U-Boot on git.qemu.org to the=20
-older version where the patch applies (but that's not desired as this old=
-=20
-version has some bugs which are fixed in later U-Boot versions). We also=20
-cannot omit the vendor patches to U-Boot and use latest upstream U-Boot=20
-for this board because guests rely on these firmware modifications to=20
-boot. So I see no way to have one U-Boot version to be used by both e500=20
-and sam460ex even if it means adding another U-Boot source (but this=20
-source is fairly static, I don't expect many changes to it so it won't=20
-diverge more than it is now and we mainly need to add it to satisfy GPL s=
-o=20
-we can bundle the binary).
+If we need it again in the future, we can certainly add it back via an 
+s390 specific interface.
 
-Regards,
-BALATON Zoltan
+
+On 02/19/2018 06:42 PM, David Hildenbrand wrote:
+> From an architecture point of view, nothing can be mapped into the address
+> space on s390x. All there is is memory. Therefore there is also not really
+> an interface to communicate such information to the guest. All we can do is
+> specify the maximum ram address and guests can probe in that range if
+> memory is available and usable (TPROT).
+> 
+> Also memory hotplug is strange. The guest can decide at some point in
+> time to add / remove memory in some range. And nobody can really hinder it
+> from doing so. So if we specify right now e.g.
+>     -m 2G,slots=2,maxmem=20G
+> An ordinary fedora guest will happily online (hotplug) all memory,
+> resulting in a guest consuming 20G. So it really behaves rather like
+>     -m 22G
+> There is no way to hotplug memory from the outside like on other
+> architectures. This is of course bad for upper management layers.
+> 
+> As the guest can create/delete memory regions while it is running, of
+> course migration support is not available and tricky to implement.
+> 
+> With virtualization, it is different. We might want to map something
+> into guest address space (e.g. fake DAX devices) and not detect it
+> automatically as memory. So we really want to use the maxmem and slots
+> parameter just like on all other architectures. Such devices will have
+> to expose the applicable memory range themselves. To finally be able to
+> provide memory hotplug to guests, we will need a new paravirtualized
+> interface to do that (e.g. something into the direction of virtio-mem).
+> 
+> This implies, that maxmem cannot be used for s390x memory hotplug
+> anymore and has to go. This simplifies the code quite a bit.
+> 
+> As migration support is not working, this change cannot really break
+> migration as guests without slots and maxmem don't see the SCLP
+> features. Also, the ram size calcualtion does not change.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+[...]
+
+looks mostly sane. Give me some more time to review. 
+
+> @@ -540,9 +302,6 @@ static void sclp_memory_init(SCLPDevice *sclp)
+>  {
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>      ram_addr_t initial_mem = machine->ram_size;
+> -    ram_addr_t max_mem = machine->maxram_size;
+> -    ram_addr_t standby_mem = max_mem - initial_mem;
+> -    ram_addr_t pad_mem = 0;
+>      int increment_size = 20;
+> 
+>      /* The storage increment size is a multiple of 1M and is a power of 2.
+> @@ -552,34 +311,14 @@ static void sclp_memory_init(SCLPDevice *sclp)
+>      while ((initial_mem >> increment_size) > MAX_STORAGE_INCREMENTS) {
+>          increment_size++;
+>      }
+
+
+In theory we could now be more fine grained (as we no longer expose the increments)
+but this would break migration so better try now to be clever. (e.g. with
+compat machines)
