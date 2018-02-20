@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hlandau@devever.net>) id 1eo8m2-0003FG-Cm
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:20:03 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eo914-0006lt-It
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:35:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hlandau@devever.net>) id 1eo8lx-00087L-FT
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:20:02 -0500
-Received: from umbriel.devever.net ([149.202.51.241]:34742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hlandau@devever.net>) id 1eo8lx-00086X-63
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:19:57 -0500
-Date: Tue, 20 Feb 2018 14:19:54 +0000
-From: Hugo Landau <hlandau@devever.net>
-Message-ID: <20180220141954.GA5614@axminster>
-References: <20180220132627.4163-1-hlandau@devever.net>
-	<e13f6f08-c29a-2202-014c-1911181671e2@kaod.org>
+	(envelope-from <imammedo@redhat.com>) id 1eo90z-0001RD-CU
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:35:34 -0500
+Date: Tue, 20 Feb 2018 15:35:10 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180220153510.27451354@redhat.com>
+In-Reply-To: <1519022574-6817-2-git-send-email-bharata@linux.vnet.ibm.com>
+References: <1519022574-6817-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1519022574-6817-2-git-send-email-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e13f6f08-c29a-2202-014c-1911181671e2@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] Fix ast2500 protection register emulation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v0 1/2] pc-dimm: Make
+ pc_dimm_built_list() global
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com
 
-> I also gave it a test on an OpenBMC romulus image. Looks fine, but that's 
-> an old custom U-Boot. Which defconfig did you use for U-Boot HEAD ? 
-evb-ast2500_defconfig.
+On Mon, 19 Feb 2018 12:12:53 +0530
+Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
 
-FYI, these changes are necessary, but not sufficient to get u-boot HEAD
-(or for that matter u-boot 2017.11, another version tested) running.
+> Making pc_dimm_built_list() global allows other parts of QEMU code
+> to build and walk through the DIMM list in address-sorted order.
+> 
+> This is needed in the next patch for sPAPR code to create
+> ibm,dynamic-memory-v2 device tree property that will have entries
+> for populated DIMMs as well as available hotpluggable areas.
+> 
+> CHECK: List of DIMMs is already available via qmp_pc_dimm_device_list(),
+maybe make it sorted first and use it?
 
-The other issues were
-  - the tests
-      while (!(readl(&regs->ecc_test_ctrl) & SDRAM_TEST_DONE));
-    and
-      while (!(readl(&info->regs->config) & SDRAM_CONF_CACHE_INIT_DONE));
-    which appear in various places in the u-boot source and which spin
-    forever. I made u-boot work by commenting these out in u-boot rather
-    than patching qemu, not familiar enough with qemu to implement this.
+(i.e. use pc_dimm_built_list in qmp_pc_dimm_device_list) and hide
+recursive callback ugliness from external users.
 
-  - the call to reset_assert in ast2500_sdrammc_probe seems to actually
-    reset the machine rather than just initialize SDRAM as it is
-    apparently supposed to, leading to an infinite cycle of resets.
-    Couldn't quite figure out how it was supposed to work, so I
-    commented this out, since obviously qemu doesn't actually have SDRAM
-    initialization requirements.
+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void) {
+    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &list);
+    ...
+}
 
-The above changes plus this patch allowed u-boot to get to the u-boot
-CLI. Haven't tried booting anything with it yet though.
+> but that doesn't provide a sorted list.
+> 
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> ---
+>  hw/mem/pc-dimm.c         | 2 +-
+>  include/hw/mem/pc-dimm.h | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 6e74b61..9bd61ca 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -261,7 +261,7 @@ static gint pc_dimm_addr_sort(gconstpointer a, gconstpointer b)
+>      return 0;
+>  }
+>  
+> -static int pc_dimm_built_list(Object *obj, void *opaque)
+> +int pc_dimm_built_list(Object *obj, void *opaque)
+>  {
+>      GSList **list = opaque;
+>  
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index d83b957..d880f5e 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -100,4 +100,5 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+>                           MemoryRegion *mr, uint64_t align, Error **errp);
+>  void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+>                             MemoryRegion *mr);
+> +int pc_dimm_built_list(Object *obj, void *opaque);
+>  #endif
