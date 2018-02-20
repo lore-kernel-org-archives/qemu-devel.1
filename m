@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9So-0007rv-9y
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:20 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eo9Su-0007w1-C7
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9Sj-0006Q7-Er
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:14 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37248 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1eo9So-0006S0-Er
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:20 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36440 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo9Sj-0006PW-9l
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:09 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo9So-0006Rk-9T
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:14 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B5084EB705
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 15:04:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D3FBC402314E
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 15:04:03 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 20 Feb 2018 16:03:53 +0100
-Message-Id: <20180220150357.324-2-kraxel@redhat.com>
+Date: Tue, 20 Feb 2018 16:03:57 +0100
+Message-Id: <20180220150357.324-6-kraxel@redhat.com>
 In-Reply-To: <20180220150357.324-1-kraxel@redhat.com>
 References: <20180220150357.324-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/5] keymap: make struct kbd_layout_t
- private to ui/keymaps.c
+Subject: [Qemu-devel] [PATCH v2 5/5] keymap: consider modifier state when
+ picking a mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,132 +33,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Also use kbd_layout_t pointers instead of void pointers.
+Pass the modifier state to the keymap lookup function.  In case multiple
+keysym -> keycode mappings exist look at the modifier state and prefer
+the mapping where the modifier state matches.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/keymaps.h | 29 ++++++-----------------------
- ui/keymaps.c | 32 +++++++++++++++++++++++++-------
- 2 files changed, 31 insertions(+), 30 deletions(-)
+ ui/keymaps.h |  3 ++-
+ ui/curses.c  |  3 ++-
+ ui/keymaps.c | 33 ++++++++++++++++++++++++++++++++-
+ ui/sdl.c     |  6 +++++-
+ ui/vnc.c     |  9 +++++++--
+ 5 files changed, 48 insertions(+), 6 deletions(-)
 
 diff --git a/ui/keymaps.h b/ui/keymaps.h
-index 8757465529..17ec03387a 100644
+index 17ec03387a..0693588225 100644
 --- a/ui/keymaps.h
 +++ b/ui/keymaps.h
-@@ -32,25 +32,6 @@ typedef struct {
- 	int keysym;
- } name2keysym_t;
+@@ -54,7 +54,8 @@ typedef struct kbd_layout_t kbd_layout_t;
  
--struct key_range {
--    int start;
--    int end;
--    struct key_range *next;
--};
--
--#define MAX_NORMAL_KEYCODE 512
--#define MAX_EXTRA_COUNT 256
--typedef struct {
--    uint16_t keysym2keycode[MAX_NORMAL_KEYCODE];
--    struct {
--	int keysym;
--	uint16_t keycode;
--    } keysym2keycode_extra[MAX_EXTRA_COUNT];
--    int extra_count;
--    struct key_range *keypad_range;
--    struct key_range *numlock_range;
--} kbd_layout_t;
--
- /* scancode without modifiers */
- #define SCANCODE_KEYMASK 0xff
- /* scancode without grey or up bit */
-@@ -69,10 +50,12 @@ typedef struct {
- #define SCANCODE_ALT    0x400
- #define SCANCODE_ALTGR  0x800
+ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+                                    const char *language);
+-int keysym2scancode(kbd_layout_t *k, int keysym);
++int keysym2scancode(kbd_layout_t *k, int keysym,
++                    bool shift, bool altgr, bool ctrl);
+ int keycode_is_keypad(kbd_layout_t *k, int keycode);
+ int keysym_is_numlock(kbd_layout_t *k, int keysym);
  
-+typedef struct kbd_layout_t kbd_layout_t;
+diff --git a/ui/curses.c b/ui/curses.c
+index 85503876c0..31cd43e73c 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -271,7 +271,8 @@ static void curses_refresh(DisplayChangeListener *dcl)
+                     keysym = chr;
+             }
  
--void *init_keyboard_layout(const name2keysym_t *table, const char *language);
--int keysym2scancode(void *kbd_layout, int keysym);
--int keycode_is_keypad(void *kbd_layout, int keycode);
--int keysym_is_numlock(void *kbd_layout, int keysym);
-+kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
-+                                   const char *language);
-+int keysym2scancode(kbd_layout_t *k, int keysym);
-+int keycode_is_keypad(kbd_layout_t *k, int keycode);
-+int keysym_is_numlock(kbd_layout_t *k, int keysym);
+-            keycode = keysym2scancode(kbd_layout, keysym & KEYSYM_MASK);
++            keycode = keysym2scancode(kbd_layout, keysym & KEYSYM_MASK,
++                                      false, false, false);
+             if (keycode == 0)
+                 continue;
  
- #endif /* QEMU_KEYMAPS_H */
 diff --git a/ui/keymaps.c b/ui/keymaps.c
-index f9762d1497..134958a197 100644
+index 26a85ff207..a10f4b7a67 100644
 --- a/ui/keymaps.c
 +++ b/ui/keymaps.c
-@@ -28,6 +28,26 @@
- #include "trace.h"
- #include "qemu/error-report.h"
+@@ -182,8 +182,12 @@ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+ }
  
-+#define MAX_NORMAL_KEYCODE 512
-+#define MAX_EXTRA_COUNT 256
+ 
+-int keysym2scancode(kbd_layout_t *k, int keysym)
++int keysym2scancode(kbd_layout_t *k, int keysym,
++                    bool shift, bool altgr, bool ctrl)
+ {
++    static const uint32_t mask =
++        SCANCODE_SHIFT | SCANCODE_ALTGR | SCANCODE_CTRL;
++    uint32_t mods, i;
+     struct keysym2code *keysym2code;
+ 
+ #ifdef XK_ISO_Left_Tab
+@@ -199,6 +203,33 @@ int keysym2scancode(kbd_layout_t *k, int keysym)
+         return 0;
+     }
+ 
++    if (keysym2code->count == 1) {
++        return keysym2code->keycodes[0];
++    }
 +
-+struct key_range {
-+    int start;
-+    int end;
-+    struct key_range *next;
-+};
++    /*
++     * We have multiple keysym -> keycode mappings.
++     *
++     * Check whenever we find one mapping where the modifier state of
++     * the mapping matches the current user interface modifier state.
++     * If so, prefer that one.
++     */
++    mods = 0;
++    if (shift) {
++        mods |= SCANCODE_SHIFT;
++    }
++    if (altgr) {
++        mods |= SCANCODE_ALTGR;
++    }
++    if (ctrl) {
++        mods |= SCANCODE_CTRL;
++    }
 +
-+struct kbd_layout_t {
-+    uint16_t keysym2keycode[MAX_NORMAL_KEYCODE];
-+    struct {
-+        int keysym;
-+        uint16_t keycode;
-+    } keysym2keycode_extra[MAX_EXTRA_COUNT];
-+    int extra_count;
-+    struct key_range *keypad_range;
-+    struct key_range *numlock_range;
-+};
-+
- static int get_keysym(const name2keysym_t *table,
-                       const char *name)
++    for (i = 0; i < keysym2code->count; i++) {
++        if ((keysym2code->keycodes[i] & mask) == mods) {
++            return keysym2code->keycodes[i];
++        }
++    }
+     return keysym2code->keycodes[0];
+ }
+ 
+diff --git a/ui/sdl.c b/ui/sdl.c
+index a6bff301eb..4c46c40a7f 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -200,6 +200,9 @@ static kbd_layout_t *kbd_layout = NULL;
+ 
+ static uint8_t sdl_keyevent_to_keycode_generic(const SDL_KeyboardEvent *ev)
  {
-@@ -186,15 +206,15 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
++    bool shift = modifiers_state[0x2a] || modifiers_state[0x36];
++    bool altgr = modifiers_state[0xb8];
++    bool ctrl  = modifiers_state[0x1d] || modifiers_state[0x9d];
+     int keysym;
+     /* workaround for X11+SDL bug with AltGR */
+     keysym = ev->keysym.sym;
+@@ -209,7 +212,8 @@ static uint8_t sdl_keyevent_to_keycode_generic(const SDL_KeyboardEvent *ev)
+     if (keysym == 92 && ev->keysym.scancode == 133) {
+         keysym = 0xa5;
+     }
+-    return keysym2scancode(kbd_layout, keysym) & SCANCODE_KEYMASK;
++    return keysym2scancode(kbd_layout, keysym,
++                           shift, altgr, ctrl) & SCANCODE_KEYMASK;
  }
  
  
--void *init_keyboard_layout(const name2keysym_t *table, const char *language)
-+kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
-+                                   const char *language)
+diff --git a/ui/vnc.c b/ui/vnc.c
+index a77b568b57..d19f86c7f4 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1734,7 +1734,8 @@ static void reset_keys(VncState *vs)
+ 
+ static void press_key(VncState *vs, int keysym)
  {
-     return parse_keyboard_layout(table, language, NULL);
+-    int keycode = keysym2scancode(vs->vd->kbd_layout, keysym) & SCANCODE_KEYMASK;
++    int keycode = keysym2scancode(vs->vd->kbd_layout, keysym,
++                                  false, false, false) & SCANCODE_KEYMASK;
+     qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, true);
+     qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
+     qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, false);
+@@ -1993,6 +1994,9 @@ static const char *code2name(int keycode)
+ 
+ static void key_event(VncState *vs, int down, uint32_t sym)
+ {
++    bool shift = vs->modifiers_state[0x2a] || vs->modifiers_state[0x36];
++    bool altgr = vs->modifiers_state[0xb8];
++    bool ctrl  = vs->modifiers_state[0x1d] || vs->modifiers_state[0x9d];
+     int keycode;
+     int lsym = sym;
+ 
+@@ -2000,7 +2004,8 @@ static void key_event(VncState *vs, int down, uint32_t sym)
+         lsym = lsym - 'A' + 'a';
+     }
+ 
+-    keycode = keysym2scancode(vs->vd->kbd_layout, lsym & 0xFFFF) & SCANCODE_KEYMASK;
++    keycode = keysym2scancode(vs->vd->kbd_layout, lsym & 0xFFFF,
++                              shift, altgr, ctrl) & SCANCODE_KEYMASK;
+     trace_vnc_key_event_map(down, sym, keycode, code2name(keycode));
+     do_key_event(vs, down, keycode, sym);
  }
- 
- 
--int keysym2scancode(void *kbd_layout, int keysym)
-+int keysym2scancode(kbd_layout_t *k, int keysym)
- {
--    kbd_layout_t *k = kbd_layout;
-     if (keysym < MAX_NORMAL_KEYCODE) {
-         if (k->keysym2keycode[keysym] == 0) {
-             trace_keymap_unmapped(keysym);
-@@ -217,9 +237,8 @@ int keysym2scancode(void *kbd_layout, int keysym)
-     return 0;
- }
- 
--int keycode_is_keypad(void *kbd_layout, int keycode)
-+int keycode_is_keypad(kbd_layout_t *k, int keycode)
- {
--    kbd_layout_t *k = kbd_layout;
-     struct key_range *kr;
- 
-     for (kr = k->keypad_range; kr; kr = kr->next) {
-@@ -230,9 +249,8 @@ int keycode_is_keypad(void *kbd_layout, int keycode)
-     return 0;
- }
- 
--int keysym_is_numlock(void *kbd_layout, int keysym)
-+int keysym_is_numlock(kbd_layout_t *k, int keysym)
- {
--    kbd_layout_t *k = kbd_layout;
-     struct key_range *kr;
- 
-     for (kr = k->numlock_range; kr; kr = kr->next) {
 -- 
 2.9.3
