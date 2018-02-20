@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGg-0008My-DQ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:58 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGi-0008QD-3f
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGd-0001nH-VP
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:54 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGe-0001nq-VU
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:56 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Feb 2018 18:03:25 +0000
-Message-Id: <20180220180325.29818-20-peter.maydell@linaro.org>
+Date: Tue, 20 Feb 2018 18:03:24 +0000
+Message-Id: <20180220180325.29818-19-peter.maydell@linaro.org>
 In-Reply-To: <20180220180325.29818-1-peter.maydell@linaro.org>
 References: <20180220180325.29818-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 19/19] mps2-an505: New board model: MPS2 with
- AN505 Cortex-M33 FPGA image
+Subject: [Qemu-devel] [PATCH 18/19] hw/arm/iotkit: Model Arm IOT Kit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,154 +22,184 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Define a new board model for the MPS2 with an AN505 FPGA image
-containing a Cortex-M33. Since the FPGA images for TrustZone
-cores (AN505, and the similar AN519 for Cortex-M23) have a
-significantly different layout of devices to the non-TrustZone
-images, we use a new source file rather than shoehorning them
-into the existing mps2.c.
+Model the Arm IoT Kit documented in
+http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
+
+The Arm IoT Kit is a subsystem which includes a CPU and some devices,
+and is intended be extended by adding extra devices to form a
+complete system.  It is used in the MPS2 board's AN505 image for the
+Cortex-M33.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/Makefile.objs |   1 +
- hw/arm/mps2-tz.c     | 504 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 505 insertions(+)
- create mode 100644 hw/arm/mps2-tz.c
+ hw/arm/Makefile.objs            |   1 +
+ include/hw/arm/iotkit.h         | 109 ++++++++
+ hw/arm/iotkit.c                 | 598 ++++++++++++++++++++++++++++++++++++++++
+ default-configs/arm-softmmu.mak |   1 +
+ 4 files changed, 709 insertions(+)
+ create mode 100644 include/hw/arm/iotkit.h
+ create mode 100644 hw/arm/iotkit.c
 
 diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 79cd30bb92..232258160a 100644
+index 1c896bafb4..79cd30bb92 100644
 --- a/hw/arm/Makefile.objs
 +++ b/hw/arm/Makefile.objs
-@@ -19,5 +19,6 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+@@ -20,3 +20,4 @@ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
  obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
  obj-$(CONFIG_MPS2) += mps2.o
-+obj-$(CONFIG_MPS2) += mps2-tz.o
  obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
- obj-$(CONFIG_IOTKIT) += iotkit.o
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
++obj-$(CONFIG_IOTKIT) += iotkit.o
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
 new file mode 100644
-index 0000000000..ff414c649c
+index 0000000000..c6129d926b
 --- /dev/null
-+++ b/hw/arm/mps2-tz.c
-@@ -0,0 +1,504 @@
++++ b/include/hw/arm/iotkit.h
+@@ -0,0 +1,109 @@
 +/*
-+ * ARM V2M MPS2 board emulation, trustzone aware FPGA images
++ * ARM IoT Kit
 + *
-+ * Copyright (c) 2017 Linaro Limited
++ * Copyright (c) 2018 Linaro Limited
 + * Written by Peter Maydell
 + *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 or
++ * (at your option) any later version.
 + */
 +
-+/* The MPS2 and MPS2+ dev boards are FPGA based (the 2+ has a bigger
-+ * FPGA but is otherwise the same as the 2). Since the CPU itself
-+ * and most of the devices are in the FPGA, the details of the board
-+ * as seen by the guest depend significantly on the FPGA image.
-+ * This source file covers the following FPGA images, for TrustZone cores:
-+ *  "mps2-an505" -- Cortex-M33 as documented in ARM Application Note AN505
++/* This is a model of the Arm IoT Kit which is documented in
++ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
++ * It contains:
++ *  a Cortex-M33
++ *  the IDAU
++ *  some timers and watchdogs
++ *  two peripheral protection controllers
++ *  a memory protection controller
++ *  a security controller
++ *  a bus fabric which arranges that some parts of the address
++ *  space are secure and non-secure aliases of each other
 + *
-+ * Links to the TRM for the board itself and to the various Application
-+ * Notes which document the FPGA images can be found here:
-+ * https://developer.arm.com/products/system-design/development-boards/fpga-prototyping-boards/mps2
++ * QEMU interface:
++ *  + QOM property "memory" is a MemoryRegion containing the devices provided
++ *    by the board model.
++ *  + QOM property "MAINCLK" is the frequency of the main system clock
++ *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts
++ *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts, which
++ *    are wired to the NVIC lines 32 .. n+32
++ * Controlling up to 4 AHB expansion PPBs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_ap[0..15]
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_irq_enable
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_irq_clear
++ *  + named GPIO inputs apb_ppcexp{0,1,2,3}_irq_status
++ * Controlling each of the 4 expansion AHB PPCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_nonsec[0..15]
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_ap[0..15]
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_enable
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_clear
++ *  + named GPIO inputs ahb_ppcexp{0,1,2,3}_irq_status
++ */
++
++#ifndef IOTKIT_H
++#define IOTKIT_H
++
++#include "hw/sysbus.h"
++#include "hw/arm/armv7m.h"
++#include "hw/misc/iotkit-secctl.h"
++#include "hw/misc/tz-ppc.h"
++#include "hw/timer/cmsdk-apb-timer.h"
++#include "hw/misc/unimp.h"
++#include "hw/or-irq.h"
++#include "hw/core/split-irq.h"
++
++#define TYPE_IOTKIT "iotkit"
++#define IOTKIT(obj) OBJECT_CHECK(IoTKit, (obj), TYPE_IOTKIT)
++
++/* We have an IRQ splitter and an OR gate input for each external PPC
++ * and the 2 internal PPCs
++ */
++#define NUM_EXTERNAL_PPCS (IOTS_NUM_AHB_EXP_PPC + IOTS_NUM_APB_EXP_PPC)
++#define NUM_PPCS (NUM_EXTERNAL_PPCS + 2)
++
++typedef struct IoTKit {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    ARMv7MState armv7m;
++    IoTKitSecCtl secctl;
++    TZPPC apb_ppc0;
++    TZPPC apb_ppc1;
++    CMSDKAPBTIMER timer0;
++    CMSDKAPBTIMER timer1;
++    qemu_or_irq ppc_irq_orgate;
++    SplitIRQ sec_resp_splitter;
++    SplitIRQ ppc_irq_splitter[NUM_PPCS];
++
++    UnimplementedDeviceState dualtimer;
++    UnimplementedDeviceState s32ktimer;
++
++    MemoryRegion container;
++    MemoryRegion alias1;
++    MemoryRegion alias2;
++    MemoryRegion alias3;
++    MemoryRegion sram0;
++
++    qemu_irq *exp_irqs;
++    qemu_irq ppc0_irq;
++    qemu_irq ppc1_irq;
++    qemu_irq sec_resp_cfg;
++    qemu_irq sec_resp_cfg_in;
++    qemu_irq nsc_cfg_in;
++
++    qemu_irq irq_status_in[NUM_EXTERNAL_PPCS];
++
++    uint32_t nsccfg;
++
++    /* Properties */
++    MemoryRegion *board_memory;
++    uint32_t exp_numirq;
++    uint32_t mainclk_frq;
++} IoTKit;
++
++#endif
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+new file mode 100644
+index 0000000000..c5f0a5b98a
+--- /dev/null
++++ b/hw/arm/iotkit.c
+@@ -0,0 +1,598 @@
++/*
++ * Arm IoT Kit
 + *
-+ * Board TRM:
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.100112_0200_06_en/versatile_express_cortex_m_prototyping_systems_v2m_mps2_and_v2m_mps2plus_technical_reference_100112_0200_06_en.pdf
-+ * Application Note AN505:
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.dai0505b/index.html
++ * Copyright (c) 2018 Linaro Limited
++ * Written by Peter Maydell
 + *
-+ * The AN505 defers to the Cortex-M33 processor ARMv8M IoT Kit FVP User Guide
-+ * (ARM ECM0601256) for the details of some of the device layout:
-+ *   http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 or
++ * (at your option) any later version.
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/log.h"
 +#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "hw/arm/arm.h"
-+#include "hw/arm/armv7m.h"
-+#include "hw/or-irq.h"
-+#include "hw/boards.h"
-+#include "exec/address-spaces.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/misc/unimp.h"
-+#include "hw/char/cmsdk-apb-uart.h"
-+#include "hw/timer/cmsdk-apb-timer.h"
-+#include "hw/misc/mps2-scc.h"
-+#include "hw/misc/mps2-fpgaio.h"
++#include "trace.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
 +#include "hw/arm/iotkit.h"
-+#include "hw/devices.h"
-+#include "net/net.h"
-+#include "hw/core/split-irq.h"
++#include "hw/misc/unimp.h"
++#include "hw/arm/arm.h"
 +
-+typedef enum MPS2TZFPGAType {
-+    FPGA_AN505,
-+} MPS2TZFPGAType;
-+
-+typedef struct {
-+    MachineClass parent;
-+    MPS2TZFPGAType fpga_type;
-+    const char *cpu_model;
-+    uint32_t scc_id;
-+} MPS2TZMachineClass;
-+
-+typedef struct {
-+    MachineState parent;
-+
-+    IoTKit iotkit;
-+    MemoryRegion psram;
-+    MemoryRegion ssram1;
-+    MemoryRegion ssram1_m;
-+    MemoryRegion ssram23;
-+    MPS2SCC scc;
-+    MPS2FPGAIO fpgaio;
-+    TZPPC ppc[5];
-+    UnimplementedDeviceState ssram_mpc[3];
-+    UnimplementedDeviceState spi[5];
-+    UnimplementedDeviceState i2c[4];
-+    UnimplementedDeviceState i2s_audio;
-+    UnimplementedDeviceState gpio[5];
-+    UnimplementedDeviceState dma[4];
-+    UnimplementedDeviceState gfx;
-+    CMSDKAPBUART uart[5];
-+    SplitIRQ sec_resp_splitter;
-+    qemu_or_irq uart_irq_orgate;
-+} MPS2TZMachineState;
-+
-+#define TYPE_MPS2TZ_MACHINE "mps2tz"
-+#define TYPE_MPS2TZ_AN505_MACHINE MACHINE_TYPE_NAME("mps2-an505")
-+
-+#define MPS2TZ_MACHINE(obj) \
-+    OBJECT_CHECK(MPS2TZMachineState, obj, TYPE_MPS2TZ_MACHINE)
-+#define MPS2TZ_MACHINE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(MPS2TZMachineClass, obj, TYPE_MPS2TZ_MACHINE)
-+#define MPS2TZ_MACHINE_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(MPS2TZMachineClass, klass, TYPE_MPS2TZ_MACHINE)
-+
-+/* Main SYSCLK frequency in Hz */
-+#define SYSCLK_FRQ 20000000
-+
-+/* Initialize the auxiliary RAM region @mr and map it into
-+ * the memory map at @base.
++/* Create an alias region of @size bytes starting at @base
++ * which mirrors the memory starting at @orig.
 + */
-+static void make_ram(MemoryRegion *mr, const char *name,
-+                     hwaddr base, hwaddr size)
++static void make_alias(IoTKit *s, MemoryRegion *mr, const char *name,
++                       hwaddr base, hwaddr size, hwaddr orig)
 +{
-+    memory_region_init_ram(mr, NULL, name, size, &error_fatal);
-+    memory_region_add_subregion(get_system_memory(), base, mr);
-+}
-+
-+/* Create an alias of an entire original MemoryRegion @orig
-+ * located at @base in the memory map.
-+ */
-+static void make_ram_alias(MemoryRegion *mr, const char *name,
-+                           MemoryRegion *orig, hwaddr base)
-+{
-+    memory_region_init_alias(mr, NULL, name, orig, 0,
-+                             memory_region_size(orig));
-+    memory_region_add_subregion(get_system_memory(), base, mr);
++    memory_region_init_alias(mr, NULL, name, &s->container, orig, size);
++    /* The alias is even lower priority than unimplemented_device regions */
++    memory_region_add_subregion_overlap(&s->container, base, mr, -1500);
 +}
 +
 +static void init_sysbus_child(Object *parent, const char *childname,
@@ -180,383 +209,576 @@ index 0000000000..ff414c649c
 +    object_initialize(child, childsize, childtype);
 +    object_property_add_child(parent, childname, OBJECT(child), &error_abort);
 +    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
-+
 +}
 +
-+/* Most of the devices in the AN505 FPGA image sit behind
-+ * Peripheral Protection Controllers. These data structures
-+ * define the layout of which devices sit behind which PPCs.
-+ * The devfn for each port is a function which creates, configures
-+ * and initializes the device, returning the MemoryRegion which
-+ * needs to be plugged into the downstream end of the PPC port.
-+ */
-+typedef MemoryRegion *MakeDevFn(MPS2TZMachineState *mms, void *opaque,
-+                                const char *name, hwaddr size);
-+
-+typedef struct PPCPortInfo {
-+    const char *name;
-+    MakeDevFn *devfn;
-+    void *opaque;
-+    hwaddr addr;
-+    hwaddr size;
-+} PPCPortInfo;
-+
-+typedef struct PPCInfo {
-+    const char *name;
-+    PPCPortInfo ports[TZ_NUM_PORTS];
-+} PPCInfo;
-+
-+static MemoryRegion *make_unimp_dev(MPS2TZMachineState *mms,
-+                                       void *opaque,
-+                                       const char *name, hwaddr size)
++static void irq_status_forwarder(void *opaque, int n, int level)
 +{
-+    /* Initialize, configure and realize a TYPE_UNIMPLEMENTED_DEVICE,
-+     * and return a pointer to its MemoryRegion.
++    qemu_irq destirq = opaque;
++
++    qemu_set_irq(destirq, level);
++}
++
++static void nsccfg_handler(void *opaque, int n, int level)
++{
++    IoTKit *s = IOTKIT(opaque);
++
++    s->nsccfg = level;
++}
++
++static void iotkit_forward_ppc(IoTKit *s, const char *ppcname, int ppcnum)
++{
++    /* Each of the 4 AHB and 4 APB PPCs that might be present in a
++     * system using the IoTKit has a collection of control lines which
++     * are provided by the security controller and which we want to
++     * expose as control lines on the IoTKit device itself, so the
++     * code using the IoTKit can wire them up to the PPCs.
 +     */
-+    UnimplementedDeviceState *uds = opaque;
++    SplitIRQ *splitter = &s->ppc_irq_splitter[ppcnum];
++    DeviceState *iotkitdev = DEVICE(s);
++    DeviceState *dev_secctl = DEVICE(&s->secctl);
++    DeviceState *dev_splitter = DEVICE(splitter);
++    char *name;
 +
-+    init_sysbus_child(OBJECT(mms), name, uds,
-+                      sizeof(UnimplementedDeviceState),
-+                      TYPE_UNIMPLEMENTED_DEVICE);
-+    qdev_prop_set_string(DEVICE(uds), "name", name);
-+    qdev_prop_set_uint64(DEVICE(uds), "size", size);
-+    object_property_set_bool(OBJECT(uds), true, "realized", &error_fatal);
-+    return sysbus_mmio_get_region(SYS_BUS_DEVICE(uds), 0);
++    name = g_strdup_printf("%s_nonsec", ppcname);
++    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    g_free(name);
++    name = g_strdup_printf("%s_ap", ppcname);
++    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    g_free(name);
++    name = g_strdup_printf("%s_irq_enable", ppcname);
++    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    g_free(name);
++    name = g_strdup_printf("%s_irq_clear", ppcname);
++    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    g_free(name);
++
++    /* irq_status is a little more tricky, because we need to
++     * split it so we can send it both to the security controller
++     * and to our OR gate for the NVIC interrupt line.
++     * Connect up the splitter's outputs, and create a GPIO input
++     * which will pass the line state to the input splitter.
++     */
++    name = g_strdup_printf("%s_irq_status", ppcname);
++    qdev_connect_gpio_out(dev_splitter, 0,
++                          qdev_get_gpio_in_named(dev_secctl,
++                                                 name, 0));
++    qdev_connect_gpio_out(dev_splitter, 1,
++                          qdev_get_gpio_in(DEVICE(&s->ppc_irq_orgate), ppcnum));
++    s->irq_status_in[ppcnum] = qdev_get_gpio_in(dev_splitter, 0);
++    qdev_init_gpio_in_named_with_opaque(iotkitdev, irq_status_forwarder,
++                                        s->irq_status_in[ppcnum], name, 1);
++    g_free(name);
 +}
 +
-+static MemoryRegion *make_uart(MPS2TZMachineState *mms, void *opaque,
-+                               const char *name, hwaddr size)
++static void iotkit_forward_sec_resp_cfg(IoTKit *s)
 +{
-+    CMSDKAPBUART *uart = opaque;
-+    int i = uart - &mms->uart[0];
-+    Chardev *uartchr = i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
-+    int rxirqno = i * 2;
-+    int txirqno = i * 2 + 1;
-+    int combirqno = i + 10;
-+    SysBusDevice *s;
-+    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-+    DeviceState *orgate_dev = DEVICE(&mms->uart_irq_orgate);
++    /* Forward the 3rd output from the splitter device as a
++     * named GPIO output of the iotkit object.
++     */
++    DeviceState *dev = DEVICE(s);
++    DeviceState *dev_splitter = DEVICE(&s->sec_resp_splitter);
 +
-+    init_sysbus_child(OBJECT(mms), name, uart,
-+                      sizeof(mms->uart[0]), TYPE_CMSDK_APB_UART);
-+    qdev_prop_set_chr(DEVICE(uart), "chardev", uartchr);
-+    qdev_prop_set_uint32(DEVICE(uart), "pclk-frq", SYSCLK_FRQ);
-+    object_property_set_bool(OBJECT(uart), true, "realized", &error_fatal);
-+    s = SYS_BUS_DEVICE(uart);
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev,
-+                                                    "EXP_IRQ", txirqno));
-+    sysbus_connect_irq(s, 1, qdev_get_gpio_in_named(iotkitdev,
-+                                                    "EXP_IRQ", rxirqno));
-+    sysbus_connect_irq(s, 2, qdev_get_gpio_in(orgate_dev, i * 2));
-+    sysbus_connect_irq(s, 3, qdev_get_gpio_in(orgate_dev, i * 2 + 1));
-+    sysbus_connect_irq(s, 4, qdev_get_gpio_in_named(iotkitdev,
-+                                                    "EXP_IRQ", combirqno));
-+    return sysbus_mmio_get_region(SYS_BUS_DEVICE(uart), 0);
++    qdev_init_gpio_out_named(dev, &s->sec_resp_cfg, "sec_resp_cfg", 1);
++    s->sec_resp_cfg_in = qemu_allocate_irq(irq_status_forwarder,
++                                           s->sec_resp_cfg, 1);
++    qdev_connect_gpio_out(dev_splitter, 2, s->sec_resp_cfg_in);
 +}
 +
-+static MemoryRegion *make_scc(MPS2TZMachineState *mms, void *opaque,
-+                              const char *name, hwaddr size)
++static void iotkit_init(Object *obj)
 +{
-+    MPS2SCC *scc = opaque;
-+    DeviceState *sccdev;
-+    MPS2TZMachineClass *mmc = MPS2TZ_MACHINE_GET_CLASS(mms);
-+
-+    object_initialize(scc, sizeof(mms->scc), TYPE_MPS2_SCC);
-+    sccdev = DEVICE(scc);
-+    qdev_set_parent_bus(sccdev, sysbus_get_default());
-+    qdev_prop_set_uint32(sccdev, "scc-cfg4", 0x2);
-+    qdev_prop_set_uint32(sccdev, "scc-aid", 0x02000008);
-+    qdev_prop_set_uint32(sccdev, "scc-id", mmc->scc_id);
-+    object_property_set_bool(OBJECT(scc), true, "realized", &error_fatal);
-+    return sysbus_mmio_get_region(SYS_BUS_DEVICE(sccdev), 0);
-+}
-+
-+static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
-+                                 const char *name, hwaddr size)
-+{
-+    MPS2FPGAIO *fpgaio = opaque;
-+
-+    object_initialize(fpgaio, sizeof(mms->fpgaio), TYPE_MPS2_FPGAIO);
-+    qdev_set_parent_bus(DEVICE(fpgaio), sysbus_get_default());
-+    object_property_set_bool(OBJECT(fpgaio), true, "realized", &error_fatal);
-+    return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
-+}
-+
-+static void mps2tz_common_init(MachineState *machine)
-+{
-+    MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    MemoryRegion *system_memory = get_system_memory();
-+    DeviceState *iotkitdev;
-+    DeviceState *dev_splitter;
++    IoTKit *s = IOTKIT(obj);
 +    int i;
 +
-+    if (strcmp(machine->cpu_type, mc->default_cpu_type) != 0) {
-+        error_report("This board can only be used with CPU %s",
-+                     mc->default_cpu_type);
-+        exit(1);
++    memory_region_init(&s->container, obj, "iotkit-container", UINT64_MAX);
++
++    init_sysbus_child(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
++                      TYPE_ARMV7M);
++    qdev_prop_set_string(DEVICE(&s->armv7m), "cpu-type",
++                         ARM_CPU_TYPE_NAME("cortex-m33"));
++
++    init_sysbus_child(obj, "secctl", &s->secctl, sizeof(s->secctl),
++                      TYPE_IOTKIT_SECCTL);
++    init_sysbus_child(obj, "apb-ppc0", &s->apb_ppc0, sizeof(s->apb_ppc0),
++                      TYPE_TZ_PPC);
++    init_sysbus_child(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
++                      TYPE_TZ_PPC);
++    init_sysbus_child(obj, "timer0", &s->timer0, sizeof(s->timer0),
++                      TYPE_CMSDK_APB_TIMER);
++    init_sysbus_child(obj, "timer1", &s->timer1, sizeof(s->timer1),
++                      TYPE_CMSDK_APB_TIMER);
++    init_sysbus_child(obj, "dualtimer", &s->dualtimer, sizeof(s->dualtimer),
++                      TYPE_UNIMPLEMENTED_DEVICE);
++    object_initialize(&s->ppc_irq_orgate, sizeof(s->ppc_irq_orgate),
++                      TYPE_OR_IRQ);
++    object_property_add_child(obj, "ppc-irq-orgate",
++                              OBJECT(&s->ppc_irq_orgate), &error_abort);
++    object_initialize(&s->sec_resp_splitter, sizeof(s->sec_resp_splitter),
++                      TYPE_SPLIT_IRQ);
++    object_property_add_child(obj, "sec-resp-splitter",
++                              OBJECT(&s->sec_resp_splitter), &error_abort);
++    for (i = 0; i < ARRAY_SIZE(s->ppc_irq_splitter); i++) {
++        char *name = g_strdup_printf("ppc-irq-splitter-%d", i);
++        SplitIRQ *splitter = &s->ppc_irq_splitter[i];
++
++        object_initialize(splitter, sizeof(*splitter), TYPE_SPLIT_IRQ);
++        object_property_add_child(obj, name, OBJECT(splitter), &error_abort);
++    }
++    init_sysbus_child(obj, "s32ktimer", &s->s32ktimer, sizeof(s->s32ktimer),
++                      TYPE_UNIMPLEMENTED_DEVICE);
++}
++
++static void iotkit_exp_irq(void *opaque, int n, int level)
++{
++    IoTKit *s = IOTKIT(opaque);
++
++    qemu_set_irq(s->exp_irqs[n], level);
++}
++
++static void iotkit_realize(DeviceState *dev, Error **errp)
++{
++    IoTKit *s = IOTKIT(dev);
++    int i;
++    MemoryRegion *mr;
++    Error *err = NULL;
++    SysBusDevice *sbd_apb_ppc0;
++    SysBusDevice *sbd_secctl;
++    DeviceState *dev_apb_ppc0;
++    DeviceState *dev_apb_ppc1;
++    DeviceState *dev_secctl;
++    DeviceState *dev_splitter;
++
++    if (!s->board_memory) {
++        error_setg(errp, "memory property was not set");
++        return;
 +    }
 +
-+    init_sysbus_child(OBJECT(machine), "iotkit", &mms->iotkit,
-+                      sizeof(mms->iotkit), TYPE_IOTKIT);
-+    iotkitdev = DEVICE(&mms->iotkit);
-+    object_property_set_link(OBJECT(&mms->iotkit), OBJECT(system_memory),
-+                             "memory", &error_abort);
-+    qdev_prop_set_uint32(iotkitdev, "EXP_NUMIRQ", 92);
-+    qdev_prop_set_uint32(iotkitdev, "MAINCLK", SYSCLK_FRQ);
-+    object_property_set_bool(OBJECT(&mms->iotkit), true, "realized",
-+                             &error_fatal);
++    if (!s->mainclk_frq) {
++        error_setg(errp, "MAINCLK property was not set");
++        return;
++    }
 +
-+    /* The sec_resp_cfg output from the IoTKit must be split into multiple
-+     * lines, one for each of the PPCs we create here.
++    /* Handling of which devices should be available only to secure
++     * code is usually done differently for M profile than for A profile.
++     * Instead of putting some devices only into the secure address space,
++     * devices exist in both address spaces but with hard-wired security
++     * permissions that will cause the CPU to fault for non-secure accesses.
++     *
++     * The IoTKit has an IDAU (Implementation Defined Access Unit),
++     * which specifies hard-wired security permissions for different
++     * areas of the physical address space. For the IoTKit IDAU, the
++     * top 4 bits of the physical address are the IDAU region ID, and
++     * if bit 28 (ie the lowest bit of the ID) is 0 then this is an NS
++     * region, otherwise it is an S region.
++     *
++     * The various devices and RAMs are generally all mapped twice,
++     * once into a region that the IDAU defines as secure and once
++     * into a non-secure region. They sit behind either a Memory
++     * Protection Controller (for RAM) or a Peripheral Protection
++     * Controller (for devices), which allow a more fine grained
++     * configuration of whether non-secure accesses are permitted.
++     *
++     * (The other place that guest software can configure security
++     * permissions is in the architected SAU (Security Attribution
++     * Unit), which is entirely inside the CPU. The IDAU can upgrade
++     * the security attributes for a region to more restrictive than
++     * the SAU specifies, but cannot downgrade them.)
++     *
++     * 0x10000000..0x1fffffff  alias of 0x00000000..0x0fffffff
++     * 0x20000000..0x2007ffff  32KB FPGA block RAM
++     * 0x30000000..0x3fffffff  alias of 0x20000000..0x2fffffff
++     * 0x40000000..0x4000ffff  base peripheral region 1
++     * 0x40010000..0x4001ffff  CPU peripherals (none for IoTKit)
++     * 0x40020000..0x4002ffff  system control element peripherals
++     * 0x40080000..0x400fffff  base peripheral region 2
++     * 0x50000000..0x5fffffff  alias of 0x40000000..0x4fffffff
 +     */
-+    object_initialize(&mms->sec_resp_splitter, sizeof(mms->sec_resp_splitter),
-+                      TYPE_SPLIT_IRQ);
-+    object_property_add_child(OBJECT(machine), "sec-resp-splitter",
-+                              OBJECT(&mms->sec_resp_splitter), &error_abort);
-+    object_property_set_int(OBJECT(&mms->sec_resp_splitter), 5,
-+                            "num-lines", &error_fatal);
-+    object_property_set_bool(OBJECT(&mms->sec_resp_splitter), true,
-+                             "realized", &error_fatal);
-+    dev_splitter = DEVICE(&mms->sec_resp_splitter);
-+    qdev_connect_gpio_out_named(iotkitdev, "sec_resp_cfg", 0,
++
++    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
++
++    qdev_prop_set_uint32(DEVICE(&s->armv7m), "num-irq", s->exp_numirq + 32);
++    /* In real hardware the initial Secure VTOR is set from the INITSVTOR0
++     * register in the IoT Kit System Control Register block, and the
++     * initial value of that is in turn specifiable by the FPGA that
++     * instantiates the IoT Kit. In QEMU we don't implement this wrinkle,
++     * and simply set the CPU's init-svtor to the IoT Kit default value.
++     */
++    qdev_prop_set_uint32(DEVICE(&s->armv7m), "init-svtor", 0x10000000);
++    object_property_set_link(OBJECT(&s->armv7m), OBJECT(&s->container),
++                             "memory", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_link(OBJECT(&s->armv7m), OBJECT(s), "idau", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    /* Connect our EXP_IRQ GPIOs to the NVIC's lines 32 and up. */
++    s->exp_irqs = g_new(qemu_irq, s->exp_numirq);
++    for (i = 0; i < s->exp_numirq; i++) {
++        s->exp_irqs[i] = qdev_get_gpio_in(DEVICE(&s->armv7m), i + 32);
++    }
++    qdev_init_gpio_in_named(dev, iotkit_exp_irq, "EXP_IRQ", s->exp_numirq);
++
++    /* Set up the big aliases first */
++    make_alias(s, &s->alias1, "alias 1", 0x10000000, 0x10000000, 0x00000000);
++    make_alias(s, &s->alias2, "alias 2", 0x30000000, 0x10000000, 0x20000000);
++    /* The 0x50000000..0x5fffffff region is not a pure alias: it has
++     * a few extra devices that only appear there (generally the
++     * control interfaces for the protection controllers).
++     * We implement this by mapping those devices over the top of this
++     * alias MR at a higher priority.
++     */
++    make_alias(s, &s->alias3, "alias 3", 0x50000000, 0x10000000, 0x40000000);
++
++    /* This RAM should be behind a Memory Protection Controller, but we
++     * don't implement that yet.
++     */
++    memory_region_init_ram(&s->sram0, NULL, "iotkit.sram0", 0x00008000, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    memory_region_add_subregion(&s->container, 0x20000000, &s->sram0);
++
++    /* Security controller */
++    object_property_set_bool(OBJECT(&s->secctl), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sbd_secctl = SYS_BUS_DEVICE(&s->secctl);
++    dev_secctl = DEVICE(&s->secctl);
++    sysbus_mmio_map(sbd_secctl, 0, 0x50080000);
++    sysbus_mmio_map(sbd_secctl, 1, 0x40080000);
++
++    s->nsc_cfg_in = qemu_allocate_irq(nsccfg_handler, s, 1);
++    qdev_connect_gpio_out_named(dev_secctl, "nsc_cfg", 0, s->nsc_cfg_in);
++
++    /* The sec_resp_cfg output from the security controller must be split into
++     * multiple lines, one for each of the PPCs within the IoTKit and one
++     * that will be an output from the IoTKit to the system.
++     */
++    object_property_set_int(OBJECT(&s->sec_resp_splitter), 3,
++                            "num-lines", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_bool(OBJECT(&s->sec_resp_splitter), true,
++                             "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    dev_splitter = DEVICE(&s->sec_resp_splitter);
++    qdev_connect_gpio_out_named(dev_secctl, "sec_resp_cfg", 0,
 +                                qdev_get_gpio_in(dev_splitter, 0));
 +
-+    /* The IoTKit sets up much of the memory layout, including
-+     * the aliases between secure and non-secure regions in the
-+     * address space. The FPGA itself contains:
-+     *
-+     * 0x00000000..0x003fffff  SSRAM1
-+     * 0x00400000..0x007fffff  alias of SSRAM1
-+     * 0x28000000..0x283fffff  4MB SSRAM2 + SSRAM3
-+     * 0x40100000..0x4fffffff  AHB Master Expansion 1 interface devices
-+     * 0x80000000..0x80ffffff  16MB PSRAM
++    /* Devices behind APB PPC0:
++     *   0x40000000: timer0
++     *   0x40001000: timer1
++     *   0x40002000: dual timer
++     * We must configure and realize each downstream device and connect
++     * it to the appropriate PPC port; then we can realize the PPC and
++     * map its upstream ends to the right place in the container.
 +     */
-+
-+    /* The FPGA images have an odd combination of different RAMs,
-+     * because in hardware they are different implementations and
-+     * connected to different buses, giving varying performance/size
-+     * tradeoffs. For QEMU they're all just RAM, though. We arbitrarily
-+     * call the 16MB our "system memory", as it's the largest lump.
-+     */
-+    memory_region_allocate_system_memory(&mms->psram,
-+                                         NULL, "mps.ram", 0x01000000);
-+    memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
-+
-+    /* The SSRAM memories should all be behind Memory Protection Controllers,
-+     * but we don't implement that yet.
-+     */
-+    make_ram(&mms->ssram1, "mps.ssram1", 0x00000000, 0x00400000);
-+    make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", &mms->ssram1, 0x00400000);
-+
-+    make_ram(&mms->ssram23, "mps.ssram23", 0x28000000, 0x00400000);
-+
-+    /* The overflow IRQs for all UARTs are ORed together.
-+     * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
-+     * Create the OR gate for this.
-+     */
-+    object_initialize(&mms->uart_irq_orgate, sizeof(mms->uart_irq_orgate),
-+                      TYPE_OR_IRQ);
-+    object_property_add_child(OBJECT(mms), "uart-irq-orgate",
-+                              OBJECT(&mms->uart_irq_orgate), &error_abort);
-+    object_property_set_int(OBJECT(&mms->uart_irq_orgate), 10, "num-lines",
-+                            &error_fatal);
-+    object_property_set_bool(OBJECT(&mms->uart_irq_orgate), true,
-+                             "realized", &error_fatal);
-+    qdev_connect_gpio_out(DEVICE(&mms->uart_irq_orgate), 0,
-+                          qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 15));
-+
-+    /* Most of the devices in the FPGA are behind Peripheral Protection
-+     * Controllers. The required order for initializing things is:
-+     *  + initialize the PPC
-+     *  + initialize, configure and realize downstream devices
-+     *  + connect downstream device MemoryRegions to the PPC
-+     *  + realize the PPC
-+     *  + map the PPC's MemoryRegions to the places in the address map
-+     *    where the downstream devices should appear
-+     *  + wire up the PPC's control lines to the IoTKit object
-+     */
-+
-+    const PPCInfo ppcs[] = { {
-+            .name = "apb_ppcexp0",
-+            .ports = {
-+                { "ssram-mpc0", make_unimp_dev, &mms->ssram_mpc[0],
-+                  0x58007000, 0x1000 },
-+                { "ssram-mpc1", make_unimp_dev, &mms->ssram_mpc[1],
-+                  0x58008000, 0x1000 },
-+                { "ssram-mpc2", make_unimp_dev, &mms->ssram_mpc[2],
-+                  0x58009000, 0x1000 },
-+            },
-+        }, {
-+            .name = "apb_ppcexp1",
-+            .ports = {
-+                { "spi0", make_unimp_dev, &mms->spi[0], 0x40205000, 0x1000 },
-+                { "spi1", make_unimp_dev, &mms->spi[1], 0x40206000, 0x1000 },
-+                { "spi2", make_unimp_dev, &mms->spi[2], 0x40209000, 0x1000 },
-+                { "spi3", make_unimp_dev, &mms->spi[3], 0x4020a000, 0x1000 },
-+                { "spi4", make_unimp_dev, &mms->spi[4], 0x4020b000, 0x1000 },
-+                { "uart0", make_uart, &mms->uart[0], 0x40200000, 0x1000 },
-+                { "uart1", make_uart, &mms->uart[1], 0x40201000, 0x1000 },
-+                { "uart2", make_uart, &mms->uart[2], 0x40202000, 0x1000 },
-+                { "uart3", make_uart, &mms->uart[3], 0x40203000, 0x1000 },
-+                { "uart4", make_uart, &mms->uart[4], 0x40204000, 0x1000 },
-+                { "i2c0", make_unimp_dev, &mms->i2c[0], 0x40207000, 0x1000 },
-+                { "i2c1", make_unimp_dev, &mms->i2c[1], 0x40208000, 0x1000 },
-+                { "i2c2", make_unimp_dev, &mms->i2c[2], 0x4020c000, 0x1000 },
-+                { "i2c3", make_unimp_dev, &mms->i2c[3], 0x4020d000, 0x1000 },
-+            },
-+        }, {
-+            .name = "apb_ppcexp2",
-+            .ports = {
-+                { "scc", make_scc, &mms->scc, 0x40300000, 0x1000 },
-+                { "i2s-audio", make_unimp_dev, &mms->i2s_audio,
-+                  0x40301000, 0x1000 },
-+                { "fpgaio", make_fpgaio, &mms->fpgaio, 0x40302000, 0x1000 },
-+            },
-+        }, {
-+            .name = "ahb_ppcexp0",
-+            .ports = {
-+                { "gfx", make_unimp_dev, &mms->gfx, 0x41000000, 0x140000 },
-+                { "gpio0", make_unimp_dev, &mms->gpio[0], 0x40100000, 0x1000 },
-+                { "gpio1", make_unimp_dev, &mms->gpio[1], 0x40101000, 0x1000 },
-+                { "gpio2", make_unimp_dev, &mms->gpio[2], 0x40102000, 0x1000 },
-+                { "gpio3", make_unimp_dev, &mms->gpio[3], 0x40103000, 0x1000 },
-+                { "gpio4", make_unimp_dev, &mms->gpio[4], 0x40104000, 0x1000 },
-+            },
-+        }, {
-+            .name = "ahb_ppcexp1",
-+            .ports = {
-+                { "dma0", make_unimp_dev, &mms->dma[0], 0x40110000, 0x1000 },
-+                { "dma1", make_unimp_dev, &mms->dma[1], 0x40111000, 0x1000 },
-+                { "dma2", make_unimp_dev, &mms->dma[2], 0x40112000, 0x1000 },
-+                { "dma3", make_unimp_dev, &mms->dma[3], 0x40113000, 0x1000 },
-+            },
-+        },
-+    };
-+
-+    for (i = 0; i < ARRAY_SIZE(ppcs); i++) {
-+        const PPCInfo *ppcinfo = &ppcs[i];
-+        TZPPC *ppc = &mms->ppc[i];
-+        DeviceState *ppcdev;
-+        int port;
-+        char *gpioname;
-+
-+        init_sysbus_child(OBJECT(machine), ppcinfo->name, ppc,
-+                          sizeof(TZPPC), TYPE_TZ_PPC);
-+        ppcdev = DEVICE(ppc);
-+
-+        for (port = 0; port < TZ_NUM_PORTS; port++) {
-+            const PPCPortInfo *pinfo = &ppcinfo->ports[port];
-+            MemoryRegion *mr;
-+            char *portname;
-+
-+            if (!pinfo->devfn) {
-+                continue;
-+            }
-+
-+            mr = pinfo->devfn(mms, pinfo->opaque, pinfo->name, pinfo->size);
-+            portname = g_strdup_printf("port[%d]", port);
-+            object_property_set_link(OBJECT(ppc), OBJECT(mr),
-+                                     portname, &error_fatal);
-+            g_free(portname);
-+        }
-+
-+        object_property_set_bool(OBJECT(ppc), true, "realized", &error_fatal);
-+
-+        for (port = 0; port < TZ_NUM_PORTS; port++) {
-+            const PPCPortInfo *pinfo = &ppcinfo->ports[port];
-+
-+            if (!pinfo->devfn) {
-+                continue;
-+            }
-+            sysbus_mmio_map(SYS_BUS_DEVICE(ppc), port, pinfo->addr);
-+
-+            gpioname = g_strdup_printf("%s_nonsec", ppcinfo->name);
-+            qdev_connect_gpio_out_named(iotkitdev, gpioname, port,
-+                                        qdev_get_gpio_in_named(ppcdev,
-+                                                               "cfg_nonsec",
-+                                                               port));
-+            g_free(gpioname);
-+            gpioname = g_strdup_printf("%s_ap", ppcinfo->name);
-+            qdev_connect_gpio_out_named(iotkitdev, gpioname, port,
-+                                        qdev_get_gpio_in_named(ppcdev,
-+                                                               "cfg_ap", port));
-+            g_free(gpioname);
-+        }
-+
-+        gpioname = g_strdup_printf("%s_irq_enable", ppcinfo->name);
-+        qdev_connect_gpio_out_named(iotkitdev, gpioname, 0,
-+                                    qdev_get_gpio_in_named(ppcdev,
-+                                                           "irq_enable", 0));
-+        g_free(gpioname);
-+        gpioname = g_strdup_printf("%s_irq_clear", ppcinfo->name);
-+        qdev_connect_gpio_out_named(iotkitdev, gpioname, 0,
-+                                    qdev_get_gpio_in_named(ppcdev,
-+                                                           "irq_clear", 0));
-+        g_free(gpioname);
-+        gpioname = g_strdup_printf("%s_irq_status", ppcinfo->name);
-+        qdev_connect_gpio_out_named(ppcdev, "irq", 0,
-+                                    qdev_get_gpio_in_named(iotkitdev,
-+                                                           gpioname, 0));
-+        g_free(gpioname);
-+
-+        qdev_connect_gpio_out(dev_splitter, i,
-+                              qdev_get_gpio_in_named(ppcdev,
-+                                                     "cfg_sec_resp", 0));
++    qdev_prop_set_uint32(DEVICE(&s->timer0), "pclk-frq", s->mainclk_frq);
++    object_property_set_bool(OBJECT(&s->timer0), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer0), 0,
++                       qdev_get_gpio_in(DEVICE(&s->armv7m), 3));
++    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->timer0), 0);
++    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[0]", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
 +    }
 +
-+    /* In hardware this is a LAN9220; the LAN9118 is software compatible
-+     * except that it doesn't support the checksum-offload feature.
-+     * The ethernet controller is not behind a PPC.
++    qdev_prop_set_uint32(DEVICE(&s->timer1), "pclk-frq", s->mainclk_frq);
++    object_property_set_bool(OBJECT(&s->timer1), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer1), 0,
++                       qdev_get_gpio_in(DEVICE(&s->armv7m), 3));
++    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->timer1), 0);
++    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[1]", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    qdev_prop_set_string(DEVICE(&s->dualtimer), "name", "Dual timer");
++    qdev_prop_set_uint64(DEVICE(&s->dualtimer), "size", 0x1000);
++    object_property_set_bool(OBJECT(&s->dualtimer), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dualtimer), 0);
++    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[2]", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    object_property_set_bool(OBJECT(&s->apb_ppc0), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    sbd_apb_ppc0 = SYS_BUS_DEVICE(&s->apb_ppc0);
++    dev_apb_ppc0 = DEVICE(&s->apb_ppc0);
++
++    mr = sysbus_mmio_get_region(sbd_apb_ppc0, 0);
++    memory_region_add_subregion(&s->container, 0x40000000, mr);
++    mr = sysbus_mmio_get_region(sbd_apb_ppc0, 1);
++    memory_region_add_subregion(&s->container, 0x40001000, mr);
++    mr = sysbus_mmio_get_region(sbd_apb_ppc0, 2);
++    memory_region_add_subregion(&s->container, 0x40002000, mr);
++    for (i = 0; i < IOTS_APB_PPC0_NUM_PORTS; i++) {
++        qdev_connect_gpio_out_named(dev_secctl, "apb_ppc0_nonsec", i,
++                                    qdev_get_gpio_in_named(dev_apb_ppc0,
++                                                           "cfg_nonsec", i));
++        qdev_connect_gpio_out_named(dev_secctl, "apb_ppc0_ap", i,
++                                    qdev_get_gpio_in_named(dev_apb_ppc0,
++                                                           "cfg_ap", i));
++    }
++    qdev_connect_gpio_out_named(dev_secctl, "apb_ppc0_irq_enable", 0,
++                                qdev_get_gpio_in_named(dev_apb_ppc0,
++                                                       "irq_enable", 0));
++    qdev_connect_gpio_out_named(dev_secctl, "apb_ppc0_irq_clear", 0,
++                                qdev_get_gpio_in_named(dev_apb_ppc0,
++                                                       "irq_clear", 0));
++    qdev_connect_gpio_out(dev_splitter, 0,
++                          qdev_get_gpio_in_named(dev_apb_ppc0,
++                                                 "cfg_sec_resp", 0));
++
++    /* All the PPC irq lines (from the 2 internal PPCs and the 8 external
++     * ones) are sent individually to the security controller, and also
++     * ORed together to give a single combined PPC interrupt to the NVIC.
 +     */
-+    lan9118_init(&nd_table[0], 0x42000000,
-+                 qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
++    object_property_set_int(OBJECT(&s->ppc_irq_orgate),
++                            NUM_PPCS, "num-lines", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_bool(OBJECT(&s->ppc_irq_orgate), true,
++                             "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    qdev_connect_gpio_out(DEVICE(&s->ppc_irq_orgate), 0,
++                          qdev_get_gpio_in(DEVICE(&s->armv7m), 10));
 +
-+    create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
++    /* 0x40010000 .. 0x4001ffff: private CPU region: unused in IoTKit */
 +
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
++    /* 0x40020000 .. 0x4002ffff : IoTKit system control peripheral region */
++    /* Devices behind APB PPC1:
++     *   0x4002f000: S32K timer
++     */
++    qdev_prop_set_string(DEVICE(&s->s32ktimer), "name", "S32KTIMER");
++    qdev_prop_set_uint64(DEVICE(&s->s32ktimer), "size", 0x1000);
++    object_property_set_bool(OBJECT(&s->s32ktimer), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->s32ktimer), 0);
++    object_property_set_link(OBJECT(&s->apb_ppc1), OBJECT(mr), "port[0]", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    object_property_set_bool(OBJECT(&s->apb_ppc1), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->apb_ppc1), 0);
++    memory_region_add_subregion(&s->container, 0x4002f000, mr);
++
++    dev_apb_ppc1 = DEVICE(&s->apb_ppc1);
++    qdev_connect_gpio_out_named(dev_secctl, "apb_ppc1_nonsec", 0,
++                                qdev_get_gpio_in_named(dev_apb_ppc1,
++                                                       "cfg_nonsec", 0));
++    qdev_connect_gpio_out_named(dev_secctl, "apb_ppc1_ap", 0,
++                                qdev_get_gpio_in_named(dev_apb_ppc1,
++                                                       "cfg_ap", 0));
++    qdev_connect_gpio_out_named(dev_secctl, "apb_ppc1_irq_enable", 0,
++                                qdev_get_gpio_in_named(dev_apb_ppc1,
++                                                       "irq_enable", 0));
++    qdev_connect_gpio_out_named(dev_secctl, "apb_ppc1_irq_clear", 0,
++                                qdev_get_gpio_in_named(dev_apb_ppc1,
++                                                       "irq_clear", 0));
++    qdev_connect_gpio_out(dev_splitter, 1,
++                          qdev_get_gpio_in_named(dev_apb_ppc1,
++                                                 "cfg_sec_resp", 0));
++
++    /* Using create_unimplemented_device() maps the stub into the
++     * system address space rather than into our container, but the
++     * overall effect to the guest is the same.
++     */
++    create_unimplemented_device("SYSINFO", 0x40020000, 0x1000);
++
++    create_unimplemented_device("SYSCONTROL", 0x50021000, 0x1000);
++    create_unimplemented_device("S32KWATCHDOG", 0x5002e000, 0x1000);
++
++    /* 0x40080000 .. 0x4008ffff : IoTKit second Base peripheral region */
++
++    create_unimplemented_device("NS watchdog", 0x40081000, 0x1000);
++    create_unimplemented_device("S watchdog", 0x50081000, 0x1000);
++
++    create_unimplemented_device("SRAM0 MPC", 0x50083000, 0x1000);
++
++    for (i = 0; i < ARRAY_SIZE(s->ppc_irq_splitter); i++) {
++        Object *splitter = OBJECT(&s->ppc_irq_splitter[i]);
++
++        object_property_set_int(splitter, 2, "num-lines", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++        object_property_set_bool(splitter, true, "realized", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++    }
++
++    for (i = 0; i < IOTS_NUM_AHB_EXP_PPC; i++) {
++        char *ppcname = g_strdup_printf("ahb_ppcexp%d", i);
++
++        iotkit_forward_ppc(s, ppcname, i);
++        g_free(ppcname);
++    }
++
++    for (i = 0; i < IOTS_NUM_APB_EXP_PPC; i++) {
++        char *ppcname = g_strdup_printf("apb_ppcexp%d", i);
++
++        iotkit_forward_ppc(s, ppcname, i + IOTS_NUM_AHB_EXP_PPC);
++        g_free(ppcname);
++    }
++
++    for (i = NUM_EXTERNAL_PPCS; i < NUM_PPCS; i++) {
++        /* Wire up IRQ splitter for internal PPCs */
++        DeviceState *devs = DEVICE(&s->ppc_irq_splitter[i]);
++        char *gpioname = g_strdup_printf("apb_ppc%d_irq_status",
++                                         i - NUM_EXTERNAL_PPCS);
++        TZPPC *ppc = (i == NUM_EXTERNAL_PPCS) ? &s->apb_ppc0 : &s->apb_ppc1;
++
++        qdev_connect_gpio_out(devs, 0,
++                              qdev_get_gpio_in_named(dev_secctl, gpioname, 0));
++        qdev_connect_gpio_out(devs, 1,
++                              qdev_get_gpio_in(DEVICE(&s->ppc_irq_orgate), i));
++        qdev_connect_gpio_out_named(DEVICE(ppc), "irq", 0,
++                                    qdev_get_gpio_in(devs, 0));
++    }
++
++    iotkit_forward_sec_resp_cfg(s);
++
++    system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
 +}
 +
-+static void mps2tz_class_init(ObjectClass *oc, void *data)
++static void iotkit_idau_check(IDAUInterface *ii, uint32_t address,
++                              int *iregion, bool *exempt, bool *ns, bool *nsc)
 +{
-+    MachineClass *mc = MACHINE_CLASS(oc);
++    /* For IoTKit systems the IDAU responses are simple logical functions
++     * of the address bits. The NSC attribute is guest-adjustable via the
++     * NSCCFG register in the security controller.
++     */
++    IoTKit *s = IOTKIT(ii);
++    int region = extract32(address, 28, 4);
 +
-+    mc->init = mps2tz_common_init;
-+    mc->max_cpus = 1;
++    *ns = !(region & 1);
++    *nsc = (region == 1 && (s->nsccfg & 1)) || (region == 3 && (s->nsccfg & 2));
++    /* 0xe0000000..0xe00fffff and 0xf0000000..0xf00fffff are exempt */
++    *exempt = (address & 0xeff00000) == 0xe0000000;
++    *iregion = region;
 +}
 +
-+static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    MPS2TZMachineClass *mmc = MPS2TZ_MACHINE_CLASS(oc);
-+
-+    mc->desc = "ARM MPS2 with AN505 FPGA image for Cortex-M33";
-+    mmc->fpga_type = FPGA_AN505;
-+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m33");
-+    mmc->scc_id = 0x41040000 | (505 << 4);
-+}
-+
-+static const TypeInfo mps2tz_info = {
-+    .name = TYPE_MPS2TZ_MACHINE,
-+    .parent = TYPE_MACHINE,
-+    .abstract = true,
-+    .instance_size = sizeof(MPS2TZMachineState),
-+    .class_size = sizeof(MPS2TZMachineClass),
-+    .class_init = mps2tz_class_init,
++static const VMStateDescription iotkit_vmstate = {
++    .name = "iotkit",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(nsccfg, IoTKit),
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+static const TypeInfo mps2tz_an505_info = {
-+    .name = TYPE_MPS2TZ_AN505_MACHINE,
-+    .parent = TYPE_MPS2TZ_MACHINE,
-+    .class_init = mps2tz_an505_class_init,
++static Property iotkit_properties[] = {
++    DEFINE_PROP_LINK("memory", IoTKit, board_memory, TYPE_MEMORY_REGION,
++                     MemoryRegion *),
++    DEFINE_PROP_UINT32("EXP_NUMIRQ", IoTKit, exp_numirq, 64),
++    DEFINE_PROP_UINT32("MAINCLK", IoTKit, mainclk_frq, 0),
++    DEFINE_PROP_END_OF_LIST()
 +};
 +
-+static void mps2tz_machine_init(void)
++static void iotkit_reset(DeviceState *dev)
 +{
-+    type_register_static(&mps2tz_info);
-+    type_register_static(&mps2tz_an505_info);
++    IoTKit *s = IOTKIT(dev);
++
++    s->nsccfg = 0;
 +}
 +
-+type_init(mps2tz_machine_init);
++static void iotkit_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(klass);
++
++    dc->realize = iotkit_realize;
++    dc->vmsd = &iotkit_vmstate;
++    dc->props = iotkit_properties;
++    dc->reset = iotkit_reset;
++    iic->check = iotkit_idau_check;
++}
++
++static const TypeInfo iotkit_info = {
++    .name = TYPE_IOTKIT,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(IoTKit),
++    .instance_init = iotkit_init,
++    .class_init = iotkit_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_IDAU_INTERFACE },
++        { }
++    }
++};
++
++static void iotkit_register_types(void)
++{
++    type_register_static(&iotkit_info);
++}
++
++type_init(iotkit_register_types);
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index a2057908f0..2f735917a5 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -104,6 +104,7 @@ CONFIG_MPS2_FPGAIO=y
+ CONFIG_MPS2_SCC=y
+ 
+ CONFIG_TZ_PPC=y
++CONFIG_IOTKIT=y
+ CONFIG_IOTKIT_SECCTL=y
+ 
+ CONFIG_VERSATILE_PCI=y
 -- 
 2.16.1
