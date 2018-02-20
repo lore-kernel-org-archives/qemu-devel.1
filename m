@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9Su-0007vk-4O
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:25 -0500
+	(envelope-from <eblake@redhat.com>) id 1eo9TJ-0008GX-U9
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9So-0006Rg-0x
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:20 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37250 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo9Sn-0006RX-Ro
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:13 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C952EB709
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 15:04:02 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 20 Feb 2018 16:03:55 +0100
-Message-Id: <20180220150357.324-4-kraxel@redhat.com>
-In-Reply-To: <20180220150357.324-1-kraxel@redhat.com>
-References: <20180220150357.324-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] keymap: numpad keysyms and keycodes are
- fixed
+	(envelope-from <eblake@redhat.com>) id 1eo9TF-0006zx-7g
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:45 -0500
+References: <20180220141531.11770-1-berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2a1cabd5-75e4-e41c-3c3c-2ae2d590a97f@redhat.com>
+Date: Tue, 20 Feb 2018 09:04:26 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180220141531.11770-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] specs/qcow2: Fix documentation of the
+ compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-No need to figure them at runtime from the keymap.
+On 02/20/2018 08:15 AM, Alberto Garcia wrote:
+> The documentation claims that the cluster descriptor contains the
+> number of sectors used to store the compressed data, but what it
+> actually contains is the number of sectors *minus one*.
+> 
+> That can be easily seen in qcow2_decompress_cluster(), that adds one
+> to the value stored in that field:
+> 
+>    nb_csectors = ((cluster_offset >> s->csize_shift) & s->csize_mask) + 1;
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>   docs/interop/qcow2.txt | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+> index d7fdb1fee3..b12972be82 100644
+> --- a/docs/interop/qcow2.txt
+> +++ b/docs/interop/qcow2.txt
+> @@ -429,7 +429,8 @@ Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
+>       Bit  0 -  x:    Host cluster offset. This is usually _not_ aligned to a
+>                       cluster boundary!
+>   
+> -       x+1 - 61:    Compressed size of the images in sectors of 512 bytes
+> +       x+1 - 61:    Size of the compressed data in sectors of 512 bytes,
+> +                    minus one (that is, a value of n here means n+1 sectors).
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/keymaps.c | 61 +++++++++---------------------------------------------------
- 1 file changed, 9 insertions(+), 52 deletions(-)
+Another way to read this field is as the index of the sector that 
+includes the tail of the compressed data (so a value of 0 means the data 
+ends in sector[0], occupying 1 sector; a value of 10 means the data ends 
+in sector[10], occupying 11 sectors...).  But your wording is more compact.
 
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index bef1405576..d71ae389e0 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -28,20 +28,12 @@
- #include "trace.h"
- #include "qemu/error-report.h"
- 
--struct key_range {
--    int start;
--    int end;
--    struct key_range *next;
--};
--
- struct keysym2code {
-     uint16_t keycode;
- };
- 
- struct kbd_layout_t {
-     GHashTable *hash;
--    struct key_range *keypad_range;
--    struct key_range *numlock_range;
- };
- 
- static inline gpointer hashkey(int keysym)
-@@ -70,29 +62,6 @@ static int get_keysym(const name2keysym_t *table,
- }
- 
- 
--static void add_to_key_range(struct key_range **krp, int code) {
--    struct key_range *kr;
--    for (kr = *krp; kr; kr = kr->next) {
--        if (code >= kr->start && code <= kr->end) {
--            break;
--        }
--        if (code == kr->start - 1) {
--            kr->start--;
--            break;
--        }
--        if (code == kr->end + 1) {
--            kr->end++;
--            break;
--        }
--    }
--    if (kr == NULL) {
--        kr = g_malloc0(sizeof(*kr));
--        kr->start = kr->end = code;
--        kr->next = *krp;
--        *krp = kr;
--    }
--}
--
- static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
- {
-     struct keysym2code *keysym2code;
-@@ -166,13 +135,6 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-                     const char *rest = line + offset + 1;
-                     int keycode = strtol(rest, NULL, 0);
- 
--                    if (strstr(rest, "numlock")) {
--                        add_to_key_range(&k->keypad_range, keycode);
--                        add_to_key_range(&k->numlock_range, keysym);
--                        /* fprintf(stderr, "keypad keysym %04x keycode %d\n",
--                                   keysym, keycode); */
--                    }
--
-                     if (strstr(rest, "shift")) {
-                         keycode |= SCANCODE_SHIFT;
-                     }
-@@ -234,24 +196,19 @@ int keysym2scancode(kbd_layout_t *k, int keysym)
- 
- int keycode_is_keypad(kbd_layout_t *k, int keycode)
- {
--    struct key_range *kr;
--
--    for (kr = k->keypad_range; kr; kr = kr->next) {
--        if (keycode >= kr->start && keycode <= kr->end) {
--            return 1;
--        }
-+    if (keycode >= 0x47 && keycode <= 0x53) {
-+        return true;
-     }
--    return 0;
-+    return false;
- }
- 
- int keysym_is_numlock(kbd_layout_t *k, int keysym)
- {
--    struct key_range *kr;
--
--    for (kr = k->numlock_range; kr; kr = kr->next) {
--        if (keysym >= kr->start && keysym <= kr->end) {
--            return 1;
--        }
-+    switch (keysym) {
-+    case 0xffb0 ... 0xffb9:  /* KP_0 .. KP_9 */
-+    case 0xffac:             /* KP_Separator */
-+    case 0xffae:             /* KP_Decimal   */
-+        return true;
-     }
--    return 0;
-+    return false;
- }
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.9.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
