@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36427)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1eo9XJ-0003dZ-QU
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:08:54 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36907)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1eo9Yd-0004pP-6v
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:10:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1eo9XF-0000IP-B9
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:08:53 -0500
-Received: from mail-bn3nam01on0047.outbound.protection.outlook.com
-	([104.47.33.47]:43037
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1eo9XE-0000Hx-UQ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:08:49 -0500
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Tue, 20 Feb 2018 15:08:45 +0000
-Message-ID: <CY4PR12MB17686F97FA2C8865AEBF41DA95CF0@CY4PR12MB1768.namprd12.prod.outlook.com>
-References: <20180126213944.7594-1-babu.moger@amd.com>
-In-Reply-To: <20180126213944.7594-1-babu.moger@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/5] Enable TOPOEXT to support
- hyperthreading on AMD CPU
+	(envelope-from <pl@kamp.de>) id 1eo9YY-0000uJ-80
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:10:15 -0500
+Received: from mx01.kamp.de ([82.141.2.16]:50820)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eo9YX-0000tL-Ug
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:10:10 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 16:10:03 +0100
+From: Peter Lieven <pl@kamp.de>
+Date: Tue, 20 Feb 2018 16:10:03 +0100
+Message-Id: <1519139403-2646-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH] migration: do not transfer ram during bulk
+ storage migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "pixo@polepetko.eu" <pixo@polepetko.eu>
-Cc: "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com, Peter Lieven <pl@kamp.de>
 
-Ping..
-Looks like these patches got lost in the mix. Any comments on these patches=
-?
-Thanks
-Babu
+this patch makes the bulk phase of a block migration to take
+place before we start transferring ram. As the bulk block migration
+can take a long time its pointless to transfer ram during that phase.
 
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
-> On Behalf Of Babu Moger
-> Sent: Friday, January 26, 2018 3:40 PM
-> To: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
-> pixo@polepetko.eu
-> Cc: mtosatti@redhat.com; Moger, Babu <Babu.Moger@amd.com>; qemu-
-> devel@nongnu.org; kvm@vger.kernel.org
-> Subject: [PATCH 0/5] Enable TOPOEXT to support hyperthreading on AMD
-> CPU
->=20
-> These series enable TOPOEXT feature on AMD CPU. These are required to
-> support
-> hyperthreading on kvm guests.
->=20
-> Stanislav Lanci posted few patches earlier.
-> https://patchwork.kernel.org/patch/10040903/
->=20
-> Rebased his patches with few changes.
-> 1. Spit the patches into two, separating cpuid functions
->    0x8000001D and 0x8000001E (Patch 2 and 3).
-> 2. Removed the generic non-intel check and made a separate patch
->    with some changes(Patch 5).
-> 3. Fixed L3_N_SETS_AMD(from 4096 to 8192) based on
-> CPUID_Fn8000001D_ECX_x03.
->=20
-> Added 2 more patches.
-> Patch 1. Fixes cache associativity.
-> Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
->=20
-> Babu Moger (3):
->   target/i386: Fix instruction cache associativity for AMD
->   target/i386: Enable TOPOEXT feature on AMD EPYC CPU
->   target/i386: Remove generic SMT thread check
->=20
-> Stanislav Lanci (2):
->   target/i386: Populate AMD Processor Cache Information
->   target/i386: Add support for CPUID_8000_001E for AMD
->=20
->  target/i386/cpu.c | 104
-> +++++++++++++++++++++++++++++++++++++++++++++++++-----
->  target/i386/kvm.c |  29 +++++++++++++--
->  2 files changed, 122 insertions(+), 11 deletions(-)
->=20
-> --
-> 2.16.0
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+ migration/ram.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/migration/ram.c b/migration/ram.c
+index 5e33e5c..42468ee 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2258,6 +2258,13 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+     int64_t t0;
+     int done = 0;
+ 
++    if (blk_mig_bulk_active()) {
++        /* Avoid transferring ram during bulk phase of block migration as
++         * the bulk phase will usually take a long time and transferring
++         * ram updates during that time is pointless. */
++        goto out;
++    }
++
+     rcu_read_lock();
+     if (ram_list.version != rs->last_version) {
+         ram_state_reset(rs);
+@@ -2304,6 +2311,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+      */
+     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+ 
++out:
+     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+     ram_counters.transferred += 8;
+ 
+-- 
+2.7.4
