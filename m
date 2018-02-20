@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoGAm-0000ma-NQ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 17:14:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1eoGLe-00046G-6X
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 17:25:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoGAl-0000Ji-MY
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 17:14:04 -0500
-References: <20180220170135.5299-1-berto@igalia.com>
-	<2d9713f2-87c1-12ba-3f46-a9a476279cda@redhat.com>
-	<6064e2b5-c7aa-7ec1-b917-5431f0dc57a8@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eoGLd-0005GY-9Y
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 17:25:18 -0500
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3e28add4-8951-18ad-5d28-2579b790d541@redhat.com>
-Date: Tue, 20 Feb 2018 16:13:39 -0600
-MIME-Version: 1.0
-In-Reply-To: <6064e2b5-c7aa-7ec1-b917-5431f0dc57a8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] specs/qcow2: Fix documentation of the
- compressed cluster descriptor
+Date: Tue, 20 Feb 2018 16:24:58 -0600
+Message-Id: <20180220222459.8461-2-eblake@redhat.com>
+In-Reply-To: <20180220222459.8461-1-eblake@redhat.com>
+References: <20180220222459.8461-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] qcow2: Prefer byte-based calls into
+ bs->file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +20,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, berto@igalia.com, Kevin Wolf <kwolf@redhat.com>
 
-On 02/20/2018 04:03 PM, Eric Blake wrote:
+We had only three sector-based stragglers left; convert them to use
+our preferred byte-based accesses.
 
->> boundary. Technically, it might be possible, but qemu does NOT do that=
-=20
->> (again, looking at qcow2_alloc_bytes() - we loop if free_in_cluster <=20
->> size) - so we may want to be explicit about this point to prevent=20
->> OTHER implementations from creating a compressed cluster that crosses=20
->> host cluster boundaries (right now, I can't see=20
->> qcow2_decompress_cluster() validating it, though - YIKES).
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/qcow2-cluster.c  | 5 ++---
+ block/qcow2-refcount.c | 6 +++---
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-Aha, I see where I went wrong.
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index e406b0f3b9e..85be7d5e340 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1615,13 +1615,12 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+         }
 
->=20
-> That said, a simple patch to try this:
->=20
+         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
+-        ret = bdrv_read(bs->file, coffset >> 9, s->cluster_data,
+-                        nb_csectors);
++        ret = bdrv_pread(bs->file, coffset, s->cluster_data, csize);
+         if (ret < 0) {
+             return ret;
+         }
+         if (decompress_buffer(s->cluster_cache, s->cluster_size,
+-                              s->cluster_data + sector_offset, csize) < 0) {
++                              s->cluster_data, csize) < 0) {
+             return -EIO;
+         }
+         s->cluster_cache_offset = coffset;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index d46b69d7f34..3fefeb3dc50 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2310,8 +2310,8 @@ write_refblocks:
+         on_disk_refblock = (void *)((char *) *refcount_table +
+                                     refblock_index * s->cluster_size);
 
->=20
-> triggers failures in iotests 122:
->=20
-> --- /home/eblake/qemu/tests/qemu-iotests/122.out=C2=A0=C2=A0=C2=A0 2017=
--10-06=20
-> 13:45:25.559279136 -0500
-> +++ /home/eblake/qemu/tests/qemu-iotests/122.out.bad=C2=A0=C2=A0=C2=A0 =
-2018-02-20=20
-> 15:54:29.890221575 -0600
-> @@ -117,8 +117,8 @@
->  =C2=A0convert -c -S 0:
->  =C2=A0read 3145728/3145728 bytes at offset 0
->  =C2=A03 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -read 63963136/63963136 bytes at offset 3145728
-> -61 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +qcow2: Marking image as corrupt: Compressed cluster at 0x5ffd2 crosses=
-=20
-> host cluster boundary; further corruption events will be suppressed
-> +read failed: Input/output error
->  =C2=A0[{ "start": 0, "length": 67108864, "depth": 0, "zero": false, "d=
-ata":=20
-> true}]
->=20
-> so it looks like I'm reading qcow2_alloc_bytes() wrong and that we CAN=20
-> have a compressed cluster that crosses host cluster boundaries?
-
-We DO allow crossing sector boundaries, IF the newly allocated cluster=20
-is contiguous to the cluster that has the unused tail that we are=20
-starting in.  Good, because that's less wasteful of the image (suppose=20
-every compressed cluster got 49% reduction in size - since each one=20
-requires 51% of a cluster, not allowing cluster crossing would require a=20
-full cluster each, rather than the expected ~49% reduction in overall=20
-image size if we are good at contiguous allocations).
-
->> So if I may suggest:
->>
->> =C2=A0=C2=A0=C2=A0 x+1 - 61:=C2=A0=C2=A0=C2=A0 Number of additional 51=
-2-byte sectors used for the
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 compressed data, beyond the sector containing th=
-e
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 offset in the previous field.=C2=A0 These sector=
-s must fit
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 within the same host cluster.
->=20
-> This sentence needs tweaking to match reality, given that my simple=20
-> patch to flag cross-sector hosts triggered (or I need to figure out wha=
-t=20
-> was wrong with my patch).
-
-So change that sentence to:  As needed, these additional sectors may=20
-reside in the next contiguous host cluster.
-
->=20
->> =C2=A0 Note that the compressed
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 data does not necessarily occupy all of the byte=
-s in
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 the final sector; rather, decompression stops wh=
-en it
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 has produced a cluster of data.=C2=A0 Another co=
-mpressed
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 cluster may map to the tail of the final sector =
-used
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 by this compressed cluster.
->>
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
+-                         on_disk_refblock, s->cluster_sectors);
++        ret = bdrv_pwrite(bs->file, refblock_offset,
++                         on_disk_refblock, s->cluster_size);
+         if (ret < 0) {
+             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-ret));
+             goto fail;
+@@ -2533,7 +2533,7 @@ fail:
+  * - 0 if writing to this offset will not affect the mentioned metadata
+  * - a positive QCow2MetadataOverlap value indicating one overlapping section
+  * - a negative value (-errno) indicating an error while performing a check,
+- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
++ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
+  */
+ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+                                  int64_t size)
+-- 
+2.14.3
