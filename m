@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGX-0008AL-2U
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:48 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGb-0008GL-Fn
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGU-0001eW-2u
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:45 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGZ-0001k1-Jh
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:49 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Feb 2018 18:03:19 +0000
-Message-Id: <20180220180325.29818-14-peter.maydell@linaro.org>
+Date: Tue, 20 Feb 2018 18:03:12 +0000
+Message-Id: <20180220180325.29818-7-peter.maydell@linaro.org>
 In-Reply-To: <20180220180325.29818-1-peter.maydell@linaro.org>
 References: <20180220180325.29818-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 13/19] hw/misc/mps2-fpgaio: FPGA control block
- for MPS2 AN505
+Subject: [Qemu-devel] [PATCH 06/19] target/arm: Define init-svtor property
+ for the reset secure VTOR value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,292 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The MPS2 AN505 FPGA image includes a "FPGA control block"
-which is a small set of registers handling LEDs, buttons
-and some counters.
+The Cortex-M33 allows the system to specify the reset value of the
+secure Vector Table Offset Register (VTOR) by asserting config
+signals. In particular, guest images for the MPS2 AN505 board rely
+on the MPS2's initial VTOR being correct for that board.
+Implement a QEMU property so board and SoC code can set the reset
+value to the correct value.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/Makefile.objs           |   1 +
- include/hw/misc/mps2-fpgaio.h   |  43 ++++++++++
- hw/misc/mps2-fpgaio.c           | 176 ++++++++++++++++++++++++++++++++++++++++
- default-configs/arm-softmmu.mak |   1 +
- hw/misc/trace-events            |   6 ++
- 5 files changed, 227 insertions(+)
- create mode 100644 include/hw/misc/mps2-fpgaio.h
- create mode 100644 hw/misc/mps2-fpgaio.c
+ * This patch doesn't try to change the handling of the load itself;
+   strictly speaking for real hardware the load of initial PC and
+   SP should honour the secure/nonsecure attributes and check
+   SAU settings and bus fault responses, as with other vector
+   table loads. That is a change for a different patch, if ever.
+ * The M33 and MPS2 are actually more flexible than "constant value
+   set when the board is created" -- the MPS2 has a register in
+   the FPGA which can be used to define the VTOR to use on the
+   next (soft) reset, since the M33 samples its config signals
+   on every reset. That would be pretty fiddly to implement in
+   QEMU (which doesn't even really have a well-defined concept
+   of reset which is not a powercycle) so I'm not going to
+   implement it unless we run into guest code that needs it.
+---
+ target/arm/cpu.h |  3 +++
+ target/arm/cpu.c | 18 ++++++++++++++----
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index f33b37a8e5..31f83dcfe7 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -58,6 +58,7 @@ obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
- obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
- obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
-+obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
- obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index dc45b740c5..c286169630 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -722,6 +722,9 @@ struct ARMCPU {
+      */
+     uint32_t psci_conduit;
  
- obj-$(CONFIG_PVPANIC) += pvpanic.o
-diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
-new file mode 100644
-index 0000000000..eedf17ebc6
---- /dev/null
-+++ b/include/hw/misc/mps2-fpgaio.h
-@@ -0,0 +1,43 @@
-+/*
-+ * ARM MPS2 FPGAIO emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
++    /* For v8M, initial value of the Secure VTOR */
++    uint32_t init_svtor;
 +
-+/* This is a model of the FPGAIO register block in the AN505
-+ * FPGA image for the MPS2 dev board; it is documented in the
-+ * application note:
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.dai0505b/index.html
-+ *
-+ * QEMU interface:
-+ *  + sysbus MMIO region 0: the register bank
-+ */
-+
-+#ifndef MPS2_FPGAIO_H
-+#define MPS2_FPGAIO_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_MPS2_FPGAIO "mps2-fpgaio"
-+#define MPS2_FPGAIO(obj) OBJECT_CHECK(MPS2FPGAIO, (obj), TYPE_MPS2_FPGAIO)
-+
-+typedef struct {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion iomem;
-+
-+    uint32_t led0;
-+    uint32_t prescale;
-+    uint32_t misc;
-+
-+    uint32_t prescale_clk;
-+} MPS2FPGAIO;
-+
-+#endif
-diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
-new file mode 100644
-index 0000000000..7394a057d8
---- /dev/null
-+++ b/hw/misc/mps2-fpgaio.c
-@@ -0,0 +1,176 @@
-+/*
-+ * ARM MPS2 AN505 FPGAIO emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+/* This is a model of the "FPGA system control and I/O" block found
-+ * in the AN505 FPGA image for the MPS2 devboard.
-+ * It is documented in AN505:
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.dai0505b/index.html
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "trace.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/misc/mps2-fpgaio.h"
-+
-+REG32(LED0, 0)
-+REG32(BUTTON, 8)
-+REG32(CLK1HZ, 0x10)
-+REG32(CLK100HZ, 0x14)
-+REG32(COUNTER, 0x18)
-+REG32(PRESCALE, 0x1c)
-+REG32(PSCNTR, 0x20)
-+REG32(MISC, 0x4c)
-+
-+static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
-+    uint64_t r;
-+
-+    switch (offset) {
-+    case A_LED0:
-+        r = s->led0;
-+        break;
-+    case A_BUTTON:
-+        /* User-pressable board buttons. We don't model that, so just return
-+         * zeroes.
-+         */
-+        r = 0;
-+        break;
-+    case A_PRESCALE:
-+        r = s->prescale;
-+        break;
-+    case A_MISC:
-+        r = s->misc;
-+        break;
-+    case A_CLK1HZ:
-+    case A_CLK100HZ:
-+    case A_COUNTER:
-+    case A_PSCNTR:
-+        /* These are all upcounters of various frequencies. */
-+        qemu_log_mask(LOG_UNIMP, "MPS2 FPGAIO: counters unimplemented\n");
-+        r = 0;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "MPS2 FPGAIO read: bad offset %x\n", (int) offset);
-+        r = 0;
-+        break;
-+    }
-+
-+    trace_mps2_fpgaio_read(offset, r, size);
-+    return r;
-+}
-+
-+static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
-+                              unsigned size)
-+{
-+    MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
-+
-+    trace_mps2_fpgaio_write(offset, value, size);
-+
-+    switch (offset) {
-+    case A_LED0:
-+        /* LED bits [1:0] control board LEDs. We don't currently have
-+         * a mechanism for displaying this graphically, so use a trace event.
-+         */
-+        trace_mps2_fpgaio_leds(value & 0x02 ? '*' : '.',
-+                               value & 0x01 ? '*' : '.');
-+        s->led0 = value & 0x3;
-+        break;
-+    case A_PRESCALE:
-+        s->prescale = value;
-+        break;
-+    case A_MISC:
-+        /* These are control bits for some of the other devices on the
-+         * board (SPI, CLCD, etc). We don't implement that yet, so just
-+         * make the bits read as written.
-+         */
-+        qemu_log_mask(LOG_UNIMP,
-+                      "MPS2 FPGAIO: MISC control bits unimplemented\n");
-+        s->misc = value;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "MPS2 FPGAIO write: bad offset 0x%x\n", (int) offset);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps mps2_fpgaio_ops = {
-+    .read = mps2_fpgaio_read,
-+    .write = mps2_fpgaio_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void mps2_fpgaio_reset(DeviceState *dev)
-+{
-+    MPS2FPGAIO *s = MPS2_FPGAIO(dev);
-+
-+    trace_mps2_fpgaio_reset();
-+    s->led0 = 0;
-+    s->prescale = 0;
-+    s->misc = 0;
-+}
-+
-+static void mps2_fpgaio_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MPS2FPGAIO *s = MPS2_FPGAIO(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &mps2_fpgaio_ops, s,
-+                          "mps2-fpgaio", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static const VMStateDescription mps2_fpgaio_vmstate = {
-+    .name = "mps2-fpgaio",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(led0, MPS2FPGAIO),
-+        VMSTATE_UINT32(prescale, MPS2FPGAIO),
-+        VMSTATE_UINT32(misc, MPS2FPGAIO),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property mps2_fpgaio_properties[] = {
-+    /* Frequency of the prescale counter */
-+    DEFINE_PROP_UINT32("prescale-clk", MPS2FPGAIO, prescale_clk, 20000000),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void mps2_fpgaio_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->vmsd = &mps2_fpgaio_vmstate;
-+    dc->reset = mps2_fpgaio_reset;
-+    dc->props = mps2_fpgaio_properties;
-+}
-+
-+static const TypeInfo mps2_fpgaio_info = {
-+    .name = TYPE_MPS2_FPGAIO,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MPS2FPGAIO),
-+    .instance_init = mps2_fpgaio_init,
-+    .class_init = mps2_fpgaio_class_init,
-+};
-+
-+static void mps2_fpgaio_register_types(void)
-+{
-+    type_register_static(&mps2_fpgaio_info);
-+}
-+
-+type_init(mps2_fpgaio_register_types);
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index ca34cf4462..c11b55e385 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -100,6 +100,7 @@ CONFIG_STM32F205_SOC=y
- CONFIG_CMSDK_APB_TIMER=y
- CONFIG_CMSDK_APB_UART=y
+     /* [QEMU_]KVM_ARM_TARGET_* constant for this CPU, or
+      * QEMU_KVM_ARM_TARGET_NONE if the kernel doesn't support this CPU type.
+      */
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 99d00c3ac9..34b5a4a00b 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -186,6 +186,7 @@ static void arm_cpu_reset(CPUState *s)
+         uint32_t initial_msp; /* Loaded from 0x0 */
+         uint32_t initial_pc; /* Loaded from 0x4 */
+         uint8_t *rom;
++        uint32_t vecbase;
  
-+CONFIG_MPS2_FPGAIO=y
- CONFIG_MPS2_SCC=y
+         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+             env->v7m.secure = true;
+@@ -213,8 +214,11 @@ static void arm_cpu_reset(CPUState *s)
+         /* Unlike A/R profile, M profile defines the reset LR value */
+         env->regs[14] = 0xffffffff;
  
- CONFIG_VERSATILE_PCI=y
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index b340d4e81c..ef852ffae7 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -62,6 +62,12 @@ mps2_scc_leds(char led7, char led6, char led5, char led4, char led3, char led2,
- mps2_scc_cfg_write(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config write: function %d device %d data 0x%" PRIx32
- mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config read: function %d device %d data 0x%" PRIx32
- 
-+# hw/misc/mps2_fpgaio.c
-+mps2_fpgaio_read(uint64_t offset, uint64_t data, unsigned size) "MPS2 FPGAIO read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+mps2_fpgaio_write(uint64_t offset, uint64_t data, unsigned size) "MPS2 FPGAIO write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+mps2_fpgaio_reset(void) "MPS2 FPGAIO: reset"
-+mps2_fpgaio_leds(char led1, char led0) "MPS2 FPGAIO LEDs: %c%c"
+-        /* Load the initial SP and PC from the vector table at address 0 */
+-        rom = rom_ptr(0);
++        env->v7m.vecbase[M_REG_S] = cpu->init_svtor;
 +
- # hw/misc/msf2-sysreg.c
- msf2_sysreg_write(uint64_t offset, uint32_t val, uint32_t prev) "msf2-sysreg write: addr 0x%08" HWADDR_PRIx " data 0x%" PRIx32 " prev 0x%" PRIx32
- msf2_sysreg_read(uint64_t offset, uint32_t val) "msf2-sysreg read: addr 0x%08" HWADDR_PRIx " data 0x%08" PRIx32
++        /* Load the initial SP and PC from offset 0 and 4 in the vector table */
++        vecbase = env->v7m.vecbase[env->v7m.secure];
++        rom = rom_ptr(vecbase);
+         if (rom) {
+             /* Address zero is covered by ROM which hasn't yet been
+              * copied into physical memory.
+@@ -227,8 +231,8 @@ static void arm_cpu_reset(CPUState *s)
+              * it got copied into memory. In the latter case, rom_ptr
+              * will return a NULL pointer and we should use ldl_phys instead.
+              */
+-            initial_msp = ldl_phys(s->as, 0);
+-            initial_pc = ldl_phys(s->as, 4);
++            initial_msp = ldl_phys(s->as, vecbase);
++            initial_pc = ldl_phys(s->as, vecbase + 4);
+         }
+ 
+         env->regs[13] = initial_msp & 0xFFFFFFFC;
+@@ -623,6 +627,10 @@ static Property arm_cpu_pmsav7_dregion_property =
+                                            pmsav7_dregion,
+                                            qdev_prop_uint32, uint32_t);
+ 
++/* M profile: initial value of the Secure VTOR */
++static Property arm_cpu_initsvtor_property =
++            DEFINE_PROP_UINT32("init-svtor", ARMCPU, init_svtor, 0);
++
+ static void arm_cpu_post_init(Object *obj)
+ {
+     ARMCPU *cpu = ARM_CPU(obj);
+@@ -693,6 +701,8 @@ static void arm_cpu_post_init(Object *obj)
+                                  qdev_prop_allow_set_link_before_realize,
+                                  OBJ_PROP_LINK_UNREF_ON_RELEASE,
+                                  &error_abort);
++        qdev_property_add_static(DEVICE(obj), &arm_cpu_initsvtor_property,
++                                 &error_abort);
+     }
+ 
+     qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
 -- 
 2.16.1
