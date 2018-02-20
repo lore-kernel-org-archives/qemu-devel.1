@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo8Gh-0005Gg-Gl
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:47:40 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eo8Gh-0005Gi-HN
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:47:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo8Ge-0006yl-MD
+	(envelope-from <kraxel@redhat.com>) id 1eo8Ge-0006yM-E7
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:47:39 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36254 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33166 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo8Ge-0006xm-Gn
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo8Ge-0006xJ-8C
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:47:36 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E91380D2EC8
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:47:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B2FE4028152
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:47:32 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 20 Feb 2018 14:47:18 +0100
-Message-Id: <20180220134723.11776-8-kraxel@redhat.com>
+Date: Tue, 20 Feb 2018 14:47:22 +0100
+Message-Id: <20180220134723.11776-12-kraxel@redhat.com>
 In-Reply-To: <20180220134723.11776-1-kraxel@redhat.com>
 References: <20180220134723.11776-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 07/12] curses: use DisplayOptions
+Subject: [Qemu-devel] [PULL 11/12] vl: drop display_type variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +32,236 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Switch curses ui to use qapi DisplayOptions for configuration.
+Switch over all leftover users to qapi DisplayType.
+Then delete the unused display_type variable.
+
+Add 'default' DisplayType, which isn't an actual display type but
+a placeholder for "user didn't specify a display".  It will be replaced
+by the DisplayType actually used, which in turn depends on the
+DisplayTypes availabel in the particular build.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180202111022.19269-9-kraxel@redhat.com
+Message-id: 20180202111022.19269-13-kraxel@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/ui/console.h | 4 ++--
- ui/curses.c          | 2 +-
- vl.c                 | 4 +++-
- qapi/ui.json         | 5 +++--
- 4 files changed, 9 insertions(+), 6 deletions(-)
+ vl.c         | 54 ++++++++++++++----------------------------------------
+ qapi/ui.json |  5 +++--
+ 2 files changed, 17 insertions(+), 42 deletions(-)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 183d9f2913..65ed6ddca6 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -471,9 +471,9 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp);
- 
- /* curses.c */
- #ifdef CONFIG_CURSES
--void curses_display_init(DisplayState *ds, int full_screen);
-+void curses_display_init(DisplayState *ds, DisplayOptions *opts);
- #else
--static inline void curses_display_init(DisplayState *ds, int full_screen)
-+static inline void curses_display_init(DisplayState *ds, DisplayOptions *opts)
- {
-     /* This must never be called if CONFIG_CURSES is disabled */
-     error_report("curses support is disabled");
-diff --git a/ui/curses.c b/ui/curses.c
-index 85503876c0..479b77bd03 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -434,7 +434,7 @@ static const DisplayChangeListenerOps dcl_ops = {
-     .dpy_text_cursor = curses_cursor_position,
- };
- 
--void curses_display_init(DisplayState *ds, int full_screen)
-+void curses_display_init(DisplayState *ds, DisplayOptions *opts)
- {
- #ifndef _WIN32
-     if (!isatty(1)) {
 diff --git a/vl.c b/vl.c
-index 38c18ef2e6..3752ebec49 100644
+index 11dc98eba2..9e7235df6d 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2186,6 +2186,7 @@ static LegacyDisplayType select_display(const char *p)
+@@ -2080,24 +2080,12 @@ static void select_vgahw(const char *p)
+     }
+ }
+ 
+-typedef enum LegacyDisplayType {
+-    DT_DEFAULT,
+-    DT_CURSES,
+-    DT_SDL,
+-    DT_COCOA,
+-    DT_GTK,
+-    DT_EGL,
+-    DT_NONE,
+-} LegacyDisplayType;
+-
+-static LegacyDisplayType select_display(const char *p)
++static void parse_display(const char *p)
+ {
+     const char *opts;
+-    LegacyDisplayType display = DT_DEFAULT;
+ 
+     if (strstart(p, "sdl", &opts)) {
+ #ifdef CONFIG_SDL
+-        display = DT_SDL;
+         dpy.type = DISPLAY_TYPE_SDL;
+         while (*opts) {
+             const char *nextopt;
+@@ -2172,7 +2160,6 @@ static LegacyDisplayType select_display(const char *p)
+     } else if (strstart(p, "egl-headless", &opts)) {
+ #ifdef CONFIG_OPENGL_DMABUF
+         display_opengl = 1;
+-        display = DT_EGL;
+         dpy.type = DISPLAY_TYPE_EGL_HEADLESS;
+ #else
+         error_report("egl support is disabled");
+@@ -2180,7 +2167,6 @@ static LegacyDisplayType select_display(const char *p)
+ #endif
      } else if (strstart(p, "curses", &opts)) {
  #ifdef CONFIG_CURSES
-         display = DT_CURSES;
-+        dpy.type = DISPLAY_TYPE_CURSES;
+-        display = DT_CURSES;
+         dpy.type = DISPLAY_TYPE_CURSES;
  #else
          error_report("curses support is disabled");
+@@ -2188,7 +2174,6 @@ static LegacyDisplayType select_display(const char *p)
+ #endif
+     } else if (strstart(p, "gtk", &opts)) {
+ #ifdef CONFIG_GTK
+-        display = DT_GTK;
+         dpy.type = DISPLAY_TYPE_GTK;
+         while (*opts) {
+             const char *nextopt;
+@@ -2225,14 +2210,11 @@ static LegacyDisplayType select_display(const char *p)
          exit(1);
-@@ -3268,6 +3269,7 @@ int main(int argc, char **argv, char **envp)
+ #endif
+     } else if (strstart(p, "none", &opts)) {
+-        display = DT_NONE;
+         dpy.type = DISPLAY_TYPE_NONE;
+     } else {
+         error_report("unknown display type");
+         exit(1);
+     }
+-
+-    return display;
+ }
+ 
+ static int balloon_parse(const char *arg)
+@@ -3056,7 +3038,6 @@ int main(int argc, char **argv, char **envp)
+     const char *incoming = NULL;
+     bool userconfig = true;
+     bool nographic = false;
+-    LegacyDisplayType display_type = DT_DEFAULT;
+     int display_remote = 0;
+     const char *log_mask = NULL;
+     const char *log_file = NULL;
+@@ -3250,18 +3231,16 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 break;
+             case QEMU_OPTION_display:
+-                display_type = select_display(optarg);
++                parse_display(optarg);
+                 break;
+             case QEMU_OPTION_nographic:
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "graphics=off", false);
+                 nographic = true;
+-                display_type = DT_NONE;
+                 dpy.type = DISPLAY_TYPE_NONE;
+                 break;
              case QEMU_OPTION_curses:
  #ifdef CONFIG_CURSES
-                 display_type = DT_CURSES;
-+                dpy.type = DISPLAY_TYPE_CURSES;
+-                display_type = DT_CURSES;
+                 dpy.type = DISPLAY_TYPE_CURSES;
  #else
                  error_report("curses support is disabled");
-                 exit(1);
-@@ -4697,7 +4699,7 @@ int main(int argc, char **argv, char **envp)
+@@ -3665,7 +3644,6 @@ int main(int argc, char **argv, char **envp)
+                 break;
+             case QEMU_OPTION_sdl:
+ #ifdef CONFIG_SDL
+-                display_type = DT_SDL;
+                 dpy.type = DISPLAY_TYPE_SDL;
+                 break;
+ #else
+@@ -4281,7 +4259,7 @@ int main(int argc, char **argv, char **envp)
+             exit(1);
+         }
+ #ifdef CONFIG_CURSES
+-        if (display_type == DT_CURSES) {
++        if (dpy.type == DISPLAY_TYPE_CURSES) {
+             error_report("curses display cannot be used with -daemonize");
+             exit(1);
+         }
+@@ -4327,39 +4305,35 @@ int main(int argc, char **argv, char **envp)
+         display_remote++;
+     }
+ #endif
+-    if (display_type == DT_DEFAULT && !display_remote) {
++    if (dpy.type == DISPLAY_TYPE_DEFAULT && !display_remote) {
+ #if defined(CONFIG_GTK)
+-        display_type = DT_GTK;
+         dpy.type = DISPLAY_TYPE_GTK;
+ #elif defined(CONFIG_SDL)
+-        display_type = DT_SDL;
+         dpy.type = DISPLAY_TYPE_SDL;
+ #elif defined(CONFIG_COCOA)
+-        display_type = DT_COCOA;
+         dpy.type = DISPLAY_TYPE_COCOA;
+ #elif defined(CONFIG_VNC)
+         vnc_parse("localhost:0,to=99,id=default", &error_abort);
+ #else
+-        display_type = DT_NONE;
+         dpy.type = DISPLAY_TYPE_NONE;
+ #endif
+     }
+ 
+-    if ((no_frame || alt_grab || ctrl_grab) && display_type != DT_SDL) {
++    if ((no_frame || alt_grab || ctrl_grab) && dpy.type != DISPLAY_TYPE_SDL) {
+         error_report("-no-frame, -alt-grab and -ctrl-grab are only valid "
+                      "for SDL, ignoring option");
+     }
+     if (dpy.has_window_close &&
+-        (display_type != DT_GTK && display_type != DT_SDL)) {
++        (dpy.type != DISPLAY_TYPE_GTK && dpy.type != DISPLAY_TYPE_SDL)) {
+         error_report("-no-quit is only valid for GTK and SDL, "
+                      "ignoring option");
+     }
+ 
+-    if (display_type == DT_GTK) {
++    if (dpy.type == DISPLAY_TYPE_GTK) {
+         early_gtk_display_init(&dpy);
+     }
+ 
+-    if (display_type == DT_SDL) {
++    if (dpy.type == DISPLAY_TYPE_SDL) {
+         sdl_display_early_init(&dpy);
+     }
+ 
+@@ -4690,17 +4664,17 @@ int main(int argc, char **argv, char **envp)
+     ds = init_displaystate();
+ 
      /* init local displays */
-     switch (display_type) {
-     case DT_CURSES:
--        curses_display_init(ds, full_screen);
-+        curses_display_init(ds, &dpy);
+-    switch (display_type) {
+-    case DT_CURSES:
++    switch (dpy.type) {
++    case DISPLAY_TYPE_CURSES:
+         curses_display_init(ds, &dpy);
          break;
-     case DT_SDL:
+-    case DT_SDL:
++    case DISPLAY_TYPE_SDL:
          sdl_display_init(ds, &dpy);
+         break;
+-    case DT_COCOA:
++    case DISPLAY_TYPE_COCOA:
+         cocoa_display_init(ds, &dpy);
+         break;
+-    case DT_GTK:
++    case DISPLAY_TYPE_GTK:
+         gtk_display_init(ds, &dpy);
+         break;
+     default:
+@@ -4721,7 +4695,7 @@ int main(int argc, char **argv, char **envp)
+     }
+ 
+ #ifdef CONFIG_OPENGL_DMABUF
+-    if (display_type == DT_EGL) {
++    if (dpy.type == DISPLAY_TYPE_EGL_HEADLESS) {
+         egl_headless_init(&dpy);
+     }
+ #endif
 diff --git a/qapi/ui.json b/qapi/ui.json
-index 43de75fa27..11aad8b496 100644
+index 398baa9698..3e82f25ac5 100644
 --- a/qapi/ui.json
 +++ b/qapi/ui.json
 @@ -1020,7 +1020,7 @@
  #
  ##
  { 'enum'    : 'DisplayType',
--  'data'    : [ 'none', 'gtk', 'sdl', 'egl-headless' ] }
-+  'data'    : [ 'none', 'gtk', 'sdl', 'egl-headless', 'curses' ] }
+-  'data'    : [ 'none', 'gtk', 'sdl',
++  'data'    : [ 'default', 'none', 'gtk', 'sdl',
+                 'egl-headless', 'curses', 'cocoa' ] }
  
  ##
- # @DisplayOptions:
-@@ -1044,4 +1044,5 @@
-   'data'    : { 'none'           : 'DisplayNoOpts',
+@@ -1042,7 +1042,8 @@
+                 '*window-close'  : 'bool',
+                 '*gl'            : 'bool' },
+   'discriminator' : 'type',
+-  'data'    : { 'none'           : 'DisplayNoOpts',
++  'data'    : { 'default'        : 'DisplayNoOpts',
++                'none'           : 'DisplayNoOpts',
                  'gtk'            : 'DisplayGTK',
                  'sdl'            : 'DisplayNoOpts',
--                'egl-headless'   : 'DisplayNoOpts' } }
-+                'egl-headless'   : 'DisplayNoOpts',
-+                'curses'         : 'DisplayNoOpts' } }
+                 'egl-headless'   : 'DisplayNoOpts',
 -- 
 2.9.3
