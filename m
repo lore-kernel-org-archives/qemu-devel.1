@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1eoAN8-0003q6-3a
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:02:31 -0500
+	(envelope-from <rdelobel@gmail.com>) id 1eoA2J-0004w3-E7
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1eoAN4-0006ax-3b
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:02:26 -0500
-Received: from mail.uni-paderborn.de ([131.234.142.9]:45586)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1eoAN3-0006al-Sx
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:02:22 -0500
-References: <20180219061827.2112-1-david.brenken@efs-auto.org>
-	<20180219061827.2112-4-david.brenken@efs-auto.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <ae382bd7-adba-543c-6ae8-8a1c1a3408b2@mail.uni-paderborn.de>
-Date: Tue, 20 Feb 2018 16:59:33 +0100
+	(envelope-from <rdelobel@gmail.com>) id 1eoA2F-0005Ls-7V
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:40:55 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rdelobel@gmail.com>) id 1eoA2F-0005LR-0M
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:40:51 -0500
+Received: by mail-ot0-x244.google.com with SMTP id 41so6648488otd.13
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 07:40:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180219061827.2112-4-david.brenken@efs-auto.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] tricore: fixed wrong masking of IE
+From: Ronald Delobel <rdelobel@gmail.com>
+Date: Tue, 20 Feb 2018 16:40:49 +0100
+Message-ID: <CAMyPS3QVbV2FPNfE-Y_-kgpcpOTWr9zFWED50oCkJaBjJ3XtRg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] make error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
-Cc: Florian Artmeier <florian.artmeier@efs-auto.de>, David Brenken <david.brenken@efs-auto.de>, Georg Hofstetter <georg.hofstetter@efs-auto.de>
+To: qemu-devel@nongnu.org
 
-On 02/19/2018 07:18 AM, David Brenken wrote:
-> From: David Brenken <david.brenken@efs-auto.de>
-> 
-> Signed-off-by: David Brenken <david.brenken@efs-auto.de>
-> Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
-> Signed-off-by: Florian Artmeier <florian.artmeier@efs-auto.de>
-> ---
->  target/tricore/cpu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
-> index c295763..6ed474c 100644
-> --- a/target/tricore/cpu.h
-> +++ b/target/tricore/cpu.h
-> @@ -257,7 +257,7 @@ void tricore_cpu_dump_state(CPUState *cpu, FILE *f,
->  #define MASK_CPUID_REV     0x000000ff
->  
->  #define MASK_ICR_PIPN 0x00ff0000
-> -#define MASK_ICR_IE   0x00000100
-> +#define MASK_ICR_IE   0x00008000
->  #define MASK_ICR_CCPN 0x000000ff
->  
->  #define MASK_FCX_FCXS 0x000f0000
-> 
+Hello,
 
-This is architecture specific. You propose the mask for 1.6+ CPUs. The
-original is for 1.3 CPUs. You could rename the original mask to
-something like MASK_ICR_IE_1_3 and add your own MASK_ICR_IE_1_6 mask.
+This is the error I get when building qemu-2.11.[0-1] with
+gcc-7.3.0/glibc-2.27, removing the static attribute suffice to finnish the
+build using the glibc provided memfd_create and qemu don't crash, but I
+miss some knowledge here about what a static function really is, a kind of
+private one? Shouldn't it be renamed instead and stay as static?
 
-Cheers,
-Bastian
+Just to report it.
+
+
+  CC      util/qemu-thread-posix.o
+  CC      util/memfd.o
+util/memfd.c:40:12: error: la d=C3=A9claration statique de =C2=AB memfd_cre=
+ate =C2=BB suit
+une d=C3=A9claration non statique
+ static int memfd_create(const char *name, unsigned int flags)
+            ^~~~~~~~~~~~
+In file included from /usr/include/bits/mman-linux.h:115:0,
+                 from /usr/include/bits/mman.h:45,
+                 from /usr/include/sys/mman.h:41,
+                 from
+/usr/local/src/qemu-2.11.1/include/sysemu/os-posix.h:29,
+                 from /usr/local/src/qemu-2.11.1/include/qemu/osdep.h:104,
+                 from util/memfd.c:28:
+/usr/include/bits/mman-shared.h:46:5: note: la d=C3=A9claration pr=C3=A9c=
+=C3=A9dente de
+=C2=AB memfd_create =C2=BB =C3=A9tait ici
+ int memfd_create (const char *__name, unsigned int __flags) __THROW;
+     ^~~~~~~~~~~~
+make: *** [/usr/local/src/qemu-2.11.1/rules.mak:66: util/memfd.o] Error 1
