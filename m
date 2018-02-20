@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGc-0008Ha-KC
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:52 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGe-0008Ie-4u
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eoCGY-0001il-9m
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:50 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eoCGb-0001lk-MW
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 13:03:52 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Feb 2018 18:03:20 +0000
-Message-Id: <20180220180325.29818-15-peter.maydell@linaro.org>
+Date: Tue, 20 Feb 2018 18:03:22 +0000
+Message-Id: <20180220180325.29818-17-peter.maydell@linaro.org>
 In-Reply-To: <20180220180325.29818-1-peter.maydell@linaro.org>
 References: <20180220180325.29818-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 14/19] hw/misc/tz-ppc: Model TrustZone
- peripheral protection controller
+Subject: [Qemu-devel] [PATCH 16/19] hw/misc/iotkit-secctl: Add handling for
+ PPCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,481 +23,529 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Add a model of the TrustZone peripheral protection controller (PPC),
-which is used to gate transactions to non-TZ-aware peripherals so
-that secure software can configure them to not be accessible to
-non-secure software.
+The IoTKit Security Controller includes various registers
+that expose to software the controls for the Peripheral
+Protection Controllers in the system. Implement these.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/Makefile.objs           |   2 +
- include/hw/misc/tz-ppc.h        | 101 ++++++++++++++
- hw/misc/tz-ppc.c                | 302 ++++++++++++++++++++++++++++++++++++++++
- default-configs/arm-softmmu.mak |   2 +
- hw/misc/trace-events            |  11 ++
- 5 files changed, 418 insertions(+)
- create mode 100644 include/hw/misc/tz-ppc.h
- create mode 100644 hw/misc/tz-ppc.c
+ include/hw/misc/iotkit-secctl.h |  64 +++++++++-
+ hw/misc/iotkit-secctl.c         | 270 +++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 315 insertions(+), 19 deletions(-)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 31f83dcfe7..dcf413d730 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -61,6 +61,8 @@ obj-$(CONFIG_MIPS_ITU) += mips_itu.o
- obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
- obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
+diff --git a/include/hw/misc/iotkit-secctl.h b/include/hw/misc/iotkit-secctl.h
+index 872f652f8d..ea3d62967f 100644
+--- a/include/hw/misc/iotkit-secctl.h
++++ b/include/hw/misc/iotkit-secctl.h
+@@ -16,6 +16,28 @@
+  * QEMU interface:
+  *  + sysbus MMIO region 0 is the "secure privilege control block" registers
+  *  + sysbus MMIO region 1 is the "non-secure privilege control block" registers
++ *  + named GPIO output "sec_resp_cfg" indicating whether blocked accesses
++ *    should RAZ/WI or bus error
++ * Controlling the 2 APB PPCs in the IoTKit:
++ *  + named GPIO outputs apb_ppc0_nonsec[0..2] and apb_ppc1_nonsec
++ *  + named GPIO outputs apb_ppc0_ap[0..2] and apb_ppc1_ap
++ *  + named GPIO outputs apb_ppc{0,1}_irq_enable
++ *  + named GPIO outputs apb_ppc{0,1}_irq_clear
++ *  + named GPIO inputs apb_ppc{0,1}_irq_status
++ * Controlling each of the 4 expansion APB PPCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_ap[0..15]
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_irq_enable
++ *  + named GPIO outputs apb_ppcexp{0,1,2,3}_irq_clear
++ *  + named GPIO inputs apb_ppcexp{0,1,2,3}_irq_status
++ * Controlling each of the 4 expansion AHB PPCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_nonsec[0..15]
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_ap[0..15]
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_enable
++ *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_clear
++ *  + named GPIO inputs ahb_ppcexp{0,1,2,3}_irq_status
+  */
  
-+obj-$(CONFIG_TZ_PPC) += tz-ppc.o
+ #ifndef IOTKIT_SECCTL_H
+@@ -26,14 +48,52 @@
+ #define TYPE_IOTKIT_SECCTL "iotkit-secctl"
+ #define IOTKIT_SECCTL(obj) OBJECT_CHECK(IoTKitSecCtl, (obj), TYPE_IOTKIT_SECCTL)
+ 
+-typedef struct IoTKitSecCtl {
++#define IOTS_APB_PPC0_NUM_PORTS 3
++#define IOTS_APB_PPC1_NUM_PORTS 1
++#define IOTS_PPC_NUM_PORTS 16
++#define IOTS_NUM_APB_PPC 2
++#define IOTS_NUM_APB_EXP_PPC 4
++#define IOTS_NUM_AHB_EXP_PPC 4
 +
- obj-$(CONFIG_PVPANIC) += pvpanic.o
- obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
- obj-$(CONFIG_AUX) += auxbus.o
-diff --git a/include/hw/misc/tz-ppc.h b/include/hw/misc/tz-ppc.h
-new file mode 100644
-index 0000000000..fc8b806e4d
---- /dev/null
-+++ b/include/hw/misc/tz-ppc.h
-@@ -0,0 +1,101 @@
-+/*
-+ * ARM TrustZone peripheral protection controller emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
++typedef struct IoTKitSecCtl IoTKitSecCtl;
++
++/* State and IRQ lines relating to a PPC. For the
++ * PPCs in the IoTKit not all the IRQ lines are used.
 + */
++typedef struct IoTKitSecCtlPPC {
++    qemu_irq nonsec[IOTS_PPC_NUM_PORTS];
++    qemu_irq ap[IOTS_PPC_NUM_PORTS];
++    qemu_irq irq_enable;
++    qemu_irq irq_clear;
 +
-+/* This is a model of the TrustZone peripheral protection controller (PPC).
-+ * It is documented in the ARM CoreLink SIE-200 System IP for Embedded TRM
-+ * (DDI 0571G):
-+ * https://developer.arm.com/products/architecture/m-profile/docs/ddi0571/g
-+ *
-+ * The PPC sits in front of peripherals and allows secure software to
-+ * configure it to either pass through or reject transactions.
-+ * Rejected transactions may be configured to either be aborted, or to
-+ * behave as RAZ/WI. An interrupt can be signalled for a rejected transaction.
-+ *
-+ * The PPC has no register interface -- it is configured purely by a
-+ * collection of input signals from other hardware in the system. Typically
-+ * they are either hardwired or exposed in an ad-hoc register interface by
-+ * the SoC that uses the PPC.
-+ *
-+ * This QEMU model can be used to model either the AHB5 or APB4 TZ PPC,
-+ * since the only difference between them is that the AHB version has a
-+ * "default" port which has no security checks applied. In QEMU the default
-+ * port can be emulated simply by wiring its downstream devices directly
-+ * into the parent address space, since the PPC does not need to intercept
-+ * transactions there.
-+ *
-+ * In the hardware, selection of which downstream port to use is done by
-+ * the user's decode logic asserting one of the hsel[] signals. In QEMU,
-+ * we provide 16 MMIO regions, one per port, and the user maps these into
-+ * the desired addresses to implement the address decode.
-+ *
-+ * QEMU interface:
-+ * + sysbus MMIO regions 0..15: MemoryRegions defining the upstream end
-+ *   of each of the 16 ports of the PPC
-+ * + Property "port[0..15]": MemoryRegion defining the downstream device(s)
-+ *   for each of the 16 ports of the PPC
-+ * + Named GPIO inputs "cfg_nonsec[0..15]": set to 1 if the port should be
-+ *   accessible to NonSecure transactions
-+ * + Named GPIO inputs "cfg_ap[0..15]": set to 1 if the port should be
-+ *   accessible to non-privileged transactions
-+ * + Named GPIO input "cfg_sec_resp": set to 1 if a rejected transaction should
-+ *   result in a transaction error, or 0 for the transaction to RAZ/WI
-+ * + Named GPIO input "irq_enable": set to 1 to enable interrupts
-+ * + Named GPIO input "irq_clear": set to 1 to clear a pending interrupt
-+ * + Named GPIO output "irq": set for a transaction-failed interrupt
-+ * + Property "NONSEC_MASK": if a bit is set in this mask then accesses to
-+ *   the associated port do not have the TZ security check performed. (This
-+ *   corresponds to the hardware allowing this to be set as a Verilog
-+ *   parameter.)
-+ */
++    uint32_t ns;
++    uint32_t sp;
++    uint32_t nsp;
 +
-+#ifndef TZ_PPC_H
-+#define TZ_PPC_H
++    /* Number of ports actually present */
++    int numports;
++    /* Offset of this PPC's interrupt bits in SECPPCINTSTAT */
++    int irq_bit_offset;
++    IoTKitSecCtl *parent;
++} IoTKitSecCtlPPC;
 +
-+#include "hw/sysbus.h"
++struct IoTKitSecCtl {
+     /*< private >*/
+     SysBusDevice parent_obj;
+ 
+     /*< public >*/
++    qemu_irq sec_resp_cfg;
+ 
+     MemoryRegion s_regs;
+     MemoryRegion ns_regs;
+-} IoTKitSecCtl;
 +
-+#define TYPE_TZ_PPC "tz-ppc"
-+#define TZ_PPC(obj) OBJECT_CHECK(TZPPC, (obj), TYPE_TZ_PPC)
++    uint32_t secppcintstat;
++    uint32_t secppcinten;
++    uint32_t secrespcfg;
 +
-+#define TZ_NUM_PORTS 16
-+
-+typedef struct TZPPC TZPPC;
-+
-+typedef struct TZPPCPort {
-+    TZPPC *ppc;
-+    MemoryRegion upstream;
-+    AddressSpace downstream_as;
-+    MemoryRegion *downstream;
-+} TZPPCPort;
-+
-+struct TZPPC {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+
-+    /* State: these just track the values of our input signals */
-+    bool cfg_nonsec[TZ_NUM_PORTS];
-+    bool cfg_ap[TZ_NUM_PORTS];
-+    bool cfg_sec_resp;
-+    bool irq_enable;
-+    bool irq_clear;
-+    /* State: are we asserting irq ? */
-+    bool irq_status;
-+
-+    qemu_irq irq;
-+
-+    /* Properties */
-+    uint32_t nonsec_mask;
-+
-+    TZPPCPort port[TZ_NUM_PORTS];
++    IoTKitSecCtlPPC apb[IOTS_NUM_APB_PPC];
++    IoTKitSecCtlPPC apbexp[IOTS_NUM_APB_EXP_PPC];
++    IoTKitSecCtlPPC ahbexp[IOTS_NUM_APB_EXP_PPC];
 +};
-+
-+#endif
-diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
-new file mode 100644
-index 0000000000..3dd045c15f
---- /dev/null
-+++ b/hw/misc/tz-ppc.c
-@@ -0,0 +1,302 @@
-+/*
-+ * ARM TrustZone peripheral protection controller emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
+ 
+ #endif
+diff --git a/hw/misc/iotkit-secctl.c b/hw/misc/iotkit-secctl.c
+index 5da52e4706..7e1ca184ab 100644
+--- a/hw/misc/iotkit-secctl.c
++++ b/hw/misc/iotkit-secctl.c
+@@ -92,12 +92,41 @@ static const uint8_t iotkit_secctl_ns_idregs[] = {
+     0x0d, 0xf0, 0x05, 0xb1,
+ };
+ 
++/* The register sets for the various PPCs (AHB internal, APB internal,
++ * AHB expansion, APB expansion) are all set up so that they are
++ * in 16-aligned blocks so offsets 0xN0, 0xN4, 0xN8, 0xNC are PPCs
++ * 0, 1, 2, 3 of that type, so we can convert a register address offset
++ * into an an index into a PPC array easily.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "trace.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/misc/tz-ppc.h"
-+
-+static void tz_ppc_update_irq(TZPPC *s)
++static inline int offset_to_ppc_idx(uint32_t offset)
 +{
-+    bool level = s->irq_status && s->irq_enable;
-+
-+    trace_tz_ppc_update_irq(level);
-+    qemu_set_irq(s->irq, level);
++    return extract32(offset, 2, 2);
 +}
 +
-+static void tz_ppc_cfg_nonsec(void *opaque, int n, int level)
++typedef void PerPPCFunction(IoTKitSecCtlPPC *ppc);
++
++static void foreach_ppc(IoTKitSecCtl *s, PerPPCFunction *fn)
 +{
-+    TZPPC *s = TZ_PPC(opaque);
-+
-+    assert(n < TZ_NUM_PORTS);
-+    trace_tz_ppc_cfg_nonsec(n, level);
-+    s->cfg_nonsec[n] = level;
-+}
-+
-+static void tz_ppc_cfg_ap(void *opaque, int n, int level)
-+{
-+    TZPPC *s = TZ_PPC(opaque);
-+
-+    assert(n < TZ_NUM_PORTS);
-+    trace_tz_ppc_cfg_ap(n, level);
-+    s->cfg_ap[n] = level;
-+}
-+
-+static void tz_ppc_cfg_sec_resp(void *opaque, int n, int level)
-+{
-+    TZPPC *s = TZ_PPC(opaque);
-+
-+    trace_tz_ppc_cfg_sec_resp(level);
-+    s->cfg_sec_resp = level;
-+}
-+
-+static void tz_ppc_irq_enable(void *opaque, int n, int level)
-+{
-+    TZPPC *s = TZ_PPC(opaque);
-+
-+    trace_tz_ppc_irq_enable(level);
-+    s->irq_enable = level;
-+    tz_ppc_update_irq(s);
-+}
-+
-+static void tz_ppc_irq_clear(void *opaque, int n, int level)
-+{
-+    TZPPC *s = TZ_PPC(opaque);
-+
-+    trace_tz_ppc_irq_clear(level);
-+
-+    s->irq_clear = level;
-+    if (level) {
-+        s->irq_status = false;
-+        tz_ppc_update_irq(s);
-+    }
-+}
-+
-+static bool tz_ppc_check(TZPPC *s, int n, MemTxAttrs attrs)
-+{
-+    /* Check whether to allow an access to port n; return true if
-+     * the check passes, and false if the transaction must be blocked.
-+     * If the latter, the caller must check cfg_sec_resp to determine
-+     * whether to abort or RAZ/WI the transaction.
-+     * The checks are:
-+     *  + nonsec_mask suppresses any check of the secure attribute
-+     *  + otherwise, block if cfg_nonsec is 1 and transaction is secure,
-+     *    or if cfg_nonsec is 0 and transaction is non-secure
-+     *  + block if transaction is usermode and cfg_ap is 0
-+     */
-+    if ((attrs.secure == s->cfg_nonsec[n] && !(s->nonsec_mask & (1 << n))) ||
-+        (attrs.user && !s->cfg_ap[n])) {
-+        /* Block the transaction. */
-+        if (!s->irq_clear) {
-+            /* Note that holding irq_clear high suppresses interrupts */
-+            s->irq_status = true;
-+            tz_ppc_update_irq(s);
-+        }
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static MemTxResult tz_ppc_read(void *opaque, hwaddr addr, uint64_t *pdata,
-+                               unsigned size, MemTxAttrs attrs)
-+{
-+    TZPPCPort *p = opaque;
-+    TZPPC *s = p->ppc;
-+    int n = p - s->port;
-+    AddressSpace *as = &p->downstream_as;
-+    uint64_t data;
-+    MemTxResult res;
-+
-+    if (!tz_ppc_check(s, n, attrs)) {
-+        trace_tz_ppc_read_blocked(n, addr, attrs.secure, attrs.user);
-+        if (s->cfg_sec_resp) {
-+            return MEMTX_ERROR;
-+        } else {
-+            *pdata = 0;
-+            return MEMTX_OK;
-+        }
-+    }
-+
-+    switch (size) {
-+    case 1:
-+        data = address_space_ldub(as, addr, attrs, &res);
-+        break;
-+    case 2:
-+        data = address_space_lduw_le(as, addr, attrs, &res);
-+        break;
-+    case 4:
-+        data = address_space_ldl_le(as, addr, attrs, &res);
-+        break;
-+    case 8:
-+        data = address_space_ldq_le(as, addr, attrs, &res);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    *pdata = data;
-+    return res;
-+}
-+
-+static MemTxResult tz_ppc_write(void *opaque, hwaddr addr, uint64_t val,
-+                                unsigned size, MemTxAttrs attrs)
-+{
-+    TZPPCPort *p = opaque;
-+    TZPPC *s = p->ppc;
-+    AddressSpace *as = &p->downstream_as;
-+    int n = p - s->port;
-+    MemTxResult res;
-+
-+    if (!tz_ppc_check(s, n, attrs)) {
-+        trace_tz_ppc_write_blocked(n, addr, attrs.secure, attrs.user);
-+        if (s->cfg_sec_resp) {
-+            return MEMTX_ERROR;
-+        } else {
-+            return MEMTX_OK;
-+        }
-+    }
-+
-+    switch (size) {
-+    case 1:
-+        address_space_stb(as, addr, val, attrs, &res);
-+        break;
-+    case 2:
-+        address_space_stw_le(as, addr, val, attrs, &res);
-+        break;
-+    case 4:
-+        address_space_stl_le(as, addr, val, attrs, &res);
-+        break;
-+    case 8:
-+        address_space_stq_le(as, addr, val, attrs, &res);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    return res;
-+}
-+
-+static const MemoryRegionOps tz_ppc_ops = {
-+    .read_with_attrs = tz_ppc_read,
-+    .write_with_attrs = tz_ppc_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void tz_ppc_reset(DeviceState *dev)
-+{
-+    TZPPC *s = TZ_PPC(dev);
-+
-+    trace_tz_ppc_reset();
-+    s->cfg_sec_resp = false;
-+    memset(s->cfg_nonsec, 0, sizeof(s->cfg_nonsec));
-+    memset(s->cfg_ap, 0, sizeof(s->cfg_ap));
-+}
-+
-+static void tz_ppc_init(Object *obj)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+    TZPPC *s = TZ_PPC(obj);
-+
-+    qdev_init_gpio_in_named(dev, tz_ppc_cfg_nonsec, "cfg_nonsec", TZ_NUM_PORTS);
-+    qdev_init_gpio_in_named(dev, tz_ppc_cfg_ap, "cfg_ap", TZ_NUM_PORTS);
-+    qdev_init_gpio_in_named(dev, tz_ppc_cfg_sec_resp, "cfg_sec_resp", 1);
-+    qdev_init_gpio_in_named(dev, tz_ppc_irq_enable, "irq_enable", 1);
-+    qdev_init_gpio_in_named(dev, tz_ppc_irq_clear, "irq_clear", 1);
-+    qdev_init_gpio_out_named(dev, &s->irq, "irq", 1);
-+}
-+
-+static void tz_ppc_realize(DeviceState *dev, Error **errp)
-+{
-+    Object *obj = OBJECT(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    TZPPC *s = TZ_PPC(dev);
 +    int i;
 +
-+    /* We can't create the upstream end of the port until realize,
-+     * as we don't know the size of the MR used as the downstream until then.
-+     */
-+    for (i = 0; i < TZ_NUM_PORTS; i++) {
-+        TZPPCPort *port = &s->port[i];
-+        char *name;
-+        uint64_t size;
-+
-+        if (!port->downstream) {
-+            continue;
-+        }
-+
-+        name = g_strdup_printf("tz-ppc-port[%d]", i);
-+
-+        port->ppc = s;
-+        address_space_init(&port->downstream_as, port->downstream, name);
-+
-+        size = memory_region_size(port->downstream);
-+        memory_region_init_io(&port->upstream, obj, &tz_ppc_ops,
-+                              port, name, size);
-+        sysbus_init_mmio(sbd, &port->upstream);
-+        g_free(name);
++    for (i = 0; i < IOTS_NUM_APB_PPC; i++) {
++        fn(&s->apb[i]);
++    }
++    for (i = 0; i < IOTS_NUM_APB_EXP_PPC; i++) {
++        fn(&s->apbexp[i]);
++    }
++    for (i = 0; i < IOTS_NUM_AHB_EXP_PPC; i++) {
++        fn(&s->ahbexp[i]);
 +    }
 +}
 +
-+static const VMStateDescription tz_ppc_vmstate = {
-+    .name = "tz-ppc",
+ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
+                                         uint64_t *pdata,
+                                         unsigned size, MemTxAttrs attrs)
+ {
+     uint64_t r;
+     uint32_t offset = addr & ~0x3;
++    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
+ 
+     switch (offset) {
+     case A_AHBNSPPC0:
+@@ -105,34 +134,52 @@ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
+         r = 0;
+         break;
+     case A_SECRESPCFG:
+-    case A_NSCCFG:
+-    case A_SECMPCINTSTATUS:
++        r = s->secrespcfg;
++        break;
+     case A_SECPPCINTSTAT:
++        r = s->secppcintstat;
++        break;
+     case A_SECPPCINTEN:
+-    case A_SECMSCINTSTAT:
+-    case A_SECMSCINTEN:
+-    case A_BRGINTSTAT:
+-    case A_BRGINTEN:
++        r = s->secppcinten;
++        break;
+     case A_AHBNSPPCEXP0:
+     case A_AHBNSPPCEXP1:
+     case A_AHBNSPPCEXP2:
+     case A_AHBNSPPCEXP3:
++        r = s->ahbexp[offset_to_ppc_idx(offset)].ns;
++        break;
+     case A_APBNSPPC0:
+     case A_APBNSPPC1:
++        r = s->apb[offset_to_ppc_idx(offset)].ns;
++        break;
+     case A_APBNSPPCEXP0:
+     case A_APBNSPPCEXP1:
+     case A_APBNSPPCEXP2:
+     case A_APBNSPPCEXP3:
++        r = s->apbexp[offset_to_ppc_idx(offset)].ns;
++        break;
+     case A_AHBSPPPCEXP0:
+     case A_AHBSPPPCEXP1:
+     case A_AHBSPPPCEXP2:
+     case A_AHBSPPPCEXP3:
++        r = s->apbexp[offset_to_ppc_idx(offset)].sp;
++        break;
+     case A_APBSPPPC0:
+     case A_APBSPPPC1:
++        r = s->apb[offset_to_ppc_idx(offset)].sp;
++        break;
+     case A_APBSPPPCEXP0:
+     case A_APBSPPPCEXP1:
+     case A_APBSPPPCEXP2:
+     case A_APBSPPPCEXP3:
++        r = s->apbexp[offset_to_ppc_idx(offset)].sp;
++        break;
++    case A_NSCCFG:
++    case A_SECMPCINTSTATUS:
++    case A_SECMSCINTSTAT:
++    case A_SECMSCINTEN:
++    case A_BRGINTSTAT:
++    case A_BRGINTEN:
+     case A_NSMSCEXP:
+         qemu_log_mask(LOG_UNIMP,
+                       "IoTKit SecCtl S block read: "
+@@ -181,11 +228,66 @@ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
+     return MEMTX_OK;
+ }
+ 
++static void iotkit_secctl_update_ppc_ap(IoTKitSecCtlPPC *ppc)
++{
++    int i;
++
++    for (i = 0; i < ppc->numports; i++) {
++        bool v;
++
++        if (extract32(ppc->ns, i, 1)) {
++            v = extract32(ppc->nsp, i, 1);
++        } else {
++            v = extract32(ppc->sp, i, 1);
++        }
++        qemu_set_irq(ppc->ap[i], v);
++    }
++}
++
++static void iotkit_secctl_ppc_ns_write(IoTKitSecCtlPPC *ppc, uint32_t value)
++{
++    int i;
++
++    ppc->ns = value & MAKE_64BIT_MASK(0, ppc->numports);
++    for (i = 0; i < ppc->numports; i++) {
++        qemu_set_irq(ppc->nonsec[i], extract32(ppc->ns, i, 1));
++    }
++    iotkit_secctl_update_ppc_ap(ppc);
++}
++
++static void iotkit_secctl_ppc_sp_write(IoTKitSecCtlPPC *ppc, uint32_t value)
++{
++    ppc->sp = value & MAKE_64BIT_MASK(0, ppc->numports);
++    iotkit_secctl_update_ppc_ap(ppc);
++}
++
++static void iotkit_secctl_ppc_nsp_write(IoTKitSecCtlPPC *ppc, uint32_t value)
++{
++    ppc->nsp = value & MAKE_64BIT_MASK(0, ppc->numports);
++    iotkit_secctl_update_ppc_ap(ppc);
++}
++
++static void iotkit_secctl_ppc_update_irq_clear(IoTKitSecCtlPPC *ppc)
++{
++    uint32_t value = ppc->parent->secppcintstat;
++
++    qemu_set_irq(ppc->irq_clear, extract32(value, ppc->irq_bit_offset, 1));
++}
++
++static void iotkit_secctl_ppc_update_irq_enable(IoTKitSecCtlPPC *ppc)
++{
++    uint32_t value = ppc->parent->secppcinten;
++
++    qemu_set_irq(ppc->irq_enable, extract32(value, ppc->irq_bit_offset, 1));
++}
++
+ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
+                                          uint64_t value,
+                                          unsigned size, MemTxAttrs attrs)
+ {
++    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
+     uint32_t offset = addr;
++    IoTKitSecCtlPPC *ppc;
+ 
+     trace_iotkit_secctl_s_write(offset, value, size);
+ 
+@@ -198,33 +300,61 @@ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
+ 
+     switch (offset) {
+     case A_SECRESPCFG:
+-    case A_NSCCFG:
++        value &= 1;
++        s->secrespcfg = value;
++        qemu_set_irq(s->sec_resp_cfg, s->secrespcfg);
++        break;
+     case A_SECPPCINTCLR:
++        value &= 0x00f000f3;
++        foreach_ppc(s, iotkit_secctl_ppc_update_irq_clear);
++        break;
+     case A_SECPPCINTEN:
+-    case A_SECMSCINTCLR:
+-    case A_SECMSCINTEN:
+-    case A_BRGINTCLR:
+-    case A_BRGINTEN:
++        s->secppcinten = value & 0x00f000f3;
++        foreach_ppc(s, iotkit_secctl_ppc_update_irq_enable);
++        break;
+     case A_AHBNSPPCEXP0:
+     case A_AHBNSPPCEXP1:
+     case A_AHBNSPPCEXP2:
+     case A_AHBNSPPCEXP3:
++        ppc = &s->ahbexp[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_ns_write(ppc, value);
++        break;
+     case A_APBNSPPC0:
+     case A_APBNSPPC1:
++        ppc = &s->apb[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_ns_write(ppc, value);
++        break;
+     case A_APBNSPPCEXP0:
+     case A_APBNSPPCEXP1:
+     case A_APBNSPPCEXP2:
+     case A_APBNSPPCEXP3:
++        ppc = &s->apbexp[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_ns_write(ppc, value);
++        break;
+     case A_AHBSPPPCEXP0:
+     case A_AHBSPPPCEXP1:
+     case A_AHBSPPPCEXP2:
+     case A_AHBSPPPCEXP3:
++        ppc = &s->ahbexp[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_sp_write(ppc, value);
++        break;
+     case A_APBSPPPC0:
+     case A_APBSPPPC1:
++        ppc = &s->apb[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_sp_write(ppc, value);
++        break;
+     case A_APBSPPPCEXP0:
+     case A_APBSPPPCEXP1:
+     case A_APBSPPPCEXP2:
+     case A_APBSPPPCEXP3:
++        ppc = &s->apbexp[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_sp_write(ppc, value);
++        break;
++    case A_NSCCFG:
++    case A_SECMSCINTCLR:
++    case A_SECMSCINTEN:
++    case A_BRGINTCLR:
++    case A_BRGINTEN:
+         qemu_log_mask(LOG_UNIMP,
+                       "IoTKit SecCtl S block write: "
+                       "unimplemented offset 0x%x\n", offset);
+@@ -266,6 +396,7 @@ static MemTxResult iotkit_secctl_ns_read(void *opaque, hwaddr addr,
+                                          uint64_t *pdata,
+                                          unsigned size, MemTxAttrs attrs)
+ {
++    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
+     uint64_t r;
+     uint32_t offset = addr & ~0x3;
+ 
+@@ -277,15 +408,17 @@ static MemTxResult iotkit_secctl_ns_read(void *opaque, hwaddr addr,
+     case A_AHBNSPPPCEXP1:
+     case A_AHBNSPPPCEXP2:
+     case A_AHBNSPPPCEXP3:
++        r = s->ahbexp[offset_to_ppc_idx(offset)].nsp;
++        break;
+     case A_APBNSPPPC0:
+     case A_APBNSPPPC1:
++        r = s->apb[offset_to_ppc_idx(offset)].nsp;
++        break;
+     case A_APBNSPPPCEXP0:
+     case A_APBNSPPPCEXP1:
+     case A_APBNSPPPCEXP2:
+     case A_APBNSPPPCEXP3:
+-        qemu_log_mask(LOG_UNIMP,
+-                      "IoTKit SecCtl NS block read: "
+-                      "unimplemented offset 0x%x\n", offset);
++        r = s->apbexp[offset_to_ppc_idx(offset)].nsp;
+         break;
+     case A_PID4:
+     case A_PID5:
+@@ -326,7 +459,9 @@ static MemTxResult iotkit_secctl_ns_write(void *opaque, hwaddr addr,
+                                           uint64_t value,
+                                           unsigned size, MemTxAttrs attrs)
+ {
++    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
+     uint32_t offset = addr;
++    IoTKitSecCtlPPC *ppc;
+ 
+     trace_iotkit_secctl_ns_write(offset, value, size);
+ 
+@@ -342,15 +477,20 @@ static MemTxResult iotkit_secctl_ns_write(void *opaque, hwaddr addr,
+     case A_AHBNSPPPCEXP1:
+     case A_AHBNSPPPCEXP2:
+     case A_AHBNSPPPCEXP3:
++        ppc = &s->ahbexp[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_nsp_write(ppc, value);
++        break;
+     case A_APBNSPPPC0:
+     case A_APBNSPPPC1:
++        ppc = &s->apb[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_nsp_write(ppc, value);
++        break;
+     case A_APBNSPPPCEXP0:
+     case A_APBNSPPPCEXP1:
+     case A_APBNSPPPCEXP2:
+     case A_APBNSPPPCEXP3:
+-        qemu_log_mask(LOG_UNIMP,
+-                      "IoTKit SecCtl NS block write: "
+-                      "unimplemented offset 0x%x\n", offset);
++        ppc = &s->apbexp[offset_to_ppc_idx(offset)];
++        iotkit_secctl_ppc_nsp_write(ppc, value);
+         break;
+     case A_AHBNSPPPC0:
+     case A_PID4:
+@@ -399,15 +539,90 @@ static const MemoryRegionOps iotkit_secctl_ns_ops = {
+     .impl.max_access_size = 4,
+ };
+ 
++static void iotkit_secctl_reset_ppc(IoTKitSecCtlPPC *ppc)
++{
++    ppc->ns = 0;
++    ppc->sp = 0;
++    ppc->nsp = 0;
++}
++
+ static void iotkit_secctl_reset(DeviceState *dev)
+ {
++    IoTKitSecCtl *s = IOTKIT_SECCTL(dev);
+ 
++    s->secppcintstat = 0;
++    s->secppcinten = 0;
++    s->secrespcfg = 0;
++
++    foreach_ppc(s, iotkit_secctl_reset_ppc);
++}
++
++static void iotkit_secctl_ppc_irqstatus(void *opaque, int n, int level)
++{
++    IoTKitSecCtlPPC *ppc = opaque;
++    IoTKitSecCtl *s = IOTKIT_SECCTL(ppc->parent);
++    int irqbit = ppc->irq_bit_offset + n;
++
++    s->secppcintstat = deposit32(s->secppcintstat, irqbit, 1, level);
++}
++
++static void iotkit_secctl_init_ppc(IoTKitSecCtl *s,
++                                   IoTKitSecCtlPPC *ppc,
++                                   const char *name,
++                                   int numports,
++                                   int irq_bit_offset)
++{
++    char *gpioname;
++    DeviceState *dev = DEVICE(s);
++
++    ppc->numports = numports;
++    ppc->irq_bit_offset = irq_bit_offset;
++    ppc->parent = s;
++
++    gpioname = g_strdup_printf("%s_nonsec", name);
++    qdev_init_gpio_out_named(dev, ppc->nonsec, gpioname, numports);
++    g_free(gpioname);
++    gpioname = g_strdup_printf("%s_ap", name);
++    qdev_init_gpio_out_named(dev, ppc->ap, gpioname, numports);
++    g_free(gpioname);
++    gpioname = g_strdup_printf("%s_irq_enable", name);
++    qdev_init_gpio_out_named(dev, &ppc->irq_enable, gpioname, 1);
++    g_free(gpioname);
++    gpioname = g_strdup_printf("%s_irq_clear", name);
++    qdev_init_gpio_out_named(dev, &ppc->irq_clear, gpioname, 1);
++    g_free(gpioname);
++    gpioname = g_strdup_printf("%s_irq_status", name);
++    qdev_init_gpio_in_named_with_opaque(dev, iotkit_secctl_ppc_irqstatus,
++                                        ppc, gpioname, 1);
++    g_free(gpioname);
+ }
+ 
+ static void iotkit_secctl_init(Object *obj)
+ {
+     IoTKitSecCtl *s = IOTKIT_SECCTL(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    DeviceState *dev = DEVICE(obj);
++    int i;
++
++    iotkit_secctl_init_ppc(s, &s->apb[0], "apb_ppc0",
++                           IOTS_APB_PPC0_NUM_PORTS, 0);
++    iotkit_secctl_init_ppc(s, &s->apb[1], "apb_ppc1",
++                           IOTS_APB_PPC1_NUM_PORTS, 1);
++
++    for (i = 0; i < IOTS_NUM_APB_EXP_PPC; i++) {
++        IoTKitSecCtlPPC *ppc = &s->apbexp[i];
++        char *ppcname = g_strdup_printf("apb_ppcexp%d", i);
++        iotkit_secctl_init_ppc(s, ppc, ppcname, IOTS_PPC_NUM_PORTS, 4 + i);
++        g_free(ppcname);
++    }
++    for (i = 0; i < IOTS_NUM_AHB_EXP_PPC; i++) {
++        IoTKitSecCtlPPC *ppc = &s->ahbexp[i];
++        char *ppcname = g_strdup_printf("ahb_ppcexp%d", i);
++        iotkit_secctl_init_ppc(s, ppc, ppcname, IOTS_PPC_NUM_PORTS, 20 + i);
++        g_free(ppcname);
++    }
++
++    qdev_init_gpio_out_named(dev, &s->sec_resp_cfg, "sec_resp_cfg", 1);
+ 
+     memory_region_init_io(&s->s_regs, obj, &iotkit_secctl_s_ops,
+                           s, "iotkit-secctl-s-regs", 0x1000);
+@@ -417,11 +632,32 @@ static void iotkit_secctl_init(Object *obj)
+     sysbus_init_mmio(sbd, &s->ns_regs);
+ }
+ 
++static const VMStateDescription iotkit_secctl_ppc_vmstate = {
++    .name = "iotkit-secctl-ppc",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_BOOL_ARRAY(cfg_nonsec, TZPPC, 16),
-+        VMSTATE_BOOL_ARRAY(cfg_ap, TZPPC, 16),
-+        VMSTATE_BOOL(cfg_sec_resp, TZPPC),
-+        VMSTATE_BOOL(irq_enable, TZPPC),
-+        VMSTATE_BOOL(irq_clear, TZPPC),
-+        VMSTATE_BOOL(irq_status, TZPPC),
++        VMSTATE_UINT32(ns, IoTKitSecCtlPPC),
++        VMSTATE_UINT32(sp, IoTKitSecCtlPPC),
++        VMSTATE_UINT32(nsp, IoTKitSecCtlPPC),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+#define DEFINE_PORT(N)                                          \
-+    DEFINE_PROP_LINK("port[" #N "]", TZPPC, port[N].downstream, \
-+                     TYPE_MEMORY_REGION, MemoryRegion *)
-+
-+static Property tz_ppc_properties[] = {
-+    DEFINE_PROP_UINT32("NONSEC_MASK", TZPPC, nonsec_mask, 0),
-+    DEFINE_PORT(0),
-+    DEFINE_PORT(1),
-+    DEFINE_PORT(2),
-+    DEFINE_PORT(3),
-+    DEFINE_PORT(4),
-+    DEFINE_PORT(5),
-+    DEFINE_PORT(6),
-+    DEFINE_PORT(7),
-+    DEFINE_PORT(8),
-+    DEFINE_PORT(9),
-+    DEFINE_PORT(10),
-+    DEFINE_PORT(11),
-+    DEFINE_PORT(12),
-+    DEFINE_PORT(13),
-+    DEFINE_PORT(14),
-+    DEFINE_PORT(15),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void tz_ppc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = tz_ppc_realize;
-+    dc->vmsd = &tz_ppc_vmstate;
-+    dc->reset = tz_ppc_reset;
-+    dc->props = tz_ppc_properties;
-+}
-+
-+static const TypeInfo tz_ppc_info = {
-+    .name = TYPE_TZ_PPC,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(TZPPC),
-+    .instance_init = tz_ppc_init,
-+    .class_init = tz_ppc_class_init,
-+};
-+
-+static void tz_ppc_register_types(void)
-+{
-+    type_register_static(&tz_ppc_info);
-+}
-+
-+type_init(tz_ppc_register_types);
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index c11b55e385..6aa564b754 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -103,6 +103,8 @@ CONFIG_CMSDK_APB_UART=y
- CONFIG_MPS2_FPGAIO=y
- CONFIG_MPS2_SCC=y
- 
-+CONFIG_TZ_PPC=y
-+
- CONFIG_VERSATILE_PCI=y
- CONFIG_VERSATILE_I2C=y
- 
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index ef852ffae7..0b638de682 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -83,3 +83,14 @@ mos6522_get_next_irq_time(uint16_t latch, int64_t d, int64_t delta) "latch=%d co
- mos6522_set_sr_int(void) "set sr_int"
- mos6522_write(uint64_t addr, uint64_t val) "reg=0x%"PRIx64 " val=0x%"PRIx64
- mos6522_read(uint64_t addr, unsigned val) "reg=0x%"PRIx64 " val=0x%x"
-+
-+# hw/misc/tz-ppc.c
-+tz_ppc_reset(void) "TZ PPC: reset"
-+tz_ppc_cfg_nonsec(int n, int level) "TZ PPC: cfg_nonsec[%d] = %d"
-+tz_ppc_cfg_ap(int n, int level) "TZ PPC: cfg_ap[%d] = %d"
-+tz_ppc_cfg_sec_resp(int level) "TZ PPC: cfg_sec_resp = %d"
-+tz_ppc_irq_enable(int level) "TZ PPC: int_enable = %d"
-+tz_ppc_irq_clear(int level) "TZ PPC: int_clear = %d"
-+tz_ppc_update_irq(int level) "TZ PPC: setting irq line to %d"
-+tz_ppc_read_blocked(int n, hwaddr offset, bool secure, bool user) "TZ PPC: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
-+tz_ppc_write_blocked(int n, hwaddr offset, bool secure, bool user) "TZ PPC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked"
+ static const VMStateDescription iotkit_secctl_vmstate = {
+     .name = "iotkit-secctl",
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32(secppcintstat, IoTKitSecCtl),
++        VMSTATE_UINT32(secppcinten, IoTKitSecCtl),
++        VMSTATE_UINT32(secrespcfg, IoTKitSecCtl),
++        VMSTATE_STRUCT_ARRAY(apb, IoTKitSecCtl, IOTS_NUM_APB_PPC, 1,
++                             iotkit_secctl_ppc_vmstate, IoTKitSecCtlPPC),
++        VMSTATE_STRUCT_ARRAY(apbexp, IoTKitSecCtl, IOTS_NUM_APB_EXP_PPC, 1,
++                             iotkit_secctl_ppc_vmstate, IoTKitSecCtlPPC),
++        VMSTATE_STRUCT_ARRAY(ahbexp, IoTKitSecCtl, IOTS_NUM_AHB_EXP_PPC, 1,
++                             iotkit_secctl_ppc_vmstate, IoTKitSecCtlPPC),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 -- 
 2.16.1
