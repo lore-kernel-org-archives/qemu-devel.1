@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo3fe-0007jY-Cm
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 03:53:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eo3zd-0002Nx-Kz
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 04:13:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo3fZ-0000kK-FG
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 03:53:06 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54960 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo3fZ-0000jr-AY
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 03:53:01 -0500
-Date: Tue, 20 Feb 2018 09:52:49 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180220085249.wd5f43xzd224riya@sirius.home.kraxel.org>
-References: <CABLmASGFPBQV8y1Omm+S53P92Dew_aWBBbDoap+c2b2PVxeLzg@mail.gmail.com>
-	<ab4612a8-5c82-5abf-cbc3-d5ec47cd9498@tuxfamily.org>
-	<CABLmASFG_cT768zVJwKwrOAB=xhbhvzLa_wvJ4qjRkE6GoZvrA@mail.gmail.com>
-	<20180219085648.kgkeo36adbk2tp6g@sirius.home.kraxel.org>
-	<CABLmASFgZaV3OgFMykpSi3Ok46+xQ+FW0GNTM+0-wgZyhh8qNw@mail.gmail.com>
-	<20180219103034.zbqxtdises26loqb@sirius.home.kraxel.org>
-	<CABLmASFziChKARGJ-+R0ZJr-F4rbVFZFaixC-CZ8mPF2Sfr=9w@mail.gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1eo3zZ-0002zI-J8
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 04:13:45 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:57045)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eo3zZ-0002yB-8g
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 04:13:41 -0500
+References: <20180219171037.24539-1-laurent@vivier.eu>
+	<CAFEAcA-W+xQMov2=WHPYwh_EVFiaW+8D+0VWB2T6kJ6Bo_xLFw@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <3d677b9c-d3aa-d34f-d6fc-48625bd1f77a@vivier.eu>
+Date: Tue, 20 Feb 2018 10:13:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABLmASFziChKARGJ-+R0ZJr-F4rbVFZFaixC-CZ8mPF2Sfr=9w@mail.gmail.com>
-Subject: Re: [Qemu-devel] Qemu SDL2 bug
+In-Reply-To: <CAFEAcA-W+xQMov2=WHPYwh_EVFiaW+8D+0VWB2T6kJ6Bo_xLFw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 0/8] Linux user for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Howard Spoelstra <hsp.cat7@gmail.com>
-Cc: Thomas Huth <huth@tuxfamily.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-  Hi,
-
-> > Including most recent ui pull request (commit 5e8d6a12d643a38b82a0a713a77d1192117dbdca) ?
-> >
-> > I'm wondering that you need Ctrl-Alt-G in the first place, sdl2 and gtk
-> > should have identical behavior here (i.e. no ctrl-alt-g needed in case a
-> > tablet or other absolute ptr device is present).
-> >
-> > cheers,
-> >   Gerd
-> >
-> Hi,
+Le 19/02/2018 à 20:50, Peter Maydell a écrit :
+> On 19 February 2018 at 17:10, Laurent Vivier <laurent@vivier.eu> wrote:
+>> The following changes since commit f0fa81767555fe2c4b5f8c9e0725a80eac1d7f56:
+>>
+>>   cuda.h: Fix multiple typedef (2018-02-16 18:38:21 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://github.com/vivier/qemu.git tags/linux-user-for-2.12-pull-request
+>>
+>> for you to fetch changes up to f352a021329f73d0219018cdfb39369687e8cadd:
+>>
+>>   linux-user: MIPS set cpu to r6 CPU if binary is R6 (2018-02-18 18:52:32 +0100)
+>>
+>> ----------------------------------------------------------------
+>>
+>> ----------------------------------------------------------------
 > 
-> I went on to compile dgibson's rep which includes that commit. But the
-> issue remains.
-> I normally use -usb-mouse -usb-kbd in the command line, as these work
-> for Mac OS 9.x up to 10.5. Using -usb-tablet allows the mouse to
-> travel outside the GUI and seems to circumvent the issue in OSX
-> guests, but Mac OS 9.x  guests do not work with -usb-tablet.
+> Hi. This breaks one of my linux-user smoke tests:
+> 
+> /home/petmay01/linaro/qemu-for-merges/build/all-linux-static/sparc32plus-linux-user/qemu-sparc32plus
+> -L ./gnemul/qemu-sparc sparc/ls -l dummyfile
+> unable to find CPU model 'Fujitsu MB86904'
+> 
+> This is because the include path for linux-user picks the
+> guest-architecture subdirectory for the TARGET_ABI_DIR,
+> which for sparc32plus is "sparc", but the set of CPUs compiled
+> in depends on the TARGET_ARCH, which is "sparc64", and
+> sparc64 doesn't include that 32-bit Fujitsu CPU.
+> The linux-user/sparc/target_elf.h needs to have code to handle
+> both the pure-32-bit and 32-bit-ABI-on-64-bit-CPU cases,
+> the same way that linux-user/ppc/target_elf.h does.
 
-Ok, I'll try to figure what is going on.
+Thank you Peter,
 
-But without usb-tablet both sdl and gtk should grab the mouse and
-require ungrab via ctrl-alt-g hotkey to move it out of the window ...
+I'm going to remove the 4 last patches from the pull request and resend it.
 
-cheers,
-  Gerd
+Thanks,
+Laurent
