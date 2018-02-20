@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eoB1i-0004Cd-78
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:44:23 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eoBDn-0006WK-23
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:56:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eoB1f-0003HP-JL
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:44:22 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52384 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1eoBDj-00047z-90
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:56:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52850 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eoB1f-0003Fx-Cg
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:44:19 -0500
-References: <20180207225540.31698-1-richard.henderson@linaro.org>
-	<20180207225540.31698-20-richard.henderson@linaro.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ddb804a5-6c00-57c3-03ef-d77daedda511@redhat.com>
-Date: Tue, 20 Feb 2018 17:44:08 +0100
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoBDj-00047V-41
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 11:56:47 -0500
+Date: Tue, 20 Feb 2018 16:56:34 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180220165634.GA12161@stefanha-x1.localdomain>
+References: <12c223afbafb402d6e6602a5888e5dca2953dbfc.1519044214.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180207225540.31698-20-richard.henderson@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="f5KeM8ejA4Qlf5OHeHyin7sCuxdXpIxgV"
-Subject: Re: [Qemu-devel] [PULL 19/20] tcg/i386: Add vector operations
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Qxx1br4bt0+wmkIi"
+Content-Disposition: inline
+In-Reply-To: <12c223afbafb402d6e6602a5888e5dca2953dbfc.1519044214.git.tgolembi@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH] docs: document virtio-balloon
+ stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Wei Wang <wei.w.wang@intel.com>, Jonathan Helman <jonathan.helman@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f5KeM8ejA4Qlf5OHeHyin7sCuxdXpIxgV
-From: Max Reitz <mreitz@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-Message-ID: <ddb804a5-6c00-57c3-03ef-d77daedda511@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 19/20] tcg/i386: Add vector operations
-References: <20180207225540.31698-1-richard.henderson@linaro.org>
- <20180207225540.31698-20-richard.henderson@linaro.org>
-In-Reply-To: <20180207225540.31698-20-richard.henderson@linaro.org>
+
+--Qxx1br4bt0+wmkIi
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-02-07 23:55, Richard Henderson wrote:
-> The x86 vector instruction set is extremely irregular.  With newer
-> editions, Intel has filled in some of the blanks.  However, we don't
-> get many 64-bit operations until SSE4.2, introduced in 2009.
+On Mon, Feb 19, 2018 at 01:43:44PM +0100, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
+ wrote:
+> Document statistics added in commits
 >=20
-> The subsequent edition was for AVX1, introduced in 2011, which added
-> three-operand addressing, and adjusts how all instructions should be
-> encoded.
+>     commit a0d06486b445985b8d128df172daefbae205bffd
+>     Author: Denis V. Lunev <den@openvz.org>
+>     Date:   Wed Feb 24 10:50:48 2016 +0300
 >=20
-> Given the relatively narrow 2 year window between possible to support
-> and desirable to support, and to vastly simplify code maintainence,
-> I am only planning to support AVX1 and later cpus.
+>         virtio-balloon: add 'available' counter
 >=20
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> and
+>=20
+>     commit bf1e7140ef0b3a149860ab9f05b36665133238f6
+>     Author: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+>     Date:   Tue Dec 5 13:14:46 2017 +0100
+>=20
+>         virtio-balloon: include statistics of disk/file caches
+>=20
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 > ---
->  tcg/i386/tcg-target.h     |  41 +-
->  tcg/i386/tcg-target.opc.h |  13 +
->  tcg/i386/tcg-target.inc.c | 987 ++++++++++++++++++++++++++++++++++++++=
-+++++---
->  3 files changed, 987 insertions(+), 54 deletions(-)
->  create mode 100644 tcg/i386/tcg-target.opc.h
+>  docs/virtio-balloon-stats.txt | 2 ++
+>  1 file changed, 2 insertions(+)
 
-This patch makes make check with clang -m32 fail for me.  (Interestingly
-enough, though, clang -m64 and gcc -m32 work fine.)
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-  GTESTER check-qtest-x86_64
-qemu-system-x86_64: tcg/tcg.c:1928: void process_op_defs(TCGContext *):
-Assertion `tdefs !=3D ((void*)0)' failed.
-socket_accept failed: Resource temporarily unavailable
-**
-ERROR:tests/libqtest.c:218:qtest_init_without_qmp_handshake: assertion
-failed: (s->fd >=3D 0 && s->qmp_fd >=3D 0)
-GTester: last random seed: R02Sd65222fb9e582d96aaa44bfe71602302
-qemu-system-x86_64: tcg/tcg.c:1928: void process_op_defs(TCGContext *):
-Assertion `tdefs !=3D ((void*)0)' failed.
-socket_accept failed: Resource temporarily unavailable
-**
-ERROR:tests/libqtest.c:218:qtest_init_without_qmp_handshake: assertion
-failed: (s->fd >=3D 0 && s->qmp_fd >=3D 0)
-GTester: last random seed: R02S244a2da30d9373db0cf52cd40f1b726a
-
-(This is with the tdefs !=3D NULL assertion enabled; usually, the qemu
-process just crashes instead of printing that assertion failure message.)=
-
-
-Max
-
-
---f5KeM8ejA4Qlf5OHeHyin7sCuxdXpIxgV
+--Qxx1br4bt0+wmkIi
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqMUFgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AjJYH/3FcfhiEQ23HuRbsEqIPJTdEG4ck+O0v
-gXwUH0qwaDzIg63akQmoHUUreaHzgeJFa+QGvX4o+N/JULJgNN1EG9YyahnnD4vV
-DyNYBVWGG8mnQSJkCKzw+YJ/vOIF2JDSGXsnKAEC/sqSLZf3lzbqoNxfU102IILP
-lVCYEzN73Mt5IRWzkiHdaf45SXXgkidow8wY+cq4YFzSv80DwON3DjMLmWsjgbT3
-tEHS+aBq9T8Vg4WYal6Wb+o6Uh6p8Do6aPvYVrAHtzn5qcJmddYr3wsxOShpOBqh
-wYfjzlEa0cVuhjjX/fSHAFRfR4vBDIlkItzj6Bl9CDr9so3FHEL/gKI=
-=8ZoC
+iQEcBAEBAgAGBQJajFNBAAoJEJykq7OBq3PIYmoIAJCqyVBCOddyRe7A+xIDRaoh
+enFTqfHEJ82tLaq4Tebw/aONy2UdklNg43kdVjUFHOmk4aELRq1psQhOmPvSq/Wb
+/2v/KuySJaigGGrbjzeQ0YjJcqWLdgTXvoBvEyCP999/3FHx6vJvH4zlVcc68i8g
+BU+RfjZMGqjs1l9WcMwkco4bNmVhL6AohBozJK6TPyN2gn/UZwPnneqdOP0ysL2W
+uTzo4uqekm4n9wZhmT4WlkhIcA7g54G7vkHkBScbM/QhiFRSj2Bq7olBjygQqfZW
+nv8x6LCOaK5ZRD5CfyIH3iSYvMLCPbwryteYQAIfwf43rxWvN4C8Sa8vSFycxfM=
+=cmwu
 -----END PGP SIGNATURE-----
 
---f5KeM8ejA4Qlf5OHeHyin7sCuxdXpIxgV--
+--Qxx1br4bt0+wmkIi--
