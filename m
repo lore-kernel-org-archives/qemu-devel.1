@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoA0l-0003pK-KK
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:39:20 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eoA1G-00048z-Nm
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:39:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoA0k-0004Jh-RQ
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:39:19 -0500
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:36357)
+	(envelope-from <peter.maydell@linaro.org>) id 1eoA1F-0004dF-MI
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:39:50 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33608)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eoA0k-0004In-L3
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:39:18 -0500
-Received: by mail-ot0-x232.google.com with SMTP id b15so5813265otf.3
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 07:39:18 -0800 (PST)
+	id 1eoA1F-0004d8-GX
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:39:49 -0500
+Received: by mail-oi0-x244.google.com with SMTP id l124so9764268oib.0
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 07:39:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180220134723.11776-1-kraxel@redhat.com>
-References: <20180220134723.11776-1-kraxel@redhat.com>
+In-Reply-To: <20180220104942.14531-1-groug@kaod.org>
+References: <20180220104942.14531-1-groug@kaod.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Feb 2018 15:38:57 +0000
-Message-ID: <CAFEAcA-PZ6pNYAYAx=FO79CKJXBgnLLYoxcRw=zSBj_2_X3isw@mail.gmail.com>
+Date: Tue, 20 Feb 2018 15:39:28 +0000
+Message-ID: <CAFEAcA_H1auuesqUu6SBj-ksLd2eghftQHDxDAVHre_z0ENyNw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] Ui 20180220 patches
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/2] 9p patches for 2.12 20180220
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
+To: Greg Kurz <groug@kaod.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 20 February 2018 at 13:47, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit afd3397a8149d8b645004e459bf2002d78f5e267:
+On 20 February 2018 at 10:49, Greg Kurz <groug@kaod.org> wrote:
+> The following changes since commit 299a2e6fac397be9b82c66583d53d1daaa3ffe=
+6c:
 >
->   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2018-02-19 16:44:12 +0000)
+>   Merge remote-tracking branch 'remotes/marcel/tags/rdma-pull-request' in=
+to staging (2018-02-19 12:51:11 +0000)
 >
 > are available in the git repository at:
 >
->   git://git.kraxel.org/qemu tags/ui-20180220-pull-request
+>   https://github.com/gkurz/qemu.git tags/for-upstream
 >
-> for you to fetch changes up to 63ad932567df012ff4bf820a9ed0e2affd9dc5af:
+> for you to fetch changes up to 6ce7177ae2e547999ef9e6f467415963991e28da:
 >
->   ui: Reorder vte terminal packing to avoid gtk3 warnings (2018-02-20 12:16:11 +0100)
->
-> ----------------------------------------------------------------
-> ui: reorganize and cleanup display command line parsing.
-> gtk: fix gtk3 warnings.
+>   9p: fix leak in synth_name_to_path() (2018-02-19 18:27:32 +0100)
 >
 > ----------------------------------------------------------------
+> Fix memory leak in synth backend.
 >
-> Gerd Hoffmann (11):
->   vl: deprecate -no-frame
->   vl: rename DisplayType to LegacyDisplayType
->   gtk: add and use DisplayOptions + DisplayGTK
->   sdl: use DisplayOptions
->   vl: drop no_quit variable
->   egl-headless: use DisplayOptions
->   curses: use DisplayOptions
->   cocoa: use DisplayOptions
->   vl: drop full_screen variable
->   vl: drop request_opengl variable
->   vl: drop display_type variable
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (2):
+>       9p: v9fs_path_copy() readability
+>       9p: fix leak in synth_name_to_path()
 >
-> Jan Kiszka (1):
->   ui: Reorder vte terminal packing to avoid gtk3 warnings
+>  hw/9pfs/9p-synth.c | 1 +
+>  hw/9pfs/9p.c       | 9 ++++-----
+>  hw/9pfs/9p.h       | 2 +-
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+> --
 
 Applied, thanks.
 
