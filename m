@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eo9Er-0002Ig-G2
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:49:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eo9HQ-0003BT-Ig
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eo9Eo-0008IH-Df
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:49:49 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38794 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eo9Eo-0008Hq-7x
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:49:46 -0500
-Date: Tue, 20 Feb 2018 14:49:38 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180220144938.GL6021@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAG9FBFpFBrUrG0bRwjAo6xHYG4rnc0BT_ufLSa-HsO2WWgvKJw@mail.gmail.com>
-	<3de4128f-7749-fc52-d5ec-5744b4e74301@redhat.com>
-	<20180220083857.5l33rci3iz35uaze@sirius.home.kraxel.org>
-	<869bcfe6-8199-d7fa-7193-4bb17f6d6ca7@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eo9HN-0001O1-Gn
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:52:28 -0500
+References: <20180205151835.20812-1-mreitz@redhat.com>
+	<20180205151835.20812-19-mreitz@redhat.com>
+	<b9fa2031-a042-165a-47fd-e0d4b4a24738@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b937024c-5fbb-1250-a02c-f187f1522594@redhat.com>
+Date: Tue, 20 Feb 2018 15:51:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <869bcfe6-8199-d7fa-7193-4bb17f6d6ca7@redhat.com>
-Subject: Re: [Qemu-devel] qemu warnings and errors
+In-Reply-To: <b9fa2031-a042-165a-47fd-e0d4b4a24738@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6mYMTc1dVb2m5Mt9peHYFaoG6UnN6F8uk"
+Subject: Re: [Qemu-devel] [PATCH v8 18/26] block: Add sgfnt_runtime_opts to
+ BlockDriver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +26,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, James Barrett <xucaen@gmail.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-On Tue, Feb 20, 2018 at 08:45:00AM -0600, Eric Blake wrote:
-> On 02/20/2018 02:38 AM, Gerd Hoffmann wrote:
-> >    Hi,
-> > 
-> > > What version of QEMU?
-> > > 
-> > > > unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
-> > > 
-> > > This part is the only part that urges you to report the error, but I
-> > > don't know much about what's going on here.
-> > > 
-> > > Maybe Gerd knows?
-> > 
-> > We had lots of keymap/keycode changes recently, most likely this will be
-> > fixed in 2.12, maybe it already is in 2.11.  So, when using something
-> > older, try upgrading first (or just ignore it in case it happes to be a
-> > key you don't need).
-> 
-> The error message doesn't mention a numeric code or other way to figure out
-> which key is problematic.  While this particular message may disappear when
-> you upgrade, it would also be worth investigating if this message can give
-> more details to figure out which keycode is problematic in case of future
-> mismatches, other than just "unnamed".
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6mYMTc1dVb2m5Mt9peHYFaoG6UnN6F8uk
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org
+Message-ID: <b937024c-5fbb-1250-a02c-f187f1522594@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 18/26] block: Add sgfnt_runtime_opts to
+ BlockDriver
+References: <20180205151835.20812-1-mreitz@redhat.com>
+ <20180205151835.20812-19-mreitz@redhat.com>
+ <b9fa2031-a042-165a-47fd-e0d4b4a24738@redhat.com>
+In-Reply-To: <b9fa2031-a042-165a-47fd-e0d4b4a24738@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It isn't about a specific key. This message is basically saying we don't
-know what keymapping the X server is using, so we've given up. Historically
-QEMU could only identify evdev and/or kbd key mappings. With the newly
-merged code, we can now detect many more especially including Windows and
-OS-X X11 server mappings. So git master hopefully removed the most common
-cases that would trigger this particular error message. There's probably
-still some remaining though, as there's a huge range of X11 servers impls
-in the world.  With current git master this message will instruct the user
-to provide us a list of relevant info to help us diagnose it - see the
-end of ui/x_keymap.c file.
+On 2018-02-06 20:43, Eric Blake wrote:
+> On 02/05/2018 09:18 AM, Max Reitz wrote:
+>> This new field can be set by block drivers to list the runtime options=
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>> they accept that may influence the contents of the respective BDS. As =
+of
+>> a follow-up patch, this list will be used by the common
+>> bdrv_refresh_filename() implementation to decide which options to put
+>> into BDS.full_open_options (and consequently whether a JSON filename h=
+as
+>> to be created), thus freeing the drivers of having to implement that
+>> logic themselves.
+>>
+>> Additionally, this patch adds the field to all of the block drivers th=
+at
+>> need it and sets it accordingly.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>=20
+>> +=C2=A0=C2=A0=C2=A0 /* Pointer to a NULL-terminated array of names of =
+significant
+>> options that
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * can be specified for bdrv_open(). A signif=
+icant option is one
+>> that
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * changes the data of a BDS.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * If this pointer is NULL, the array is cons=
+idered empty.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * "filename" and "driver" are always conside=
+red significant. */
+>> +=C2=A0=C2=A0=C2=A0 const char *const *sgfnt_runtime_opts;
+>=20
+> Warning: Bikeshedding follows:
+>=20
+> s/sgfnt/vital/
+>=20
+> might read easier (same number of letters, but has some vowels rthr thn=
+
+> bng crptc bbrvtn).
+
+So, did we reach any verdict on this? :-)
+
+To sum up IRC (as far as I've understood), I don't quite like "vital" or
+"needed" because they sound like those options would be required; but
+they usually have defaults so they are not.
+
+I preferred "strong", but you said that might mean something else
+(although I still don't know what exactly :-)).
+
+So...?
+
+Max
+
+
+--6mYMTc1dVb2m5Mt9peHYFaoG6UnN6F8uk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqMNgoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AAJ4IALPqeZ8MUmK+g+2GJ2sY0GsWR2f1r4Vk
+1D6W/SVZR2rdh8nkinTbuDntpkzktebW80g/MDpXQxPabmnVxdW3YeX/QicMJf6K
+3qRQEAYOkp5QuhMW+f0yoX9MPkZG300ClIxjYtdGXwXcX6rO1EAl2IAo6JLN8GKI
+ZIk3b4mFDNhzWMrSQe1VYl3DaxWETmtXfu6BJ/rCSa1qP/V2LYhcTVS5O3ZP8VKQ
+gKRSVmBLP28bsr4Hog23GROGsiS7qig8MRLUTbvh49nQ+ivHc7kG6J79N2kuIbPq
+3cVp5pFkqJn1Y6EPfAZEffP/+09tbid6u6TkVBovMN0yxBGAd0FsmP0=
+=WNHN
+-----END PGP SIGNATURE-----
+
+--6mYMTc1dVb2m5Mt9peHYFaoG6UnN6F8uk--
