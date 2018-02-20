@@ -1,18 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hlandau@devever.net>) id 1eo7wt-00081i-8R
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:27:12 -0500
+	(envelope-from <bounces@canonical.com>) id 1eo8Es-0004XD-Ay
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:45:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hlandau@devever.net>) id 1eo7wp-0006on-WB
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:27:11 -0500
-Received: from umbriel.devever.net ([149.202.51.241]:34574)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hlandau@devever.net>) id 1eo7wp-0006nD-KH
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:27:07 -0500
-From: Hugo Landau <hlandau@devever.net>
-Date: Tue, 20 Feb 2018 13:26:27 +0000
-Message-Id: <20180220132627.4163-1-hlandau@devever.net>
-Subject: [Qemu-devel] [PATCH] Fix ast2500 protection register emulation
+	(envelope-from <bounces@canonical.com>) id 1eo8Ep-0005Fo-71
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:45:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eo8Ep-0005Ec-0U
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 08:45:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eo8En-0000WL-UP
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:45:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D83802E80CC
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 13:45:41 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 20 Feb 2018 13:26:38 -0000
+From: Thomas Huth <1187529@bugs.launchpad.net>
+Reply-To: Bug 1187529 <1187529@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130604183209.6036.79098.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151913319887.2410.11052716208316289987.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1187529] Re: Devices on PCI bridge stop working
+ when live-migrated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,92 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, clg@kaod.org
-Cc: Hugo Landau <hlandau@devever.net>
+To: qemu-devel@nongnu.org
 
-Some register blocks of the ast2500 are protected by protection key
-registers which require the right magic value to be written to those
-registers to allow those registers to be mutated.
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-Register manuals indicate that writing the correct magic value to these
-registers should cause subsequent reads from those values to return 1,
-and writing any other value should cause subsequent reads to return 0.
 
-Previously, qemu implemented these registers incorrectly: the registers
-were handled as simple memory, meaning that writing some value x to a
-protection key register would result in subsequent reads from that
-register returning the same value x. The protection was implemented by
-ensuring that the current value of that register equaled the magic
-value.
+** Changed in: qemu
+     Assignee: Don Koch (dkoch-r) =3D> (unassigned)
 
-This modifies qemu to have the correct behaviour: attempts to write to a
-ast2500 protection register results in a transition to 1 or 0 depending
-on whether the written value is the correct magic. The protection logic
-is updated to ensure that the value of the register is nonzero.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-This bug caused deadlocks with u-boot HEAD: when u-boot is done with a
-protectable register block, it attempts to lock it by writing the
-bitwise inverse of the correct magic value, and then spinning forever
-until the register reads as zero. Since qemu implemented writes to these
-registers as ordinary memory writes, writing the inverse of the magic
-value resulted in subsequent reads returning that value, leading to
-u-boot spinning forever.
+-- =
 
-Signed-off-by: Hugo Landau <hlandau@devever.net>
----
- hw/misc/aspeed_scu.c  | 6 +++++-
- hw/misc/aspeed_sdmc.c | 8 +++++++-
- 2 files changed, 12 insertions(+), 2 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1187529
 
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index 74537ce975..5e6d5744ee 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -191,7 +191,7 @@ static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t data,
-     }
- 
-     if (reg > PROT_KEY && reg < CPU2_BASE_SEG1 &&
--            s->regs[PROT_KEY] != ASPEED_SCU_PROT_KEY) {
-+            !s->regs[PROT_KEY]) {
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: SCU is locked!\n", __func__);
-         return;
-     }
-@@ -199,6 +199,10 @@ static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t data,
-     trace_aspeed_scu_write(offset, size, data);
- 
-     switch (reg) {
-+    case PROT_KEY:
-+        s->regs[reg] = (data == ASPEED_SCU_PROT_KEY) ? 1 : 0;
-+        return;
-+
-     case FREQ_CNTR_EVAL:
-     case VGA_SCRATCH1 ... VGA_SCRATCH8:
-     case RNG_DATA:
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index f0b3053fae..265171ee42 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -110,7 +110,12 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
-         return;
-     }
- 
--    if (addr != R_PROT && s->regs[R_PROT] != PROT_KEY_UNLOCK) {
-+    if (addr == R_PROT) {
-+      s->regs[addr] = (data == PROT_KEY_UNLOCK) ? 1 : 0;
-+      return;
-+    }
-+
-+    if (!s->regs[R_PROT]) {
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
-         return;
-     }
-@@ -123,6 +128,7 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
-             data &= ~ASPEED_SDMC_READONLY_MASK;
-             break;
-         case AST2500_A0_SILICON_REV:
-+        case AST2500_A1_SILICON_REV:
-             data &= ~ASPEED_SDMC_AST2500_READONLY_MASK;
-             break;
-         default:
--- 
-2.15.0
+Title:
+  Devices on PCI bridge stop working when live-migrated
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  qemu version: 1.4.50 (0ca5aa4f4c4a8bcc73988dd52a536241d35e5223)
+  host: x86_64, Linux 3.6.10 (Fedora 17)
+  client: x86_64 Centos 6.3 (doesn't matter, really)
+
+  If a device, e.g. an lsi53c895a, is on a pci-bridge, after migration, the=
+ device stops working (e.g., commands like "poweroff"
+  get an Input/Output error. Fails under either xen or kvm. If "top" was ru=
+nning, some cpus go to ~100% wait.
+
+  Sample KVM invocation line:
+  qemu-system-x86_64 -machine type=3Dpc,accel=3Dkvm -m 4096 -device pci-bri=
+dgemsi=3Don,chassis_nr=3D1,id=3DpciBridge1.0,addr=3D0x11.0 -device lsi53c89=
+5a,id=3Dsas,bus=3DpciBridge1.0,addr=3D0x1.0x0 -drive if=3Dnone,id=3Ddisk0,f=
+ile=3D/path/to/disk/image -device scsi-disk,bus=3Dsas.0,scsi-id=3D0,drive=
+=3Ddisk0 -vnc 127.0.0.1:0,to=3D99 -serial pty -boot order=3Dcda -smp 4,maxc=
+pus=3D4 -monitor vc
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1187529/+subscriptions
