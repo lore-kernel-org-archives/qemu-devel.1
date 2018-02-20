@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9Sp-0007s3-7O
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:16 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9Sj-0006Q3-F9
+	(envelope-from <kraxel@redhat.com>) id 1eo9Sp-0007s2-2D
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46248 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kraxel@redhat.com>) id 1eo9Sj-0006Py-EJ
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:15 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36436 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo9Sj-0006PV-9d
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo9Sj-0006PT-A4
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:04:09 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40B04404085A
+	by mx1.redhat.com (Postfix) with ESMTPS id 803E8402315A
 	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 15:04:04 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 20 Feb 2018 16:03:54 +0100
-Message-Id: <20180220150357.324-3-kraxel@redhat.com>
+Date: Tue, 20 Feb 2018 16:03:56 +0100
+Message-Id: <20180220150357.324-5-kraxel@redhat.com>
 In-Reply-To: <20180220150357.324-1-kraxel@redhat.com>
 References: <20180220150357.324-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/5] keymap: use glib hash for kbd_layout_t
+Subject: [Qemu-devel] [PATCH v2 4/5] keymap: record multiple keysym ->
+ keycode mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,153 +33,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Drop home-grown lookup code, which is a strange mix of a lookup table
-and a list.  Use standard glib hash instead.
+Sometimes the same keysym can be created using different key
+combinations.  Record them all in the reverse keymap, not only
+the first one.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/keymaps.c    | 79 +++++++++++++++++++++++++++------------------------------
- ui/trace-events |  2 +-
- 2 files changed, 38 insertions(+), 43 deletions(-)
+ ui/keymaps.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/ui/keymaps.c b/ui/keymaps.c
-index 134958a197..bef1405576 100644
+index d71ae389e0..26a85ff207 100644
 --- a/ui/keymaps.c
 +++ b/ui/keymaps.c
-@@ -28,26 +28,28 @@
- #include "trace.h"
+@@ -29,7 +29,8 @@
  #include "qemu/error-report.h"
  
--#define MAX_NORMAL_KEYCODE 512
--#define MAX_EXTRA_COUNT 256
--
- struct key_range {
-     int start;
-     int end;
-     struct key_range *next;
+ struct keysym2code {
+-    uint16_t keycode;
++    uint32_t count;
++    uint16_t keycodes[4];
  };
  
-+struct keysym2code {
-+    uint16_t keycode;
-+};
-+
  struct kbd_layout_t {
--    uint16_t keysym2keycode[MAX_NORMAL_KEYCODE];
--    struct {
--        int keysym;
--        uint16_t keycode;
--    } keysym2keycode_extra[MAX_EXTRA_COUNT];
--    int extra_count;
-+    GHashTable *hash;
-     struct key_range *keypad_range;
-     struct key_range *numlock_range;
- };
+@@ -68,11 +69,18 @@ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
  
-+static inline gpointer hashkey(int keysym)
-+{
-+    intptr_t ptr = keysym;
-+    return (gpointer)(ptr);
-+}
-+
- static int get_keysym(const name2keysym_t *table,
-                       const char *name)
- {
-@@ -91,23 +93,19 @@ static void add_to_key_range(struct key_range **krp, int code) {
+     keysym2code = g_hash_table_lookup(k->hash, hashkey(keysym));
+     if (keysym2code) {
++        if (keysym2code->count < ARRAY_SIZE(keysym2code->keycodes)) {
++            keysym2code->keycodes[keysym2code->count++] = keycode;
++        } else {
++            warn_report("more than %zd keycodes for keysym %d",
++                        ARRAY_SIZE(keysym2code->keycodes), keysym);
++        }
+         return;
      }
+ 
+     keysym2code = g_new0(struct keysym2code, 1);
+-    keysym2code->keycode = keycode;
++    keysym2code->keycodes[0] = keycode;
++    keysym2code->count = 1;
+     g_hash_table_replace(k->hash, hashkey(keysym), keysym2code);
+     trace_keymap_add(keysym, keycode, line);
  }
- 
--static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k) {
--    if (keysym < MAX_NORMAL_KEYCODE) {
--        trace_keymap_add("normal", keysym, keycode, line);
--        k->keysym2keycode[keysym] = keycode;
--    } else {
--        if (k->extra_count >= MAX_EXTRA_COUNT) {
--            warn_report("Could not assign keysym %s (0x%x)"
--                        " because of memory constraints.", line, keysym);
--        } else {
--            trace_keymap_add("extra", keysym, keycode, line);
--            k->keysym2keycode_extra[k->extra_count].
--            keysym = keysym;
--            k->keysym2keycode_extra[k->extra_count].
--            keycode = keycode;
--            k->extra_count++;
--        }
-+static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k)
-+{
-+    struct keysym2code *keysym2code;
-+
-+    keysym2code = g_hash_table_lookup(k->hash, hashkey(keysym));
-+    if (keysym2code) {
-+        return;
-     }
-+
-+    keysym2code = g_new0(struct keysym2code, 1);
-+    keysym2code->keycode = keycode;
-+    g_hash_table_replace(k->hash, hashkey(keysym), keysym2code);
-+    trace_keymap_add(keysym, keycode, line);
- }
- 
- static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-@@ -131,6 +129,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
- 
-     if (!k) {
-         k = g_new0(kbd_layout_t, 1);
-+        k->hash = g_hash_table_new(NULL, NULL);
+@@ -191,7 +199,7 @@ int keysym2scancode(kbd_layout_t *k, int keysym)
+         return 0;
      }
  
-     for(;;) {
-@@ -215,26 +214,22 @@ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
- 
- int keysym2scancode(kbd_layout_t *k, int keysym)
- {
--    if (keysym < MAX_NORMAL_KEYCODE) {
--        if (k->keysym2keycode[keysym] == 0) {
--            trace_keymap_unmapped(keysym);
--            warn_report("no scancode found for keysym %d", keysym);
--        }
--        return k->keysym2keycode[keysym];
--    } else {
--        int i;
-+    struct keysym2code *keysym2code;
-+
- #ifdef XK_ISO_Left_Tab
--        if (keysym == XK_ISO_Left_Tab) {
--            keysym = XK_Tab;
--        }
-+    if (keysym == XK_ISO_Left_Tab) {
-+        keysym = XK_Tab;
-+    }
- #endif
--        for (i = 0; i < k->extra_count; i++) {
--            if (k->keysym2keycode_extra[i].keysym == keysym) {
--                return k->keysym2keycode_extra[i].keycode;
--            }
--        }
-+
-+    keysym2code = g_hash_table_lookup(k->hash, hashkey(keysym));
-+    if (!keysym2code) {
-+        trace_keymap_unmapped(keysym);
-+        warn_report("no scancode found for keysym %d", keysym);
-+        return 0;
-     }
--    return 0;
-+
-+    return keysym2code->keycode;
+-    return keysym2code->keycode;
++    return keysym2code->keycodes[0];
  }
  
  int keycode_is_keypad(kbd_layout_t *k, int keycode)
-diff --git a/ui/trace-events b/ui/trace-events
-index 34229e6747..861b68a305 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -78,7 +78,7 @@ qemu_spice_create_update(uint32_t left, uint32_t right, uint32_t top, uint32_t b
- 
- # ui/keymaps.c
- keymap_parse(const char *file) "file %s"
--keymap_add(const char *type, int sym, int code, const char *line) "%-6s sym=0x%04x code=0x%04x (line: %s)"
-+keymap_add(int sym, int code, const char *line) "sym=0x%04x code=0x%04x (line: %s)"
- keymap_unmapped(int sym) "sym=0x%04x"
- 
- # ui/x_keymap.c
 -- 
 2.9.3
