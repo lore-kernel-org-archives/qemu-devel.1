@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eo0h3-00032O-0k
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 00:42:22 -0500
+	(envelope-from <bounces@canonical.com>) id 1eo1S2-0001Ta-La
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 01:30:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eo0h1-0000we-VC
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 00:42:21 -0500
-Date: Tue, 20 Feb 2018 00:42:04 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180220054204.GA2962@localhost.localdomain>
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-9-git-send-email-vsementsov@virtuozzo.com>
-	<0739c439-4c1e-4c55-0c68-2c64978079eb@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eo1Rz-0000BI-HV
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 01:30:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eo1Rz-00006q-BB
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 01:30:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eo1Rx-0005qv-74
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 06:30:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C952D2E80E5
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 06:30:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0739c439-4c1e-4c55-0c68-2c64978079eb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 8/9] iotests: add file_path helper
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 20 Feb 2018 06:21:43 -0000
+From: Thomas Huth <1734810@bugs.launchpad.net>
+Reply-To: Bug 1734810 <1734810@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151184788907.20350.3674834740850334109.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151910770387.2755.12872898784239297454.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1734810] Re: Windows guest virtual PC running
+ abnormally slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-On Fri, Feb 16, 2018 at 02:46:35PM -0600, Eric Blake wrote:
-> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> >Simple way to have auto generated filenames with auto clenup. Like
-> 
-> s/clenup/cleanup/
-> 
-> >FilePath but without using 'with' statement and without additional
-> >indentation of the whole test.
-> >
-> >Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >---
-> >  tests/qemu-iotests/iotests.py | 32 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 32 insertions(+)
-> 
-> Jeff, where do we stand on your iotests cleanups?  Is this something you
-> want to use?
-> 
+Which command line parameters are passed to QEMU? Is your system able to
+use KVM (e.g. did you enable virtualization support in your BIOS)?
 
-This patch has niceties that my patch does not, in that explicit clean-up is
-not required.  This is also a slight design difference; my patch series
-explicitly avoided auto-cleanup, so that ./check could handle it, or
-(optionally) leave behind all the mouse droppings for later analysis, in the
-case of test failure.
+** Changed in: qemu
+       Status: Confirmed =3D> Incomplete
 
-Ideally, I'd love clean-up to be optional; if a test fails, I'd like to have
-the option of examining all the intermediate files and output of the test
-(and once it resides in its own subdir, that is also side-affect free for
-the other tests).
+-- =
 
-> >
-> >diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> >index c1302a2f9b..f2d05ca3fd 100644
-> >--- a/tests/qemu-iotests/iotests.py
-> >+++ b/tests/qemu-iotests/iotests.py
-> >@@ -27,6 +27,7 @@ import struct
-> >  import json
-> >  import signal
-> >  import logging
-> >+import atexit
-> >  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
-> >  import qtest
-> >@@ -250,6 +251,37 @@ class FilePath(object):
-> >          return False
-> >+def file_path_remover():
-> >+    for path in reversed(file_path_remover.paths):
-> >+        try:
-> >+            os.remove(path)
-> >+        except OSError:
-> >+            pass
-> >+
-> >+
-> >+def file_path(*names):
-> >+    ''' Another way to get auto-generated filename that cleans itself up.
-> >+
-> >+    Use it as simple as:
-> >+
-> >+    img_a, img_b = file_path('a.img', 'b.img')
-> >+    sock = file_path('socket')
-> >+    '''
-> >+
-> >+    if not hasattr(file_path_remover, 'paths'):
-> >+        file_path_remover.paths = []
-> >+        atexit.register(file_path_remover)
-> >+
-> >+    paths = []
-> >+    for name in names:
-> >+        filename = '{0}-{1}'.format(os.getpid(), name)
-> >+        path = os.path.join(test_dir, filename)
-> >+        file_path_remover.paths.append(path)
-> >+        paths.append(path)
-> >+
-> >+    return paths[0] if len(paths) == 1 else paths
-> >+
-> >+
-> >  class VM(qtest.QEMUQtestMachine):
-> >      '''A QEMU VM'''
-> >
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1734810
+
+Title:
+  Windows guest virtual PC running abnormally slow
+
+Status in Boxes:
+  New
+Status in KVM:
+  New
+Status in libvirt:
+  New
+Status in QEMU:
+  Incomplete
+Status in spice related packages:
+  Confirmed
+Status in gnome-boxes package in Ubuntu:
+  Confirmed
+
+Bug description:
+  Guest systems running Windows 10 in a virtualized environment run
+  unacceptably slow, with no option in Boxes to offer the virtual
+  machine more (or less) cores from my physical CPU.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: gnome-boxes 3.26.1-1
+  ProcVersionSignature: Ubuntu 4.13.0-17.20-lowlatency 4.13.8
+  Uname: Linux 4.13.0-17-lowlatency x86_64
+  ApportVersion: 2.20.7-0ubuntu3.5
+  Architecture: amd64
+  CurrentDesktop: ubuntu:GNOME
+  Date: Tue Nov 28 00:37:11 2017
+  ProcEnviron:
+   TERM=3Dxterm-256color
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  SourcePackage: gnome-boxes
+  UpgradeStatus: No upgrade log present (probably fresh install)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/gnome-boxes/+bug/1734810/+subscriptions
