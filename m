@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eoBJP-0001B6-3j
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:02:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eoBKU-0002VK-Sy
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:03:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eoBJJ-0000R3-VK
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:02:39 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 20 Feb 2018 19:01:35 +0200
-Message-Id: <20180220170135.5299-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2] specs/qcow2: Fix documentation of the
- compressed cluster descriptor
+	(envelope-from <peter.maydell@linaro.org>) id 1eoBKT-00012T-Kl
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:03:46 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:35918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eoBKT-000129-Em
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:03:45 -0500
+Received: by mail-oi0-x244.google.com with SMTP id 24so9980113oij.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 09:03:45 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180220152843.26464-1-kraxel@redhat.com>
+References: <20180220152843.26464-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Feb 2018 17:03:24 +0000
+Message-ID: <CAFEAcA8oEGS48UgDQw9AWsvi62nO5m1eMM4E4U_L4drYePjTaw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] Usb 20180220 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,60 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bandan Das <bsd@redhat.com>
 
-The documentation claims that the cluster descriptor contains the
-number of sectors used to store the compressed data, but what it
-actually contains is the number of sectors *minus one*.
+On 20 February 2018 at 15:28, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit b487e2b2ff6e9fff8a45a9600d6de3a7bf82666a:
+>
+>   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2018-02-20 11:52:24 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/usb-20180220-pull-request
+>
+> for you to fetch changes up to 18c7310e9982b71d17e76648acfec0be42a57aea:
+>
+>   usb-mtp: Advertise SendObjectInfo for write support (2018-02-20 16:06:56 +0100)
+>
+> ----------------------------------------------------------------
+> usb: Add write support to MTP.
+>
+> ----------------------------------------------------------------
+>
+> Bandan Das (5):
+>   usb-mtp: Add one more argument when building results
+>   usb-mtp: print parent path in IN_IGNORED trace fn
+>   usb-mtp: Support delete of mtp objects
+>   usb-mtp: Introduce write support for MTP objects
+>   usb-mtp: Advertise SendObjectInfo for write support
 
-That can be easily seen in qcow2_decompress_cluster(), that adds one
-to the value stored in that field:
+Hi. This fails to build on the BSDs, I'm afraid.
 
-  nb_csectors = ((cluster_offset >> s->csize_shift) & s->csize_mask) + 1;
+FreeBSD:
+  CC      hw/usb/dev-mtp.o
+/root/qemu/hw/usb/dev-mtp.c:1558:8: warning: no previous prototype for
+function 'getumask' [-Wmissing-prototypes]
+mode_t getumask(void)
+       ^
+/root/qemu/hw/usb/dev-mtp.c:1664:9: warning: implicit declaration of
+function 'usb_mtp_object_lookup_name' is invalid in C99
+[-Wimplicit-function-declaration]
+    o = usb_mtp_object_lookup_name(p, filename, dataset->length);
+        ^
+/root/qemu/hw/usb/dev-mtp.c:1664:7: warning: incompatible integer to
+pointer conversion assigning to 'MTPObject *' (aka 'struct MTPObject
+*') from 'int' [-Wint-conversion]
+    o = usb_mtp_object_lookup_name(p, filename, dataset->length);
+      ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3 warnings generated.
 
-In addition to that this patch clarifies where the actual compressed
-data is located.
+and then all the link steps fail with:
 
-Although the size of the data is specified in sectors, the offset is
-not necessarily aligned to a sector boundary, so the actual data goes
-from the specified offset until the end of the last sector, leaving
-the initial bytes of the first sector (if any) unused.
+../hw/usb/dev-mtp.o: In function `usb_mtp_write_metadata':
+/root/qemu/hw/usb/dev-mtp.c:1664: undefined reference to
+`usb_mtp_object_lookup_name'
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
+NetBSD:
+  CC      hw/usb/dev-mtp.o
+/root/qemu/hw/usb/dev-mtp.c:1558:8: warning: no previous prototype for
+'getumask' [-Wmissing-prototypes]
+ mode_t getumask(void)
+        ^
+/root/qemu/hw/usb/dev-mtp.c: In function 'usb_mtp_write_metadata':
+/root/qemu/hw/usb/dev-mtp.c:1664:5: warning: implicit declaration of
+function 'usb_mtp_object_lookup_name'
+[-Wimplicit-function-declaration]
+     o = usb_mtp_object_lookup_name(p, filename, dataset->length);
+     ^
+/root/qemu/hw/usb/dev-mtp.c:1664:5: warning: nested extern declaration
+of 'usb_mtp_object_lookup_name' [-Wnested-externs]
+/root/qemu/hw/usb/dev-mtp.c:1664:7: warning: assignment makes pointer
+from integer without a cast [enabled by default]
+     o = usb_mtp_object_lookup_name(p, filename, dataset->length);
+       ^
 
-v2: I realized that the documentation is not completely clear about
-    the exact location and size of the compressed data, so I updated
-    the patch to clarify this.
+OpenBSD and OSX fail similarly.
 
----
- docs/interop/qcow2.txt | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index d7fdb1fee3..dc2b9cefb2 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -427,9 +427,17 @@ Standard Cluster Descriptor:
- Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
- 
-     Bit  0 -  x:    Host cluster offset. This is usually _not_ aligned to a
--                    cluster boundary!
-+                    cluster or sector boundary!
- 
--       x+1 - 61:    Compressed size of the images in sectors of 512 bytes
-+       x+1 - 61:    Number of 512-byte sectors used for the compressed data,
-+                    minus one (that is, a value of n here means n+1 sectors).
-+
-+                    The actual compressed data is located at the end of this
-+                    region, from the offset indicated in the previous field
-+                    until the end of the last sector.
-+
-+                    The initial bytes of this region are therefore unused if
-+                    the offset is not aligned to a sector boundary.
- 
- If a cluster is unallocated, read requests shall read the data from the backing
- file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
--- 
-2.11.0
+thanks
+-- PMM
