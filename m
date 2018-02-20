@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9qi-0006Ym-Io
+	(envelope-from <kraxel@redhat.com>) id 1eo9qi-0006Yj-IS
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:28:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eo9qe-00088G-IW
+	(envelope-from <kraxel@redhat.com>) id 1eo9qe-00088Q-K0
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:28:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35438 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40518 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo9qe-00087X-D3
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eo9qe-00087i-DI
 	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 10:28:52 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18A414023EDE
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 15:28:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E6C878160F83
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 15:28:51 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 20 Feb 2018 16:28:40 +0100
-Message-Id: <20180220152843.26464-4-kraxel@redhat.com>
+Date: Tue, 20 Feb 2018 16:28:41 +0100
+Message-Id: <20180220152843.26464-5-kraxel@redhat.com>
 In-Reply-To: <20180220152843.26464-1-kraxel@redhat.com>
 References: <20180220152843.26464-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 3/5] usb-mtp: Support delete of mtp objects
+Subject: [Qemu-devel] [PULL 4/5] usb-mtp: Introduce write support for MTP
+ objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,202 +35,248 @@ Cc: Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
 From: Bandan Das <bsd@redhat.com>
 
-Write of existing objects by the initiator is acheived by
-making a temporary buffer with the new changes, deleting the
-old file and then writing a new file with the same name.
-
-Also, add a "readonly" property which needs to be set to false
-for deletion to work.
+Allow write operations on behalf of the initiator. The
+precursor to write is the sending of the write metadata
+that consists of the ObjectInfo dataset. This patch introduces
+a flag that is set when the responder is ready to receive
+write data based on a previous SendObjectInfo operation by
+the initiator (The SendObjectInfo implementation is in a
+later patch)
 
 Signed-off-by: Bandan Das <bsd@redhat.com>
-Message-id: 20180215231129.14710-4-bsd@redhat.com
+Message-id: 20180215231129.14710-5-bsd@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-mtp.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+)
+ hw/usb/dev-mtp.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 157 insertions(+), 2 deletions(-)
 
 diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 63f8f3b90b..5ef77f3e9f 100644
+index 5ef77f3e9f..4f369e1277 100644
 --- a/hw/usb/dev-mtp.c
 +++ b/hw/usb/dev-mtp.c
-@@ -46,6 +46,7 @@ enum mtp_code {
-     CMD_GET_OBJECT_HANDLES         = 0x1007,
+@@ -47,6 +47,7 @@ enum mtp_code {
      CMD_GET_OBJECT_INFO            = 0x1008,
      CMD_GET_OBJECT                 = 0x1009,
-+    CMD_DELETE_OBJECT              = 0x100b,
+     CMD_DELETE_OBJECT              = 0x100b,
++    CMD_SEND_OBJECT                = 0x100d,
      CMD_GET_PARTIAL_OBJECT         = 0x101b,
      CMD_GET_OBJECT_PROPS_SUPPORTED = 0x9801,
      CMD_GET_OBJECT_PROP_DESC       = 0x9802,
-@@ -62,6 +63,8 @@ enum mtp_code {
+@@ -63,9 +64,11 @@ enum mtp_code {
      RES_INVALID_STORAGE_ID         = 0x2008,
      RES_INVALID_OBJECT_HANDLE      = 0x2009,
      RES_INVALID_OBJECT_FORMAT_CODE = 0x200b,
-+    RES_STORE_READ_ONLY            = 0x200e,
-+    RES_PARTIAL_DELETE             = 0x2012,
++    RES_STORE_FULL                 = 0x200c,
+     RES_STORE_READ_ONLY            = 0x200e,
+     RES_PARTIAL_DELETE             = 0x2012,
      RES_SPEC_BY_FORMAT_UNSUPPORTED = 0x2014,
++    RES_INVALID_OBJECTINFO         = 0x2015,
      RES_INVALID_PARENT_OBJECT      = 0x201a,
      RES_INVALID_PARAMETER          = 0x201d,
-@@ -172,6 +175,7 @@ struct MTPState {
-     MTPControl   *result;
-     uint32_t     session;
-     uint32_t     next_handle;
-+    bool         readonly;
+     RES_SESSION_ALREADY_OPEN       = 0x201e,
+@@ -183,6 +186,14 @@ struct MTPState {
+     int          inotifyfd;
+     QTAILQ_HEAD(events, MTPMonEntry) events;
+ #endif
++    /* Responder is expecting a write operation */
++    bool write_pending;
++    struct {
++        uint32_t parent_handle;
++        uint16_t format;
++        uint32_t size;
++        char *filename;
++    } dataset;
+ };
  
-     QTAILQ_HEAD(, MTPObject) objects;
- #ifdef CONFIG_INOTIFY1
-@@ -799,6 +803,7 @@ static MTPData *usb_mtp_get_device_info(MTPState *s, MTPControl *c)
-         CMD_GET_NUM_OBJECTS,
+ #define TYPE_USB_MTP "usb-mtp"
+@@ -804,6 +815,7 @@ static MTPData *usb_mtp_get_device_info(MTPState *s, MTPControl *c)
          CMD_GET_OBJECT_HANDLES,
          CMD_GET_OBJECT_INFO,
-+        CMD_DELETE_OBJECT,
+         CMD_DELETE_OBJECT,
++        CMD_SEND_OBJECT,
          CMD_GET_OBJECT,
          CMD_GET_PARTIAL_OBJECT,
          CMD_GET_OBJECT_PROPS_SUPPORTED,
-@@ -1113,6 +1118,116 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
-     return d;
+@@ -1378,6 +1390,14 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+         nres = 1;
+         res0 = data_in->length;
+         break;
++    case CMD_SEND_OBJECT:
++        if (!s->write_pending) {
++            usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO,
++                                 c->trans, 0, 0, 0, 0);
++            return;
++        }
++        s->data_out = usb_mtp_data_alloc(c);
++        return;
+     case CMD_GET_OBJECT_PROPS_SUPPORTED:
+         if (c->argv[0] != FMT_UNDEFINED_OBJECT &&
+             c->argv[0] != FMT_ASSOCIATION) {
+@@ -1472,12 +1492,133 @@ static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
+     fprintf(stderr, "%s\n", __func__);
  }
  
-+/* Return correct return code for a delete event */
-+enum {
-+    ALL_DELETE,
-+    PARTIAL_DELETE,
-+    READ_ONLY,
-+};
-+
-+/* Assumes that children, if any, have been already freed */
-+static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
++mode_t getumask(void)
 +{
-+#ifndef CONFIG_INOTIFY1
-+    assert(o->nchildren == 0);
-+    QTAILQ_REMOVE(&s->objects, o, next);
-+    g_free(o->name);
-+    g_free(o->path);
-+    g_free(o);
-+#endif
++    mode_t mask = umask(0);
++    umask(mask);
++    return mask;
 +}
 +
-+static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
++static void usb_mtp_write_data(MTPState *s)
 +{
-+    MTPObject *iter, *iter2;
-+    bool partial_delete = false;
-+    bool success = false;
++    MTPData *d = s->data_out;
++    MTPObject *parent =
++        usb_mtp_object_lookup(s, s->dataset.parent_handle);
++    char *path = NULL;
++    int rc = -1;
++    mode_t mask = ~getumask() & 0666;
 +
-+    /*
-+     * TODO: Add support for Protection Status
-+     */
++    assert(d != NULL);
 +
-+    QLIST_FOREACH(iter, &o->children, list) {
-+        if (iter->format == FMT_ASSOCIATION) {
-+            QLIST_FOREACH(iter2, &iter->children, list) {
-+                usb_mtp_deletefn(s, iter2, trans);
++    if (parent == NULL || !s->write_pending) {
++        usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
++                             0, 0, 0, 0);
++        return;
++    }
++
++    if (s->dataset.filename) {
++        path = g_strdup_printf("%s/%s", parent->path, s->dataset.filename);
++        if (s->dataset.format == FMT_ASSOCIATION) {
++            d->fd = mkdir(path, mask);
++            goto free;
++        }
++        if (s->dataset.size < d->length) {
++            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
++                                 0, 0, 0, 0);
++            goto done;
++        }
++        d->fd = open(path, O_CREAT | O_WRONLY, mask);
++        if (d->fd == -1) {
++            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
++                                 0, 0, 0, 0);
++            goto done;
++        }
++
++        /*
++         * Return success if initiator sent 0 sized data
++         */
++        if (!s->dataset.size) {
++            goto success;
++        }
++
++        rc = write(d->fd, d->data, s->dataset.size);
++        if (rc == -1) {
++            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
++                                 0, 0, 0, 0);
++            goto done;
 +            }
++        if (rc != s->dataset.size) {
++            usb_mtp_queue_result(s, RES_INCOMPLETE_TRANSFER, d->trans,
++                                 0, 0, 0, 0);
++            goto done;
 +        }
 +    }
 +
-+    if (o->format == FMT_UNDEFINED_OBJECT) {
-+        if (remove(o->path)) {
-+            partial_delete = true;
-+        } else {
-+            usb_mtp_object_free_one(s, o);
-+            success = true;
-+        }
-+    }
++success:
++    usb_mtp_queue_result(s, RES_OK, d->trans,
++                         0, 0, 0, 0);
 +
-+    if (o->format == FMT_ASSOCIATION) {
-+        if (rmdir(o->path)) {
-+            partial_delete = true;
-+        } else {
-+            usb_mtp_object_free_one(s, o);
-+            success = true;
-+        }
++done:
++    /*
++     * The write dataset is kept around and freed only
++     * on success or if another write request comes in
++     */
++    if (d->fd != -1) {
++        close(d->fd);
 +    }
-+
-+    if (success && partial_delete) {
-+        return PARTIAL_DELETE;
-+    }
-+    if (!success && partial_delete) {
-+        return READ_ONLY;
-+    }
-+    return ALL_DELETE;
++free:
++    g_free(s->dataset.filename);
++    g_free(path);
++    s->write_pending = false;
 +}
 +
-+static void usb_mtp_object_delete(MTPState *s, uint32_t handle,
-+                                  uint32_t format_code, uint32_t trans)
++static void usb_mtp_get_data(MTPState *s, mtp_container *container,
++                             USBPacket *p)
 +{
-+    MTPObject *o;
-+    int ret;
++    MTPData *d = s->data_out;
++    uint64_t dlen;
++    uint32_t data_len = p->iov.size;
 +
-+    /* Return error if store is read-only */
-+    if (!FLAG_SET(s, MTP_FLAG_WRITABLE)) {
-+        usb_mtp_queue_result(s, RES_STORE_READ_ONLY,
-+                             trans, 0, 0, 0, 0);
-+        return;
++    if (d->first) {
++        /* Total length of incoming data */
++        d->length = cpu_to_le32(container->length) - sizeof(mtp_container);
++        /* Length of data in this packet */
++        data_len -= sizeof(mtp_container);
++        usb_mtp_realloc(d, d->length);
++        d->offset = 0;
++        d->first = false;
 +    }
 +
-+    if (format_code != 0) {
-+        usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    }
-+
-+    if (handle == 0xFFFFFFF) {
-+        o = QTAILQ_FIRST(&s->objects);
++    if (d->length - d->offset > data_len) {
++        dlen = data_len;
 +    } else {
-+        o = usb_mtp_object_lookup(s, handle);
-+    }
-+    if (o == NULL) {
-+        usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
-+                             trans, 0, 0, 0, 0);
-+        return;
++        dlen = d->length - d->offset;
 +    }
 +
-+    ret = usb_mtp_deletefn(s, o, trans);
-+    if (ret == PARTIAL_DELETE) {
-+        usb_mtp_queue_result(s, RES_PARTIAL_DELETE,
-+                             trans, 0, 0, 0, 0);
-+        return;
-+    } else if (ret == READ_ONLY) {
-+        usb_mtp_queue_result(s, RES_STORE_READ_ONLY, trans,
-+                             0, 0, 0, 0);
-+        return;
-+    } else {
-+        usb_mtp_queue_result(s, RES_OK, trans,
-+                             0, 0, 0, 0);
++    switch (d->code) {
++    case CMD_SEND_OBJECT:
++        usb_packet_copy(p, d->data + d->offset, dlen);
++        d->offset += dlen;
++        if (d->offset == d->length) {
++            usb_mtp_write_data(s);
++            usb_mtp_data_free(s->data_out);
++            s->data_out = NULL;
++            return;
++        }
++        break;
++    default:
++        p->status = USB_RET_STALL;
 +        return;
 +    }
 +}
 +
- static void usb_mtp_command(MTPState *s, MTPControl *c)
+ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
  {
-     MTPData *data_in = NULL;
-@@ -1239,6 +1354,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-             return;
-         }
-         break;
-+    case CMD_DELETE_OBJECT:
-+        usb_mtp_object_delete(s, c->argv[0], c->argv[1], c->trans);
-+        return;
-     case CMD_GET_PARTIAL_OBJECT:
-         o = usb_mtp_object_lookup(s, c->argv[0]);
-         if (o == NULL) {
-@@ -1545,6 +1663,10 @@ static void usb_mtp_realize(USBDevice *dev, Error **errp)
-             return;
-         }
-         s->desc = strrchr(s->root, '/');
-+        /* Mark store as RW */
-+        if (!s->readonly) {
-+            s->flags |= (1 << MTP_FLAG_WRITABLE);
-+        }
-         if (s->desc && s->desc[0]) {
-             s->desc = g_strdup(s->desc + 1);
-         } else {
-@@ -1567,6 +1689,7 @@ static const VMStateDescription vmstate_usb_mtp = {
- static Property mtp_properties[] = {
-     DEFINE_PROP_STRING("x-root", MTPState, root),
-     DEFINE_PROP_STRING("desc", MTPState, desc),
-+    DEFINE_PROP_BOOL("readonly", MTPState, readonly, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
+     MTPState *s = USB_MTP(dev);
+     MTPControl cmd;
+     mtp_container container;
+     uint32_t params[5];
++    uint16_t container_type;
+     int i, rc;
  
+     switch (p->ep->nr) {
+@@ -1567,8 +1708,13 @@ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
+             p->status = USB_RET_STALL;
+             return;
+         }
+-        usb_packet_copy(p, &container, sizeof(container));
+-        switch (le16_to_cpu(container.type)) {
++        if (s->data_out && !s->data_out->first) {
++            container_type = TYPE_DATA;
++        } else {
++            usb_packet_copy(p, &container, sizeof(container));
++            container_type = le16_to_cpu(container.type);
++        }
++        switch (container_type) {
+         case TYPE_COMMAND:
+             if (s->data_in || s->data_out || s->result) {
+                 trace_usb_mtp_stall(s->dev.addr, "transaction inflight");
+@@ -1599,6 +1745,15 @@ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
+                                   (cmd.argc > 4) ? cmd.argv[4] : 0);
+             usb_mtp_command(s, &cmd);
+             break;
++        case TYPE_DATA:
++            /* One of the previous transfers has already errored but the
++             * responder is still sending data associated with it
++             */
++            if (s->result != NULL) {
++                return;
++            }
++            usb_mtp_get_data(s, &container, p);
++            break;
+         default:
+             /* not needed as long as the mtp device is read-only */
+             p->status = USB_RET_STALL;
 -- 
 2.9.3
