@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jonathan.helman@oracle.com>) id 1eo01P-00057R-Hw
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:59:22 -0500
+	(envelope-from <jonathan.helman@oracle.com>) id 1eo0DH-0007VH-1z
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 00:11:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jonathan.helman@oracle.com>) id 1eo01J-0003a4-DM
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:59:19 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:55330)
+	(envelope-from <jonathan.helman@oracle.com>) id 1eo0DD-0005pN-26
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 00:11:35 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:34048)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jonathan.helman@oracle.com>)
-	id 1eo01J-0003Wy-4v
-	for qemu-devel@nongnu.org; Mon, 19 Feb 2018 23:59:13 -0500
+	id 1eo0DC-0005p6-Rd
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 00:11:30 -0500
 Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
 From: Jonathan Helman <jonathan.helman@oracle.com>
-In-Reply-To: <12c223afbafb402d6e6602a5888e5dca2953dbfc.1519044214.git.tgolembi@redhat.com>
-Date: Mon, 19 Feb 2018 20:59:03 -0800
+In-Reply-To: <20180219141139.14e0a9d9@fiorina>
+Date: Mon, 19 Feb 2018 21:11:27 -0800
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <6367F6C8-7CD5-46CF-8143-5708F88D8976@oracle.com>
-References: <12c223afbafb402d6e6602a5888e5dca2953dbfc.1519044214.git.tgolembi@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docs: document virtio-balloon stats
+Message-Id: <9471BF09-A515-4D17-8D88-3514CC3B830B@oracle.com>
+References: <cover.1512476043.git.tgolembi@redhat.com>
+	<938dc32019864c9c19259bdddd64a53b6b99efef.1512476043.git.tgolembi@redhat.com>
+	<20180205130824.79f570bc@fiorina>
+	<1e6717d5-a1bc-3409-b01f-24ea761659fb@oracle.com>
+	<20180214000454-mutt-send-email-mst@kernel.org>
+	<20180219141139.14e0a9d9@fiorina>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-balloon: include statistics
+ of disk/file caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +34,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, virtio-dev@lists.oasis-open.org, Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org
 
 
-> On Feb 19, 2018, at 4:43 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD =
+> On Feb 19, 2018, at 5:11 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD =
 <tgolembi@redhat.com> wrote:
 >=20
-> Document statistics added in commits
+> On Wed, 14 Feb 2018 00:07:53 +0200
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 >=20
->    commit a0d06486b445985b8d128df172daefbae205bffd
->    Author: Denis V. Lunev <den@openvz.org>
->    Date:   Wed Feb 24 10:50:48 2016 +0300
->=20
->        virtio-balloon: add 'available' counter
->=20
-> and
->=20
->    commit bf1e7140ef0b3a149860ab9f05b36665133238f6
->    Author: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
->    Date:   Tue Dec 5 13:14:46 2017 +0100
->=20
->        virtio-balloon: include statistics of disk/file caches
->=20
-> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+>> On Tue, Feb 13, 2018 at 12:29:39PM -0800, Jonathan Helman wrote:
+>>>=20
+>>>=20
+>>> On 02/05/2018 04:08 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD wrote: =20
+>>>> ping
+>>>>=20
+>>>> On Tue,  5 Dec 2017 13:14:46 +0100
+>>>> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
+>>>>=20
+>>>=20
+>>> It would be good to include the corresponding upstream kernel change =
+in the
+>>> commit message. This would be similar to a previous change:
+>>> https://lists.gnu.org/archive/html/qemu-devel/2016-02/msg05555.html =20=
 
-Reviewed-by: Jonathan Helman <jonathan.helman@oracle.com>
+>>=20
+>> good idea, but this has been merged by now.
+>=20
+> Maybe next time, sorry.
+>=20
+>=20
+>>>>> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD =
+<tgolembi@redhat.com>
+>>>>> ---
+>>>>>  hw/virtio/virtio-balloon.c                      | 1 +
+>>>>>  include/standard-headers/linux/virtio_balloon.h | 3 ++-
+>>>>>  2 files changed, 3 insertions(+), 1 deletion(-)
+>>>>>=20
+>>>>> diff --git a/hw/virtio/virtio-balloon.c =
+b/hw/virtio/virtio-balloon.c
+>>>>> index 37cde38982..8141326a51 100644
+>>>>> --- a/hw/virtio/virtio-balloon.c
+>>>>> +++ b/hw/virtio/virtio-balloon.c
+>>>>> @@ -50,6 +50,7 @@ static const char *balloon_stat_names[] =3D {
+>>>>>     [VIRTIO_BALLOON_S_MEMFREE] =3D "stat-free-memory",
+>>>>>     [VIRTIO_BALLOON_S_MEMTOT] =3D "stat-total-memory",
+>>>>>     [VIRTIO_BALLOON_S_AVAIL] =3D "stat-available-memory",
+>>>>> +   [VIRTIO_BALLOON_S_CACHES] =3D "stat-disk-caches",
+>>>>>     [VIRTIO_BALLOON_S_NR] =3D NULL
+>>>>>  };
+>>>>> diff --git a/include/standard-headers/linux/virtio_balloon.h =
+b/include/standard-headers/linux/virtio_balloon.h
+>>>>> index 9d06ccd066..7b0a41b8fc 100644
+>>>>> --- a/include/standard-headers/linux/virtio_balloon.h
+>>>>> +++ b/include/standard-headers/linux/virtio_balloon.h
+>>>>> @@ -52,7 +52,8 @@ struct virtio_balloon_config {
+>>>>>  #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free =
+memory */
+>>>>>  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory =
+*/
+>>>>>  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in =
+/proc */
+>>>>> -#define VIRTIO_BALLOON_S_NR       7
+>>>>> +#define VIRTIO_BALLOON_S_CACHES   7   /* Disk caches */ =20
+>>>=20
+>>> I've been wondering, VIRTIO_BALLOON_S_AVAIL is not in the virtio =
+spec (see
+>>> Section 5.5.6.3). It seems like this header file needs to be in sync =
+with
+>>> the virtio spec in order to make this change.
+>>>=20
+>>> I have a similar change to add a new statistic and was wondering =
+this. =20
+>>=20
+>> Absolutely. Tom=C3=A1=C5=A1?
+>=20
+> Sent. I also included description for the VIRTIO_BALLOON_S_AVAIL that
+> was missing.
+>=20
+>=20
+>>>>> +#define VIRTIO_BALLOON_S_NR       8
+>>>>>  /*
+>>>>>   * Memory statistics structure.
+>>>>> --=20
+>>>>> 2.15.1
+>>>>>=20
+>>>>=20
+>>>>=20
+>>>=20
+>>> You need to add your new stat to the list of stats in
+>>> docs/virtio-balloon-stats.txt.
+>>>=20
+>>> Jon =20
+>>=20
+>> Can't hurt, I agree.
+>=20
+> Sent.
+>=20
 
-> ---
-> docs/virtio-balloon-stats.txt | 2 ++
-> 1 file changed, 2 insertions(+)
+Awesome, thank you.
+
+Do you also plan to make the commensurate changes in libvirt, or did I =
+just miss the patch?
+
+Jon
+
+>    Tomas
 >=20
-> diff --git a/docs/virtio-balloon-stats.txt =
-b/docs/virtio-balloon-stats.txt
-> index edff5f22a8..7a66d25da5 100644
-> --- a/docs/virtio-balloon-stats.txt
-> +++ b/docs/virtio-balloon-stats.txt
-> @@ -32,6 +32,8 @@ which will return a dictionary containing:
->       - stat-minor-faults
->       - stat-free-memory
->       - stat-total-memory
-> +      - stat-available-memory
-> +      - stat-disk-caches
->=20
->   o A key named last-update, which contains the last stats update
->     timestamp in seconds. Since this timestamp is generated by the =
-host,
 > --=20
-> 2.16.1
->=20
->=20
+> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
