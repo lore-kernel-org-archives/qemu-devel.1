@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoBuA-0002T8-4b
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:43 -0500
+	(envelope-from <thuth@redhat.com>) id 1eoBuE-0002Wg-By
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoBu6-0000YN-S5
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:38 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42330 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1eoBuC-0000dm-Up
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:42 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39596 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoBu6-0000Y4-LT
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:34 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoBuC-0000dT-PD
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 12:40:40 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3EA0E40287F9
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 17:40:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 53FEC4023EDE
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 17:40:40 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 20 Feb 2018 18:40:03 +0100
-Message-Id: <1519148406-15006-6-git-send-email-thuth@redhat.com>
+Date: Tue, 20 Feb 2018 18:40:05 +0100
+Message-Id: <1519148406-15006-8-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519148406-15006-1-git-send-email-thuth@redhat.com>
 References: <1519148406-15006-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/8] net: Remove the deprecated way of
- dumping network packets
+Subject: [Qemu-devel] [PATCH v2 7/8] net: Add a new convenience option
+ "--nic" to configure default/on-board NICs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,308 +33,231 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-"-net dump" has been marked as deprecated since QEMU v2.10, since it
-only works with the deprecated 'vlan' parameter (or hubs). Network
-dumping should be done with "-object filter-dump" nowadays instead.
-Since nobody complained so far about the deprecation message, let's
-finally get rid of "-net dump" now.
+The legacy "-net" option can be quite confusing for the users since most
+people do not expect to get a "vlan" hub between their emulated guest
+hardware and the host backend. But so far, we are also not able to get
+rid of "-net" completely, since it is the only way to configure on-board
+NICs that can not be instantiated via "-device" yet. It's also a little
+bit shorter to type "-net nic -net tap" instead of "-device xyz,netdev=n1
+-netdev tap,id=n1".
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+So what we need is a new convenience option that is shorter to type than
+the full -device + -netdev stuff, and which can be used to configure the
+on-board NICs that can not be handled via -device yet. Thus this patch now
+provides such a new option "--nic": It adds an entry in the nd_table to
+configure a on-board / default NIC, creates a host backend and connects
+the two directly, without a confusing "vlan" hub inbetween.
+
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- net/dump.c      | 102 ++------------------------------------------------------
- net/net.c       |   9 +----
- qapi/net.json   |  29 ++++------------
- qemu-doc.texi   |   6 ----
- qemu-options.hx |   8 -----
- 5 files changed, 9 insertions(+), 145 deletions(-)
+ include/sysemu/sysemu.h |  1 +
+ net/net.c               | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx         | 40 +++++++++++++++++++++----
+ vl.c                    |  7 +++++
+ 4 files changed, 120 insertions(+), 6 deletions(-)
 
-diff --git a/net/dump.c b/net/dump.c
-index 15df9a4..f16c354 100644
---- a/net/dump.c
-+++ b/net/dump.c
-@@ -109,7 +109,7 @@ static int net_dump_state_init(DumpState *s, const char *filename,
- 
-     fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0644);
-     if (fd < 0) {
--        error_setg_errno(errp, errno, "-net dump: can't open %s", filename);
-+        error_setg_errno(errp, errno, "net dump: can't open %s", filename);
-         return -1;
-     }
- 
-@@ -122,7 +122,7 @@ static int net_dump_state_init(DumpState *s, const char *filename,
-     hdr.linktype = 1;
- 
-     if (write(fd, &hdr, sizeof(hdr)) < sizeof(hdr)) {
--        error_setg_errno(errp, errno, "-net dump write error");
-+        error_setg_errno(errp, errno, "net dump write error");
-         close(fd);
-         return -1;
-     }
-@@ -136,104 +136,6 @@ static int net_dump_state_init(DumpState *s, const char *filename,
-     return 0;
- }
- 
--/* Dumping via VLAN netclient */
--
--struct DumpNetClient {
--    NetClientState nc;
--    DumpState ds;
--};
--typedef struct DumpNetClient DumpNetClient;
--
--static ssize_t dumpclient_receive(NetClientState *nc, const uint8_t *buf,
--                                  size_t size)
--{
--    DumpNetClient *dc = DO_UPCAST(DumpNetClient, nc, nc);
--    struct iovec iov = {
--        .iov_base = (void *)buf,
--        .iov_len = size
--    };
--
--    return dump_receive_iov(&dc->ds, &iov, 1);
--}
--
--static ssize_t dumpclient_receive_iov(NetClientState *nc,
--                                      const struct iovec *iov, int cnt)
--{
--    DumpNetClient *dc = DO_UPCAST(DumpNetClient, nc, nc);
--
--    return dump_receive_iov(&dc->ds, iov, cnt);
--}
--
--static void dumpclient_cleanup(NetClientState *nc)
--{
--    DumpNetClient *dc = DO_UPCAST(DumpNetClient, nc, nc);
--
--    dump_cleanup(&dc->ds);
--}
--
--static NetClientInfo net_dump_info = {
--    .type = NET_CLIENT_DRIVER_DUMP,
--    .size = sizeof(DumpNetClient),
--    .receive = dumpclient_receive,
--    .receive_iov = dumpclient_receive_iov,
--    .cleanup = dumpclient_cleanup,
--};
--
--int net_init_dump(const Netdev *netdev, const char *name,
--                  NetClientState *peer, Error **errp)
--{
--    int len, rc;
--    const char *file;
--    char def_file[128];
--    const NetdevDumpOptions *dump;
--    NetClientState *nc;
--    DumpNetClient *dnc;
--
--    assert(netdev->type == NET_CLIENT_DRIVER_DUMP);
--    dump = &netdev->u.dump;
--
--    assert(peer);
--
--    error_report("'-net dump' is deprecated. "
--                 "Please use '-object filter-dump' instead.");
--
--    if (dump->has_file) {
--        file = dump->file;
--    } else {
--        int id;
--        int ret;
--
--        ret = net_hub_id_for_client(peer, &id);
--        assert(ret == 0); /* peer must be on a hub */
--
--        snprintf(def_file, sizeof(def_file), "qemu-vlan%d.pcap", id);
--        file = def_file;
--    }
--
--    if (dump->has_len) {
--        if (dump->len > INT_MAX) {
--            error_setg(errp, "invalid length: %"PRIu64, dump->len);
--            return -1;
--        }
--        len = dump->len;
--    } else {
--        len = 65536;
--    }
--
--    nc = qemu_new_net_client(&net_dump_info, peer, "dump", name);
--    snprintf(nc->info_str, sizeof(nc->info_str),
--             "dump to %s (len=%d)", file, len);
--
--    dnc = DO_UPCAST(DumpNetClient, nc, nc);
--    rc = net_dump_state_init(&dnc->ds, file, len, errp);
--    if (rc) {
--        qemu_del_net_client(nc);
--    }
--    return rc;
--}
--
--/* Dumping via filter */
--
- #define TYPE_FILTER_DUMP "filter-dump"
- 
- #define FILTER_DUMP(obj) \
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 77bb3da..66f0761 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -197,6 +197,7 @@ extern QemuOptsList bdrv_runtime_opts;
+ extern QemuOptsList qemu_chardev_opts;
+ extern QemuOptsList qemu_device_opts;
+ extern QemuOptsList qemu_netdev_opts;
++extern QemuOptsList qemu_nic_opts;
+ extern QemuOptsList qemu_net_opts;
+ extern QemuOptsList qemu_global_opts;
+ extern QemuOptsList qemu_mon_opts;
 diff --git a/net/net.c b/net/net.c
-index dd80f1b..cbd553d 100644
+index 2d05808..0bab269 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -63,7 +63,6 @@ static QTAILQ_HEAD(, NetClientState) net_clients;
- const char *host_net_devices[] = {
-     "tap",
-     "socket",
--    "dump",
- #ifdef CONFIG_NET_BRIDGE
-     "bridge",
- #endif
-@@ -967,7 +966,6 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
- #ifdef CONFIG_NETMAP
-         [NET_CLIENT_DRIVER_NETMAP]    = net_init_netmap,
- #endif
--        [NET_CLIENT_DRIVER_DUMP]      = net_init_dump,
- #ifdef CONFIG_NET_BRIDGE
-         [NET_CLIENT_DRIVER_BRIDGE]    = net_init_bridge,
- #endif
-@@ -993,8 +991,7 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-         netdev = object;
-         name = netdev->id;
+@@ -1462,6 +1462,67 @@ static int net_init_netdev(void *dummy, QemuOpts *opts, Error **errp)
+     return net_client_init(opts, true, errp);
+ }
  
--        if (netdev->type == NET_CLIENT_DRIVER_DUMP ||
--            netdev->type == NET_CLIENT_DRIVER_NIC ||
-+        if (netdev->type == NET_CLIENT_DRIVER_NIC ||
-             !net_client_init_fun[netdev->type]) {
-             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
-                        "a netdev backend type");
-@@ -1036,10 +1033,6 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-             legacy.type = NET_CLIENT_DRIVER_VDE;
-             legacy.u.vde = opts->u.vde;
-             break;
--        case NET_LEGACY_OPTIONS_TYPE_DUMP:
--            legacy.type = NET_CLIENT_DRIVER_DUMP;
--            legacy.u.dump = opts->u.dump;
--            break;
-         case NET_LEGACY_OPTIONS_TYPE_BRIDGE:
-             legacy.type = NET_CLIENT_DRIVER_BRIDGE;
-             legacy.u.bridge = opts->u.bridge;
-diff --git a/qapi/net.json b/qapi/net.json
-index 1238ba5..09af929 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -39,8 +39,10 @@
- #
- # Add a network backend.
- #
--# @type: the type of network backend.  Current valid values are 'user', 'tap',
--#        'vde', 'socket', 'dump' and 'bridge'
-+# @type: the type of network backend. Possible values in version
-+#        2.11: 'user', 'tap', 'vde', 'socket', 'hubport', 'bridge',
-+#              'dump', 'l2tpv3', 'netmap', 'vhost-user'
-+#        2.12: 'dump' dropped
- #
- # @id: the name of the new network backend
- #
-@@ -372,23 +374,6 @@
-     '*mode':  'uint16' } }
++/* For the convenience "--nic" parameter */
++static int net_param_nic(void *dummy, QemuOpts *opts, Error **errp)
++{
++    char *mac, *nd_id;
++    int idx, ret;
++    NICInfo *ni;
++    const char *type;
++
++    type = qemu_opt_get(opts, "type");
++    if (type && g_str_equal(type, "none")) {
++        return 0;    /* Nothing to do, default_net is cleared in vl.c */
++    }
++
++    idx = nic_get_free_idx();
++    if (idx == -1 || nb_nics >= MAX_NICS) {
++        error_setg(errp, "no more on-board/default NIC slots available");
++        return -1;
++    }
++
++    if (!type) {
++        qemu_opt_set(opts, "type", "user", &error_abort);
++    }
++
++    ni = &nd_table[idx];
++    memset(ni, 0, sizeof(*ni));
++    ni->model = qemu_opt_get_del(opts, "model");
++
++    /* Create an ID if the user did not specify one */
++    nd_id = g_strdup(qemu_opts_id(opts));
++    if (!nd_id) {
++        nd_id = g_strdup_printf("__org.qemu.nic%i\n", idx);
++        qemu_opts_set_id(opts, nd_id);
++    }
++
++    /* Handle MAC address */
++    mac = qemu_opt_get_del(opts, "mac");
++    if (mac) {
++        ret = net_parse_macaddr(ni->macaddr.a, mac);
++        g_free(mac);
++        if (ret) {
++            error_setg(errp, "invalid syntax for ethernet address");
++            return -1;
++        }
++        if (is_multicast_ether_addr(ni->macaddr.a)) {
++            error_setg(errp, "NIC cannot have multicast MAC address");
++            return -1;
++        }
++    }
++    qemu_macaddr_default_if_unset(&ni->macaddr);
++
++    ret = net_client_init(opts, true, errp);
++    if (ret == 0) {
++        ni->netdev = qemu_find_netdev(nd_id);
++        ni->used = true;
++        nb_nics++;
++    }
++
++    g_free(nd_id);
++    return ret;
++}
++
+ int net_init_clients(Error **errp)
+ {
+     net_change_state_entry =
+@@ -1474,6 +1535,10 @@ int net_init_clients(Error **errp)
+         return -1;
+     }
  
- ##
--# @NetdevDumpOptions:
--#
--# Dump VLAN network traffic to a file.
--#
--# @len: per-packet size limit (64k default). Understands [TGMKkb]
--# suffixes.
--#
--# @file: dump file path (default is qemu-vlan0.pcap)
--#
--# Since: 1.2
--##
--{ 'struct': 'NetdevDumpOptions',
--  'data': {
--    '*len':  'size',
--    '*file': 'str' } }
--
--##
- # @NetdevBridgeOptions:
- #
- # Connect a host TAP network interface to a host bridge device.
-@@ -468,7 +453,7 @@
- # Since: 2.7
- ##
- { 'enum': 'NetClientDriver',
--  'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde', 'dump',
-+  'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
-             'bridge', 'hubport', 'netmap', 'vhost-user' ] }
++    if (qemu_opts_foreach(qemu_find_opts("nic"), net_param_nic, NULL, errp)) {
++        return -1;
++    }
++
+     if (qemu_opts_foreach(qemu_find_opts("net"), net_init_client, NULL, errp)) {
+         return -1;
+     }
+@@ -1549,6 +1614,19 @@ QemuOptsList qemu_netdev_opts = {
+     },
+ };
  
- ##
-@@ -495,7 +480,6 @@
-     'l2tpv3':   'NetdevL2TPv3Options',
-     'socket':   'NetdevSocketOptions',
-     'vde':      'NetdevVdeOptions',
--    'dump':     'NetdevDumpOptions',
-     'bridge':   'NetdevBridgeOptions',
-     'hubport':  'NetdevHubPortOptions',
-     'netmap':   'NetdevNetmapOptions',
-@@ -530,7 +514,7 @@
- ##
- { 'enum': 'NetLegacyOptionsType',
-   'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
--           'dump', 'bridge', 'netmap', 'vhost-user'] }
-+           'bridge', 'netmap', 'vhost-user'] }
- 
- ##
- # @NetLegacyOptions:
-@@ -550,7 +534,6 @@
-     'l2tpv3':   'NetdevL2TPv3Options',
-     'socket':   'NetdevSocketOptions',
-     'vde':      'NetdevVdeOptions',
--    'dump':     'NetdevDumpOptions',
-     'bridge':   'NetdevBridgeOptions',
-     'netmap':   'NetdevNetmapOptions',
-     'vhost-user': 'NetdevVhostUserOptions' } }
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 8e35569..97025c2 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2707,12 +2707,6 @@ that can be specified with the ``-device'' parameter.
- The drive addr argument is replaced by the the addr argument
- that can be specified with the ``-device'' parameter.
- 
--@subsection -net dump (since 2.10.0)
--
--The ``--net dump'' argument is now replaced with the
--``-object filter-dump'' argument which works in combination
--with the modern ``-netdev`` backends instead.
--
- @subsection -usbdevice (since 2.10.0)
- 
- The ``-usbdevice DEV'' argument is now a synonym for setting
++QemuOptsList qemu_nic_opts = {
++    .name = "nic",
++    .implied_opt_name = "type",
++    .head = QTAILQ_HEAD_INITIALIZER(qemu_nic_opts.head),
++    .desc = {
++        /*
++         * no elements => accept any params
++         * validation will happen later
++         */
++        { /* end of list */ }
++    },
++};
++
+ QemuOptsList qemu_net_opts = {
+     .name = "net",
+     .implied_opt_name = "type",
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 9ae49a0..a9249b6 100644
+index a9249b6..399905e 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -2009,8 +2009,6 @@ DEF("net", HAS_ARG, QEMU_OPTION_net,
+@@ -2004,13 +2004,34 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+ #endif
+     "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
+     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
++DEF("nic", HAS_ARG, QEMU_OPTION_nic,
++    "--nic [tap|bridge|"
++#ifdef CONFIG_SLIRP
++    "user|"
++#endif
++#ifdef __linux__
++    "l2tpv3|"
++#endif
++#ifdef CONFIG_VDE
++    "vde|"
++#endif
++#ifdef CONFIG_NETMAP
++    "netmap|"
++#endif
++#ifdef CONFIG_POSIX
++    "vhost-user|"
++#endif
++    "socket][,option][,...][mac=macaddr]\n"
++    "                initialize an on-board / default host NIC (using MAC address\n"
++    "                macaddr) and connect it to the given host network backend\n"
++    "--nic none      use it alone to have zero network devices (the default is to\n"
++    "                provided a 'user' network connection)\n",
++    QEMU_ARCH_ALL)
+ DEF("net", HAS_ARG, QEMU_OPTION_net,
+     "-net nic[,vlan=n][,netdev=nd][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
      "                configure or create an on-board (or machine default) NIC and\n"
      "                connect it either to VLAN 'n' or the netdev 'nd' (for pluggable\n"
      "                NICs please use '-device devtype,netdev=nd' instead)\n"
--    "-net dump[,vlan=n][,file=f][,len=n]\n"
--    "                dump traffic on vlan 'n' to file 'f' (max n bytes per packet)\n"
-     "-net none       use it alone to have zero network devices. If no -net option\n"
-     "                is provided, the default is '-net nic -net user'\n"
+-    "-net none       use it alone to have zero network devices. If no -net option\n"
+-    "                is provided, the default is '-net nic -net user'\n"
      "-net ["
-@@ -2458,12 +2456,6 @@ qemu -m 512 -object memory-backend-file,id=mem,size=512M,mem-path=/hugetlbfs,sha
+ #ifdef CONFIG_SLIRP
+     "user|"
+@@ -2456,10 +2477,17 @@ qemu -m 512 -object memory-backend-file,id=mem,size=512M,mem-path=/hugetlbfs,sha
       -device virtio-net-pci,netdev=net0
  @end example
  
--@item -net dump[,vlan=@var{n}][,file=@var{file}][,len=@var{len}]
--Dump network traffic on VLAN @var{n} to file @var{file} (@file{qemu-vlan0.pcap} by default).
--At most @var{len} bytes (64k by default) per packet are stored. The file format is
--libpcap, so it can be analyzed with tools such as tcpdump or Wireshark.
--Note: For devices created with '-netdev', use '-object filter-dump,...' instead.
--
- @item -net none
- Indicate that no network devices should be configured. It is used to
- override the default configuration (@option{-net nic -net user}) which
+-@item -net none
+-Indicate that no network devices should be configured. It is used to
+-override the default configuration (@option{-net nic -net user}) which
+-is activated if no @option{-net} options are provided.
++@item --nic [tap|bridge|user|l2tpv3|vde|netmap|vhost-user|socket][,...][,mac=macaddr]
++
++This option is a shortcut for setting both, the on-board (default) guest NIC
++hardware and the host network backend in one go. The host backend options are
++the same as with the corresponding @option{--netdev} option. The guest NIC
++hardware MAC address can be set with @option{mac=@var{macaddr}}.
++
++@item --nic none
++Indicate that no network devices should be configured. It is used to override
++the default configuration (default NIC with @option{--net user} backend) which
++is activated if no other networking options are provided.
+ ETEXI
+ 
+ STEXI
+diff --git a/vl.c b/vl.c
+index 698b681..59ffadb 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3078,6 +3078,7 @@ int main(int argc, char **argv, char **envp)
+     qemu_add_opts(&qemu_chardev_opts);
+     qemu_add_opts(&qemu_device_opts);
+     qemu_add_opts(&qemu_netdev_opts);
++    qemu_add_opts(&qemu_nic_opts);
+     qemu_add_opts(&qemu_net_opts);
+     qemu_add_opts(&qemu_rtc_opts);
+     qemu_add_opts(&qemu_global_opts);
+@@ -3298,6 +3299,12 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++            case QEMU_OPTION_nic:
++                default_net = 0;
++                if (net_client_parse(qemu_find_opts("nic"), optarg) == -1) {
++                    exit(1);
++                }
++                break;
+             case QEMU_OPTION_net:
+                 default_net = 0;
+                 if (net_client_parse(qemu_find_opts("net"), optarg) == -1) {
 -- 
 1.8.3.1
