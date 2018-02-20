@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eo6oM-0003ma-JT
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:14:23 -0500
+	(envelope-from <david@redhat.com>) id 1eo6qh-0005JL-Ab
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eo6oL-0000In-Gu
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:14:18 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57700 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eo6oL-0000I9-CH
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:14:17 -0500
-References: <1518598187-27169-1-git-send-email-whois.zihan.yang@gmail.com>
-	<4f4fd107-e836-ad27-0778-aa13c9f93b23@redhat.com>
-	<CAKwiv-gm39NU0Y5sWaWHoKq6_LBo2FR1RopXLSoi0tC_Ray71w@mail.gmail.com>
-	<6681bcc4-d9f9-8b14-4463-9e93ec422f06@redhat.com>
-	<CAFEAcA8urY-pXDeZ5Hq33O2JOfWiVkdL2XRwWoCnXxSM6Q4B3Q@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ad515c08-346e-bc73-acf7-da8fdbc631bd@redhat.com>
-Date: Tue, 20 Feb 2018 13:14:15 +0100
+	(envelope-from <david@redhat.com>) id 1eo6qd-0003Ci-CA
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 07:16:43 -0500
+References: <20180219174231.10874-1-david@redhat.com>
+	<493dbfb3-086b-cc89-2d8d-4298345c6bb2@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <ef55dc18-971f-b012-40cc-0c32f24664cf@redhat.com>
+Date: Tue, 20 Feb 2018 13:16:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8urY-pXDeZ5Hq33O2JOfWiVkdL2XRwWoCnXxSM6Q4B3Q@mail.gmail.com>
+In-Reply-To: <493dbfb3-086b-cc89-2d8d-4298345c6bb2@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] RAMList: replace QemuMutex with
- CompatGMutex
+Subject: Re: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Zihan Yang <whois.zihan.yang@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>
 
-On 16/02/2018 10:13, Peter Maydell wrote:
-> On 14 February 2018 at 12:11, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 14/02/2018 12:43, Zihan Yang wrote:
->>>
->>>> I'm not sure what is the advantage of this change.  QEMU is more or less
->>>> uniformly using QemuMutex and QemuCond.
->>>
->>> I see. QEMU uses some glib functions, like g_new, g_free, g_hash_table ,
->>> g_assert and g_poll, so I thought there was a trend for making more use
->>> of glib.
->>> I get the point now.
->>
->> There are some plans about using priority inheritance mutexes for
->> QemuMutex.  GLib does not support anymore pluggable thread functions, so
->> we are stuck with our own implementation.
+On 20.02.2018 13:05, Christian Borntraeger wrote:
 > 
-> Should we remove the entry
-> "Change QemuMutex and QemuCond to CompatGMutex and CompatGCond (these are
->  the same as GMutex and GCond, just with a different type). With this change,
->  qemu_mutex_init/qemu_cond_init becomes optional for global variables."
-> from https://wiki.qemu.org/Contribute/BiteSizedTasks then?
+> 
+> On 02/19/2018 06:42 PM, David Hildenbrand wrote:
+>> From an architecture point of view, nothing can be mapped into the address
+>> space on s390x. All there is is memory. Therefore there is also not really
+>> an interface to communicate such information to the guest. All we can do is
+>> specify the maximum ram address and guests can probe in that range if
+>> memory is available and usable (TPROT).
+> 
+> In fact there is an interface in SCLP that describes the memory sizes (maximum in 
+> read scp info) and the details (read_storage_element0_info).  I am asking myself
+> if we should re-introduce read_storage_element_info and use that to avoid tprot
 
-Yes, good idea.
+Yes, we could do that (basically V1 of this patch) but have to glue it
+to the a compatibility machine then.
 
-Paolo
+> in the guests. Anyway that is future but maybe change your "TPROT" to sclp + tprot.
+
+Yes, makes sense.
+
+> 
+> 
+>>
+>> Also memory hotplug is strange. The guest can decide at some point in
+>> time to add / remove memory in some range. And nobody can really hinder it
+>> from doing so.
+> 
+> The host can reject to online an increment. For example on LPAR this is used as
+> a poor mans overcommitment. You can online prepared standy memory if there is
+> enough memory left.
+
+Interesting, didn't know about that. Will rephrase then to
+
+"While the hypervisor can deny to online an increment, all increments
+have to be predefined and there is no way of telling the guest about a
+newly "hotplugged" increment."
+
+> 
+>  So if we specify right now e.g.
+>>     -m 2G,slots=2,maxmem=20G
+>> An ordinary fedora guest will happily online (hotplug) all memory,
+>> resulting in a guest consuming 20G. So it really behaves rather like
+>>     -m 22G
+>> There is no way to hotplug memory from the outside like on other
+>> architectures. This is of course bad for upper management layers.
+> 
+> This is the main issue with the current code.
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
