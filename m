@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eo914-0006lt-It
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:35:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1eo9Ab-0001JZ-0P
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eo90z-0001RD-CU
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:35:34 -0500
-Date: Tue, 20 Feb 2018 15:35:10 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180220153510.27451354@redhat.com>
-In-Reply-To: <1519022574-6817-2-git-send-email-bharata@linux.vnet.ibm.com>
-References: <1519022574-6817-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1519022574-6817-2-git-send-email-bharata@linux.vnet.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1eo9AW-0006Mf-OZ
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:45:25 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35672 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eo9AW-0006MB-Im
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 09:45:20 -0500
+References: <CAG9FBFpFBrUrG0bRwjAo6xHYG4rnc0BT_ufLSa-HsO2WWgvKJw@mail.gmail.com>
+	<3de4128f-7749-fc52-d5ec-5744b4e74301@redhat.com>
+	<20180220083857.5l33rci3iz35uaze@sirius.home.kraxel.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <869bcfe6-8199-d7fa-7193-4bb17f6d6ca7@redhat.com>
+Date: Tue, 20 Feb 2018 08:45:00 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180220083857.5l33rci3iz35uaze@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v0 1/2] pc-dimm: Make
- pc_dimm_built_list() global
+Subject: Re: [Qemu-devel] qemu warnings and errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com
+To: Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, James Barrett <xucaen@gmail.com>
 
-On Mon, 19 Feb 2018 12:12:53 +0530
-Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
-
-> Making pc_dimm_built_list() global allows other parts of QEMU code
-> to build and walk through the DIMM list in address-sorted order.
+On 02/20/2018 02:38 AM, Gerd Hoffmann wrote:
+>    Hi,
 > 
-> This is needed in the next patch for sPAPR code to create
-> ibm,dynamic-memory-v2 device tree property that will have entries
-> for populated DIMMs as well as available hotpluggable areas.
+>> What version of QEMU?
+>>
+>>> unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
+>>
+>> This part is the only part that urges you to report the error, but I
+>> don't know much about what's going on here.
+>>
+>> Maybe Gerd knows?
 > 
-> CHECK: List of DIMMs is already available via qmp_pc_dimm_device_list(),
-maybe make it sorted first and use it?
+> We had lots of keymap/keycode changes recently, most likely this will be
+> fixed in 2.12, maybe it already is in 2.11.  So, when using something
+> older, try upgrading first (or just ignore it in case it happes to be a
+> key you don't need).
 
-(i.e. use pc_dimm_built_list in qmp_pc_dimm_device_list) and hide
-recursive callback ugliness from external users.
+The error message doesn't mention a numeric code or other way to figure 
+out which key is problematic.  While this particular message may 
+disappear when you upgrade, it would also be worth investigating if this 
+message can give more details to figure out which keycode is problematic 
+in case of future mismatches, other than just "unnamed".
 
-MemoryDeviceInfoList *qmp_pc_dimm_device_list(void) {
-    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &list);
-    ...
-}
-
-> but that doesn't provide a sorted list.
-> 
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> ---
->  hw/mem/pc-dimm.c         | 2 +-
->  include/hw/mem/pc-dimm.h | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 6e74b61..9bd61ca 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -261,7 +261,7 @@ static gint pc_dimm_addr_sort(gconstpointer a, gconstpointer b)
->      return 0;
->  }
->  
-> -static int pc_dimm_built_list(Object *obj, void *opaque)
-> +int pc_dimm_built_list(Object *obj, void *opaque)
->  {
->      GSList **list = opaque;
->  
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index d83b957..d880f5e 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -100,4 +100,5 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
->                           MemoryRegion *mr, uint64_t align, Error **errp);
->  void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
->                             MemoryRegion *mr);
-> +int pc_dimm_built_list(Object *obj, void *opaque);
->  #endif
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
