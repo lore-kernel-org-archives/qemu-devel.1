@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eoXld-0003wi-S4
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:01:19 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1eoXr1-0007hD-U9
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eoXla-0001Bn-Nt
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:01:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eoXla-0001B9-ET
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:01:14 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eoXlX-0002jy-QX
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 17:01:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2A27D2E80D2
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 17:01:11 +0000 (UTC)
+	(envelope-from <balaton@eik.bme.hu>) id 1eoXqx-0004Ys-LN
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:06:51 -0500
+Date: Wed, 21 Feb 2018 18:06:38 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.1802211754370.60913@zero.eik.bme.hu>
+References: <cover.1519150239.git.balaton@eik.bme.hu>
+	<CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
+	<20180220204450.GA27101@flamenco>
+	<CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Feb 2018 16:55:12 -0000
-From: Neil Skrypuch <1732959@bugs.launchpad.net>
-Reply-To: Bug 1732959 <1732959@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151094264088.1535.6755029665700711915.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151923211307.2799.4638033341793296269.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1732959] Re: [regression] Clock jump on source VM
- after migration
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH 0/2] Firmware blob and git submodule for
+ Sam460ex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,137 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-As a further test, I disabled ntpd on the host and ran ntpdate via cron
-every 12 hours, so that the clock would be relatively accurate, but no
-clock skew would be involved. This also reproduced the failure as
-initially described.
+On Wed, 21 Feb 2018, Peter Maydell wrote:
+> On 20 February 2018 at 20:44, Emilio G. Cota <cota@braap.org> wrote:
+>> On Tue, Feb 20, 2018 at 18:31:17 +0000, Peter Maydell wrote:
+>>> On 20 February 2018 at 18:10, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>>>> I've created a git repo for the Sam460ex u-boot sources and this adds
+>>>> that as a submodule and a separate patch to add the binary built from
+>>>> these sources. Feel free to keep this as two patches, squash them into
+>>>> one patch or take the git repo and commit the content under the QEMU
+>>>> repo and use that as a submodule as you see fit (or let me know if any
+>>>> changes are needed for these patches).
+>>>>
+>>>> BALATON Zoltan (2):
+>>>>   roms: Added git submodule for u-boot-sam460 (firmware for sam460ex)
+>>>>   pc-bios: Added u-boot-sam460 firmware binary
+>>>
+>>> We already have a submodule for u-boot. Is it not possible to
+>>> build this bios blob from those upstream u-boot sources?
+>>
+>> This is discussed in the following thread:
+>>   Re: [Qemu-ppc] [PATCH v3 2/2] ppc: Add aCube Sam460ex board
+>>   http://lists.gnu.org/archive/html/qemu-ppc/2018-02/msg00268.html
+>
+> If upstream u-boot have abandoned the board support I'm not very
+> enthusiastic about our taking it on :-(
 
-This is interesting as it means that a much simpler and faster
-reproduction case is probably feasible, something like:
+It's not that upstream u-boot has abandoned board support (it only removed 
+support for the PPC440 CPU it once had). The board itself never had 
+support in upstream u-boot, it only exists in vendor's fork which is the 
+reason we need a separate source and cannot use upstream u-boot source we 
+already have.
 
-1) start guest
-2) jump host clock by a few seconds
-3) migrate + cont src guest
-4) check clock in src guest
+In my opinion we don't aim to take on support for this board in u-boot, we 
+only need to include the firmware binary for the emulation to be useful 
+which then requires us to also include the source for the GPL it's 
+licensed under. I've also found a few bugs in the firmware which I've 
+fixed but apart from such occasional bug fixes when needed I don't expect 
+to take over support for the board from the hardware vendor so this source 
+is only so we can include the firmware binary which is needed for the 
+board emulation. Does this answer your concerns?
 
-Though, I haven't tried this yet.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1732959
-
-Title:
-  [regression] Clock jump on source VM after migration
-
-Status in QEMU:
-  New
-
-Bug description:
-  We (ab)use migration + block mirroring to perform transparent zero
-  downtime VM backups. Basically:
-
-  1) do a block mirror of the source VM's disk
-  2) migrate the source VM to a destination VM using the disk copy
-  3) cancel the block mirroring
-  4) resume the source VM
-  5) shut down the destination VM gracefully and move the disk to backup
-
-  Relatively recently, the source VM's clock started jumping after step
-  #4. More specifically, the clock jumps an amount of time proportional
-  to the time since it was last migrated. With a week between
-  migrations, clock jumps between ~2.5s and ~12s have been observed. For
-  a particular host, the amount of clock jump is fairly consistent, but
-  there is a large variation from one host to the next (this is likely
-  down to hardware variations and the amount of NTP adjusted clock drift
-  on the host).
-
-  This is caused by a kernel regression which I was able to bisect. The
-  result of the bisect was:
-
-  108b249c453dd7132599ab6dc7e435a7036c193f is the first bad commit
-  commit 108b249c453dd7132599ab6dc7e435a7036c193f
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Thu Sep 1 14:21:03 2016 +0200
-
-      KVM: x86: introduce get_kvmclock_ns
-      =
-
-      Introduce a function that reads the exact nanoseconds value that is
-      provided to the guest in kvmclock.  This crystallizes the notion of
-      kvmclock as a thin veneer over a stable TSC, that the guest will
-      (hopefully) convert with NTP.  In other words, kvmclock is *not* a
-      paravirtualized host-to-guest NTP.
-      =
-
-      Drop the get_kernel_ns() function, that was used both to get the base
-      value of the master clock and to get the current value of kvmclock.
-      The former use is replaced by ktime_get_boot_ns(), the latter is
-      the purpose of get_kernel_ns().
-      =
-
-      This also allows KVM to provide a Hyper-V time reference counter that
-      is synchronized with the time that is computed from the TSC page.
-      =
-
-      Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  I am able to reproduce the issue with much newer kernels as well,
-  including 4.12.5 and 4.9.6.
-
-  Reliably reproducing the problem in isolation is difficult, as one
-  must run a VM for many hours before the clock jump from this bug is
-  noticeable over the clock jump inherent with a pause and resume of the
-  VM. The reproducer I am including is set to run the VM for 18 hours
-  before migration and looks for >=3D 150 ms of clock jump. On different
-  hardware, you may need to let the VM run for more than 18 hours to
-  reliably reproduce the issue.
-
-  To reproduce the issue, please see the attached reproducer. The host
-  needs to have perl, screen and socat installed for the backup script
-  to work. Both the host and guest need to be running NTP (and NTP must
-  autostart at boot in the guest). The host needs to be able to SSH into
-  the guest using SSH keys (to measure the clock jump), so you will need
-  to configure the network and SSH keys appropriately, then change the
-  hardcoded IP address in checktime.sh and test.sh. I have only tested
-  with CentOS 7 guests.
-
-  The qemu command that gets run is in .kvmscreen (the destination VM's
-  command line is programmatically constructed from this command as
-  well), you may need to tweak the bridge configuration. Also, although
-  the reproducer is relatively self contained, it has several built in
-  assumptions that will break if the image file is not in the
-  /var/lib/kvm directory or if the monitor file is not in the
-  /var/lib/kvm/monitor directory, or if the /backup directory does not
-  exist. Finally, if you change the process name or socket name in
-  .kvmscreen, you'll need to adjust the cleanup section in test.sh.
-
-  With all of the above in place, run test.sh and check back in a little
-  over 18 hours, part of the output should include something along these
-  lines:
-
-  Target not found (wanted 150, at 10)
-
-  - or -
-
-  Target found (wanted 150, found 340)
-
-  If the target is reported as found, that means that we have probably
-  reproduced the described issue.
-
-  The version of QEMU in use does not appear to matter. At one point I
-  tested every major version from 2.4 to 2.9 (inclusive) and reproduced
-  the issue in all of them.
-
-  This was initially observed on two different Gentoo hosts. I have also
-  started to see this issue happening with four different RHEL 7 hosts
-  as of the upgrade to RHEL 7.4. This is not too surprising as it
-  appears that the above commit has been backported into RHEL 7. All
-  hosts and guests are 64-bit.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1732959/+subscriptions
+Regards,
+BALATON Zoltan
