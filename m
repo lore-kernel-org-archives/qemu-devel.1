@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eobW5-00020m-9i
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 16:02:52 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eobbL-0004b3-Lo
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 16:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eobV9-0001Eh-2Y
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 16:01:29 -0500
-References: <20180221135404.27598-1-kwolf@redhat.com>
-	<20180221135404.27598-11-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <53e504b6-cb8e-e261-e7b9-c2ea9453621b@redhat.com>
-Date: Wed, 21 Feb 2018 14:57:34 -0600
+	(envelope-from <rth7680@gmail.com>) id 1eobaH-0007Wb-IT
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 16:06:55 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:42902)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eobaH-0007V4-5u
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 16:05:49 -0500
+Received: by mail-pl0-x241.google.com with SMTP id 31so1617192ple.9
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 13:05:49 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1519246509-4022-1-git-send-email-cota@braap.org>
+	<1519246509-4022-2-git-send-email-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <19ddf862-2525-50c0-4375-7c88e7fcebc2@twiddle.net>
+Date: Wed, 21 Feb 2018 13:05:45 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180221135404.27598-11-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1519246509-4022-2-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/36] test-qemu-opts: Test
- qemu_opts_to_qdict_filtered()
+Subject: Re: [Qemu-devel] [PATCHv3 1/2] translator: merge max_insns into
+ DisasContextBase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-On 02/21/2018 07:53 AM, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   tests/test-qemu-opts.c | 125 +++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 125 insertions(+)
+On 02/21/2018 12:55 PM, Emilio G. Cota wrote:
+> While at it, use int for both num_insns and max_insns to make
+> sure we have same-type comparisons.
 > 
-> diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
-> index 6c3183390b..2c422abcd4 100644
-> --- a/tests/test-qemu-opts.c
-> +++ b/tests/test-qemu-opts.c
-> @@ -10,6 +10,7 @@
->   #include "qemu/osdep.h"
->   #include "qemu/cutils.h"
->   #include "qemu/option.h"
-> +#include "qemu/option_int.h"
->   #include "qapi/error.h"
->   #include "qapi/qmp/qdict.h"
->   #include "qapi/qmp/qstring.h"
-> @@ -868,6 +869,127 @@ static void test_opts_append(void)
->       qemu_opts_free(merged);
->   }
->   
-> +static void test_opts_to_qdict_basic(void)
-> +{
-> +    QemuOpts *opts;
-> +    QDict *dict;
-> +
-> +    opts = qemu_opts_parse(&opts_list_01, "str1=foo,str2=,str3=bar,number1=42",
-> +                           false, &error_abort);
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  accel/tcg/translator.c     | 21 ++++++++++-----------
+>  include/exec/translator.h  |  8 ++++----
+>  target/alpha/translate.c   |  6 ++----
+>  target/arm/translate-a64.c |  8 +++-----
+>  target/arm/translate.c     |  9 +++------
+>  target/hppa/translate.c    |  7 ++-----
+>  target/i386/translate.c    |  5 +----
+>  target/ppc/translate.c     |  5 ++---
+>  8 files changed, 27 insertions(+), 42 deletions(-)
 
-Worth any additional craziness in regards to our QemuOpts parsing, like 
-str1=foo,,bar,str2... for an option containing commas, or 
-str2=,str1=foo, for supplying options in a different order than the 
-list?  But what you have is a good addition even if you don't tweak it.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
