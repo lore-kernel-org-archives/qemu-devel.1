@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoXku-0003IT-0P
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:00:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1eoXld-0003wi-S4
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:01:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoXkt-0000rP-2o
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:00:32 -0500
-References: <20180220222459.8461-1-eblake@redhat.com>
-	<20180220222459.8461-3-eblake@redhat.com>
-	<20180221165116.GB4196@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <aed232fa-af26-5994-0bed-ec84a514b645@redhat.com>
-Date: Wed, 21 Feb 2018 10:59:58 -0600
+	(envelope-from <bounces@canonical.com>) id 1eoXla-0001Bn-Nt
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:01:17 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43426)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eoXla-0001B9-ET
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:01:14 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eoXlX-0002jy-QX
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 17:01:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2A27D2E80D2
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 17:01:11 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180221165116.GB4196@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: Avoid memory over-allocation on
- compressed images
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 21 Feb 2018 16:55:12 -0000
+From: Neil Skrypuch <1732959@bugs.launchpad.net>
+Reply-To: Bug 1732959 <1732959@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151094264088.1535.6755029665700711915.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151923211307.2799.4638033341793296269.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1732959] Re: [regression] Clock jump on source VM
+ after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +37,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, berto@igalia.com
+To: qemu-devel@nongnu.org
 
-On 02/21/2018 10:51 AM, Kevin Wolf wrote:
-> Am 20.02.2018 um 23:24 hat Eric Blake geschrieben:
->> When reading a compressed image, we were allocating s->cluster_data
->> to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
->> with 2M clusters).  Let's check out the history:
->>
+As a further test, I disabled ntpd on the host and ran ntpdate via cron
+every 12 hours, so that the clock would be relatively accurate, but no
+clock skew would be involved. This also reproduced the failure as
+initially described.
 
->> Much later, in commit de82815d (v2.2), we noticed that a 64M
->> allocation is prone to failure, so we switched over to a graceful
->> memory allocation error message.  But note that elsewhere in the
->> code, we do g_malloc(2 * cluster_size) without ever checking for
->> failure.
->>
+This is interesting as it means that a much simpler and faster
+reproduction case is probably feasible, something like:
 
->> -        }
->> -        if (!s->cluster_cache) {
->> -            s->cluster_cache = g_malloc(s->cluster_size);
->> +            assert(!s->cluster_cache);
-> 
-> Wouldn't it be better to assert (!!s->cluster_cache ==
-> !!s->cluster_data) unconditionally?
-> 
+1) start guest
+2) jump host clock by a few seconds
+3) migrate + cont src guest
+4) check clock in src guest
 
-Sure.
+Though, I haven't tried this yet.
 
->> +            s->cluster_data = g_try_malloc(s->cluster_size);
-> 
-> Why are you going from qemu_try_blockalign() to simple malloc here? This
-> buffer is used with bdrv_read() (or bdrv_pread() after patch 1), so we
-> should avoid unnecessary use of a bounce buffer.
+-- =
 
-But does bdrv_pread() actually need to use a bounce buffer if we don't 
-have an aligned buffer to read into?  Either the underlying protocol 
-already supports byte-aligned reads (direct into our buffer, regardless 
-of alignment, no bouncing required), or it already has do to a full 
-sector read into a bounce buffer anyways (and it doesn't matter whether 
-we aligned our buffer).  blockalign() made sense when we had multiple 
-clients for the buffer, but ever since v1.1, when we have only a single 
-client, and that single client is most likely not going to read 
-sector-aligned data in the first place, aligning the buffer doesn't buy 
-us anything.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1732959
 
-> 
->> +            s->cluster_cache = g_try_malloc(s->cluster_size);
-> 
-> As you already said, either g_malloc() or check the result. I actually
-> think that g_try_malloc() and checking the result is nicer, we still
-> allocate up to 2 MB here.
+Title:
+  [regression] Clock jump on source VM after migration
 
-See my commit message comment - we have other spots in the code base 
-that blindly g_malloc(2 * s->cluster_size).  And I intended (but sent 
-the email without amending my commit) to use g_malloc().  But as Berto 
-has convinced me that an externally produced image can convince us to 
-read up to 4M (even though we don't need that much to decompress), I 
-suppose that the try_ variant plus checking is reasonable (and care in 
-NULL'ing out if one but not both allocations succeed).
+Status in QEMU:
+  New
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Bug description:
+  We (ab)use migration + block mirroring to perform transparent zero
+  downtime VM backups. Basically:
+
+  1) do a block mirror of the source VM's disk
+  2) migrate the source VM to a destination VM using the disk copy
+  3) cancel the block mirroring
+  4) resume the source VM
+  5) shut down the destination VM gracefully and move the disk to backup
+
+  Relatively recently, the source VM's clock started jumping after step
+  #4. More specifically, the clock jumps an amount of time proportional
+  to the time since it was last migrated. With a week between
+  migrations, clock jumps between ~2.5s and ~12s have been observed. For
+  a particular host, the amount of clock jump is fairly consistent, but
+  there is a large variation from one host to the next (this is likely
+  down to hardware variations and the amount of NTP adjusted clock drift
+  on the host).
+
+  This is caused by a kernel regression which I was able to bisect. The
+  result of the bisect was:
+
+  108b249c453dd7132599ab6dc7e435a7036c193f is the first bad commit
+  commit 108b249c453dd7132599ab6dc7e435a7036c193f
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Thu Sep 1 14:21:03 2016 +0200
+
+      KVM: x86: introduce get_kvmclock_ns
+      =
+
+      Introduce a function that reads the exact nanoseconds value that is
+      provided to the guest in kvmclock.  This crystallizes the notion of
+      kvmclock as a thin veneer over a stable TSC, that the guest will
+      (hopefully) convert with NTP.  In other words, kvmclock is *not* a
+      paravirtualized host-to-guest NTP.
+      =
+
+      Drop the get_kernel_ns() function, that was used both to get the base
+      value of the master clock and to get the current value of kvmclock.
+      The former use is replaced by ktime_get_boot_ns(), the latter is
+      the purpose of get_kernel_ns().
+      =
+
+      This also allows KVM to provide a Hyper-V time reference counter that
+      is synchronized with the time that is computed from the TSC page.
+      =
+
+      Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  I am able to reproduce the issue with much newer kernels as well,
+  including 4.12.5 and 4.9.6.
+
+  Reliably reproducing the problem in isolation is difficult, as one
+  must run a VM for many hours before the clock jump from this bug is
+  noticeable over the clock jump inherent with a pause and resume of the
+  VM. The reproducer I am including is set to run the VM for 18 hours
+  before migration and looks for >=3D 150 ms of clock jump. On different
+  hardware, you may need to let the VM run for more than 18 hours to
+  reliably reproduce the issue.
+
+  To reproduce the issue, please see the attached reproducer. The host
+  needs to have perl, screen and socat installed for the backup script
+  to work. Both the host and guest need to be running NTP (and NTP must
+  autostart at boot in the guest). The host needs to be able to SSH into
+  the guest using SSH keys (to measure the clock jump), so you will need
+  to configure the network and SSH keys appropriately, then change the
+  hardcoded IP address in checktime.sh and test.sh. I have only tested
+  with CentOS 7 guests.
+
+  The qemu command that gets run is in .kvmscreen (the destination VM's
+  command line is programmatically constructed from this command as
+  well), you may need to tweak the bridge configuration. Also, although
+  the reproducer is relatively self contained, it has several built in
+  assumptions that will break if the image file is not in the
+  /var/lib/kvm directory or if the monitor file is not in the
+  /var/lib/kvm/monitor directory, or if the /backup directory does not
+  exist. Finally, if you change the process name or socket name in
+  .kvmscreen, you'll need to adjust the cleanup section in test.sh.
+
+  With all of the above in place, run test.sh and check back in a little
+  over 18 hours, part of the output should include something along these
+  lines:
+
+  Target not found (wanted 150, at 10)
+
+  - or -
+
+  Target found (wanted 150, found 340)
+
+  If the target is reported as found, that means that we have probably
+  reproduced the described issue.
+
+  The version of QEMU in use does not appear to matter. At one point I
+  tested every major version from 2.4 to 2.9 (inclusive) and reproduced
+  the issue in all of them.
+
+  This was initially observed on two different Gentoo hosts. I have also
+  started to see this issue happening with four different RHEL 7 hosts
+  as of the upgrade to RHEL 7.4. This is not too surprising as it
+  appears that the above commit has been backported into RHEL 7. All
+  hosts and guests are 64-bit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1732959/+subscriptions
