@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoXVU-0003f6-VN
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:44:41 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eoXWE-00043U-C3
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoXVR-00014N-Tk
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:44:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34566 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1eoXWD-0001UZ-Hu
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:45:22 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34584 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoXVR-00014H-PR
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:44:33 -0500
-Date: Wed, 21 Feb 2018 16:44:31 +0000
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoXWD-0001UD-D4
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:45:21 -0500
+Date: Wed, 21 Feb 2018 16:45:19 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180221164431.GC21436@stefanha-x1.localdomain>
+Message-ID: <20180221164519.GE21436@stefanha-x1.localdomain>
 References: <20180124053957.29145-1-peterx@redhat.com>
 	<20180124053957.29145-13-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
+	protocol="application/pgp-signature"; boundary="FEz7ebHBGB6b2e8X"
 Content-Disposition: inline
 In-Reply-To: <20180124053957.29145-13-peterx@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v7 12/23] monitor: let suspend_cnt be
@@ -33,33 +33,35 @@ To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
---32u276st3Jlj2kUU
+--FEz7ebHBGB6b2e8X
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
 On Wed, Jan 24, 2018 at 01:39:46PM +0800, Peter Xu wrote:
-> @@ -3996,7 +3996,7 @@ int monitor_suspend(Monitor *mon)
->  {
->      if (!mon->rs)
->          return -ENOTTY;
+> Monitor code now can be run in more than one thread.  Let it be thread
+> safe when accessing suspend_cnt counter.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 
-Does this mean that QMP monitors like -qmp unix:/tmp/foo,server,nowait
-will not use suspend_cnt?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-I thought the point was to use suspend_cnt for QMP monitors too.
-
---32u276st3Jlj2kUU
+--FEz7ebHBGB6b2e8X
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJajaHvAAoJEJykq7OBq3PIACUIAMjE4Aqf27TohlJUwXEqcOPo
-/K4u/J0GzXv6WWEQKF4sCID3JoSS+WW+ost9k391LF1zKaMsxS7z48kQPQWGvsRS
-UsWkSOGbRVn3dZcq6vd13I9Y1ds+8T3VehnUpU8lBiA2oLJuOhk+QG7N2M82pRI9
-N8KaDwVY8ewJvrZo3vNeK/jMRDAivP1GkkkwO6tUgK0O7C9B1vZZ6sPUc+eaRyjv
-5xhaYGIBCqMkdnhvciDoxTdjgCsVvkSv3lgFWbGzCn65x1muMBbUbR9NWwScPhue
-+OEl2oA2vDA8uv19SUpBMApVG310l5IU4xapjOfxTqU6hSnhh81BmZ+uDNdTq6I=
-=lm0M
+iQEcBAEBAgAGBQJajaIfAAoJEJykq7OBq3PIzbsH/0ZRkSBsS565vDxrSRkZ7yTr
+2l6WmZLp5f3EcCDg+5qPVNCSfaCZ+jVvQpWu0H6045MWVYt2obtvZ+Y5l5ty9wgO
+F+ScGf5DCEK6XDK6PRPZYGLap26IRKYaVfrPQ52TF5uM+kMVlUfS0IDkvtKbSXyQ
+v19495bFaDxKGWxHwd+jop/Y+CejRWMEO/XAH9kWvy4R8CVTj4CyCsaDHG/bDgwY
+e+Ao0f67pX7AFT389XZNhSUsRlFzep25gz2lawPE3nsBTZZUfGLCwDM6nI+iQ7ik
+HVPqqxFisOhCK18cPW7P3FA+y82uDsLGS2cvZrx+nfR7PHUridHAIdy/EfCLKNM=
+=sonx
 -----END PGP SIGNATURE-----
 
---32u276st3Jlj2kUU--
+--FEz7ebHBGB6b2e8X--
