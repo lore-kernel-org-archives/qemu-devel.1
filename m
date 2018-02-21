@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eoV59-000509-8T
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:09:16 -0500
+	(envelope-from <clg@kaod.org>) id 1eoVNQ-0004Gm-2H
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eoV56-0002B5-2d
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:09:15 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed, 21 Feb 2018 16:08:49 +0200
-Message-Id: <20180221140849.16068-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3] specs/qcow2: Fix documentation of the
- compressed cluster descriptor
+	(envelope-from <clg@kaod.org>) id 1eoVNK-00071k-WA
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:28:08 -0500
+Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:33302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eoVNK-0006uO-QX
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:28:02 -0500
+Received: from player774.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id A223D13D1C0
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 15:27:53 +0100 (CET)
+References: <20180220132627.4163-1-hlandau@devever.net>
+	<e13f6f08-c29a-2202-014c-1911181671e2@kaod.org>
+	<20180220141954.GA5614@axminster>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <53c1e0f5-9652-e5da-57fb-0447b301d4f5@kaod.org>
+Date: Wed, 21 Feb 2018 15:27:51 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180220141954.GA5614@axminster>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Fix ast2500 protection register emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,74 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Hugo Landau <hlandau@devever.net>
+Cc: qemu-devel@nongnu.org
 
-This patch fixes several mistakes in the documentation of the
-compressed cluster descriptor:
+On 02/20/2018 03:19 PM, Hugo Landau wrote:
+>> I also gave it a test on an OpenBMC romulus image. Looks fine, but that's 
+>> an old custom U-Boot. Which defconfig did you use for U-Boot HEAD ? 
+> evb-ast2500_defconfig.
 
-1) the documentation claims that the cluster descriptor contains the
-   number of sectors used to store the compressed data, but what it
-   actually contains is the number of sectors *minus one* or, in other
-   words, the number of additional sectors after the first one.
+ok
 
-2) the width of the fields is incorrectly specified. The number of bits
-   used by each field is
+> FYI, these changes are necessary, but not sufficient to get u-boot HEAD
+> (or for that matter u-boot 2017.11, another version tested) running.
+> 
+> The other issues were
+>   - the tests
+>       while (!(readl(&regs->ecc_test_ctrl) & SDRAM_TEST_DONE));
+>     and
+>       while (!(readl(&info->regs->config) & SDRAM_CONF_CACHE_INIT_DONE));
+>     which appear in various places in the u-boot source and which spin
+>     forever. I made u-boot work by commenting these out in u-boot rather
+>     than patching qemu, not familiar enough with qemu to implement this.
 
-      x = 62 - (cluster_bits - 8)   for the offset field
-      y = (cluster_bits - 8)        for the size field
+This patch :
 
-   So the offset field's location is [0, x-1], not [0, x] as stated.
+  https://github.com/openbmc/qemu/commit/4fb98fffd3115d8d3d0a16a1033f5335b5c0fd9b
 
-3) the size field does not contain the size of the compressed data,
-   but rather the number of sectors where that data is stored. The
-   compressed data starts at the exact point specified in the offset
-   field and ends when there's enough data to produce a cluster of
-   decompressed data. Both points can be in the middle of a sector,
-   allowing several compressed clusters to be stored next to one
-   another, sharing sectors if necessary.
+fakes some more SDMC registers to let the SDRAM initialization run. you
+might want to take a look at it.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
+Thanks,
 
-v3: Fix the specification of the width of the fields, and update the
-    explanation of how the compressed data is stored [Eric].
+C.  
 
-v2: I realized that the documentation is not completely clear about
-    the exact location and size of the compressed data, so I updated
-    the patch to clarify this.
-
----
- docs/interop/qcow2.txt | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index d7fdb1fee3..feb711fb6a 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -426,10 +426,20 @@ Standard Cluster Descriptor:
- 
- Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
- 
--    Bit  0 -  x:    Host cluster offset. This is usually _not_ aligned to a
--                    cluster boundary!
-+    Bit  0 - x-1:   Host cluster offset. This is usually _not_ aligned to a
-+                    cluster or sector boundary!
- 
--       x+1 - 61:    Compressed size of the images in sectors of 512 bytes
-+         x - 61:    Number of additional 512-byte sectors used for the
-+                    compressed data, beyond the sector containing the offset
-+                    in the previous field. Some of these sectors may reside
-+                    in the next contiguous host cluster.
-+
-+                    Note that the compressed data does not necessarily occupy
-+                    all of the bytes in the final sector; rather, decompression
-+                    stops when it has produced a cluster of data.
-+
-+                    Another compressed cluster may map to the tail of the final
-+                    sector used by this compressed cluster.
- 
- If a cluster is unallocated, read requests shall read the data from the backing
- file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
--- 
-2.11.0
+>   - the call to reset_assert in ast2500_sdrammc_probe seems to actually
+>     reset the machine rather than just initialize SDRAM as it is
+>     apparently supposed to, leading to an infinite cycle of resets.
+>     Couldn't quite figure out how it was supposed to work, so I
+>     commented this out, since obviously qemu doesn't actually have SDRAM
+>     initialization requirements.
+> 
+> The above changes plus this patch allowed u-boot to get to the u-boot
+> CLI. Haven't tried booting anything with it yet though.
+> 
