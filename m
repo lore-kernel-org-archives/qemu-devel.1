@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoYMg-00058Q-Hg
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:35 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eoYRc-0006zA-0s
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:44:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoYMd-0005DP-Bv
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:34 -0500
-Date: Wed, 21 Feb 2018 18:39:26 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180221173926.GB353@localhost.localdomain>
-References: <20180220222459.8461-1-eblake@redhat.com>
-	<20180220222459.8461-3-eblake@redhat.com>
-	<20180221165116.GB4196@localhost.localdomain>
-	<aed232fa-af26-5994-0bed-ec84a514b645@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1eoYRY-00085F-TN
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:44:40 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36520 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoYRY-00084t-PG
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:44:36 -0500
+Date: Wed, 21 Feb 2018 17:44:19 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180221174419.GK21436@stefanha-x1.localdomain>
+References: <20180124053957.29145-1-peterx@redhat.com>
+	<20180124053957.29145-20-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/rDaUNvWv5XYRSKj"
 Content-Disposition: inline
-In-Reply-To: <aed232fa-af26-5994-0bed-ec84a514b645@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: Avoid memory over-allocation on
- compressed images
+In-Reply-To: <20180124053957.29145-20-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 19/23] qmp: isolate responses into io
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, berto@igalia.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Am 21.02.2018 um 17:59 hat Eric Blake geschrieben:
-> On 02/21/2018 10:51 AM, Kevin Wolf wrote:
-> > Am 20.02.2018 um 23:24 hat Eric Blake geschrieben:
-> > > When reading a compressed image, we were allocating s->cluster_data
-> > > to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
-> > > with 2M clusters).  Let's check out the history:
-> > > 
-> 
-> > > Much later, in commit de82815d (v2.2), we noticed that a 64M
-> > > allocation is prone to failure, so we switched over to a graceful
-> > > memory allocation error message.  But note that elsewhere in the
-> > > code, we do g_malloc(2 * cluster_size) without ever checking for
-> > > failure.
-> > > 
-> 
-> > > -        }
-> > > -        if (!s->cluster_cache) {
-> > > -            s->cluster_cache = g_malloc(s->cluster_size);
-> > > +            assert(!s->cluster_cache);
-> > 
-> > Wouldn't it be better to assert (!!s->cluster_cache ==
-> > !!s->cluster_data) unconditionally?
-> > 
-> 
-> Sure.
-> 
-> > > +            s->cluster_data = g_try_malloc(s->cluster_size);
-> > 
-> > Why are you going from qemu_try_blockalign() to simple malloc here? This
-> > buffer is used with bdrv_read() (or bdrv_pread() after patch 1), so we
-> > should avoid unnecessary use of a bounce buffer.
-> 
-> But does bdrv_pread() actually need to use a bounce buffer if we don't have
-> an aligned buffer to read into?  Either the underlying protocol already
-> supports byte-aligned reads (direct into our buffer, regardless of
-> alignment, no bouncing required), or it already has do to a full sector read
-> into a bounce buffer anyways (and it doesn't matter whether we aligned our
-> buffer).  blockalign() made sense when we had multiple clients for the
-> buffer, but ever since v1.1, when we have only a single client, and that
-> single client is most likely not going to read sector-aligned data in the
-> first place, aligning the buffer doesn't buy us anything.
 
-Good point.
+--/rDaUNvWv5XYRSKj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-To be honest, I don't even analyse each caller, but just consistently use
-qemu_try_blockalign() whenever a buffer is used for I/O. It's a simple
-rule of thumb that generally makes sense.
+On Wed, Jan 24, 2018 at 01:39:53PM +0800, Peter Xu wrote:
+> For those monitors who have enabled IO thread, we'll offload the
+> responding procedure into IO thread.  The main reason is that chardev is
+> not thread safe, and we need to do all the read/write IOs in the same
+> thread.  For use_io_thr=3Dtrue monitors, that thread is the IO thread.
+>=20
+> We do this isolation in similar pattern as what we have done to the
+> request queue: we first create one response queue for each monitor, then
+> instead of replying directly in the main thread, we queue the responses
+> and kick the IO thread to do the rest of the job for us.
+>=20
+> A funny thing after doing this is that, when the QMP clients send "quit"
+> to QEMU, it's possible that we close the IOThread even earlier than
+> replying to that "quit".  So another thing we need to do before cleaning
+> up the monitors is that we need to flush the response queue (we don't
+> need to do that for command queue; after all we are quitting) to make
+> sure replies for handled commands are always flushed back to clients.
+>=20
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  1 file changed, 95 insertions(+), 1 deletion(-)
 
-So as you say, in this case it's unlikely, but possible that we can
-benefit from an aligned buffer. I guess my point is more about
-consistency than actual functionality then. But it's okay either way.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> > 
-> > > +            s->cluster_cache = g_try_malloc(s->cluster_size);
-> > 
-> > As you already said, either g_malloc() or check the result. I actually
-> > think that g_try_malloc() and checking the result is nicer, we still
-> > allocate up to 2 MB here.
-> 
-> See my commit message comment - we have other spots in the code base that
-> blindly g_malloc(2 * s->cluster_size).
+--/rDaUNvWv5XYRSKj
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Though is that a reason to do the same in new code or to phase out such
-allocations whenever you touch them?
+-----BEGIN PGP SIGNATURE-----
 
-> And I intended (but sent the email without amending my commit) to use
-> g_malloc().  But as Berto has convinced me that an externally produced
-> image can convince us to read up to 4M (even though we don't need that
-> much to decompress), I suppose that the try_ variant plus checking is
-> reasonable (and care in NULL'ing out if one but not both allocations
-> succeed).
+iQEcBAEBAgAGBQJaja/zAAoJEJykq7OBq3PIViEIAJ3xxyOk3y+rGGbCokIeQNEo
+ygSCV8W2jLOUNpZt6qm8/wg4sq7qGZ6MCC6epeHyjJ+VIwvuH0l5a2u+YNwNfAyM
+HWiLknMmoQRF4u5t9NxtgJLvsapcQzgS8thYw1uS2dfp+MTcXKOW6gGoBEW2W4Uo
+JeptphvAEsAZF1adlQDC2LKwwEpBmkSz3W0ZXB58QxCRZTektfkONzwj+Tmisp35
+AJMsJU1m4n01rErTMkpe1mPMuqpORBXiN9/n9T+jtTlKXB/zp0eIdeAElZAUV64H
+jUP7e3R49/kWkqmQ0scDx9/NAed3N4T8vDTy5yox7vWATpzAs8wRMfBH9690amk=
+=ky+U
+-----END PGP SIGNATURE-----
 
-Sounds good.
-
-Another thought I had is whether we should do per-request allocation for
-compressed clusters, too, instead of having per-BDS buffers.
-
-Kevin
+--/rDaUNvWv5XYRSKj--
