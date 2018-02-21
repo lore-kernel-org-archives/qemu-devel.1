@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eoavV-00072e-W0
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:24:48 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eoawg-0007vj-H9
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eoauU-0005VT-Pl
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:23:41 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:47059)
+	(envelope-from <rth7680@gmail.com>) id 1eoavc-0006kL-DO
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:24:54 -0500
+Received: from mail-pl0-x22b.google.com ([2607:f8b0:400e:c01::22b]:34538)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eoauU-0005U9-4J
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:22:38 -0500
-Received: by mail-pf0-x241.google.com with SMTP id z24so1122407pfh.13
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 12:22:38 -0800 (PST)
-References: <20180207225540.31698-1-richard.henderson@linaro.org>
-	<20180207225540.31698-20-richard.henderson@linaro.org>
-	<ddb804a5-6c00-57c3-03ef-d77daedda511@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <75fc3d37-b450-a61a-d7cc-a0052b1ad18b@linaro.org>
-Date: Wed, 21 Feb 2018 12:22:34 -0800
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eoavb-0006hh-UO
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:23:48 -0500
+Received: by mail-pl0-x22b.google.com with SMTP id u13so1569290plq.1
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 12:23:47 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1519093616-10563-1-git-send-email-cota@braap.org>
+	<1519093616-10563-2-git-send-email-cota@braap.org>
+	<512f6e39-9aa0-7e4f-fad4-7085d499ae65@linaro.org>
+	<20180221201723.GA30501@flamenco>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <acb5eeb7-a350-2cb9-2596-f1017dce7aae@twiddle.net>
+Date: Wed, 21 Feb 2018 12:23:43 -0800
 MIME-Version: 1.0
-In-Reply-To: <ddb804a5-6c00-57c3-03ef-d77daedda511@redhat.com>
+In-Reply-To: <20180221201723.GA30501@flamenco>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 19/20] tcg/i386: Add vector operations
+Subject: Re: [Qemu-devel] [PATCHv2 1/2] translator: merge max_insns into
+ DisasContextBase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +34,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-On 02/20/2018 08:44 AM, Max Reitz wrote:
-> This patch makes make check with clang -m32 fail for me.  (Interestingly
-> enough, though, clang -m64 and gcc -m32 work fine.)
+On 02/21/2018 12:17 PM, Emilio G. Cota wrote:
+> On Wed, Feb 21, 2018 at 10:19:05 -0800, Richard Henderson wrote:
+>> On 02/19/2018 06:26 PM, Emilio G. Cota wrote:
+>>> @@ -68,6 +69,7 @@ typedef struct DisasContextBase {
+>>>      target_ulong pc_next;
+>>>      DisasJumpType is_jmp;
+>>>      unsigned int num_insns;
+>>> +    int max_insns;
+>>>      bool singlestep_enabled;
+>>>  } DisasContextBase;
+>>
+>> We really should pick the same type for max_insns and num_insns, which ever
+>> type we settle on.  I can't see how we can go wrong with unsigned...
+> 
+> I was just trying to avoid warnings with -Wsign-compare in case
+> we ever enabled it.
 
-What's really interesting is that gcc -m32 should *not* have worked, but does.
-I'm not sure why.  The assert is for the missing constraints for INDEX_op_dup2_vec.
+Well, right.  That's my point.  We compare num_insns < max_insns.
 
-Will fix.
+> Should I bother converting the "bound" variables we use for
+> MIN(max_insns, bound) to unsigned as well? Or just leave them
+> alone and forget about -Wsign-compare?
+
+You could change num_insns to "int" as well.
 
 
 r~
