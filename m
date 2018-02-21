@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eoaI2-0006h3-Kq
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:43:49 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eoaHu-0006gU-NP
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:43:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eoaHI-0006Qa-VY
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:42:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34130)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eoaH9-0006Dx-Il
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:42:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51088
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eoaHI-0006PP-DY
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:42:08 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1LJd2SB118914
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:42:07 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9cprphp7-1
+	id 1eoaH9-0006DH-AF
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:41:59 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1LJdVxl081911
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:41:58 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g9ej79epe-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:41:54 -0500
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:41:53 -0500
 Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
 	Wed, 21 Feb 2018 14:41:52 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Wed, 21 Feb 2018 14:35:41 -0500
+Date: Wed, 21 Feb 2018 14:35:40 -0500
 In-Reply-To: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1519241752-28083-3-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v8 02/13] s390-ccw: refactor eckd_block_num to
- use CHS
+Message-Id: <1519241752-28083-2-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v8 01/13] s390-ccw: refactor boot map table code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,128 +41,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Add new cylinder/head/sector struct. Use it to calculate
-eckd block numbers instead of a BootMapPointer (which used
-eckd chs anyway).
+Some ECKD bootmap code was using structs designed for SCSI.
+Even though this works, it confuses readability. Add a new
+BootMapTable struct to assist with readability in bootmap
+entry code. Also:
+
+- replace ScsiMbr in ECKD code with appropriate structs
+- fix read_block messages to reflect BootMapTable
+- fixup ipl_scsi to use BootMapTable (referred to as Program Table)
+- defined value for maximum table entries
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c | 28 ++++++++++++++--------------
- pc-bios/s390-ccw/bootmap.h |  8 ++++++--
- 2 files changed, 20 insertions(+), 16 deletions(-)
+ pc-bios/s390-ccw/bootmap.c | 60 +++++++++++++++++++++-------------------------
+ pc-bios/s390-ccw/bootmap.h | 11 ++++++++-
+ 2 files changed, 37 insertions(+), 34 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index a4eaf24..9534f56 100644
+index 67a6123..a4eaf24 100644
 --- a/pc-bios/s390-ccw/bootmap.c
 +++ b/pc-bios/s390-ccw/bootmap.c
-@@ -95,32 +95,32 @@ static inline void verify_boot_info(BootInfo *bip)
-                "Bad block size in zIPL section of the 1st record.");
+@@ -182,24 +182,24 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
+     return block_nr;
  }
  
--static block_number_t eckd_block_num(BootMapPointer *p)
-+static block_number_t eckd_block_num(EckdCHS *chs)
+-static void run_eckd_boot_script(block_number_t mbr_block_nr)
++static void run_eckd_boot_script(block_number_t bmt_block_nr)
  {
-     const uint64_t sectors = virtio_get_sectors();
-     const uint64_t heads = virtio_get_heads();
--    const uint64_t cylinder = p->eckd.cylinder
--                            + ((p->eckd.head & 0xfff0) << 12);
--    const uint64_t head = p->eckd.head & 0x000f;
-+    const uint64_t cylinder = chs->cylinder
-+                            + ((chs->head & 0xfff0) << 12);
-+    const uint64_t head = chs->head & 0x000f;
-     const block_number_t block = sectors * heads * cylinder
-                                + sectors * head
--                               + p->eckd.sector
-+                               + chs->sector
-                                - 1; /* block nr starts with zero */
-     return block;
- }
+     int i;
+     unsigned int loadparm = get_loadparm_index();
+     block_number_t block_nr;
+     uint64_t address;
+-    ScsiMbr *bte = (void *)sec; /* Eckd bootmap table entry */
++    BootMapTable *bmt = (void *)sec;
+     BootMapScript *bms = (void *)sec;
  
- static bool eckd_valid_address(BootMapPointer *p)
- {
--    const uint64_t head = p->eckd.head & 0x000f;
-+    const uint64_t head = p->eckd.chs.head & 0x000f;
- 
-     if (head >= virtio_get_heads()
--        ||  p->eckd.sector > virtio_get_sectors()
--        ||  p->eckd.sector <= 0) {
-+        ||  p->eckd.chs.sector > virtio_get_sectors()
-+        ||  p->eckd.chs.sector <= 0) {
-         return false;
-     }
- 
-     if (!virtio_guessed_disk_nature() &&
--        eckd_block_num(p) >= virtio_get_blocks()) {
-+        eckd_block_num(&p->eckd.chs) >= virtio_get_blocks()) {
-         return false;
-     }
- 
-@@ -140,7 +140,7 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
-     do {
-         more_data = false;
-         for (j = 0;; j++) {
--            block_nr = eckd_block_num((void *)&(bprs[j].xeckd));
-+            block_nr = eckd_block_num(&bprs[j].xeckd.bptr.chs);
-             if (is_null_block_number(block_nr)) { /* end of chunk */
-                 break;
-             }
-@@ -198,7 +198,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
- 
--    block_nr = eckd_block_num(&bmt->entry[loadparm]);
-+    block_nr = eckd_block_num(&bmt->entry[loadparm].xeckd.bptr.chs);
-     IPL_assert(block_nr != -1, "Cannot find Boot Map Table Entry");
+     debug_print_int("loadparm", loadparm);
+-    IPL_assert(loadparm < 31, "loadparm value greater than"
++    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
+                " maximum number of boot entries allowed");
  
      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-@@ -206,7 +206,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+-    read_block(mbr_block_nr, sec, "Cannot read MBR");
++    read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
  
-     for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
-         address = bms->entry[i].address.load_address;
--        block_nr = eckd_block_num(&(bms->entry[i].blkptr));
-+        block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
+-    block_nr = eckd_block_num((void *)&(bte->blockptr[loadparm]));
+-    IPL_assert(block_nr != -1, "No Boot Map");
++    block_nr = eckd_block_num(&bmt->entry[loadparm]);
++    IPL_assert(block_nr != -1, "Cannot find Boot Map Table Entry");
  
-         do {
-             block_nr = load_eckd_segments(block_nr, &address);
-@@ -239,7 +239,7 @@ static void ipl_eckd_cdl(void)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(block_nr, sec, "Cannot read Boot Map Script");
+@@ -223,7 +223,7 @@ static void ipl_eckd_cdl(void)
+     XEckdMbr *mbr;
+     Ipl2 *ipl2 = (void *)sec;
+     IplVolumeLabel *vlbl = (void *)sec;
+-    block_number_t block_nr;
++    block_number_t bmt_block_nr;
+ 
+     /* we have just read the block #0 and recognized it as "IPL1" */
+     sclp_print("CDL\n");
+@@ -238,8 +238,8 @@ static void ipl_eckd_cdl(void)
+     IPL_assert(mbr->dev_type == DEV_TYPE_ECKD,
                 "Non-ECKD device type in zIPL section of IPL2 record.");
  
-     /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num(&mbr->blockptr);
-+    bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
+-    /* save pointer to Boot Script */
+-    block_nr = eckd_block_num((void *)&(mbr->blockptr));
++    /* save pointer to Boot Map Table */
++    bmt_block_nr = eckd_block_num(&mbr->blockptr);
  
      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
      read_block(2, vlbl, "Cannot read Volume Label at block 2");
-@@ -300,7 +300,7 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+@@ -249,7 +249,7 @@ static void ipl_eckd_cdl(void)
+                "Invalid magic of volser block");
+     print_volser(vlbl->f.volser);
+ 
+-    run_eckd_boot_script(block_nr);
++    run_eckd_boot_script(bmt_block_nr);
+     /* no return */
+ }
+ 
+@@ -280,7 +280,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+ 
+ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+ {
+-    block_number_t block_nr;
++    block_number_t bmt_block_nr;
+     BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
+ 
+     if (mode != ECKD_LDL_UNLABELED) {
+@@ -299,8 +299,10 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+     }
      verify_boot_info(bip);
  
-     /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num((void *)&bip->bp.ipl.bm_ptr.eckd.bptr);
-+    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
- 
-     run_eckd_boot_script(bmt_block_nr);
+-    block_nr = eckd_block_num((void *)&(bip->bp.ipl.bm_ptr.eckd.bptr));
+-    run_eckd_boot_script(block_nr);
++    /* save pointer to Boot Map Table */
++    bmt_block_nr = eckd_block_num((void *)&bip->bp.ipl.bm_ptr.eckd.bptr);
++
++    run_eckd_boot_script(bmt_block_nr);
      /* no return */
+ }
+ 
+@@ -325,7 +327,7 @@ static void print_eckd_msg(void)
+ 
+ static void ipl_eckd(void)
+ {
+-    ScsiMbr *mbr = (void *)sec;
++    XEckdMbr *mbr = (void *)sec;
+     LDL_VTOC *vlbl = (void *)sec;
+ 
+     print_eckd_msg();
+@@ -449,10 +451,8 @@ static void zipl_run(ScsiBlockPtr *pte)
+ static void ipl_scsi(void)
+ {
+     ScsiMbr *mbr = (void *)sec;
+-    uint8_t *ns, *ns_end;
+     int program_table_entries = 0;
+-    const int pte_len = sizeof(ScsiBlockPtr);
+-    ScsiBlockPtr *prog_table_entry = NULL;
++    BootMapTable *prog_table = (void *)sec;
+     unsigned int loadparm = get_loadparm_index();
+ 
+     /* Grab the MBR */
+@@ -467,34 +467,28 @@ static void ipl_scsi(void)
+     debug_print_int("MBR Version", mbr->version_id);
+     IPL_check(mbr->version_id == 1,
+               "Unknown MBR layout version, assuming version 1");
+-    debug_print_int("program table", mbr->blockptr[0].blockno);
+-    IPL_assert(mbr->blockptr[0].blockno, "No Program Table");
++    debug_print_int("program table", mbr->pt.blockno);
++    IPL_assert(mbr->pt.blockno, "No Program Table");
+ 
+     /* Parse the program table */
+-    read_block(mbr->blockptr[0].blockno, sec,
+-               "Error reading Program Table");
+-
++    read_block(mbr->pt.blockno, sec, "Error reading Program Table");
+     IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
+ 
+-    debug_print_int("loadparm index", loadparm);
+-    ns_end = sec + virtio_get_block_size();
+-    for (ns = (sec + pte_len); (ns + pte_len) < ns_end; ns += pte_len) {
+-        prog_table_entry = (ScsiBlockPtr *)ns;
+-        if (!prog_table_entry->blockno) {
++    while (program_table_entries <= MAX_TABLE_ENTRIES) {
++        if (!prog_table->entry[program_table_entries].scsi.blockno) {
+             break;
+         }
+-
+         program_table_entries++;
+-        if (program_table_entries == loadparm + 1) {
+-            break; /* selected entry found */
+-        }
+     }
+ 
+     debug_print_int("program table entries", program_table_entries);
+-
+     IPL_assert(program_table_entries != 0, "Empty Program Table");
+ 
+-    zipl_run(prog_table_entry); /* no return */
++    debug_print_int("loadparm", loadparm);
++    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
++               " maximum number of boot entries allowed");
++
++    zipl_run(&prog_table->entry[loadparm].scsi); /* no return */
+ }
+ 
+ /***********************************************************************
 diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 486c0f3..b361084 100644
+index cf99a4c..486c0f3 100644
 --- a/pc-bios/s390-ccw/bootmap.h
 +++ b/pc-bios/s390-ccw/bootmap.h
-@@ -32,10 +32,14 @@ typedef struct FbaBlockPtr {
-     uint16_t blockct;
- } __attribute__ ((packed)) FbaBlockPtr;
+@@ -53,6 +53,15 @@ typedef union BootMapPointer {
+     ExtEckdBlockPtr xeckd;
+ } __attribute__ ((packed)) BootMapPointer;
  
--typedef struct EckdBlockPtr {
--    uint16_t cylinder; /* cylinder/head/sector is an address of the block */
-+typedef struct EckdCHS {
-+    uint16_t cylinder;
-     uint16_t head;
-     uint8_t sector;
-+} __attribute__ ((packed)) EckdCHS;
++#define MAX_TABLE_ENTRIES  30
 +
-+typedef struct EckdBlockPtr {
-+    EckdCHS chs; /* cylinder/head/sector is an address of the block */
-     uint16_t size;
-     uint8_t count; /* (size_in_blocks-1);
-                     * it's 0 for TablePtr, ScriptPtr, and SectionPtr */
++/* aka Program Table */
++typedef struct BootMapTable {
++    uint8_t magic[4];
++    uint8_t reserved[12];
++    BootMapPointer entry[];
++} __attribute__ ((packed)) BootMapTable;
++
+ typedef struct ComponentEntry {
+     ScsiBlockPtr data;
+     uint8_t pad[7];
+@@ -70,7 +79,7 @@ typedef struct ScsiMbr {
+     uint8_t magic[4];
+     uint32_t version_id;
+     uint8_t reserved[8];
+-    ScsiBlockPtr blockptr[];
++    ScsiBlockPtr pt;   /* block pointer to program table */
+ } __attribute__ ((packed)) ScsiMbr;
+ 
+ #define ZIPL_MAGIC              "zIPL"
 -- 
 2.7.4
