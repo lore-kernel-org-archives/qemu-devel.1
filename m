@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoVtX-0004ie-0M
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 10:01:25 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eoW5B-0000Fc-0N
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 10:13:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoVtS-00077X-UJ
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 10:01:19 -0500
-References: <20180220222459.8461-1-eblake@redhat.com>
-	<20180220222459.8461-3-eblake@redhat.com>
-	<w51tvuak6b0.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <37fa8b17-116b-ea53-6f65-68412fdb813c@redhat.com>
-Date: Wed, 21 Feb 2018 09:00:54 -0600
+	(envelope-from <cohuck@redhat.com>) id 1eoW51-0005Nj-BD
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 10:13:20 -0500
+Date: Wed, 21 Feb 2018 16:12:59 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180221161215.766900c5.cohuck@redhat.com>
+In-Reply-To: <1519152302-19079-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+References: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1519152302-19079-2-git-send-email-imbrenda@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <w51tvuak6b0.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: Avoid memory over-allocation on
- compressed images
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] s390x/sclp: proper support of
+ larger send and receive masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,124 +24,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, Kevin Wolf <kwolf@redhat.com>
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-On 02/21/2018 04:04 AM, Alberto Garcia wrote:
-> On Tue 20 Feb 2018 11:24:59 PM CET, Eric Blake wrote:
-> 
-> I was also preparing a patch to change this, but you arrived first :-)
-> 
->> So, it's time to cut back on the waste.  A compressed cluster
->> will NEVER occupy more than an uncompressed cluster (okay, gzip
->> DOES document that because the compression stream adds metadata,
->> and because of the pigeonhole principle, there are worst case
->> scenarios where attempts to compress will actually inflate an
->> image - but in those cases, we would just write the cluster
->> uncompressed instead of inflating it).  And as that is a smaller
->> amount of memory, we can get by with the simpler g_malloc.
-> 
->> -        if (!s->cluster_cache) {
->> -            s->cluster_cache = g_malloc(s->cluster_size);
->> +            assert(!s->cluster_cache);
->> +            s->cluster_data = g_try_malloc(s->cluster_size);
->> +            s->cluster_cache = g_try_malloc(s->cluster_size);
+On Tue, 20 Feb 2018 19:45:00 +0100
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
 
-Shoot - I made edits that I forgot to commit before sending; I meant for 
-these to be g_malloc() rather than g_try_malloc().
+> The architecture allows the guests to ask for masks up to 1021 bytes in
+> length. Part was fixed in 67915de9f0383ccf4ab8c42dd02aa18dcd79b411
+> ("s390x/event-facility: variable-length event masks"), but some issues
+> were still remaining, in particular regarding the handling of selective
+> reads.
+> 
+> This patch fixes the handling of selective reads, whose size will now
+> match the length of the event mask, as per architecture.
+> 
+> The default behaviour is to be compliant with the architecture, but when
+> using older machine models the old behaviour is selected, in order to
+> be able to migrate toward older versions.
+
+I remember trying to do this back when I still had access to the
+architecture, but somehow never finished this (don't remember why).
 
 > 
-> There's a few things here:
+> Fixes: 67915de9f0383ccf4a ("s390x/event-facility: variable-length event masks")
+
+Doesn't that rather fix the initial implementation? What am I missing?
+
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/event-facility.c  | 90 +++++++++++++++++++++++++++++++++++++++-------
+>  hw/s390x/s390-virtio-ccw.c |  8 ++++-
+>  2 files changed, 84 insertions(+), 14 deletions(-)
 > 
-> - QEMU won't write compressed data if the size is >= s->cluster_size
->    (there's an explicit check for that in qcow2_co_pwritev_compressed())
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 155a694..2414614 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -31,6 +31,14 @@ struct SCLPEventFacility {
+>      SCLPEventsBus sbus;
+>      /* guest' receive mask */
+>      unsigned int receive_mask;
+> +    /*
+> +     * when false, we keep the same broken, backwards compatible behaviour as
+> +     * before; when true, we implement the architecture correctly. Needed for
+> +     * migration toward older versions.
+> +     */
+> +    bool allow_all_mask_sizes;
 
-Correct, we never cause inflation (and even if we wanted to, we can't, 
-because the qcow2 format doesn't have enough bits for us to record that 
-many sectors for a compressed stream that occupies more space than the 
-original cluster).
+The comment does not really tell us what the old behaviour is ;)
 
-> 
-> - The size field of the compressed cluster descriptor *does* allow
->    larger sizes, so you can't simply read csize bytes into
->    s->cluster_data becuase you could cause a buffer overflow.
+So, if this is about extending the mask size, call this
+"allow_large_masks" or so?
 
-Let's step through this:
+> +    /* length of the receive mask */
+> +    uint16_t mask_length;
+>  };
+>  
+>  /* return true if any child has event pending set */
+> @@ -220,6 +228,17 @@ static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
+>      return rc;
+>  }
+>  
+> +/* copy up to dst_len bytes and fill the rest of dst with zeroes */
+> +static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
+> +                      uint16_t src_len)
+> +{
+> +    int i;
+> +
+> +    for (i = 0; i < dst_len; i++) {
+> +        dst[i] = i < src_len ? src[i] : 0;
+> +    }
+> +}
+> +
+>  static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+>  {
+>      unsigned int sclp_active_selection_mask;
+> @@ -240,7 +259,9 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+>          sclp_active_selection_mask = sclp_cp_receive_mask;
+>          break;
+>      case SCLP_SELECTIVE_READ:
+> -        sclp_active_selection_mask = be32_to_cpu(red->mask);
+> +        copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
+> +                  sizeof(sclp_active_selection_mask), ef->mask_length);
+> +        sclp_active_selection_mask = be32_to_cpu(sclp_active_selection_mask);
 
-   nb_csectors = ((cluster_offset >> s->csize_shift) & s->csize_mask + 1;
+Hm, this looks like a real bug fix for the commit referenced above.
+Split this out? We don't need compat support for that; maybe even
+cc:stable?
 
-Since s->csize_mask is determined by s->cluster_size / 512, then after 
-this assignment, the most nb_csectors can be is exactly s->cluster_size 
-/ 512.
+(Not sure what the consequences are here, other than unwanted bits at
+the end; can't say without doc.)
 
-   sector_offset = coffset & 511;
-   csize = nb_csectors * 512 - sector_offset;
+>          if (!sclp_cp_receive_mask ||
+>              (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
+>              sccb->h.response_code =
+> @@ -259,24 +280,14 @@ out:
+>      return;
+>  }
+>  
+> -/* copy up to dst_len bytes and fill the rest of dst with zeroes */
+> -static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
+> -                      uint16_t src_len)
+> -{
+> -    int i;
+> -
+> -    for (i = 0; i < dst_len; i++) {
+> -        dst[i] = i < src_len ? src[i] : 0;
+> -    }
+> -}
+> -
+>  static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+>  {
+>      WriteEventMask *we_mask = (WriteEventMask *) sccb;
+>      uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
+>      uint32_t tmp_mask;
+>  
+> -    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX)) {
+> +    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
+> +        ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
 
-And here, csize can only get smaller than the length picked by 
-nb_csectors.  Therefore, csize is GUARANTEED to be <= c->sector_size.
+This is a behaviour change, isn't it? Previously, we allowed up to 4
+bytes, now we allow exactly 4 bytes?
 
-> 
-> - Solution a: check that csize < s->cluster_size and return an error if
->    it's not. However! although QEMU won't produce an image with a
->    compressed cluster that is larger than the uncompressed one, the qcow2
->    on-disk format in principle allows for that, so arguably we should
->    accept it.
-
-No, the qcow2 on-disk format does not have enough bits reserved for 
-that.  It is impossible to store an inflated cluster, because you don't 
-have enough bits to record it.
-
-That said, we MAY have a bug, more likely to be visible in 512-byte 
-clusters but possible on any size.  While the 'number sectors' field IS 
-sufficient for any compressed cluster starting at offset 0 in the 
-cluster, we run into issues if the starting offset is later in the 
-cluster.  That is, even though the compressed length of a 512-byte 
-cluster is <= 512 (or we wouldn't compress it), if we start at offset 
-510, we NEED to read the next cluster to get the rest of the compressed 
-stream - but at 512-byte clusters, there are 0 bits reserved for 'number 
-sectors'.  Per the above calculations with the example offset of 510, 
-nb_csectors would be 1 (it can't be anything else for a 512-byte cluster 
-image), and csize would then be 2 bytes, which is insufficient for 
-reading back enough data to reconstruct the cluster.
-
-We probably need to clarify in the spec that if the starting offset of a 
-compressed cluster falls mid-sector, then the compressed size has to be 
-smaller than cluster size - (offset % 512) (this requirement is already 
-there implicitly due to the field widths, but being explicit can't 
-hurt).  We probably also need to fix our compression code to actually do 
-the right thing, particularly for 512-byte clusters where we are most 
-likely to run into a compressed size that is likely to overflow the 
-space available for nb_csectors.
-
-> 
-> - Solution b: the width of the 'compressed cluster size' field is
->    (cluster_bits - 8), that's (cluster_size / 256) sectors.
-
-Not true.  It is (cluster_bits - 9) or (cluster_size / 512).  Remember, 
-x = 62 - (cluster_bits - 8); for a 512-byte cluster, x = 61.  The 
-'number sectors' field is then bits x+1 - 61 (but you can't have a 
-bitfield occupying bit 62 upto 61; especially since bit 62 is the bit 
-for compressed cluster).
-
-> Since the
->    size of each sector is 512 bytes, the maximum possible size that the
->    field can store is (cluster_size * 2) bytes. So allocate that amount
->    of space for s->cluster_data, read the data as it is on disk and let
->    the decompression code return an error if the data is indeed
->    corrupted or it doesn't fit in the output buffer.
-
-Again, I argue that the qcow2 spec says that the maximum size for a 
-compressed cluster is cluster_size, even if it spills over a host 
-cluster boundary.  But if in practice, we HAVE allowed a spillover 
-beyond the 'number fields' maximum size because of a non-zero offset, 
-where we weren't careful about what got recorded into the qcow2 image, 
-then we could instead state that reading s->cluster_size+512 is 
-guaranteed to find the end of the compressed stream, even when 'number 
-fields' is 0 because of overflow, at which point, sizing the buffer to 
-be one sector larger than a cluster will mean that we can cope even with 
-512-byte clusters that were compressed incorrectly.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>          sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
+>          goto out;
+>      }
