@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoYIC-0003q7-5v
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:34:56 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eoYMX-00053N-AA
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoYI8-0002aG-7K
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:34:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54480 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoYI8-0002a4-21
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:34:52 -0500
-Date: Wed, 21 Feb 2018 17:34:30 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180221173430.GJ21436@stefanha-x1.localdomain>
-References: <20180124053957.29145-1-peterx@redhat.com>
-	<20180124053957.29145-19-peterx@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1eoYMU-00058n-5U
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:25 -0500
+Date: Wed, 21 Feb 2018 18:39:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180221183918.7cc4fad1.cohuck@redhat.com>
+In-Reply-To: <aeb36cb1-aadf-6146-9e59-549998538db1@redhat.com>
+References: <20180219174231.10874-1-david@redhat.com>
+	<493dbfb3-086b-cc89-2d8d-4298345c6bb2@de.ibm.com>
+	<ef55dc18-971f-b012-40cc-0c32f24664cf@redhat.com>
+	<20180220155759.17dfd955.cohuck@redhat.com>
+	<aeb36cb1-aadf-6146-9e59-549998538db1@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wRtZRu2mMGBZ6YQ7"
-Content-Disposition: inline
-In-Reply-To: <20180124053957.29145-19-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 18/23] qmp: support out-of-band (oob)
- execution
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
+On Tue, 20 Feb 2018 16:05:54 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
---wRtZRu2mMGBZ6YQ7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 20.02.2018 15:57, Cornelia Huck wrote:
+> > On Tue, 20 Feb 2018 13:16:37 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 20.02.2018 13:05, Christian Borntraeger wrote:  
+> >>>
+> >>>
+> >>> On 02/19/2018 06:42 PM, David Hildenbrand wrote:    
+> >>>> From an architecture point of view, nothing can be mapped into the address
+> >>>> space on s390x. All there is is memory. Therefore there is also not really
+> >>>> an interface to communicate such information to the guest. All we can do is
+> >>>> specify the maximum ram address and guests can probe in that range if
+> >>>> memory is available and usable (TPROT).    
+> >>>
+> >>> In fact there is an interface in SCLP that describes the memory sizes (maximum in 
+> >>> read scp info) and the details (read_storage_element0_info).  I am asking myself
+> >>> if we should re-introduce read_storage_element_info and use that to avoid tprot    
+> >>
+> >> Yes, we could do that (basically V1 of this patch) but have to glue it
+> >> to the a compatibility machine then.  
+> > 
+> > Actually, this makes quite a bit of sense (introduce the interface for
+> > everyone in 2.12 and turn it off in compat machines).  
+> 
+> Jup, either 2.12 or 2.13, no need to hurry.
+> 
+> > 
+> > Does real hardware have configurations where you can get the memory
+> > sizes, but not the attach/deattach support? (Hardware with the feature,
+> > but no standby memory defined?)  
+> 
+> I would guess that "0" for standby memory is valid but only people with
+> access to documentation can answer that :)
 
-On Wed, Jan 24, 2018 at 01:39:52PM +0800, Peter Xu wrote:
-> Having "allow-oob" to true for a command does not mean that this command
-> will always be run in out-of-band mode.  The out-of-band quick path will
-> only be executed if we specify the extra "run-oob" flag when sending the
-> QMP request:
->=20
->     { "execute":   "command-that-allows-oob",
->       "arguments": { ... },
->       "control":   { "run-oob": true } }
->=20
-> The "control" key is introduced to store this extra flag.  "control"
-> field is used to store arguments that are shared by all the commands,
-> rather than command specific arguments.  Let "run-oob" be the first.
->=20
-> Note that in the patch I exported qmp_dispatch_check_obj() to be used to
-> check the request earlier, and at the same time allowed "id" field to be
-> there since actually we always allow that.
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/qapi/qmp/dispatch.h |  2 ++
->  monitor.c                   | 84 +++++++++++++++++++++++++++++++++++++++=
-+-----
->  qapi/qmp-dispatch.c         | 32 ++++++++++++++++-
->  trace-events                |  2 ++
->  4 files changed, 110 insertions(+), 10 deletions(-)
+So, should we go with this patch now and re-introduce the read
+functions if the above is indeed true?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> >> Interesting, didn't know about that. Will rephrase then to
+> >>
+> >> "While the hypervisor can deny to online an increment, all increments
+> >> have to be predefined and there is no way of telling the guest about a
+> >> newly "hotplugged" increment."  
+> > 
+> > Rephrase which part? :)  
+> 
+> "And nobody can really hinder it from doing so."
 
---wRtZRu2mMGBZ6YQ7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaja2mAAoJEJykq7OBq3PIfwAH/j9DtJ1M5bHicIGUvFgYvAfY
-oxIu8yBKtBMNB+MYdCX5T1OnHIJhQXq9G341Ccp9euGa7tFXAsuBGmOWAUm0DuOk
-NeYFICmG9+/2Ci28eFVEGB0G35SOcmNSOexl3ojGAEh/aSs0pbiovV7nKDxf15p9
-xVVXLD7BiztrwfduzeqZu+o+/s1bTQ+D52gomlDrrSJYmMEw7PNkqNvqJ16BZIKc
-hy/FIqwvdlnhrPZH3hIfAxEu3ocJ4joN+IMmhxfgmmCzWm9FrRqBpaH7SF0qiena
-hPAXtmxqEk4AlT7e4+F9+bfYUKwMneaGJ4CvGjS058id0eNMEdjx7ow2g47U5IE=
-=sKVr
------END PGP SIGNATURE-----
-
---wRtZRu2mMGBZ6YQ7--
+OK.
