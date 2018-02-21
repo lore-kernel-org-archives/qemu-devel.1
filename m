@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrH-0000gC-GW
+	(envelope-from <kwolf@redhat.com>) id 1eoUrH-0000gF-Go
 	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrG-0002ej-Ch
+	(envelope-from <kwolf@redhat.com>) id 1eoUrG-0002eo-DI
 	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:55 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:36 +0100
-Message-Id: <20180221135404.27598-9-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:53:37 +0100
+Message-Id: <20180221135404.27598-10-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/36] util: Add
- qemu_opts_to_qdict_filtered()
+Subject: [Qemu-devel] [PATCH v2 09/36] test-qemu-opts: Test
+ qemu_opts_append()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +23,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This allows, given a QemuOpts for a QemuOptsList that was merged from
-multiple QemuOptsList, to only consider those options that exist in one
-specific list. Block drivers need this to separate format-layer create
-options from protocol-level options.
+Basic test for merging two QemuOptsLists.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/qemu/option.h |  2 ++
- util/qemu-option.c    | 42 +++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 39 insertions(+), 5 deletions(-)
+ tests/test-qemu-opts.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
 
-diff --git a/include/qemu/option.h b/include/qemu/option.h
-index b127fb6db6..306fdb5f7a 100644
---- a/include/qemu/option.h
-+++ b/include/qemu/option.h
-@@ -124,6 +124,8 @@ void qemu_opts_set_defaults(QemuOptsList *list, const char *params,
-                             int permit_abbrev);
- QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, const QDict *qdict,
-                                Error **errp);
-+QDict *qemu_opts_to_qdict_filtered(QemuOpts *opts, QDict *qdict,
-+                                   QemuOptsList *list, bool del);
- QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict);
- void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp);
- 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index a401e936da..2b412eff5e 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -1007,14 +1007,23 @@ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp)
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index 5d5a3daa7b..6c3183390b 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -23,6 +23,8 @@ static QemuOptsList opts_list_01 = {
+         {
+             .name = "str1",
+             .type = QEMU_OPT_STRING,
++            .help = "Help texts are preserved in qemu_opts_append",
++            .def_value_str = "default",
+         },{
+             .name = "str2",
+             .type = QEMU_OPT_STRING,
+@@ -32,6 +34,7 @@ static QemuOptsList opts_list_01 = {
+         },{
+             .name = "number1",
+             .type = QEMU_OPT_NUMBER,
++            .help = "Having help texts only for some options is okay",
+         },{
+             .name = "number2",
+             .type = QEMU_OPT_NUMBER,
+@@ -743,6 +746,129 @@ static void test_opts_parse_size(void)
+     qemu_opts_reset(&opts_list_02);
  }
  
- /*
-- * Convert from QemuOpts to QDict.
-- * The QDict values are of type QString.
-+ * Convert from QemuOpts to QDict. The QDict values are of type QString.
-+ *
-+ * If @list is given, only add those options to the QDict that are contained in
-+ * the list. If @del is true, any options added to the QDict are removed from
-+ * the QemuOpts, otherwise they remain there.
-+ *
-+ * If two options in @opts have the same name, they are processed in order
-+ * so that the last one wins (consistent with the reverse iteration in
-+ * qemu_opt_find()), but all of them are deleted if @del is true.
-+ *
-  * TODO We'll want to use types appropriate for opt->desc->type, but
-  * this is enough for now.
-  */
--QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
-+QDict *qemu_opts_to_qdict_filtered(QemuOpts *opts, QDict *qdict,
-+                                   QemuOptsList *list, bool del)
- {
--    QemuOpt *opt;
-+    QemuOpt *opt, *next;
- 
-     if (!qdict) {
-         qdict = qdict_new();
-@@ -1022,12 +1031,35 @@ QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
-     if (opts->id) {
-         qdict_put_str(qdict, "id", opts->id);
-     }
--    QTAILQ_FOREACH(opt, &opts->head, next) {
-+    QTAILQ_FOREACH_SAFE(opt, &opts->head, next, next) {
-+        if (list) {
-+            QemuOptDesc *desc;
-+            bool found = false;
-+            for (desc = list->desc; desc->name; desc++) {
-+                if (!strcmp(desc->name, opt->name)) {
-+                    found = true;
-+                    break;
-+                }
-+            }
-+            if (!found) {
-+                continue;
-+            }
-+        }
-         qdict_put_str(qdict, opt->name, opt->str);
-+        if (del) {
-+            qemu_opt_del(opt);
-+        }
-     }
-     return qdict;
- }
- 
-+/* Copy all options in a QemuOpts to the given QDict. See
-+ * qemu_opts_to_qdict_filtered() for details. */
-+QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
++static void append_verify_list_01(QemuOptDesc *desc, bool with_overlapping)
 +{
-+    return qemu_opts_to_qdict_filtered(opts, qdict, NULL, false);
++    int i = 0;
++
++    if (with_overlapping) {
++        g_assert_cmpstr(desc[i].name, ==, "str1");
++        g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++        g_assert_cmpstr(desc[i].help, ==,
++                        "Help texts are preserved in qemu_opts_append");
++        g_assert_cmpstr(desc[i].def_value_str, ==, "default");
++        i++;
++
++        g_assert_cmpstr(desc[i].name, ==, "str2");
++        g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++        g_assert_cmpstr(desc[i].help, ==, NULL);
++        g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++        i++;
++    }
++
++    g_assert_cmpstr(desc[i].name, ==, "str3");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "number1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_NUMBER);
++    g_assert_cmpstr(desc[i].help, ==,
++                    "Having help texts only for some options is okay");
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "number2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_NUMBER);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, NULL);
 +}
 +
- /* Validate parsed opts against descriptions where no
-  * descriptions were provided in the QemuOptsList.
-  */
++static void append_verify_list_02(QemuOptDesc *desc)
++{
++    int i = 0;
++
++    g_assert_cmpstr(desc[i].name, ==, "str1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "str2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "bool1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_BOOL);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "bool2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_BOOL);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "size1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "size2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "size3");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++}
++
++static void test_opts_append_to_null(void)
++{
++    QemuOptsList *merged;
++
++    merged = qemu_opts_append(NULL, &opts_list_01);
++    g_assert(merged != &opts_list_01);
++
++    g_assert_cmpstr(merged->name, ==, NULL);
++    g_assert_cmpstr(merged->implied_opt_name, ==, NULL);
++    g_assert_false(merged->merge_lists);
++
++    append_verify_list_01(merged->desc, true);
++
++    qemu_opts_free(merged);
++}
++
++static void test_opts_append(void)
++{
++    QemuOptsList *first, *merged;
++
++    first = qemu_opts_append(NULL, &opts_list_02);
++    merged = qemu_opts_append(first, &opts_list_01);
++    g_assert(first != &opts_list_02);
++    g_assert(merged != &opts_list_01);
++
++    g_assert_cmpstr(merged->name, ==, NULL);
++    g_assert_cmpstr(merged->implied_opt_name, ==, NULL);
++    g_assert_false(merged->merge_lists);
++
++    append_verify_list_02(&merged->desc[0]);
++    append_verify_list_01(&merged->desc[7], false);
++
++    qemu_opts_free(merged);
++}
++
++
+ int main(int argc, char *argv[])
+ {
+     register_opts();
+@@ -761,6 +887,8 @@ int main(int argc, char *argv[])
+     g_test_add_func("/qemu-opts/opts_parse/bool", test_opts_parse_bool);
+     g_test_add_func("/qemu-opts/opts_parse/number", test_opts_parse_number);
+     g_test_add_func("/qemu-opts/opts_parse/size", test_opts_parse_size);
++    g_test_add_func("/qemu-opts/append_to_null", test_opts_append_to_null);
++    g_test_add_func("/qemu-opts/append", test_opts_append);
+     g_test_run();
+     return 0;
+ }
 -- 
 2.13.6
