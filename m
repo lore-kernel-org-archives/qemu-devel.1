@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eoQS1-0003xA-4b
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:35 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eoQSB-00041A-0J
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eoQRx-0000zJ-VK
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:33 -0500
-Received: from mail-qt0-f171.google.com ([209.85.216.171]:42714)
+	(envelope-from <pbonzini@redhat.com>) id 1eoQS7-00013B-SJ
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:43 -0500
+Received: from mail-wr0-f172.google.com ([209.85.128.172]:43597)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eoQRx-0000yw-Qb
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:29 -0500
-Received: by mail-qt0-f171.google.com with SMTP id l19so1051112qtj.9
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 01:12:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eoQS7-00012e-M3
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:39 -0500
+Received: by mail-wr0-f172.google.com with SMTP id u49so2302974wrc.10
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 01:12:39 -0800 (PST)
+References: <1519148406-15006-1-git-send-email-thuth@redhat.com>
+	<1519148406-15006-9-git-send-email-thuth@redhat.com>
+	<55a10378-b99f-f73c-3162-55dcf023453b@redhat.com>
+	<06c04a52-2f9c-2a95-1f47-e8e448c5f2c1@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c13de0b1-a35f-950c-a6fe-628a2a99b19d@redhat.com>
+Date: Wed, 21 Feb 2018 10:12:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519174995-1039-1-git-send-email-cota@braap.org>
-References: <1519174995-1039-1-git-send-email-cota@braap.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Feb 2018 10:12:28 +0100
-Message-ID: <CAMxuvazD3r_-soineNOs1ZEdfUZdrYuCOq5j2xJVb0ZY5k7iaQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: fix sanitizers' test program to
- mend ASan detection
+In-Reply-To: <06c04a52-2f9c-2a95-1f47-e8e448c5f2c1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] qemu-doc: Make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi
+On 21/02/2018 01:05, Thomas Huth wrote:
+> On 20.02.2018 19:37, Paolo Bonzini wrote:
+>> On 20/02/2018 18:40, Thomas Huth wrote:
+>>> "-net" is clearly a legacy option. Yet we still use it in almost all
+>>> examples in the qemu documentation, and many other spots in the network
+>>> chapter. We should make it less prominent that users are not lured into
+>>> using it so often anymore. So instead of starting the network chapter with
+>>> "-net nic" and documenting "-net <backend>" below "-netdev <backend>"
+>>> everywhere, all the "-net" related documentation is now moved to the end
+>>> of the chapter. And the examples are changed to use the "--device" and
+>>> "--netdev" options instead of "-net nic -net <backend>".
+>>
+>> Do we want to change them to "-nic" instead?  The proof is in the
+>> pudding, they say, :) and "-nic" is way easier to learn than "-device
+>> -netdev".
+> 
+> While -nic is easier to use than -netdev, I don't think that we should
+> put the focus in our main qemu-doc on -nic instead of -netdev. -nic is a
+> convenience option, while -netdev is the "architected" way to configure
+> network devices. We first should document how to do it "right", and
+> teach the user to proper distinguish between emulated guest hardware and
+> host network backend (with the old -net command, a lot of people seemed
+> to have mixed that up IIRC), and then finally explain -nic on top of it.
 
-On Wed, Feb 21, 2018 at 2:03 AM, Emilio G. Cota <cota@braap.org> wrote:
-> Commit 218bb57 ("build-sys: check static linking of UBSAN", 2018-02-13)
-> adds a small test program to check whether ubsan works even when
-> configuring with --static. This added program is used to
-> detect all sanitizers, which breaks ASan's detection since the
-> compilation fails with -fsanitize=3Daddress, at least with gcc 5.4.0
-> and 7.2.0:
->
->   qemu-conf.c: In function =E2=80=98main=E2=80=99:
->   qemu-conf.c:3:20: error: integer overflow in expression [-Werror=3Dover=
-flow]
->      return INT32_MIN / -1;
->                       ^
->   cc1: all warnings being treated as errors
+Heh, that's a philosophy question regarding the organization of the
+whole manual.  Currently the "architected" way is pretty much confined
+to docs/qdev-device-use.txt.  The manual is full of uses of -drive or
+-hda, and I think it makes sense because honestly that's what users use.
+ I should have explained this in the previous message, sorry.
 
+>> And maybe we *should* go the extra mile and deprecate "-net" altogether.
+>>  The only case where the newer syntax is a bit more uncomfortable is for
+>> "-net nic -net nic -net tap|user", which however does work with "-nic
+>> hubport -nic hubport -netdev tap|user,id=x -netdev hubport,netdev=x".
+> 
+> I'd be glad to add such a deprecation patch to this series - I just
+> thought it might have been too early so far, but if you feel confident
+> that we can mark it as deprecated, I can spin a v3 with such a patch on
+> top...
 
-I sent a patch a few days ago:
-"[PATCH 1/6] build-sys: fix -fsanitize=3Daddress check"
+I can't deny it's going to be a loooong deprecation.  But we have to
+start somewhere, and -nic is a great start.
 
->
-> Fix it by:
->
-> - Changing the test program to one that incurs undefined behaviour that i=
-sn't
->   detected at compile-time, even with -fsanitize=3Daddress.
->
-> - To be extra safe (since compilers might evolve and eventually figure ou=
-t
->   the UB at compile-time), use this newly-added test only when checking
->   for UBSan; use the skeleton otherwise.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  configure | 20 ++++++++++++--------
->  1 file changed, 12 insertions(+), 8 deletions(-)
->
-> diff --git a/configure b/configure
-> index 913e148..56f647f 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5306,13 +5306,13 @@ fi
->  ##########################################
->  # checks for sanitizers
->
-> -# we could use a simple skeleton for flags checks, but this also
-> -# detect the static linking issue of ubsan, see also:
-> +# Use this program to detect the static linking issue of ubsan; see
->  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D84285
->  cat > $TMPC << EOF
-> -#include <stdint.h>
-> -int main(void) {
-> -  return INT32_MIN / -1;
-> +int main(int argc, char **argv) {
-> +  int k =3D 0x7fffffff;
-> +  k +=3D argc;
-> +  return 0;
->  }
->  EOF
->
-> @@ -5322,12 +5322,16 @@ have_asan_iface_h=3Dno
->  have_asan_iface_fiber=3Dno
->
->  if test "$sanitizers" =3D "yes" ; then
-> +  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=3Dundefined" ""; then
-> +    have_ubsan=3Dyes
-> +  fi
-> +
-> +  # Use the skeleton for all other sanitizer checks
-> +  write_c_skeleton
-> +
->    if compile_prog "$CPU_CFLAGS -Werror -fsanitize=3Daddress" ""; then
->        have_asan=3Dyes
->    fi
-> -  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=3Dundefined" ""; then
-> -      have_ubsan=3Dyes
-> -  fi
->
->    if check_include "sanitizer/asan_interface.h" ; then
->        have_asan_iface_h=3Dyes
-> --
-> 2.7.4
->
+I think you should send v3 with the minimal changes required to accept
+these patches, and then leave the rest to a separate submission, but of
+course you don't have to do it that way.
+
+Thanks,
+
+Paolo
