@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoRUH-0004kc-3E
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 05:19:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1eoRUC-0004hm-0L
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 05:19:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoRUF-0001ZY-Ic
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 05:18:57 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38560 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1eoRU7-0001V0-35
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 05:18:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50129 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoRUF-0001ZO-Cp
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 05:18:55 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoRU6-0001UM-UA
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 05:18:47 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0CAA4406E808
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 10:18:55 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 877308182D15
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 10:18:42 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 21 Feb 2018 11:18:36 +0100
-Message-Id: <1519208316-18812-8-git-send-email-thuth@redhat.com>
-In-Reply-To: <1519208316-18812-1-git-send-email-thuth@redhat.com>
-References: <1519208316-18812-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 7/7] net: Add a new convenience option
- "--nic" to configure default/on-board NICs
+Date: Wed, 21 Feb 2018 11:18:29 +0100
+Message-Id: <1519208316-18812-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/7] Improvements and clean-ups related to
+ -net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,232 +31,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The legacy "-net" option can be quite confusing for the users since most
-people do not expect to get a "vlan" hub between their emulated guest
-hardware and the host backend. But so far, we are also not able to get
-rid of "-net" completely, since it is the only way to configure on-board
-NICs that can not be instantiated via "-device" yet. It's also a little
-bit shorter to type "-net nic -net tap" instead of "-device xyz,netdev=n1
--netdev tap,id=n1".
+"-net" is a legacy option that often causes confusion and
+misconfigurations for the users, since most people are not aware
+of the underlying "vlan" (i.e. hub) concept that is used for this
+parameter. The prefered way of configuring your network stack is
+to use "--netdev" instead, which gives you a clean 1:1 connection
+between your emulated guest hardware and the host network backend.
 
-So what we need is a new convenience option that is shorter to type than
-the full -device + -netdev stuff, and which can be used to configure the
-on-board NICs that can not be handled via -device yet. Thus this patch now
-provides such a new option "--nic": It adds an entry in the nd_table to
-configure a on-board / default NIC, creates a host backend and connects
-the two directly, without a confusing "vlan" hub inbetween.
+However, there are two reasons why we could not completely deprecate
+"-net" yet:
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- include/sysemu/sysemu.h |  1 +
- net/net.c               | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx         | 40 +++++++++++++++++++++----
- vl.c                    |  7 +++++
- 4 files changed, 120 insertions(+), 6 deletions(-)
+1) Convenience:
+In some cases, it's more convenient to use "-net" instead of "--netdev",
+e.g. if you just want to have a "tap" network connection, it's faster
+to type "-net nic -net tap" instead of "--device e1000,netdev=n1
+--netdev tap,id=n1".
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 77bb3da..66f0761 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -197,6 +197,7 @@ extern QemuOptsList bdrv_runtime_opts;
- extern QemuOptsList qemu_chardev_opts;
- extern QemuOptsList qemu_device_opts;
- extern QemuOptsList qemu_netdev_opts;
-+extern QemuOptsList qemu_nic_opts;
- extern QemuOptsList qemu_net_opts;
- extern QemuOptsList qemu_global_opts;
- extern QemuOptsList qemu_mon_opts;
-diff --git a/net/net.c b/net/net.c
-index 2d05808..0bab269 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1462,6 +1462,67 @@ static int net_init_netdev(void *dummy, QemuOpts *opts, Error **errp)
-     return net_client_init(opts, true, errp);
- }
- 
-+/* For the convenience "--nic" parameter */
-+static int net_param_nic(void *dummy, QemuOpts *opts, Error **errp)
-+{
-+    char *mac, *nd_id;
-+    int idx, ret;
-+    NICInfo *ni;
-+    const char *type;
-+
-+    type = qemu_opt_get(opts, "type");
-+    if (type && g_str_equal(type, "none")) {
-+        return 0;    /* Nothing to do, default_net is cleared in vl.c */
-+    }
-+
-+    idx = nic_get_free_idx();
-+    if (idx == -1 || nb_nics >= MAX_NICS) {
-+        error_setg(errp, "no more on-board/default NIC slots available");
-+        return -1;
-+    }
-+
-+    if (!type) {
-+        qemu_opt_set(opts, "type", "user", &error_abort);
-+    }
-+
-+    ni = &nd_table[idx];
-+    memset(ni, 0, sizeof(*ni));
-+    ni->model = qemu_opt_get_del(opts, "model");
-+
-+    /* Create an ID if the user did not specify one */
-+    nd_id = g_strdup(qemu_opts_id(opts));
-+    if (!nd_id) {
-+        nd_id = g_strdup_printf("__org.qemu.nic%i\n", idx);
-+        qemu_opts_set_id(opts, nd_id);
-+    }
-+
-+    /* Handle MAC address */
-+    mac = qemu_opt_get_del(opts, "mac");
-+    if (mac) {
-+        ret = net_parse_macaddr(ni->macaddr.a, mac);
-+        g_free(mac);
-+        if (ret) {
-+            error_setg(errp, "invalid syntax for ethernet address");
-+            return -1;
-+        }
-+        if (is_multicast_ether_addr(ni->macaddr.a)) {
-+            error_setg(errp, "NIC cannot have multicast MAC address");
-+            return -1;
-+        }
-+    }
-+    qemu_macaddr_default_if_unset(&ni->macaddr);
-+
-+    ret = net_client_init(opts, true, errp);
-+    if (ret == 0) {
-+        ni->netdev = qemu_find_netdev(nd_id);
-+        ni->used = true;
-+        nb_nics++;
-+    }
-+
-+    g_free(nd_id);
-+    return ret;
-+}
-+
- int net_init_clients(Error **errp)
- {
-     net_change_state_entry =
-@@ -1474,6 +1535,10 @@ int net_init_clients(Error **errp)
-         return -1;
-     }
- 
-+    if (qemu_opts_foreach(qemu_find_opts("nic"), net_param_nic, NULL, errp)) {
-+        return -1;
-+    }
-+
-     if (qemu_opts_foreach(qemu_find_opts("net"), net_init_client, NULL, errp)) {
-         return -1;
-     }
-@@ -1549,6 +1614,19 @@ QemuOptsList qemu_netdev_opts = {
-     },
- };
- 
-+QemuOptsList qemu_nic_opts = {
-+    .name = "nic",
-+    .implied_opt_name = "type",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_nic_opts.head),
-+    .desc = {
-+        /*
-+         * no elements => accept any params
-+         * validation will happen later
-+         */
-+        { /* end of list */ }
-+    },
-+};
-+
- QemuOptsList qemu_net_opts = {
-     .name = "net",
-     .implied_opt_name = "type",
-diff --git a/qemu-options.hx b/qemu-options.hx
-index a9249b6..399905e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2004,13 +2004,34 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
- #endif
-     "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
-     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
-+DEF("nic", HAS_ARG, QEMU_OPTION_nic,
-+    "--nic [tap|bridge|"
-+#ifdef CONFIG_SLIRP
-+    "user|"
-+#endif
-+#ifdef __linux__
-+    "l2tpv3|"
-+#endif
-+#ifdef CONFIG_VDE
-+    "vde|"
-+#endif
-+#ifdef CONFIG_NETMAP
-+    "netmap|"
-+#endif
-+#ifdef CONFIG_POSIX
-+    "vhost-user|"
-+#endif
-+    "socket][,option][,...][mac=macaddr]\n"
-+    "                initialize an on-board / default host NIC (using MAC address\n"
-+    "                macaddr) and connect it to the given host network backend\n"
-+    "--nic none      use it alone to have zero network devices (the default is to\n"
-+    "                provided a 'user' network connection)\n",
-+    QEMU_ARCH_ALL)
- DEF("net", HAS_ARG, QEMU_OPTION_net,
-     "-net nic[,vlan=n][,netdev=nd][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
-     "                configure or create an on-board (or machine default) NIC and\n"
-     "                connect it either to VLAN 'n' or the netdev 'nd' (for pluggable\n"
-     "                NICs please use '-device devtype,netdev=nd' instead)\n"
--    "-net none       use it alone to have zero network devices. If no -net option\n"
--    "                is provided, the default is '-net nic -net user'\n"
-     "-net ["
- #ifdef CONFIG_SLIRP
-     "user|"
-@@ -2456,10 +2477,17 @@ qemu -m 512 -object memory-backend-file,id=mem,size=512M,mem-path=/hugetlbfs,sha
-      -device virtio-net-pci,netdev=net0
- @end example
- 
--@item -net none
--Indicate that no network devices should be configured. It is used to
--override the default configuration (@option{-net nic -net user}) which
--is activated if no @option{-net} options are provided.
-+@item --nic [tap|bridge|user|l2tpv3|vde|netmap|vhost-user|socket][,...][,mac=macaddr]
-+
-+This option is a shortcut for setting both, the on-board (default) guest NIC
-+hardware and the host network backend in one go. The host backend options are
-+the same as with the corresponding @option{--netdev} option. The guest NIC
-+hardware MAC address can be set with @option{mac=@var{macaddr}}.
-+
-+@item --nic none
-+Indicate that no network devices should be configured. It is used to override
-+the default configuration (default NIC with @option{--net user} backend) which
-+is activated if no other networking options are provided.
- ETEXI
- 
- STEXI
-diff --git a/vl.c b/vl.c
-index 698b681..59ffadb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3078,6 +3078,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_add_opts(&qemu_chardev_opts);
-     qemu_add_opts(&qemu_device_opts);
-     qemu_add_opts(&qemu_netdev_opts);
-+    qemu_add_opts(&qemu_nic_opts);
-     qemu_add_opts(&qemu_net_opts);
-     qemu_add_opts(&qemu_rtc_opts);
-     qemu_add_opts(&qemu_global_opts);
-@@ -3298,6 +3299,12 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
-+            case QEMU_OPTION_nic:
-+                default_net = 0;
-+                if (net_client_parse(qemu_find_opts("nic"), optarg) == -1) {
-+                    exit(1);
-+                }
-+                break;
-             case QEMU_OPTION_net:
-                 default_net = 0;
-                 if (net_client_parse(qemu_find_opts("net"), optarg) == -1) {
+2) On-board NICs:
+Currently the "-net nic" parameter is the only way to configure on-
+board NICs on certain (embedded) machines via the nd_table[] array.
+
+So beside some generic clean-ups and removal of code that has been
+marked as deprecated since QEMU 2.10 already, this patch series intro-
+duces a new parameter "--nic" (in patch 7) which should be able to re-
+place "-net" in the long run completely: This new convenience parameter
+can be used to configure the default/on-board guest HW together with a
+host network backend in a very compact way. To configure a tap backend
+for the default NIC, you just have to type "--nic tap" here for example.
+
+Note that "-net" itself is not marked as deprecated yet - that is
+subject to a later patch, since it likely needs some additional
+discussion first (or we might rather want to wait for some more
+releases first until --nic has been properly established instead)...
+
+v3:
+- Changed the comments in qapi/net.json in patch 5/7 according
+  to the suggestion from Eric. Dropped the Reviewed-bys from this
+  patch since the text changed a bit now.
+- Dropped the final patch 8 with the updates to qemu-doc about
+  making -net less prominent. I'll resubmit that patch together
+  with a patch that deprecates "-net" in a separate patch series
+  instead (which will likely both need some more discussion first).
+
+v2:
+- Renamed "-n" to "--nic" (suggested by Paolo)
+- Improved the QAPI comment about the removal of 'dump (suggested by Eric)
+- exit(0) instead of exit(1) after showing the "-netdev help" (Eric)
+- Improved the documenation for hubport a little bit (suggested by Paolo)
+
+Thomas Huth (7):
+  net: Move error reporting from net_init_client/netdev to the calling
+    site
+  net: List available netdevs with "-netdev help"
+  net: Only show vhost-user in the help text if CONFIG_POSIX is defined
+  net: Make net_client_init() static
+  net: Remove the deprecated way of dumping network packets
+  net: Remove the deprecated 'host_net_add' and 'host_net_remove' HMP
+    commands
+  net: Add a new convenience option "--nic" to configure
+    default/on-board NICs
+
+ hmp-commands.hx         |  30 ------
+ hmp.h                   |   3 -
+ include/net/net.h       |   4 +-
+ include/sysemu/sysemu.h |   1 +
+ monitor.c               |  61 ------------
+ net/dump.c              | 102 +--------------------
+ net/net.c               | 239 +++++++++++++++++++++++-------------------------
+ qapi/net.json           |  29 ++----
+ qemu-doc.texi           |  16 ----
+ qemu-options.hx         |  48 +++++++---
+ tests/test-hmp.c        |   2 -
+ vl.c                    |  10 +-
+ 12 files changed, 170 insertions(+), 375 deletions(-)
+
 -- 
 1.8.3.1
