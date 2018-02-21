@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrh-0001DP-3z
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUri-0001F8-DG
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUre-0002xE-D2
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUre-0002xJ-EC
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:22 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:47 +0100
-Message-Id: <20180221135404.27598-20-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:53:44 +0100
+Message-Id: <20180221135404.27598-17-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 19/36] rbd: Factor out qemu_rbd_connect()
+Subject: [Qemu-devel] [PATCH v2 16/36] file-win32: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,192 +22,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-The code to establish an RBD connection is duplicated between open and
-create. In order to be able to share the code, factor out the code from
-qemu_rbd_open() as a first step.
+This adds the .bdrv_co_create driver callback to file-win32, which
+enables image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/rbd.c | 100 ++++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 60 insertions(+), 40 deletions(-)
+ block/file-win32.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 37 insertions(+), 8 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 27fa11b473..4bbcce4eca 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -544,32 +544,17 @@ out:
-     return rados_str;
+diff --git a/block/file-win32.c b/block/file-win32.c
+index f24c7bb92c..d572cde357 100644
+--- a/block/file-win32.c
++++ b/block/file-win32.c
+@@ -553,29 +553,58 @@ static int64_t raw_get_allocated_file_size(BlockDriverState *bs)
+     return st.st_size;
  }
  
--static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
--                         Error **errp)
-+static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-+                            char **s_snap, char **s_image_name,
-+                            QDict *options, bool cache, Error **errp)
+-static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
++static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
  {
--    BDRVRBDState *s = bs->opaque;
--    const char *pool, *snap, *conf, *user, *image_name, *keypairs;
--    const char *secretid, *filename;
-     QemuOpts *opts;
--    Error *local_err = NULL;
-     char *mon_host = NULL;
-+    const char *pool, *snap, *conf, *user, *image_name, *keypairs;
-+    const char *secretid;
-+    Error *local_err = NULL;
-     int r;
++    BlockdevCreateOptionsFile *file_opts;
+     int fd;
+-    int64_t total_size = 0;
  
--    /* If we are given a filename, parse the filename, with precedence given to
--     * filename encoded options */
--    filename = qdict_get_try_str(options, "filename");
--    if (filename) {
--        warn_report("'filename' option specified. "
--                    "This is an unsupported option, and may be deprecated "
--                    "in the future");
--        qemu_rbd_parse_filename(filename, options, &local_err);
--        if (local_err) {
--            r = -EINVAL;
--            error_propagate(errp, local_err);
--            goto exit;
--        }
--    }
--
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-     if (local_err) {
-@@ -600,35 +585,35 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto failed_opts;
-     }
+-    strstart(filename, "file:", &filename);
++    assert(options->driver == BLOCKDEV_DRIVER_FILE);
++    file_opts = &options->u.file;
  
--    r = rados_create(&s->cluster, user);
-+    r = rados_create(cluster, user);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "error initializing");
-         goto failed_opts;
-     }
- 
--    s->snap = g_strdup(snap);
--    s->image_name = g_strdup(image_name);
-+    *s_snap = g_strdup(snap);
-+    *s_image_name = g_strdup(image_name);
- 
-     /* try default location when conf=NULL, but ignore failure */
--    r = rados_conf_read_file(s->cluster, conf);
-+    r = rados_conf_read_file(*cluster, conf);
-     if (conf && r < 0) {
-         error_setg_errno(errp, -r, "error reading conf file %s", conf);
-         goto failed_shutdown;
-     }
- 
--    r = qemu_rbd_set_keypairs(s->cluster, keypairs, errp);
-+    r = qemu_rbd_set_keypairs(*cluster, keypairs, errp);
-     if (r < 0) {
-         goto failed_shutdown;
-     }
- 
-     if (mon_host) {
--        r = rados_conf_set(s->cluster, "mon_host", mon_host);
-+        r = rados_conf_set(*cluster, "mon_host", mon_host);
-         if (r < 0) {
-             goto failed_shutdown;
-         }
-     }
- 
--    if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
-+    if (qemu_rbd_set_auth(*cluster, secretid, errp) < 0) {
-         r = -EIO;
-         goto failed_shutdown;
-     }
-@@ -640,24 +625,65 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-      * librbd defaults to no caching. If write through caching cannot
-      * be set up, fall back to no caching.
-      */
--    if (flags & BDRV_O_NOCACHE) {
--        rados_conf_set(s->cluster, "rbd_cache", "false");
-+    if (cache) {
-+        rados_conf_set(*cluster, "rbd_cache", "true");
-     } else {
--        rados_conf_set(s->cluster, "rbd_cache", "true");
-+        rados_conf_set(*cluster, "rbd_cache", "false");
-     }
- 
--    r = rados_connect(s->cluster);
-+    r = rados_connect(*cluster);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "error connecting");
-         goto failed_shutdown;
-     }
- 
--    r = rados_ioctx_create(s->cluster, pool, &s->io_ctx);
-+    r = rados_ioctx_create(*cluster, pool, io_ctx);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "error opening pool %s", pool);
-         goto failed_shutdown;
-     }
- 
-+    qemu_opts_del(opts);
-+    return 0;
-+
-+failed_shutdown:
-+    rados_shutdown(*cluster);
-+    g_free(*s_snap);
-+    g_free(*s_image_name);
-+failed_opts:
-+    qemu_opts_del(opts);
-+    g_free(mon_host);
-+    return r;
-+}
-+
-+static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-+                         Error **errp)
-+{
-+    BDRVRBDState *s = bs->opaque;
-+    Error *local_err = NULL;
-+    const char *filename;
-+    int r;
-+
-+    /* If we are given a filename, parse the filename, with precedence given to
-+     * filename encoded options */
-+    filename = qdict_get_try_str(options, "filename");
-+    if (filename) {
-+        warn_report("'filename' option specified. "
-+                    "This is an unsupported option, and may be deprecated "
-+                    "in the future");
-+        qemu_rbd_parse_filename(filename, options, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return -EINVAL;
-+        }
+-    /* Read out options */
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
++    if (file_opts->has_preallocation) {
++        error_setg(errp, "Preallocation is not supported on Windows");
++        return -EINVAL;
 +    }
-+
-+    r = qemu_rbd_connect(&s->cluster, &s->io_ctx, &s->snap, &s->image_name,
-+                         options, !(flags & BDRV_O_NOCACHE), errp);
-+    if (r < 0) {
-+        return r;
++    if (file_opts->has_nocow) {
++        error_setg(errp, "nocow is not supported on Windows");
++        return -EINVAL;
 +    }
-+
-     /* rbd_open is always r/w */
-     r = rbd_open(s->io_ctx, s->image_name, &s->image, s->snap);
-     if (r < 0) {
-@@ -682,19 +708,13 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         }
-     }
  
--    qemu_opts_del(opts);
+-    fd = qemu_open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
++    fd = qemu_open(file_opts->filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
+                    0644);
+     if (fd < 0) {
+         error_setg_errno(errp, errno, "Could not create file");
+         return -EIO;
+     }
+     set_sparse(fd);
+-    ftruncate(fd, total_size);
++    ftruncate(fd, file_opts->size);
+     qemu_close(fd);
++
      return 0;
- 
- failed_open:
-     rados_ioctx_destroy(s->io_ctx);
--failed_shutdown:
--    rados_shutdown(s->cluster);
-     g_free(s->snap);
-     g_free(s->image_name);
--failed_opts:
--    qemu_opts_del(opts);
--    g_free(mon_host);
--exit:
-+    rados_shutdown(s->cluster);
-     return r;
  }
  
++static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
++{
++    BlockdevCreateOptions options;
++    int64_t total_size = 0;
++
++    strstart(filename, "file:", &filename);
++
++    /* Read out options */
++    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++                          BDRV_SECTOR_SIZE);
++
++    options = (BlockdevCreateOptions) {
++        .driver     = BLOCKDEV_DRIVER_FILE,
++        .u.file     = {
++            .filename           = (char *) filename,
++            .size               = total_size,
++            .has_preallocation  = false,
++            .has_nocow          = false,
++        },
++    };
++    return raw_co_create(&options, errp);
++}
+ 
+ static QemuOptsList raw_create_opts = {
+     .name = "raw-create-opts",
 -- 
 2.13.6
