@@ -1,46 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1eoLdS-0004hr-7r
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 23:04:03 -0500
+	(envelope-from <jcody@redhat.com>) id 1eoMwf-0007U2-MF
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 00:27:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1eoLdN-0000dU-9L
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 23:04:02 -0500
-Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:59714)
+	(envelope-from <jcody@redhat.com>) id 1eoMwc-0005bv-D5
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 00:27:57 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58742 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1eoLdN-0000ZJ-3x
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 23:03:57 -0500
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w1L408mW037061
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 23:03:51 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id 30F737E
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 23:03:52 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
-	[128.59.72.13]) by hazelnut (Postfix) with ESMTP id 07C1E7E
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 23:03:52 -0500 (EST)
-Received: from mail-wr0-f197.google.com (mail-wr0-f197.google.com
-	[209.85.128.197])
-	by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w1L43oOD036940
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 23:03:50 -0500
-Received: by mail-wr0-f197.google.com with SMTP id o20so283075wro.3
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 20:03:50 -0800 (PST)
-Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com.
-	[209.85.128.177]) by smtp.gmail.com with ESMTPSA id
-	e12sm20460963edi.29.2018.02.20.20.03.47 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 20 Feb 2018 20:03:48 -0800 (PST)
-Received: by mail-wr0-f177.google.com with SMTP id p104so629848wrc.12
-	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 20:03:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1eoMwc-0005bc-7R
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 00:27:54 -0500
+Date: Wed, 21 Feb 2018 00:27:35 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180221052735.GA2919@localhost.localdomain>
+References: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
 MIME-Version: 1.0
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Tue, 20 Feb 2018 23:03:46 -0500
-Message-ID: <CAHyh4xii5y-8=uMJeQGARrHZAETtW4ugmBWUypbQ923vk0P3Lw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] intel-iommu and vhost: Do we need 'device-iotlb' and
- 'ats'?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Moving seabios-hppa git submodule to use a
+ qemu.org mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,41 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
-Cc: jasowang@redhat.com, Eric Auger <eric.auger@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, BALATON Zoltan <balaton@eik.bme.hu>
 
-Hi,
+On Tue, Feb 20, 2018 at 06:43:22PM +0000, Peter Maydell wrote:
+> I just noticed that we seem to have acquired another git
+> submodule that isn't pointing to a qemu.org git url:
+> 
+> [submodule "roms/seabios-hppa"]
+>         path = roms/seabios-hppa
+>         url = git://github.com/hdeller/seabios-hppa.git
+> 
+> Jeff, could we set up so we can mirror this repo on qemu.org?
+> Then we can send a patch to update the .gitmodules to point to it.
+> 
 
-I'm using vhost with the virtual intel-iommu, and this page[1] shows
-the QEMU command line example.
+Yes, of course... Although Paolo has suggested making it a branch of the
+existing SeaBIOS repo instead.  But I can go ahead and get the clone setup,
+in case we go that route.
 
-qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split -m 2G \
-                   -device intel-iommu,intremap=on,device-iotlb=on \
-                   -device ioh3420,id=pcie.1,chassis=1 \
-                   -device
-virtio-net-pci,bus=pcie.1,netdev=net0,disable-legacy=on,disable-modern=off,iommu_platform=on,ats=on
-\
-                   -netdev tap,id=net0,vhostforce \
-                   $IMAGE_PATH
+> (There's also a patchset on list that wants to add a
+> submodule for git://github.com/zbalaton/u-boot-sam460ex
+> but I don't know if that will go in or not yet. Should
+> we insist that we set up the mirror first for new
+> submodules, or allow them in and fix things up after?
+> By default we're doing the latter at the moment; the
+> former seems cleaner but makes it more painful for
+> contributors to get things added which need new
+> submodules.)
+> 
 
-I wonder what's the impact of using device-iotlb and ats options as
-they are described necessary.
+My thought: while not as clean, I think it makes sense in general to allow a
+patchset in first, and then switch it over later.  If we require a mirror on
+qemu.org first, then we could end up creating mirrors that are never used,
+if patches are rejected for some other reason and the submodule goes unused.
+By doing the mirror later, the patchset goes through normal review and the
+submodule is committed, and so we know for sure at that point we want the
+mirror.
 
-In my understanding, vhost in the kernel only looks at
-VIRTIO_F_IOMMU_PLATFORM, and when it is set, vhost uses a
-device-iotlb. In addition, vhost and QEMU communicate using vhost_msg
-basically to cache mappings correctly in the vhost, so I wonder what's
-the role of ats in this case.
 
-A related question is that if we use SMMU emulation[2] on ARM without
-those options, does vhost cache mappings as if it has a device-iotlb?
-(I guess this is the case.)
-
-I'm pretty new to QEMU code, so I might be missing something. Can
-somebody shed some light on it?
-
-[1] https://wiki.qemu.org/Features/VT-d
-[2] http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg04736.html
-
-Thanks,
-Jintack
+-Jeff
