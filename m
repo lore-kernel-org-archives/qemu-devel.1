@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eoQR1-0003TX-GO
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:11:33 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eoQS1-0003xA-4b
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eoQQx-0000ZJ-V1
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:11:31 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49218)
+	(envelope-from <mlureau@redhat.com>) id 1eoQRx-0000zJ-VK
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:33 -0500
+Received: from mail-qt0-f171.google.com ([209.85.216.171]:42714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eoQQx-0000YL-Li
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:11:27 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eoQQt-0005cL-IY
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 09:11:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B03562E80E5
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 09:11:19 +0000 (UTC)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eoQRx-0000yw-Qb
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:12:29 -0500
+Received: by mail-qt0-f171.google.com with SMTP id l19so1051112qtj.9
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 01:12:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1519174995-1039-1-git-send-email-cota@braap.org>
+References: <1519174995-1039-1-git-send-email-cota@braap.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 21 Feb 2018 10:12:28 +0100
+Message-ID: <CAMxuvazD3r_-soineNOs1ZEdfUZdrYuCOq5j2xJVb0ZY5k7iaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Feb 2018 08:58:46 -0000
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Reply-To: Bug 1750229 <1750229@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151895395027.16252.6709701353823193410.malonedeb@wampee.canonical.com>
-	<151895676126.9179.11445904436158393603.malone@chaenomeles.canonical.com>
-	<CAJs94EYQoWSZY2oZju=f4Qxxbdd6exFibuFjnVh4uOFjGWY6zA@mail.gmail.com>
-	<CAJs94EbxKVvz+aPpodUAOQB0yG+4wnb2tAq1KHp0p844JK+7Ew@mail.gmail.com>
-Message-Id: <CAJs94EbevgkNO8s9N6RAfzpVJ3EfBy0HX4wXShPXs83k9nPqYw@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1750229] Re: virtio-blk-pci regression:
- softlock in guest kernel at module loading
+Subject: Re: [Qemu-devel] [PATCH] configure: fix sanitizers' test program to
+ mend ASan detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,336 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Well, last_avail_idx equals to shadow_avail_idx and both of them are 1
-at the qemu side. So, only one request is transferred.
-I wonder why, probably something is badly cached, but new avail_idx
-(which is supposed to become 2) is never shown up.
+Hi
 
-2018-02-20 15:49 GMT+03:00 Matwey V. Kornilov <matwey.kornilov@gmail.com>:
-> virtqueue_pop() returns NULL due to virtio_queue_empty_rcu() returns
-> true all the time.
+On Wed, Feb 21, 2018 at 2:03 AM, Emilio G. Cota <cota@braap.org> wrote:
+> Commit 218bb57 ("build-sys: check static linking of UBSAN", 2018-02-13)
+> adds a small test program to check whether ubsan works even when
+> configuring with --static. This added program is used to
+> detect all sanitizers, which breaks ASan's detection since the
+> compilation fails with -fsanitize=3Daddress, at least with gcc 5.4.0
+> and 7.2.0:
 >
-> 2018-02-20 14:47 GMT+03:00 Matwey V. Kornilov <matwey.kornilov@gmail.com>:
->> Well, I've found that on qemu side VirtQueue for virtio_blk device
->> infinitely calls virtio_blk_handle_vq() where virtio_blk_get_request()
->> (virtqueue_pop() in essens) always returns NULL.
->>
->> 2018-02-18 15:26 GMT+03:00 Matwey V. Kornilov <matwey.kornilov@gmail.com=
->:
->>> ** Attachment added: ".build.kernel.kvm"
->>>    https://bugs.launchpad.net/qemu/+bug/1750229/+attachment/5057653/+fi=
-les/.build.kernel.kvm
->>>
->>> --
->>> You received this bug notification because you are subscribed to the bug
->>> report.
->>> https://bugs.launchpad.net/bugs/1750229
->>>
->>> Title:
->>>   virtio-blk-pci regression: softlock in guest kernel at module loading
->>>
->>> Status in QEMU:
->>>   New
->>>
->>> Bug description:
->>>   Hello,
->>>
->>>   I am running qemu from master git branch on x86_64 host with kernel is
->>>   4.4.114. I've found that commit
->>>
->>>       9a4c0e220d8a "hw/virtio-pci: fix virtio behaviour"
->>>
->>>   introduces an regression with the following command:
->>>
->>>       qemu-system-x86_64 -enable-kvm -nodefaults -no-reboot -nographic
->>>   -vga none -runas qemu -kernel .build.kernel.kvm -initrd
->>>   .build.initrd.kvm -append 'panic=3D1 softlockup_panic=3D1 no-kvmclock
->>>   nmi_watchdog=3D0 console=3DttyS0 root=3D/dev/disk/by-id/virtio-0' -m =
-2048
->>>   -drive file=3D./root,format=3Draw,if=3Dnone,id=3Ddisk,serial=3D0,cach=
-e=3Dunsafe
->>>   -device virtio-blk-pci,drive=3Ddisk -serial stdio -smp 2
->>>
->>>   Starting from this commit to master the following happens with a wide
->>>   variety of guest kernels (4.4 to 4.15):
->>>
->>>   [   62.428107] BUG: workqueue lockup - pool cpus=3D0 node=3D0 flags=
-=3D0x0 nice=3D-20 stuck for 59s!
->>>   [   62.437426] Showing busy workqueues and worker pools:
->>>   [   62.443117] workqueue events: flags=3D0x0
->>>   [   62.447512]   pwq 0: cpus=3D0 node=3D0 flags=3D0x0 nice=3D0 active=
-=3D1/256
->>>   [   62.448161]     pending: check_corruption
->>>   [   62.458570] workqueue kblockd: flags=3D0x18
->>>   [   62.463082]   pwq 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 acti=
-ve=3D3/256
->>>   [   62.463082]     in-flight: 4:blk_mq_run_work_fn
->>>   [   62.463082]     pending: blk_mq_run_work_fn, blk_mq_timeout_work
->>>   [   62.474831] pool 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 hung=
-=3D59s workers=3D2 idle: 214
->>>   [   62.492121] INFO: rcu_preempt detected stalls on CPUs/tasks:
->>>   [   62.492121]  Tasks blocked on level-0 rcu_node (CPUs 0-1): P4
->>>   [   62.492121]  (detected by 0, t=3D15002 jiffies, g=3D-130, c=3D-131=
-, q=3D32)
->>>   [   62.492121] kworker/0:0H    R  running task        0     4      2 =
-0x80000000
->>>   [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
->>>   [   62.492121] Call Trace:
->>>   [   62.492121]  <IRQ>
->>>   [   62.492121]  sched_show_task+0xdf/0x100
->>>   [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
->>>   [   62.492121]  rcu_check_callbacks+0x93d/0x9d0
->>>   [   62.492121]  ? tick_sched_do_timer+0x40/0x40
->>>   [   62.492121]  update_process_times+0x28/0x50
->>>   [   62.492121]  tick_sched_handle+0x22/0x70
->>>   [   62.492121]  tick_sched_timer+0x34/0x70
->>>   [   62.492121]  __hrtimer_run_queues+0xcc/0x250
->>>   [   62.492121]  hrtimer_interrupt+0xab/0x1f0
->>>   [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
->>>   [   62.492121]  apic_timer_interrupt+0xa2/0xb0
->>>   [   62.492121]  </IRQ>
->>>   [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
->>>   [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: =
-ffffffffffffff11
->>>   [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 00000=
-00000000001
->>>   [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 00000=
-00000000000
->>>   [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 00000=
-00001080020
->>>   [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 00000=
-00000000000
->>>   [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff9=
-2a1f8e1aa80
->>>   [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
->>>   [   62.492121]  vp_notify+0x12/0x20
->>>   [   62.492121]  virtqueue_notify+0x18/0x30
->>>   [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
->>>   [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
->>>   [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
->>>   [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
->>>   [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
->>>   [   62.492121]  process_one_work+0x1e3/0x420
->>>   [   62.492121]  worker_thread+0x2b/0x3d0
->>>   [   62.492121]  ? process_one_work+0x420/0x420
->>>   [   62.492121]  kthread+0x113/0x130
->>>   [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
->>>   [   62.492121]  ret_from_fork+0x3a/0x50
->>>   [   62.492121] kworker/0:0H    R  running task        0     4      2 =
-0x80000000
->>>   [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
->>>   [   62.492121] Call Trace:
->>>   [   62.492121]  <IRQ>
->>>   [   62.492121]  sched_show_task+0xdf/0x100
->>>   [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
->>>   [   62.492121]  rcu_check_callbacks+0x972/0x9d0
->>>   [   62.492121]  ? tick_sched_do_timer+0x40/0x40
->>>   [   62.492121]  update_process_times+0x28/0x50
->>>   [   62.492121]  tick_sched_handle+0x22/0x70
->>>   [   62.492121]  tick_sched_timer+0x34/0x70
->>>   [   62.492121]  __hrtimer_run_queues+0xcc/0x250
->>>   [   62.492121]  hrtimer_interrupt+0xab/0x1f0
->>>   [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
->>>   [   62.492121]  apic_timer_interrupt+0xa2/0xb0
->>>   [   62.492121]  </IRQ>
->>>   [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
->>>   [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: =
-ffffffffffffff11
->>>   [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 00000=
-00000000001
->>>   [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 00000=
-00000000000
->>>   [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 00000=
-00001080020
->>>   [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 00000=
-00000000000
->>>   [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff9=
-2a1f8e1aa80
->>>   [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
->>>   [   62.492121]  vp_notify+0x12/0x20
->>>   [   62.492121]  virtqueue_notify+0x18/0x30
->>>   [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
->>>   [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
->>>   [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
->>>   [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
->>>   [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
->>>   [   62.492121]  process_one_work+0x1e3/0x420
->>>   [   62.492121]  worker_thread+0x2b/0x3d0
->>>   [   62.492121]  ? process_one_work+0x420/0x420
->>>   [   62.492121]  kthread+0x113/0x130
->>>   [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
->>>   [   62.492121]  ret_from_fork+0x3a/0x50
->>>
->>>   Another important thing is that the commit works well on other
->>>   hardware with the same setup (same host kernel, same qemu command line
->>>   and host kernel binaries). How could I try to find the issue reason?
->>>
->>> To manage notifications about this bug go to:
->>> https://bugs.launchpad.net/qemu/+bug/1750229/+subscriptions
->>
->>
->>
->> --
->> With best regards,
->> Matwey V. Kornilov
+>   qemu-conf.c: In function =E2=80=98main=E2=80=99:
+>   qemu-conf.c:3:20: error: integer overflow in expression [-Werror=3Dover=
+flow]
+>      return INT32_MIN / -1;
+>                       ^
+>   cc1: all warnings being treated as errors
+
+
+I sent a patch a few days ago:
+"[PATCH 1/6] build-sys: fix -fsanitize=3Daddress check"
+
 >
+> Fix it by:
 >
+> - Changing the test program to one that incurs undefined behaviour that i=
+sn't
+>   detected at compile-time, even with -fsanitize=3Daddress.
 >
+> - To be extra safe (since compilers might evolve and eventually figure ou=
+t
+>   the UB at compile-time), use this newly-added test only when checking
+>   for UBSan; use the skeleton otherwise.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  configure | 20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 913e148..56f647f 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5306,13 +5306,13 @@ fi
+>  ##########################################
+>  # checks for sanitizers
+>
+> -# we could use a simple skeleton for flags checks, but this also
+> -# detect the static linking issue of ubsan, see also:
+> +# Use this program to detect the static linking issue of ubsan; see
+>  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D84285
+>  cat > $TMPC << EOF
+> -#include <stdint.h>
+> -int main(void) {
+> -  return INT32_MIN / -1;
+> +int main(int argc, char **argv) {
+> +  int k =3D 0x7fffffff;
+> +  k +=3D argc;
+> +  return 0;
+>  }
+>  EOF
+>
+> @@ -5322,12 +5322,16 @@ have_asan_iface_h=3Dno
+>  have_asan_iface_fiber=3Dno
+>
+>  if test "$sanitizers" =3D "yes" ; then
+> +  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=3Dundefined" ""; then
+> +    have_ubsan=3Dyes
+> +  fi
+> +
+> +  # Use the skeleton for all other sanitizer checks
+> +  write_c_skeleton
+> +
+>    if compile_prog "$CPU_CFLAGS -Werror -fsanitize=3Daddress" ""; then
+>        have_asan=3Dyes
+>    fi
+> -  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=3Dundefined" ""; then
+> -      have_ubsan=3Dyes
+> -  fi
+>
+>    if check_include "sanitizer/asan_interface.h" ; then
+>        have_asan_iface_h=3Dyes
 > --
-> With best regards,
-> Matwey V. Kornilov
-
-
--- =
-
-With best regards,
-Matwey V. Kornilov
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1750229
-
-Title:
-  virtio-blk-pci regression: softlock in guest kernel at module loading
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  I am running qemu from master git branch on x86_64 host with kernel is
-  4.4.114. I've found that commit
-
-      9a4c0e220d8a "hw/virtio-pci: fix virtio behaviour"
-
-  introduces an regression with the following command:
-
-      qemu-system-x86_64 -enable-kvm -nodefaults -no-reboot -nographic
-  -vga none -runas qemu -kernel .build.kernel.kvm -initrd
-  .build.initrd.kvm -append 'panic=3D1 softlockup_panic=3D1 no-kvmclock
-  nmi_watchdog=3D0 console=3DttyS0 root=3D/dev/disk/by-id/virtio-0' -m 2048
-  -drive file=3D./root,format=3Draw,if=3Dnone,id=3Ddisk,serial=3D0,cache=3D=
-unsafe
-  -device virtio-blk-pci,drive=3Ddisk -serial stdio -smp 2
-
-  Starting from this commit to master the following happens with a wide
-  variety of guest kernels (4.4 to 4.15):
-
-  [   62.428107] BUG: workqueue lockup - pool cpus=3D0 node=3D0 flags=3D0x0=
- nice=3D-20 stuck for 59s!
-  [   62.437426] Showing busy workqueues and worker pools:
-  [   62.443117] workqueue events: flags=3D0x0
-  [   62.447512]   pwq 0: cpus=3D0 node=3D0 flags=3D0x0 nice=3D0 active=3D1=
-/256
-  [   62.448161]     pending: check_corruption
-  [   62.458570] workqueue kblockd: flags=3D0x18
-  [   62.463082]   pwq 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 active=
-=3D3/256
-  [   62.463082]     in-flight: 4:blk_mq_run_work_fn
-  [   62.463082]     pending: blk_mq_run_work_fn, blk_mq_timeout_work
-  [   62.474831] pool 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 hung=3D59=
-s workers=3D2 idle: 214
-  [   62.492121] INFO: rcu_preempt detected stalls on CPUs/tasks:
-  [   62.492121]  Tasks blocked on level-0 rcu_node (CPUs 0-1): P4
-  [   62.492121]  (detected by 0, t=3D15002 jiffies, g=3D-130, c=3D-131, q=
-=3D32)
-  [   62.492121] kworker/0:0H    R  running task        0     4      2 0x80=
-000000
-  [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
-  [   62.492121] Call Trace:
-  [   62.492121]  <IRQ>
-  [   62.492121]  sched_show_task+0xdf/0x100
-  [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
-  [   62.492121]  rcu_check_callbacks+0x93d/0x9d0
-  [   62.492121]  ? tick_sched_do_timer+0x40/0x40
-  [   62.492121]  update_process_times+0x28/0x50
-  [   62.492121]  tick_sched_handle+0x22/0x70
-  [   62.492121]  tick_sched_timer+0x34/0x70
-  [   62.492121]  __hrtimer_run_queues+0xcc/0x250
-  [   62.492121]  hrtimer_interrupt+0xab/0x1f0
-  [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
-  [   62.492121]  apic_timer_interrupt+0xa2/0xb0
-  [   62.492121]  </IRQ>
-  [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
-  [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: ffff=
-ffffffffff11
-  [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 000000000=
-0000001
-  [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 000000000=
-0000000
-  [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 000000000=
-1080020
-  [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 000000000=
-0000000
-  [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff92a1f=
-8e1aa80
-  [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
-  [   62.492121]  vp_notify+0x12/0x20
-  [   62.492121]  virtqueue_notify+0x18/0x30
-  [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
-  [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
-  [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
-  [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
-  [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
-  [   62.492121]  process_one_work+0x1e3/0x420
-  [   62.492121]  worker_thread+0x2b/0x3d0
-  [   62.492121]  ? process_one_work+0x420/0x420
-  [   62.492121]  kthread+0x113/0x130
-  [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
-  [   62.492121]  ret_from_fork+0x3a/0x50
-  [   62.492121] kworker/0:0H    R  running task        0     4      2 0x80=
-000000
-  [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
-  [   62.492121] Call Trace:
-  [   62.492121]  <IRQ>
-  [   62.492121]  sched_show_task+0xdf/0x100
-  [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
-  [   62.492121]  rcu_check_callbacks+0x972/0x9d0
-  [   62.492121]  ? tick_sched_do_timer+0x40/0x40
-  [   62.492121]  update_process_times+0x28/0x50
-  [   62.492121]  tick_sched_handle+0x22/0x70
-  [   62.492121]  tick_sched_timer+0x34/0x70
-  [   62.492121]  __hrtimer_run_queues+0xcc/0x250
-  [   62.492121]  hrtimer_interrupt+0xab/0x1f0
-  [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
-  [   62.492121]  apic_timer_interrupt+0xa2/0xb0
-  [   62.492121]  </IRQ>
-  [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
-  [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: ffff=
-ffffffffff11
-  [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 000000000=
-0000001
-  [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 000000000=
-0000000
-  [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 000000000=
-1080020
-  [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 000000000=
-0000000
-  [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff92a1f=
-8e1aa80
-  [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
-  [   62.492121]  vp_notify+0x12/0x20
-  [   62.492121]  virtqueue_notify+0x18/0x30
-  [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
-  [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
-  [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
-  [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
-  [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
-  [   62.492121]  process_one_work+0x1e3/0x420
-  [   62.492121]  worker_thread+0x2b/0x3d0
-  [   62.492121]  ? process_one_work+0x420/0x420
-  [   62.492121]  kthread+0x113/0x130
-  [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
-  [   62.492121]  ret_from_fork+0x3a/0x50
-
-  Another important thing is that the commit works well on other
-  hardware with the same setup (same host kernel, same qemu command line
-  and host kernel binaries). How could I try to find the issue reason?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1750229/+subscriptions
+> 2.7.4
+>
