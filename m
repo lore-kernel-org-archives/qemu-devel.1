@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUry-0001Xh-Jm
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUs6-0001h1-Rj
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrx-00039m-Kx
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUs4-0003Cm-Iu
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:46 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:59 +0100
-Message-Id: <20180221135404.27598-32-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:54:03 +0100
+Message-Id: <20180221135404.27598-36-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 31/36] ssh: Pass BlockdevOptionsSsh to
- connect_to_ssh()
+Subject: [Qemu-devel] [PATCH v2 35/36] qemu-iotests: Test qcow2 over file
+ image creation with QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,129 +23,681 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Move the parsing of the QDict options up to the callers, in preparation
-for the .bdrv_co_create implementation that directly gets a QAPI type.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/ssh.c | 34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+ tests/qemu-iotests/206     | 436 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/206.out | 209 ++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 646 insertions(+)
+ create mode 100755 tests/qemu-iotests/206
+ create mode 100644 tests/qemu-iotests/206.out
 
-diff --git a/block/ssh.c b/block/ssh.c
-index dcf766c213..77bc20041f 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -655,19 +655,13 @@ fail:
-     return result;
- }
- 
--static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-+static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
-                           int ssh_flags, int creat_mode, Error **errp)
- {
--    BlockdevOptionsSsh *opts;
-     int r, ret;
-     const char *user;
-     long port = 0;
- 
--    opts = ssh_parse_options(options, errp);
--    if (opts == NULL) {
--        return -EINVAL;
--    }
--
-     if (opts->has_user) {
-         user = opts->user;
-     } else {
-@@ -747,8 +741,6 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-         goto err;
-     }
- 
--    qapi_free_BlockdevOptionsSsh(opts);
--
-     r = libssh2_sftp_fstat(s->sftp_handle, &s->attrs);
-     if (r < 0) {
-         sftp_error_setg(errp, s, "failed to read file attributes");
-@@ -774,8 +766,6 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-     }
-     s->session = NULL;
- 
--    qapi_free_BlockdevOptionsSsh(opts);
--
-     return ret;
- }
- 
-@@ -783,6 +773,7 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
-                          Error **errp)
- {
-     BDRVSSHState *s = bs->opaque;
-+    BlockdevOptionsSsh *opts;
-     int ret;
-     int ssh_flags;
- 
-@@ -793,8 +784,13 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
-         ssh_flags |= LIBSSH2_FXF_WRITE;
-     }
- 
-+    opts = ssh_parse_options(options, errp);
-+    if (opts == NULL) {
-+        return -EINVAL;
-+    }
+diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+new file mode 100755
+index 0000000000..0a18b2b19a
+--- /dev/null
++++ b/tests/qemu-iotests/206
+@@ -0,0 +1,436 @@
++#!/bin/bash
++#
++# Test qcow2 and file image creation
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     /* Start up SSH. */
--    ret = connect_to_ssh(s, options, ssh_flags, 0, errp);
-+    ret = connect_to_ssh(s, opts, ssh_flags, 0, errp);
-     if (ret < 0) {
-         goto err;
-     }
-@@ -802,6 +798,8 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
-     /* Go non-blocking. */
-     libssh2_session_set_blocking(s->session, 0);
- 
-+    qapi_free_BlockdevOptionsSsh(opts);
++# creator
++owner=kwolf@redhat.com
 +
-     return 0;
- 
-  err:
-@@ -810,6 +808,8 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
-     }
-     s->sock = -1;
- 
-+    qapi_free_BlockdevOptionsSsh(opts);
++seq=`basename $0`
++echo "QA output created by $seq"
 +
-     return ret;
- }
- 
-@@ -831,6 +831,7 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
-     int r, ret;
-     int64_t total_size = 0;
-     QDict *uri_options = NULL;
-+    BlockdevOptionsSsh *ssh_opts = NULL;
-     BDRVSSHState s;
-     ssize_t r2;
-     char c[1] = { '\0' };
-@@ -849,7 +850,13 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
-         goto out;
-     }
- 
--    r = connect_to_ssh(&s, uri_options,
-+    ssh_opts = ssh_parse_options(uri_options, errp);
-+    if (ssh_opts == NULL) {
-+        ret = -EINVAL;
-+        goto out;
-+    }
++here=`pwd`
++status=1	# failure is the default!
 +
-+    r = connect_to_ssh(&s, ssh_opts,
-                        LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
-                        LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
-                        0644, errp);
-@@ -876,6 +883,7 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
-     if (uri_options != NULL) {
-         QDECREF(uri_options);
-     }
-+    qapi_free_BlockdevOptionsSsh(ssh_opts);
-     return ret;
- }
- 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++function do_run_qemu()
++{
++    echo Testing: "$@"
++    $QEMU -nographic -qmp stdio -serial none "$@"
++    echo
++}
++
++function run_qemu()
++{
++    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp \
++                          | _filter_qemu | _filter_imgfmt \
++                          | _filter_actual_image_size
++}
++
++echo
++echo "=== Successful image creation (defaults) ==="
++echo
++
++size=$((128 * 1024 * 1024))
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "file",
++      "filename": "$TEST_IMG",
++      "size": 0
++  }
++}
++{ "execute": "blockdev-add",
++  "arguments": {
++      "driver": "file",
++      "node-name": "imgfile",
++      "filename": "$TEST_IMG"
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "imgfile",
++      "size": $size
++  }
++}
++{ "execute": "quit" }
++EOF
++
++_img_info --format-specific
++
++echo
++echo "=== Successful image creation (inline blockdev-add, explicit defaults) ==="
++echo
++
++# Choose a different size to show that we got a new image
++size=$((64 * 1024 * 1024))
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "file",
++      "filename": "$TEST_IMG",
++      "size": 0,
++      "preallocation": "off",
++      "nocow": false
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": {
++          "driver": "file",
++          "filename": "$TEST_IMG"
++      },
++      "size": $size,
++      "version": "v3",
++      "cluster-size": 65536,
++      "preallocation": "off",
++      "lazy-refcounts": false,
++      "refcount-bits": 16
++  }
++}
++{ "execute": "quit" }
++EOF
++
++_img_info --format-specific
++
++echo
++echo "=== Successful image creation (v3 non-default options) ==="
++echo
++
++# Choose a different size to show that we got a new image
++size=$((32 * 1024 * 1024))
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "file",
++      "filename": "$TEST_IMG",
++      "size": 0,
++      "preallocation": "falloc",
++      "nocow": true
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": {
++          "driver": "file",
++          "filename": "$TEST_IMG"
++      },
++      "size": $size,
++      "version": "v3",
++      "cluster-size": 2097152,
++      "preallocation": "metadata",
++      "lazy-refcounts": true,
++      "refcount-bits": 1
++  }
++}
++{ "execute": "quit" }
++EOF
++
++_img_info --format-specific
++
++echo
++echo "=== Successful image creation (v2 non-default options) ==="
++echo
++
++mv $TEST_IMG $TEST_IMG.base
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "file",
++      "filename": "$TEST_IMG",
++      "size": 0
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": {
++          "driver": "file",
++          "filename": "$TEST_IMG"
++      },
++      "size": $size,
++      "backing-file": "$TEST_IMG.base",
++      "backing-fmt": "qcow2",
++      "version": "v2",
++      "cluster-size": 512
++  }
++}
++{ "execute": "quit" }
++EOF
++
++_img_info --format-specific
++
++echo
++echo "=== Successful image creation (encrypted) ==="
++echo
++
++run_qemu -object secret,id=keysec0,data="foo" <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": {
++          "driver": "file",
++          "filename": "$TEST_IMG"
++      },
++      "size": $size,
++      "encrypt": {
++          "format": "luks",
++          "key-secret": "keysec0",
++          "cipher-alg": "twofish-128",
++          "cipher-mode": "ctr",
++          "ivgen-alg": "plain64",
++          "ivgen-hash-alg": "md5",
++          "hash-alg": "sha1",
++          "iter-time": 10
++      }
++  }
++}
++{ "execute": "quit" }
++EOF
++
++_img_info --format-specific | _filter_img_info --format-specific
++
++echo
++echo "=== Invalid BlockdevRef ==="
++echo
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "this doesn't exist",
++      "size": $size
++  }
++}
++{ "execute": "quit" }
++EOF
++
++
++echo
++echo "=== Invalid sizes ==="
++echo
++
++# TODO Negative image sizes aren't handled correctly, but this is a problem
++# with QAPI's implementation of the 'size' type and affects other commands as
++# well. Once this is fixed, we may want to add a test case here.
++
++# 1. Misaligned image size
++# 2. 2^64 - 512
++# 3. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
++# 4. 2^63 - 512 (generally valid, but qcow2 can't handle images this size)
++
++run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 1234
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 18446744073709551104
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 9223372036854775808
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 9223372036854775296
++  }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++echo "=== Invalid version ==="
++echo
++
++run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "version": "v1"
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "version": "v2",
++      "lazy-refcounts": true
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "version": "v2",
++      "refcount-bits": 8
++  }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++echo "=== Invalid backing file options ==="
++echo
++
++run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "backing-file": "/dev/null",
++      "preallocation": "full"
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "backing-fmt": "$IMGFMT"
++  }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++echo "=== Invalid cluster size ==="
++echo
++
++run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "cluster-size": 1234
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "cluster-size": 128
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "cluster-size": 4194304
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "cluster-size": 0
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 281474976710656,
++      "cluster-size": 512
++  }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++echo "=== Invalid refcount width ==="
++echo
++
++run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "refcount-bits": 128
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "refcount-bits": 0
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "refcount-bits": 7
++  }
++}
++{ "execute": "quit" }
++EOF
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
+new file mode 100644
+index 0000000000..042342ae9d
+--- /dev/null
++++ b/tests/qemu-iotests/206.out
+@@ -0,0 +1,209 @@
++QA output created by 206
++
++=== Successful image creation (defaults) ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 128M (134217728 bytes)
++cluster_size: 65536
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    corrupt: false
++
++=== Successful image creation (inline blockdev-add, explicit defaults) ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++cluster_size: 65536
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    corrupt: false
++
++=== Successful image creation (v3 non-default options) ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32M (33554432 bytes)
++cluster_size: 2097152
++Format specific information:
++    compat: 1.1
++    lazy refcounts: true
++    refcount bits: 1
++    corrupt: false
++
++=== Successful image creation (v2 non-default options) ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32M (33554432 bytes)
++cluster_size: 512
++backing file: TEST_DIR/t.IMGFMT.base
++backing file format: IMGFMT
++Format specific information:
++    compat: 0.10
++    refcount bits: 16
++
++=== Successful image creation (encrypted) ===
++
++Testing: -object secret,id=keysec0,data=foo
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32M (33554432 bytes)
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    encrypt:
++        ivgen alg: plain64
++        hash alg: sha1
++        cipher alg: twofish-128
++        uuid: 00000000-0000-0000-0000-000000000000
++        format: luks
++        cipher mode: ctr
++        slots:
++            [0]:
++                active: true
++                iters: 1024
++                key offset: 4096
++                stripes: 4000
++            [1]:
++                active: false
++                key offset: 69632
++            [2]:
++                active: false
++                key offset: 135168
++            [3]:
++                active: false
++                key offset: 200704
++            [4]:
++                active: false
++                key offset: 266240
++            [5]:
++                active: false
++                key offset: 331776
++            [6]:
++                active: false
++                key offset: 397312
++            [7]:
++                active: false
++                key offset: 462848
++        payload offset: 528384
++        master key iters: 1024
++    corrupt: false
++
++=== Invalid BlockdevRef ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"error": {"class": "GenericError", "desc": "Cannot find device=this doesn't exist nor node_name=this doesn't exist"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
++=== Invalid sizes ===
++
++Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
++QMP_VERSION
++{"return": {}}
++{"error": {"class": "GenericError", "desc": "Image size must be a multiple of 512 bytes"}}
++{"error": {"class": "GenericError", "desc": "Could not resize image: Image size cannot be negative"}}
++{"error": {"class": "GenericError", "desc": "Could not resize image: Image size cannot be negative"}}
++{"error": {"class": "GenericError", "desc": "Could not resize image: Failed to grow the L1 table: File too large"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
++=== Invalid version ===
++
++Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
++QMP_VERSION
++{"return": {}}
++{"error": {"class": "GenericError", "desc": "Invalid parameter 'v1'"}}
++{"error": {"class": "GenericError", "desc": "Lazy refcounts only supported with compatibility level 1.1 and above (use version=v3 or greater)"}}
++{"error": {"class": "GenericError", "desc": "Different refcount widths than 16 bits require compatibility level 1.1 or above (use version=v3 or greater)"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
++=== Invalid backing file options ===
++
++Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
++QMP_VERSION
++{"return": {}}
++{"error": {"class": "GenericError", "desc": "Backing file and preallocation cannot be used at the same time"}}
++{"error": {"class": "GenericError", "desc": "Backing format cannot be used without backing file"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
++=== Invalid cluster size ===
++
++Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
++QMP_VERSION
++{"return": {}}
++{"error": {"class": "GenericError", "desc": "Cluster size must be a power of two between 512 and 2048k"}}
++{"error": {"class": "GenericError", "desc": "Cluster size must be a power of two between 512 and 2048k"}}
++{"error": {"class": "GenericError", "desc": "Cluster size must be a power of two between 512 and 2048k"}}
++{"error": {"class": "GenericError", "desc": "Cluster size must be a power of two between 512 and 2048k"}}
++{"error": {"class": "GenericError", "desc": "Could not resize image: Failed to grow the L1 table: File too large"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
++=== Invalid refcount width ===
++
++Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
++QMP_VERSION
++{"return": {}}
++{"error": {"class": "GenericError", "desc": "Refcount width must be a power of two and may not exceed 64 bits"}}
++{"error": {"class": "GenericError", "desc": "Refcount width must be a power of two and may not exceed 64 bits"}}
++{"error": {"class": "GenericError", "desc": "Refcount width must be a power of two and may not exceed 64 bits"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index a2dfe79d86..69b6504f67 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -202,3 +202,4 @@
+ 203 rw auto
+ 204 rw auto quick
+ 205 rw auto quick
++206 rw auto
 -- 
 2.13.6
