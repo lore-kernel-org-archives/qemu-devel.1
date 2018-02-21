@@ -1,40 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoXhR-00018Y-Tb
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:56:59 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eoXia-0001pm-4p
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:58:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoXhO-0007E2-QH
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:56:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45688)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eoXiU-0007Wg-Bo
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:58:08 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39910)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1eoXhO-0007DX-92
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:56:54 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eoXiU-0007AW-35
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:58:02 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1LGudFK016248
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 11:56:52 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9bjbkcws-1
+	w1LGueHF021451
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 11:56:42 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9cprg49k-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 11:56:52 -0500
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 11:56:41 -0500
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Wed, 21 Feb 2018 16:51:23 -0000
-Date: Wed, 21 Feb 2018 17:51:19 +0100
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-In-Reply-To: <20180221163459.50829ebf.cohuck@redhat.com>
-References: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1519152302-19079-4-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<20180221163459.50829ebf.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20180221175119.4223dacd@p-imbrenda.boeblingen.de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] s390x/sclp: extend SCLP event masks
- to 64 bits
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 21 Feb 2018 16:56:36 -0000
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 21 Feb 2018 17:56:28 +0100
+Message-Id: <20180221165628.78946-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/1] 390x/cpumodel: document S390FeatDef.bit
+ not applicable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,156 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: David Hildenbrand <david@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-On Wed, 21 Feb 2018 16:34:59 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+The 'bit' field of the 'S390FeatDef' structure is not applicable to all
+its instances. Currently this field is not applicable, and remains
+unused, iff the feature is of type S390_FEAT_TYPE_MISC. Having the value 0
+specified for multiple such feature definition  was a little confusing,
+as it's a perfectly legit bit value, and as the value of the bit
+field is usually ought to be unique for each feature of a given
+feature type.
 
-> On Tue, 20 Feb 2018 19:45:02 +0100
-> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
-> 
-> > Extend the SCLP event masks to 64 bits. This will make us future
-> > proof against future extensions of the architecture.
-> > 
-> > Notice that using any of the new bits results in a state that
-> > cannot be migrated to an older version.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-> > ---
-> >  hw/s390x/event-facility.c         | 43
-> > +++++++++++++++++++++++++++++++++------
-> > include/hw/s390x/event-facility.h |  2 +- 2 files changed, 38
-> > insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> > index f6f28fd..e71302a 100644
-> > --- a/hw/s390x/event-facility.c
-> > +++ b/hw/s390x/event-facility.c
-> > @@ -30,7 +30,10 @@ struct SCLPEventFacility {
-> >      SysBusDevice parent_obj;
-> >      SCLPEventsBus sbus;
-> >      /* guest' receive mask */
-> > -    sccb_mask_t receive_mask;
-> > +    union {
-> > +        uint32_t receive_mask_compat32;
-> > +        sccb_mask_t receive_mask;
-> > +    };
-> >      /*
-> >       * when false, we keep the same broken, backwards compatible
-> > behaviour as
-> >       * before; when true, we implement the architecture correctly.
-> > Needed for @@ -261,7 +264,7 @@ static void
-> > read_event_data(SCLPEventFacility *ef, SCCB *sccb) case
-> > SCLP_SELECTIVE_READ: copy_mask((uint8_t
-> > *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
-> > sizeof(sclp_active_selection_mask), ef->mask_length);
-> > -        sclp_active_selection_mask =
-> > be32_to_cpu(sclp_active_selection_mask);
-> > +        sclp_active_selection_mask =
-> > be64_to_cpu(sclp_active_selection_mask);  
-> 
-> Would it make sense to introduce a wrapper that combines copy_mask()
-> and the endianness conversion (just in case you want to extend this
-> again in the future?
+Let us introduce a specialized macro for defining features of type
+S390_FEAT_TYPE_MISC so, that one does not have to specify neither bit nor
+type (as the later is implied).
 
-maybe? but then we'd need to change the scalars into bitmasks, and the
-whole thing would have to be rewritten anyway.
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+---
 
-> >          if (!sclp_cp_receive_mask ||
-> >              (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
-> >              sccb->h.response_code =
-> > @@ -301,13 +304,13 @@ static void
-> > write_event_mask(SCLPEventFacility *ef, SCCB *sccb) /* keep track
-> > of the guest's capability masks */ copy_mask((uint8_t *)&tmp_mask,
-> > WEM_CP_RECEIVE_MASK(we_mask, mask_length), sizeof(tmp_mask),
-> > mask_length);
-> > -    ef->receive_mask = be32_to_cpu(tmp_mask);
-> > +    ef->receive_mask = be64_to_cpu(tmp_mask);
-> >  
-> >      /* return the SCLP's capability masks to the guest */
-> > -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-> > +    tmp_mask = cpu_to_be64(get_host_receive_mask(ef));
-> >      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t
-> > *)&tmp_mask, mask_length, sizeof(tmp_mask));
-> > -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-> > +    tmp_mask = cpu_to_be64(get_host_send_mask(ef));
-> >      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t
-> > *)&tmp_mask, mask_length, sizeof(tmp_mask));
-> >  
-> > @@ -368,6 +371,21 @@ static void command_handler(SCLPEventFacility
-> > *ef, SCCB *sccb, uint64_t code) }
-> >  }
-> >  
-> > +static bool vmstate_event_facility_mask64_needed(void *opaque)
-> > +{
-> > +    SCLPEventFacility *ef = opaque;
-> > +
-> > +    return (ef->receive_mask & 0xFFFFFFFF) != 0;
-> > +}
-> > +
-> > +static int vmstate_event_facility_mask64_pre_load(void *opaque)
-> > +{
-> > +    SCLPEventFacility *ef = opaque;
-> > +
-> > +    ef->receive_mask &= ~0xFFFFFFFFULL;
-> > +    return 0;
-> > +}
-> > +
-> >  static bool vmstate_event_facility_mask_length_needed(void *opaque)
-> >  {
-> >      SCLPEventFacility *ef = opaque;
-> > @@ -383,6 +401,18 @@ static int
-> > vmstate_event_facility_mask_length_pre_load(void *opaque) return 0;
-> >  }
-> >  
-> > +static const VMStateDescription vmstate_event_facility_mask64 = {
-> > +    .name = "vmstate-event-facility/mask64",
-> > +    .version_id = 0,
-> > +    .minimum_version_id = 0,
-> > +    .needed = vmstate_event_facility_mask64_needed,
-> > +    .pre_load = vmstate_event_facility_mask64_pre_load,
-> > +    .fields = (VMStateField[]) {
-> > +        VMSTATE_UINT64(receive_mask, SCLPEventFacility),
-> > +        VMSTATE_END_OF_LIST()
-> > +     }
-> > +};
-> > +  
-> 
-> Are there plans for extending this beyond 64 bits? Would it make sense
+v1 -> v2
+* Specialized feature initializer macro for type MISC that does not
+  require a bit value instead of defining a 'not a bit number' (that
+  is extremal) bit number.
+---
+ target/s390x/cpu_features.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-I don't know. I'm not even aware of anything above 32 bits, but since we
-are already using all of the first 32 bits, it's only matter of time I
-guess :)
-
-> to use the maximum possible size for the mask here, so you don't need
-> to introduce yet another vmstate in the future? (If it's unlikely that
-
-That's true, but it requires changing simple scalars into bitmasks.
-Surely doable, but I wanted to touch as little as possible.
-
-> the mask will ever move beyond 64 bit, that might be overkill, of
-> course.)
-> 
-> >  static const VMStateDescription vmstate_event_facility_mask_length
-> > = { .name = "vmstate-event-facility/mask_length",
-> >      .version_id = 0,
-> > @@ -401,10 +431,11 @@ static const VMStateDescription
-> > vmstate_event_facility = { .version_id = 0,
-> >      .minimum_version_id = 0,
-> >      .fields = (VMStateField[]) {
-> > -        VMSTATE_UINT32(receive_mask, SCLPEventFacility),
-> > +        VMSTATE_UINT32(receive_mask_compat32, SCLPEventFacility),
-> >          VMSTATE_END_OF_LIST()
-> >       },
-> >      .subsections = (const VMStateDescription * []) {
-> > +        &vmstate_event_facility_mask64,
-> >          &vmstate_event_facility_mask_length,
-> >          NULL
-> >       }  
-> 
-> So what happens for compat machines? They can't ever set bits beyond
-> 31 IIUC?
-
-correct. compat machines are limited to exactly 32 bits anyway, as per
-old broken behaviour. (this is ensured in the first patch of the series)
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index a5619f2893..3b9e2745e9 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -23,6 +23,10 @@
+         .desc = _desc,                               \
+     }
+ 
++/* S390FeatDef.bit is not applicable as there is no feature block. */
++#define FEAT_INIT_MISC(_name, _desc)                 \
++            FEAT_INIT(_name, S390_FEAT_TYPE_MISC, 0, _desc)
++
+ /* indexed by feature number for easy lookup */
+ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("esan3", S390_FEAT_TYPE_STFL, 0, "Instructions marked as n3"),
+@@ -123,8 +127,8 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("ib", S390_FEAT_TYPE_SCLP_CPU, 42, "SIE: Intervention bypass facility"),
+     FEAT_INIT("cei", S390_FEAT_TYPE_SCLP_CPU, 43, "SIE: Conditional-external-interception facility"),
+ 
+-    FEAT_INIT("dateh2", S390_FEAT_TYPE_MISC, 0, "DAT-enhancement facility 2"),
+-    FEAT_INIT("cmm", S390_FEAT_TYPE_MISC, 0, "Collaborative-memory-management facility"),
++    FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
++    FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
+ 
+     FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
+     FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
+-- 
+2.13.5
