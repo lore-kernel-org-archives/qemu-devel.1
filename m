@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44299)
+Received: from eggs.gnu.org ([208.118.235.92]:41122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoe3N-0001qb-5R
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 18:45:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1eoe5a-0002s7-Mt
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 18:47:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eoe2J-0008Mf-4Q
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 18:44:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1eoe3a-0001ce-1P
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 18:46:18 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 21 Feb 2018 17:39:51 -0600
-Message-Id: <20180221233953.5142-2-eblake@redhat.com>
+Date: Wed, 21 Feb 2018 17:39:52 -0600
+Message-Id: <20180221233953.5142-3-eblake@redhat.com>
 In-Reply-To: <20180221233953.5142-1-eblake@redhat.com>
 References: <20180221233953.5142-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] qcow2: Prefer byte-based calls into
- bs->file
+Subject: [Qemu-devel] [PATCH v2 2/3] qcow2: Don't allow overflow during
+ cluster allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +23,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, berto@igalia.com, Max Reitz <mreitz@redhat.com>
 
-We had only three sector-based stragglers left; convert them to use
-our preferred byte-based accesses.
+Our code was already checking that we did not attempt to
+allocate more clusters than what would fit in an INT64 (the
+physical maximimum if we can access a full off_t's worth of
+data).  But this does not catch smaller limits enforced by
+various spots in the qcow2 image description: L1 and normal
+clusters of L2 are documented as having bits 63-56 reserved
+for other purposes, capping our maximum offset at 64PB (bit
+55 is the maximum bit set).  And for compressed images with
+2M clusters, the cap drops the maximum offset to bit 48, or
+a maximum offset of 512TB.  If we overflow that offset, we
+would write compressed data into one place, but try to
+decompress from another, which won't work.
+
+I don't have 512TB handy to prove whether things break if we
+compress so much data that we overflow that limit, and don't
+think that iotests can (quickly) test it either.  Test 138
+comes close (it corrupts an image into thinking something lives
+at 32PB, which is half the maximum for L1 sizing - although
+it relies on 512-byte clusters).  But that test points out
+that we will generally hit other limits first (such as running
+out of memory for the refcount table, or exceeding file system
+limits like 16TB on ext4, etc), so this is more a theoretical
+safety valve than something likely to be hit.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-
 ---
-v2: indentation fix
----
- block/qcow2-cluster.c  | 5 ++---
- block/qcow2-refcount.c | 6 +++---
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ block/qcow2.h          |  6 ++++++
+ block/qcow2-refcount.c | 20 +++++++++++++-------
+ 2 files changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index e406b0f3b9e..85be7d5e340 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1615,13 +1615,12 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
-         }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 883802241fb..560008c331d 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -41,6 +41,12 @@
+ #define QCOW_MAX_CRYPT_CLUSTERS 32
+ #define QCOW_MAX_SNAPSHOTS 65536
 
-         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
--        ret = bdrv_read(bs->file, coffset >> 9, s->cluster_data,
--                        nb_csectors);
-+        ret = bdrv_pread(bs->file, coffset, s->cluster_data, csize);
-         if (ret < 0) {
-             return ret;
-         }
-         if (decompress_buffer(s->cluster_cache, s->cluster_size,
--                              s->cluster_data + sector_offset, csize) < 0) {
-+                              s->cluster_data, csize) < 0) {
-             return -EIO;
-         }
-         s->cluster_cache_offset = coffset;
++/* Field widths in qcow2 mean normal cluster offsets cannot reach
++ * 64PB; depending on cluster size, compressed clusters can have a
++ * smaller limit (64PB for up to 16k clusters, then ramps down to
++ * 512TB for 2M clusters).  */
++#define QCOW_MAX_CLUSTER_OFFSET ((1ULL << 56) - 1)
++
+ /* 8 MB refcount table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+ #define QCOW_MAX_REFTABLE_SIZE 0x800000
 diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index d46b69d7f34..28afbb1b5ea 100644
+index 28afbb1b5ea..58c19789a22 100644
 --- a/block/qcow2-refcount.c
 +++ b/block/qcow2-refcount.c
-@@ -2310,8 +2310,8 @@ write_refblocks:
-         on_disk_refblock = (void *)((char *) *refcount_table +
-                                     refblock_index * s->cluster_size);
+@@ -31,7 +31,8 @@
+ #include "qemu/bswap.h"
+ #include "qemu/cutils.h"
 
--        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
--                         on_disk_refblock, s->cluster_sectors);
-+        ret = bdrv_pwrite(bs->file, refblock_offset, on_disk_refblock,
-+                          s->cluster_size);
-         if (ret < 0) {
-             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-ret));
-             goto fail;
-@@ -2533,7 +2533,7 @@ fail:
-  * - 0 if writing to this offset will not affect the mentioned metadata
-  * - a positive QCow2MetadataOverlap value indicating one overlapping section
-  * - a negative value (-errno) indicating an error while performing a check,
-- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
-+ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
-  */
- int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
-                                  int64_t size)
+-static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size);
++static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size,
++                                    uint64_t max);
+ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+                             int64_t offset, int64_t length, uint64_t addend,
+                             bool decrease, enum qcow2_discard_type type);
+@@ -362,7 +363,8 @@ static int alloc_refcount_block(BlockDriverState *bs,
+     }
+
+     /* Allocate the refcount block itself and mark it as used */
+-    int64_t new_block = alloc_clusters_noref(bs, s->cluster_size);
++    int64_t new_block = alloc_clusters_noref(bs, s->cluster_size,
++                                             QCOW_MAX_CLUSTER_OFFSET);
+     if (new_block < 0) {
+         return new_block;
+     }
+@@ -947,7 +949,8 @@ int qcow2_update_cluster_refcount(BlockDriverState *bs,
+
+
+ /* return < 0 if error */
+-static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size)
++static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size,
++                                    uint64_t max)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t i, nb_clusters, refcount;
+@@ -972,9 +975,9 @@ retry:
+     }
+
+     /* Make sure that all offsets in the "allocated" range are representable
+-     * in an int64_t */
++     * in the requested max */
+     if (s->free_cluster_index > 0 &&
+-        s->free_cluster_index - 1 > (INT64_MAX >> s->cluster_bits))
++        s->free_cluster_index - 1 > (max >> s->cluster_bits))
+     {
+         return -EFBIG;
+     }
+@@ -994,7 +997,7 @@ int64_t qcow2_alloc_clusters(BlockDriverState *bs, uint64_t size)
+
+     BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
+     do {
+-        offset = alloc_clusters_noref(bs, size);
++        offset = alloc_clusters_noref(bs, size, QCOW_MAX_CLUSTER_OFFSET);
+         if (offset < 0) {
+             return offset;
+         }
+@@ -1076,7 +1079,10 @@ int64_t qcow2_alloc_bytes(BlockDriverState *bs, int size)
+     free_in_cluster = s->cluster_size - offset_into_cluster(s, offset);
+     do {
+         if (!offset || free_in_cluster < size) {
+-            int64_t new_cluster = alloc_clusters_noref(bs, s->cluster_size);
++            int64_t new_cluster;
++
++            new_cluster = alloc_clusters_noref(bs, s->cluster_size,
++                                               (1ULL << s->csize_shift) - 1);
+             if (new_cluster < 0) {
+                 return new_cluster;
+             }
 -- 
 2.14.3
