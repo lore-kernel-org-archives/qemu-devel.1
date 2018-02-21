@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoX5I-0002dT-VC
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:17:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1eoX9c-0004JF-VJ
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:22:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoX5E-0002Xv-1v
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:17:32 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59446 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoX5D-0002Xl-SE
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:17:27 -0500
-Date: Wed, 21 Feb 2018 16:17:18 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180221161718.GB21436@stefanha-x1.localdomain>
-References: <20180124053957.29145-1-peterx@redhat.com>
-	<20180124053957.29145-11-peterx@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eoX9c-0005CR-0D
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 11:22:00 -0500
+References: <20180208192328.16550-1-kwolf@redhat.com>
+	<20180208192328.16550-12-kwolf@redhat.com>
+	<ab90d9c1-ea99-9a21-7303-e26af2796d22@redhat.com>
+	<20180221102954.GA4196@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cc255826-ca6b-eeb8-6a2d-45eddedc0bde@redhat.com>
+Date: Wed, 21 Feb 2018 10:21:52 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="f2QGlHpHGjS2mn6Y"
-Content-Disposition: inline
-In-Reply-To: <20180124053957.29145-11-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 10/23] qmp: introduce QMPCapability
+In-Reply-To: <20180221102954.GA4196@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/27] block: x-blockdev-create QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
+On 02/21/2018 04:29 AM, Kevin Wolf wrote:
 
---f2QGlHpHGjS2mn6Y
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+>>> +++ b/include/block/block_int.h
+>>> @@ -130,6 +130,8 @@ struct BlockDriver {
+>>>        int (*bdrv_file_open)(BlockDriverState *bs, QDict *options, int flags,
+>>>                              Error **errp);
+>>>        void (*bdrv_close)(BlockDriverState *bs);
+>>> +    int coroutine_fn (*bdrv_co_create)(BlockdevCreateOptions *opts,
+>>> +                                       Error **errp);
+>>
+>> I know we haven't been very good in the past, but can you add a comment here
+>> on the contract that drivers are supposed to obey when implementing this
+>> callback?
+> 
+> Anything specific you want to see here?
+> 
+> Essentially the meaning of BlockdevCreateOptions depends on the driver
+> and is documented in the QAPI schema, how Error works is common
+> knowledge, and I don't see much else to explain here.
+> 
+> I mean, I can add something like "Creates an image. See the QAPI
+> documentation for BlockdevCreateOptions for details." if you think this
+> is useful. But is it?
 
-On Wed, Jan 24, 2018 at 01:39:44PM +0800, Peter Xu wrote:
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 5c06745c79..2490d5188e 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -102,21 +102,47 @@
->  #
->  # Enable QMP capabilities.
->  #
-> -# Arguments: None.
-> +# Arguments:
-> +#
-> +# @enable:    List of QMPCapabilities to enable, which is optional.
-> +#             Client must not enable any capability that is not
-> +#             mentioned in QMP greeting message.
+I guess my concern is whether this interface MUST overwrite any existing 
+data in order to convert existing storage into a newly-created image of 
+this driver's type (even if the overwritten data previously probed as a 
+different image type), or if it is only called at a point when any 
+existing data would be probed as raw, or any other useful tidbits that a 
+driver might need to know in implementing it.  But if all you can think 
+of is "See QAPI for BlockdevCreateOptions for details", then yeah, 
+that's not worth a comment.
 
-qapi-schema.json uses full sentences so I've added missing articles to
-the text.  I also changed s/QMPCapabilities/QMPCapability values/ to
-avoid confusion about the type name:
+> 
+>>> +    /* Call callback if it exists */
+>>> +    if (!drv->bdrv_co_create) {
+>>> +        error_setg(errp, "Driver does not support blockdev-create");
+>>
+>> Should this error message refer to 'x-blockdev-create' in the short term?
+> 
+> Hm, it would be more correct. On the other hand, I'm almost sure we'd
+> forget to rename it back when we remove the x- prefix...
 
-  An optional list of QMPCapability values to enable.  The client must
-  not enable any capability that is not mentioned in the QMP greeting
-  message.
+Good point.  And being an x- prefix implies that inconsistency may be 
+expected (not to mention short-lived, if we promote the interface); 
+while being consistent now but risking long-term inconsistency down the 
+road when it actually becomes a stable interface is indeed worse.  So 
+keep this message as-is.
 
->  #
->  # Example:
->  #
-> -# -> { "execute": "qmp_capabilities" }
-> +# -> { "execute": "qmp_capabilities",
-> +#      "arguments": { "enable": [ "oob" ] } }
->  # <- { "return": {} }
->  #
->  # Notes: This command is valid exactly when first connecting: it must be
->  # issued before any other command will be accepted, and will fail once the
->  # monitor is accepting other commands. (see qemu docs/interop/qmp-spec.txt)
->  #
-> +# QMP client needs to explicitly enable QMP capabilities, otherwise
-
-s/QMP client/The QMP client/
-
---f2QGlHpHGjS2mn6Y
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJajZuOAAoJEJykq7OBq3PIrSkIAJoBi8XVrcKlBHdgx5pc3IVo
-KNNvW7XfEZRBnBOyAT91mxhwpIrbdWBfbeKNKLIeAS5WpFTrAki4r4ZejY7GBFGS
-O6XE13ZEgjDPfABM5atKD/CXi7rJlic9u3IKtqINwQf3IFRgqQQ+Ypm+uwYUuBEA
-WE1ZDD7CSoVY1ii/Awuh9LYk9nFcuLuIthk6bILg0WHFjeGxVydXZmbZ604Q9GO3
-pu+h+yyf6qDPX5GEZWVh0xsffRaV7WHnYZCXeBggtoxWR9W055QWLNvVORJ/oqM2
-oU1f9XQbKdPjaKxoQDsgv3V84IlivICs7OqfO6agpQ3SmL4oKo1BtsFDDus9MDs=
-=RVK9
------END PGP SIGNATURE-----
-
---f2QGlHpHGjS2mn6Y--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
