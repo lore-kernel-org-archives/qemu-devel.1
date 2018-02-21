@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrb-00012y-Tt
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrg-0001CC-9Q
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUra-0002tW-Gs
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUra-0002tb-JT
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:45 +0100
-Message-Id: <20180221135404.27598-18-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:53:48 +0100
+Message-Id: <20180221135404.27598-21-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 17/36] gluster: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH v2 20/36] rbd: Remove non-schema options from
+ runtime_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,266 +23,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to gluster, which enables
-image creation over QMP.
+Instead of the QemuOpts in qemu_rbd_connect(), we want to use QAPI
+objects. As a preparation, fetch those options directly from the QDict
+that .bdrv_open() supports in the rbd driver and that are not in the
+schema.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json |  18 ++++++-
- block/gluster.c      | 135 ++++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 108 insertions(+), 45 deletions(-)
+ block/rbd.c | 55 ++++++++++++++++++++++++-------------------------------
+ 1 file changed, 24 insertions(+), 31 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0040795603..74021c51d7 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3377,6 +3377,22 @@
-             '*nocow':           'bool' } }
+diff --git a/block/rbd.c b/block/rbd.c
+index 4bbcce4eca..2e79c2d1fd 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -326,28 +326,6 @@ static QemuOptsList runtime_opts = {
+         /*
+          * server.* extracted manually, see qemu_rbd_mon_host()
+          */
+-        {
+-            .name = "password-secret",
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of secret providing the password",
+-        },
+-
+-        /*
+-         * Keys for qemu_rbd_parse_filename(), not in the QAPI schema
+-         */
+-        {
+-            /*
+-             * HACK: name starts with '=' so that qemu_opts_parse()
+-             * can't set it
+-             */
+-            .name = "=keyvalue-pairs",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Legacy rados key/value option parameters",
+-        },
+-        {
+-            .name = "filename",
+-            .type = QEMU_OPT_STRING,
+-        },
+         { /* end of list */ }
+     },
+ };
+@@ -546,12 +524,13 @@ out:
  
- ##
-+# @BlockdevCreateOptionsGluster:
-+#
-+# Driver specific image creation options for gluster.
-+#
-+# @location         Where to store the new image file
-+# @size             Size of the virtual disk in bytes
-+# @preallocation    Preallocation mode for the new image (default: off)
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsGluster',
-+  'data': { 'location':         'BlockdevOptionsGluster',
-+            'size':             'size',
-+            '*preallocation':   'PreallocMode' } }
-+
-+##
- # @BlockdevQcow2Version:
- #
- # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-@@ -3450,7 +3466,7 @@
-       'file':           'BlockdevCreateOptionsFile',
-       'ftp':            'BlockdevCreateNotSupported',
-       'ftps':           'BlockdevCreateNotSupported',
--      'gluster':        'BlockdevCreateNotSupported',
-+      'gluster':        'BlockdevCreateOptionsGluster',
-       'host_cdrom':     'BlockdevCreateNotSupported',
-       'host_device':    'BlockdevCreateNotSupported',
-       'http':           'BlockdevCreateNotSupported',
-diff --git a/block/gluster.c b/block/gluster.c
-index 1a07d221d1..6e2f0e3185 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -655,9 +655,11 @@ out:
-     return -errno;
- }
- 
--static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
--                                      const char *filename,
--                                      QDict *options, Error **errp)
-+/* Converts options given in @filename and the @options QDict into the QAPI
-+ * object @gconf. */
-+static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
-+                              const char *filename,
-+                              QDict *options, Error **errp)
+ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+                             char **s_snap, char **s_image_name,
+-                            QDict *options, bool cache, Error **errp)
++                            QDict *options, bool cache,
++                            const char *keypairs, const char *secretid,
++                            Error **errp)
  {
-     int ret;
-     if (filename) {
-@@ -668,8 +670,7 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
-                                     "[host[:port]]volume/path[?socket=...]"
-                                     "[,file.debug=N]"
-                                     "[,file.logfile=/path/filename.log]\n");
--            errno = -ret;
--            return NULL;
-+            return ret;
-         }
-     } else {
-         ret = qemu_gluster_parse_json(gconf, options, errp);
-@@ -685,10 +686,23 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
-                              "file.server.1.transport=unix,"
-                              "file.server.1.socket=/var/run/glusterd.socket ..."
-                              "\n");
--            errno = -ret;
--            return NULL;
-+            return ret;
-         }
-+    }
- 
-+    return 0;
-+}
-+
-+static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
-+                                      const char *filename,
-+                                      QDict *options, Error **errp)
-+{
-+    int ret;
-+
-+    ret = qemu_gluster_parse(gconf, filename, options, errp);
-+    if (ret < 0) {
-+        errno = -ret;
-+        return NULL;
-     }
- 
-     return qemu_gluster_glfs_init(gconf, errp);
-@@ -1021,19 +1035,71 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
-     return 0;
- }
- 
--static int qemu_gluster_create(const char *filename,
--                               QemuOpts *opts, Error **errp)
-+static int qemu_gluster_co_create(BlockdevCreateOptions *options,
-+                                  Error **errp)
- {
--    BlockdevOptionsGluster *gconf;
-+    BlockdevCreateOptionsGluster *opts = &options->u.gluster;
-     struct glfs *glfs;
-     struct glfs_fd *fd = NULL;
-     int ret = 0;
--    PreallocMode prealloc;
--    int64_t total_size = 0;
-+
-+    assert(options->driver == BLOCKDEV_DRIVER_GLUSTER);
-+
-+    glfs = qemu_gluster_glfs_init(opts->location, errp);
-+    if (!glfs) {
-+        ret = -errno;
-+        goto out;
-+    }
-+
-+    fd = glfs_creat(glfs, opts->location->path,
-+                    O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
-+    if (!fd) {
-+        ret = -errno;
-+        goto out;
-+    }
-+
-+    ret = qemu_gluster_do_truncate(fd, opts->size, opts->preallocation, errp);
-+
-+out:
-+    if (fd) {
-+        if (glfs_close(fd) != 0 && ret == 0) {
-+            ret = -errno;
-+        }
-+    }
-+    glfs_clear_preopened(glfs);
-+    return ret;
-+}
-+
-+static int qemu_gluster_create(const char *filename,
-+                               QemuOpts *opts, Error **errp)
-+{
-+    BlockdevCreateOptions *options;
-+    BlockdevCreateOptionsGluster *gopts;
-+    BlockdevOptionsGluster *gconf;
-     char *tmp = NULL;
+     QemuOpts *opts;
+     char *mon_host = NULL;
+-    const char *pool, *snap, *conf, *user, *image_name, *keypairs;
+-    const char *secretid;
++    const char *pool, *snap, *conf, *user, *image_name;
      Error *local_err = NULL;
-+    int ret;
-+
-+    options = g_new0(BlockdevCreateOptions, 1);
-+    options->driver = BLOCKDEV_DRIVER_GLUSTER;
-+    gopts = &options->u.gluster;
+     int r;
  
-     gconf = g_new0(BlockdevOptionsGluster, 1);
-+    gopts->location = gconf;
-+
-+    gopts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                           BDRV_SECTOR_SIZE);
-+
-+    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    gopts->preallocation = qapi_enum_parse(&PreallocMode_lookup, tmp,
-+                                           PREALLOC_MODE_OFF, &local_err);
-+    g_free(tmp);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail;
+@@ -570,14 +549,11 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+         goto failed_opts;
+     }
+ 
+-    secretid = qemu_opt_get(opts, "password-secret");
+-
+     pool           = qemu_opt_get(opts, "pool");
+     conf           = qemu_opt_get(opts, "conf");
+     snap           = qemu_opt_get(opts, "snapshot");
+     user           = qemu_opt_get(opts, "user");
+     image_name     = qemu_opt_get(opts, "image");
+-    keypairs       = qemu_opt_get(opts, "=keyvalue-pairs");
+ 
+     if (!pool || !image_name) {
+         error_setg(errp, "Parameters 'pool' and 'image' are required");
+@@ -662,6 +638,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+     BDRVRBDState *s = bs->opaque;
+     Error *local_err = NULL;
+     const char *filename;
++    char *keypairs, *secretid;
+     int r;
+ 
+     /* If we are given a filename, parse the filename, with precedence given to
+@@ -672,16 +649,28 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+                     "This is an unsupported option, and may be deprecated "
+                     "in the future");
+         qemu_rbd_parse_filename(filename, options, &local_err);
++        qdict_del(options, "filename");
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return -EINVAL;
+         }
+     }
+ 
++    keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
++    if (keypairs) {
++        qdict_del(options, "=keyvalue-pairs");
 +    }
 +
-     gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
-                                            GLUSTER_DEBUG_DEFAULT);
-     if (gconf->debug < 0) {
-@@ -1049,42 +1115,19 @@ static int qemu_gluster_create(const char *filename,
-     }
-     gconf->has_logfile = true;
- 
--    glfs = qemu_gluster_init(gconf, filename, NULL, errp);
--    if (!glfs) {
--        ret = -errno;
--        goto out;
--    }
--
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
--
--    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc = qapi_enum_parse(&PreallocMode_lookup, tmp, PREALLOC_MODE_OFF,
--                               &local_err);
--    g_free(tmp);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        ret = -EINVAL;
--        goto out;
-+    ret = qemu_gluster_parse(gconf, filename, NULL, errp);
-+    if (ret < 0) {
-+        goto fail;
++    secretid = g_strdup(qdict_get_try_str(options, "password-secret"));
++    if (secretid) {
++        qdict_del(options, "password-secret");
++    }
++
+     r = qemu_rbd_connect(&s->cluster, &s->io_ctx, &s->snap, &s->image_name,
+-                         options, !(flags & BDRV_O_NOCACHE), errp);
++                         options, !(flags & BDRV_O_NOCACHE), keypairs, secretid,
++                         errp);
+     if (r < 0) {
+-        return r;
++        goto out;
      }
  
--    fd = glfs_creat(glfs, gconf->path,
--                    O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
--    if (!fd) {
--        ret = -errno;
--        goto out;
-+    ret = qemu_gluster_co_create(options, errp);
-+    if (ret < 0) {
-+        goto fail;
+     /* rbd_open is always r/w */
+@@ -708,13 +697,17 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         }
      }
  
--    ret = qemu_gluster_do_truncate(fd, total_size, prealloc, errp);
--
--out:
--    if (fd) {
--        if (glfs_close(fd) != 0 && ret == 0) {
--            ret = -errno;
--        }
--    }
--    qapi_free_BlockdevOptionsGluster(gconf);
--    glfs_clear_preopened(glfs);
-+    ret = 0;
-+fail:
-+    qapi_free_BlockdevCreateOptions(options);
-     return ret;
+-    return 0;
++    r = 0;
++    goto out;
+ 
+ failed_open:
+     rados_ioctx_destroy(s->io_ctx);
+     g_free(s->snap);
+     g_free(s->image_name);
+     rados_shutdown(s->cluster);
++out:
++    g_free(keypairs);
++    g_free(secretid);
+     return r;
  }
  
-@@ -1436,6 +1479,7 @@ static BlockDriver bdrv_gluster = {
-     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
-     .bdrv_close                   = qemu_gluster_close,
-     .bdrv_create                  = qemu_gluster_create,
-+    .bdrv_co_create               = qemu_gluster_co_create,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
-     .bdrv_truncate                = qemu_gluster_truncate,
-@@ -1464,6 +1508,7 @@ static BlockDriver bdrv_gluster_tcp = {
-     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
-     .bdrv_close                   = qemu_gluster_close,
-     .bdrv_create                  = qemu_gluster_create,
-+    .bdrv_co_create               = qemu_gluster_co_create,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
-     .bdrv_truncate                = qemu_gluster_truncate,
-@@ -1492,6 +1537,7 @@ static BlockDriver bdrv_gluster_unix = {
-     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
-     .bdrv_close                   = qemu_gluster_close,
-     .bdrv_create                  = qemu_gluster_create,
-+    .bdrv_co_create               = qemu_gluster_co_create,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
-     .bdrv_truncate                = qemu_gluster_truncate,
-@@ -1526,6 +1572,7 @@ static BlockDriver bdrv_gluster_rdma = {
-     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
-     .bdrv_close                   = qemu_gluster_close,
-     .bdrv_create                  = qemu_gluster_create,
-+    .bdrv_co_create               = qemu_gluster_co_create,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
-     .bdrv_truncate                = qemu_gluster_truncate,
 -- 
 2.13.6
