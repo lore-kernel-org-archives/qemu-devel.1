@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eoXr1-0007hD-U9
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:06:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eoXrB-0007ou-1g
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:07:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eoXqx-0004Ys-LN
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:06:51 -0500
-Date: Wed, 21 Feb 2018 18:06:38 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1802211754370.60913@zero.eik.bme.hu>
-References: <cover.1519150239.git.balaton@eik.bme.hu>
-	<CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
-	<20180220204450.GA27101@flamenco>
-	<CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1eoXr6-0004gx-1b
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:07:01 -0500
+Date: Wed, 21 Feb 2018 18:06:36 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180221180636.1f9af0bc.cohuck@redhat.com>
+In-Reply-To: <20180221172849.75275b92@p-imbrenda.boeblingen.de.ibm.com>
+References: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1519152302-19079-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<20180221161215.766900c5.cohuck@redhat.com>
+	<20180221172849.75275b92@p-imbrenda.boeblingen.de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH 0/2] Firmware blob and git submodule for
- Sam460ex
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] s390x/sclp: proper support of
+ larger send and receive masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +26,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-On Wed, 21 Feb 2018, Peter Maydell wrote:
-> On 20 February 2018 at 20:44, Emilio G. Cota <cota@braap.org> wrote:
->> On Tue, Feb 20, 2018 at 18:31:17 +0000, Peter Maydell wrote:
->>> On 20 February 2018 at 18:10, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->>>> I've created a git repo for the Sam460ex u-boot sources and this adds
->>>> that as a submodule and a separate patch to add the binary built from
->>>> these sources. Feel free to keep this as two patches, squash them into
->>>> one patch or take the git repo and commit the content under the QEMU
->>>> repo and use that as a submodule as you see fit (or let me know if any
->>>> changes are needed for these patches).
->>>>
->>>> BALATON Zoltan (2):
->>>>   roms: Added git submodule for u-boot-sam460 (firmware for sam460ex)
->>>>   pc-bios: Added u-boot-sam460 firmware binary
->>>
->>> We already have a submodule for u-boot. Is it not possible to
->>> build this bios blob from those upstream u-boot sources?
->>
->> This is discussed in the following thread:
->>   Re: [Qemu-ppc] [PATCH v3 2/2] ppc: Add aCube Sam460ex board
->>   http://lists.gnu.org/archive/html/qemu-ppc/2018-02/msg00268.html
->
-> If upstream u-boot have abandoned the board support I'm not very
-> enthusiastic about our taking it on :-(
+On Wed, 21 Feb 2018 17:28:49 +0100
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
 
-It's not that upstream u-boot has abandoned board support (it only removed 
-support for the PPC440 CPU it once had). The board itself never had 
-support in upstream u-boot, it only exists in vendor's fork which is the 
-reason we need a separate source and cannot use upstream u-boot source we 
-already have.
+> On Wed, 21 Feb 2018 16:12:59 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Tue, 20 Feb 2018 19:45:00 +0100
+> > Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
+> >   
+> > > The architecture allows the guests to ask for masks up to 1021
+> > > bytes in length. Part was fixed in
+> > > 67915de9f0383ccf4ab8c42dd02aa18dcd79b411 ("s390x/event-facility:
+> > > variable-length event masks"), but some issues were still
+> > > remaining, in particular regarding the handling of selective reads.
+> > > 
+> > > This patch fixes the handling of selective reads, whose size will
+> > > now match the length of the event mask, as per architecture.
+> > > 
+> > > The default behaviour is to be compliant with the architecture, but
+> > > when using older machine models the old behaviour is selected, in
+> > > order to be able to migrate toward older versions.    
+> > 
+> > I remember trying to do this back when I still had access to the
+> > architecture, but somehow never finished this (don't remember why).
+> >   
+> > > 
+> > > Fixes: 67915de9f0383ccf4a ("s390x/event-facility: variable-length
+> > > event masks")    
+> > 
+> > Doesn't that rather fix the initial implementation? What am I missing?  
+> 
+> well that too. but I think this fixes the fix, since the fix was
+> incomplete?
+> 
+> > > Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> > > ---
+> > >  hw/s390x/event-facility.c  | 90
+> > > +++++++++++++++++++++++++++++++++++++++-------
+> > > hw/s390x/s390-virtio-ccw.c |  8 ++++- 2 files changed, 84
+> > > insertions(+), 14 deletions(-)
+> > > 
+> > > diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> > > index 155a694..2414614 100644
+> > > --- a/hw/s390x/event-facility.c
+> > > +++ b/hw/s390x/event-facility.c
+> > > @@ -31,6 +31,14 @@ struct SCLPEventFacility {
+> > >      SCLPEventsBus sbus;
+> > >      /* guest' receive mask */
+> > >      unsigned int receive_mask;
+> > > +    /*
+> > > +     * when false, we keep the same broken, backwards compatible
+> > > behaviour as
+> > > +     * before; when true, we implement the architecture correctly.
+> > > Needed for
+> > > +     * migration toward older versions.
+> > > +     */
+> > > +    bool allow_all_mask_sizes;    
+> > 
+> > The comment does not really tell us what the old behaviour is ;)  
+> 
+> hmm, I'll fix that
+> 
+> > So, if this is about extending the mask size, call this
+> > "allow_large_masks" or so?  
+> 
+> no, the old broken behaviour allowed only _exactly_ 4 bytes:
+> 
+> if (be16_to_cpu(we_mask->mask_length) != 4) {
+>      sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
+>      goto out;
+> }
 
-In my opinion we don't aim to take on support for this board in u-boot, we 
-only need to include the firmware binary for the emulation to be useful 
-which then requires us to also include the source for the GPL it's 
-licensed under. I've also found a few bugs in the firmware which I've 
-fixed but apart from such occasional bug fixes when needed I don't expect 
-to take over support for the board from the hardware vendor so this source 
-is only so we can include the firmware binary which is needed for the 
-board emulation. Does this answer your concerns?
+Hm, I can't seem to find this in the code?
 
-Regards,
-BALATON Zoltan
+> 
+> With the 67915de9f0383ccf4a patch mentioned above, we allow any size,
+> but we don't keep track of the size itself, only the bits. This is a
+> problem for selective reads (see below)
+
+Oh, you meant before that patch...
+
+> 
+> > > +    /* length of the receive mask */
+> > > +    uint16_t mask_length;
+> > >  };
+> > >  
+> > >  /* return true if any child has event pending set */
+> > > @@ -220,6 +228,17 @@ static uint16_t
+> > > handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb, return
+> > > rc; }
+> > >  
+> > > +/* copy up to dst_len bytes and fill the rest of dst with zeroes */
+> > > +static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
+> > > +                      uint16_t src_len)
+> > > +{
+> > > +    int i;
+> > > +
+> > > +    for (i = 0; i < dst_len; i++) {
+> > > +        dst[i] = i < src_len ? src[i] : 0;
+> > > +    }
+> > > +}
+> > > +
+> > >  static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+> > >  {
+> > >      unsigned int sclp_active_selection_mask;
+> > > @@ -240,7 +259,9 @@ static void read_event_data(SCLPEventFacility
+> > > *ef, SCCB *sccb) sclp_active_selection_mask = sclp_cp_receive_mask;
+> > >          break;
+> > >      case SCLP_SELECTIVE_READ:
+> > > -        sclp_active_selection_mask = be32_to_cpu(red->mask);
+> > > +        copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t
+> > > *)&red->mask,
+> > > +                  sizeof(sclp_active_selection_mask),
+> > > ef->mask_length);
+> > > +        sclp_active_selection_mask =
+> > > be32_to_cpu(sclp_active_selection_mask);    
+> > 
+> > Hm, this looks like a real bug fix for the commit referenced above.
+> > Split this out? We don't need compat support for that; maybe even
+> > cc:stable?  
+> 
+> I think we do. We can avoid keeping track of the mask size when setting
+> the mask size, because we can simply take the bits we need and ignore
+> the rest. But for selective reads we need the mask size, so we have to
+> keep track of it. (selective reads specify a mask, but not a mask
+> length, the mask length is the length of the last mask set)
+
+OK, that's non-obvious without documentation :/
+
+> 
+> And now we have additional state that we need to copy around when
+> migrating. And we don't want to break older machines! Moreover a
+> "new" guest started on a new qemu but with older machine version should
+> still be limited to 4 bytes, so we can migrate it to an actual older
+> version of qemu.
+> 
+> If a "new" guest uses a larger (or shorter!) mask then we can't migrate
+> it back to an older version of qemu. New guests that support masks of
+> size != 4 also still need to support the case where only size == 4 is
+> allowed, otherwise they will not work at all on actual old versions of
+> qemu.
+> 
+> So fixing selective reads needs compat support. 
+
+Agreed.
+
+> 
+> > (Not sure what the consequences are here, other than unwanted bits at
+> > the end; can't say without doc.)  
+> 
+> yes: if the mask is longer, we ignore bits, and we should give back an
+> error if selective read asks for bits that are not in the receive mask.
+> 
+> If the mask is shorter, we risk considering bits that we are instead
+> supposed to ignore. 
+> 
+> > >          if (!sclp_cp_receive_mask ||
+> > >              (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
+> > >              sccb->h.response_code =
+> > > @@ -259,24 +280,14 @@ out:
+> > >      return;
+> > >  }
+> > >  
+> > > -/* copy up to dst_len bytes and fill the rest of dst with zeroes */
+> > > -static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
+> > > -                      uint16_t src_len)
+> > > -{
+> > > -    int i;
+> > > -
+> > > -    for (i = 0; i < dst_len; i++) {
+> > > -        dst[i] = i < src_len ? src[i] : 0;
+> > > -    }
+> > > -}
+> > > -
+> > >  static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+> > >  {
+> > >      WriteEventMask *we_mask = (WriteEventMask *) sccb;
+> > >      uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
+> > >      uint32_t tmp_mask;
+> > >  
+> > > -    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX)) {
+> > > +    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
+> > > +        ((mask_length != 4) && !ef->allow_all_mask_sizes)) {    
+> > 
+> > This is a behaviour change, isn't it? Previously, we allowed up to 4
+> > bytes, now we allow exactly 4 bytes?  
+> 
+> no, we allowed only exactly 4 bytes, see above :)
+
+This really needs more explanation in the patch description. Much of
+this is really hard to understand without either that or access to the
+documentation.
+
+> 
+> > >          sccb->h.response_code =
+> > > cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH); goto out;
+> > >      }    
+> >   
+> 
