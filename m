@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eoYMX-00053N-AA
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoYMg-00058Q-Hg
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eoYMU-00058n-5U
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:25 -0500
-Date: Wed, 21 Feb 2018 18:39:18 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180221183918.7cc4fad1.cohuck@redhat.com>
-In-Reply-To: <aeb36cb1-aadf-6146-9e59-549998538db1@redhat.com>
-References: <20180219174231.10874-1-david@redhat.com>
-	<493dbfb3-086b-cc89-2d8d-4298345c6bb2@de.ibm.com>
-	<ef55dc18-971f-b012-40cc-0c32f24664cf@redhat.com>
-	<20180220155759.17dfd955.cohuck@redhat.com>
-	<aeb36cb1-aadf-6146-9e59-549998538db1@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1eoYMd-0005DP-Bv
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:39:34 -0500
+Date: Wed, 21 Feb 2018 18:39:26 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180221173926.GB353@localhost.localdomain>
+References: <20180220222459.8461-1-eblake@redhat.com>
+	<20180220222459.8461-3-eblake@redhat.com>
+	<20180221165116.GB4196@localhost.localdomain>
+	<aed232fa-af26-5994-0bed-ec84a514b645@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug
- support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aed232fa-af26-5994-0bed-ec84a514b645@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: Avoid memory over-allocation on
+ compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, berto@igalia.com
 
-On Tue, 20 Feb 2018 16:05:54 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 20.02.2018 15:57, Cornelia Huck wrote:
-> > On Tue, 20 Feb 2018 13:16:37 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 20.02.2018 13:05, Christian Borntraeger wrote:  
-> >>>
-> >>>
-> >>> On 02/19/2018 06:42 PM, David Hildenbrand wrote:    
-> >>>> From an architecture point of view, nothing can be mapped into the address
-> >>>> space on s390x. All there is is memory. Therefore there is also not really
-> >>>> an interface to communicate such information to the guest. All we can do is
-> >>>> specify the maximum ram address and guests can probe in that range if
-> >>>> memory is available and usable (TPROT).    
-> >>>
-> >>> In fact there is an interface in SCLP that describes the memory sizes (maximum in 
-> >>> read scp info) and the details (read_storage_element0_info).  I am asking myself
-> >>> if we should re-introduce read_storage_element_info and use that to avoid tprot    
-> >>
-> >> Yes, we could do that (basically V1 of this patch) but have to glue it
-> >> to the a compatibility machine then.  
+Am 21.02.2018 um 17:59 hat Eric Blake geschrieben:
+> On 02/21/2018 10:51 AM, Kevin Wolf wrote:
+> > Am 20.02.2018 um 23:24 hat Eric Blake geschrieben:
+> > > When reading a compressed image, we were allocating s->cluster_data
+> > > to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
+> > > with 2M clusters).  Let's check out the history:
+> > > 
+> 
+> > > Much later, in commit de82815d (v2.2), we noticed that a 64M
+> > > allocation is prone to failure, so we switched over to a graceful
+> > > memory allocation error message.  But note that elsewhere in the
+> > > code, we do g_malloc(2 * cluster_size) without ever checking for
+> > > failure.
+> > > 
+> 
+> > > -        }
+> > > -        if (!s->cluster_cache) {
+> > > -            s->cluster_cache = g_malloc(s->cluster_size);
+> > > +            assert(!s->cluster_cache);
 > > 
-> > Actually, this makes quite a bit of sense (introduce the interface for
-> > everyone in 2.12 and turn it off in compat machines).  
-> 
-> Jup, either 2.12 or 2.13, no need to hurry.
-> 
+> > Wouldn't it be better to assert (!!s->cluster_cache ==
+> > !!s->cluster_data) unconditionally?
 > > 
-> > Does real hardware have configurations where you can get the memory
-> > sizes, but not the attach/deattach support? (Hardware with the feature,
-> > but no standby memory defined?)  
 > 
-> I would guess that "0" for standby memory is valid but only people with
-> access to documentation can answer that :)
-
-So, should we go with this patch now and re-introduce the read
-functions if the above is indeed true?
-
+> Sure.
 > 
-> >> Interesting, didn't know about that. Will rephrase then to
-> >>
-> >> "While the hypervisor can deny to online an increment, all increments
-> >> have to be predefined and there is no way of telling the guest about a
-> >> newly "hotplugged" increment."  
+> > > +            s->cluster_data = g_try_malloc(s->cluster_size);
 > > 
-> > Rephrase which part? :)  
+> > Why are you going from qemu_try_blockalign() to simple malloc here? This
+> > buffer is used with bdrv_read() (or bdrv_pread() after patch 1), so we
+> > should avoid unnecessary use of a bounce buffer.
 > 
-> "And nobody can really hinder it from doing so."
+> But does bdrv_pread() actually need to use a bounce buffer if we don't have
+> an aligned buffer to read into?  Either the underlying protocol already
+> supports byte-aligned reads (direct into our buffer, regardless of
+> alignment, no bouncing required), or it already has do to a full sector read
+> into a bounce buffer anyways (and it doesn't matter whether we aligned our
+> buffer).  blockalign() made sense when we had multiple clients for the
+> buffer, but ever since v1.1, when we have only a single client, and that
+> single client is most likely not going to read sector-aligned data in the
+> first place, aligning the buffer doesn't buy us anything.
 
-OK.
+Good point.
+
+To be honest, I don't even analyse each caller, but just consistently use
+qemu_try_blockalign() whenever a buffer is used for I/O. It's a simple
+rule of thumb that generally makes sense.
+
+So as you say, in this case it's unlikely, but possible that we can
+benefit from an aligned buffer. I guess my point is more about
+consistency than actual functionality then. But it's okay either way.
+
+> > 
+> > > +            s->cluster_cache = g_try_malloc(s->cluster_size);
+> > 
+> > As you already said, either g_malloc() or check the result. I actually
+> > think that g_try_malloc() and checking the result is nicer, we still
+> > allocate up to 2 MB here.
+> 
+> See my commit message comment - we have other spots in the code base that
+> blindly g_malloc(2 * s->cluster_size).
+
+Though is that a reason to do the same in new code or to phase out such
+allocations whenever you touch them?
+
+> And I intended (but sent the email without amending my commit) to use
+> g_malloc().  But as Berto has convinced me that an externally produced
+> image can convince us to read up to 4M (even though we don't need that
+> much to decompress), I suppose that the try_ variant plus checking is
+> reasonable (and care in NULL'ing out if one but not both allocations
+> succeed).
+
+Sounds good.
+
+Another thought I had is whether we should do per-request allocation for
+compressed clusters, too, instead of having per-BDS buffers.
+
+Kevin
