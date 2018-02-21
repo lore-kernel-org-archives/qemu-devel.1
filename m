@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoYSF-0007R6-In
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:45:20 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eoYwD-00055T-6H
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoYSC-0000A0-Cn
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:45:19 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42122 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoYSC-00009l-4O
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:45:16 -0500
-Date: Wed, 21 Feb 2018 17:45:07 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180221174507.GL21436@stefanha-x1.localdomain>
-References: <20180124053957.29145-1-peterx@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eoYw8-0003X0-R7
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:16:17 -0500
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:45404)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eoYw8-0003VD-KG
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:16:12 -0500
+Received: by mail-pg0-x231.google.com with SMTP id e11so949448pgq.12
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 10:16:12 -0800 (PST)
+References: <20180208173157.24705-1-alex.bennee@linaro.org>
+	<20180208173157.24705-4-alex.bennee@linaro.org>
+	<CAFEAcA-=Oh=MgSGoheP70o9dy0hgo64PBtRH5u1u51bjqUAh7A@mail.gmail.com>
+	<87lgfm9u7a.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <595a9f5d-80ca-7ff9-5dd7-f4177a348afc@linaro.org>
+Date: Wed, 21 Feb 2018 10:16:07 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="sMZCuqyhuhd4ycTi"
-Content-Disposition: inline
-In-Reply-To: <20180124053957.29145-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 00/23] QMP: out-of-band (OOB) execution
- support
+In-Reply-To: <87lgfm9u7a.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/32] target/arm/cpu64: allow fp16 to
+ be disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +34,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+
+On 02/21/2018 08:35 AM, Alex Bennée wrote:
+>> Good news everybody -- this is an opportunity for a naming bikeshed
+>> discussion!
+...
+>>  * use the hwcaps names that Linux defines and prints in /proc/cpuinfo
+>>    (in this case that would be a combination of "fphp" and "asimdhp",
+>>    since hwcaps reflects the ID register setup that allows a CPU
+>>    to report support for one and not the other)
+> 
+> In naming I favour the Arm ARM over whatever Linux-ism /proc came up
+> with.
+
+Likewise.
 
 
---sMZCuqyhuhd4ycTi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 24, 2018 at 01:39:34PM +0800, Peter Xu wrote:
-> This version should have addressed all comments in previous one, also
-> fixed another race condition after I addressed all the comments (a new
-> race condition introduced by addressing the comments...).  For some
-> more details of the race condition, please see the last entry of
-> change log, and please refer to patch 9 for the code change.
->=20
-> I removed RFC tag from this version.  Please review.  Thanks.
-
-I have posted comments on a few patches.
-
-Stefan
-
---sMZCuqyhuhd4ycTi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJajbAjAAoJEJykq7OBq3PIajUH/RsN5bK/LFLHxZroKtwH15vE
-9Nor9ue3c6vWEcNb7YSsPGUWfUitfaVSjCZTxaQIDIG7ZUS4fJSuJ+D4Naje5XXq
-4ZuVqjxppnVRacPRIKd+aRQiq0jeFE83HiONYiwuUydSg5bNCoUhScZ4fzQdaPrf
-n7k6bszdJz9In2ohACm/Iqe9SiC8ZWYDYCe6SZpPOPLyC0qvWa26MkJTwbBtzwke
-BxHpDA1VwXn/VEctp8dLKrIthCWwQ/zosHmDXx12+OSGTUnyyTJhM+PkDUyN3VMY
-TngRNWa4YpST6iK93Acf9iZkrvlaS6S0SPa9117MURrB0jN2QMGHXckkzSwruao=
-=vI3p
------END PGP SIGNATURE-----
-
---sMZCuqyhuhd4ycTi--
+r~
