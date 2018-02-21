@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eoUFT-0003GF-E3
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:15:52 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eoUFP-0007V9-BF
+	(envelope-from <kraxel@redhat.com>) id 1eoUFS-0003Fz-0U
 	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:15:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55786 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kraxel@redhat.com>) id 1eoUFO-0007UH-Sk
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:15:49 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55777 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eoUFP-0007Tq-53
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:15:47 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eoUFO-0007Sv-Ky
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:15:46 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C1B8407A9B0
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 13:15:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 595A5407A9AA
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 13:15:42 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 21 Feb 2018 14:15:37 +0100
-Message-Id: <20180221131537.31341-13-kraxel@redhat.com>
-In-Reply-To: <20180221131537.31341-1-kraxel@redhat.com>
-References: <20180221131537.31341-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/12] curses: build as ui module
+Date: Wed, 21 Feb 2018 14:15:25 +0100
+Message-Id: <20180221131537.31341-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 00/12] ui: build sdl, gtk and curses as modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +30,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Also drop curses libs from libs_softmmu.  Add CURSES_{CFLAGS,LIBS}
-variables so we can use them for linking the curses module.
+This patch series adds a registry for user interfaces (aka displays),
+adds support for user interface modules and allows to build sdl, gtk
+and curses as modules.  Especially gtk cuts down the number of shared
+libraries qemu links against by a significant amount.
 
-Shared library dependencies dropped from qemu-system-*:
+Note one: Modules are disabled by default, so configure with
+          --enable-modules to test this.
 
-libncursesw.so.5 => /lib64/libncursesw.so.5
-libtinfo.so.5 => /lib64/libtinfo.so.5
+Note two: Qemu build system doesn't rebuild object files when
+          the compiler flags change.  You might see build failures
+	  when enabling modules without "make clean" because of this,
+          due to non-modular object files being built without -fPIC.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- configure        | 6 +++---
- ui/Makefile.objs | 6 +++++-
- 2 files changed, 8 insertions(+), 4 deletions(-)
+Gerd Hoffmann (12):
+  console: add qemu display registry, add gtk
+  sdl: switch over to new display registry
+  cocoa: switch over to new display registry
+  curses: switch over to new display registry
+  egl-headless: switch over to new display registry
+  console: add and use qemu_display_find_default
+  console: add ui module loading support
+  configure: add X11 vars to config-host.mak
+  configure: opengl doesn't depend on x11
+  sdl: build as ui module
+  gtk: build as ui module
+  curses: build as ui module
 
-diff --git a/configure b/configure
-index cfab17275f..4d0100ec7e 100755
---- a/configure
-+++ b/configure
-@@ -3268,8 +3268,6 @@ EOF
-       unset IFS
-       if compile_prog "$curses_inc" "$curses_lib" ; then
-         curses_found=yes
--        QEMU_CFLAGS="$curses_inc $QEMU_CFLAGS"
--        libs_softmmu="$curses_lib $libs_softmmu"
-         break
-       fi
-     done
-@@ -6037,7 +6035,9 @@ if test "$cocoa" = "yes" ; then
-   echo "CONFIG_COCOA=y" >> $config_host_mak
- fi
- if test "$curses" = "yes" ; then
--  echo "CONFIG_CURSES=y" >> $config_host_mak
-+  echo "CONFIG_CURSES=m" >> $config_host_mak
-+  echo "CURSES_CFLAGS=$curses_inc" >> $config_host_mak
-+  echo "CURSES_LIBS=$curses_lib" >> $config_host_mak
- fi
- if test "$pipe2" = "yes" ; then
-   echo "CONFIG_PIPE2=y" >> $config_host_mak
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 9a0e8a94f1..dcd54a5287 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -12,7 +12,6 @@ common-obj-y += input.o input-keymap.o input-legacy.o
- common-obj-$(CONFIG_LINUX) += input-linux.o
- common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
- common-obj-$(CONFIG_COCOA) += cocoa.o
--common-obj-$(CONFIG_CURSES) += curses.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
- common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
- 
-@@ -40,6 +39,11 @@ gtk.mo-objs := gtk.o
- gtk.mo-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
- gtk.mo-libs := $(GTK_LIBS) $(VTE_LIBS)
- 
-+common-obj-$(CONFIG_CURSES) += curses.mo
-+curses.mo-objs := curses.o
-+curses.mo-cflags := $(CURSES_CFLAGS)
-+curses.mo-libs := $(CURSES_LIBS)
-+
- ifeq ($(CONFIG_OPENGL),y)
- common-obj-y += shader.o
- common-obj-y += console-gl.o
+ configure             | 29 +++++++++++---------
+ Makefile.objs         |  1 +
+ include/qemu/module.h |  1 +
+ include/ui/console.h  | 75 ++++++++-------------------------------------------
+ ui/console.c          | 59 ++++++++++++++++++++++++++++++++++++++++
+ ui/curses.c           | 14 +++++++++-
+ ui/egl-headless.c     | 20 +++++++++++++-
+ ui/gtk.c              | 17 ++++++++++--
+ ui/sdl.c              | 24 +++++++++--------
+ ui/sdl2.c             | 17 ++++++++++--
+ vl.c                  | 74 ++++++++------------------------------------------
+ ui/Makefile.objs      | 31 +++++++++++++--------
+ ui/cocoa.m            | 14 +++++++++-
+ 13 files changed, 208 insertions(+), 168 deletions(-)
+
 -- 
 2.9.3
