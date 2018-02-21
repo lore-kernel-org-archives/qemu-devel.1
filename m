@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrN-0000or-2j
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:02 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrS-0000vH-5g
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrJ-0002hZ-5g
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:01 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrO-0002ls-Ch
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:06 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:39 +0100
-Message-Id: <20180221135404.27598-12-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:53:41 +0100
+Message-Id: <20180221135404.27598-14-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/36] qdict: Introduce qdict_rename_keys()
+Subject: [Qemu-devel] [PATCH v2 13/36] block: Make bdrv_is_whitelisted()
+ public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,203 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-A few block drivers will need to rename .bdrv_create options for their
-QAPIfication, so let's have a helper function for that.
+We'll use a separate source file for image creation, and we need to
+check there whether the requested driver is whitelisted.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/qapi/qmp/qdict.h |   6 +++
- qobject/qdict.c          |  34 ++++++++++++++
- tests/check-qdict.c      | 113 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 153 insertions(+)
+ include/block/block.h | 1 +
+ block.c               | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index ff6f7842c3..7c6d844549 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -81,4 +81,10 @@ QObject *qdict_crumple(const QDict *src, Error **errp);
- 
- void qdict_join(QDict *dest, QDict *src, bool overwrite);
- 
-+typedef struct QDictRenames {
-+    const char *from;
-+    const char *to;
-+} QDictRenames;
-+bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp);
-+
- #endif /* QDICT_H */
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 23df84f9cd..229b8c840b 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -1072,3 +1072,37 @@ void qdict_join(QDict *dest, QDict *src, bool overwrite)
-         entry = next;
-     }
- }
-+
-+/**
-+ * qdict_rename_keys(): Rename keys in qdict according to the replacements
-+ * specified in the array renames. The array must be terminated by an entry
-+ * with from = NULL.
-+ *
-+ * The renames are performed individually in the order of the array, so entries
-+ * may be renamed multiple times and may or may not conflict depending on the
-+ * order of the renames array.
-+ *
-+ * Returns true for success, false in error cases.
-+ */
-+bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp)
-+{
-+    QObject *qobj;
-+
-+    while (renames->from) {
-+        if (qdict_haskey(qdict, renames->from)) {
-+            if (qdict_haskey(qdict, renames->to)) {
-+                error_setg(errp, "'%s' and its alias '%s' can't be used at the "
-+                           "same time", renames->to, renames->from);
-+                return false;
-+            }
-+
-+            qobj = qdict_get(qdict, renames->from);
-+            qobject_incref(qobj);
-+            qdict_put_obj(qdict, renames->to, qobj);
-+            qdict_del(qdict, renames->from);
-+        }
-+
-+        renames++;
-+    }
-+    return true;
-+}
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index ec628f3453..5f8f3be9ff 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -665,6 +665,117 @@ static void qdict_crumple_test_empty(void)
-     QDECREF(dst);
+diff --git a/include/block/block.h b/include/block/block.h
+index 54fe8b7a0e..cfce88cbda 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -225,6 +225,7 @@ char *bdrv_perm_names(uint64_t perm);
+ void bdrv_init(void);
+ void bdrv_init_with_whitelist(void);
+ bool bdrv_uses_whitelist(void);
++int bdrv_is_whitelisted(BlockDriver *drv, bool read_only);
+ BlockDriver *bdrv_find_protocol(const char *filename,
+                                 bool allow_protocol_prefix,
+                                 Error **errp);
+diff --git a/block.c b/block.c
+index c0e343d278..4a7e448226 100644
+--- a/block.c
++++ b/block.c
+@@ -372,7 +372,7 @@ BlockDriver *bdrv_find_format(const char *format_name)
+     return bdrv_do_find_format(format_name);
  }
  
-+static void qdict_rename_keys_test(void)
-+{
-+    QDict *dict = qdict_new();
-+    QDict *copy;
-+    QDictRenames *renames;
-+    Error *local_err = NULL;
-+
-+    qdict_put_str(dict, "abc", "foo");
-+    qdict_put_str(dict, "abcdef", "bar");
-+    qdict_put_int(dict, "number", 42);
-+    qdict_put_bool(dict, "flag", true);
-+    qdict_put_null(dict, "nothing");
-+
-+    /* Empty rename list */
-+    renames = (QDictRenames[]) {
-+        { NULL, "this can be anything" }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
-+
-+    QDECREF(copy);
-+
-+    /* Simple rename of all entries */
-+    renames = (QDictRenames[]) {
-+        { "abc",        "str1" },
-+        { "abcdef",     "str2" },
-+        { "number",     "int" },
-+        { "flag",       "bool" },
-+        { "nothing",    "null" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
-+
-+    g_assert(!qdict_haskey(copy, "abc"));
-+    g_assert(!qdict_haskey(copy, "abcdef"));
-+    g_assert(!qdict_haskey(copy, "number"));
-+    g_assert(!qdict_haskey(copy, "flag"));
-+    g_assert(!qdict_haskey(copy, "nothing"));
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "str1"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "str2"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "int"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "bool"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "null")) == QTYPE_QNULL);
-+
-+    QDECREF(copy);
-+
-+    /* Renames are processed top to bottom */
-+    renames = (QDictRenames[]) {
-+        { "abc",        "tmp" },
-+        { "abcdef",     "abc" },
-+        { "number",     "abcdef" },
-+        { "flag",       "number" },
-+        { "nothing",    "flag" },
-+        { "tmp",        "nothing" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "nothing"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "abcdef"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "number"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "flag")) == QTYPE_QNULL);
-+    g_assert(!qdict_haskey(copy, "tmp"));
-+
-+    QDECREF(copy);
-+
-+    /* Conflicting renam */
-+    renames = (QDictRenames[]) {
-+        { "abcdef",     "abc" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &local_err);
-+
-+    g_assert(local_err != NULL);
-+    error_free(local_err);
-+    local_err = NULL;
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
-+
-+    QDECREF(copy);
-+
-+    /* Renames in an empty dict */
-+    renames = (QDictRenames[]) {
-+        { "abcdef",     "abc" },
-+        { NULL , NULL }
-+    };
-+
-+    QDECREF(dict);
-+    dict = qdict_new();
-+
-+    qdict_rename_keys(dict, renames, &error_abort);
-+    g_assert(qdict_first(dict) == NULL);
-+
-+    QDECREF(dict);
-+}
-+
- static void qdict_crumple_test_bad_inputs(void)
+-static int bdrv_is_whitelisted(BlockDriver *drv, bool read_only)
++int bdrv_is_whitelisted(BlockDriver *drv, bool read_only)
  {
-     QDict *src;
-@@ -880,6 +991,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/public/crumple/bad_inputs",
-                     qdict_crumple_test_bad_inputs);
- 
-+    g_test_add_func("/public/rename_keys", qdict_rename_keys_test);
-+
-     /* The Big one */
-     if (g_test_slow()) {
-         g_test_add_func("/stress/test", qdict_stress_test);
+     static const char *whitelist_rw[] = {
+         CONFIG_BDRV_RW_WHITELIST
 -- 
 2.13.6
