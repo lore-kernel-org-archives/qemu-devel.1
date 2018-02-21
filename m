@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrv-0001Ta-C3
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrx-0001Wc-Ma
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrt-00037d-Vd
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrw-000392-Ga
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:37 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:57 +0100
-Message-Id: <20180221135404.27598-30-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:54:00 +0100
+Message-Id: <20180221135404.27598-33-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 29/36] ssh: Use QAPI BlockdevOptionsSsh
- object
+Subject: [Qemu-devel] [PATCH v2 32/36] ssh: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,220 +22,177 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Create a BlockdevOptionsSsh object in connect_to_ssh() and take the
-options from there. 'host_key_check' is still processed separately
-because it's not in the schema yet.
+This adds the .bdrv_co_create driver callback to ssh, which enables
+image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/ssh.c | 136 +++++++++++++++++++++++++++---------------------------------
- 1 file changed, 61 insertions(+), 75 deletions(-)
+ qapi/block-core.json | 16 ++++++++-
+ block/ssh.c          | 92 +++++++++++++++++++++++++++++-----------------------
+ 2 files changed, 67 insertions(+), 41 deletions(-)
 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 431d4a4fb2..2f7fab46eb 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3593,6 +3593,20 @@
+             '*object-size':     'size' } }
+ 
+ ##
++# @BlockdevCreateOptionsSsh:
++#
++# Driver specific image creation options for SSH.
++#
++# @location         Where to store the new image file
++# @size             Size of the virtual disk in bytes
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsSsh',
++  'data': { 'location':         'BlockdevOptionsSsh',
++            'size':             'size' } }
++
++##
+ # @BlockdevCreateNotSupported:
+ #
+ # This is used for all drivers that don't support creating images.
+@@ -3644,7 +3658,7 @@
+       'rbd':            'BlockdevCreateOptionsRbd',
+       'replication':    'BlockdevCreateNotSupported',
+       'sheepdog':       'BlockdevCreateOptionsSheepdog',
+-      'ssh':            'BlockdevCreateNotSupported',
++      'ssh':            'BlockdevCreateOptionsSsh',
+       'throttle':       'BlockdevCreateNotSupported',
+       'vdi':            'BlockdevCreateNotSupported',
+       'vhdx':           'BlockdevCreateNotSupported',
 diff --git a/block/ssh.c b/block/ssh.c
-index b63addcf94..9a89b7f350 100644
+index 77bc20041f..bd3044e5f6 100644
 --- a/block/ssh.c
 +++ b/block/ssh.c
-@@ -543,21 +543,6 @@ static QemuOptsList ssh_runtime_opts = {
-             .type = QEMU_OPT_NUMBER,
-             .help = "Port to connect to",
-         },
--        {
--            .name = "path",
--            .type = QEMU_OPT_STRING,
--            .help = "Path of the image on the host",
--        },
--        {
--            .name = "user",
--            .type = QEMU_OPT_STRING,
--            .help = "User as which to connect",
--        },
--        {
--            .name = "host_key_check",
--            .type = QEMU_OPT_STRING,
--            .help = "Defines how and what to check the host key against",
--        },
-         { /* end of list */ }
-     },
+@@ -826,64 +826,75 @@ static QemuOptsList ssh_create_opts = {
+     }
  };
-@@ -582,23 +567,31 @@ static bool ssh_process_legacy_socket_options(QDict *output_opts,
-     return true;
- }
  
--static InetSocketAddress *ssh_config(QDict *options, Error **errp)
-+static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
+-static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
++static int ssh_co_create(BlockdevCreateOptions *options, Error **errp)
  {
--    InetSocketAddress *inet = NULL;
--    QDict *addr = NULL;
--    QObject *crumpled_addr = NULL;
--    Visitor *iv = NULL;
--    Error *local_error = NULL;
--
--    qdict_extract_subqdict(options, &addr, "server.");
--    if (!qdict_size(addr)) {
--        error_setg(errp, "SSH server address missing");
--        goto out;
-+    BlockdevOptionsSsh *result = NULL;
-+    QemuOpts *opts = NULL;
-+    Error *local_err = NULL;
-+    QObject *crumpled;
-+    const QDictEntry *e;
-+    Visitor *v;
+-    int r, ret;
+-    int64_t total_size = 0;
+-    QDict *uri_options = NULL;
+-    BlockdevOptionsSsh *ssh_opts = NULL;
++    BlockdevCreateOptionsSsh *opts = &options->u.ssh;
+     BDRVSSHState s;
+-    ssize_t r2;
+     char c[1] = { '\0' };
++    int ret;
 +
-+    /* Translate legacy options */
-+    opts = qemu_opts_create(&ssh_runtime_opts, NULL, 0, &error_abort);
-+    qemu_opts_absorb_qdict(opts, options, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto fail;
-     }
++    assert(options->driver == BLOCKDEV_DRIVER_SSH);
  
--    crumpled_addr = qdict_crumple(addr, errp);
--    if (!crumpled_addr) {
--        goto out;
-+    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
+     ssh_state_init(&s);
+ 
++    ret = connect_to_ssh(&s, opts->location,
++                         LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
++                         LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
++                         0644, errp);
++    if (ret < 0) {
 +        goto fail;
 +    }
 +
-+    /* Create the QAPI object */
-+    crumpled = qdict_crumple(options, errp);
-+    if (crumpled == NULL) {
-+        goto fail;
-     }
- 
-     /*
-@@ -609,51 +602,50 @@ static InetSocketAddress *ssh_config(QDict *options, Error **errp)
-      * but when they come from -drive, they're all QString.  The
-      * visitor expects the former.
-      */
--    iv = qobject_input_visitor_new(crumpled_addr);
--    visit_type_InetSocketAddress(iv, NULL, &inet, &local_error);
--    if (local_error) {
--        error_propagate(errp, local_error);
--        goto out;
-+    v = qobject_input_visitor_new(crumpled);
-+    visit_type_BlockdevOptionsSsh(v, NULL, &result, &local_err);
-+    visit_free(v);
-+    qobject_decref(crumpled);
-+
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto fail;
-     }
- 
--out:
--    QDECREF(addr);
--    qobject_decref(crumpled_addr);
--    visit_free(iv);
--    return inet;
-+    /* Remove the processed options from the QDict (the visitor processes
-+     * _all_ options in the QDict) */
-+    while ((e = qdict_first(options))) {
-+        qdict_del(options, e->key);
++    if (opts->size > 0) {
++        libssh2_sftp_seek64(s.sftp_handle, opts->size - 1);
++        ret = libssh2_sftp_write(s.sftp_handle, c, 1);
++        if (ret < 0) {
++            sftp_error_setg(errp, &s, "truncate failed");
++            ret = -EINVAL;
++            goto fail;
++        }
++        s.attrs.filesize = opts->size;
 +    }
 +
++    ret = 0;
 +fail:
-+    qemu_opts_del(opts);
-+    return result;
- }
++    ssh_state_free(&s);
++    return ret;
++}
++
++static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
++{
++    BlockdevCreateOptions *create_options;
++    BlockdevCreateOptionsSsh *ssh_opts;
++    int ret;
++    QDict *uri_options = NULL;
++
++    create_options = g_new0(BlockdevCreateOptions, 1);
++    create_options->driver = BLOCKDEV_DRIVER_SSH;
++    ssh_opts = &create_options->u.ssh;
++
+     /* Get desired file size. */
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
+-    DPRINTF("total_size=%" PRIi64, total_size);
++    ssh_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++                              BDRV_SECTOR_SIZE);
++    DPRINTF("total_size=%" PRIi64, ssh_opts->size);
  
- static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-                           int ssh_flags, int creat_mode, Error **errp)
- {
-+    BlockdevOptionsSsh *opts;
-     int r, ret;
--    QemuOpts *opts = NULL;
--    Error *local_err = NULL;
--    const char *user, *path, *host_key_check;
-+    const char *user, *host_key_check;
-     long port = 0;
- 
--    opts = qemu_opts_create(&ssh_runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        ret = -EINVAL;
--        error_propagate(errp, local_err);
--        goto err;
--    }
--
--    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
--        ret = -EINVAL;
--        goto err;
-+    host_key_check = qdict_get_try_str(options, "host_key_check");
-+    if (!host_key_check) {
-+        host_key_check = "yes";
-+    } else {
-+        qdict_del(options, "host_key_check");
+     uri_options = qdict_new();
+-    r = parse_uri(filename, uri_options, errp);
+-    if (r < 0) {
+-        ret = r;
++    ret = parse_uri(filename, uri_options, errp);
++    if (ret < 0) {
+         goto out;
      }
  
--    path = qemu_opt_get(opts, "path");
--    if (!path) {
--        ret = -EINVAL;
--        error_setg(errp, "No path was specified");
--        goto err;
-+    opts = ssh_parse_options(options, errp);
-+    if (opts == NULL) {
-+        return -EINVAL;
-     }
- 
--    user = qemu_opt_get(opts, "user");
--    if (!user) {
-+    if (opts->has_user) {
-+        user = opts->user;
-+    } else {
-         user = g_get_user_name();
-         if (!user) {
-             error_setg_errno(errp, errno, "Can't get user name");
-@@ -662,17 +654,9 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-         }
-     }
- 
--    host_key_check = qemu_opt_get(opts, "host_key_check");
--    if (!host_key_check) {
--        host_key_check = "yes";
--    }
--
-     /* Pop the config into our state object, Exit if invalid */
--    s->inet = ssh_config(options, errp);
--    if (!s->inet) {
--        ret = -EINVAL;
--        goto err;
--    }
-+    s->inet = opts->server;
-+    opts->server = NULL;
- 
-     if (qemu_strtol(s->inet->port, NULL, 10, &port) < 0) {
-         error_setg(errp, "Use only numeric port value");
-@@ -729,15 +713,17 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
- 
-     /* Open the remote file. */
-     DPRINTF("opening file %s flags=0x%x creat_mode=0%o",
--            path, ssh_flags, creat_mode);
--    s->sftp_handle = libssh2_sftp_open(s->sftp, path, ssh_flags, creat_mode);
-+            opts->path, ssh_flags, creat_mode);
-+    s->sftp_handle = libssh2_sftp_open(s->sftp, opts->path, ssh_flags,
-+                                       creat_mode);
-     if (!s->sftp_handle) {
--        session_error_setg(errp, s, "failed to open remote file '%s'", path);
-+        session_error_setg(errp, s, "failed to open remote file '%s'",
-+                           opts->path);
+-    ssh_opts = ssh_parse_options(uri_options, errp);
+-    if (ssh_opts == NULL) {
++    ssh_opts->location = ssh_parse_options(uri_options, errp);
++    if (ssh_opts->location == NULL) {
          ret = -EINVAL;
-         goto err;
+         goto out;
      }
  
--    qemu_opts_del(opts);
-+    qapi_free_BlockdevOptionsSsh(opts);
+-    r = connect_to_ssh(&s, ssh_opts,
+-                       LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
+-                       LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
+-                       0644, errp);
+-    if (r < 0) {
+-        ret = r;
+-        goto out;
+-    }
+-
+-    if (total_size > 0) {
+-        libssh2_sftp_seek64(s.sftp_handle, total_size-1);
+-        r2 = libssh2_sftp_write(s.sftp_handle, c, 1);
+-        if (r2 < 0) {
+-            sftp_error_setg(errp, &s, "truncate failed");
+-            ret = -EINVAL;
+-            goto out;
+-        }
+-        s.attrs.filesize = total_size;
+-    }
+-
+-    ret = 0;
++    ret = ssh_co_create(create_options, errp);
  
-     r = libssh2_sftp_fstat(s->sftp_handle, &s->attrs);
-     if (r < 0) {
-@@ -764,7 +750,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-     }
-     s->session = NULL;
- 
--    qemu_opts_del(opts);
-+    qapi_free_BlockdevOptionsSsh(opts);
- 
+  out:
+-    ssh_state_free(&s);
+-    if (uri_options != NULL) {
+-        QDECREF(uri_options);
+-    }
+-    qapi_free_BlockdevOptionsSsh(ssh_opts);
++    QDECREF(uri_options);
++    qapi_free_BlockdevCreateOptions(create_options);
      return ret;
  }
+ 
+@@ -1223,6 +1234,7 @@ static BlockDriver bdrv_ssh = {
+     .bdrv_parse_filename          = ssh_parse_filename,
+     .bdrv_file_open               = ssh_file_open,
+     .bdrv_create                  = ssh_create,
++    .bdrv_co_create               = ssh_co_create,
+     .bdrv_close                   = ssh_close,
+     .bdrv_has_zero_init           = ssh_has_zero_init,
+     .bdrv_co_readv                = ssh_co_readv,
 -- 
 2.13.6
