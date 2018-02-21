@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrH-0000gF-Go
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrI-0000h6-5c
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrG-0002eo-DI
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrG-0002fM-W2
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:37 +0100
-Message-Id: <20180221135404.27598-10-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:53:38 +0100
+Message-Id: <20180221135404.27598-11-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 09/36] test-qemu-opts: Test
- qemu_opts_append()
+Subject: [Qemu-devel] [PATCH v2 10/36] test-qemu-opts: Test
+ qemu_opts_to_qdict_filtered()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,170 +23,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Basic test for merging two QemuOptsLists.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-qemu-opts.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 128 insertions(+)
+ tests/test-qemu-opts.c | 125 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
 diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
-index 5d5a3daa7b..6c3183390b 100644
+index 6c3183390b..2c422abcd4 100644
 --- a/tests/test-qemu-opts.c
 +++ b/tests/test-qemu-opts.c
-@@ -23,6 +23,8 @@ static QemuOptsList opts_list_01 = {
-         {
-             .name = "str1",
-             .type = QEMU_OPT_STRING,
-+            .help = "Help texts are preserved in qemu_opts_append",
-+            .def_value_str = "default",
-         },{
-             .name = "str2",
-             .type = QEMU_OPT_STRING,
-@@ -32,6 +34,7 @@ static QemuOptsList opts_list_01 = {
-         },{
-             .name = "number1",
-             .type = QEMU_OPT_NUMBER,
-+            .help = "Having help texts only for some options is okay",
-         },{
-             .name = "number2",
-             .type = QEMU_OPT_NUMBER,
-@@ -743,6 +746,129 @@ static void test_opts_parse_size(void)
-     qemu_opts_reset(&opts_list_02);
+@@ -10,6 +10,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
++#include "qemu/option_int.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
+@@ -868,6 +869,127 @@ static void test_opts_append(void)
+     qemu_opts_free(merged);
  }
  
-+static void append_verify_list_01(QemuOptDesc *desc, bool with_overlapping)
++static void test_opts_to_qdict_basic(void)
 +{
-+    int i = 0;
++    QemuOpts *opts;
++    QDict *dict;
 +
-+    if (with_overlapping) {
-+        g_assert_cmpstr(desc[i].name, ==, "str1");
-+        g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
-+        g_assert_cmpstr(desc[i].help, ==,
-+                        "Help texts are preserved in qemu_opts_append");
-+        g_assert_cmpstr(desc[i].def_value_str, ==, "default");
-+        i++;
++    opts = qemu_opts_parse(&opts_list_01, "str1=foo,str2=,str3=bar,number1=42",
++                           false, &error_abort);
++    g_assert(opts != NULL);
 +
-+        g_assert_cmpstr(desc[i].name, ==, "str2");
-+        g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
-+        g_assert_cmpstr(desc[i].help, ==, NULL);
-+        g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+        i++;
-+    }
++    dict = qemu_opts_to_qdict(opts, NULL);
++    g_assert(dict != NULL);
 +
-+    g_assert_cmpstr(desc[i].name, ==, "str3");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "str3"), ==, "bar");
++    g_assert_cmpstr(qdict_get_str(dict, "number1"), ==, "42");
++    g_assert_false(qdict_haskey(dict, "number2"));
 +
-+    g_assert_cmpstr(desc[i].name, ==, "number1");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_NUMBER);
-+    g_assert_cmpstr(desc[i].help, ==,
-+                    "Having help texts only for some options is okay");
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "number2");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_NUMBER);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, NULL);
++    QDECREF(dict);
++    qemu_opts_del(opts);
 +}
 +
-+static void append_verify_list_02(QemuOptDesc *desc)
-+{
-+    int i = 0;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "str1");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "str2");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "bool1");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_BOOL);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "bool2");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_BOOL);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "size1");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "size2");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+    i++;
-+
-+    g_assert_cmpstr(desc[i].name, ==, "size3");
-+    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
-+    g_assert_cmpstr(desc[i].help, ==, NULL);
-+    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
-+}
-+
-+static void test_opts_append_to_null(void)
-+{
-+    QemuOptsList *merged;
-+
-+    merged = qemu_opts_append(NULL, &opts_list_01);
-+    g_assert(merged != &opts_list_01);
-+
-+    g_assert_cmpstr(merged->name, ==, NULL);
-+    g_assert_cmpstr(merged->implied_opt_name, ==, NULL);
-+    g_assert_false(merged->merge_lists);
-+
-+    append_verify_list_01(merged->desc, true);
-+
-+    qemu_opts_free(merged);
-+}
-+
-+static void test_opts_append(void)
++static void test_opts_to_qdict_filtered(void)
 +{
 +    QemuOptsList *first, *merged;
++    QemuOpts *opts;
++    QDict *dict;
 +
 +    first = qemu_opts_append(NULL, &opts_list_02);
 +    merged = qemu_opts_append(first, &opts_list_01);
-+    g_assert(first != &opts_list_02);
-+    g_assert(merged != &opts_list_01);
 +
-+    g_assert_cmpstr(merged->name, ==, NULL);
-+    g_assert_cmpstr(merged->implied_opt_name, ==, NULL);
-+    g_assert_false(merged->merge_lists);
++    opts = qemu_opts_parse(merged,
++                           "str1=foo,str2=,str3=bar,bool1=off,number1=42",
++                           false, &error_abort);
++    g_assert(opts != NULL);
 +
-+    append_verify_list_02(&merged->desc[0]);
-+    append_verify_list_01(&merged->desc[7], false);
++    /* Convert to QDict without deleting from opts */
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_01, false);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "str3"), ==, "bar");
++    g_assert_cmpstr(qdict_get_str(dict, "number1"), ==, "42");
++    g_assert_false(qdict_haskey(dict, "number2"));
++    g_assert_false(qdict_haskey(dict, "bool1"));
++    QDECREF(dict);
 +
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_02, false);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "bool1"), ==, "off");
++    g_assert_false(qdict_haskey(dict, "str3"));
++    g_assert_false(qdict_haskey(dict, "number1"));
++    g_assert_false(qdict_haskey(dict, "number2"));
++    QDECREF(dict);
++
++    /* Now delete converted options from opts */
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_01, true);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "str3"), ==, "bar");
++    g_assert_cmpstr(qdict_get_str(dict, "number1"), ==, "42");
++    g_assert_false(qdict_haskey(dict, "number2"));
++    g_assert_false(qdict_haskey(dict, "bool1"));
++    QDECREF(dict);
++
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_02, true);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "bool1"), ==, "off");
++    g_assert_false(qdict_haskey(dict, "str1"));
++    g_assert_false(qdict_haskey(dict, "str2"));
++    g_assert_false(qdict_haskey(dict, "str3"));
++    g_assert_false(qdict_haskey(dict, "number1"));
++    g_assert_false(qdict_haskey(dict, "number2"));
++    QDECREF(dict);
++
++    g_assert_true(QTAILQ_EMPTY(&opts->head));
++
++    qemu_opts_del(opts);
 +    qemu_opts_free(merged);
 +}
 +
++static void test_opts_to_qdict_duplicates(void)
++{
++    QemuOpts *opts;
++    QemuOpt *opt;
++    QDict *dict;
 +
++    opts = qemu_opts_parse(&opts_list_03, "foo=a,foo=b", false, &error_abort);
++    g_assert(opts != NULL);
++
++    /* Verify that opts has two options with the same name */
++    opt = QTAILQ_FIRST(&opts->head);
++    g_assert_cmpstr(opt->name, ==, "foo");
++    g_assert_cmpstr(opt->str , ==, "a");
++
++    opt = QTAILQ_NEXT(opt, next);
++    g_assert_cmpstr(opt->name, ==, "foo");
++    g_assert_cmpstr(opt->str , ==, "b");
++
++    opt = QTAILQ_NEXT(opt, next);
++    g_assert(opt == NULL);
++
++    /* In the conversion to QDict, the last one wins */
++    dict = qemu_opts_to_qdict(opts, NULL);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "foo"), ==, "b");
++    QDECREF(dict);
++
++    /* The last one still wins if entries are deleted, and both are deleted */
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, NULL, true);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "foo"), ==, "b");
++    QDECREF(dict);
++
++    g_assert_true(QTAILQ_EMPTY(&opts->head));
++
++    qemu_opts_del(opts);
++}
+ 
  int main(int argc, char *argv[])
  {
-     register_opts();
-@@ -761,6 +887,8 @@ int main(int argc, char *argv[])
-     g_test_add_func("/qemu-opts/opts_parse/bool", test_opts_parse_bool);
-     g_test_add_func("/qemu-opts/opts_parse/number", test_opts_parse_number);
+@@ -889,6 +1011,9 @@ int main(int argc, char *argv[])
      g_test_add_func("/qemu-opts/opts_parse/size", test_opts_parse_size);
-+    g_test_add_func("/qemu-opts/append_to_null", test_opts_append_to_null);
-+    g_test_add_func("/qemu-opts/append", test_opts_append);
+     g_test_add_func("/qemu-opts/append_to_null", test_opts_append_to_null);
+     g_test_add_func("/qemu-opts/append", test_opts_append);
++    g_test_add_func("/qemu-opts/to_qdict/basic", test_opts_to_qdict_basic);
++    g_test_add_func("/qemu-opts/to_qdict/filtered", test_opts_to_qdict_filtered);
++    g_test_add_func("/qemu-opts/to_qdict/duplicates", test_opts_to_qdict_duplicates);
      g_test_run();
      return 0;
  }
