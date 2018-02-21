@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoVSe-0008Jt-HS
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:33:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1eoVTW-0000T5-Va
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:34:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoVSa-0003lx-Jj
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:33:32 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46816 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eoVSa-0003l7-ES
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:33:28 -0500
-Date: Wed, 21 Feb 2018 14:33:17 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180221143317.GU17096@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180220225904.16129-1-bsd@redhat.com>
-	<20180220225904.16129-5-bsd@redhat.com>
-	<20180221093524.GH17096@redhat.com>
-	<20180221111100.kcfyhhlgfm2qbfgw@sirius.home.kraxel.org>
+	(envelope-from <eblake@redhat.com>) id 1eoVTT-0004Wb-5R
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:34:26 -0500
+References: <20180215032905.27146-1-eblake@redhat.com>
+	<3600bf5d-a91e-337c-57bf-6edf1ee3766e@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <111de9f8-4e88-8f3d-7f43-f1c99d0a6170@redhat.com>
+Date: Wed, 21 Feb 2018 08:34:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180221111100.kcfyhhlgfm2qbfgw@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] usb-mtp: Introduce write support
- for MTP objects
+In-Reply-To: <3600bf5d-a91e-337c-57bf-6edf1ee3766e@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd: Honor server's advertised minimum
+ block size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Bandan Das <bsd@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Feb 21, 2018 at 12:11:00PM +0100, Gerd Hoffmann wrote:
-> > > +static void usb_mtp_write_data(MTPState *s)
-> > > +{
-> > > +    MTPData *d = s->data_out;
-> > > +    MTPObject *parent =
-> > > +        usb_mtp_object_lookup(s, s->dataset.parent_handle);
-> > > +    char *path = NULL;
-> > > +    int rc = -1;
-> > > +    mode_t mask = 0644;
-> > > +
-> > > +    assert(d != NULL);
-> > > +
-> > 
-> > 
-> > Somewhere in here should surely be validating the "readonly" flag.
-> > 
-> > > +    if (parent == NULL || !s->write_pending) {
-> 
-> Does happens here.  With a readonly device write_pending should
-> never be true.
+On 02/16/2018 05:50 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 15.02.2018 06:29, Eric Blake wrote:
+>> Commit 79ba8c98 (v2.7) changed the setting of request_alignment
+>> to occur only during bdrv_refresh_limits(), rather than at at
+>> bdrv_open() time; but at the time, NBD was unaffected, because
+>> it still used sector-based callbacks, so the block layer
+>> defaulted NBD to use 512 request_alignment.
+>>
 
-Unless I'm mis-understanding the flow, the next patch appears to set
-write_pending = true, in response to a guest command, without checking
-the readonly flag.
+>> Fix these issues by moving the assignment to request_alignment
+>> to the right function, and by using a sane default when the
+>> server does not advertise a minimum size.
+>>
+>> CC: qemu-stable@nongnu.org
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
 
-> 
-> > > +        usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
-> > > +                             0, 0, 0, 0);
-> > > +        return;
-> > > +    }
-> 
-> But adding an "assert(!readonly)" here as double-check surely doesn't hurt.
-> 
-> cheers,
->   Gerd
-> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
 
-Regards,
-Daniel
+Thanks; applied to my NBD queue.
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
