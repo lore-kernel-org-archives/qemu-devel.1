@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoQqa-0001hZ-Iv
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:37:58 -0500
+	(envelope-from <berto@igalia.com>) id 1eoQue-0002y5-VS
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:42:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoQqX-0005Tq-FE
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:37:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49024 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eoQqX-0005Tc-AY
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:37:53 -0500
-Date: Wed, 21 Feb 2018 09:37:49 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180221093749.GJ17096@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180220225904.16129-1-bsd@redhat.com>
-	<20180220225904.16129-4-bsd@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1eoQua-0007Jb-9J
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 04:42:09 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180220222459.8461-2-eblake@redhat.com>
+References: <20180220222459.8461-1-eblake@redhat.com>
+	<20180220222459.8461-2-eblake@redhat.com>
+Date: Wed, 21 Feb 2018 10:42:00 +0100
+Message-ID: <w51woz6k7br.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180220225904.16129-4-bsd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] usb-mtp: Support delete of mtp
- objects
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: Prefer byte-based calls into
+ bs->file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,216 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bandan Das <bsd@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-On Tue, Feb 20, 2018 at 05:59:02PM -0500, Bandan Das wrote:
-> Write of existing objects by the initiator is acheived by
-> making a temporary buffer with the new changes, deleting the
-> old file and then writing a new file with the same name.
-> 
-> Also, add a "readonly" property which needs to be set to false
-> for deletion to work.
-> 
-> Signed-off-by: Bandan Das <bsd@redhat.com>
-> ---
->  hw/usb/dev-mtp.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 123 insertions(+)
-> 
-> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-> index 63f8f3b90b..5ef77f3e9f 100644
-> --- a/hw/usb/dev-mtp.c
-> +++ b/hw/usb/dev-mtp.c
-> @@ -46,6 +46,7 @@ enum mtp_code {
->      CMD_GET_OBJECT_HANDLES         = 0x1007,
->      CMD_GET_OBJECT_INFO            = 0x1008,
->      CMD_GET_OBJECT                 = 0x1009,
-> +    CMD_DELETE_OBJECT              = 0x100b,
->      CMD_GET_PARTIAL_OBJECT         = 0x101b,
->      CMD_GET_OBJECT_PROPS_SUPPORTED = 0x9801,
->      CMD_GET_OBJECT_PROP_DESC       = 0x9802,
-> @@ -62,6 +63,8 @@ enum mtp_code {
->      RES_INVALID_STORAGE_ID         = 0x2008,
->      RES_INVALID_OBJECT_HANDLE      = 0x2009,
->      RES_INVALID_OBJECT_FORMAT_CODE = 0x200b,
-> +    RES_STORE_READ_ONLY            = 0x200e,
-> +    RES_PARTIAL_DELETE             = 0x2012,
->      RES_SPEC_BY_FORMAT_UNSUPPORTED = 0x2014,
->      RES_INVALID_PARENT_OBJECT      = 0x201a,
->      RES_INVALID_PARAMETER          = 0x201d,
-> @@ -172,6 +175,7 @@ struct MTPState {
->      MTPControl   *result;
->      uint32_t     session;
->      uint32_t     next_handle;
-> +    bool         readonly;
->  
->      QTAILQ_HEAD(, MTPObject) objects;
->  #ifdef CONFIG_INOTIFY1
-> @@ -799,6 +803,7 @@ static MTPData *usb_mtp_get_device_info(MTPState *s, MTPControl *c)
->          CMD_GET_NUM_OBJECTS,
->          CMD_GET_OBJECT_HANDLES,
->          CMD_GET_OBJECT_INFO,
-> +        CMD_DELETE_OBJECT,
+On Tue 20 Feb 2018 11:24:58 PM CET, Eric Blake wrote:
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index d46b69d7f34..3fefeb3dc50 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -2310,8 +2310,8 @@ write_refblocks:
+>          on_disk_refblock = (void *)((char *) *refcount_table +
+>                                      refblock_index * s->cluster_size);
+>
+> -        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
+> -                         on_disk_refblock, s->cluster_sectors);
+> +        ret = bdrv_pwrite(bs->file, refblock_offset,
+> +                         on_disk_refblock, s->cluster_size);
 
-Should we not advertize this in the first place if the device is readonly.
+It looks like the second line is not properly indented. I think you can
+also move on_disk_refblock to the previous line.
 
->          CMD_GET_OBJECT,
->          CMD_GET_PARTIAL_OBJECT,
->          CMD_GET_OBJECT_PROPS_SUPPORTED,
-> @@ -1113,6 +1118,116 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
->      return d;
->  }
->  
-> +/* Return correct return code for a delete event */
-> +enum {
-> +    ALL_DELETE,
-> +    PARTIAL_DELETE,
-> +    READ_ONLY,
-> +};
-> +
-> +/* Assumes that children, if any, have been already freed */
-> +static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
-> +{
-> +#ifndef CONFIG_INOTIFY1
-> +    assert(o->nchildren == 0);
-> +    QTAILQ_REMOVE(&s->objects, o, next);
-> +    g_free(o->name);
-> +    g_free(o->path);
-> +    g_free(o);
-> +#endif
-> +}
-> +
-> +static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
-> +{
-> +    MTPObject *iter, *iter2;
-> +    bool partial_delete = false;
-> +    bool success = false;
-> +
-> +    /*
-> +     * TODO: Add support for Protection Status
-> +     */
-> +
-> +    QLIST_FOREACH(iter, &o->children, list) {
-> +        if (iter->format == FMT_ASSOCIATION) {
-> +            QLIST_FOREACH(iter2, &iter->children, list) {
-> +                usb_mtp_deletefn(s, iter2, trans);
-> +            }
-> +        }
-> +    }
-> +
-> +    if (o->format == FMT_UNDEFINED_OBJECT) {
-> +        if (remove(o->path)) {
-> +            partial_delete = true;
-> +        } else {
-> +            usb_mtp_object_free_one(s, o);
-> +            success = true;
-> +        }
-> +    }
-> +
-> +    if (o->format == FMT_ASSOCIATION) {
-> +        if (rmdir(o->path)) {
-> +            partial_delete = true;
-> +        } else {
-> +            usb_mtp_object_free_one(s, o);
-> +            success = true;
-> +        }
-> +    }
-> +
-> +    if (success && partial_delete) {
-> +        return PARTIAL_DELETE;
-> +    }
-> +    if (!success && partial_delete) {
-> +        return READ_ONLY;
-> +    }
-> +    return ALL_DELETE;
-> +}
-> +
-> +static void usb_mtp_object_delete(MTPState *s, uint32_t handle,
-> +                                  uint32_t format_code, uint32_t trans)
-> +{
-> +    MTPObject *o;
-> +    int ret;
-> +
-> +    /* Return error if store is read-only */
-> +    if (!FLAG_SET(s, MTP_FLAG_WRITABLE)) {
-> +        usb_mtp_queue_result(s, RES_STORE_READ_ONLY,
-> +                             trans, 0, 0, 0, 0);
-> +        return;
-> +    }
-> +
-> +    if (format_code != 0) {
-> +        usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
-> +                             trans, 0, 0, 0, 0);
-> +        return;
-> +    }
-> +
-> +    if (handle == 0xFFFFFFF) {
-> +        o = QTAILQ_FIRST(&s->objects);
-> +    } else {
-> +        o = usb_mtp_object_lookup(s, handle);
-> +    }
-> +    if (o == NULL) {
-> +        usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
-> +                             trans, 0, 0, 0, 0);
-> +        return;
-> +    }
-> +
-> +    ret = usb_mtp_deletefn(s, o, trans);
-> +    if (ret == PARTIAL_DELETE) {
-> +        usb_mtp_queue_result(s, RES_PARTIAL_DELETE,
-> +                             trans, 0, 0, 0, 0);
-> +        return;
-> +    } else if (ret == READ_ONLY) {
-> +        usb_mtp_queue_result(s, RES_STORE_READ_ONLY, trans,
-> +                             0, 0, 0, 0);
-> +        return;
-> +    } else {
-> +        usb_mtp_queue_result(s, RES_OK, trans,
-> +                             0, 0, 0, 0);
-> +        return;
-> +    }
-> +}
-> +
->  static void usb_mtp_command(MTPState *s, MTPControl *c)
->  {
->      MTPData *data_in = NULL;
-> @@ -1239,6 +1354,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
->              return;
->          }
->          break;
-> +    case CMD_DELETE_OBJECT:
-> +        usb_mtp_object_delete(s, c->argv[0], c->argv[1], c->trans);
-> +        return;
->      case CMD_GET_PARTIAL_OBJECT:
->          o = usb_mtp_object_lookup(s, c->argv[0]);
->          if (o == NULL) {
-> @@ -1545,6 +1663,10 @@ static void usb_mtp_realize(USBDevice *dev, Error **errp)
->              return;
->          }
->          s->desc = strrchr(s->root, '/');
-> +        /* Mark store as RW */
-> +        if (!s->readonly) {
-> +            s->flags |= (1 << MTP_FLAG_WRITABLE);
-> +        }
->          if (s->desc && s->desc[0]) {
->              s->desc = g_strdup(s->desc + 1);
->          } else {
-> @@ -1567,6 +1689,7 @@ static const VMStateDescription vmstate_usb_mtp = {
->  static Property mtp_properties[] = {
->      DEFINE_PROP_STRING("x-root", MTPState, root),
->      DEFINE_PROP_STRING("desc", MTPState, desc),
-> +    DEFINE_PROP_BOOL("readonly", MTPState, readonly, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> -- 
-> 2.14.3
-> 
-> 
+Otherwise the patch looks good.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
