@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUro-0001MP-AN
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrs-0001Pz-Aj
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUrm-00033j-Dl
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:28 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUrq-00035T-6c
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:32 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:50 +0100
-Message-Id: <20180221135404.27598-23-kwolf@redhat.com>
+Date: Wed, 21 Feb 2018 14:53:54 +0100
+Message-Id: <20180221135404.27598-27-kwolf@redhat.com>
 In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
 References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 22/36] rbd: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH v2 26/36] nfs: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,263 +22,187 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to rbd, which enables
+This adds the .bdrv_co_create driver callback to nfs, which enables
 image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json |  19 ++++++-
- block/rbd.c          | 146 ++++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 116 insertions(+), 49 deletions(-)
+ qapi/block-core.json | 16 +++++++++++-
+ block/nfs.c          | 74 +++++++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 74 insertions(+), 16 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 74021c51d7..6c0c16ebe3 100644
+index 6c0c16ebe3..085b791303 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3436,6 +3436,23 @@
-             '*refcount-bits':   'int' } }
+@@ -3393,6 +3393,20 @@
+             '*preallocation':   'PreallocMode' } }
  
  ##
-+# @BlockdevCreateOptionsRbd:
++# @BlockdevCreateOptionsNfs:
 +#
-+# Driver specific image creation options for rbd/Ceph.
++# Driver specific image creation options for NFS.
 +#
-+# @location         Where to store the new image file. This location cannot
-+#                   point to a snapshot.
++# @location         Where to store the new image file
 +# @size             Size of the virtual disk in bytes
-+# @cluster-size     RBD object size
 +#
 +# Since: 2.12
 +##
-+{ 'struct': 'BlockdevCreateOptionsRbd',
-+  'data': { 'location':         'BlockdevOptionsRbd',
-+            'size':             'size',
-+            '*cluster-size' :   'size' } }
++{ 'struct': 'BlockdevCreateOptionsNfs',
++  'data': { 'location':         'BlockdevOptionsNfs',
++            'size':             'size' } }
 +
 +##
- # @BlockdevCreateNotSupported:
+ # @BlockdevQcow2Version:
  #
- # This is used for all drivers that don't support creating images.
-@@ -3484,7 +3501,7 @@
-       'qed':            'BlockdevCreateNotSupported',
-       'quorum':         'BlockdevCreateNotSupported',
-       'raw':            'BlockdevCreateNotSupported',
--      'rbd':            'BlockdevCreateNotSupported',
-+      'rbd':            'BlockdevCreateOptionsRbd',
-       'replication':    'BlockdevCreateNotSupported',
-       'sheepdog':       'BlockdevCreateNotSupported',
-       'ssh':            'BlockdevCreateNotSupported',
-diff --git a/block/rbd.c b/block/rbd.c
-index 26641e53e0..82f03505a9 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -332,69 +332,55 @@ static QemuOptsList runtime_opts = {
-     },
- };
+ # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
+@@ -3491,7 +3505,7 @@
+       'iscsi':          'BlockdevCreateNotSupported',
+       'luks':           'BlockdevCreateNotSupported',
+       'nbd':            'BlockdevCreateNotSupported',
+-      'nfs':            'BlockdevCreateNotSupported',
++      'nfs':            'BlockdevCreateOptionsNfs',
+       'null-aio':       'BlockdevCreateNotSupported',
+       'null-co':        'BlockdevCreateNotSupported',
+       'nvme':           'BlockdevCreateNotSupported',
+diff --git a/block/nfs.c b/block/nfs.c
+index 9283bfbaae..c0c153cadb 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -551,33 +551,45 @@ out:
+     return ret;
+ }
  
--static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-+/* FIXME Deprecate and remove keypairs or make it available in QMP.
-+ * password_secret should eventually be configurable in opts->location. Support
-+ * for it in .bdrv_open will make it work here as well. */
-+static int qemu_rbd_do_create(BlockdevCreateOptions *options,
-+                              const char *keypairs, const char *password_secret,
-+                              Error **errp)
+-static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
+-                                     int flags, int open_flags, Error **errp)
++static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
++                                                     Error **errp)
  {
--    Error *local_err = NULL;
--    int64_t bytes = 0;
--    int64_t objsize;
--    int obj_order = 0;
--    const char *pool, *image_name, *conf, *user, *keypairs;
--    const char *secretid;
-+    BlockdevCreateOptionsRbd *opts = &options->u.rbd;
-     rados_t cluster;
-     rados_ioctx_t io_ctx;
--    QDict *options = NULL;
--    int ret = 0;
-+    int obj_order = 0;
-+    int ret;
+     BlockdevOptionsNfs *opts = NULL;
+     QObject *crumpled = NULL;
+     Visitor *v;
+     Error *local_err = NULL;
+-    int ret;
  
--    secretid = qemu_opt_get(opts, "password-secret");
-+    assert(options->driver == BLOCKDEV_DRIVER_RBD);
-+    if (opts->location->has_snapshot) {
-+        error_setg(errp, "Can't use snapshot name for image creation");
-+        return -EINVAL;
-+    }
+     crumpled = qdict_crumple(options, errp);
+     if (crumpled == NULL) {
+-        return -EINVAL;
++        return NULL;
+     }
  
--    /* Read out options */
--    bytes = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                     BDRV_SECTOR_SIZE);
--    objsize = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE, 0);
--    if (objsize) {
-+    /* TODO Remove the limitation */
-+    if (opts->location->has_server) {
-+        error_setg(errp, "Can't specify server for image creation");
-+        return -EINVAL;
+     v = qobject_input_visitor_new_keyval(crumpled);
+     visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
+     visit_free(v);
++    qobject_decref(crumpled);
+ 
+     if (local_err) {
+-        error_propagate(errp, local_err);
++        return NULL;
 +    }
 +
-+    if (opts->has_cluster_size) {
-+        int64_t objsize = opts->cluster_size;
-         if ((objsize - 1) & objsize) {    /* not a power of 2? */
-             error_setg(errp, "obj size needs to be power of 2");
--            ret = -EINVAL;
--            goto exit;
-+            return -EINVAL;
-         }
-         if (objsize < 4096) {
-             error_setg(errp, "obj size too small");
--            ret = -EINVAL;
--            goto exit;
-+            return -EINVAL;
-         }
-         obj_order = ctz32(objsize);
++    return opts;
++}
++
++static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
++                                     int flags, int open_flags, Error **errp)
++{
++    BlockdevOptionsNfs *opts;
++    int ret;
++
++    opts = nfs_options_qdict_to_qapi(options, errp);
++    if (opts == NULL) {
+         ret = -EINVAL;
+         goto fail;
      }
  
--    options = qdict_new();
--    qemu_rbd_parse_filename(filename, options, &local_err);
--    if (local_err) {
--        ret = -EINVAL;
--        error_propagate(errp, local_err);
--        goto exit;
--    }
--
--    /*
--     * Caution: while qdict_get_try_str() is fine, getting non-string
--     * types would require more care.  When @options come from -blockdev
--     * or blockdev_add, its members are typed according to the QAPI
--     * schema, but when they come from -drive, they're all QString.
--     */
--    pool       = qdict_get_try_str(options, "pool");
--    conf       = qdict_get_try_str(options, "conf");
--    user       = qdict_get_try_str(options, "user");
--    image_name = qdict_get_try_str(options, "image");
--    keypairs   = qdict_get_try_str(options, "=keyvalue-pairs");
--
--    ret = rados_create(&cluster, user);
-+    ret = rados_create(&cluster, opts->location->user);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "error initializing");
--        goto exit;
-+        return ret;
+     ret = nfs_client_open(client, opts, flags, open_flags, errp);
+ fail:
+-    qobject_decref(crumpled);
+     qapi_free_BlockdevOptionsNfs(opts);
+     return ret;
+ }
+@@ -614,17 +626,42 @@ static QemuOptsList nfs_create_opts = {
      }
+ };
  
-     /* try default location when conf=NULL, but ignore failure */
--    ret = rados_conf_read_file(cluster, conf);
--    if (conf && ret < 0) {
--        error_setg_errno(errp, -ret, "error reading conf file %s", conf);
-+    ret = rados_conf_read_file(cluster, opts->location->conf);
-+    if (opts->location->conf && ret < 0) {
-+        error_setg_errno(errp, -ret, "error reading conf file %s",
-+                         opts->location->conf);
-         ret = -EIO;
-         goto shutdown;
-     }
-@@ -405,7 +391,7 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-         goto shutdown;
-     }
+-static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
++static int nfs_file_co_create(BlockdevCreateOptions *options, Error **errp)
+ {
+-    int64_t ret, total_size;
++    BlockdevCreateOptionsNfs *opts = &options->u.nfs;
+     NFSClient *client = g_new0(NFSClient, 1);
+-    QDict *options = NULL;
++    int ret;
++
++    assert(options->driver == BLOCKDEV_DRIVER_NFS);
  
--    if (qemu_rbd_set_auth(cluster, secretid, errp) < 0) {
-+    if (qemu_rbd_set_auth(cluster, password_secret, errp) < 0) {
-         ret = -EIO;
-         goto shutdown;
-     }
-@@ -416,24 +402,87 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-         goto shutdown;
-     }
+     client->aio_context = qemu_get_aio_context();
  
--    ret = rados_ioctx_create(cluster, pool, &io_ctx);
-+    ret = rados_ioctx_create(cluster, opts->location->pool, &io_ctx);
-     if (ret < 0) {
--        error_setg_errno(errp, -ret, "error opening pool %s", pool);
-+        error_setg_errno(errp, -ret, "error opening pool %s",
-+                         opts->location->pool);
-         goto shutdown;
-     }
- 
--    ret = rbd_create(io_ctx, image_name, bytes, &obj_order);
-+    ret = rbd_create(io_ctx, opts->location->image, opts->size, &obj_order);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "error rbd create");
-     }
- 
-     rados_ioctx_destroy(io_ctx);
- 
-+    ret = 0;
- shutdown:
-     rados_shutdown(cluster);
++    ret = nfs_client_open(client, opts->location, O_CREAT, 0, errp);
++    if (ret < 0) {
++        goto out;
++    }
++    ret = nfs_ftruncate(client->context, client->fh, opts->size);
++    nfs_client_close(client);
++
++out:
++    g_free(client);
 +    return ret;
 +}
 +
-+static int qemu_rbd_co_create(BlockdevCreateOptions *options, Error **errp)
-+{
-+    return qemu_rbd_do_create(options, NULL, NULL, errp);
-+}
-+
-+static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
++static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
 +{
 +    BlockdevCreateOptions *create_options;
-+    BlockdevCreateOptionsRbd *rbd_opts;
-+    BlockdevOptionsRbd *loc;
-+    Error *local_err = NULL;
-+    const char *keypairs, *password_secret;
-+    QDict *options = NULL;
-+    int ret = 0;
++    BlockdevCreateOptionsNfs *nfs_opts;
++    QDict *options;
++    int ret;
 +
 +    create_options = g_new0(BlockdevCreateOptions, 1);
-+    create_options->driver = BLOCKDEV_DRIVER_RBD;
-+    rbd_opts = &create_options->u.rbd;
++    create_options->driver = BLOCKDEV_DRIVER_NFS;
++    nfs_opts = &create_options->u.nfs;
 +
-+    rbd_opts->location = g_new0(BlockdevOptionsRbd, 1);
-+
-+    password_secret = qemu_opt_get(opts, "password-secret");
-+
-+    /* Read out options */
-+    rbd_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+     /* Read out options */
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
++    nfs_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
 +                              BDRV_SECTOR_SIZE);
-+    rbd_opts->cluster_size = qemu_opt_get_size_del(opts,
-+                                                   BLOCK_OPT_CLUSTER_SIZE, 0);
-+    rbd_opts->has_cluster_size = (rbd_opts->cluster_size != 0);
-+
-+    options = qdict_new();
-+    qemu_rbd_parse_filename(filename, options, &local_err);
-+    if (local_err) {
-+        ret = -EINVAL;
-+        error_propagate(errp, local_err);
-+        goto exit;
-+    }
-+
-+    /*
-+     * Caution: while qdict_get_try_str() is fine, getting non-string
-+     * types would require more care.  When @options come from -blockdev
-+     * or blockdev_add, its members are typed according to the QAPI
-+     * schema, but when they come from -drive, they're all QString.
-+     */
-+    loc = rbd_opts->location;
-+    loc->pool     = g_strdup(qdict_get_try_str(options, "pool"));
-+    loc->conf     = g_strdup(qdict_get_try_str(options, "conf"));
-+    loc->has_conf = !!loc->conf;
-+    loc->user     = g_strdup(qdict_get_try_str(options, "user"));
-+    loc->has_user = !!loc->user;
-+    loc->image    = g_strdup(qdict_get_try_str(options, "image"));
-+    keypairs      = qdict_get_try_str(options, "=keyvalue-pairs");
-+
-+    ret = qemu_rbd_do_create(create_options, keypairs, password_secret, errp);
-+    if (ret < 0) {
-+        goto exit;
-+    }
  
- exit:
+     options = qdict_new();
+     ret = nfs_parse_uri(url, options, errp);
+@@ -632,15 +669,21 @@ static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
+         goto out;
+     }
+ 
+-    ret = nfs_client_open_qdict(client, options, O_CREAT, 0, errp);
++    nfs_opts->location = nfs_options_qdict_to_qapi(options, errp);
++    if (nfs_opts->location == NULL) {
++        ret = -EINVAL;
++        goto out;
++    }
++
++    ret = nfs_file_co_create(create_options, errp);
+     if (ret < 0) {
+         goto out;
+     }
+-    ret = nfs_ftruncate(client->context, client->fh, total_size);
+-    nfs_client_close(client);
++
++    ret = 0;
+ out:
      QDECREF(options);
+-    g_free(client);
 +    qapi_free_BlockdevCreateOptions(create_options);
      return ret;
  }
  
-@@ -1149,6 +1198,7 @@ static BlockDriver bdrv_rbd = {
-     .bdrv_close             = qemu_rbd_close,
-     .bdrv_reopen_prepare    = qemu_rbd_reopen_prepare,
-     .bdrv_create            = qemu_rbd_create,
-+    .bdrv_co_create         = qemu_rbd_co_create,
-     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
-     .bdrv_get_info          = qemu_rbd_getinfo,
-     .create_opts            = &qemu_rbd_create_opts,
+@@ -828,6 +871,7 @@ static BlockDriver bdrv_nfs = {
+     .bdrv_file_open                 = nfs_file_open,
+     .bdrv_close                     = nfs_file_close,
+     .bdrv_create                    = nfs_file_create,
++    .bdrv_co_create                 = nfs_file_co_create,
+     .bdrv_reopen_prepare            = nfs_reopen_prepare,
+ 
+     .bdrv_co_preadv                 = nfs_co_preadv,
 -- 
 2.13.6
