@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <airlied@gmail.com>) id 1eoJYg-0000mF-5v
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 20:50:59 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eoLCX-0006ml-Rq
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 22:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <airlied@gmail.com>) id 1eoJYb-0004oM-5n
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 20:50:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46094 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <airlied@gmail.com>) id 1eoJYb-0004np-12
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 20:50:53 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D6DE8424F
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 01:50:41 +0000 (UTC)
-Received: from dreadlord-bne-redhat-com.bne.redhat.com
-	(dhcp-40-179.bne.redhat.com [10.64.40.179])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7397E10A9DFB
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 01:50:36 +0000 (UTC)
-From: Dave Airlie <airlied@gmail.com>
-Date: Wed, 21 Feb 2018 11:50:35 +1000
-Message-Id: <20180221015035.22964-1-airlied@gmail.com>
-Subject: [Qemu-devel] [PATCH] virtio-gpu-3d: add support for second
- capability set (v2)
+	(envelope-from <aik@ozlabs.ru>) id 1eoLCU-0004gq-LD
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 22:36:13 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eoLCU-0004fB-C0
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 22:36:10 -0500
+Received: by mail-pf0-x244.google.com with SMTP id q13so169190pff.0
+	for <qemu-devel@nongnu.org>; Tue, 20 Feb 2018 19:36:09 -0800 (PST)
+References: <20180119050906.18930-1-aik@ozlabs.ru>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <cde2e179-820f-5afb-9d90-43862a50be51@ozlabs.ru>
+Date: Wed, 21 Feb 2018 14:36:03 +1100
+MIME-Version: 1.0
+In-Reply-To: <20180119050906.18930-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +31,147 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Andrea Bolognani <abologna@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Dave Airlie <airlied@redhat.com>
+On 19/01/18 16:09, Alexey Kardashevskiy wrote:
+> There is already 'device-list-properties' which does most of the job,
+> however it does not handle everything returned by qom-list-types such
+> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+> 
+> This adds a new qom-list-properties command which prints properties
+> of a specific class and its instance. It is pretty much a simplified copy
+> of the device-list-properties handler.
+> 
+> Since it creates an object instance, device properties should appear
+> in the output as they are copied to QOM properties at the instance_init
+> hook.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Due to a kernel bug we can never increase the size of capability
-set 1, so introduce a new capability set in parallel, old userspace
-will continue to use the old set, new userspace will start using
-the new one when it detects a fixed kernel.
 
-v2: don't use a define from virglrenderer, just probe it.
+So is it ack or nack for the patch? Whose area is this? Thanks,
 
-Signed-off-by: Dave Airlie <airlied@redhat.com>
----
- hw/display/virtio-gpu-3d.c                  | 5 +++++
- hw/display/virtio-gpu.c                     | 7 ++++++-
- include/standard-headers/linux/virtio_gpu.h | 1 +
- 3 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
-index 7db84efe89..c601b43810 100644
---- a/hw/display/virtio-gpu-3d.c
-+++ b/hw/display/virtio-gpu-3d.c
-@@ -362,6 +362,11 @@ static void virgl_cmd_get_capset_info(VirtIOGPU *g,
-         virgl_renderer_get_cap_set(resp.capset_id,
-                                    &resp.capset_max_version,
-                                    &resp.capset_max_size);
-+    } else if (info.capset_index == 1) {
-+        resp.capset_id = VIRTIO_GPU_CAPSET_VIRGL2;
-+        virgl_renderer_get_cap_set(resp.capset_id,
-+                                   &resp.capset_max_version,
-+                                   &resp.capset_max_size);
-     } else {
-         resp.capset_max_version = 0;
-         resp.capset_max_size = 0;
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 6658f6c6a6..1418db1b88 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -1212,10 +1212,15 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-     g->req_state[0].height = g->conf.yres;
- 
-     if (virtio_gpu_virgl_enabled(g->conf)) {
-+        uint32_t capset2_max_ver, capset2_max_size;
-         /* use larger control queue in 3d mode */
-         g->ctrl_vq   = virtio_add_queue(vdev, 256, virtio_gpu_handle_ctrl_cb);
-         g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
--        g->virtio_config.num_capsets = 1;
-+
-+        virgl_renderer_get_cap_set(VIRTIO_GPU_CAPSET_VIRGL2,
-+                                   &capset2_max_ver,
-+                                   &capset2_max_size);
-+        g->virtio_config.num_capsets = capset2_max_ver > 0 ? 2 : 1;
-     } else {
-         g->ctrl_vq   = virtio_add_queue(vdev, 64, virtio_gpu_handle_ctrl_cb);
-         g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
-diff --git a/include/standard-headers/linux/virtio_gpu.h b/include/standard-headers/linux/virtio_gpu.h
-index c1c8f0751d..52a830dcf8 100644
---- a/include/standard-headers/linux/virtio_gpu.h
-+++ b/include/standard-headers/linux/virtio_gpu.h
-@@ -260,6 +260,7 @@ struct virtio_gpu_cmd_submit {
- };
- 
- #define VIRTIO_GPU_CAPSET_VIRGL 1
-+#define VIRTIO_GPU_CAPSET_VIRGL2 2
- 
- /* VIRTIO_GPU_CMD_GET_CAPSET_INFO */
- struct virtio_gpu_get_capset_info {
+
+> ---
+> 
+> I am missing the point of make_device_property_info().
+> qmp_device_list_properties() creates the instance which copies everything
+> to QOM properties hashtable and commenting out the do{}while() in
+> make_device_property_info() does not seem to change a thing, what case
+> am I missing here?
+> 
+> 
+> ---
+>  qapi-schema.json | 29 +++++++++++++++++++++++++++++
+>  qmp.c            | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 81 insertions(+)
+> 
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 5c06745..9d73501 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -1455,6 +1455,35 @@
+>    'returns': [ 'DevicePropertyInfo' ] }
+>  
+>  ##
+> +# @QOMPropertyInfo:
+> +#
+> +# Information about object properties.
+> +#
+> +# @name: the name of the property
+> +# @type: the typename of the property
+> +# @description: if specified, the description of the property.
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'QOMPropertyInfo',
+> +  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
+> +
+> +##
+> +# @qom-list-properties:
+> +#
+> +# List properties associated with a QOM object.
+> +#
+> +# @typename: the type name of an object
+> +#
+> +# Returns: a list of QOMPropertyInfo describing object properties
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'qom-list-properties',
+> +  'data': { 'typename': 'str'},
+> +  'returns': [ 'QOMPropertyInfo' ] }
+> +
+> +##
+>  # @xen-set-global-dirty-log:
+>  #
+>  # Enable or disable the global dirty log mode.
+> diff --git a/qmp.c b/qmp.c
+> index 52cfd2d..20cb662 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -574,6 +574,58 @@ DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
+>      return prop_list;
+>  }
+>  
+> +QOMPropertyInfoList *qmp_qom_list_properties(const char *typename,
+> +                                             Error **errp)
+> +{
+> +    ObjectClass *klass;
+> +    Object *obj;
+> +    ObjectProperty *prop;
+> +    ObjectPropertyIterator iter;
+> +    QOMPropertyInfoList *prop_list = NULL;
+> +
+> +    klass = object_class_by_name(typename);
+> +    if (klass == NULL) {
+> +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> +                  "Class '%s' not found", typename);
+> +        return NULL;
+> +    }
+> +
+> +    klass = object_class_dynamic_cast(klass, TYPE_OBJECT);
+> +    if (klass == NULL) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_OBJECT);
+> +        return NULL;
+> +    }
+> +
+> +    if (object_class_is_abstract(klass)) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename",
+> +                   "non-abstract class");
+> +        return NULL;
+> +    }
+> +
+> +    obj = object_new(typename);
+> +
+> +    object_property_iter_init(&iter, obj);
+> +    while ((prop = object_property_iter_next(&iter))) {
+> +        QOMPropertyInfo *info;
+> +        QOMPropertyInfoList *entry;
+> +
+> +        info = g_malloc0(sizeof(*info));
+> +        info->name = g_strdup(prop->name);
+> +        info->type = g_strdup(prop->type);
+> +        info->has_description = !!prop->description;
+> +        info->description = g_strdup(prop->description);
+> +
+> +        entry = g_malloc0(sizeof(*entry));
+> +        entry->value = info;
+> +        entry->next = prop_list;
+> +        prop_list = entry;
+> +    }
+> +
+> +    object_unref(obj);
+> +
+> +    return prop_list;
+> +}
+> +
+>  CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+>  {
+>      return arch_query_cpu_definitions(errp);
+> 
+
+
 -- 
-2.14.3
+Alexey
