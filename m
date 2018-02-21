@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eoSDg-000443-5z
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:05:54 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eoSDm-0004D2-2W
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eoSDe-0006lF-EZ
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:05:52 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:41252)
+	(envelope-from <alex.bennee@linaro.org>) id 1eoSDf-0006mi-M8
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:05:58 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34347)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eoSDe-0006kk-4o
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:05:50 -0500
-Received: by mail-wr0-x241.google.com with SMTP id f14so3266187wre.8
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 03:05:50 -0800 (PST)
+	id 1eoSDf-0006mO-Bp
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:05:51 -0500
+Received: by mail-wr0-x241.google.com with SMTP id m5so3302882wrg.1
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 03:05:51 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 21 Feb 2018 11:05:16 +0000
-Message-Id: <20180221110523.859-17-alex.bennee@linaro.org>
+Date: Wed, 21 Feb 2018 11:05:21 +0000
+Message-Id: <20180221110523.859-22-alex.bennee@linaro.org>
 In-Reply-To: <20180221110523.859-1-alex.bennee@linaro.org>
 References: <20180221110523.859-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/22] fpu/softfloat: re-factor round_to_int
+Subject: [Qemu-devel] [PULL 21/22] fpu/softfloat: re-factor compare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,378 +30,178 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-We can now add float16_round_to_int and use the common round_decomposed and
-canonicalize functions to have a single implementation for
-float16/32/64 round_to_int functions.
+The compare function was already expanded from a macro. I keep the
+macro expansion but move most of the logic into a compare_decomposed.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index ae4ba6de51..616c6cef07 100644
+index 7a53c36da4..4bc425d7e4 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -560,6 +560,25 @@ static bool is_qnan(FloatClass c)
-     return c == float_class_qnan;
- }
+@@ -1783,6 +1783,86 @@ MINMAX(64, maxnummag, false, true, true)
  
-+static FloatParts return_nan(FloatParts a, float_status *s)
+ #undef MINMAX
+ 
++/* Floating point compare */
++static int compare_floats(FloatParts a, FloatParts b, bool is_quiet,
++                          float_status *s)
 +{
-+    switch (a.cls) {
-+    case float_class_snan:
-+        s->float_exception_flags |= float_flag_invalid;
-+        a.cls = float_class_msnan;
-+        /* fall through */
-+    case float_class_qnan:
-+        if (s->default_nan_mode) {
-+            a.cls = float_class_dnan;
++    if (is_nan(a.cls) || is_nan(b.cls)) {
++        if (!is_quiet ||
++            a.cls == float_class_snan ||
++            b.cls == float_class_snan) {
++            s->float_exception_flags |= float_flag_invalid;
 +        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+    return a;
-+}
-+
- static FloatParts pick_nan(FloatParts a, FloatParts b, float_status *s)
- {
-     if (is_snan(a.cls) || is_snan(b.cls)) {
-@@ -1175,6 +1194,132 @@ float64 float64_div(float64 a, float64 b, float_status *status)
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+/*
-+ * Rounds the floating-point value `a' to an integer, and returns the
-+ * result as a floating-point value. The operation is performed
-+ * according to the IEC/IEEE Standard for Binary Floating-Point
-+ * Arithmetic.
-+ */
-+
-+static FloatParts round_to_int(FloatParts a, int rounding_mode, float_status *s)
-+{
-+    if (is_nan(a.cls)) {
-+        return return_nan(a, s);
++        return float_relation_unordered;
 +    }
 +
-+    switch (a.cls) {
-+    case float_class_zero:
-+    case float_class_inf:
-+    case float_class_qnan:
-+        /* already "integral" */
-+        break;
-+    case float_class_normal:
-+        if (a.exp >= DECOMPOSED_BINARY_POINT) {
-+            /* already integral */
-+            break;
++    if (a.cls == float_class_zero) {
++        if (b.cls == float_class_zero) {
++            return float_relation_equal;
 +        }
-+        if (a.exp < 0) {
-+            bool one;
-+            /* all fractional */
-+            s->float_exception_flags |= float_flag_inexact;
-+            switch (rounding_mode) {
-+            case float_round_nearest_even:
-+                one = a.exp == -1 && a.frac > DECOMPOSED_IMPLICIT_BIT;
-+                break;
-+            case float_round_ties_away:
-+                one = a.exp == -1 && a.frac >= DECOMPOSED_IMPLICIT_BIT;
-+                break;
-+            case float_round_to_zero:
-+                one = false;
-+                break;
-+            case float_round_up:
-+                one = !a.sign;
-+                break;
-+            case float_round_down:
-+                one = a.sign;
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
++        return b.sign ? float_relation_greater : float_relation_less;
++    } else if (b.cls == float_class_zero) {
++        return a.sign ? float_relation_less : float_relation_greater;
++    }
 +
-+            if (one) {
-+                a.frac = DECOMPOSED_IMPLICIT_BIT;
-+                a.exp = 0;
-+            } else {
-+                a.cls = float_class_zero;
-+            }
++    /* The only really important thing about infinity is its sign. If
++     * both are infinities the sign marks the smallest of the two.
++     */
++    if (a.cls == float_class_inf) {
++        if ((b.cls == float_class_inf) && (a.sign == b.sign)) {
++            return float_relation_equal;
++        }
++        return a.sign ? float_relation_less : float_relation_greater;
++    } else if (b.cls == float_class_inf) {
++        return b.sign ? float_relation_greater : float_relation_less;
++    }
++
++    if (a.sign != b.sign) {
++        return a.sign ? float_relation_less : float_relation_greater;
++    }
++
++    if (a.exp == b.exp) {
++        if (a.frac == b.frac) {
++            return float_relation_equal;
++        }
++        if (a.sign) {
++            return a.frac > b.frac ?
++                float_relation_less : float_relation_greater;
 +        } else {
-+            uint64_t frac_lsb = DECOMPOSED_IMPLICIT_BIT >> a.exp;
-+            uint64_t frac_lsbm1 = frac_lsb >> 1;
-+            uint64_t rnd_even_mask = (frac_lsb - 1) | frac_lsb;
-+            uint64_t rnd_mask = rnd_even_mask >> 1;
-+            uint64_t inc;
-+
-+            switch (rounding_mode) {
-+            case float_round_nearest_even:
-+                inc = ((a.frac & rnd_even_mask) != frac_lsbm1 ? frac_lsbm1 : 0);
-+                break;
-+            case float_round_ties_away:
-+                inc = frac_lsbm1;
-+                break;
-+            case float_round_to_zero:
-+                inc = 0;
-+                break;
-+            case float_round_up:
-+                inc = a.sign ? 0 : rnd_mask;
-+                break;
-+            case float_round_down:
-+                inc = a.sign ? rnd_mask : 0;
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-+
-+            if (a.frac & rnd_mask) {
-+                s->float_exception_flags |= float_flag_inexact;
-+                a.frac += inc;
-+                a.frac &= ~rnd_mask;
-+                if (a.frac & DECOMPOSED_OVERFLOW_BIT) {
-+                    a.frac >>= 1;
-+                    a.exp++;
-+                }
-+            }
++            return a.frac > b.frac ?
++                float_relation_greater : float_relation_less;
 +        }
-+        break;
-+    default:
-+        g_assert_not_reached();
++    } else {
++        if (a.sign) {
++            return a.exp > b.exp ? float_relation_less : float_relation_greater;
++        } else {
++            return a.exp > b.exp ? float_relation_greater : float_relation_less;
++        }
 +    }
-+    return a;
 +}
 +
-+float16 float16_round_to_int(float16 a, float_status *s)
-+{
-+    FloatParts pa = float16_unpack_canonical(a, s);
-+    FloatParts pr = round_to_int(pa, s->float_rounding_mode, s);
-+    return float16_round_pack_canonical(pr, s);
++#define COMPARE(sz)                                                     \
++int float ## sz ## _compare(float ## sz a, float ## sz b,               \
++                            float_status *s)                            \
++{                                                                       \
++    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
++    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
++    return compare_floats(pa, pb, false, s);                            \
++}                                                                       \
++int float ## sz ## _compare_quiet(float ## sz a, float ## sz b,         \
++                                  float_status *s)                      \
++{                                                                       \
++    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
++    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
++    return compare_floats(pa, pb, true, s);                             \
 +}
 +
-+float32 float32_round_to_int(float32 a, float_status *s)
-+{
-+    FloatParts pa = float32_unpack_canonical(a, s);
-+    FloatParts pr = round_to_int(pa, s->float_rounding_mode, s);
-+    return float32_round_pack_canonical(pr, s);
-+}
++COMPARE(16)
++COMPARE(32)
++COMPARE(64)
 +
-+float64 float64_round_to_int(float64 a, float_status *s)
-+{
-+    FloatParts pa = float64_unpack_canonical(a, s);
-+    FloatParts pr = round_to_int(pa, s->float_rounding_mode, s);
-+    return float64_round_pack_canonical(pr, s);
-+}
++#undef COMPARE
 +
-+float64 float64_trunc_to_int(float64 a, float_status *s)
-+{
-+    FloatParts pa = float64_unpack_canonical(a, s);
-+    FloatParts pr = round_to_int(pa, float_round_to_zero, s);
-+    return float64_round_pack_canonical(pr, s);
-+}
-+
- /*----------------------------------------------------------------------------
- | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
- | and 7, and returns the properly rounded 32-bit integer corresponding to the
-@@ -2905,87 +3050,6 @@ float128 float32_to_float128(float32 a, float_status *status)
- 
+ /* Multiply A by 2 raised to the power N.  */
+ static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
+ {
+@@ -6884,60 +6964,6 @@ int float128_unordered_quiet(float128 a, float128 b, float_status *status)
+     return 0;
  }
  
--/*----------------------------------------------------------------------------
--| Rounds the single-precision floating-point value `a' to an integer, and
--| returns the result as a single-precision floating-point value.  The
--| operation is performed according to the IEC/IEEE Standard for Binary
--| Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--float32 float32_round_to_int(float32 a, float_status *status)
--{
--    flag aSign;
--    int aExp;
--    uint32_t lastBitMask, roundBitsMask;
--    uint32_t z;
--    a = float32_squash_input_denormal(a, status);
--
--    aExp = extractFloat32Exp( a );
--    if ( 0x96 <= aExp ) {
--        if ( ( aExp == 0xFF ) && extractFloat32Frac( a ) ) {
--            return propagateFloat32NaN(a, a, status);
--        }
--        return a;
--    }
--    if ( aExp <= 0x7E ) {
--        if ( (uint32_t) ( float32_val(a)<<1 ) == 0 ) return a;
--        status->float_exception_flags |= float_flag_inexact;
--        aSign = extractFloat32Sign( a );
--        switch (status->float_rounding_mode) {
--         case float_round_nearest_even:
--            if ( ( aExp == 0x7E ) && extractFloat32Frac( a ) ) {
--                return packFloat32( aSign, 0x7F, 0 );
--            }
--            break;
--        case float_round_ties_away:
--            if (aExp == 0x7E) {
--                return packFloat32(aSign, 0x7F, 0);
--            }
--            break;
--         case float_round_down:
--            return make_float32(aSign ? 0xBF800000 : 0);
--         case float_round_up:
--            return make_float32(aSign ? 0x80000000 : 0x3F800000);
--        }
--        return packFloat32( aSign, 0, 0 );
--    }
--    lastBitMask = 1;
--    lastBitMask <<= 0x96 - aExp;
--    roundBitsMask = lastBitMask - 1;
--    z = float32_val(a);
--    switch (status->float_rounding_mode) {
--    case float_round_nearest_even:
--        z += lastBitMask>>1;
--        if ((z & roundBitsMask) == 0) {
--            z &= ~lastBitMask;
--        }
--        break;
--    case float_round_ties_away:
--        z += lastBitMask >> 1;
--        break;
--    case float_round_to_zero:
--        break;
--    case float_round_up:
--        if (!extractFloat32Sign(make_float32(z))) {
--            z += roundBitsMask;
--        }
--        break;
--    case float_round_down:
--        if (extractFloat32Sign(make_float32(z))) {
--            z += roundBitsMask;
--        }
--        break;
--    default:
--        abort();
--    }
--    z &= ~ roundBitsMask;
--    if (z != float32_val(a)) {
--        status->float_exception_flags |= float_flag_inexact;
--    }
--    return make_float32(z);
--
+-#define COMPARE(s, nan_exp)                                                  \
+-static inline int float ## s ## _compare_internal(float ## s a, float ## s b,\
+-                                      int is_quiet, float_status *status)    \
+-{                                                                            \
+-    flag aSign, bSign;                                                       \
+-    uint ## s ## _t av, bv;                                                  \
+-    a = float ## s ## _squash_input_denormal(a, status);                     \
+-    b = float ## s ## _squash_input_denormal(b, status);                     \
+-                                                                             \
+-    if (( ( extractFloat ## s ## Exp( a ) == nan_exp ) &&                    \
+-         extractFloat ## s ## Frac( a ) ) ||                                 \
+-        ( ( extractFloat ## s ## Exp( b ) == nan_exp ) &&                    \
+-          extractFloat ## s ## Frac( b ) )) {                                \
+-        if (!is_quiet ||                                                     \
+-            float ## s ## _is_signaling_nan(a, status) ||                  \
+-            float ## s ## _is_signaling_nan(b, status)) {                 \
+-            float_raise(float_flag_invalid, status);                         \
+-        }                                                                    \
+-        return float_relation_unordered;                                     \
+-    }                                                                        \
+-    aSign = extractFloat ## s ## Sign( a );                                  \
+-    bSign = extractFloat ## s ## Sign( b );                                  \
+-    av = float ## s ## _val(a);                                              \
+-    bv = float ## s ## _val(b);                                              \
+-    if ( aSign != bSign ) {                                                  \
+-        if ( (uint ## s ## _t) ( ( av | bv )<<1 ) == 0 ) {                   \
+-            /* zero case */                                                  \
+-            return float_relation_equal;                                     \
+-        } else {                                                             \
+-            return 1 - (2 * aSign);                                          \
+-        }                                                                    \
+-    } else {                                                                 \
+-        if (av == bv) {                                                      \
+-            return float_relation_equal;                                     \
+-        } else {                                                             \
+-            return 1 - 2 * (aSign ^ ( av < bv ));                            \
+-        }                                                                    \
+-    }                                                                        \
+-}                                                                            \
+-                                                                             \
+-int float ## s ## _compare(float ## s a, float ## s b, float_status *status) \
+-{                                                                            \
+-    return float ## s ## _compare_internal(a, b, 0, status);                 \
+-}                                                                            \
+-                                                                             \
+-int float ## s ## _compare_quiet(float ## s a, float ## s b,                 \
+-                                 float_status *status)                       \
+-{                                                                            \
+-    return float ## s ## _compare_internal(a, b, 1, status);                 \
 -}
 -
- /*----------------------------------------------------------------------------
- | Returns the remainder of the single-precision floating-point value `a'
- | with respect to the corresponding value `b'.  The operation is performed
-@@ -4129,99 +4193,6 @@ float128 float64_to_float128(float64 a, float_status *status)
- 
- }
- 
--/*----------------------------------------------------------------------------
--| Rounds the double-precision floating-point value `a' to an integer, and
--| returns the result as a double-precision floating-point value.  The
--| operation is performed according to the IEC/IEEE Standard for Binary
--| Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
+-COMPARE(32, 0xff)
+-COMPARE(64, 0x7ff)
 -
--float64 float64_round_to_int(float64 a, float_status *status)
--{
--    flag aSign;
--    int aExp;
--    uint64_t lastBitMask, roundBitsMask;
--    uint64_t z;
--    a = float64_squash_input_denormal(a, status);
--
--    aExp = extractFloat64Exp( a );
--    if ( 0x433 <= aExp ) {
--        if ( ( aExp == 0x7FF ) && extractFloat64Frac( a ) ) {
--            return propagateFloat64NaN(a, a, status);
--        }
--        return a;
--    }
--    if ( aExp < 0x3FF ) {
--        if ( (uint64_t) ( float64_val(a)<<1 ) == 0 ) return a;
--        status->float_exception_flags |= float_flag_inexact;
--        aSign = extractFloat64Sign( a );
--        switch (status->float_rounding_mode) {
--         case float_round_nearest_even:
--            if ( ( aExp == 0x3FE ) && extractFloat64Frac( a ) ) {
--                return packFloat64( aSign, 0x3FF, 0 );
--            }
--            break;
--        case float_round_ties_away:
--            if (aExp == 0x3FE) {
--                return packFloat64(aSign, 0x3ff, 0);
--            }
--            break;
--         case float_round_down:
--            return make_float64(aSign ? LIT64( 0xBFF0000000000000 ) : 0);
--         case float_round_up:
--            return make_float64(
--            aSign ? LIT64( 0x8000000000000000 ) : LIT64( 0x3FF0000000000000 ));
--        }
--        return packFloat64( aSign, 0, 0 );
--    }
--    lastBitMask = 1;
--    lastBitMask <<= 0x433 - aExp;
--    roundBitsMask = lastBitMask - 1;
--    z = float64_val(a);
--    switch (status->float_rounding_mode) {
--    case float_round_nearest_even:
--        z += lastBitMask >> 1;
--        if ((z & roundBitsMask) == 0) {
--            z &= ~lastBitMask;
--        }
--        break;
--    case float_round_ties_away:
--        z += lastBitMask >> 1;
--        break;
--    case float_round_to_zero:
--        break;
--    case float_round_up:
--        if (!extractFloat64Sign(make_float64(z))) {
--            z += roundBitsMask;
--        }
--        break;
--    case float_round_down:
--        if (extractFloat64Sign(make_float64(z))) {
--            z += roundBitsMask;
--        }
--        break;
--    default:
--        abort();
--    }
--    z &= ~ roundBitsMask;
--    if (z != float64_val(a)) {
--        status->float_exception_flags |= float_flag_inexact;
--    }
--    return make_float64(z);
--
--}
--
--float64 float64_trunc_to_int(float64 a, float_status *status)
--{
--    int oldmode;
--    float64 res;
--    oldmode = status->float_rounding_mode;
--    status->float_rounding_mode = float_round_to_zero;
--    res = float64_round_to_int(a, status);
--    status->float_rounding_mode = oldmode;
--    return res;
--}
--
- 
- /*----------------------------------------------------------------------------
- | Returns the remainder of the double-precision floating-point value `a'
+ static inline int floatx80_compare_internal(floatx80 a, floatx80 b,
+                                             int is_quiet, float_status *status)
+ {
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 65bc7442d2..4650758c23 100644
+index 35df225a55..cebe37b716 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -237,6 +237,7 @@ float64 float16_to_float64(float16 a, flag ieee, float_status *status);
- | Software half-precision operations.
- *----------------------------------------------------------------------------*/
+@@ -251,6 +251,8 @@ float16 float16_minnum(float16, float16, float_status *status);
+ float16 float16_maxnum(float16, float16, float_status *status);
+ float16 float16_minnummag(float16, float16, float_status *status);
+ float16 float16_maxnummag(float16, float16, float_status *status);
++int float16_compare(float16, float16, float_status *status);
++int float16_compare_quiet(float16, float16, float_status *status);
  
-+float16 float16_round_to_int(float16, float_status *status);
- float16 float16_add(float16, float16, float_status *status);
- float16 float16_sub(float16, float16, float_status *status);
- float16 float16_mul(float16, float16, float_status *status);
+ int float16_is_quiet_nan(float16, float_status *status);
+ int float16_is_signaling_nan(float16, float_status *status);
 -- 
 2.15.1
