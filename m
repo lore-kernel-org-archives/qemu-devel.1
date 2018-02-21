@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoY7p-00009B-Bj
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:24:14 -0500
+	(envelope-from <david@redhat.com>) id 1eoYDC-0001ON-3t
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:29:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eoY7l-0005Y0-DA
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:24:13 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35808 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eoY7l-0005Xg-4b
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:24:09 -0500
-Date: Wed, 21 Feb 2018 17:23:46 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180221172346.GI21436@stefanha-x1.localdomain>
-References: <20180124053957.29145-1-peterx@redhat.com>
-	<20180124053957.29145-17-peterx@redhat.com>
+	(envelope-from <david@redhat.com>) id 1eoYD8-0007SE-1L
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 12:29:46 -0500
+References: <20180221165628.78946-1-pasic@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <724303ad-100b-109f-f843-44e0795f0ae6@redhat.com>
+Date: Wed, 21 Feb 2018 18:29:19 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="16qp2B0xu0fRvRD7"
-Content-Disposition: inline
-In-Reply-To: <20180124053957.29145-17-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 16/23] monitor: send event when command
- queue full
+In-Reply-To: <20180221165628.78946-1-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] 390x/cpumodel: document
+ S390FeatDef.bit not applicable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
+On 21.02.2018 17:56, Halil Pasic wrote:
+> The 'bit' field of the 'S390FeatDef' structure is not applicable to all
+> its instances. Currently this field is not applicable, and remains
+> unused, iff the feature is of type S390_FEAT_TYPE_MISC. Having the value 0
+> specified for multiple such feature definition  was a little confusing,
 
---16qp2B0xu0fRvRD7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+s/  / /
 
-On Wed, Jan 24, 2018 at 01:39:50PM +0800, Peter Xu wrote:
-> Set maximum QMP command queue length to 8.  If queue full, instead of
-> queue the command, we directly return a "command-dropped" event, telling
-> client that specific command is dropped.
->=20
-> Note that this flow control mechanism is only valid if OOB is enabled.
-> If it's not, the effective queue length will always be 1, which strictly
-> follows original behavior of QMP command handling (which never drop
-> messages).
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> as it's a perfectly legit bit value, and as the value of the bit
+> field is usually ought to be unique for each feature of a given
+> feature type.
+> 
+> Let us introduce a specialized macro for defining features of type
+> S390_FEAT_TYPE_MISC so, that one does not have to specify neither bit nor
+> type (as the later is implied).
+
+s/later is implied/latter is implicit/
+
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 > ---
->  monitor.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> v1 -> v2
+> * Specialized feature initializer macro for type MISC that does not
+>   require a bit value instead of defining a 'not a bit number' (that
+>   is extremal) bit number.
+> ---
+>  target/s390x/cpu_features.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index a5619f2893..3b9e2745e9 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -23,6 +23,10 @@
+>          .desc = _desc,                               \
+>      }
+>  
+> +/* S390FeatDef.bit is not applicable as there is no feature block. */
+> +#define FEAT_INIT_MISC(_name, _desc)                 \
+> +            FEAT_INIT(_name, S390_FEAT_TYPE_MISC, 0, _desc)
+> +
+>  /* indexed by feature number for easy lookup */
+>  static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("esan3", S390_FEAT_TYPE_STFL, 0, "Instructions marked as n3"),
+> @@ -123,8 +127,8 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("ib", S390_FEAT_TYPE_SCLP_CPU, 42, "SIE: Intervention bypass facility"),
+>      FEAT_INIT("cei", S390_FEAT_TYPE_SCLP_CPU, 43, "SIE: Conditional-external-interception facility"),
+>  
+> -    FEAT_INIT("dateh2", S390_FEAT_TYPE_MISC, 0, "DAT-enhancement facility 2"),
+> -    FEAT_INIT("cmm", S390_FEAT_TYPE_MISC, 0, "Collaborative-memory-management facility"),
+> +    FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
+> +    FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
+>  
+>      FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
+>      FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
+> 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
---16qp2B0xu0fRvRD7
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
 
------BEGIN PGP SIGNATURE-----
+Thanks,
 
-iQEcBAEBAgAGBQJajasiAAoJEJykq7OBq3PIoh4IAIXiS/7HAcBHwfj9NRX4fxXN
-f9/T7wPHvelEmVMaOpqtOqz7LG8AxL51qo6HrkMX9Zn0xrl9Icsb+4ovIiqg5a21
-wRS50SVB8SE5CnJAgle60vbv+yVjAnR8Cr/gGKEoDL5gDRyEyOHxgEYvGh1Z5q6N
-VklrfGqnfuseFkpQ5LxD74xEu68E8LViloTZfQck096Wj6qmvcO5n2ymDcom9Iwl
-S9yNtA0hlfMPTtgC1sGNj0rtSZiGQZkfcQU+xCVKNk+an0IbcMPZZbwfYhiPAnoZ
-VvjvDfig+TcNbDsYuCBj7OGpCz3kBRVoA/fBUCPJO3LRYxS4aJEr8hNqMN91ukM=
-=sgp3
------END PGP SIGNATURE-----
-
---16qp2B0xu0fRvRD7--
+David / dhildenb
