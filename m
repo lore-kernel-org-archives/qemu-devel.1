@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoHv9-00084t-Fu
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 19:06:04 -0500
+	(envelope-from <thuth@redhat.com>) id 1eoI90-0002LR-JB
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 19:20:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoHv6-0003xS-66
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 19:06:03 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33750 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1eoI8x-0002dW-Rn
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 19:20:22 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42694 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoHv6-0003wr-17
-	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 19:06:00 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eoI8x-0002dI-Mk
+	for qemu-devel@nongnu.org; Tue, 20 Feb 2018 19:20:19 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5678A407244E
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 00:05:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBA107C6A0
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 00:20:07 +0000 (UTC)
 References: <1519148406-15006-1-git-send-email-thuth@redhat.com>
-	<1519148406-15006-9-git-send-email-thuth@redhat.com>
-	<55a10378-b99f-f73c-3162-55dcf023453b@redhat.com>
+	<1519148406-15006-6-git-send-email-thuth@redhat.com>
+	<c5813dc8-5ec4-0aa1-074b-98547a49d8c6@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <06c04a52-2f9c-2a95-1f47-e8e448c5f2c1@redhat.com>
-Date: Wed, 21 Feb 2018 01:05:39 +0100
+Message-ID: <e566ab27-5cbb-ce58-23fe-c125e5bac542@redhat.com>
+Date: Wed, 21 Feb 2018 01:20:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <55a10378-b99f-f73c-3162-55dcf023453b@redhat.com>
+In-Reply-To: <c5813dc8-5ec4-0aa1-074b-98547a49d8c6@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] qemu-doc: Make "-net" less prominent
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] net: Remove the deprecated way of
+ dumping network packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 20.02.2018 19:37, Paolo Bonzini wrote:
-> On 20/02/2018 18:40, Thomas Huth wrote:
->> "-net" is clearly a legacy option. Yet we still use it in almost all
->> examples in the qemu documentation, and many other spots in the networ=
-k
->> chapter. We should make it less prominent that users are not lured int=
-o
->> using it so often anymore. So instead of starting the network chapter =
-with
->> "-net nic" and documenting "-net <backend>" below "-netdev <backend>"
->> everywhere, all the "-net" related documentation is now moved to the e=
-nd
->> of the chapter. And the examples are changed to use the "--device" and
->> "--netdev" options instead of "-net nic -net <backend>".
+On 20.02.2018 23:35, Eric Blake wrote:
+> On 02/20/2018 11:40 AM, Thomas Huth wrote:
+>> "-net dump" has been marked as deprecated since QEMU v2.10, since it
+>> only works with the deprecated 'vlan' parameter (or hubs). Network
+>> dumping should be done with "-object filter-dump" nowadays instead.
+>> Since nobody complained so far about the deprecation message, let's
+>> finally get rid of "-net dump" now.
+>>
+>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
 >=20
-> Do we want to change them to "-nic" instead?  The proof is in the
-> pudding, they say, :) and "-nic" is way easier to learn than "-device
-> -netdev".
+>> +++ b/qapi/net.json
+>> @@ -39,8 +39,10 @@
+>> =C2=A0 #
+>> =C2=A0 # Add a network backend.
+>> =C2=A0 #
+>> -# @type: the type of network backend.=C2=A0 Current valid values are
+>> 'user', 'tap',
+>> -#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'vde', 'socket', 'dump' a=
+nd 'bridge'
+>> +# @type: the type of network backend. Possible values in version
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2.11: 'user', 'tap', 'vde=
+', 'socket', 'hubport', 'bridge',
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 'dump', 'l2tpv3', 'netmap', 'vhost-user'
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2.12: 'dump' dropped
+>> =C2=A0 #
+>=20
+> That's a bit fuzzy, especially since the command has been around since
+> 0.14.=C2=A0 It might be easier to word it as:
+>=20
+> @type: the type of network backend. Possible values are listed in
+> NetClientDriver.
 
-While -nic is easier to use than -netdev, I don't think that we should
-put the focus in our main qemu-doc on -nic instead of -netdev. -nic is a
-convenience option, while -netdev is the "architected" way to configure
-network devices. We first should document how to do it "right", and
-teach the user to proper distinguish between emulated guest hardware and
-host network backend (with the old -net command, a lot of people seemed
-to have mixed that up IIRC), and then finally explain -nic on top of it.
+That's a really good idea to avoid that we have to maintain the list
+multiple times...
 
-> And maybe we *should* go the extra mile and deprecate "-net" altogether=
-.
->  The only case where the newer syntax is a bit more uncomfortable is fo=
-r
-> "-net nic -net nic -net tap|user", which however does work with "-nic
-> hubport -nic hubport -netdev tap|user,id=3Dx -netdev hubport,netdev=3Dx=
-".
-
-I'd be glad to add such a deprecation patch to this series - I just
-thought it might have been too early so far, but if you feel confident
-that we can mark it as deprecated, I can spin a v3 with such a patch on
-top...
+> Then defer the actual listing by version...
+>=20
+>> @@ -468,7 +453,7 @@
+>> =C2=A0 # Since: 2.7
+>> =C2=A0 ##
+>> =C2=A0 { 'enum': 'NetClientDriver',
+>> -=C2=A0 'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'v=
+de',
+>> 'dump',
+>> +=C2=A0 'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'v=
+de',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+>=20
+> ...to here
+... but 'none' and 'nic' are not valid for netdev_add. Well, I guess I
+can simply write something like "Possible values are listed in
+NetClientDriver (excluding 'none' and 'nic')". I'll send a v3 with that.
 
  Thomas
+
+
+PS: By the way, now that you've mentioned this, I think "dump" was also
+not valid for netdev_add, so the comment was even wrong there.
