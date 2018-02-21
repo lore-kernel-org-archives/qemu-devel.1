@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoZDX-0002qG-BU
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:34:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoZDW-0002qE-L1
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:34:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoZDQ-00080N-Bx
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:34:11 -0500
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:38003)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eoZDQ-0007zY-0S
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:34:04 -0500
-Received: by mail-ot0-x230.google.com with SMTP id 95so2297665ote.5
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 10:34:03 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1eoZDS-00083I-Pd
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 13:34:10 -0500
+Date: Wed, 21 Feb 2018 19:33:55 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180221183355.GC353@localhost.localdomain>
+References: <20180219145459.8143-1-berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1802211754370.60913@zero.eik.bme.hu>
-References: <cover.1519150239.git.balaton@eik.bme.hu>
-	<CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
-	<20180220204450.GA27101@flamenco>
-	<CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
-	<alpine.BSF.2.21.1802211754370.60913@zero.eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 21 Feb 2018 18:33:42 +0000
-Message-ID: <CAFEAcA-UaWGqLHfN_Z7h+C-k=1A5ic_REaWUu0-w19ALcNJy_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] Firmware blob and git submodule for
- Sam460ex
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180219145459.8143-1-berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] docs: document how to use the
+ l2-cache-entry-size parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: "Emilio G. Cota" <cota@braap.org>, Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Denis V . Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>
 
-On 21 February 2018 at 17:06, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> It's not that upstream u-boot has abandoned board support (it only removed
-> support for the PPC440 CPU it once had). The board itself never had support
-> in upstream u-boot, it only exists in vendor's fork which is the reason we
-> need a separate source and cannot use upstream u-boot source we already
-> have.
->
-> In my opinion we don't aim to take on support for this board in u-boot, we
-> only need to include the firmware binary for the emulation to be useful
-> which then requires us to also include the source for the GPL it's licensed
-> under. I've also found a few bugs in the firmware which I've fixed but apart
-> from such occasional bug fixes when needed I don't expect to take over
-> support for the board from the hardware vendor so this source is only so we
-> can include the firmware binary which is needed for the board emulation.
-> Does this answer your concerns?
+Am 19.02.2018 um 15:54 hat Alberto Garcia geschrieben:
+> This patch updates docs/qcow2-cache.txt explaining how to use the new
+> l2-cache-entry-size parameter.
+> 
+> Here's a more detailed technical description of this feature:
+> 
+>    https://lists.gnu.org/archive/html/qemu-block/2017-09/msg00635.html
+> 
+> And here are some performance numbers:
+> 
+>    https://lists.gnu.org/archive/html/qemu-block/2017-12/msg00507.html
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-We have lots of boards we don't ship firmware blobs for and
-which we expect the users to provide the guest code for
-if they're going to use them. If we had a git submodule
-for every random dev board model that needs some hardware
-vendor's BSP and bootloader we'd probably have 50 submodules...
+Thanks, applied to the block branch.
 
-Which isn't to say I'm definitely against this -- I'm just
-trying to figure out where we should draw the line of
-"these bits of guest code we build for you and ship with
-QEMU" versus "we provide the model of the hardware for you
-to run whatever guest code you happen to have".
 
-thanks
--- PMM
+While reviewing this, I read the whole document and stumbled across
+these paragraphs:
+
+> The reason for this 1/4 ratio is to ensure that both caches cover the
+> same amount of disk space. Note however that this is only valid with
+> the default value of refcount_bits (16). If you are using a different
+> value you might want to calculate both cache sizes yourself since QEMU
+> will always use the same 1/4 ratio.
+
+Sounds like we should fix our defaults?
+
+While we're at it, would l2-cache-entry-size = MIN(cluster_size, 64k)
+make sense as a default?
+
+> It's also worth mentioning that there's no strict need for both caches
+> to cover the same amount of disk space. The refcount cache is used
+> much less often than the L2 cache, so it's perfectly reasonable to
+> keep it small.
+
+More precisely, it is only used for cluster allocation, not for read or
+for rewrites. Usually this means that it's indeed accessed a lot less,
+though especially in benchmarks, this isn't necessarily less often.
+
+However, the more important part is that even for allocating writes with
+random I/O, the refcount cache is still accessed sequentially and we
+don't really take advantage of having more than a single refcount block
+in memory. This only stops being true as soon as you add something that
+can free clusters (discards, overwriting compressed cluster, deleting
+internal snapshots).
+
+We have a minimum refcount block cache size of 4 clusters because of the
+possible recursion during refcount table growth, which leaves some room
+to hold the refcount block for an occasional discard (and subsequent
+reallocation).
+
+So should we default to this minimum on the grounds that for most
+people, refcounts blocks are probably only accessed sequentially in
+practice? The remaining memory of the total cache size seems to help the
+average case more if it's added to the L2 cache instead.
+
+Kevin
