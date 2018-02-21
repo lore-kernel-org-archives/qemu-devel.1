@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUsD-0001lg-RU
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:55 -0500
+	(envelope-from <berto@igalia.com>) id 1eoV59-000509-8T
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:09:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUsC-0003H8-Ag
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:55:53 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:54:04 +0100
-Message-Id: <20180221135404.27598-37-kwolf@redhat.com>
-In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
-References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 36/36] qemu-iotests: Test ssh image creation
- over QMP
+	(envelope-from <berto@igalia.com>) id 1eoV56-0002B5-2d
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:09:15 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed, 21 Feb 2018 16:08:49 +0200
+Message-Id: <20180221140849.16068-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v3] specs/qcow2: Fix documentation of the
+ compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,375 +18,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+This patch fixes several mistakes in the documentation of the
+compressed cluster descriptor:
+
+1) the documentation claims that the cluster descriptor contains the
+   number of sectors used to store the compressed data, but what it
+   actually contains is the number of sectors *minus one* or, in other
+   words, the number of additional sectors after the first one.
+
+2) the width of the fields is incorrectly specified. The number of bits
+   used by each field is
+
+      x = 62 - (cluster_bits - 8)   for the offset field
+      y = (cluster_bits - 8)        for the size field
+
+   So the offset field's location is [0, x-1], not [0, x] as stated.
+
+3) the size field does not contain the size of the compressed data,
+   but rather the number of sectors where that data is stored. The
+   compressed data starts at the exact point specified in the offset
+   field and ends when there's enough data to produce a cluster of
+   decompressed data. Both points can be in the middle of a sector,
+   allowing several compressed clusters to be stored next to one
+   another, sharing sectors if necessary.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- tests/qemu-iotests/207     | 261 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/207.out |  75 +++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 337 insertions(+)
- create mode 100755 tests/qemu-iotests/207
- create mode 100644 tests/qemu-iotests/207.out
 
-diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
-new file mode 100755
-index 0000000000..f5c77852d1
---- /dev/null
-+++ b/tests/qemu-iotests/207
-@@ -0,0 +1,261 @@
-+#!/bin/bash
-+#
-+# Test ssh image creation
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+v3: Fix the specification of the width of the fields, and update the
+    explanation of how the compressed data is stored [Eric].
+
+v2: I realized that the documentation is not completely clear about
+    the exact location and size of the compressed data, so I updated
+    the patch to clarify this.
+
+---
+ docs/interop/qcow2.txt | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index d7fdb1fee3..feb711fb6a 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -426,10 +426,20 @@ Standard Cluster Descriptor:
+ 
+ Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
+ 
+-    Bit  0 -  x:    Host cluster offset. This is usually _not_ aligned to a
+-                    cluster boundary!
++    Bit  0 - x-1:   Host cluster offset. This is usually _not_ aligned to a
++                    cluster or sector boundary!
+ 
+-       x+1 - 61:    Compressed size of the images in sectors of 512 bytes
++         x - 61:    Number of additional 512-byte sectors used for the
++                    compressed data, beyond the sector containing the offset
++                    in the previous field. Some of these sectors may reside
++                    in the next contiguous host cluster.
 +
-+# creator
-+owner=kwolf@redhat.com
++                    Note that the compressed data does not necessarily occupy
++                    all of the bytes in the final sector; rather, decompression
++                    stops when it has produced a cluster of data.
 +
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt raw
-+_supported_proto ssh
-+_supported_os Linux
-+
-+function do_run_qemu()
-+{
-+    echo Testing: "$@"
-+    $QEMU -nographic -qmp stdio -serial none "$@"
-+    echo
-+}
-+
-+function run_qemu()
-+{
-+    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp \
-+                          | _filter_qemu | _filter_imgfmt \
-+                          | _filter_actual_image_size
-+}
-+
-+echo
-+echo "=== Successful image creation (defaults) ==="
-+echo
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          }
-+      },
-+      "size": 4194304
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info | _filter_img_info
-+echo
-+TEST_IMG=$TEST_IMG_FILE _img_info | _filter_img_info
-+
-+echo
-+echo "=== Test host-key-check options ==="
-+echo
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          },
-+          "host-key-check": {
-+              "mode": "none"
-+          }
-+      },
-+      "size": 8388608
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info | _filter_img_info
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          },
-+          "host-key-check": {
-+              "mode": "known_hosts"
-+          }
-+      },
-+      "size": 4194304
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info | _filter_img_info
-+
-+
-+key=$(ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" |
-+      cut -d" " -f3 | base64 -d | md5sum -b | cut -d" " -f1)
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          },
-+          "host-key-check": {
-+              "mode": "hash",
-+              "type": "md5",
-+              "hash": "wrong"
-+          }
-+      },
-+      "size": 8388608
-+  }
-+}
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          },
-+          "host-key-check": {
-+              "mode": "hash",
-+              "type": "md5",
-+              "hash": "$key"
-+          }
-+      },
-+      "size": 8388608
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info | _filter_img_info
-+
-+
-+key=$(ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" |
-+      cut -d" " -f3 | base64 -d | sha1sum -b | cut -d" " -f1)
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          },
-+          "host-key-check": {
-+              "mode": "hash",
-+              "type": "sha1",
-+              "hash": "wrong"
-+          }
-+      },
-+      "size": 4194304
-+  }
-+}
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          },
-+          "host-key-check": {
-+              "mode": "hash",
-+              "type": "sha1",
-+              "hash": "$key"
-+          }
-+      },
-+      "size": 4194304
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info | _filter_img_info
-+
-+echo
-+echo "=== Invalid path and user ==="
-+echo
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "/this/is/not/an/existing/path",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          }
-+      },
-+      "size": 4194304
-+  }
-+}
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "ssh",
-+      "location": {
-+          "path": "$TEST_IMG_FILE",
-+          "user": "invalid user",
-+          "server": {
-+              "host": "127.0.0.1",
-+              "port": "22"
-+          }
-+      },
-+      "size": 4194304
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/207.out b/tests/qemu-iotests/207.out
-new file mode 100644
-index 0000000000..417deee970
---- /dev/null
-+++ b/tests/qemu-iotests/207.out
-@@ -0,0 +1,75 @@
-+QA output created by 207
-+
-+=== Successful image creation (defaults) ===
-+
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
-+file format: IMGFMT
-+virtual size: 4.0M (4194304 bytes)
-+
-+image: TEST_DIR/t.IMGFMT
-+file format: IMGFMT
-+virtual size: 4.0M (4194304 bytes)
-+
-+=== Test host-key-check options ===
-+
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
-+file format: IMGFMT
-+virtual size: 8.0M (8388608 bytes)
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
-+file format: IMGFMT
-+virtual size: 4.0M (4194304 bytes)
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"error": {"class": "GenericError", "desc": "remote host key does not match host_key_check 'wrong'"}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
-+file format: IMGFMT
-+virtual size: 8.0M (8388608 bytes)
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"error": {"class": "GenericError", "desc": "remote host key does not match host_key_check 'wrong'"}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
-+file format: IMGFMT
-+virtual size: 4.0M (4194304 bytes)
-+
-+=== Invalid path and user ===
-+
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"error": {"class": "GenericError", "desc": "failed to open remote file '/this/is/not/an/existing/path': Failed opening remote file (libssh2 error code: -31)"}}
-+{"error": {"class": "GenericError", "desc": "failed to authenticate using publickey authentication and the identities held by your ssh-agent"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 69b6504f67..c401791fcd 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -203,3 +203,4 @@
- 204 rw auto quick
- 205 rw auto quick
- 206 rw auto
-+207 rw auto
++                    Another compressed cluster may map to the tail of the final
++                    sector used by this compressed cluster.
+ 
+ If a cluster is unallocated, read requests shall read the data from the backing
+ file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
 -- 
-2.13.6
+2.11.0
