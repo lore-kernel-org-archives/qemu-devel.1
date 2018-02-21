@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoVbC-0004zT-77
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:42:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1eoVdd-0005zn-Lh
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:44:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eoVbB-0002UF-DG
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:42:22 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47000 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1eoVdZ-0003sr-OI
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:44:53 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35372 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eoVbB-0002Tu-8b
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:42:21 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eoVdZ-0003sI-HX
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 09:44:49 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C633B40A0971
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:42:20 +0000 (UTC)
-Date: Wed, 21 Feb 2018 14:42:16 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id AC9F0EB6E7
+	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:44:48 +0000 (UTC)
+Date: Wed, 21 Feb 2018 14:44:44 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180221144216.GY17096@redhat.com>
+Message-ID: <20180221144444.GZ17096@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180220150357.324-1-kraxel@redhat.com>
-	<20180220150357.324-5-kraxel@redhat.com>
+	<20180220150357.324-6-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180220150357.324-5-kraxel@redhat.com>
+In-Reply-To: <20180220150357.324-6-kraxel@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] keymap: record multiple keysym ->
- keycode mappings
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] keymap: consider modifier state
+ when picking a mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,17 +39,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Gerd Hoffmann <kraxel@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-On Tue, Feb 20, 2018 at 04:03:56PM +0100, Gerd Hoffmann wrote:
-> Sometimes the same keysym can be created using different key
-> combinations.  Record them all in the reverse keymap, not only
-> the first one.
+On Tue, Feb 20, 2018 at 04:03:57PM +0100, Gerd Hoffmann wrote:
+> Pass the modifier state to the keymap lookup function.  In case multipl=
+e
+> keysym -> keycode mappings exist look at the modifier state and prefer
+> the mapping where the modifier state matches.
 >=20
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  ui/keymaps.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
+>  ui/keymaps.h |  3 ++-
+>  ui/curses.c  |  3 ++-
+>  ui/keymaps.c | 33 ++++++++++++++++++++++++++++++++-
+>  ui/sdl.c     |  6 +++++-
+>  ui/vnc.c     |  9 +++++++--
+>  5 files changed, 48 insertions(+), 6 deletions(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
 
 Regards,
 Daniel
