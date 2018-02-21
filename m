@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUr7-0000Ux-9v
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUr8-0000W7-4o
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eoUr6-0002WK-3U
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eoUr6-0002WR-EL
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 08:54:46 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Feb 2018 14:53:31 +0100
-Message-Id: <20180221135404.27598-4-kwolf@redhat.com>
-In-Reply-To: <20180221135404.27598-1-kwolf@redhat.com>
-References: <20180221135404.27598-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/36] qcow2: Let qcow2_create() handle
- protocol layer
+Date: Wed, 21 Feb 2018 14:53:28 +0100
+Message-Id: <20180221135404.27598-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/36] x-blockdev-create for protocols and
+ qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,140 +21,193 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Currently, qcow2_create() only parses the QemuOpts and then calls
-qcow2_create2() for the actual image creation, which includes both the
-creation of the actual file on the file system and writing a valid empty
-qcow2 image into that file.
+This series implements a minimal QMP command that allows to create an
+image file on the protocol level or an image format on a given block
+node.
 
-The plan is that qcow2_create2() becomes the function that implements
-the functionality for a future 'blockdev-create' QMP command, which only
-creates the qcow2 layer on an already opened file node.
+Eventually, the interface is going to change to some kind of an async
+command (possibly a (non-)block job), but that will require more work on
+the job infrastructure first, so let's first QAPIfy image creation in
+the block drivers. In this series, I'm going for a synchronous command
+that is prefixed with x- for now.
 
-This is a first step towards that goal: Let's move out anything that
-deals with the protocol layer from qcow2_create2() into qcow2_create().
-This means that qcow2_create2() doesn't need a file name any more.
+This series converts qcow2 and all protocol drivers that allow an actual
+image creation. This means that drivers which only check if the already
+existing storage is good enough are not converted (e.g. host_device,
+iscsi). The old behaviour was useful because 'qemu-img create' wants to
+create both protocol and format layer, but with the separation in QMP,
+you can just leave out the protocol layer creation when the device
+already exists.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2.c | 64 +++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 38 insertions(+), 26 deletions(-)
+Please note that for some of the protocol drivers (gluster, rbd and
+sheepdog) I don't have a test setup ready. For those, I only tested
+with a fake server address to check that the option are parsed correctly
+up to this point and an appropriate error is returned without crashing.
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 288b5299d8..dc6cdea113 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2725,7 +2725,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
-     return refcount_bits;
- }
- 
--static int qcow2_create2(const char *filename, int64_t total_size,
-+static int qcow2_create2(BlockDriverState *bs, int64_t total_size,
-                          const char *backing_file, const char *backing_format,
-                          int flags, size_t cluster_size, PreallocMode prealloc,
-                          QemuOpts *opts, int version, int refcount_order,
-@@ -2751,28 +2751,11 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-     Error *local_err = NULL;
-     int ret;
- 
--    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
--        int64_t prealloc_size =
--            qcow2_calc_prealloc_size(total_size, cluster_size, refcount_order);
--        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
--        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
--                     &error_abort);
--    }
--
--    ret = bdrv_create_file(filename, opts, &local_err);
-+    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-+    ret = blk_insert_bs(blk, bs, errp);
-     if (ret < 0) {
--        error_propagate(errp, local_err);
--        return ret;
--    }
--
--    blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
--                       &local_err);
--    if (blk == NULL) {
--        error_propagate(errp, local_err);
--        return -EIO;
-+        goto out;
-     }
--
-     blk_set_allow_write_beyond_eof(blk, true);
- 
-     /* Write the header */
-@@ -2827,7 +2810,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-      */
-     options = qdict_new();
-     qdict_put_str(options, "driver", "qcow2");
--    blk = blk_new_open(filename, NULL, options,
-+    qdict_put_str(options, "file", bs->node_name);
-+    blk = blk_new_open(NULL, NULL, options,
-                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
-                        &local_err);
-     if (blk == NULL) {
-@@ -2899,7 +2883,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-      */
-     options = qdict_new();
-     qdict_put_str(options, "driver", "qcow2");
--    blk = blk_new_open(filename, NULL, options,
-+    qdict_put_str(options, "file", bs->node_name);
-+    blk = blk_new_open(NULL, NULL, options,
-                        BDRV_O_RDWR | BDRV_O_NO_BACKING | BDRV_O_NO_IO,
-                        &local_err);
-     if (blk == NULL) {
-@@ -2929,6 +2914,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-     uint64_t refcount_bits;
-     int refcount_order;
-     char *encryptfmt = NULL;
-+    BlockDriverState *bs = NULL;
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -2997,12 +2983,38 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
- 
-     refcount_order = ctz32(refcount_bits);
- 
--    ret = qcow2_create2(filename, size, backing_file, backing_fmt, flags,
-+    /* Create and open the file (protocol layer) */
-+    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
-+        int64_t prealloc_size =
-+            qcow2_calc_prealloc_size(size, cluster_size, refcount_order);
-+        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
-+        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
-+                     &error_abort);
-+    }
-+
-+    ret = bdrv_create_file(filename, opts, errp);
-+    if (ret < 0) {
-+        goto finish;
-+    }
-+
-+    bs = bdrv_open(filename, NULL, NULL,
-+                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
-+    if (bs == NULL) {
-+        ret = -EIO;
-+        goto finish;
-+    }
-+
-+    /* Create the qcow2 image (format layer) */
-+    ret = qcow2_create2(bs, size, backing_file, backing_fmt, flags,
-                         cluster_size, prealloc, opts, version, refcount_order,
--                        encryptfmt, &local_err);
--    error_propagate(errp, local_err);
-+                        encryptfmt, errp);
-+    if (ret < 0) {
-+        goto finish;
-+    }
- 
- finish:
-+    bdrv_unref(bs);
-+
-     g_free(backing_file);
-     g_free(backing_fmt);
-     g_free(encryptfmt);
+If you are a maintainer of one of these protocols and you are
+interested in keeping image creation working for your protocol, you
+probably want to test this series on a real setup and give me some
+feedback. If you don't, I'll just merge the patches and hope that they
+won't break anything.
+
+v2:
+- Patch 1 ('block/qapi: Introduce BlockdevCreateOptions'):
+  Added nvme as unsupported driver
+
+- Patch 8 ('util: Add qemu_opts_to_qdict_filtered'):
+  Fixed use after free with QemuOpts that contained more than one option
+  with the same name, documented the behaviour with them
+
+- Patches 9 and 10 (new):
+  Added unit tests for qemu_opts_append() and
+  qemu_opts_to_qdict_filtered()
+
+- Patch 11 ('qdict: Introduce qdict_rename_keys()'):
+  Added unit test, improved documentation
+
+- Patch 12 ('qcow2: Use visitor for options in qcow2_create()'):
+  Improved commit message, removed unnecessary movement of declaration
+
+- Patches 13 and 14 ('block: x-blockdev-create QMP command'):
+  Move making bdrv_is_whitelisted() public into a separate patch,
+  use read-write driver whitelist instead of read-only
+
+- Patch 17 ('gluster: Support .bdrv_co_create'):
+  Rebased on top of preallocated truncate
+
+- Patches 18-24 ('rbd: Support .bdrv_co_create'):
+  QAPIfied .bdrv_open() implementation so that it can be shared with
+  .bdrv_co_create() and specified servers are actually used instead of
+  silently ignored
+
+- Patch 25 ('nfs: Use QAPI options in nfs_client_open()'):
+  Fixed use of uninitialised variable in the error path
+
+- Patch 27 ('sheepdog: QAPIfy "redundacy" create option'):
+  Addressed FIXME to use qemu_strtol()
+
+- Patch 28 ('sheepdog: Support .bdrv_co_create'):
+  Renamed 'backing_file' to 'backing-file', rebased on top of
+  preallocated truncate
+
+
+git-backport-diff compared to v1:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/36:[0001] [FC] 'block/qapi: Introduce BlockdevCreateOptions'
+002/36:[----] [-C] 'block/qapi: Add qcow2 create options to schema'
+003/36:[----] [--] 'qcow2: Let qcow2_create() handle protocol layer'
+004/36:[----] [--] 'qcow2: Pass BlockdevCreateOptions to qcow2_create2()'
+005/36:[----] [-C] 'qcow2: Use BlockdevRef in qcow2_create2()'
+006/36:[----] [--] 'qcow2: Use QCryptoBlockCreateOptions in qcow2_create2()'
+007/36:[----] [--] 'qcow2: Handle full/falloc preallocation in qcow2_create2()'
+008/36:[0007] [FC] 'util: Add qemu_opts_to_qdict_filtered()'
+009/36:[down] 'test-qemu-opts: Test qemu_opts_append()'
+010/36:[down] 'test-qemu-opts: Test qemu_opts_to_qdict_filtered()'
+011/36:[0117] [FC] 'qdict: Introduce qdict_rename_keys()'
+012/36:[0002] [FC] 'qcow2: Use visitor for options in qcow2_create()'
+013/36:[down] 'block: Make bdrv_is_whitelisted() public'
+014/36:[0006] [FC] 'block: x-blockdev-create QMP command'
+015/36:[----] [-C] 'file-posix: Support .bdrv_co_create'
+016/36:[----] [--] 'file-win32: Support .bdrv_co_create'
+017/36:[0130] [FC] 'gluster: Support .bdrv_co_create'
+018/36:[down] 'rbd: Fix use after free in qemu_rbd_set_keypairs() error path'
+019/36:[down] 'rbd: Factor out qemu_rbd_connect()'
+020/36:[down] 'rbd: Remove non-schema options from runtime_opts'
+021/36:[down] 'rbd: Pass BlockdevOptionsRbd to qemu_rbd_connect()'
+022/36:[0034] [FC] 'rbd: Support .bdrv_co_create'
+023/36:[down] 'rbd: Assing s->snap/image_name in qemu_rbd_open()'
+024/36:[down] 'rbd: Use qemu_rbd_connect() in qemu_rbd_do_create()'
+025/36:[0002] [FC] 'nfs: Use QAPI options in nfs_client_open()'
+026/36:[----] [-C] 'nfs: Support .bdrv_co_create'
+027/36:[0013] [FC] 'sheepdog: QAPIfy "redundacy" create option'
+028/36:[0049] [FC] 'sheepdog: Support .bdrv_co_create'
+029/36:[----] [-C] 'ssh: Use QAPI BlockdevOptionsSsh object'
+030/36:[----] [-C] 'ssh: QAPIfy host-key-check option'
+031/36:[----] [--] 'ssh: Pass BlockdevOptionsSsh to connect_to_ssh()'
+032/36:[----] [--] 'ssh: Support .bdrv_co_create'
+033/36:[----] [--] 'file-posix: Fix no-op bdrv_truncate() with falloc preallocation'
+034/36:[----] [--] 'block: Fail bdrv_truncate() with negative size'
+035/36:[----] [--] 'qemu-iotests: Test qcow2 over file image creation with QMP'
+036/36:[----] [--] 'qemu-iotests: Test ssh image creation over QMP'
+
+
+Kevin Wolf (36):
+  block/qapi: Introduce BlockdevCreateOptions
+  block/qapi: Add qcow2 create options to schema
+  qcow2: Let qcow2_create() handle protocol layer
+  qcow2: Pass BlockdevCreateOptions to qcow2_create2()
+  qcow2: Use BlockdevRef in qcow2_create2()
+  qcow2: Use QCryptoBlockCreateOptions in qcow2_create2()
+  qcow2: Handle full/falloc preallocation in qcow2_create2()
+  util: Add qemu_opts_to_qdict_filtered()
+  test-qemu-opts: Test qemu_opts_append()
+  test-qemu-opts: Test qemu_opts_to_qdict_filtered()
+  qdict: Introduce qdict_rename_keys()
+  qcow2: Use visitor for options in qcow2_create()
+  block: Make bdrv_is_whitelisted() public
+  block: x-blockdev-create QMP command
+  file-posix: Support .bdrv_co_create
+  file-win32: Support .bdrv_co_create
+  gluster: Support .bdrv_co_create
+  rbd: Fix use after free in qemu_rbd_set_keypairs() error path
+  rbd: Factor out qemu_rbd_connect()
+  rbd: Remove non-schema options from runtime_opts
+  rbd: Pass BlockdevOptionsRbd to qemu_rbd_connect()
+  rbd: Support .bdrv_co_create
+  rbd: Assing s->snap/image_name in qemu_rbd_open()
+  rbd: Use qemu_rbd_connect() in qemu_rbd_do_create()
+  nfs: Use QAPI options in nfs_client_open()
+  nfs: Support .bdrv_co_create
+  sheepdog: QAPIfy "redundacy" create option
+  sheepdog: Support .bdrv_co_create
+  ssh: Use QAPI BlockdevOptionsSsh object
+  ssh: QAPIfy host-key-check option
+  ssh: Pass BlockdevOptionsSsh to connect_to_ssh()
+  ssh: Support .bdrv_co_create
+  file-posix: Fix no-op bdrv_truncate() with falloc preallocation
+  block: Fail bdrv_truncate() with negative size
+  qemu-iotests: Test qcow2 over file image creation with QMP
+  qemu-iotests: Test ssh image creation over QMP
+
+ qapi/block-core.json       | 326 ++++++++++++++++++++++++++++++++-
+ include/block/block.h      |   2 +
+ include/block/block_int.h  |   2 +
+ include/qapi/qmp/qdict.h   |   6 +
+ include/qemu/option.h      |   2 +
+ block.c                    |  54 +++++-
+ block/create.c             |  76 ++++++++
+ block/file-posix.c         |  91 +++++++---
+ block/file-win32.c         |  45 ++++-
+ block/gluster.c            | 135 +++++++++-----
+ block/nfs.c                | 236 +++++++++++-------------
+ block/qcow2.c              | 384 +++++++++++++++++++++++++--------------
+ block/rbd.c                | 380 +++++++++++++++++++++------------------
+ block/sheepdog.c           | 318 +++++++++++++++++++++++----------
+ block/ssh.c                | 298 +++++++++++++++++--------------
+ qobject/qdict.c            |  34 ++++
+ tests/check-qdict.c        | 113 ++++++++++++
+ tests/test-qemu-opts.c     | 253 ++++++++++++++++++++++++++
+ util/qemu-option.c         |  42 ++++-
+ block/Makefile.objs        |   2 +-
+ tests/qemu-iotests/049.out |   8 +-
+ tests/qemu-iotests/112.out |   4 +-
+ tests/qemu-iotests/206     | 436 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/206.out | 209 ++++++++++++++++++++++
+ tests/qemu-iotests/207     | 261 +++++++++++++++++++++++++++
+ tests/qemu-iotests/207.out |  75 ++++++++
+ tests/qemu-iotests/group   |   2 +
+ 27 files changed, 3030 insertions(+), 764 deletions(-)
+ create mode 100644 block/create.c
+ create mode 100755 tests/qemu-iotests/206
+ create mode 100644 tests/qemu-iotests/206.out
+ create mode 100755 tests/qemu-iotests/207
+ create mode 100644 tests/qemu-iotests/207.out
+
 -- 
 2.13.6
