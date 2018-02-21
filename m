@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eoSNH-000422-1O
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:15:48 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eoSSS-0008Hn-AT
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:21:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eoSNF-0003Ou-UT
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:15:47 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:39867)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eoSNF-0003Om-OJ
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:15:45 -0500
-Received: by mail-wr0-x230.google.com with SMTP id w77so3360195wrc.6
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 03:15:45 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1eoSSO-00064V-GK
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 06:21:08 -0500
+Date: Wed, 21 Feb 2018 11:20:40 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180221112040.GA19501@stefanha-x1.localdomain>
+References: <1519139403-2646-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 21 Feb 2018 11:15:44 +0000
-Message-ID: <CAJSP0QXTCt2+UVFuaBL9hG130-8uD4ZpoFpaNvnKemjQ4HAfvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] QEMU & KVM are participating in Outreachy May-August
- 2018!
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="envbJBWh7q8WU6mo"
+Content-Disposition: inline
+In-Reply-To: <1519139403-2646-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH] migration: do not transfer ram during bulk
+ storage migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,20 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, jjherne@linux.vnet.ibm.com
 
-QEMU & KVM are participating in the Outreachy open source internship
-program that offers 12-week, paid, remote work internships for
-individuals from underrepresented groups in open source.
 
-The application period is from February 12 to March 22 2018.  The
-internships themselves run May-August.
+--envbJBWh7q8WU6mo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Our project ideas page is currently being populated and will have more
-projects over the coming days:
-https://www.outreachy.org/2018-may-august/communities/qemu/
+On Tue, Feb 20, 2018 at 04:10:03PM +0100, Peter Lieven wrote:
+> this patch makes the bulk phase of a block migration to take
+> place before we start transferring ram. As the bulk block migration
+> can take a long time its pointless to transfer ram during that phase.
+>=20
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  migration/ram.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 
-Let me know if you have questions or drop by #qemu-outreachy on
-irc.oftc.net to chat with mentors!
+This makes sense to me:
 
-Stefan
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--envbJBWh7q8WU6mo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJajVYIAAoJEJykq7OBq3PIup4IAJzbvoF8zVlal6HDspMR5Sq4
+JnDWaK8UTerm9q6M/Ue6lo1TFbisXH39FqY6iqJyVsxuIx8ad2mmCSjOrQb4oFmd
+3voCMyeAiHnojQUMQnSXqyp5Eif6N5bOjJAkpO5OaVDvp+9X5/37WDsI1ZTtYBbD
+k7uFtzDWpU2d1IzEvOJJloWl/xrZTCnjvZQpPO09uUlinZH+sS1+8+W8DHRJEbug
+8WGepxRtlFi6UfVqPyMGeXbl/V0zmaomTMMXk3Of9rZc4nWPwDC7xB2K2hMCa2ZC
+uLsR9R/EnOriQCaU1HdkxtFqnos3BdA+sAskL7xuXas/iQSVFhIEscdszIOZtL0=
+=n7Vg
+-----END PGP SIGNATURE-----
+
+--envbJBWh7q8WU6mo--
