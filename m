@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eoaHz-0006gp-0T
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:46:25 -0500
+	(envelope-from <cota@braap.org>) id 1eoaqY-0004p5-IT
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:19:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eoaH8-0006D8-V2
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:42:50 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50958
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eoaH8-0006CR-KW
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 14:41:58 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1LJdX0x082032
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:41:58 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g9ej79ep8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 21 Feb 2018 14:41:52 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Wed, 21 Feb 2018 14:41:52 -0500
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Wed, 21 Feb 2018 14:35:42 -0500
-In-Reply-To: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1519241752-28083-4-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v8 03/13] s390-ccw: refactor IPL structs
+	(envelope-from <cota@braap.org>) id 1eoapR-0008LP-N3
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:18:34 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:35875)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eoapR-0008K0-Ar
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 15:17:25 -0500
+Date: Wed, 21 Feb 2018 15:17:23 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180221201723.GA30501@flamenco>
+References: <1519093616-10563-1-git-send-email-cota@braap.org>
+	<1519093616-10563-2-git-send-email-cota@braap.org>
+	<512f6e39-9aa0-7e4f-fad4-7085d499ae65@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <512f6e39-9aa0-7e4f-fad4-7085d499ae65@linaro.org>
+Subject: Re: [Qemu-devel] [PATCHv2 1/2] translator: merge max_insns into
+ DisasContextBase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,119 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-ECKD DASDs have different IPL structures for CDL and LDL
-formats. The current Ipl1 and Ipl2 structs follow the CDL
-format, so we prepend "EckdCdl" to them. Boot info for LDL
-has been moved to a new struct: EckdLdlIpl1.
+On Wed, Feb 21, 2018 at 10:19:05 -0800, Richard Henderson wrote:
+> On 02/19/2018 06:26 PM, Emilio G. Cota wrote:
+> > @@ -68,6 +69,7 @@ typedef struct DisasContextBase {
+> >      target_ulong pc_next;
+> >      DisasJumpType is_jmp;
+> >      unsigned int num_insns;
+> > +    int max_insns;
+> >      bool singlestep_enabled;
+> >  } DisasContextBase;
+> 
+> We really should pick the same type for max_insns and num_insns, which ever
+> type we settle on.  I can't see how we can go wrong with unsigned...
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/bootmap.c | 12 ++++++------
- pc-bios/s390-ccw/bootmap.h | 37 +++++++++++++++++++++----------------
- 2 files changed, 27 insertions(+), 22 deletions(-)
+I was just trying to avoid warnings with -Wsign-compare in case
+we ever enabled it.
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 9534f56..a94638d 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -221,7 +221,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
- static void ipl_eckd_cdl(void)
- {
-     XEckdMbr *mbr;
--    Ipl2 *ipl2 = (void *)sec;
-+    EckdCdlIpl2 *ipl2 = (void *)sec;
-     IplVolumeLabel *vlbl = (void *)sec;
-     block_number_t bmt_block_nr;
- 
-@@ -231,7 +231,7 @@ static void ipl_eckd_cdl(void)
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
- 
--    mbr = &ipl2->u.x.mbr;
-+    mbr = &ipl2->mbr;
-     IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
-     IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
-                "Bad block size in zIPL section of IPL2 record.");
-@@ -281,7 +281,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
- static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
- {
-     block_number_t bmt_block_nr;
--    BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
-+    EckdLdlIpl1 *ipl1 = (void *)sec;
- 
-     if (mode != ECKD_LDL_UNLABELED) {
-         print_eckd_ldl_msg(mode);
-@@ -292,15 +292,15 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(0, sec, "Cannot read block 0 to grab boot info.");
-     if (mode == ECKD_LDL_UNLABELED) {
--        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
-+        if (!magic_match(ipl1->bip.magic, ZIPL_MAGIC)) {
-             return; /* not applicable layout */
-         }
-         sclp_print("unlabeled LDL.\n");
-     }
--    verify_boot_info(bip);
-+    verify_boot_info(&ipl1->bip);
- 
-     /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
-+    bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
- 
-     run_eckd_boot_script(bmt_block_nr);
-     /* no return */
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index b361084..4bd95cd 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -239,22 +239,27 @@ typedef struct BootInfo {          /* @ 0x70, record #0    */
-     } bp;
- } __attribute__ ((packed)) BootInfo; /* see also XEckdMbr   */
- 
--typedef struct Ipl1 {
--    unsigned char key[4]; /* == "IPL1" */
--    unsigned char data[24];
--} __attribute__((packed)) Ipl1;
--
--typedef struct Ipl2 {
--    unsigned char key[4]; /* == "IPL2" */
--    union {
--        unsigned char data[144];
--        struct {
--            unsigned char reserved1[92-4];
--            XEckdMbr mbr;
--            unsigned char reserved2[144-(92-4)-sizeof(XEckdMbr)];
--        } x;
--    } u;
--} __attribute__((packed)) Ipl2;
-+/*
-+ * Structs for IPL
-+ */
-+#define STAGE2_BLK_CNT_MAX  24 /* Stage 1b can load up to 24 blocks */
-+
-+typedef struct EckdCdlIpl1 {
-+    uint8_t key[4]; /* == "IPL1" */
-+    uint8_t data[24];
-+} __attribute__((packed)) EckdCdlIpl1;
-+
-+typedef struct EckdCdlIpl2 {
-+    uint8_t key[4]; /* == "IPL2" */
-+    uint8_t reserved0[88];
-+    XEckdMbr mbr;
-+    uint8_t reserved[24];
-+} __attribute__((packed)) EckdCdlIpl2;
-+
-+typedef struct EckdLdlIpl1 {
-+    uint8_t reserved[112];
-+    BootInfo bip; /* BootInfo is MBR for LDL */
-+} __attribute__((packed)) EckdLdlIpl1;
- 
- typedef struct IplVolumeLabel {
-     unsigned char key[4]; /* == "VOL1" */
--- 
-2.7.4
+Should I bother converting the "bound" variables we use for
+MIN(max_insns, bound) to unsigned as well? Or just leave them
+alone and forget about -Wsign-compare?
+
+Thanks,
+
+		Emilio
