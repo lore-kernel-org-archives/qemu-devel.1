@@ -1,14 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eopnM-0005Ci-MG
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:16:18 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eopqs-0006vH-VO
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eopnL-0007S0-0V
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:16:16 -0500
-Date: Thu, 22 Feb 2018 12:16:05 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180222121605.GL9323@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1eopqr-0000h9-P6
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:19:54 -0500
+Date: Thu, 22 Feb 2018 13:19:25 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180222121925.GD4147@localhost.localdomain>
 References: <7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
 	<20180222105755.GB4147@localhost.localdomain>
 	<37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
@@ -20,7 +19,7 @@ References: <7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
 	<20180222120334.GJ9323@redhat.com>
 	<f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 In-Reply-To: <f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
 Content-Transfer-Encoding: quoted-printable
@@ -34,14 +33,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Lieven <pl@kamp.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On Thu, Feb 22, 2018 at 01:06:33PM +0100, Peter Lieven wrote:
-> Am 22.02.2018 um 13:03 schrieb Daniel P. Berrang=C3=A9:
+Am 22.02.2018 um 13:06 hat Peter Lieven geschrieben:
+> Am 22.02.2018 um 13:03 schrieb Daniel P. Berrang=E9:
 > > On Thu, Feb 22, 2018 at 01:02:05PM +0100, Peter Lieven wrote:
-> >> Am 22.02.2018 um 13:00 schrieb Daniel P. Berrang=C3=A9:
+> >> Am 22.02.2018 um 13:00 schrieb Daniel P. Berrang=E9:
 > >>> On Thu, Feb 22, 2018 at 12:51:58PM +0100, Peter Lieven wrote:
-> >>>> Am 22.02.2018 um 12:40 schrieb Daniel P. Berrang=C3=A9:
+> >>>> Am 22.02.2018 um 12:40 schrieb Daniel P. Berrang=E9:
 > >>>>> On Thu, Feb 22, 2018 at 12:32:04PM +0100, Kevin Wolf wrote:
 > >>>>>> Am 22.02.2018 um 12:01 hat Peter Lieven geschrieben:
 > >>>>>>> Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
@@ -123,15 +122,6 @@ S
 > When I am at it, what would be the proper replacement for char[PATH_MAX=
 ] ?
 
-Generally code should dynamically allocate paths. If they need to sprintf
-a path, then  g_strdup_printf() is the right approach.
+g_malloc() with the exact size?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Kevin
