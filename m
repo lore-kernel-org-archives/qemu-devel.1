@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eonC6-0005Ct-Kd
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:29:39 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eonDZ-0006HH-B5
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:31:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eonC3-0001bk-GE
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:29:38 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53718
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1eonC3-0001bP-AT
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:29:35 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1M9OHqY045633
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 04:29:34 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g9rbfevwq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 04:29:34 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Thu, 22 Feb 2018 09:29:32 -0000
-Date: Thu, 22 Feb 2018 10:29:29 +0100
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-In-Reply-To: <20180221183012.1c3a8b27.cohuck@redhat.com>
-References: <1519152302-19079-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1519152302-19079-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<20180221162005.77390824.cohuck@redhat.com>
-	<20180221174257.1763f43e@p-imbrenda.boeblingen.de.ibm.com>
-	<20180221183012.1c3a8b27.cohuck@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1eonDW-00038M-6b
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:31:09 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37048 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eonDW-00038B-1p
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:31:06 -0500
+Date: Thu, 22 Feb 2018 10:30:55 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180222093055.u34o2pp6twcx645f@sirius.home.kraxel.org>
+References: <20180219111458.25983-1-kraxel@redhat.com>
+	<20180219151649.13a197f9@w520.home>
+	<20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
+	<20180220170417.p7hkqbong5euul7p@sirius.home.kraxel.org>
+	<20180222064003.yzrcmh7hi6qvgcij@zhen-hp.sh.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20180222102929.73da3a53@p-imbrenda.boeblingen.de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] s390x/sclp: clean up sclp masks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180222064003.yzrcmh7hi6qvgcij@zhen-hp.sh.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,62 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>, intel-gvt-dev@lists.freedesktop.org, qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>
 
-On Wed, 21 Feb 2018 18:30:12 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+  Hi,
 
-> On Wed, 21 Feb 2018 17:42:57 +0100
-> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
-> 
-> > On Wed, 21 Feb 2018 16:20:05 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> > > On Tue, 20 Feb 2018 19:45:01 +0100
-> > > Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:  
-> 
-> > > > diff --git a/include/hw/s390x/event-facility.h
-> > > > b/include/hw/s390x/event-facility.h index 5119b9b..0a8b47a
-> > > > 100644 --- a/include/hw/s390x/event-facility.h
-> > > > +++ b/include/hw/s390x/event-facility.h
-> > > > @@ -28,12 +28,14 @@
-> > > >  #define SCLP_EVENT_SIGNAL_QUIESCE               0x1d
-> > > >  
-> > > >  /* SCLP event masks */
-> > > > -#define SCLP_EVENT_MASK_SIGNAL_QUIESCE          0x00000008
-> > > > -#define SCLP_EVENT_MASK_MSG_ASCII               0x00000040
-> > > > -#define SCLP_EVENT_MASK_CONFIG_MGT_DATA         0x10000000
-> > > > -#define SCLP_EVENT_MASK_OP_CMD                  0x80000000
-> > > > -#define SCLP_EVENT_MASK_MSG                     0x40000000
-> > > > -#define SCLP_EVENT_MASK_PMSGCMD                 0x00800000
-> > > > +#define SCLPEVMSK(T)  (1ULL << (sizeof(sccb_mask_t) * 8 -
-> > > > (T)))      
-> > > 
-> > > SCLP_EVMASK() would be a bit more readable, I think.    
-> > 
-> > I know, but then it looks ugly when trying to fit everything in 80
-> > columns.   
-> 
-> I'd rather go slightly over 80 in that case (as long as you don't
-> cross 90).
+> Nice! Seems to be the last missing gap for local spice with cursor
+> dmabuf support, we'll do more testing on that for sure. Btw, another
+> method might be to add direct cursor dmabuf passing for spice as gl
+> output, is that correct way?
 
-will do
+Passing on the cursor sprite needs the hotspot information, so spice
+client can position the cursor correctly.  I didn't got hotspot
+information in my testing yet, but maybe the guest kernel was too old.
+Is that supported meanwhile?  If so, which kernel version is needed?
 
-> >   
-> > > > +
-> > > > +#define SCLP_EVENT_MASK_OP_CMD
-> > > > SCLPEVMSK(SCLP_EVENT_OPRTNS_COMMAND) +#define
-> > > > SCLP_EVENT_MASK_MSG             SCLPEVMSK(SCLP_EVENT_MESSAGE)
-> > > > +#define SCLP_EVENT_MASK_CONFIG_MGT_DATA
-> > > > SCLPEVMSK(SCLP_EVENT_CONFIG_MGT_DATA) +#define
-> > > > SCLP_EVENT_MASK_PMSGCMD         SCLPEVMSK(SCLP_EVENT_PMSGCMD)
-> > > > +#define SCLP_EVENT_MASK_MSG_ASCII
-> > > > SCLPEVMSK(SCLP_EVENT_ASCII_CONSOLE_DATA) +#define
-> > > > SCLP_EVENT_MASK_SIGNAL_QUIESCE
-> > > > SCLPEVMSK(SCLP_EVENT_SIGNAL_QUIESCE) #define
-> > > > SCLP_UNCONDITIONAL_READ                 0x00 #define
-> > > > SCLP_SELECTIVE_READ                     0x01      
-> > >     
-> >   
-> 
+Spice already has support for setting pointers, we can simply use
+that, at least initially.  Doesn't use dma-bufs.  If it turns out to be
+a performance issue we can add support for using dma-bufs instead, but
+that needs spice server changes.
+
+> And really like to see dmabuf support could be in upstream soon. Do
+> you have any predict for which qemu version?
+
+I want have this in 2.12, at least the current, initial version.
+Improved cursor support might take a little longer.
+
+cheers,
+  Gerd
