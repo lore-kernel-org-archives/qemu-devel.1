@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ep06l-0006uD-GD
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:17:42 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ep06r-0006x0-W4
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ep05w-0004Np-Hz
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:16:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ep05f-0003n7-W8
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:17:05 -0500
 References: <20180221135404.27598-1-kwolf@redhat.com>
-	<20180221135404.27598-12-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <83887ef6-4e27-13e3-f29d-b3df08056eb1@redhat.com>
-Date: Thu, 22 Feb 2018 17:13:52 -0600
+	<20180221135404.27598-21-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e489044a-0cb7-b7f1-3042-26ba1bbc7dfc@redhat.com>
+Date: Fri, 23 Feb 2018 00:13:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180221135404.27598-12-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/36] qdict: Introduce
- qdict_rename_keys()
+In-Reply-To: <20180221135404.27598-21-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="C94pcZWrusjkhSABtLmcQiC1aUGIBFFGK"
+Subject: Re: [Qemu-devel] [PATCH v2 20/36] rbd: Remove non-schema options
+ from runtime_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +26,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On 02/21/2018 07:53 AM, Kevin Wolf wrote:
-> A few block drivers will need to rename .bdrv_create options for their
-> QAPIfication, so let's have a helper function for that.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C94pcZWrusjkhSABtLmcQiC1aUGIBFFGK
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
+ jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
+ qemu-devel@nongnu.org
+Message-ID: <e489044a-0cb7-b7f1-3042-26ba1bbc7dfc@redhat.com>
+Subject: Re: [PATCH v2 20/36] rbd: Remove non-schema options from runtime_opts
+References: <20180221135404.27598-1-kwolf@redhat.com>
+ <20180221135404.27598-21-kwolf@redhat.com>
+In-Reply-To: <20180221135404.27598-21-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-02-21 14:53, Kevin Wolf wrote:
+> Instead of the QemuOpts in qemu_rbd_connect(), we want to use QAPI
+> objects. As a preparation, fetch those options directly from the QDict
+> that .bdrv_open() supports in the rbd driver and that are not in the
+> schema.
+>=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->   include/qapi/qmp/qdict.h |   6 +++
->   qobject/qdict.c          |  34 ++++++++++++++
->   tests/check-qdict.c      | 113 +++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 153 insertions(+)
-> 
+>  block/rbd.c | 55 ++++++++++++++++++++++++-----------------------------=
+--
+>  1 file changed, 24 insertions(+), 31 deletions(-)
+>=20
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 4bbcce4eca..2e79c2d1fd 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -326,28 +326,6 @@ static QemuOptsList runtime_opts =3D {
+>          /*
+>           * server.* extracted manually, see qemu_rbd_mon_host()
+>           */
+> -        {
+> -            .name =3D "password-secret",
+> -            .type =3D QEMU_OPT_STRING,
+> -            .help =3D "ID of secret providing the password",
+> -        },
 
-> +/**
-> + * qdict_rename_keys(): Rename keys in qdict according to the replacements
-> + * specified in the array renames. The array must be terminated by an entry
-> + * with from = NULL.
-> + *
-> + * The renames are performed individually in the order of the array, so entries
-> + * may be renamed multiple times and may or may not conflict depending on the
-> + * order of the renames array.
+Err, did we just forget this in the QAPI schema or is it really not
+supposed to be there?
 
-Oh interesting - so I could rename a->tmp, b->a, tmp->b in the classic 
-strategy to intentionally avoid conflicts.  But I hope none of our 
-actual clients ever abuse the interface that directly.
+Max
 
-> + *
-> + * Returns true for success, false in error cases.
 
-I won't make you change it, but is 0/-1 any easier to understand 
-intuitively?  With bool, it's often a case of "I'd better check the docs 
-for whether true meant the sense I wanted"
+--C94pcZWrusjkhSABtLmcQiC1aUGIBFFGK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> + */
-> +bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp)
-> +{
+-----BEGIN PGP SIGNATURE-----
 
-> +++ b/tests/check-qdict.c
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqPTpUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AyngH/0BYPLaCh00kw8uQWKfPEzLwrDsOZ284
+LBK1hfgYfvZibL3eLjZGgo744orW/jfE7rYKP0DNIwivDgEPaJiFoGUuP8kYoRkP
+n9D/ecWvGN9xhtFWXwikVsDgWEsyK3QDw++CIoJt715GymElVRr/IqBy5nP5RHff
+Cp+M+cakQkczfY2uYeHNNSt3S5XyFebhIODaROV3boJgvTl2idRLjHCjnKMmsd2D
+z4nyF2XkKt6OMRpaKqP1sKHmFoxdk3b/kmSO1Ynioum7xLzP2HZO03sbT88sxtCQ
+29U5TnqelkXJOU4Vsg51e66jx4DXTP2VjOIYS50B7J6960cdudToAFM=
+=ZbOE
+-----END PGP SIGNATURE-----
 
-> +    copy = qdict_clone_shallow(dict);
-> +    qdict_rename_keys(copy, renames, &error_abort);
-> +
-> +    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-> +    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-> +    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
-> +    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
-> +    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
-
-Also worth an assert that there are exactly 5 keys, so that rename 
-didn't botch something to leave a different straggler key behind?
-
-> +
-> +    QDECREF(copy);
-> +
-> +    /* Simple rename of all entries */
-> +    renames = (QDictRenames[]) {
-> +        { "abc",        "str1" },
-> +        { "abcdef",     "str2" },
-> +        { "number",     "int" },
-> +        { "flag",       "bool" },
-> +        { "nothing",    "null" },
-> +        { NULL , NULL }
-> +    };
-> +    copy = qdict_clone_shallow(dict);
-> +    qdict_rename_keys(copy, renames, &error_abort);
-> +
-> +    g_assert(!qdict_haskey(copy, "abc"));
-> +    g_assert(!qdict_haskey(copy, "abcdef"));
-> +    g_assert(!qdict_haskey(copy, "number"));
-> +    g_assert(!qdict_haskey(copy, "flag"));
-> +    g_assert(!qdict_haskey(copy, "nothing"));
-
-Direct check for the obvious keys that should have been renamed,
-
-> +
-> +    g_assert_cmpstr(qdict_get_str(copy, "str1"), ==, "foo");
-> +    g_assert_cmpstr(qdict_get_str(copy, "str2"), ==, "bar");
-> +    g_assert_cmpint(qdict_get_int(copy, "int"), ==, 42);
-> +    g_assert_cmpint(qdict_get_bool(copy, "bool"), ==, true);
-> +    g_assert(qobject_type(qdict_get(copy, "null")) == QTYPE_QNULL);
-
-but again, an assert that there are 5 keys rules out all other mistakes, 
-too.
-
-Up to you whether to further tweak the tests; and with the spelling fix 
-Max already found,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--C94pcZWrusjkhSABtLmcQiC1aUGIBFFGK--
