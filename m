@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoigf-0007qL-Ke
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:40:57 -0500
+	(envelope-from <wei@redhat.com>) id 1eoik6-0000x9-6R
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eoiga-0004s9-Nv
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:40:53 -0500
-References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1519241752-28083-6-git-send-email-walling@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <022d14c9-8b5f-dc32-7efa-b3a53a7b898d@redhat.com>
-Date: Thu, 22 Feb 2018 05:40:42 +0100
-MIME-Version: 1.0
-In-Reply-To: <1519241752-28083-6-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 05/13] s390-ccw: move
- auxiliary IPL data to separate location
+	(envelope-from <wei@redhat.com>) id 1eoik1-0006X7-St
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:44:26 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59294 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1eoik1-0006X1-Mw
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:44:21 -0500
+From: Wei Huang <wei@redhat.com>
+Date: Wed, 21 Feb 2018 22:44:16 -0600
+Message-Id: <20180222044417.15561-3-wei@redhat.com>
+In-Reply-To: <20180222044417.15561-1-wei@redhat.com>
+References: <20180222044417.15561-1-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V4 2/3] tests/migration: Add migration-test
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +24,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com, wei@redhat.com
 
-On 21.02.2018 20:35, Collin L. Walling wrote:
-> The s390-ccw firmware needs some information in support of the
-> boot process which is not available on the native machine.
-> Examples are the netboot firmware load address and now the
-> boot menu parameters.
-> 
-> While storing that data in unused fields of the IPL parameter block
-> works, that approach could create problems if the parameter block
-> definition should change in the future. Because then a guest could
-> overwrite these fields using the set IPLB diagnose.
-> 
-> In fact the data in question is of more global nature and not really
-> tied to an IPL device, so separating it is rather logical.
-> 
-> This commit introduces a new structure to hold firmware relevant
-> IPL parameters set by QEMU. The data is stored at location 204 (dec)
-> and can contain up to 7 32-bit words. This area is available to
-> programming in the z/Architecture Principles of Operation and
-> can thus safely be used by the firmware until the IPL has completed.
-> 
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c          | 18 +++++++++++++++++-
->  hw/s390x/ipl.h          | 25 +++++++++++++++++++++++--
->  pc-bios/s390-ccw/iplb.h | 18 ++++++++++++++++--
->  pc-bios/s390-ccw/main.c |  6 +++++-
->  4 files changed, 61 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 0d06fc1..79f5a58 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -399,6 +399,21 @@ void s390_reipl_request(void)
->      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->  }
->  
-> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
-> +{
-> +    S390IPLState *ipl = get_ipl_device();
-> +    uint8_t *addr;
-> +    uint64_t len = 4096;
-> +
-> +    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
-> +    if (!addr || len < QIPL_ADDRESS + sizeof(QemuIplParameters)) {
-> +        error_report("Cannot set QEMU IPL parameters");
-> +        return;
-> +    }
-> +    memcpy(addr + QIPL_ADDRESS, &ipl->qipl, sizeof(QemuIplParameters));
-> +    cpu_physical_memory_unmap(addr, len, 1, len);
-> +}
-> +
->  void s390_ipl_prepare_cpu(S390CPU *cpu)
->  {
->      S390IPLState *ipl = get_ipl_device();
-> @@ -418,8 +433,9 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
->              error_report_err(err);
->              vm_stop(RUN_STATE_INTERNAL_ERROR);
->          }
-> -        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-> +        ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
->      }
-> +    s390_ipl_prepare_qipl(cpu);
->  }
->  
->  static void s390_ipl_reset(DeviceState *dev)
-> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-> index 8a705e0..08926a3 100644
-> --- a/hw/s390x/ipl.h
-> +++ b/hw/s390x/ipl.h
-> @@ -16,8 +16,7 @@
->  #include "cpu.h"
->  
->  struct IplBlockCcw {
-> -    uint64_t netboot_start_addr;
-> -    uint8_t  reserved0[77];
-> +    uint8_t  reserved0[85];
->      uint8_t  ssid;
->      uint16_t devno;
->      uint8_t  vm_flags;
-> @@ -90,6 +89,27 @@ void s390_ipl_prepare_cpu(S390CPU *cpu);
->  IplParameterBlock *s390_ipl_get_iplb(void);
->  void s390_reipl_request(void);
->  
-> +#define QIPL_ADDRESS  0xcc
-> +
-> +/*
-> + * The QEMU IPL Parameters will be stored at absolute address
-> + * 204 (0xcc) which means it is 32-bit word aligned but not
-> + * double-word aligned.
-> + * Placement of data fields in this area must account for
-> + * their alignment needs. E.g., netboot_start_address must
-> + * have an offset of n * 8 bytes within the struct in order
-> + * to keep it double-word aligned.
+This patch moves the settings related migration-test from the
+migration-test.c file to a seperate header file. It also renames the
+x86-a-b-bootblock.s file extension from .s to .S, allowing gcc
+pre-processor to include the C-style header file correctly.
 
-Should that rather be "4 + n * 8" instead of "n * 8" ?
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ tests/migration-test.c                                |  9 +++++----
+ tests/migration/Makefile                              |  4 ++--
+ tests/migration/migration-test.h                      | 19 +++++++++++++++++++
+ .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}      |  7 ++++---
+ tests/migration/x86-a-b-bootblock.h                   |  2 +-
+ 5 files changed, 31 insertions(+), 10 deletions(-)
+ create mode 100644 tests/migration/migration-test.h
+ rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (94%)
 
-Apart from that, patch looks good to me now, so once you've fixed the
-comment (if necessary):
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 74f9361bdd..e2e06ed337 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -21,10 +21,10 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/nvram/chrp_nvram.h"
+ 
+-#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
++#include "migration/migration-test.h"
+ 
+-const unsigned start_address = 1024 * 1024;
+-const unsigned end_address = 100 * 1024 * 1024;
++const unsigned start_address = TEST_MEM_START;
++const unsigned end_address = TEST_MEM_END;
+ bool got_stop;
+ 
+ #if defined(__linux__)
+@@ -278,7 +278,8 @@ static void check_guests_ram(QTestState *who)
+     qtest_memread(who, start_address, &first_byte, 1);
+     last_byte = first_byte;
+ 
+-    for (address = start_address + 4096; address < end_address; address += 4096)
++    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
++         address += TEST_MEM_PAGE_SIZE)
+     {
+         uint8_t b;
+         qtest_memread(who, address, &b, 1);
+diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+index 1c07dd7be9..b768d0729d 100644
+--- a/tests/migration/Makefile
++++ b/tests/migration/Makefile
+@@ -27,8 +27,8 @@ endef
+ 
+ all: x86-a-b-bootblock.h
+ 
+-x86-a-b-bootblock.h: x86-a-b-bootblock.s
+-	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
++x86-a-b-bootblock.h: x86-a-b-bootblock.S
++	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
+ 	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+ 	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+ 	echo "$$__note" > $@
+diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
+new file mode 100644
+index 0000000000..a618fe069e
+--- /dev/null
++++ b/tests/migration/migration-test.h
+@@ -0,0 +1,19 @@
++/*
++ * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#ifndef _TEST_MIGRATION_H_
++#define _TEST_MIGRATION_H_
++
++/* Common */
++#define TEST_MEM_START      (1 * 1024 * 1024)
++#define TEST_MEM_END        (100 * 1024 * 1024)
++#define TEST_MEM_PAGE_SIZE  4096
++
++/* PPC */
++#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
++
++#endif /* _TEST_MIGRATION_H_ */
++
+diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
+similarity index 94%
+rename from tests/migration/x86-a-b-bootblock.s
+rename to tests/migration/x86-a-b-bootblock.S
+index 98dbfab084..08b51f9e7f 100644
+--- a/tests/migration/x86-a-b-bootblock.s
++++ b/tests/migration/x86-a-b-bootblock.S
+@@ -12,6 +12,7 @@
+ #
+ # Author: dgilbert@redhat.com
+ 
++#include "migration-test.h"
+ 
+ .code16
+ .org 0x7c00
+@@ -45,11 +46,11 @@ start:             # at 0x7c00 ?
+         mov $0, %bl
+ mainloop:
+         # Start from 1MB
+-        mov $(1024*1024),%eax
++        mov $TEST_MEM_START,%eax
+ innerloop:
+         incb (%eax)
+-        add $4096,%eax
+-        cmp $(100*1024*1024),%eax
++        add $TEST_MEM_PAGE_SIZE,%eax
++        cmp $TEST_MEM_END,%eax
+         jl innerloop
+ 
+         inc %bl
+diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+index 9e8e2e028b..44e4b99506 100644
+--- a/tests/migration/x86-a-b-bootblock.h
++++ b/tests/migration/x86-a-b-bootblock.h
+@@ -1,5 +1,5 @@
+ /* This file is automatically generated from
+- * tests/migration/x86-a-b-bootblock.s, edit that and then run
++ * tests/migration/x86-a-b-bootblock.S, edit that and then run
+  * "make x86-a-b-bootblock.h" inside tests/migration to update,
+  * and then remember to send both in your patch submission.
+  */
+-- 
+2.14.3
