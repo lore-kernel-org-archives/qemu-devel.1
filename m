@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eot9K-0004DL-Hr
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:51:12 -0500
+	(envelope-from <linus.walleij@linaro.org>) id 1eotDm-0008U0-AC
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:55:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eot9G-0004ad-IT
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:51:10 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34950 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eot9G-0004ZN-Ce
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:51:06 -0500
-Date: Thu, 22 Feb 2018 15:50:47 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180222155047.GQ9323@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180124053957.29145-1-peterx@redhat.com>
-	<20180124053957.29145-10-peterx@redhat.com>
-	<20180221160007.GA21436@stefanha-x1.localdomain>
-	<20180222100119.GH18962@xz-mi>
+	(envelope-from <linus.walleij@linaro.org>) id 1eotDl-0008F1-FE
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:55:46 -0500
+Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:55165)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
+	id 1eotDl-0008E9-9N
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:55:45 -0500
+Received: by mail-it0-x22a.google.com with SMTP id p204so6741108itc.4
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:55:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180222100119.GH18962@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v7 09/23] monitor: allow using IO thread
- for parsing
+In-Reply-To: <CAFEAcA82fEnt6oGz7O+zPZ2+zoZmhm0J6rAioX6SmJwoSykuGw@mail.gmail.com>
+References: <CACRpkda9B=frmS0QF429p-q+KoCKG=5NON-kQ0Rt-nba2powRA@mail.gmail.com>
+	<1519053606-9817-1-git-send-email-minyard@acm.org>
+	<1519053606-9817-3-git-send-email-minyard@acm.org>
+	<CAFEAcA-jTZMDNTF2rPn20DjSxu=z7n9M+2xo-pNfAYoha_LuzQ@mail.gmail.com>
+	<03f96a6b-3a52-0d72-e634-8b8f167f2992@acm.org>
+	<CACRpkdYMTojtHnafK+kMnm1G7j+9Nj=p65WLZGbrN8MJv+4psQ@mail.gmail.com>
+	<CAFEAcA82fEnt6oGz7O+zPZ2+zoZmhm0J6rAioX6SmJwoSykuGw@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 22 Feb 2018 16:55:44 +0100
+Message-ID: <CACRpkdaYKzQHHxCOZEydL2pa3iX60oCsXvX7FvBZkXbByo6Z5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] i2c: Move the bus class to i2c.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Corey Minyard <minyard@acm.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Corey Minyard <cminyard@mvista.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Feb 22, 2018 at 06:01:19PM +0800, Peter Xu wrote:
-> On Wed, Feb 21, 2018 at 04:00:07PM +0000, Stefan Hajnoczi wrote:
-> > On Wed, Jan 24, 2018 at 01:39:43PM +0800, Peter Xu wrote:
-> > > @@ -4034,12 +4044,29 @@ static void sortcmdlist(void)
-> > >      qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
-> > >  }
-> > >  
-> > > +static GMainContext *monitor_io_context_get(void)
-> > > +{
-> > > +    return iothread_get_g_main_context(mon_global.mon_iothread);
-> > > +}
-> > > +
-> > > +static AioContext *monitor_aio_context_get(void)
-> > > +{
-> > > +    return iothread_get_aio_context(mon_global.mon_iothread);
-> > > +}
-> > 
-> > Please follow the X_get_Y() naming convention instead of X_Y_get().  For
-> > example, see qemu_get_aio_context() and iothread_get_aio_context().
-> 
-> Sure.
-> 
-> > 
-> > > @@ -4082,11 +4109,41 @@ void error_vprintf_unless_qmp(const char *fmt, va_list ap)
-> > >      }
-> > >  }
-> > >  
-> > > +static void monitor_list_append(Monitor *mon)
-> > > +{
-> > > +    qemu_mutex_lock(&monitor_lock);
-> > > +    QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
-> > > +    qemu_mutex_unlock(&monitor_lock);
-> > > +}
-> > > +
-> > > +static void monitor_qmp_setup_handlers(void *data)
-> > 
-> > BH functions are usually declared like this:
-> > 
-> >   static void X_bh(void *opaque)
-> > 
-> > This way it's immediately clear that this function is invoked as a BH.
-> > 
-> > I suggest renaming the function to monitor_qmp_setup_handlers_bh().
-> > Using 'opaque' instead of 'data' is common, too.
-> 
-> Sure.
-> 
-> > 
-> > > @@ -4099,24 +4156,55 @@ void monitor_init(Chardev *chr, int flags)
-> > >      }
-> > >  
-> > >      if (monitor_is_qmp(mon)) {
-> > > -        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
-> > > -                                 monitor_qmp_event, NULL, mon, NULL, true);
-> > >          qemu_chr_fe_set_echo(&mon->chr, true);
-> > >          json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
-> > > +        if (mon->use_io_thr) {
-> > > +            /*
-> > > +             * It's possible that we already have an IOWatchPoll
-> > > +             * registered for the Chardev during chardev_init_func().
-> > 
-> > When does this happen?
-> > 
-> > This seems like a hack that breaks when certain -chardev options are
-> > used.  For example, what happens if the chardev is a TCP connection with
-> > reconnect=5.  In that case the socket will be connecting asynchronously
-> > and we cannot just remove the fd watch.
-> > 
-> > How does this interact with TCP listen chardevs?  It looks like the
-> > listener socket uses the main loop (see tcp_chr_disconnect()).
-> > 
-> > I'm worried that the chardev layer isn't thread-safe and you haven't
-> > added anything to protect it or at least refuse to run in unsafe
-> > conditions.
-> 
-> Indeed, I did some more reading and noticed that the TCP typed chardev
-> is really special.
-> 
-> Firstly there can be the QIO thread that handles sync connecting when
-> "reconnect" is setup (I don't really understand why we only need the
-> threads when reconnect != 0, but anyway, I'll just assume we need the
-> threads).  It's done in qmp_chardev_open_socket().
-> 
-> Secondly, TCP can support TLS or TELNET (tcp_chr_new_client() handles
-> the main logic of it), so there can be actually more than one GSource
-> created for a single TCP chardev.  Meanwhile, the
-> chr_update_read_handler() calls never handles the re-setup of those
-> special GSources (TLS/TELNET), only the common GSource of TCP stream
-> read/write.
-> 
-> And the whole TCP channel is based on QIO stuff, which means I need to
-> add non-default context support to QIO stuff too...  That's mostly
-> about qio_channel_add_watch().  I may need to pass in context
-> information, and switch to GSource for that function instead of the
-> old tags, just like what I did to chardev in general.
+On Thu, Feb 22, 2018 at 4:44 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 22 February 2018 at 15:39, Linus Walleij <linus.walleij@linaro.org> wrote:
+>> On Tue, Feb 20, 2018 at 2:06 PM, Corey Minyard <minyard@acm.org> wrote:
+>>> Linus, Philippe, do you want me to submit this, or do you want
+>>> to take it?  You can pull it from:
+>>>
+>>> https://github.com/cminyard/qemu.git tags/i2c-bus-move
+>>
+>> I don't have any commit rights, if you can push this to the
+>> QEMU master I will happily rebase my stuff and resubmit :)
+>
+> I suggest you take Corey's 2 patches, add them to the front
+> of your patchset and add your signed-off-by line to them.
+> That way you don't have to wait for them to go into git master.
 
-Rather than changing qio_channel_add_watch() which affects all callers,
-just add a qio_channel_add_watch_full() variant which includes  GMainContext
-as an extra arg
+OK no problem!
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Yours,
+Linus Walleij
