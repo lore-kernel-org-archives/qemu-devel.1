@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eokxU-0000IF-6q
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:06:25 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eol1k-0003Cr-6I
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eokxQ-0008Vs-9A
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:06:24 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:53844)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eol1d-0003RR-W6
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:10:48 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:54132)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eokxP-0008Tv-Rg
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:06:20 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eol1d-0003Qg-Ni
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:10:41 -0500
 From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
 References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
 	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
@@ -28,11 +28,11 @@ References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
 	<001801d3aa2f$ac7b4160$0571c420$@ru>
 	<CAFXrp_d7WDGcZ99pnfpxggYgqzHJDLRxnjNcGH1SLgbyq2Y7yQ@mail.gmail.com>
 	<001401d3aadf$00d2cbc0$02786340$@ru>
-	<CAFXrp_epimy5WRugYjojkuj-u=WLDaz=7_8w2D-r qjNUGZz0vw@mail.gmail.
-	com>
-In-Reply-To: <CAFXrp_epimy5WRugYjojkuj-u=WLDaz=7_8w2D-rqjNUGZz0vw@mail.gmail.com>
-Date: Thu, 22 Feb 2018 10:06:19 +0300
-Message-ID: <001201d3abab$a38b77a0$eaa266e0$@ru>
+	<CAFXrp_epimy5WRugYjojkuj-u=WLDaz=7_8w2D-r qjNUGZz0vw@mail.gmail
+	.	com> <001201d3abab$a38b77a0$eaa266e0$@ru>
+In-Reply-To: <001201d3abab$a38b77a0$eaa266e0$@ru>
+Date: Thu, 22 Feb 2018 10:10:45 +0300
+Message-ID: <001301d3abac$421392e0$c63ab8a0$@ru>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="UTF-8"
@@ -47,56 +47,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Ciro Santilli' <ciro.santilli@gmail.com>
+To: 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, 'Ciro Santilli' <ciro.santilli@gmail.com>
 Cc: 'Peter Maydell' <peter.maydell@linaro.org>, richard.henderson@linaro.org, "'Emilio G. Cota'" <cota@braap.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Kevin Wolf' <kwolf@redhat.com>, war2jordan@live.com, 'Igor R' <boost.lists@gmail.com>, 'Juan Quintela' <quintela@redhat.com>, 'Jason Wang' <jasowang@redhat.com>, "'Michael S. Tsirkin'" <mst@redhat.com>, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, 'Gerd Hoffmann' <kraxel@redhat.com>, 'Thomas Dullien' <thomas.dullien@googlemail.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
 
-> From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
-> On Wed, Feb 21, 2018 at 6:41 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> >> From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
-> >> On Tue, Feb 20, 2018 at 9:46 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> >> >
-> >> > Updated the branch on github.
-> >> > You may try it.
-> >>
-> >> At 8a482834780a131e7747c1c3c1931379ed0beedc ARM initrd record runs,
-> >> but replay is getting stuck at:
-> >>
-> >> [   12.120424] scsi host0: sym-2.2.3
+> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+> > From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
+> > On Wed, Feb 21, 2018 at 6:41 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+> > >> From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
+> > >> On Tue, Feb 20, 2018 at 9:46 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+> > >> >
+> > >> > Updated the branch on github.
+> > >> > You may try it.
+> > >>
+> > >> At 8a482834780a131e7747c1c3c1931379ed0beedc ARM initrd record runs,
+> > >> but replay is getting stuck at:
+> > >>
+> > >> [   12.120424] scsi host0: sym-2.2.3
+> 
+> Yes, I've got the same.
+> But when I use -serial stdio instead of -nographic, replay makes a pause
+> at this line and then continues and finishes successfully.
 
-Yes, I've got the same.
-But when I use -serial stdio instead of -nographic, replay makes a pause
-at this line and then continues and finishes successfully.
-
-> >>
-> >> Neighboring lines on record:
-> >>
-> >> [   11.346357] sym53c8xx 0000:00:0c.0: enabling device (0100 -> 0103)
-> >> [   11.536683] sym0: <895a> rev 0x0 at pci 0000:00:0c.0 irq 66
-> >> [   11.731679] sym0: No NVRAM, ID 7, Fast-40, LVD, parity checking
-> >> [   11.930599] sym0: SCSI BUS has been reset.
-> >> [   12.120424] scsi host0: sym-2.2.3
-> >> [   15.451809] scsi 0:0:2:0: CD-ROM            QEMU     QEMU CD-ROM
-> >>   2.5+ PQ: 0 ANSI: 5
-> >> [   15.847227] scsi target0:0:2: tagged command queuing enabled,
-> >> command queue depth 16.
-> >> [   16.256585] scsi target0:0:2: Beginning Domain Validation
-> >> [   16.482189] scsi target0:0:2: Domain Validation skipping write tests
-> >> [   16.699445] scsi target0:0:2: Ending Domain Validation
-> >>
-> >> My QEMU command:
-> >>
-> >> time ./buildroot/output.arm~/host/usr/bin/qemu-system-arm -M
-> >> versatilepb -append 'root=/dev/sda nokaslr norandmaps
-> >> printk.devkmsg=on printk.time=y - lkmc_eval="/rand_check.out;wget -S
-> >> google.com;/poweroff.out;"'
-> >>  -kernel ./buildroot/output.arm~/images/zImage -dtb
-> >> ./buildroot/output.arm~/images/versatile-pb.dtb -nographic -initrd
-> >> ./buildroot/output.arm~/images/rootfs.cpio -netdev user,id=net1
-> >> -device rtl8139,netdev=net1
-> >> -object filter-replay,id=replay,netdev=net1
-> >>
-> >> What is your full QEMU command?
-
-
+It doesn't stuck, but works much slower with -nographic. 
+You just have to wait for 5 minutes or something to notice the progress.
 
 Pavel Dovgalyuk
