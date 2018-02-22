@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45241)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rndfax@yandex.ru>) id 1eopcv-00087Q-8I
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:05:30 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45430)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1eope4-0000JA-Gf
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rndfax@yandex.ru>) id 1eopcu-00026g-2V
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:05:29 -0500
-Received: from forward104p.mail.yandex.net
-	([2a02:6b8:0:1472:2741:0:8b7:107]:38636)
+	(envelope-from <pl@kamp.de>) id 1eope1-0003BN-Ca
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:40 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:53330 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rndfax@yandex.ru>) id 1eopct-00016c-Hd
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:05:27 -0500
-From: Aleksey Kuleshov <rndfax@yandex.ru>
-In-Reply-To: <20180222114536.GF9323@redhat.com>
-References: <52841519299484@web28j.yandex.ru>
-	<20180222114536.GF9323@redhat.com>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eope1-00039U-2f
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:37 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 13:06:33 +0100
+References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
+	<7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
+	<20180222105755.GB4147@localhost.localdomain>
+	<37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
+	<20180222113204.GC4147@localhost.localdomain>
+	<20180222114053.GE9323@redhat.com>
+	<ab206ced-9b56-93d5-04b7-f342d45a2927@kamp.de>
+	<20180222120029.GI9323@redhat.com>
+	<c46fd50f-3952-75a3-eb5a-a53a06c3bc4d@kamp.de>
+	<20180222120334.GJ9323@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
+Date: Thu, 22 Feb 2018 13:06:33 +0100
 MIME-Version: 1.0
-Message-Id: <340261519301018@web58j.yandex.ru>
-Date: Thu, 22 Feb 2018 15:03:38 +0300
+In-Reply-To: <20180222120334.GJ9323@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Patch 9894dc0cdcc broke something
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +39,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-I'm using 2.11.0.=20
+Am 22.02.2018 um 13:03 schrieb Daniel P. Berrangé:
+> On Thu, Feb 22, 2018 at 01:02:05PM +0100, Peter Lieven wrote:
+>> Am 22.02.2018 um 13:00 schrieb Daniel P. Berrangé:
+>>> On Thu, Feb 22, 2018 at 12:51:58PM +0100, Peter Lieven wrote:
+>>>> Am 22.02.2018 um 12:40 schrieb Daniel P. Berrangé:
+>>>>> On Thu, Feb 22, 2018 at 12:32:04PM +0100, Kevin Wolf wrote:
+>>>>>> Am 22.02.2018 um 12:01 hat Peter Lieven geschrieben:
+>>>>>>> Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
+>>>>>>>> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
+>>>>>>>>> On 20/02/2018 18:04, Peter Lieven wrote:
+>>>>>>>>>> Hi,
+>>>>>>>>>>
+>>>>>>>>>> I remember we discussed a long time ago to limit the stack usage of all
+>>>>>>>>>> functions that are executed in a coroutine
+>>>>>>>>>> context to a very low value to be able to safely limit the coroutine
+>>>>>>>>>> stack size as well.
+>>>>>>>>> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
+>>>>>>>>> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
+>>>>>>>>> ide_atapi_cmd_reply_end.
+>>>>>>>>>
+>>>>>>>>> But perhaps it's not an issue, somebody needs to audit the code.
+>>>>>>>> I think John intended to get rid of the recursion sometime, but I doubt
+>>>>>>>> he has had the time so far.
+>>>>>>> Apart from this is is possible to define special cflags in the
+>>>>>>> Makefile.objs just for a subdirectory? I have patches ready to make
+>>>>>>> the block layer files and other coroutine users compile with
+>>>>>>> -Wstack-size=2048. But I do not want to specify each file separately.
+>>>>>> Our Makefiles have lines like this:
+>>>>>>
+>>>>>>     iscsi.o-cflags     := $(LIBISCSI_CFLAGS)
+>>>>>>
+>>>>>> I don't think there is a direct mechanism to apply cflags to a whole
+>>>>>> directory or just to block-obj-y/block-obj-m, but just looping over them
+>>>>>> could work. I'm not a Makefile expert at all, but after some toying with
+>>>>>> a simple example, something like this might work:
+>>>>>>
+>>>>>>     $(foreach x,$(block-obj-y),$(eval $x-cflags += -Wstack-size=2048))
+>>>>> You'll need it for anything block layer depends on too - so that's much
+>>>>> of util/, crypto/ and io/ directories at least.
+>>>>>
+>>>>> So perhaps it would be shorter if we do the opposite - set -Wstack-size=2048
+>>>>> globally for everything in QEMU, and then override -Wstack-size=$BIGGER
+>>>>> for the (hopefully) few sources that have a larger stack need ?
+>>>> I tried that already. 2048 is a strong limit for many functions.
+>>>> It breaks already as soon as some buffer has a size of PATH_MAX, but
+>>>> thats handleable. But there are some structs around that are very large.
+>>> There are surprisingly few "char [PATH_MAX]" variables left in QEMU - we
+>>> should have a final push to eliminate them regardless.
+>>>
+>>>> Generally, it would be a good idea to have a global limit, of course.
+>>> We could at least put a limit on that matches the current worst case to
+>>> prevent it getting worse than it already is.
+>> That would be a good idea, yes.
+>>
+>> How would you handle the override for a smaller -Wstack-usage ?
+> If you have multiple -Wstack-size=$XXX  flags to GCC, I expect the last
+> one wins. So just need to double check that the per-object file CFLAGS
+> occur after the global CFLAS in the compiler args
 
-22.02.2018, 14:45, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
-> On Thu, Feb 22, 2018 at 02:38:04PM +0300, Aleksey Kuleshov wrote:
->> =C2=A0Hello!
->>
->> =C2=A0I hit unexpected disconnections because of this patch:
->>
->> =C2=A0commit 9894dc0cdcc397ee5b26370bc53da6d360a363c2
->> =C2=A0Author: Daniel P. Berrange <berrange@redhat.com>
->> =C2=A0Date: Tue Jan 19 11:14:29 2016 +0000
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char: convert from GIOChannel to QIOChan=
-nel
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0In preparation for introducing TLS suppo=
-rt to the TCP chardev
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0backend, convert existing chardev code f=
-rom using GIOChannel
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0to QIOChannel. This simplifies the chard=
-ev code by removing
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0most of the OS platform conditional code=
- for dealing with
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0file descriptor passing.
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Daniel P. Berrange <berra=
-nge@redhat.com>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <1453202071-10289-3-git-send=
--email-berrange@redhat.com>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Paolo Bonzini <pbonzini@r=
-edhat.com>
->>
->> =C2=A0breaks tcp_chr_read:
->
-> What version of QEMU are you using ?
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com -o- https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org -o- https://fstop138.berrange.com :|
-> |: https://entangle-photo.org -o- https://www.instagram.com/dberrange :=
-|
+I will check that, thanks.
+
+When I am at it, what would be the proper replacement for char[PATH_MAX] ?
+
+Peter
