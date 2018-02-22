@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eoroi-0000pL-Ks
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:25:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eoroo-0000u7-U6
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:25:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eoroc-0000sQ-RR
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:25:48 -0500
-Date: Thu, 22 Feb 2018 15:25:36 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180222142536.2upstkie3wsv5cps@sirius.home.kraxel.org>
-References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
-	<1519303376-92875-2-git-send-email-imammedo@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eorol-00010R-1M
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:25:54 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:45822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eorok-0000zk-SR
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:25:50 -0500
+Received: by mail-ot0-x244.google.com with SMTP id f11so4731791otj.12
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 06:25:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1519303376-92875-2-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/9] acpi: remove unused acpi-dsdt.aml
+In-Reply-To: <20180215221325.7611-20-f4bug@amsat.org>
+References: <20180215221325.7611-1-f4bug@amsat.org>
+	<20180215221325.7611-20-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Feb 2018 14:25:29 +0000
+Message-ID: <CAFEAcA-fFV+JVWvqQCPfhFK5J-=Ad6c2mubqZAmg5Ce5VwANMQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 19/20] sdcard: add a 'uhs' property,
+ update the OCR register ACCEPT_SWITCH_1V8 bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,17 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrzej Zaborowski <balrogg@gmail.com>
 
-On Thu, Feb 22, 2018 at 01:42:48PM +0100, Igor Mammedov wrote:
-> SeaBIOS blob which is currently shipped with QEMU
-> doesn't need acpi-dsdt.aml nor is able to use it
-> and code that loaded it QEMU was removed by
-> (commit 9fb7aaaf4c "pc: drop external DSDT loading")
-> in 2013.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> CC: Gerd Hoffmann <kraxel@redhat.com>
+On 15 February 2018 at 22:13, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sd.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index ada96f5574..b9429b06ca 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -93,6 +93,7 @@ struct SDState {
+>      /* Configurable properties */
+>      BlockBackend *blk;
+>      bool spi;
+> +    uint8_t uhs_supported;
+>
+>      uint32_t mode;    /* current card mode, one of SDCardModes */
+>      int32_t state;    /* current card state, one of SDCardStates */
+> @@ -292,6 +293,8 @@ static void sd_set_ocr(SDState *sd)
+>  {
+>      /* All voltages OK */
+>      sd->ocr =3D R_OCR_VDD_VOLTAGE_WIN_HI_MASK;
+> +
+> +    sd->ocr =3D FIELD_DP32(sd->ocr, OCR, ACCEPT_SWITCH_1V8, !!sd->uhs_su=
+pported);
+>  }
+>
+>  static void sd_ocr_powerup(void *opaque)
+> @@ -2189,6 +2192,7 @@ static Property sd_properties[] =3D {
+>       * board to ensure that ssi transfers only occur when the chip selec=
+t
+>       * is asserted.  */
+>      DEFINE_PROP_BOOL("spi", SDState, spi, false),
+> +    DEFINE_PROP_UINT8("uhs", SDState, uhs_supported, UHS_NOT_SUPPORTED),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+The field name and the use of the value suggest that this is just
+a boolean flag, so why define it as a PROP_UINT8 rather than PROP_BOOL ?
+
+thanks
+-- PMM
