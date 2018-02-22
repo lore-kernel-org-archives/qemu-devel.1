@@ -1,19 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eomnf-00060N-Cl
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:04:27 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eomoB-0006H2-4o
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:04:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eomnZ-0003TX-MB
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:04:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42316 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eomnZ-0003Sq-GO
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:04:17 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 22 Feb 2018 10:04:13 +0100
-Message-Id: <1519290253-23854-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] net: Move the toeplitz functions from
- checksum.h to net_rx_pkt.c
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eomoA-0003o6-0v
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:04:55 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:39536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eomo9-0003nh-O1
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:04:53 -0500
+Received: by mail-wr0-x242.google.com with SMTP id w77so9717599wrc.6
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 01:04:53 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180215221325.7611-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <04f770af-b35c-73d1-9297-1b80694f18a7@amsat.org>
+Date: Thu, 22 Feb 2018 06:04:52 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180215221325.7611-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 00/20] SDCard: bugfixes,
+ support UHS-I (part 5)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,125 +35,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrzej Zaborowski <balrogg@gmail.com>
 
-The functions are only used in this single .c file, so there is
-no need to put all this code in a header that is included from
-multiple places.
+ping? :)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/net/net_rx_pkt.c    | 44 ++++++++++++++++++++++++++++++++++++++++++++
- include/net/checksum.h | 44 --------------------------------------------
- 2 files changed, 44 insertions(+), 44 deletions(-)
-
-diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-index 98a5030..f66beb3 100644
---- a/hw/net/net_rx_pkt.c
-+++ b/hw/net/net_rx_pkt.c
-@@ -48,6 +48,50 @@ struct NetRxPkt {
-     eth_l4_hdr_info  l4hdr_info;
- };
- 
-+typedef struct toeplitz_key_st {
-+    uint32_t leftmost_32_bits;
-+    uint8_t *next_byte;
-+} net_toeplitz_key;
-+
-+static inline
-+void net_toeplitz_key_init(net_toeplitz_key *key, uint8_t *key_bytes)
-+{
-+    key->leftmost_32_bits = be32_to_cpu(*(uint32_t *)key_bytes);
-+    key->next_byte = key_bytes + sizeof(uint32_t);
-+}
-+
-+static inline
-+void net_toeplitz_add(uint32_t *result,
-+                      uint8_t *input,
-+                      uint32_t len,
-+                      net_toeplitz_key *key)
-+{
-+    register uint32_t accumulator = *result;
-+    register uint32_t leftmost_32_bits = key->leftmost_32_bits;
-+    register uint32_t byte;
-+
-+    for (byte = 0; byte < len; byte++) {
-+        register uint8_t input_byte = input[byte];
-+        register uint8_t key_byte = *(key->next_byte++);
-+        register uint8_t bit;
-+
-+        for (bit = 0; bit < 8; bit++) {
-+            if (input_byte & (1 << 7)) {
-+                accumulator ^= leftmost_32_bits;
-+            }
-+
-+            leftmost_32_bits =
-+                (leftmost_32_bits << 1) | ((key_byte & (1 << 7)) >> 7);
-+
-+            input_byte <<= 1;
-+            key_byte <<= 1;
-+        }
-+    }
-+
-+    key->leftmost_32_bits = leftmost_32_bits;
-+    *result = accumulator;
-+}
-+
- void net_rx_pkt_init(struct NetRxPkt **pkt, bool has_virt_hdr)
- {
-     struct NetRxPkt *p = g_malloc0(sizeof *p);
-diff --git a/include/net/checksum.h b/include/net/checksum.h
-index 05a0d27..77a56c1 100644
---- a/include/net/checksum.h
-+++ b/include/net/checksum.h
-@@ -59,48 +59,4 @@ uint32_t net_checksum_add_iov(const struct iovec *iov,
-                               uint32_t iov_off, uint32_t size,
-                               uint32_t csum_offset);
- 
--typedef struct toeplitz_key_st {
--    uint32_t leftmost_32_bits;
--    uint8_t *next_byte;
--} net_toeplitz_key;
--
--static inline
--void net_toeplitz_key_init(net_toeplitz_key *key, uint8_t *key_bytes)
--{
--    key->leftmost_32_bits = be32_to_cpu(*(uint32_t *)key_bytes);
--    key->next_byte = key_bytes + sizeof(uint32_t);
--}
--
--static inline
--void net_toeplitz_add(uint32_t *result,
--                      uint8_t *input,
--                      uint32_t len,
--                      net_toeplitz_key *key)
--{
--    register uint32_t accumulator = *result;
--    register uint32_t leftmost_32_bits = key->leftmost_32_bits;
--    register uint32_t byte;
--
--    for (byte = 0; byte < len; byte++) {
--        register uint8_t input_byte = input[byte];
--        register uint8_t key_byte = *(key->next_byte++);
--        register uint8_t bit;
--
--        for (bit = 0; bit < 8; bit++) {
--            if (input_byte & (1 << 7)) {
--                accumulator ^= leftmost_32_bits;
--            }
--
--            leftmost_32_bits =
--                (leftmost_32_bits << 1) | ((key_byte & (1 << 7)) >> 7);
--
--            input_byte <<= 1;
--            key_byte <<= 1;
--        }
--    }
--
--    key->leftmost_32_bits = leftmost_32_bits;
--    *result = accumulator;
--}
--
- #endif /* QEMU_NET_CHECKSUM_H */
--- 
-1.8.3.1
+On 02/15/2018 07:13 PM, Philippe Mathieu-Daudé wrote:
+> Some refactors, few bugfixes, better SD/SPI support.
+> 
+> With this series apply, machines can use SD cards in UHS-I mode.
+> (mostly imported from Alistair Francis work)
+> 
+> MMC mode split out for another series,
+> so UHS enabled MMC cards are still not usable:
+> 
+>   kernel: mmc0: SDHCI controller on PCI [0000:00:05.0] using ADMA
+>   kernel: sd 0:0:0:0: Attached scsi generic sg0 type 0
+>   kernel: mmc0: Skipping voltage switch
+>   [mmc kthread looping]
+> 
+> Since v3:
+> - simpler SPI handling, improved descriptions (Alistair review)
+> - inverted patches 16/17 order
+> 
+> Since v2:
+> - split again in 2... other part is cleanup/tracing
+> 
+> Since v1:
+> - rewrote mostly all patches to keep it simpler.
+> 
+> $ git backport-diff
+> 001/20:[----] [-C] 'sdcard: Don't always set the high capacity bit'
+> 002/20:[----] [-C] 'sdcard: update the CSD CRC register regardless the CSD structure version'
+> 003/20:[----] [-C] 'sdcard: fix the 'maximum data transfer rate' to 25MHz'
+> 004/20:[----] [-C] 'sdcard: clean the SCR register and add few comments'
+> 005/20:[----] [--] 'sdcard: remove commands from unsupported old MMC specification'
+> 006/20:[----] [--] 'sdcard: simplify using the ldst API'
+> 007/20:[0008] [FC] 'sdcard: use the correct masked OCR in the R3 reply'
+> 008/20:[----] [-C] 'sdcard: use the registerfields API for the CARD_STATUS register masks'
+> 009/20:[----] [--] 'sdcard: handle CMD54 (SDIO)'
+> 010/20:[down] 'sdcard: handle the Security Specification commands'
+> 011/20:[down] 'sdcard: use a more descriptive label 'unimplemented_spi_cmd''
+> 012/20:[0034] [FC] 'sdcard: handles more commands in SPI mode'
+> 013/20:[----] [--] 'sdcard: check the card is in correct state for APP CMD (CMD55)'
+> 014/20:[----] [--] 'sdcard: warn if host uses an incorrect address for APP CMD (CMD55)'
+> 015/20:[----] [--] 'sdcard: simplify SEND_IF_COND (CMD8)'
+> 016/20:[----] [--] 'sdcard: simplify SD_SEND_OP_COND (ACMD41)'
+> 017/20:[----] [--] 'sdcard: add SD SEND_TUNING_BLOCK (CMD19)'
+> 018/20:[----] [--] 'sdcard: implement the UHS-I SWITCH_FUNCTION entries (Spec v3)'
+> 019/20:[----] [-C] 'sdcard: add a 'uhs' property, update the OCR register ACCEPT_SWITCH_1V8 bit'
+> 020/20:[----] [--] 'sdcard: add an enum for the SD PHY Spec version'
+> 
+> Based-on: 20180215220540.6556-12-f4bug@amsat.org
+> 
+> Philippe Mathieu-Daudé (20):
+>   sdcard: Don't always set the high capacity bit
+>   sdcard: update the CSD CRC register regardless the CSD structure
+>     version
+>   sdcard: fix the 'maximum data transfer rate' to 25MHz
+>   sdcard: clean the SCR register and add few comments
+>   sdcard: remove commands from unsupported old MMC specification
+>   sdcard: simplify using the ldst API
+>   sdcard: use the correct masked OCR in the R3 reply
+>   sdcard: use the registerfields API for the CARD_STATUS register masks
+>   sdcard: handle CMD54 (SDIO)
+>   sdcard: handle the Security Specification commands
+>   sdcard: use a more descriptive label 'unimplemented_spi_cmd'
+>   sdcard: handles more commands in SPI mode
+>   sdcard: check the card is in correct state for APP CMD (CMD55)
+>   sdcard: warn if host uses an incorrect address for APP CMD (CMD55)
+>   sdcard: simplify SEND_IF_COND (CMD8)
+>   sdcard: simplify SD_SEND_OP_COND (ACMD41)
+>   sdcard: add SD SEND_TUNING_BLOCK (CMD19)
+>   sdcard: implement the UHS-I SWITCH_FUNCTION entries (Spec v3)
+>   sdcard: add a 'uhs' property, update the OCR register
+>     ACCEPT_SWITCH_1V8 bit
+>   sdcard: add an enum for the SD PHY Spec version
+> 
+>  hw/sd/sd.c         | 498 ++++++++++++++++++++++++++++++++++++-----------------
+>  hw/sd/trace-events |   1 +
+>  2 files changed, 343 insertions(+), 156 deletions(-)
+> 
