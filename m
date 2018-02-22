@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eosf0-0002XG-7B
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:19:51 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eosiP-0004dS-Je
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:23:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eosez-0006TI-Gb
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:19:50 -0500
-References: <20180205151835.20812-1-mreitz@redhat.com>
-	<20180205151835.20812-19-mreitz@redhat.com>
-	<w51po5icfbh.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f2885948-d6b3-90a3-9960-6f8fd53e0177@redhat.com>
-Date: Thu, 22 Feb 2018 16:19:45 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1eosiO-0001WQ-Mo
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:23:21 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46584)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eosiO-0001RM-Es
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:23:20 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1eosiG-000204-TN
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 15:23:12 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Feb 2018 15:22:35 +0000
+Message-Id: <20180222152307.7499-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <w51po5icfbh.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Z7JVIFioGAIeOuGTxKxKIsn9XwRBQUCPa"
-Subject: Re: [Qemu-devel] [PATCH v8 18/26] block: Add sgfnt_runtime_opts to
- BlockDriver
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/32] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Z7JVIFioGAIeOuGTxKxKIsn9XwRBQUCPa
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <f2885948-d6b3-90a3-9960-6f8fd53e0177@redhat.com>
-Subject: Re: [PATCH v8 18/26] block: Add sgfnt_runtime_opts to BlockDriver
-References: <20180205151835.20812-1-mreitz@redhat.com>
- <20180205151835.20812-19-mreitz@redhat.com>
- <w51po5icfbh.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51po5icfbh.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Latest run of arm patches -- most of these are Philippe's SD card
+cleanups. I have more in my queue to review, but 32 is enough
+patches to warrant sending out.
 
-On 2018-02-06 16:23, Alberto Garcia wrote:
-> On Mon 05 Feb 2018 04:18:27 PM CET, Max Reitz wrote:
->> --- a/block/blkdebug.c
->> +++ b/block/blkdebug.c
->> @@ -886,6 +886,21 @@ static int blkdebug_reopen_prepare(BDRVReopenStat=
-e *reopen_state,
->>      return 0;
->>  }
->> =20
->> +static const char *const blkdebug_sgfnt_runtime_opts[] =3D {
->> +    "config",
->> +    "inject-error.",
->> +    "set-state.",
->> +    "suspend.",
->=20
-> Where did this "suspend." come from?
+thanks
+-- PMM
 
-Er, well, er.
+The following changes since commit ff8689611a1d954897d857b28f7ef404e11cfa2c:
 
-After having looked at it a couple of times now, I can't see anything.
-I guess I'll remove it and hope for the best...?
+  Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-signed' into staging (2018-02-22 11:37:05 +0000)
 
-Max
+are available in the Git repository at:
 
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180222
 
---Z7JVIFioGAIeOuGTxKxKIsn9XwRBQUCPa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+for you to fetch changes up to 4e5cc6756586e967993187657dfcdde4e00288d9:
 
------BEGIN PGP SIGNATURE-----
+  sdcard: simplify SD_SEND_OP_COND (ACMD41) (2018-02-22 15:12:54 +0000)
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqO35ESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AKQQIAIU4PZoxcr7rggcMCaBpnyJD8gwGhyF7
-xHezcmxkLNK5t8+ayl1fVlKyUzEMUtWqatVDUCaYcQ28zYnDI8sqHv1UIbyNS0V0
-iICAa7VZ/ObbqkR2Vs2RWW96kBcujYI5QeVaOAQXzoKQmdhYpp6yAP9OOo0vxXtt
-xRuCGgo6jTFdmT/CyDJaPxPmqPXKzzjRs3P2YoE1j+2SlwdP+HbPzfEYlh861nVm
-FbFTvm6jT/b+nUTKmDhlMhXt+Xb5ci6QLedhOh9iwxgqdp1R8Nhk1jh8U5TXlpaV
-NXYo1IZzJn6GmZJPBZgwIL5xkQneP5l5LIT+4gUVmKOcgwrb6cmIIkI=
-=rdC9
------END PGP SIGNATURE-----
+----------------------------------------------------------------
+ * New "raspi3" machine emulating RaspberryPi 3
+ * Fix bad register definitions for VMIDR and VMPIDR (which caused
+   assertions for 64-bit guest CPUs with EL2 on big-endian hosts)
+ * hw/char/stm32f2xx_usart: fix TXE/TC bit handling
+ * Fix ast2500 protection register emulation
+ * Lots of SD card emulation cleanups and bugfixes
 
---Z7JVIFioGAIeOuGTxKxKIsn9XwRBQUCPa--
+----------------------------------------------------------------
+Hugo Landau (1):
+      Fix ast2500 protection register emulation
+
+Pekka Enberg (1):
+      raspi: Add "raspi3" machine type
+
+Peter Maydell (1):
+      target/arm: Fix register definitions for VMIDR and VMPIDR
+
+Philippe Mathieu-Daudé (28):
+      hw/sd/milkymist-memcard: use qemu_log_mask()
+      hw/sd/milkymist-memcard: split realize() out of SysBusDevice init()
+      hw/sd/milkymist-memcard: expose a SDBus and connect the SDCard to it
+      hw/sd/ssi-sd: use the SDBus API, connect the SDCard to the bus
+      sdcard: reorder SDState struct members
+      sdcard: replace DPRINTF() by trace events
+      sdcard: add a trace event for command responses
+      sdcard: replace fprintf() by qemu_hexdump()
+      sdcard: add more trace events
+      sdcard: define SDMMC_CMD_MAX instead of using the magic '64'
+      sdcard: use G_BYTE from cutils
+      sdcard: use the registerfields API to access the OCR register
+      sdcard: Don't always set the high capacity bit
+      sdcard: update the CSD CRC register regardless the CSD structure version
+      sdcard: fix the 'maximum data transfer rate' to 25MHz
+      sdcard: clean the SCR register and add few comments
+      sdcard: remove commands from unsupported old MMC specification
+      sdcard: simplify using the ldst API
+      sdcard: use the correct masked OCR in the R3 reply
+      sdcard: use the registerfields API for the CARD_STATUS register masks
+      sdcard: handle CMD54 (SDIO)
+      sdcard: handle the Security Specification commands
+      sdcard: use a more descriptive label 'unimplemented_spi_cmd'
+      sdcard: handles more commands in SPI mode
+      sdcard: check the card is in correct state for APP CMD (CMD55)
+      sdcard: warn if host uses an incorrect address for APP CMD (CMD55)
+      sdcard: simplify SEND_IF_COND (CMD8)
+      sdcard: simplify SD_SEND_OP_COND (ACMD41)
+
+Richard Braun (1):
+      hw/char/stm32f2xx_usart: fix TXE/TC bit handling
+
+ hw/sd/sdmmc-internal.h            |  15 ++
+ include/hw/char/stm32f2xx_usart.h |   7 +-
+ include/hw/sd/sd.h                |   1 -
+ hw/arm/raspi.c                    |  23 ++
+ hw/char/stm32f2xx_usart.c         |  12 +-
+ hw/misc/aspeed_scu.c              |   6 +-
+ hw/misc/aspeed_sdmc.c             |   8 +-
+ hw/sd/milkymist-memcard.c         |  87 +++----
+ hw/sd/sd.c                        | 467 +++++++++++++++++++++++---------------
+ hw/sd/ssi-sd.c                    |  32 +--
+ target/arm/helper.c               |   8 +-
+ hw/sd/trace-events                |  20 ++
+ 12 files changed, 446 insertions(+), 240 deletions(-)
+ create mode 100644 hw/sd/sdmmc-internal.h
