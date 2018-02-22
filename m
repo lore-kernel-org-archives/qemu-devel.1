@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <king.wang@huawei.com>) id 1eomAP-0004QO-G1
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:23:50 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eomAd-0004ZM-SV
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:24:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <king.wang@huawei.com>) id 1eomAO-00051W-8t
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:23:49 -0500
-From: "Wangjing (King, Euler)" <king.wang@huawei.com>
-Date: Thu, 22 Feb 2018 08:23:29 +0000
-Message-ID: <7A02ABD51F591A40B389D980F778B2BF012526B7CB@dggemm501-mbs.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eomAa-0005Mt-Mw
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:24:03 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:46659
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eomAa-00057e-Eh
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:24:00 -0500
+Date: Thu, 22 Feb 2018 08:23:41 +0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <20180222082341.sk2pkai7kf5kurfh@kentang.home>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Qemu aborted in ide_restart_bh after migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PULL] Update OpenBIOS images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,89 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: weifuqiang <weifuqiang@huawei.com>, "Denis V. Lunev" <den@openvz.org>, Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-VGhpcyBpc3N1ZSBvY2N1cnJlZCBhdCBhIHZlcnkgbG93IHByb2JhYmlsaXR5LCBJZiB3ZSBpbmpl
-Y3QgZGVsYXlzIGluIGFkZHJlc3Nfc3BhY2Vfd3JpdGVfY29udGludWUgbGlrZSB0aGlzLCB0aGUg
-aXNzdWUgb2NjdXJyZWQgaW5ldml0YWJsee+8mg0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjDQpkaWZmIC0tZ2l0IGEvZXhlYy5jIGIvZXhlYy5jDQppbmRleCBlOGQ3YjMzLi5iOTc3OWUw
-IDEwMDY0NA0KLS0tIGEvZXhlYy5jDQorKysgYi9leGVjLmMNCkBAIC0zMDU2LDYgKzMwNTYsMTEg
-QEAgc3RhdGljIE1lbVR4UmVzdWx0IGZsYXR2aWV3X3dyaXRlX2NvbnRpbnVlKEZsYXRWaWV3ICpm
-diwgaHdhZGRyIGFkZHIsDQoNCiAgICAgICAgIGlmIChyZWxlYXNlX2xvY2spIHsNCiAgICAgICAg
-ICAgICBxZW11X211dGV4X3VubG9ja19pb3RocmVhZCgpOw0KKyAgICAgICAgICAgIGlmIChtci0+
-bmFtZSAmJiAhc3RyY21wKG1yLT5uYW1lLCAiaWRlIikgJiYgYXRvbWljX3hjaGdfbXlfZmxhZygw
-KSkgew0KKyAgICAgICAgICAgICAgICBwcmludGYoInN0YXJ0IHNsZWVwIik7DQorICAgICAgICAg
-ICAgICAgIHVzbGVlcCg1ICogMTAwMCAqIDEwMDApOw0KKyAgICAgICAgICAgICAgICBwcmludGYo
-ImVuZCBzbGVlcCIpOw0KKyAgICAgICAgICAgIH0NCiAgICAgICAgICAgICByZWxlYXNlX2xvY2sg
-PSBmYWxzZTsNCiAgICAgICAgIH0NCg0KDQp3MDAxODUzODRASEdIWTF3MDAxODUzODQxIC9jeWdk
-cml2ZS9mL0dpdEhvbWUvb3BlbnNvdXJjZS9xZW11DQokIGdpdCBkaWZmDQpkaWZmIC0tZ2l0IGEv
-ZXhlYy5jIGIvZXhlYy5jDQppbmRleCBlOGQ3YjMzLi5iOTc3OWUwIDEwMDY0NA0KLS0tIGEvZXhl
-Yy5jDQorKysgYi9leGVjLmMNCkBAIC0zMDU2LDYgKzMwNTYsMTEgQEAgc3RhdGljIE1lbVR4UmVz
-dWx0IGZsYXR2aWV3X3dyaXRlX2NvbnRpbnVlKEZsYXRWaWV3ICpmdiwgaHdhZGRyIGFkZHIsDQoN
-CiAgICAgICAgIGlmIChyZWxlYXNlX2xvY2spIHsNCiAgICAgICAgICAgICBxZW11X211dGV4X3Vu
-bG9ja19pb3RocmVhZCgpOw0KKyAgICAgICAgICAgIGlmIChtci0+bmFtZSAmJiAhc3RyY21wKG1y
-LT5uYW1lLCAiaWRlIikgJiYgYXRvbWljX3hjaGdfbXlfZmxhZygwKSkgew0KKyAgICAgICAgICAg
-ICAgICBwcmludGYoInN0YXJ0IHNsZWVwIik7DQorICAgICAgICAgICAgICAgIHVzbGVlcCg1ICog
-MTAwMCAqIDEwMDApOw0KKyAgICAgICAgICAgICAgICBwcmludGYoImVuZCBzbGVlcCIpOw0KKyAg
-ICAgICAgICAgIH0NCiAgICAgICAgICAgICByZWxlYXNlX2xvY2sgPSBmYWxzZTsNCiAgICAgICAg
-IH0NCg0KZGlmZiAtLWdpdCBhL2h3L2lkZS9wY2kuYyBiL2h3L2lkZS9wY2kuYw0KaW5kZXggMWFi
-MGE4OS4uYTE4MDdjOCAxMDA2NDQNCi0tLSBhL2h3L2lkZS9wY2kuYw0KKysrIGIvaHcvaWRlL3Bj
-aS5jDQpAQCAtNTEsNiArNTEsMTEgQEAgc3RhdGljIHZvaWQgYm1kbWFfc3RhcnRfZG1hKElERURN
-QSAqZG1hLCBJREVTdGF0ZSAqcywNCiAgICAgaWYgKGJtLT5zdGF0dXMgJiBCTV9TVEFUVVNfRE1B
-SU5HKSB7DQogICAgICAgICBibS0+ZG1hX2NiKGJtZG1hX2FjdGl2ZV9pZihibSksIDApOw0KICAg
-ICB9DQorDQorICAgIGlmICghKGJtLT5zdGF0dXMgJiBCTV9TVEFUVVNfRE1BSU5HKSAmJiBibS0+
-ZG1hX2NiICYmDQorICAgICAgICBJREVfRE1BX0FUQVBJID09IGJtZG1hX2FjdGl2ZV9pZihibSkt
-PmRtYV9jbWQpIHsNCisgICAgICAgIGF0b21pY194Y2hnX215X2ZsYWcoMSk7DQorICAgIH0NCiB9
-DQoNCiAvKioNCmRpZmYgLS1naXQgYS9pbmNsdWRlL3FlbXUvZXJyb3ItcmVwb3J0LmggYi9pbmNs
-dWRlL3FlbXUvZXJyb3ItcmVwb3J0LmgNCmluZGV4IGUxYzhhZTEuLjA5NWQ2YTQgMTAwNjQ0DQot
-LS0gYS9pbmNsdWRlL3FlbXUvZXJyb3ItcmVwb3J0LmgNCisrKyBiL2luY2x1ZGUvcWVtdS9lcnJv
-ci1yZXBvcnQuaA0KQEAgLTQ3LDQgKzQ3LDYgQEAgdm9pZCBpbmZvX3JlcG9ydChjb25zdCBjaGFy
-ICpmbXQsIC4uLikgR0NDX0ZNVF9BVFRSKDEsIDIpOw0KIGNvbnN0IGNoYXIgKmVycm9yX2dldF9w
-cm9nbmFtZSh2b2lkKTsNCiBleHRlcm4gYm9vbCBlbmFibGVfdGltZXN0YW1wX21zZzsNCg0KK2lu
-dCBhdG9taWNfeGNoZ19teV9mbGFnKGludCBmbGFnKTsNCisNCiAjZW5kaWYNCmRpZmYgLS1naXQg
-YS91dGlsL3FlbXUtZXJyb3IuYyBiL3V0aWwvcWVtdS1lcnJvci5jDQppbmRleCBhMjVkM2I5Li45
-NjliZGViIDEwMDY0NA0KLS0tIGEvdXRpbC9xZW11LWVycm9yLmMNCisrKyBiL3V0aWwvcWVtdS1l
-cnJvci5jDQpAQCAtMzEwLDMgKzMxMCw5IEBAIHZvaWQgaW5mb19yZXBvcnQoY29uc3QgY2hhciAq
-Zm10LCAuLi4pDQogICAgIHZyZXBvcnQoUkVQT1JUX1RZUEVfSU5GTywgZm10LCBhcCk7DQogICAg
-IHZhX2VuZChhcCk7DQogfQ0KKw0KK2ludCBhdG9taWNfeGNoZ19teV9mbGFnKGludCBmbGFnKQ0K
-K3sNCisgICAgc3RhdGljIGludCBteV9mbGFnID0gMDsNCisgICAgcmV0dXJuIGF0b21pY194Y2hn
-KCZteV9mbGFnLCBmbGFnKTsNCit9DQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNClJl
-cHJvZHVjZSBzdGVwczoNCjEpIHVzZSAndmlyc2ggY3JlYXRlIHZtLnhtbCcgdG8gc3RhcnQgYSBW
-TSwgYW5kIHRoZSBWTSBjb25maWd1cmVkIGVtcHR5IElERSBDRC1ST00uDQoyKSB3aGVuIHFlbXUg
-cHJvY2VzcyBwcmludCAic3RhcnQgc2xlZXAiLCBleGVjdXRlICJ2aXJzaCByZXNldCB2bTsgdmly
-c2ggc3VzcGVuZCB2bSIgY29tbWFuZC4NCjMpIHVzZSAidmlyc2ggc2F2ZSB2bSB2bS5zdGF0ZSIg
-dG8gc2F2ZSBWTSdzIHN0YXRlLg0KNCkgdXNlICJ2aXJzaCByZXN0b3JlIHZtLnN0YXRlIiB0byBy
-ZXN0b3JlIFZNJ3Mgc3RhdGUuDQo1KSBleGVjdXRlICJ2aXJzaCByZXN1bWUgdm0iLCBhbmQgdGhl
-biBxZW11IHByb2Nlc3MgYWJvcnRlZCBhdCBpZGVfcmVzdGFydF9iaC4NCg0KSSB0aGluayB3ZSBz
-aG91bGQgc2V0IGJtLT5kbWFfY2IgdG8gTlVMTCBpbiBibWRtYV9yZXNldCBmdW5jdGlvbiB0byBh
-dm9pZCB0aGlzIGlzc3Vlcy4NCg0KPj4gRW1wdHkgSURFIENELVJPTSBjb25maWd1cmVkIG9uIHRo
-ZSBWTToNCj4+ICAgICA8ZGlzayB0eXBlPSdmaWxlJyBkZXZpY2U9J2Nkcm9tJz4NCj4+ICAgICAg
-IDxkcml2ZXIgbmFtZT0ncWVtdScgdHlwZT0ncmF3JyBjYWNoZT0nbm9uZScgaW89J3RocmVhZHMn
-Lz4NCj4+ICAgICAgIDx0YXJnZXQgZGV2PSdoZGInIGJ1cz0naWRlJy8+DQo+PiAgICAgICA8cmVh
-ZG9ubHkvPg0KPj4gICAgICAgPGFkZHJlc3MgdHlwZT0nZHJpdmUnIGNvbnRyb2xsZXI9JzAnIGJ1
-cz0nMCcgdGFyZ2V0PScwJyB1bml0PScxJy8+DQo+PiAgICAgPC9kaXNrPg0KPj4gTWFrZSBtaWdy
-YXRpb24gZm9yIHRoaXMgVk0sIHRoZW4gcWVtdSBhYm9ydGVkIGluIGlkZV9yZXN0YXJ0X2JoLiAN
-Cj4+IElERVN0YXRlIGV4cGVjdCBlbmRfdHJhbnNmZXJfZnVuYyBlcXVhbCB0byBpZGVfYXRhcGlf
-Y21kLCBidXQgaXQgcmVmZXIgdG8gaWRlX2R1bW15X3RyYW5zZmVyX3N0b3AuDQo+PiBJIGhhdmUg
-bm8gaWRlYSBhYm91dCB0aGlzLCBjYW4gYW55b25lIGhlbHAgbWU/DQo+PiANCj4NCj5EbyB5b3Ug
-aGF2ZSBhbiBlYXN5IHdheSB0byByZXByb2R1Y2UgdGhpcz8gMi44LjEgaXMgYSBiaXQgb2xkIGF0
-IHRoaXMgcG9pbnQsIGJ1dCBJIGRvbid0IHRoaW5rIHdlJ3ZlIGNoYW5nZWQgYW55dGhpbmcgaW4g
-dGhlIElERSBlbXVsYXRvciBzdWJzdGFudGl2ZWx5IHNpbmNlIHRoZW4sIHNvIEknbSBjdXJpb3Vz
-IHRvIHNlZSBpZiBJIGNhbiBnZXQgdGhpcyB0byByZXByb2R1Y2UuDQo+DQo+SSdtIHN1cnByaXNl
-ZCBhbiBlbXB0eSBDRC1ST00gd291bGQgY2F1c2UgdGhpcywgdGhvdWdoLCBzaW5jZSBpdCBzaG91
-bGRuJ3QgcmVhbGx5IGhhdmUgYW55IGNvbW1hbmRzIGluLWZsaWdodCB0aGF0IG1pZ2h0IGdldCB1
-cyB0byBhIHdlaXJkIGVkZ2UgY2FzZSwgc28gSSB3YW50IHRvIHRha2UgYSBjbG9zZSBsb29rIGF0
-IHRoaXMuDQo+DQo+RGVuaXMgTHVuZXYgbm90ZWQgc29tZSBpc3N1ZXMgd2l0aCBtaWdyYXRpb24g
-dGhhdCBJIGNvdWxkbid0IHNvbHZlIGF0IHRoZSB0aW1lIGVpdGhlci4gQSByZXByb2R1Y2VyIHdv
-dWxkIGJlIGZhbnRhc3RpYy4NCj4NCj4+IHFlbXUgdmVyc2lvbiBpcyAyLjguMQ0KPj4gKGdkYikg
-YnQNCj4+ICMwICAweDAwMDA3ZmNmZjdjNGIxNTcgaW4gcmFpc2UgKCkgZnJvbSAvdXNyL2xpYjY0
-L2xpYmMuc28uNg0KPj4gIzEgIDB4MDAwMDdmY2ZmN2M0Yzg0OCBpbiBhYm9ydCAoKSBmcm9tIC91
-c3IvbGliNjQvbGliYy5zby42DQo+PiAjMiAgMHgwMDAwN2ZjZmY3YzQ0MWM2IGluIF9fYXNzZXJ0
-X2ZhaWxfYmFzZSAoKSBmcm9tIA0KPj4gL3Vzci9saWI2NC9saWJjLnNvLjYNCj4+ICMzICAweDAw
-MDA3ZmNmZjdjNDQyNzIgaW4gX19hc3NlcnRfZmFpbCAoKSBmcm9tIC91c3IvbGliNjQvbGliYy5z
-by42DQo+PiAjNCAgMHgwMDAwMDAwMDAwNjIwN2FiIGluIGlkZV9yZXN0YXJ0X2JoIChvcGFxdWU9
-MHgzOGIzNDMwKSBhdCANCj4+IC4uLi4NCj4+IChnZGIpDQo+PiANCj4NCj4tLQ0KPuKAlGpzDQo+
-DQo=
+Hi Peter,
+
+This update for OpenBIOS contains a single fix which allows yaboot 1.3.17 to boot
+under qemu-system-ppc. Please pull.
+
+
+ATB,
+
+Mark.
+
+
+The following changes since commit a6e0344fa0e09413324835ae122c4cadd7890231:
+
+  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180220-pull-request' into staging (2018-02-20 14:05:00 +0000)
+
+are available in the git repository at:
+
+  https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
+
+for you to fetch changes up to feb3174ff27f94d34247952d9779f09e9b1dfd39:
+
+  Update OpenBIOS images to 54d959d9 built from submodule. (2018-02-22 07:55:47 +0000)
+
+----------------------------------------------------------------
+Update OpenBIOS images
+
+----------------------------------------------------------------
+Mark Cave-Ayland (1):
+      Update OpenBIOS images to 54d959d9 built from submodule.
+
+ pc-bios/openbios-ppc     | Bin 754936 -> 754936 bytes
+ pc-bios/openbios-sparc32 | Bin 382048 -> 382048 bytes
+ pc-bios/openbios-sparc64 | Bin 1593408 -> 1593408 bytes
+ roms/openbios            |   2 +-
+ 4 files changed, 1 insertion(+), 1 deletion(-)
