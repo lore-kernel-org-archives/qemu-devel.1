@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eoik6-0000xC-7E
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:44:27 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eoj0A-0005J6-Ag
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:01:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eoik1-0006Wq-9r
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:44:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59290 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1eoik1-0006WC-4m
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 23:44:21 -0500
-From: Wei Huang <wei@redhat.com>
-Date: Wed, 21 Feb 2018 22:44:14 -0600
-Message-Id: <20180222044417.15561-1-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V4 0/3] tests: Add migration test for aarch64
+	(envelope-from <aik@ozlabs.ru>) id 1eoj07-0000K1-93
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:01:02 -0500
+Received: from ozlabs.ru ([107.173.13.209]:49088)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1eoj06-0000IY-VD
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:00:59 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Thu, 22 Feb 2018 16:00:20 +1100
+Message-Id: <20180222050020.1717-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu repost] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,64 +23,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com, wei@redhat.com
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Markus Armbruster <armbru@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>
 
-This patchset adds a migration test for aarch64. It leverages
-Dave Gilbert's recent patch "tests/migration: Add source to PC boot block"
-to create a new test case for aarch64.
+There is already 'device-list-properties' which does most of the job,
+however it does not handle everything returned by qom-list-types such
+as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
 
-V3->V4:
- * Rename .s to .S, allowing assembly to include C-style header file
- * Move test defines into a new migration-test.h file
- * Use different cpu & gic settings for kvm and tcg modes on aarch64
- * Clean up aarch64-a-b-kernel.S based on Andrew Jones' comments
+This adds a new qom-list-properties command which prints properties
+of a specific class and its instance. It is pretty much a simplified copy
+of the device-list-properties handler.
+
+Since it creates an object instance, device properties should appear
+in the output as they are copied to QOM properties at the instance_init
+hook.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+
+This is a simple rebase on top of the current upstream.
+
+
+---
+ qapi-schema.json | 29 +++++++++++++++++++++++++++++
+ qmp.c            | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 81 insertions(+)
+
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 0262b9f..fa5f189 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1455,6 +1455,35 @@
+   'returns': [ 'DevicePropertyInfo' ] }
  
-V2->V3:
- * Convert build script to Makefile
- * Add cross-compilation support
- * Fix CPU type for "tcg" machine type
- * Revise asm code and the compilation process from asm to header file
-
-V1->V2:
- * Similar to Dave Gilbert's recent changes to migration-test, we
-   provide the test source and a build script in V2.
- * aarch64 kernel blob is defined as "unsigned char" because the source
-   is now provided in V2.
- * Add "-machine none" to test_deprecated() because aarch64 doesn't have
-   a default machine type.
-
-RFC->V1:
- * aarch64 kernel blob is defined as an uint32_t array
- * The test code is re-written to address a data caching issue under KVM.
-   Tests passed under both x86 and aarch64.
- * Re-use init_bootfile_x86() for both x86 and aarch64
- * Other minor fixes
-
-Thanks,
--Wei
-
-Wei Huang (3):
-  tests/migration: Convert the boot block compilation script into
-    Makefile
-  tests/migration: Add migration-test header file
-  tests: Add migration test for aarch64
-
- tests/Makefile.include                             |  1 +
- tests/migration-test.c                             | 52 +++++++++++++---
- tests/migration/Makefile                           | 46 ++++++++++++++
- tests/migration/aarch64-a-b-kernel.S               | 71 ++++++++++++++++++++++
- tests/migration/aarch64-a-b-kernel.h               | 19 ++++++
- tests/migration/migration-test.h                   | 24 ++++++++
- tests/migration/rebuild-x86-bootblock.sh           | 33 ----------
- .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   | 12 ++--
- tests/migration/x86-a-b-bootblock.h                |  4 +-
- 9 files changed, 213 insertions(+), 49 deletions(-)
- create mode 100644 tests/migration/Makefile
- create mode 100644 tests/migration/aarch64-a-b-kernel.S
- create mode 100644 tests/migration/aarch64-a-b-kernel.h
- create mode 100644 tests/migration/migration-test.h
- delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
- rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (88%)
-
+ ##
++# @QOMPropertyInfo:
++#
++# Information about object properties.
++#
++# @name: the name of the property
++# @type: the typename of the property
++# @description: if specified, the description of the property.
++#
++# Since: 2.12
++##
++{ 'struct': 'QOMPropertyInfo',
++  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
++
++##
++# @qom-list-properties:
++#
++# List properties associated with a QOM object.
++#
++# @typename: the type name of an object
++#
++# Returns: a list of QOMPropertyInfo describing object properties
++#
++# Since: 2.12
++##
++{ 'command': 'qom-list-properties',
++  'data': { 'typename': 'str'},
++  'returns': [ 'QOMPropertyInfo' ] }
++
++##
+ # @xen-set-global-dirty-log:
+ #
+ # Enable or disable the global dirty log mode.
+diff --git a/qmp.c b/qmp.c
+index 793f6f3..f2d4781 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -576,6 +576,58 @@ DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
+     return prop_list;
+ }
+ 
++QOMPropertyInfoList *qmp_qom_list_properties(const char *typename,
++                                             Error **errp)
++{
++    ObjectClass *klass;
++    Object *obj;
++    ObjectProperty *prop;
++    ObjectPropertyIterator iter;
++    QOMPropertyInfoList *prop_list = NULL;
++
++    klass = object_class_by_name(typename);
++    if (klass == NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Class '%s' not found", typename);
++        return NULL;
++    }
++
++    klass = object_class_dynamic_cast(klass, TYPE_OBJECT);
++    if (klass == NULL) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_OBJECT);
++        return NULL;
++    }
++
++    if (object_class_is_abstract(klass)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename",
++                   "non-abstract class");
++        return NULL;
++    }
++
++    obj = object_new(typename);
++
++    object_property_iter_init(&iter, obj);
++    while ((prop = object_property_iter_next(&iter))) {
++        QOMPropertyInfo *info;
++        QOMPropertyInfoList *entry;
++
++        info = g_malloc0(sizeof(*info));
++        info->name = g_strdup(prop->name);
++        info->type = g_strdup(prop->type);
++        info->has_description = !!prop->description;
++        info->description = g_strdup(prop->description);
++
++        entry = g_malloc0(sizeof(*entry));
++        entry->value = info;
++        entry->next = prop_list;
++        prop_list = entry;
++    }
++
++    object_unref(obj);
++
++    return prop_list;
++}
++
+ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+ {
+     return arch_query_cpu_definitions(errp);
 -- 
-2.14.3
+2.11.0
