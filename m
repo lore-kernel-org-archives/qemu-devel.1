@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eooSZ-0006zY-Aj
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 05:50:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eooZv-0000i8-2q
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 05:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eooSW-00057Z-9S
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 05:50:43 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180221233953.5142-4-eblake@redhat.com>
-References: <20180221233953.5142-1-eblake@redhat.com>
-	<20180221233953.5142-4-eblake@redhat.com>
-Date: Thu, 22 Feb 2018 11:50:36 +0100
-Message-ID: <w51h8q95mdf.fsf@maestria.local.igalia.com>
+	(envelope-from <kwolf@redhat.com>) id 1eooZt-0003HM-VN
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 05:58:19 -0500
+Date: Thu, 22 Feb 2018 11:57:55 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180222105755.GB4147@localhost.localdomain>
+References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
+	<7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qcow2: Avoid memory over-allocation
- on compressed images
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +23,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jsnow@redhat.com
 
-On Thu 22 Feb 2018 12:39:53 AM CET, Eric Blake wrote:
-> +        assert(!!s->cluster_data == !!s->cluster_cache);
-> +        assert(csize < 2 * s->cluster_size + 512);
->          if (!s->cluster_data) {
-> -            /* one more sector for decompressed data alignment */
-> -            s->cluster_data = qemu_try_blockalign(bs->file->bs,
-> -                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
-> +            s->cluster_data = g_try_malloc(2 * s->cluster_size + 512);
->              if (!s->cluster_data) {
->                  return -ENOMEM;
->              }
+Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
+> On 20/02/2018 18:04, Peter Lieven wrote:
+> > Hi,
+> > 
+> > I remember we discussed a long time ago to limit the stack usage of all
+> > functions that are executed in a coroutine
+> > context to a very low value to be able to safely limit the coroutine
+> > stack size as well.
+> 
+> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
+> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
+> ide_atapi_cmd_reply_end.
+> 
+> But perhaps it's not an issue, somebody needs to audit the code.
 
-Why the "+ 512" ?
+I think John intended to get rid of the recursion sometime, but I doubt
+he has had the time so far.
 
-nb_csectors is guaranteed to be at most twice the cluster size, you can
-even assert that:
-
-    int max_csize = (s->csize_mask + 1) * 512;
-    assert(max_csize == s->cluster_size * 2);
-    s->cluster_data = qemu_try_blockalign(bs->file->bs, max_csize);
-
-And csize is at most (max_csize - sector_offset), so you can change your
-assertion to this:
-
-   assert(csize <= 2 * s->cluster_size);
-
-Berto
+Kevin
