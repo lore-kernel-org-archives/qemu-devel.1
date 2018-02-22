@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eot4x-0000X0-OA
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:46:40 -0500
+	(envelope-from <berrange@redhat.com>) id 1eot9K-0004DL-Hr
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eot4w-0000WM-U8
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:46:39 -0500
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:41718)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eot4w-0000W1-Nm
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:46:38 -0500
-Received: by mail-oi0-x235.google.com with SMTP id e10so4002983oiy.8
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:46:38 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1eot9G-0004ad-IT
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:51:10 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34950 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eot9G-0004ZN-Ce
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:51:06 -0500
+Date: Thu, 22 Feb 2018 15:50:47 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180222155047.GQ9323@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180124053957.29145-1-peterx@redhat.com>
+	<20180124053957.29145-10-peterx@redhat.com>
+	<20180221160007.GA21436@stefanha-x1.localdomain>
+	<20180222100119.GH18962@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <20180222153740.3zkvjen77uwjqhd2@sirius.home.kraxel.org>
-References: <20180219111458.25983-1-kraxel@redhat.com>
-	<20180219111458.25983-5-kraxel@redhat.com>
-	<20180222153740.3zkvjen77uwjqhd2@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 15:46:17 +0000
-Message-ID: <CAFEAcA8_VRML=FopCKdGnrPCyZ9MwKokMj60962=tgCNwNT2oA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/7] qdev: add hotpluggable to
- DeviceState
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180222100119.GH18962@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v7 09/23] monitor: allow using IO thread
+ for parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 22 February 2018 at 15:37, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> On Mon, Feb 19, 2018 at 12:14:55PM +0100, Gerd Hoffmann wrote:
->> vfio display support wants disable hotplug for certain devices, because
->> qemu doesn't support hotplugging display devices and qemu consoles.
->>
->> Add a hotpluggable bool to DeviceState, initialize it from
->> DeviceClass->hotpluggable, update device_get_hotpluggable accordingly.
->>
->> Devices can flip the new variable from true to false if needed.
->
-> Alex wants an ack for this one.  Who maintains it these days?
->
-> MAINTAINERS doesn't list qdev.  For QOM which is closest probably
-> Andreas F=C3=A4rber is listed.  Havn't seen him on the list for a while
-> though.
->
-> Ok, lets try some usual suspects...
-> Markus? Eric? Paolo? Peter?  Any comments on this one?
+On Thu, Feb 22, 2018 at 06:01:19PM +0800, Peter Xu wrote:
+> On Wed, Feb 21, 2018 at 04:00:07PM +0000, Stefan Hajnoczi wrote:
+> > On Wed, Jan 24, 2018 at 01:39:43PM +0800, Peter Xu wrote:
+> > > @@ -4034,12 +4044,29 @@ static void sortcmdlist(void)
+> > >      qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
+> > >  }
+> > >  
+> > > +static GMainContext *monitor_io_context_get(void)
+> > > +{
+> > > +    return iothread_get_g_main_context(mon_global.mon_iothread);
+> > > +}
+> > > +
+> > > +static AioContext *monitor_aio_context_get(void)
+> > > +{
+> > > +    return iothread_get_aio_context(mon_global.mon_iothread);
+> > > +}
+> > 
+> > Please follow the X_get_Y() naming convention instead of X_Y_get().  For
+> > example, see qemu_get_aio_context() and iothread_get_aio_context().
+> 
+> Sure.
+> 
+> > 
+> > > @@ -4082,11 +4109,41 @@ void error_vprintf_unless_qmp(const char *fmt, va_list ap)
+> > >      }
+> > >  }
+> > >  
+> > > +static void monitor_list_append(Monitor *mon)
+> > > +{
+> > > +    qemu_mutex_lock(&monitor_lock);
+> > > +    QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
+> > > +    qemu_mutex_unlock(&monitor_lock);
+> > > +}
+> > > +
+> > > +static void monitor_qmp_setup_handlers(void *data)
+> > 
+> > BH functions are usually declared like this:
+> > 
+> >   static void X_bh(void *opaque)
+> > 
+> > This way it's immediately clear that this function is invoked as a BH.
+> > 
+> > I suggest renaming the function to monitor_qmp_setup_handlers_bh().
+> > Using 'opaque' instead of 'data' is common, too.
+> 
+> Sure.
+> 
+> > 
+> > > @@ -4099,24 +4156,55 @@ void monitor_init(Chardev *chr, int flags)
+> > >      }
+> > >  
+> > >      if (monitor_is_qmp(mon)) {
+> > > -        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+> > > -                                 monitor_qmp_event, NULL, mon, NULL, true);
+> > >          qemu_chr_fe_set_echo(&mon->chr, true);
+> > >          json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+> > > +        if (mon->use_io_thr) {
+> > > +            /*
+> > > +             * It's possible that we already have an IOWatchPoll
+> > > +             * registered for the Chardev during chardev_init_func().
+> > 
+> > When does this happen?
+> > 
+> > This seems like a hack that breaks when certain -chardev options are
+> > used.  For example, what happens if the chardev is a TCP connection with
+> > reconnect=5.  In that case the socket will be connecting asynchronously
+> > and we cannot just remove the fd watch.
+> > 
+> > How does this interact with TCP listen chardevs?  It looks like the
+> > listener socket uses the main loop (see tcp_chr_disconnect()).
+> > 
+> > I'm worried that the chardev layer isn't thread-safe and you haven't
+> > added anything to protect it or at least refuse to run in unsafe
+> > conditions.
+> 
+> Indeed, I did some more reading and noticed that the TCP typed chardev
+> is really special.
+> 
+> Firstly there can be the QIO thread that handles sync connecting when
+> "reconnect" is setup (I don't really understand why we only need the
+> threads when reconnect != 0, but anyway, I'll just assume we need the
+> threads).  It's done in qmp_chardev_open_socket().
+> 
+> Secondly, TCP can support TLS or TELNET (tcp_chr_new_client() handles
+> the main logic of it), so there can be actually more than one GSource
+> created for a single TCP chardev.  Meanwhile, the
+> chr_update_read_handler() calls never handles the re-setup of those
+> special GSources (TLS/TELNET), only the common GSource of TCP stream
+> read/write.
+> 
+> And the whole TCP channel is based on QIO stuff, which means I need to
+> add non-default context support to QIO stuff too...  That's mostly
+> about qio_channel_add_watch().  I may need to pass in context
+> information, and switch to GSource for that function instead of the
+> old tags, just like what I did to chardev in general.
 
-What type of device is only sometimes hotpluggable ?
-The commit message says "display devices" and "consoles",
-but I would expect those to both be types of device which
-have a class which is never hotpluggable, so you can mark
-them non-hotpluggable with the existing class flag rather
-than needing a per-instance flag.
+Rather than changing qio_channel_add_watch() which affects all callers,
+just add a qio_channel_add_watch_full() variant which includes  GMainContext
+as an extra arg
 
-thanks
--- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
