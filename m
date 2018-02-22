@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53670)
+Received: from eggs.gnu.org ([208.118.235.92]:54909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eogiL-00030y-1m
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 21:36:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eogiy-00035d-0v
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 21:36:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eoghH-0002sa-2O
-	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 21:34:28 -0500
-Date: Thu, 22 Feb 2018 13:19:24 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eoghH-0002sc-0n
+	for qemu-devel@nongnu.org; Wed, 21 Feb 2018 21:35:07 -0500
+Date: Thu, 22 Feb 2018 13:11:16 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180222021924.GC2164@umbus.fritz.box>
-References: <20180219181922.21586-1-mark.cave-ayland@ilande.co.uk>
-	<20180219181922.21586-10-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20180222021116.GA2164@umbus.fritz.box>
+References: <cover.1519150239.git.balaton@eik.bme.hu>
+	<CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
+	<20180220204450.GA27101@flamenco>
+	<CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
+	<alpine.BSF.2.21.1802211754370.60913@zero.eik.bme.hu>
+	<CAFEAcA-UaWGqLHfN_Z7h+C-k=1A5ic_REaWUu0-w19ALcNJy_A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="adJ1OR3c6QgCpb/j"
+	protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
 Content-Disposition: inline
-In-Reply-To: <20180219181922.21586-10-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 09/11] mac_newworld: use object link to
- pass OpenPIC object to macio
+In-Reply-To: <CAFEAcA-UaWGqLHfN_Z7h+C-k=1A5ic_REaWUu0-w19ALcNJy_A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] Firmware blob and git submodule for
+ Sam460ex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,171 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, "Emilio G. Cota" <cota@braap.org>, Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
 
 
---adJ1OR3c6QgCpb/j
+--M9NhX3UHpAaciwkO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 19, 2018 at 06:19:20PM +0000, Mark Cave-Ayland wrote:
-> Also switch macio_newworld_realize() over to use it rather than using the=
- pic_mem
-> memory region directly.
+On Wed, Feb 21, 2018 at 06:33:42PM +0000, Peter Maydell wrote:
+> On 21 February 2018 at 17:06, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> > It's not that upstream u-boot has abandoned board support (it only remo=
+ved
+> > support for the PPC440 CPU it once had). The board itself never had sup=
+port
+> > in upstream u-boot, it only exists in vendor's fork which is the reason=
+ we
+> > need a separate source and cannot use upstream u-boot source we already
+> > have.
+> >
+> > In my opinion we don't aim to take on support for this board in u-boot,=
+ we
+> > only need to include the firmware binary for the emulation to be useful
+> > which then requires us to also include the source for the GPL it's lice=
+nsed
+> > under. I've also found a few bugs in the firmware which I've fixed but =
+apart
+> > from such occasional bug fixes when needed I don't expect to take over
+> > support for the board from the hardware vendor so this source is only s=
+o we
+> > can include the firmware binary which is needed for the board emulation.
+> > Does this answer your concerns?
 >=20
-> Now that both Old World and New World macio devices no longer make use of=
- the
-> pic_mem memory region directly, we can remove it.
+> We have lots of boards we don't ship firmware blobs for and
+> which we expect the users to provide the guest code for
+> if they're going to use them. If we had a git submodule
+> for every random dev board model that needs some hardware
+> vendor's BSP and bootloader we'd probably have 50 submodules...
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Which isn't to say I'm definitely against this -- I'm just
+> trying to figure out where we should draw the line of
+> "these bits of guest code we build for you and ship with
+> QEMU" versus "we provide the model of the hardware for you
+> to run whatever guest code you happen to have".
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/misc/macio/macio.c         | 14 +++++++++-----
->  hw/ppc/mac_newworld.c         | 20 +++++++++++---------
->  include/hw/misc/macio/macio.h |  4 +++-
->  3 files changed, 23 insertions(+), 15 deletions(-)
->=20
-> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index d4c1d190c4..e5288f1084 100644
-> --- a/hw/misc/macio/macio.c
-> +++ b/hw/misc/macio/macio.c
-> @@ -279,10 +279,10 @@ static void macio_newworld_realize(PCIDevice *d, Er=
-ror **errp)
->      sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
->      sysbus_connect_irq(sysbus_dev, 1, ns->irqs[cur_irq++]);
-> =20
-> -    if (s->pic_mem) {
-> -        /* OpenPIC */
-> -        memory_region_add_subregion(&s->bar, 0x40000, s->pic_mem);
-> -    }
-> +    /* OpenPIC */
-> +    sysbus_dev =3D SYS_BUS_DEVICE(ns->pic);
-> +    memory_region_add_subregion(&s->bar, 0x40000,
-> +                                sysbus_mmio_get_region(sysbus_dev, 0));
-> =20
->      /* IDE buses */
->      for (i =3D 0; i < ARRAY_SIZE(ns->ide); i++) {
-> @@ -311,6 +311,11 @@ static void macio_newworld_init(Object *obj)
-> =20
->      qdev_init_gpio_out(DEVICE(obj), ns->irqs, ARRAY_SIZE(ns->irqs));
-> =20
-> +    object_property_add_link(obj, "pic", TYPE_OPENPIC,
-> +                             (Object **) &ns->pic,
-> +                             qdev_prop_allow_set_link_before_realize,
-> +                             0, NULL);
-> +
->      for (i =3D 0; i < 2; i++) {
->          macio_init_ide(s, &ns->ide[i], sizeof(ns->ide[i]), i);
->      }
-> @@ -441,7 +446,6 @@ void macio_init(PCIDevice *d,
->  {
->      MacIOState *macio_state =3D MACIO(d);
-> =20
-> -    macio_state->pic_mem =3D pic_mem;
->      /* Note: this code is strongly inspirated from the corresponding code
->         in PearPC */
->      qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "timebase-frequency=
-",
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 396216954e..c7960ab67a 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -154,7 +154,7 @@ static void ppc_core99_init(MachineState *machine)
->      hwaddr kernel_base, initrd_base, cmdline_base =3D 0;
->      long kernel_size, initrd_size;
->      PCIBus *pci_bus;
-> -    PCIDevice *macio;
-> +    NewWorldMacIOState *macio;
->      MACIOIDEState *macio_ide;
->      BusState *adb_bus;
->      MacIONVRAMState *nvr;
-> @@ -166,7 +166,7 @@ static void ppc_core99_init(MachineState *machine)
->      void *fw_cfg;
->      int machine_arch;
->      SysBusDevice *s;
-> -    DeviceState *dev;
-> +    DeviceState *dev, *pic_dev;
->      int *token =3D g_new(int, 1);
->      hwaddr nvram_addr =3D 0xFFF04000;
->      uint64_t tbfreq;
-> @@ -333,10 +333,10 @@ static void ppc_core99_init(MachineState *machine)
-> =20
->      pic =3D g_new0(qemu_irq, 64);
-> =20
-> -    dev =3D qdev_create(NULL, TYPE_OPENPIC);
-> -    qdev_prop_set_uint32(dev, "model", OPENPIC_MODEL_KEYLARGO);
-> -    qdev_init_nofail(dev);
-> -    s =3D SYS_BUS_DEVICE(dev);
-> +    pic_dev =3D qdev_create(NULL, TYPE_OPENPIC);
-> +    qdev_prop_set_uint32(pic_dev, "model", OPENPIC_MODEL_KEYLARGO);
-> +    qdev_init_nofail(pic_dev);
-> +    s =3D SYS_BUS_DEVICE(pic_dev);
->      pic_mem =3D s->mmio[0].memory;
->      k =3D 0;
->      for (i =3D 0; i < smp_cpus; i++) {
-> @@ -346,7 +346,7 @@ static void ppc_core99_init(MachineState *machine)
->      }
-> =20
->      for (i =3D 0; i < 64; i++) {
-> -        pic[i] =3D qdev_get_gpio_in(dev, i);
-> +        pic[i] =3D qdev_get_gpio_in(pic_dev, i);
->      }
-> =20
->      if (PPC_INPUT(env) =3D=3D PPC_FLAGS_INPUT_970) {
-> @@ -369,7 +369,7 @@ static void ppc_core99_init(MachineState *machine)
->      }
-> =20
->      /* MacIO */
-> -    macio =3D pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
-> +    macio =3D NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO=
-));
->      dev =3D DEVICE(macio);
->      qdev_connect_gpio_out(dev, 0, pic[0x19]); /* CUDA */
->      qdev_connect_gpio_out(dev, 1, pic[0x24]); /* ESCC-B */
-> @@ -379,7 +379,9 @@ static void ppc_core99_init(MachineState *machine)
->      qdev_connect_gpio_out(dev, 5, pic[0x0e]); /* IDE */
->      qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE DMA */
->      qdev_prop_set_uint64(dev, "frequency", tbfreq);
-> -    macio_init(macio, pic_mem);
-> +    object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-> +                             &error_abort);
-> +    macio_init(PCI_DEVICE(macio), pic_mem);
-> =20
->      /* We only emulate 2 out of 3 IDE controllers for now */
->      ide_drive_get(hd, ARRAY_SIZE(hd));
-> diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
-> index 843c114c07..4528282b36 100644
-> --- a/include/hw/misc/macio/macio.h
-> +++ b/include/hw/misc/macio/macio.h
-> @@ -29,6 +29,7 @@
->  #include "hw/intc/heathrow_pic.h"
->  #include "hw/misc/macio/cuda.h"
->  #include "hw/ppc/mac_dbdma.h"
-> +#include "hw/ppc/openpic.h"
-> =20
->  #define TYPE_MACIO "macio"
->  #define MACIO(obj) OBJECT_CHECK(MacIOState, (obj), TYPE_MACIO)
-> @@ -42,7 +43,6 @@ typedef struct MacIOState {
->      CUDAState cuda;
->      DBDMAState dbdma;
->      ESCCState escc;
-> -    MemoryRegion *pic_mem;
->      uint64_t frequency;
->  } MacIOState;
-> =20
-> @@ -70,6 +70,8 @@ typedef struct NewWorldMacIOState {
->      /*< private >*/
->      MacIOState parent_obj;
->      /*< public >*/
-> +
-> +    OpenPICState *pic;
->      qemu_irq irqs[7];
->      MACIOIDEState ide[2];
->  } NewWorldMacIOState;
+So, I encouraged Zoltan to attempt this because I thought boards
+without suitable firmware blobs were the exception.  If they're common
+it's probably fine as is.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -197,24 +84,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---adJ1OR3c6QgCpb/j
+--M9NhX3UHpAaciwkO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqOKKwACgkQbDjKyiDZ
-s5KMgBAArqjmpKYMyFzcrujYo8KD0zNjdRbv4+DEHyMvl8SiieEdMNyZwB7VbvY5
-dHyoeiifzyz+fCdL1CUdb/j9smt4IVzrBja0sj9SY9KELK+T1q2WEZrVKtFub2WP
-L35RnQDl/4XXcERnLB6Y65szRjTuX1IVlXfnD3tAczh+5TLjtM50lKxpAy89BSAW
-Yigim8gXhD+oRpRIhbagitD3x815rt15stYE4MxxvjzZXCSX8lR0zYABXbXBpnZn
-ghvkNRPJiC+ouDY4Hzs1DU7HZtEI9r54RhbFh0NwCeGMS+NqdCAertAZJvnDEmfm
-MveArnV6WFmlRQM/mjza4W58/cCcNPopMZHolD+nvd/pbDSXPW7EWNHA8dOytzSX
-mtVH3inVxLpHLLU7vbTsDOwVVq8q/aEt14uLe8ifzFakCxHLlEoUJXk0RCgM6chN
-IfT5J684vTL7fpvXqkrGroskvLkGT2iO/JmywpBG9PfYy4JUWLk9SaB0+Ln2/FPz
-UZddGxdfiSe92JpW2VBhgt5eHxxmVY25gpKvov0WKUBviWAnMhhgsZ1OvTqaNOKk
-aaqGVlj2AkNx76aVupJLPHVcNEcsT0EKTi6m44aqH5mI/wfgd0U4dszDizo/mhQa
-VN8aDbFdYU51Fin3XMikiVUndV8nrtHSN4sufWY++IC9ww2WF6M=
-=jaYX
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqOJsIACgkQbDjKyiDZ
+s5LnfRAA3wbr6wYDeBHYNpc7HGayL7HOsuX7IEp23GhhJHxGXIxCIlGGVhgjfEfe
+lMzOU/t78vuAkOdiIAHbG6mapOUGYAcGtNwGHb/r8bb2HxlOVqTnxse67ZeKJBYp
+UBhInnNuhCY74gtr3aN8S5j/gdnRsEIoZ1CRziQ4rrBer6m0LMKIYQF7r7tjvERp
+nKcfdbHHodIT1B+0M6KRrDIcwL/I0bLOGfSSaPUZU5LXhHILjiVQCdOOlfb6d29W
+wGtH9kcn8kad4mYIWrpgplQC1+hSDpt9cmGpiKtDhP/VTVOypQb6LMWprBVr1TWY
+Iv78C2otVWZqcL+L8ITndlvIQtWDDwmQvJAeBjMIu7RM5liVglAtb++FKsKxOm6X
+ENuw2hNsW8TtZkFAhmtf4M3SYflWRMGn/Gy87y7L8FDTqHxxnFDhC9DZ9Q1NXwzE
+MnuK7toEMRzdDZBTa+uBXSoJJ0PnyQ3dFFc5PgY7gISlKbgvjJLgj0CpBYWtQcJr
+qeYmTBdaLp0wYqIL/ZsJZNkQ6Pm4TAWSIXjYVoU49LgjN6gTg7lNtLpgpGs53Nsm
+jAIbFtKmamsTpyEnEr8wlYybVwyZGwYvXvTyiTS0mFXnOrXdvV/joZ9sQVB39pWN
+kM8tPnH8fAVvhW+J5q06SjLSR/VzYDR5EJfrLWmE0e5rcr3fwcs=
+=OYsV
 -----END PGP SIGNATURE-----
 
---adJ1OR3c6QgCpb/j--
+--M9NhX3UHpAaciwkO--
