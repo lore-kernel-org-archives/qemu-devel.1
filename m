@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eolOa-0001K7-TG
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:34:25 -0500
+	(envelope-from <chen_han_xiao@126.com>) id 1eolUx-0002sW-CL
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:41:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eolOX-0005FC-Qr
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:34:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34366 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eolOX-0005Dl-M4
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:34:21 -0500
-Date: Thu, 22 Feb 2018 15:34:00 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180222073400.GF18962@xz-mi>
-References: <20180208103132.28452-1-peterx@redhat.com>
-	<20180208103132.28452-22-peterx@redhat.com>
-	<20180213181750.GQ2378@work-vm> <20180214042000.GF4472@xz-mi>
-	<20180214184045.GE2507@work-vm>
+	(envelope-from <chen_han_xiao@126.com>) id 1eolUu-0002st-9l
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:40:59 -0500
+Received: from m15-47.126.com ([220.181.15.47]:52501)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1eolUt-0002b8-Fz
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:40:56 -0500
+Date: Thu, 22 Feb 2018 15:40:44 +0800 (CST)
+From: "Chen Hanxiao" <chen_han_xiao@126.com>
+In-Reply-To: <151872008505.15399.14198607718964730192@sif>
+References: <20180209013542.24516-1-chen_han_xiao@126.com>
+	<151872008505.15399.14198607718964730192@sif>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180214184045.GE2507@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v6 21/28] migration: setup ramstate for
- resume
+Message-ID: <3b9029f0.2ab6.161bc75118f.Coremail.chen_han_xiao@126.com>
+Subject: Re: [Qemu-devel] [Resend][PATCH] qga: unset frozen state if no
+ mount points are frozen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Feb 14, 2018 at 06:40:46PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Tue, Feb 13, 2018 at 06:17:51PM +0000, Dr. David Alan Gilbert wrote:
-> > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > After we updated the dirty bitmaps of ramblocks, we also need to update
-> > > > the critical fields in RAMState to make sure it is ready for a resume.
-> > > > 
-> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > ---
-> > > >  migration/ram.c        | 40 +++++++++++++++++++++++++++++++++++++++-
-> > > >  migration/trace-events |  1 +
-> > > >  2 files changed, 40 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/migration/ram.c b/migration/ram.c
-> > > > index a2a4b05d5c..d275875f54 100644
-> > > > --- a/migration/ram.c
-> > > > +++ b/migration/ram.c
-> > > > @@ -2250,6 +2250,36 @@ static int ram_init_all(RAMState **rsp)
-> > > >      return 0;
-> > > >  }
-> > > >  
-> > > > +static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
-> > > > +{
-> > > > +    RAMBlock *block;
-> > > > +    long pages = 0;
-> > > > +
-> > > > +    /*
-> > > > +     * Postcopy is not using xbzrle/compression, so no need for that.
-> > > > +     * Also, since source are already halted, we don't need to care
-> > > > +     * about dirty page logging as well.
-> > > > +     */
-> > > > +
-> > > > +    RAMBLOCK_FOREACH(block) {
-> > > > +        pages += bitmap_count_one(block->bmap,
-> > > > +                                  block->used_length >> TARGET_PAGE_BITS);
-> > > > +    }
-> > > > +
-> > > > +    /* This may not be aligned with current bitmaps. Recalculate. */
-> > > > +    rs->migration_dirty_pages = pages;
-> > > 
-> > > migration_dirty_pages is uint64_t - so we should probably do the cast
-> > > above and keep 'pages' as uint64_t.
-> > 
-> > Sure.
-> > 
-> > > 
-> > > > +    rs->last_seen_block = NULL;
-> > > > +    rs->last_sent_block = NULL;
-> > > > +    rs->last_page = 0;
-> > > > +    rs->last_version = ram_list.version;
-> > > 
-> > > Do you need to explicitly set
-> > >        rs->ram_bulk_stage = false;
-> > > 
-> > > if the failure happened just after the start of postcopy and no
-> > > requested pages had been sent, I think it might still  be set?
-> > 
-> > Could you elaborate what would go wrong even if it's still set?
-> 
-> I think it might start sending all pages rather than just those
-> that are dirty/needed;  see migration_bitmap_find_dirty.
-
-Ah yes.  I should turn it off.
-
--- 
-Peter Xu
+CkF0IDIwMTgtMDItMTYgMDI6NDE6MjUsICJNaWNoYWVsIFJvdGgiIDxtZHJvdGhAbGludXgudm5l
+dC5pYm0uY29tPiB3cm90ZToKPlF1b3RpbmcgQ2hlbiBIYW54aWFvICgyMDE4LTAyLTA4IDE5OjM1
+OjQyKQo+PiBGcm9tOiBDaGVuIEhhbnhpYW8gPGNoZW5oYW54aWFvQGdtYWlsLmNvbT4KPj4gCj4+
+IElmIHdlIHNldCBtb3VudHBvaW50cyB0byBxbXBfZ3Vlc3RfZnNmcmVlemVfZnJlZXplX2xpc3Qs
+Cj4+IHdlIG1heSBnb3Qgbm90aGluZyB0byBmcmVlemUgYXMgYWxsIG1vdW50cG9pbnRzIGFyZQo+
+PiBub3QgdmFsaWQuCj4+IENhbGwgZ2FfdW5zZXRfZnJvemVuIGluIHRoaXMgc2VuYXJpby4KPj4g
+Cj4+IENjOiBNaWNoYWVsIFJvdGggPG1kcm90aEBsaW51eC52bmV0LmlibS5jb20+Cj4+IFNpZ25l
+ZC1vZmYtYnk6IENoZW4gSGFueGlhbyA8Y2hlbmhhbnhpYW9AZ21haWwuY29tPgo+PiAtLS0KPj4g
+UmViYXNlIG9uIG1hc3Rlcgo+PiAKPj4gIHFnYS9jb21tYW5kcy1wb3NpeC5jIHwgNiArKysrKysK
+Pj4gIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKykKPj4gCj4+IGRpZmYgLS1naXQgYS9x
+Z2EvY29tbWFuZHMtcG9zaXguYyBiL3FnYS9jb21tYW5kcy1wb3NpeC5jCj4+IGluZGV4IGU4MDll
+MzgyZWIuLjlmZDUxZjFkN2EgMTAwNjQ0Cj4+IC0tLSBhL3FnYS9jb21tYW5kcy1wb3NpeC5jCj4+
+ICsrKyBiL3FnYS9jb21tYW5kcy1wb3NpeC5jCj4+IEBAIC0xMjczLDYgKzEyNzMsMTIgQEAgaW50
+NjRfdCBxbXBfZ3Vlc3RfZnNmcmVlemVfZnJlZXplX2xpc3QoYm9vbCBoYXNfbW91bnRwb2ludHMs
+Cj4+ICAgICAgfQo+PiAKPj4gICAgICBmcmVlX2ZzX21vdW50X2xpc3QoJm1vdW50cyk7Cj4+ICsg
+ICAgLyogV2UgbWF5IG5vdCBpc3N1ZSBhbnkgRklGUkVFWkUgaGVyZSB3aGVuIGhhZCBtb3VudHBv
+aW50cy4KPj4gKyAgICAgKiBKdXN0IHVuc2V0IGdhX3N0YXRlIGhlcmUgYW5kIHJlYWR5IGZvciB0
+aGUgbmV4dCBjYWxsLgo+PiArICAgICAqLwo+PiArICAgIGlmIChoYXNfbW91bnRwb2ludHMgJiYg
+aSA9PSAwKSB7Cj4+ICsgICAgICAgIGdhX3Vuc2V0X2Zyb3plbihnYV9zdGF0ZSk7Cj4+ICsgICAg
+fQo+Cj5JdCBzZWVtcyBvZGQgdG8gc3BlY2lhbC1jYXNlIGhhc19tb3VudHBvaW50cy4gV291bGRu
+J3Q6Cj4KPiAgaWYgKGkgPT0gMCkgewo+ICAgIC4uLgo+ICB9Cj4KPmJlIG1vcmUgY29uc2lzdGVu
+dD8gVGhlbiBtYW5hZ2VtZW50IGNvdWxkIGluZmVyIGk9PTAgbGVhdmVzIHFnYSBpbgo+dW5mcm96
+ZW4gc3RhdGUuIE90aGVyd2lzZSBJJ2QgcmF0aGVyIGp1c3Qgc3RpY2sgd2l0aCBleHBlY3Rpbmcg
+YQo+Z3JhdHVpdG91cyB1bmZyZWV6ZSgpIHNpbmNlIGl0IHJlcXVpcmVzIGxlc3Mgc3BlY2lhbC1j
+YXNpbmcgb24gdGhlCj5tYW5hZ2VtZW50LyBzaWRlLgo+Cj5BbmQgaWYgd2UgZG8gY2hhbmdlIHRo
+aXMsIHdlJ2QgcHJvYmFibHkgd2FudCB0byB1cGRhdGUKPnFnYS9xYXBpLXNjaGVtYS5qc29uIHRv
+IHJlZmxlY3QgdGhlIGJlaGF2aW9yLiBJLmUuOgo+Cj4jIwo+IyBAZ3Vlc3QtZnNmcmVlemUtZnJl
+ZXplOgo+Iwo+IyBTeW5jIGFuZCBmcmVlemUgYWxsIGZyZWV6YWJsZSwgbG9jYWwgZ3Vlc3QgZmls
+ZXN5c3RlbXMuIElmIHRoaXMKPiMgY29tbWFuZCBzdWNjZWVkZWQsIHlvdSBtYXkgY2FsbCBAZ3Vl
+c3QtZnNmcmVlemUtdGhhdyBsYXRlciB0bwo+IyB1bmZyZWV6ZS4KPi4uLgo+IyBSZXR1cm5zOiBO
+dW1iZXIgb2YgZmlsZSBzeXN0ZW1zIGN1cnJlbnRseSBmcm96ZW4uIE9uIGVycm9yLCBhbGwgZmls
+ZXN5c3RlbXMKPi0jIHdpbGwgYmUgdGhhd2VkLgo+KyMgd2lsbCBiZSB0aGF3ZWQuIElmIG5vIGZp
+bGVzeXN0ZW1zIGFyZSBmcm96ZW4gYXMgYSByZXN1bHQgb2YgdGhpcyBjYWxsLAo+KyMgdGhlbiBA
+Z3Vlc3QtZnNmcmVlemUtc3RhdHVzIHdpbGwgcmVtYWluICJ0aGF3ZWQiIGFuZCBjYWxsaW5nCj4r
+IyBAZ3Vlc3QtZnNmcmVlemUtdGhhdyBpcyBub3QgbmVjZXNzYXJ5Lgo+CgpUaGFua3MgZm9yIHRo
+ZSByZXZpZXcuCldpbGwgYmUgZml4ZWQgaW4gdjIuCgpSZWdhcmRzLAotIENoZW4K
