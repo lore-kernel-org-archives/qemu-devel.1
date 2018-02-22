@@ -1,36 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45430)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1eope4-0000JA-Gf
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:41 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eopeJ-0000VG-HP
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1eope1-0003BN-Ca
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:40 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:53330 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eope1-00039U-2f
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:37 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 13:06:33 +0100
-References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
-	<7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
-	<20180222105755.GB4147@localhost.localdomain>
-	<37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
-	<20180222113204.GC4147@localhost.localdomain>
-	<20180222114053.GE9323@redhat.com>
-	<ab206ced-9b56-93d5-04b7-f342d45a2927@kamp.de>
-	<20180222120029.GI9323@redhat.com>
-	<c46fd50f-3952-75a3-eb5a-a53a06c3bc4d@kamp.de>
-	<20180222120334.GJ9323@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
-Date: Thu, 22 Feb 2018 13:06:33 +0100
+	(envelope-from <borntraeger@de.ibm.com>) id 1eopeG-0003MW-9x
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:55 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51620
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eopeG-0003M4-41
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:52 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1MC4TqF056467
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:06:51 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g9urjvtu9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:06:49 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 22 Feb 2018 12:06:41 -0000
+References: <20180221165628.78946-1-pasic@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 22 Feb 2018 13:06:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180222120334.GJ9323@redhat.com>
+In-Reply-To: <20180221165628.78946-1-pasic@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
+Content-Transfer-Encoding: 7bit
+Message-Id: <1f66a73d-a34a-e808-ab3d-8bd5a6059a43@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] 390x/cpumodel: document
+ S390FeatDef.bit not applicable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,70 +43,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-Am 22.02.2018 um 13:03 schrieb Daniel P. Berrangé:
-> On Thu, Feb 22, 2018 at 01:02:05PM +0100, Peter Lieven wrote:
->> Am 22.02.2018 um 13:00 schrieb Daniel P. Berrangé:
->>> On Thu, Feb 22, 2018 at 12:51:58PM +0100, Peter Lieven wrote:
->>>> Am 22.02.2018 um 12:40 schrieb Daniel P. Berrangé:
->>>>> On Thu, Feb 22, 2018 at 12:32:04PM +0100, Kevin Wolf wrote:
->>>>>> Am 22.02.2018 um 12:01 hat Peter Lieven geschrieben:
->>>>>>> Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
->>>>>>>> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
->>>>>>>>> On 20/02/2018 18:04, Peter Lieven wrote:
->>>>>>>>>> Hi,
->>>>>>>>>>
->>>>>>>>>> I remember we discussed a long time ago to limit the stack usage of all
->>>>>>>>>> functions that are executed in a coroutine
->>>>>>>>>> context to a very low value to be able to safely limit the coroutine
->>>>>>>>>> stack size as well.
->>>>>>>>> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
->>>>>>>>> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
->>>>>>>>> ide_atapi_cmd_reply_end.
->>>>>>>>>
->>>>>>>>> But perhaps it's not an issue, somebody needs to audit the code.
->>>>>>>> I think John intended to get rid of the recursion sometime, but I doubt
->>>>>>>> he has had the time so far.
->>>>>>> Apart from this is is possible to define special cflags in the
->>>>>>> Makefile.objs just for a subdirectory? I have patches ready to make
->>>>>>> the block layer files and other coroutine users compile with
->>>>>>> -Wstack-size=2048. But I do not want to specify each file separately.
->>>>>> Our Makefiles have lines like this:
->>>>>>
->>>>>>     iscsi.o-cflags     := $(LIBISCSI_CFLAGS)
->>>>>>
->>>>>> I don't think there is a direct mechanism to apply cflags to a whole
->>>>>> directory or just to block-obj-y/block-obj-m, but just looping over them
->>>>>> could work. I'm not a Makefile expert at all, but after some toying with
->>>>>> a simple example, something like this might work:
->>>>>>
->>>>>>     $(foreach x,$(block-obj-y),$(eval $x-cflags += -Wstack-size=2048))
->>>>> You'll need it for anything block layer depends on too - so that's much
->>>>> of util/, crypto/ and io/ directories at least.
->>>>>
->>>>> So perhaps it would be shorter if we do the opposite - set -Wstack-size=2048
->>>>> globally for everything in QEMU, and then override -Wstack-size=$BIGGER
->>>>> for the (hopefully) few sources that have a larger stack need ?
->>>> I tried that already. 2048 is a strong limit for many functions.
->>>> It breaks already as soon as some buffer has a size of PATH_MAX, but
->>>> thats handleable. But there are some structs around that are very large.
->>> There are surprisingly few "char [PATH_MAX]" variables left in QEMU - we
->>> should have a final push to eliminate them regardless.
->>>
->>>> Generally, it would be a good idea to have a global limit, of course.
->>> We could at least put a limit on that matches the current worst case to
->>> prevent it getting worse than it already is.
->> That would be a good idea, yes.
->>
->> How would you handle the override for a smaller -Wstack-usage ?
-> If you have multiple -Wstack-size=$XXX  flags to GCC, I expect the last
-> one wins. So just need to double check that the per-object file CFLAGS
-> occur after the global CFLAS in the compiler args
 
-I will check that, thanks.
 
-When I am at it, what would be the proper replacement for char[PATH_MAX] ?
+On 02/21/2018 05:56 PM, Halil Pasic wrote:
+> The 'bit' field of the 'S390FeatDef' structure is not applicable to all
+> its instances. Currently this field is not applicable, and remains
+> unused, iff the feature is of type S390_FEAT_TYPE_MISC. Having the value 0
+> specified for multiple such feature definition  was a little confusing,
+> as it's a perfectly legit bit value, and as the value of the bit
+> field is usually ought to be unique for each feature of a given
+> feature type.
+> 
+> Let us introduce a specialized macro for defining features of type
+> S390_FEAT_TYPE_MISC so, that one does not have to specify neither bit nor
+> type (as the later is implied).
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Peter
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+
+> ---
+> 
+> v1 -> v2
+> * Specialized feature initializer macro for type MISC that does not
+>   require a bit value instead of defining a 'not a bit number' (that
+>   is extremal) bit number.
+> ---
+>  target/s390x/cpu_features.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index a5619f2893..3b9e2745e9 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -23,6 +23,10 @@
+>          .desc = _desc,                               \
+>      }
+> 
+> +/* S390FeatDef.bit is not applicable as there is no feature block. */
+> +#define FEAT_INIT_MISC(_name, _desc)                 \
+> +            FEAT_INIT(_name, S390_FEAT_TYPE_MISC, 0, _desc)
+> +
+>  /* indexed by feature number for easy lookup */
+>  static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("esan3", S390_FEAT_TYPE_STFL, 0, "Instructions marked as n3"),
+> @@ -123,8 +127,8 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("ib", S390_FEAT_TYPE_SCLP_CPU, 42, "SIE: Intervention bypass facility"),
+>      FEAT_INIT("cei", S390_FEAT_TYPE_SCLP_CPU, 43, "SIE: Conditional-external-interception facility"),
+> 
+> -    FEAT_INIT("dateh2", S390_FEAT_TYPE_MISC, 0, "DAT-enhancement facility 2"),
+> -    FEAT_INIT("cmm", S390_FEAT_TYPE_MISC, 0, "Collaborative-memory-management facility"),
+> +    FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
+> +    FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
+> 
+>      FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
+>      FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
+> 
