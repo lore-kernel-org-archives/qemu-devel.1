@@ -1,30 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eowY5-0005Iz-LZ
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:28:58 -0500
+	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1eowYV-0005bT-2Z
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:29:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eowY4-0008FT-PT
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:28:57 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:37963)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eowY4-0008F7-JA
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:28:56 -0500
-Received: by mail-pl0-x243.google.com with SMTP id d4so3445670pll.5
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 11:28:56 -0800 (PST)
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-5-richard.henderson@linaro.org>
-	<CAFEAcA9Xy8z85KRuVUFLJtEwpUgu+cHGYe_A6ymxurWZL-N+RQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <374e47e7-4d6d-0c77-0cbd-b2b665b41157@linaro.org>
-Date: Thu, 22 Feb 2018 11:28:52 -0800
+	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1eowYR-0008SI-H7
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:29:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mjrosato@linux.vnet.ibm.com>)
+	id 1eowYR-0008Qs-92
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:29:19 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1MJQxpA031752
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 14:29:17 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ga25tvngs-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 14:29:16 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mjrosato@linux.vnet.ibm.com>;
+	Thu, 22 Feb 2018 12:29:15 -0700
+References: <20180219174231.10874-1-david@redhat.com>
+	<493dbfb3-086b-cc89-2d8d-4298345c6bb2@de.ibm.com>
+	<ef55dc18-971f-b012-40cc-0c32f24664cf@redhat.com>
+	<20180220155759.17dfd955.cohuck@redhat.com>
+	<aeb36cb1-aadf-6146-9e59-549998538db1@redhat.com>
+	<20180221183918.7cc4fad1.cohuck@redhat.com>
+	<635dc4c5-8b54-9903-334c-d07cbc0d27f6@de.ibm.com>
+From: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+Date: Thu, 22 Feb 2018 14:29:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Xy8z85KRuVUFLJtEwpUgu+cHGYe_A6ymxurWZL-N+RQ@mail.gmail.com>
+In-Reply-To: <635dc4c5-8b54-9903-334c-d07cbc0d27f6@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 04/67] target/arm: Implement
- SVE Bitwise Logical - Unpredicated Group
+Message-Id: <b156703a-b1b3-aa83-2c30-d07fec706ee0@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFCv2] s390x/sclp: remove memory hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +48,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 02/22/2018 10:04 AM, Peter Maydell wrote:
-> On 17 February 2018 at 18:22, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> These were the instructions that were stubbed out when
->> introducing the decode skeleton.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/arm/translate-sve.c | 50 +++++++++++++++++++++++++++++++++++++++-------
->>  1 file changed, 43 insertions(+), 7 deletions(-)
->>
->> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
->> index 2c9e4733cb..50cf2a1fdd 100644
->> --- a/target/arm/translate-sve.c
->> +++ b/target/arm/translate-sve.c
->> @@ -32,6 +32,10 @@
->>  #include "trace-tcg.h"
->>  #include "translate-a64.h"
->>
->> +typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
->> +typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
->> +                        uint32_t, uint32_t, uint32_t);
+On 02/22/2018 06:13 AM, Christian Borntraeger wrote:
 > 
-> I see we already have these in translate-a64.c -- put them in
-> translate-a64.h ?
+> 
+> On 02/21/2018 06:39 PM, Cornelia Huck wrote:
+>> On Tue, 20 Feb 2018 16:05:54 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> On 20.02.2018 15:57, Cornelia Huck wrote:
+>>>> On Tue, 20 Feb 2018 13:16:37 +0100
+>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>   
+>>>>> On 20.02.2018 13:05, Christian Borntraeger wrote:  
+>>>>>>
+>>>>>>
+>>>>>> On 02/19/2018 06:42 PM, David Hildenbrand wrote:    
+>>>>>>> From an architecture point of view, nothing can be mapped into the address
+>>>>>>> space on s390x. All there is is memory. Therefore there is also not really
+>>>>>>> an interface to communicate such information to the guest. All we can do is
+>>>>>>> specify the maximum ram address and guests can probe in that range if
+>>>>>>> memory is available and usable (TPROT).    
+>>>>>>
+>>>>>> In fact there is an interface in SCLP that describes the memory sizes (maximum in 
+>>>>>> read scp info) and the details (read_storage_element0_info).  I am asking myself
+>>>>>> if we should re-introduce read_storage_element_info and use that to avoid tprot    
+>>>>>
+>>>>> Yes, we could do that (basically V1 of this patch) but have to glue it
+>>>>> to the a compatibility machine then.  
+>>>>
+>>>> Actually, this makes quite a bit of sense (introduce the interface for
+>>>> everyone in 2.12 and turn it off in compat machines).  
+>>>
+>>> Jup, either 2.12 or 2.13, no need to hurry.
+>>>
+>>>>
+>>>> Does real hardware have configurations where you can get the memory
+>>>> sizes, but not the attach/deattach support? (Hardware with the feature,
+>>>> but no standby memory defined?)  
+> 
+> We have different sclp facilities for attach/detach and information, so
+> we can implement that. 
+> 
+> 
+>>>
+>>> I would guess that "0" for standby memory is valid but only people with
+>>> access to documentation can answer that :)
+>>
+>> So, should we go with this patch now and re-introduce the read
+>> functions if the above is indeed true?
+> 
+> Yes, go with this patch. Right now Linux guests will not make use of that, so
+> we can re-add that if it turns out to be useful for future guests.
+> 
+> 
+> 
+> Matt, last chance to complain with reasons why we want to keep the current standby memory
+> solution in its current form. (Or please ack the patch if you agree)
 
-Good plan, thanks.
+Nope, this makes sense given its incompatibility w/ the common layer.  I
+also agree with the prior comment that, should we revisit this feature
+in the future, it should probably be via an s390-specific interface.
 
-
-r~
+Acked-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
