@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eopmW-0004Up-59
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:15:25 -0500
+	(envelope-from <berrange@redhat.com>) id 1eopnM-0005Ci-MG
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:16:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eopmU-0006Z6-W9
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:15:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43804 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eopmU-0006Xe-NE
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:15:22 -0500
-Date: Thu, 22 Feb 2018 12:15:19 +0000
+	(envelope-from <berrange@redhat.com>) id 1eopnL-0007S0-0V
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:16:16 -0500
+Date: Thu, 22 Feb 2018 12:16:05 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180222121519.GK9323@redhat.com>
+Message-ID: <20180222121605.GL9323@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <52841519299484@web28j.yandex.ru>
+References: <7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
+	<20180222105755.GB4147@localhost.localdomain>
+	<37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
+	<20180222113204.GC4147@localhost.localdomain>
+	<20180222114053.GE9323@redhat.com>
+	<ab206ced-9b56-93d5-04b7-f342d45a2927@kamp.de>
+	<20180222120029.GI9323@redhat.com>
+	<c46fd50f-3952-75a3-eb5a-a53a06c3bc4d@kamp.de>
+	<20180222120334.GJ9323@redhat.com>
+	<f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <52841519299484@web28j.yandex.ru>
+In-Reply-To: <f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Patch 9894dc0cdcc broke something
+Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +33,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksey Kuleshov <rndfax@yandex.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On Thu, Feb 22, 2018 at 02:38:04PM +0300, Aleksey Kuleshov wrote:
-> Hello!
+On Thu, Feb 22, 2018 at 01:06:33PM +0100, Peter Lieven wrote:
+> Am 22.02.2018 um 13:03 schrieb Daniel P. Berrang=C3=A9:
+> > On Thu, Feb 22, 2018 at 01:02:05PM +0100, Peter Lieven wrote:
+> >> Am 22.02.2018 um 13:00 schrieb Daniel P. Berrang=C3=A9:
+> >>> On Thu, Feb 22, 2018 at 12:51:58PM +0100, Peter Lieven wrote:
+> >>>> Am 22.02.2018 um 12:40 schrieb Daniel P. Berrang=C3=A9:
+> >>>>> On Thu, Feb 22, 2018 at 12:32:04PM +0100, Kevin Wolf wrote:
+> >>>>>> Am 22.02.2018 um 12:01 hat Peter Lieven geschrieben:
+> >>>>>>> Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
+> >>>>>>>> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
+> >>>>>>>>> On 20/02/2018 18:04, Peter Lieven wrote:
+> >>>>>>>>>> Hi,
+> >>>>>>>>>>
+> >>>>>>>>>> I remember we discussed a long time ago to limit the stack u=
+sage of all
+> >>>>>>>>>> functions that are executed in a coroutine
+> >>>>>>>>>> context to a very low value to be able to safely limit the c=
+oroutine
+> >>>>>>>>>> stack size as well.
+> >>>>>>>>> IIRC the only issue was that hw/ide/atapi.c has mutual recurs=
+ion between
+> >>>>>>>>> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_t=
+ransfer ->
+> >>>>>>>>> ide_atapi_cmd_reply_end.
+> >>>>>>>>>
+> >>>>>>>>> But perhaps it's not an issue, somebody needs to audit the co=
+de.
+> >>>>>>>> I think John intended to get rid of the recursion sometime, bu=
+t I doubt
+> >>>>>>>> he has had the time so far.
+> >>>>>>> Apart from this is is possible to define special cflags in the
+> >>>>>>> Makefile.objs just for a subdirectory? I have patches ready to =
+make
+> >>>>>>> the block layer files and other coroutine users compile with
+> >>>>>>> -Wstack-size=3D2048. But I do not want to specify each file sep=
+arately.
+> >>>>>> Our Makefiles have lines like this:
+> >>>>>>
+> >>>>>>     iscsi.o-cflags     :=3D $(LIBISCSI_CFLAGS)
+> >>>>>>
+> >>>>>> I don't think there is a direct mechanism to apply cflags to a w=
+hole
+> >>>>>> directory or just to block-obj-y/block-obj-m, but just looping o=
+ver them
+> >>>>>> could work. I'm not a Makefile expert at all, but after some toy=
+ing with
+> >>>>>> a simple example, something like this might work:
+> >>>>>>
+> >>>>>>     $(foreach x,$(block-obj-y),$(eval $x-cflags +=3D -Wstack-siz=
+e=3D2048))
+> >>>>> You'll need it for anything block layer depends on too - so that'=
+s much
+> >>>>> of util/, crypto/ and io/ directories at least.
+> >>>>>
+> >>>>> So perhaps it would be shorter if we do the opposite - set -Wstac=
+k-size=3D2048
+> >>>>> globally for everything in QEMU, and then override -Wstack-size=3D=
+$BIGGER
+> >>>>> for the (hopefully) few sources that have a larger stack need ?
+> >>>> I tried that already. 2048 is a strong limit for many functions.
+> >>>> It breaks already as soon as some buffer has a size of PATH_MAX, b=
+ut
+> >>>> thats handleable. But there are some structs around that are very =
+large.
+> >>> There are surprisingly few "char [PATH_MAX]" variables left in QEMU=
+ - we
+> >>> should have a final push to eliminate them regardless.
+> >>>
+> >>>> Generally, it would be a good idea to have a global limit, of cour=
+se.
+> >>> We could at least put a limit on that matches the current worst cas=
+e to
+> >>> prevent it getting worse than it already is.
+> >> That would be a good idea, yes.
+> >>
+> >> How would you handle the override for a smaller -Wstack-usage ?
+> > If you have multiple -Wstack-size=3D$XXX  flags to GCC, I expect the =
+last
+> > one wins. So just need to double check that the per-object file CFLAG=
+S
+> > occur after the global CFLAS in the compiler args
 >=20
-> I hit unexpected disconnections because of this patch:
+> I will check that, thanks.
 >=20
-> commit 9894dc0cdcc397ee5b26370bc53da6d360a363c2
-> Author: Daniel P. Berrange <berrange@redhat.com>
-> Date:   Tue Jan 19 11:14:29 2016 +0000
->=20
->     char: convert from GIOChannel to QIOChannel
->    =20
->     In preparation for introducing TLS support to the TCP chardev
->     backend, convert existing chardev code from using GIOChannel
->     to QIOChannel. This simplifies the chardev code by removing
->     most of the OS platform conditional code for dealing with
->     file descriptor passing.
->    =20
->     Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->     Message-Id: <1453202071-10289-3-git-send-email-berrange@redhat.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->=20
-> breaks tcp_chr_read:
->=20
-> -static gboolean tcp_chr_read(GIOChannel *chan, GIOCondition cond, void=
- *opaque)
-> +static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void=
- *opaque)
->  {
->      CharDriverState *chr =3D opaque;
->      TCPCharDriver *s =3D chr->opaque;
-> @@ -2938,9 +2801,7 @@ static gboolean tcp_chr_read(GIOChannel *chan, GI=
-OCondition cond, void *opaque)
->      if (len > s->max_size)
->          len =3D s->max_size;
->      size =3D tcp_chr_recv(chr, (void *)buf, len);
-> -    if (size =3D=3D 0 ||
-> -        (size < 0 &&
-> -         socket_error() !=3D EAGAIN && socket_error() !=3D EWOULDBLOCK=
-)) {
-> +    if (size =3D=3D 0 || size =3D=3D -1) {
->          /* connection closed */
->          tcp_chr_disconnect(chr);
->      } else if (size > 0) {
->=20
-> since tcp_chr_recv returns -1 on blocking:
+> When I am at it, what would be the proper replacement for char[PATH_MAX=
+] ?
 
-Actually it did not do that in this patch - tcp_chr_recv returns -2
-on blocking when that patch was written.
-
->=20
-> static ssize_t tcp_chr_recv(Chardev *chr, char *buf, size_t len)
-> {
-> ...
->     if (ret =3D=3D QIO_CHANNEL_ERR_BLOCK) {
->         errno =3D EAGAIN;
->         ret =3D -1;
->     } else if (ret =3D=3D -1) {
->         errno =3D EIO;
->     }
-
-This was caused by by a later change
-
-  commit b6572b4f97a7b126c7b24e165893ed9fe3d72e1f
-  Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-  Date:   Fri Mar 11 18:55:24 2016 +0100
-
-    char: translate from QIOChannel error to errno
-   =20
+Generally code should dynamically allocate paths. If they need to sprintf
+a path, then  g_strdup_printf() is the right approach.
 
 Regards,
 Daniel
