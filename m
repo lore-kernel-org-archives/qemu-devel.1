@@ -1,41 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eomP1-0008LC-IX
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:38:56 -0500
+	(envelope-from <a.perevalov@samsung.com>) id 1eomVN-0001LM-AR
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eomOy-00061B-EU
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:38:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39614)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1eomOy-00060Y-6R
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:38:52 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1M8bjff042951
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 03:38:50 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9pnv7ht7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 03:38:50 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Thu, 22 Feb 2018 08:38:48 -0000
-References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1519241752-28083-6-git-send-email-walling@linux.vnet.ibm.com>
-	<022d14c9-8b5f-dc32-7efa-b3a53a7b898d@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Thu, 22 Feb 2018 09:38:42 +0100
-MIME-Version: 1.0
-In-Reply-To: <022d14c9-8b5f-dc32-7efa-b3a53a7b898d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <971a8588-95fc-f569-3183-cfa0e2ce67c5@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 05/13] s390-ccw: move
- auxiliary IPL data to separate location
+	(envelope-from <a.perevalov@samsung.com>) id 1eomVK-0002r2-75
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:45:29 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:60442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1eomVJ-0002q2-PT
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:45:26 -0500
+MIME-version: 1.0
+Content-type: text/plain; charset="UTF-8"
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Thu, 22 Feb 2018 11:45:06 +0300
+Message-id: <1519289107-20251-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20180222084519eucas1p19bfdda3c62fa37b881f8de2d3602f3f3@eucas1p1.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4] Fix build on ppc platform in
+ migration/postcopy-ram.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,115 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
 
-On 22.02.2018 05:40, Thomas Huth wrote:
-> On 21.02.2018 20:35, Collin L. Walling wrote:
->> The s390-ccw firmware needs some information in support of the
->> boot process which is not available on the native machine.
->> Examples are the netboot firmware load address and now the
->> boot menu parameters.
->>
->> While storing that data in unused fields of the IPL parameter block
->> works, that approach could create problems if the parameter block
->> definition should change in the future. Because then a guest could
->> overwrite these fields using the set IPLB diagnose.
->>
->> In fact the data in question is of more global nature and not really
->> tied to an IPL device, so separating it is rather logical.
->>
->> This commit introduces a new structure to hold firmware relevant
->> IPL parameters set by QEMU. The data is stored at location 204 (dec)
->> and can contain up to 7 32-bit words. This area is available to
->> programming in the z/Architecture Principles of Operation and
->> can thus safely be used by the firmware until the IPL has completed.
->>
->> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
->> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->> ---
->>  hw/s390x/ipl.c          | 18 +++++++++++++++++-
->>  hw/s390x/ipl.h          | 25 +++++++++++++++++++++++--
->>  pc-bios/s390-ccw/iplb.h | 18 ++++++++++++++++--
->>  pc-bios/s390-ccw/main.c |  6 +++++-
->>  4 files changed, 61 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->> index 0d06fc1..79f5a58 100644
->> --- a/hw/s390x/ipl.c
->> +++ b/hw/s390x/ipl.c
->> @@ -399,6 +399,21 @@ void s390_reipl_request(void)
->>      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->>  }
->>  
->> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
->> +{
->> +    S390IPLState *ipl = get_ipl_device();
->> +    uint8_t *addr;
->> +    uint64_t len = 4096;
->> +
->> +    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
->> +    if (!addr || len < QIPL_ADDRESS + sizeof(QemuIplParameters)) {
->> +        error_report("Cannot set QEMU IPL parameters");
->> +        return;
->> +    }
->> +    memcpy(addr + QIPL_ADDRESS, &ipl->qipl, sizeof(QemuIplParameters));
->> +    cpu_physical_memory_unmap(addr, len, 1, len);
->> +}
->> +
->>  void s390_ipl_prepare_cpu(S390CPU *cpu)
->>  {
->>      S390IPLState *ipl = get_ipl_device();
->> @@ -418,8 +433,9 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
->>              error_report_err(err);
->>              vm_stop(RUN_STATE_INTERNAL_ERROR);
->>          }
->> -        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
->> +        ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
->>      }
->> +    s390_ipl_prepare_qipl(cpu);
->>  }
->>  
->>  static void s390_ipl_reset(DeviceState *dev)
->> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
->> index 8a705e0..08926a3 100644
->> --- a/hw/s390x/ipl.h
->> +++ b/hw/s390x/ipl.h
->> @@ -16,8 +16,7 @@
->>  #include "cpu.h"
->>  
->>  struct IplBlockCcw {
->> -    uint64_t netboot_start_addr;
->> -    uint8_t  reserved0[77];
->> +    uint8_t  reserved0[85];
->>      uint8_t  ssid;
->>      uint16_t devno;
->>      uint8_t  vm_flags;
->> @@ -90,6 +89,27 @@ void s390_ipl_prepare_cpu(S390CPU *cpu);
->>  IplParameterBlock *s390_ipl_get_iplb(void);
->>  void s390_reipl_request(void);
->>  
->> +#define QIPL_ADDRESS  0xcc
->> +
->> +/*
->> + * The QEMU IPL Parameters will be stored at absolute address
->> + * 204 (0xcc) which means it is 32-bit word aligned but not
->> + * double-word aligned.
->> + * Placement of data fields in this area must account for
->> + * their alignment needs. E.g., netboot_start_address must
->> + * have an offset of n * 8 bytes within the struct in order
->> + * to keep it double-word aligned.
-> 
-> Should that rather be "4 + n * 8" instead of "n * 8" ?
-I wonder if I ever get that comment right. You're correct of course.
-> 
-> Apart from that, patch looks good to me now, so once you've fixed the
-> comment (if necessary):
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
+V4->V3
+    - common helper was introduced and sanity check for
+probable time jumps (comment from David)
+
+V2->V3
+    - use UINT32_MAX instead of 0xffffffff (comment from Philippe)
+    - use lelative time to avoid milliseconds overflow in uint32
+(comment from David)
 
 
--- 
-Regards,
- Viktor Mihajlovski
+V2->V1
+This is a second version:
+    - comment from David about casting
+David was right, I tried to find it in standard, but it was implicitly
+described for me, so part of standard:
+
+   1. When a value with integer type is converted to another integer
+type other than _Bool, if the value can be represented by the new
+type, it is unchanged.
+   2. Otherwise, if the new type is unsigned, the value is converted
+by repeatedly adding or subtracting one more than the maximum value
+that can be represented in the new type until the value is in the
+range of the new type.
+
+
+
+Initial message:
+
+It was a problem with 64 atomics on ppc in migration/postcopy-ram.c repor=
+ted by
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>.
+
+Tested in Debian on qemu-system-ppc and in Ubuntu16.04 on i386.
+
+This commit is based on commit afd3397a8149d8b645004e459bf2002d78f5e267
+Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request'=
+ into staging
+but with all necessary commit reverted in
+ee86981bda9ecd40c8daf81b7307b1d2aff68174
+
+Alexey Perevalov (1):
+  migration: change blocktime type to uint32_t
+
+ hmp.c                    |  4 ++--
+ migration/postcopy-ram.c | 52 ++++++++++++++++++++++++++++--------------=
+------
+ migration/trace-events   |  4 ++--
+ qapi/migration.json      |  4 ++--
+ 4 files changed, 36 insertions(+), 28 deletions(-)
+
+--=20
+2.7.4
