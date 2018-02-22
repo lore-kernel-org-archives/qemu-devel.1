@@ -1,43 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eou0S-00080b-Mm
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:46:05 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eouDP-0002I5-4I
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eou0O-0002QU-Mt
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:46:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eou0O-0002OY-D4
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:46:00 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1MGhsEj061423
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 11:45:58 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9xf890gd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 11:45:58 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Thu, 22 Feb 2018 09:45:57 -0700
-References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-	<29048432-906e-5fbe-d927-0814b0c24e4d@de.ibm.com>
-	<d31eb692-fd5e-7e83-1fa3-66d66f631043@linux.vnet.ibm.com>
-	<25e410d1-3b6a-1178-d46c-87f247eacea9@linux.vnet.ibm.com>
-	<11d66e11-7a56-c5d0-f285-2a532e85fcf8@de.ibm.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Thu, 22 Feb 2018 11:45:53 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eouDL-0006ZN-VY
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:59:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1eouDL-0006YX-PK
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:59:23 -0500
+Date: Thu, 22 Feb 2018 09:59:17 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180222095917.29eda1d9@w520.home>
+In-Reply-To: <CAFEAcA8_VRML=FopCKdGnrPCyZ9MwKokMj60962=tgCNwNT2oA@mail.gmail.com>
+References: <20180219111458.25983-1-kraxel@redhat.com>
+	<20180219111458.25983-5-kraxel@redhat.com>
+	<20180222153740.3zkvjen77uwjqhd2@sirius.home.kraxel.org>
+	<CAFEAcA8_VRML=FopCKdGnrPCyZ9MwKokMj60962=tgCNwNT2oA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <11d66e11-7a56-c5d0-f285-2a532e85fcf8@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <450ee50a-660b-6ec8-7de4-e5c9ce8fa26a@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 00/13] Interactive Boot
- Menu for DASD and SCSI Guests on s390x
+Subject: Re: [Qemu-devel] [PATCH v4 4/7] qdev: add hotpluggable to
+ DeviceState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,87 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 02/22/2018 10:44 AM, Christian Borntraeger wrote:
->
-> On 02/22/2018 04:40 PM, Collin L. Walling wrote:
->> On 02/22/2018 07:23 AM, Viktor Mihajlovski wrote:
->>> On 22.02.2018 12:51, Christian Borntraeger wrote:
->>>> Series
->>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> Thanks!!!
->>
->>>>
->>>> menu on scsi and dasd bootmaps tested successfully.
->>>>
->>>> There is one thing that we might want to fix (can be an addon patch =
-since this is a non-customer
->>>> scenario (no libvirt)).
->>>>
->>>> If you start QEMU manually without a bootindex, the -boot menu=3Don =
-is ignored
->>>> if no drive has a bootindex.
->>>>
->>>> For example:
->>>>
->>>> -drive file=3D/dev/dasda,if=3Dnone,id=3Dd1 -device virtio-blk-ccw,dr=
-ive=3Dd1,bootindex=3D1 -boot menu=3Don
->>>> does work
->>>>
->>>> -drive file=3D/dev/dasda -boot menu=3Don
->>>> does not
->>>>
->>>> instead it prints:
->>>> qemu-system-s390x: boot menu is not supported for this device type.
->>>>
->>>> and the boots up the default entry.
->>>>
->>> That should indeed be a separate patch, as it would move logic curren=
-tly
->>> in the BIOS up to QEMU (find the first defined virtio disk and select=
- it
->>> as boot disk).
->>> In fact it's more complicated than that, because it would have to
->>> properly account for -boot order=3D[acdn] and produce the respective =
-IPLB.
->>> While it makes sense, I wouldn't rush that in but rather change the
->>> error message to indicate that -device bootindex is needed to activat=
-e
->>> the menu, at least for the time being.
->>> [...]
->>>
->> I can look into it.=C2=A0 Theoretically, the easier fix should just in=
-volve parsing all
->> of the -device commands and looking for a "bootindex=3D1" field. The Q=
-emu options
->> code already handles a bulk of this work, so it's just a matter of put=
-ting it all
->> together.
->>
->> Shall I whip something up and post what I have as a reply to this emai=
-l chain?
-> In fact, it should already be there.
->
-> static bool s390_gen_initial_iplb(S390IPLState *ipl)
-> {
->      DeviceState *dev_st;
->
->      dev_st =3D get_boot_device(0);
->
-> --> if this returns 0 we have no bootindex statement anywhere and the B=
-IOS will IPL the default
-> disk.
->
->
-Makes sense.=C2=A0 I'm working on making this patch look as clean as=20
-possible. The fact that no boot menu
-options present means we fallback to using zipl values for CCW being=20
-tied into the switch statement
-is making things a bit tricky. Just have to think the logic through a=20
-bit.=C2=A0 Will get back to you once
-I have something good.
+On Thu, 22 Feb 2018 15:46:17 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
---=20
-- Collin L Walling
+> On 22 February 2018 at 15:37, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > On Mon, Feb 19, 2018 at 12:14:55PM +0100, Gerd Hoffmann wrote: =20
+> >> vfio display support wants disable hotplug for certain devices, because
+> >> qemu doesn't support hotplugging display devices and qemu consoles.
+> >>
+> >> Add a hotpluggable bool to DeviceState, initialize it from
+> >> DeviceClass->hotpluggable, update device_get_hotpluggable accordingly.
+> >>
+> >> Devices can flip the new variable from true to false if needed. =20
+> >
+> > Alex wants an ack for this one.  Who maintains it these days?
+> >
+> > MAINTAINERS doesn't list qdev.  For QOM which is closest probably
+> > Andreas F=C3=A4rber is listed.  Havn't seen him on the list for a while
+> > though.
+> >
+> > Ok, lets try some usual suspects...
+> > Markus? Eric? Paolo? Peter?  Any comments on this one? =20
+>=20
+> What type of device is only sometimes hotpluggable ?
+> The commit message says "display devices" and "consoles",
+> but I would expect those to both be types of device which
+> have a class which is never hotpluggable, so you can mark
+> them non-hotpluggable with the existing class flag rather
+> than needing a per-instance flag.
+
+With this series, a vfio-pci device optionally supports a display.  The
+vfio-pci device is hotpluggable, but QEMU display support is not.  So
+the solution here is to make the vfio-pci device non-hotpluggable only
+when it supports and enables a display.
+
+Gerd, is there another solution that the display object is instantiated
+separately from the vfio-pci object and the display support in the
+vfio-pci device references the display object via an id.  Possibly
+vfio-pci could remain hotpluggable while the display class device is
+not.  Potentially one display could be switched between multiple
+display capable devices, like an input control button on a monitor,
+losing signal if none are connected.  Possible?  Clearly I have no idea
+how display objects actually work in QEMU.  Thanks,
+
+Alex
