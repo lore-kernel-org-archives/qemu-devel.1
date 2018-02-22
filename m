@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eos5U-0007DB-Je
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:43:09 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eos5v-0007XW-Uv
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:43:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eos5T-0004uT-Gr
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:43:08 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38834)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eos5T-0004tG-B2
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:43:07 -0500
-Received: by mail-oi0-x244.google.com with SMTP id 123so1400535oig.5
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 06:43:07 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1eos5v-0005K3-0v
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:43:35 -0500
+References: <20180205151835.20812-1-mreitz@redhat.com>
+	<20180205151835.20812-2-mreitz@redhat.com>
+	<20180222122700.GE4147@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6c7b8ff6-20f8-3954-1d39-537738e77d7c@redhat.com>
+Date: Thu, 22 Feb 2018 15:43:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180217140051.22731-2-linus.walleij@linaro.org>
-References: <20180217140051.22731-1-linus.walleij@linaro.org>
-	<20180217140051.22731-2-linus.walleij@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 14:42:46 +0000
-Message-ID: <CAFEAcA8QVBRLs1ZfgMP1nTUG4xQJRH9WrwxdXzrwAR8pZJJ4ew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/3] hw/sii9022: Add support for
- Silicon Image SII9022
+In-Reply-To: <20180222122700.GE4147@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FcpBq7oTUvYrzvxILHC9LkYSwJYXOsfQB"
+Subject: Re: [Qemu-devel] [PATCH v8 01/26] block/mirror: Small
+ absolute-paths simplification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>
 
-On 17 February 2018 at 14:00, Linus Walleij <linus.walleij@linaro.org> wrote:
-> This adds support for emulating the Silicon Image SII9022 DVI/HDMI
-> bridge. It's not very clever right now, it just acknowledges
-> the switch into DDC I2C mode and back. Combining this with the
-> existing DDC I2C emulation gives the right behavior on the Versatile
-> Express emulation passing through the QEMU EDID to the emulated
-> platform.
->
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  hw/display/Makefile.objs |   1 +
->  hw/display/sii9022.c     | 185 +++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 186 insertions(+)
->  create mode 100644 hw/display/sii9022.c
->
-> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-> index d3a4cb396eb9..3c7c75b94da5 100644
-> --- a/hw/display/Makefile.objs
-> +++ b/hw/display/Makefile.objs
-> @@ -3,6 +3,7 @@ common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
->  common-obj-$(CONFIG_G364FB) += g364fb.o
->  common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
->  common-obj-$(CONFIG_PL110) += pl110.o
-> +common-obj-$(CONFIG_SII9022) += sii9022.o
->  common-obj-$(CONFIG_SSD0303) += ssd0303.o
->  common-obj-$(CONFIG_SSD0323) += ssd0323.o
->  common-obj-$(CONFIG_XEN) += xenfb.o
-> diff --git a/hw/display/sii9022.c b/hw/display/sii9022.c
-> new file mode 100644
-> index 000000000000..d6f3cdc04293
-> --- /dev/null
-> +++ b/hw/display/sii9022.c
-> @@ -0,0 +1,185 @@
-> +/*
-> + * Silicon Image SiI9022
-> + *
-> + * This is a pretty hollow emulation: all we do is acknowledge that we
-> + * exist (chip ID) and confirm that we get switched over into DDC mode
-> + * so the emulated host can proceed to read out EDID data. All subsequent
-> + * set-up of connectors etc will be acknowledged and ignored.
-> + *
-> + * Copyright (c) 2018 Linus Walleij
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FcpBq7oTUvYrzvxILHC9LkYSwJYXOsfQB
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Alberto Garcia <berto@igalia.com>
+Message-ID: <6c7b8ff6-20f8-3954-1d39-537738e77d7c@redhat.com>
+Subject: Re: [PATCH v8 01/26] block/mirror: Small absolute-paths
+ simplification
+References: <20180205151835.20812-1-mreitz@redhat.com>
+ <20180205151835.20812-2-mreitz@redhat.com>
+ <20180222122700.GE4147@localhost.localdomain>
+In-Reply-To: <20180222122700.GE4147@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sanity check: really copyright you and not Linaro ?
+On 2018-02-22 13:27, Kevin Wolf wrote:
+> Am 05.02.2018 um 16:18 hat Max Reitz geschrieben:
+>> When invoking drive-mirror in absolute-paths mode, the target's backin=
+g
+>> BDS is assigned to it in mirror_exit(). The current logic only does so=
 
-> + *
-> + * This code is licensed under the GNU GPL v2.
-> + *
-> + * Contributions after 2012-01-13 are licensed under the terms of the
-> + * GNU GPL, version 2 or (at your option) any later version.
+>> if the target does not have that backing BDS already; but it actually
+>> cannot have a backing BDS at all (the BDS is opened with O_NO_BACKING =
+in
+>> qmp_drive_mirror()), so just assert that and assign the new backing BD=
+S
+>> unconditionally.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>=20
+> Introducing new assumptions that the graph stays unmodified between the=
 
-If this is copyright 2018 then what parts of it are not covered by
-the "contributions after 2012-01-13" condition? Could we just have
-this be GPL-v2-or-later, which is what most new code is ?
+> start of a block job and its completion feels a bit adventurous when al=
+l
+> of the blockdev work is moving towards making things more flexible.
+
+But as the commit message hints at, MIRROR_SOURCE_BACKING_CHAIN is used
+only by drive-mirror.  How flexible do you intend that to be?
+
+Yes, technically you can specify a node name for the newly created image
+and then go wild while the block job is still running.  But then
+something inside me feels like you should see your VM crashing for
+that...  OTOH, a crash is always bad.
+
+I can't make it crash in the current state because the mirror job
+creates a BB and blockdev-snapshot thus refuses to attach a backing file
+to the target.  But I guess I'll drop this patch anyway (unless I find
+it was important for some other patch in this series, which I hope it
+wasn't...).
+
+On a totally unrelated note, we need some protocol for hurting the user
+if they do something that deserves a bit of pain.  Crashing is always
+bad and our fault, so it needs to be something else.  Removing $HOME?
+Marking all attached qcow2 images corrupt even though they aren't so you
+have to run a qemu-img check?  I like that one.
+
+Max
 
 
-> +static void sii9022_reset(DeviceState *dev)
-> +{
-> +    sii9022_state *s = SII9022(dev);
-> +
-> +    s->ptr = 0;
-> +    s->addr_byte = false;
+--FcpBq7oTUvYrzvxILHC9LkYSwJYXOsfQB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I think we should reset ddc/ddc_skip_finish/ddc_req
-here too. I suspect the state machine logic means we
-can't get to a place where their values are used once
-we reset ptr and addr_byte, but it's easier to reason
-about if we just reset all the device's state.
+-----BEGIN PGP SIGNATURE-----
 
-I agree with Philippe that we should use trace events here rather
-than the DPRINTF macro. Otherwise the code looks fine.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqO1vwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Aea0IAKdVXViKj1RqZXvRcPzyuO94RaJqcS5K
+Slgppt+vFWJ3S+CfJ0+EBzV5URlqIRShSGj5KlndE3GCfbLiaFU6uQG+yB8nOWPr
+be2+Xik/Li2p+oJDihf3MO7ltpn62jlV8arrL/grikCQZO0ybrgqDFth9n/3MpL2
+H3N3z8JHrfd8M7fs+zVE3+IUWTtVUqZgdhp9IAHPOMi/0G+Dh6JLV6JSN4jQLILO
+tWUwrfMLaKtDWrOGH8t8Dsv9SUAFZjxWD3t/1fkjXJlpsyqPlbOZh9geChKFI0OC
+UhcXwKZJKoIq3+Hplad7mFXOuXcHIA5pi7A8DF2Sk//NE6CNZwPUA/M=
+=IQaB
+-----END PGP SIGNATURE-----
 
-thanks
--- PMM
+--FcpBq7oTUvYrzvxILHC9LkYSwJYXOsfQB--
