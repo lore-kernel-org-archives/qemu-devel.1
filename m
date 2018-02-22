@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eorme-0007n8-Tx
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:23:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1eornW-0008Mg-JD
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eormd-0007M2-PH
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:23:40 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:32802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eormd-0007LU-IL
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:23:39 -0500
-Received: by mail-ot0-x241.google.com with SMTP id k7so4052675otj.0
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 06:23:39 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1eornV-000896-PO
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:24:34 -0500
+References: <20180221135404.27598-1-kwolf@redhat.com>
+	<20180221135404.27598-11-kwolf@redhat.com>
+	<53e504b6-cb8e-e261-e7b9-c2ea9453621b@redhat.com>
+	<20180222095042.GA4147@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6af497b2-9bc0-9ee0-4b88-429c0ddc7af1@redhat.com>
+Date: Thu, 22 Feb 2018 08:24:16 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180215221325.7611-18-f4bug@amsat.org>
-References: <20180215221325.7611-1-f4bug@amsat.org>
-	<20180215221325.7611-18-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 14:23:18 +0000
-Message-ID: <CAFEAcA9f-GNqaSbxKa0=U+uJaK7pVU+acG-1F4kiA6ctA1P53g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 17/20] sdcard: add SD SEND_TUNING_BLOCK
- (CMD19)
+In-Reply-To: <20180222095042.GA4147@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/36] test-qemu-opts: Test
+ qemu_opts_to_qdict_filtered()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrzej Zaborowski <balrogg@gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On 15 February 2018 at 22:13, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
->  from qemu/xilinx tag xilinx-v2015.2]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
->  hw/sd/sd.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 911aae6233..4b0bb7992d 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -1166,6 +1166,14 @@ static sd_rsp_type_t sd_normal_command(SDState *sd=
-, SDRequest req)
->          }
->          break;
->
-> +    case 19:    /* CMD19: SEND_TUNING_BLOCK (SD) */
-> +        if (sd->state =3D=3D sd_transfer_state) {
-> +            sd->state =3D sd_sendingdata_state;
-> +            sd->data_offset =3D 0;
-> +            return sd_r1;
-> +        }
-> +        break;
-> +
->      case 23:    /* CMD23: SET_BLOCK_COUNT */
->          switch (sd->state) {
->          case sd_transfer_state:
-> @@ -1889,6 +1897,15 @@ void sd_write_data(SDState *sd, uint8_t value)
->      }
->  }
->
-> +#define SD_TUNING_BLOCK_SIZE    64
-> +
-> +static const uint32_t sd_tunning_data[SD_TUNING_BLOCK_SIZE / 4] =3D {
+On 02/22/2018 03:50 AM, Kevin Wolf wrote:
 
-Typo, s/tunning/tuning/.
+>>> +    opts = qemu_opts_parse(&opts_list_01, "str1=foo,str2=,str3=bar,number1=42",
+>>> +                           false, &error_abort);
+>>
+>> Worth any additional craziness in regards to our QemuOpts parsing, like
+>> str1=foo,,bar,str2... for an option containing commas, or str2=,str1=foo,
+>> for supplying options in a different order than the list?  But what you have
+>> is a good addition even if you don't tweak it.
+> 
+> This is not a test for parsing options string, but for converting an
+> already existing QemuOpts to a QDict. Parsing is already extensively
+> tested in /qemu-opts/opts_parse/*. I'm only using qemu_opts_parse() here
+> because it's the most convenient way to create a QemuOpts with multiple
+> options.
+> 
+> So the only things we need to consider in this test case are different
+> QemuOpts that result from the parsing. Escaped commas don't exist in
+> this representation any more and the associated QemuOptsList isn't
+> involved in the conversion to QDicts, so these wouldn't actually be new
+> cases for the thing we're testing here.
 
-> +    0xFF0FFF00, 0x0FFCC3CC, 0xC33CCCFF, 0xFEFFFEEF,
-> +    0xFFDFFFDD, 0xFFFBFFFB, 0XBFFF7FFF, 0X77F7BDEF,
+Alright, you've convinced me that this isn't the test to be hammering on 
+QemuOpts.
 
-Can we have lowercase 'x' consistently here please?
-
-> +    0XFFF0FFF0, 0X0FFCCC3C, 0XCC33CCCF, 0XFFEFFFEE,
-> +    0XFFFDFFFD, 0XDFFFBFFF, 0XBBFFF7FF, 0XF77F7BDE,
-> +};
-
-A comment about what all these magic numbers are for would
-be useful.
-
-
-> +
->  uint8_t sd_read_data(SDState *sd)
->  {
->      /* TODO: Append CRCs */
-> @@ -1968,6 +1985,13 @@ uint8_t sd_read_data(SDState *sd)
->          }
->          break;
->
-> +    case 19:    /* CMD19:  SEND_TUNING_BLOCK (SD) */
-> +        if (sd->data_offset >=3D SD_TUNING_BLOCK_SIZE - 1) {
-> +            sd->state =3D sd_transfer_state;
-> +        }
-> +        ret =3D ((uint8_t *)(&sd_tunning_data))[sd->data_offset++];
-
-If you're going to treat it as a uint8_t buffer it might be
-cleaner to just declare it as a uint8_t buffer rather than
-uint32_t: you'd get to avoid the cast here and the / 4 in
-the array definition.
-
-> +        break;
-> +
->      case 22:   /* ACMD22: SEND_NUM_WR_BLOCKS */
->          ret =3D sd->data[sd->data_offset ++];
->
-> --
-> 2.16.1
->
-
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
