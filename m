@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eosiU-0004gU-Ft
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:23:27 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eosiU-0004gt-W4
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:23:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eosiT-0001Zi-7g
+	(envelope-from <pm215@archaic.org.uk>) id 1eosiT-0001a0-PP
 	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:23:26 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46586)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46588)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eosiT-0001Ye-0f
+	id 1eosiT-0001ZQ-HQ
 	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:23:25 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eosiR-00020n-QU
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 15:23:23 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eosiS-000213-Iy
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 15:23:24 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 15:22:38 +0000
-Message-Id: <20180222152307.7499-4-peter.maydell@linaro.org>
+Date: Thu, 22 Feb 2018 15:22:39 +0000
+Message-Id: <20180222152307.7499-5-peter.maydell@linaro.org>
 In-Reply-To: <20180222152307.7499-1-peter.maydell@linaro.org>
 References: <20180222152307.7499-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 03/32] hw/char/stm32f2xx_usart: fix TXE/TC bit
- handling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 04/32] Fix ast2500 protection register emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +32,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Braun <rbraun@sceen.net>
+From: Hugo Landau <hlandau@devever.net>
 
-I/O currently being synchronous, there is no reason to ever clear the
-SR_TXE bit. However the SR_TC bit may be cleared by software writing
-to the SR register, so set it on each write.
+Some register blocks of the ast2500 are protected by protection key
+registers which require the right magic value to be written to those
+registers to allow those registers to be mutated.
 
-In addition, fix the reset value of the USART status register.
+Register manuals indicate that writing the correct magic value to these
+registers should cause subsequent reads from those values to return 1,
+and writing any other value should cause subsequent reads to return 0.
 
-Signed-off-by: Richard Braun <rbraun@sceen.net>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-[PMM: removed XXX tag from comment, since it isn't something
- we need to come back and fix in QEMU]
+Previously, qemu implemented these registers incorrectly: the registers
+were handled as simple memory, meaning that writing some value x to a
+protection key register would result in subsequent reads from that
+register returning the same value x. The protection was implemented by
+ensuring that the current value of that register equaled the magic
+value.
+
+This modifies qemu to have the correct behaviour: attempts to write to a
+ast2500 protection register results in a transition to 1 or 0 depending
+on whether the written value is the correct magic. The protection logic
+is updated to ensure that the value of the register is nonzero.
+
+This bug caused deadlocks with u-boot HEAD: when u-boot is done with a
+protectable register block, it attempts to lock it by writing the
+bitwise inverse of the correct magic value, and then spinning forever
+until the register reads as zero. Since qemu implemented writes to these
+registers as ordinary memory writes, writing the inverse of the magic
+value resulted in subsequent reads returning that value, leading to
+u-boot spinning forever.
+
+Signed-off-by: Hugo Landau <hlandau@devever.net>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Acked-by: Andrew Jeffery <andrew@aj.id.au>
+Message-id: 20180220132627.4163-1-hlandau@devever.net
+[PMM: fixed incorrect code indentation]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/char/stm32f2xx_usart.h |  7 ++++++-
- hw/char/stm32f2xx_usart.c         | 12 ++++++++----
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ hw/misc/aspeed_scu.c  | 6 +++++-
+ hw/misc/aspeed_sdmc.c | 8 +++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/char/stm32f2xx_usart.h b/include/hw/char/stm32f2xx_usart.h
-index 9d03a7527c..84c4029777 100644
---- a/include/hw/char/stm32f2xx_usart.h
-+++ b/include/hw/char/stm32f2xx_usart.h
-@@ -37,7 +37,12 @@
- #define USART_CR3  0x14
- #define USART_GTPR 0x18
+diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+index 74537ce975..5e6d5744ee 100644
+--- a/hw/misc/aspeed_scu.c
++++ b/hw/misc/aspeed_scu.c
+@@ -191,7 +191,7 @@ static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t data,
+     }
  
--#define USART_SR_RESET 0x00C00000
-+/*
-+ * NB: The reset value mentioned in "24.6.1 Status register" seems bogus.
-+ * Looking at "Table 98 USART register map and reset values", it seems it
-+ * should be 0xc0, and that's how real hardware behaves.
-+ */
-+#define USART_SR_RESET (USART_SR_TXE | USART_SR_TC)
- 
- #define USART_SR_TXE  (1 << 7)
- #define USART_SR_TC   (1 << 6)
-diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
-index 07b462d4b6..032b5fda13 100644
---- a/hw/char/stm32f2xx_usart.c
-+++ b/hw/char/stm32f2xx_usart.c
-@@ -96,12 +96,10 @@ static uint64_t stm32f2xx_usart_read(void *opaque, hwaddr addr,
-     switch (addr) {
-     case USART_SR:
-         retvalue = s->usart_sr;
--        s->usart_sr &= ~USART_SR_TC;
-         qemu_chr_fe_accept_input(&s->chr);
-         return retvalue;
-     case USART_DR:
-         DB_PRINT("Value: 0x%" PRIx32 ", %c\n", s->usart_dr, (char) s->usart_dr);
--        s->usart_sr |= USART_SR_TXE;
-         s->usart_sr &= ~USART_SR_RXNE;
-         qemu_chr_fe_accept_input(&s->chr);
-         qemu_set_irq(s->irq, 0);
-@@ -137,7 +135,9 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
-     switch (addr) {
-     case USART_SR:
-         if (value <= 0x3FF) {
--            s->usart_sr = value;
-+            /* I/O being synchronous, TXE is always set. In addition, it may
-+               only be set by hardware, so keep it set here. */
-+            s->usart_sr = value | USART_SR_TXE;
-         } else {
-             s->usart_sr &= value;
-         }
-@@ -151,8 +151,12 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
-             /* XXX this blocks entire thread. Rewrite to use
-              * qemu_chr_fe_write and background I/O callbacks */
-             qemu_chr_fe_write_all(&s->chr, &ch, 1);
-+            /* XXX I/O are currently synchronous, making it impossible for
-+               software to observe transient states where TXE or TC aren't
-+               set. Unlike TXE however, which is read-only, software may
-+               clear TC by writing 0 to the SR register, so set it again
-+               on each write. */
-             s->usart_sr |= USART_SR_TC;
--            s->usart_sr &= ~USART_SR_TXE;
-         }
+     if (reg > PROT_KEY && reg < CPU2_BASE_SEG1 &&
+-            s->regs[PROT_KEY] != ASPEED_SCU_PROT_KEY) {
++            !s->regs[PROT_KEY]) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: SCU is locked!\n", __func__);
          return;
-     case USART_BRR:
+     }
+@@ -199,6 +199,10 @@ static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t data,
+     trace_aspeed_scu_write(offset, size, data);
+ 
+     switch (reg) {
++    case PROT_KEY:
++        s->regs[reg] = (data == ASPEED_SCU_PROT_KEY) ? 1 : 0;
++        return;
++
+     case FREQ_CNTR_EVAL:
+     case VGA_SCRATCH1 ... VGA_SCRATCH8:
+     case RNG_DATA:
+diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+index f0b3053fae..0df008e52a 100644
+--- a/hw/misc/aspeed_sdmc.c
++++ b/hw/misc/aspeed_sdmc.c
+@@ -110,7 +110,12 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
+         return;
+     }
+ 
+-    if (addr != R_PROT && s->regs[R_PROT] != PROT_KEY_UNLOCK) {
++    if (addr == R_PROT) {
++        s->regs[addr] = (data == PROT_KEY_UNLOCK) ? 1 : 0;
++        return;
++    }
++
++    if (!s->regs[R_PROT]) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
+         return;
+     }
+@@ -123,6 +128,7 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
+             data &= ~ASPEED_SDMC_READONLY_MASK;
+             break;
+         case AST2500_A0_SILICON_REV:
++        case AST2500_A1_SILICON_REV:
+             data &= ~ASPEED_SDMC_AST2500_READONLY_MASK;
+             break;
+         default:
 -- 
 2.16.1
