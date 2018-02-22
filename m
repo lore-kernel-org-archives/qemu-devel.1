@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eozVx-0004m6-RS
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 17:38:59 -0500
+	(envelope-from <cota@braap.org>) id 1eozWw-0005L5-48
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 17:40:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eozVv-0006SF-Bw
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 17:38:57 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35129)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eozVu-0006QI-V3
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 17:38:55 -0500
-Received: by mail-lf0-x244.google.com with SMTP id 70so9705169lfw.2
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 14:38:54 -0800 (PST)
+	(envelope-from <cota@braap.org>) id 1eozWs-0000kl-Rj
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 17:39:58 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:37363)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eozWs-0000gZ-7W
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 17:39:54 -0500
+Date: Thu, 22 Feb 2018 17:39:51 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180222223951.GA26967@flamenco>
+References: <1519324303-5674-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1519324303-5674-3-git-send-email-aleksandar.markovic@rt-rk.com>
+	<20180222223327.GA25701@flamenco>
 MIME-Version: 1.0
-In-Reply-To: <20180222222844.7109-2-frasse.iglesias@gmail.com>
-References: <20180222222844.7109-1-frasse.iglesias@gmail.com>
-	<20180222222844.7109-2-frasse.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 22 Feb 2018 14:38:23 -0800
-Message-ID: <CAKmqyKN+_vdSVUn92Te-6DP4bP33ZE+OQ_HSe3erC4B7mtM70Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] xilinx_spips: Enable only two slaves
- when reading/writing with stripe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180222223327.GA25701@flamenco>
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] target/mips: reimplement SC
+ instruction emulation and use cmpxchg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Petar Jovanovic <petar.jovanovic@mips.com>, Fam Zheng <famz@redhat.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Raghu Gandham <raghu.gandham@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>, Goran Ferenc <goran.ferenc@mips.com>, Paolo Bonzini <pbonzini@redhat.com>, Miodrag Dinic <miodrag.dinic@mips.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Feb 22, 2018 at 2:28 PM, Francisco Iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Assert only the lower cs on bus 0 and upper cs on bus 1 when both buses and
-> chip selects are enabled (e.g reading/writing with stripe).
->
-> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> ---
->  hw/ssi/xilinx_spips.c | 42 ++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 38 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index 8af36ca3d4..e566d179fe 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -223,7 +223,7 @@ static void xilinx_spips_update_cs(XilinxSPIPS *s, int field)
->  {
->      int i;
->
-> -    for (i = 0; i < s->num_cs; i++) {
-> +    for (i = 0; i < s->num_cs * s->num_busses; i++) {
->          bool old_state = s->cs_lines_state[i];
->          bool new_state = field & (1 << i);
->
-> @@ -234,7 +234,7 @@ static void xilinx_spips_update_cs(XilinxSPIPS *s, int field)
->          }
->          qemu_set_irq(s->cs_lines[i], !new_state);
->      }
-> -    if (!(field & ((1 << s->num_cs) - 1))) {
-> +    if (!(field & ((1 << (s->num_cs * s->num_busses)) - 1))) {
->          s->snoop_state = SNOOP_CHECKING;
->          s->cmd_dummies = 0;
->          s->link_state = 1;
-> @@ -248,7 +248,41 @@ static void xlnx_zynqmp_qspips_update_cs_lines(XlnxZynqMPQSPIPS *s)
->  {
->      if (s->regs[R_GQSPI_GF_SNAPSHOT]) {
->          int field = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, CHIP_SELECT);
-> -        xilinx_spips_update_cs(XILINX_SPIPS(s), field);
-> +        bool both_buses_enabled;
-> +        uint8_t buses;
-> +        int cs = 0;
-> +
-> +        buses = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, DATA_BUS_SELECT);
-> +        both_buses_enabled = (buses & 0x3) == 0x3;
-> +
-> +        if (both_buses_enabled) {
-> +            /* Bus 0 lower cs */
-> +            if (field & 1) {
-> +                cs |= 1;
-> +            }
-> +            /* Bus 1 upper cs */
-> +            if (field & (1 << 1)) {
-> +                cs |= 1 << 3;
-> +            }
-> +        } else {
-> +            /* Bus 0 lower cs */
-> +            if (buses & 1 && field & 1) {
-> +                cs |= 1;
-> +            }
-> +            /* Bus 0 upper cs */
-> +            if (buses & 1 && field & (1 << 1)) {
-> +                cs |= 1 << 1;
-> +            }
-> +            /* Bus 1 lower cs */
-> +            if (buses & (1 << 1) && field & 1) {
-> +                cs |= 1 << 2;
-> +            }
-> +            /* Bus 1 upper cs */
-> +            if (buses & (1 << 1) && field & (1 << 1)) {
-> +                cs |= 1 << 3;
-> +            }
+On Thu, Feb 22, 2018 at 17:33:27 -0500, Emilio G. Cota wrote:
+> Here are some numbers I just gathered for qht-bench, feel
+> free to include them in this commit's log:
+> 
+>   mipsel-linux-user tests/qht-bench -d 5 -n 1 -u 20 -g 10000
+>              Host: AMD Opteron(tm) Processor 6376           
 
-It might make more sense to have the buses & 1 in it's own if
-statement and have nested if statements here. Just to be easier to
-follow.
+Obviously "-n $THREADS", not "-n 1".
+Updated png: https://imgur.com/aI9Hvb6
 
-Tested-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Alistair
-
-> +        }
-> +        xilinx_spips_update_cs(XILINX_SPIPS(s), cs);
->      }
->  }
->
-> @@ -260,7 +294,7 @@ static void xilinx_spips_update_cs_lines(XilinxSPIPS *s)
->      if (num_effective_busses(s) == 2) {
->          /* Single bit chip-select for qspi */
->          field &= 0x1;
-> -        field |= field << 1;
-> +        field |= field << 3;
->      /* Dual stack U-Page */
->      } else if (s->regs[R_LQSPI_CFG] & LQSPI_CFG_TWO_MEM &&
->                 s->regs[R_LQSPI_STS] & LQSPI_CFG_U_PAGE) {
-> --
-> 2.11.0
->
->
+		E.
