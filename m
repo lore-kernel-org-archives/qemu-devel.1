@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1eojoE-00052u-Uv
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:52:47 -0500
+	(envelope-from <thuth@redhat.com>) id 1eokEW-0008Gf-Ab
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:19:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1eojoA-0002K7-Ah
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:52:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1eojoA-0002JG-2W
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:52:42 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1M5ojmJ059920
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 00:52:39 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9kd10y4d-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 00:52:39 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Thu, 22 Feb 2018 05:52:37 -0000
-Date: Thu, 22 Feb 2018 11:22:29 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1519022574-6817-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1519022574-6817-2-git-send-email-bharata@linux.vnet.ibm.com>
-	<20180220153510.27451354@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1eokES-0004OT-AP
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:19:56 -0500
+References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1519241752-28083-12-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <147f3c25-486c-44d8-adf6-93487d3dda5f@redhat.com>
+Date: Thu, 22 Feb 2018 07:19:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180220153510.27451354@redhat.com>
-Message-Id: <20180222055229.GC30038@in.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v0 1/2] pc-dimm: Make
- pc_dimm_built_list() global
+In-Reply-To: <1519241752-28083-12-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 11/13] s390-ccw: set
+ cp_receive mask only when needed and consume pending service irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,32 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-On Tue, Feb 20, 2018 at 03:35:10PM +0100, Igor Mammedov wrote:
-> On Mon, 19 Feb 2018 12:12:53 +0530
-> Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+On 21.02.2018 20:35, Collin L. Walling wrote:
+> It is possible while waiting for multiple types of external
+> interrupts that we might have pending irqs remaining between
+> irq consumption and irq-type disabling. Those interrupts
+> could potentially propagate to the guest after IPL completes
+> and cause unwanted behavior.
 > 
-> > Making pc_dimm_built_list() global allows other parts of QEMU code
-> > to build and walk through the DIMM list in address-sorted order.
-> > 
-> > This is needed in the next patch for sPAPR code to create
-> > ibm,dynamic-memory-v2 device tree property that will have entries
-> > for populated DIMMs as well as available hotpluggable areas.
-> > 
-> > CHECK: List of DIMMs is already available via qmp_pc_dimm_device_list(),
-> maybe make it sorted first and use it?
+> As it is today, the SCLP will only recognize write events that
+> are enabled by the control program's send and receive masks. To
+> limit the window for, and prevent further irqs from, ASCII
+> console events (specifically keystrokes), we should only enable
+> the control program's receive mask when we need it.
 > 
-> (i.e. use pc_dimm_built_list in qmp_pc_dimm_device_list) and hide
-> recursive callback ugliness from external users.
+> While we're at it, remove assignment of the (non control program)
+> send and receive masks, as those are actually set by the SCLP.
 > 
-> MemoryDeviceInfoList *qmp_pc_dimm_device_list(void) {
->     object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &list);
->     ...
-> }
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> ---
+>  pc-bios/s390-ccw/menu.c     |  5 +++++
+>  pc-bios/s390-ccw/s390-ccw.h |  1 +
+>  pc-bios/s390-ccw/sclp.c     | 10 ++++------
+>  3 files changed, 10 insertions(+), 6 deletions(-)
 
-Thanks will attempt this in my next version.
-
-Regards,
-Bharata.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
