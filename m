@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eorNn-0005pT-OZ
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 08:58:00 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eoraW-00012P-KZ
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:11:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eorNj-0004eT-0t
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 08:57:59 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <aed232fa-af26-5994-0bed-ec84a514b645@redhat.com>
-References: <20180220222459.8461-1-eblake@redhat.com>
-	<20180220222459.8461-3-eblake@redhat.com>
-	<20180221165116.GB4196@localhost.localdomain>
-	<aed232fa-af26-5994-0bed-ec84a514b645@redhat.com>
-Date: Thu, 22 Feb 2018 14:57:51 +0100
-Message-ID: <w518tbl5dpc.fsf@maestria.local.igalia.com>
+	(envelope-from <no-reply@patchew.org>) id 1eoraS-0006IX-Jy
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:11:08 -0500
+Resent-Message-Id: <E1eoraS-0006IX-Jy@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eoraS-0006G4-DA
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:11:04 -0500
+In-Reply-To: <1518746572-14747-1-git-send-email-cota@braap.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151930849825.717.11832218543568356492@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: Avoid memory over-allocation on
- compressed images
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 22 Feb 2018 06:08:19 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/mips: translator loop conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: cota@braap.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, yongbok.kim@mips.com, aurelien@aurel32.net, rth@twiddle.net
 
-On Wed 21 Feb 2018 05:59:58 PM CET, Eric Blake wrote:
-> But as Berto has convinced me that an externally produced image can
-> convince us to read up to 4M (even though we don't need that much to
-> decompress),
-
-A (harmless but funny) consequence of the way this works is that for any
-valid compressed cluster you should be able to increase the value of the
-size field as much as you want without causing any user-visible effect.
-
-So if you're working with 2MB clusters but for a particular compressed
-cluster the size field is 0x0006 (7 sectors) you can still increase it
-to the maximum (0x1fff, or 8192 sectors) and it should work just the
-same. QEMU will read 4MB instead of ~4KB but since decompression stops
-once the original cluster has been restored there's no harm.
-
-I think I'll write a test case for this, it can be useful to verify that
-QEMU can handle this kind of scenarios.
-
-Berto
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTg3NDY1NzItMTQ3NDctMS1naXQtc2VuZC1lbWFpbC1jb3RhQGJyYWFwLm9y
+ZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdGFyZ2V0L21pcHM6IHRyYW5zbGF0
+b3IgbG9vcCBjb252ZXJzaW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
+KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzE1MTkxNDg0MDYtMTUwMDYtMS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRo
+YXQuY29tIC0+IHBhdGNoZXcvMTUxOTE0ODQwNi0xNTAwNi0xLWdpdC1zZW5kLWVtYWlsLXRodXRo
+QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2NTU1NjFhMWRiIHRh
+cmdldC9taXBzOiBjb252ZXJ0IHRvIFRyYW5zbGF0b3JPcHMKNDZlMzU5Y2FmOCB0YXJnZXQvbWlw
+czogdXNlICpjdHggZm9yIERpc2FzQ29udGV4dAo1NTI1NmQ3MDg4IHRhcmdldC9taXBzOiBjb252
+ZXJ0IHRvIERpc2FzQ29udGV4dEJhc2UKZWJhZDQ0NzBmZSB0YXJnZXQvbWlwczogY29udmVydCB0
+byBEaXNhc0p1bXBUeXBlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6
+IHRhcmdldC9taXBzOiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0gg
+Mi80OiB0YXJnZXQvbWlwczogY29udmVydCB0byBEaXNhc0NvbnRleHRCYXNlLi4uCkNoZWNraW5n
+IFBBVENIIDMvNDogdGFyZ2V0L21pcHM6IHVzZSAqY3R4IGZvciBEaXNhc0NvbnRleHQuLi4KRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3NjogRklMRTog
+dGFyZ2V0L21pcHMvdHJhbnNsYXRlLmM6MjAyMjA6CisgICAgY3R4LT5rc2NyZXhpc3QgPSAoZW52
+LT5DUDBfQ29uZmlnNCA+PiBDUDBDNF9LU2NyRXhpc3QpICYgMHhmZjsKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCAyNTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiB0YXJnZXQvbWlwczogY29u
+dmVydCB0byBUcmFuc2xhdG9yT3BzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
