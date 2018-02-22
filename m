@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ep0KO-00043N-Cd
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:31:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1ep0PW-0005Fr-8h
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:36:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ep0KN-0000dJ-Ju
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:31:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1ep0Ow-0001jY-V1
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 18:36:22 -0500
 References: <20180221135404.27598-1-kwolf@redhat.com>
-	<20180221135404.27598-23-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bba7014f-b130-ac29-36fe-de4cbc1ecdd9@redhat.com>
-Date: Fri, 23 Feb 2018 00:30:40 +0100
+	<20180221135404.27598-16-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d6fd1420-a752-29fd-06be-ae92cf7add08@redhat.com>
+Date: Thu, 22 Feb 2018 17:34:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180221135404.27598-23-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lHhE5fxg1V6Y7Mw2Pa94uCIFQfKAgRgq0"
-Subject: Re: [Qemu-devel] [PATCH v2 22/36] rbd: Support .bdrv_co_create
+In-Reply-To: <20180221135404.27598-16-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 15/36] file-posix: Support
+ .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +26,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lHhE5fxg1V6Y7Mw2Pa94uCIFQfKAgRgq0
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
- jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
- qemu-devel@nongnu.org
-Message-ID: <bba7014f-b130-ac29-36fe-de4cbc1ecdd9@redhat.com>
-Subject: Re: [PATCH v2 22/36] rbd: Support .bdrv_co_create
-References: <20180221135404.27598-1-kwolf@redhat.com>
- <20180221135404.27598-23-kwolf@redhat.com>
-In-Reply-To: <20180221135404.27598-23-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-02-21 14:53, Kevin Wolf wrote:
-> This adds the .bdrv_co_create driver callback to rbd, which enables
+On 02/21/2018 07:53 AM, Kevin Wolf wrote:
+> This adds the .bdrv_co_create driver callback to file, which enables
 > image creation over QMP.
->=20
+> 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  qapi/block-core.json |  19 ++++++-
->  block/rbd.c          | 146 ++++++++++++++++++++++++++++++++++---------=
---------
->  2 files changed, 116 insertions(+), 49 deletions(-)
+>   qapi/block-core.json | 20 +++++++++++++-
+>   block/file-posix.c   | 77 +++++++++++++++++++++++++++++++++++++---------------
+>   2 files changed, 74 insertions(+), 23 deletions(-)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 359195a1a3..0040795603 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3359,6 +3359,24 @@
+>   { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+>   
+>   ##
+> +# @BlockdevCreateOptionsFile:
+> +#
+> +# Driver specific image creation options for file.
+> +#
+> +# @filename         Filename for the new image file
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Does this allow /dev/fdset magic filenames, for when libvirt has to 
+pre-create a file and assign correct SELinux permissions, then hand the 
+fd over the monitor, but where qemu then takes over the rest of the 
+creation task?  What tasks remain in file-posix creation, you ask?...
+
+> +# @size             Size of the virtual disk in bytes
+> +# @preallocation    Preallocation mode for the new image (default: off)
+
+...why, of course, a non-default preallocation.  It would be nice to 
+hand a 0-byte fd to qemu, then let qemu uniformly truncate it to its 
+desired size, using whatever preallocation strategy is supported, rather 
+than having to have libvirt worry about preallocation in addition to 
+SELinux labeling.  Especially once we get an async command variant 
+working, where we can track progress, given that some forms of 
+preallocation take a while.  And we may someday still reach the policy 
+decision where we can block qemu from directly calling open().
+
+> +# @nocow            Turn off copy-on-write (valid only on btrfs; default: off)
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'BlockdevCreateOptionsFile',
+> +  'data': { 'filename':         'str',
+> +            'size':             'size',
+> +            '*preallocation':   'PreallocMode',
+> +            '*nocow':           'bool' } }
+> +
+
+I think I asked earlier why size is mandatory at this layer, but I'm 
+still okay with that.
+
+Hmm, since "creating" a file can be a destructive operation (if size 
+requires a downwards truncation, or even if we intentionally wipe the 
+first sector so that any prior bits that resemble a different format are 
+no longer visible, or if preallocation explicitly wipes the entire 
+image...), do we want to have any safeguards in place so that creation 
+is attempted only on a newly-opened BDS, or with a force flag if size 
+does not match the current size, or so on?  That's more a question for 
+the x-blockdev-create command though, so it doesn't stop review of this 
+patch.
 
 
---lHhE5fxg1V6Y7Mw2Pa94uCIFQfKAgRgq0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>   
+> -    fd = qemu_open(filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
+> +    /* Create file */
+> +    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
+>                      0644);
 
------BEGIN PGP SIGNATURE-----
+At any rate, qemu_open() means that we be supporting /dev/fdset magic on 
+a passed-in fd.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqPUqASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AuXUH/3eSYhmhMUpcRrBx59BzLQCsLE4XCRDy
-n6Y8O5oyApEgxb6mV3R2EXsr2qOpSlsjkesNFjQHcgGL2x0sybbN8kwjpvTTeTcT
-z4W6fn6xcDa69YJa3Cs+R1hF9RJZ74z5pOqV5AFn1DLuGZt71pWr6SmgPCrG1Da8
-kCbebmWk4wX7bR390LLeP7EVv1y2mCwNCkXIIqLjdIR3jxysR4w0Hxmcpygddw3k
-TSo34oLNMgj4e2oIcB98O0TzmtyQOiG0JdFvADwG3fU2eBiJ6bmhtqYlchGkPeQz
-ErK57CG9STvvPZSyRFp9NULziytSOZeAtXyoXXOu9I8057DGxhGxDHo=
-=JqLV
------END PGP SIGNATURE-----
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
---lHhE5fxg1V6Y7Mw2Pa94uCIFQfKAgRgq0--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
