@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eotHg-00041Z-Nd
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1eotHo-00049h-Ey
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eotHf-0001hL-8A
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1eotHk-0001kA-Ho
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:56 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 22 Feb 2018 09:59:22 -0600
-Message-Id: <20180222155922.9833-5-eblake@redhat.com>
+Date: Thu, 22 Feb 2018 09:59:21 -0600
+Message-Id: <20180222155922.9833-4-eblake@redhat.com>
 In-Reply-To: <20180222155922.9833-1-eblake@redhat.com>
 References: <20180222155922.9833-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] qcow2: Avoid memory over-allocation on
- compressed images
+Subject: [Qemu-devel] [PATCH v3 3/4] qcow2: Don't allow overflow during
+ cluster allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,135 +23,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, berto@igalia.com, Max Reitz <mreitz@redhat.com>
 
-When reading a compressed image, we were allocating s->cluster_data
-to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
-with 2M clusters).  Let's check out the history:
+Our code was already checking that we did not attempt to
+allocate more clusters than what would fit in an INT64 (the
+physical maximimum if we can access a full off_t's worth of
+data).  But this does not catch smaller limits enforced by
+various spots in the qcow2 image description: L1 and normal
+clusters of L2 are documented as having bits 63-56 reserved
+for other purposes, capping our maximum offset at 64PB (bit
+55 is the maximum bit set).  And for compressed images with
+2M clusters, the cap drops the maximum offset to bit 48, or
+a maximum offset of 512TB.  If we overflow that offset, we
+would write compressed data into one place, but try to
+decompress from another, which won't work.
 
-Back when qcow2 was first written, we used s->cluster_data for
-everything, including copy_sectors() and encryption, where we want
-to operate on more than one cluster at once.  Obviously, at that
-point, the buffer had to be aligned for other users, even though
-compression itself doesn't require any alignment (the fact that
-the compressed data generally starts mid-sector means that aligning
-our buffer buys us nothing - either the protocol already supports
-byte-based access into whatever offset we want, or we are already
-using a bounce buffer to read a full sector, and copying into
-our destination no longer requires alignment).
-
-But commit 1b9f1491 (v1.1!) changed things to allocate parallel
-buffers on demand rather than sharing a single buffer, for encryption
-and COW, leaving compression as the final client of s->cluster_data.
-That use was still preserved, because if a single compressed cluster
-is read more than once, we reuse the cache instead of decompressing
-it a second time (someday, we may come up with better caching to
-avoid wasting repeated decompressions while still being more parallel,
-but that is a task for another patch; the XXX comment in
-qcow2_co_preadv for QCOW2_CLUSTER_COMPRESSED is telling).
-
-Much later, in commit de82815d (v2.2), we noticed that a 64M
-allocation is prone to failure, so we switched over to a graceful
-memory allocation error message.  Elsewhere in the code, we do
-g_malloc(2 * cluster_size) without ever checking for failure, but
-even 4M starts to be large enough that trying to be nice is worth
-the effort, so we want to keep that aspect.
-
-Then even later, in 3e4c7052 (2.11), we realized that allocating
-a large buffer up front for every qcow2 image is expensive, and
-switched to lazy allocation only for images that actually had
-compressed clusters.  But in the process, we never even bothered
-to check whether what we were allocating still made sense in its
-new context!
-
-So, it's time to cut back on the waste.  A compressed cluster
-written by qemu will NEVER occupy more than an uncompressed
-cluster, but based on mid-sector alignment, we may still need
-to read 1 cluster + 1 sector in order to recover enough bytes
-for the decompression.  But third-party producers of qcow2 may
-not be as smart, and gzip DOES document that because the
-compression stream adds metadata, and because of the pigeonhole
-principle, there are worst case scenarios where attempts to
-compress will actually inflate an image, by up to 0.015% (or 62
-sectors larger for an unfortunate 2M compression).  In fact,
-the qcow2 spec permits an all-ones sector count, plus 511 bytes
-from the sector containing the initial offset, for a maximum
-read of nearly 2 full clusters; and thanks to the way
-decompression works, even though such a value is probably too
-large for the actual compressed data, it really doesn't matter
-if we read too much (gzip ignores slop, once it has decoded a
-full cluster).  So it's easier to just allocate cluster_data
-to be as large as we can ever possibly see; even if it still
-wastes up to 2M on any image created by qcow2, that's still an
-improvment of 60M less waste than pre-patch.
+I don't have 512TB handy to prove whether things break if we
+compress so much data that we overflow that limit, and don't
+think that iotests can (quickly) test it either.  Test 138
+comes close (it corrupts an image into thinking something lives
+at 32PB, which is half the maximum for L1 sizing - although
+it relies on 512-byte clusters).  But that test points out
+that we will generally hit other limits first (such as running
+out of memory for the refcount table, or exceeding file system
+limits like 16TB on ext4, etc), so this is more a theoretical
+safety valve than something likely to be hit.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v3: tighten allocation [Berto]
-v2: actually check allocation failure (previous version meant
-to use g_malloc, but ended up posted with g_try_malloc without
-checking); add assertions outside of conditional, improve
-commit message to better match reality now that qcow2 spec bug
-has been fixed
+v3: use s->cluster_offset_mask instead of open-coding it [Berto],
+use MIN() to clamp offset on small cluster size, add spec patch
+first to justify clamping even on refcount allocations
 ---
- block/qcow2-cluster.c | 27 ++++++++++++++++++---------
- block/qcow2.c         |  2 +-
- 2 files changed, 19 insertions(+), 10 deletions(-)
+ block/qcow2.h          |  6 ++++++
+ block/qcow2-refcount.c | 21 ++++++++++++++-------
+ 2 files changed, 20 insertions(+), 7 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 85be7d5e340..af51d71d012 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1598,20 +1598,29 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
-         sector_offset = coffset & 511;
-         csize = nb_csectors * 512 - sector_offset;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 883802241fb..560008c331d 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -41,6 +41,12 @@
+ #define QCOW_MAX_CRYPT_CLUSTERS 32
+ #define QCOW_MAX_SNAPSHOTS 65536
 
--        /* Allocate buffers on first decompress operation, most images are
--         * uncompressed and the memory overhead can be avoided.  The buffers
--         * are freed in .bdrv_close().
-+        /* Allocate buffers on the first decompress operation; most
-+         * images are uncompressed and the memory overhead can be
-+         * avoided.  The buffers are freed in .bdrv_close().  qemu
-+         * never writes an inflated cluster, and gzip itself never
-+         * inflates a problematic cluster by more than 0.015%, but the
-+         * qcow2 format allows up to 1 byte short of 2 full clusters
-+         * when including the sector containing offset.  gzip ignores
-+         * trailing slop, so just allocate that much up front rather
-+         * than reject third-party images with overlarge csize.
-          */
-+        assert(!!s->cluster_data == !!s->cluster_cache);
-+        assert(csize < 2 * s->cluster_size);
-         if (!s->cluster_data) {
--            /* one more sector for decompressed data alignment */
--            s->cluster_data = qemu_try_blockalign(bs->file->bs,
--                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
-+            s->cluster_data = g_try_malloc(2 * s->cluster_size);
-             if (!s->cluster_data) {
-                 return -ENOMEM;
-             }
--        }
--        if (!s->cluster_cache) {
--            s->cluster_cache = g_malloc(s->cluster_size);
-+            s->cluster_cache = g_try_malloc(s->cluster_size);
-+            if (!s->cluster_cache) {
-+                g_free(s->cluster_data);
-+                s->cluster_data = NULL;
-+                return -ENOMEM;
-+            }
++/* Field widths in qcow2 mean normal cluster offsets cannot reach
++ * 64PB; depending on cluster size, compressed clusters can have a
++ * smaller limit (64PB for up to 16k clusters, then ramps down to
++ * 512TB for 2M clusters).  */
++#define QCOW_MAX_CLUSTER_OFFSET ((1ULL << 56) - 1)
++
+ /* 8 MB refcount table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+ #define QCOW_MAX_REFTABLE_SIZE 0x800000
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 28afbb1b5ea..c46a2257a9e 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -31,7 +31,8 @@
+ #include "qemu/bswap.h"
+ #include "qemu/cutils.h"
+
+-static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size);
++static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size,
++                                    uint64_t max);
+ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+                             int64_t offset, int64_t length, uint64_t addend,
+                             bool decrease, enum qcow2_discard_type type);
+@@ -362,7 +363,8 @@ static int alloc_refcount_block(BlockDriverState *bs,
+     }
+
+     /* Allocate the refcount block itself and mark it as used */
+-    int64_t new_block = alloc_clusters_noref(bs, s->cluster_size);
++    int64_t new_block = alloc_clusters_noref(bs, s->cluster_size,
++                                             QCOW_MAX_CLUSTER_OFFSET);
+     if (new_block < 0) {
+         return new_block;
+     }
+@@ -947,7 +949,8 @@ int qcow2_update_cluster_refcount(BlockDriverState *bs,
+
+
+ /* return < 0 if error */
+-static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size)
++static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size,
++                                    uint64_t max)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t i, nb_clusters, refcount;
+@@ -972,9 +975,9 @@ retry:
+     }
+
+     /* Make sure that all offsets in the "allocated" range are representable
+-     * in an int64_t */
++     * in the requested max */
+     if (s->free_cluster_index > 0 &&
+-        s->free_cluster_index - 1 > (INT64_MAX >> s->cluster_bits))
++        s->free_cluster_index - 1 > (max >> s->cluster_bits))
+     {
+         return -EFBIG;
+     }
+@@ -994,7 +997,7 @@ int64_t qcow2_alloc_clusters(BlockDriverState *bs, uint64_t size)
+
+     BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
+     do {
+-        offset = alloc_clusters_noref(bs, size);
++        offset = alloc_clusters_noref(bs, size, QCOW_MAX_CLUSTER_OFFSET);
+         if (offset < 0) {
+             return offset;
          }
-
-         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 288b5299d80..6ad3436e0e5 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2103,7 +2103,7 @@ static void qcow2_close(BlockDriverState *bs)
-     g_free(s->image_backing_format);
-
-     g_free(s->cluster_cache);
--    qemu_vfree(s->cluster_data);
-+    g_free(s->cluster_data);
-     qcow2_refcount_close(bs);
-     qcow2_free_snapshots(bs);
- }
+@@ -1076,7 +1079,11 @@ int64_t qcow2_alloc_bytes(BlockDriverState *bs, int size)
+     free_in_cluster = s->cluster_size - offset_into_cluster(s, offset);
+     do {
+         if (!offset || free_in_cluster < size) {
+-            int64_t new_cluster = alloc_clusters_noref(bs, s->cluster_size);
++            int64_t new_cluster;
++
++            new_cluster = alloc_clusters_noref(bs, s->cluster_size,
++                                               MIN(s->cluster_offset_mask,
++                                                   QCOW_MAX_CLUSTER_OFFSET));
+             if (new_cluster < 0) {
+                 return new_cluster;
+             }
 -- 
 2.14.3
