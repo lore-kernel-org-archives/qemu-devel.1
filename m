@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eow1t-0004jn-W5
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 13:55:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1eow6Y-0006Ia-Cq
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:00:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eow1t-0003Iq-1V
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 13:55:42 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43981)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eow1s-0003IV-RB
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 13:55:40 -0500
-Received: by mail-oi0-x241.google.com with SMTP id a207so4459951oii.10
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 10:55:40 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1eow6X-0007qm-HU
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:00:30 -0500
+References: <20180222161811.26200-1-berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ea7725b4-a06a-0be0-4fc2-80cfa4359489@redhat.com>
+Date: Thu, 22 Feb 2018 13:00:08 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-8-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-8-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 18:55:19 +0000
-Message-ID: <CAFEAcA-PzKt-gZe2FjvqZuJqFmgoziNKaDLyen9o+hToMboQWw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 07/67] target/arm: Implement
- SVE Predicate Logical Operations Group
+In-Reply-To: <20180222161811.26200-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: Test abnormally large size in
+ compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 17 February 2018 at 18:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 02/22/2018 10:18 AM, Alberto Garcia wrote:
+> L2 entries for compressed clusters have a field that indicates the
+> number of sectors used to store the data in the image.
+> 
+> That's however not the size of the compressed data itself, just the
+> number of sectors where that data is located. The actual data size is
+> usually not a multiple of the sector size, and therefore cannot be
+> represented with this field.
+> 
+> The way it works is that QEMU reads all the specified sectors and
+> starts decompressing the data until there's enough to recover the
+> original uncompressed cluster. If there are any bytes left that
+> haven't been decompressed they are simply ignored.
+> 
+> One consequence of this is that even if the size field is larger than
+> it needs to be QEMU can handle it just fine: it will read more data
+> from disk but it will ignore the extra bytes.
 
-> -void trans_PTEST(DisasContext *s, arg_PTEST *a, uint32_t insn)
-> +static void trans_PTEST(DisasContext *s, arg_PTEST *a, uint32_t insn)
->  {
+(is that true even for the corner case when the size field points beyond 
+the end of the image?  But not important to the meat of the patch)
 
-Should this be in a previous patch?
+> 
+> This test creates an image with a compressed cluster that uses 5
+> sectors (2.5 KB), increases the size field to the maximum (8192
+> sectors, or 4 MB) and verifies that the data can be read without
+> problems.
+> 
+> This test is important because while the decompressed data takes
+> exactly one cluster, the maximum value allowed in the compressed size
+> field is twice the cluster size. So although QEMU won't produce images
+> with such large values we need to make sure that it can handle them.
+> 
+> Aditionally, this patch also tests that decreasing the size corrupts
 
->      int nofs = pred_full_reg_offset(s, a->rn);
->      int gofs = pred_full_reg_offset(s, a->pg);
-> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-> index 7efaa8fe8e..d92886127a 100644
-> --- a/target/arm/sve.decode
-> +++ b/target/arm/sve.decode
-> @@ -31,6 +31,7 @@
->
->  &rri           rd rn imm
->  &rrr_esz       rd rn rm esz
-> +&rprr_s                rd pg rn rm s
->
->  ###########################################################################
->  # Named instruction formats.  These are generally used to
-> @@ -39,6 +40,9 @@
->  # Three operand with unused vector element size
->  @rd_rn_rm_e0   ........ ... rm:5 ... ... rn:5 rd:5             &rrr_esz esz=0
->
-> +# Three prediate operand, with governing predicate, flag setting
+s/Aditionally/Additionally/
 
-Three what?
+> the image since the original data can no longer be recovered.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>   tests/qemu-iotests/122     | 22 ++++++++++++++++++++++
+>   tests/qemu-iotests/122.out |  9 +++++++++
+>   2 files changed, 31 insertions(+)
+> 
 
-> +@pd_pg_pn_pm_s ........ . s:1 .. rm:4 .. pg:4 . rn:4 . rd:4    &rprr_s
 > +
->  # Basic Load/Store with 9-bit immediate offset
->  @pd_rn_i9      ........ ........ ...... rn:5 . rd:4    \
->                 &rri imm=%imm9_16_10
-> @@ -56,6 +60,18 @@ ORR_zzz              00000100 01 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
->  EOR_zzz                00000100 10 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
->  BIC_zzz                00000100 11 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
->
-> +### SVE Predicate Logical Operations Group
+> +# Reduce size of compressed data to 4 sectors: this corrupts the image
+> +poke_file "$TEST_IMG".1 $((0x800000)) "\x40\x06"
+> +$QEMU_IO -c "read  -P 0x11 0 4M" "$TEST_IMG".1 2>&1 | _filter_qemu_io | _filter_testdir
 > +
-> +# SVE predicate logical operations
-> +AND_pppp       00100101 0. 00 .... 01 .... 0 .... 0 ....       @pd_pg_pn_pm_s
-> +BIC_pppp       00100101 0. 00 .... 01 .... 0 .... 1 ....       @pd_pg_pn_pm_s
-> +EOR_pppp       00100101 0. 00 .... 01 .... 1 .... 0 ....       @pd_pg_pn_pm_s
-> +SEL_pppp       00100101 0. 00 .... 01 .... 1 .... 1 ....       @pd_pg_pn_pm_s
-> +ORR_pppp       00100101 1. 00 .... 01 .... 0 .... 0 ....       @pd_pg_pn_pm_s
-> +ORN_pppp       00100101 1. 00 .... 01 .... 0 .... 1 ....       @pd_pg_pn_pm_s
-> +NOR_pppp       00100101 1. 00 .... 01 .... 1 .... 0 ....       @pd_pg_pn_pm_s
-> +NAND_pppp      00100101 1. 00 .... 01 .... 1 .... 1 ....       @pd_pg_pn_pm_s
+
+Should we run 'qemu-img check' at this point, to see if that likewise 
+diagnoses the image as broken?  (And if it doesn't, should it be able to?)
+
+> +# Increase size of compressed data to the maximum (8192 sectors)
+> +# This makes QEMU read more data (8192 sectors instead of 5), but the
+> +# decompression algorithm stops once we have enough to restore the
+> +# uncompressed cluster, so the rest of the data is ignored
+> +poke_file "$TEST_IMG".1 $((0x800000)) "\x7f\xfe"
+> +$QEMU_IO -c "read  -P 0x11 0 4M" "$TEST_IMG".1 2>&1 | _filter_qemu_io | _filter_testdir
 > +
->  ### SVE Predicate Misc Group
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+But what you added is a strict improvement, so
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
