@@ -1,32 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42681)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1eopPz-0003AA-SO
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:52:08 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43497)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eopUK-0004HI-GJ
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:56:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1eopPw-0000NC-QB
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:52:07 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40284 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eopPw-0000MI-Gi
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:52:04 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:51:58 +0100
-References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
-	<7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
-	<20180222105755.GB4147@localhost.localdomain>
-	<37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
-	<20180222113204.GC4147@localhost.localdomain>
-	<20180222114053.GE9323@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <ab206ced-9b56-93d5-04b7-f342d45a2927@kamp.de>
-Date: Thu, 22 Feb 2018 12:51:58 +0100
+	(envelope-from <borntraeger@de.ibm.com>) id 1eopUH-0003yD-Db
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:56:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eopUH-0003xE-5T
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:56:33 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1MBt3v7080752
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 06:56:31 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9tqtex58-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 06:56:31 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 22 Feb 2018 11:51:24 -0000
+References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 22 Feb 2018 12:51:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180222114053.GE9323@redhat.com>
+In-Reply-To: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
+Content-Transfer-Encoding: 7bit
+Message-Id: <29048432-906e-5fbe-d927-0814b0c24e4d@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v8 00/13] Interactive Boot Menu for DASD
+ and SCSI Guests on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +42,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Am 22.02.2018 um 12:40 schrieb Daniel P. Berrangé:
-> On Thu, Feb 22, 2018 at 12:32:04PM +0100, Kevin Wolf wrote:
->> Am 22.02.2018 um 12:01 hat Peter Lieven geschrieben:
->>> Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
->>>> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
->>>>> On 20/02/2018 18:04, Peter Lieven wrote:
->>>>>> Hi,
->>>>>>
->>>>>> I remember we discussed a long time ago to limit the stack usage of all
->>>>>> functions that are executed in a coroutine
->>>>>> context to a very low value to be able to safely limit the coroutine
->>>>>> stack size as well.
->>>>> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
->>>>> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
->>>>> ide_atapi_cmd_reply_end.
->>>>>
->>>>> But perhaps it's not an issue, somebody needs to audit the code.
->>>> I think John intended to get rid of the recursion sometime, but I doubt
->>>> he has had the time so far.
->>> Apart from this is is possible to define special cflags in the
->>> Makefile.objs just for a subdirectory? I have patches ready to make
->>> the block layer files and other coroutine users compile with
->>> -Wstack-size=2048. But I do not want to specify each file separately.
->> Our Makefiles have lines like this:
->>
->>     iscsi.o-cflags     := $(LIBISCSI_CFLAGS)
->>
->> I don't think there is a direct mechanism to apply cflags to a whole
->> directory or just to block-obj-y/block-obj-m, but just looping over them
->> could work. I'm not a Makefile expert at all, but after some toying with
->> a simple example, something like this might work:
->>
->>     $(foreach x,$(block-obj-y),$(eval $x-cflags += -Wstack-size=2048))
-> You'll need it for anything block layer depends on too - so that's much
-> of util/, crypto/ and io/ directories at least.
->
-> So perhaps it would be shorter if we do the opposite - set -Wstack-size=2048
-> globally for everything in QEMU, and then override -Wstack-size=$BIGGER
-> for the (hopefully) few sources that have a larger stack need ?
+Series
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-I tried that already. 2048 is a strong limit for many functions.
-It breaks already as soon as some buffer has a size of PATH_MAX, but
-thats handleable. But there are some structs around that are very large.
 
-Generally, it would be a good idea to have a global limit, of course.
+menu on scsi and dasd bootmaps tested successfully.
 
-Peter
+There is one thing that we might want to fix (can be an addon patch since this is a non-customer
+scenario (no libvirt)).
+
+If you start QEMU manually without a bootindex, the -boot menu=on is ignored
+if no drive has a bootindex.
+
+For example:
+
+-drive file=/dev/dasda,if=none,id=d1 -device virtio-blk-ccw,drive=d1,bootindex=1 -boot menu=on
+does work
+
+-drive file=/dev/dasda -boot menu=on
+does not
+
+instead it prints:
+qemu-system-s390x: boot menu is not supported for this device type.
+
+and the boots up the default entry.
+
+
+
+
+On 02/21/2018 08:35 PM, Collin L. Walling wrote:
+> Due to the introduction of the QemuIplParameter block and taking some time to
+> revist some areas, a few chunks of code have been reworked to better align with
+> those changes. I also think the reworkings improve readability. The same 
+> functionality is still there, the code just looks a little different (and 
+> hopefully looks better).
+> 
+> --- [v8] ---
+> 
+> The tl;dr:
+> 
+>     cleaned up some early patches based on review, threw zipl boot option code
+>     into its own patch, refactored s390_ipl_set_boot_menu to reflect latest
+>     changes.
+> 
+> The "pls explain":
+> 
+>     * cleaned up "s390-ccw: refactor boot map table code"
+> 
+>         - removed void ptr casting in a couple of spots
+> 
+>     * cleaned up "s390-ccw: set cp_receive mask..." patch
+> 
+>         - setting the mask consumes a service interrupt, so there is no need for 
+>           a followup sclp_print
+> 
+>     * fixed uitoa based on feedback from v7
+> 
+>     * fixed alignment concerns in QemuIplParameters and renamed flags field
+> 
+>         - reasoning: necessary; better readability
+> 
+>         - s/boot_menu_flags/qipl_flags so this field can be (potentially) used for 
+>           other purposes in the future
+> 
+>         - when setting the boot menu parms in the bios, we take care to mask out
+>           the appropriate qipl_flags for boot menu specific flags
+> 
+>         - boot menu flags defines are renamed to be prefixed with "QIPL_FLAG_"
+> 
+>         - also updated comment above this struct
+> 
+>     * cleaned up "s390-ccw: read user input..." patch
+> 
+>         - defines for low core external interrupt code addr and 
+>           clock comparator interrupt code
+> 
+>         - take care to make sure buf remains null terminated when passed to read_prompt
+>     
+>     * [NEW PATCH] "s390-ccw: use zipl values when no boot menu options are present"
+> 
+>         - reasoning: better readability; further explanation of feature
+> 
+>         - *nothing new added to this patch series here*
+> 
+>         - zipl options flag setting and parsing *moved to* this patch
+> 
+>         - this attempts to better explain how these fields are used and how they get
+>           parsed
+> 
+>         - the commit message gives details on how to set these fields in the zipl
+>           configuration file
+> 
+>         - the zipl options are only set for CCW type IPL devices (since no 
+>           other devices actually support it)
+> 
+>     * refactored s390_ipl_set_boot_menu
+> 
+>         - reasoning: better readability
+> 
+>         - the idea is that we should take care to appropriately set the boot menu
+>           flags for each IPL device type from the beginning. We should not set
+>           certain flags for devices that cannot support certain features (eg SCSI 
+>           does not support zipl menus, so we should never set the use_zipl_opts flag
+>           for SCSI) 
+> 
+>         - since there are no longer boot menu fields specific to each IPL type,
+>           the switch statement is simply used to detect if the IPL device type
+>           is capable of a boot menu
+> 
+>         - since zipl flags are only set for CCW type IPL devices, I reworked 
+>           the logic and removed some indentation
+> 
+>     * s/menu_check_flags/menu_is_enabled
+> 
+>         - reasoning: better readability
+> 
+>         - no parameters
+> 
+>         - "if menu is enabled" reads better than "if these specific flag bits are set"
+> 
+>     * removed menu.h
+> 
+>         - reasoning: file not needed; less to maintain
+> 
+>         - introduction of qipl and better understanding of zipl options led to 
+>           this decision. by the end of these changes, this file ended up 
+>           housing 4 function declarations and no longer seemed necessary
+> 
+>         - all menu related function declarations are in s390-ccw.h
+> 
+>         - boot menu flags are defined in iplb.h (which aligns with hw/s390x/ipl.h)
+> 
+> --- [Summary] ---
+> 
+> These patches implement a boot menu for ECKD DASD and SCSI guests on s390x. 
+> The menu will only appear if the disk has been configured for IPL with the 
+> zIPL tool and with the following QEMU command line options:
+> 
+>     -boot menu=on[,splash-time=X] and/or -machine loadparm='prompt'
+> 
+> The following must be specified for the device to be IPL'd from:
+> 
+>     -device ...,bootindex=1
+> 
+> or via the following libvirt domain xml:
+> 
+>     <os>
+>       <bootmenu enable='yes' timeout='X'/>
+>     </os>
+> 
+>     or
+>     
+>     <disk>
+>       ...
+>       <boot order='1' loadparm='PROMPT'/>
+>     </disk>
+> 
+> Where X is some positive integer representing time in milliseconds.
+> 
+> <boot order='1' ... > must be specified for the device to be IPL'd from
+> 
+> A loadparm other than 'prompt' will disable the menu and just boot 
+> the specified entry.
+> 
+> If no boot options are specified, we will attempt to use the values
+> provided by zipl (ECKD DASD only).
+> 
+> Collin L. Walling (13):
+>   s390-ccw: refactor boot map table code
+>   s390-ccw: refactor eckd_block_num to use CHS
+>   s390-ccw: refactor IPL structs
+>   s390-ccw: update libc
+>   s390-ccw: move auxiliary IPL data to separate location
+>   s390-ccw: parse and set boot menu options
+>   s390-ccw: set up interactive boot menu parameters
+>   s390-ccw: read stage2 boot loader data to find menu
+>   s390-ccw: print zipl boot menu
+>   s390-ccw: read user input for boot index via the SCLP console
+>   s390-ccw: set cp_receive mask only when needed and consume pending
+>     service irqs
+>   s390-ccw: use zipl values when no boot menu options are present
+>   s390-ccw: interactive boot menu for scsi
+> 
+>  hw/s390x/ipl.c              |  68 ++++++++++++-
+>  hw/s390x/ipl.h              |  31 +++++-
+>  pc-bios/s390-ccw/Makefile   |   2 +-
+>  pc-bios/s390-ccw/bootmap.c  | 184 +++++++++++++++++++++++----------
+>  pc-bios/s390-ccw/bootmap.h  |  91 ++++++++++-------
+>  pc-bios/s390-ccw/iplb.h     |  24 ++++-
+>  pc-bios/s390-ccw/libc.c     |  88 ++++++++++++++++
+>  pc-bios/s390-ccw/libc.h     |  37 ++++++-
+>  pc-bios/s390-ccw/main.c     |  49 +++++----
+>  pc-bios/s390-ccw/menu.c     | 243 ++++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/s390-ccw.h |   9 ++
+>  pc-bios/s390-ccw/sclp.c     |  39 ++++---
+>  pc-bios/s390-ccw/virtio.c   |   2 +-
+>  13 files changed, 741 insertions(+), 126 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/libc.c
+>  create mode 100644 pc-bios/s390-ccw/menu.c
+> 
