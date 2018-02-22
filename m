@@ -1,29 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eowoN-00045o-1O
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:45:48 -0500
+	(envelope-from <bsd@redhat.com>) id 1eox0K-0006Qz-I0
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:58:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eowoK-0002R9-KY
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:45:47 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:39208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eowoK-0002P4-Bx
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:45:44 -0500
-Received: by mail-lf0-x244.google.com with SMTP id f75so4053840lfg.6
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 11:45:43 -0800 (PST)
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAKmqyKOw-bced1cbcvJmJE_WM1_W5cEScOf8U+CaD3o9uyuXaw@mail.gmail.com>
-References: <d131e24b911653a945e46ca2d8f90f572469e1dd.1517856214.git.alistair.francis@xilinx.com>
-	<CAKmqyKOw-bced1cbcvJmJE_WM1_W5cEScOf8U+CaD3o9uyuXaw@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 22 Feb 2018 11:45:11 -0800
-Message-ID: <CAKmqyKNT_qBzg=uCV9C5HJbqH7yxuctBwnoGK0JRKZos+JcPdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] hw: register: Run post_write hook
- on reset
+	(envelope-from <bsd@redhat.com>) id 1eox0H-0000Dz-Hf
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:58:08 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33604 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1eox0H-0000DH-CZ
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 14:58:05 -0500
+From: Bandan Das <bsd@redhat.com>
+Date: Thu, 22 Feb 2018 14:57:35 -0500
+Message-Id: <20180222195740.12726-1-bsd@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/5] Initial write support for MTP objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +21,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, eblake@redhat.com, peter.maydell@linaro.org, berrange@redhat.com
 
-On Thu, Feb 15, 2018 at 3:05 PM, Alistair Francis <alistair23@gmail.com> wr=
-ote:
-> On Mon, Feb 5, 2018 at 10:44 AM, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
->> Ensure that the post write hook is called during reset. This allows us
->> to rely on the post write functions instead of having to call them from
->> the reset() function.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> Ping!
+v5:
+  4/5,5/5: Add check for the RO bit and set response to STORE_READ_ONLY
+  
+v4:
+  4/5: Remove getumask and set default permissions to 0644
+  5/5: Remove usb_mtp_object_lookup_name out of #ifdef CONFIG_INOTIFY1
+  Test compilation on freebsd
+  
+v3:
+  3/5: Add a property that sets r/w to on/off (default:off)
+       Restructure ifdefs
+  4/5: Sort the response codes
+  5/5: Use actual names for fields in the dataset
+       Copy uint16_t to wchar_t and use wcstombs to get char type
+       for filename
+v2:
+  3/5: Set mtp store flag to read only
+  4/5: Fix compiler warnings and change default file permissions
+  5/5: Fix file permissions
 
-Ping^2
+These patches implement write support for Qemu's MTP
+emulation. Simple tests such as delete/move/edit/copy work ok.
+Current issues/TODO:
 
->
->> ---
->>
->> V2:
->>  - Update the header documentation
->>
->>  include/hw/register.h | 6 +++---
->>  hw/core/register.c    | 8 ++++++++
->>  2 files changed, 11 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/hw/register.h b/include/hw/register.h
->> index de2414e6b4..5796584588 100644
->> --- a/include/hw/register.h
->> +++ b/include/hw/register.h
->> @@ -34,7 +34,7 @@ typedef struct RegisterInfoArray RegisterInfoArray;
->>   * immediately before the actual write. The returned value is what is w=
-ritten,
->>   * giving the handler a chance to modify the written value.
->>   * @post_write: Post write callback. Passed the written value. Most wri=
-te side
->> - * effects should be implemented here.
->> + * effects should be implemented here. This is called during device res=
-et.
->>   *
->>   * @post_read: Post read callback. Passes the value that is about to be=
- returned
->>   * for a read. The return value from this function is what is ultimatel=
-y read,
->> @@ -135,8 +135,8 @@ uint64_t register_read(RegisterInfo *reg, uint64_t r=
-e, const char* prefix,
->>                         bool debug);
->>
->>  /**
->> - * reset a register
->> - * @reg: register to reset
->> + * Resets a register. This will also call the post_write hook if it exi=
-sts.
->> + * @reg: The register to reset.
->>   */
->>
->>  void register_reset(RegisterInfo *reg);
->> diff --git a/hw/core/register.c b/hw/core/register.c
->> index 900294b9c4..0741a1af32 100644
->> --- a/hw/core/register.c
->> +++ b/hw/core/register.c
->> @@ -159,13 +159,21 @@ uint64_t register_read(RegisterInfo *reg, uint64_t=
- re, const char* prefix,
->>
->>  void register_reset(RegisterInfo *reg)
->>  {
->> +    const RegisterAccessInfo *ac;
->> +
->>      g_assert(reg);
->>
->>      if (!reg->data || !reg->access) {
->>          return;
->>      }
->>
->> +    ac =3D reg->access;
->> +
->>      register_write_val(reg, reg->access->reset);
->> +
->> +    if (ac->post_write) {
->> +        ac->post_write(reg, reg->access->reset);
->> +    }
->>  }
->>
->>  void register_init(RegisterInfo *reg)
->> --
->> 2.14.1
->>
+ - File transfers > 4GB has not been tested and will probably not work
+ - Some (or most) MTP clients don't advertise hidden files and folders (names
+ that start with a .) even though iiuc Qemu MTP does advertise these files.
+ This can confuse certain applications such as text editors or git.
+ - Also related, file editors typically run fsync when saving. Depending on
+ the MTP client, it may choose not to implement it (such as simple-mtpfs that 
+ runs on top of fuse).
+ - Needs more testing :)
+
+Bandan Das (5):
+  usb-mtp: Add one more argument when building results
+  usb-mtp: print parent path in IN_IGNORED trace fn
+  usb-mtp: Support delete of mtp objects
+  usb-mtp: Introduce write support for MTP objects
+  usb-mtp: Advertise SendObjectInfo for write support
+
+ hw/usb/dev-mtp.c | 471 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 441 insertions(+), 30 deletions(-)
+
+-- 
+2.14.3
