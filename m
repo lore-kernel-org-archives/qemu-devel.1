@@ -1,44 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eol1k-0003Cr-6I
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:10:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1eolIG-0008OS-SY
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:27:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eol1d-0003RR-W6
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:10:48 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:54132)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eol1d-0003Qg-Ni
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:10:41 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180207120353.5389.54531.stgit@pasha-VirtualBox>
-	<CAFXrp_fenK2mzLSOUUcWLTR1r4_jUEN07QDqfkRDpTFEo4oHpQ@mail.gmail.com>
-	<002401d3a010$8d551280$a7ff3780$@ru>
-	<CAFXrp_c09S6e9EnT7LOYox2YMiOXN_suFo30wfqcmzwRB8zx2A@mail.gmail.com>
-	<CAFXrp_dUAZDYLUTqY0nxbGg7w4TEqD2+rNRPT+47a0B8N1Y6Aw@mail.gmail.com>
-	<001b01d3a3c5$032e09f0$098a1dd0$@ru>
-	<CAFXrp_dNj+BSYo+0rpv5d4PxdjJ1RL_cROaDWRvjQTLziFtO_Q@mail.gmail.com>
-	<000c01d3a496$fd2bc470$f7834d50$@ru>
-	<CAFXrp_cEsHH_6VQevxsrj8GTchraGKEJ_t0xhSbfajcBu-mmzg@mail.gmail.com>
-	<001a01d3a4b1$273f1a90$75bd4fb0$@ru>
-	<002201d3a4b5$2a642b80$7f2c8280$@ru>
-	<CAFEAcA9yO_4FX0J6hsdAmV7TwZd5kp9J-B2EPwm_KZxDO25bGQ@mail.gmail.com>
-	<000d01d3a590$caa17950$5fe46bf0$@ru>
-	<001201d3a957$f85ed610$e91c8230$@ru>
-	<CAFXrp_cR16EOwZp-FauZuZcwuWwB53gxSO57ggy5qud-vyzimA@mail.gmail.com>
-	<001801d3aa2f$ac7b4160$0571c420$@ru>
-	<CAFXrp_d7WDGcZ99pnfpxggYgqzHJDLRxnjNcGH1SLgbyq2Y7yQ@mail.gmail.com>
-	<001401d3aadf$00d2cbc0$02786340$@ru>
-	<CAFXrp_epimy5WRugYjojkuj-u=WLDaz=7_8w2D-r qjNUGZz0vw@mail.gmail
-	.	com> <001201d3abab$a38b77a0$eaa266e0$@ru>
-In-Reply-To: <001201d3abab$a38b77a0$eaa266e0$@ru>
-Date: Thu, 22 Feb 2018 10:10:45 +0300
-Message-ID: <001301d3abac$421392e0$c63ab8a0$@ru>
+	(envelope-from <thuth@redhat.com>) id 1eolID-00070t-Pd
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:27:52 -0500
+References: <cover.1519150239.git.balaton@eik.bme.hu>
+	<CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
+	<20180220204450.GA27101@flamenco>
+	<CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
+	<alpine.BSF.2.21.1802211754370.60913@zero.eik.bme.hu>
+	<CAFEAcA-UaWGqLHfN_Z7h+C-k=1A5ic_REaWUu0-w19ALcNJy_A@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e300f9da-8a47-7c0f-71db-2e5227c0c275@redhat.com>
+Date: Thu, 22 Feb 2018 08:27:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v6 00/20] replay additions
+In-Reply-To: <CAFEAcA-UaWGqLHfN_Z7h+C-k=1A5ic_REaWUu0-w19ALcNJy_A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/2] Firmware blob and git
+ submodule for Sam460ex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,28 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, 'Ciro Santilli' <ciro.santilli@gmail.com>
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>, richard.henderson@linaro.org, "'Emilio G. Cota'" <cota@braap.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Kevin Wolf' <kwolf@redhat.com>, war2jordan@live.com, 'Igor R' <boost.lists@gmail.com>, 'Juan Quintela' <quintela@redhat.com>, 'Jason Wang' <jasowang@redhat.com>, "'Michael S. Tsirkin'" <mst@redhat.com>, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, maria.klimushenkova@ispras.ru, 'Gerd Hoffmann' <kraxel@redhat.com>, 'Thomas Dullien' <thomas.dullien@googlemail.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, David Gibson <dgibson@redhat.com>
 
-> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
-> > From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
-> > On Wed, Feb 21, 2018 at 6:41 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> > >> From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
-> > >> On Tue, Feb 20, 2018 at 9:46 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> > >> >
-> > >> > Updated the branch on github.
-> > >> > You may try it.
-> > >>
-> > >> At 8a482834780a131e7747c1c3c1931379ed0beedc ARM initrd record runs,
-> > >> but replay is getting stuck at:
-> > >>
-> > >> [   12.120424] scsi host0: sym-2.2.3
-> 
-> Yes, I've got the same.
-> But when I use -serial stdio instead of -nographic, replay makes a pause
-> at this line and then continues and finishes successfully.
+On 21.02.2018 19:33, Peter Maydell wrote:
+> On 21 February 2018 at 17:06, BALATON Zoltan <balaton@eik.bme.hu> wrote=
+:
+>> It's not that upstream u-boot has abandoned board support (it only rem=
+oved
+>> support for the PPC440 CPU it once had). The board itself never had su=
+pport
+>> in upstream u-boot, it only exists in vendor's fork which is the reaso=
+n we
+>> need a separate source and cannot use upstream u-boot source we alread=
+y
+>> have.
+>>
+>> In my opinion we don't aim to take on support for this board in u-boot=
+, we
+>> only need to include the firmware binary for the emulation to be usefu=
+l
+>> which then requires us to also include the source for the GPL it's lic=
+ensed
+>> under. I've also found a few bugs in the firmware which I've fixed but=
+ apart
+>> from such occasional bug fixes when needed I don't expect to take over
+>> support for the board from the hardware vendor so this source is only =
+so we
+>> can include the firmware binary which is needed for the board emulatio=
+n.
+>> Does this answer your concerns?
+>=20
+> We have lots of boards we don't ship firmware blobs for and
+> which we expect the users to provide the guest code for
+> if they're going to use them.
 
-It doesn't stuck, but works much slower with -nographic. 
-You just have to wait for 5 minutes or something to notice the progress.
+... which is also somewhat unfortunate. Have you ever tried to run one
+of those boards to see whether you've broken something with your code
+changes or not? Hunting the firmware for such a board can be quite
+challenging. I'm not saying that we should now try to include way more
+firmware blobs in our repository (its size would explode, I guess), but
+maybe we should at least start a Wiki page with links to the various
+firmware images or so?
 
-Pavel Dovgalyuk
+ Thomas
