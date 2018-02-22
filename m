@@ -1,22 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eojUl-0002ON-NW
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:32:40 -0500
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1eojoE-00052u-Uv
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:52:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eojUh-0002DN-QR
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:32:39 -0500
-References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1519241752-28083-7-git-send-email-walling@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4c21b669-87d1-7f64-2db2-8dd04961c42e@redhat.com>
-Date: Thu, 22 Feb 2018 06:32:14 +0100
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1eojoA-0002K7-Ah
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:52:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1eojoA-0002JG-2W
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 00:52:42 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1M5ojmJ059920
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 00:52:39 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9kd10y4d-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 00:52:39 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Thu, 22 Feb 2018 05:52:37 -0000
+Date: Thu, 22 Feb 2018 11:22:29 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1519022574-6817-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1519022574-6817-2-git-send-email-bharata@linux.vnet.ibm.com>
+	<20180220153510.27451354@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1519241752-28083-7-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 06/13] s390-ccw: parse and
- set boot menu options
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180220153510.27451354@redhat.com>
+Message-Id: <20180222055229.GC30038@in.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v0 1/2] pc-dimm: Make
+ pc_dimm_built_list() global
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +44,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com
 
-On 21.02.2018 20:35, Collin L. Walling wrote:
-> Set boot menu options for an s390 guest and store them in
-> the iplb. These options are set via the QEMU command line
-> option:
+On Tue, Feb 20, 2018 at 03:35:10PM +0100, Igor Mammedov wrote:
+> On Mon, 19 Feb 2018 12:12:53 +0530
+> Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
 > 
->     -boot menu=on|off[,splash-time=X]
+> > Making pc_dimm_built_list() global allows other parts of QEMU code
+> > to build and walk through the DIMM list in address-sorted order.
+> > 
+> > This is needed in the next patch for sPAPR code to create
+> > ibm,dynamic-memory-v2 device tree property that will have entries
+> > for populated DIMMs as well as available hotpluggable areas.
+> > 
+> > CHECK: List of DIMMs is already available via qmp_pc_dimm_device_list(),
+> maybe make it sorted first and use it?
 > 
-> or via the libvirt domain xml:
+> (i.e. use pc_dimm_built_list in qmp_pc_dimm_device_list) and hide
+> recursive callback ugliness from external users.
 > 
->     <os>
->       <bootmenu enable='yes|no' timeout='X'/>
->     </os>
-> 
-> Where X represents some positive integer representing
-> milliseconds.
-> 
-> Any value set for loadparm will override all boot menu options.
-> If loadparm=PROMPT, then the menu will be enabled without a
-> timeout.
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c          | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/ipl.h          |  9 +++++++--
->  pc-bios/s390-ccw/iplb.h |  9 +++++++--
->  3 files changed, 58 insertions(+), 4 deletions(-)
+> MemoryDeviceInfoList *qmp_pc_dimm_device_list(void) {
+>     object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &list);
+>     ...
+> }
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks will attempt this in my next version.
+
+Regards,
+Bharata.
