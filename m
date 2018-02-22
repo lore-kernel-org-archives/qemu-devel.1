@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhenyuw@linux.intel.com>) id 1eokf1-00053r-TX
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:47:20 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eokwb-00089g-PZ
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhenyuw@linux.intel.com>) id 1eokex-00011d-Fn
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:47:19 -0500
-Received: from mga05.intel.com ([192.55.52.43]:14430)
+	(envelope-from <kraxel@redhat.com>) id 1eokwX-00084v-QJ
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:05:29 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50250 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhenyuw@linux.intel.com>)
-	id 1eokew-0000o0-NF
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:47:15 -0500
-Date: Thu, 22 Feb 2018 14:40:03 +0800
-From: Zhenyu Wang <zhenyuw@linux.intel.com>
-Message-ID: <20180222064003.yzrcmh7hi6qvgcij@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20180219111458.25983-1-kraxel@redhat.com>
-	<20180219151649.13a197f9@w520.home>
-	<20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
-	<20180220170417.p7hkqbong5euul7p@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eokwX-000841-Gn
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:05:25 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2AECE40753A2
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:05:20 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 22 Feb 2018 08:05:13 +0100
+Message-Id: <20180222070513.8740-6-kraxel@redhat.com>
+In-Reply-To: <20180222070513.8740-1-kraxel@redhat.com>
+References: <20180222070513.8740-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4uudmaxut5sqcxbt"
-Content-Disposition: inline
-In-Reply-To: <20180220170417.p7hkqbong5euul7p@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 5/5] keymap: consider modifier state when
+ picking a mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +33,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>, intel-gvt-dev@lists.freedesktop.org, qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
+Pass the modifier state to the keymap lookup function.  In case multiple
+keysym -> keycode mappings exist look at the modifier state and prefer
+the mapping where the modifier state matches.
 
---4uudmaxut5sqcxbt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ ui/keymaps.h |  3 ++-
+ ui/curses.c  |  3 ++-
+ ui/keymaps.c | 33 ++++++++++++++++++++++++++++++++-
+ ui/sdl.c     |  6 +++++-
+ ui/vnc.c     |  9 +++++++--
+ 5 files changed, 48 insertions(+), 6 deletions(-)
 
-On 2018.02.20 18:04:17 +0100, Gerd Hoffmann wrote:
->   Hi,
->=20
-> > Sneak preview at https://www.kraxel.org/cgit/qemu/log/?h=3Dwork/intel-v=
-gpu
-> > Note: branch is a moving target ;)
-> >=20
-> > State:
-> >   spice: Partly working (no mouse ptr yet).
->=20
-> Working now, in case anyone wants play.
->=20
-> Must turn on opengl and use a unix socket, i.e. this:
->=20
->   qemu -spice disable-ticketing,gl=3Don,unix,addr=3D/tmp/spice-vgpu
->=20
-> and this:
->=20
->   remote-viewer spice+unix:////tmp/spice-vgpu
->=20
-> Host needs a 4.16-rc kernel.
->=20
-> Guest can be older, most of the time I'm testing with the Fedora 27 live
-> iso (4.13) which works ok.
->=20
-
-Nice! Seems to be the last missing gap for local spice with cursor
-dmabuf support, we'll do more testing on that for sure. Btw, another
-method might be to add direct cursor dmabuf passing for spice as gl
-output, is that correct way?
-
-And really like to see dmabuf support could be in upstream soon. Do
-you have any predict for which qemu version?
-
-Thanks!
-
+diff --git a/ui/keymaps.h b/ui/keymaps.h
+index 17ec03387a..0693588225 100644
+--- a/ui/keymaps.h
++++ b/ui/keymaps.h
+@@ -54,7 +54,8 @@ typedef struct kbd_layout_t kbd_layout_t;
+=20
+ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+                                    const char *language);
+-int keysym2scancode(kbd_layout_t *k, int keysym);
++int keysym2scancode(kbd_layout_t *k, int keysym,
++                    bool shift, bool altgr, bool ctrl);
+ int keycode_is_keypad(kbd_layout_t *k, int keycode);
+ int keysym_is_numlock(kbd_layout_t *k, int keysym);
+=20
+diff --git a/ui/curses.c b/ui/curses.c
+index 479b77bd03..597e47fd4a 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -271,7 +271,8 @@ static void curses_refresh(DisplayChangeListener *dcl=
+)
+                     keysym =3D chr;
+             }
+=20
+-            keycode =3D keysym2scancode(kbd_layout, keysym & KEYSYM_MASK=
+);
++            keycode =3D keysym2scancode(kbd_layout, keysym & KEYSYM_MASK=
+,
++                                      false, false, false);
+             if (keycode =3D=3D 0)
+                 continue;
+=20
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 1eba6d7057..43fe604724 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -176,8 +176,12 @@ kbd_layout_t *init_keyboard_layout(const name2keysym=
+_t *table,
+ }
+=20
+=20
+-int keysym2scancode(kbd_layout_t *k, int keysym)
++int keysym2scancode(kbd_layout_t *k, int keysym,
++                    bool shift, bool altgr, bool ctrl)
+ {
++    static const uint32_t mask =3D
++        SCANCODE_SHIFT | SCANCODE_ALTGR | SCANCODE_CTRL;
++    uint32_t mods, i;
+     struct keysym2code *keysym2code;
+=20
+ #ifdef XK_ISO_Left_Tab
+@@ -193,6 +197,33 @@ int keysym2scancode(kbd_layout_t *k, int keysym)
+         return 0;
+     }
+=20
++    if (keysym2code->count =3D=3D 1) {
++        return keysym2code->keycodes[0];
++    }
++
++    /*
++     * We have multiple keysym -> keycode mappings.
++     *
++     * Check whenever we find one mapping where the modifier state of
++     * the mapping matches the current user interface modifier state.
++     * If so, prefer that one.
++     */
++    mods =3D 0;
++    if (shift) {
++        mods |=3D SCANCODE_SHIFT;
++    }
++    if (altgr) {
++        mods |=3D SCANCODE_ALTGR;
++    }
++    if (ctrl) {
++        mods |=3D SCANCODE_CTRL;
++    }
++
++    for (i =3D 0; i < keysym2code->count; i++) {
++        if ((keysym2code->keycodes[i] & mask) =3D=3D mods) {
++            return keysym2code->keycodes[i];
++        }
++    }
+     return keysym2code->keycodes[0];
+ }
+=20
+diff --git a/ui/sdl.c b/ui/sdl.c
+index 963cdf77a7..c4ae7ab05d 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -201,6 +201,9 @@ static kbd_layout_t *kbd_layout =3D NULL;
+=20
+ static uint8_t sdl_keyevent_to_keycode_generic(const SDL_KeyboardEvent *=
+ev)
+ {
++    bool shift =3D modifiers_state[0x2a] || modifiers_state[0x36];
++    bool altgr =3D modifiers_state[0xb8];
++    bool ctrl  =3D modifiers_state[0x1d] || modifiers_state[0x9d];
+     int keysym;
+     /* workaround for X11+SDL bug with AltGR */
+     keysym =3D ev->keysym.sym;
+@@ -210,7 +213,8 @@ static uint8_t sdl_keyevent_to_keycode_generic(const =
+SDL_KeyboardEvent *ev)
+     if (keysym =3D=3D 92 && ev->keysym.scancode =3D=3D 133) {
+         keysym =3D 0xa5;
+     }
+-    return keysym2scancode(kbd_layout, keysym) & SCANCODE_KEYMASK;
++    return keysym2scancode(kbd_layout, keysym,
++                           shift, altgr, ctrl) & SCANCODE_KEYMASK;
+ }
+=20
+=20
+diff --git a/ui/vnc.c b/ui/vnc.c
+index a77b568b57..d19f86c7f4 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1734,7 +1734,8 @@ static void reset_keys(VncState *vs)
+=20
+ static void press_key(VncState *vs, int keysym)
+ {
+-    int keycode =3D keysym2scancode(vs->vd->kbd_layout, keysym) & SCANCO=
+DE_KEYMASK;
++    int keycode =3D keysym2scancode(vs->vd->kbd_layout, keysym,
++                                  false, false, false) & SCANCODE_KEYMAS=
+K;
+     qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, true);
+     qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
+     qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, false);
+@@ -1993,6 +1994,9 @@ static const char *code2name(int keycode)
+=20
+ static void key_event(VncState *vs, int down, uint32_t sym)
+ {
++    bool shift =3D vs->modifiers_state[0x2a] || vs->modifiers_state[0x36=
+];
++    bool altgr =3D vs->modifiers_state[0xb8];
++    bool ctrl  =3D vs->modifiers_state[0x1d] || vs->modifiers_state[0x9d=
+];
+     int keycode;
+     int lsym =3D sym;
+=20
+@@ -2000,7 +2004,8 @@ static void key_event(VncState *vs, int down, uint3=
+2_t sym)
+         lsym =3D lsym - 'A' + 'a';
+     }
+=20
+-    keycode =3D keysym2scancode(vs->vd->kbd_layout, lsym & 0xFFFF) & SCA=
+NCODE_KEYMASK;
++    keycode =3D keysym2scancode(vs->vd->kbd_layout, lsym & 0xFFFF,
++                              shift, altgr, ctrl) & SCANCODE_KEYMASK;
+     trace_vnc_key_event_map(down, sym, keycode, code2name(keycode));
+     do_key_event(vs, down, keycode, sym);
+ }
 --=20
-Open Source Technology Center, Intel ltd.
-
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
-
---4uudmaxut5sqcxbt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCWo5lwwAKCRCxBBozTXgY
-J4qwAJ41alj0iAyuzk+xiILnF4TscX3IHwCfTCcoQ/uW5OJuX3dysZnQLliABQ8=
-=EUW2
------END PGP SIGNATURE-----
-
---4uudmaxut5sqcxbt--
+2.9.3
