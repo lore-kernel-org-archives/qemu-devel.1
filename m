@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1eomVN-0001LN-EM
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:45:31 -0500
+	(envelope-from <drjones@redhat.com>) id 1eomk6-0004S3-IY
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1eomVK-0002r4-7N
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:45:29 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:56663)
+	(envelope-from <drjones@redhat.com>) id 1eomjw-000133-57
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:00:42 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38588 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1eomVJ-0002qF-PO
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:45:26 -0500
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 22 Feb 2018 11:45:07 +0300
-Message-id: <1519289107-20251-2-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1519289107-20251-1-git-send-email-a.perevalov@samsung.com>
-References: <1519289107-20251-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20180222084520eucas1p16aa4a165d2e1c0f5ec4da12257eda269@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH v4] migration: change blocktime type to uint32_t
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1eomjv-00012M-UO
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:00:32 -0500
+Date: Thu, 22 Feb 2018 10:00:12 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180222090012.mtwfbrbi3gayedcp@kamzik.brq.redhat.com>
+References: <20180222044417.15561-1-wei@redhat.com>
+	<20180222044417.15561-4-wei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180222044417.15561-4-wei@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V4 3/3] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,228 +28,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, dgilbert@redhat.com, quintela@redhat.com
 
-Initially int64_t was used, but on PowerPC architecture,
-clang doesn't have atomic_*_8 function, so it produces
-link time error.
+On Wed, Feb 21, 2018 at 10:44:17PM -0600, Wei Huang wrote:
+> This patch adds migration test support for aarch64. The test code, which
+> implements the same functionality as x86, is booted as a kernel in qemu.
+> Here are the design choices we make for aarch64:
+> 
+>  * We choose this -kernel approach because aarch64 QEMU doesn't provide a
+>    built-in fw like x86 does. So instead of relying on a boot loader, we
+>    use -kernel approach for aarch64.
+>  * The serial output is sent to PL011 directly.
+>  * The physical memory base for mach-virt machine is 0x40000000. We change
+>    the start_address and end_address for aarch64.
+> 
+> In addition to providing the binary, this patch also includes the source
+> code and the build script in tests/migration/. So users can change the
+> source and/or re-compile the binary as they wish.
+> 
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  tests/Makefile.include               |  1 +
+>  tests/migration-test.c               | 47 +++++++++++++++++++++---
+>  tests/migration/Makefile             | 12 +++++-
+>  tests/migration/aarch64-a-b-kernel.S | 71 ++++++++++++++++++++++++++++++++++++
+>  tests/migration/aarch64-a-b-kernel.h | 19 ++++++++++
+>  tests/migration/migration-test.h     |  5 +++
+>  6 files changed, 147 insertions(+), 8 deletions(-)
+>  create mode 100644 tests/migration/aarch64-a-b-kernel.S
+>  create mode 100644 tests/migration/aarch64-a-b-kernel.h
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index a1bcbffe12..df9f64438f 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -372,6 +372,7 @@ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
+>  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+>  check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
+>  check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
+> +check-qtest-aarch64-y += tests/migration-test$(EXESUF)
+>  
+>  check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
+>  
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index e2e06ed337..a4f6732a59 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -11,6 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include <sys/utsname.h>
+>  
+>  #include "libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+> @@ -23,8 +24,8 @@
+>  
+>  #include "migration/migration-test.h"
+>  
+> -const unsigned start_address = TEST_MEM_START;
+> -const unsigned end_address = TEST_MEM_END;
+> +unsigned start_address = TEST_MEM_START;
+> +unsigned end_address = TEST_MEM_END;
+>  bool got_stop;
+>  
+>  #if defined(__linux__)
+> @@ -81,12 +82,13 @@ static const char *tmpfs;
+>   * outputting a 'B' every so often if it's still running.
+>   */
+>  #include "tests/migration/x86-a-b-bootblock.h"
+> +#include "tests/migration/aarch64-a-b-kernel.h"
+>  
+> -static void init_bootfile_x86(const char *bootpath)
+> +static void init_bootfile(const char *bootpath, void *content)
+>  {
+>      FILE *bootfile = fopen(bootpath, "wb");
+>  
+> -    g_assert_cmpint(fwrite(x86_bootsect, 512, 1, bootfile), ==, 1);
+> +    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
+>      fclose(bootfile);
+>  }
+>  
+> @@ -393,7 +395,7 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>      got_stop = false;
+>  
+>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+> -        init_bootfile_x86(bootpath);
+> +        init_bootfile(bootpath, x86_bootsect);
+>          cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
+>                                    " -name source,debug-threads=on"
+>                                    " -serial file:%s/src_serial"
+> @@ -422,6 +424,39 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>                                    " -serial file:%s/dest_serial"
+>                                    " -incoming %s",
+>                                    accel, tmpfs, uri);
+> +    } else if (strcmp(arch, "aarch64") == 0) {
+> +        const char *cpu;
+> +        const char *gic_ver;
+> +        struct utsname utsname;
+> +
+> +        /* kvm and tcg need different cpu and gic-version configs */
+> +        if (access("/dev/kvm", F_OK) == 0 && uname(&utsname) == 0 &&
+> +            strcmp(utsname.machine, "aarch64") == 0) {
+> +            accel = "kvm";
+> +            cpu = "host";
+> +            gic_ver = "host";
+> +        } else {
+> +            accel = "tcg";
+> +            cpu = "cortex-a57";
+> +            gic_ver = "2";
+> +        }
+> +
+> +        init_bootfile(bootpath, aarch64_kernel);
+> +        cmd_src = g_strdup_printf("-machine virt,accel=%s,gic-version=%s "
+> +                                  "-name vmsource,debug-threads=on -cpu %s "
+> +                                  "-m 150M -serial file:%s/src_serial "
+> +                                  "-kernel %s ",
+> +                                  accel, gic_ver, cpu, tmpfs, bootpath);
+> +        cmd_dst = g_strdup_printf("-machine virt,accel=%s,gic-version=%s "
+> +                                  "-name vmdest,debug-threads=on -cpu %s "
+> +                                  "-m 150M -serial file:%s/dest_serial "
+> +                                  "-kernel %s "
+> +                                  "-incoming %s ",
+> +                                  accel, gic_ver, cpu, tmpfs, bootpath, uri);
+> +
+> +        /* aarch64 virt machine physical memory starts at 0x40000000 */
+> +        start_address = ARM_TEST_MEM_START;
+> +        end_address = ARM_TEST_MEM_END;
+>      } else {
+>          g_assert_not_reached();
+>      }
+> @@ -506,7 +541,7 @@ static void test_deprecated(void)
+>  {
+>      QTestState *from;
+>  
+> -    from = qtest_start("");
+> +    from = qtest_start("-machine none");
+>  
+>      deprecated_set_downtime(from, 0.12345);
+>      deprecated_set_speed(from, "12345");
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> index b768d0729d..b72d41367f 100644
+> --- a/tests/migration/Makefile
+> +++ b/tests/migration/Makefile
+> @@ -15,6 +15,7 @@ cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call cross-ld,$(1)))))
+>  find-cross-prefix = $(subst gcc,,$(notdir $(call cross-gcc,$(1))))
+>  
+>  x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> +aarch64_cross_prefix := $(call find-cross-prefix,aarch64)
+>  
+>  export __note
+>  override define __note
+> @@ -25,7 +26,7 @@ override define __note
+>   */
+>  endef
+>  
+> -all: x86-a-b-bootblock.h
+> +all: x86-a-b-bootblock.h aarch64-a-b-kernel.h
+>  
+>  x86-a-b-bootblock.h: x86-a-b-bootblock.S
+>  	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
+> @@ -34,5 +35,12 @@ x86-a-b-bootblock.h: x86-a-b-bootblock.S
+>  	echo "$$__note" > $@
+>  	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
+>  
+> +aarch64-a-b-kernel.h: aarch64-a-b-kernel.S
+> +	$(aarch64_cross_prefix)gcc -o aarch64.elf -nostdlib \
+> +		-Wl,--build-id=none,-Ttext=40080000 $<
 
-QEMU is working with time as with 64bit value, but by
-fact 32 bit is enough with CLOCK_REALTIME. In this case
-blocktime will keep only 1200 hours time interval.
+Adding the arm64 Linux kernel offset here is a bit subtle. And, since the
+TEST_MEM_START is at 1M, that only leaves 512K for test code and data.
+I think you may want to define this offset somewhere, making it less
+subtle, and then also factor it in when computing the test mem start.
 
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-Acked-by: Eric Blake <eblake@redhat.com>
----
- hmp.c                    |  4 ++--
- migration/postcopy-ram.c | 52 ++++++++++++++++++++++++++++--------------------
- migration/trace-events   |  4 ++--
- qapi/migration.json      |  4 ++--
- 4 files changed, 36 insertions(+), 28 deletions(-)
+> +	$(aarch64_cross_prefix)objcopy -O binary aarch64.elf aarch64.kernel
+> +	echo "$$__note" > $@
+> +	xxd -i aarch64.kernel | sed -e 's/.*int.*//' >> $@
+> +
+>  clean:
+> -	rm -f *.bootsect *.boot *.o
+> +	rm -f *.bootsect *.boot *.o *.elf *.kernel
+> diff --git a/tests/migration/aarch64-a-b-kernel.S b/tests/migration/aarch64-a-b-kernel.S
+> new file mode 100644
+> index 0000000000..deadcbbdc6
+> --- /dev/null
+> +++ b/tests/migration/aarch64-a-b-kernel.S
+> @@ -0,0 +1,71 @@
+> +#
+> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
+> +#
+> +# Author:
+> +#   Wei Huang <wei@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +# See the COPYING file in the top-level directory.
+> +
+> +#include "migration-test.h"
+> +
+> +.section .text
+> +
+> +        .globl  _start
+> +
+> +_start:
+> +        /* disable MMU to use phys mem address */
+> +        mrs     x0, sctlr_el1
+> +        bic     x0, x0, #(1<<0)
+> +        msr     sctlr_el1, x0
+> +        isb
+> +
+> +        /* traverse 1M-100M */
 
-diff --git a/hmp.c b/hmp.c
-index be091e0..ec90043 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -267,7 +267,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-     }
- 
-     if (info->has_postcopy_blocktime) {
--        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
-+        monitor_printf(mon, "postcopy blocktime: %u\n",
-                        info->postcopy_blocktime);
-     }
- 
-@@ -275,7 +275,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-         Visitor *v;
-         char *str;
-         v = string_output_visitor_new(false, &str);
--        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
-+        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
-         visit_complete(v, &str);
-         monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
-         g_free(str);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 05475e0..c46225c 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -63,16 +63,17 @@ struct PostcopyDiscardState {
- 
- typedef struct PostcopyBlocktimeContext {
-     /* time when page fault initiated per vCPU */
--    int64_t *page_fault_vcpu_time;
-+    uint32_t *page_fault_vcpu_time;
-     /* page address per vCPU */
-     uintptr_t *vcpu_addr;
--    int64_t total_blocktime;
-+    uint32_t total_blocktime;
-     /* blocktime per vCPU */
--    int64_t *vcpu_blocktime;
-+    uint32_t *vcpu_blocktime;
-     /* point in time when last page fault was initiated */
--    int64_t last_begin;
-+    uint32_t last_begin;
-     /* number of vCPU are suspended */
-     int smp_cpus_down;
-+    uint64_t start_time;
- 
-     /*
-      * Handler for exit event, necessary for
-@@ -99,22 +100,23 @@ static void migration_exit_cb(Notifier *n, void *data)
- static struct PostcopyBlocktimeContext *blocktime_context_new(void)
- {
-     PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
--    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
-+    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
-     ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
--    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
-+    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
- 
-     ctx->exit_notifier.notify = migration_exit_cb;
-+    ctx->start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-     qemu_add_exit_notifier(&ctx->exit_notifier);
-     return ctx;
- }
- 
--static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
-+static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
- {
--    int64List *list = NULL, *entry = NULL;
-+    uint32List *list = NULL, *entry = NULL;
-     int i;
- 
-     for (i = smp_cpus - 1; i >= 0; i--) {
--        entry = g_new0(int64List, 1);
-+        entry = g_new0(uint32List, 1);
-         entry->value = ctx->vcpu_blocktime[i];
-         entry->next = list;
-         list = entry;
-@@ -145,7 +147,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
-     info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
- }
- 
--static uint64_t get_postcopy_total_blocktime(void)
-+static uint32_t get_postcopy_total_blocktime(void)
- {
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
-@@ -610,6 +612,13 @@ static int get_mem_fault_cpu_index(uint32_t pid)
-     return -1;
- }
- 
-+static uint32_t get_low_time_offset(PostcopyBlocktimeContext *dc)
-+{
-+    int64_t start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) -
-+                                    dc->start_time;
-+    return start_time_offset < 1 ? 1 : start_time_offset & UINT32_MAX;
-+}
-+
- /*
-  * This function is being called when pagefault occurs. It
-  * tracks down vCPU blocking time.
-@@ -624,7 +633,7 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
-     int cpu, already_received;
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
--    int64_t now_ms;
-+    uint32_t low_time_offset;
- 
-     if (!dc || ptid == 0) {
-         return;
-@@ -634,14 +643,14 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
-         return;
-     }
- 
--    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    low_time_offset = get_low_time_offset(dc);
-     if (dc->vcpu_addr[cpu] == 0) {
-         atomic_inc(&dc->smp_cpus_down);
-     }
- 
--    atomic_xchg__nocheck(&dc->last_begin, now_ms);
--    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
--    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
-+    atomic_xchg(&dc->last_begin, low_time_offset);
-+    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
-+    atomic_xchg(&dc->vcpu_addr[cpu], addr);
- 
-     /* check it here, not at the begining of the function,
-      * due to, check could accur early than bitmap_set in
-@@ -688,22 +697,20 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-     int i, affected_cpu = 0;
--    int64_t now_ms;
-     bool vcpu_total_blocktime = false;
--    int64_t read_vcpu_time;
-+    uint32_t read_vcpu_time, low_time_offset;
- 
-     if (!dc) {
-         return;
-     }
- 
--    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
--
-+    low_time_offset = get_low_time_offset(dc);
-     /* lookup cpu, to clear it,
-      * that algorithm looks straighforward, but it's not
-      * optimal, more optimal algorithm is keeping tree or hash
-      * where key is address value is a list of  */
-     for (i = 0; i < smp_cpus; i++) {
--        uint64_t vcpu_blocktime = 0;
-+        uint32_t vcpu_blocktime = 0;
- 
-         read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
-         if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
-@@ -711,7 +718,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
-             continue;
-         }
-         atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
--        vcpu_blocktime = now_ms - read_vcpu_time;
-+        vcpu_blocktime = low_time_offset - read_vcpu_time;
-         affected_cpu += 1;
-         /* we need to know is that mark_postcopy_end was due to
-          * faulted page, another possible case it's prefetched
-@@ -726,7 +733,8 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
- 
-     atomic_sub(&dc->smp_cpus_down, affected_cpu);
-     if (vcpu_total_blocktime) {
--        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
-+        dc->total_blocktime += low_time_offset - atomic_fetch_add(
-+                &dc->last_begin, 0);
-     }
-     trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
-                                       affected_cpu);
-diff --git a/migration/trace-events b/migration/trace-events
-index 59b1a2d..def03c4 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
- process_incoming_migration_co_postcopy_end_main(void) ""
- migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
- migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
--mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
--mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
-+mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
-+mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
- 
- # migration/rdma.c
- qemu_rdma_accept_incoming_migration(void) ""
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 90d125c..c4737f8 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -175,8 +175,8 @@
-            '*setup-time': 'int',
-            '*cpu-throttle-percentage': 'int',
-            '*error-desc': 'str',
--           '*postcopy-blocktime' : 'int64',
--           '*postcopy-vcpu-blocktime': ['int64']} }
-+           '*postcopy-blocktime' : 'uint32',
-+           '*postcopy-vcpu-blocktime': ['uint32']} }
- 
- ##
- # @query-migrate:
--- 
-2.7.4
+s/1M-100M/the test memory region/
+
+There's no reason to create nice defines if we still have to maintain
+the comments.
+
+> +        mov     x0, #ARM_TEST_MEM_START
+> +        mov     x1, #ARM_TEST_MEM_END
+> +
+> +        /* output char 'A' to PL011 */
+> +        mov     w3, 'A'
+> +        mov     x2, #ARM_MACH_VIRT_UART
+> +        strb    w3, [x2]
+> +
+> +        /* clean up memory */
+> +        mov     w3, #0
+> +        mov     x4, x0
+> +clean:
+> +        strb    w3, [x4]
+> +        add     x4, x4, #TEST_MEM_PAGE_SIZE
+> +        cmp     x4, x1
+> +        ble     clean
+> +
+> +        /* w5 keeps a counter so we can limit the output speed */
+> +        mov     w5, #0
+> +
+> +        /* main body */
+> +mainloop:
+> +        mov     x4, x0
+> +
+> +innerloop:
+> +        /* clean cache because el2 might still cache guest data under KVM */
+> +        dc      civac, x4
+> +
+> +        /* increment the first byte of each 4KB page by 1 */
+
+s/4KB page/page/
+
+> +        ldrb    w3, [x4]
+> +        add     w3, w3, #1
+> +        and     w3, w3, #0xff
+> +        strb    w3, [x4]
+> +
+> +        add     x4, x4, #TEST_MEM_PAGE_SIZE
+> +        cmp     x4, x1
+> +        blt     innerloop
+> +
+> +        add     w5, w5, #1
+> +        and     w5, w5, #0xff
+> +        cmp     w5, #0
+> +        bne     mainloop
+> +
+> +        /* output char 'B' to PL011 */
+> +        mov     w3, 'B'
+> +        strb    w3, [x2]
+> +
+> +        bl      mainloop
+
+nit: should use just 'b' here, no need to set the link register.
+
+> diff --git a/tests/migration/aarch64-a-b-kernel.h b/tests/migration/aarch64-a-b-kernel.h
+> new file mode 100644
+> index 0000000000..a3dab67aed
+> --- /dev/null
+> +++ b/tests/migration/aarch64-a-b-kernel.h
+> @@ -0,0 +1,19 @@
+> +/* This file is automatically generated from
+> + * tests/migration/aarch64-a-b-kernel.S, edit that and then run
+> + * "make aarch64-a-b-kernel.h" inside tests/migration to update,
+> + * and then remember to send both in your patch submission.
+> + */
+> +unsigned char aarch64_kernel[] = {
+> +  0x00, 0x10, 0x38, 0xd5, 0x00, 0xf8, 0x7f, 0x92, 0x00, 0x10, 0x18, 0xd5,
+> +  0xdf, 0x3f, 0x03, 0xd5, 0x00, 0x02, 0xa8, 0xd2, 0x01, 0xc8, 0xa8, 0xd2,
+> +  0x23, 0x08, 0x80, 0x52, 0x02, 0x20, 0xa1, 0xd2, 0x43, 0x00, 0x00, 0x39,
+> +  0x03, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x83, 0x00, 0x00, 0x39,
+> +  0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb, 0xad, 0xff, 0xff, 0x54,
+> +  0x05, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x24, 0x7e, 0x0b, 0xd5,
+> +  0x83, 0x00, 0x40, 0x39, 0x63, 0x04, 0x00, 0x11, 0x63, 0x1c, 0x00, 0x12,
+> +  0x83, 0x00, 0x00, 0x39, 0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb,
+> +  0x2b, 0xff, 0xff, 0x54, 0xa5, 0x04, 0x00, 0x11, 0xa5, 0x1c, 0x00, 0x12,
+> +  0xbf, 0x00, 0x00, 0x71, 0x81, 0xfe, 0xff, 0x54, 0x43, 0x08, 0x80, 0x52,
+> +  0x43, 0x00, 0x00, 0x39, 0xf1, 0xff, 0xff, 0x97
+> +};
+> +
+> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
+> index a618fe069e..8c3fef3a0c 100644
+> --- a/tests/migration/migration-test.h
+> +++ b/tests/migration/migration-test.h
+> @@ -15,5 +15,10 @@
+>  /* PPC */
+>  #define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
+>  
+> +/* AArch64 */
+> +#define ARM_MACH_VIRT_UART  0x09000000
+> +#define ARM_TEST_MEM_START  (0x40000000 + TEST_MEM_START)
+> +#define ARM_TEST_MEM_END    (0x40000000 + TEST_MEM_END)
+> +
+
+As stated above, this should be something like
+
+#define ARM_TEST_MEM_START (0x40000000 + ARM64_KERNEL_OFFSET + TEST_MEM_START)
+#define ARM_TEST_MEM_END   (0x40000000 + ARM64_KERNEL_OFFSET + TEST_MEM_END)
+
+Otherwise, it's not even obvious that TEST_MEM_START > ARM64_KERNEL_OFFSET
+
+Thanks,
+drew
+
+>  #endif /* _TEST_MIGRATION_H_ */
+>  
+> -- 
+> 2.14.3
+> 
+> 
