@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rndfax@yandex.ru>) id 1eoqE9-0005Bc-Ao
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:43:58 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eoqEd-0005W8-Rp
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rndfax@yandex.ru>) id 1eoqE5-0004ML-Fn
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:43:57 -0500
-Received: from forward105p.mail.yandex.net ([77.88.28.108]:49844)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rndfax@yandex.ru>) id 1eoqE5-0004Jb-2S
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:43:53 -0500
-From: Aleksey Kuleshov <rndfax@yandex.ru>
-In-Reply-To: <20180222121351.26191-1-berrange@redhat.com>
-References: <20180222121351.26191-1-berrange@redhat.com>
-MIME-Version: 1.0
-Message-Id: <1900481519303427@web43g.yandex.ru>
-Date: Thu, 22 Feb 2018 15:43:47 +0300
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] chardev: fix handling of EAGAIN for TCP
- chardev
+	(envelope-from <imammedo@redhat.com>) id 1eoqEc-00050J-UG
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:44:27 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 22 Feb 2018 13:42:49 +0100
+Message-Id: <1519303376-92875-3-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
+References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/9] pc: replace pm object initialization with
+ one-liner in acpi_get_pm_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +20,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org
 
-Thank you, Daniel!
+next patch will need it before it gets to piix4/lpc branches
+that initializes 'obj' now.
 
-22.02.2018, 15:14, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
-> When this commit was applied
->
-> =C2=A0=C2=A0commit 9894dc0cdcc397ee5b26370bc53da6d360a363c2
-> =C2=A0=C2=A0Author: Daniel P. Berrange <berrange@redhat.com>
-> =C2=A0=C2=A0Date: Tue Jan 19 11:14:29 2016 +0000
->
-> =C2=A0=C2=A0=C2=A0=C2=A0char: convert from GIOChannel to QIOChannel
->
-> The tcp_chr_recv() function was changed to return QIO_CHANNEL_ERR_BLOCK
-> which corresonds to -2. As such the handling for EAGAIN was able to be
-> removed from tcp_chr_read(). Unfortunately in a later commit:
->
-> =C2=A0=C2=A0commit b6572b4f97a7b126c7b24e165893ed9fe3d72e1f
-> =C2=A0=C2=A0Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com=
->
-> =C2=A0=C2=A0Date: Fri Mar 11 18:55:24 2016 +0100
->
-> =C2=A0=C2=A0=C2=A0=C2=A0char: translate from QIOChannel error to errno
->
-> The tcp_chr_recv() function was changed back to return -1, with errno
-> set to EAGAIN, without also re-addding support for this to tcp_chr_read=
-()
->
-> Reported-by: Aleksey Kuleshov <rndfax@yandex.ru>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
-> =C2=A0chardev/char-socket.c | 2 +-
-> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index bdd6cff5f6..b15682c362 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -449,7 +449,7 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOC=
-ondition cond, void *opaque)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0len =3D s->max_si=
-ze;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0size =3D tcp_chr_recv(chr, (void *)buf, l=
-en);
-> - if (size =3D=3D 0 || size =3D=3D -1) {
-> + if (size =3D=3D 0 || (size =3D=3D -1 && errno !=3D EAGAIN)) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* connection clo=
-sed */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tcp_chr_disconnec=
-t(chr);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (size > 0) {
-> --
-> 2.14.3
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/i386/acpi-build.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index deb440f..b85fefe 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -128,7 +128,7 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+ {
+     Object *piix = piix4_pm_find();
+     Object *lpc = ich9_lpc_find();
+-    Object *obj = NULL;
++    Object *obj = piix ? piix : lpc;
+     QObject *o;
+ 
+     pm->force_rev1_fadt = false;
+@@ -138,7 +138,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+     if (piix) {
+         /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+         pm->force_rev1_fadt = true;
+-        obj = piix;
+         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+         pm->pcihp_io_base =
+             object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+@@ -146,7 +145,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+             object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+     }
+     if (lpc) {
+-        obj = lpc;
+         pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
+     }
+     assert(obj);
+-- 
+2.7.4
