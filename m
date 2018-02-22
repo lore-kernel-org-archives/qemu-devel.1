@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eopeJ-0000VG-HP
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1eoplR-0003pQ-AG
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:14:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eopeG-0003MW-9x
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51620
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eopeG-0003M4-41
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:06:52 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1MC4TqF056467
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:06:51 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2g9urjvtu9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:06:49 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 22 Feb 2018 12:06:41 -0000
-References: <20180221165628.78946-1-pasic@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 22 Feb 2018 13:06:36 +0100
+	(envelope-from <berrange@redhat.com>) id 1eoplM-0005JP-Bw
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:14:17 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43740 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eoplM-0005HI-7O
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:14:12 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 22 Feb 2018 12:13:51 +0000
+Message-Id: <20180222121351.26191-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180221165628.78946-1-pasic@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <1f66a73d-a34a-e808-ab3d-8bd5a6059a43@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] 390x/cpumodel: document
- S390FeatDef.bit not applicable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1] chardev: fix handling of EAGAIN for TCP
+ chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,63 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Aleksey Kuleshov <rndfax@yandex.ru>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
+When this commit was applied
 
+  commit 9894dc0cdcc397ee5b26370bc53da6d360a363c2
+  Author: Daniel P. Berrange <berrange@redhat.com>
+  Date:   Tue Jan 19 11:14:29 2016 +0000
 
-On 02/21/2018 05:56 PM, Halil Pasic wrote:
-> The 'bit' field of the 'S390FeatDef' structure is not applicable to all
-> its instances. Currently this field is not applicable, and remains
-> unused, iff the feature is of type S390_FEAT_TYPE_MISC. Having the value 0
-> specified for multiple such feature definition  was a little confusing,
-> as it's a perfectly legit bit value, and as the value of the bit
-> field is usually ought to be unique for each feature of a given
-> feature type.
-> 
-> Let us introduce a specialized macro for defining features of type
-> S390_FEAT_TYPE_MISC so, that one does not have to specify neither bit nor
-> type (as the later is implied).
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+    char: convert from GIOChannel to QIOChannel
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+The tcp_chr_recv() function was changed to return QIO_CHANNEL_ERR_BLOCK
+which corresonds to -2. As such the handling for EAGAIN was able to be
+removed from tcp_chr_read(). Unfortunately in a later commit:
 
+  commit b6572b4f97a7b126c7b24e165893ed9fe3d72e1f
+  Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+  Date:   Fri Mar 11 18:55:24 2016 +0100
 
-> ---
-> 
-> v1 -> v2
-> * Specialized feature initializer macro for type MISC that does not
->   require a bit value instead of defining a 'not a bit number' (that
->   is extremal) bit number.
-> ---
->  target/s390x/cpu_features.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index a5619f2893..3b9e2745e9 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -23,6 +23,10 @@
->          .desc = _desc,                               \
->      }
-> 
-> +/* S390FeatDef.bit is not applicable as there is no feature block. */
-> +#define FEAT_INIT_MISC(_name, _desc)                 \
-> +            FEAT_INIT(_name, S390_FEAT_TYPE_MISC, 0, _desc)
-> +
->  /* indexed by feature number for easy lookup */
->  static const S390FeatDef s390_features[] = {
->      FEAT_INIT("esan3", S390_FEAT_TYPE_STFL, 0, "Instructions marked as n3"),
-> @@ -123,8 +127,8 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("ib", S390_FEAT_TYPE_SCLP_CPU, 42, "SIE: Intervention bypass facility"),
->      FEAT_INIT("cei", S390_FEAT_TYPE_SCLP_CPU, 43, "SIE: Conditional-external-interception facility"),
-> 
-> -    FEAT_INIT("dateh2", S390_FEAT_TYPE_MISC, 0, "DAT-enhancement facility 2"),
-> -    FEAT_INIT("cmm", S390_FEAT_TYPE_MISC, 0, "Collaborative-memory-management facility"),
-> +    FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
-> +    FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
-> 
->      FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
->      FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
-> 
+    char: translate from QIOChannel error to errno
+
+The tcp_chr_recv() function was changed back to return -1, with errno
+set to EAGAIN, without also re-addding support for this to tcp_chr_read()
+
+Reported-by: Aleksey Kuleshov <rndfax@yandex.ru>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ chardev/char-socket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index bdd6cff5f6..b15682c362 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -449,7 +449,7 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCon=
+dition cond, void *opaque)
+         len =3D s->max_size;
+     }
+     size =3D tcp_chr_recv(chr, (void *)buf, len);
+-    if (size =3D=3D 0 || size =3D=3D -1) {
++    if (size =3D=3D 0 || (size =3D=3D -1 && errno !=3D EAGAIN)) {
+         /* connection closed */
+         tcp_chr_disconnect(chr);
+     } else if (size > 0) {
+--=20
+2.14.3
