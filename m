@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eotjM-0000sc-51
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:28:25 -0500
+	(envelope-from <berto@igalia.com>) id 1eotja-00016R-MH
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:28:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eotjH-0004BX-B3
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:28:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40302)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1eotjH-0004Ag-4I
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:28:19 -0500
-Date: Thu, 22 Feb 2018 09:28:11 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180222092811.0a705b9e@w520.home>
-In-Reply-To: <20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
-References: <20180219111458.25983-1-kraxel@redhat.com>
-	<20180219151649.13a197f9@w520.home>
-	<20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
+	(envelope-from <berto@igalia.com>) id 1eotjV-0004OI-Si
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:28:38 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180222141757.GH4147@localhost.localdomain>
+References: <20180219145459.8143-1-berto@igalia.com>
+	<20180221183355.GC353@localhost.localdomain>
+	<w51efld5g26.fsf@maestria.local.igalia.com>
+	<20180222141757.GH4147@localhost.localdomain>
+Date: Thu, 22 Feb 2018 17:28:31 +0100
+Message-ID: <w51zi413s5s.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] docs: document how to use the
+ l2-cache-entry-size parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Denis V . Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>
 
-On Tue, 20 Feb 2018 11:28:14 +0100
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Thu 22 Feb 2018 03:17:57 PM CET, Kevin Wolf wrote:
+>> > While we're at it, would l2-cache-entry-size = MIN(cluster_size,
+>> > 64k) make sense as a default?
+>> 
+>> Any reason why you choose 64k, or is it because it's the default
+>> cluster size?
+>> 
+>> In general I'd be cautious to reduce the default entry size
+>> unconditionally because with rotating HDDs it may even have a
+>> negative (although slight) effect on performance. But the larger the
+>> cluster, the larger the area mapped by L2 entries, so we need less
+>> metadata and it makes more sense to read less in general.
+>> 
+>> In summary: while I think it's probably a good idea, it would be good
+>> to make some tests before changing the default.
+>
+> The exact value of 64k is more or less because it's the default
+> cluster size, yes. Not changing anything for the default cluster size
+> makes it a bit easier to justify.
+>
+> What I really want to fix is the 2 MB entry size with the maximum
+> cluster size, because that's just unreasonably large. It's not
+> completely clear what the ideal size is, but when we increased the
+> default cluster size from 4k, the optimal values (on rotating hard
+> disks back then) were 64k or 128k. So I assume that it's somewhere
+> around these sizes that unnecessary I/O starts to hurt more than
+> reading one big chunk instead of two smaller ones helps.
+>
+> Of course, guest I/O a few years ago and metadata I/O today aren't
+> exactly the same thing, so I agree that a change should be measured
+> first. But 64k-128k feels right as an educated guess where to start.
 
-> On Mon, Feb 19, 2018 at 03:16:49PM -0700, Alex Williamson wrote:
-> > On Mon, 19 Feb 2018 12:14:51 +0100
-> > Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >   
-> > > This series adds support for a vgpu display to the qemu vfio code.
-> > > For now only regions are supported, dmabufs will follow later.
-> > > 
-> > > This version adds a patch to allow devices disable hotplugging, which
-> > > will be used by vfio display support.  Also fixed issues Alex found in
-> > > review.  
-> > 
-> > Looks ok to me, if this is to go through my tree I'll need a qdev ack
-> > for 4/7.  If you want to go a different route, for 5-7:
-> > 
-> > Acked-by: Alex Williamson <alex.williamson@redhat.com>
-> > 
-> > I'm still a bit confused though, what's preventing us from adding
-> > dmabuf support now?  It's strange to provide the implementation for the
-> > proprietary, unavailable vendor driver implementation first.  Is GVT-g
-> > broken, lagging?  Thanks,  
-> 
-> A bit more complicated because it depends on user interface changes ...
-> 
-> Sneak preview at https://www.kraxel.org/cgit/qemu/log/?h=work/intel-vgpu
-> Note: branch is a moving target ;)
-> 
-> State:
->   vfio:  Working, needs some cleanups though (drop debug logging, ...).
->   gtk:   Working, needs some minor cleanups too.
->   spice: Partly working (no mouse ptr yet).
->   sdl:   Not working.  Need to figure how I get a egl context (instead
->          of glx).  Possibly requires SDL 2.2.  Tina looked at this a
->          while back, need to look at some old mails ...
-> 
-> Current plan:
->   (1) fix/complete spice support.
->   (2) cleanup patches, send them out.
->   (3) look at the SDL issues.
+Yes, I agree.
 
-Hi Gerd,
+>> > So should we default to this minimum on the grounds that for most
+>> > people, refcounts blocks are probably only accessed sequentially in
+>> > practice? The remaining memory of the total cache size seems to
+>> > help the average case more if it's added to the L2 cache instead.
+>> 
+>> That sounds like a good idea. We should double check that the minimum
+>> is indeed the required minimum, and run some tests, but otherwise I'm
+>> all for it.
+>> 
+>> I think I can take care of this if you want.
+>
+> That would be good.
+>
+> I'm pretty confident that the minimum is enough because it's also the
+> default for 64k clusters. Maybe it's too high if I miscalculated back
+> then, but I haven't seen a crash report related to running out of
+> refcount block cache entries.
 
-It's a little bit concerning that the only way we can test the
-region-based display support is with proprietary drivers that nobody
-but NVIDIA has at this point.  Have you considered adding region-based
-display support to the mdev sample tty driver?  I know it sounds
-ridiculous for a serial device to have a display, but the vfio display
-region support isn't really tied to the functionality of the base mdev
-device.  We could have it simply display a static test pattern, just so
-we can test the end to end code path without a dependency on a closed
-vendor driver.  Thanks,
+Ok, I'll take a look.
 
-Alex
+Berto
