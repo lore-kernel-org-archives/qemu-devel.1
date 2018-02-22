@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eos75-0008Or-J3
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:44:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eosGj-0002Fz-W6
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:54:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eos74-0006s6-Cz
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:44:47 -0500
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:40147)
+	(envelope-from <peter.maydell@linaro.org>) id 1eosGj-0004bh-3B
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:54:46 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eos74-0006rX-7Y
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:44:46 -0500
-Received: by mail-oi0-x234.google.com with SMTP id c12so3855067oic.7
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 06:44:46 -0800 (PST)
+	id 1eosGi-0004ah-Sn
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:54:44 -0500
+Received: by mail-oi0-x241.google.com with SMTP id a207so3867903oii.10
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 06:54:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180222082341.sk2pkai7kf5kurfh@kentang.home>
-References: <20180222082341.sk2pkai7kf5kurfh@kentang.home>
+In-Reply-To: <20180217164037.15727-2-richard.henderson@linaro.org>
+References: <20180217164037.15727-1-richard.henderson@linaro.org>
+	<20180217164037.15727-2-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 14:44:25 +0000
-Message-ID: <CAFEAcA-yzR+YwpmcXT45X3pnE78vHveL4eQF_Ly9o=BV=oKfFQ@mail.gmail.com>
+Date: Thu, 22 Feb 2018 14:54:23 +0000
+Message-ID: <CAFEAcA9rLWsSH82XM4nvPZo_urJL3BZv_4g_CMCvxYsCT=hVyA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] Update OpenBIOS images
+Subject: Re: [Qemu-devel] [PATCH 1/2] tcg: Fold unspecified opcode test into
+ tcg_can_emit_vec_op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Richard Henderson <richard.henderson@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 22 February 2018 at 08:23, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> Hi Peter,
+On 17 February 2018 at 16:40, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> This releases the callers from having to check themselves,
+> which tidies up the code a bit.
 >
-> This update for OpenBIOS contains a single fix which allows yaboot 1.3.17 to boot
-> under qemu-system-ppc. Please pull.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/aarch64/tcg-target.inc.c |  4 ++++
+>  tcg/i386/tcg-target.inc.c    |  4 ++++
+>  tcg/tcg-op-gvec.c            | 28 ++++++++++++----------------
+>  3 files changed, 20 insertions(+), 16 deletions(-)
 >
->
-> ATB,
->
-> Mark.
->
->
-> The following changes since commit a6e0344fa0e09413324835ae122c4cadd7890231:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180220-pull-request' into staging (2018-02-20 14:05:00 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
->
-> for you to fetch changes up to feb3174ff27f94d34247952d9779f09e9b1dfd39:
->
->   Update OpenBIOS images to 54d959d9 built from submodule. (2018-02-22 07:55:47 +0000)
->
-> ----------------------------------------------------------------
-> Update OpenBIOS images
->
-> ----------------------------------------------------------------
-> Mark Cave-Ayland (1):
->       Update OpenBIOS images to 54d959d9 built from submodule.
->
->  pc-bios/openbios-ppc     | Bin 754936 -> 754936 bytes
->  pc-bios/openbios-sparc32 | Bin 382048 -> 382048 bytes
->  pc-bios/openbios-sparc64 | Bin 1593408 -> 1593408 bytes
->  roms/openbios            |   2 +-
->  4 files changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+> index be3192078d..9b0a803d79 100644
+> --- a/tcg/aarch64/tcg-target.inc.c
+> +++ b/tcg/aarch64/tcg-target.inc.c
+> @@ -2217,6 +2217,10 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+>  int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+>  {
+>      switch (opc) {
+> +    case 0:
+> +        /* Unspecified opcode */
+> +        return 1;
+> +
+>      case INDEX_op_add_vec:
+>      case INDEX_op_sub_vec:
+>      case INDEX_op_mul_vec:
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+since there's clearly no behaviour change here.
 
-Applied, thanks.
+But it isn't clear to me why tcg_can_emit_vec_op() should return 1
+for unspecified opcodes -- shouldn't the default be "we can't vectorize
+something we don't know about", not "no idea what this is so let's
+assume it's vectorizable" ?
 
+A comment about why unspecified opcodes are always OK might be helpful.
+
+thanks
 -- PMM
