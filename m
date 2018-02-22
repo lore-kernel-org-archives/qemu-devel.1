@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1eotDm-0008U0-AC
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:55:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1eotHf-00040X-M4
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1eotDl-0008F1-FE
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:55:46 -0500
-Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:55165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
-	id 1eotDl-0008E9-9N
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:55:45 -0500
-Received: by mail-it0-x22a.google.com with SMTP id p204so6741108itc.4
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:55:45 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA82fEnt6oGz7O+zPZ2+zoZmhm0J6rAioX6SmJwoSykuGw@mail.gmail.com>
-References: <CACRpkda9B=frmS0QF429p-q+KoCKG=5NON-kQ0Rt-nba2powRA@mail.gmail.com>
-	<1519053606-9817-1-git-send-email-minyard@acm.org>
-	<1519053606-9817-3-git-send-email-minyard@acm.org>
-	<CAFEAcA-jTZMDNTF2rPn20DjSxu=z7n9M+2xo-pNfAYoha_LuzQ@mail.gmail.com>
-	<03f96a6b-3a52-0d72-e634-8b8f167f2992@acm.org>
-	<CACRpkdYMTojtHnafK+kMnm1G7j+9Nj=p65WLZGbrN8MJv+4psQ@mail.gmail.com>
-	<CAFEAcA82fEnt6oGz7O+zPZ2+zoZmhm0J6rAioX6SmJwoSykuGw@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 22 Feb 2018 16:55:44 +0100
-Message-ID: <CACRpkdaYKzQHHxCOZEydL2pa3iX60oCsXvX7FvBZkXbByo6Z5A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/2] i2c: Move the bus class to i2c.h
+	(envelope-from <eblake@redhat.com>) id 1eotHe-0001gn-OI
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:47 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 22 Feb 2018 09:59:19 -0600
+Message-Id: <20180222155922.9833-2-eblake@redhat.com>
+In-Reply-To: <20180222155922.9833-1-eblake@redhat.com>
+References: <20180222155922.9833-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/4] qcow2: Prefer byte-based calls into
+ bs->file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +20,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Corey Minyard <minyard@acm.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Corey Minyard <cminyard@mvista.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, berto@igalia.com, Max Reitz <mreitz@redhat.com>
 
-On Thu, Feb 22, 2018 at 4:44 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 22 February 2018 at 15:39, Linus Walleij <linus.walleij@linaro.org> wrote:
->> On Tue, Feb 20, 2018 at 2:06 PM, Corey Minyard <minyard@acm.org> wrote:
->>> Linus, Philippe, do you want me to submit this, or do you want
->>> to take it?  You can pull it from:
->>>
->>> https://github.com/cminyard/qemu.git tags/i2c-bus-move
->>
->> I don't have any commit rights, if you can push this to the
->> QEMU master I will happily rebase my stuff and resubmit :)
->
-> I suggest you take Corey's 2 patches, add them to the front
-> of your patchset and add your signed-off-by line to them.
-> That way you don't have to wait for them to go into git master.
+We had only three sector-based stragglers left; convert them to use
+our preferred byte-based accesses.
 
-OK no problem!
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Yours,
-Linus Walleij
+---
+v2: indentation fix
+---
+ block/qcow2-cluster.c  | 5 ++---
+ block/qcow2-refcount.c | 6 +++---
+ 2 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index e406b0f3b9e..85be7d5e340 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1615,13 +1615,12 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+         }
+
+         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
+-        ret = bdrv_read(bs->file, coffset >> 9, s->cluster_data,
+-                        nb_csectors);
++        ret = bdrv_pread(bs->file, coffset, s->cluster_data, csize);
+         if (ret < 0) {
+             return ret;
+         }
+         if (decompress_buffer(s->cluster_cache, s->cluster_size,
+-                              s->cluster_data + sector_offset, csize) < 0) {
++                              s->cluster_data, csize) < 0) {
+             return -EIO;
+         }
+         s->cluster_cache_offset = coffset;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index d46b69d7f34..28afbb1b5ea 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2310,8 +2310,8 @@ write_refblocks:
+         on_disk_refblock = (void *)((char *) *refcount_table +
+                                     refblock_index * s->cluster_size);
+
+-        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
+-                         on_disk_refblock, s->cluster_sectors);
++        ret = bdrv_pwrite(bs->file, refblock_offset, on_disk_refblock,
++                          s->cluster_size);
+         if (ret < 0) {
+             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-ret));
+             goto fail;
+@@ -2533,7 +2533,7 @@ fail:
+  * - 0 if writing to this offset will not affect the mentioned metadata
+  * - a positive QCow2MetadataOverlap value indicating one overlapping section
+  * - a negative value (-errno) indicating an error while performing a check,
+- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
++ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
+  */
+ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+                                  int64_t size)
+-- 
+2.14.3
