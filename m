@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoteh-0004ve-Hs
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:23:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eotfJ-0005Wm-91
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:24:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eoted-0005g8-Oi
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:23:32 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:34687)
+	(envelope-from <peter.maydell@linaro.org>) id 1eotfI-00079r-Ez
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:24:13 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41326)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eoted-0005fC-Ig
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:23:31 -0500
-Received: by mail-ot0-x242.google.com with SMTP id n74so4907648ota.1
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 08:23:31 -0800 (PST)
+	id 1eotfI-00079G-A7
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:24:12 -0500
+Received: by mail-oi0-x243.google.com with SMTP id e10so4102165oiy.8
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 08:24:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180216215608.13227-5-richard.henderson@linaro.org>
+In-Reply-To: <20180216215608.13227-2-richard.henderson@linaro.org>
 References: <20180216215608.13227-1-richard.henderson@linaro.org>
-	<20180216215608.13227-5-richard.henderson@linaro.org>
+	<20180216215608.13227-2-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 16:23:10 +0000
-Message-ID: <CAFEAcA-7LRypmv9CcOcyGR=1f9eT=_eun1NrD0W4p1NCpNhNiw@mail.gmail.com>
+Date: Thu, 22 Feb 2018 16:23:51 +0000
+Message-ID: <CAFEAcA_FNWi8OK5hyekZiiZLvjAR=r3T4eHFLNCam4O8KGXi2Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] aarch64-linux-user: Add support for
- EXTRA signal frame records
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] linux-user: Implement aarch64
+ PR_SVE_SET/GET_VL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,82 +35,18 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 On 16 February 2018 at 21:56, Richard Henderson
 <richard.henderson@linaro.org> wrote:
-> The EXTRA record allows for additional space to be allocated
-> beyon what is currently reserved.  Add code to emit and read
-> this record type.
->
-> Nothing uses extra space yet.
+> As an implementation choice, widening VL has zeroed the
+> previously inaccessible portion of the sve registers.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
+>  linux-user/aarch64/target_syscall.h |  3 +++
+>  target/arm/cpu.h                    |  1 +
+>  linux-user/syscall.c                | 27 ++++++++++++++++++++++++
+>  target/arm/cpu64.c                  | 41 +++++++++++++++++++++++++++++++++++++
+>  4 files changed, 72 insertions(+)
 
-> @@ -1554,14 +1572,16 @@ static void target_restore_fpsimd_record(CPUARMState *env,
->  static int target_restore_sigframe(CPUARMState *env,
->                                     struct target_rt_sigframe *sf)
->  {
-> -    struct target_aarch64_ctx *ctx;
-> +    struct target_aarch64_ctx *ctx, *extra = NULL;
->      struct target_fpsimd_context *fpsimd = NULL;
-> +    uint64_t extra_datap = 0;
-> +    bool used_extra = false;
->
->      target_restore_general_frame(env, sf);
->
->      ctx = (struct target_aarch64_ctx *)sf->uc.tuc_mcontext.__reserved;
->      while (ctx) {
-> -        uint32_t magic, size;
-> +        uint32_t magic, size, extra_size;
->
->          __get_user(magic, &ctx->magic);
->          __get_user(size, &ctx->size);
-> @@ -1570,7 +1590,12 @@ static int target_restore_sigframe(CPUARMState *env,
->              if (size != 0) {
->                  return 1;
->              }
-> -            ctx = NULL;
-> +            if (used_extra) {
-> +                ctx = NULL;
-> +            } else {
-> +                ctx = extra;
-> +                used_extra = true;
-> +            }
->              continue;
->
->          case TARGET_FPSIMD_MAGIC:
-> @@ -1580,6 +1605,17 @@ static int target_restore_sigframe(CPUARMState *env,
->              fpsimd = (struct target_fpsimd_context *)ctx;
->              break;
->
-> +        case TARGET_EXTRA_MAGIC:
-> +            if (extra || size != sizeof(struct target_extra_context)) {
-> +                return 1;
-> +            }
-> +            __get_user(extra_datap,
-> +                       &((struct target_extra_context *)ctx)->datap);
-> +            __get_user(extra_size,
-> +                       &((struct target_extra_context *)ctx)->size);
-> +            extra = lock_user(VERIFY_READ, extra_datap, extra_size, 0);
-> +            break;
-> +
->          default:
->              /* Unknown record -- we certainly didn't generate it.
->               * Did we in fact get out of sync?
-> @@ -1595,6 +1631,9 @@ static int target_restore_sigframe(CPUARMState *env,
->      }
->      target_restore_fpsimd_record(env, fpsimd);
->
-> +    if (extra) {
-> +        unlock_user(extra, extra_datap, 0);
-> +    }
-
-This will fail to call unlock_user if the function returns early
-(eg because of failed magic-number checks or the FPSIMD record
-not being present).
-
-You don't need the "if (extra)" check -- unlock_user() is
-specified to do nothing if passed a NULL host_ptr.
-
-Otherwise looks good.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
