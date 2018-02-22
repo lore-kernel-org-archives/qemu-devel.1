@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eopJm-0008MY-H7
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:45:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eopLJ-00014C-J5
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:47:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eopJj-0005DG-Ev
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:45:42 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40426 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eopJj-0005D2-9b
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:45:39 -0500
-Date: Thu, 22 Feb 2018 11:45:36 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180222114536.GF9323@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <52841519299484@web28j.yandex.ru>
+	(envelope-from <peter.maydell@linaro.org>) id 1eopLI-00069m-Py
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:47:17 -0500
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:44719)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eopLI-00069L-JX
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:47:16 -0500
+Received: by mail-oi0-x233.google.com with SMTP id b8so3473525oib.11
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 03:47:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <52841519299484@web28j.yandex.ru>
-Subject: Re: [Qemu-devel] Patch 9894dc0cdcc broke something
+In-Reply-To: <20180216022933.10945-6-f4bug@amsat.org>
+References: <20180216022933.10945-1-f4bug@amsat.org>
+	<20180216022933.10945-6-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Feb 2018 11:46:55 +0000
+Message-ID: <CAFEAcA_9L=FZoyvHpOPQH=kA36=W2ZAx7RukJb3_S0Vr0TNt2A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v3 5/7] hw/sd/pl181: expose a SDBus and
+ connect the SDCard to it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksey Kuleshov <rndfax@yandex.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, Michael Walle <michael@walle.cc>, Stefan Weil <sw@weilnetz.de>, "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>
 
-On Thu, Feb 22, 2018 at 02:38:04PM +0300, Aleksey Kuleshov wrote:
-> Hello!
-> 
-> I hit unexpected disconnections because of this patch:
-> 
-> commit 9894dc0cdcc397ee5b26370bc53da6d360a363c2
-> Author: Daniel P. Berrange <berrange@redhat.com>
-> Date:   Tue Jan 19 11:14:29 2016 +0000
-> 
->     char: convert from GIOChannel to QIOChannel
->     
->     In preparation for introducing TLS support to the TCP chardev
->     backend, convert existing chardev code from using GIOChannel
->     to QIOChannel. This simplifies the chardev code by removing
->     most of the OS platform conditional code for dealing with
->     file descriptor passing.
->     
->     Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->     Message-Id: <1453202071-10289-3-git-send-email-berrange@redhat.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> breaks tcp_chr_read:
+On 16 February 2018 at 02:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> using the sdbus_*() API.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>
+> RFC because how pl181_sdbus_create_inplace() doing class_init(SDBus) in
+> realize(pl181) seems weird...
 
-What version of QEMU are you using ?
+In the two other places where we set the set_inserted and set_readonly
+methods for the SDBus class (pxa2xx_mmci.c and sdhci.c), we do it by
+defining a subclass of TYPE_SD_BUS, whose class init function can then
+set up the method pointers. Is there a reason not to do pl181 the
+same way as those two examples?
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
