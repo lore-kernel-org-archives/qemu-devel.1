@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eoqEd-0005W8-Rp
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:44:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eoqEd-0005W6-RZ
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:44:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eoqEc-00050J-UG
+	(envelope-from <imammedo@redhat.com>) id 1eoqEc-0004zU-Oa
 	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:44:27 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 22 Feb 2018 13:42:49 +0100
-Message-Id: <1519303376-92875-3-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
-References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/9] pc: replace pm object initialization with
- one-liner in acpi_get_pm_info()
+Date: Thu, 22 Feb 2018 13:42:47 +0100
+Message-Id: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/9] generalize build_fadt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +20,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org
 
-next patch will need it before it gets to piix4/lpc branches
-that initializes 'obj' now.
+Series first cleanups ACPI code around build_fadt() and then
+converts current packed structure approach to a build_append_FOO()
+API, getting rid of error prone explicit endianness conversions
+in code and making build_fadt() look more like APCI table declaration
+from spec, which should be easier to read/maintain. After that
+build_fadt() becomes generic enough that we could drop ARM specific
+implementation and reuse generic build_fadt(), reducing code
+duplication.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/acpi-build.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+PS: tested only x86 which has make check coverage,
+    ARM was only slightly tested. 
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index deb440f..b85fefe 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -128,7 +128,7 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
- {
-     Object *piix = piix4_pm_find();
-     Object *lpc = ich9_lpc_find();
--    Object *obj = NULL;
-+    Object *obj = piix ? piix : lpc;
-     QObject *o;
- 
-     pm->force_rev1_fadt = false;
-@@ -138,7 +138,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-     if (piix) {
-         /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
-         pm->force_rev1_fadt = true;
--        obj = piix;
-         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
-         pm->pcihp_io_base =
-             object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-@@ -146,7 +145,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-             object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
-     }
-     if (lpc) {
--        obj = lpc;
-         pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
-     }
-     assert(obj);
+git tree for testing:
+  https://github.com/imammedo/qemu.git fadt_refactoring_v1
+
+CC: "Michael S. Tsirkin" <mst@redhat.com> 
+CC: Shannon Zhao <zhaoshenglong@huawei.com> 
+CC: Peter Maydell <peter.maydell@linaro.org> 
+CC: Andrew Jones <drjones@redhat.com>
+CC: qemu-devel@nongnu.org 
+CC: qemu-arm@nongnu.org 
+
+Igor Mammedov (9):
+  acpi: remove unused acpi-dsdt.aml
+  pc: replace pm object initialization with one-liner in
+    acpi_get_pm_info()
+  acpi: reuse AcpiGenericAddress instead of Acpi20GenericAddress
+  acpi: add build_append_gas() helper for Generic Address Structure
+  pc: acpi: isolate FADT specific data into AcpiFadtData structure
+  pc: acpi: use build_append_foo() API to construct FADT
+  acpi: move build_fadt() from i386 specific to generic ACPI source
+  virt_arm: acpi: reuse common build_fadt()
+  tests: acpi: don't read all fields in test_acpi_fadt_table()
+
+ include/hw/acpi/acpi-defs.h | 136 +++++++-----------------------
+ include/hw/acpi/aml-build.h |  23 ++++++
+ Makefile                    |   1 -
+ hw/acpi/aml-build.c         | 140 +++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c    |  39 ++++-----
+ hw/i386/acpi-build.c        | 197 ++++++++++++++------------------------------
+ pc-bios/acpi-dsdt.aml       | Bin 4405 -> 0 bytes
+ tests/bios-tables-test.c    |  82 ++++--------------
+ 8 files changed, 292 insertions(+), 326 deletions(-)
+ delete mode 100644 pc-bios/acpi-dsdt.aml
+
 -- 
 2.7.4
