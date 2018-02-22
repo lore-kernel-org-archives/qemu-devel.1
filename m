@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eorgD-0003XY-Mt
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:17:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1eorh4-0003wX-4G
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:17:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eorgA-000234-IE
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:17:01 -0500
-Resent-Message-Id: <E1eorgA-000234-IE@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eorgA-000229-Ar
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:16:58 -0500
-In-Reply-To: <20180220184159.16483-1-mark.cave-ayland@ilande.co.uk>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151930898065.717.18373692460273926219@bdbb90650ae5>
+	(envelope-from <eblake@redhat.com>) id 1eorh3-0002Wo-B0
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 09:17:54 -0500
+References: <20180221233953.5142-1-eblake@redhat.com>
+	<20180221233953.5142-3-eblake@redhat.com>
+	<w51k1v55ncp.fsf@maestria.local.igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3d6368b1-53b4-a954-a489-e3873652d9e6@redhat.com>
+Date: Thu, 22 Feb 2018 08:17:35 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 22 Feb 2018 06:16:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCHv2 00/11] macio: remove legacy macio_init()
- function
+In-Reply-To: <w51k1v55ncp.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qcow2: Don't allow overflow during
+ cluster allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjIwMTg0MTU5LjE2NDgzLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
-Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSHYyIDAwLzExXSBtYWNpbzogcmVtb3Zl
-IGxlZ2FjeSBtYWNpb19pbml0KCkgZnVuY3Rpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFn
-XSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAyMjExMzE1MzcuMzEzNDEtMS1rcmF4ZWxAcmVk
-aGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMjIxMTMxNTM3LjMxMzQxLTEta3JheGVsQHJlZGhhdC5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkNWUyOWU1NDBiIG1hY2lvOiByZW1v
-dmUgbWFjaW9faW5pdCgpIGZ1bmN0aW9uCmQ1MTFmZDQ0MjIgbWFjaW86IG1vdmUgc2V0dGluZyBv
-ZiBDVURBIHRpbWViYXNlIGZyZXF1ZW5jeSB0byBtYWNpb19jb21tb25fcmVhbGl6ZSgpCjRmYjM5
-MDJmMTkgbWFjX25ld3dvcmxkOiB1c2Ugb2JqZWN0IGxpbmsgdG8gcGFzcyBPcGVuUElDIG9iamVj
-dCB0byBtYWNpbwplNjdkMWQzYThjIG9wZW5waWM6IG1vdmUgT3BlblBJQyBzdGF0ZSBhbmQgcmVs
-YXRlZCBkZWZpbml0aW9ucyB0byBvcGVucGljLmgKZDNkZTYyMmQ2OSBtYWNfb2xkd29ybGQ6IHVz
-ZSBvYmplY3QgbGluayB0byBwYXNzIGhlYXRocm93IFBJQyBvYmplY3QgdG8gbWFjaW8KZDQzZGIw
-OGJiMCBtYWNpbzogbW92ZSBtYWNpbyByZWxhdGVkIHN0cnVjdHVyZXMgYW5kIGRlZmluZXMgaW50
-byBzZXBhcmF0ZSBtYWNpby5oIGZpbGUKNDAxM2VmMTU4MCBoZWF0aHJvdzogY2hhbmdlIGhlYXRo
-cm93X3BpY19pbml0KCkgdG8gcmV0dXJuIHRoZSBoZWF0aHJvdyBkZXZpY2UKNzkzNWEwNTlhOSBo
-ZWF0aHJvdzogY29udmVydCB0byB0cmFjZS1ldmVudHMKNzIwODM3MjZmNSBoZWF0aHJvdzogUU9N
-aWZ5IGhlYXRocm93IFBJQwpiZWExNWRkZDE5IG1hY2lvOiBtb3ZlIEVTQ0MgZGV2aWNlIHdpdGhp
-biB0aGUgbWFjaW8gZGV2aWNlCjJjMTIxZTQwMWIgbWFjaW86IGVtYmVkIERCRE1BIGRldmljZSBk
-aXJlY3RseSB3aXRoaW4gbWFjaW8KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvMTE6IG1hY2lvOiBlbWJlZCBEQkRNQSBkZXZpY2UgZGlyZWN0bHkgd2l0aGluIG1hY2lvLi4u
-CkNoZWNraW5nIFBBVENIIDIvMTE6IG1hY2lvOiBtb3ZlIEVTQ0MgZGV2aWNlIHdpdGhpbiB0aGUg
-bWFjaW8gZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDMvMTE6IGhlYXRocm93OiBRT01pZnkgaGVh
-dGhyb3cgUElDLi4uCkNoZWNraW5nIFBBVENIIDQvMTE6IGhlYXRocm93OiBjb252ZXJ0IHRvIHRy
-YWNlLWV2ZW50cy4uLgpDaGVja2luZyBQQVRDSCA1LzExOiBoZWF0aHJvdzogY2hhbmdlIGhlYXRo
-cm93X3BpY19pbml0KCkgdG8gcmV0dXJuIHRoZSBoZWF0aHJvdyBkZXZpY2UuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNi8xMTogbWFjaW86IG1vdmUgbWFjaW8gcmVsYXRlZCBzdHJ1Y3R1cmVzIGFuZCBkZWZp
-bmVzIGludG8gc2VwYXJhdGUgbWFjaW8uaCBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDcvMTE6IG1h
-Y19vbGR3b3JsZDogdXNlIG9iamVjdCBsaW5rIHRvIHBhc3MgaGVhdGhyb3cgUElDIG9iamVjdCB0
-byBtYWNpby4uLgpDaGVja2luZyBQQVRDSCA4LzExOiBvcGVucGljOiBtb3ZlIE9wZW5QSUMgc3Rh
-dGUgYW5kIHJlbGF0ZWQgZGVmaW5pdGlvbnMgdG8gb3BlbnBpYy5oLi4uCkVSUk9SOiAiZm9vICog
-YmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojMjQ4OiBGSUxFOiBpbmNsdWRlL2h3L3BwYy9vcGVu
-cGljLmg6NTc6CisjZGVmaW5lIFJBVkVOX0RCTF9JUlEgICAgKFJBVkVOX0lQSV9JUlEgKyAoUkFW
-RU5fTUFYX0NQVSAqIFJBVkVOX01BWF9JUEkpKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCAzNTYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggOS8xMTogbWFjX25ld3dvcmxkOiB1c2Ugb2JqZWN0IGxpbmsgdG8g
-cGFzcyBPcGVuUElDIG9iamVjdCB0byBtYWNpby4uLgpDaGVja2luZyBQQVRDSCAxMC8xMTogbWFj
-aW86IG1vdmUgc2V0dGluZyBvZiBDVURBIHRpbWViYXNlIGZyZXF1ZW5jeSB0byBtYWNpb19jb21t
-b25fcmVhbGl6ZSgpLi4uCkNoZWNraW5nIFBBVENIIDExLzExOiBtYWNpbzogcmVtb3ZlIG1hY2lv
-X2luaXQoKSBmdW5jdGlvbi4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 02/22/2018 04:29 AM, Alberto Garcia wrote:
+> On Thu 22 Feb 2018 12:39:52 AM CET, Eric Blake wrote:
+>>       free_in_cluster = s->cluster_size - offset_into_cluster(s, offset);
+>>       do {
+>>           if (!offset || free_in_cluster < size) {
+>> -            int64_t new_cluster = alloc_clusters_noref(bs, s->cluster_size);
+>> +            int64_t new_cluster;
+>> +
+>> +            new_cluster = alloc_clusters_noref(bs, s->cluster_size,
+>> +                                               (1ULL << s->csize_shift) - 1);
+> 
+> (1ULL << s->csize_shift) - 1) is the same as s->cluster_offset_mask, but
+> I guess it's confusing to use that here, so your approach looks
+> appropriate.
+
+Actually, s->cluster_offset_mask fits better - we want to ensure that 
+the allocated cluster fits within the mask!  I'll adjust on respin.
+
+> 
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Thanks for bearing with me.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
