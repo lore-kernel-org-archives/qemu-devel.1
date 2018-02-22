@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eotHf-00040y-VB
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1eotHg-00041Z-Nd
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eotHe-0001gv-Tf
+	(envelope-from <eblake@redhat.com>) id 1eotHf-0001hL-8A
 	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 10:59:48 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 22 Feb 2018 09:59:20 -0600
-Message-Id: <20180222155922.9833-3-eblake@redhat.com>
+Date: Thu, 22 Feb 2018 09:59:22 -0600
+Message-Id: <20180222155922.9833-5-eblake@redhat.com>
 In-Reply-To: <20180222155922.9833-1-eblake@redhat.com>
 References: <20180222155922.9833-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/4] qcow2: Document some maximum size
- constraints
+Subject: [Qemu-devel] [PATCH v3 4/4] qcow2: Avoid memory over-allocation on
+ compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +23,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, berto@igalia.com, Max Reitz <mreitz@redhat.com>
 
-Although off_t permits up to 63 bits (8EB) of file offsets, in
-practice, we're going to hit other limits first.  Document some
-of those limits in the qcow2 spec, and how choice of cluster size
-can influence some of the limits.
+When reading a compressed image, we were allocating s->cluster_data
+to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
+with 2M clusters).  Let's check out the history:
 
-While at it, notice that since we cannot map any virtual cluster
-to any address higher than 64 PB (56 bits) (due to the L1/L2 field
-encoding), it makes little sense to require the refcount table to
-access host offsets beyond that point.  Mark the upper bits of
-the refcount table entries as reserved, with no ill effects, since
-it is unlikely that there are any existing images larger than 64PB
-in the first place, and thus all existing images already have those
-bits as 0.
+Back when qcow2 was first written, we used s->cluster_data for
+everything, including copy_sectors() and encryption, where we want
+to operate on more than one cluster at once.  Obviously, at that
+point, the buffer had to be aligned for other users, even though
+compression itself doesn't require any alignment (the fact that
+the compressed data generally starts mid-sector means that aligning
+our buffer buys us nothing - either the protocol already supports
+byte-based access into whatever offset we want, or we are already
+using a bounce buffer to read a full sector, and copying into
+our destination no longer requires alignment).
+
+But commit 1b9f1491 (v1.1!) changed things to allocate parallel
+buffers on demand rather than sharing a single buffer, for encryption
+and COW, leaving compression as the final client of s->cluster_data.
+That use was still preserved, because if a single compressed cluster
+is read more than once, we reuse the cache instead of decompressing
+it a second time (someday, we may come up with better caching to
+avoid wasting repeated decompressions while still being more parallel,
+but that is a task for another patch; the XXX comment in
+qcow2_co_preadv for QCOW2_CLUSTER_COMPRESSED is telling).
+
+Much later, in commit de82815d (v2.2), we noticed that a 64M
+allocation is prone to failure, so we switched over to a graceful
+memory allocation error message.  Elsewhere in the code, we do
+g_malloc(2 * cluster_size) without ever checking for failure, but
+even 4M starts to be large enough that trying to be nice is worth
+the effort, so we want to keep that aspect.
+
+Then even later, in 3e4c7052 (2.11), we realized that allocating
+a large buffer up front for every qcow2 image is expensive, and
+switched to lazy allocation only for images that actually had
+compressed clusters.  But in the process, we never even bothered
+to check whether what we were allocating still made sense in its
+new context!
+
+So, it's time to cut back on the waste.  A compressed cluster
+written by qemu will NEVER occupy more than an uncompressed
+cluster, but based on mid-sector alignment, we may still need
+to read 1 cluster + 1 sector in order to recover enough bytes
+for the decompression.  But third-party producers of qcow2 may
+not be as smart, and gzip DOES document that because the
+compression stream adds metadata, and because of the pigeonhole
+principle, there are worst case scenarios where attempts to
+compress will actually inflate an image, by up to 0.015% (or 62
+sectors larger for an unfortunate 2M compression).  In fact,
+the qcow2 spec permits an all-ones sector count, plus 511 bytes
+from the sector containing the initial offset, for a maximum
+read of nearly 2 full clusters; and thanks to the way
+decompression works, even though such a value is probably too
+large for the actual compressed data, it really doesn't matter
+if we read too much (gzip ignores slop, once it has decoded a
+full cluster).  So it's easier to just allocate cluster_data
+to be as large as we can ever possibly see; even if it still
+wastes up to 2M on any image created by qcow2, that's still an
+improvment of 60M less waste than pre-patch.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+
 ---
- docs/interop/qcow2.txt | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+v3: tighten allocation [Berto]
+v2: actually check allocation failure (previous version meant
+to use g_malloc, but ended up posted with g_try_malloc without
+checking); add assertions outside of conditional, improve
+commit message to better match reality now that qcow2 spec bug
+has been fixed
+---
+ block/qcow2-cluster.c | 27 ++++++++++++++++++---------
+ block/qcow2.c         |  2 +-
+ 2 files changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index feb711fb6a8..2417522ca9b 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -40,7 +40,16 @@ The first cluster of a qcow2 image contains the file header:
-                     with larger cluster sizes.
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 85be7d5e340..af51d71d012 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1598,20 +1598,29 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+         sector_offset = coffset & 511;
+         csize = nb_csectors * 512 - sector_offset;
 
-          24 - 31:   size
--                    Virtual disk size in bytes
-+                    Virtual disk size in bytes.
-+
-+                    Note: with a 2 MB cluster size, the maximum
-+                    virtual size is 2 EB (61 bits) for a sparse file,
-+                    but other sizing limitations mean that an image
-+                    cannot have more than 64 PB of populated clusters
-+                    (and may hit other sizing limitations as well,
-+                    such as underlying protocol limits).  With a 512
-+                    byte cluster size, the maximum virtual size drops
-+                    to 128 GB (37 bits).
+-        /* Allocate buffers on first decompress operation, most images are
+-         * uncompressed and the memory overhead can be avoided.  The buffers
+-         * are freed in .bdrv_close().
++        /* Allocate buffers on the first decompress operation; most
++         * images are uncompressed and the memory overhead can be
++         * avoided.  The buffers are freed in .bdrv_close().  qemu
++         * never writes an inflated cluster, and gzip itself never
++         * inflates a problematic cluster by more than 0.015%, but the
++         * qcow2 format allows up to 1 byte short of 2 full clusters
++         * when including the sector containing offset.  gzip ignores
++         * trailing slop, so just allocate that much up front rather
++         * than reject third-party images with overlarge csize.
+          */
++        assert(!!s->cluster_data == !!s->cluster_cache);
++        assert(csize < 2 * s->cluster_size);
+         if (!s->cluster_data) {
+-            /* one more sector for decompressed data alignment */
+-            s->cluster_data = qemu_try_blockalign(bs->file->bs,
+-                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
++            s->cluster_data = g_try_malloc(2 * s->cluster_size);
+             if (!s->cluster_data) {
+                 return -ENOMEM;
+             }
+-        }
+-        if (!s->cluster_cache) {
+-            s->cluster_cache = g_malloc(s->cluster_size);
++            s->cluster_cache = g_try_malloc(s->cluster_size);
++            if (!s->cluster_cache) {
++                g_free(s->cluster_data);
++                s->cluster_data = NULL;
++                return -ENOMEM;
++            }
+         }
 
-          32 - 35:   crypt_method
-                     0 for no encryption
-@@ -318,6 +327,11 @@ for each host cluster. A refcount of 0 means that the cluster is free, 1 means
- that it is used, and >= 2 means that it is used and any write access must
- perform a COW (copy on write) operation.
+         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 288b5299d80..6ad3436e0e5 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2103,7 +2103,7 @@ static void qcow2_close(BlockDriverState *bs)
+     g_free(s->image_backing_format);
 
-+The refcount table has implications on the maximum host file size; a
-+larger cluster size is required for the refcount table to cover larger
-+offsets.  Furthermore, all qcow2 metadata must reside at offsets below
-+64 PB (56 bits).
-+
- The refcounts are managed in a two-level table. The first level is called
- refcount table and has a variable size (which is stored in the header). The
- refcount table can cover multiple clusters, however it needs to be contiguous
-@@ -341,7 +355,7 @@ Refcount table entry:
-
-     Bit  0 -  8:    Reserved (set to 0)
-
--         9 - 63:    Bits 9-63 of the offset into the image file at which the
-+         9 - 55:    Bits 9-55 of the offset into the image file at which the
-                     refcount block starts. Must be aligned to a cluster
-                     boundary.
-
-@@ -349,6 +363,8 @@ Refcount table entry:
-                     been allocated. All refcounts managed by this refcount block
-                     are 0.
-
-+        56 - 63:    Reserved (set to 0)
-+
- Refcount block entry (x = refcount_bits - 1):
-
-     Bit  0 -  x:    Reference count of the cluster. If refcount_bits implies a
-@@ -365,6 +381,11 @@ The L1 table has a variable size (stored in the header) and may use multiple
- clusters, however it must be contiguous in the image file. L2 tables are
- exactly one cluster in size.
-
-+The L1 and L2 tables have implications on the maximum virtual file
-+size; a larger cluster size is required for guest to have access to a
-+larger size.  Furthermore, a virtual cluster must map to a host offset
-+below 64 PB (56 bits).
-+
- Given a offset into the virtual disk, the offset into the image file can be
- obtained as follows:
-
-@@ -427,7 +448,9 @@ Standard Cluster Descriptor:
- Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
-
-     Bit  0 - x-1:   Host cluster offset. This is usually _not_ aligned to a
--                    cluster or sector boundary!
-+                    cluster or sector boundary!  If cluster_bits is
-+                    small enough that this field includes bits beyond
-+                    55, those upper bits must be set to 0.
-
-          x - 61:    Number of additional 512-byte sectors used for the
-                     compressed data, beyond the sector containing the offset
+     g_free(s->cluster_cache);
+-    qemu_vfree(s->cluster_data);
++    g_free(s->cluster_data);
+     qcow2_refcount_close(bs);
+     qcow2_free_snapshots(bs);
+ }
 -- 
 2.14.3
