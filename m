@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eoub9-00040B-SX
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:24:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eoufc-0005Pn-BN
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:28:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eoub7-0001Hb-7c
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:23:59 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:34277)
+	(envelope-from <peter.maydell@linaro.org>) id 1eoufb-0006vD-B7
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:28:36 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:40328)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eoub7-0001Fq-06
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:23:57 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id a20so3385204wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 09:23:56 -0800 (PST)
-References: <20180208173157.24705-1-alex.bennee@linaro.org>
-	<20180208173157.24705-21-alex.bennee@linaro.org>
-	<d6f98bba-04ca-80f6-1fad-cfed416f4127@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <d6f98bba-04ca-80f6-1fad-cfed416f4127@linaro.org>
-Date: Thu, 22 Feb 2018 17:23:54 +0000
-Message-ID: <87h8q99bv9.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eoufb-0006u5-0p
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:28:35 -0500
+Received: by mail-ot0-x241.google.com with SMTP id s4so5306567oth.7
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 09:28:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 20/32] arm/translate-a64: add FP16 FCMxx
- (zero) to simd_two_reg_misc_fp16
+In-Reply-To: <20180217182323.25885-2-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Feb 2018 17:28:13 +0000
+Message-ID: <CAFEAcA-00jCXJzwSgGmC0gg=vWpmVFs0qUbrzEQ_THSzw74O9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 01/67] target/arm: Enable SVE
+ for aarch64-linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +31,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 02/08/2018 09:31 AM, Alex Benn=C3=A9e wrote:
->> +            maxpasses =3D hp ? (is_q ? 8 : 4) : (is_q ? 4 : 2);
+On 17 February 2018 at 18:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Enable ARM_FEATURE_SVE for the generic "any" cpu.
 >
->   (8 << is_q) >> size
->
-> ?
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.c   | 7 +++++++
+>  target/arm/cpu64.c | 1 +
+>  2 files changed, 8 insertions(+)
 
-Hmm I'm not so sure about this. While mine is longer form at least the
-intent is clear. What about:
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-    maxpasses =3D (is_q ? 4 : 2) << hp
+though this should probably go at the end of the patchseries rather
+than the beginning?
 
-It's still a little magical IMHO though...
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
