@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eopqs-0006vH-VO
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:19:56 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eopuP-00081d-37
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:23:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eopqr-0000h9-P6
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:19:54 -0500
-Date: Thu, 22 Feb 2018 13:19:25 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180222121925.GD4147@localhost.localdomain>
-References: <7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
-	<20180222105755.GB4147@localhost.localdomain>
-	<37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
-	<20180222113204.GC4147@localhost.localdomain>
-	<20180222114053.GE9323@redhat.com>
-	<ab206ced-9b56-93d5-04b7-f342d45a2927@kamp.de>
-	<20180222120029.GI9323@redhat.com>
-	<c46fd50f-3952-75a3-eb5a-a53a06c3bc4d@kamp.de>
-	<20180222120334.GJ9323@redhat.com>
-	<f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eopuK-00033a-RT
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:23:33 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51764
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1eopuK-00033L-Ly
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:23:28 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1MCKWRF028335
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:23:28 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2g9wex9242-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 07:23:26 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Thu, 22 Feb 2018 12:23:25 -0000
+References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
+	<29048432-906e-5fbe-d927-0814b0c24e4d@de.ibm.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Thu, 22 Feb 2018 13:23:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <f2c949cb-ef04-3b7d-1068-6af02ac2201c@kamp.de>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
+In-Reply-To: <29048432-906e-5fbe-d927-0814b0c24e4d@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <d31eb692-fd5e-7e83-1fa3-66d66f631043@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v8 00/13] Interactive Boot Menu for DASD
+ and SCSI Guests on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +44,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com
 
-Am 22.02.2018 um 13:06 hat Peter Lieven geschrieben:
-> Am 22.02.2018 um 13:03 schrieb Daniel P. Berrang=E9:
-> > On Thu, Feb 22, 2018 at 01:02:05PM +0100, Peter Lieven wrote:
-> >> Am 22.02.2018 um 13:00 schrieb Daniel P. Berrang=E9:
-> >>> On Thu, Feb 22, 2018 at 12:51:58PM +0100, Peter Lieven wrote:
-> >>>> Am 22.02.2018 um 12:40 schrieb Daniel P. Berrang=E9:
-> >>>>> On Thu, Feb 22, 2018 at 12:32:04PM +0100, Kevin Wolf wrote:
-> >>>>>> Am 22.02.2018 um 12:01 hat Peter Lieven geschrieben:
-> >>>>>>> Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
-> >>>>>>>> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
-> >>>>>>>>> On 20/02/2018 18:04, Peter Lieven wrote:
-> >>>>>>>>>> Hi,
-> >>>>>>>>>>
-> >>>>>>>>>> I remember we discussed a long time ago to limit the stack u=
-sage of all
-> >>>>>>>>>> functions that are executed in a coroutine
-> >>>>>>>>>> context to a very low value to be able to safely limit the c=
-oroutine
-> >>>>>>>>>> stack size as well.
-> >>>>>>>>> IIRC the only issue was that hw/ide/atapi.c has mutual recurs=
-ion between
-> >>>>>>>>> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_t=
-ransfer ->
-> >>>>>>>>> ide_atapi_cmd_reply_end.
-> >>>>>>>>>
-> >>>>>>>>> But perhaps it's not an issue, somebody needs to audit the co=
-de.
-> >>>>>>>> I think John intended to get rid of the recursion sometime, bu=
-t I doubt
-> >>>>>>>> he has had the time so far.
-> >>>>>>> Apart from this is is possible to define special cflags in the
-> >>>>>>> Makefile.objs just for a subdirectory? I have patches ready to =
-make
-> >>>>>>> the block layer files and other coroutine users compile with
-> >>>>>>> -Wstack-size=3D2048. But I do not want to specify each file sep=
-arately.
-> >>>>>> Our Makefiles have lines like this:
-> >>>>>>
-> >>>>>>     iscsi.o-cflags     :=3D $(LIBISCSI_CFLAGS)
-> >>>>>>
-> >>>>>> I don't think there is a direct mechanism to apply cflags to a w=
-hole
-> >>>>>> directory or just to block-obj-y/block-obj-m, but just looping o=
-ver them
-> >>>>>> could work. I'm not a Makefile expert at all, but after some toy=
-ing with
-> >>>>>> a simple example, something like this might work:
-> >>>>>>
-> >>>>>>     $(foreach x,$(block-obj-y),$(eval $x-cflags +=3D -Wstack-siz=
-e=3D2048))
-> >>>>> You'll need it for anything block layer depends on too - so that'=
-s much
-> >>>>> of util/, crypto/ and io/ directories at least.
-> >>>>>
-> >>>>> So perhaps it would be shorter if we do the opposite - set -Wstac=
-k-size=3D2048
-> >>>>> globally for everything in QEMU, and then override -Wstack-size=3D=
-$BIGGER
-> >>>>> for the (hopefully) few sources that have a larger stack need ?
-> >>>> I tried that already. 2048 is a strong limit for many functions.
-> >>>> It breaks already as soon as some buffer has a size of PATH_MAX, b=
-ut
-> >>>> thats handleable. But there are some structs around that are very =
-large.
-> >>> There are surprisingly few "char [PATH_MAX]" variables left in QEMU=
- - we
-> >>> should have a final push to eliminate them regardless.
-> >>>
-> >>>> Generally, it would be a good idea to have a global limit, of cour=
-se.
-> >>> We could at least put a limit on that matches the current worst cas=
-e to
-> >>> prevent it getting worse than it already is.
-> >> That would be a good idea, yes.
-> >>
-> >> How would you handle the override for a smaller -Wstack-usage ?
-> > If you have multiple -Wstack-size=3D$XXX  flags to GCC, I expect the =
-last
-> > one wins. So just need to double check that the per-object file CFLAG=
-S
-> > occur after the global CFLAS in the compiler args
->=20
-> I will check that, thanks.
->=20
-> When I am at it, what would be the proper replacement for char[PATH_MAX=
-] ?
+On 22.02.2018 12:51, Christian Borntraeger wrote:
+> Series
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> 
+> menu on scsi and dasd bootmaps tested successfully.
+> 
+> There is one thing that we might want to fix (can be an addon patch since this is a non-customer
+> scenario (no libvirt)).
+> 
+> If you start QEMU manually without a bootindex, the -boot menu=on is ignored
+> if no drive has a bootindex.
+> 
+> For example:
+> 
+> -drive file=/dev/dasda,if=none,id=d1 -device virtio-blk-ccw,drive=d1,bootindex=1 -boot menu=on
+> does work
+> 
+> -drive file=/dev/dasda -boot menu=on
+> does not
+> 
+> instead it prints:
+> qemu-system-s390x: boot menu is not supported for this device type.
+> 
+> and the boots up the default entry.
+> 
+That should indeed be a separate patch, as it would move logic currently
+in the BIOS up to QEMU (find the first defined virtio disk and select it
+as boot disk).
+In fact it's more complicated than that, because it would have to
+properly account for -boot order=[acdn] and produce the respective IPLB.
+While it makes sense, I wouldn't rush that in but rather change the
+error message to indicate that -device bootindex is needed to activate
+the menu, at least for the time being.
+[...]
 
-g_malloc() with the exact size?
-
-Kevin
+-- 
+Regards,
+ Viktor Mihajlovski
