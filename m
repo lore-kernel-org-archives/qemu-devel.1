@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eouKp-0007pV-3n
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:07:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eouRG-0001R9-Ln
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:13:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eouKo-00004q-7u
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:07:07 -0500
-References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
-	<7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
-	<20180222105755.GB4147@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c374c10a-a46c-1870-8f2c-47a2841b8a44@redhat.com>
-Date: Thu, 22 Feb 2018 12:06:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eouRF-0008B1-AJ
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:13:46 -0500
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:43793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eouRF-0008AK-47
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:13:45 -0500
+Received: by mail-ot0-x231.google.com with SMTP id q12so5263517otg.10
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 09:13:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180222105755.GB4147@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
+In-Reply-To: <20180219040342.12686-4-mdavidsaver@gmail.com>
+References: <20180219040342.12686-1-mdavidsaver@gmail.com>
+	<20180219040342.12686-4-mdavidsaver@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Feb 2018 17:13:23 +0000
+Message-ID: <CAFEAcA88Uq3VYBnpkME_63ezTVt9irj-J0nGUMwMb5HP9L6J2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/5] timer: generalize Dallas/Maxim RTC i2c
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Michael Davidsaver <mdavidsaver@gmail.com>
+Cc: Paul Brook <paul@codesourcery.com>, Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>
+
+On 19 February 2018 at 04:03, Michael Davidsaver <mdavidsaver@gmail.com> wrote:
+> Support for: ds1307, ds1337, ds1338, ds1339,
+> ds1340, ds1375, ds1388, and ds3231.
+>
+> Tested with ds1338 and ds1375.
+>
+> The existing ds1338 model has two bugs
+> with almost no practical impact.
+>
+> 1. Trying to set time in 12-hour mode works,
+> but the 12 hour mode bit isn't stored.
+> So time always reads in 24 hour mode.
+>
+> 2. wday_offset is always stored for the
+> local time zone.  When the RTC is set
+> and rtc_utc=1 and the local timezone
+> has a different day than UTC, then
+> wday_offset will be off by one.
+>
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+> ---
+>  default-configs/arm-softmmu.mak |   2 +-
+>  hw/timer/Makefile.objs          |   2 +-
+>  hw/timer/ds-rtc-i2c.c           | 466 ++++++++++++++++++++++++++++++++++++++++
+>  hw/timer/ds1338.c               | 248 ---------------------
+
+This patch is really hard for me to read because it's
+basically "throw away the old file and implement a new one".
+Can you split it up a bit please? I'd recommend starting with
+"just a plain file rename" and then piecemeal changes of
+behaviour. Then it's easy to see what has been changed.
 
 
+> --- /dev/null
+> +++ b/hw/timer/ds-rtc-i2c.c
+> @@ -0,0 +1,466 @@
+> +/* Emulation of various Dallas/Maxim RTCs accessed via I2C bus
+> + *
+> + * Copyright (c) 2017 Michael Davidsaver
+> + * Copyright (c) 2009 CodeSourcery
+> + *
+> + * Authors: Michael Davidsaver
+> + *          Paul Brook
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the LICENSE file in the top-level directory.
 
-On 02/22/2018 05:57 AM, Kevin Wolf wrote:
-> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
->> On 20/02/2018 18:04, Peter Lieven wrote:
->>> Hi,
->>>
->>> I remember we discussed a long time ago to limit the stack usage of all
->>> functions that are executed in a coroutine
->>> context to a very low value to be able to safely limit the coroutine
->>> stack size as well.
->>
->> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
->> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
->> ide_atapi_cmd_reply_end.
->>
->> But perhaps it's not an issue, somebody needs to audit the code.
-> 
-> I think John intended to get rid of the recursion sometime, but I doubt
-> he has had the time so far.
-> 
+This has lost the "contributions after 2012 are GPL-2-or-later"
+part of the licensing information.
 
-It hasn't been a priority for me.
+> +#ifdef DEBUG_DSRTC
+> +#define DPRINTK(FMT, ...) info_report(TYPE_DSRTC " : " FMT, ## __VA_ARGS__)
+> +#else
+> +#define DPRINTK(FMT, ...) do {} while (0)
+> +#endif
 
-Paolo tried to fix ATAPI by adding a BH callback, but that added the
-possibility of a migration halfway through a data transfer IIRC.
+If we're overhauling the device it might be nice to convert it
+to tracepoints, but I don't insist on that.
 
-If anyone wants to tackle it, I'll dig up Paolo's patches.
+> +#define TYPE_DSRTC "ds-rtc-i2c"
+> +#define DSRTC(obj) OBJECT_CHECK(DSRTCState, (obj), TYPE_DSRTC)
+> +#define DSRTC_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(DSRTCClass, obj, TYPE_DSRTC)
+> +#define DSRTC_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(DSRTCClass, klass, TYPE_DSRTC)
+> +
+> +static const VMStateDescription vmstate_dsrtc = {
+> +    .name = TYPE_DSRTC,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_I2C_SLAVE(parent_obj, DSRTCState),
+> +        VMSTATE_INT64(time_offset, DSRTCState),
+> +        VMSTATE_INT8_V(wday_offset, DSRTCState, 2),
+> +        VMSTATE_UINT8_ARRAY(regs, DSRTCState, DSRTC_REGSIZE),
+> +        VMSTATE_UINT8(addr, DSRTCState),
+> +        VMSTATE_BOOL(addrd, DSRTCState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
 
---js
+Changing the VMState name and fields will break cross-version
+migration from old QEMU versions of all the boards which use a
+DS1338. I'd strongly prefer to avoid that. There are ways to
+do that, like subsections and pre/post-load functions, but a
+big part of it is not changing fields if you don't really need to.
+
+> +
+> +static void dsrtc_reset(DeviceState *device);
+> +
+> +/* update current time registers */
+> +static
+
+Can you not put newlines after the 'static' keyword, please?
+
+> +void dsrtc_latch(DSRTCState *ds)
+> +{
+
+
+thanks
+-- PMM
