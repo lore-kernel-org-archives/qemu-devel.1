@@ -1,23 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eomAd-0004ZM-SV
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:24:04 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eomP1-0008LC-IX
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:38:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eomAa-0005Mt-Mw
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:24:03 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:46659
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eomOy-00061B-EU
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:38:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39614)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eomAa-00057e-Eh
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:24:00 -0500
-Date: Thu, 22 Feb 2018 08:23:41 +0000
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <20180222082341.sk2pkai7kf5kurfh@kentang.home>
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1eomOy-00060Y-6R
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 03:38:52 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1M8bjff042951
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 03:38:50 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9pnv7ht7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 03:38:50 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Thu, 22 Feb 2018 08:38:48 -0000
+References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1519241752-28083-6-git-send-email-walling@linux.vnet.ibm.com>
+	<022d14c9-8b5f-dc32-7efa-b3a53a7b898d@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Thu, 22 Feb 2018 09:38:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PULL] Update OpenBIOS images
+In-Reply-To: <022d14c9-8b5f-dc32-7efa-b3a53a7b898d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <971a8588-95fc-f569-3183-cfa0e2ce67c5@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 05/13] s390-ccw: move
+ auxiliary IPL data to separate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +44,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
-Hi Peter,
+On 22.02.2018 05:40, Thomas Huth wrote:
+> On 21.02.2018 20:35, Collin L. Walling wrote:
+>> The s390-ccw firmware needs some information in support of the
+>> boot process which is not available on the native machine.
+>> Examples are the netboot firmware load address and now the
+>> boot menu parameters.
+>>
+>> While storing that data in unused fields of the IPL parameter block
+>> works, that approach could create problems if the parameter block
+>> definition should change in the future. Because then a guest could
+>> overwrite these fields using the set IPLB diagnose.
+>>
+>> In fact the data in question is of more global nature and not really
+>> tied to an IPL device, so separating it is rather logical.
+>>
+>> This commit introduces a new structure to hold firmware relevant
+>> IPL parameters set by QEMU. The data is stored at location 204 (dec)
+>> and can contain up to 7 32-bit words. This area is available to
+>> programming in the z/Architecture Principles of Operation and
+>> can thus safely be used by the firmware until the IPL has completed.
+>>
+>> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+>> ---
+>>  hw/s390x/ipl.c          | 18 +++++++++++++++++-
+>>  hw/s390x/ipl.h          | 25 +++++++++++++++++++++++--
+>>  pc-bios/s390-ccw/iplb.h | 18 ++++++++++++++++--
+>>  pc-bios/s390-ccw/main.c |  6 +++++-
+>>  4 files changed, 61 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 0d06fc1..79f5a58 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -399,6 +399,21 @@ void s390_reipl_request(void)
+>>      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>>  }
+>>  
+>> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
+>> +{
+>> +    S390IPLState *ipl = get_ipl_device();
+>> +    uint8_t *addr;
+>> +    uint64_t len = 4096;
+>> +
+>> +    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
+>> +    if (!addr || len < QIPL_ADDRESS + sizeof(QemuIplParameters)) {
+>> +        error_report("Cannot set QEMU IPL parameters");
+>> +        return;
+>> +    }
+>> +    memcpy(addr + QIPL_ADDRESS, &ipl->qipl, sizeof(QemuIplParameters));
+>> +    cpu_physical_memory_unmap(addr, len, 1, len);
+>> +}
+>> +
+>>  void s390_ipl_prepare_cpu(S390CPU *cpu)
+>>  {
+>>      S390IPLState *ipl = get_ipl_device();
+>> @@ -418,8 +433,9 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>>              error_report_err(err);
+>>              vm_stop(RUN_STATE_INTERNAL_ERROR);
+>>          }
+>> -        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+>> +        ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+>>      }
+>> +    s390_ipl_prepare_qipl(cpu);
+>>  }
+>>  
+>>  static void s390_ipl_reset(DeviceState *dev)
+>> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+>> index 8a705e0..08926a3 100644
+>> --- a/hw/s390x/ipl.h
+>> +++ b/hw/s390x/ipl.h
+>> @@ -16,8 +16,7 @@
+>>  #include "cpu.h"
+>>  
+>>  struct IplBlockCcw {
+>> -    uint64_t netboot_start_addr;
+>> -    uint8_t  reserved0[77];
+>> +    uint8_t  reserved0[85];
+>>      uint8_t  ssid;
+>>      uint16_t devno;
+>>      uint8_t  vm_flags;
+>> @@ -90,6 +89,27 @@ void s390_ipl_prepare_cpu(S390CPU *cpu);
+>>  IplParameterBlock *s390_ipl_get_iplb(void);
+>>  void s390_reipl_request(void);
+>>  
+>> +#define QIPL_ADDRESS  0xcc
+>> +
+>> +/*
+>> + * The QEMU IPL Parameters will be stored at absolute address
+>> + * 204 (0xcc) which means it is 32-bit word aligned but not
+>> + * double-word aligned.
+>> + * Placement of data fields in this area must account for
+>> + * their alignment needs. E.g., netboot_start_address must
+>> + * have an offset of n * 8 bytes within the struct in order
+>> + * to keep it double-word aligned.
+> 
+> Should that rather be "4 + n * 8" instead of "n * 8" ?
+I wonder if I ever get that comment right. You're correct of course.
+> 
+> Apart from that, patch looks good to me now, so once you've fixed the
+> comment (if necessary):
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
 
-This update for OpenBIOS contains a single fix which allows yaboot 1.3.17 to boot
-under qemu-system-ppc. Please pull.
 
-
-ATB,
-
-Mark.
-
-
-The following changes since commit a6e0344fa0e09413324835ae122c4cadd7890231:
-
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180220-pull-request' into staging (2018-02-20 14:05:00 +0000)
-
-are available in the git repository at:
-
-  https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
-
-for you to fetch changes up to feb3174ff27f94d34247952d9779f09e9b1dfd39:
-
-  Update OpenBIOS images to 54d959d9 built from submodule. (2018-02-22 07:55:47 +0000)
-
-----------------------------------------------------------------
-Update OpenBIOS images
-
-----------------------------------------------------------------
-Mark Cave-Ayland (1):
-      Update OpenBIOS images to 54d959d9 built from submodule.
-
- pc-bios/openbios-ppc     | Bin 754936 -> 754936 bytes
- pc-bios/openbios-sparc32 | Bin 382048 -> 382048 bytes
- pc-bios/openbios-sparc64 | Bin 1593408 -> 1593408 bytes
- roms/openbios            |   2 +-
- 4 files changed, 1 insertion(+), 1 deletion(-)
+-- 
+Regards,
+ Viktor Mihajlovski
