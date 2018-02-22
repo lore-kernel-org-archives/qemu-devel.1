@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eoq5z-0002t0-Rb
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:35:32 -0500
+	(envelope-from <thuth@redhat.com>) id 1eoqCq-0004Po-DB
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:42:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eoq5y-0004id-Eg
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:35:31 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44117)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eoq5y-0004hN-73
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:35:30 -0500
-Received: by mail-wr0-x241.google.com with SMTP id v65so10374686wrc.11
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 04:35:29 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1eoqCn-0002Mc-7v
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 07:42:36 -0500
+References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
+	<29048432-906e-5fbe-d927-0814b0c24e4d@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <70f37041-309d-c131-51be-5c6c8488e63d@redhat.com>
+Date: Thu, 22 Feb 2018 13:42:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180222121351.26191-1-berrange@redhat.com>
-References: <20180222121351.26191-1-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 22 Feb 2018 13:35:28 +0100
-Message-ID: <CAJ+F1C+TnFeqWK11fTgC68s107++5jPhbb0thuU0b-kGTXVeug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] chardev: fix handling of EAGAIN for TCP
- chardev
+In-Reply-To: <29048432-906e-5fbe-d927-0814b0c24e4d@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 00/13] Interactive Boot
+ Menu for DASD and SCSI Guests on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksey Kuleshov <rndfax@yandex.ru>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, eblake@redhat.com
 
-On Thu, Feb 22, 2018 at 1:13 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> When this commit was applied
->
->   commit 9894dc0cdcc397ee5b26370bc53da6d360a363c2
->   Author: Daniel P. Berrange <berrange@redhat.com>
->   Date:   Tue Jan 19 11:14:29 2016 +0000
->
->     char: convert from GIOChannel to QIOChannel
->
-> The tcp_chr_recv() function was changed to return QIO_CHANNEL_ERR_BLOCK
-> which corresonds to -2. As such the handling for EAGAIN was able to be
-> removed from tcp_chr_read(). Unfortunately in a later commit:
->
->   commit b6572b4f97a7b126c7b24e165893ed9fe3d72e1f
->   Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->   Date:   Fri Mar 11 18:55:24 2016 +0100
->
->     char: translate from QIOChannel error to errno
->
-> The tcp_chr_recv() function was changed back to return -1, with errno
-> set to EAGAIN, without also re-addding support for this to tcp_chr_read()
->
-> Reported-by: Aleksey Kuleshov <rndfax@yandex.ru>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On 22.02.2018 12:51, Christian Borntraeger wrote:
+> Series
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+OK, thanks.
 
+I can pick up the patches from this series and fix the comment in patch
+5 and the missing break in patch 13 manually, no need to resend so far.
 
-> ---
->  chardev/char-socket.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index bdd6cff5f6..b15682c362 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -449,7 +449,7 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCon=
-dition cond, void *opaque)
->          len =3D s->max_size;
->      }
->      size =3D tcp_chr_recv(chr, (void *)buf, len);
-> -    if (size =3D=3D 0 || size =3D=3D -1) {
-> +    if (size =3D=3D 0 || (size =3D=3D -1 && errno !=3D EAGAIN)) {
->          /* connection closed */
->          tcp_chr_disconnect(chr);
->      } else if (size > 0) {
-> --
-> 2.14.3
->
->
+> menu on scsi and dasd bootmaps tested successfully.
+> 
+> There is one thing that we might want to fix (can be an addon patch since this is a non-customer
+> scenario (no libvirt)).
 
+I agree that this can be an add-on patch.
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+ Thomas
