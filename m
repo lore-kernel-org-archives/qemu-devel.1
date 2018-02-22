@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eolIG-0008OS-SY
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:27:53 -0500
+	(envelope-from <peterx@redhat.com>) id 1eolOa-0001K7-TG
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:34:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eolID-00070t-Pd
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:27:52 -0500
-References: <cover.1519150239.git.balaton@eik.bme.hu>
-	<CAFEAcA8UnMNoGbpx+Mhh8AT9MfOMuUZvMd139tGQFokTAWqWpA@mail.gmail.com>
-	<20180220204450.GA27101@flamenco>
-	<CAFEAcA-p_og1Dc3DOTbAYofqAUEn0rnuuizoU8xtWrtOtzpp-w@mail.gmail.com>
-	<alpine.BSF.2.21.1802211754370.60913@zero.eik.bme.hu>
-	<CAFEAcA-UaWGqLHfN_Z7h+C-k=1A5ic_REaWUu0-w19ALcNJy_A@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e300f9da-8a47-7c0f-71db-2e5227c0c275@redhat.com>
-Date: Thu, 22 Feb 2018 08:27:36 +0100
+	(envelope-from <peterx@redhat.com>) id 1eolOX-0005FC-Qr
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:34:24 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34366 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eolOX-0005Dl-M4
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 02:34:21 -0500
+Date: Thu, 22 Feb 2018 15:34:00 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180222073400.GF18962@xz-mi>
+References: <20180208103132.28452-1-peterx@redhat.com>
+	<20180208103132.28452-22-peterx@redhat.com>
+	<20180213181750.GQ2378@work-vm> <20180214042000.GF4472@xz-mi>
+	<20180214184045.GE2507@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-UaWGqLHfN_Z7h+C-k=1A5ic_REaWUu0-w19ALcNJy_A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/2] Firmware blob and git
- submodule for Sam460ex
+Content-Disposition: inline
+In-Reply-To: <20180214184045.GE2507@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v6 21/28] migration: setup ramstate for
+ resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, David Gibson <dgibson@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 21.02.2018 19:33, Peter Maydell wrote:
-> On 21 February 2018 at 17:06, BALATON Zoltan <balaton@eik.bme.hu> wrote=
-:
->> It's not that upstream u-boot has abandoned board support (it only rem=
-oved
->> support for the PPC440 CPU it once had). The board itself never had su=
-pport
->> in upstream u-boot, it only exists in vendor's fork which is the reaso=
-n we
->> need a separate source and cannot use upstream u-boot source we alread=
-y
->> have.
->>
->> In my opinion we don't aim to take on support for this board in u-boot=
-, we
->> only need to include the firmware binary for the emulation to be usefu=
-l
->> which then requires us to also include the source for the GPL it's lic=
-ensed
->> under. I've also found a few bugs in the firmware which I've fixed but=
- apart
->> from such occasional bug fixes when needed I don't expect to take over
->> support for the board from the hardware vendor so this source is only =
-so we
->> can include the firmware binary which is needed for the board emulatio=
-n.
->> Does this answer your concerns?
->=20
-> We have lots of boards we don't ship firmware blobs for and
-> which we expect the users to provide the guest code for
-> if they're going to use them.
+On Wed, Feb 14, 2018 at 06:40:46PM +0000, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Tue, Feb 13, 2018 at 06:17:51PM +0000, Dr. David Alan Gilbert wrote:
+> > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > After we updated the dirty bitmaps of ramblocks, we also need to update
+> > > > the critical fields in RAMState to make sure it is ready for a resume.
+> > > > 
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  migration/ram.c        | 40 +++++++++++++++++++++++++++++++++++++++-
+> > > >  migration/trace-events |  1 +
+> > > >  2 files changed, 40 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/migration/ram.c b/migration/ram.c
+> > > > index a2a4b05d5c..d275875f54 100644
+> > > > --- a/migration/ram.c
+> > > > +++ b/migration/ram.c
+> > > > @@ -2250,6 +2250,36 @@ static int ram_init_all(RAMState **rsp)
+> > > >      return 0;
+> > > >  }
+> > > >  
+> > > > +static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
+> > > > +{
+> > > > +    RAMBlock *block;
+> > > > +    long pages = 0;
+> > > > +
+> > > > +    /*
+> > > > +     * Postcopy is not using xbzrle/compression, so no need for that.
+> > > > +     * Also, since source are already halted, we don't need to care
+> > > > +     * about dirty page logging as well.
+> > > > +     */
+> > > > +
+> > > > +    RAMBLOCK_FOREACH(block) {
+> > > > +        pages += bitmap_count_one(block->bmap,
+> > > > +                                  block->used_length >> TARGET_PAGE_BITS);
+> > > > +    }
+> > > > +
+> > > > +    /* This may not be aligned with current bitmaps. Recalculate. */
+> > > > +    rs->migration_dirty_pages = pages;
+> > > 
+> > > migration_dirty_pages is uint64_t - so we should probably do the cast
+> > > above and keep 'pages' as uint64_t.
+> > 
+> > Sure.
+> > 
+> > > 
+> > > > +    rs->last_seen_block = NULL;
+> > > > +    rs->last_sent_block = NULL;
+> > > > +    rs->last_page = 0;
+> > > > +    rs->last_version = ram_list.version;
+> > > 
+> > > Do you need to explicitly set
+> > >        rs->ram_bulk_stage = false;
+> > > 
+> > > if the failure happened just after the start of postcopy and no
+> > > requested pages had been sent, I think it might still  be set?
+> > 
+> > Could you elaborate what would go wrong even if it's still set?
+> 
+> I think it might start sending all pages rather than just those
+> that are dirty/needed;  see migration_bitmap_find_dirty.
 
-... which is also somewhat unfortunate. Have you ever tried to run one
-of those boards to see whether you've broken something with your code
-changes or not? Hunting the firmware for such a board can be quite
-challenging. I'm not saying that we should now try to include way more
-firmware blobs in our repository (its size would explode, I guess), but
-maybe we should at least start a Wiki page with links to the various
-firmware images or so?
+Ah yes.  I should turn it off.
 
- Thomas
+-- 
+Peter Xu
