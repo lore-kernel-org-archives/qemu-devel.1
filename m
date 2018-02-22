@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eotdG-00040X-1b
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:22:07 -0500
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoteH-0004Zz-0b
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:23:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eotdE-0003Ol-LX
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:22:06 -0500
-Date: Thu, 22 Feb 2018 17:21:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180222162147.GL4147@localhost.localdomain>
-References: <20180205151835.20812-1-mreitz@redhat.com>
-	<20180205151835.20812-4-mreitz@redhat.com>
-	<20180222133956.GG4147@localhost.localdomain>
-	<a28d1832-cdf2-3413-a0f3-a885dfaa2375@redhat.com>
-	<20180222151210.GK4147@localhost.localdomain>
-	<c5a34045-7c8f-f37b-8fc6-a5338cedc2bf@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uZ3hkaAS1mZxFaxD"
-Content-Disposition: inline
-In-Reply-To: <c5a34045-7c8f-f37b-8fc6-a5338cedc2bf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 03/26] block: Add BDS.backing_overridden
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1eoteD-0004pw-No
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:23:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50274
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
+	id 1eoteD-0004ot-IA
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 11:23:05 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1MGIrv5129957
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 11:23:05 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2g9x78sbq0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 11:23:04 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
+	Thu, 22 Feb 2018 16:23:02 -0000
+From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Date: Thu, 22 Feb 2018 17:22:57 +0100
+In-Reply-To: <1519316579-7162-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+References: <1519316579-7162-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+Message-Id: <1519316579-7162-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] s390x/sclp: proper support of larger
+ send and receive masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,150 +39,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>
+To: cohuck@redhat.com
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
+Until 67915de9f0383ccf4a ("s390x/event-facility: variable-length event masks")
+we only supported sclp event masks of size exactly 4 bytes, even though
+the archiecture allows the guests to set up sclp event masks from 1 to
+1021 bytes in length.
+After that patch, the behaviour was almost compliant, but some issues
+were still remaining, in particular regarding the handling of selective
+reads and migration.
 
---uZ3hkaAS1mZxFaxD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+When setting the sclp event mask, a mask size is also specified. Until
+now we only considered the size in order to decide which bits to save
+in the internal state. On the other hand, when a guest performs a
+selective read, it sends a mask, but it does not specify a size; the
+implied size is the size of the last mask that has been set.
 
-Am 22.02.2018 um 16:17 hat Max Reitz geschrieben:
-> On 2018-02-22 16:12, Kevin Wolf wrote:
-> > Am 22.02.2018 um 15:55 hat Max Reitz geschrieben:
-> >> On 2018-02-22 14:39, Kevin Wolf wrote:
-> >>> Am 05.02.2018 um 16:18 hat Max Reitz geschrieben:
-> >>>> If the backing file is overridden, this most probably does change the
-> >>>> guest-visible data of a BDS. Therefore, we will need to consider thi=
-s in
-> >>>> bdrv_refresh_filename().
-> >>>>
-> >>>> Adding a new field to the BDS is not nice, but it is very simple and
-> >>>> exactly keeps track of whether the backing file has been overridden.
-> >>>
-> >>> ...as long as we manage to actually keep it up to date all the time.
-> >>>
-> >>> First of all, what I'm missing here (or in fact in the comment in the
-> >>> code) is a definition what "overridden" really means. "specified by t=
-he
-> >>> user" is kind of vague: You consider the backing file relationship for
-> >>> snapshot=3Don as user specified, even though the user wasn't explicit
-> >>> about this. On the other hand, creating a live snapshot results in a
-> >>> node that isn't user specified.
-> >>>
-> >>> Isn't the real question to ask whether the default backing file (taken
-> >>> from the image header) would result in the same tree? The answer to t=
-his
-> >>> changes after more operations, like qmp_change_backing_file().
-> >>
-> >> With you so far.
-> >>
-> >>> Considering that there are so many ways to change the answer, I think
-> >>> the simplest reliable option isn't a new BDS field that needs to upda=
-ted
-> >>> everywhere, but looking at the current value of bs->options and
-> >>> bs->backing_file and see if they match.
-> >>
-> >> I don't see how that is simple.  First, bs->options does not necessari=
-ly
-> >> reflect the "current options", those would be bs->full_open_options.
-> >> And for generating that, we need a way to determine whether the backing
-> >> file has been overridden or not, so whether we need to put the backing
-> >> options into it or whether we do not.
-> >=20
-> > For the purpose of this comparison, we need a set of options that
-> > contains the backing file options unconditionally.
-> >=20
-> >> (I am right that bs->backing_file is what the image header says, right?
-> >> So we need to compare it against something that reflects the runtime s=
-tate.)
-> >=20
-> > I think so, yes.
-> >=20
-> >> What I could see would be comparing bs->backing_file to
-> >> bs->backing->bs->filename.  But this sounds very hacky to me.
-> >>
-> >> One thing the comes to mind is that it can break whenever
-> >> bdrv_refresh_filename() is clever.  So you specify
-> >> 'json:{"driver":"null-co"}' in the image header, and
-> >> bdrv_refresh_filename() optimizes that to "null-co://".  Now the
-> >> filenames differ even though it's still the original filename.  So this
-> >> wouldn't work very well either.
+Specifying bits in the mask of selective read that are not available in
+the internal mask should return an error, and bits past the end of the
+mask should obviously be ignored. This can only be achieved by keeping
+track of the lenght of the mask.
 
-So what's the full effect here?
+The mask length is thus now part of the internal state that needs to be
+migrated.
 
-You example says that if you use an overcomplicated way to specify an
-image (by using json: instead of an URL), you get back an
-overcomplicated filename for the parent image (which includes the
-backing file even though it's not really necessary). Sounds fair enough
-to me.
+This patch fixes the handling of selective reads, whose size will now
+match the length of the event mask, as per architecture.
 
-Can bad things happen with absolute vs. relative paths?
+While the default behaviour is to be compliant with the architecture,
+when using older machine models the old broken behaviour is selected
+(allowing only masks of size exactly 4), in order to be able to migrate
+toward older versions.
 
-> > On the other hand, the problem with your current approach is that it
-> > results in a JSON filename even if you override the backing file and
-> > specify the same file name as we already have in the image header.
->=20
-> Yes.
->=20
-> > In the future, libvirt is going to manually build the graph, so we will
-> > always have the backing file overridden according to the logic in this
-> > patch. I don't think we want to get JSON filenames for all libvirt
-> > managed VMs, so can we realistically do without any kind of comparison?
->=20
-> libvirt doesn't need to query the filename, though, does it?
+Fixes: 67915de9f0383ccf4a ("s390x/event-facility: variable-length event masks")
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+---
+ hw/s390x/event-facility.c  | 91 +++++++++++++++++++++++++++++++++++++++-------
+ hw/s390x/s390-virtio-ccw.c |  8 +++-
+ 2 files changed, 85 insertions(+), 14 deletions(-)
 
-I know that libvirt uses the output in qemu-img info. And I learnt about
-that because they were surprised that json: filenames you get there
-can't necessarily be fed to QMP (because they contain only strings).
-
-Other than that, I hope they don't. I suppose the filename can end up in
-error messages in logfiles, though.
-
-> In my mind, we wanted to phase out filenames and basically only present
-> them as convenience/legacy information to users who use qemu directly.
->=20
-> I really don't see the point of burdening qemu with simplifying and
-> niceifying filenames when you want to use node names for everything
-> anyway.
-
-But if you essentially say "filenames are only for those who don't use
-advanced features", then why bother with overridden backing files?
-
-There are two problems I have with this patch: The first is that it
-introduces additional state that needs to be managed correctly in all
-future patches that modify the graph, and the second (and worse one) is
-that it fails to manage this state correctly even now.
-
-I mentioned snapshots and change-backing-file that can result in a wrong
-bs->backing_overridden, and those were only the obvious first places I
-had a look at. Even if you fix them, I wouldn't trust my own review to
-find all relevant places. And that's a really bad sign for a design.
-
-This is the most important reason why I'm looking for some method to
-derive the flag from already existing state.
-
-Kevin
-
---uZ3hkaAS1mZxFaxD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJaju4bAAoJEH8JsnLIjy/WPl0QAJJhVtQYZS/eFM35zt39z4ut
-Lg4znNc8HVYlopihxj7arzMuAfN5Wl8ys789y/ikGSR/wSTS5tVW5rK0k3Ej9Ejr
-/9rj9XBu9SgXS1t3+PHT99GAMV9/LmtLOIpKWbx7cuABu/QZmRvO3vKZtpJwMei+
-pA7N/eIsvLsqvA9673YguNouXKJVfbWjznXslPKLhR+wcS8IbOlEI96cmDNA51S3
-No1FQCincxFWgRRx3J8jwSTlg5jf9XjYm2xIiS3izqBEaaPIQ1fw1Sl+NJ1VVKvu
-iQ3KVDGSlCekv+owpLSg7Y8sqrXVLvvFntquuM4c12d292A+aKxCV08U4lHOd0NB
-ogOSvl0g9TumRpWgluHXOI2YU/XpD5lwUBcBPqXtkicPVDHw6nEYD42/1FL0IXIf
-TIV/rYO4/g/5SYNb1MFThQ5CMPG4siHsuvmqQLFXgMpwZvmPqSvU7rTuFJLGLiKw
-nRBPERxPv+AZAJkvUFw2H4TZIjbHGqs2fy8lu8ZRhrNRDJIdfcpz6LdsWNSDOSz5
-UppP5HbTXskMIysjdRN1slMponitGkA2UapatLfKa1H/CEwRiB4I6q2d7OgAZa1X
-urmpqyWXQCS5AiAB5rcoyhzsgNrzYYgyt8WPGS8/Rw/MTWlPheh0FBn/WOug+qmu
-KyVw1CwHFByprgZUZSD6
-=lxCg
------END PGP SIGNATURE-----
-
---uZ3hkaAS1mZxFaxD--
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 155a694..b7cd075 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -31,6 +31,15 @@ struct SCLPEventFacility {
+     SCLPEventsBus sbus;
+     /* guest' receive mask */
+     unsigned int receive_mask;
++    /*
++     * when false, we keep the same broken, backwards compatible behaviour as
++     * before, allowing only masks of size exactly 4; when true, we implement
++     * the architecture correctly, allowing all valid mask sizes. Needed for
++     * migration toward older versions.
++     */
++    bool allow_all_mask_sizes;
++    /* length of the receive mask */
++    uint16_t mask_length;
+ };
+ 
+ /* return true if any child has event pending set */
+@@ -220,6 +229,17 @@ static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
+     return rc;
+ }
+ 
++/* copy up to dst_len bytes and fill the rest of dst with zeroes */
++static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
++                      uint16_t src_len)
++{
++    int i;
++
++    for (i = 0; i < dst_len; i++) {
++        dst[i] = i < src_len ? src[i] : 0;
++    }
++}
++
+ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+ {
+     unsigned int sclp_active_selection_mask;
+@@ -240,7 +260,9 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+         sclp_active_selection_mask = sclp_cp_receive_mask;
+         break;
+     case SCLP_SELECTIVE_READ:
+-        sclp_active_selection_mask = be32_to_cpu(red->mask);
++        copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
++                  sizeof(sclp_active_selection_mask), ef->mask_length);
++        sclp_active_selection_mask = be32_to_cpu(sclp_active_selection_mask);
+         if (!sclp_cp_receive_mask ||
+             (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
+             sccb->h.response_code =
+@@ -259,24 +281,14 @@ out:
+     return;
+ }
+ 
+-/* copy up to dst_len bytes and fill the rest of dst with zeroes */
+-static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
+-                      uint16_t src_len)
+-{
+-    int i;
+-
+-    for (i = 0; i < dst_len; i++) {
+-        dst[i] = i < src_len ? src[i] : 0;
+-    }
+-}
+-
+ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+ {
+     WriteEventMask *we_mask = (WriteEventMask *) sccb;
+     uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
+     uint32_t tmp_mask;
+ 
+-    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX)) {
++    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
++        ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
+         sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
+         goto out;
+     }
+@@ -301,6 +313,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+               mask_length, sizeof(tmp_mask));
+ 
+     sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_COMPLETION);
++    ef->mask_length = mask_length;
+ 
+ out:
+     return;
+@@ -356,6 +369,34 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
+     }
+ }
+ 
++static bool vmstate_event_facility_mask_length_needed(void *opaque)
++{
++    SCLPEventFacility *ef = opaque;
++
++    return ef->allow_all_mask_sizes;
++}
++
++static int vmstate_event_facility_mask_length_pre_load(void *opaque)
++{
++    SCLPEventFacility *ef = opaque;
++
++    ef->allow_all_mask_sizes = false;
++    return 0;
++}
++
++static const VMStateDescription vmstate_event_facility_mask_length = {
++    .name = "vmstate-event-facility/mask_length",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .needed = vmstate_event_facility_mask_length_needed,
++    .pre_load = vmstate_event_facility_mask_length_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(allow_all_mask_sizes, SCLPEventFacility),
++        VMSTATE_UINT16(mask_length, SCLPEventFacility),
++        VMSTATE_END_OF_LIST()
++     }
++};
++
+ static const VMStateDescription vmstate_event_facility = {
+     .name = "vmstate-event-facility",
+     .version_id = 0,
+@@ -363,15 +404,39 @@ static const VMStateDescription vmstate_event_facility = {
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(receive_mask, SCLPEventFacility),
+         VMSTATE_END_OF_LIST()
++     },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_event_facility_mask_length,
++        NULL
+      }
+ };
+ 
++static void sclp_event_set_allow_all_mask_sizes(Object *obj, bool value,
++                                                       Error **errp)
++{
++    SCLPEventFacility *ef = (SCLPEventFacility *)obj;
++
++    ef->allow_all_mask_sizes = value;
++}
++
++static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **e)
++{
++    SCLPEventFacility *ef = (SCLPEventFacility *)obj;
++
++    return ef->allow_all_mask_sizes;
++}
++
+ static void init_event_facility(Object *obj)
+ {
+     SCLPEventFacility *event_facility = EVENT_FACILITY(obj);
+     DeviceState *sdev = DEVICE(obj);
+     Object *new;
+ 
++    event_facility->mask_length = 4;
++    event_facility->allow_all_mask_sizes = true;
++    object_property_add_bool(obj, "allow_all_mask_sizes",
++                             sclp_event_get_allow_all_mask_sizes,
++                             sclp_event_set_allow_all_mask_sizes, NULL);
+     /* Spawn a new bus for SCLP events */
+     qbus_create_inplace(&event_facility->sbus, sizeof(event_facility->sbus),
+                         TYPE_SCLP_EVENTS_BUS, sdev, NULL);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 8b3053f..e9309fd 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -29,6 +29,7 @@
+ #include "s390-pci-bus.h"
+ #include "hw/s390x/storage-keys.h"
+ #include "hw/s390x/storage-attributes.h"
++#include "hw/s390x/event-facility.h"
+ #include "hw/compat.h"
+ #include "ipl.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
+@@ -671,7 +672,12 @@ bool css_migration_enabled(void)
+     type_init(ccw_machine_register_##suffix)
+ 
+ #define CCW_COMPAT_2_11 \
+-        HW_COMPAT_2_11
++        HW_COMPAT_2_11 \
++        {\
++            .driver   = TYPE_SCLP_EVENT_FACILITY,\
++            .property = "allow_all_mask_sizes",\
++            .value    = "off",\
++        },
+ 
+ #define CCW_COMPAT_2_10 \
+         HW_COMPAT_2_10
+-- 
+2.7.4
