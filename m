@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58625)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eooZv-0000i8-2q
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 05:58:19 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59295)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1eoocs-0001jg-7v
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:01:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eooZt-0003HM-VN
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 05:58:19 -0500
-Date: Thu, 22 Feb 2018 11:57:55 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180222105755.GB4147@localhost.localdomain>
+	(envelope-from <pl@kamp.de>) id 1eoocp-0007hf-8K
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:01:22 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:47003 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eooco-0007eY-To
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:01:19 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:01:12 +0100
 References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
 	<7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
+	<20180222105755.GB4147@localhost.localdomain>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
+Date: Thu, 22 Feb 2018 12:01:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
+In-Reply-To: <20180222105755.GB4147@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,25 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jsnow@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jsnow@redhat.com
 
-Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
-> On 20/02/2018 18:04, Peter Lieven wrote:
-> > Hi,
-> > 
-> > I remember we discussed a long time ago to limit the stack usage of all
-> > functions that are executed in a coroutine
-> > context to a very low value to be able to safely limit the coroutine
-> > stack size as well.
-> 
-> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
-> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
-> ide_atapi_cmd_reply_end.
-> 
-> But perhaps it's not an issue, somebody needs to audit the code.
+Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
+> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
+>> On 20/02/2018 18:04, Peter Lieven wrote:
+>>> Hi,
+>>>
+>>> I remember we discussed a long time ago to limit the stack usage of all
+>>> functions that are executed in a coroutine
+>>> context to a very low value to be able to safely limit the coroutine
+>>> stack size as well.
+>> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
+>> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
+>> ide_atapi_cmd_reply_end.
+>>
+>> But perhaps it's not an issue, somebody needs to audit the code.
+> I think John intended to get rid of the recursion sometime, but I doubt
+> he has had the time so far.
 
-I think John intended to get rid of the recursion sometime, but I doubt
-he has had the time so far.
+Apart from this is is possible to define special cflags in the Makefile.objs just
+for a subdirectory? I have patches ready to make the block layer files and
+other coroutine users compile with -Wstack-size=2048. But I do not want
+to specify each file separately.
 
-Kevin
+Limiting the coroutine size to much could also lead to trouble in some third party
+libraries that are called from a coroutine context, or not?
+
+Thanks,
+Peter
