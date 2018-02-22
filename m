@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eokEW-0008Gf-Ab
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:19:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1eokMU-0001NI-UP
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eokES-0004OT-AP
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:19:56 -0500
+	(envelope-from <thuth@redhat.com>) id 1eokMR-0003pQ-QW
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 01:28:10 -0500
 References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1519241752-28083-12-git-send-email-walling@linux.vnet.ibm.com>
+	<1519241752-28083-13-git-send-email-walling@linux.vnet.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <147f3c25-486c-44d8-adf6-93487d3dda5f@redhat.com>
-Date: Thu, 22 Feb 2018 07:19:29 +0100
+Message-ID: <f981ed82-f512-2a75-7188-da0486cb49db@redhat.com>
+Date: Thu, 22 Feb 2018 07:27:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519241752-28083-12-git-send-email-walling@linux.vnet.ibm.com>
+In-Reply-To: <1519241752-28083-13-git-send-email-walling@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 11/13] s390-ccw: set
- cp_receive mask only when needed and consume pending service irqs
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 12/13] s390-ccw: use zipl
+ values when no boot menu options are present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +29,31 @@ To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qem
 Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, mihajlov@linux.vnet.ibm.com, borntraeger@de.ibm.com, eblake@redhat.com
 
 On 21.02.2018 20:35, Collin L. Walling wrote:
-> It is possible while waiting for multiple types of external
-> interrupts that we might have pending irqs remaining between
-> irq consumption and irq-type disabling. Those interrupts
-> could potentially propagate to the guest after IPL completes
-> and cause unwanted behavior.
+> If no boot menu options are present, then flag the boot menu to
+> use the zipl options that were set in the zipl configuration file
+> (and stored on disk by zipl). These options are found at some
+> offset prior to the start of the zipl boot menu banner. The zipl
+> timeout value is limited to a 16-bit unsigned integer and stored
+> as seconds, so we take care to convert it to milliseconds in order
+> to conform to the rest of the boot menu functionality. This is
+> limited to CCW devices.
 > 
-> As it is today, the SCLP will only recognize write events that
-> are enabled by the control program's send and receive masks. To
-> limit the window for, and prevent further irqs from, ASCII
-> console events (specifically keystrokes), we should only enable
-> the control program's receive mask when we need it.
+> For reference, the zipl configuration file uses the following
+> fields in the menu section:
 > 
-> While we're at it, remove assignment of the (non control program)
-> send and receive masks, as those are actually set by the SCLP.
+>       prompt=1      enable the boot menu
+>       timeout=X     set the timeout to X seconds
+> 
+> To explicitly disregard any boot menu options, then menu=off or
+> <bootmenu enable='no' ... /> must be specified.
 > 
 > Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 > ---
->  pc-bios/s390-ccw/menu.c     |  5 +++++
->  pc-bios/s390-ccw/s390-ccw.h |  1 +
->  pc-bios/s390-ccw/sclp.c     | 10 ++++------
->  3 files changed, 10 insertions(+), 6 deletions(-)
+>  hw/s390x/ipl.c          |  5 +++++
+>  hw/s390x/ipl.h          |  1 +
+>  pc-bios/s390-ccw/iplb.h |  1 +
+>  pc-bios/s390-ccw/main.c |  3 ++-
+>  pc-bios/s390-ccw/menu.c | 14 ++++++++++++++
+>  5 files changed, 23 insertions(+), 1 deletion(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
