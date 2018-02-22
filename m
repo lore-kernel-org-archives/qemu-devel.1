@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eomuN-0001Fl-OY
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:11:25 -0500
+	(envelope-from <drjones@redhat.com>) id 1eomyB-0002QP-5x
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:15:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eomuJ-0007Yr-F0
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:11:19 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36524 helo=mx1.redhat.com)
+	(envelope-from <drjones@redhat.com>) id 1eomy6-0001Sf-77
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:15:15 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36608 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eomuJ-0007YK-AV
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:11:15 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49E034084FEC
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 09:11:14 +0000 (UTC)
-Date: Thu, 22 Feb 2018 09:11:08 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180222091108.GB9323@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180222070513.8740-1-kraxel@redhat.com>
-	<20180222070513.8740-3-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1eomy6-0001RC-19
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 04:15:10 -0500
+Date: Thu, 22 Feb 2018 10:15:00 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180222091500.ahiahifyxlm3zkvq@kamzik.brq.redhat.com>
+References: <20180222044417.15561-1-wei@redhat.com>
+	<20180222044417.15561-2-wei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180222070513.8740-3-kraxel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] keymap: use glib hash for
- kbd_layout_t
+In-Reply-To: <20180222044417.15561-2-wei@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V4 1/3] tests/migration: Convert the boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,29 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, dgilbert@redhat.com, quintela@redhat.com
 
-On Thu, Feb 22, 2018 at 08:05:10AM +0100, Gerd Hoffmann wrote:
-> Drop home-grown lookup code, which is a strange mix of a lookup table
-> and a list.  Use standard glib hash instead.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+On Wed, Feb 21, 2018 at 10:44:15PM -0600, Wei Huang wrote:
+> The x86 boot block header currently is generated with a shell script.
+> To better support other CPUs (e.g. aarch64), we convert the script
+> into Makefile. This allows us to 1) support cross-compilation easily,
+> and 2) avoid creating a script file for every architecture.
+> 
+> Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  ui/keymaps.c    | 73 ++++++++++++++++++++++++-------------------------=
---------
->  ui/trace-events |  2 +-
->  2 files changed, 32 insertions(+), 43 deletions(-)
+>  tests/migration/Makefile                 | 38 ++++++++++++++++++++++++++++++++
+>  tests/migration/rebuild-x86-bootblock.sh | 33 ---------------------------
+>  tests/migration/x86-a-b-bootblock.h      |  2 +-
+>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
+>  4 files changed, 41 insertions(+), 37 deletions(-)
+>  create mode 100644 tests/migration/Makefile
+>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+> 
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> new file mode 100644
+> index 0000000000..1c07dd7be9
+> --- /dev/null
+> +++ b/tests/migration/Makefile
+> @@ -0,0 +1,38 @@
+> +#
+> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+> +#
+> +# Authors:
+> +#   Dave Gilbert <dgilbert@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +# See the COPYING file in the top-level directory.
+> +#
+> +path := $(subst :, ,$(PATH))
+> +system := $(shell uname -s | tr "A-Z" "a-z")
+> +
+> +cross-ld = $(firstword $(wildcard $(patsubst %,%/$(1)-*$(system)*-ld,$(path))))
+> +cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call cross-ld,$(1)))))
+> +find-cross-prefix = $(subst gcc,,$(notdir $(call cross-gcc,$(1))))
+> +
+> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+I see the above lines are copied from roms/Makefile. Is there no way to
+avoid the duplication? Add them to $(SRC_PATH)/rules.mak and include them?
 
+> +
+> +export __note
+> +override define __note
+> +/* This file is automatically generated from
+> + * tests/migration/$<, edit that and then run
+> + * "make $@" inside tests/migration to update,
+> + * and then remember to send both in your patch submission.
+> + */
+> +endef
+> +
+> +all: x86-a-b-bootblock.h
+> +
+> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
+> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+> +	echo "$$__note" > $@
+> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
+> +
+> +clean:
+> +	rm -f *.bootsect *.boot *.o
+> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+> deleted file mode 100755
+> index 86cec5d284..0000000000
+> --- a/tests/migration/rebuild-x86-bootblock.sh
+> +++ /dev/null
+> @@ -1,33 +0,0 @@
+> -#!/bin/sh
+> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> -# See the COPYING file in the top-level directory.
+> -#
+> -# Author: dgilbert@redhat.com
+> -
+> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+> -
+> -if [ ! -e "$ASMFILE" ]
+> -then
+> -  echo "Couldn't find $ASMFILE" >&2
+> -  exit 1
+> -fi
+> -
+> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
+> -cd "$ASM_WORK_DIR" &&
+> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
+> -objcopy -O binary x86.o x86.boot &&
+> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
+> -xxd -i x86.bootsect |
+> -sed -e 's/.*int.*//' > x86.hex &&
+> -cat - x86.hex <<HERE > "$HEADER"
+> -/* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> - * and then remember to send both in your patch submission.
+> - */
+> -HERE
+> -
+> -rm x86.hex x86.bootsect x86.boot x86.o
+> -cd .. && rmdir "$ASM_WORK_DIR"
+> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+> index 78a151fe2a..9e8e2e028b 100644
+> --- a/tests/migration/x86-a-b-bootblock.h
+> +++ b/tests/migration/x86-a-b-bootblock.h
+> @@ -1,6 +1,6 @@
+>  /* This file is automatically generated from
+>   * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> + * "make x86-a-b-bootblock.h" inside tests/migration to update,
+>   * and then remember to send both in your patch submission.
+>   */
+>  unsigned char x86_bootsect[] = {
+> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
+> index b1642641a7..98dbfab084 100644
+> --- a/tests/migration/x86-a-b-bootblock.s
+> +++ b/tests/migration/x86-a-b-bootblock.s
+> @@ -3,9 +3,8 @@
+>  #  range.
+>  #  Outputs an initial 'A' on serial followed by repeated 'B's
+>  #
+> -# run   tests/migration/rebuild-x86-bootblock.sh
+> -#   to regenerate the hex, and remember to include both the .h and .s
+> -#   in any patches.
+> +#  In tests/migration dir, run 'make x86-a-b-bootblock.h' to regenerate
+> +#  the hex, and remember to include both the .h and .s in any patches.
+>  #
+>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
+> -- 
+> 2.14.3
+> 
+>
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks,
+drew
