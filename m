@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41624)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eopML-0001lo-Uu
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:48:23 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42681)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1eopPz-0003AA-SO
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:52:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eopML-0006ip-8O
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:48:22 -0500
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:45308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eopML-0006iW-2n
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:48:21 -0500
-Received: by mail-ot0-x22b.google.com with SMTP id f11so4333353otj.12
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 03:48:20 -0800 (PST)
+	(envelope-from <pl@kamp.de>) id 1eopPw-0000NC-QB
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:52:07 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40284 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eopPw-0000MI-Gi
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 06:52:04 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 12:51:58 +0100
+References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
+	<7c23f28d-ee14-c504-ae13-04414c4b032e@redhat.com>
+	<20180222105755.GB4147@localhost.localdomain>
+	<37efa6ac-8e36-9c96-84ef-a8639ba64937@kamp.de>
+	<20180222113204.GC4147@localhost.localdomain>
+	<20180222114053.GE9323@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <ab206ced-9b56-93d5-04b7-f342d45a2927@kamp.de>
+Date: Thu, 22 Feb 2018 12:51:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180216022933.10945-1-f4bug@amsat.org>
-References: <20180216022933.10945-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Feb 2018 11:47:59 +0000
-Message-ID: <CAFEAcA_YneTscMtpT6hyf6GJeAgD1ehfc7Jopyb=EDRFcx9-RQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] SDHCI: convert legacy devices to
- the SDBus API (part 6)
+In-Reply-To: <20180222114053.GE9323@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, Michael Walle <michael@walle.cc>, Stefan Weil <sw@weilnetz.de>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On 16 February 2018 at 02:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> Hi,
+Am 22.02.2018 um 12:40 schrieb Daniel P. Berrangé:
+> On Thu, Feb 22, 2018 at 12:32:04PM +0100, Kevin Wolf wrote:
+>> Am 22.02.2018 um 12:01 hat Peter Lieven geschrieben:
+>>> Am 22.02.2018 um 11:57 schrieb Kevin Wolf:
+>>>> Am 20.02.2018 um 22:54 hat Paolo Bonzini geschrieben:
+>>>>> On 20/02/2018 18:04, Peter Lieven wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> I remember we discussed a long time ago to limit the stack usage of all
+>>>>>> functions that are executed in a coroutine
+>>>>>> context to a very low value to be able to safely limit the coroutine
+>>>>>> stack size as well.
+>>>>> IIRC the only issue was that hw/ide/atapi.c has mutual recursion between
+>>>>> ide_atapi_cmd_reply_end -> ide_transfer_start -> ahci_start_transfer ->
+>>>>> ide_atapi_cmd_reply_end.
+>>>>>
+>>>>> But perhaps it's not an issue, somebody needs to audit the code.
+>>>> I think John intended to get rid of the recursion sometime, but I doubt
+>>>> he has had the time so far.
+>>> Apart from this is is possible to define special cflags in the
+>>> Makefile.objs just for a subdirectory? I have patches ready to make
+>>> the block layer files and other coroutine users compile with
+>>> -Wstack-size=2048. But I do not want to specify each file separately.
+>> Our Makefiles have lines like this:
+>>
+>>     iscsi.o-cflags     := $(LIBISCSI_CFLAGS)
+>>
+>> I don't think there is a direct mechanism to apply cflags to a whole
+>> directory or just to block-obj-y/block-obj-m, but just looping over them
+>> could work. I'm not a Makefile expert at all, but after some toying with
+>> a simple example, something like this might work:
+>>
+>>     $(foreach x,$(block-obj-y),$(eval $x-cflags += -Wstack-size=2048))
+> You'll need it for anything block layer depends on too - so that's much
+> of util/, crypto/ and io/ directories at least.
 >
-> Since v2:
-> - pl181: remove legacy sd_set_cb() (Peter)
->
-> Since v1:
-> - rebased on /master (Peter sdcard reset() patches)
-> - fix milkymist-mmc from previous seris using instance_init (Michael Wall=
-e)
->
-> This series convert 3 devices using the legacy SDCard API to the SDBus AP=
-I:
-> - milkymist-mmc
-> - pl181
-> - ssi-sd
->
-> Then move the legacy API to a separate header "sdcard_legacy.h".
->
-> Now the OMAP MMC is the last device using the legacy API, but need to get
-> QOM'ified first.
->
-> Having a common sdbus interface simplify qtesting (next series)
->
-> This series is not related to the previous set (4/5) and can be applied
-> independently.
->
-> Regards,
->
-> Phil.
->
-> $ git backport-diff
-> 001/7:[----] [--] 'hw/sd/milkymist-memcard: use qemu_log_mask()'
-> 002/7:[----] [--] 'hw/sd/milkymist-memcard: split realize() out of SysBus=
-Device init()'
-> 003/7:[----] [--] 'hw/sd/milkymist-memcard: expose a SDBus and connect th=
-e SDCard to it'
-> 004/7:[----] [--] 'hw/sd/ssi-sd: use the SDBus API, connect the SDCard to=
- the bus'
-> 005/7:[0034] [FC] 'hw/sd/pl181: expose a SDBus and connect the SDCard to =
-it'
-> 006/7:[down] 'hw/sd: make sd_data_ready() static'
-> 007/7:[0003] [FC] 'hw/sd: move sdcard legacy API to "hw/sd/sdcard_legacy.=
-h"'
+> So perhaps it would be shorter if we do the opposite - set -Wstack-size=2048
+> globally for everything in QEMU, and then override -Wstack-size=$BIGGER
+> for the (hopefully) few sources that have a larger stack need ?
 
-I've applied patches 1-4 to target-arm.next; I had a review comment on 5
-and 6,7 depend on that one.
+I tried that already. 2048 is a strong limit for many functions.
+It breaks already as soon as some buffer has a size of PATH_MAX, but
+thats handleable. But there are some structs around that are very large.
 
-thanks
--- PMM
+Generally, it would be a good idea to have a global limit, of course.
+
+Peter
