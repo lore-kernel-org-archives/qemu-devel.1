@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep10u-00011c-Uj
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:16:15 -0500
+	(envelope-from <mjc@sifive.com>) id 1ep10d-0000uI-7m
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep0zV-0004jE-T3
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:15:00 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:47022)
+	(envelope-from <mjc@sifive.com>) id 1ep0zn-0005IC-Rn
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:14:43 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:40982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep0zV-0004gD-Dd
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:13:33 -0500
-Received: by mail-pl0-x243.google.com with SMTP id x19so3860504plr.13
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:13:33 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep0zn-0005GR-7K
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:13:51 -0500
+Received: by mail-pf0-x243.google.com with SMTP id a17so2775680pff.8
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:13:51 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 23 Feb 2018 13:11:46 +1300
-Message-Id: <1519344729-73482-1-git-send-email-mjc@sifive.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 00/23] RISC-V QEMU Port Submission
+Date: Fri, 23 Feb 2018 13:11:51 +1300
+Message-Id: <1519344729-73482-6-git-send-email-mjc@sifive.com>
+In-Reply-To: <1519344729-73482-1-git-send-email-mjc@sifive.com>
+References: <1519344729-73482-1-git-send-email-mjc@sifive.com>
+Subject: [Qemu-devel] [PATCH v6 05/23] RISC-V CPU Helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,477 +28,1274 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-QEMU RISC-V Emulation Support (RV64GC, RV32GC)
+Privileged control and status register helpers and page fault handling.
 
-This is hopefully the "fix remaining issues in-tree" release.
-
-This version the RISC-V patch series contains cleanups and adds locking to
-the interrupt handling code and enables MTTCG. Fedora have been performing
-MTTCG-enabled SMP package builds using the RISC-V 'virt' machine. This series
-also removes a broken ELF implementation used by the HTIF driver, instead
-adding a symbol table callback function interface to load_elf_*. The HTIF
-driver has had a lot of cleanups and removal of redundant code. Also, the
-"riscv" cpu type prefix has been changed to a "riscv-cpu" suffix to conform
-with the scheme used by other ports. The current CPUs have been renamed with
-a generic prefix. Subsequent patches will implement vendor CPU models.
-
-We have temporarily dropped the fmin/fmax fix that adds softfloat support for
-IEEE 754-201x minimumNumber/maximumNumber. This has the result of riscv-qemu
-now failing the riscv-tests sNaN fmin/fmax test case. This will be fixed later.
-
-All of the core code has now been reviewed and we believe the port is in shape
-for a pull request pending review of a few remaining files in hw/riscv.
-We have tested RV32/RV64 on 64-bit (x86_64) and 32-bit (i386) hosts.
-RV64 riscv-linux boots on a Ubuntu 14.04 i386 host, however MTTCG is disabled.
-
-Special thanks to Richard Henderson for his very detailed review comments,
-Stefan O'Rear for his help with enabling MTTCG, and Richard WM Jones for
-testing SMP support while creating the Fedora stage 4 image. Thanks to
-everyone else who has given feedback submitted patches and pull requests.
-
-The git tree for this v6 patch series (squashed and rebased):
-
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v6
-
-The git tree for the v1-v5 patch series with review commit history:
-
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v5
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v4
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v3
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v2
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v1
-
-*** Known Issues ***
-
-- Disassembler has some checkpatch warnings for the sake of code brevity
-- scripts/qemu-binfmt-conf.sh has checkpatch warnings due to line length
-- PMP (Physical Memory Protection) is as-of-yet unused and needs testing
-
-*** Changelog ***
-
-v6
-
-- Drop IEEE 754-201x minimumNumber/maximumNumber for fmin/fmax
-- Remove some unnecessary commented debug statements
-- Change RISCV_CPU_TYPE_NAME to use riscv-cpu suffix
-- Define all CPU variants for linux-user
-- qemu_log calls require trailing \n
-- Replace PLIC printfs with qemu_log
-- Tear out unused HTIF code and eliminate shouting debug messages
-- Fix illegal instruction when sfence.vma is passed (rs2) arguments
-- Make updates to PTE accessed and dirty bits atomic
-- Only require atomic PTE updates on MTTCG enabled guests
-- Page fault if accessed or dirty bits can't be updated
-- Fix get_physical_address PTE reads and writes on riscv32
-- Remove erroneous comments from the PLIC
-- Default enable MTTCG
-- Make WFI less conservative
-- Unify local interrupt handling
-- Expunge HTIF interrupts
-- Always access mstatus.mip under a lock
-- Don't implement rdtime/rdtimeh in system mode (bbl emulates them)
-- Implement insreth/cycleh for rv32 and always enable user-mode counters
-- Add GDB stub support for reading and writing CSRs
-- Rename ENABLE_CHARDEV #ifdef from HTIF code
-- Replace bad HTIF ELF code with load_elf symbol callback
-- Convert chained if else fault handlers to switch statements
-- Use RISCV exception codes for linux-user page faults
-
-v5
-
-- Implement NaN-boxing for flw, set high order bits to 1
-- Use float_muladd_negate_* flags to floatXX_muladd
-- Use IEEE 754-201x minimumNumber/maximumNumber for fmin/fmax
-- Fix TARGET_NR_syscalls
-- Update linux-user/riscv/syscall_nr.h
-- Fix FENCE.I, needs to terminate translation block
-- Adjust unusual convention for interruptno >= 0
-
-v4
-
-- Add @riscv: since 2.12 to CpuInfoArch
-- Remove misleading little-endian comment from load_kernel
-- Rename cpu-model property to cpu-type
-- Drop some unnecessary inline function attributes
-- Don't allow GDB to set value of x0 register
-- Remove unnecessary empty property lists
-- Add Test Finisher device to implement poweroff in virt machine
-- Implement priv ISA v1.10 trap and sret/mret xPIE/xIE behavior
-- Store fflags data in fp_status
-- Purge runtime users of helper_raise_exception
-- Fix validate_csr
-- Tidy gen_jalr
-- Tidy immediate shifts
-- Add gen_exception_inst_addr_mis
-- Add gen_exception_debug
-- Add gen_exception_illegal
-- Tidy helper_fclass_*
-- Split rounding mode setting to a new function
-- Enforce MSTATUS_FS via TB flags
-- Implement acquire/release barrier semantics
-- Use atomic operations as required
-- Fix FENCE and FENCE_I
-- Remove commented code from spike machines
-- PAGE_WRITE permissions can be set on loads if page is already dirty
-- The result of format conversion on an NaN must be a quiet NaN
-- Add missing process_queued_cpu_work to riscv linux-user
-- Remove float(32|64)_classify from cpu.h
-- Removed nonsensical unions aliasing the same type
-- Use uintN_t instead of uintN_fast_t in fpu_helper.c
-- Use macros for FPU exception values in softfloat_flags_to_riscv
-- Move code to set round mode into set_fp_round_mode function
-- Convert set_fp_exceptions from a macro to an inline function
-- Convert round mode helper into an inline function
-- Make fpu_helper ieee_rm array static const
-- Include cpu_mmu_index in cpu_get_tb_cpu_state flags
-- Eliminate MPRV influence on mmu_index
-- Remove unrecoverable do_unassigned_access function
-- Only update PTE accessed and dirty bits if necessary
-- Remove unnecessary tlb_flush in set_mode as mode is in mmu_idx
-- Remove buggy support for misa writes. misa writes are optional
-  and are not implemented in any known hardware
-- Always set PTE read or execute permissions during page walk
-- Reorder helper function declarations to match order in helper.c
-- Remove redundant variable declaration in get_physical_address
-- Remove duplicated code from get_physical_address
-- Use mmu_idx instead of mem_idx in riscv_cpu_get_phys_page_debug
-
-v3
-
-- Fix indentation in PMP and HTIF debug macros
-- Fix disassembler checkpatch open brace '{' on next line errors
-- Fix trailing statements on next line in decode_inst_decompress
-- NOTE: the other checkpatch issues have been reviewed previously
-
-v2
-
-- Remove redundant NULL terminators from disassembler register arrays
-- Change disassembler register name arrays to const
-- Refine disassembler internal function names
-- Update dates in disassembler copyright message
-- Remove #ifdef CONFIG_USER_ONLY version of cpu_has_work
-- Use ULL suffix on 64-bit constants
-- Move riscv_cpu_mmu_index from cpu.h to helper.c
-- Move riscv_cpu_hw_interrupts_pending from cpu.h to helper.c
-- Remove redundant TARGET_HAS_ICE from cpu.h
-- Use qemu_irq instead of void* for irq definition in cpu.h
-- Remove duplicate typedef from struct CPURISCVState
-- Remove redundant g_strdup from cpu_register
-- Remove redundant tlb_flush from riscv_cpu_reset
-- Remove redundant mode calculation from get_physical_address
-- Remove redundant debug mode printf and dcsr comment
-- Remove redundant clearing of MSB for bare physical addresses
-- Use g_assert_not_reached for invalid mode in get_physical_address
-- Use g_assert_not_reached for unreachable checks in get_physical_address
-- Use g_assert_not_reached for unreachable type in raise_mmu_exception
-- Return exception instead of aborting for misaligned fetches
-- Move exception defines from cpu.h to cpu_bits.h
-- Remove redundant breakpoint control definitions from cpu_bits.h
-- Implement riscv_cpu_unassigned_access exception handling
-- Log and raise exceptions for unimplemented CSRs
-- Match Spike HTIF exit behavior - don’t print TEST-PASSED
-- Make frm,fflags,fcsr writes trap when mstatus.FS is clear
-- Use g_assert_not_reached for unreachable invalid mode
-- Make hret,uret,dret generate illegal instructions
-- Move riscv_cpu_dump_state and int/fpr regnames to cpu.c
-- Lift interrupt flag and mask into constants in cpu_bits.h
-- Change trap debugging to use qemu_log_mask LOG_TRACE 
-- Change CSR debugging to use qemu_log_mask LOG_TRACE
-- Change PMP debugging to use qemu_log_mask LOG_TRACE
-- Remove commented code from pmp.c
-- Change CpuInfoRISCV qapi schema docs to Since 2.12
-- Change RV feature macro to use target_ulong cast
-- Remove riscv_feature and instead use misa extension flags
-- Make riscv_flush_icache_syscall a no-op
-- Undo checkpatch whitespace fixes in unrelated linux-user code
-- Remove redudant constants and tidy up cpu_bits.h
-- Make helper_fence_i a no-op
-- Move include "exec/cpu-all" to end of cpu.h
-- Rename set_privilege to riscv_set_mode
-- Move redundant forward declaration for cpu_riscv_translate_address
-- Remove TCGV_UNUSED from riscv_translate_init
-- Add comment to pmp.c stating the code is untested and currently unused
-- Use ctz to simplify decoding of PMP NAPOT address ranges
-- Change pmp_is_in_range to use than equal for end addresses
-- Fix off by one error in pmp_update_rule
-- Rearrange PMP_DEBUG so that formatting is compile-time checked
-- Rearrange trap debugging so that formatting is compile-time checked
-- Rearrange PLIC debugging so that formatting is compile-time checked
-- Use qemu_log/qemu_log_mask for HTIF logging and debugging
-- Move exception and interrupt names into cpu.c
-- Add Palmer Dabbelt as a RISC-V Maintainer
-- Rebase against current qemu master branch
-
-v1
-
-- initial version based on forward port from riscv-qemu repository
-
-*** Background ***
-
-"RISC-V is an open, free ISA enabling a new era of processor innovation
-through open standard collaboration. Born in academia and research,
-RISC-V ISA delivers a new level of free, extensible software and
-hardware freedom on architecture, paving the way for the next 50 years
-of computing design and innovation."
-
-The QEMU RISC-V port has been developed and maintained out-of-tree for
-several years by Sagar Karandikar and Bastian Koppelmann. The RISC-V
-Privileged specification has evolved substantially over this period but
-has recently been solidifying. The RISC-V Base ISA has been frozon for
-some time and the Privileged ISA, GCC toolchain and Linux ABI are now
-quite stable. I have recently joined Sagar and Bastian as a RISC-V QEMU
-Maintainer and hope to support upstreaming the port. 
-
-There are multiple vendors taping out, preparing to ship, or shipping
-silicon that implements the RISC-V Privileged ISA Version 1.10. There
-are also several RISC-V Soft-IP cores implementing Privileged ISA
-Version 1.10 that run on FPGA such as SiFive's Freedom U500 Platform
-and the U54‑MC RISC-V Core IP, among many more implementations from a
-variety of vendors. See https://riscv.org/ for more details.
-
-RISC-V support was upstreamed in binutils 2.28 and GCC 7.1 in the first
-half of 2016. RISC-V support is now available in LLVM top-of-tree and
-the RISC-V Linux port was accepted into Linux 4.15-rc1 late last year
-and is available in the Linux 4.15 release. GLIBC 2.27 added support
-for the RISC-V ISA running on Linux (requires at least binutils-2.30,
-gcc-7.3.0, and linux-4.15). We believe it is timely to submit the
-RISC-V QEMU port for upstream review with the goal of incorporating
-RISC-V support into the upcoming QEMU 2.12 release.
-
-The RISC-V QEMU port is still under active development, mostly with
-respect to device emulation, the addition of Hypervisor support as
-specified in the RISC-V Draft Privileged ISA Version 1.11, and Vector
-support once the first draft is finalized later this year. We believe
-now is the appropriate time for RISC-V QEMU development to be carried
-out in the main QEMU repository as the code will benefit from more
-rigorous review. The RISC-V QEMU port currently supports all the ISA
-extensions that have been finalized and frozen in the Base ISA.
-
-Blog post about recent additions to RISC-V QEMU: https://goo.gl/fJ4zgk
-
-The RISC-V QEMU wiki: https://github.com/riscv/riscv-qemu/wiki
-
-Instructions for building a busybox+dropbear root image, BBL (Berkeley
-Boot Loader) and linux kernel image for use with the RISC-V QEMU
-'virt' machine: https://github.com/michaeljclark/busybear-linux
-
-*** Overview ***
-
-The RISC-V QEMU port implements the following specifications:
-
-- RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
-
-The RISC-V QEMU port supports the following instruction set extensions:
-
-- RV32GC with Supervisor-mode and User-mode (RV32IMAFDCSU)
-- RV64GC with Supervisor-mode and User-mode (RV64IMAFDCSU)
-
-The RISC-V QEMU port adds the following targets to QEMU:
-
-- riscv32-softmmu
-- riscv64-softmmu
-- riscv32-linux-user
-- riscv64-linux-user
-
-The RISC-V QEMU port supports the following hardware:
-
-- HTIF Console (Host Target Interface)
-- SiFive CLINT (Core Local Interruptor) for Timer interrupts and IPIs
-- SiFive PLIC (Platform Level Interrupt Controller)
-- SiFive Test (Test Finisher) for exiting simulation
-- SiFive UART, PRCI, AON, PWM, QSPI support is partially implemented
-- VirtIO MMIO (GPEX PCI support will be added in a future patch)
-- Generic 16550A UART emulation using 'hw/char/serial.c'
-- MTTCG and SMP support (PLIC and CLINT) on the 'virt' machine
-
-The RISC-V QEMU full system emulator supports 5 machines:
-
-- 'spike_v1.9';  CLINT, PLIC, HTIF console, config-string, Priv v1.9.1
-- 'spike_v1.10'; CLINT, PLIC, HTIF console, device-tree, Priv v1.10
-- 'sifive_e300'; CLINT, PLIC, SiFive UART, HiFive1 compat, Priv v1.10
-- 'sifive_u500'; CLINT, PLIC, SiFive UART, device-tree, Priv v1.10
-- 'virt'; CLINT, PLIC, 16550A UART, VirtIO, device-tree, Priv v1.10
-
-This is a list of RISC-V QEMU Port Contributors:
-
-- Alex Suykov
-- Andreas Schwab
-- Antony Pavlov
-- Bastian Koppelmann
-- Bruce Hoult
-- Chih-Min Chao
-- Daire McNamara
-- Darius Rad
-- David Abdurachmanov
-- Hesham Almatary
-- Ivan Griffin
-- Jim Wilson
-- Kito Cheng
-- Michael Clark
-- Palmer Dabbelt
-- Richard Henderson
-- Sagar Karandikar
-- Stefan O'Rear
-
-Notes:
-
-- contributor email addresses available off-list on request.
-- checkpatch has been run on all 23 patches.
-- checkpatch exceptions are noted in 2 patches that have errors.
-- tested linux on 'spike_v1.9', 'spike_v1.10' and 'virt' machines
-- passes "make check" on full build for all targets
-
-This patch series includes the following patches:
-
-Michael Clark (23):
-  RISC-V Maintainers
-  RISC-V ELF Machine Definition
-  RISC-V CPU Core Definition
-  RISC-V Disassembler
-  RISC-V CPU Helpers
-  RISC-V FPU Support
-  RISC-V GDB Stub
-  RISC-V TCG Code Generation
-  RISC-V Physical Memory Protection
-  RISC-V Linux User Emulation
-  Add symbol table callback function interface to load_elf
-  RISC-V HTIF Console
-  RISC-V HART Array
-  SiFive RISC-V CLINT Block
-  SiFive RISC-V PLIC Block
-  RISC-V Spike Machines
-  RISC-V VirtIO Machine
-  SiFive RISC-V UART Device
-  SiFive RISC-V PRCI Block
-  SiFive RISC-V Test Finisher
-  SiFive Freedom E300 RISC-V Machine
-  SiFive Freedom U500 RISC-V Machine
-  RISC-V Build Infrastructure
-
- MAINTAINERS                            |   11 +
- Makefile.objs                          |    1 +
- arch_init.c                            |    2 +
- configure                              |   13 +
- cpus.c                                 |    6 +
- default-configs/riscv32-linux-user.mak |    1 +
- default-configs/riscv32-softmmu.mak    |    4 +
- default-configs/riscv64-linux-user.mak |    1 +
- default-configs/riscv64-softmmu.mak    |    4 +
- disas.c                                |    2 +
- disas/Makefile.objs                    |    1 +
- disas/riscv.c                          | 3054 ++++++++++++++++++++++++++++++++
- fpu/softfloat-specialize.h             |    7 +-
- hw/core/loader.c                       |   18 +-
- hw/riscv/Makefile.objs                 |   12 +
- hw/riscv/riscv_hart.c                  |   95 +
- hw/riscv/riscv_htif.c                  |  263 +++
- hw/riscv/sifive_clint.c                |  260 +++
- hw/riscv/sifive_e300.c                 |  233 +++
- hw/riscv/sifive_plic.c                 |  511 ++++++
- hw/riscv/sifive_prci.c                 |   95 +
- hw/riscv/sifive_test.c                 |   99 ++
- hw/riscv/sifive_u500.c                 |  339 ++++
- hw/riscv/sifive_uart.c                 |  182 ++
- hw/riscv/spike_v1_09.c                 |  203 +++
- hw/riscv/spike_v1_10.c                 |  277 +++
- hw/riscv/virt.c                        |  376 ++++
- include/disas/bfd.h                    |    2 +
- include/elf.h                          |    2 +
- include/hw/elf_ops.h                   |   34 +-
- include/hw/loader.h                    |   17 +-
- include/hw/riscv/riscv_hart.h          |   45 +
- include/hw/riscv/riscv_htif.h          |   64 +
- include/hw/riscv/sifive_clint.h        |   56 +
- include/hw/riscv/sifive_e300.h         |   79 +
- include/hw/riscv/sifive_plic.h         |   91 +
- include/hw/riscv/sifive_prci.h         |   43 +
- include/hw/riscv/sifive_test.h         |   48 +
- include/hw/riscv/sifive_u500.h         |   69 +
- include/hw/riscv/sifive_uart.h         |   76 +
- include/hw/riscv/spike.h               |   51 +
- include/hw/riscv/virt.h                |   74 +
- include/sysemu/arch_init.h             |    1 +
- linux-user/elfload.c                   |   22 +
- linux-user/main.c                      |   99 ++
- linux-user/riscv/syscall_nr.h          |  287 +++
- linux-user/riscv/target_cpu.h          |   18 +
- linux-user/riscv/target_signal.h       |   23 +
- linux-user/riscv/target_structs.h      |   46 +
- linux-user/riscv/target_syscall.h      |   56 +
- linux-user/riscv/termbits.h            |  220 +++
- linux-user/signal.c                    |  203 ++-
- linux-user/syscall.c                   |    2 +
- linux-user/syscall_defs.h              |   13 +-
- qapi-schema.json                       |   16 +-
- scripts/qemu-binfmt-conf.sh            |   13 +-
- target/riscv/Makefile.objs             |    1 +
- target/riscv/cpu.c                     |  391 ++++
- target/riscv/cpu.h                     |  256 +++
- target/riscv/cpu_bits.h                |  416 +++++
- target/riscv/cpu_user.h                |   13 +
- target/riscv/fpu_helper.c              |  375 ++++
- target/riscv/gdbstub.c                 |   64 +
- target/riscv/helper.c                  |  504 ++++++
- target/riscv/helper.h                  |   78 +
- target/riscv/instmap.h                 |  366 ++++
- target/riscv/op_helper.c               |  656 +++++++
- target/riscv/pmp.c                     |  386 ++++
- target/riscv/pmp.h                     |   70 +
- target/riscv/trace-events              |    1 +
- target/riscv/translate.c               | 1976 +++++++++++++++++++++
- 71 files changed, 13366 insertions(+), 27 deletions(-)
- create mode 100644 default-configs/riscv32-linux-user.mak
- create mode 100644 default-configs/riscv32-softmmu.mak
- create mode 100644 default-configs/riscv64-linux-user.mak
- create mode 100644 default-configs/riscv64-softmmu.mak
- create mode 100644 disas/riscv.c
- create mode 100644 hw/riscv/Makefile.objs
- create mode 100644 hw/riscv/riscv_hart.c
- create mode 100644 hw/riscv/riscv_htif.c
- create mode 100644 hw/riscv/sifive_clint.c
- create mode 100644 hw/riscv/sifive_e300.c
- create mode 100644 hw/riscv/sifive_plic.c
- create mode 100644 hw/riscv/sifive_prci.c
- create mode 100644 hw/riscv/sifive_test.c
- create mode 100644 hw/riscv/sifive_u500.c
- create mode 100644 hw/riscv/sifive_uart.c
- create mode 100644 hw/riscv/spike_v1_09.c
- create mode 100644 hw/riscv/spike_v1_10.c
- create mode 100644 hw/riscv/virt.c
- create mode 100644 include/hw/riscv/riscv_hart.h
- create mode 100644 include/hw/riscv/riscv_htif.h
- create mode 100644 include/hw/riscv/sifive_clint.h
- create mode 100644 include/hw/riscv/sifive_e300.h
- create mode 100644 include/hw/riscv/sifive_plic.h
- create mode 100644 include/hw/riscv/sifive_prci.h
- create mode 100644 include/hw/riscv/sifive_test.h
- create mode 100644 include/hw/riscv/sifive_u500.h
- create mode 100644 include/hw/riscv/sifive_uart.h
- create mode 100644 include/hw/riscv/spike.h
- create mode 100644 include/hw/riscv/virt.h
- create mode 100644 linux-user/riscv/syscall_nr.h
- create mode 100644 linux-user/riscv/target_cpu.h
- create mode 100644 linux-user/riscv/target_signal.h
- create mode 100644 linux-user/riscv/target_structs.h
- create mode 100644 linux-user/riscv/target_syscall.h
- create mode 100644 linux-user/riscv/termbits.h
- create mode 100644 target/riscv/Makefile.objs
- create mode 100644 target/riscv/cpu.c
- create mode 100644 target/riscv/cpu.h
- create mode 100644 target/riscv/cpu_bits.h
- create mode 100644 target/riscv/cpu_user.h
- create mode 100644 target/riscv/fpu_helper.c
- create mode 100644 target/riscv/gdbstub.c
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+---
+ target/riscv/helper.c    | 504 ++++++++++++++++++++++++++++++++++++
+ target/riscv/helper.h    |  78 ++++++
+ target/riscv/op_helper.c | 656 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 1238 insertions(+)
  create mode 100644 target/riscv/helper.c
  create mode 100644 target/riscv/helper.h
- create mode 100644 target/riscv/instmap.h
  create mode 100644 target/riscv/op_helper.c
- create mode 100644 target/riscv/pmp.c
- create mode 100644 target/riscv/pmp.h
- create mode 100644 target/riscv/trace-events
- create mode 100644 target/riscv/translate.c
 
+diff --git a/target/riscv/helper.c b/target/riscv/helper.c
+new file mode 100644
+index 0000000..923107e
+--- /dev/null
++++ b/target/riscv/helper.c
+@@ -0,0 +1,504 @@
++/*
++ *  RISC-V emulation helpers for qemu.
++ *
++ *  Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ *
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "tcg-op.h"
++
++#define RISCV_DEBUG_INTERRUPT 0
++
++int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
++{
++#ifdef CONFIG_USER_ONLY
++    return 0;
++#else
++    return env->priv;
++#endif
++}
++
++#ifndef CONFIG_USER_ONLY
++/*
++ * Return RISC-V IRQ number if an interrupt should be taken, else -1.
++ * Used in cpu-exec.c
++ *
++ * Adapted from Spike's processor_t::take_interrupt()
++ */
++static int riscv_cpu_hw_interrupts_pending(CPURISCVState *env)
++{
++    target_ulong pending_interrupts = atomic_read(&env->mip) & env->mie;
++
++    target_ulong mie = get_field(env->mstatus, MSTATUS_MIE);
++    target_ulong m_enabled = env->priv < PRV_M || (env->priv == PRV_M && mie);
++    target_ulong enabled_interrupts = pending_interrupts &
++                                      ~env->mideleg & -m_enabled;
++
++    target_ulong sie = get_field(env->mstatus, MSTATUS_SIE);
++    target_ulong s_enabled = env->priv < PRV_S || (env->priv == PRV_S && sie);
++    enabled_interrupts |= pending_interrupts & env->mideleg &
++                          -s_enabled;
++
++    if (enabled_interrupts) {
++        return ctz64(enabled_interrupts); /* since non-zero */
++    } else {
++        return EXCP_NONE; /* indicates no pending interrupt */
++    }
++}
++#endif
++
++bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++{
++#if !defined(CONFIG_USER_ONLY)
++    if (interrupt_request & CPU_INTERRUPT_HARD) {
++        RISCVCPU *cpu = RISCV_CPU(cs);
++        CPURISCVState *env = &cpu->env;
++        int interruptno = riscv_cpu_hw_interrupts_pending(env);
++        if (interruptno >= 0) {
++            cs->exception_index = RISCV_EXCP_INT_FLAG | interruptno;
++            riscv_cpu_do_interrupt(cs);
++            return true;
++        }
++    }
++#endif
++    return false;
++}
++
++#if !defined(CONFIG_USER_ONLY)
++
++/* get_physical_address - get the physical address for this virtual address
++ *
++ * Do a page table walk to obtain the physical address corresponding to a
++ * virtual address. Returns 0 if the translation was successful
++ *
++ * Adapted from Spike's mmu_t::translate and mmu_t::walk
++ *
++ */
++static int get_physical_address(CPURISCVState *env, hwaddr *physical,
++                                int *prot, target_ulong addr,
++                                int access_type, int mmu_idx)
++{
++    /* NOTE: the env->pc value visible here will not be
++     * correct, but the value visible to the exception handler
++     * (riscv_cpu_do_interrupt) is correct */
++
++    int mode = mmu_idx;
++
++    if (mode == PRV_M && access_type != MMU_INST_FETCH) {
++        if (get_field(env->mstatus, MSTATUS_MPRV)) {
++            mode = get_field(env->mstatus, MSTATUS_MPP);
++        }
++    }
++
++    if (mode == PRV_M) {
++        *physical = addr;
++        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++        return TRANSLATE_SUCCESS;
++    }
++
++    *prot = 0;
++
++    target_ulong base;
++    int levels, ptidxbits, ptesize, vm, sum;
++    int mxr = get_field(env->mstatus, MSTATUS_MXR);
++
++    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
++        base = get_field(env->satp, SATP_PPN) << PGSHIFT;
++        sum = get_field(env->mstatus, MSTATUS_SUM);
++        vm = get_field(env->satp, SATP_MODE);
++        switch (vm) {
++        case VM_1_10_SV32:
++          levels = 2; ptidxbits = 10; ptesize = 4; break;
++        case VM_1_10_SV39:
++          levels = 3; ptidxbits = 9; ptesize = 8; break;
++        case VM_1_10_SV48:
++          levels = 4; ptidxbits = 9; ptesize = 8; break;
++        case VM_1_10_SV57:
++          levels = 5; ptidxbits = 9; ptesize = 8; break;
++        case VM_1_10_MBARE:
++            *physical = addr;
++            *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++            return TRANSLATE_SUCCESS;
++        default:
++          g_assert_not_reached();
++        }
++    } else {
++        base = env->sptbr << PGSHIFT;
++        sum = !get_field(env->mstatus, MSTATUS_PUM);
++        vm = get_field(env->mstatus, MSTATUS_VM);
++        switch (vm) {
++        case VM_1_09_SV32:
++          levels = 2; ptidxbits = 10; ptesize = 4; break;
++        case VM_1_09_SV39:
++          levels = 3; ptidxbits = 9; ptesize = 8; break;
++        case VM_1_09_SV48:
++          levels = 4; ptidxbits = 9; ptesize = 8; break;
++        case VM_1_09_MBARE:
++            *physical = addr;
++            *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++            return TRANSLATE_SUCCESS;
++        default:
++          g_assert_not_reached();
++        }
++    }
++
++    CPUState *cs = CPU(riscv_env_get_cpu(env));
++    int va_bits = PGSHIFT + levels * ptidxbits;
++    target_ulong mask = (1L << (TARGET_LONG_BITS - (va_bits - 1))) - 1;
++    target_ulong masked_msbs = (addr >> (va_bits - 1)) & mask;
++    if (masked_msbs != 0 && masked_msbs != mask) {
++        return TRANSLATE_FAIL;
++    }
++
++    int ptshift = (levels - 1) * ptidxbits;
++    int i;
++
++#if !TCG_OVERSIZED_GUEST
++restart:
++#endif
++    for (i = 0; i < levels; i++, ptshift -= ptidxbits) {
++        target_ulong idx = (addr >> (PGSHIFT + ptshift)) &
++                           ((1 << ptidxbits) - 1);
++
++        /* check that physical address of PTE is legal */
++        target_ulong pte_addr = base + idx * ptesize;
++#if defined(TARGET_RISCV32)
++        target_ulong pte = ldl_phys(cs->as, pte_addr);
++#elif defined(TARGET_RISCV64)
++        target_ulong pte = ldq_phys(cs->as, pte_addr);
++#endif
++        target_ulong ppn = pte >> PTE_PPN_SHIFT;
++
++        if (PTE_TABLE(pte)) { /* next level of page table */
++            base = ppn << PGSHIFT;
++        } else if ((pte & PTE_U) ? (mode == PRV_S) && !sum : !(mode == PRV_S)) {
++            break;
++        } else if (!(pte & PTE_V) || (!(pte & PTE_R) && (pte & PTE_W))) {
++            break;
++        } else if (access_type == MMU_INST_FETCH ? !(pte & PTE_X) :
++                  access_type == MMU_DATA_LOAD ?  !(pte & PTE_R) &&
++                  !(mxr && (pte & PTE_X)) : !((pte & PTE_R) && (pte & PTE_W))) {
++            break;
++        } else {
++            /* if necessary, set accessed and dirty bits. */
++            target_ulong updated_pte = pte | PTE_A |
++                (access_type == MMU_DATA_STORE ? PTE_D : 0);
++
++            /* Page table updates need to be atomic with MTTCG enabled */
++            if (updated_pte != pte) {
++                /* if accessed or dirty bits need updating, and the PTE is
++                 * in RAM, then we do so atomically with a compare and swap.
++                 * if the PTE is in IO space, then it can't be updated.
++                 * if the PTE changed, then we must re-walk the page table
++                   as the PTE is no longer valid */
++                MemoryRegion *mr;
++                hwaddr l = sizeof(target_ulong), addr1;
++                mr = address_space_translate(cs->as, pte_addr,
++                    &addr1, &l, false);
++                if (memory_access_is_direct(mr, true)) {
++                    target_ulong *pte_pa =
++                        qemu_map_ram_ptr(mr->ram_block, addr1);
++#if TCG_OVERSIZED_GUEST
++                    /* MTTCG is not enabled on oversized TCG guests so
++                     * page table updates do not need to be atomic */
++                    *pte_pa = pte = updated_pte;
++#else
++                    target_ulong old_pte =
++                        atomic_cmpxchg(pte_pa, pte, updated_pte);
++                    if (old_pte != pte) {
++                        goto restart;
++                    } else {
++                        pte = updated_pte;
++                    }
++#endif
++                } else {
++                    /* misconfigured PTE in ROM (AD bits are not preset) or
++                     * PTE is in IO space and can't be updated atomically */
++                    return TRANSLATE_FAIL;
++                }
++            }
++
++            /* for superpage mappings, make a fake leaf PTE for the TLB's
++               benefit. */
++            target_ulong vpn = addr >> PGSHIFT;
++            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
++
++            if ((pte & PTE_R)) {
++                *prot |= PAGE_READ;
++            }
++            if ((pte & PTE_X)) {
++                *prot |= PAGE_EXEC;
++            }
++           /* only add write permission on stores or if the page
++              is already dirty, so that we don't miss further
++              page table walks to update the dirty bit */
++            if ((pte & PTE_W) &&
++                    (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
++                *prot |= PAGE_WRITE;
++            }
++            return TRANSLATE_SUCCESS;
++        }
++    }
++    return TRANSLATE_FAIL;
++}
++
++static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
++                                MMUAccessType access_type)
++{
++    CPUState *cs = CPU(riscv_env_get_cpu(env));
++    int page_fault_exceptions =
++        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
++        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE;
++    switch (access_type) {
++    case MMU_INST_FETCH:
++        cs->exception_index = page_fault_exceptions ?
++            RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
++        break;
++    case MMU_DATA_LOAD:
++        cs->exception_index = page_fault_exceptions ?
++            RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
++        break;
++    case MMU_DATA_STORE:
++        cs->exception_index = page_fault_exceptions ?
++            RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    env->badaddr = address;
++}
++
++hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    hwaddr phys_addr;
++    int prot;
++    int mmu_idx = cpu_mmu_index(&cpu->env, false);
++
++    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx)) {
++        return -1;
++    }
++    return phys_addr;
++}
++
++void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
++                                   MMUAccessType access_type, int mmu_idx,
++                                   uintptr_t retaddr)
++{
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    CPURISCVState *env = &cpu->env;
++    switch (access_type) {
++    case MMU_INST_FETCH:
++        cs->exception_index = RISCV_EXCP_INST_ADDR_MIS;
++        break;
++    case MMU_DATA_LOAD:
++        cs->exception_index = RISCV_EXCP_LOAD_ADDR_MIS;
++        break;
++    case MMU_DATA_STORE:
++        cs->exception_index = RISCV_EXCP_STORE_AMO_ADDR_MIS;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    env->badaddr = addr;
++    do_raise_exception_err(env, cs->exception_index, retaddr);
++}
++
++/* called by qemu's softmmu to fill the qemu tlb */
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++        MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    int ret;
++    ret = riscv_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
++    if (ret == TRANSLATE_FAIL) {
++        RISCVCPU *cpu = RISCV_CPU(cs);
++        CPURISCVState *env = &cpu->env;
++        do_raise_exception_err(env, cs->exception_index, retaddr);
++    }
++}
++
++#endif
++
++int riscv_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
++        int rw, int mmu_idx)
++{
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    CPURISCVState *env = &cpu->env;
++#if !defined(CONFIG_USER_ONLY)
++    hwaddr pa = 0;
++    int prot;
++#endif
++    int ret = TRANSLATE_FAIL;
++
++    qemu_log_mask(CPU_LOG_MMU,
++            "%s pc " TARGET_FMT_lx " ad %" VADDR_PRIx " rw %d mmu_idx \
++             %d\n", __func__, env->pc, address, rw, mmu_idx);
++
++#if !defined(CONFIG_USER_ONLY)
++    ret = get_physical_address(env, &pa, &prot, address, rw, mmu_idx);
++    qemu_log_mask(CPU_LOG_MMU,
++            "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
++             " prot %d\n", __func__, address, ret, pa, prot);
++    if (!pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << rw)) {
++        ret = TRANSLATE_FAIL;
++    }
++    if (ret == TRANSLATE_SUCCESS) {
++        tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
++                     prot, mmu_idx, TARGET_PAGE_SIZE);
++    } else if (ret == TRANSLATE_FAIL) {
++        raise_mmu_exception(env, address, rw);
++    }
++#else
++    switch (rw) {
++    case MMU_INST_FETCH:
++        cs->exception_index = RISCV_EXCP_INST_PAGE_FAULT;
++        break;
++    case MMU_DATA_LOAD:
++        cs->exception_index = RISCV_EXCP_LOAD_PAGE_FAULT;
++        break;
++    case MMU_DATA_STORE:
++        cs->exception_index = RISCV_EXCP_STORE_PAGE_FAULT;
++        break;
++    }
++#endif
++    return ret;
++}
++
++/*
++ * Handle Traps
++ *
++ * Adapted from Spike's processor_t::take_trap.
++ *
++ */
++void riscv_cpu_do_interrupt(CPUState *cs)
++{
++#if !defined(CONFIG_USER_ONLY)
++
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    CPURISCVState *env = &cpu->env;
++
++    if (RISCV_DEBUG_INTERRUPT) {
++        int log_cause = cs->exception_index & RISCV_EXCP_INT_MASK;
++        if (cs->exception_index & RISCV_EXCP_INT_FLAG) {
++            qemu_log_mask(LOG_TRACE, "core   0: trap %s, epc 0x" TARGET_FMT_lx,
++                riscv_intr_names[log_cause], env->pc);
++        } else {
++            qemu_log_mask(LOG_TRACE, "core   0: intr %s, epc 0x" TARGET_FMT_lx,
++                riscv_excp_names[log_cause], env->pc);
++        }
++    }
++
++    target_ulong fixed_cause = 0;
++    if (cs->exception_index & (RISCV_EXCP_INT_FLAG)) {
++        /* hacky for now. the MSB (bit 63) indicates interrupt but cs->exception
++           index is only 32 bits wide */
++        fixed_cause = cs->exception_index & RISCV_EXCP_INT_MASK;
++        fixed_cause |= ((target_ulong)1) << (TARGET_LONG_BITS - 1);
++    } else {
++        /* fixup User ECALL -> correct priv ECALL */
++        if (cs->exception_index == RISCV_EXCP_U_ECALL) {
++            switch (env->priv) {
++            case PRV_U:
++                fixed_cause = RISCV_EXCP_U_ECALL;
++                break;
++            case PRV_S:
++                fixed_cause = RISCV_EXCP_S_ECALL;
++                break;
++            case PRV_H:
++                fixed_cause = RISCV_EXCP_H_ECALL;
++                break;
++            case PRV_M:
++                fixed_cause = RISCV_EXCP_M_ECALL;
++                break;
++            }
++        } else {
++            fixed_cause = cs->exception_index;
++        }
++    }
++
++    target_ulong backup_epc = env->pc;
++
++    target_ulong bit = fixed_cause;
++    target_ulong deleg = env->medeleg;
++
++    int hasbadaddr =
++        (fixed_cause == RISCV_EXCP_INST_ADDR_MIS) ||
++        (fixed_cause == RISCV_EXCP_INST_ACCESS_FAULT) ||
++        (fixed_cause == RISCV_EXCP_LOAD_ADDR_MIS) ||
++        (fixed_cause == RISCV_EXCP_STORE_AMO_ADDR_MIS) ||
++        (fixed_cause == RISCV_EXCP_LOAD_ACCESS_FAULT) ||
++        (fixed_cause == RISCV_EXCP_STORE_AMO_ACCESS_FAULT) ||
++        (fixed_cause == RISCV_EXCP_INST_PAGE_FAULT) ||
++        (fixed_cause == RISCV_EXCP_LOAD_PAGE_FAULT) ||
++        (fixed_cause == RISCV_EXCP_STORE_PAGE_FAULT);
++
++    if (bit & ((target_ulong)1 << (TARGET_LONG_BITS - 1))) {
++        deleg = env->mideleg;
++        bit &= ~((target_ulong)1 << (TARGET_LONG_BITS - 1));
++    }
++
++    if (env->priv <= PRV_S && bit < 64 && ((deleg >> bit) & 1)) {
++        /* handle the trap in S-mode */
++        /* No need to check STVEC for misaligned - lower 2 bits cannot be set */
++        env->pc = env->stvec;
++        env->scause = fixed_cause;
++        env->sepc = backup_epc;
++
++        if (hasbadaddr) {
++            if (RISCV_DEBUG_INTERRUPT) {
++                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
++                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badaddr);
++            }
++            env->sbadaddr = env->badaddr;
++        }
++
++        target_ulong s = env->mstatus;
++        s = set_field(s, MSTATUS_SPIE, env->priv_ver >= PRIV_VERSION_1_10_0 ?
++            get_field(s, MSTATUS_SIE) : get_field(s, MSTATUS_UIE << env->priv));
++        s = set_field(s, MSTATUS_SPP, env->priv);
++        s = set_field(s, MSTATUS_SIE, 0);
++        csr_write_helper(env, s, CSR_MSTATUS);
++        riscv_set_mode(env, PRV_S);
++    } else {
++        /* No need to check MTVEC for misaligned - lower 2 bits cannot be set */
++        env->pc = env->mtvec;
++        env->mepc = backup_epc;
++        env->mcause = fixed_cause;
++
++        if (hasbadaddr) {
++            if (RISCV_DEBUG_INTERRUPT) {
++                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
++                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badaddr);
++            }
++            env->mbadaddr = env->badaddr;
++        }
++
++        target_ulong s = env->mstatus;
++        s = set_field(s, MSTATUS_MPIE, env->priv_ver >= PRIV_VERSION_1_10_0 ?
++            get_field(s, MSTATUS_MIE) : get_field(s, MSTATUS_UIE << env->priv));
++        s = set_field(s, MSTATUS_MPP, env->priv);
++        s = set_field(s, MSTATUS_MIE, 0);
++        csr_write_helper(env, s, CSR_MSTATUS);
++        riscv_set_mode(env, PRV_M);
++    }
++    /* TODO yield load reservation  */
++#endif
++    cs->exception_index = EXCP_NONE; /* mark handled to qemu */
++}
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+new file mode 100644
+index 0000000..debb22a
+--- /dev/null
++++ b/target/riscv/helper.h
+@@ -0,0 +1,78 @@
++/* Exceptions */
++DEF_HELPER_2(raise_exception, noreturn, env, i32)
++
++/* Floating Point - rounding mode */
++DEF_HELPER_FLAGS_2(set_rounding_mode, TCG_CALL_NO_WG, void, env, i32)
++
++/* Floating Point - fused */
++DEF_HELPER_FLAGS_4(fmadd_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fmadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fmsub_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fmsub_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fnmsub_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fnmsub_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fnmadd_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fnmadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++
++/* Floating Point - Single Precision */
++DEF_HELPER_FLAGS_3(fadd_s, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fsub_s, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fmul_s, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fdiv_s, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fmin_s, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fmax_s, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_2(fsqrt_s, TCG_CALL_NO_RWG, i64, env, i64)
++DEF_HELPER_FLAGS_3(fle_s, TCG_CALL_NO_RWG, tl, env, i64, i64)
++DEF_HELPER_FLAGS_3(flt_s, TCG_CALL_NO_RWG, tl, env, i64, i64)
++DEF_HELPER_FLAGS_3(feq_s, TCG_CALL_NO_RWG, tl, env, i64, i64)
++DEF_HELPER_FLAGS_2(fcvt_w_s, TCG_CALL_NO_RWG, tl, env, i64)
++DEF_HELPER_FLAGS_2(fcvt_wu_s, TCG_CALL_NO_RWG, tl, env, i64)
++#if defined(TARGET_RISCV64)
++DEF_HELPER_FLAGS_2(fcvt_l_s, TCG_CALL_NO_RWG, tl, env, i64)
++DEF_HELPER_FLAGS_2(fcvt_lu_s, TCG_CALL_NO_RWG, tl, env, i64)
++#endif
++DEF_HELPER_FLAGS_2(fcvt_s_w, TCG_CALL_NO_RWG, i64, env, tl)
++DEF_HELPER_FLAGS_2(fcvt_s_wu, TCG_CALL_NO_RWG, i64, env, tl)
++#if defined(TARGET_RISCV64)
++DEF_HELPER_FLAGS_2(fcvt_s_l, TCG_CALL_NO_RWG, i64, env, tl)
++DEF_HELPER_FLAGS_2(fcvt_s_lu, TCG_CALL_NO_RWG, i64, env, tl)
++#endif
++DEF_HELPER_FLAGS_1(fclass_s, TCG_CALL_NO_RWG_SE, tl, i64)
++
++/* Floating Point - Double Precision */
++DEF_HELPER_FLAGS_3(fadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fsub_d, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fmul_d, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fdiv_d, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fmin_d, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(fmax_d, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_2(fcvt_s_d, TCG_CALL_NO_RWG, i64, env, i64)
++DEF_HELPER_FLAGS_2(fcvt_d_s, TCG_CALL_NO_RWG, i64, env, i64)
++DEF_HELPER_FLAGS_2(fsqrt_d, TCG_CALL_NO_RWG, i64, env, i64)
++DEF_HELPER_FLAGS_3(fle_d, TCG_CALL_NO_RWG, tl, env, i64, i64)
++DEF_HELPER_FLAGS_3(flt_d, TCG_CALL_NO_RWG, tl, env, i64, i64)
++DEF_HELPER_FLAGS_3(feq_d, TCG_CALL_NO_RWG, tl, env, i64, i64)
++DEF_HELPER_FLAGS_2(fcvt_w_d, TCG_CALL_NO_RWG, tl, env, i64)
++DEF_HELPER_FLAGS_2(fcvt_wu_d, TCG_CALL_NO_RWG, tl, env, i64)
++#if defined(TARGET_RISCV64)
++DEF_HELPER_FLAGS_2(fcvt_l_d, TCG_CALL_NO_RWG, tl, env, i64)
++DEF_HELPER_FLAGS_2(fcvt_lu_d, TCG_CALL_NO_RWG, tl, env, i64)
++#endif
++DEF_HELPER_FLAGS_2(fcvt_d_w, TCG_CALL_NO_RWG, i64, env, tl)
++DEF_HELPER_FLAGS_2(fcvt_d_wu, TCG_CALL_NO_RWG, i64, env, tl)
++#if defined(TARGET_RISCV64)
++DEF_HELPER_FLAGS_2(fcvt_d_l, TCG_CALL_NO_RWG, i64, env, tl)
++DEF_HELPER_FLAGS_2(fcvt_d_lu, TCG_CALL_NO_RWG, i64, env, tl)
++#endif
++DEF_HELPER_FLAGS_1(fclass_d, TCG_CALL_NO_RWG_SE, tl, i64)
++
++/* Special functions */
++DEF_HELPER_3(csrrw, tl, env, tl, tl)
++DEF_HELPER_4(csrrs, tl, env, tl, tl, tl)
++DEF_HELPER_4(csrrc, tl, env, tl, tl, tl)
++#ifndef CONFIG_USER_ONLY
++DEF_HELPER_2(sret, tl, env, tl)
++DEF_HELPER_2(mret, tl, env, tl)
++DEF_HELPER_1(wfi, void, env)
++DEF_HELPER_1(tlb_flush, void, env)
++#endif
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+new file mode 100644
+index 0000000..4f7b0db
+--- /dev/null
++++ b/target/riscv/op_helper.c
+@@ -0,0 +1,656 @@
++/*
++ * RISC-V Emulation Helpers for QEMU.
++ *
++ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ *
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "cpu.h"
++#include "qemu/main-loop.h"
++#include "exec/exec-all.h"
++#include "exec/helper-proto.h"
++
++#ifndef CONFIG_USER_ONLY
++
++#if defined(TARGET_RISCV32)
++static const char valid_vm_1_09[16] = {
++    [VM_1_09_MBARE] = 1,
++    [VM_1_09_SV32] = 1,
++};
++static const char valid_vm_1_10[16] = {
++    [VM_1_10_MBARE] = 1,
++    [VM_1_10_SV32] = 1
++};
++#elif defined(TARGET_RISCV64)
++static const char valid_vm_1_09[16] = {
++    [VM_1_09_MBARE] = 1,
++    [VM_1_09_SV39] = 1,
++    [VM_1_09_SV48] = 1,
++};
++static const char valid_vm_1_10[16] = {
++    [VM_1_10_MBARE] = 1,
++    [VM_1_10_SV39] = 1,
++    [VM_1_10_SV48] = 1,
++    [VM_1_10_SV57] = 1
++};
++#endif
++
++static int validate_vm(CPURISCVState *env, target_ulong vm)
++{
++    return (env->priv_ver >= PRIV_VERSION_1_10_0) ?
++        valid_vm_1_10[vm & 0xf] : valid_vm_1_09[vm & 0xf];
++}
++
++#endif
++
++/* Exceptions processing helpers */
++void QEMU_NORETURN do_raise_exception_err(CPURISCVState *env,
++                                          uint32_t exception, uintptr_t pc)
++{
++    CPUState *cs = CPU(riscv_env_get_cpu(env));
++    qemu_log_mask(CPU_LOG_INT, "%s: %d\n", __func__, exception);
++    cs->exception_index = exception;
++    cpu_loop_exit_restore(cs, pc);
++}
++
++void helper_raise_exception(CPURISCVState *env, uint32_t exception)
++{
++    do_raise_exception_err(env, exception, 0);
++}
++
++static void validate_mstatus_fs(CPURISCVState *env, uintptr_t ra)
++{
++#ifndef CONFIG_USER_ONLY
++    if (!(env->mstatus & MSTATUS_FS)) {
++        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, ra);
++    }
++#endif
++}
++
++/*
++ * Handle writes to CSRs and any resulting special behavior
++ *
++ * Adapted from Spike's processor_t::set_csr
++ */
++void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
++        target_ulong csrno)
++{
++#ifndef CONFIG_USER_ONLY
++    uint64_t delegable_ints = MIP_SSIP | MIP_STIP | MIP_SEIP | (1 << IRQ_X_COP);
++    uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP;
++#endif
++
++    switch (csrno) {
++    case CSR_FFLAGS:
++        validate_mstatus_fs(env, GETPC());
++        cpu_riscv_set_fflags(env, val_to_write & (FSR_AEXC >> FSR_AEXC_SHIFT));
++        break;
++    case CSR_FRM:
++        validate_mstatus_fs(env, GETPC());
++        env->frm = val_to_write & (FSR_RD >> FSR_RD_SHIFT);
++        break;
++    case CSR_FCSR:
++        validate_mstatus_fs(env, GETPC());
++        env->frm = (val_to_write & FSR_RD) >> FSR_RD_SHIFT;
++        cpu_riscv_set_fflags(env, (val_to_write & FSR_AEXC) >> FSR_AEXC_SHIFT);
++        break;
++#ifndef CONFIG_USER_ONLY
++    case CSR_MSTATUS: {
++        target_ulong mstatus = env->mstatus;
++        target_ulong mask = 0;
++        if (env->priv_ver <= PRIV_VERSION_1_09_1) {
++            if ((val_to_write ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP |
++                    MSTATUS_MPRV | MSTATUS_SUM | MSTATUS_VM)) {
++                helper_tlb_flush(env);
++            }
++            mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
++                MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
++                MSTATUS_MPP | MSTATUS_MXR |
++                (validate_vm(env, get_field(val_to_write, MSTATUS_VM)) ?
++                    MSTATUS_VM : 0);
++        }
++        if (env->priv_ver >= PRIV_VERSION_1_10_0) {
++            if ((val_to_write ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP |
++                    MSTATUS_MPRV | MSTATUS_SUM)) {
++                helper_tlb_flush(env);
++            }
++            mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
++                MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
++                MSTATUS_MPP | MSTATUS_MXR;
++        }
++        mstatus = (mstatus & ~mask) | (val_to_write & mask);
++        int dirty = (mstatus & MSTATUS_FS) == MSTATUS_FS;
++        dirty |= (mstatus & MSTATUS_XS) == MSTATUS_XS;
++        mstatus = set_field(mstatus, MSTATUS_SD, dirty);
++        env->mstatus = mstatus;
++        break;
++    }
++    case CSR_MIP: {
++        /*
++         * Since the writeable bits in MIP are not set asynchrously by the
++         * CLINT, no additional locking is needed for read-modifiy-write
++         * CSR operations
++         */
++        qemu_mutex_lock_iothread();
++        RISCVCPU *cpu = riscv_env_get_cpu(env);
++        riscv_set_local_interrupt(cpu, MIP_SSIP,
++                                  (val_to_write & MIP_SSIP) != 0);
++        riscv_set_local_interrupt(cpu, MIP_STIP,
++                                  (val_to_write & MIP_STIP) != 0);
++        /*
++         * csrs, csrc on mip.SEIP is not decomposable into separate read and
++         * write steps, so a different implementation is needed
++         */
++        qemu_mutex_unlock_iothread();
++        break;
++    }
++    case CSR_MIE: {
++        env->mie = (env->mie & ~all_ints) |
++            (val_to_write & all_ints);
++        break;
++    }
++    case CSR_MIDELEG:
++        env->mideleg = (env->mideleg & ~delegable_ints)
++                                | (val_to_write & delegable_ints);
++        break;
++    case CSR_MEDELEG: {
++        target_ulong mask = 0;
++        mask |= 1ULL << (RISCV_EXCP_INST_ADDR_MIS);
++        mask |= 1ULL << (RISCV_EXCP_INST_ACCESS_FAULT);
++        mask |= 1ULL << (RISCV_EXCP_ILLEGAL_INST);
++        mask |= 1ULL << (RISCV_EXCP_BREAKPOINT);
++        mask |= 1ULL << (RISCV_EXCP_LOAD_ADDR_MIS);
++        mask |= 1ULL << (RISCV_EXCP_LOAD_ACCESS_FAULT);
++        mask |= 1ULL << (RISCV_EXCP_STORE_AMO_ADDR_MIS);
++        mask |= 1ULL << (RISCV_EXCP_STORE_AMO_ACCESS_FAULT);
++        mask |= 1ULL << (RISCV_EXCP_U_ECALL);
++        mask |= 1ULL << (RISCV_EXCP_S_ECALL);
++        mask |= 1ULL << (RISCV_EXCP_H_ECALL);
++        mask |= 1ULL << (RISCV_EXCP_M_ECALL);
++        mask |= 1ULL << (RISCV_EXCP_INST_PAGE_FAULT);
++        mask |= 1ULL << (RISCV_EXCP_LOAD_PAGE_FAULT);
++        mask |= 1ULL << (RISCV_EXCP_STORE_PAGE_FAULT);
++        env->medeleg = (env->medeleg & ~mask)
++                                | (val_to_write & mask);
++        break;
++    }
++    case CSR_MINSTRET:
++        qemu_log_mask(LOG_UNIMP, "CSR_MINSTRET: write not implemented");
++        goto do_illegal;
++    case CSR_MCYCLE:
++        qemu_log_mask(LOG_UNIMP, "CSR_MCYCLE: write not implemented");
++        goto do_illegal;
++    case CSR_MINSTRETH:
++        qemu_log_mask(LOG_UNIMP, "CSR_MINSTRETH: write not implemented");
++        goto do_illegal;
++    case CSR_MCYCLEH:
++        qemu_log_mask(LOG_UNIMP, "CSR_MCYCLEH: write not implemented");
++        goto do_illegal;
++    case CSR_MUCOUNTEREN:
++        env->mucounteren = val_to_write;
++        break;
++    case CSR_MSCOUNTEREN:
++        env->mscounteren = val_to_write;
++        break;
++    case CSR_SSTATUS: {
++        target_ulong ms = env->mstatus;
++        target_ulong mask = SSTATUS_SIE | SSTATUS_SPIE | SSTATUS_UIE
++            | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS
++            | SSTATUS_SUM | SSTATUS_MXR | SSTATUS_SD;
++        ms = (ms & ~mask) | (val_to_write & mask);
++        csr_write_helper(env, ms, CSR_MSTATUS);
++        break;
++    }
++    case CSR_SIP: {
++        qemu_mutex_lock_iothread();
++        target_ulong next_mip = (env->mip & ~env->mideleg)
++                                | (val_to_write & env->mideleg);
++        qemu_mutex_unlock_iothread();
++        csr_write_helper(env, next_mip, CSR_MIP);
++        break;
++    }
++    case CSR_SIE: {
++        target_ulong next_mie = (env->mie & ~env->mideleg)
++                                | (val_to_write & env->mideleg);
++        csr_write_helper(env, next_mie, CSR_MIE);
++        break;
++    }
++    case CSR_SATP: /* CSR_SPTBR */ {
++        if (env->priv_ver <= PRIV_VERSION_1_09_1 && (val_to_write ^ env->sptbr))
++        {
++            helper_tlb_flush(env);
++            env->sptbr = val_to_write & (((target_ulong)
++                1 << (TARGET_PHYS_ADDR_SPACE_BITS - PGSHIFT)) - 1);
++        }
++        if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
++            validate_vm(env, get_field(val_to_write, SATP_MODE)) &&
++            ((val_to_write ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
++        {
++            helper_tlb_flush(env);
++            env->satp = val_to_write;
++        }
++        break;
++    }
++    case CSR_SEPC:
++        env->sepc = val_to_write;
++        break;
++    case CSR_STVEC:
++        if (val_to_write & 1) {
++            qemu_log_mask(LOG_UNIMP, "CSR_STVEC: vectored traps not supported");
++            goto do_illegal;
++        }
++        env->stvec = val_to_write >> 2 << 2;
++        break;
++    case CSR_SCOUNTEREN:
++        env->scounteren = val_to_write;
++        break;
++    case CSR_SSCRATCH:
++        env->sscratch = val_to_write;
++        break;
++    case CSR_SCAUSE:
++        env->scause = val_to_write;
++        break;
++    case CSR_SBADADDR:
++        env->sbadaddr = val_to_write;
++        break;
++    case CSR_MEPC:
++        env->mepc = val_to_write;
++        break;
++    case CSR_MTVEC:
++        if (val_to_write & 1) {
++            qemu_log_mask(LOG_UNIMP, "CSR_MTVEC: vectored traps not supported");
++            goto do_illegal;
++        }
++        env->mtvec = val_to_write >> 2 << 2;
++        break;
++    case CSR_MCOUNTEREN:
++        env->mcounteren = val_to_write;
++        break;
++    case CSR_MSCRATCH:
++        env->mscratch = val_to_write;
++        break;
++    case CSR_MCAUSE:
++        env->mcause = val_to_write;
++        break;
++    case CSR_MBADADDR:
++        env->mbadaddr = val_to_write;
++        break;
++    case CSR_MISA: {
++        qemu_log_mask(LOG_UNIMP, "CSR_MISA: misa writes not supported");
++        goto do_illegal;
++    }
++    case CSR_PMPCFG0:
++    case CSR_PMPCFG1:
++    case CSR_PMPCFG2:
++    case CSR_PMPCFG3:
++       pmpcfg_csr_write(env, csrno - CSR_PMPCFG0, val_to_write);
++       break;
++    case CSR_PMPADDR0:
++    case CSR_PMPADDR1:
++    case CSR_PMPADDR2:
++    case CSR_PMPADDR3:
++    case CSR_PMPADDR4:
++    case CSR_PMPADDR5:
++    case CSR_PMPADDR6:
++    case CSR_PMPADDR7:
++    case CSR_PMPADDR8:
++    case CSR_PMPADDR9:
++    case CSR_PMPADDR10:
++    case CSR_PMPADDR11:
++    case CSR_PMPADDR12:
++    case CSR_PMPADDR13:
++    case CSR_PMPADDR14:
++    case CSR_PMPADDR15:
++       pmpaddr_csr_write(env, csrno - CSR_PMPADDR0, val_to_write);
++       break;
++    do_illegal:
++#endif
++    default:
++        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    }
++}
++
++/*
++ * Handle reads to CSRs and any resulting special behavior
++ *
++ * Adapted from Spike's processor_t::get_csr
++ */
++target_ulong csr_read_helper(CPURISCVState *env, target_ulong csrno)
++{
++#ifndef CONFIG_USER_ONLY
++    target_ulong ctr_en = env->priv == PRV_U ? env->mucounteren :
++                   env->priv == PRV_S ? env->mscounteren : -1U;
++#else
++    target_ulong ctr_en = -1;
++#endif
++    target_ulong ctr_ok = (ctr_en >> (csrno & 31)) & 1;
++
++    if (csrno >= CSR_HPMCOUNTER3 && csrno <= CSR_HPMCOUNTER31) {
++        if (ctr_ok) {
++            return 0;
++        }
++    }
++#if defined(TARGET_RISCV32)
++    if (csrno >= CSR_HPMCOUNTER3H && csrno <= CSR_HPMCOUNTER31H) {
++        if (ctr_ok) {
++            return 0;
++        }
++    }
++#endif
++    if (csrno >= CSR_MHPMCOUNTER3 && csrno <= CSR_MHPMCOUNTER31) {
++        return 0;
++    }
++#if defined(TARGET_RISCV32)
++    if (csrno >= CSR_MHPMCOUNTER3 && csrno <= CSR_MHPMCOUNTER31) {
++        return 0;
++    }
++#endif
++    if (csrno >= CSR_MHPMEVENT3 && csrno <= CSR_MHPMEVENT31) {
++        return 0;
++    }
++
++    switch (csrno) {
++    case CSR_FFLAGS:
++        validate_mstatus_fs(env, GETPC());
++        return cpu_riscv_get_fflags(env);
++    case CSR_FRM:
++        validate_mstatus_fs(env, GETPC());
++        return env->frm;
++    case CSR_FCSR:
++        validate_mstatus_fs(env, GETPC());
++        return (cpu_riscv_get_fflags(env) << FSR_AEXC_SHIFT)
++                | (env->frm << FSR_RD_SHIFT);
++    /* rdtime/rdtimeh is trapped and emulated by bbl in system mode */
++#ifdef CONFIG_USER_ONLY
++    case CSR_TIME:
++        return cpu_get_host_ticks();
++#if defined(TARGET_RISCV32)
++    case CSR_TIMEH:
++        return cpu_get_host_ticks() >> 32;
++#endif
++#endif
++    case CSR_INSTRET:
++    case CSR_CYCLE:
++        if (ctr_ok) {
++            return cpu_get_host_ticks();
++        }
++        break;
++#if defined(TARGET_RISCV32)
++    case CSR_INSTRETH:
++    case CSR_CYCLEH:
++        if (ctr_ok) {
++            return cpu_get_host_ticks() >> 32;
++        }
++        break;
++#endif
++#ifndef CONFIG_USER_ONLY
++    case CSR_MINSTRET:
++    case CSR_MCYCLE:
++        return cpu_get_host_ticks();
++    case CSR_MINSTRETH:
++    case CSR_MCYCLEH:
++#if defined(TARGET_RISCV32)
++        return cpu_get_host_ticks() >> 32;
++#endif
++        break;
++    case CSR_MUCOUNTEREN:
++        return env->mucounteren;
++    case CSR_MSCOUNTEREN:
++        return env->mscounteren;
++    case CSR_SSTATUS: {
++        target_ulong mask = SSTATUS_SIE | SSTATUS_SPIE | SSTATUS_UIE
++            | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS
++            | SSTATUS_SUM |  SSTATUS_SD;
++        if (env->priv_ver >= PRIV_VERSION_1_10_0) {
++            mask |= SSTATUS_MXR;
++        }
++        return env->mstatus & mask;
++    }
++    case CSR_SIP: {
++        qemu_mutex_lock_iothread();
++        target_ulong tmp = env->mip & env->mideleg;
++        qemu_mutex_unlock_iothread();
++        return tmp;
++    }
++    case CSR_SIE:
++        return env->mie & env->mideleg;
++    case CSR_SEPC:
++        return env->sepc;
++    case CSR_SBADADDR:
++        return env->sbadaddr;
++    case CSR_STVEC:
++        return env->stvec;
++    case CSR_SCOUNTEREN:
++        return env->scounteren;
++    case CSR_SCAUSE:
++        return env->scause;
++    case CSR_SPTBR:
++        if (env->priv_ver >= PRIV_VERSION_1_10_0) {
++            return env->satp;
++        } else {
++            return env->sptbr;
++        }
++    case CSR_SSCRATCH:
++        return env->sscratch;
++    case CSR_MSTATUS:
++        return env->mstatus;
++    case CSR_MIP: {
++        qemu_mutex_lock_iothread();
++        target_ulong tmp = env->mip;
++        qemu_mutex_unlock_iothread();
++        return tmp;
++    }
++    case CSR_MIE:
++        return env->mie;
++    case CSR_MEPC:
++        return env->mepc;
++    case CSR_MSCRATCH:
++        return env->mscratch;
++    case CSR_MCAUSE:
++        return env->mcause;
++    case CSR_MBADADDR:
++        return env->mbadaddr;
++    case CSR_MISA:
++        return env->misa;
++    case CSR_MARCHID:
++        return 0; /* as spike does */
++    case CSR_MIMPID:
++        return 0; /* as spike does */
++    case CSR_MVENDORID:
++        return 0; /* as spike does */
++    case CSR_MHARTID:
++        return env->mhartid;
++    case CSR_MTVEC:
++        return env->mtvec;
++    case CSR_MCOUNTEREN:
++        return env->mcounteren;
++    case CSR_MEDELEG:
++        return env->medeleg;
++    case CSR_MIDELEG:
++        return env->mideleg;
++    case CSR_PMPCFG0:
++    case CSR_PMPCFG1:
++    case CSR_PMPCFG2:
++    case CSR_PMPCFG3:
++       return pmpcfg_csr_read(env, csrno - CSR_PMPCFG0);
++    case CSR_PMPADDR0:
++    case CSR_PMPADDR1:
++    case CSR_PMPADDR2:
++    case CSR_PMPADDR3:
++    case CSR_PMPADDR4:
++    case CSR_PMPADDR5:
++    case CSR_PMPADDR6:
++    case CSR_PMPADDR7:
++    case CSR_PMPADDR8:
++    case CSR_PMPADDR9:
++    case CSR_PMPADDR10:
++    case CSR_PMPADDR11:
++    case CSR_PMPADDR12:
++    case CSR_PMPADDR13:
++    case CSR_PMPADDR14:
++    case CSR_PMPADDR15:
++       return pmpaddr_csr_read(env, csrno - CSR_PMPADDR0);
++#endif
++    }
++    /* used by e.g. MTIME read */
++    do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++}
++
++/*
++ * Check that CSR access is allowed.
++ *
++ * Adapted from Spike's decode.h:validate_csr
++ */
++static void validate_csr(CPURISCVState *env, uint64_t which,
++                         uint64_t write, uintptr_t ra)
++{
++#ifndef CONFIG_USER_ONLY
++    unsigned csr_priv = get_field((which), 0x300);
++    unsigned csr_read_only = get_field((which), 0xC00) == 3;
++    if (((write) && csr_read_only) || (env->priv < csr_priv)) {
++        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, ra);
++    }
++#endif
++}
++
++target_ulong helper_csrrw(CPURISCVState *env, target_ulong src,
++        target_ulong csr)
++{
++    validate_csr(env, csr, 1, GETPC());
++    uint64_t csr_backup = csr_read_helper(env, csr);
++    csr_write_helper(env, src, csr);
++    return csr_backup;
++}
++
++target_ulong helper_csrrs(CPURISCVState *env, target_ulong src,
++        target_ulong csr, target_ulong rs1_pass)
++{
++    validate_csr(env, csr, rs1_pass != 0, GETPC());
++    uint64_t csr_backup = csr_read_helper(env, csr);
++    if (rs1_pass != 0) {
++        csr_write_helper(env, src | csr_backup, csr);
++    }
++    return csr_backup;
++}
++
++target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
++        target_ulong csr, target_ulong rs1_pass)
++{
++    validate_csr(env, csr, rs1_pass != 0, GETPC());
++    uint64_t csr_backup = csr_read_helper(env, csr);
++    if (rs1_pass != 0) {
++        csr_write_helper(env, (~src) & csr_backup, csr);
++    }
++    return csr_backup;
++}
++
++#ifndef CONFIG_USER_ONLY
++
++/* iothread_mutex must be held */
++void riscv_set_local_interrupt(RISCVCPU *cpu, target_ulong mask, int value)
++{
++    target_ulong old_mip = cpu->env.mip;
++    cpu->env.mip = (old_mip & ~mask) | (value ? mask : 0);
++
++    if (cpu->env.mip && !old_mip) {
++        cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
++    } else if (!cpu->env.mip && old_mip) {
++        cpu_reset_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
++    }
++}
++
++void riscv_set_mode(CPURISCVState *env, target_ulong newpriv)
++{
++    if (newpriv > PRV_M) {
++        g_assert_not_reached();
++    }
++    if (newpriv == PRV_H) {
++        newpriv = PRV_U;
++    }
++    /* tlb_flush is unnecessary as mode is contained in mmu_idx */
++    env->priv = newpriv;
++}
++
++target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
++{
++    if (!(env->priv >= PRV_S)) {
++        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    }
++
++    target_ulong retpc = env->sepc;
++    if (!riscv_has_ext(env, RVC) && (retpc & 0x3)) {
++        do_raise_exception_err(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
++    }
++
++    target_ulong mstatus = env->mstatus;
++    target_ulong prev_priv = get_field(mstatus, MSTATUS_SPP);
++    mstatus = set_field(mstatus,
++        env->priv_ver >= PRIV_VERSION_1_10_0 ?
++        MSTATUS_SIE : MSTATUS_UIE << prev_priv,
++        get_field(mstatus, MSTATUS_SPIE));
++    mstatus = set_field(mstatus, MSTATUS_SPIE, 0);
++    mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
++    riscv_set_mode(env, prev_priv);
++    csr_write_helper(env, mstatus, CSR_MSTATUS);
++
++    return retpc;
++}
++
++target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
++{
++    if (!(env->priv >= PRV_M)) {
++        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    }
++
++    target_ulong retpc = env->mepc;
++    if (!riscv_has_ext(env, RVC) && (retpc & 0x3)) {
++        do_raise_exception_err(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
++    }
++
++    target_ulong mstatus = env->mstatus;
++    target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
++    mstatus = set_field(mstatus,
++        env->priv_ver >= PRIV_VERSION_1_10_0 ?
++        MSTATUS_MIE : MSTATUS_UIE << prev_priv,
++        get_field(mstatus, MSTATUS_MPIE));
++    mstatus = set_field(mstatus, MSTATUS_MPIE, 0);
++    mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
++    riscv_set_mode(env, prev_priv);
++    csr_write_helper(env, mstatus, CSR_MSTATUS);
++
++    return retpc;
++}
++
++
++void helper_wfi(CPURISCVState *env)
++{
++    CPUState *cs = CPU(riscv_env_get_cpu(env));
++
++    cs->halted = 1;
++    cs->exception_index = EXCP_HLT;
++    cpu_loop_exit(cs);
++}
++
++void helper_tlb_flush(CPURISCVState *env)
++{
++    RISCVCPU *cpu = riscv_env_get_cpu(env);
++    CPUState *cs = CPU(cpu);
++    tlb_flush(cs);
++}
++
++#endif /* !CONFIG_USER_ONLY */
 -- 
 2.7.0
