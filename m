@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1epBfd-0005Wz-O1
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:37:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epBid-0006eJ-UX
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1epBfY-0005EL-OU
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:37:45 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46874 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1epBfY-0005DE-Ix
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:37:40 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C555E12267D
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 11:37:39 +0000 (UTC)
-References: <20180215212552.26997-1-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bbf391fa-acf1-16bd-e6e9-336b977160e8@redhat.com>
-Date: Fri, 23 Feb 2018 12:37:33 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1epBid-0005Kf-0H
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:40:51 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:42101)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1epBic-0005I3-QR
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:40:50 -0500
+Received: by mail-pf0-x241.google.com with SMTP id t15so3401017pfh.9
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 03:40:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180215212552.26997-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] vhost-user-test and leak fixes
+In-Reply-To: <20180217182323.25885-4-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-4-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Feb 2018 11:40:29 +0000
+Message-ID: <CAFEAcA8h-Y8_zDL1mQuZTarMqWo9LwDgvgwEmpPbmYLfBvtRyw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 03/67] target/arm: Add SVE
+ decode skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 15/02/2018 22:25, Marc-Andr=C3=A9 Lureau wrote:
-> Hi,
->=20
-> The following patches fix a regression introduced in commit
-> 218bb57dd79d that prevent ASAN from being detected & used.  There is
-> also a works around for a GCC ASAN optimization bug. A few test leaks
-> are fixed, and a few patches reenable vhost-user memfd test fixing the
-> recent race bug that was identified in the previous version.
->=20
-> Marc-Andr=C3=A9 Lureau (6):
->   build-sys: fix -fsanitize=3Daddress check
->   lockable: workaround GCC link issue with ASAN
->   vhost-user-test: add back memfd check
->   vhost-user-test: do not hang if chardev creation failed
->   ahci-test: fix opts leak of skip tests
->   sdhci-test: fix leaks
->=20
->  include/qemu/lockable.h |  2 +-
->  tests/ahci-test.c       |  1 +
->  tests/sdhci-test.c      |  2 ++
->  tests/vhost-user-test.c | 94 +++++++++++++++++++++++++++++++++++------=
---------
->  configure               | 22 ++++++------
->  5 files changed, 83 insertions(+), 38 deletions(-)
->=20
+On 17 February 2018 at 18:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Including only 4, as-yet unimplemented, instruction patterns
+> so that the whole thing compiles.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.c | 11 +++++++-
+>  target/arm/translate-sve.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+>  .gitignore                 |  1 +
+>  target/arm/Makefile.objs   | 10 ++++++++
+>  target/arm/sve.decode      | 45 +++++++++++++++++++++++++++++++++
+>  5 files changed, 129 insertions(+), 1 deletion(-)
+>  create mode 100644 target/arm/translate-sve.c
+>  create mode 100644 target/arm/sve.decode
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index e0e7ebf68c..a50fef98af 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -12772,9 +12772,18 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+>      s->fp_access_checked = false;
+>
+>      switch (extract32(insn, 25, 4)) {
+> -    case 0x0: case 0x1: case 0x2: case 0x3: /* UNALLOCATED */
+> +    case 0x0: case 0x1: case 0x3: /* UNALLOCATED */
+>          unallocated_encoding(s);
+>          break;
+> +    case 0x2:
+> +        if (!arm_dc_feature(s, ARM_FEATURE_SVE)) {
+> +            unallocated_encoding(s);
+> +        } else if (!sve_access_check(s) || !fp_access_check(s)) {
+> +            /* exception raised */
+> +        } else if (!disas_sve(s, insn)) {
+> +            unallocated_encoding(s);
+> +        }
+> +        break;
 
-Queued 1-2-5-6, not really confident enough in what's going on with
-vhost-user-test. :)
+I realized while working through the rest of the series that this is
+too early to do the sve_access_check() and fp_access_check(). Those
+only apply to instructions which actually exist, so we mustn't
+do the checks until after we've dealt with all the unallocated_encoding()
+cases. I think you need to push them down inside disas_sve() somehow.
+See also my comments on patch 8.
 
-Paolo
+(We get this wrong for current AArch32 VFP and Neon, but correct
+for all of AArch64.)
+
+thanks
+-- PMM
