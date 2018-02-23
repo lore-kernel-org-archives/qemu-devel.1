@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep11i-0001ct-3J
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:16:54 -0500
+	(envelope-from <mjc@sifive.com>) id 1ep11a-0001YN-0p
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep10E-00065S-0W
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:15:49 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:35217)
+	(envelope-from <mjc@sifive.com>) id 1ep10L-0006Jt-3y
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:15:41 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:38629)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep10D-000635-FD
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:14:17 -0500
-Received: by mail-pf0-x242.google.com with SMTP id y186so2092837pfb.2
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:14:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep10K-0006I0-DT
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:14:24 -0500
+Received: by mail-pf0-x244.google.com with SMTP id d26so2775363pfn.5
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:14:24 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 23 Feb 2018 13:11:58 +1300
-Message-Id: <1519344729-73482-13-git-send-email-mjc@sifive.com>
+Date: Fri, 23 Feb 2018 13:12:00 +1300
+Message-Id: <1519344729-73482-15-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519344729-73482-1-git-send-email-mjc@sifive.com>
 References: <1519344729-73482-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v6 12/23] RISC-V HTIF Console
+Subject: [Qemu-devel] [PATCH v6 14/23] SiFive RISC-V CLINT Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +28,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-HTIF (Host Target Interface) provides console emulation for QEMU. HTIF
-allows identical copies of BBL (Berkeley Boot Loader) and linux to run
-on both Spike and QEMU. BBL provides HTIF console access via the
-SBI (Supervisor Binary Interface) and the linux kernel SBI console.
-
-The HTIT chardev implements the pre qom legacy interface consistent
-with the 16550a UART in 'hw/char/serial.c'.
+The CLINT (Core Local Interruptor) device provides real-time clock, timer
+and interprocessor interrupts based on SiFive's CLINT specification.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/riscv_htif.c         | 263 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/riscv_htif.h |  64 ++++++++++
- 2 files changed, 327 insertions(+)
- create mode 100644 hw/riscv/riscv_htif.c
- create mode 100644 include/hw/riscv/riscv_htif.h
+ hw/riscv/sifive_clint.c         | 260 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_clint.h |  56 +++++++++
+ 2 files changed, 316 insertions(+)
+ create mode 100644 hw/riscv/sifive_clint.c
+ create mode 100644 include/hw/riscv/sifive_clint.h
 
-diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
 new file mode 100644
-index 0000000..e1087da
+index 0000000..93fbb33
 --- /dev/null
-+++ b/hw/riscv/riscv_htif.c
-@@ -0,0 +1,263 @@
++++ b/hw/riscv/sifive_clint.c
+@@ -0,0 +1,260 @@
 +/*
-+ * QEMU RISC-V Host Target Interface (HTIF) Emulation
++ * SiFive CLINT (Core Local Interruptor)
 + *
-+ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * This provides HTIF device emulation for QEMU. At the moment this allows
-+ * for identical copies of bbl/linux to run on both spike and QEMU.
++ * This provides real-time clock, timer and interprocessor interrupts.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -78,250 +73,249 @@ index 0000000..e1087da
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "hw/sysbus.h"
-+#include "hw/char/serial.h"
-+#include "chardev/char.h"
-+#include "chardev/char-fe.h"
-+#include "hw/riscv/riscv_htif.h"
-+#include "qemu/timer.h"
-+#include "exec/address-spaces.h"
 +#include "qemu/error-report.h"
++#include "hw/sysbus.h"
++#include "target/riscv/cpu.h"
++#include "hw/riscv/sifive_clint.h"
++#include "qemu/timer.h"
 +
-+#define RISCV_DEBUG_HTIF 0
-+#define HTIF_DEBUG(fmt, ...)                                                   \
-+    do {                                                                       \
-+        if (RISCV_DEBUG_HTIF) {                                                \
-+            qemu_log_mask(LOG_TRACE, "%s: " fmt "\n", __func__, ##__VA_ARGS__);\
-+        }                                                                      \
-+    } while (0)
++/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
++#define TIMER_FREQ (10 * 1000 * 1000)
 +
-+static uint64_t fromhost_addr, tohost_addr;
-+
-+void htif_symbol_callback(const char *st_name, int st_info, uint64_t st_value,
-+    uint64_t st_size)
++static uint64_t cpu_riscv_read_rtc(void)
 +{
-+    if (strcmp("fromhost", st_name) == 0) {
-+        fromhost_addr = st_value;
-+        if (st_size != 8) {
-+            error_report("HTIF fromhost must be 8 bytes");
-+            exit(1);
-+        }
-+    } else if (strcmp("tohost", st_name) == 0) {
-+        tohost_addr = st_value;
-+        if (st_size != 8) {
-+            error_report("HTIF tohost must be 8 bytes");
-+            exit(1);
-+        }
-+    }
++    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
++                    NANOSECONDS_PER_SECOND);
 +}
 +
 +/*
-+ * Called by the char dev to see if HTIF is ready to accept input.
++ * Called when timecmp is written to update the QEMU timer or immediately
++ * trigger timer interrupt if mtimecmp <= current timer value.
 + */
-+static int htif_can_recv(void *opaque)
++static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
 +{
-+    return 1;
-+}
++    uint64_t next;
++    uint64_t diff;
 +
-+/*
-+ * Called by the char dev to supply input to HTIF console.
-+ * We assume that we will receive one character at a time.
-+ */
-+static void htif_recv(void *opaque, const uint8_t *buf, int size)
-+{
-+    HTIFState *htifstate = opaque;
++    uint64_t rtc_r = cpu_riscv_read_rtc();
 +
-+    if (size != 1) {
++    cpu->env.timecmp = value;
++    if (cpu->env.timecmp <= rtc_r) {
++        /* if we're setting an MTIMECMP value in the "past",
++           immediately raise the timer interrupt */
++        riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
 +        return;
 +    }
 +
-+    /* TODO - we need to check whether mfromhost is zero which indicates
-+              the device is ready to receive. The current implementation
-+              will drop characters */
-+
-+    uint64_t val_written = htifstate->pending_read;
-+    uint64_t resp = 0x100 | *buf;
-+
-+    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
++    /* otherwise, set up the future timer interrupt */
++    riscv_set_local_interrupt(cpu, MIP_MTIP, 0);
++    diff = cpu->env.timecmp - rtc_r;
++    /* back to ns (note args switched in muldiv64) */
++    next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
++    timer_mod(cpu->env.timer, next);
 +}
 +
 +/*
-+ * Called by the char dev to supply special events to the HTIF console.
-+ * Not used for HTIF.
++ * Callback used when the timer set using timer_mod expires.
++ * Should raise the timer interrupt line
 + */
-+static void htif_event(void *opaque, int event)
++static void sifive_clint_timer_cb(void *opaque)
 +{
-+
++    RISCVCPU *cpu = opaque;
++    riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
 +}
 +
-+static int htif_be_change(void *opaque)
++/* CPU wants to read rtc or timecmp register */
++static uint64_t sifive_clint_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    HTIFState *s = opaque;
++    SiFiveCLINTState *clint = opaque;
++    if (addr >= clint->sip_base &&
++        addr < clint->sip_base + (clint->num_harts << 2)) {
++        size_t hartid = (addr - clint->sip_base) >> 2;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x3) == 0) {
++            return (env->mip & MIP_MSIP) > 0;
++        } else {
++            error_report("clint: invalid read: %08x", (uint32_t)addr);
++            return 0;
++        }
++    } else if (addr >= clint->timecmp_base &&
++        addr < clint->timecmp_base + (clint->num_harts << 3)) {
++        size_t hartid = (addr - clint->timecmp_base) >> 3;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x7) == 0) {
++            /* timecmp_lo */
++            uint64_t timecmp = env->timecmp;
++            return timecmp & 0xFFFFFFFF;
++        } else if ((addr & 0x7) == 4) {
++            /* timecmp_hi */
++            uint64_t timecmp = env->timecmp;
++            return (timecmp >> 32) & 0xFFFFFFFF;
++        } else {
++            error_report("clint: invalid read: %08x", (uint32_t)addr);
++            return 0;
++        }
++    } else if (addr == clint->time_base) {
++        /* time_lo */
++        return cpu_riscv_read_rtc() & 0xFFFFFFFF;
++    } else if (addr == clint->time_base + 4) {
++        /* time_hi */
++        return (cpu_riscv_read_rtc() >> 32) & 0xFFFFFFFF;
++    }
 +
-+    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
-+        htif_be_change, s, NULL, true);
-+
++    error_report("clint: invalid read: %08x", (uint32_t)addr);
 +    return 0;
 +}
 +
-+static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
++/* CPU wrote to rtc or timecmp register */
++static void sifive_clint_write(void *opaque, hwaddr addr, uint64_t value,
++        unsigned size)
 +{
-+    uint8_t device = val_written >> 56;
-+    uint8_t cmd = val_written >> 48;
-+    uint64_t payload = val_written & 0xFFFFFFFFFFFFULL;
-+    int resp = 0;
++    SiFiveCLINTState *clint = opaque;
 +
-+    HTIF_DEBUG("mtohost write: device: %d cmd: %d what: %02" PRIx64
-+        " -payload: %016" PRIx64 "\n", device, cmd, payload & 0xFF, payload);
-+
-+    /*
-+     * Currently, there is a fixed mapping of devices:
-+     * 0: riscv-tests Pass/Fail Reporting Only (no syscall proxy)
-+     * 1: Console
-+     */
-+    if (unlikely(device == 0x0)) {
-+        /* frontend syscall handler, shutdown and exit code support */
-+        if (cmd == 0x0) {
-+            if (payload & 0x1) {
-+                /* exit code */
-+                int exit_code = payload >> 1;
-+                exit(exit_code);
-+            } else {
-+                qemu_log_mask(LOG_UNIMP, "pk syscall proxy not supported\n");
-+            }
++    if (addr >= clint->sip_base &&
++        addr < clint->sip_base + (clint->num_harts << 2)) {
++        size_t hartid = (addr - clint->sip_base) >> 2;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x3) == 0) {
++            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MSIP, value != 0);
 +        } else {
-+            qemu_log("HTIF device %d: unknown command\n", device);
++            error_report("clint: invalid sip write: %08x", (uint32_t)addr);
 +        }
-+    } else if (likely(device == 0x1)) {
-+        /* HTIF Console */
-+        if (cmd == 0x0) {
-+            /* this should be a queue, but not yet implemented as such */
-+            htifstate->pending_read = val_written;
-+            htifstate->env->mtohost = 0; /* clear to indicate we read */
++        return;
++    } else if (addr >= clint->timecmp_base &&
++        addr < clint->timecmp_base + (clint->num_harts << 3)) {
++        size_t hartid = (addr - clint->timecmp_base) >> 3;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x7) == 0) {
++            /* timecmp_lo */
++            uint64_t timecmp = env->timecmp;
++            sifive_clint_write_timecmp(RISCV_CPU(cpu),
++                timecmp << 32 | (value & 0xFFFFFFFF));
 +            return;
-+        } else if (cmd == 0x1) {
-+            qemu_chr_fe_write(&htifstate->chr, (uint8_t *)&payload, 1);
-+            resp = 0x100 | (uint8_t)payload;
++        } else if ((addr & 0x7) == 4) {
++            /* timecmp_hi */
++            uint64_t timecmp = env->timecmp;
++            sifive_clint_write_timecmp(RISCV_CPU(cpu),
++                value << 32 | (timecmp & 0xFFFFFFFF));
 +        } else {
-+            qemu_log("HTIF device %d: unknown command\n", device);
++            error_report("clint: invalid timecmp write: %08x", (uint32_t)addr);
 +        }
-+    } else {
-+        qemu_log("HTIF unknown device or command\n");
-+        HTIF_DEBUG("device: %d cmd: %d what: %02" PRIx64
-+            " payload: %016" PRIx64, device, cmd, payload & 0xFF, payload);
++        return;
++    } else if (addr == clint->time_base) {
++        /* time_lo */
++        error_report("clint: time_lo write not implemented");
++        return;
++    } else if (addr == clint->time_base + 4) {
++        /* time_hi */
++        error_report("clint: time_hi write not implemented");
++        return;
 +    }
-+    /*
-+     * - latest bbl does not set fromhost to 0 if there is a value in tohost
-+     * - with this code enabled, qemu hangs waiting for fromhost to go to 0
-+     * - with this code disabled, qemu works with bbl priv v1.9.1 and v1.10
-+     * - HTIF needs protocol documentation and a more complete state machine
 +
-+        while (!htifstate->fromhost_inprogress &&
-+            htifstate->env->mfromhost != 0x0) {
-+        }
-+    */
-+    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
-+    htifstate->env->mtohost = 0; /* clear to indicate we read */
++    error_report("clint: invalid write: %08x", (uint32_t)addr);
 +}
 +
-+#define TOHOST_OFFSET1 (htifstate->tohost_offset)
-+#define TOHOST_OFFSET2 (htifstate->tohost_offset + 4)
-+#define FROMHOST_OFFSET1 (htifstate->fromhost_offset)
-+#define FROMHOST_OFFSET2 (htifstate->fromhost_offset + 4)
-+
-+/* CPU wants to read an HTIF register */
-+static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    HTIFState *htifstate = opaque;
-+    if (addr == TOHOST_OFFSET1) {
-+        return htifstate->env->mtohost & 0xFFFFFFFF;
-+    } else if (addr == TOHOST_OFFSET2) {
-+        return (htifstate->env->mtohost >> 32) & 0xFFFFFFFF;
-+    } else if (addr == FROMHOST_OFFSET1) {
-+        return htifstate->env->mfromhost & 0xFFFFFFFF;
-+    } else if (addr == FROMHOST_OFFSET2) {
-+        return (htifstate->env->mfromhost >> 32) & 0xFFFFFFFF;
-+    } else {
-+        qemu_log("Invalid htif read: address %016" PRIx64 "\n",
-+            (uint64_t)addr);
-+        return 0;
++static const MemoryRegionOps sifive_clint_ops = {
++    .read = sifive_clint_read,
++    .write = sifive_clint_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
 +    }
-+}
-+
-+/* CPU wrote to an HTIF register */
-+static void htif_mm_write(void *opaque, hwaddr addr,
-+                            uint64_t value, unsigned size)
-+{
-+    HTIFState *htifstate = opaque;
-+    if (addr == TOHOST_OFFSET1) {
-+        if (htifstate->env->mtohost == 0x0) {
-+            htifstate->allow_tohost = 1;
-+            htifstate->env->mtohost = value & 0xFFFFFFFF;
-+        } else {
-+            htifstate->allow_tohost = 0;
-+        }
-+    } else if (addr == TOHOST_OFFSET2) {
-+        if (htifstate->allow_tohost) {
-+            htifstate->env->mtohost |= value << 32;
-+            htif_handle_tohost_write(htifstate, htifstate->env->mtohost);
-+        }
-+    } else if (addr == FROMHOST_OFFSET1) {
-+        htifstate->fromhost_inprogress = 1;
-+        htifstate->env->mfromhost = value & 0xFFFFFFFF;
-+    } else if (addr == FROMHOST_OFFSET2) {
-+        htifstate->env->mfromhost |= value << 32;
-+        htifstate->fromhost_inprogress = 0;
-+    } else {
-+        qemu_log("Invalid htif write: address %016" PRIx64 "\n",
-+            (uint64_t)addr);
-+    }
-+}
-+
-+static const MemoryRegionOps htif_mm_ops = {
-+    .read = htif_mm_read,
-+    .write = htif_mm_write,
 +};
 +
-+HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
-+    CPURISCVState *env, Chardev *chr)
-+{
-+    uint64_t base = MIN(tohost_addr, fromhost_addr);
-+    uint64_t size = MAX(tohost_addr + 8, fromhost_addr + 8) - base;
-+    uint64_t tohost_offset = tohost_addr - base;
-+    uint64_t fromhost_offset = fromhost_addr - base;
++static Property sifive_clint_properties[] = {
++    DEFINE_PROP_UINT32("num-harts", SiFiveCLINTState, num_harts, 0),
++    DEFINE_PROP_UINT32("sip-base", SiFiveCLINTState, sip_base, 0),
++    DEFINE_PROP_UINT32("timecmp-base", SiFiveCLINTState, timecmp_base, 0),
++    DEFINE_PROP_UINT32("time-base", SiFiveCLINTState, time_base, 0),
++    DEFINE_PROP_UINT32("aperture-size", SiFiveCLINTState, aperture_size, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+    HTIFState *s = g_malloc0(sizeof(HTIFState));
-+    s->address_space = address_space;
-+    s->main_mem = main_mem;
-+    s->main_mem_ram_ptr = memory_region_get_ram_ptr(main_mem);
-+    s->env = env;
-+    s->tohost_offset = tohost_offset;
-+    s->fromhost_offset = fromhost_offset;
-+    s->pending_read = 0;
-+    s->allow_tohost = 0;
-+    s->fromhost_inprogress = 0;
-+    qemu_chr_fe_init(&s->chr, chr, &error_abort);
-+    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
-+        htif_be_change, s, NULL, true);
-+    if (base) {
-+        memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
-+                            TYPE_HTIF_UART, size);
-+        memory_region_add_subregion(address_space, base, &s->mmio);
++static void sifive_clint_realize(DeviceState *dev, Error **errp)
++{
++    SiFiveCLINTState *s = SIFIVE_CLINT(dev);
++    memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_clint_ops, s,
++                          TYPE_SIFIVE_CLINT, s->aperture_size);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
++}
++
++static void sifive_clint_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    dc->realize = sifive_clint_realize;
++    dc->props = sifive_clint_properties;
++}
++
++static const TypeInfo sifive_clint_info = {
++    .name          = TYPE_SIFIVE_CLINT,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SiFiveCLINTState),
++    .class_init    = sifive_clint_class_init,
++};
++
++static void sifive_clint_register_types(void)
++{
++    type_register_static(&sifive_clint_info);
++}
++
++type_init(sifive_clint_register_types)
++
++
++/*
++ * Create CLINT device.
++ */
++DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
++    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base)
++{
++    int i;
++    for (i = 0; i < num_harts; i++) {
++        CPUState *cpu = qemu_get_cpu(i);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            continue;
++        }
++        env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                                  &sifive_clint_timer_cb, cpu);
++        env->timecmp = 0;
 +    }
 +
-+    return s;
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_CLINT);
++    qdev_prop_set_uint32(dev, "num-harts", num_harts);
++    qdev_prop_set_uint32(dev, "sip-base", sip_base);
++    qdev_prop_set_uint32(dev, "timecmp-base", timecmp_base);
++    qdev_prop_set_uint32(dev, "time-base", time_base);
++    qdev_prop_set_uint32(dev, "aperture-size", size);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
++    return dev;
 +}
-diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/riscv/riscv_htif.h
+diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
 new file mode 100644
-index 0000000..5131fb2
+index 0000000..cec3fbd
 --- /dev/null
-+++ b/include/hw/riscv/riscv_htif.h
-@@ -0,0 +1,64 @@
++++ b/include/hw/riscv/sifive_clint.h
+@@ -0,0 +1,56 @@
 +/*
-+ * QEMU RISCV Host Target Interface (HTIF) Emulation
++ * SiFive CLINT (Core Local Interruptor) interface
 + *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017 SiFive, Inc.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -341,46 +335,36 @@ index 0000000..5131fb2
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
 + */
-+#ifndef HW_RISCV_HTIF_H
-+#define HW_RISCV_HTIF_H
 +
-+#include "hw/hw.h"
-+#include "chardev/char.h"
-+#include "chardev/char-fe.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/memory.h"
-+#include "target/riscv/cpu.h"
++#ifndef HW_SIFIVE_CLINT_H
++#define HW_SIFIVE_CLINT_H
 +
-+#define TYPE_HTIF_UART "riscv.htif.uart"
++#define TYPE_SIFIVE_CLINT "riscv.sifive.clint"
 +
-+typedef struct HTIFState {
-+    int allow_tohost;
-+    int fromhost_inprogress;
++#define SIFIVE_CLINT(obj) \
++    OBJECT_CHECK(SiFiveCLINTState, (obj), TYPE_SIFIVE_CLINT)
 +
-+    hwaddr tohost_offset;
-+    hwaddr fromhost_offset;
-+    uint64_t tohost_size;
-+    uint64_t fromhost_size;
++typedef struct SiFiveCLINTState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
 +    MemoryRegion mmio;
-+    MemoryRegion *address_space;
-+    MemoryRegion *main_mem;
-+    void *main_mem_ram_ptr;
++    uint32_t num_harts;
++    uint32_t sip_base;
++    uint32_t timecmp_base;
++    uint32_t time_base;
++    uint32_t aperture_size;
++} SiFiveCLINTState;
 +
-+    CPURISCVState *env;
-+    CharBackend chr;
-+    uint64_t pending_read;
-+} HTIFState;
++DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
++    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base);
 +
-+extern const VMStateDescription vmstate_htif;
-+extern const MemoryRegionOps htif_io_ops;
-+
-+/* HTIF symbol callback */
-+void htif_symbol_callback(const char *st_name, int st_info, uint64_t st_value,
-+    uint64_t st_size);
-+
-+/* legacy pre qom */
-+HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
-+    CPURISCVState *env, Chardev *chr);
++enum {
++    SIFIVE_SIP_BASE     = 0x0,
++    SIFIVE_TIMECMP_BASE = 0x4000,
++    SIFIVE_TIME_BASE    = 0xBFF8
++};
 +
 +#endif
 -- 
