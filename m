@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1epAd6-0002fS-GN
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:31:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1epAe8-00039c-PX
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1epAd3-0003Ar-A0
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:31:04 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <ea7725b4-a06a-0be0-4fc2-80cfa4359489@redhat.com>
-References: <20180222161811.26200-1-berto@igalia.com>
-	<ea7725b4-a06a-0be0-4fc2-80cfa4359489@redhat.com>
-Date: Fri, 23 Feb 2018 11:30:21 +0100
-Message-ID: <w51woz4kngi.fsf@maestria.local.igalia.com>
+	(envelope-from <cohuck@redhat.com>) id 1epAe5-0006RI-Me
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:32:08 -0500
+Date: Fri, 23 Feb 2018 11:31:46 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180223113146.5121ca64.cohuck@redhat.com>
+In-Reply-To: <1519316579-7162-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+References: <1519316579-7162-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1519316579-7162-2-git-send-email-imbrenda@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] iotests: Test abnormally large size in
- compressed cluster descriptor
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] s390x/sclp: proper support of
+ larger send and receive masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-On Thu 22 Feb 2018 08:00:08 PM CET, Eric Blake wrote:
->> One consequence of this is that even if the size field is larger than
->> it needs to be QEMU can handle it just fine: it will read more data
->> from disk but it will ignore the extra bytes.
->
-> (is that true even for the corner case when the size field points
-> beyond the end of the image?  But not important to the meat of the
-> patch)
+On Thu, 22 Feb 2018 17:22:57 +0100
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
 
-As a matter of fact this is exactly what happens in this test
-case... I'm thinking to expand it so both cases are tested.
+> Until 67915de9f0383ccf4a ("s390x/event-facility: variable-length event masks")
+> we only supported sclp event masks of size exactly 4 bytes, even though
 
-Berto
+s/of size/of a size of/
+
+> the archiecture allows the guests to set up sclp event masks from 1 to
+
+s/archiecture/architecture/
+
+> 1021 bytes in length.
+> After that patch, the behaviour was almost compliant, but some issues
+> were still remaining, in particular regarding the handling of selective
+> reads and migration.
+> 
+> When setting the sclp event mask, a mask size is also specified. Until
+> now we only considered the size in order to decide which bits to save
+> in the internal state. On the other hand, when a guest performs a
+> selective read, it sends a mask, but it does not specify a size; the
+> implied size is the size of the last mask that has been set.
+> 
+> Specifying bits in the mask of selective read that are not available in
+> the internal mask should return an error, and bits past the end of the
+> mask should obviously be ignored. This can only be achieved by keeping
+> track of the lenght of the mask.
+> 
+> The mask length is thus now part of the internal state that needs to be
+> migrated.
+> 
+> This patch fixes the handling of selective reads, whose size will now
+> match the length of the event mask, as per architecture.
+> 
+> While the default behaviour is to be compliant with the architecture,
+> when using older machine models the old broken behaviour is selected
+> (allowing only masks of size exactly 4), in order to be able to migrate
+> toward older versions.
+> 
+> Fixes: 67915de9f0383ccf4a ("s390x/event-facility: variable-length event masks")
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/event-facility.c  | 91 +++++++++++++++++++++++++++++++++++++++-------
+>  hw/s390x/s390-virtio-ccw.c |  8 +++-
+>  2 files changed, 85 insertions(+), 14 deletions(-)
+
+Looks reasonable.
