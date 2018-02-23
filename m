@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1epEN6-0002HW-Rp
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:30:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epER9-0003Nc-Mx
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:35:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1epEN3-0001Yc-5t
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:30:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44776
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1epEN2-0001Y3-WA
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:30:45 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NEJ99b079464
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 09:30:44 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gahx9q3a1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 09:30:43 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 23 Feb 2018 14:30:42 -0000
-References: <1519390265-15576-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1519390265-15576-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 23 Feb 2018 15:30:38 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1epER8-0000aH-Pn
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:34:59 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:42410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1epER8-0000Zc-JK
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:34:58 -0500
+Received: by mail-pl0-x242.google.com with SMTP id 31so4983345ple.9
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 06:34:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1519390265-15576-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <9018fa2d-578d-a0c0-8f6a-444902639348@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] s390x/sclp: clean up sclp masks
+In-Reply-To: <20180217182323.25885-28-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-28-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Feb 2018 14:34:36 +0000
+Message-ID: <CAFEAcA-TuO4F=QoU7WWVieX6OLDX2dEX-g-jz2Hjq4jGb3O9KA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 27/67] target/arm: Implement SVE Permute
+ - Unpredicated Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,16 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, cohuck@redhat.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
+On 17 February 2018 at 18:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    |  23 +++++++++
+>  target/arm/translate-a64.h |  14 +++---
+>  target/arm/sve_helper.c    | 114 +++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 113 ++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      |  29 +++++++++++-
+>  5 files changed, 285 insertions(+), 8 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
+> index e519aee314..328aa7fce1 100644
+> --- a/target/arm/translate-a64.h
+> +++ b/target/arm/translate-a64.h
+> @@ -66,18 +66,18 @@ static inline void assert_fp_access_checked(DisasContext *s)
+>  static inline int vec_reg_offset(DisasContext *s, int regno,
+>                                   int element, TCGMemOp size)
+>  {
+> -    int offs = 0;
+> +    int element_size = 1 << size;
+> +    int offs = element * element_size;
+>  #ifdef HOST_WORDS_BIGENDIAN
+>      /* This is complicated slightly because vfp.zregs[n].d[0] is
+>       * still the low half and vfp.zregs[n].d[1] the high half
+>       * of the 128 bit vector, even on big endian systems.
+> -     * Calculate the offset assuming a fully bigendian 128 bits,
+> -     * then XOR to account for the order of the two 64 bit halves.
+> +     * Calculate the offset assuming a fully little-endian 128 bits,
+> +     * then XOR to account for the order of the 64 bit units.
+>       */
+> -    offs += (16 - ((element + 1) * (1 << size)));
+> -    offs ^= 8;
+> -#else
+> -    offs += element * (1 << size);
+> +    if (element_size < 8) {
+> +        offs ^= 8 - element_size;
+> +    }
+>  #endif
+>      offs += offsetof(CPUARMState, vfp.zregs[regno]);
+>      assert_fp_access_checked(s);
 
+This looks like it should have been in an earlier patch?
 
-On 02/23/2018 01:51 PM, Claudio Imbrenda wrote:
-> Introduce an sccb_mask_t to be used for SCLP event masks instead of just
-> unsigned int or uint32_t. This will allow later to extend the mask with
-> more ease.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> @@ -85,7 +86,9 @@
+>  @pd_pg_pn_pm_s ........ . s:1 .. rm:4 .. pg:4 . rn:4 . rd:4    &rprr_s
+>
+>  # Three operand, vector element size
+> -@rd_rn_rm      ........ esz:2 . rm:5  ... ...  rn:5 rd:5       &rrr_esz
+> +@rd_rn_rm      ........ esz:2 . rm:5 ... ... rn:5 rd:5         &rrr_esz
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Another fragment that should be squashed.
+
+> +@rdn_rm                ........ esz:2 ...... ...... rm:5 rd:5 \
+> +               &rrr_esz rn=%reg_movprfx
+>
+>  # Three operand with "memory" size, aka immediate left shift
+>  @rd_rn_msz_rm  ........ ... rm:5 .... imm:2 rn:5 rd:5          &rrri
+
+Otherwise
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
