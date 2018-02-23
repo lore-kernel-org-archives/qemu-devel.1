@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVm-00018X-1I
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:52 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVl-00017g-AY
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVj-0007UZ-61
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60650)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVi-0007Sp-5H
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47824)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1epFVi-0007TH-Rl
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:47 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1epFVh-0007RQ-Sn
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:46 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NFdPiQ029324
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:45 -0500
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gah26kmpr-1
+	w1NFcxkH007082
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:44 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gak44q69x-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:45 -0500
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:44 -0500
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
 	Fri, 23 Feb 2018 10:43:43 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 10:43:10 -0500
+Date: Fri, 23 Feb 2018 10:43:09 -0500
 In-Reply-To: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1519400599-21081-5-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v9 04/13] s390-ccw: update libc
+Message-Id: <1519400599-21081-4-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v9 03/13] s390-ccw: refactor IPL structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,317 +40,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Moved:
-  memcmp from bootmap.h to libc.h (renamed from _memcmp)
-  strlen from sclp.c to libc.h (renamed from _strlen)
-
-Added C standard functions:
-  isdigit
-
-Added non C-standard function:
-  uitoa
-  atoui
+ECKD DASDs have different IPL structures for CDL and LDL
+formats. The current Ipl1 and Ipl2 structs follow the CDL
+format, so we prepend "EckdCdl" to them. Boot info for LDL
+has been moved to a new struct: EckdLdlIpl1.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/Makefile  |  2 +-
- pc-bios/s390-ccw/bootmap.c |  4 +--
- pc-bios/s390-ccw/bootmap.h | 16 +--------
- pc-bios/s390-ccw/libc.c    | 88 ++++++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/libc.h    | 37 +++++++++++++++++--
- pc-bios/s390-ccw/main.c    | 17 +--------
- pc-bios/s390-ccw/sclp.c    | 10 +-----
- 7 files changed, 129 insertions(+), 45 deletions(-)
- create mode 100644 pc-bios/s390-ccw/libc.c
+ pc-bios/s390-ccw/bootmap.c | 12 ++++++------
+ pc-bios/s390-ccw/bootmap.h | 37 +++++++++++++++++++++----------------
+ 2 files changed, 27 insertions(+), 22 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 6d0c2ee..9f7904f 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- 
- .PHONY : all clean build-all
- 
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
-+OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
 diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index a94638d..092fb35 100644
+index 9534f56..a94638d 100644
 --- a/pc-bios/s390-ccw/bootmap.c
 +++ b/pc-bios/s390-ccw/bootmap.c
-@@ -506,7 +506,7 @@ static bool is_iso_bc_entry_compatible(IsoBcSection *s)
-                     "Failed to read image sector 0");
+@@ -221,7 +221,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+ static void ipl_eckd_cdl(void)
+ {
+     XEckdMbr *mbr;
+-    Ipl2 *ipl2 = (void *)sec;
++    EckdCdlIpl2 *ipl2 = (void *)sec;
+     IplVolumeLabel *vlbl = (void *)sec;
+     block_number_t bmt_block_nr;
  
-     /* Checking bytes 8 - 32 for S390 Linux magic */
--    return !_memcmp(magic_sec + 8, linux_s390_magic, 24);
-+    return !memcmp(magic_sec + 8, linux_s390_magic, 24);
- }
+@@ -231,7 +231,7 @@ static void ipl_eckd_cdl(void)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
  
- /* Location of the current sector of the directory */
-@@ -635,7 +635,7 @@ static uint32_t find_iso_bc(void)
-         if (vd->type == VOL_DESC_TYPE_BOOT) {
-             IsoVdElTorito *et = &vd->vd.boot;
+-    mbr = &ipl2->u.x.mbr;
++    mbr = &ipl2->mbr;
+     IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
+     IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
+                "Bad block size in zIPL section of IPL2 record.");
+@@ -281,7 +281,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+ {
+     block_number_t bmt_block_nr;
+-    BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
++    EckdLdlIpl1 *ipl1 = (void *)sec;
  
--            if (!_memcmp(&et->el_torito[0], el_torito_magic, 32)) {
-+            if (!memcmp(&et->el_torito[0], el_torito_magic, 32)) {
-                 return bswap32(et->bc_offset);
-             }
+     if (mode != ECKD_LDL_UNLABELED) {
+         print_eckd_ldl_msg(mode);
+@@ -292,15 +292,15 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(0, sec, "Cannot read block 0 to grab boot info.");
+     if (mode == ECKD_LDL_UNLABELED) {
+-        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
++        if (!magic_match(ipl1->bip.magic, ZIPL_MAGIC)) {
+             return; /* not applicable layout */
          }
+         sclp_print("unlabeled LDL.\n");
+     }
+-    verify_boot_info(bip);
++    verify_boot_info(&ipl1->bip);
+ 
+     /* save pointer to Boot Map Table */
+-    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
++    bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
+ 
+     run_eckd_boot_script(bmt_block_nr);
+     /* no return */
 diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 4bd95cd..4cf7e1e 100644
+index b361084..4bd95cd 100644
 --- a/pc-bios/s390-ccw/bootmap.h
 +++ b/pc-bios/s390-ccw/bootmap.h
-@@ -328,20 +328,6 @@ static inline bool magic_match(const void *data, const void *magic)
-     return *((uint32_t *)data) == *((uint32_t *)magic);
- }
+@@ -239,22 +239,27 @@ typedef struct BootInfo {          /* @ 0x70, record #0    */
+     } bp;
+ } __attribute__ ((packed)) BootInfo; /* see also XEckdMbr   */
  
--static inline int _memcmp(const void *s1, const void *s2, size_t n)
--{
--    int i;
--    const uint8_t *p1 = s1, *p2 = s2;
+-typedef struct Ipl1 {
+-    unsigned char key[4]; /* == "IPL1" */
+-    unsigned char data[24];
+-} __attribute__((packed)) Ipl1;
 -
--    for (i = 0; i < n; i++) {
--        if (p1[i] != p2[i]) {
--            return p1[i] > p2[i] ? 1 : -1;
--        }
--    }
--
--    return 0;
--}
--
- static inline uint32_t iso_733_to_u32(uint64_t x)
- {
-     return (uint32_t)x;
-@@ -434,7 +420,7 @@ const uint8_t vol_desc_magic[] = "CD001";
- 
- static inline bool is_iso_vd_valid(IsoVolDesc *vd)
- {
--    return !_memcmp(&vd->ident[0], vol_desc_magic, 5) &&
-+    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
-            vd->version == 0x1 &&
-            vd->type <= VOL_DESC_TYPE_PARTITION;
- }
-diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
-new file mode 100644
-index 0000000..38ea77d
---- /dev/null
-+++ b/pc-bios/s390-ccw/libc.c
-@@ -0,0 +1,88 @@
+-typedef struct Ipl2 {
+-    unsigned char key[4]; /* == "IPL2" */
+-    union {
+-        unsigned char data[144];
+-        struct {
+-            unsigned char reserved1[92-4];
+-            XEckdMbr mbr;
+-            unsigned char reserved2[144-(92-4)-sizeof(XEckdMbr)];
+-        } x;
+-    } u;
+-} __attribute__((packed)) Ipl2;
 +/*
-+ * libc-style definitions and functions
-+ *
-+ * Copyright 2018 IBM Corp.
-+ * Author(s): Collin L. Walling <walling@linux.vnet.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
++ * Structs for IPL
 + */
++#define STAGE2_BLK_CNT_MAX  24 /* Stage 1b can load up to 24 blocks */
 +
-+#include "libc.h"
-+#include "s390-ccw.h"
++typedef struct EckdCdlIpl1 {
++    uint8_t key[4]; /* == "IPL1" */
++    uint8_t data[24];
++} __attribute__((packed)) EckdCdlIpl1;
 +
-+/**
-+ * atoui:
-+ * @str: the string to be converted.
-+ *
-+ * Given a string @str, convert it to an integer. Leading spaces are
-+ * ignored. Any other non-numerical value will terminate the conversion
-+ * and return 0. This function only handles numbers between 0 and
-+ * UINT64_MAX inclusive.
-+ *
-+ * Returns: an integer converted from the string @str, or the number 0
-+ * if an error occurred.
-+ */
-+uint64_t atoui(const char *str)
-+{
-+    int val = 0;
++typedef struct EckdCdlIpl2 {
++    uint8_t key[4]; /* == "IPL2" */
++    uint8_t reserved0[88];
++    XEckdMbr mbr;
++    uint8_t reserved[24];
++} __attribute__((packed)) EckdCdlIpl2;
 +
-+    if (!str || !str[0]) {
-+        return 0;
-+    }
-+
-+    while (*str == ' ') {
-+        str++;
-+    }
-+
-+    while (*str) {
-+        if (!isdigit(*str)) {
-+            break;
-+        }
-+        val = val * 10 + *str - '0';
-+        str++;
-+    }
-+
-+    return val;
-+}
-+
-+/**
-+ * uitoa:
-+ * @num: an integer (base 10) to be converted.
-+ * @str: a pointer to a string to store the conversion.
-+ * @len: the length of the passed string.
-+ *
-+ * Given an integer @num, convert it to a string. The string @str must be
-+ * allocated beforehand. The resulting string will be null terminated and
-+ * returned. This function only handles numbers between 0 and UINT64_MAX
-+ * inclusive.
-+ *
-+ * Returns: the string @str of the converted integer @num
-+ */
-+char *uitoa(uint64_t num, char *str, size_t len)
-+{
-+    size_t num_idx = 1; /* account for NUL */
-+    uint64_t tmp = num;
-+
-+    IPL_assert(str != NULL, "uitoa: no space allocated to store string");
-+
-+    /* Count indices of num */
-+    while ((tmp /= 10) != 0) {
-+        num_idx++;
-+    }
-+
-+    /* Check if we have enough space for num and NUL */
-+    IPL_assert(len > num_idx, "uitoa: array too small for conversion");
-+
-+    str[num_idx--] = '\0';
-+
-+    /* Convert int to string */
-+    while (num_idx >= 0) {
-+        str[num_idx--] = num % 10 + '0';
-+        num /= 10;
-+    }
-+
-+    return str;
-+}
-diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-index 0142ea8..63ece70 100644
---- a/pc-bios/s390-ccw/libc.h
-+++ b/pc-bios/s390-ccw/libc.h
-@@ -1,6 +1,8 @@
- /*
-  * libc-style definitions and functions
-  *
-+ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
-+ *
-  * This code is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the
-  * Free Software Foundation; either version 2 of the License, or (at your
-@@ -19,7 +21,7 @@ typedef unsigned long long uint64_t;
++typedef struct EckdLdlIpl1 {
++    uint8_t reserved[112];
++    BootInfo bip; /* BootInfo is MBR for LDL */
++} __attribute__((packed)) EckdLdlIpl1;
  
- static inline void *memset(void *s, int c, size_t n)
- {
--    int i;
-+    size_t i;
-     unsigned char *p = s;
- 
-     for (i = 0; i < n; i++) {
-@@ -33,7 +35,7 @@ static inline void *memcpy(void *s1, const void *s2, size_t n)
- {
-     uint8_t *dest = s1;
-     const uint8_t *src = s2;
--    int i;
-+    size_t i;
- 
-     for (i = 0; i < n; i++) {
-         dest[i] = src[i];
-@@ -42,4 +44,35 @@ static inline void *memcpy(void *s1, const void *s2, size_t n)
-     return s1;
- }
- 
-+static inline int memcmp(const void *s1, const void *s2, size_t n)
-+{
-+    size_t i;
-+    const uint8_t *p1 = s1, *p2 = s2;
-+
-+    for (i = 0; i < n; i++) {
-+        if (p1[i] != p2[i]) {
-+            return p1[i] > p2[i] ? 1 : -1;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static inline size_t strlen(const char *str)
-+{
-+    size_t i;
-+    for (i = 0; *str; i++) {
-+        str++;
-+    }
-+    return i;
-+}
-+
-+static inline int isdigit(int c)
-+{
-+    return (c >= '0') && (c <= '9');
-+}
-+
-+uint64_t atoui(const char *str);
-+char *uitoa(uint64_t num, char *str, size_t len);
-+
- #endif
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 401e9db..e857ce4 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -40,22 +40,7 @@ void panic(const char *string)
- 
- unsigned int get_loadparm_index(void)
- {
--    const char *lp = loadparm;
--    int i;
--    unsigned int idx = 0;
--
--    for (i = 0; i < 8; i++) {
--        char c = lp[i];
--
--        if (c < '0' || c > '9') {
--            break;
--        }
--
--        idx *= 10;
--        idx += c - '0';
--    }
--
--    return idx;
-+    return atoui(loadparm);
- }
- 
- static bool find_dev(Schib *schib, int dev_no)
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index 90d1bc3..e6a0898 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -65,14 +65,6 @@ void sclp_setup(void)
-     sclp_set_write_mask();
- }
- 
--static int _strlen(const char *str)
--{
--    int i;
--    for (i = 0; *str; i++)
--        str++;
--    return i;
--}
--
- long write(int fd, const void *str, size_t len)
- {
-     WriteEventData *sccb = (void *)_sccb;
-@@ -113,7 +105,7 @@ long write(int fd, const void *str, size_t len)
- 
- void sclp_print(const char *str)
- {
--    write(1, str, _strlen(str));
-+    write(1, str, strlen(str));
- }
- 
- void sclp_get_loadparm_ascii(char *loadparm)
+ typedef struct IplVolumeLabel {
+     unsigned char key[4]; /* == "VOL1" */
 -- 
 2.7.4
