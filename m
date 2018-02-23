@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1epInX-0006Gf-AN
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:14:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIyy-0000XS-IS
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1epInS-0004q9-Be
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:14:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42046 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1epInS-0004oy-7f
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:14:18 -0500
-References: <20180223132311.26555-1-marcandre.lureau@redhat.com>
-	<20180223132311.26555-4-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <53540b2d-e52e-af98-6008-cab3a1688388@redhat.com>
-Date: Fri, 23 Feb 2018 20:14:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180223132311.26555-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/7] HACK: HobLib: workaround infinite loop
+	(envelope-from <kwolf@redhat.com>) id 1epIyx-00045P-B0
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:12 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:14 +0100
+Message-Id: <20180223192549.26666-2-kwolf@redhat.com>
+In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
+References: <20180223192549.26666-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/36] block/qapi: Introduce
+ BlockdevCreateOptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +20,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, qemu-devel@nongnu.org, javierm@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-On 02/23/18 14:23, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Without this hack, GetNextHob() loops infinitely with the next patch.
-> I don't understand the reason.
->=20
-> The loop is triggered by the GetFirstGuidHob (&gTpmErrorHobGuid) call.
->=20
-> CC: Laszlo Ersek <lersek@redhat.com>
-> CC: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Contributed-under: TianoCore Contribution Agreement 1.0
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  MdePkg/Library/PeiHobLib/HobLib.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/MdePkg/Library/PeiHobLib/HobLib.c b/MdePkg/Library/PeiHobL=
-ib/HobLib.c
-> index 5c0eeb992f..ed3c5fbd6d 100644
-> --- a/MdePkg/Library/PeiHobLib/HobLib.c
-> +++ b/MdePkg/Library/PeiHobLib/HobLib.c
-> @@ -89,6 +89,10 @@ GetNextHob (
->      if (Hob.Header->HobType =3D=3D Type) {
->        return Hob.Raw;
->      }
-> +    if (GET_HOB_LENGTH (HobStart) =3D=3D 0) {
-> +        DEBUG ((DEBUG_INFO, "FIXME: GetNextHob length =3D=3D 0"));
-> +        return NULL;
-> +    }
->      Hob.Raw =3D GET_NEXT_HOB (Hob);
->    }
->    return NULL;
->=20
+This creates a BlockdevCreateOptions union type that will contain all of
+the options for image creation. We'll start out with an empty struct
+type BlockdevCreateNotSupported for all drivers.
 
-Strange. The HobLength field is supposed to include the size of the HOB h=
-eader, so it should never be zero.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ qapi/block-core.json | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
-Furthermore, the PEI core initializes the HOB list; it should be terminat=
-ed with an End-of-HOB-List HOB:
-
-PeiCore()                             [MdeModulePkg/Core/Pei/PeiMain/PeiM=
-ain.c]
-  InitializeMemoryServices()          [MdeModulePkg/Core/Pei/Memory/Memor=
-yServices.c]
-    PeiCoreBuildHobHandoffInfoTable() [MdeModulePkg/Core/Pei/Hob/Hob.c]
-
-I tried to reproduce this issue by:
-- applying patches 1, 2, and 4
-- in function PeimEntryMA(), file "SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.c", mo=
-ving the GetFirstGuidHob (&gTpmErrorHobGuid) call to the top of the funct=
-ion.
-
-It didn't hang for me.
-
-Laszlo
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 5c5921bfb7..d256cefc79 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3359,6 +3359,68 @@
+ { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+ 
+ ##
++# @BlockdevCreateNotSupported:
++#
++# This is used for all drivers that don't support creating images.
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateNotSupported', 'data': {}}
++
++##
++# @BlockdevCreateOptions:
++#
++# Options for creating an image format on a given node.
++#
++# @driver           block driver to create the image format
++#
++# Since: 2.12
++##
++{ 'union': 'BlockdevCreateOptions',
++  'base': {
++      'driver':         'BlockdevDriver' },
++  'discriminator': 'driver',
++  'data': {
++      'blkdebug':       'BlockdevCreateNotSupported',
++      'blkverify':      'BlockdevCreateNotSupported',
++      'bochs':          'BlockdevCreateNotSupported',
++      'cloop':          'BlockdevCreateNotSupported',
++      'dmg':            'BlockdevCreateNotSupported',
++      'file':           'BlockdevCreateNotSupported',
++      'ftp':            'BlockdevCreateNotSupported',
++      'ftps':           'BlockdevCreateNotSupported',
++      'gluster':        'BlockdevCreateNotSupported',
++      'host_cdrom':     'BlockdevCreateNotSupported',
++      'host_device':    'BlockdevCreateNotSupported',
++      'http':           'BlockdevCreateNotSupported',
++      'https':          'BlockdevCreateNotSupported',
++      'iscsi':          'BlockdevCreateNotSupported',
++      'luks':           'BlockdevCreateNotSupported',
++      'nbd':            'BlockdevCreateNotSupported',
++      'nfs':            'BlockdevCreateNotSupported',
++      'null-aio':       'BlockdevCreateNotSupported',
++      'null-co':        'BlockdevCreateNotSupported',
++      'nvme':           'BlockdevCreateNotSupported',
++      'parallels':      'BlockdevCreateNotSupported',
++      'qcow2':          'BlockdevCreateNotSupported',
++      'qcow':           'BlockdevCreateNotSupported',
++      'qed':            'BlockdevCreateNotSupported',
++      'quorum':         'BlockdevCreateNotSupported',
++      'raw':            'BlockdevCreateNotSupported',
++      'rbd':            'BlockdevCreateNotSupported',
++      'replication':    'BlockdevCreateNotSupported',
++      'sheepdog':       'BlockdevCreateNotSupported',
++      'ssh':            'BlockdevCreateNotSupported',
++      'throttle':       'BlockdevCreateNotSupported',
++      'vdi':            'BlockdevCreateNotSupported',
++      'vhdx':           'BlockdevCreateNotSupported',
++      'vmdk':           'BlockdevCreateNotSupported',
++      'vpc':            'BlockdevCreateNotSupported',
++      'vvfat':          'BlockdevCreateNotSupported',
++      'vxhs':           'BlockdevCreateNotSupported'
++  } }
++
++##
+ # @blockdev-open-tray:
+ #
+ # Opens a block device's tray. If there is a block driver state tree inserted as
+-- 
+2.13.6
