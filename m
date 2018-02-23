@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deepa.srinivasan@oracle.com>) id 1epK3P-0004dh-4R
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:34:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1epKP2-0001s8-PJ
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:57:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deepa.srinivasan@oracle.com>) id 1epK3N-0000Df-MC
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:34:51 -0500
-References: <1513385953-5466-1-git-send-email-deepa.srinivasan@oracle.com>
-	<20180129155153.GM20446@stefanha-x1.localdomain>
-From: Deepa Srinivasan <deepa.srinivasan@oracle.com>
-Message-ID: <2a617f25-33c1-d4b2-5150-357f1d6e5492@oracle.com>
-Date: Fri, 23 Feb 2018 12:34:36 -0800
+	(envelope-from <richard.henderson@linaro.org>) id 1epKOz-0006NJ-P1
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:57:12 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:35241)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1epKOz-0006MZ-Gu
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:57:09 -0500
+Received: by mail-pl0-x241.google.com with SMTP id bb3so5567729plb.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 12:57:09 -0800 (PST)
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-37-richard.henderson@linaro.org>
+	<CAFEAcA8mvCXMEBv+dLwVfQcdEeyaqSfK9EX1HzQOKfQi8+Tk2g@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5b1ac6b7-096f-0e20-2d35-18f095efc56f@linaro.org>
+Date: Fri, 23 Feb 2018 12:57:04 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180129155153.GM20446@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAFEAcA8mvCXMEBv+dLwVfQcdEeyaqSfK9EX1HzQOKfQi8+Tk2g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] block: Fix qemu crash when
- using scsi-block
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 36/67] target/arm: Implement SVE Integer
+ Compare - Vectors Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,202 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Stefan, Kevin - Ping, to take this patch. Thanks.
-
-
-On 01/29/2018 07:51 AM, Stefan Hajnoczi wrote:
-> On Fri, Dec 15, 2017 at 04:59:13PM -0800, Deepa Srinivasan wrote:
->> Starting qemu with the following arguments causes qemu to segfault:
->> ... -device lsi,id=lsi0 -drive file=iscsi:<...>,format=raw,if=none,node-name=
->> iscsi1 -device scsi-block,bus=lsi0.0,id=<...>,drive=iscsi1
->>
->> This patch fixes blk_aio_ioctl() so it does not pass stack addresses to
->> blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() returns. More
->> details about the bug follow.
->>
->> blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
->> coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
->>
->> When blk_aio_ioctl() is executed from within a coroutine context (e.g.
->> iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry) to
->> the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
->>
->> When blk_aio_ioctl_entry() executes later, it accesses an invalid pointer:
->> ....
->>      BlkRwCo *rwco = &acb->rwco;
->>
->>      rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
->>                               rwco->qiov->iov[0].iov_base);  <--- qiov is
->>                                                                   invalid here
->> ...
->>
->> In the case when blk_aio_ioctl() is called from a non-coroutine context,
->> blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() calls
->> qemu_coroutine_yield(), blk_aio_ioctl() will return. When the coroutine
->> execution is complete, control returns to blk_aio_ioctl_entry() after the call
->> to blk_co_ioctl(). There is no invalid reference after this point, but the
->> function is still holding on to invalid pointers.
->>
->> The fix is to change blk_aio_prwv() to accept a void pointer for the IO buffer
->> rather than a QEMUIOVector. blk_aio_prwv() passes this through in BlkRwCo and the
->> coroutine function casts it to QEMUIOVector or uses the void pointer directly.
->>
->> Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
->> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
->> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+On 02/23/2018 08:29 AM, Peter Maydell wrote:
+> On 17 February 2018 at 18:22, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 >> ---
->>   block/block-backend.c | 51 +++++++++++++++++++++++++--------------------------
-> Kevin: Ping.  Will you take this through your tree?
->
->>   1 file changed, 25 insertions(+), 26 deletions(-)
+> 
+>> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+>> index 86cd792cdf..ae433861f8 100644
+>> --- a/target/arm/sve_helper.c
+>> +++ b/target/arm/sve_helper.c
+>> @@ -46,14 +46,14 @@
+>>   *
+>>   * The return value has bit 31 set if N is set, bit 1 set if Z is clear,
+>>   * and bit 0 set if C is set.
+>> - *
+>> - * This is an iterative function, called for each Pd and Pg word
+>> - * moving forward.
+>>   */
 >>
->> diff --git a/block/block-backend.c b/block/block-backend.c
->> index baef8e7..2d0d9b6 100644
->> --- a/block/block-backend.c
->> +++ b/block/block-backend.c
->> @@ -1140,7 +1140,7 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
->>   typedef struct BlkRwCo {
->>       BlockBackend *blk;
->>       int64_t offset;
->> -    QEMUIOVector *qiov;
->> +    void *iobuf;
->>       int ret;
->>       BdrvRequestFlags flags;
->>   } BlkRwCo;
->> @@ -1148,17 +1148,19 @@ typedef struct BlkRwCo {
->>   static void blk_read_entry(void *opaque)
->>   {
->>       BlkRwCo *rwco = opaque;
->> +    QEMUIOVector *qiov = rwco->iobuf;
->>   
->> -    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, rwco->qiov->size,
->> -                              rwco->qiov, rwco->flags);
->> +    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
->> +                              qiov, rwco->flags);
->>   }
->>   
->>   static void blk_write_entry(void *opaque)
->>   {
->>       BlkRwCo *rwco = opaque;
->> +    QEMUIOVector *qiov = rwco->iobuf;
->>   
->> -    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, rwco->qiov->size,
->> -                               rwco->qiov, rwco->flags);
->> +    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
->> +                               qiov, rwco->flags);
->>   }
->>   
->>   static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
->> @@ -1178,7 +1180,7 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
->>       rwco = (BlkRwCo) {
->>           .blk    = blk,
->>           .offset = offset,
->> -        .qiov   = &qiov,
->> +        .iobuf  = &qiov,
->>           .flags  = flags,
->>           .ret    = NOT_DONE,
->>       };
->> @@ -1275,7 +1277,7 @@ static void blk_aio_complete_bh(void *opaque)
->>   }
->>   
->>   static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
->> -                                QEMUIOVector *qiov, CoroutineEntry co_entry,
->> +                                void *iobuf, CoroutineEntry co_entry,
->>                                   BdrvRequestFlags flags,
->>                                   BlockCompletionFunc *cb, void *opaque)
->>   {
->> @@ -1287,7 +1289,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
->>       acb->rwco = (BlkRwCo) {
->>           .blk    = blk,
->>           .offset = offset,
->> -        .qiov   = qiov,
->> +        .iobuf  = iobuf,
->>           .flags  = flags,
->>           .ret    = NOT_DONE,
->>       };
->> @@ -1310,10 +1312,11 @@ static void blk_aio_read_entry(void *opaque)
->>   {
->>       BlkAioEmAIOCB *acb = opaque;
->>       BlkRwCo *rwco = &acb->rwco;
->> +    QEMUIOVector *qiov = rwco->iobuf;
->>   
->> -    assert(rwco->qiov->size == acb->bytes);
->> +    assert(qiov->size == acb->bytes);
->>       rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, acb->bytes,
->> -                              rwco->qiov, rwco->flags);
->> +                              qiov, rwco->flags);
->>       blk_aio_complete(acb);
->>   }
->>   
->> @@ -1321,10 +1324,11 @@ static void blk_aio_write_entry(void *opaque)
->>   {
->>       BlkAioEmAIOCB *acb = opaque;
->>       BlkRwCo *rwco = &acb->rwco;
->> +    QEMUIOVector *qiov = rwco->iobuf;
->>   
->> -    assert(!rwco->qiov || rwco->qiov->size == acb->bytes);
->> +    assert(!qiov || qiov->size == acb->bytes);
->>       rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, acb->bytes,
->> -                               rwco->qiov, rwco->flags);
->> +                               qiov, rwco->flags);
->>       blk_aio_complete(acb);
->>   }
->>   
->> @@ -1453,8 +1457,10 @@ int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
->>   static void blk_ioctl_entry(void *opaque)
->>   {
->>       BlkRwCo *rwco = opaque;
->> +    QEMUIOVector *qiov = rwco->iobuf;
->> +
->>       rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
->> -                             rwco->qiov->iov[0].iov_base);
->> +                             qiov->iov[0].iov_base);
->>   }
->>   
->>   int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
->> @@ -1467,24 +1473,15 @@ static void blk_aio_ioctl_entry(void *opaque)
->>       BlkAioEmAIOCB *acb = opaque;
->>       BlkRwCo *rwco = &acb->rwco;
->>   
->> -    rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
->> -                             rwco->qiov->iov[0].iov_base);
->> +    rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset, rwco->iobuf);
->> +
->>       blk_aio_complete(acb);
->>   }
->>   
->>   BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
->>                             BlockCompletionFunc *cb, void *opaque)
->>   {
->> -    QEMUIOVector qiov;
->> -    struct iovec iov;
->> -
->> -    iov = (struct iovec) {
->> -        .iov_base = buf,
->> -        .iov_len = 0,
->> -    };
->> -    qemu_iovec_init_external(&qiov, &iov, 1);
->> -
->> -    return blk_aio_prwv(blk, req, 0, &qiov, blk_aio_ioctl_entry, 0, cb, opaque);
->> +    return blk_aio_prwv(blk, req, 0, buf, blk_aio_ioctl_entry, 0, cb, opaque);
->>   }
->>   
->>   int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
->> @@ -1900,7 +1897,9 @@ int blk_truncate(BlockBackend *blk, int64_t offset, PreallocMode prealloc,
->>   static void blk_pdiscard_entry(void *opaque)
->>   {
->>       BlkRwCo *rwco = opaque;
->> -    rwco->ret = blk_co_pdiscard(rwco->blk, rwco->offset, rwco->qiov->size);
->> +    QEMUIOVector *qiov = rwco->iobuf;
->> +
->> +    rwco->ret = blk_co_pdiscard(rwco->blk, rwco->offset, qiov->size);
->>   }
->>   
->>   int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
->> -- 
->> 2.7.4
+>>  /* For no G bits set, NZCV = C.  */
+>>  #define PREDTEST_INIT  1
 >>
->>
+>> +/* This is an iterative function, called for each Pd and Pg word
+>> + * moving forward.
+>> + */
+> 
+> Why move this comment?
+
+Meant to fold this to the first.  But moving so that I can separately document...
+
+>> +/* This is an iterative function, called for each Pd and Pg word
+>> + * moving backward.
+>> + */
+>> +static uint32_t iter_predtest_bwd(uint64_t d, uint64_t g, uint32_t flags)
+
+... this.
+
+>> +    do {                                                                     \
+>> +        uint64_t out = 0, pg;                                                \
+>> +        do {                                                                 \
+>> +            i -= sizeof(TYPE), out <<= sizeof(TYPE);                         \
+>> +            TYPE nn = *(TYPE *)(vn + H(i));                                  \
+>> +            TYPE mm = *(TYPE *)(vm + H(i));                                  \
+>> +            out |= nn OP mm;                                                 \
+>> +        } while (i & 63);                                                    \
+>> +        pg = *(uint64_t *)(vg + (i >> 3)) & MASK;                            \
+>> +        out &= pg;                                                           \
+>> +        *(uint64_t *)(vd + (i >> 3)) = out;                                  \
+>> +        flags = iter_predtest_bwd(out, pg, flags);                           \
+>> +    } while (i > 0);                                                         \
+>> +    return flags;                                                            \
+>> +}
+> 
+> Why do we iterate backwards through the vector? As far as I can
+> see the pseudocode iterates forwards, and I don't think it
+> makes a difference to the result which way we go.
+
+You're right, it does not make a difference to the result which way we iterate.
+
+Of the several different ways I've written loops over predicates, this is my
+favorite.  It has several points in its favor:
+
+  1) Operate on full uint64_t predicate units instead
+     of uint8_t or uint16_t sub-units.  This means
+
+     1a) No big-endian adjustment required,
+     1b) Fewer memory loads.
+
+  2) No separate loop tail; it is shared with the main loop body.
+
+  3) A sub-point specific to predicate output, but the main loop
+     gets to run un-predicated.  Here the governing predicate is
+     applied at the end: out &= pg.
+
+
+r~
