@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1epFUp-0000Af-TP
+	(envelope-from <alex.bennee@linaro.org>) id 1epFUp-00009i-9m
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1epFUo-00061Q-Ov
+	(envelope-from <alex.bennee@linaro.org>) id 1epFUn-0005yi-JQ
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:51 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:44724)
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37917)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1epFUo-0005zP-Ez
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:50 -0500
-Received: by mail-wr0-x243.google.com with SMTP id v65so14511241wrc.11
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:42:50 -0800 (PST)
+	id 1epFUn-0005x9-9i
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:49 -0500
+Received: by mail-wm0-x242.google.com with SMTP id z9so5345612wmb.3
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:42:49 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 23 Feb 2018 15:36:19 +0000
-Message-Id: <20180223153636.29809-15-alex.bennee@linaro.org>
+Date: Fri, 23 Feb 2018 15:36:24 +0000
+Message-Id: <20180223153636.29809-20-alex.bennee@linaro.org>
 In-Reply-To: <20180223153636.29809-1-alex.bennee@linaro.org>
 References: <20180223153636.29809-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 14/31] arm/translate-a64: add FP16
- FMULX/MLS/FMLA to simd_indexed
+Subject: [Qemu-devel] [PATCH v3 19/31] arm/translate-a64: add FP16 FCMxx
+ (zero) to simd_two_reg_misc_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,151 +33,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-The helpers use the new re-factored muladd support in SoftFloat for
-the float16 work.
+I re-use the existing handle_2misc_fcmp_zero handler and tweak it
+slightly to deal with the half-precision case.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
 v3
-  - re-jigged switch statement to fall-through for unalloc
-  - added is_fp16 bool for fpst
-  - fixed up some long lines
+  - use size directly wuth read/write_vec_element
+  - drop unneeded break
+  - WIP: mess with calculating maxpasses
 ---
- target/arm/translate-a64.c | 83 +++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 67 insertions(+), 16 deletions(-)
+ target/arm/translate-a64.c | 80 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 57 insertions(+), 23 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e96e6cdd15..43bff5cd09 100644
+index e3318837c9..c251121c2b 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -11198,6 +11198,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
-     int rd = extract32(insn, 0, 5);
-     bool is_long = false;
-     bool is_fp = false;
-+    bool is_fp16 = false;
-     int index;
+@@ -7821,14 +7821,14 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+                                    bool is_scalar, bool is_u, bool is_q,
+                                    int size, int rn, int rd)
+ {
+-    bool is_double = (size == 3);
++    bool is_double = (size == MO_64);
      TCGv_ptr fpst;
  
-@@ -11244,7 +11245,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
-         }
-         /* fall through */
-     case 0x9: /* FMUL, FMULX */
--        if (!extract32(size, 1, 1)) {
-+        if (size == 1 ||
-+            (size < 2 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))) {
-             unallocated_encoding(s);
-             return;
-         }
-@@ -11256,18 +11258,34 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     if (!fp_access_check(s)) {
+         return;
      }
  
-     if (is_fp) {
--        /* low bit of size indicates single/double */
--        size = extract32(size, 0, 1) ? 3 : 2;
--        if (size == 2) {
-+        /* convert insn encoded size to TCGMemOp size */
-+        switch (size) {
-+        case 2: /* single precision */
-+            size = MO_32;
-             index = h << 1 | l;
--        } else {
-+            rm |= (m << 4);
-+            break;
-+        case 3: /* double precision */
-+            size = MO_64;
-             if (l || !is_q) {
-                 unallocated_encoding(s);
-                 return;
-             }
-             index = h;
-+            rm |= (m << 4);
-+            break;
-+        case 0: /* half precision */
-+            size = MO_16;
-+            index = h << 2 | l << 1 | m;
-+            is_fp16 = true;
-+            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+-    fpst = get_fpstatus_ptr(false);
++    fpst = get_fpstatus_ptr(size == MO_16);
+ 
+     if (is_double) {
+         TCGv_i64 tcg_op = tcg_temp_new_i64();
+@@ -7880,34 +7880,57 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+         bool swap = false;
+         int pass, maxpasses;
+ 
+-        switch (opcode) {
+-        case 0x2e: /* FCMLT (zero) */
+-            swap = true;
+-            /* fall through */
+-        case 0x2c: /* FCMGT (zero) */
+-            genfn = gen_helper_neon_cgt_f32;
+-            break;
+-        case 0x2d: /* FCMEQ (zero) */
+-            genfn = gen_helper_neon_ceq_f32;
+-            break;
+-        case 0x6d: /* FCMLE (zero) */
+-            swap = true;
+-            /* fall through */
+-        case 0x6c: /* FCMGE (zero) */
+-            genfn = gen_helper_neon_cge_f32;
+-            break;
+-        default:
+-            g_assert_not_reached();
++        if (size == MO_16) {
++            switch (opcode) {
++            case 0x2e: /* FCMLT (zero) */
++                swap = true;
++                /* fall through */
++            case 0x2c: /* FCMGT (zero) */
++                genfn = gen_helper_advsimd_cgt_f16;
 +                break;
++            case 0x2d: /* FCMEQ (zero) */
++                genfn = gen_helper_advsimd_ceq_f16;
++                break;
++            case 0x6d: /* FCMLE (zero) */
++                swap = true;
++                /* fall through */
++            case 0x6c: /* FCMGE (zero) */
++                genfn = gen_helper_advsimd_cge_f16;
++                break;
++            default:
++                g_assert_not_reached();
 +            }
-+            /* fallthru */
-+        default: /* unallocated */
-+            unallocated_encoding(s);
-+            return;
++        } else {
++            switch (opcode) {
++            case 0x2e: /* FCMLT (zero) */
++                swap = true;
++                /* fall through */
++            case 0x2c: /* FCMGT (zero) */
++                genfn = gen_helper_neon_cgt_f32;
++                break;
++            case 0x2d: /* FCMEQ (zero) */
++                genfn = gen_helper_neon_ceq_f32;
++                break;
++            case 0x6d: /* FCMLE (zero) */
++                swap = true;
++                /* fall through */
++            case 0x6c: /* FCMGE (zero) */
++                genfn = gen_helper_neon_cge_f32;
++                break;
++            default:
++                g_assert_not_reached();
++            }
          }
--        rm |= (m << 4);
-     } else {
-         switch (size) {
-         case 1:
-@@ -11288,7 +11306,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
-     }
  
-     if (is_fp) {
--        fpst = get_fpstatus_ptr(false);
-+        fpst = get_fpstatus_ptr(is_fp16);
-     } else {
-         fpst = NULL;
-     }
-@@ -11390,18 +11408,51 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
-                 break;
+         if (is_scalar) {
+             maxpasses = 1;
+         } else {
+-            maxpasses = is_q ? 4 : 2;
++            int vector_size = 8 << is_q;
++            maxpasses = vector_size >> size;
+         }
+ 
+         for (pass = 0; pass < maxpasses; pass++) {
+-            read_vec_element_i32(s, tcg_op, rn, pass, MO_32);
++            read_vec_element_i32(s, tcg_op, rn, pass, size);
+             if (swap) {
+                 genfn(tcg_res, tcg_zero, tcg_op, fpst);
+             } else {
+@@ -7916,7 +7939,7 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+             if (is_scalar) {
+                 write_fp_sreg(s, rd, tcg_res);
+             } else {
+-                write_vec_element_i32(s, tcg_res, rd, pass, MO_32);
++                write_vec_element_i32(s, tcg_res, rd, pass, size);
              }
-             case 0x5: /* FMLS */
--                /* As usual for ARM, separate negation for fused multiply-add */
--                gen_helper_vfp_negs(tcg_op, tcg_op);
--                /* fall through */
-             case 0x1: /* FMLA */
--                read_vec_element_i32(s, tcg_res, rd, pass, MO_32);
--                gen_helper_vfp_muladds(tcg_res, tcg_op, tcg_idx, tcg_res, fpst);
-+                read_vec_element_i32(s, tcg_res, rd, pass,
-+                                     is_scalar ? size : MO_32);
-+                switch (size) {
-+                case 1:
-+                    if (opcode == 0x5) {
-+                        /* As usual for ARM, separate negation for fused
-+                         * multiply-add */
-+                        tcg_gen_xori_i32(tcg_op, tcg_op, 0x80008000);
-+                    }
-+                    gen_helper_advsimd_muladdh(tcg_res, tcg_op, tcg_idx,
-+                                               tcg_res, fpst);
-+                    break;
-+                case 2:
-+                    if (opcode == 0x5) {
-+                        /* As usual for ARM, separate negation for
-+                         * fused multiply-add */
-+                        tcg_gen_xori_i32(tcg_op, tcg_op, 0x80000000);
-+                    }
-+                    gen_helper_vfp_muladds(tcg_res, tcg_op, tcg_idx,
-+                                           tcg_res, fpst);
-+                    break;
-+                default:
-+                    g_assert_not_reached();
-+                }
-                 break;
-             case 0x9: /* FMUL, FMULX */
--                if (u) {
--                    gen_helper_vfp_mulxs(tcg_res, tcg_op, tcg_idx, fpst);
--                } else {
--                    gen_helper_vfp_muls(tcg_res, tcg_op, tcg_idx, fpst);
-+                switch (size) {
-+                case 1:
-+                    if (u) {
-+                        gen_helper_advsimd_mulxh(tcg_res, tcg_op, tcg_idx,
-+                                                 fpst);
-+                    } else {
-+                        g_assert_not_reached();
-+                    }
-+                    break;
-+                case 2:
-+                    if (u) {
-+                        gen_helper_vfp_mulxs(tcg_res, tcg_op, tcg_idx, fpst);
-+                    } else {
-+                        gen_helper_vfp_muls(tcg_res, tcg_op, tcg_idx, fpst);
-+                    }
-+                    break;
-+                default:
-+                    g_assert_not_reached();
-                 }
-                 break;
-             case 0xc: /* SQDMULH */
+         }
+         tcg_temp_free_i32(tcg_res);
+@@ -11209,7 +11232,18 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+     fpop = deposit32(opcode, 5, 1, a);
+     fpop = deposit32(fpop, 6, 1, u);
+ 
++    rd = extract32(insn, 0, 5);
++    rn = extract32(insn, 5, 5);
++
+     switch (fpop) {
++    break;
++    case 0x2c: /* FCMGT (zero) */
++    case 0x2d: /* FCMEQ (zero) */
++    case 0x2e: /* FCMLT (zero) */
++    case 0x6c: /* FCMGE (zero) */
++    case 0x6d: /* FCMLE (zero) */
++        handle_2misc_fcmp_zero(s, fpop, is_scalar, 0, is_q, MO_16, rn, rd);
++        return;
+     case 0x18: /* FRINTN */
+         need_rmode = true;
+         only_in_vector = true;
 -- 
 2.15.1
