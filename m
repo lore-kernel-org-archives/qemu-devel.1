@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzd-0001En-Rc
+	(envelope-from <kwolf@redhat.com>) id 1epIze-0001FH-5t
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzc-0005CM-KH
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzc-0005Cz-QR
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:54 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:39 +0100
-Message-Id: <20180223192549.26666-27-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:40 +0100
+Message-Id: <20180223192549.26666-28-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 26/36] nfs: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH v3 27/36] sheepdog: QAPIfy "redundancy" create
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,187 +23,210 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to nfs, which enables
-image creation over QMP.
+The "redundancy" option for Sheepdog image creation is currently a
+string that can encode one or two integers depending on its format,
+which at the same time implicitly selects a mode.
+
+This patch turns it into a QAPI union and converts the string into such
+a QAPI object before interpreting the values.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 16 +++++++++++-
- block/nfs.c          | 74 +++++++++++++++++++++++++++++++++++++++++-----------
- 2 files changed, 74 insertions(+), 16 deletions(-)
+ qapi/block-core.json | 45 +++++++++++++++++++++++++
+ block/sheepdog.c     | 94 +++++++++++++++++++++++++++++++++++++---------------
+ 2 files changed, 112 insertions(+), 27 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 6c0c16ebe3..085b791303 100644
+index 085b791303..2b249c9e3d 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3393,6 +3393,20 @@
-             '*preallocation':   'PreallocMode' } }
+@@ -3467,6 +3467,51 @@
+             '*cluster-size' :   'size' } }
  
  ##
-+# @BlockdevCreateOptionsNfs:
++# @SheepdogRedundancyType:
 +#
-+# Driver specific image creation options for NFS.
-+#
-+# @location         Where to store the new image file
-+# @size             Size of the virtual disk in bytes
++# @full             Create a fully replicated vdi with x copies
++# @erasure-coded    Create an erasure coded vdi with x data strips and
++#                   y parity strips
 +#
 +# Since: 2.12
 +##
-+{ 'struct': 'BlockdevCreateOptionsNfs',
-+  'data': { 'location':         'BlockdevOptionsNfs',
-+            'size':             'size' } }
++{ 'enum': 'SheepdogRedundancyType',
++  'data': [ 'full', 'erasure-coded' ] }
 +
 +##
- # @BlockdevQcow2Version:
++# @SheepdogRedundancyFull:
++#
++# @copies           Number of copies to use (between 1 and 31)
++#
++# Since: 2.12
++##
++{ 'struct': 'SheepdogRedundancyFull',
++  'data': { 'copies': 'int' }}
++
++##
++# @SheepdogRedundancyErasureCoded:
++#
++# @data-strips      Number of data strips to use (one of {2,4,8,16})
++# @parity-strips    Number of parity strips to use (between 1 and 15)
++#
++# Since: 2.12
++##
++{ 'struct': 'SheepdogRedundancyErasureCoded',
++  'data': { 'data-strips': 'int',
++            'parity-strips': 'int' }}
++
++##
++# @SheepdogRedundancy:
++#
++# Since: 2.12
++##
++{ 'union': 'SheepdogRedundancy',
++  'base': { 'type': 'SheepdogRedundancyType' },
++  'discriminator': 'type',
++  'data': { 'full': 'SheepdogRedundancyFull',
++            'erasure-coded': 'SheepdogRedundancyErasureCoded' } }
++
++##
+ # @BlockdevCreateNotSupported:
  #
- # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-@@ -3491,7 +3505,7 @@
-       'iscsi':          'BlockdevCreateNotSupported',
-       'luks':           'BlockdevCreateNotSupported',
-       'nbd':            'BlockdevCreateNotSupported',
--      'nfs':            'BlockdevCreateNotSupported',
-+      'nfs':            'BlockdevCreateOptionsNfs',
-       'null-aio':       'BlockdevCreateNotSupported',
-       'null-co':        'BlockdevCreateNotSupported',
-       'nvme':           'BlockdevCreateNotSupported',
-diff --git a/block/nfs.c b/block/nfs.c
-index 9283bfbaae..c0c153cadb 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -551,33 +551,45 @@ out:
+ # This is used for all drivers that don't support creating images.
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 3c3becf94d..22df2ba9d0 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -1882,6 +1882,48 @@ out_with_err_set:
      return ret;
  }
  
--static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
--                                     int flags, int open_flags, Error **errp)
-+static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-+                                                     Error **errp)
++static int parse_redundancy(BDRVSheepdogState *s, SheepdogRedundancy *opt)
++{
++    struct SheepdogInode *inode = &s->inode;
++
++    switch (opt->type) {
++    case SHEEPDOG_REDUNDANCY_TYPE_FULL:
++        if (opt->u.full.copies > SD_MAX_COPIES || opt->u.full.copies < 1) {
++            return -EINVAL;
++        }
++        inode->copy_policy = 0;
++        inode->nr_copies = opt->u.full.copies;
++        return 0;
++
++    case SHEEPDOG_REDUNDANCY_TYPE_ERASURE_CODED:
++    {
++        int64_t copy = opt->u.erasure_coded.data_strips;
++        int64_t parity = opt->u.erasure_coded.parity_strips;
++
++        if (copy != 2 && copy != 4 && copy != 8 && copy != 16) {
++            return -EINVAL;
++        }
++
++        if (parity >= SD_EC_MAX_STRIP || parity < 1) {
++            return -EINVAL;
++        }
++
++        /*
++         * 4 bits for parity and 4 bits for data.
++         * We have to compress upper data bits because it can't represent 16
++         */
++        inode->copy_policy = ((copy / 2) << 4) + parity;
++        inode->nr_copies = copy + parity;
++        return 0;
++    }
++
++    default:
++        g_assert_not_reached();
++    }
++
++    return -EINVAL;
++}
++
+ /*
+  * Sheepdog support two kinds of redundancy, full replication and erasure
+  * coding.
+@@ -1892,12 +1934,13 @@ out_with_err_set:
+  * # create a erasure coded vdi with x data strips and y parity strips
+  * -o redundancy=x:y (x must be one of {2,4,8,16} and 1 <= y < SD_EC_MAX_STRIP)
+  */
+-static int parse_redundancy(BDRVSheepdogState *s, const char *opt)
++static int parse_redundancy_str(BDRVSheepdogState *s, const char *opt)
  {
-     BlockdevOptionsNfs *opts = NULL;
-     QObject *crumpled = NULL;
-     Visitor *v;
-     Error *local_err = NULL;
--    int ret;
+-    struct SheepdogInode *inode = &s->inode;
++    struct SheepdogRedundancy redundancy;
+     const char *n1, *n2;
+     long copy, parity;
+     char p[10];
++    int ret;
  
-     crumpled = qdict_crumple(options, errp);
-     if (crumpled == NULL) {
+     pstrcpy(p, sizeof(p), opt);
+     n1 = strtok(p, ":");
+@@ -1907,35 +1950,32 @@ static int parse_redundancy(BDRVSheepdogState *s, const char *opt)
+         return -EINVAL;
+     }
+ 
+-    copy = strtol(n1, NULL, 10);
+-    /* FIXME fix error checking by switching to qemu_strtol() */
+-    if (copy > SD_MAX_COPIES || copy < 1) {
 -        return -EINVAL;
-+        return NULL;
-     }
- 
-     v = qobject_input_visitor_new_keyval(crumpled);
-     visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
-     visit_free(v);
-+    qobject_decref(crumpled);
- 
-     if (local_err) {
--        error_propagate(errp, local_err);
-+        return NULL;
-+    }
-+
-+    return opts;
-+}
-+
-+static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
-+                                     int flags, int open_flags, Error **errp)
-+{
-+    BlockdevOptionsNfs *opts;
-+    int ret;
-+
-+    opts = nfs_options_qdict_to_qapi(options, errp);
-+    if (opts == NULL) {
-         ret = -EINVAL;
-         goto fail;
-     }
- 
-     ret = nfs_client_open(client, opts, flags, open_flags, errp);
- fail:
--    qobject_decref(crumpled);
-     qapi_free_BlockdevOptionsNfs(opts);
-     return ret;
- }
-@@ -614,17 +626,42 @@ static QemuOptsList nfs_create_opts = {
-     }
- };
- 
--static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
-+static int nfs_file_co_create(BlockdevCreateOptions *options, Error **errp)
- {
--    int64_t ret, total_size;
-+    BlockdevCreateOptionsNfs *opts = &options->u.nfs;
-     NFSClient *client = g_new0(NFSClient, 1);
--    QDict *options = NULL;
-+    int ret;
-+
-+    assert(options->driver == BLOCKDEV_DRIVER_NFS);
- 
-     client->aio_context = qemu_get_aio_context();
- 
-+    ret = nfs_client_open(client, opts->location, O_CREAT, 0, errp);
+-    }
+-    if (!n2) {
+-        inode->copy_policy = 0;
+-        inode->nr_copies = copy;
+-        return 0;
++    ret = qemu_strtol(n1, NULL, 10, &copy);
 +    if (ret < 0) {
-+        goto out;
-+    }
-+    ret = nfs_ftruncate(client->context, client->fh, opts->size);
-+    nfs_client_close(client);
-+
-+out:
-+    g_free(client);
-+    return ret;
-+}
-+
-+static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
-+{
-+    BlockdevCreateOptions *create_options;
-+    BlockdevCreateOptionsNfs *nfs_opts;
-+    QDict *options;
-+    int ret;
-+
-+    create_options = g_new0(BlockdevCreateOptions, 1);
-+    create_options->driver = BLOCKDEV_DRIVER_NFS;
-+    nfs_opts = &create_options->u.nfs;
-+
-     /* Read out options */
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
-+    nfs_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                              BDRV_SECTOR_SIZE);
- 
-     options = qdict_new();
-     ret = nfs_parse_uri(url, options, errp);
-@@ -632,15 +669,21 @@ static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
-         goto out;
++        return ret;
      }
  
--    ret = nfs_client_open_qdict(client, options, O_CREAT, 0, errp);
-+    nfs_opts->location = nfs_options_qdict_to_qapi(options, errp);
-+    if (nfs_opts->location == NULL) {
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+
-+    ret = nfs_file_co_create(create_options, errp);
-     if (ret < 0) {
-         goto out;
+-    if (copy != 2 && copy != 4 && copy != 8 && copy != 16) {
+-        return -EINVAL;
+-    }
++    if (!n2) {
++        redundancy = (SheepdogRedundancy) {
++            .type               = SHEEPDOG_REDUNDANCY_TYPE_FULL,
++            .u.full.copies      = copy,
++        };
++    } else {
++        ret = qemu_strtol(n2, NULL, 10, &parity);
++        if (ret < 0) {
++            return ret;
++        }
+ 
+-    parity = strtol(n2, NULL, 10);
+-    /* FIXME fix error checking by switching to qemu_strtol() */
+-    if (parity >= SD_EC_MAX_STRIP || parity < 1) {
+-        return -EINVAL;
++        redundancy = (SheepdogRedundancy) {
++            .type               = SHEEPDOG_REDUNDANCY_TYPE_ERASURE_CODED,
++            .u.erasure_coded    = {
++                .data_strips    = copy,
++                .parity_strips  = parity,
++            },
++        };
      }
--    ret = nfs_ftruncate(client->context, client->fh, total_size);
--    nfs_client_close(client);
-+
-+    ret = 0;
- out:
-     QDECREF(options);
--    g_free(client);
-+    qapi_free_BlockdevCreateOptions(create_options);
-     return ret;
+ 
+-    /*
+-     * 4 bits for parity and 4 bits for data.
+-     * We have to compress upper data bits because it can't represent 16
+-     */
+-    inode->copy_policy = ((copy / 2) << 4) + parity;
+-    inode->nr_copies = copy + parity;
+-
+-    return 0;
++    return parse_redundancy(s, &redundancy);
  }
  
-@@ -828,6 +871,7 @@ static BlockDriver bdrv_nfs = {
-     .bdrv_file_open                 = nfs_file_open,
-     .bdrv_close                     = nfs_file_close,
-     .bdrv_create                    = nfs_file_create,
-+    .bdrv_co_create                 = nfs_file_co_create,
-     .bdrv_reopen_prepare            = nfs_reopen_prepare,
- 
-     .bdrv_co_preadv                 = nfs_co_preadv,
+ static int parse_block_size_shift(BDRVSheepdogState *s, QemuOpts *opt)
+@@ -2007,7 +2047,7 @@ static int sd_create(const char *filename, QemuOpts *opts,
+     g_free(buf);
+     buf = qemu_opt_get_del(opts, BLOCK_OPT_REDUNDANCY);
+     if (buf) {
+-        ret = parse_redundancy(s, buf);
++        ret = parse_redundancy_str(s, buf);
+         if (ret < 0) {
+             error_setg(errp, "Invalid redundancy mode: '%s'", buf);
+             goto out;
 -- 
 2.13.6
