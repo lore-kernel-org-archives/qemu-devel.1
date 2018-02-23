@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIz0-0000ZZ-6A
+	(envelope-from <kwolf@redhat.com>) id 1epIz0-0000Zh-8u
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIyy-00048j-Uf
+	(envelope-from <kwolf@redhat.com>) id 1epIyy-00048U-TK
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:14 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:19 +0100
-Message-Id: <20180223192549.26666-7-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:16 +0100
+Message-Id: <20180223192549.26666-4-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 06/36] qcow2: Use QCryptoBlockCreateOptions
- in qcow2_create2()
+Subject: [Qemu-devel] [PATCH v3 03/36] qcow2: Let qcow2_create() handle
+ protocol layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,168 +23,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Instead of passing the encryption format name and the QemuOpts down, use
-the QCryptoBlockCreateOptions contained in BlockdevCreateOptions.
+Currently, qcow2_create() only parses the QemuOpts and then calls
+qcow2_create2() for the actual image creation, which includes both the
+creation of the actual file on the file system and writing a valid empty
+qcow2 image into that file.
+
+The plan is that qcow2_create2() becomes the function that implements
+the functionality for a future 'blockdev-create' QMP command, which only
+creates the qcow2 layer on an already opened file node.
+
+This is a first step towards that goal: Let's move out anything that
+deals with the protocol layer from qcow2_create2() into qcow2_create().
+This means that qcow2_create2() doesn't need a file name any more.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 62 +++++++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 45 insertions(+), 17 deletions(-)
+ block/qcow2.c | 64 +++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 38 insertions(+), 26 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index b34924b0f0..9a2028b3cf 100644
+index 288b5299d8..dc6cdea113 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2414,13 +2414,10 @@ static int qcow2_crypt_method_from_format(const char *encryptfmt)
-     }
- }
- 
--static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
--                                   QemuOpts *opts, Error **errp)
-+static QCryptoBlockCreateOptions *
-+qcow2_parse_encryption(const char *encryptfmt, QemuOpts *opts, Error **errp)
- {
--    BDRVQcow2State *s = bs->opaque;
-     QCryptoBlockCreateOptions *cryptoopts = NULL;
--    QCryptoBlock *crypto = NULL;
--    int ret = -EINVAL;
-     QDict *options, *encryptopts;
-     int fmt;
- 
-@@ -2443,10 +2440,31 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
-         error_setg(errp, "Unknown encryption format '%s'", encryptfmt);
-         break;
-     }
--    if (!cryptoopts) {
--        ret = -EINVAL;
--        goto out;
-+
-+    QDECREF(encryptopts);
-+    return cryptoopts;
-+}
-+
-+static int qcow2_set_up_encryption(BlockDriverState *bs,
-+                                   QCryptoBlockCreateOptions *cryptoopts,
-+                                   Error **errp)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    QCryptoBlock *crypto = NULL;
-+    int fmt, ret;
-+
-+    switch (cryptoopts->format) {
-+    case Q_CRYPTO_BLOCK_FORMAT_LUKS:
-+        fmt = QCOW_CRYPT_LUKS;
-+        break;
-+    case Q_CRYPTO_BLOCK_FORMAT_QCOW:
-+        fmt = QCOW_CRYPT_AES;
-+        break;
-+    default:
-+        error_setg(errp, "Crypto format not supported in qcow2");
-+        return -EINVAL;
-     }
-+
-     s->crypt_method_header = fmt;
- 
-     crypto = qcrypto_block_create(cryptoopts, "encrypt.",
-@@ -2454,8 +2472,7 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
-                                   qcow2_crypto_hdr_write_func,
-                                   bs, errp);
-     if (!crypto) {
--        ret = -EINVAL;
--        goto out;
-+        return -EINVAL;
-     }
- 
-     ret = qcow2_update_header(bs);
-@@ -2464,10 +2481,9 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
-         goto out;
-     }
- 
-+    ret = 0;
-  out:
--    QDECREF(encryptopts);
-     qcrypto_block_free(crypto);
--    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
-     return ret;
- }
- 
-@@ -2732,8 +2748,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
+@@ -2725,7 +2725,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
      return refcount_bits;
  }
  
--static int qcow2_create2(BlockdevCreateOptions *create_options,
--                         QemuOpts *opts, const char *encryptfmt, Error **errp)
-+static int qcow2_create2(BlockdevCreateOptions *create_options, Error **errp)
- {
-     BlockdevCreateOptionsQcow2 *qcow2_opts;
-     QDict *options;
-@@ -2963,8 +2978,8 @@ static int qcow2_create2(BlockdevCreateOptions *create_options,
-     }
- 
-     /* Want encryption? There you go. */
--    if (encryptfmt) {
--        ret = qcow2_set_up_encryption(blk_bs(blk), encryptfmt, opts, errp);
-+    if (qcow2_opts->has_encrypt) {
-+        ret = qcow2_set_up_encryption(blk_bs(blk), qcow2_opts->encrypt, errp);
-         if (ret < 0) {
-             goto out;
-         }
-@@ -3021,6 +3036,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-     int version;
-     uint64_t refcount_bits;
-     char *encryptfmt = NULL;
-+    QCryptoBlockCreateOptions *cryptoopts = NULL;
-     BlockDriverState *bs = NULL;
+-static int qcow2_create2(const char *filename, int64_t total_size,
++static int qcow2_create2(BlockDriverState *bs, int64_t total_size,
+                          const char *backing_file, const char *backing_format,
+                          int flags, size_t cluster_size, PreallocMode prealloc,
+                          QemuOpts *opts, int version, int refcount_order,
+@@ -2751,28 +2751,11 @@ static int qcow2_create2(const char *filename, int64_t total_size,
      Error *local_err = NULL;
      int ret;
-@@ -3037,6 +3053,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-         ret = -EINVAL;
-         goto finish;
+ 
+-    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
+-        int64_t prealloc_size =
+-            qcow2_calc_prealloc_size(total_size, cluster_size, refcount_order);
+-        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
+-        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
+-                     &error_abort);
+-    }
+-
+-    ret = bdrv_create_file(filename, opts, &local_err);
++    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
++    ret = blk_insert_bs(blk, bs, errp);
+     if (ret < 0) {
+-        error_propagate(errp, local_err);
+-        return ret;
+-    }
+-
+-    blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                       &local_err);
+-    if (blk == NULL) {
+-        error_propagate(errp, local_err);
+-        return -EIO;
++        goto out;
      }
-+
-     encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-     if (encryptfmt) {
-         if (qemu_opt_get(opts, BLOCK_OPT_ENCRYPT)) {
-@@ -3048,6 +3065,14 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-     } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-         encryptfmt = g_strdup("aes");
-     }
-+    if (encryptfmt) {
-+        cryptoopts = qcow2_parse_encryption(encryptfmt, opts, errp);
-+        if (cryptoopts == NULL) {
-+            ret = -EINVAL;
-+            goto finish;
-+        }
+-
+     blk_set_allow_write_beyond_eof(blk, true);
+ 
+     /* Write the header */
+@@ -2827,7 +2810,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+      */
+     options = qdict_new();
+     qdict_put_str(options, "driver", "qcow2");
+-    blk = blk_new_open(filename, NULL, options,
++    qdict_put_str(options, "file", bs->node_name);
++    blk = blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
+                        &local_err);
+     if (blk == NULL) {
+@@ -2899,7 +2883,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+      */
+     options = qdict_new();
+     qdict_put_str(options, "driver", "qcow2");
+-    blk = blk_new_open(filename, NULL, options,
++    qdict_put_str(options, "file", bs->node_name);
++    blk = blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_NO_BACKING | BDRV_O_NO_IO,
+                        &local_err);
+     if (blk == NULL) {
+@@ -2929,6 +2914,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+     uint64_t refcount_bits;
+     int refcount_order;
+     char *encryptfmt = NULL;
++    BlockDriverState *bs = NULL;
+     Error *local_err = NULL;
+     int ret;
+ 
+@@ -2997,12 +2983,38 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+ 
+     refcount_order = ctz32(refcount_bits);
+ 
+-    ret = qcow2_create2(filename, size, backing_file, backing_fmt, flags,
++    /* Create and open the file (protocol layer) */
++    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
++        int64_t prealloc_size =
++            qcow2_calc_prealloc_size(size, cluster_size, refcount_order);
++        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
++        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
++                     &error_abort);
 +    }
 +
-     cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -3121,6 +3146,8 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-             .backing_file       = backing_file,
-             .has_backing_fmt    = (backing_fmt != NULL),
-             .backing_fmt        = backing_drv,
-+            .has_encrypt        = (encryptfmt != NULL),
-+            .encrypt            = cryptoopts,
-             .has_cluster_size   = true,
-             .cluster_size       = cluster_size,
-             .has_preallocation  = true,
-@@ -3131,7 +3158,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-             .refcount_bits      = refcount_bits,
-         },
-     };
--    ret = qcow2_create2(&create_options, opts, encryptfmt, errp);
-+    ret = qcow2_create2(&create_options, errp);
-     if (ret < 0) {
-         goto finish;
-     }
-@@ -3139,6 +3166,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
- finish:
-     bdrv_unref(bs);
++    ret = bdrv_create_file(filename, opts, errp);
++    if (ret < 0) {
++        goto finish;
++    }
++
++    bs = bdrv_open(filename, NULL, NULL,
++                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
++    if (bs == NULL) {
++        ret = -EIO;
++        goto finish;
++    }
++
++    /* Create the qcow2 image (format layer) */
++    ret = qcow2_create2(bs, size, backing_file, backing_fmt, flags,
+                         cluster_size, prealloc, opts, version, refcount_order,
+-                        encryptfmt, &local_err);
+-    error_propagate(errp, local_err);
++                        encryptfmt, errp);
++    if (ret < 0) {
++        goto finish;
++    }
  
-+    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
+ finish:
++    bdrv_unref(bs);
++
      g_free(backing_file);
      g_free(backing_fmt);
      g_free(encryptfmt);
