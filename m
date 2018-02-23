@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ep4Hg-0007AL-Df
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:45:42 -0500
+	(envelope-from <peterx@redhat.com>) id 1ep4Tb-0000pi-G3
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:57:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ep4Gf-00019F-M7
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:44:32 -0500
-Resent-Message-Id: <E1ep4Gf-00019F-M7@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21010)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ep4Gf-000150-2P
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:43:29 -0500
-In-Reply-To: <20180222195740.12726-1-bsd@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151935739375.747.14628929821017242116@bdbb90650ae5>
+	(envelope-from <peterx@redhat.com>) id 1ep4T0-0000Uo-QM
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:56:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33172 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ep4T0-0000SC-9i
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:56:14 -0500
+Date: Fri, 23 Feb 2018 11:55:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180223035555.GL18962@xz-mi>
+References: <CAHyh4xii5y-8=uMJeQGARrHZAETtW4ugmBWUypbQ923vk0P3Lw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 22 Feb 2018 19:43:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Initial write support for MTP
- objects
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHyh4xii5y-8=uMJeQGARrHZAETtW4ugmBWUypbQ923vk0P3Lw@mail.gmail.com>
+Subject: Re: [Qemu-devel] intel-iommu and vhost: Do we need 'device-iotlb'
+ and 'ats'?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bsd@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, jasowang@redhat.com, Eric Auger <eric.auger@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjIyMTk1NzQwLjEyNzI2LTEtYnNkQHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCB2NSAwLzVdIEluaXRpYWwgd3JpdGUgc3VwcG9ydCBmb3IgTVRQ
-IG9iamVjdHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
-dG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
-Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
-bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
-YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
-dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
-ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKY2I5ODQ5Y2M4MCB1c2ItbXRwOiBBZHZlcnRpc2UgU2VuZE9iamVjdEluZm8g
-Zm9yIHdyaXRlIHN1cHBvcnQKMTE4YzkyYjZiZSB1c2ItbXRwOiBJbnRyb2R1Y2Ugd3JpdGUgc3Vw
-cG9ydCBmb3IgTVRQIG9iamVjdHMKNDI4NDNjMzM5NiB1c2ItbXRwOiBTdXBwb3J0IGRlbGV0ZSBv
-ZiBtdHAgb2JqZWN0cwoyMzdhYTE1Zjc0IHVzYi1tdHA6IHByaW50IHBhcmVudCBwYXRoIGluIElO
-X0lHTk9SRUQgdHJhY2UgZm4KMDE1M2ZiNDIxMyB1c2ItbXRwOiBBZGQgb25lIG1vcmUgYXJndW1l
-bnQgd2hlbiBidWlsZGluZyByZXN1bHRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
-QVRDSCAxLzU6IHVzYi1tdHA6IEFkZCBvbmUgbW9yZSBhcmd1bWVudCB3aGVuIGJ1aWxkaW5nIHJl
-c3VsdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi81OiB1c2ItbXRwOiBwcmludCBwYXJlbnQgcGF0aCBp
-biBJTl9JR05PUkVEIHRyYWNlIGZuLi4uCkNoZWNraW5nIFBBVENIIDMvNTogdXNiLW10cDogU3Vw
-cG9ydCBkZWxldGUgb2YgbXRwIG9iamVjdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiB1c2ItbXRw
-OiBJbnRyb2R1Y2Ugd3JpdGUgc3VwcG9ydCBmb3IgTVRQIG9iamVjdHMuLi4KRVJST1I6IHRyYWls
-aW5nIHdoaXRlc3BhY2UKIzczOiBGSUxFOiBody91c2IvZGV2LW10cC5jOjEzOTg6CisgICAgICAg
-IH0gICAgICAgICAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIxNCBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCA1LzU6IHVzYi1tdHA6IEFkdmVydGlzZSBTZW5kT2JqZWN0SW5mbyBmb3Igd3JpdGUgc3Vw
-cG9ydC4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVt
-ZW50cyAoOCwgOCkKIzExNTogRklMRTogaHcvdXNiL2Rldi1tdHAuYzoxNDMwOgorICAgICAgICB9
-IGVsc2UgaWYgKGMtPmFyZ3ZbMF0gJiYgKGMtPmFyZ3ZbMF0gIT0gUUVNVV9TVE9SQUdFX0lEKSkg
-eworICAgICAgICAvKiBGaXJzdCBwYXJhbWV0ZXIgcG9pbnRzIHRvIHN0b3JhZ2UgaWQgb3IgaXMg
-MCAqLwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMDQgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Tue, Feb 20, 2018 at 11:03:46PM -0500, Jintack Lim wrote:
+> Hi,
+> 
+> I'm using vhost with the virtual intel-iommu, and this page[1] shows
+> the QEMU command line example.
+> 
+> qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split -m 2G \
+>                    -device intel-iommu,intremap=on,device-iotlb=on \
+>                    -device ioh3420,id=pcie.1,chassis=1 \
+>                    -device
+> virtio-net-pci,bus=pcie.1,netdev=net0,disable-legacy=on,disable-modern=off,iommu_platform=on,ats=on
+> \
+>                    -netdev tap,id=net0,vhostforce \
+>                    $IMAGE_PATH
+> 
+> I wonder what's the impact of using device-iotlb and ats options as
+> they are described necessary.
+> 
+> In my understanding, vhost in the kernel only looks at
+> VIRTIO_F_IOMMU_PLATFORM, and when it is set, vhost uses a
+> device-iotlb. In addition, vhost and QEMU communicate using vhost_msg
+> basically to cache mappings correctly in the vhost, so I wonder what's
+> the role of ats in this case.
+
+The "ats" as virtio device parameter will add ATS capability to the
+PCI device.
+
+The "device-iotlb" as intel-iommu parameter will enable ATS in the
+IOMMU device (and also report that in ACPI field).
+
+If both parameters are provided IIUC it means guest will know virtio
+device has device-iotlb and it'll treat the device specially (e.g.,
+guest will need to send device-iotlb invalidations).
+
+We'd better keep these parameters when running virtio devices with
+vIOMMU.  For the rest of vhost/arm specific questions, I'll leave to
+others.
+
+PS: Though IIUC the whole ATS thing may not really be necessary for
+current VT-d emulation, since even with ATS vhost is registering UNMAP
+IOMMU notifiers (see vhost_iommu_region_add()), and IIUC that means
+vhost will receive IOTLB invalidations even without ATS support, and
+it _might_ still work.  But there can be other differences, like
+performance, etc.
+
+> 
+> A related question is that if we use SMMU emulation[2] on ARM without
+> those options, does vhost cache mappings as if it has a device-iotlb?
+> (I guess this is the case.)
+> 
+> I'm pretty new to QEMU code, so I might be missing something. Can
+> somebody shed some light on it?
+> 
+> [1] https://wiki.qemu.org/Features/VT-d
+> [2] http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg04736.html
+> 
+> Thanks,
+> Jintack
+> 
+
+-- 
+Peter Xu
