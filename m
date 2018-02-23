@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8R-0005yp-Bj
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:18 -0500
+	(envelope-from <jsnow@redhat.com>) id 1epN8S-0005zP-0k
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8P-000668-Ia
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:15 -0500
+	(envelope-from <jsnow@redhat.com>) id 1epN8O-00063a-9n
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:16 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 23 Feb 2018 18:51:32 -0500
-Message-Id: <20180223235142.21501-12-jsnow@redhat.com>
+Date: Fri, 23 Feb 2018 18:51:23 -0500
+Message-Id: <20180223235142.21501-3-jsnow@redhat.com>
 In-Reply-To: <20180223235142.21501-1-jsnow@redhat.com>
 References: <20180223235142.21501-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v4 11/21] blockjobs: add block_job_dismiss
+Subject: [Qemu-devel] [RFC v4 02/21] blockjobs: model single jobs as
+ transactions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,224 +23,253 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-For jobs that have reached their CONCLUDED state, prior to having their
-last reference put down (meaning jobs that have completed successfully,
-unsuccessfully, or have been canceled), allow the user to dismiss the
-job's lingering status report via block-job-dismiss.
+model all independent jobs as single job transactions.
 
-This gives management APIs the chance to conclusively determine if a job
-failed or succeeded, even if the event broadcast was missed.
+It's one less case we have to worry about when we add more states to the
+transition machine. This way, we can just treat all job lifetimes exactly
+the same. This helps tighten assertions of the STM graph and removes some
+conditionals that would have been needed in the coming commits adding a
+more explicit job lifetime management API.
 
-Note that jobs do not yet linger in any such state, they are freed
-immediately upon reaching this previously-unnamed state. such a state is
-added immediately in the next commit.
-
-Verbs:
-Dismiss: operates on CONCLUDED jobs only.
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/trace-events       |  1 +
- blockdev.c               | 14 ++++++++++++++
- blockjob.c               | 34 ++++++++++++++++++++++++++++++++--
- include/block/blockjob.h |  9 +++++++++
- qapi/block-core.json     | 24 +++++++++++++++++++++++-
- 5 files changed, 79 insertions(+), 3 deletions(-)
+ block/backup.c               |  3 +--
+ block/commit.c               |  2 +-
+ block/mirror.c               |  2 +-
+ block/stream.c               |  2 +-
+ blockjob.c                   | 25 ++++++++++++++++---------
+ include/block/blockjob_int.h |  3 ++-
+ tests/test-bdrv-drain.c      |  4 ++--
+ tests/test-blockjob-txn.c    | 19 +++++++------------
+ tests/test-blockjob.c        |  2 +-
+ 9 files changed, 32 insertions(+), 30 deletions(-)
 
-diff --git a/block/trace-events b/block/trace-events
-index 3fe89f7ea6..266afd9e99 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -50,6 +50,7 @@ qmp_block_job_cancel(void *job) "job %p"
- qmp_block_job_pause(void *job) "job %p"
- qmp_block_job_resume(void *job) "job %p"
- qmp_block_job_complete(void *job) "job %p"
-+qmp_block_job_dismiss(void *job) "job %p"
- qmp_block_stream(void *bs, void *job) "bs %p job %p"
+diff --git a/block/backup.c b/block/backup.c
+index 4a16a37229..7e254dabff 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -621,7 +621,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+     }
  
- # block/file-win32.c
-diff --git a/blockdev.c b/blockdev.c
-index cba935a0a6..3180130782 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3852,6 +3852,20 @@ void qmp_block_job_complete(const char *device, Error **errp)
-     aio_context_release(aio_context);
- }
+     /* job->common.len is fixed, so we can't allow resize */
+-    job = block_job_create(job_id, &backup_job_driver, bs,
++    job = block_job_create(job_id, &backup_job_driver, txn, bs,
+                            BLK_PERM_CONSISTENT_READ,
+                            BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
+                            BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD,
+@@ -677,7 +677,6 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
+                        &error_abort);
+     job->common.len = len;
+-    block_job_txn_add_job(txn, &job->common);
  
-+void qmp_block_job_dismiss(const char *id, Error **errp)
-+{
-+    AioContext *aio_context;
-+    BlockJob *job = find_block_job(id, &aio_context, errp);
-+
-+    if (!job) {
-+        return;
-+    }
-+
-+    trace_qmp_block_job_dismiss(job);
-+    block_job_dismiss(&job, errp);
-+    aio_context_release(aio_context);
-+}
-+
- void qmp_change_backing_file(const char *device,
-                              const char *image_node_name,
-                              const char *backing_file,
+     return &job->common;
+ 
+diff --git a/block/commit.c b/block/commit.c
+index bb6c904704..9682158ee7 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -289,7 +289,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+         return;
+     }
+ 
+-    s = block_job_create(job_id, &commit_job_driver, bs, 0, BLK_PERM_ALL,
++    s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
+                          speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
+     if (!s) {
+         return;
+diff --git a/block/mirror.c b/block/mirror.c
+index c9badc1203..6bab7cfdd8 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1166,7 +1166,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+     }
+ 
+     /* Make sure that the source is not resized while the job is running */
+-    s = block_job_create(job_id, driver, mirror_top_bs,
++    s = block_job_create(job_id, driver, NULL, mirror_top_bs,
+                          BLK_PERM_CONSISTENT_READ,
+                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+                          BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD, speed,
+diff --git a/block/stream.c b/block/stream.c
+index 499cdacdb0..f3b53f49e2 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -244,7 +244,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+     /* Prevent concurrent jobs trying to modify the graph structure here, we
+      * already have our own plans. Also don't allow resize as the image size is
+      * queried only at the job start and then cached. */
+-    s = block_job_create(job_id, &stream_job_driver, bs,
++    s = block_job_create(job_id, &stream_job_driver, NULL, bs,
+                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+                          BLK_PERM_GRAPH_MOD,
+                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
 diff --git a/blockjob.c b/blockjob.c
-index 7b5c4063cf..4d29391673 100644
+index 24833ef30f..7ba3683ee3 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -63,6 +63,7 @@ bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
-     [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
-     [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0},
-     [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 1, 0},
- };
+@@ -357,10 +357,8 @@ static void block_job_completed_single(BlockJob *job)
+         }
+     }
  
- static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -424,7 +425,6 @@ static void block_job_completed_single(BlockJob *job)
-     QLIST_REMOVE(job, txn_list);
-     block_job_txn_unref(job->txn);
-     block_job_event_concluded(job);
--    block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
+-    if (job->txn) {
+-        QLIST_REMOVE(job, txn_list);
+-        block_job_txn_unref(job->txn);
+-    }
++    QLIST_REMOVE(job, txn_list);
++    block_job_txn_unref(job->txn);
      block_job_unref(job);
  }
  
-@@ -441,6 +441,13 @@ static void block_job_cancel_async(BlockJob *job)
-     job->cancelled = true;
- }
+@@ -647,7 +645,7 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
+  */
  
-+static void block_job_do_dismiss(BlockJob *job)
-+{
-+    assert(job);
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
-+    block_job_unref(job);
-+}
-+
- static int block_job_finish_sync(BlockJob *job,
-                                  void (*finish)(BlockJob *, Error **errp),
-                                  Error **errp)
-@@ -590,6 +597,19 @@ void block_job_complete(BlockJob *job, Error **errp)
-     job->driver->complete(job, errp);
- }
- 
-+void block_job_dismiss(BlockJob **jobptr, Error **errp)
-+{
-+    BlockJob *job = *jobptr;
-+    /* similarly to _complete, this is QMP-interface only. */
-+    assert(job->id);
-+    if (block_job_apply_verb(job, BLOCK_JOB_VERB_DISMISS, errp)) {
-+        return;
-+    }
-+
-+    block_job_do_dismiss(job);
-+    *jobptr = NULL;
-+}
-+
- void block_job_user_pause(BlockJob *job, Error **errp)
+ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+-                       BlockDriverState *bs, uint64_t perm,
++                       BlockJobTxn *txn, BlockDriverState *bs, uint64_t perm,
+                        uint64_t shared_perm, int64_t speed, int flags,
+                        BlockCompletionFunc *cb, void *opaque, Error **errp)
  {
-     if (block_job_apply_verb(job, BLOCK_JOB_VERB_PAUSE, errp)) {
-@@ -626,7 +646,7 @@ void block_job_user_resume(BlockJob *job, Error **errp)
- void block_job_cancel(BlockJob *job)
- {
-     if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
--        return;
-+        block_job_do_dismiss(job);
-     } else if (block_job_started(job)) {
-         block_job_cancel_async(job);
-         block_job_enter(job);
-@@ -737,6 +757,10 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
- static void block_job_event_concluded(BlockJob *job)
- {
-     block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
-+    /* for pre-2.12 style jobs, automatically destroy */
-+    if (!job->manual) {
-+        block_job_do_dismiss(job);
-+    }
- }
- 
- /*
-@@ -841,6 +865,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-         block_job_txn_add_job(txn, job);
+@@ -729,6 +727,17 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+             return NULL;
+         }
      }
- 
-+    /* For the expanded job control STM, grab an extra
-+     * reference for finalize() to put down */
-+    block_job_ref(job);
++
++    /* Single jobs are modeled as single-job transactions for sake of
++     * consolidating the job management logic */
++    if (!txn) {
++        txn = block_job_txn_new();
++        block_job_txn_add_job(txn, job);
++        block_job_txn_unref(txn);
++    } else {
++        block_job_txn_add_job(txn, job);
++    }
++
      return job;
  }
  
-@@ -859,6 +886,9 @@ void block_job_pause_all(void)
+@@ -752,13 +761,11 @@ void block_job_early_fail(BlockJob *job)
  
- void block_job_early_fail(BlockJob *job)
+ void block_job_completed(BlockJob *job, int ret)
  {
-+    /* One for creation, one for finalize() */
-+    assert(job->status == BLOCK_JOB_STATUS_CREATED);
-+    block_job_unref(job);
-     block_job_unref(job);
- }
- 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 403a168073..9bb0be1b13 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -245,6 +245,15 @@ void block_job_cancel(BlockJob *job);
++    assert(job && job->txn && !job->completed);
+     assert(blk_bs(job->blk)->job == job);
+-    assert(!job->completed);
+     job->completed = true;
+     job->ret = ret;
+-    if (!job->txn) {
+-        block_job_completed_single(job);
+-    } else if (ret < 0 || block_job_is_cancelled(job)) {
++    if (ret < 0 || block_job_is_cancelled(job)) {
+         block_job_completed_txn_abort(job);
+     } else {
+         block_job_completed_txn_success(job);
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index c9b23b0cc9..becaae74c2 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -115,6 +115,7 @@ struct BlockJobDriver {
+  * @job_id: The id of the newly-created job, or %NULL to have one
+  * generated automatically.
+  * @job_type: The class object for the newly-created job.
++ * @txn: The transaction this job belongs to, if any. %NULL otherwise.
+  * @bs: The block
+  * @perm, @shared_perm: Permissions to request for @bs
+  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
+@@ -132,7 +133,7 @@ struct BlockJobDriver {
+  * called from a wrapper that is specific to the job type.
   */
- void block_job_complete(BlockJob *job, Error **errp);
+ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+-                       BlockDriverState *bs, uint64_t perm,
++                       BlockJobTxn *txn, BlockDriverState *bs, uint64_t perm,
+                        uint64_t shared_perm, int64_t speed, int flags,
+                        BlockCompletionFunc *cb, void *opaque, Error **errp);
  
-+/**
-+ * block_job_dismiss:
-+ * @job: The job to be dismissed.
-+ * @errp: Error object.
-+ *
-+ * Remove a concluded job from the query list.
-+ */
-+void block_job_dismiss(BlockJob **job, Error **errp);
-+
- /**
-  * block_job_query:
-  * @job: The job to get information about.
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 578c0c91ca..b42796a6a0 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -970,10 +970,12 @@
- #
- # @complete: see @block-job-complete
- #
-+# @dismiss: see @block-job-dismiss
-+#
- # Since: 2.12
- ##
- { 'enum': 'BlockJobVerb',
--  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete' ] }
-+  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss' ] }
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index d760e2b243..a7eecf1c1e 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -541,8 +541,8 @@ static void test_blockjob_common(enum drain_type drain_type)
+     blk_target = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
+     blk_insert_bs(blk_target, target, &error_abort);
  
- ##
- # @BlockJobStatus:
-@@ -2243,6 +2245,26 @@
- ##
- { 'command': 'block-job-complete', 'data': { 'device': 'str' } }
+-    job = block_job_create("job0", &test_job_driver, src, 0, BLK_PERM_ALL, 0,
+-                           0, NULL, NULL, &error_abort);
++    job = block_job_create("job0", &test_job_driver, NULL, src, 0, BLK_PERM_ALL,
++                           0, 0, NULL, NULL, &error_abort);
+     block_job_add_bdrv(job, "target", target, 0, BLK_PERM_ALL, &error_abort);
+     block_job_start(job);
  
-+##
-+# @block-job-dismiss:
-+#
-+# For jobs that have already concluded, remove them from the block-job-query
-+# list. This command only needs to be run for jobs which were started with
-+# QEMU 2.12+ job lifetime management semantics.
-+#
-+# This command will refuse to operate on any job that has not yet reached
-+# its terminal state, BLOCK_JOB_STATUS_CONCLUDED. For jobs that make use of
-+# BLOCK_JOB_READY event, block-job-cancel or block-job-complete will still need
-+# to be used as appropriate.
-+#
-+# @id: The job identifier.
-+#
-+# Returns: Nothing on success
-+#
-+# Since: 2.12
-+##
-+{ 'command': 'block-job-dismiss', 'data': { 'id': 'str' } }
-+
- ##
- # @BlockdevDiscardOptions:
- #
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 3591c9617f..34f09ef8c1 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -87,7 +87,7 @@ static const BlockJobDriver test_block_job_driver = {
+  */
+ static BlockJob *test_block_job_start(unsigned int iterations,
+                                       bool use_timer,
+-                                      int rc, int *result)
++                                      int rc, int *result, BlockJobTxn *txn)
+ {
+     BlockDriverState *bs;
+     TestBlockJob *s;
+@@ -101,7 +101,7 @@ static BlockJob *test_block_job_start(unsigned int iterations,
+     g_assert_nonnull(bs);
+ 
+     snprintf(job_id, sizeof(job_id), "job%u", counter++);
+-    s = block_job_create(job_id, &test_block_job_driver, bs,
++    s = block_job_create(job_id, &test_block_job_driver, txn, bs,
+                          0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT,
+                          test_block_job_cb, data, &error_abort);
+     s->iterations = iterations;
+@@ -120,8 +120,7 @@ static void test_single_job(int expected)
+     int result = -EINPROGRESS;
+ 
+     txn = block_job_txn_new();
+-    job = test_block_job_start(1, true, expected, &result);
+-    block_job_txn_add_job(txn, job);
++    job = test_block_job_start(1, true, expected, &result, txn);
+     block_job_start(job);
+ 
+     if (expected == -ECANCELED) {
+@@ -160,10 +159,8 @@ static void test_pair_jobs(int expected1, int expected2)
+     int result2 = -EINPROGRESS;
+ 
+     txn = block_job_txn_new();
+-    job1 = test_block_job_start(1, true, expected1, &result1);
+-    block_job_txn_add_job(txn, job1);
+-    job2 = test_block_job_start(2, true, expected2, &result2);
+-    block_job_txn_add_job(txn, job2);
++    job1 = test_block_job_start(1, true, expected1, &result1, txn);
++    job2 = test_block_job_start(2, true, expected2, &result2, txn);
+     block_job_start(job1);
+     block_job_start(job2);
+ 
+@@ -224,10 +221,8 @@ static void test_pair_jobs_fail_cancel_race(void)
+     int result2 = -EINPROGRESS;
+ 
+     txn = block_job_txn_new();
+-    job1 = test_block_job_start(1, true, -ECANCELED, &result1);
+-    block_job_txn_add_job(txn, job1);
+-    job2 = test_block_job_start(2, false, 0, &result2);
+-    block_job_txn_add_job(txn, job2);
++    job1 = test_block_job_start(1, true, -ECANCELED, &result1, txn);
++    job2 = test_block_job_start(2, false, 0, &result2, txn);
+     block_job_start(job1);
+     block_job_start(job2);
+ 
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 23bdf1a932..599e28d732 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -30,7 +30,7 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
+     BlockJob *job;
+     Error *errp = NULL;
+ 
+-    job = block_job_create(id, &test_block_job_driver, blk_bs(blk),
++    job = block_job_create(id, &test_block_job_driver, NULL, blk_bs(blk),
+                            0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT, block_job_cb,
+                            NULL, &errp);
+     if (should_succeed) {
 -- 
 2.14.3
