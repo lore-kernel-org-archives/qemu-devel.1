@@ -1,21 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epFxc-0002CC-6S
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:12:38 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epG1i-00061b-Mn
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epFxW-0000EX-PG
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:12:36 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:38880)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1epFxW-0000Dh-FM
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:12:30 -0500
-Received: by mail-pf0-x241.google.com with SMTP id d26so3692624pfn.5
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 08:12:30 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 23 Feb 2018 08:12:26 -0800
-Message-Id: <20180223161226.11640-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2] tcg: Add choose_vector_size
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epG1e-0003Mx-Jc
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:16:50 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40288
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1epG1e-0003Ml-DB
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:16:46 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1NGGjIc011419
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 11:16:45 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gakaa0kgr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 11:16:43 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Fri, 23 Feb 2018 11:14:20 -0500
+References: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1519400599-21081-6-git-send-email-walling@linux.vnet.ibm.com>
+	<66c09cf1-464f-fb31-521c-7ab33c07b26c@redhat.com>
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Fri, 23 Feb 2018 11:14:17 -0500
+MIME-Version: 1.0
+In-Reply-To: <66c09cf1-464f-fb31-521c-7ab33c07b26c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <cdede26a-38d7-8529-3610-2ca0c683d8d0@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v9 05/13] s390-ccw: move auxiliary IPL data
+ to separate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,650 +45,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-This unifies 5 copies of checks for supported vector size,
-and in the process fixes a missing check in tcg_gen_gvec_2s.
+On 02/23/2018 11:03 AM, Thomas Huth wrote:
+> On 23.02.2018 16:43, Collin L. Walling wrote:
+>> The s390-ccw firmware needs some information in support of the
+>> boot process which is not available on the native machine.
+>> Examples are the netboot firmware load address and now the
+>> boot menu parameters.
+>>
+>> While storing that data in unused fields of the IPL parameter block
+>> works, that approach could create problems if the parameter block
+>> definition should change in the future. Because then a guest could
+>> overwrite these fields using the set IPLB diagnose.
+>>
+>> In fact the data in question is of more global nature and not really
+>> tied to an IPL device, so separating it is rather logical.
+>>
+>> This commit introduces a new structure to hold firmware relevant
+>> IPL parameters set by QEMU. The data is stored at location 204 (dec)
+>> and can contain up to 7 32-bit words. This area is available to
+>> programming in the z/Architecture Principles of Operation and
+>> can thus safely be used by the firmware until the IPL has completed.
+>>
+>> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   hw/s390x/ipl.c          | 18 +++++++++++++++++-
+>>   hw/s390x/ipl.h          | 25 +++++++++++++++++++++++--
+>>   pc-bios/s390-ccw/iplb.h | 18 ++++++++++++++++--
+>>   pc-bios/s390-ccw/main.c |  6 +++++-
+>>   4 files changed, 61 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 0d06fc1..79f5a58 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -399,6 +399,21 @@ void s390_reipl_request(void)
+>>       qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>>   }
+>>   
+>> +static void s390_ipl_prepare_qipl(S390CPU *cpu)
+>> +{
+>> +    S390IPLState *ipl = get_ipl_device();
+>> +    uint8_t *addr;
+>> +    uint64_t len = 4096;
+>> +
+>> +    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
+>> +    if (!addr || len < QIPL_ADDRESS + sizeof(QemuIplParameters)) {
+>> +        error_report("Cannot set QEMU IPL parameters");
+>> +        return;
+>> +    }
+>> +    memcpy(addr + QIPL_ADDRESS, &ipl->qipl, sizeof(QemuIplParameters));
+>> +    cpu_physical_memory_unmap(addr, len, 1, len);
+>> +}
+>> +
+>>   void s390_ipl_prepare_cpu(S390CPU *cpu)
+>>   {
+>>       S390IPLState *ipl = get_ipl_device();
+>> @@ -418,8 +433,9 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>>               error_report_err(err);
+>>               vm_stop(RUN_STATE_INTERNAL_ERROR);
+>>           }
+>> -        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+>> +        ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+>>       }
+>> +    s390_ipl_prepare_qipl(cpu);
+>>   }
+>>   
+>>   static void s390_ipl_reset(DeviceState *dev)
+>> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+>> index 8a705e0..08926a3 100644
+>> --- a/hw/s390x/ipl.h
+>> +++ b/hw/s390x/ipl.h
+>> @@ -16,8 +16,7 @@
+>>   #include "cpu.h"
+>>   
+>>   struct IplBlockCcw {
+>> -    uint64_t netboot_start_addr;
+>> -    uint8_t  reserved0[77];
+>> +    uint8_t  reserved0[85];
+>>       uint8_t  ssid;
+>>       uint16_t devno;
+>>       uint8_t  vm_flags;
+>> @@ -90,6 +89,27 @@ void s390_ipl_prepare_cpu(S390CPU *cpu);
+>>   IplParameterBlock *s390_ipl_get_iplb(void);
+>>   void s390_reipl_request(void);
+>>   
+>> +#define QIPL_ADDRESS  0xcc
+>> +
+>> +/*
+>> + * The QEMU IPL Parameters will be stored at absolute address
+>> + * 204 (0xcc) which means it is 32-bit word aligned but not
+>> + * double-word aligned.
+>> + * Placement of data fields in this area must account for
+>> + * their alignment needs. E.g., netboot_start_address must
+>> + * have an offset of n * 8 bytes within the struct in order
+> Please replace "n * 8" with "4 + n * 8" in your tree. I can fix it up
+> manually again, but in case we need a v10 ...
+>
+>   Thomas
+>
+Fixed just in case (along with the missing break for 13/13). Thank you 
+for reminding me.
 
-This lead to an assertion failure for 64-bit vector multiply,
-which is not available in the AVX instruction set.
-
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg-op-gvec.c | 438 ++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 259 insertions(+), 179 deletions(-)
-
-This is a replacement for two previous patches.  I'm keeping the
-OP == 0 test local, where it makes sense.  But since all of those
-tests are now isolated in one function, it's cleaner than before.
-
-
-r~
----
-
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index bfe44bba81..22db1590d5 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -351,6 +351,42 @@ static void gen_dup_i64(unsigned vece, TCGv_i64 out, TCGv_i64 in)
-     }
- }
- 
-+/* Select a supported vector type for implementing an operation on SIZE
-+ * bytes.  If OP is 0, assume that the real operation to be performed is
-+ * required by all backends.  Otherwise, make sure than OP can be performed
-+ * on elements of size VECE in the selected type.  Do not select V64 if
-+ * PREFER_I64 is true.  Return 0 if no vector type is selected.
-+ */
-+static TCGType choose_vector_type(TCGOpcode op, unsigned vece, uint32_t size,
-+                                  bool prefer_i64)
-+{
-+    if (TCG_TARGET_HAS_v256 && check_size_impl(size, 32)) {
-+        if (op == 0) {
-+            return TCG_TYPE_V256;
-+        }
-+        /* Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+         * It is hard to imagine a case in which v256 is supported
-+         * but v128 is not, but check anyway.
-+         */
-+        if (tcg_can_emit_vec_op(op, TCG_TYPE_V256, vece)
-+            && (size % 32 == 0
-+                || tcg_can_emit_vec_op(op, TCG_TYPE_V128, vece))) {
-+            return TCG_TYPE_V256;
-+        }
-+    }
-+    if (TCG_TARGET_HAS_v128 && check_size_impl(size, 16)
-+        && (op == 0 || tcg_can_emit_vec_op(op, TCG_TYPE_V128, vece))) {
-+        return TCG_TYPE_V128;
-+    }
-+    if (TCG_TARGET_HAS_v64 && !prefer_i64 && check_size_impl(size, 8)
-+        && (op == 0 || tcg_can_emit_vec_op(op, TCG_TYPE_V64, vece))) {
-+        return TCG_TYPE_V64;
-+    }
-+    return 0;
-+}
-+
- /* Set OPRSZ bytes at DOFS to replications of IN_32, IN_64 or IN_C.
-  * Only one of IN_32 or IN_64 may be set;
-  * IN_C is used if IN_32 and IN_64 are unset.
-@@ -376,19 +412,12 @@ static void do_dup(unsigned vece, uint32_t dofs, uint32_t oprsz,
-         }
-     }
- 
--    type = 0;
--    if (TCG_TARGET_HAS_v256 && check_size_impl(oprsz, 32)) {
--        type = TCG_TYPE_V256;
--    } else if (TCG_TARGET_HAS_v128 && check_size_impl(oprsz, 16)) {
--        type = TCG_TYPE_V128;
--    } else if (TCG_TARGET_HAS_v64 && check_size_impl(oprsz, 8)
--               /* Prefer integer when 64-bit host and no variable dup.  */
--               && !(TCG_TARGET_REG_BITS == 64 && in_32 == NULL
--                    && (in_64 == NULL || vece == MO_64))) {
--        type = TCG_TYPE_V64;
--    }
--
--    /* Implement inline with a vector type, if possible.  */
-+    /* Implement inline with a vector type, if possible.
-+     * Prefer integer when 64-bit host and no variable dup.
-+     */
-+    type = choose_vector_type(0, vece, oprsz,
-+                              (TCG_TARGET_REG_BITS == 64 && in_32 == NULL
-+                               && (in_64 == NULL || vece == MO_64)));
-     if (type != 0) {
-         TCGv_vec t_vec = tcg_temp_new_vec(type);
- 
-@@ -414,21 +443,30 @@ static void do_dup(unsigned vece, uint32_t dofs, uint32_t oprsz,
-         }
- 
-         i = 0;
--        if (TCG_TARGET_HAS_v256) {
-+        switch (type) {
-+        case TCG_TYPE_V256:
-+            /* Recall that ARM SVE allows vector sizes that are not a
-+             * power of 2, but always a multiple of 16.  The intent is
-+             * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+             */
-             for (; i + 32 <= oprsz; i += 32) {
-                 tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V256);
-             }
--        }
--        if (TCG_TARGET_HAS_v128) {
-+            /* fallthru */
-+        case TCG_TYPE_V128:
-             for (; i + 16 <= oprsz; i += 16) {
-                 tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V128);
-             }
--        }
--        if (TCG_TARGET_HAS_v64) {
-+            break;
-+        case TCG_TYPE_V64:
-             for (; i < oprsz; i += 8) {
-                 tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V64);
-             }
-+            break;
-+        default:
-+            g_assert_not_reached();
-         }
-+
-         tcg_temp_free_vec(t_vec);
-         goto done;
-     }
-@@ -484,7 +522,7 @@ static void do_dup(unsigned vece, uint32_t dofs, uint32_t oprsz,
-             }
-             tcg_temp_free_i64(t_64);
-             goto done;
--        } 
-+        }
-     }
- 
-     /* Otherwise implement out of line.  */
-@@ -866,49 +904,55 @@ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen2 *g)
- {
-+    TCGType type;
-+    uint32_t some;
-+
-     check_size_align(oprsz, maxsz, dofs | aofs);
-     check_overlap_2(dofs, aofs, maxsz);
- 
--    /* Recall that ARM SVE allows vector sizes that are not a power of 2.
--       Expand with successively smaller host vector sizes.  The intent is
--       that e.g. oprsz == 80 would be expanded with 2x32 + 1x16.  */
--    /* ??? For maxsz > oprsz, the host may be able to use an opr-sized
--       operation, zeroing the balance of the register.  We can then
--       use a max-sized store to implement the clearing without an extra
--       store operation.  This is true for aarch64 and x86_64 hosts.  */
--
--    if (TCG_TARGET_HAS_v256 && g->fniv && check_size_impl(oprsz, 32)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V256, g->vece))) {
--        uint32_t some = QEMU_ALIGN_DOWN(oprsz, 32);
-+    type = 0;
-+    if (g->fniv) {
-+        type = choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i64);
-+    }
-+    switch (type) {
-+    case TCG_TYPE_V256:
-+        /* Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+         */
-+        some = QEMU_ALIGN_DOWN(oprsz, 32);
-         expand_2_vec(g->vece, dofs, aofs, some, 32, TCG_TYPE_V256, g->fniv);
-         if (some == oprsz) {
--            goto done;
-+            break;
-         }
-         dofs += some;
-         aofs += some;
-         oprsz -= some;
-         maxsz -= some;
--    }
--
--    if (TCG_TARGET_HAS_v128 && g->fniv && check_size_impl(oprsz, 16)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V128, g->vece))) {
-+        /* fallthru */
-+    case TCG_TYPE_V128:
-         expand_2_vec(g->vece, dofs, aofs, oprsz, 16, TCG_TYPE_V128, g->fniv);
--    } else if (TCG_TARGET_HAS_v64 && !g->prefer_i64
--               && g->fniv && check_size_impl(oprsz, 8)
--               && (!g->opc
--                   || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V64, g->vece))) {
-+        break;
-+    case TCG_TYPE_V64:
-         expand_2_vec(g->vece, dofs, aofs, oprsz, 8, TCG_TYPE_V64, g->fniv);
--    } else if (g->fni8 && check_size_impl(oprsz, 8)) {
--        expand_2_i64(dofs, aofs, oprsz, g->fni8);
--    } else if (g->fni4 && check_size_impl(oprsz, 4)) {
--        expand_2_i32(dofs, aofs, oprsz, g->fni4);
--    } else {
--        assert(g->fno != NULL);
--        tcg_gen_gvec_2_ool(dofs, aofs, oprsz, maxsz, g->data, g->fno);
--        return;
-+        break;
-+
-+    case 0:
-+        if (g->fni8 && check_size_impl(oprsz, 8)) {
-+            expand_2_i64(dofs, aofs, oprsz, g->fni8);
-+        } else if (g->fni4 && check_size_impl(oprsz, 4)) {
-+            expand_2_i32(dofs, aofs, oprsz, g->fni4);
-+        } else {
-+            assert(g->fno != NULL);
-+            tcg_gen_gvec_2_ool(dofs, aofs, oprsz, maxsz, g->data, g->fno);
-+            return;
-+        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-     }
- 
-- done:
-     if (oprsz < maxsz) {
-         expand_clr(dofs + oprsz, maxsz - oprsz);
-     }
-@@ -918,53 +962,64 @@ void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_2i(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
-                      uint32_t maxsz, int64_t c, const GVecGen2i *g)
- {
-+    TCGType type;
-+    uint32_t some;
-+
-     check_size_align(oprsz, maxsz, dofs | aofs);
-     check_overlap_2(dofs, aofs, maxsz);
- 
--    /* Recall that ARM SVE allows vector sizes that are not a power of 2.
--       Expand with successively smaller host vector sizes.  The intent is
--       that e.g. oprsz == 80 would be expanded with 2x32 + 1x16.  */
--
--    if (TCG_TARGET_HAS_v256 && g->fniv && check_size_impl(oprsz, 32)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V256, g->vece))) {
--        uint32_t some = QEMU_ALIGN_DOWN(oprsz, 32);
-+    type = 0;
-+    if (g->fniv) {
-+        type = choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i64);
-+    }
-+    switch (type) {
-+    case TCG_TYPE_V256:
-+        /* Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+         */
-+        some = QEMU_ALIGN_DOWN(oprsz, 32);
-         expand_2i_vec(g->vece, dofs, aofs, some, 32, TCG_TYPE_V256,
-                       c, g->load_dest, g->fniv);
-         if (some == oprsz) {
--            goto done;
-+            break;
-         }
-         dofs += some;
-         aofs += some;
-         oprsz -= some;
-         maxsz -= some;
--    }
--
--    if (TCG_TARGET_HAS_v128 && g->fniv && check_size_impl(oprsz, 16)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V128, g->vece))) {
-+        /* fallthru */
-+    case TCG_TYPE_V128:
-         expand_2i_vec(g->vece, dofs, aofs, oprsz, 16, TCG_TYPE_V128,
-                       c, g->load_dest, g->fniv);
--    } else if (TCG_TARGET_HAS_v64 && !g->prefer_i64
--               && g->fniv && check_size_impl(oprsz, 8)
--               && (!g->opc
--                   || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V64, g->vece))) {
-+        break;
-+    case TCG_TYPE_V64:
-         expand_2i_vec(g->vece, dofs, aofs, oprsz, 8, TCG_TYPE_V64,
-                       c, g->load_dest, g->fniv);
--    } else if (g->fni8 && check_size_impl(oprsz, 8)) {
--        expand_2i_i64(dofs, aofs, oprsz, c, g->load_dest, g->fni8);
--    } else if (g->fni4 && check_size_impl(oprsz, 4)) {
--        expand_2i_i32(dofs, aofs, oprsz, c, g->load_dest, g->fni4);
--    } else {
--        if (g->fno) {
--            tcg_gen_gvec_2_ool(dofs, aofs, oprsz, maxsz, c, g->fno);
-+        break;
-+
-+    case 0:
-+        if (g->fni8 && check_size_impl(oprsz, 8)) {
-+            expand_2i_i64(dofs, aofs, oprsz, c, g->load_dest, g->fni8);
-+        } else if (g->fni4 && check_size_impl(oprsz, 4)) {
-+            expand_2i_i32(dofs, aofs, oprsz, c, g->load_dest, g->fni4);
-         } else {
--            TCGv_i64 tcg_c = tcg_const_i64(c);
--            tcg_gen_gvec_2i_ool(dofs, aofs, tcg_c, oprsz, maxsz, c, g->fnoi);
--            tcg_temp_free_i64(tcg_c);
-+            if (g->fno) {
-+                tcg_gen_gvec_2_ool(dofs, aofs, oprsz, maxsz, c, g->fno);
-+            } else {
-+                TCGv_i64 tcg_c = tcg_const_i64(c);
-+                tcg_gen_gvec_2i_ool(dofs, aofs, tcg_c, oprsz,
-+                                    maxsz, c, g->fnoi);
-+                tcg_temp_free_i64(tcg_c);
-+            }
-+            return;
-         }
--        return;
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-     }
- 
-- done:
-     if (oprsz < maxsz) {
-         expand_clr(dofs + oprsz, maxsz - oprsz);
-     }
-@@ -981,37 +1036,30 @@ void tcg_gen_gvec_2s(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
- 
-     type = 0;
-     if (g->fniv) {
--        if (TCG_TARGET_HAS_v256 && check_size_impl(oprsz, 32)) {
--            type = TCG_TYPE_V256;
--        } else if (TCG_TARGET_HAS_v128 && check_size_impl(oprsz, 16)) {
--            type = TCG_TYPE_V128;
--        } else if (TCG_TARGET_HAS_v64 && !g->prefer_i64
--               && check_size_impl(oprsz, 8)) {
--            type = TCG_TYPE_V64;
--        }
-+        type = choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i64);
-     }
-     if (type != 0) {
-         TCGv_vec t_vec = tcg_temp_new_vec(type);
-+        uint32_t some;
- 
-         tcg_gen_dup_i64_vec(g->vece, t_vec, c);
- 
--        /* Recall that ARM SVE allows vector sizes that are not a power of 2.
--           Expand with successively smaller host vector sizes.  The intent is
--           that e.g. oprsz == 80 would be expanded with 2x32 + 1x16.  */
-         switch (type) {
-         case TCG_TYPE_V256:
--            {
--                uint32_t some = QEMU_ALIGN_DOWN(oprsz, 32);
--                expand_2s_vec(g->vece, dofs, aofs, some, 32, TCG_TYPE_V256,
--                              t_vec, g->scalar_first, g->fniv);
--                if (some == oprsz) {
--                    break;
--                }
--                dofs += some;
--                aofs += some;
--                oprsz -= some;
--                maxsz -= some;
-+            /* Recall that ARM SVE allows vector sizes that are not a
-+             * power of 2, but always a multiple of 16.  The intent is
-+             * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+             */
-+            some = QEMU_ALIGN_DOWN(oprsz, 32);
-+            expand_2s_vec(g->vece, dofs, aofs, some, 32, TCG_TYPE_V256,
-+                          t_vec, g->scalar_first, g->fniv);
-+            if (some == oprsz) {
-+                break;
-             }
-+            dofs += some;
-+            aofs += some;
-+            oprsz -= some;
-+            maxsz -= some;
-             /* fallthru */
- 
-         case TCG_TYPE_V128:
-@@ -1055,48 +1103,60 @@ void tcg_gen_gvec_2s(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
- void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen3 *g)
- {
-+    TCGType type;
-+    uint32_t some;
-+
-     check_size_align(oprsz, maxsz, dofs | aofs | bofs);
-     check_overlap_3(dofs, aofs, bofs, maxsz);
- 
--    /* Recall that ARM SVE allows vector sizes that are not a power of 2.
--       Expand with successively smaller host vector sizes.  The intent is
--       that e.g. oprsz == 80 would be expanded with 2x32 + 1x16.  */
--
--    if (TCG_TARGET_HAS_v256 && g->fniv && check_size_impl(oprsz, 32)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V256, g->vece))) {
--        uint32_t some = QEMU_ALIGN_DOWN(oprsz, 32);
-+    type = 0;
-+    if (g->fniv) {
-+        type = choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i64);
-+    }
-+    switch (type) {
-+    case TCG_TYPE_V256:
-+        /* Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+         */
-+        some = QEMU_ALIGN_DOWN(oprsz, 32);
-         expand_3_vec(g->vece, dofs, aofs, bofs, some, 32, TCG_TYPE_V256,
-                      g->load_dest, g->fniv);
-         if (some == oprsz) {
--            goto done;
-+            break;
-         }
-         dofs += some;
-         aofs += some;
-         bofs += some;
-         oprsz -= some;
-         maxsz -= some;
--    }
--
--    if (TCG_TARGET_HAS_v128 && g->fniv && check_size_impl(oprsz, 16)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V128, g->vece))) {
-+        /* fallthru */
-+    case TCG_TYPE_V128:
-         expand_3_vec(g->vece, dofs, aofs, bofs, oprsz, 16, TCG_TYPE_V128,
-                      g->load_dest, g->fniv);
--    } else if (TCG_TARGET_HAS_v64 && !g->prefer_i64
--               && g->fniv && check_size_impl(oprsz, 8)
--               && (!g->opc
--                   || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V64, g->vece))) {
-+        break;
-+    case TCG_TYPE_V64:
-         expand_3_vec(g->vece, dofs, aofs, bofs, oprsz, 8, TCG_TYPE_V64,
-                      g->load_dest, g->fniv);
--    } else if (g->fni8 && check_size_impl(oprsz, 8)) {
--        expand_3_i64(dofs, aofs, bofs, oprsz, g->load_dest, g->fni8);
--    } else if (g->fni4 && check_size_impl(oprsz, 4)) {
--        expand_3_i32(dofs, aofs, bofs, oprsz, g->load_dest, g->fni4);
--    } else {
--        assert(g->fno != NULL);
--        tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz, maxsz, g->data, g->fno);
-+        break;
-+
-+    case 0:
-+        if (g->fni8 && check_size_impl(oprsz, 8)) {
-+            expand_3_i64(dofs, aofs, bofs, oprsz, g->load_dest, g->fni8);
-+        } else if (g->fni4 && check_size_impl(oprsz, 4)) {
-+            expand_3_i32(dofs, aofs, bofs, oprsz, g->load_dest, g->fni4);
-+        } else {
-+            assert(g->fno != NULL);
-+            tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz,
-+                               maxsz, g->data, g->fno);
-+            return;
-+        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-     }
- 
-- done:
-     if (oprsz < maxsz) {
-         expand_clr(dofs + oprsz, maxsz - oprsz);
-     }
-@@ -1106,20 +1166,27 @@ void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, uint32_t bofs,
- void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen4 *g)
- {
-+    TCGType type;
-+    uint32_t some;
-+
-     check_size_align(oprsz, maxsz, dofs | aofs | bofs | cofs);
-     check_overlap_4(dofs, aofs, bofs, cofs, maxsz);
- 
--    /* Recall that ARM SVE allows vector sizes that are not a power of 2.
--       Expand with successively smaller host vector sizes.  The intent is
--       that e.g. oprsz == 80 would be expanded with 2x32 + 1x16.  */
--
--    if (TCG_TARGET_HAS_v256 && g->fniv && check_size_impl(oprsz, 32)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V256, g->vece))) {
--        uint32_t some = QEMU_ALIGN_DOWN(oprsz, 32);
-+    type = 0;
-+    if (g->fniv) {
-+        type = choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i64);
-+    }
-+    switch (type) {
-+    case TCG_TYPE_V256:
-+        /* Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+         */
-+        some = QEMU_ALIGN_DOWN(oprsz, 32);
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, some,
-                      32, TCG_TYPE_V256, g->fniv);
-         if (some == oprsz) {
--            goto done;
-+            break;
-         }
-         dofs += some;
-         aofs += some;
-@@ -1127,30 +1194,33 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
-         cofs += some;
-         oprsz -= some;
-         maxsz -= some;
--    }
--
--    if (TCG_TARGET_HAS_v128 && g->fniv && check_size_impl(oprsz, 16)
--        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V128, g->vece))) {
-+        /* fallthru */
-+    case TCG_TYPE_V128:
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
-                      16, TCG_TYPE_V128, g->fniv);
--    } else if (TCG_TARGET_HAS_v64 && !g->prefer_i64
--               && g->fniv && check_size_impl(oprsz, 8)
--                && (!g->opc
--                    || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V64, g->vece))) {
-+        break;
-+    case TCG_TYPE_V64:
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
-                      8, TCG_TYPE_V64, g->fniv);
--    } else if (g->fni8 && check_size_impl(oprsz, 8)) {
--        expand_4_i64(dofs, aofs, bofs, cofs, oprsz, g->fni8);
--    } else if (g->fni4 && check_size_impl(oprsz, 4)) {
--        expand_4_i32(dofs, aofs, bofs, cofs, oprsz, g->fni4);
--    } else {
--        assert(g->fno != NULL);
--        tcg_gen_gvec_4_ool(dofs, aofs, bofs, cofs,
--                           oprsz, maxsz, g->data, g->fno);
--        return;
-+        break;
-+
-+    case 0:
-+        if (g->fni8 && check_size_impl(oprsz, 8)) {
-+            expand_4_i64(dofs, aofs, bofs, cofs, oprsz, g->fni8);
-+        } else if (g->fni4 && check_size_impl(oprsz, 4)) {
-+            expand_4_i32(dofs, aofs, bofs, cofs, oprsz, g->fni4);
-+        } else {
-+            assert(g->fno != NULL);
-+            tcg_gen_gvec_4_ool(dofs, aofs, bofs, cofs,
-+                               oprsz, maxsz, g->data, g->fno);
-+            return;
-+        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-     }
- 
-- done:
-     if (oprsz < maxsz) {
-         expand_clr(dofs + oprsz, maxsz - oprsz);
-     }
-@@ -2155,6 +2225,8 @@ void tcg_gen_gvec_cmp(TCGCond cond, unsigned vece, uint32_t dofs,
-         [TCG_COND_LTU] = ltu_fn,
-         [TCG_COND_LEU] = leu_fn,
-     };
-+    TCGType type;
-+    uint32_t some;
- 
-     check_size_align(oprsz, maxsz, dofs | aofs | bofs);
-     check_overlap_3(dofs, aofs, bofs, maxsz);
-@@ -2165,51 +2237,59 @@ void tcg_gen_gvec_cmp(TCGCond cond, unsigned vece, uint32_t dofs,
-         return;
-     }
- 
--    /* Recall that ARM SVE allows vector sizes that are not a power of 2.
--       Expand with successively smaller host vector sizes.  The intent is
--       that e.g. oprsz == 80 would be expanded with 2x32 + 1x16.  */
--
--    if (TCG_TARGET_HAS_v256 && check_size_impl(oprsz, 32)
--        && tcg_can_emit_vec_op(INDEX_op_cmp_vec, TCG_TYPE_V256, vece)) {
--        uint32_t some = QEMU_ALIGN_DOWN(oprsz, 32);
-+    /* Implement inline with a vector type, if possible.
-+     * Prefer integer when 64-bit host and 64-bit comparison.
-+     */
-+    type = choose_vector_type(INDEX_op_cmp_vec, vece, oprsz,
-+                              TCG_TARGET_REG_BITS == 64 && vece == MO_64);
-+    switch (type) {
-+    case TCG_TYPE_V256:
-+        /* Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+         */
-+        some = QEMU_ALIGN_DOWN(oprsz, 32);
-         expand_cmp_vec(vece, dofs, aofs, bofs, some, 32, TCG_TYPE_V256, cond);
-         if (some == oprsz) {
--            goto done;
-+            break;
-         }
-         dofs += some;
-         aofs += some;
-         bofs += some;
-         oprsz -= some;
-         maxsz -= some;
--    }
--
--    if (TCG_TARGET_HAS_v128 && check_size_impl(oprsz, 16)
--        && tcg_can_emit_vec_op(INDEX_op_cmp_vec, TCG_TYPE_V128, vece)) {
-+        /* fallthru */
-+    case TCG_TYPE_V128:
-         expand_cmp_vec(vece, dofs, aofs, bofs, oprsz, 16, TCG_TYPE_V128, cond);
--    } else if (TCG_TARGET_HAS_v64
--               && check_size_impl(oprsz, 8)
--               && (TCG_TARGET_REG_BITS == 32 || vece != MO_64)
--               && tcg_can_emit_vec_op(INDEX_op_cmp_vec, TCG_TYPE_V64, vece)) {
-+        break;
-+    case TCG_TYPE_V64:
-         expand_cmp_vec(vece, dofs, aofs, bofs, oprsz, 8, TCG_TYPE_V64, cond);
--    } else if (vece == MO_64 && check_size_impl(oprsz, 8)) {
--        expand_cmp_i64(dofs, aofs, bofs, oprsz, cond);
--    } else if (vece == MO_32 && check_size_impl(oprsz, 4)) {
--        expand_cmp_i32(dofs, aofs, bofs, oprsz, cond);
--    } else {
--        gen_helper_gvec_3 * const *fn = fns[cond];
-+        break;
- 
--        if (fn == NULL) {
--            uint32_t tmp;
--            tmp = aofs, aofs = bofs, bofs = tmp;
--            cond = tcg_swap_cond(cond);
--            fn = fns[cond];
--            assert(fn != NULL);
-+    case 0:
-+        if (vece == MO_64 && check_size_impl(oprsz, 8)) {
-+            expand_cmp_i64(dofs, aofs, bofs, oprsz, cond);
-+        } else if (vece == MO_32 && check_size_impl(oprsz, 4)) {
-+            expand_cmp_i32(dofs, aofs, bofs, oprsz, cond);
-+        } else {
-+            gen_helper_gvec_3 * const *fn = fns[cond];
-+
-+            if (fn == NULL) {
-+                uint32_t tmp;
-+                tmp = aofs, aofs = bofs, bofs = tmp;
-+                cond = tcg_swap_cond(cond);
-+                fn = fns[cond];
-+                assert(fn != NULL);
-+            }
-+            tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz, maxsz, 0, fn[vece]);
-+            return;
-         }
--        tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz, maxsz, 0, fn[vece]);
--        return;
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-     }
- 
-- done:
-     if (oprsz < maxsz) {
-         expand_clr(dofs + oprsz, maxsz - oprsz);
-     }
 -- 
-2.14.3
+- Collin L Walling
