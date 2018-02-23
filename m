@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIze-0001FH-5t
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzg-0001IJ-PC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzc-0005Cz-QR
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzf-0005HZ-LC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:40 +0100
-Message-Id: <20180223192549.26666-28-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:42 +0100
+Message-Id: <20180223192549.26666-30-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 27/36] sheepdog: QAPIfy "redundancy" create
- option
+Subject: [Qemu-devel] [PATCH v3 29/36] ssh: Use QAPI BlockdevOptionsSsh
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,210 +23,220 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-The "redundancy" option for Sheepdog image creation is currently a
-string that can encode one or two integers depending on its format,
-which at the same time implicitly selects a mode.
-
-This patch turns it into a QAPI union and converts the string into such
-a QAPI object before interpreting the values.
+Create a BlockdevOptionsSsh object in connect_to_ssh() and take the
+options from there. 'host_key_check' is still processed separately
+because it's not in the schema yet.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 45 +++++++++++++++++++++++++
- block/sheepdog.c     | 94 +++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 112 insertions(+), 27 deletions(-)
+ block/ssh.c | 136 +++++++++++++++++++++++++++---------------------------------
+ 1 file changed, 61 insertions(+), 75 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 085b791303..2b249c9e3d 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3467,6 +3467,51 @@
-             '*cluster-size' :   'size' } }
+diff --git a/block/ssh.c b/block/ssh.c
+index b63addcf94..9a89b7f350 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -543,21 +543,6 @@ static QemuOptsList ssh_runtime_opts = {
+             .type = QEMU_OPT_NUMBER,
+             .help = "Port to connect to",
+         },
+-        {
+-            .name = "path",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Path of the image on the host",
+-        },
+-        {
+-            .name = "user",
+-            .type = QEMU_OPT_STRING,
+-            .help = "User as which to connect",
+-        },
+-        {
+-            .name = "host_key_check",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Defines how and what to check the host key against",
+-        },
+         { /* end of list */ }
+     },
+ };
+@@ -582,23 +567,31 @@ static bool ssh_process_legacy_socket_options(QDict *output_opts,
+     return true;
+ }
  
- ##
-+# @SheepdogRedundancyType:
-+#
-+# @full             Create a fully replicated vdi with x copies
-+# @erasure-coded    Create an erasure coded vdi with x data strips and
-+#                   y parity strips
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'SheepdogRedundancyType',
-+  'data': [ 'full', 'erasure-coded' ] }
+-static InetSocketAddress *ssh_config(QDict *options, Error **errp)
++static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
+ {
+-    InetSocketAddress *inet = NULL;
+-    QDict *addr = NULL;
+-    QObject *crumpled_addr = NULL;
+-    Visitor *iv = NULL;
+-    Error *local_error = NULL;
+-
+-    qdict_extract_subqdict(options, &addr, "server.");
+-    if (!qdict_size(addr)) {
+-        error_setg(errp, "SSH server address missing");
+-        goto out;
++    BlockdevOptionsSsh *result = NULL;
++    QemuOpts *opts = NULL;
++    Error *local_err = NULL;
++    QObject *crumpled;
++    const QDictEntry *e;
++    Visitor *v;
 +
-+##
-+# @SheepdogRedundancyFull:
-+#
-+# @copies           Number of copies to use (between 1 and 31)
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SheepdogRedundancyFull',
-+  'data': { 'copies': 'int' }}
++    /* Translate legacy options */
++    opts = qemu_opts_create(&ssh_runtime_opts, NULL, 0, &error_abort);
++    qemu_opts_absorb_qdict(opts, options, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
+     }
+ 
+-    crumpled_addr = qdict_crumple(addr, errp);
+-    if (!crumpled_addr) {
+-        goto out;
++    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
++        goto fail;
++    }
 +
-+##
-+# @SheepdogRedundancyErasureCoded:
-+#
-+# @data-strips      Number of data strips to use (one of {2,4,8,16})
-+# @parity-strips    Number of parity strips to use (between 1 and 15)
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SheepdogRedundancyErasureCoded',
-+  'data': { 'data-strips': 'int',
-+            'parity-strips': 'int' }}
++    /* Create the QAPI object */
++    crumpled = qdict_crumple(options, errp);
++    if (crumpled == NULL) {
++        goto fail;
+     }
+ 
+     /*
+@@ -609,51 +602,50 @@ static InetSocketAddress *ssh_config(QDict *options, Error **errp)
+      * but when they come from -drive, they're all QString.  The
+      * visitor expects the former.
+      */
+-    iv = qobject_input_visitor_new(crumpled_addr);
+-    visit_type_InetSocketAddress(iv, NULL, &inet, &local_error);
+-    if (local_error) {
+-        error_propagate(errp, local_error);
+-        goto out;
++    v = qobject_input_visitor_new(crumpled);
++    visit_type_BlockdevOptionsSsh(v, NULL, &result, &local_err);
++    visit_free(v);
++    qobject_decref(crumpled);
 +
-+##
-+# @SheepdogRedundancy:
-+#
-+# Since: 2.12
-+##
-+{ 'union': 'SheepdogRedundancy',
-+  'base': { 'type': 'SheepdogRedundancyType' },
-+  'discriminator': 'type',
-+  'data': { 'full': 'SheepdogRedundancyFull',
-+            'erasure-coded': 'SheepdogRedundancyErasureCoded' } }
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
+     }
+ 
+-out:
+-    QDECREF(addr);
+-    qobject_decref(crumpled_addr);
+-    visit_free(iv);
+-    return inet;
++    /* Remove the processed options from the QDict (the visitor processes
++     * _all_ options in the QDict) */
++    while ((e = qdict_first(options))) {
++        qdict_del(options, e->key);
++    }
 +
-+##
- # @BlockdevCreateNotSupported:
- #
- # This is used for all drivers that don't support creating images.
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 3c3becf94d..22df2ba9d0 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1882,6 +1882,48 @@ out_with_err_set:
++fail:
++    qemu_opts_del(opts);
++    return result;
+ }
+ 
+ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+                           int ssh_flags, int creat_mode, Error **errp)
+ {
++    BlockdevOptionsSsh *opts;
+     int r, ret;
+-    QemuOpts *opts = NULL;
+-    Error *local_err = NULL;
+-    const char *user, *path, *host_key_check;
++    const char *user, *host_key_check;
+     long port = 0;
+ 
+-    opts = qemu_opts_create(&ssh_runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        ret = -EINVAL;
+-        error_propagate(errp, local_err);
+-        goto err;
+-    }
+-
+-    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
+-        ret = -EINVAL;
+-        goto err;
++    host_key_check = qdict_get_try_str(options, "host_key_check");
++    if (!host_key_check) {
++        host_key_check = "yes";
++    } else {
++        qdict_del(options, "host_key_check");
+     }
+ 
+-    path = qemu_opt_get(opts, "path");
+-    if (!path) {
+-        ret = -EINVAL;
+-        error_setg(errp, "No path was specified");
+-        goto err;
++    opts = ssh_parse_options(options, errp);
++    if (opts == NULL) {
++        return -EINVAL;
+     }
+ 
+-    user = qemu_opt_get(opts, "user");
+-    if (!user) {
++    if (opts->has_user) {
++        user = opts->user;
++    } else {
+         user = g_get_user_name();
+         if (!user) {
+             error_setg_errno(errp, errno, "Can't get user name");
+@@ -662,17 +654,9 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+         }
+     }
+ 
+-    host_key_check = qemu_opt_get(opts, "host_key_check");
+-    if (!host_key_check) {
+-        host_key_check = "yes";
+-    }
+-
+     /* Pop the config into our state object, Exit if invalid */
+-    s->inet = ssh_config(options, errp);
+-    if (!s->inet) {
+-        ret = -EINVAL;
+-        goto err;
+-    }
++    s->inet = opts->server;
++    opts->server = NULL;
+ 
+     if (qemu_strtol(s->inet->port, NULL, 10, &port) < 0) {
+         error_setg(errp, "Use only numeric port value");
+@@ -729,15 +713,17 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+ 
+     /* Open the remote file. */
+     DPRINTF("opening file %s flags=0x%x creat_mode=0%o",
+-            path, ssh_flags, creat_mode);
+-    s->sftp_handle = libssh2_sftp_open(s->sftp, path, ssh_flags, creat_mode);
++            opts->path, ssh_flags, creat_mode);
++    s->sftp_handle = libssh2_sftp_open(s->sftp, opts->path, ssh_flags,
++                                       creat_mode);
+     if (!s->sftp_handle) {
+-        session_error_setg(errp, s, "failed to open remote file '%s'", path);
++        session_error_setg(errp, s, "failed to open remote file '%s'",
++                           opts->path);
+         ret = -EINVAL;
+         goto err;
+     }
+ 
+-    qemu_opts_del(opts);
++    qapi_free_BlockdevOptionsSsh(opts);
+ 
+     r = libssh2_sftp_fstat(s->sftp_handle, &s->attrs);
+     if (r < 0) {
+@@ -764,7 +750,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+     }
+     s->session = NULL;
+ 
+-    qemu_opts_del(opts);
++    qapi_free_BlockdevOptionsSsh(opts);
+ 
      return ret;
  }
- 
-+static int parse_redundancy(BDRVSheepdogState *s, SheepdogRedundancy *opt)
-+{
-+    struct SheepdogInode *inode = &s->inode;
-+
-+    switch (opt->type) {
-+    case SHEEPDOG_REDUNDANCY_TYPE_FULL:
-+        if (opt->u.full.copies > SD_MAX_COPIES || opt->u.full.copies < 1) {
-+            return -EINVAL;
-+        }
-+        inode->copy_policy = 0;
-+        inode->nr_copies = opt->u.full.copies;
-+        return 0;
-+
-+    case SHEEPDOG_REDUNDANCY_TYPE_ERASURE_CODED:
-+    {
-+        int64_t copy = opt->u.erasure_coded.data_strips;
-+        int64_t parity = opt->u.erasure_coded.parity_strips;
-+
-+        if (copy != 2 && copy != 4 && copy != 8 && copy != 16) {
-+            return -EINVAL;
-+        }
-+
-+        if (parity >= SD_EC_MAX_STRIP || parity < 1) {
-+            return -EINVAL;
-+        }
-+
-+        /*
-+         * 4 bits for parity and 4 bits for data.
-+         * We have to compress upper data bits because it can't represent 16
-+         */
-+        inode->copy_policy = ((copy / 2) << 4) + parity;
-+        inode->nr_copies = copy + parity;
-+        return 0;
-+    }
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    return -EINVAL;
-+}
-+
- /*
-  * Sheepdog support two kinds of redundancy, full replication and erasure
-  * coding.
-@@ -1892,12 +1934,13 @@ out_with_err_set:
-  * # create a erasure coded vdi with x data strips and y parity strips
-  * -o redundancy=x:y (x must be one of {2,4,8,16} and 1 <= y < SD_EC_MAX_STRIP)
-  */
--static int parse_redundancy(BDRVSheepdogState *s, const char *opt)
-+static int parse_redundancy_str(BDRVSheepdogState *s, const char *opt)
- {
--    struct SheepdogInode *inode = &s->inode;
-+    struct SheepdogRedundancy redundancy;
-     const char *n1, *n2;
-     long copy, parity;
-     char p[10];
-+    int ret;
- 
-     pstrcpy(p, sizeof(p), opt);
-     n1 = strtok(p, ":");
-@@ -1907,35 +1950,32 @@ static int parse_redundancy(BDRVSheepdogState *s, const char *opt)
-         return -EINVAL;
-     }
- 
--    copy = strtol(n1, NULL, 10);
--    /* FIXME fix error checking by switching to qemu_strtol() */
--    if (copy > SD_MAX_COPIES || copy < 1) {
--        return -EINVAL;
--    }
--    if (!n2) {
--        inode->copy_policy = 0;
--        inode->nr_copies = copy;
--        return 0;
-+    ret = qemu_strtol(n1, NULL, 10, &copy);
-+    if (ret < 0) {
-+        return ret;
-     }
- 
--    if (copy != 2 && copy != 4 && copy != 8 && copy != 16) {
--        return -EINVAL;
--    }
-+    if (!n2) {
-+        redundancy = (SheepdogRedundancy) {
-+            .type               = SHEEPDOG_REDUNDANCY_TYPE_FULL,
-+            .u.full.copies      = copy,
-+        };
-+    } else {
-+        ret = qemu_strtol(n2, NULL, 10, &parity);
-+        if (ret < 0) {
-+            return ret;
-+        }
- 
--    parity = strtol(n2, NULL, 10);
--    /* FIXME fix error checking by switching to qemu_strtol() */
--    if (parity >= SD_EC_MAX_STRIP || parity < 1) {
--        return -EINVAL;
-+        redundancy = (SheepdogRedundancy) {
-+            .type               = SHEEPDOG_REDUNDANCY_TYPE_ERASURE_CODED,
-+            .u.erasure_coded    = {
-+                .data_strips    = copy,
-+                .parity_strips  = parity,
-+            },
-+        };
-     }
- 
--    /*
--     * 4 bits for parity and 4 bits for data.
--     * We have to compress upper data bits because it can't represent 16
--     */
--    inode->copy_policy = ((copy / 2) << 4) + parity;
--    inode->nr_copies = copy + parity;
--
--    return 0;
-+    return parse_redundancy(s, &redundancy);
- }
- 
- static int parse_block_size_shift(BDRVSheepdogState *s, QemuOpts *opt)
-@@ -2007,7 +2047,7 @@ static int sd_create(const char *filename, QemuOpts *opts,
-     g_free(buf);
-     buf = qemu_opt_get_del(opts, BLOCK_OPT_REDUNDANCY);
-     if (buf) {
--        ret = parse_redundancy(s, buf);
-+        ret = parse_redundancy_str(s, buf);
-         if (ret < 0) {
-             error_setg(errp, "Invalid redundancy mode: '%s'", buf);
-             goto out;
 -- 
 2.13.6
