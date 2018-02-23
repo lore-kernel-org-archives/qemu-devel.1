@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1ep7sP-0004z5-4J
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 02:34:42 -0500
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1ep88a-0000Dd-VM
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 02:51:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1ep7sM-000214-0N
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 02:34:41 -0500
-Received: from mga18.intel.com ([134.134.136.126]:55904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1ep7sL-0001ua-MR
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 02:34:37 -0500
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Fri, 23 Feb 2018 07:34:28 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D191015735@SHSMSX101.ccr.corp.intel.com>
-References: <CAHyh4xii5y-8=uMJeQGARrHZAETtW4ugmBWUypbQ923vk0P3Lw@mail.gmail.com>
-	<20180223035555.GL18962@xz-mi>
-	<CAHyh4xiCpJQZgtQR-KDrDntZZnAK5V5D=oB7UwQbuZNy7G_z7g@mail.gmail.com>
-	<20180223061034.GM18962@xz-mi>
-	<CAHyh4xh+EP6-vvrcQiQTBQQ4+3yrQvVFNGrtgt0w57ZZ0LNcZA@mail.gmail.com>
-	<20180223070927.GN18962@xz-mi>
-In-Reply-To: <20180223070927.GN18962@xz-mi>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] intel-iommu and vhost: Do we need 'device-iotlb'
- and 'ats'?
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1ep88Z-0004TZ-2C
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 02:51:25 -0500
+Received: from smtp20.cstnet.cn ([159.226.251.20]:44751 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1ep88Y-0004Rt-3K
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 02:51:22 -0500
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Fri, 23 Feb 2018 15:51:18 +0800
+Message-Id: <1519372278-20644-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH v3 2/3] util/uri.c: only remove `return`'s
+ brackets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +22,591 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
-Cc: Eric Auger <eric.auger@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, QEMU
-	Devel Mailing List <qemu-devel@nongnu.org>
+To: thuth@redhat.com, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org
 
-PiBGcm9tOiBQZXRlciBYdQ0KPiBTZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDIzLCAyMDE4IDM6MDkg
-UE0NCj4gDQo+ID4NCj4gPiBSaWdodC4gSSB0aGluayBteSBxdWVzdGlvbiB3YXMgbm90IGNsZWFy
-LiBNeSBxdWVzdGlvbiB3YXMgdGhhdCB3aHkgZG9u4oCZdA0KPiA+IElPTU1VIGludmFsaWRhdGUg
-ZGV2aWNlLWlvdGxiIGFsb25nIHdpdGggaXRzIG1hcHBpbmdzIGluIG9uZSBnby4gVGhlbg0KPiBJ
-T01NVQ0KPiA+IGRldmljZSBkcml2ZXIgZG9lc27igJl0IG5lZWQgdG8gZmx1c2ggZGV2aWNlLWlv
-dGxiIGV4cGxpY2l0bHkuIE1heWJlIHRoZQ0KPiA+IHJlYXNvbiBpcyB0aGF0IEFUUyBhbmQgSU9N
-TVUgYXJlIG5vdCBhbHdheXMgY291cGxlZC4uIGJ1dCBJIGd1ZXNzIGl04oCZcw0KPiB0aW1lDQo+
-ID4gZm9yIG1lIHRvIGdldCBzb21lIG1vcmUgYmFja2dyb3VuZCA6KQ0KPiANCj4gQWgsIEkgc2Vl
-IHlvdXIgcG9pbnQuDQo+IA0KPiBJIGRvbid0IGtub3cgdGhlIGFuc3dlci4gIE15IHdpbGQgZ3Vl
-c3MgaXMgdGhhdCBJT01NVSBpcyBqdXN0IHRyeWluZw0KPiB0byBiZSBzaW1wbGUgYW5kIG9ubHkg
-cHJvdmlkZSBtb3N0IGJhc2ljIGZ1bmN0aW9uYWxpdGllcywgbGVhdmluZw0KPiBjb21wbGV4IHN0
-dWZmIHRvIENQVS4gIEZvciBleGFtcGxlLCBpZiBJT01NVSB0YWtlcyBvdmVyIHRoZSBvd25lcnNo
-aXANCj4gdG8gZGVsaWV2ZXIgZGV2aWNlLWlvdGxiIGludmFsaWRhdGlvbnMgd2hlbiByZWNlaXZp
-bmcgaW90bGINCj4gaW52YWxpZGF0aW9ucywgaXQgcG9zc2libHkgbmVlZHMgdG8gdHJhdmVyc2Ug
-dGhlIGRldmljZSB0cmVlIHNvbWV0aW1lcw0KPiAoZS5nLiwgZm9yIGRvbWFpbiBpbnZhbGlkYXRp
-b25zKSB0byBrbm93IHdoYXQgZGV2aWNlIGlzIHVuZGVyIHdoYXQNCj4gZG9tYWluLCB3aGljaCBp
-cyByZWFsbHkgY29tcGxpYXRlZC4gIFdoaWxlIGl0J2xsIGJlIHNpbXBsZXIgZm9yIENQVSB0bw0K
-PiBkbyB0aGlzIHNpbmNlIGl0J3MgdmVyeSBwb3NzaWJsZSB0aGF0IHRoZSBPUyBrZWVwcyBhIGxp
-c3Qgb2YgZGV2aWNlcw0KPiBmb3IgYSBkb21haW4gYWxyZWFkeS4NCj4gDQo+IElNSE8gdGhhdCBm
-b2xsb3dzIHRoZSAqbml4IHBoaWxvc29waHkgdG9vIC0gRG8gT25lIFRoaW5nIEFuZCBEbyBJdA0K
-PiBXZWxsLiAgVGhvdWdoIGFnYWluLCBpdCdzIHdpbGQgZ3Vlc3MgYW5kIEkgbWF5IGJlIHdyb25n
-LiA6KQ0KPiANCj4gQ0NpbmcgQWxleCwgaW4gY2FzZSBoZSBoYXMgcXVpY2sgYW5zd2Vycy4NCj4g
-DQoNCklPTU1VIGFuZCBkZXZpY2VzIGFyZSBkZS1jb3VwbGVkLiBZb3UgbmVlZCBhIHByb3RvY29s
-IHNvIElPTU1VDQprbm93cyB3aGljaCBkZXZpY2UgZW5hYmxlcyB0cmFuc2xhdGlvbiBjYWNoZXMg
-YW5kIHRodXMgcmVxdWlyZXMNCmV4cGxpY2l0IGludmFsaWRhdGlvbiwgd2hpY2ggaXMgaG93IEFU
-UyBjb21lcyB0byBwbGF5LiBBVFMgaXMgbm90DQptYW5kYXRvcnkgZm9yIHZob3N0LCBidXQgZG9p
-bmcgc28gcHJvdmlkZXMgbW9yZSBmbGV4aWJpbGl0eSBlLmcuDQp0byBlbmFibGUgSS9PIHBhZ2Ug
-ZmF1bHQgaWYgZnVydGhlciBlbXVsYXRpbmcgUENJIFBSUyBjYXAuDQoNClRoYW5rcw0KS2V2aW4N
-Cg==
+only remove brackets that wrap `return` statements' content.
+
+use `perl -pi -e "s/return \((.*?)\);/return \1;/g" util/uri.c`
+to remove pattern like this: "return (1);"
+
+Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+---
+ util/uri.c | 160 ++++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 80 insertions(+), 80 deletions(-)
+
+diff --git a/util/uri.c b/util/uri.c
+index 81f7a6841077..278e876ab8b1 100644
+--- a/util/uri.c
++++ b/util/uri.c
+@@ -212,11 +212,11 @@ static int rfc3986_parse_scheme(URI *uri, const char **str)
+     const char *cur;
+ 
+     if (str == NULL)
+-        return (-1);
++        return -1;
+ 
+     cur = *str;
+     if (!ISA_ALPHA(cur))
+-        return (2);
++        return 2;
+     cur++;
+     while (ISA_ALPHA(cur) || ISA_DIGIT(cur) ||
+            (*cur == '+') || (*cur == '-') || (*cur == '.'))
+@@ -226,7 +226,7 @@ static int rfc3986_parse_scheme(URI *uri, const char **str)
+         uri->scheme = g_strndup(*str, cur - *str);
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -249,7 +249,7 @@ static int rfc3986_parse_fragment(URI *uri, const char **str)
+     const char *cur;
+ 
+     if (str == NULL)
+-        return (-1);
++        return -1;
+ 
+     cur = *str;
+ 
+@@ -265,7 +265,7 @@ static int rfc3986_parse_fragment(URI *uri, const char **str)
+             uri->fragment = uri_string_unescape(*str, cur - *str, NULL);
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -284,7 +284,7 @@ static int rfc3986_parse_query(URI *uri, const char **str)
+     const char *cur;
+ 
+     if (str == NULL)
+-        return (-1);
++        return -1;
+ 
+     cur = *str;
+ 
+@@ -296,7 +296,7 @@ static int rfc3986_parse_query(URI *uri, const char **str)
+         uri->query = g_strndup(*str, cur - *str);
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -362,9 +362,9 @@ static int rfc3986_parse_user_info(URI *uri, const char **str)
+                 uri->user = uri_string_unescape(*str, cur - *str, NULL);
+         }
+         *str = cur;
+-        return (0);
++        return 0;
+     }
+-    return (1);
++    return 1;
+ }
+ 
+ /**
+@@ -386,7 +386,7 @@ static int rfc3986_parse_dec_octet(const char **str)
+     const char *cur = *str;
+ 
+     if (!(ISA_DIGIT(cur)))
+-        return (1);
++        return 1;
+     if (!ISA_DIGIT(cur + 1))
+         cur++;
+     else if ((*cur != '0') && (ISA_DIGIT(cur + 1)) && (!ISA_DIGIT(cur + 2)))
+@@ -400,9 +400,9 @@ static int rfc3986_parse_dec_octet(const char **str)
+              (*(cur + 1) <= '5'))
+         cur += 3;
+     else
+-        return (1);
++        return 1;
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ /**
+  * rfc3986_parse_host:
+@@ -433,7 +433,7 @@ static int rfc3986_parse_host(URI *uri, const char **str)
+         while ((*cur != ']') && (*cur != 0))
+             cur++;
+         if (*cur != ']')
+-            return (1);
++            return 1;
+         cur++;
+         goto found;
+     }
+@@ -479,7 +479,7 @@ found:
+             uri->server = NULL;
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -510,15 +510,15 @@ static int rfc3986_parse_authority(URI *uri, const char **str)
+         cur++;
+     ret = rfc3986_parse_host(uri, &cur);
+     if (ret != 0)
+-        return (ret);
++        return ret;
+     if (*cur == ':') {
+         cur++;
+         ret = rfc3986_parse_port(uri, &cur);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -544,13 +544,13 @@ static int rfc3986_parse_segment(const char **str, char forbid, int empty)
+     cur = *str;
+     if (!ISA_PCHAR(cur)) {
+         if (empty)
+-            return (0);
+-        return (1);
++            return 0;
++        return 1;
+     }
+     while (ISA_PCHAR(cur) && (*cur != forbid))
+         NEXT(cur);
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -576,7 +576,7 @@ static int rfc3986_parse_path_ab_empty(URI *uri, const char **str)
+         cur++;
+         ret = rfc3986_parse_segment(&cur, 0, 1);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     if (uri != NULL) {
+         g_free(uri->path);
+@@ -590,7 +590,7 @@ static int rfc3986_parse_path_ab_empty(URI *uri, const char **str)
+         }
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -613,7 +613,7 @@ static int rfc3986_parse_path_absolute(URI *uri, const char **str)
+     cur = *str;
+ 
+     if (*cur != '/')
+-        return (1);
++        return 1;
+     cur++;
+     ret = rfc3986_parse_segment(&cur, 0, 0);
+     if (ret == 0) {
+@@ -621,7 +621,7 @@ static int rfc3986_parse_path_absolute(URI *uri, const char **str)
+             cur++;
+             ret = rfc3986_parse_segment(&cur, 0, 1);
+             if (ret != 0)
+-                return (ret);
++                return ret;
+         }
+     }
+     if (uri != NULL) {
+@@ -636,7 +636,7 @@ static int rfc3986_parse_path_absolute(URI *uri, const char **str)
+         }
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -660,12 +660,12 @@ static int rfc3986_parse_path_rootless(URI *uri, const char **str)
+ 
+     ret = rfc3986_parse_segment(&cur, 0, 0);
+     if (ret != 0)
+-        return (ret);
++        return ret;
+     while (*cur == '/') {
+         cur++;
+         ret = rfc3986_parse_segment(&cur, 0, 1);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     if (uri != NULL) {
+         g_free(uri->path);
+@@ -679,7 +679,7 @@ static int rfc3986_parse_path_rootless(URI *uri, const char **str)
+         }
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -703,12 +703,12 @@ static int rfc3986_parse_path_no_scheme(URI *uri, const char **str)
+ 
+     ret = rfc3986_parse_segment(&cur, ':', 0);
+     if (ret != 0)
+-        return (ret);
++        return ret;
+     while (*cur == '/') {
+         cur++;
+         ret = rfc3986_parse_segment(&cur, 0, 1);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     if (uri != NULL) {
+         g_free(uri->path);
+@@ -722,7 +722,7 @@ static int rfc3986_parse_path_no_scheme(URI *uri, const char **str)
+         }
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -751,20 +751,20 @@ static int rfc3986_parse_hier_part(URI *uri, const char **str)
+         cur += 2;
+         ret = rfc3986_parse_authority(uri, &cur);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+         ret = rfc3986_parse_path_ab_empty(uri, &cur);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+         *str = cur;
+-        return (0);
++        return 0;
+     } else if (*cur == '/') {
+         ret = rfc3986_parse_path_absolute(uri, &cur);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     } else if (ISA_PCHAR(cur)) {
+         ret = rfc3986_parse_path_rootless(uri, &cur);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     } else {
+         /* path-empty is effectively empty */
+         if (uri != NULL) {
+@@ -773,7 +773,7 @@ static int rfc3986_parse_hier_part(URI *uri, const char **str)
+         }
+     }
+     *str = cur;
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -800,18 +800,18 @@ static int rfc3986_parse_relative_ref(URI *uri, const char *str)
+         str += 2;
+         ret = rfc3986_parse_authority(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+         ret = rfc3986_parse_path_ab_empty(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     } else if (*str == '/') {
+         ret = rfc3986_parse_path_absolute(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     } else if (ISA_PCHAR(str)) {
+         ret = rfc3986_parse_path_no_scheme(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     } else {
+         /* path-empty is effectively empty */
+         if (uri != NULL) {
+@@ -824,19 +824,19 @@ static int rfc3986_parse_relative_ref(URI *uri, const char *str)
+         str++;
+         ret = rfc3986_parse_query(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     if (*str == '#') {
+         str++;
+         ret = rfc3986_parse_fragment(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     if (*str != 0) {
+         uri_clean(uri);
+-        return (1);
++        return 1;
+     }
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -857,31 +857,31 @@ static int rfc3986_parse(URI *uri, const char *str)
+ 
+     ret = rfc3986_parse_scheme(uri, &str);
+     if (ret != 0)
+-        return (ret);
++        return ret;
+     if (*str != ':') {
+-        return (1);
++        return 1;
+     }
+     str++;
+     ret = rfc3986_parse_hier_part(uri, &str);
+     if (ret != 0)
+-        return (ret);
++        return ret;
+     if (*str == '?') {
+         str++;
+         ret = rfc3986_parse_query(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     if (*str == '#') {
+         str++;
+         ret = rfc3986_parse_fragment(uri, &str);
+         if (ret != 0)
+-            return (ret);
++            return ret;
+     }
+     if (*str != 0) {
+         uri_clean(uri);
+-        return (1);
++        return 1;
+     }
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -901,7 +901,7 @@ static int rfc3986_parse_uri_reference(URI *uri, const char *str)
+     int ret;
+ 
+     if (str == NULL)
+-        return (-1);
++        return -1;
+     uri_clean(uri);
+ 
+     /*
+@@ -914,10 +914,10 @@ static int rfc3986_parse_uri_reference(URI *uri, const char *str)
+         ret = rfc3986_parse_relative_ref(uri, str);
+         if (ret != 0) {
+             uri_clean(uri);
+-            return (ret);
++            return ret;
+         }
+     }
+-    return (0);
++    return 0;
+ }
+ 
+ /**
+@@ -936,14 +936,14 @@ URI *uri_parse(const char *str)
+     int ret;
+ 
+     if (str == NULL)
+-        return (NULL);
++        return NULL;
+     uri = uri_new();
+     ret = rfc3986_parse_uri_reference(uri, str);
+     if (ret) {
+         uri_free(uri);
+-        return (NULL);
++        return NULL;
+     }
+-    return (uri);
++    return uri;
+ }
+ 
+ /**
+@@ -960,7 +960,7 @@ URI *uri_parse(const char *str)
+  */
+ int uri_parse_into(URI *uri, const char *str)
+ {
+-    return (rfc3986_parse_uri_reference(uri, str));
++    return rfc3986_parse_uri_reference(uri, str);
+ }
+ 
+ /**
+@@ -980,7 +980,7 @@ URI *uri_parse_raw(const char *str, int raw)
+     int ret;
+ 
+     if (str == NULL)
+-        return (NULL);
++        return NULL;
+     uri = uri_new();
+     if (raw) {
+         uri->cleanup |= 2;
+@@ -988,9 +988,9 @@ URI *uri_parse_raw(const char *str, int raw)
+     ret = uri_parse_into(uri, str);
+     if (ret) {
+         uri_free(uri);
+-        return (NULL);
++        return NULL;
+     }
+-    return (uri);
++    return uri;
+ }
+ 
+ /************************************************************************
+@@ -1011,7 +1011,7 @@ URI *uri_new(void)
+     URI *ret;
+ 
+     ret = g_new0(URI, 1);
+-    return (ret);
++    return ret;
+ }
+ 
+ /**
+@@ -1028,7 +1028,7 @@ static char *realloc2n(char *ret, int *max)
+     tmp = *max * 2;
+     temp = g_realloc(ret, (tmp + 1));
+     *max = tmp;
+-    return (temp);
++    return temp;
+ }
+ 
+ /**
+@@ -1048,7 +1048,7 @@ char *uri_to_string(URI *uri)
+     int max;
+ 
+     if (uri == NULL)
+-        return (NULL);
++        return NULL;
+ 
+     max = 80;
+     ret = g_malloc(max + 1);
+@@ -1249,7 +1249,7 @@ char *uri_to_string(URI *uri)
+         ret = temp;
+     }
+     ret[len] = 0;
+-    return (ret);
++    return ret;
+ }
+ 
+ /**
+@@ -1315,7 +1315,7 @@ static int normalize_uri_path(char *path)
+     char *cur, *out;
+ 
+     if (path == NULL)
+-        return (-1);
++        return -1;
+ 
+     /* Skip all initial "/" chars.  We want to get to the beginning of the
+      * first non-empty segment.
+@@ -1324,7 +1324,7 @@ static int normalize_uri_path(char *path)
+     while (cur[0] == '/')
+         ++cur;
+     if (cur[0] == '\0')
+-        return (0);
++        return 0;
+ 
+     /* Keep everything we've seen so far.  */
+     out = cur;
+@@ -1372,7 +1372,7 @@ done_cd:
+     while (cur[0] == '/')
+         ++cur;
+     if (cur[0] == '\0')
+-        return (0);
++        return 0;
+ 
+     /*
+      * Analyze each segment in sequence for cases (e) and (f).
+@@ -1485,15 +1485,15 @@ done_cd:
+         }
+     }
+ 
+-    return (0);
++    return 0;
+ }
+ 
+ static int is_hex(char c)
+ {
+     if (((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) ||
+         ((c >= 'A') && (c <= 'F')))
+-        return (1);
+-    return (0);
++        return 1;
++    return 0;
+ }
+ 
+ /**
+@@ -1516,11 +1516,11 @@ char *uri_string_unescape(const char *str, int len, char *target)
+     const char *in;
+ 
+     if (str == NULL)
+-        return (NULL);
++        return NULL;
+     if (len <= 0)
+         len = strlen(str);
+     if (len < 0)
+-        return (NULL);
++        return NULL;
+ 
+     if (target == NULL) {
+         ret = g_malloc(len + 1);
+@@ -1553,7 +1553,7 @@ char *uri_string_unescape(const char *str, int len, char *target)
+         }
+     }
+     *out = 0;
+-    return (ret);
++    return ret;
+ }
+ 
+ /**
+@@ -1574,12 +1574,12 @@ char *uri_string_escape(const char *str, const char *list)
+     int len, out;
+ 
+     if (str == NULL)
+-        return (NULL);
++        return NULL;
+     if (str[0] == 0)
+-        return (g_strdup(str));
++        return g_strdup(str);
+     len = strlen(str);
+     if (!(len > 0))
+-        return (NULL);
++        return NULL;
+ 
+     len += 20;
+     ret = g_malloc(len);
+@@ -1612,7 +1612,7 @@ char *uri_string_escape(const char *str, const char *list)
+         }
+     }
+     ret[out] = 0;
+-    return (ret);
++    return ret;
+ }
+ 
+ /************************************************************************
+@@ -1851,7 +1851,7 @@ done:
+         uri_free(bas);
+     if (res != NULL)
+         uri_free(res);
+-    return (val);
++    return val;
+ }
+ 
+ /**
+-- 
+2.7.4
