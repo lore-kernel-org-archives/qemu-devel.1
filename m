@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <airlied@gmail.com>) id 1ep3GV-00036Z-Rp
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 21:40:21 -0500
+	(envelope-from <zhenyuw@linux.intel.com>) id 1ep3SY-0005OX-TG
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 21:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <airlied@gmail.com>) id 1ep3Fl-0001wd-Bs
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 21:39:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59458 helo=mx1.redhat.com)
+	(envelope-from <zhenyuw@linux.intel.com>) id 1ep3R2-00065O-AR
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 21:51:42 -0500
+Received: from mga07.intel.com ([134.134.136.100]:17399)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <airlied@gmail.com>) id 1ep3Fl-0001v4-4W
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 21:38:29 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CAC0BEAEAB
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 02:38:20 +0000 (UTC)
-Received: from dreadlord-bne-redhat-com.bne.redhat.com
-	(dhcp-40-179.bne.redhat.com [10.64.40.179])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1CBFE217B400
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 02:38:15 +0000 (UTC)
-From: Dave Airlie <airlied@gmail.com>
-Date: Fri, 23 Feb 2018 12:38:14 +1000
-Message-Id: <20180223023814.24459-1-airlied@gmail.com>
-Subject: [Qemu-devel] [PATCH] virtio-gpu-3d: add support for second
- capability set (v4)
+	(Exim 4.71) (envelope-from <zhenyuw@linux.intel.com>)
+	id 1ep3R1-00060r-O5
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 21:50:08 -0500
+Date: Fri, 23 Feb 2018 10:42:57 +0800
+From: Zhenyu Wang <zhenyuw@linux.intel.com>
+Message-ID: <20180223024257.vrnsisgmefdyarkc@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20180219111458.25983-1-kraxel@redhat.com>
+	<20180219151649.13a197f9@w520.home>
+	<20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
+	<20180220170417.p7hkqbong5euul7p@sirius.home.kraxel.org>
+	<20180222064003.yzrcmh7hi6qvgcij@zhen-hp.sh.intel.com>
+	<20180222093055.u34o2pp6twcx645f@sirius.home.kraxel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="rwzy5ffhrjjmmsga"
+Content-Disposition: inline
+In-Reply-To: <20180222093055.u34o2pp6twcx645f@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>, intel-gvt-dev@lists.freedesktop.org, qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>
 
-From: Dave Airlie <airlied@redhat.com>
 
-Due to a kernel bug we can never increase the size of capability
-set 1, so introduce a new capability set in parallel, old userspace
-will continue to use the old set, new userspace will start using
-the new one when it detects a fixed kernel.
+--rwzy5ffhrjjmmsga
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-v2: don't use a define from virglrenderer, just probe it.
-v3: fix compilation when virglrenderer disabled
-v4: fix style warning, just use ?: op instead.
+On 2018.02.22 10:30:55 +0100, Gerd Hoffmann wrote:
+>   Hi,
+>=20
+> > Nice! Seems to be the last missing gap for local spice with cursor
+> > dmabuf support, we'll do more testing on that for sure. Btw, another
+> > method might be to add direct cursor dmabuf passing for spice as gl
+> > output, is that correct way?
+>=20
+> Passing on the cursor sprite needs the hotspot information, so spice
+> client can position the cursor correctly.  I didn't got hotspot
+> information in my testing yet, but maybe the guest kernel was too old.
+> Is that supported meanwhile?  If so, which kernel version is needed?
+>
 
-Signed-off-by: Dave Airlie <airlied@redhat.com>
----
- hw/display/virtio-gpu-3d.c                  | 15 +++++++++++++++
- hw/display/virtio-gpu.c                     |  7 ++++++-
- include/hw/virtio/virtio-gpu.h              |  2 +-
- include/standard-headers/linux/virtio_gpu.h |  1 +
- 4 files changed, 23 insertions(+), 2 deletions(-)
+Current gvt dmabuf doesn't support true hotspot info yet which requires
+some pv info update as we can't get it from hw state. Tina is pursuing that.
 
-diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
-index 7db84efe89..3558f38fe8 100644
---- a/hw/display/virtio-gpu-3d.c
-+++ b/hw/display/virtio-gpu-3d.c
-@@ -362,6 +362,11 @@ static void virgl_cmd_get_capset_info(VirtIOGPU *g,
-         virgl_renderer_get_cap_set(resp.capset_id,
-                                    &resp.capset_max_version,
-                                    &resp.capset_max_size);
-+    } else if (info.capset_index == 1) {
-+        resp.capset_id = VIRTIO_GPU_CAPSET_VIRGL2;
-+        virgl_renderer_get_cap_set(resp.capset_id,
-+                                   &resp.capset_max_version,
-+                                   &resp.capset_max_size);
-     } else {
-         resp.capset_max_version = 0;
-         resp.capset_max_size = 0;
-@@ -635,4 +640,14 @@ int virtio_gpu_virgl_init(VirtIOGPU *g)
-     return 0;
- }
- 
-+int virtio_gpu_virgl_get_num_capsets(VirtIOGPU *g)
-+{
-+    uint32_t capset2_max_ver, capset2_max_size;
-+    virgl_renderer_get_cap_set(VIRTIO_GPU_CAPSET_VIRGL2,
-+                              &capset2_max_ver,
-+                              &capset2_max_size);
-+
-+    return capset2_max_ver ? 2 : 1;
-+}
-+
- #endif /* CONFIG_VIRGL */
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 6658f6c6a6..2dd3c3481a 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -1215,7 +1215,12 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-         /* use larger control queue in 3d mode */
-         g->ctrl_vq   = virtio_add_queue(vdev, 256, virtio_gpu_handle_ctrl_cb);
-         g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
--        g->virtio_config.num_capsets = 1;
-+
-+#if defined(CONFIG_VIRGL)
-+        g->virtio_config.num_capsets = virtio_gpu_virgl_get_num_capsets(g);
-+#else
-+        g->virtio_config.num_capsets = 0;
-+#endif
-     } else {
-         g->ctrl_vq   = virtio_add_queue(vdev, 64, virtio_gpu_handle_ctrl_cb);
-         g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
-diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
-index 83f474ffc3..22ac3c2d0e 100644
---- a/include/hw/virtio/virtio-gpu.h
-+++ b/include/hw/virtio/virtio-gpu.h
-@@ -171,5 +171,5 @@ void virtio_gpu_virgl_fence_poll(VirtIOGPU *g);
- void virtio_gpu_virgl_reset(VirtIOGPU *g);
- void virtio_gpu_gl_block(void *opaque, bool block);
- int virtio_gpu_virgl_init(VirtIOGPU *g);
--
-+int virtio_gpu_virgl_get_num_capsets(VirtIOGPU *g);
- #endif
-diff --git a/include/standard-headers/linux/virtio_gpu.h b/include/standard-headers/linux/virtio_gpu.h
-index c1c8f0751d..52a830dcf8 100644
---- a/include/standard-headers/linux/virtio_gpu.h
-+++ b/include/standard-headers/linux/virtio_gpu.h
-@@ -260,6 +260,7 @@ struct virtio_gpu_cmd_submit {
- };
- 
- #define VIRTIO_GPU_CAPSET_VIRGL 1
-+#define VIRTIO_GPU_CAPSET_VIRGL2 2
- 
- /* VIRTIO_GPU_CMD_GET_CAPSET_INFO */
- struct virtio_gpu_get_capset_info {
--- 
-2.14.3
+> Spice already has support for setting pointers, we can simply use
+> that, at least initially.  Doesn't use dma-bufs.  If it turns out to be
+> a performance issue we can add support for using dma-bufs instead, but
+> that needs spice server changes.
+>=20
+> > And really like to see dmabuf support could be in upstream soon. Do
+> > you have any predict for which qemu version?
+>=20
+> I want have this in 2.12, at least the current, initial version.
+> Improved cursor support might take a little longer.
+>=20
+
+Good to know. Thanks!
+
+--=20
+Open Source Technology Center, Intel ltd.
+
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--rwzy5ffhrjjmmsga
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCWo9/sQAKCRCxBBozTXgY
+J16lAJ0X7Ed6gLdnmFbz7UsEwbXwbEOAMwCfRn/utAz1sPS6pRyt/AQX8qhsFMM=
+=QDSg
+-----END PGP SIGNATURE-----
+
+--rwzy5ffhrjjmmsga--
