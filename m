@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzm-0001QM-TI
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:27:04 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzo-0001Ru-8h
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:27:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzl-0005Oy-9J
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:27:02 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzm-0005Rk-TJ
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:27:04 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:43 +0100
-Message-Id: <20180223192549.26666-31-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:45 +0100
+Message-Id: <20180223192549.26666-33-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 30/36] ssh: QAPIfy host-key-check option
+Subject: [Qemu-devel] [PATCH v3 32/36] ssh: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,251 +22,177 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This makes the host-key-check option available in blockdev-add.
+This adds the .bdrv_co_create driver callback to ssh, which enables
+image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 63 +++++++++++++++++++++++++++++++++++--
- block/ssh.c          | 88 +++++++++++++++++++++++++++++++++-------------------
- 2 files changed, 117 insertions(+), 34 deletions(-)
+ qapi/block-core.json | 16 ++++++++-
+ block/ssh.c          | 92 +++++++++++++++++++++++++++++-----------------------
+ 2 files changed, 67 insertions(+), 41 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index f7679fce53..431d4a4fb2 100644
+index 431d4a4fb2..2f7fab46eb 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -2553,6 +2553,63 @@
-             '*encrypt': 'BlockdevQcow2Encryption' } }
+@@ -3593,6 +3593,20 @@
+             '*object-size':     'size' } }
  
  ##
-+# @SshHostKeyCheckMode:
++# @BlockdevCreateOptionsSsh:
 +#
-+# @none             Don't check the host key at all
-+# @hash             Compare the host key with a given hash
-+# @known_hosts      Check the host key against the known_hosts file
++# Driver specific image creation options for SSH.
 +#
-+# Since: 2.12
-+##
-+{ 'enum': 'SshHostKeyCheckMode',
-+  'data': [ 'none', 'hash', 'known_hosts' ] }
-+
-+##
-+# @SshHostKeyCheckHashType:
-+#
-+# @md5              The given hash is an md5 hash
-+# @sha1             The given hash is an sha1 hash
++# @location         Where to store the new image file
++# @size             Size of the virtual disk in bytes
 +#
 +# Since: 2.12
 +##
-+{ 'enum': 'SshHostKeyCheckHashType',
-+  'data': [ 'md5', 'sha1' ] }
++{ 'struct': 'BlockdevCreateOptionsSsh',
++  'data': { 'location':         'BlockdevOptionsSsh',
++            'size':             'size' } }
 +
 +##
-+# @SshHostKeyHash:
-+#
-+# @type             The hash algorithm used for the hash
-+# @hash             The expected hash value
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SshHostKeyHash',
-+  'data': { 'type': 'SshHostKeyCheckHashType',
-+            'hash': 'str' }}
-+
-+##
-+# @SshHostKeyDummy:
-+#
-+# For those union branches that don't need additional fields.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SshHostKeyDummy',
-+  'data': {} }
-+
-+##
-+# @SshHostKeyCheck:
-+#
-+# Since: 2.12
-+##
-+{ 'union': 'SshHostKeyCheck',
-+  'base': { 'mode': 'SshHostKeyCheckMode' },
-+  'discriminator': 'mode',
-+  'data': { 'none': 'SshHostKeyDummy',
-+            'hash': 'SshHostKeyHash',
-+            'known_hosts': 'SshHostKeyDummy' } }
-+
-+##
- # @BlockdevOptionsSsh:
+ # @BlockdevCreateNotSupported:
  #
- # @server:              host address
-@@ -2562,14 +2619,16 @@
- # @user:                user as which to connect, defaults to current
- #                       local user name
- #
--# TODO: Expose the host_key_check option in QMP
-+# @host-key-check:      Defines how and what to check the host key against
-+#                       (default: known_hosts)
- #
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsSsh',
-   'data': { 'server': 'InetSocketAddress',
-             'path': 'str',
--            '*user': 'str' } }
-+            '*user': 'str',
-+            '*host-key-check': 'SshHostKeyCheck' } }
- 
- 
- ##
+ # This is used for all drivers that don't support creating images.
+@@ -3644,7 +3658,7 @@
+       'rbd':            'BlockdevCreateOptionsRbd',
+       'replication':    'BlockdevCreateNotSupported',
+       'sheepdog':       'BlockdevCreateOptionsSheepdog',
+-      'ssh':            'BlockdevCreateNotSupported',
++      'ssh':            'BlockdevCreateOptionsSsh',
+       'throttle':       'BlockdevCreateNotSupported',
+       'vdi':            'BlockdevCreateNotSupported',
+       'vhdx':           'BlockdevCreateNotSupported',
 diff --git a/block/ssh.c b/block/ssh.c
-index 9a89b7f350..dcf766c213 100644
+index 77bc20041f..bd3044e5f6 100644
 --- a/block/ssh.c
 +++ b/block/ssh.c
-@@ -430,31 +430,35 @@ check_host_key_hash(BDRVSSHState *s, const char *hash,
- }
- 
- static int check_host_key(BDRVSSHState *s, const char *host, int port,
--                          const char *host_key_check, Error **errp)
-+                          SshHostKeyCheck *hkc, Error **errp)
- {
--    /* host_key_check=no */
--    if (strcmp(host_key_check, "no") == 0) {
--        return 0;
--    }
-+    SshHostKeyCheckMode mode;
- 
--    /* host_key_check=md5:xx:yy:zz:... */
--    if (strncmp(host_key_check, "md5:", 4) == 0) {
--        return check_host_key_hash(s, &host_key_check[4],
--                                   LIBSSH2_HOSTKEY_HASH_MD5, 16, errp);
--    }
--
--    /* host_key_check=sha1:xx:yy:zz:... */
--    if (strncmp(host_key_check, "sha1:", 5) == 0) {
--        return check_host_key_hash(s, &host_key_check[5],
--                                   LIBSSH2_HOSTKEY_HASH_SHA1, 20, errp);
-+    if (hkc) {
-+        mode = hkc->mode;
-+    } else {
-+        mode = SSH_HOST_KEY_CHECK_MODE_KNOWN_HOSTS;
+@@ -826,64 +826,75 @@ static QemuOptsList ssh_create_opts = {
      }
- 
--    /* host_key_check=yes */
--    if (strcmp(host_key_check, "yes") == 0) {
-+    switch (mode) {
-+    case SSH_HOST_KEY_CHECK_MODE_NONE:
-+        return 0;
-+    case SSH_HOST_KEY_CHECK_MODE_HASH:
-+        if (hkc->u.hash.type == SSH_HOST_KEY_CHECK_HASH_TYPE_MD5) {
-+            return check_host_key_hash(s, hkc->u.hash.hash,
-+                                       LIBSSH2_HOSTKEY_HASH_MD5, 16, errp);
-+        } else if (hkc->u.hash.type == SSH_HOST_KEY_CHECK_HASH_TYPE_SHA1) {
-+            return check_host_key_hash(s, hkc->u.hash.hash,
-+                                       LIBSSH2_HOSTKEY_HASH_SHA1, 20, errp);
-+        }
-+        g_assert_not_reached();
-+        break;
-+    case SSH_HOST_KEY_CHECK_MODE_KNOWN_HOSTS:
-         return check_host_key_knownhosts(s, host, port, errp);
-+    default:
-+        g_assert_not_reached();
-     }
- 
--    error_setg(errp, "unknown host_key_check setting (%s)", host_key_check);
-     return -EINVAL;
- }
- 
-@@ -543,16 +547,22 @@ static QemuOptsList ssh_runtime_opts = {
-             .type = QEMU_OPT_NUMBER,
-             .help = "Port to connect to",
-         },
-+        {
-+            .name = "host_key_check",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Defines how and what to check the host key against",
-+        },
-         { /* end of list */ }
-     },
  };
  
--static bool ssh_process_legacy_socket_options(QDict *output_opts,
--                                              QemuOpts *legacy_opts,
--                                              Error **errp)
-+static bool ssh_process_legacy_options(QDict *output_opts,
-+                                       QemuOpts *legacy_opts,
-+                                       Error **errp)
+-static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
++static int ssh_co_create(BlockdevCreateOptions *options, Error **errp)
  {
-     const char *host = qemu_opt_get(legacy_opts, "host");
-     const char *port = qemu_opt_get(legacy_opts, "port");
-+    const char *host_key_check = qemu_opt_get(legacy_opts, "host_key_check");
+-    int r, ret;
+-    int64_t total_size = 0;
+-    QDict *uri_options = NULL;
+-    BlockdevOptionsSsh *ssh_opts = NULL;
++    BlockdevCreateOptionsSsh *opts = &options->u.ssh;
+     BDRVSSHState s;
+-    ssize_t r2;
+     char c[1] = { '\0' };
++    int ret;
++
++    assert(options->driver == BLOCKDEV_DRIVER_SSH);
  
-     if (!host && port) {
-         error_setg(errp, "port may not be used without host");
-@@ -564,6 +574,28 @@ static bool ssh_process_legacy_socket_options(QDict *output_opts,
-         qdict_put_str(output_opts, "server.port", port ?: stringify(22));
-     }
+     ssh_state_init(&s);
  
-+    if (host_key_check) {
-+        if (strcmp(host_key_check, "no") == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "none");
-+        } else if (strncmp(host_key_check, "md5:", 4) == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "hash");
-+            qdict_put_str(output_opts, "host-key-check.type", "md5");
-+            qdict_put_str(output_opts, "host-key-check.hash",
-+                          &host_key_check[4]);
-+        } else if (strncmp(host_key_check, "sha1:", 5) == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "hash");
-+            qdict_put_str(output_opts, "host-key-check.type", "sha1");
-+            qdict_put_str(output_opts, "host-key-check.hash",
-+                          &host_key_check[5]);
-+        } else if (strcmp(host_key_check, "yes") == 0) {
-+            qdict_put_str(output_opts, "host-key-check.mode", "known_hosts");
-+        } else {
-+            error_setg(errp, "unknown host_key_check setting (%s)",
-+                       host_key_check);
-+            return false;
-+        }
++    ret = connect_to_ssh(&s, opts->location,
++                         LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
++                         LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
++                         0644, errp);
++    if (ret < 0) {
++        goto fail;
 +    }
 +
-     return true;
- }
++    if (opts->size > 0) {
++        libssh2_sftp_seek64(s.sftp_handle, opts->size - 1);
++        ret = libssh2_sftp_write(s.sftp_handle, c, 1);
++        if (ret < 0) {
++            sftp_error_setg(errp, &s, "truncate failed");
++            ret = -EINVAL;
++            goto fail;
++        }
++        s.attrs.filesize = opts->size;
++    }
++
++    ret = 0;
++fail:
++    ssh_state_free(&s);
++    return ret;
++}
++
++static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
++{
++    BlockdevCreateOptions *create_options;
++    BlockdevCreateOptionsSsh *ssh_opts;
++    int ret;
++    QDict *uri_options = NULL;
++
++    create_options = g_new0(BlockdevCreateOptions, 1);
++    create_options->driver = BLOCKDEV_DRIVER_SSH;
++    ssh_opts = &create_options->u.ssh;
++
+     /* Get desired file size. */
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
+-    DPRINTF("total_size=%" PRIi64, total_size);
++    ssh_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++                              BDRV_SECTOR_SIZE);
++    DPRINTF("total_size=%" PRIi64, ssh_opts->size);
  
-@@ -584,7 +616,7 @@ static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
-         goto fail;
+     uri_options = qdict_new();
+-    r = parse_uri(filename, uri_options, errp);
+-    if (r < 0) {
+-        ret = r;
++    ret = parse_uri(filename, uri_options, errp);
++    if (ret < 0) {
+         goto out;
      }
  
--    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
-+    if (!ssh_process_legacy_options(options, opts, errp)) {
-         goto fail;
+-    ssh_opts = ssh_parse_options(uri_options, errp);
+-    if (ssh_opts == NULL) {
++    ssh_opts->location = ssh_parse_options(uri_options, errp);
++    if (ssh_opts->location == NULL) {
+         ret = -EINVAL;
+         goto out;
      }
  
-@@ -628,16 +660,9 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
- {
-     BlockdevOptionsSsh *opts;
-     int r, ret;
--    const char *user, *host_key_check;
-+    const char *user;
-     long port = 0;
- 
--    host_key_check = qdict_get_try_str(options, "host_key_check");
--    if (!host_key_check) {
--        host_key_check = "yes";
--    } else {
--        qdict_del(options, "host_key_check");
+-    r = connect_to_ssh(&s, ssh_opts,
+-                       LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
+-                       LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
+-                       0644, errp);
+-    if (r < 0) {
+-        ret = r;
+-        goto out;
 -    }
 -
-     opts = ssh_parse_options(options, errp);
-     if (opts == NULL) {
-         return -EINVAL;
-@@ -691,8 +716,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-     }
+-    if (total_size > 0) {
+-        libssh2_sftp_seek64(s.sftp_handle, total_size-1);
+-        r2 = libssh2_sftp_write(s.sftp_handle, c, 1);
+-        if (r2 < 0) {
+-            sftp_error_setg(errp, &s, "truncate failed");
+-            ret = -EINVAL;
+-            goto out;
+-        }
+-        s.attrs.filesize = total_size;
+-    }
+-
+-    ret = 0;
++    ret = ssh_co_create(create_options, errp);
  
-     /* Check the remote host's key against known_hosts. */
--    ret = check_host_key(s, s->inet->host, port, host_key_check,
--                         errp);
-+    ret = check_host_key(s, s->inet->host, port, opts->host_key_check, errp);
-     if (ret < 0) {
-         goto err;
-     }
+  out:
+-    ssh_state_free(&s);
+-    if (uri_options != NULL) {
+-        QDECREF(uri_options);
+-    }
+-    qapi_free_BlockdevOptionsSsh(ssh_opts);
++    QDECREF(uri_options);
++    qapi_free_BlockdevCreateOptions(create_options);
+     return ret;
+ }
+ 
+@@ -1223,6 +1234,7 @@ static BlockDriver bdrv_ssh = {
+     .bdrv_parse_filename          = ssh_parse_filename,
+     .bdrv_file_open               = ssh_file_open,
+     .bdrv_create                  = ssh_create,
++    .bdrv_co_create               = ssh_co_create,
+     .bdrv_close                   = ssh_close,
+     .bdrv_has_zero_init           = ssh_has_zero_init,
+     .bdrv_co_readv                = ssh_co_readv,
 -- 
 2.13.6
