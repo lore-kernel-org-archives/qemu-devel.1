@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8L-0005qO-A6
+	(envelope-from <jsnow@redhat.com>) id 1epN8L-0005rD-Sb
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8I-0005rj-8w
+	(envelope-from <jsnow@redhat.com>) id 1epN8H-0005qo-VX
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:09 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 23 Feb 2018 18:51:33 -0500
-Message-Id: <20180223235142.21501-13-jsnow@redhat.com>
+Date: Fri, 23 Feb 2018 18:51:29 -0500
+Message-Id: <20180223235142.21501-9-jsnow@redhat.com>
 In-Reply-To: <20180223235142.21501-1-jsnow@redhat.com>
 References: <20180223235142.21501-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v4 12/21] blockjobs: ensure abort is called for
- cancelled jobs
+Subject: [Qemu-devel] [RFC v4 08/21] blockjobs: add ABORTING state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +22,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Presently, even if a job is canceled post-completion as a result of
-a failing peer in a transaction, it will still call .commit because
-nothing has updated or changed its return code.
+Add a new state ABORTING.
 
-The reason why this does not cause problems currently is because
-backup's implementation of .commit checks for cancellation itself.
+This makes transitions from normative states to error states explicit
+in the STM, and serves as a disambiguation for which states may complete
+normally when normal end-states (CONCLUDED) are added in future commits.
 
-I'd like to simplify this contract:
+Notably, Paused/Standby jobs do not transition directly to aborting,
+as they must wake up first and cooperate in their cancellation.
 
-(1) Abort is called if the job/transaction fails
-(2) Commit is called if the job/transaction succeeds
+Transitions:
+Running -> Aborting: can be cancelled or encounter an error
+Ready   -> Aborting: can be cancelled or encounter an error
 
-To this end: A job's return code, if 0, will be forcibly set as
--ECANCELED if that job has already concluded. Remove the now
-redundant check in the backup job implementation.
+Verbs:
+None. The job must finish cleaning itself up and report its final status.
 
-We need to check for cancellation in both block_job_completed
-AND block_job_completed_single, because jobs may be cancelled between
-those two calls; for instance in transactions.
-
-The check in block_job_completed could be removed, but there's no
-point in starting to attempt to succeed a transaction that we know
-in advance will fail.
-
-This does NOT affect mirror jobs that are "canceled" during their
-synchronous phase. The mirror job itself forcibly sets the canceled
-property to false prior to ceding control, so such cases will invoke
-the "commit" callback.
+             +---------+
+             |UNDEFINED|
+             +--+------+
+                |
+             +--v----+
+             |CREATED|
+             +--+----+
+                |
+             +--v----+     +------+
+   +---------+RUNNING<----->PAUSED|
+   |         +--+----+     +------+
+   |            |
+   |         +--v--+       +-------+
+   +---------+READY<------->STANDBY|
+   |         +-----+       +-------+
+   |
++--v-----+
+|ABORTING|
++--------+
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c     |  2 +-
- block/trace-events |  1 +
- blockjob.c         | 19 +++++++++++++++----
- 3 files changed, 17 insertions(+), 5 deletions(-)
+ blockjob.c           | 31 ++++++++++++++++++-------------
+ qapi/block-core.json |  7 ++++++-
+ 2 files changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 7e254dabff..453cd62c24 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -206,7 +206,7 @@ static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
-     BdrvDirtyBitmap *bm;
-     BlockDriverState *bs = blk_bs(job->common.blk);
- 
--    if (ret < 0 || block_job_is_cancelled(&job->common)) {
-+    if (ret < 0) {
-         /* Merge the successor back into the parent, delete nothing. */
-         bm = bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
-         assert(bm);
-diff --git a/block/trace-events b/block/trace-events
-index 266afd9e99..5e531e0310 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -5,6 +5,7 @@ bdrv_open_common(void *bs, const char *filename, int flags, const char *format_n
- bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
- 
- # blockjob.c
-+block_job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
- block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
- block_job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
- 
 diff --git a/blockjob.c b/blockjob.c
-index 4d29391673..ef17dea004 100644
+index 4e424fef72..4c3fcda46c 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -384,13 +384,22 @@ void block_job_start(BlockJob *job)
-     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
- }
+@@ -44,22 +44,23 @@ static QemuMutex block_job_mutex;
  
-+static void block_job_update_rc(BlockJob *job)
-+{
-+    if (!job->ret && block_job_is_cancelled(job)) {
-+        job->ret = -ECANCELED;
-+    }
-+    if (job->ret) {
-+        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
-+    }
-+}
-+
- static void block_job_completed_single(BlockJob *job)
+ /* BlockJob State Transition Table */
+ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S */
+-    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0},
+-    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0},
+-    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0},
+-    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0},
+-    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1},
+-    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0},
++                                          /* U, C, R, P, Y, S, X */
++    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0},
++    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0},
++    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1},
++    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0},
++    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1},
++    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0},
++    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0},
+ };
+ 
+ bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S */
+-    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1},
+-    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1},
+-    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1},
+-    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1},
+-    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0},
++                                          /* U, C, R, P, Y, S, X */
++    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0},
++    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0},
++    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0},
++    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0},
++    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0},
+ };
+ 
+ static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+@@ -383,6 +384,10 @@ static void block_job_completed_single(BlockJob *job)
  {
      assert(job->completed);
  
--    if (job->ret || block_job_is_cancelled(job)) {
--        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
--    }
-+    /* Ensure abort is called for late-transactional failures */
-+    block_job_update_rc(job);
- 
++    if (job->ret || block_job_is_cancelled(job)) {
++        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
++    }
++
      if (!job->ret) {
          if (job->driver->commit) {
-@@ -898,7 +907,9 @@ void block_job_completed(BlockJob *job, int ret)
-     assert(blk_bs(job->blk)->job == job);
-     job->completed = true;
-     job->ret = ret;
--    if (ret < 0 || block_job_is_cancelled(job)) {
-+    block_job_update_rc(job);
-+    trace_block_job_completed(job, ret, job->ret);
-+    if (job->ret) {
-         block_job_completed_txn_abort(job);
-     } else {
-         block_job_completed_txn_success(job);
+             job->driver->commit(job);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 11659496c5..3f7d559fc0 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -996,10 +996,15 @@
+ # @standby: The job is ready, but paused. This is nearly identical to @paused.
+ #           The job may return to @ready or otherwise be canceled.
+ #
++# @aborting: The job is in the process of being aborted, and will finish with
++#            an error. The job will afterwards report that it is @concluded.
++#            This status may not be visible to the management process.
++#
+ # Since: 2.12
+ ##
+ { 'enum': 'BlockJobStatus',
+-  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby'] }
++  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
++           'aborting' ] }
+ 
+ ##
+ # @BlockJobInfo:
 -- 
 2.14.3
