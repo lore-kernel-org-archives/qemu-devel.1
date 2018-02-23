@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIz0-0000aB-Ss
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:19 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIz9-0000iI-Sb
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIyz-00049H-6p
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIz8-0004NZ-DC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:23 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:13 +0100
-Message-Id: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 00/36] x-blockdev-create for protocols and
- qcow2
+Date: Fri, 23 Feb 2018 20:25:24 +0100
+Message-Id: <20180223192549.26666-12-kwolf@redhat.com>
+In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
+References: <20180223192549.26666-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 11/36] qdict: Introduce qdict_rename_keys()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,175 +22,221 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This series implements a minimal QMP command that allows to create an
-image file on the protocol level or an image format on a given block
-node.
+A few block drivers will need to rename .bdrv_create options for their
+QAPIfication, so let's have a helper function for that.
 
-Eventually, the interface is going to change to some kind of an async
-command (possibly a (non-)block job), but that will require more work on
-the job infrastructure first, so let's first QAPIfy image creation in
-the block drivers. In this series, I'm going for a synchronous command
-that is prefixed with x- for now.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ include/qapi/qmp/qdict.h |   6 +++
+ qobject/qdict.c          |  34 +++++++++++++
+ tests/check-qdict.c      | 129 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 169 insertions(+)
 
-This series converts qcow2 and all protocol drivers that allow an actual
-image creation. This means that drivers which only check if the already
-existing storage is good enough are not converted (e.g. host_device,
-iscsi). The old behaviour was useful because 'qemu-img create' wants to
-create both protocol and format layer, but with the separation in QMP,
-you can just leave out the protocol layer creation when the device
-already exists.
-
-Please note that for some of the protocol drivers (gluster, rbd and
-sheepdog) I don't have a test setup ready. For those, I only tested
-with a fake server address to check that the option are parsed correctly
-up to this point and an appropriate error is returned without crashing.
-
-If you are a maintainer of one of these protocols and you are
-interested in keeping image creation working for your protocol, you
-probably want to test this series on a real setup and give me some
-feedback. If you don't, I'll just merge the patches and hope that they
-won't break anything.
-
-
-v3:
-- Patch 11 ('qdict: Introduce qdict_rename_keys()'):
-  Additional assertion in each test case [Eric]
-  Fixed typo in comment [Max]
-
-- Patch 21 ('rbd: Pass BlockdevOptionsRbd to qemu_rbd_connect()'):
-  Removed NULL check that is redundant with schema validation [Max]
-  Fixed memory leaks on the error path [Max]
-
-- Patch 23 ('rbd: Assing s->snap/image_name in qemu_rbd_open()'):
-  Fixed typo in the subject line
-
-- Patch 24 ('rbd: Use qemu_rbd_connect() in qemu_rbd_do_create()'):
-  Don't ignore password_secret, but pass it to qemu_rbd_connect() [Max]
-
-- Patch 27 ('sheepdog: QAPIfy "redundacy" create option'):
-  Fixed typo in the subject line and commit message
-
-- Patch 28 ('sheepdog: Support .bdrv_co_create'):
-  Set the 'driver' option for bdrv_open() [Max]
-
-
-git-backport-diff compared to v2:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/36:[----] [--] 'block/qapi: Introduce BlockdevCreateOptions'
-002/36:[----] [--] 'block/qapi: Add qcow2 create options to schema'
-003/36:[----] [--] 'qcow2: Let qcow2_create() handle protocol layer'
-004/36:[----] [--] 'qcow2: Pass BlockdevCreateOptions to qcow2_create2()'
-005/36:[----] [--] 'qcow2: Use BlockdevRef in qcow2_create2()'
-006/36:[----] [--] 'qcow2: Use QCryptoBlockCreateOptions in qcow2_create2()'
-007/36:[----] [--] 'qcow2: Handle full/falloc preallocation in qcow2_create2()'
-008/36:[----] [--] 'util: Add qemu_opts_to_qdict_filtered()'
-009/36:[----] [--] 'test-qemu-opts: Test qemu_opts_append()'
-010/36:[----] [--] 'test-qemu-opts: Test qemu_opts_to_qdict_filtered()'
-011/36:[0018] [FC] 'qdict: Introduce qdict_rename_keys()'
-012/36:[----] [--] 'qcow2: Use visitor for options in qcow2_create()'
-013/36:[----] [--] 'block: Make bdrv_is_whitelisted() public'
-014/36:[----] [--] 'block: x-blockdev-create QMP command'
-015/36:[----] [--] 'file-posix: Support .bdrv_co_create'
-016/36:[----] [--] 'file-win32: Support .bdrv_co_create'
-017/36:[----] [--] 'gluster: Support .bdrv_co_create'
-018/36:[----] [--] 'rbd: Fix use after free in qemu_rbd_set_keypairs() error path'
-019/36:[----] [--] 'rbd: Factor out qemu_rbd_connect()'
-020/36:[----] [--] 'rbd: Remove non-schema options from runtime_opts'
-021/36:[0013] [FC] 'rbd: Pass BlockdevOptionsRbd to qemu_rbd_connect()'
-022/36:[----] [--] 'rbd: Support .bdrv_co_create'
-023/36:[down] 'rbd: Assign s->snap/image_name in qemu_rbd_open()'
-024/36:[0002] [FC] 'rbd: Use qemu_rbd_connect() in qemu_rbd_do_create()'
-025/36:[----] [--] 'nfs: Use QAPI options in nfs_client_open()'
-026/36:[----] [--] 'nfs: Support .bdrv_co_create'
-027/36:[down] 'sheepdog: QAPIfy "redundancy" create option'
-028/36:[0002] [FC] 'sheepdog: Support .bdrv_co_create'
-029/36:[----] [--] 'ssh: Use QAPI BlockdevOptionsSsh object'
-030/36:[----] [--] 'ssh: QAPIfy host-key-check option'
-031/36:[----] [--] 'ssh: Pass BlockdevOptionsSsh to connect_to_ssh()'
-032/36:[----] [--] 'ssh: Support .bdrv_co_create'
-033/36:[----] [--] 'file-posix: Fix no-op bdrv_truncate() with falloc preallocation'
-034/36:[----] [--] 'block: Fail bdrv_truncate() with negative size'
-035/36:[----] [--] 'qemu-iotests: Test qcow2 over file image creation with QMP'
-036/36:[----] [--] 'qemu-iotests: Test ssh image creation over QMP'
-
-
-Kevin Wolf (36):
-  block/qapi: Introduce BlockdevCreateOptions
-  block/qapi: Add qcow2 create options to schema
-  qcow2: Let qcow2_create() handle protocol layer
-  qcow2: Pass BlockdevCreateOptions to qcow2_create2()
-  qcow2: Use BlockdevRef in qcow2_create2()
-  qcow2: Use QCryptoBlockCreateOptions in qcow2_create2()
-  qcow2: Handle full/falloc preallocation in qcow2_create2()
-  util: Add qemu_opts_to_qdict_filtered()
-  test-qemu-opts: Test qemu_opts_append()
-  test-qemu-opts: Test qemu_opts_to_qdict_filtered()
-  qdict: Introduce qdict_rename_keys()
-  qcow2: Use visitor for options in qcow2_create()
-  block: Make bdrv_is_whitelisted() public
-  block: x-blockdev-create QMP command
-  file-posix: Support .bdrv_co_create
-  file-win32: Support .bdrv_co_create
-  gluster: Support .bdrv_co_create
-  rbd: Fix use after free in qemu_rbd_set_keypairs() error path
-  rbd: Factor out qemu_rbd_connect()
-  rbd: Remove non-schema options from runtime_opts
-  rbd: Pass BlockdevOptionsRbd to qemu_rbd_connect()
-  rbd: Support .bdrv_co_create
-  rbd: Assign s->snap/image_name in qemu_rbd_open()
-  rbd: Use qemu_rbd_connect() in qemu_rbd_do_create()
-  nfs: Use QAPI options in nfs_client_open()
-  nfs: Support .bdrv_co_create
-  sheepdog: QAPIfy "redundancy" create option
-  sheepdog: Support .bdrv_co_create
-  ssh: Use QAPI BlockdevOptionsSsh object
-  ssh: QAPIfy host-key-check option
-  ssh: Pass BlockdevOptionsSsh to connect_to_ssh()
-  ssh: Support .bdrv_co_create
-  file-posix: Fix no-op bdrv_truncate() with falloc preallocation
-  block: Fail bdrv_truncate() with negative size
-  qemu-iotests: Test qcow2 over file image creation with QMP
-  qemu-iotests: Test ssh image creation over QMP
-
- qapi/block-core.json       | 326 ++++++++++++++++++++++++++++++++-
- include/block/block.h      |   2 +
- include/block/block_int.h  |   2 +
- include/qapi/qmp/qdict.h   |   6 +
- include/qemu/option.h      |   2 +
- block.c                    |  54 +++++-
- block/create.c             |  76 ++++++++
- block/file-posix.c         |  91 +++++++---
- block/file-win32.c         |  45 ++++-
- block/gluster.c            | 135 +++++++++-----
- block/nfs.c                | 236 +++++++++++-------------
- block/qcow2.c              | 384 +++++++++++++++++++++++++--------------
- block/rbd.c                | 387 +++++++++++++++++++++-------------------
- block/sheepdog.c           | 320 +++++++++++++++++++++++----------
- block/ssh.c                | 298 +++++++++++++++++--------------
- qobject/qdict.c            |  34 ++++
- tests/check-qdict.c        | 129 ++++++++++++++
- tests/test-qemu-opts.c     | 253 ++++++++++++++++++++++++++
- util/qemu-option.c         |  42 ++++-
- block/Makefile.objs        |   2 +-
- tests/qemu-iotests/049.out |   8 +-
- tests/qemu-iotests/112.out |   4 +-
- tests/qemu-iotests/206     | 436 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/206.out | 209 ++++++++++++++++++++++
- tests/qemu-iotests/207     | 261 +++++++++++++++++++++++++++
- tests/qemu-iotests/207.out |  75 ++++++++
- tests/qemu-iotests/group   |   2 +
- 27 files changed, 3049 insertions(+), 770 deletions(-)
- create mode 100644 block/create.c
- create mode 100755 tests/qemu-iotests/206
- create mode 100644 tests/qemu-iotests/206.out
- create mode 100755 tests/qemu-iotests/207
- create mode 100644 tests/qemu-iotests/207.out
-
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index ff6f7842c3..7c6d844549 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -81,4 +81,10 @@ QObject *qdict_crumple(const QDict *src, Error **errp);
+ 
+ void qdict_join(QDict *dest, QDict *src, bool overwrite);
+ 
++typedef struct QDictRenames {
++    const char *from;
++    const char *to;
++} QDictRenames;
++bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp);
++
+ #endif /* QDICT_H */
+diff --git a/qobject/qdict.c b/qobject/qdict.c
+index 23df84f9cd..229b8c840b 100644
+--- a/qobject/qdict.c
++++ b/qobject/qdict.c
+@@ -1072,3 +1072,37 @@ void qdict_join(QDict *dest, QDict *src, bool overwrite)
+         entry = next;
+     }
+ }
++
++/**
++ * qdict_rename_keys(): Rename keys in qdict according to the replacements
++ * specified in the array renames. The array must be terminated by an entry
++ * with from = NULL.
++ *
++ * The renames are performed individually in the order of the array, so entries
++ * may be renamed multiple times and may or may not conflict depending on the
++ * order of the renames array.
++ *
++ * Returns true for success, false in error cases.
++ */
++bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp)
++{
++    QObject *qobj;
++
++    while (renames->from) {
++        if (qdict_haskey(qdict, renames->from)) {
++            if (qdict_haskey(qdict, renames->to)) {
++                error_setg(errp, "'%s' and its alias '%s' can't be used at the "
++                           "same time", renames->to, renames->from);
++                return false;
++            }
++
++            qobj = qdict_get(qdict, renames->from);
++            qobject_incref(qobj);
++            qdict_put_obj(qdict, renames->to, qobj);
++            qdict_del(qdict, renames->from);
++        }
++
++        renames++;
++    }
++    return true;
++}
+diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+index ec628f3453..a3faea8bfc 100644
+--- a/tests/check-qdict.c
++++ b/tests/check-qdict.c
+@@ -665,6 +665,133 @@ static void qdict_crumple_test_empty(void)
+     QDECREF(dst);
+ }
+ 
++static int qdict_count_entries(QDict *dict)
++{
++    const QDictEntry *e;
++    int count = 0;
++
++    for (e = qdict_first(dict); e; e = qdict_next(dict, e)) {
++        count++;
++    }
++
++    return count;
++}
++
++static void qdict_rename_keys_test(void)
++{
++    QDict *dict = qdict_new();
++    QDict *copy;
++    QDictRenames *renames;
++    Error *local_err = NULL;
++
++    qdict_put_str(dict, "abc", "foo");
++    qdict_put_str(dict, "abcdef", "bar");
++    qdict_put_int(dict, "number", 42);
++    qdict_put_bool(dict, "flag", true);
++    qdict_put_null(dict, "nothing");
++
++    /* Empty rename list */
++    renames = (QDictRenames[]) {
++        { NULL, "this can be anything" }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &error_abort);
++
++    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    QDECREF(copy);
++
++    /* Simple rename of all entries */
++    renames = (QDictRenames[]) {
++        { "abc",        "str1" },
++        { "abcdef",     "str2" },
++        { "number",     "int" },
++        { "flag",       "bool" },
++        { "nothing",    "null" },
++        { NULL , NULL }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &error_abort);
++
++    g_assert(!qdict_haskey(copy, "abc"));
++    g_assert(!qdict_haskey(copy, "abcdef"));
++    g_assert(!qdict_haskey(copy, "number"));
++    g_assert(!qdict_haskey(copy, "flag"));
++    g_assert(!qdict_haskey(copy, "nothing"));
++
++    g_assert_cmpstr(qdict_get_str(copy, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "str2"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "int"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "bool"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "null")) == QTYPE_QNULL);
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    QDECREF(copy);
++
++    /* Renames are processed top to bottom */
++    renames = (QDictRenames[]) {
++        { "abc",        "tmp" },
++        { "abcdef",     "abc" },
++        { "number",     "abcdef" },
++        { "flag",       "number" },
++        { "nothing",    "flag" },
++        { "tmp",        "nothing" },
++        { NULL , NULL }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &error_abort);
++
++    g_assert_cmpstr(qdict_get_str(copy, "nothing"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "abcdef"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "number"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "flag")) == QTYPE_QNULL);
++    g_assert(!qdict_haskey(copy, "tmp"));
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    QDECREF(copy);
++
++    /* Conflicting rename */
++    renames = (QDictRenames[]) {
++        { "abcdef",     "abc" },
++        { NULL , NULL }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &local_err);
++
++    g_assert(local_err != NULL);
++    error_free(local_err);
++    local_err = NULL;
++
++    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    QDECREF(copy);
++
++    /* Renames in an empty dict */
++    renames = (QDictRenames[]) {
++        { "abcdef",     "abc" },
++        { NULL , NULL }
++    };
++
++    QDECREF(dict);
++    dict = qdict_new();
++
++    qdict_rename_keys(dict, renames, &error_abort);
++    g_assert(qdict_first(dict) == NULL);
++
++    QDECREF(dict);
++}
++
+ static void qdict_crumple_test_bad_inputs(void)
+ {
+     QDict *src;
+@@ -880,6 +1007,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/public/crumple/bad_inputs",
+                     qdict_crumple_test_bad_inputs);
+ 
++    g_test_add_func("/public/rename_keys", qdict_rename_keys_test);
++
+     /* The Big one */
+     if (g_test_slow()) {
+         g_test_add_func("/stress/test", qdict_stress_test);
 -- 
 2.13.6
