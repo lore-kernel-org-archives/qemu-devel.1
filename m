@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1epFFK-0004a1-Ex
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:26:51 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1epFFL-0004bE-Go
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1epFFJ-0005VC-JW
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:26:50 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1epFFK-0005W9-KK
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:26:51 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 23 Feb 2018 16:26:38 +0100
-Message-Id: <20180223152640.11459-4-pbonzini@redhat.com>
+Date: Fri, 23 Feb 2018 16:26:39 +0100
+Message-Id: <20180223152640.11459-5-pbonzini@redhat.com>
 In-Reply-To: <20180223152640.11459-1-pbonzini@redhat.com>
 References: <20180223152640.11459-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] ide: do not set s->end_transfer_func to
- ide_transfer_cancel
+Subject: [Qemu-devel] [PATCH 4/5] atapi: call ide_set_irq before
+ ide_transfer_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
 
-There is code checking s->end_transfer_func and it was not taught
-about ide_transfer_cancel.  We can just use ide_transfer_stop because
-s->end_transfer_func is only ever called in the DRQ phase: after
-ide_transfer_cancel, the value of s->end_transfer_func is only used
-as a marker and never used to actually invoke the function.
+The ATAPI_INT_REASON_IO interrupt is raised when I/O starts, but in the
+AHCI case ide_set_irq was actually called at the end of a mutual recursion.
+Move it early, with the side effect that ide_transfer_start becomes a tail
+call in ide_atapi_cmd_reply_end.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/ide/core.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/ide/atapi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index c4710a6f55..447d9624df 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -553,10 +553,9 @@ static void ide_cmd_done(IDEState *s)
+diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
+index c0509c8bf5..be99a929cf 100644
+--- a/hw/ide/atapi.c
++++ b/hw/ide/atapi.c
+@@ -287,6 +287,7 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+         } else {
+             /* a new transfer is needed */
+             s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO;
++            ide_set_irq(s->bus);
+             byte_count_limit = atapi_byte_count_limit(s);
+             trace_ide_atapi_cmd_reply_end_bcl(s, byte_count_limit);
+             size = s->packet_transfer_size;
+@@ -307,10 +308,9 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+             s->packet_transfer_size -= size;
+             s->elementary_transfer_size -= size;
+             s->io_buffer_index += size;
++            trace_ide_atapi_cmd_reply_end_new(s, s->status);
+             ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
+                                size, ide_atapi_cmd_reply_end);
+-            ide_set_irq(s->bus);
+-            trace_ide_atapi_cmd_reply_end_new(s, s->status);
+         }
      }
  }
- 
--static void ide_transfer_halt(IDEState *s,
--                              void(*end_transfer_func)(IDEState *))
-+static void ide_transfer_halt(IDEState *s)
- {
--    s->end_transfer_func = end_transfer_func;
-+    s->end_transfer_func = ide_transfer_stop;
-     s->data_ptr = s->io_buffer;
-     s->data_end = s->io_buffer;
-     s->status &= ~DRQ_STAT;
-@@ -564,7 +563,7 @@ static void ide_transfer_halt(IDEState *s,
- 
- void ide_transfer_stop(IDEState *s)
- {
--    ide_transfer_halt(s, ide_transfer_stop);
-+    ide_transfer_halt(s);
-     if (s->bus->dma->ops->end_transfer) {
-         s->bus->dma->ops->end_transfer(s->bus->dma);
-     }
-@@ -573,7 +572,7 @@ void ide_transfer_stop(IDEState *s)
- 
- static void ide_transfer_cancel(IDEState *s)
- {
--    ide_transfer_halt(s, ide_transfer_cancel);
-+    ide_transfer_halt(s);
- }
- 
- int64_t ide_get_sector(IDEState *s)
 -- 
 2.14.3
