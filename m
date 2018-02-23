@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVp-0001Cl-9D
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:56 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVt-0001IL-7t
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVn-0007dc-8q
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51788
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVq-0007lL-VC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45004
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1epFVm-0007cC-Vg
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:51 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NFds0R073222
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:50 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gam3kn70c-1
+	id 1epFVq-0007kQ-OQ
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:54 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1NFfgwK046344
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:54 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gaka9yax4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:50 -0500
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:53 -0500
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 10:43:49 -0500
+	Fri, 23 Feb 2018 10:43:53 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 10:43:14 -0500
+Date: Fri, 23 Feb 2018 10:43:18 -0500
 In-Reply-To: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1519400599-21081-9-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v9 08/13] s390-ccw: read stage2 boot loader
- data to find menu
+Message-Id: <1519400599-21081-13-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v9 12/13] s390-ccw: use zipl values when no
+ boot menu options are present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,258 +42,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Read the stage2 boot loader data block-by-block. We scan the
-current block for the string "zIPL" to detect the start of the
-boot menu banner. We then load the adjacent blocks (previous
-block and next block) to account for the possibility of menu
-data spanning multiple blocks.
+If no boot menu options are present, then flag the boot menu to
+use the zipl options that were set in the zipl configuration file
+(and stored on disk by zipl). These options are found at some
+offset prior to the start of the zipl boot menu banner. The zipl
+timeout value is limited to a 16-bit unsigned integer and stored
+as seconds, so we take care to convert it to milliseconds in order
+to conform to the rest of the boot menu functionality. This is
+limited to CCW devices.
+
+For reference, the zipl configuration file uses the following
+fields in the menu section:
+
+      prompt=1      enable the boot menu
+      timeout=X     set the timeout to X seconds
+
+To explicitly disregard any boot menu options, then menu=off or
+<bootmenu enable='no' ... /> must be specified.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c  | 94 ++++++++++++++++++++++++++++++++++++++++++---
- pc-bios/s390-ccw/bootmap.h  | 23 ++++++++++-
- pc-bios/s390-ccw/menu.c     | 10 +++++
- pc-bios/s390-ccw/s390-ccw.h |  2 +
- 4 files changed, 122 insertions(+), 7 deletions(-)
+ hw/s390x/ipl.c          |  5 +++++
+ hw/s390x/ipl.h          |  1 +
+ pc-bios/s390-ccw/iplb.h |  1 +
+ pc-bios/s390-ccw/main.c |  3 ++-
+ pc-bios/s390-ccw/menu.c | 16 +++++++++++++++-
+ 5 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 092fb35..ae93b55 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -83,6 +83,10 @@ static void jump_to_IPL_code(uint64_t address)
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index ee2039d..c12e460 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -241,6 +241,11 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
  
- static unsigned char _bprs[8*1024]; /* guessed "max" ECKD sector size */
- static const int max_bprs_entries = sizeof(_bprs) / sizeof(ExtEckdBlockPtr);
-+static uint8_t _s2[MAX_SECTOR_SIZE * 3] __attribute__((__aligned__(PAGE_SIZE)));
-+static void *s2_prev_blk = _s2;
-+static void *s2_cur_blk = _s2 + MAX_SECTOR_SIZE;
-+static void *s2_next_blk = _s2 + MAX_SECTOR_SIZE * 2;
- 
- static inline void verify_boot_info(BootInfo *bip)
- {
-@@ -182,7 +186,77 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
-     return block_nr;
- }
- 
--static void run_eckd_boot_script(block_number_t bmt_block_nr)
-+static bool find_zipl_boot_menu_banner(int *offset)
-+{
-+    int i;
-+
-+    /* Menu banner starts with "zIPL" */
-+    for (i = 0; i < virtio_get_block_size() - 4; i++) {
-+        if (magic_match(s2_cur_blk + i, ZIPL_MAGIC_EBCDIC)) {
-+            *offset = i;
-+            return true;
+     switch (ipl->iplb.pbt) {
+     case S390_IPL_TYPE_CCW:
++        /* In the absence of -boot menu, use zipl parameters */
++        if (!qemu_opt_get(opts, "menu")) {
++            *flags |= QIPL_FLAG_BM_OPTS_ZIPL;
++            return;
 +        }
-+    }
-+
-+    return false;
-+}
-+
-+static int eckd_get_boot_menu_index(block_number_t s1b_block_nr)
-+{
-+    block_number_t cur_block_nr;
-+    block_number_t prev_block_nr = 0;
-+    block_number_t next_block_nr = 0;
-+    EckdStage1b *s1b = (void *)sec;
-+    int banner_offset;
-+    int i;
-+
-+    /* Get Stage1b data */
-+    memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-+    read_block(s1b_block_nr, s1b, "Cannot read stage1b boot loader");
-+
-+    memset(_s2, FREE_SPACE_FILLER, sizeof(_s2));
-+
-+    /* Get Stage2 data */
-+    for (i = 0; i < STAGE2_BLK_CNT_MAX; i++) {
-+        cur_block_nr = eckd_block_num(&s1b->seek[i].chs);
-+
-+        if (!cur_block_nr) {
-+            break;
-+        }
-+
-+        read_block(cur_block_nr, s2_cur_blk, "Cannot read stage2 boot loader");
-+
-+        if (find_zipl_boot_menu_banner(&banner_offset)) {
-+            /*
-+             * Load the adjacent blocks to account for the
-+             * possibility of menu data spanning multiple blocks.
-+             */
-+            if (prev_block_nr) {
-+                read_block(prev_block_nr, s2_prev_blk,
-+                           "Cannot read stage2 boot loader");
-+            }
-+
-+            if (i + 1 < STAGE2_BLK_CNT_MAX) {
-+                next_block_nr = eckd_block_num(&s1b->seek[i + 1].chs);
-+            }
-+
-+            if (next_block_nr) {
-+                read_block(next_block_nr, s2_next_blk,
-+                           "Cannot read stage2 boot loader");
-+            }
-+
-+            return menu_get_zipl_boot_index(s2_cur_blk + banner_offset);
-+        }
-+
-+        prev_block_nr = cur_block_nr;
-+    }
-+
-+    sclp_print("No zipl boot menu data found. Booting default entry.");
-+    return 0;
-+}
-+
-+static void run_eckd_boot_script(block_number_t bmt_block_nr,
-+                                 block_number_t s1b_block_nr)
- {
-     int i;
-     unsigned int loadparm = get_loadparm_index();
-@@ -191,6 +265,10 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
-     BootMapTable *bmt = (void *)sec;
-     BootMapScript *bms = (void *)sec;
+         break;
+     default:
+         error_report("boot menu is not supported for this device type.");
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 3a37924..1a8adc2 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -93,6 +93,7 @@ void s390_reipl_request(void);
  
-+    if (menu_is_enabled_zipl()) {
-+        loadparm = eckd_get_boot_menu_index(s1b_block_nr);
-+    }
-+
-     debug_print_int("loadparm", loadparm);
-     IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
-                " maximum number of boot entries allowed");
-@@ -223,7 +301,7 @@ static void ipl_eckd_cdl(void)
-     XEckdMbr *mbr;
-     EckdCdlIpl2 *ipl2 = (void *)sec;
-     IplVolumeLabel *vlbl = (void *)sec;
--    block_number_t bmt_block_nr;
-+    block_number_t bmt_block_nr, s1b_block_nr;
+ /* Boot Menu flags */
+ #define QIPL_FLAG_BM_OPTS_CMD   0x80
++#define QIPL_FLAG_BM_OPTS_ZIPL  0x40
  
-     /* we have just read the block #0 and recognized it as "IPL1" */
-     sclp_print("CDL\n");
-@@ -241,6 +319,9 @@ static void ipl_eckd_cdl(void)
-     /* save pointer to Boot Map Table */
-     bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
+ /*
+  * The QEMU IPL Parameters will be stored at absolute address
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 832bb94..7dfce4f 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -76,6 +76,7 @@ extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
  
-+    /* save pointer to Stage1b Data */
-+    s1b_block_nr = eckd_block_num(&ipl2->stage1.seek[0].chs);
-+
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(2, vlbl, "Cannot read Volume Label at block 2");
-     IPL_assert(magic_match(vlbl->key, VOL1_MAGIC),
-@@ -249,7 +330,7 @@ static void ipl_eckd_cdl(void)
-                "Invalid magic of volser block");
-     print_volser(vlbl->f.volser);
+ /* Boot Menu flags */
+ #define QIPL_FLAG_BM_OPTS_CMD   0x80
++#define QIPL_FLAG_BM_OPTS_ZIPL  0x40
  
--    run_eckd_boot_script(bmt_block_nr);
-+    run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
-     /* no return */
- }
+ /*
+  * This definition must be kept in sync with the defininition
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 32ed70e..a7473b0 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -20,6 +20,7 @@ QemuIplParameters qipl;
  
-@@ -280,7 +361,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+ #define LOADPARM_PROMPT "PROMPT  "
+ #define LOADPARM_EMPTY  "........"
++#define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
  
- static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
- {
--    block_number_t bmt_block_nr;
-+    block_number_t bmt_block_nr, s1b_block_nr;
-     EckdLdlIpl1 *ipl1 = (void *)sec;
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+@@ -91,7 +92,7 @@ static void menu_setup(void)
  
-     if (mode != ECKD_LDL_UNLABELED) {
-@@ -302,7 +383,10 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
-     /* save pointer to Boot Map Table */
-     bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
- 
--    run_eckd_boot_script(bmt_block_nr);
-+    /* save pointer to Stage1b Data */
-+    s1b_block_nr = eckd_block_num(&ipl1->stage1.seek[0].chs);
-+
-+    run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
-     /* no return */
- }
- 
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 4cf7e1e..c636626 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -87,6 +87,7 @@ typedef struct ScsiMbr {
- } __attribute__ ((packed)) ScsiMbr;
- 
- #define ZIPL_MAGIC              "zIPL"
-+#define ZIPL_MAGIC_EBCDIC       "\xa9\xc9\xd7\xd3"
- #define IPL1_MAGIC "\xc9\xd7\xd3\xf1" /* == "IPL1" in EBCDIC */
- #define IPL2_MAGIC "\xc9\xd7\xd3\xf2" /* == "IPL2" in EBCDIC */
- #define VOL1_MAGIC "\xe5\xd6\xd3\xf1" /* == "VOL1" in EBCDIC */
-@@ -249,15 +250,33 @@ typedef struct EckdCdlIpl1 {
-     uint8_t data[24];
- } __attribute__((packed)) EckdCdlIpl1;
- 
-+typedef struct EckdSeekArg {
-+    uint16_t pad;
-+    EckdCHS chs;
-+    uint8_t pad2;
-+} __attribute__ ((packed)) EckdSeekArg;
-+
-+typedef struct EckdStage1b {
-+    uint8_t reserved[32 * STAGE2_BLK_CNT_MAX];
-+    struct EckdSeekArg seek[STAGE2_BLK_CNT_MAX];
-+    uint8_t unused[64];
-+} __attribute__ ((packed)) EckdStage1b;
-+
-+typedef struct EckdStage1 {
-+    uint8_t reserved[72];
-+    struct EckdSeekArg seek[2];
-+} __attribute__ ((packed)) EckdStage1;
-+
- typedef struct EckdCdlIpl2 {
-     uint8_t key[4]; /* == "IPL2" */
--    uint8_t reserved0[88];
-+    struct EckdStage1 stage1;
-     XEckdMbr mbr;
-     uint8_t reserved[24];
- } __attribute__((packed)) EckdCdlIpl2;
- 
- typedef struct EckdLdlIpl1 {
--    uint8_t reserved[112];
-+    uint8_t reserved[24];
-+    struct EckdStage1 stage1;
-     BootInfo bip; /* BootInfo is MBR for LDL */
- } __attribute__((packed)) EckdLdlIpl1;
- 
+     switch (iplb.pbt) {
+     case S390_IPL_TYPE_CCW:
+-        menu_set_parms(qipl.qipl_flags & QIPL_FLAG_BM_OPTS_CMD,
++        menu_set_parms(qipl.qipl_flags & BOOT_MENU_FLAG_MASK,
+                        qipl.boot_menu_timeout);
+         return;
+     }
 diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 1ce33dd..c1d242f 100644
+index 8d55869..ee56939 100644
 --- a/pc-bios/s390-ccw/menu.c
 +++ b/pc-bios/s390-ccw/menu.c
-@@ -15,8 +15,18 @@
- static uint8_t flag;
- static uint64_t timeout;
+@@ -18,6 +18,10 @@
+ #define KEYCODE_BACKSP '\177'
+ #define KEYCODE_ENTER  '\r'
  
-+int menu_get_zipl_boot_index(const char *menu_data)
-+{
-+    return 0; /* implemented next patch */
-+}
++/* Offsets from zipl fields to zipl banner start */
++#define ZIPL_TIMEOUT_OFFSET 138
++#define ZIPL_FLAG_OFFSET    140
 +
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
+ #define TOD_CLOCK_MILLISECOND   0x3e8000
+ 
+ #define LOW_CORE_EXTERNAL_INT_ADDR   0x86
+@@ -187,6 +191,16 @@ int menu_get_zipl_boot_index(const char *menu_data)
  {
-     flag = boot_menu_flag;
-     timeout = boot_menu_timeout;
+     size_t len;
+     int entries;
++    uint16_t zipl_flag = *(uint16_t *)(menu_data - ZIPL_FLAG_OFFSET);
++    uint16_t zipl_timeout = *(uint16_t *)(menu_data - ZIPL_TIMEOUT_OFFSET);
++
++    if (flag == QIPL_FLAG_BM_OPTS_ZIPL) {
++        if (!zipl_flag) {
++            return 0; /* Boot default */
++        }
++        /* zipl stores timeout as seconds */
++        timeout = zipl_timeout * 1000;
++    }
+ 
+     /* Print and count all menu items, including the banner */
+     for (entries = 0; *menu_data; entries++) {
+@@ -211,5 +225,5 @@ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
+ 
+ bool menu_is_enabled_zipl(void)
+ {
+-    return flag & QIPL_FLAG_BM_OPTS_CMD;
++    return flag & (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL);
  }
-+
-+bool menu_is_enabled_zipl(void)
-+{
-+    return flag & QIPL_FLAG_BM_OPTS_CMD;
-+}
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 6cfd4b2..c0dd37f 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -86,6 +86,8 @@ void zipl_load(void);
- 
- /* menu.c */
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
-+int menu_get_zipl_boot_index(const char *menu_data);
-+bool menu_is_enabled_zipl(void);
- 
- static inline void fill_hex(char *out, unsigned char val)
- {
 -- 
 2.7.4
