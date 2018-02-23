@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzc-0001DU-MB
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzd-0001En-Rc
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzb-000598-6o
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzc-0005CM-KH
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:53 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:38 +0100
-Message-Id: <20180223192549.26666-26-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:39 +0100
+Message-Id: <20180223192549.26666-27-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 25/36] nfs: Use QAPI options in
- nfs_client_open()
+Subject: [Qemu-devel] [PATCH v3 26/36] nfs: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,290 +22,187 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Using the QAPI visitor to turn all options into QAPI BlockdevOptionsNfs
-simplifies the code a lot. It will also be useful for implementing the
-QAPI based .bdrv_co_create callback.
+This adds the .bdrv_co_create driver callback to nfs, which enables
+image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/nfs.c | 176 ++++++++++++++++++------------------------------------------
- 1 file changed, 53 insertions(+), 123 deletions(-)
+ qapi/block-core.json | 16 +++++++++++-
+ block/nfs.c          | 74 +++++++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 74 insertions(+), 16 deletions(-)
 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 6c0c16ebe3..085b791303 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3393,6 +3393,20 @@
+             '*preallocation':   'PreallocMode' } }
+ 
+ ##
++# @BlockdevCreateOptionsNfs:
++#
++# Driver specific image creation options for NFS.
++#
++# @location         Where to store the new image file
++# @size             Size of the virtual disk in bytes
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsNfs',
++  'data': { 'location':         'BlockdevOptionsNfs',
++            'size':             'size' } }
++
++##
+ # @BlockdevQcow2Version:
+ #
+ # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
+@@ -3491,7 +3505,7 @@
+       'iscsi':          'BlockdevCreateNotSupported',
+       'luks':           'BlockdevCreateNotSupported',
+       'nbd':            'BlockdevCreateNotSupported',
+-      'nfs':            'BlockdevCreateNotSupported',
++      'nfs':            'BlockdevCreateOptionsNfs',
+       'null-aio':       'BlockdevCreateNotSupported',
+       'null-co':        'BlockdevCreateNotSupported',
+       'nvme':           'BlockdevCreateNotSupported',
 diff --git a/block/nfs.c b/block/nfs.c
-index 6576a73d6e..9283bfbaae 100644
+index 9283bfbaae..c0c153cadb 100644
 --- a/block/nfs.c
 +++ b/block/nfs.c
-@@ -367,49 +367,6 @@ static int coroutine_fn nfs_co_flush(BlockDriverState *bs)
-     return task.ret;
- }
- 
--static QemuOptsList runtime_opts = {
--    .name = "nfs",
--    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
--    .desc = {
--        {
--            .name = "path",
--            .type = QEMU_OPT_STRING,
--            .help = "Path of the image on the host",
--        },
--        {
--            .name = "user",
--            .type = QEMU_OPT_NUMBER,
--            .help = "UID value to use when talking to the server",
--        },
--        {
--            .name = "group",
--            .type = QEMU_OPT_NUMBER,
--            .help = "GID value to use when talking to the server",
--        },
--        {
--            .name = "tcp-syn-count",
--            .type = QEMU_OPT_NUMBER,
--            .help = "Number of SYNs to send during the session establish",
--        },
--        {
--            .name = "readahead-size",
--            .type = QEMU_OPT_NUMBER,
--            .help = "Set the readahead size in bytes",
--        },
--        {
--            .name = "page-cache-size",
--            .type = QEMU_OPT_NUMBER,
--            .help = "Set the pagecache size in bytes",
--        },
--        {
--            .name = "debug",
--            .type = QEMU_OPT_NUMBER,
--            .help = "Set the NFS debug level (max 2)",
--        },
--        { /* end of list */ }
--    },
--};
--
- static void nfs_detach_aio_context(BlockDriverState *bs)
- {
-     NFSClient *client = bs->opaque;
-@@ -452,71 +409,16 @@ static void nfs_file_close(BlockDriverState *bs)
-     nfs_client_close(client);
- }
- 
--static NFSServer *nfs_config(QDict *options, Error **errp)
--{
--    NFSServer *server = NULL;
--    QDict *addr = NULL;
--    QObject *crumpled_addr = NULL;
--    Visitor *iv = NULL;
--    Error *local_error = NULL;
--
--    qdict_extract_subqdict(options, &addr, "server.");
--    if (!qdict_size(addr)) {
--        error_setg(errp, "NFS server address missing");
--        goto out;
--    }
--
--    crumpled_addr = qdict_crumple(addr, errp);
--    if (!crumpled_addr) {
--        goto out;
--    }
--
--    /*
--     * Caution: this works only because all scalar members of
--     * NFSServer are QString in @crumpled_addr.  The visitor expects
--     * @crumpled_addr to be typed according to the QAPI schema.  It
--     * is when @options come from -blockdev or blockdev_add.  But when
--     * they come from -drive, they're all QString.
--     */
--    iv = qobject_input_visitor_new(crumpled_addr);
--    visit_type_NFSServer(iv, NULL, &server, &local_error);
--    if (local_error) {
--        error_propagate(errp, local_error);
--        goto out;
--    }
--
--out:
--    QDECREF(addr);
--    qobject_decref(crumpled_addr);
--    visit_free(iv);
--    return server;
--}
--
--
--static int64_t nfs_client_open(NFSClient *client, QDict *options,
-+static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
-                                int flags, int open_flags, Error **errp)
- {
-     int64_t ret = -EINVAL;
--    QemuOpts *opts = NULL;
--    Error *local_err = NULL;
-     struct stat st;
-     char *file = NULL, *strp = NULL;
- 
-     qemu_mutex_init(&client->mutex);
--    opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        ret = -EINVAL;
--        goto fail;
--    }
- 
--    client->path = g_strdup(qemu_opt_get(opts, "path"));
--    if (!client->path) {
--        ret = -EINVAL;
--        error_setg(errp, "No path was specified");
--        goto fail;
--    }
-+    client->path = g_strdup(opts->path);
- 
-     strp = strrchr(client->path, '/');
-     if (strp == NULL) {
-@@ -526,12 +428,10 @@ static int64_t nfs_client_open(NFSClient *client, QDict *options,
-     file = g_strdup(strp);
-     *strp = 0;
- 
--    /* Pop the config into our state object, Exit if invalid */
--    client->server = nfs_config(options, errp);
--    if (!client->server) {
--        ret = -EINVAL;
--        goto fail;
--    }
-+    /* Steal the NFSServer object from opts; set the original pointer to NULL
-+     * to avoid use after free and double free. */
-+    client->server = opts->server;
-+    opts->server = NULL;
- 
-     client->context = nfs_init_context();
-     if (client->context == NULL) {
-@@ -539,29 +439,29 @@ static int64_t nfs_client_open(NFSClient *client, QDict *options,
-         goto fail;
-     }
- 
--    if (qemu_opt_get(opts, "user")) {
--        client->uid = qemu_opt_get_number(opts, "user", 0);
-+    if (opts->has_user) {
-+        client->uid = opts->user;
-         nfs_set_uid(client->context, client->uid);
-     }
- 
--    if (qemu_opt_get(opts, "group")) {
--        client->gid = qemu_opt_get_number(opts, "group", 0);
-+    if (opts->has_group) {
-+        client->gid = opts->group;
-         nfs_set_gid(client->context, client->gid);
-     }
- 
--    if (qemu_opt_get(opts, "tcp-syn-count")) {
--        client->tcp_syncnt = qemu_opt_get_number(opts, "tcp-syn-count", 0);
-+    if (opts->has_tcp_syn_count) {
-+        client->tcp_syncnt = opts->tcp_syn_count;
-         nfs_set_tcp_syncnt(client->context, client->tcp_syncnt);
-     }
- 
- #ifdef LIBNFS_FEATURE_READAHEAD
--    if (qemu_opt_get(opts, "readahead-size")) {
-+    if (opts->has_readahead_size) {
-         if (open_flags & BDRV_O_NOCACHE) {
-             error_setg(errp, "Cannot enable NFS readahead "
-                              "if cache.direct = on");
-             goto fail;
-         }
--        client->readahead = qemu_opt_get_number(opts, "readahead-size", 0);
-+        client->readahead = opts->readahead_size;
-         if (client->readahead > QEMU_NFS_MAX_READAHEAD_SIZE) {
-             warn_report("Truncating NFS readahead size to %d",
-                         QEMU_NFS_MAX_READAHEAD_SIZE);
-@@ -576,13 +476,13 @@ static int64_t nfs_client_open(NFSClient *client, QDict *options,
- #endif
- 
- #ifdef LIBNFS_FEATURE_PAGECACHE
--    if (qemu_opt_get(opts, "page-cache-size")) {
-+    if (opts->has_page_cache_size) {
-         if (open_flags & BDRV_O_NOCACHE) {
-             error_setg(errp, "Cannot enable NFS pagecache "
-                              "if cache.direct = on");
-             goto fail;
-         }
--        client->pagecache = qemu_opt_get_number(opts, "page-cache-size", 0);
-+        client->pagecache = opts->page_cache_size;
-         if (client->pagecache > QEMU_NFS_MAX_PAGECACHE_SIZE) {
-             warn_report("Truncating NFS pagecache size to %d pages",
-                         QEMU_NFS_MAX_PAGECACHE_SIZE);
-@@ -595,8 +495,8 @@ static int64_t nfs_client_open(NFSClient *client, QDict *options,
- #endif
- 
- #ifdef LIBNFS_FEATURE_DEBUG
--    if (qemu_opt_get(opts, "debug")) {
--        client->debug = qemu_opt_get_number(opts, "debug", 0);
-+    if (opts->has_debug) {
-+        client->debug = opts->debug;
-         /* limit the maximum debug level to avoid potential flooding
-          * of our log files. */
-         if (client->debug > QEMU_NFS_MAX_DEBUG_LEVEL) {
-@@ -647,11 +547,41 @@ static int64_t nfs_client_open(NFSClient *client, QDict *options,
- fail:
-     nfs_client_close(client);
- out:
--    qemu_opts_del(opts);
-     g_free(file);
+@@ -551,33 +551,45 @@ out:
      return ret;
  }
  
+-static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
+-                                     int flags, int open_flags, Error **errp)
++static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
++                                                     Error **errp)
+ {
+     BlockdevOptionsNfs *opts = NULL;
+     QObject *crumpled = NULL;
+     Visitor *v;
+     Error *local_err = NULL;
+-    int ret;
+ 
+     crumpled = qdict_crumple(options, errp);
+     if (crumpled == NULL) {
+-        return -EINVAL;
++        return NULL;
+     }
+ 
+     v = qobject_input_visitor_new_keyval(crumpled);
+     visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
+     visit_free(v);
++    qobject_decref(crumpled);
+ 
+     if (local_err) {
+-        error_propagate(errp, local_err);
++        return NULL;
++    }
++
++    return opts;
++}
++
 +static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
 +                                     int flags, int open_flags, Error **errp)
 +{
-+    BlockdevOptionsNfs *opts = NULL;
-+    QObject *crumpled = NULL;
-+    Visitor *v;
-+    Error *local_err = NULL;
++    BlockdevOptionsNfs *opts;
 +    int ret;
 +
-+    crumpled = qdict_crumple(options, errp);
-+    if (crumpled == NULL) {
-+        return -EINVAL;
++    opts = nfs_options_qdict_to_qapi(options, errp);
++    if (opts == NULL) {
+         ret = -EINVAL;
+         goto fail;
+     }
+ 
+     ret = nfs_client_open(client, opts, flags, open_flags, errp);
+ fail:
+-    qobject_decref(crumpled);
+     qapi_free_BlockdevOptionsNfs(opts);
+     return ret;
+ }
+@@ -614,17 +626,42 @@ static QemuOptsList nfs_create_opts = {
+     }
+ };
+ 
+-static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
++static int nfs_file_co_create(BlockdevCreateOptions *options, Error **errp)
+ {
+-    int64_t ret, total_size;
++    BlockdevCreateOptionsNfs *opts = &options->u.nfs;
+     NFSClient *client = g_new0(NFSClient, 1);
+-    QDict *options = NULL;
++    int ret;
++
++    assert(options->driver == BLOCKDEV_DRIVER_NFS);
+ 
+     client->aio_context = qemu_get_aio_context();
+ 
++    ret = nfs_client_open(client, opts->location, O_CREAT, 0, errp);
++    if (ret < 0) {
++        goto out;
 +    }
++    ret = nfs_ftruncate(client->context, client->fh, opts->size);
++    nfs_client_close(client);
 +
-+    v = qobject_input_visitor_new_keyval(crumpled);
-+    visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
-+    visit_free(v);
-+
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-+    ret = nfs_client_open(client, opts, flags, open_flags, errp);
-+fail:
-+    qobject_decref(crumpled);
-+    qapi_free_BlockdevOptionsNfs(opts);
++out:
++    g_free(client);
 +    return ret;
 +}
 +
- static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp) {
-     NFSClient *client = bs->opaque;
-@@ -659,9 +589,9 @@ static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
++static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
++{
++    BlockdevCreateOptions *create_options;
++    BlockdevCreateOptionsNfs *nfs_opts;
++    QDict *options;
++    int ret;
++
++    create_options = g_new0(BlockdevCreateOptions, 1);
++    create_options->driver = BLOCKDEV_DRIVER_NFS;
++    nfs_opts = &create_options->u.nfs;
++
+     /* Read out options */
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
++    nfs_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++                              BDRV_SECTOR_SIZE);
  
-     client->aio_context = bdrv_get_aio_context(bs);
- 
--    ret = nfs_client_open(client, options,
--                          (flags & BDRV_O_RDWR) ? O_RDWR : O_RDONLY,
--                          bs->open_flags, errp);
-+    ret = nfs_client_open_qdict(client, options,
-+                                (flags & BDRV_O_RDWR) ? O_RDWR : O_RDONLY,
-+                                bs->open_flags, errp);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -702,7 +632,7 @@ static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
+     options = qdict_new();
+     ret = nfs_parse_uri(url, options, errp);
+@@ -632,15 +669,21 @@ static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
          goto out;
      }
  
--    ret = nfs_client_open(client, options, O_CREAT, 0, errp);
-+    ret = nfs_client_open_qdict(client, options, O_CREAT, 0, errp);
+-    ret = nfs_client_open_qdict(client, options, O_CREAT, 0, errp);
++    nfs_opts->location = nfs_options_qdict_to_qapi(options, errp);
++    if (nfs_opts->location == NULL) {
++        ret = -EINVAL;
++        goto out;
++    }
++
++    ret = nfs_file_co_create(create_options, errp);
      if (ret < 0) {
          goto out;
      }
+-    ret = nfs_ftruncate(client->context, client->fh, total_size);
+-    nfs_client_close(client);
++
++    ret = 0;
+ out:
+     QDECREF(options);
+-    g_free(client);
++    qapi_free_BlockdevCreateOptions(create_options);
+     return ret;
+ }
+ 
+@@ -828,6 +871,7 @@ static BlockDriver bdrv_nfs = {
+     .bdrv_file_open                 = nfs_file_open,
+     .bdrv_close                     = nfs_file_close,
+     .bdrv_create                    = nfs_file_create,
++    .bdrv_co_create                 = nfs_file_co_create,
+     .bdrv_reopen_prepare            = nfs_reopen_prepare,
+ 
+     .bdrv_co_preadv                 = nfs_co_preadv,
 -- 
 2.13.6
