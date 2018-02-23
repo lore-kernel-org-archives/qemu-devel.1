@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1epABU-0000Vm-Gs
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:02:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epAE6-0001c0-AL
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:05:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1epABK-0002bg-Sq
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:02:32 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56448)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1epABK-0002ZW-Kp
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:02:22 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NA1qbT055733
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 05:02:21 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gaadcnh16-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 05:02:20 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 23 Feb 2018 10:02:18 -0000
-References: <20180223095406.18251-1-cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 23 Feb 2018 11:02:15 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1epAE5-0000gd-0T
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:05:14 -0500
+Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:45135)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1epAE4-0000fg-Pu
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 05:05:12 -0500
+Received: by mail-pl0-x231.google.com with SMTP id v9-v6so2636920plp.12
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 02:05:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180223095406.18251-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <9caa0a62-e2cf-837b-a037-76cbcb851b0d@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x/sclp: remove duplicate
- MAX_AVAIL_SLOTS define
+In-Reply-To: <20180222152307.7499-1-peter.maydell@linaro.org>
+References: <20180222152307.7499-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Feb 2018 10:04:51 +0000
+Message-ID: <CAFEAcA9kHfD_o+5k+_id4dPMbm+nTdN74AUOkWYBw+MH2XwY2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/32] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,32 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
 
+On 22 February 2018 at 15:22, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Latest run of arm patches -- most of these are Philippe's SD card
+> cleanups. I have more in my queue to review, but 32 is enough
+> patches to warrant sending out.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit ff8689611a1d954897d857b28f7ef404e11cfa2c:
+>
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-signed' into staging (2018-02-22 11:37:05 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180222
+>
+> for you to fetch changes up to 4e5cc6756586e967993187657dfcdde4e00288d9:
+>
+>   sdcard: simplify SD_SEND_OP_COND (ACMD41) (2018-02-22 15:12:54 +0000)
+>
+> ----------------------------------------------------------------
+>  * New "raspi3" machine emulating RaspberryPi 3
+>  * Fix bad register definitions for VMIDR and VMPIDR (which caused
+>    assertions for 64-bit guest CPUs with EL2 on big-endian hosts)
+>  * hw/char/stm32f2xx_usart: fix TXE/TC bit handling
+>  * Fix ast2500 protection register emulation
+>  * Lots of SD card emulation cleanups and bugfixes
+>
 
+Applied, thanks.
 
-On 02/23/2018 10:54 AM, Cornelia Huck wrote:
-> It's already defined in cpu.h (to the same value) and not used in
-> the sclp code.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  include/hw/s390x/sclp.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> index 476cbf78f2..f9db243484 100644
-> --- a/include/hw/s390x/sclp.h
-> +++ b/include/hw/s390x/sclp.h
-> @@ -35,7 +35,6 @@
->  #define SCLP_FC_ASSIGN_ATTACH_READ_STOR         0xE00000000000ULL
->  #define SCLP_STARTING_SUBINCREMENT_ID           0x10001
->  #define SCLP_INCREMENT_UNIT                     0x10000
-> -#define MAX_AVAIL_SLOTS                         32
->  #define MAX_STORAGE_INCREMENTS                  1020
-> 
->  /* CPU hotplug SCLP codes */
-> 
-Do we need this define and s390_get_memslot_count at all after removing
-the hotplug code?
+-- PMM
