@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1epEap-0007Bj-7W
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:45:00 -0500
+	(envelope-from <eblake@redhat.com>) id 1epEcc-0008S7-1d
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1epEam-0003y4-0C
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:44:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52286
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1epEal-0003vH-P2
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:44:55 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NEiJBY142087
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 09:44:55 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gajk8xg05-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 09:44:54 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 23 Feb 2018 14:44:52 -0000
-References: <1519390265-15576-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1519390265-15576-4-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 23 Feb 2018 15:44:48 +0100
+	(envelope-from <eblake@redhat.com>) id 1epEca-0001zI-SZ
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:46:50 -0500
+References: <20180221135404.27598-1-kwolf@redhat.com>
+	<20180221135404.27598-17-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <90d7a9eb-566d-9c30-2f4a-41d15ba7ccaf@redhat.com>
+Date: Fri, 23 Feb 2018 08:46:32 -0600
 MIME-Version: 1.0
-In-Reply-To: <1519390265-15576-4-git-send-email-imbrenda@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180221135404.27598-17-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <95b90dd7-82aa-bc7f-896b-88aed8f9ee80@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] s390x/sclp: extend SCLP event masks
- to 64 bits
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 16/36] file-win32: Support
+ .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,27 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, cohuck@redhat.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-
-
-On 02/23/2018 01:51 PM, Claudio Imbrenda wrote:
-
+On 02/21/2018 07:53 AM, Kevin Wolf wrote:
+> This adds the .bdrv_co_create driver callback to file-win32, which
+> enables image creation over QMP.
 > 
-> +static bool vmstate_event_facility_mask64_needed(void *opaque)
-> +{
-> +    SCLPEventFacility *ef = opaque;
-> +
-> +    return (ef->receive_mask & 0xFFFFFFFF) != 0;
-> +}
-> +
-> +static int vmstate_event_facility_mask64_pre_load(void *opaque)
-> +{
-> +    SCLPEventFacility *ef = opaque;
-> +
-> +    ef->receive_mask &= ~0xFFFFFFFFULL;
-> +    return 0;
-> +}
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block/file-win32.c | 45 +++++++++++++++++++++++++++++++++++++--------
+>   1 file changed, 37 insertions(+), 8 deletions(-)
+> 
 
-again, no need for a pre-load here. The ef->receive_mask should start out as 0.
+> +
+> +    options = (BlockdevCreateOptions) {
+> +        .driver     = BLOCKDEV_DRIVER_FILE,
+> +        .u.file     = {
+> +            .filename           = (char *) filename,
+> +            .size               = total_size,
+> +            .has_preallocation  = false,
+> +            .has_nocow          = false,
+
+Technically, these last two lines aren't needed (you get false by 
+default), but it doesn't hurt to list them either.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
