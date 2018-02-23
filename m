@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8V-00062S-IN
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:22 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1epNFj-0004UL-3X
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:59:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8S-0006Aj-AU
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:19 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Fri, 23 Feb 2018 18:51:25 -0500
-Message-Id: <20180223235142.21501-5-jsnow@redhat.com>
-In-Reply-To: <20180223235142.21501-1-jsnow@redhat.com>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v4 04/21] blockjobs: add status enum
+	(envelope-from <richard.henderson@linaro.org>) id 1epNFe-00057E-9x
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:59:47 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:34874)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1epNFe-00056h-30
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:59:42 -0500
+Received: by mail-pl0-x241.google.com with SMTP id bb3so5795530plb.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 15:59:41 -0800 (PST)
+References: <20180223153636.29809-1-alex.bennee@linaro.org>
+	<20180223153636.29809-14-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <10368265-15cd-a473-f8a6-83c075bce825@linaro.org>
+Date: Fri, 23 Feb 2018 15:59:38 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180223153636.29809-14-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 13/31] arm/translate-a64: add FP16
+ pairwise ops simd_three_reg_same_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,300 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-We're about to add several new states, and booleans are becoming
-unwieldly and difficult to reason about. It would help to have a
-more explicit bookkeeping of the state of blockjobs. To this end,
-add a new "status" field and add our existing states in a redundant
-manner alongside the bools they are replacing:
+On 02/23/2018 07:36 AM, Alex Bennée wrote:
+> This includes FMAXNMP, FADDP, FMAXP, FMINNMP, FMINP.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v2
+>   - checkpatch fixes
+> ---
+>  target/arm/translate-a64.c | 208 +++++++++++++++++++++++++++++----------------
+>  1 file changed, 133 insertions(+), 75 deletions(-)
 
-UNDEFINED: Placeholder, default state. Not currently visible to QMP
-           unless changes occur in the future to allow creating jobs
-           without starting them via QMP.
-CREATED:   replaces !!job->co && paused && !busy
-RUNNING:   replaces effectively (!paused && busy)
-PAUSED:    Nearly redundant with info->paused, which shows pause_count.
-           This reports the actual status of the job, which almost always
-           matches the paused request status. It differs in that it is
-           strictly only true when the job has actually gone dormant.
-READY:     replaces job->ready.
-STANDBY:   Paused, but job->ready is true.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-New state additions in coming commits will not be quite so redundant:
 
-WAITING:   Waiting on transaction. This job has finished all the work
-           it can until the transaction converges, fails, or is canceled.
-PENDING:   Pending authorization from user. This job has finished all the
-           work it can until the job or transaction is finalized via
-           block_job_finalize. This implies the transaction has converged
-           and left the WAITING phase.
-ABORTING:  Job has encountered an error condition and is in the process
-           of aborting.
-CONCLUDED: Job has ceased all operations and has a return code available
-           for query and may be dismissed via block_job_dismiss.
-NULL:      Job has been dismissed and (should) be destroyed. Should never
-           be visible to QMP.
-
-Some of these states appear somewhat superfluous, but it helps define the
-expected flow of a job; so some of the states wind up being synchronous
-empty transitions. Importantly, jobs can be in only one of these states
-at any given time, which helps code and external users alike reason about
-the current condition of a job unambiguously.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- blockjob.c                 |  9 +++++++++
- include/block/blockjob.h   |  7 +++++--
- qapi/block-core.json       | 31 ++++++++++++++++++++++++++++++-
- tests/qemu-iotests/109.out | 24 ++++++++++++------------
- 4 files changed, 56 insertions(+), 15 deletions(-)
-
-diff --git a/blockjob.c b/blockjob.c
-index 47468331ec..1be9c20cff 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -320,6 +320,7 @@ void block_job_start(BlockJob *job)
-     job->pause_count--;
-     job->busy = true;
-     job->paused = false;
-+    job->status = BLOCK_JOB_STATUS_RUNNING;
-     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
- }
- 
-@@ -598,6 +599,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->speed     = job->speed;
-     info->io_status = job->iostatus;
-     info->ready     = job->ready;
-+    info->status    = job->status;
-     return info;
- }
- 
-@@ -701,6 +703,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->pause_count   = 1;
-     job->refcnt        = 1;
-     job->manual        = (flags & BLOCK_JOB_MANUAL);
-+    job->status        = BLOCK_JOB_STATUS_CREATED;
-     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-                    QEMU_CLOCK_REALTIME, SCALE_NS,
-                    block_job_sleep_timer_cb, job);
-@@ -814,9 +817,14 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
-     }
- 
-     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
-+        BlockJobStatus status = job->status;
-+        job->status = status == BLOCK_JOB_STATUS_READY ? \
-+                                BLOCK_JOB_STATUS_STANDBY : \
-+                                BLOCK_JOB_STATUS_PAUSED;
-         job->paused = true;
-         block_job_do_yield(job, -1);
-         job->paused = false;
-+        job->status = status;
-     }
- 
-     if (job->driver->resume) {
-@@ -922,6 +930,7 @@ void block_job_iostatus_reset(BlockJob *job)
- 
- void block_job_event_ready(BlockJob *job)
- {
-+    job->status = BLOCK_JOB_STATUS_READY;
-     job->ready = true;
- 
-     if (block_job_is_internal(job)) {
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 8ffabdcbc4..e254359d6b 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -143,10 +143,13 @@ typedef struct BlockJob {
- 
-     /**
-      * Set to true when the management API has requested manual job
--     * management semantics.
-+     * management semantics. See @BlockJobStatus for details.
-      */
-     bool manual;
- 
-+    /** Current state; See @BlockJobStatus for details. */
-+    BlockJobStatus status;
-+
-     /** Non-NULL if this job is part of a transaction */
-     BlockJobTxn *txn;
-     QLIST_ENTRY(BlockJob) txn_list;
-@@ -157,7 +160,7 @@ typedef enum BlockJobCreateFlags {
-     BLOCK_JOB_DEFAULT = 0x00,
-     /* BlockJob is not QMP-created and should not send QMP events */
-     BLOCK_JOB_INTERNAL = 0x01,
--    /* BlockJob requests manual job management steps. */
-+    /* BlockJob requests manual job management steps. See @BlockJobStatus. */
-     BLOCK_JOB_MANUAL = 0x02,
- } BlockJobCreateFlags;
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5c5921bfb7..deddee616a 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -955,6 +955,32 @@
- { 'enum': 'BlockJobType',
-   'data': ['commit', 'stream', 'mirror', 'backup'] }
- 
-+##
-+# @BlockJobStatus:
-+#
-+# Indicates the present state of a given blockjob in its lifetime.
-+#
-+# @undefined: Erroneous, default state. Should not ever be visible.
-+#
-+# @created: The job has been created, but not yet started.
-+#
-+# @running: The job is currently running.
-+#
-+# @paused: The job is running, but paused. The pause may be requested by
-+#          either the QMP user or by internal processes.
-+#
-+# @ready: The job is running, but is ready for the user to signal completion.
-+#         This is used for long-running jobs like mirror that are designed to
-+#         run indefinitely.
-+#
-+# @standby: The job is ready, but paused. This is nearly identical to @paused.
-+#           The job may return to @ready or otherwise be canceled.
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'BlockJobStatus',
-+  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby'] }
-+
- ##
- # @BlockJobInfo:
- #
-@@ -981,12 +1007,15 @@
- #
- # @ready: true if the job may be completed (since 2.2)
- #
-+# @status: Current job state/status (since 2.12)
-+#
- # Since: 1.1
- ##
- { 'struct': 'BlockJobInfo',
-   'data': {'type': 'str', 'device': 'str', 'len': 'int',
-            'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
--           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool'} }
-+           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
-+           'status': 'BlockJobStatus' } }
- 
- ##
- # @query-block-jobs:
-diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
-index c189e2833d..d288f2eef6 100644
---- a/tests/qemu-iotests/109.out
-+++ b/tests/qemu-iotests/109.out
-@@ -19,7 +19,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
-@@ -45,7 +45,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 197120, "offset": 197120, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 197120, "offset": 197120, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
-@@ -71,7 +71,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
-@@ -97,7 +97,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
-@@ -123,7 +123,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 65536, "offset": 65536, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 65536, "offset": 65536, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-@@ -149,7 +149,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
-@@ -174,7 +174,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
-@@ -199,7 +199,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 31457280, "offset": 31457280, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 31457280, "offset": 31457280, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
-@@ -224,7 +224,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
-@@ -249,7 +249,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2048, "offset": 2048, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2048, "offset": 2048, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
-@@ -265,7 +265,7 @@ Automatically detecting the format is dangerous for raw images, write operations
- Specify the 'raw' format explicitly to remove the restrictions.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
-@@ -274,7 +274,7 @@ Images are identical.
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
--- 
-2.14.3
+r~
