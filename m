@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8M-0005sR-Pj
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:14 -0500
+	(envelope-from <jsnow@redhat.com>) id 1epN8O-0005v3-R0
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8I-0005tA-Tq
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:10 -0500
+	(envelope-from <jsnow@redhat.com>) id 1epN8J-0005uM-LO
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:12 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 23 Feb 2018 18:51:30 -0500
-Message-Id: <20180223235142.21501-10-jsnow@redhat.com>
+Date: Fri, 23 Feb 2018 18:51:28 -0500
+Message-Id: <20180223235142.21501-8-jsnow@redhat.com>
 In-Reply-To: <20180223235142.21501-1-jsnow@redhat.com>
 References: <20180223235142.21501-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v4 09/21] blockjobs: add CONCLUDED state
+Subject: [Qemu-devel] [RFC v4 07/21] blockjobs: add block_job_verb
+ permission table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,153 +23,349 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-add a new state "CONCLUDED" that identifies a job that has ceased all
-operations. The wording was chosen to avoid any phrasing that might
-imply success, error, or cancellation. The task has simply ceased all
-operation and can never again perform any work.
+Which commands ("verbs") are appropriate for jobs in which state is
+also somewhat burdensome to keep track of.
 
-("finished", "done", and "completed" might all imply success.)
+As of this commit, it looks rather useless, but begins to look more
+interesting the more states we add to the STM table.
 
-Transitions:
-Running  -> Concluded: normal completion
-Ready    -> Concluded: normal completion
-Aborting -> Concluded: error and cancellations
+A recurring theme is that no verb will apply to an 'undefined' job.
 
-Verbs:
-None as of this commit. (a future commit adds 'dismiss')
+Further, it's not presently possible to restrict the "pause" or "resume"
+verbs any more than they are in this commit because of the asynchronous
+nature of how jobs enter the PAUSED state; justifications for some
+seemingly erroneous applications are given below.
 
-             +---------+
-             |UNDEFINED|
-             +--+------+
-                |
-             +--v----+
-             |CREATED|
-             +--+----+
-                |
-             +--v----+     +------+
-   +---------+RUNNING<----->PAUSED|
-   |         +--+-+--+     +------+
-   |            | |
-   |            | +------------------+
-   |            |                    |
-   |         +--v--+       +-------+ |
-   +---------+READY<------->STANDBY| |
-   |         +--+--+       +-------+ |
-   |            |                    |
-+--v-----+   +--v------+             |
-|ABORTING+--->CONCLUDED<-------------+
-+--------+   +---------+
+=====
+Verbs
+=====
+
+Cancel:    Any state except undefined.
+Pause:     Any state except undefined;
+           'created': Requests that the job pauses as it starts.
+           'running': Normal usage. (PAUSED)
+           'paused':  The job may be paused for internal reasons,
+                      but the user may wish to force an indefinite
+                      user-pause, so this is allowed.
+           'ready':   Normal usage. (STANDBY)
+           'standby': Same logic as above.
+Resume:    Any state except undefined;
+           'created': Will lift a user's pause-on-start request.
+           'running': Will lift a pause request before it takes effect.
+           'paused':  Normal usage.
+           'ready':   Will lift a pause request before it takes effect.
+           'standby': Normal usage.
+Set-speed: Any state except undefined, though ready may not be meaningful.
+Complete:  Only a 'ready' job may accept a complete request.
+
+
+=======
+Changes
+=======
+
+(1)
+
+To facilitate "nice" error checking, all five major block-job verb
+interfaces in blockjob.c now support an errp parameter:
+
+- block_job_user_cancel is added as a new interface.
+- block_job_user_pause gains an errp paramter
+- block_job_user_resume gains an errp parameter
+- block_job_set_speed already had an errp parameter.
+- block_job_complete already had an errp parameter.
+
+(2)
+
+block-job-pause and block-job-resume will no longer no-op when trying
+to pause an already paused job, or trying to resume a job that isn't
+paused. These functions will now report that they did not perform the
+action requested because it was not possible.
+
+iotests have been adjusted to address this new behavior.
+
+(3)
+
+block-job-complete doesn't worry about checking !block_job_started,
+because the permission table guards against this.
+
+(4)
+
+test-bdrv-drain's job implementation needs to announce that it is
+'ready' now, in order to be completed.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c           | 43 ++++++++++++++++++++++++++++---------------
- qapi/block-core.json |  5 ++++-
- 2 files changed, 32 insertions(+), 16 deletions(-)
+ block/trace-events       |  1 +
+ blockdev.c               | 10 +++----
+ blockjob.c               | 71 ++++++++++++++++++++++++++++++++++++++++++------
+ include/block/blockjob.h | 13 +++++++--
+ qapi/block-core.json     | 20 ++++++++++++++
+ tests/test-bdrv-drain.c  |  1 +
+ 6 files changed, 100 insertions(+), 16 deletions(-)
 
+diff --git a/block/trace-events b/block/trace-events
+index b75a0c8409..3fe89f7ea6 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -6,6 +6,7 @@ bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
+ 
+ # blockjob.c
+ block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
++block_job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
+ 
+ # block/block-backend.c
+ blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
+diff --git a/blockdev.c b/blockdev.c
+index 3fb1ca803c..cba935a0a6 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3805,7 +3805,7 @@ void qmp_block_job_cancel(const char *device,
+     }
+ 
+     trace_qmp_block_job_cancel(job);
+-    block_job_cancel(job);
++    block_job_user_cancel(job, errp);
+ out:
+     aio_context_release(aio_context);
+ }
+@@ -3815,12 +3815,12 @@ void qmp_block_job_pause(const char *device, Error **errp)
+     AioContext *aio_context;
+     BlockJob *job = find_block_job(device, &aio_context, errp);
+ 
+-    if (!job || block_job_user_paused(job)) {
++    if (!job) {
+         return;
+     }
+ 
+     trace_qmp_block_job_pause(job);
+-    block_job_user_pause(job);
++    block_job_user_pause(job, errp);
+     aio_context_release(aio_context);
+ }
+ 
+@@ -3829,12 +3829,12 @@ void qmp_block_job_resume(const char *device, Error **errp)
+     AioContext *aio_context;
+     BlockJob *job = find_block_job(device, &aio_context, errp);
+ 
+-    if (!job || !block_job_user_paused(job)) {
++    if (!job) {
+         return;
+     }
+ 
+     trace_qmp_block_job_resume(job);
+-    block_job_user_resume(job);
++    block_job_user_resume(job, errp);
+     aio_context_release(aio_context);
+ }
+ 
 diff --git a/blockjob.c b/blockjob.c
-index 4c3fcda46c..93b0a36306 100644
+index d745b3bb69..4e424fef72 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -44,23 +44,24 @@ static QemuMutex block_job_mutex;
- 
- /* BlockJob State Transition Table */
- bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1},
--    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0},
--    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0},
-+                                          /* U, C, R, P, Y, S, X, E */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 0},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1},
-+    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0},
-+    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1},
-+    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0},
+@@ -53,6 +53,15 @@ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+     /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0},
  };
  
- bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0},
-+                                          /* U, C, R, P, Y, S, X, E */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0},
- };
- 
++bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
++                                          /* U, C, R, P, Y, S */
++    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1},
++    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1},
++    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1},
++    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1},
++    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0},
++};
++
  static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -114,6 +115,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
- 
- static void block_job_event_cancelled(BlockJob *job);
- static void block_job_event_completed(BlockJob *job, const char *msg);
-+static void block_job_event_concluded(BlockJob *job);
- static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
- 
- /* Transactional group of block jobs */
-@@ -420,6 +422,7 @@ static void block_job_completed_single(BlockJob *job)
- 
-     QLIST_REMOVE(job, txn_list);
-     block_job_txn_unref(job->txn);
-+    block_job_event_concluded(job);
-     block_job_unref(job);
- }
- 
-@@ -620,7 +623,9 @@ void block_job_user_resume(BlockJob *job, Error **errp)
- 
- void block_job_cancel(BlockJob *job)
  {
--    if (block_job_started(job)) {
-+    if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
-+        return;
-+    } else if (block_job_started(job)) {
-         block_job_cancel_async(job);
-         block_job_enter(job);
-     } else {
-@@ -727,6 +732,14 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
-                                         &error_abort);
+     BlockJobStatus s0 = job->status;
+@@ -70,6 +79,23 @@ static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+     job->status = s1;
  }
  
-+static void block_job_event_concluded(BlockJob *job)
++static int block_job_apply_verb(BlockJob *job, BlockJobVerb bv, Error **errp)
 +{
-+    if (block_job_is_internal(job) || !job->manual) {
-+        return;
++    assert(bv >= 0 && bv <= BLOCK_JOB_VERB__MAX);
++    trace_block_job_apply_verb(job, qapi_enum_lookup(&BlockJobStatus_lookup,
++                                                     job->status),
++                               qapi_enum_lookup(&BlockJobVerb_lookup, bv),
++                               BlockJobVerbTable[bv][job->status] ?
++                               "allowed" : "prohibited");
++    if (BlockJobVerbTable[bv][job->status]) {
++        return 0;
 +    }
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
++    error_setg(errp, "Job '%s' in state '%s' cannot accept command verb '%s'",
++               job->id, qapi_enum_lookup(&BlockJobStatus_lookup, job->status),
++               qapi_enum_lookup(&BlockJobVerb_lookup, bv));
++    return -EPERM;
 +}
 +
- /*
-  * API for block job drivers and the block layer.  These functions are
-  * declared in blockjob_int.h.
+ static void block_job_lock(void)
+ {
+     qemu_mutex_lock(&block_job_mutex);
+@@ -520,6 +546,9 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_UNSUPPORTED);
+         return;
+     }
++    if (block_job_apply_verb(job, BLOCK_JOB_VERB_SET_SPEED, errp)) {
++        return;
++    }
+     job->driver->set_speed(job, speed, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+@@ -539,8 +568,10 @@ void block_job_complete(BlockJob *job, Error **errp)
+ {
+     /* Should not be reachable via external interface for internal jobs */
+     assert(job->id);
+-    if (job->pause_count || job->cancelled ||
+-        !block_job_started(job) || !job->driver->complete) {
++    if (block_job_apply_verb(job, BLOCK_JOB_VERB_COMPLETE, errp)) {
++        return;
++    }
++    if (job->pause_count || job->cancelled || !job->driver->complete) {
+         error_setg(errp, "The active block job '%s' cannot be completed",
+                    job->id);
+         return;
+@@ -549,8 +580,15 @@ void block_job_complete(BlockJob *job, Error **errp)
+     job->driver->complete(job, errp);
+ }
+ 
+-void block_job_user_pause(BlockJob *job)
++void block_job_user_pause(BlockJob *job, Error **errp)
+ {
++    if (block_job_apply_verb(job, BLOCK_JOB_VERB_PAUSE, errp)) {
++        return;
++    }
++    if (job->user_paused) {
++        error_setg(errp, "Job is already paused");
++        return;
++    }
+     job->user_paused = true;
+     block_job_pause(job);
+ }
+@@ -560,13 +598,19 @@ bool block_job_user_paused(BlockJob *job)
+     return job->user_paused;
+ }
+ 
+-void block_job_user_resume(BlockJob *job)
++void block_job_user_resume(BlockJob *job, Error **errp)
+ {
+-    if (job && job->user_paused && job->pause_count > 0) {
+-        block_job_iostatus_reset(job);
+-        job->user_paused = false;
+-        block_job_resume(job);
++    assert(job);
++    if (!job->user_paused || job->pause_count <= 0) {
++        error_setg(errp, "Can't resume a job that was not paused");
++        return;
+     }
++    if (block_job_apply_verb(job, BLOCK_JOB_VERB_RESUME, errp)) {
++        return;
++    }
++    block_job_iostatus_reset(job);
++    job->user_paused = false;
++    block_job_resume(job);
+ }
+ 
+ void block_job_cancel(BlockJob *job)
+@@ -579,6 +623,14 @@ void block_job_cancel(BlockJob *job)
+     }
+ }
+ 
++void block_job_user_cancel(BlockJob *job, Error **errp)
++{
++    if (block_job_apply_verb(job, BLOCK_JOB_VERB_CANCEL, errp)) {
++        return;
++    }
++    block_job_cancel(job);
++}
++
+ /* A wrapper around block_job_cancel() taking an Error ** parameter so it may be
+  * used with block_job_finish_sync() without the need for (rather nasty)
+  * function pointer casts there. */
+@@ -1004,8 +1056,9 @@ BlockErrorAction block_job_error_action(BlockJob *job, BlockdevOnError on_err,
+                                         action, &error_abort);
+     }
+     if (action == BLOCK_ERROR_ACTION_STOP) {
++        block_job_pause(job);
+         /* make the pause user visible, which will be resumed from QMP. */
+-        block_job_user_pause(job);
++        job->user_paused = true;
+         block_job_iostatus_set_err(job, error);
+     }
+     return action;
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index e254359d6b..403a168073 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -260,7 +260,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp);
+  * Asynchronously pause the specified job.
+  * Do not allow a resume until a matching call to block_job_user_resume.
+  */
+-void block_job_user_pause(BlockJob *job);
++void block_job_user_pause(BlockJob *job, Error **errp);
+ 
+ /**
+  * block_job_paused:
+@@ -277,7 +277,16 @@ bool block_job_user_paused(BlockJob *job);
+  * Resume the specified job.
+  * Must be paired with a preceding block_job_user_pause.
+  */
+-void block_job_user_resume(BlockJob *job);
++void block_job_user_resume(BlockJob *job, Error **errp);
++
++/**
++ * block_job_user_cancel:
++ * @job: The job to be cancelled.
++ *
++ * Cancels the specified job, but may refuse to do so if the
++ * operation isn't currently meaningful.
++ */
++void block_job_user_cancel(BlockJob *job, Error **errp);
+ 
+ /**
+  * block_job_cancel_sync:
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3f7d559fc0..aeb9b1937b 100644
+index deddee616a..11659496c5 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -1000,11 +1000,14 @@
- #            an error. The job will afterwards report that it is @concluded.
- #            This status may not be visible to the management process.
- #
-+# @concluded: The job has finished all work. If manual was set to true, the job
-+#             will remain in the query list until it is dismissed.
-+#
- # Since: 2.12
- ##
- { 'enum': 'BlockJobStatus',
-   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
--           'aborting' ] }
-+           'aborting', 'concluded' ] }
+@@ -955,6 +955,26 @@
+ { 'enum': 'BlockJobType',
+   'data': ['commit', 'stream', 'mirror', 'backup'] }
  
++##
++# @BlockJobVerb:
++#
++# Represents command verbs that can be applied to a blockjob.
++#
++# @cancel: see @block-job-cancel
++#
++# @pause: see @block-job-pause
++#
++# @resume: see @block-job-resume
++#
++# @set-speed: see @block-job-set-speed
++#
++# @complete: see @block-job-complete
++#
++# Since: 2.12
++##
++{ 'enum': 'BlockJobVerb',
++  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete' ] }
++
  ##
- # @BlockJobInfo:
+ # @BlockJobStatus:
+ #
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index a7eecf1c1e..7673de1062 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -505,6 +505,7 @@ static void coroutine_fn test_job_start(void *opaque)
+ {
+     TestBlockJob *s = opaque;
+ 
++    block_job_event_ready(&s->common);
+     while (!s->should_complete) {
+         block_job_sleep_ns(&s->common, 100000);
+     }
 -- 
 2.14.3
