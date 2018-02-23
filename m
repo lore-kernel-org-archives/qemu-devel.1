@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVq-0001Dq-78
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:56 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVj-000166-OL
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVm-0007ci-Vu
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58386)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVg-0007Q2-Hx
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:47 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34230
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1epFVm-0007as-M2
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:50 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NFeYUg139419
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:49 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gam6yn1nv-1
+	id 1epFVg-0007Om-CM
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:44 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1NFctTr037139
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:43 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gamd24fwg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:48 -0500
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:43 -0500
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 10:43:47 -0500
+	Fri, 23 Feb 2018 10:43:42 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 10:43:13 -0500
+Date: Fri, 23 Feb 2018 10:43:08 -0500
 In-Reply-To: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1519400599-21081-8-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v9 07/13] s390-ccw: set up interactive boot
- menu parameters
+Message-Id: <1519400599-21081-3-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v9 02/13] s390-ccw: refactor eckd_block_num to
+ use CHS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,122 +42,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Reads boot menu flag and timeout values from the iplb and
-sets the respective fields for the menu.
+Add new cylinder/head/sector struct. Use it to calculate
+eckd block numbers instead of a BootMapPointer (which used
+eckd chs anyway).
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/Makefile   |  2 +-
- pc-bios/s390-ccw/main.c     | 24 ++++++++++++++++++++++++
- pc-bios/s390-ccw/menu.c     | 22 ++++++++++++++++++++++
- pc-bios/s390-ccw/s390-ccw.h |  3 +++
- 4 files changed, 50 insertions(+), 1 deletion(-)
- create mode 100644 pc-bios/s390-ccw/menu.c
+ pc-bios/s390-ccw/bootmap.c | 28 ++++++++++++++--------------
+ pc-bios/s390-ccw/bootmap.h |  8 ++++++--
+ 2 files changed, 20 insertions(+), 16 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 9f7904f..1712c2d 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- 
- .PHONY : all clean build-all
- 
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
-+OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index e41b264..32ed70e 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -18,6 +18,9 @@ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- 
-+#define LOADPARM_PROMPT "PROMPT  "
-+#define LOADPARM_EMPTY  "........"
-+
- /*
-  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
-  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
-@@ -74,6 +77,26 @@ static bool find_dev(Schib *schib, int dev_no)
-     return false;
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index a4eaf24..9534f56 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -95,32 +95,32 @@ static inline void verify_boot_info(BootInfo *bip)
+                "Bad block size in zIPL section of the 1st record.");
  }
  
-+static void menu_setup(void)
-+{
-+    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
-+        menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
-+        return;
-+    }
-+
-+    /* If loadparm was set to any other value, then do not enable menu */
-+    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
-+        return;
-+    }
-+
-+    switch (iplb.pbt) {
-+    case S390_IPL_TYPE_CCW:
-+        menu_set_parms(qipl.qipl_flags & QIPL_FLAG_BM_OPTS_CMD,
-+                       qipl.boot_menu_timeout);
-+        return;
-+    }
-+}
-+
- static void virtio_setup(void)
+-static block_number_t eckd_block_num(BootMapPointer *p)
++static block_number_t eckd_block_num(EckdCHS *chs)
  {
-     Schib schib;
-@@ -117,6 +140,7 @@ static void virtio_setup(void)
-         default:
-             panic("List-directed IPL not supported yet!\n");
-         }
-+        menu_setup();
-     } else {
-         for (ssid = 0; ssid < 0x3; ssid++) {
-             blk_schid.ssid = ssid;
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-new file mode 100644
-index 0000000..1ce33dd
---- /dev/null
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -0,0 +1,22 @@
-+/*
-+ * QEMU S390 Interactive Boot Menu
-+ *
-+ * Copyright 2018 IBM Corp.
-+ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "libc.h"
-+#include "s390-ccw.h"
-+
-+static uint8_t flag;
-+static uint64_t timeout;
-+
-+void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
-+{
-+    flag = boot_menu_flag;
-+    timeout = boot_menu_timeout;
-+}
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 25d4d21..6cfd4b2 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -84,6 +84,9 @@ ulong get_second(void);
- /* bootmap.c */
- void zipl_load(void);
+     const uint64_t sectors = virtio_get_sectors();
+     const uint64_t heads = virtio_get_heads();
+-    const uint64_t cylinder = p->eckd.cylinder
+-                            + ((p->eckd.head & 0xfff0) << 12);
+-    const uint64_t head = p->eckd.head & 0x000f;
++    const uint64_t cylinder = chs->cylinder
++                            + ((chs->head & 0xfff0) << 12);
++    const uint64_t head = chs->head & 0x000f;
+     const block_number_t block = sectors * heads * cylinder
+                                + sectors * head
+-                               + p->eckd.sector
++                               + chs->sector
+                                - 1; /* block nr starts with zero */
+     return block;
+ }
  
-+/* menu.c */
-+void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
-+
- static inline void fill_hex(char *out, unsigned char val)
+ static bool eckd_valid_address(BootMapPointer *p)
  {
-     const char hex[] = "0123456789abcdef";
+-    const uint64_t head = p->eckd.head & 0x000f;
++    const uint64_t head = p->eckd.chs.head & 0x000f;
+ 
+     if (head >= virtio_get_heads()
+-        ||  p->eckd.sector > virtio_get_sectors()
+-        ||  p->eckd.sector <= 0) {
++        ||  p->eckd.chs.sector > virtio_get_sectors()
++        ||  p->eckd.chs.sector <= 0) {
+         return false;
+     }
+ 
+     if (!virtio_guessed_disk_nature() &&
+-        eckd_block_num(p) >= virtio_get_blocks()) {
++        eckd_block_num(&p->eckd.chs) >= virtio_get_blocks()) {
+         return false;
+     }
+ 
+@@ -140,7 +140,7 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
+     do {
+         more_data = false;
+         for (j = 0;; j++) {
+-            block_nr = eckd_block_num((void *)&(bprs[j].xeckd));
++            block_nr = eckd_block_num(&bprs[j].xeckd.bptr.chs);
+             if (is_null_block_number(block_nr)) { /* end of chunk */
+                 break;
+             }
+@@ -198,7 +198,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
+ 
+-    block_nr = eckd_block_num(&bmt->entry[loadparm]);
++    block_nr = eckd_block_num(&bmt->entry[loadparm].xeckd.bptr.chs);
+     IPL_assert(block_nr != -1, "Cannot find Boot Map Table Entry");
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+@@ -206,7 +206,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+ 
+     for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
+         address = bms->entry[i].address.load_address;
+-        block_nr = eckd_block_num(&(bms->entry[i].blkptr));
++        block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
+ 
+         do {
+             block_nr = load_eckd_segments(block_nr, &address);
+@@ -239,7 +239,7 @@ static void ipl_eckd_cdl(void)
+                "Non-ECKD device type in zIPL section of IPL2 record.");
+ 
+     /* save pointer to Boot Map Table */
+-    bmt_block_nr = eckd_block_num(&mbr->blockptr);
++    bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(2, vlbl, "Cannot read Volume Label at block 2");
+@@ -300,7 +300,7 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+     verify_boot_info(bip);
+ 
+     /* save pointer to Boot Map Table */
+-    bmt_block_nr = eckd_block_num((void *)&bip->bp.ipl.bm_ptr.eckd.bptr);
++    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
+ 
+     run_eckd_boot_script(bmt_block_nr);
+     /* no return */
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index 486c0f3..b361084 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -32,10 +32,14 @@ typedef struct FbaBlockPtr {
+     uint16_t blockct;
+ } __attribute__ ((packed)) FbaBlockPtr;
+ 
+-typedef struct EckdBlockPtr {
+-    uint16_t cylinder; /* cylinder/head/sector is an address of the block */
++typedef struct EckdCHS {
++    uint16_t cylinder;
+     uint16_t head;
+     uint8_t sector;
++} __attribute__ ((packed)) EckdCHS;
++
++typedef struct EckdBlockPtr {
++    EckdCHS chs; /* cylinder/head/sector is an address of the block */
+     uint16_t size;
+     uint8_t count; /* (size_in_blocks-1);
+                     * it's 0 for TablePtr, ScriptPtr, and SectionPtr */
 -- 
 2.7.4
