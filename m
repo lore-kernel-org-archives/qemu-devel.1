@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIyy-0000XS-IS
+	(envelope-from <kwolf@redhat.com>) id 1epIyy-0000XE-C1
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIyx-00045P-B0
+	(envelope-from <kwolf@redhat.com>) id 1epIyx-00045V-C5
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:12 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:14 +0100
-Message-Id: <20180223192549.26666-2-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:15 +0100
+Message-Id: <20180223192549.26666-3-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/36] block/qapi: Introduce
- BlockdevCreateOptions
+Subject: [Qemu-devel] [PATCH v3 02/36] block/qapi: Add qcow2 create options
+ to schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This creates a BlockdevCreateOptions union type that will contain all of
-the options for image creation. We'll start out with an empty struct
-type BlockdevCreateNotSupported for all drivers.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ qapi/block-core.json | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5c5921bfb7..d256cefc79 100644
+index d256cefc79..74b864d64e 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3359,6 +3359,68 @@
+@@ -3359,6 +3359,49 @@
  { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
  
  ##
-+# @BlockdevCreateNotSupported:
++# @BlockdevQcow2Version:
 +#
-+# This is used for all drivers that don't support creating images.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateNotSupported', 'data': {}}
-+
-+##
-+# @BlockdevCreateOptions:
-+#
-+# Options for creating an image format on a given node.
-+#
-+# @driver           block driver to create the image format
++# @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
++# @v3:  The extended QCOW2 format as introduced in qemu 1.1 (version 3)
 +#
 +# Since: 2.12
 +##
-+{ 'union': 'BlockdevCreateOptions',
-+  'base': {
-+      'driver':         'BlockdevDriver' },
-+  'discriminator': 'driver',
-+  'data': {
-+      'blkdebug':       'BlockdevCreateNotSupported',
-+      'blkverify':      'BlockdevCreateNotSupported',
-+      'bochs':          'BlockdevCreateNotSupported',
-+      'cloop':          'BlockdevCreateNotSupported',
-+      'dmg':            'BlockdevCreateNotSupported',
-+      'file':           'BlockdevCreateNotSupported',
-+      'ftp':            'BlockdevCreateNotSupported',
-+      'ftps':           'BlockdevCreateNotSupported',
-+      'gluster':        'BlockdevCreateNotSupported',
-+      'host_cdrom':     'BlockdevCreateNotSupported',
-+      'host_device':    'BlockdevCreateNotSupported',
-+      'http':           'BlockdevCreateNotSupported',
-+      'https':          'BlockdevCreateNotSupported',
-+      'iscsi':          'BlockdevCreateNotSupported',
-+      'luks':           'BlockdevCreateNotSupported',
-+      'nbd':            'BlockdevCreateNotSupported',
-+      'nfs':            'BlockdevCreateNotSupported',
-+      'null-aio':       'BlockdevCreateNotSupported',
-+      'null-co':        'BlockdevCreateNotSupported',
-+      'nvme':           'BlockdevCreateNotSupported',
-+      'parallels':      'BlockdevCreateNotSupported',
-+      'qcow2':          'BlockdevCreateNotSupported',
-+      'qcow':           'BlockdevCreateNotSupported',
-+      'qed':            'BlockdevCreateNotSupported',
-+      'quorum':         'BlockdevCreateNotSupported',
-+      'raw':            'BlockdevCreateNotSupported',
-+      'rbd':            'BlockdevCreateNotSupported',
-+      'replication':    'BlockdevCreateNotSupported',
-+      'sheepdog':       'BlockdevCreateNotSupported',
-+      'ssh':            'BlockdevCreateNotSupported',
-+      'throttle':       'BlockdevCreateNotSupported',
-+      'vdi':            'BlockdevCreateNotSupported',
-+      'vhdx':           'BlockdevCreateNotSupported',
-+      'vmdk':           'BlockdevCreateNotSupported',
-+      'vpc':            'BlockdevCreateNotSupported',
-+      'vvfat':          'BlockdevCreateNotSupported',
-+      'vxhs':           'BlockdevCreateNotSupported'
-+  } }
++{ 'enum': 'BlockdevQcow2Version',
++  'data': [ 'v2', 'v3' ] }
++
 +
 +##
- # @blockdev-open-tray:
++# @BlockdevCreateOptionsQcow2:
++#
++# Driver specific image creation options for qcow2.
++#
++# @file             Node to create the image format on
++# @size             Size of the virtual disk in bytes
++# @version          Compatibility level (default: v3)
++# @backing-file     File name of the backing file if a backing file
++#                   should be used
++# @backing-fmt      Name of the block driver to use for the backing file
++# @encrypt          Encryption options if the image should be encrypted
++# @cluster-size     qcow2 cluster size in bytes (default: 65536)
++# @preallocation    Preallocation mode for the new image (default: off)
++# @lazy-refcounts   True if refcounts may be updated lazily (default: off)
++# @refcount-bits    Width of reference counts in bits (default: 16)
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsQcow2',
++  'data': { 'file':             'BlockdevRef',
++            'size':             'size',
++            '*version':         'BlockdevQcow2Version',
++            '*backing-file':    'str',
++            '*backing-fmt':     'BlockdevDriver',
++            '*encrypt':         'QCryptoBlockCreateOptions',
++            '*cluster-size':    'size',
++            '*preallocation':   'PreallocMode',
++            '*lazy-refcounts':  'bool',
++            '*refcount-bits':   'int' } }
++
++##
+ # @BlockdevCreateNotSupported:
  #
- # Opens a block device's tray. If there is a block driver state tree inserted as
+ # This is used for all drivers that don't support creating images.
+@@ -3402,7 +3445,7 @@
+       'null-co':        'BlockdevCreateNotSupported',
+       'nvme':           'BlockdevCreateNotSupported',
+       'parallels':      'BlockdevCreateNotSupported',
+-      'qcow2':          'BlockdevCreateNotSupported',
++      'qcow2':          'BlockdevCreateOptionsQcow2',
+       'qcow':           'BlockdevCreateNotSupported',
+       'qed':            'BlockdevCreateNotSupported',
+       'quorum':         'BlockdevCreateNotSupported',
 -- 
 2.13.6
