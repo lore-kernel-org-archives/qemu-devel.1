@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8M-0005rs-5i
+	(envelope-from <jsnow@redhat.com>) id 1epN8M-0005sR-Pj
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8I-0005s2-BO
+	(envelope-from <jsnow@redhat.com>) id 1epN8I-0005tA-Tq
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:10 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 23 Feb 2018 18:51:26 -0500
-Message-Id: <20180223235142.21501-6-jsnow@redhat.com>
+Date: Fri, 23 Feb 2018 18:51:30 -0500
+Message-Id: <20180223235142.21501-10-jsnow@redhat.com>
 In-Reply-To: <20180223235142.21501-1-jsnow@redhat.com>
 References: <20180223235142.21501-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v4 05/21] blockjobs: add state transition table
+Subject: [Qemu-devel] [RFC v4 09/21] blockjobs: add CONCLUDED state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,157 +22,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-The state transition table has mostly been implied. We're about to make
-it a bit more complex, so let's make the STM explicit instead.
+add a new state "CONCLUDED" that identifies a job that has ceased all
+operations. The wording was chosen to avoid any phrasing that might
+imply success, error, or cancellation. The task has simply ceased all
+operation and can never again perform any work.
 
-Perform state transitions with a function that for now just asserts the
-transition is appropriate.
+("finished", "done", and "completed" might all imply success.)
 
 Transitions:
-Undefined -> Created: During job initialization.
-Created   -> Running: Once the job is started.
-                      Jobs cannot transition from "Created" to "Paused"
-                      directly, but will instead synchronously transition
-                      to running to paused immediately.
-Running   -> Paused:  Normal workflow for pauses.
-Running   -> Ready:   Normal workflow for jobs reaching their sync point.
-                      (e.g. mirror)
-Ready     -> Standby: Normal workflow for pausing ready jobs.
-Paused    -> Running: Normal resume.
-Standby   -> Ready:   Resume of a Standby job.
+Running  -> Concluded: normal completion
+Ready    -> Concluded: normal completion
+Aborting -> Concluded: error and cancellations
 
+Verbs:
+None as of this commit. (a future commit adds 'dismiss')
 
-+---------+
-|UNDEFINED|
-+--+------+
-   |
-+--v----+
-|CREATED|
-+--+----+
-   |
-+--v----+     +------+
-|RUNNING<----->PAUSED|
-+--+----+     +------+
-   |
-+--v--+       +-------+
-|READY<------->STANDBY|
-+-----+       +-------+
-
-
-Notably, there is no state presently defined as of this commit that
-deals with a job after the "running" or "ready" states, so this table
-will be adjusted alongside the commits that introduce those states.
+             +---------+
+             |UNDEFINED|
+             +--+------+
+                |
+             +--v----+
+             |CREATED|
+             +--+----+
+                |
+             +--v----+     +------+
+   +---------+RUNNING<----->PAUSED|
+   |         +--+-+--+     +------+
+   |            | |
+   |            | +------------------+
+   |            |                    |
+   |         +--v--+       +-------+ |
+   +---------+READY<------->STANDBY| |
+   |         +--+--+       +-------+ |
+   |            |                    |
++--v-----+   +--v------+             |
+|ABORTING+--->CONCLUDED<-------------+
++--------+   +---------+
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/trace-events |  3 +++
- blockjob.c         | 42 ++++++++++++++++++++++++++++++++++++------
- 2 files changed, 39 insertions(+), 6 deletions(-)
+ blockjob.c           | 43 ++++++++++++++++++++++++++++---------------
+ qapi/block-core.json |  5 ++++-
+ 2 files changed, 32 insertions(+), 16 deletions(-)
 
-diff --git a/block/trace-events b/block/trace-events
-index 02dd80ff0c..b75a0c8409 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -4,6 +4,9 @@
- bdrv_open_common(void *bs, const char *filename, int flags, const char *format_name) "bs %p filename \"%s\" flags 0x%x format_name \"%s\""
- bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
- 
-+# blockjob.c
-+block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
-+
- # block/block-backend.c
- blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
- blk_co_pwritev(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
 diff --git a/blockjob.c b/blockjob.c
-index 1be9c20cff..d745b3bb69 100644
+index 4c3fcda46c..93b0a36306 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -28,6 +28,7 @@
- #include "block/block.h"
- #include "block/blockjob_int.h"
- #include "block/block_int.h"
-+#include "block/trace.h"
- #include "sysemu/block-backend.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
-@@ -41,6 +42,34 @@
-  * block_job_enter. */
- static QemuMutex block_job_mutex;
+@@ -44,23 +44,24 @@ static QemuMutex block_job_mutex;
  
-+/* BlockJob State Transition Table */
-+bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
-+                                          /* U, C, R, P, Y, S */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1},
-+    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0},
-+};
-+
-+static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-+{
-+    BlockJobStatus s0 = job->status;
-+    if (s0 == s1) {
-+        return;
-+    }
-+    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
-+    trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1] ?
-+                                     "allowed" : "disallowed",
-+                                     qapi_enum_lookup(&BlockJobStatus_lookup,
-+                                                      s0),
-+                                     qapi_enum_lookup(&BlockJobStatus_lookup,
-+                                                      s1));
-+    assert(BlockJobSTT[s0][s1]);
-+    job->status = s1;
-+}
-+
- static void block_job_lock(void)
- {
-     qemu_mutex_lock(&block_job_mutex);
-@@ -320,7 +349,7 @@ void block_job_start(BlockJob *job)
-     job->pause_count--;
-     job->busy = true;
-     job->paused = false;
--    job->status = BLOCK_JOB_STATUS_RUNNING;
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
-     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+ /* BlockJob State Transition Table */
+ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S, X */
+-    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0},
+-    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0},
+-    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1},
+-    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0},
+-    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1},
+-    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0},
+-    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0},
++                                          /* U, C, R, P, Y, S, X, E */
++    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0},
++    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 0},
++    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1},
++    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0},
++    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1},
++    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0},
++    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1},
++    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0},
+ };
+ 
+ bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S, X */
+-    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0},
+-    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0},
+-    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0},
+-    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0},
+-    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0},
++                                          /* U, C, R, P, Y, S, X, E */
++    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0},
++    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0},
++    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0},
++    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0},
++    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0},
+ };
+ 
+ static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+@@ -114,6 +115,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
+ 
+ static void block_job_event_cancelled(BlockJob *job);
+ static void block_job_event_completed(BlockJob *job, const char *msg);
++static void block_job_event_concluded(BlockJob *job);
+ static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
+ 
+ /* Transactional group of block jobs */
+@@ -420,6 +422,7 @@ static void block_job_completed_single(BlockJob *job)
+ 
+     QLIST_REMOVE(job, txn_list);
+     block_job_txn_unref(job->txn);
++    block_job_event_concluded(job);
+     block_job_unref(job);
  }
  
-@@ -704,6 +733,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->refcnt        = 1;
-     job->manual        = (flags & BLOCK_JOB_MANUAL);
-     job->status        = BLOCK_JOB_STATUS_CREATED;
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
-     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-                    QEMU_CLOCK_REALTIME, SCALE_NS,
-                    block_job_sleep_timer_cb, job);
-@@ -818,13 +848,13 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+@@ -620,7 +623,9 @@ void block_job_user_resume(BlockJob *job, Error **errp)
  
-     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
-         BlockJobStatus status = job->status;
--        job->status = status == BLOCK_JOB_STATUS_READY ? \
--                                BLOCK_JOB_STATUS_STANDBY : \
--                                BLOCK_JOB_STATUS_PAUSED;
-+        block_job_state_transition(job, status == BLOCK_JOB_STATUS_READY ? \
-+                                   BLOCK_JOB_STATUS_STANDBY :           \
-+                                   BLOCK_JOB_STATUS_PAUSED);
-         job->paused = true;
-         block_job_do_yield(job, -1);
-         job->paused = false;
--        job->status = status;
-+        block_job_state_transition(job, status);
-     }
- 
-     if (job->driver->resume) {
-@@ -930,7 +960,7 @@ void block_job_iostatus_reset(BlockJob *job)
- 
- void block_job_event_ready(BlockJob *job)
+ void block_job_cancel(BlockJob *job)
  {
--    job->status = BLOCK_JOB_STATUS_READY;
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_READY);
-     job->ready = true;
+-    if (block_job_started(job)) {
++    if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
++        return;
++    } else if (block_job_started(job)) {
+         block_job_cancel_async(job);
+         block_job_enter(job);
+     } else {
+@@ -727,6 +732,14 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
+                                         &error_abort);
+ }
  
-     if (block_job_is_internal(job)) {
++static void block_job_event_concluded(BlockJob *job)
++{
++    if (block_job_is_internal(job) || !job->manual) {
++        return;
++    }
++    block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
++}
++
+ /*
+  * API for block job drivers and the block layer.  These functions are
+  * declared in blockjob_int.h.
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 3f7d559fc0..aeb9b1937b 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1000,11 +1000,14 @@
+ #            an error. The job will afterwards report that it is @concluded.
+ #            This status may not be visible to the management process.
+ #
++# @concluded: The job has finished all work. If manual was set to true, the job
++#             will remain in the query list until it is dismissed.
++#
+ # Since: 2.12
+ ##
+ { 'enum': 'BlockJobStatus',
+   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
+-           'aborting' ] }
++           'aborting', 'concluded' ] }
+ 
+ ##
+ # @BlockJobInfo:
 -- 
 2.14.3
