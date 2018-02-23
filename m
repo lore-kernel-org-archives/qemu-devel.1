@@ -1,21 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epEpt-0006Sb-Un
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:37 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1epEqb-00075e-2O
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:01:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epEpn-0005ej-QM
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:34 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:52945)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1epEpn-0005d4-Ax
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:27 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 23 Feb 2018 15:59:58 +0100
-Message-Id: <20180223145959.18761-4-laurent@vivier.eu>
-In-Reply-To: <20180223145959.18761-1-laurent@vivier.eu>
-References: <20180223145959.18761-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v3 3/4] softfloat: use floatx80_infinity in
- softfloat
+	(envelope-from <borntraeger@de.ibm.com>) id 1epEqX-0006AW-Vd
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:01:17 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1epEqX-00069e-M2
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:01:13 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1NExIE5002332
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:01:12 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gak0jp43v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:01:12 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 23 Feb 2018 15:01:09 -0000
+References: <1519241752-28083-1-git-send-email-walling@linux.vnet.ibm.com>
+	<29048432-906e-5fbe-d927-0814b0c24e4d@de.ibm.com>
+	<d31eb692-fd5e-7e83-1fa3-66d66f631043@linux.vnet.ibm.com>
+	<25e410d1-3b6a-1178-d46c-87f247eacea9@linux.vnet.ibm.com>
+	<11d66e11-7a56-c5d0-f285-2a532e85fcf8@de.ibm.com>
+	<450ee50a-660b-6ec8-7de4-e5c9ce8fa26a@linux.vnet.ibm.com>
+	<173adc8c-f251-73e4-9cda-f278b2483186@linux.vnet.ibm.com>
+	<f599e3d7-0c82-f841-ae18-9a6a3a010030@redhat.com>
+	<bae827ac-1b24-70c6-2bfe-6e9f95136917@de.ibm.com>
+	<fcbfab45-e231-038e-696c-607a42683124@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 23 Feb 2018 16:01:06 +0100
+MIME-Version: 1.0
+In-Reply-To: <fcbfab45-e231-038e-696c-607a42683124@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Message-Id: <ac2f9da4-1743-4238-c219-fd5934c1498f@de.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 00/13] Interactive Boot
+ Menu for DASD and SCSI Guests on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,206 +51,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, david@redhat.com, cohuck@redhat.com
 
-Since f3218a8 ("softfloat: add floatx80 constants")
-floatx80_infinity is defined but never used.
 
-This patch updates floatx80 functions to use
-this definition.
 
-This allows to define a different default Infinity
-value on m68k: the m68k FPU defines infinity with
-all bits set to zero in the mantissa.
+On 02/23/2018 03:57 PM, Collin L. Walling wrote:
+> On 02/23/2018 05:11 AM, Christian Borntraeger wrote:
+>>
+>> On 02/23/2018 11:07 AM, Thomas Huth wrote:
+>>> On 22.02.2018 20:40, Collin L. Walling wrote:
+>>>> On 02/22/2018 11:45 AM, Collin L. Walling wrote:
+>>>>> On 02/22/2018 10:44 AM, Christian Borntraeger wrote:
+>>>>>> On 02/22/2018 04:40 PM, Collin L. Walling wrote:
+>>>>>>> On 02/22/2018 07:23 AM, Viktor Mihajlovski wrote:
+>>>>>>>> On 22.02.2018 12:51, Christian Borntraeger wrote:
+>>>>>>>>> Series
+>>>>>>>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>>>>> Thanks!!!
+>>>>>>>
+>>>>>>>>> menu on scsi and dasd bootmaps tested successfully.
+>>>>>>>>>
+>>>>>>>>> There is one thing that we might want to fix (can be an addon
+>>>>>>>>> patch since this is a non-customer
+>>>>>>>>> scenario (no libvirt)).
+>>>>>>>>>
+>>>>>>>>> If you start QEMU manually without a bootindex, the -boot menu=3D=
+on
+>>>>>>>>> is ignored
+>>>>>>>>> if no drive has a bootindex.
+>>>>>>>>>
+>>>>>>>>> For example:
+>>>>>>>>>
+>>>>>>>>> -drive file=3D/dev/dasda,if=3Dnone,id=3Dd1 -device
+>>>>>>>>> virtio-blk-ccw,drive=3Dd1,bootindex=3D1 -boot menu=3Don
+>>>>>>>>> does work
+>>>>>>>>>
+>>>>>>>>> -drive file=3D/dev/dasda -boot menu=3Don
+>>>>>>>>> does not
+>>>>>>>>>
+>>>>>>>>> instead it prints:
+>>>>>>>>> qemu-system-s390x: boot menu is not supported for this device t=
+ype.
+>>>>>>>>>
+>>>>>>>>> and the boots up the default entry.
+>>>>>>>>>
+>>>>>>>> That should indeed be a separate patch, as it would move logic
+>>>>>>>> currently
+>>>>>>>> in the BIOS up to QEMU (find the first defined virtio disk and
+>>>>>>>> select it
+>>>>>>>> as boot disk).
+>>>>>>>> In fact it's more complicated than that, because it would have t=
+o
+>>>>>>>> properly account for -boot order=3D[acdn] and produce the respec=
+tive
+>>>>>>>> IPLB.
+>>>>>>>> While it makes sense, I wouldn't rush that in but rather change =
+the
+>>>>>>>> error message to indicate that -device bootindex is needed to ac=
+tivate
+>>>>>>>> the menu, at least for the time being.
+>>>>>>>> [...]
+>>>>>>>>
+>>>>>>> I can look into it.=C2=A0 Theoretically, the easier fix should ju=
+st
+>>>>>>> involve parsing all
+>>>>>>> of the -device commands and looking for a "bootindex=3D1" field. =
+The
+>>>>>>> Qemu options
+>>>>>>> code already handles a bulk of this work, so it's just a matter o=
+f
+>>>>>>> putting it all
+>>>>>>> together.
+>>>>>>>
+>>>>>>> Shall I whip something up and post what I have as a reply to this
+>>>>>>> email chain?
+>>>>>> In fact, it should already be there.
+>>>>>>
+>>>>>> static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>>>>>> {
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceState *dev_st;
+>>>>>>
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev_st =3D get_boot_device(0);
+>>>>>>
+>>>>>> --> if this returns 0 we have no bootindex statement anywhere and =
+the
+>>>>>> BIOS will IPL the default
+>>>>>> disk.
+>>>>>>
+>>>>>>
+>>>>> Makes sense.=C2=A0 I'm working on making this patch look as clean a=
+s
+>>>>> possible. The fact that no boot menu
+>>>>> options present means we fallback to using zipl values for CCW bein=
+g
+>>>>> tied into the switch statement
+>>>>> is making things a bit tricky. Just have to think the logic through=
+ a
+>>>>> bit.=C2=A0 Will get back to you once
+>>>>> I have something good.
+>>>>>
+>>>> This should do the trick (this can also be squished painlessly into =
+6/13
+>>>> if desired)
+>>> Patch looks fine to me. I can either take it directly like this, or i=
+n
+>>> case you have to respin (depends on the problem that Christian report=
+ed
+>>> with the Ubuntu guest), I'm also fine if you squash it into an earlie=
+r
+>>> patch instead.
+>> FWIW, my problem (a menu happens even without -boot menu=3Don or loadp=
+arm) also
+>> happens with other guests (e.g. fedora).
+>>
+>>
+> Is this on guests using DASD?=C2=A0 If so, a boot menu will appear if t=
+he appropriate zipl configuration
+> values are set (even if no -boot menu or loadparm).=C2=A0 Patch 12/13 g=
+oes into more detail.
+>=20
+> Is this not wanted behavior?
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
-CC: Aurelien Jarno <aurelien@aurel32.net>
-
- fpu/softfloat-specialize.h | 14 ++++++++++++++
- fpu/softfloat.c            | 38 ++++++++++++++++++++++++++------------
- include/fpu/softfloat.h    |  9 +++++++--
- 3 files changed, 47 insertions(+), 14 deletions(-)
-
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 46126e9e0a..9ccb59422c 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -177,6 +177,20 @@ floatx80 floatx80_default_nan(float_status *status)
-     return r;
- }
- 
-+/*----------------------------------------------------------------------------
-+| The pattern for a default generated extended double-precision inf.
-+*----------------------------------------------------------------------------*/
-+
-+#define floatx80_infinity_high 0x7FFF
-+#if defined(TARGET_M68K)
-+#define floatx80_infinity_low  LIT64(0x0000000000000000)
-+#else
-+#define floatx80_infinity_low  LIT64(0x8000000000000000)
-+#endif
-+
-+const floatx80 floatx80_infinity
-+    = make_floatx80_init(floatx80_infinity_high, floatx80_infinity_low);
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated quadruple-precision NaN.
- *----------------------------------------------------------------------------*/
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index fb4853682e..70a86e156c 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -2636,7 +2636,9 @@ floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
-                ) {
-                 return packFloatx80( zSign, 0x7FFE, ~ roundMask );
-             }
--            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+            return packFloatx80(zSign,
-+                                floatx80_infinity_high,
-+                                floatx80_infinity_low);
-         }
-         if ( zExp <= 0 ) {
-             isTiny =
-@@ -3182,7 +3184,9 @@ floatx80 float32_to_floatx80(float32 a, float_status *status)
-         if (aSig) {
-             return commonNaNToFloatx80(float32ToCommonNaN(a, status), status);
-         }
--        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(aSign,
-+                            floatx80_infinity_high,
-+                            floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( aSig == 0 ) return packFloatx80( aSign, 0, 0 );
-@@ -4037,7 +4041,9 @@ floatx80 float64_to_floatx80(float64 a, float_status *status)
-         if (aSig) {
-             return commonNaNToFloatx80(float64ToCommonNaN(a, status), status);
-         }
--        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(aSign,
-+                            floatx80_infinity_high,
-+                            floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( aSig == 0 ) return packFloatx80( aSign, 0, 0 );
-@@ -4550,8 +4556,8 @@ int64_t floatx80_to_int64(floatx80 a, float_status *status)
-         if ( shiftCount ) {
-             float_raise(float_flag_invalid, status);
-             if (    ! aSign
--                 || (    ( aExp == 0x7FFF )
--                      && ( aSig != LIT64( 0x8000000000000000 ) ) )
-+                 || ((aExp == floatx80_infinity_high)
-+                     && (aSig != floatx80_infinity_low))
-                ) {
-                 return LIT64( 0x7FFFFFFFFFFFFFFF );
-             }
-@@ -4858,7 +4864,9 @@ static floatx80 addFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
-             if ((uint64_t)(bSig << 1)) {
-                 return propagateFloatx80NaN(a, b, status);
-             }
--            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+            return packFloatx80(zSign,
-+                                floatx80_infinity_high,
-+                                floatx80_infinity_low);
-         }
-         if ( aExp == 0 ) ++expDiff;
-         shift64ExtraRightJamming( aSig, 0, - expDiff, &aSig, &zSig1 );
-@@ -4933,7 +4941,8 @@ static floatx80 subFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
-         if ((uint64_t)(bSig << 1)) {
-             return propagateFloatx80NaN(a, b, status);
-         }
--        return packFloatx80( zSign ^ 1, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign ^ 1, floatx80_infinity_high,
-+                            floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) ++expDiff;
-     shift128RightJamming( aSig, 0, - expDiff, &aSig, &zSig1 );
-@@ -5038,7 +5047,8 @@ floatx80 floatx80_mul(floatx80 a, floatx80 b, float_status *status)
-             return propagateFloatx80NaN(a, b, status);
-         }
-         if ( ( bExp | bSig ) == 0 ) goto invalid;
--        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( bExp == 0x7FFF ) {
-         if ((uint64_t)(bSig << 1)) {
-@@ -5049,7 +5059,8 @@ floatx80 floatx80_mul(floatx80 a, floatx80 b, float_status *status)
-             float_raise(float_flag_invalid, status);
-             return floatx80_default_nan(status);
-         }
--        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( aSig == 0 ) return packFloatx80( zSign, 0, 0 );
-@@ -5103,7 +5114,8 @@ floatx80 floatx80_div(floatx80 a, floatx80 b, float_status *status)
-             }
-             goto invalid;
-         }
--        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( bExp == 0x7FFF ) {
-         if ((uint64_t)(bSig << 1)) {
-@@ -5119,7 +5131,8 @@ floatx80 floatx80_div(floatx80 a, floatx80 b, float_status *status)
-                 return floatx80_default_nan(status);
-             }
-             float_raise(float_flag_divbyzero, status);
--            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+            return packFloatx80(zSign, floatx80_infinity_high,
-+                                       floatx80_infinity_low);
-         }
-         normalizeFloatx80Subnormal( bSig, &bExp, &bSig );
-     }
-@@ -5942,7 +5955,8 @@ floatx80 float128_to_floatx80(float128 a, float_status *status)
-         if ( aSig0 | aSig1 ) {
-             return commonNaNToFloatx80(float128ToCommonNaN(a, status), status);
-         }
--        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(aSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( ( aSig0 | aSig1 ) == 0 ) return packFloatx80( aSign, 0, 0 );
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 125dcb5586..7edf407cbc 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -563,6 +563,11 @@ float32 floatx80_to_float32(floatx80, float_status *status);
- float64 floatx80_to_float64(floatx80, float_status *status);
- float128 floatx80_to_float128(floatx80, float_status *status);
- 
-+/*----------------------------------------------------------------------------
-+| The pattern for an extended double-precision inf.
-+*----------------------------------------------------------------------------*/
-+extern const floatx80 floatx80_infinity;
-+
- /*----------------------------------------------------------------------------
- | Software IEC/IEEE extended double-precision operations.
- *----------------------------------------------------------------------------*/
-@@ -603,7 +608,8 @@ static inline floatx80 floatx80_chs(floatx80 a)
- 
- static inline int floatx80_is_infinity(floatx80 a)
- {
--    return (a.high & 0x7fff) == 0x7fff && a.low == 0x8000000000000000LL;
-+    return (a.high & 0x7fff) == floatx80_infinity.high &&
-+                       a.low == floatx80_infinity.low;
- }
- 
- static inline int floatx80_is_neg(floatx80 a)
-@@ -646,7 +652,6 @@ static inline bool floatx80_invalid_encoding(floatx80 a)
- #define floatx80_ln2 make_floatx80(0x3ffe, 0xb17217f7d1cf79acLL)
- #define floatx80_pi make_floatx80(0x4000, 0xc90fdaa22168c235LL)
- #define floatx80_half make_floatx80(0x3ffe, 0x8000000000000000LL)
--#define floatx80_infinity make_floatx80(0x7fff, 0x8000000000000000LL)
- 
- /*----------------------------------------------------------------------------
- | Returns the fraction bits of the extended double-precision floating-point
--- 
-2.14.3
+Its on an image file with a scsi bootmap. And for that it is absolutely n=
+ot wanted to wait
+forever during boot even if you did not specify to have a boot menu. That=
+ will break all=20
+existing guest definitions that boot up unattended. Imagine to have lets =
+say 1000 guests
+with services running. Do you expect the host admin to login to every gue=
+st just to start
+it after the host has rebooted.
