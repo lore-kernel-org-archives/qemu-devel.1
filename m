@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8S-0005zg-9P
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:19 -0500
+	(envelope-from <jsnow@redhat.com>) id 1epN8L-0005qh-FS
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1epN8P-000664-JQ
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:16 -0500
+	(envelope-from <jsnow@redhat.com>) id 1epN8H-0005pW-Hv
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:09 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 23 Feb 2018 18:51:38 -0500
-Message-Id: <20180223235142.21501-18-jsnow@redhat.com>
+Date: Fri, 23 Feb 2018 18:51:40 -0500
+Message-Id: <20180223235142.21501-20-jsnow@redhat.com>
 In-Reply-To: <20180223235142.21501-1-jsnow@redhat.com>
 References: <20180223235142.21501-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v4 17/21] blockjobs: add PENDING status and event
+Subject: [Qemu-devel] [RFC v4 19/21] blockjobs: Expose manual property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,243 +22,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-For jobs utilizing the new manual workflow, we intend to prohibit
-them from modifying the block graph until the management layer provides
-an explicit ACK via block-job-finalize to move the process forward.
-
-To distinguish this runstate from "ready" or "waiting," we add a new
-"pending" event.
-
-For now, the transition from PENDING to CONCLUDED/ABORTING is automatic,
-but a future commit will add the explicit block-job-finalize step.
-
-Transitions:
-Waiting -> Pending:   Normal transition.
-Pending -> Concluded: Normal transition.
-Pending -> Aborting:  Late transactional failures and cancellations.
-
-Removed Transitions:
-Waiting -> Concluded: Jobs must go to PENDING first.
-
-Verbs:
-Cancel: Can be applied to a pending job.
-
-             +---------+
-             |UNDEFINED|
-             +--+------+
-                |
-             +--v----+
-             |CREATED+-----------------+
-             +--+----+                 |
-                |                      |
-             +--+----+     +------+    |
-   +---------+RUNNING<----->PAUSED|    |
-   |         +--+-+--+     +------+    |
-   |            | |                    |
-   |            | +------------------+ |
-   |            |                    | |
-   |         +--v--+       +-------+ | |
-   +---------+READY<------->STANDBY| | |
-   |         +--+--+       +-------+ | |
-   |            |                    | |
-   |         +--v----+               | |
-   +---------+WAITING+---------------+ |
-   |         +--+----+                 |
-   |            |                      |
-   |         +--v----+                 |
-   +---------+PENDING|                 |
-   |         +--+----+                 |
-   |            |                      |
-+--v-----+   +--v------+               |
-|ABORTING+--->CONCLUDED|               |
-+--------+   +--+------+               |
-                |                      |
-             +--v-+                    |
-             |NULL+--------------------+
-             +----+
+Expose the "manual" property via QAPI for the backup-related jobs.
+As of this commit, this allows the management API to request the
+"concluded" and "dismiss" semantics for backup jobs.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c           | 66 +++++++++++++++++++++++++++++++++-------------------
- qapi/block-core.json | 31 +++++++++++++++++++++++-
- 2 files changed, 72 insertions(+), 25 deletions(-)
+ blockdev.c           | 19 ++++++++++++++++---
+ qapi/block-core.json | 32 ++++++++++++++++++++++++++------
+ 2 files changed, 42 insertions(+), 9 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 4aed86fc6b..23b4b99fd4 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -44,27 +44,28 @@ static QemuMutex block_job_mutex;
+diff --git a/blockdev.c b/blockdev.c
+index 05fd421cdc..2eddb0e726 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3260,7 +3260,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+     AioContext *aio_context;
+     QDict *options = NULL;
+     Error *local_err = NULL;
+-    int flags;
++    int flags, job_flags = BLOCK_JOB_DEFAULT;
+     int64_t size;
+     bool set_backing_hd = false;
  
- /* BlockJob State Transition Table */
- bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, W, X, E, N */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1, 0, 0},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1, 0, 0},
--    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
--    /* W: */ [BLOCK_JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
--    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
--    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
--    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-+                                          /* U, C, R, P, Y, S, W, D, X, E, N */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0},
-+    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-+    /* W: */ [BLOCK_JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0},
-+    /* D: */ [BLOCK_JOB_STATUS_PENDING]   = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
-+    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-+    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-+    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
- };
- 
- bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, W, X, E, N */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 1, 0, 0, 0},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-+                                          /* U, C, R, P, Y, S, W, D, X, E, N */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
- };
- 
- static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -119,6 +120,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
- static void block_job_event_cancelled(BlockJob *job);
- static void block_job_event_completed(BlockJob *job, const char *msg);
- static void block_job_event_concluded(BlockJob *job);
-+static int block_job_event_pending(BlockJob *job);
- static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
- 
- /* Transactional group of block jobs */
-@@ -481,17 +483,21 @@ static void block_job_cancel_async(BlockJob *job)
-     job->cancelled = true;
- }
- 
--static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *))
-+static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *), bool lock)
- {
-     AioContext *ctx;
-     BlockJob *job, *next;
-     int rc;
- 
-     QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
--        ctx = blk_get_aio_context(job->blk);
--        aio_context_acquire(ctx);
-+        if (lock) {
-+            ctx = blk_get_aio_context(job->blk);
-+            aio_context_acquire(ctx);
-+        }
-         rc = fn(job);
--        aio_context_release(ctx);
-+        if (lock) {
-+            aio_context_release(ctx);
-+        }
-         if (rc) {
-             break;
-         }
-@@ -601,14 +607,15 @@ static void block_job_completed_txn_success(BlockJob *job)
+@@ -3279,6 +3279,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+     if (!backup->has_job_id) {
+         backup->job_id = NULL;
      }
- 
-     /* Jobs may require some prep-work to complete without failure */
--    rc = block_job_txn_apply(txn, block_job_prepare);
-+    rc = block_job_txn_apply(txn, block_job_prepare, true);
-     if (rc) {
-         block_job_completed_txn_abort(job);
-         return;
-     }
- 
-     /* We are the last completed job, commit the transaction. */
--    block_job_txn_apply(txn, block_job_completed_single);
-+    block_job_txn_apply(txn, block_job_event_pending, false);
-+    block_job_txn_apply(txn, block_job_completed_single, true);
- }
- 
- /* Assumes the block_job_mutex is held */
-@@ -817,6 +824,17 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
-                                         &error_abort);
- }
- 
-+static int block_job_event_pending(BlockJob *job)
-+{
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_PENDING);
-+    if (job->manual && !block_job_is_internal(job)) {
-+        qapi_event_send_block_job_pending(job->driver->job_type,
-+                                          job->id,
-+                                          &error_abort);
++    if (!backup->has_manual) {
++        backup->manual = false;
 +    }
-+    return 0;
-+}
-+
- static void block_job_event_concluded(BlockJob *job)
- {
-     block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
+     if (!backup->has_compress) {
+         backup->compress = false;
+     }
+@@ -3370,11 +3373,14 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+             goto out;
+         }
+     }
++    if (backup->manual) {
++        job_flags |= BLOCK_JOB_MANUAL;
++    }
+ 
+     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
+                             backup->sync, bmap, backup->compress,
+                             backup->on_source_error, backup->on_target_error,
+-                            BLOCK_JOB_DEFAULT, NULL, NULL, txn, &local_err);
++                            job_flags, NULL, NULL, txn, &local_err);
+     bdrv_unref(target_bs);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+@@ -3409,6 +3415,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+     Error *local_err = NULL;
+     AioContext *aio_context;
+     BlockJob *job = NULL;
++    int job_flags = BLOCK_JOB_DEFAULT;
+ 
+     if (!backup->has_speed) {
+         backup->speed = 0;
+@@ -3422,6 +3429,9 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+     if (!backup->has_job_id) {
+         backup->job_id = NULL;
+     }
++    if (!backup->has_manual) {
++        backup->manual = false;
++    }
+     if (!backup->has_compress) {
+         backup->compress = false;
+     }
+@@ -3450,10 +3460,13 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+             goto out;
+         }
+     }
++    if (backup->manual) {
++        job_flags |= BLOCK_JOB_MANUAL;
++    }
+     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
+                             backup->sync, NULL, backup->compress,
+                             backup->on_source_error, backup->on_target_error,
+-                            BLOCK_JOB_DEFAULT, NULL, NULL, txn, &local_err);
++                            job_flags, NULL, NULL, txn, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+     }
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3005aac7e2..acf9e56876 100644
+index 549c6c02d8..7b3af93682 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -1002,6 +1002,11 @@
- #           to the waiting state. This status will likely not be visible for
- #           the last job in a transaction.
+@@ -1177,6 +1177,16 @@
+ # @job-id: identifier for the newly-created block job. If
+ #          omitted, the device name will be used. (Since 2.7)
  #
-+# @pending: The job has finished its work, but has finalization steps that it
-+#           needs to make prior to completing. These changes may require
-+#           manual intervention by the management process if manual was set
-+#           to true.
++# @manual: True to use an expanded, more explicit job control flow.
++#          Jobs may transition from a running state to a pending state,
++#          where they must be instructed to complete manually via
++#          block-job-finalize.
++#          Jobs belonging to a transaction must either all or all not use this
++#          setting. Once a transaction reaches a pending state, issuing the
++#          finalize command to any one job in the transaction is sufficient
++#          to finalize the entire transaction.
++#          (Since 2.12)
 +#
- # @aborting: The job is in the process of being aborted, and will finish with
- #            an error. The job will afterwards report that it is @concluded.
- #            This status may not be visible to the management process.
-@@ -1016,7 +1021,7 @@
- ##
- { 'enum': 'BlockJobStatus',
-   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
--           'waiting', 'aborting', 'concluded', 'null' ] }
-+           'waiting', 'pending', 'aborting', 'concluded', 'null' ] }
- 
- ##
- # @BlockJobInfo:
-@@ -3961,6 +3966,30 @@
-   'data': { 'type'  : 'BlockJobType',
-             'id'    : 'str' } }
- 
-+##
-+# @BLOCK_JOB_PENDING:
-+#
-+# Emitted when a block job is awaiting explicit authorization to finalize graph
-+# changes via @block-job-finalize. If this job is part of a transaction, it will
-+# not emit this event until the transaction has converged first.
-+#
-+# @type: job type
-+#
-+# @id: The job identifier.
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# <- { "event": "BLOCK_JOB_WAITING",
-+#      "data": { "device": "drive0", "type": "mirror" },
-+#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
-+#
-+##
-+{ 'event': 'BLOCK_JOB_PENDING',
-+  'data': { 'type'  : 'BlockJobType',
-+            'id'    : 'str' } }
-+
- ##
- # @PreallocMode:
+ # @device: the device name or node-name of a root node which should be copied.
  #
+ # @target: the target of the new image. If the file exists, or if it
+@@ -1217,9 +1227,10 @@
+ # Since: 1.6
+ ##
+ { 'struct': 'DriveBackup',
+-  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+-            '*format': 'str', 'sync': 'MirrorSyncMode', '*mode': 'NewImageMode',
+-            '*speed': 'int', '*bitmap': 'str', '*compress': 'bool',
++  'data': { '*job-id': 'str', '*manual': 'bool', 'device': 'str',
++            'target': 'str', '*format': 'str', 'sync': 'MirrorSyncMode',
++            '*mode': 'NewImageMode', '*speed': 'int',
++            '*bitmap': 'str', '*compress': 'bool',
+             '*on-source-error': 'BlockdevOnError',
+             '*on-target-error': 'BlockdevOnError' } }
+ 
+@@ -1229,6 +1240,16 @@
+ # @job-id: identifier for the newly-created block job. If
+ #          omitted, the device name will be used. (Since 2.7)
+ #
++# @manual: True to use an expanded, more explicit job control flow.
++#          Jobs may transition from a running state to a pending state,
++#          where they must be instructed to complete manually via
++#          block-job-finalize.
++#          Jobs belonging to a transaction must either all or all not use this
++#          setting. Once a transaction reaches a pending state, issuing the
++#          finalize command to any one job in the transaction is sufficient
++#          to finalize the entire transaction.
++#          (Since 2.12)
++#
+ # @device: the device name or node-name of a root node which should be copied.
+ #
+ # @target: the device name or node-name of the backup target node.
+@@ -1258,9 +1279,8 @@
+ # Since: 2.3
+ ##
+ { 'struct': 'BlockdevBackup',
+-  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+-            'sync': 'MirrorSyncMode',
+-            '*speed': 'int',
++  'data': { '*job-id': 'str', '*manual': 'bool', 'device': 'str',
++            'target': 'str', 'sync': 'MirrorSyncMode', '*speed': 'int',
+             '*compress': 'bool',
+             '*on-source-error': 'BlockdevOnError',
+             '*on-target-error': 'BlockdevOnError' } }
 -- 
 2.14.3
