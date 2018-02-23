@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epFiS-00053q-Hl
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:56:57 -0500
+	(envelope-from <lersek@redhat.com>) id 1epFkG-0006ua-QO
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:58:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epFiR-0001Xl-Jb
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:56:56 -0500
-Date: Fri, 23 Feb 2018 16:56:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180223155647.GD3470@localhost.localdomain>
-References: <20180221135404.27598-1-kwolf@redhat.com>
-	<20180221135404.27598-19-kwolf@redhat.com>
-	<80aaebea-b192-333f-aa35-3cdf0e71aef3@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1epFkB-0003pg-RE
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:58:48 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55366 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1epFkB-0003oe-Mf
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:58:43 -0500
+References: <20180223132311.26555-1-marcandre.lureau@redhat.com>
+	<20180223132311.26555-2-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f4673d80-32a6-1324-8a20-9ce845ed6e49@redhat.com>
+Date: Fri, 23 Feb 2018 16:58:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80aaebea-b192-333f-aa35-3cdf0e71aef3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 18/36] rbd: Fix use after free in
- qemu_rbd_set_keypairs() error path
+In-Reply-To: <20180223132311.26555-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH 1/7] SecurityPkg/Tcg2Pei: drop
+ Tcg2PhysicalPresenceLib dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
 
-Am 23.02.2018 um 16:15 hat Eric Blake geschrieben:
-> On 02/21/2018 07:53 AM, Kevin Wolf wrote:
-> > If we want to include the invalid option name in the error message, we
-> > can't free the string earlier than that.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   block/rbd.c | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> D'oh.  Should this one be cc'd to qemu-stable?
+On 02/23/18 14:23, marcandre.lureau@redhat.com wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> Apparently, unnecessary. Avoids extra build dependency and churn.
+>=20
+> CC: Laszlo Ersek <lersek@redhat.com>
+> CC: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Contributed-under: TianoCore Contribution Agreement 1.0
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.c   | 2 --
+>  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf | 1 -
+>  2 files changed, 3 deletions(-)
+>=20
+> diff --git a/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.c b/SecurityPkg/Tcg/Tcg2Pe=
+i/Tcg2Pei.c
+> index a7ae3354b5..3758fc6a41 100644
+> --- a/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.c
+> +++ b/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.c
+> @@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EI=
+THER EXPRESS OR IMPLIED.
+>  #include <IndustryStandard/UefiTcgPlatform.h>
+>  #include <Ppi/FirmwareVolumeInfo.h>
+>  #include <Ppi/FirmwareVolumeInfo2.h>
+> -#include <Ppi/LockPhysicalPresence.h>
+>  #include <Ppi/TpmInitialized.h>
+>  #include <Ppi/FirmwareVolume.h>
+>  #include <Ppi/EndOfPeiPhase.h>
+> @@ -44,7 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EI=
+THER EXPRESS OR IMPLIED.
+>  #include <Library/MemoryAllocationLib.h>
+>  #include <Library/ReportStatusCodeLib.h>
+>  #include <Library/ResetSystemLib.h>
+> -#include <Library/Tcg2PhysicalPresenceLib.h>
+> =20
+>  #define PERF_ID_TCG2_PEI  0x3080
+> =20
+> diff --git a/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf b/SecurityPkg/Tcg/Tcg2=
+Pei/Tcg2Pei.inf
+> index f7b85444d9..bc910c3baf 100644
+> --- a/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
+> +++ b/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
+> @@ -58,7 +58,6 @@
+>    PerformanceLib
+>    MemoryAllocationLib
+>    ReportStatusCodeLib
+> -  Tcg2PhysicalPresenceLib
+>    ResetSystemLib
+> =20
+>  [Guids]
+>=20
 
-Yes, good point. Adding the CC to this reply, and also adding a Cc: line
-in the commit message.
+Good catch.
 
-Kevin
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
