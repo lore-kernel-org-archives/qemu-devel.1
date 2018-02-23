@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1epFP3-0002u9-U5
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:36:55 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1epFP8-000304-GM
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:36:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1epFP2-0007Me-DD
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:36:53 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38850)
+	(envelope-from <alex.bennee@linaro.org>) id 1epFP7-0007aZ-7W
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:36:58 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52089)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1epFP2-0007K5-2r
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:36:52 -0500
-Received: by mail-wm0-x243.google.com with SMTP id z9so5312295wmb.3
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:36:51 -0800 (PST)
+	id 1epFP6-0007Y6-Ug
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:36:57 -0500
+Received: by mail-wm0-x244.google.com with SMTP id h21so5411809wmd.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:36:56 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 23 Feb 2018 15:36:18 +0000
-Message-Id: <20180223153636.29809-14-alex.bennee@linaro.org>
+Date: Fri, 23 Feb 2018 15:36:35 +0000
+Message-Id: <20180223153636.29809-31-alex.bennee@linaro.org>
 In-Reply-To: <20180223153636.29809-1-alex.bennee@linaro.org>
 References: <20180223153636.29809-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 13/31] arm/translate-a64: add FP16 pairwise
- ops simd_three_reg_same_fp16
+Subject: [Qemu-devel] [PATCH v3 30/31] arm/translate-a64: implement
+ simd_scalar_three_reg_same_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,252 +33,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-This includes FMAXNMP, FADDP, FMAXP, FMINNMP, FMINP.
+This covers the encoding group:
+
+  Advanced SIMD scalar three same FP16
+
+As all the helpers are already there it is simply a case of calling the
+existing helpers in the scalar context.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
 v2
   - checkpatch fixes
+v3
+  - check for FP16 feature
+  - remove stray debug
+  - make abs a bitwise operation
+  - checkpatch long line
 ---
- target/arm/translate-a64.c | 208 +++++++++++++++++++++++++++++----------------
- 1 file changed, 133 insertions(+), 75 deletions(-)
+ target/arm/translate-a64.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 217e73ef58..e96e6cdd15 100644
+index 6eae8bd8b1..6704d66be7 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -10247,6 +10247,7 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
-     int datasize, elements;
-     int pass;
-     TCGv_ptr fpst;
-+    bool pairwise = false;
+@@ -7802,6 +7802,104 @@ static void disas_simd_scalar_three_reg_same(DisasContext *s, uint32_t insn)
+     tcg_temp_free_i64(tcg_rd);
+ }
  
-     if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-         unallocated_encoding(s);
-@@ -10272,91 +10273,148 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
-     datasize = is_q ? 128 : 64;
-     elements = datasize / 16;
- 
++/* AdvSIMD scalar three same FP16
++ *  31 30  29 28       24 23  22 21 20  16 15 14 13    11 10  9  5 4  0
++ * +-----+---+-----------+---+-----+------+-----+--------+---+----+----+
++ * | 0 1 | U | 1 1 1 1 0 | a | 1 0 |  Rm  | 0 0 | opcode | 1 | Rn | Rd |
++ * +-----+---+-----------+---+-----+------+-----+--------+---+----+----+
++ * v: 0101 1110 0100 0000 0000 0100 0000 0000 => 5e400400
++ * m: 1101 1111 0110 0000 1100 0100 0000 0000 => df60c400
++ */
++static void disas_simd_scalar_three_reg_same_fp16(DisasContext *s,
++                                                  uint32_t insn)
++{
++    int rd = extract32(insn, 0, 5);
++    int rn = extract32(insn, 5, 5);
++    int opcode = extract32(insn, 11, 3);
++    int rm = extract32(insn, 16, 5);
++    bool u = extract32(insn, 29, 1);
++    bool a = extract32(insn, 23, 1);
++    int fpopcode = opcode | (a << 3) |  (u << 4);
++    TCGv_ptr fpst;
++    TCGv_i32 tcg_op1;
++    TCGv_i32 tcg_op2;
++    TCGv_i32 tcg_res;
++
 +    switch (fpopcode) {
-+    case 0x10: /* FMAXNMP */
-+    case 0x12: /* FADDP */
-+    case 0x16: /* FMAXP */
-+    case 0x18: /* FMINNMP */
-+    case 0x1e: /* FMINP */
-+        pairwise = true;
++    case 0x03: /* FMULX */
++    case 0x04: /* FCMEQ (reg) */
++    case 0x07: /* FRECPS */
++    case 0x0f: /* FRSQRTS */
++    case 0x14: /* FCMGE (reg) */
++    case 0x15: /* FACGE */
++    case 0x1a: /* FABD */
++    case 0x1c: /* FCMGT (reg) */
++    case 0x1d: /* FACGT */
 +        break;
++    default:
++        unallocated_encoding(s);
++        return;
 +    }
 +
-     fpst = get_fpstatus_ptr(true);
++    if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++        unallocated_encoding(s);
++    }
++
++    if (!fp_access_check(s)) {
++        return;
++    }
++
++    fpst = get_fpstatus_ptr(true);
++
++    tcg_op1 = tcg_temp_new_i32();
++    tcg_op2 = tcg_temp_new_i32();
++    tcg_res = tcg_temp_new_i32();
++
++    read_vec_element_i32(s, tcg_op1, rn, 0, MO_16);
++    read_vec_element_i32(s, tcg_op2, rm, 0, MO_16);
++
++    switch (fpopcode) {
++    case 0x03: /* FMULX */
++        gen_helper_advsimd_mulxh(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    case 0x04: /* FCMEQ (reg) */
++        gen_helper_advsimd_ceq_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    case 0x07: /* FRECPS */
++        gen_helper_recpsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    case 0x0f: /* FRSQRTS */
++        gen_helper_rsqrtsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    case 0x14: /* FCMGE (reg) */
++        gen_helper_advsimd_cge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    case 0x15: /* FACGE */
++        gen_helper_advsimd_acge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    case 0x1a: /* FABD */
++        gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
++        tcg_gen_andi_i32(tcg_res, tcg_res, 0x7fff);
++        break;
++    case 0x1c: /* FCMGT (reg) */
++        gen_helper_advsimd_cgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    case 0x1d: /* FACGT */
++        gen_helper_advsimd_acgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    write_fp_sreg(s, rd, tcg_res);
++
++
++    tcg_temp_free_i32(tcg_res);
++    tcg_temp_free_i32(tcg_op1);
++    tcg_temp_free_i32(tcg_op2);
++    tcg_temp_free_ptr(fpst);
++}
++
+ static void handle_2misc_64(DisasContext *s, int opcode, bool u,
+                             TCGv_i64 tcg_rd, TCGv_i64 tcg_rn,
+                             TCGv_i32 tcg_rmode, TCGv_ptr tcg_fpstatus)
+@@ -12654,6 +12752,7 @@ static const AArch64DecodeTable data_proc_simd[] = {
+     { 0xce408000, 0xffe0c000, disas_crypto_three_reg_imm2 },
+     { 0x0e400400, 0x9f60c400, disas_simd_three_reg_same_fp16 },
+     { 0x0e780800, 0x8f7e0c00, disas_simd_two_reg_misc_fp16 },
++    { 0x5e400400, 0xdf60c400, disas_simd_scalar_three_reg_same_fp16 },
+     { 0x00000000, 0x00000000, NULL }
+ };
  
--    for (pass = 0; pass < elements; pass++) {
-+    if (pairwise) {
-+        int maxpass = is_q ? 8 : 4;
-         TCGv_i32 tcg_op1 = tcg_temp_new_i32();
-         TCGv_i32 tcg_op2 = tcg_temp_new_i32();
--        TCGv_i32 tcg_res = tcg_temp_new_i32();
-+        TCGv_i32 tcg_res[8];
- 
--        read_vec_element_i32(s, tcg_op1, rn, pass, MO_16);
--        read_vec_element_i32(s, tcg_op2, rm, pass, MO_16);
-+        for (pass = 0; pass < maxpass; pass++) {
-+            int passreg = pass < (maxpass / 2) ? rn : rm;
-+            int passelt = (pass << 1) & (maxpass - 1);
- 
--        switch (fpopcode) {
--        case 0x0: /* FMAXNM */
--            gen_helper_advsimd_maxnumh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x1: /* FMLA */
--            read_vec_element_i32(s, tcg_res, rd, pass, MO_16);
--            gen_helper_advsimd_muladdh(tcg_res, tcg_op1, tcg_op2, tcg_res,
--                                       fpst);
--            break;
--        case 0x2: /* FADD */
--            gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x3: /* FMULX */
--            gen_helper_advsimd_mulxh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x4: /* FCMEQ */
--            gen_helper_advsimd_ceq_f16(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x6: /* FMAX */
--            gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x7: /* FRECPS */
--            gen_helper_recpsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x8: /* FMINNM */
--            gen_helper_advsimd_minnumh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x9: /* FMLS */
--             /* As usual for ARM, separate negation for fused multiply-add */
--            tcg_gen_xori_i32(tcg_op1, tcg_op1, 0x8000);
--            read_vec_element_i32(s, tcg_res, rd, pass, MO_16);
--            gen_helper_advsimd_muladdh(tcg_res, tcg_op1, tcg_op2, tcg_res,
--                                       fpst);
--            break;
--        case 0xa: /* FSUB */
--            gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0xe: /* FMIN */
--            gen_helper_advsimd_minh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0xf: /* FRSQRTS */
--            gen_helper_rsqrtsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x13: /* FMUL */
--            gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x14: /* FCMGE */
--            gen_helper_advsimd_cge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x15: /* FACGE */
--            gen_helper_advsimd_acge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x17: /* FDIV */
--            gen_helper_advsimd_divh(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x1a: /* FABD */
--            gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
--            tcg_gen_andi_i32(tcg_res, tcg_res, 0x7fff);
--            break;
--        case 0x1c: /* FCMGT */
--            gen_helper_advsimd_cgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x1d: /* FACGT */
--            gen_helper_advsimd_acgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        default:
--            fprintf(stderr, "%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
--                    __func__, insn, fpopcode, s->pc);
--            g_assert_not_reached();
-+            read_vec_element_i32(s, tcg_op1, passreg, passelt, MO_16);
-+            read_vec_element_i32(s, tcg_op2, passreg, passelt + 1, MO_16);
-+            tcg_res[pass] = tcg_temp_new_i32();
-+
-+            switch (fpopcode) {
-+            case 0x10: /* FMAXNMP */
-+                gen_helper_advsimd_maxnumh(tcg_res[pass], tcg_op1, tcg_op2,
-+                                           fpst);
-+                break;
-+            case 0x12: /* FADDP */
-+                gen_helper_advsimd_addh(tcg_res[pass], tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x16: /* FMAXP */
-+                gen_helper_advsimd_maxh(tcg_res[pass], tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x18: /* FMINNMP */
-+                gen_helper_advsimd_minnumh(tcg_res[pass], tcg_op1, tcg_op2,
-+                                           fpst);
-+                break;
-+            case 0x1e: /* FMINP */
-+                gen_helper_advsimd_minh(tcg_res[pass], tcg_op1, tcg_op2, fpst);
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-+        }
-+
-+        for (pass = 0; pass < maxpass; pass++) {
-+            write_vec_element_i32(s, tcg_res[pass], rd, pass, MO_16);
-+            tcg_temp_free_i32(tcg_res[pass]);
-         }
- 
--        write_vec_element_i32(s, tcg_res, rd, pass, MO_16);
--        tcg_temp_free_i32(tcg_res);
-         tcg_temp_free_i32(tcg_op1);
-         tcg_temp_free_i32(tcg_op2);
-+
-+    } else {
-+        for (pass = 0; pass < elements; pass++) {
-+            TCGv_i32 tcg_op1 = tcg_temp_new_i32();
-+            TCGv_i32 tcg_op2 = tcg_temp_new_i32();
-+            TCGv_i32 tcg_res = tcg_temp_new_i32();
-+
-+            read_vec_element_i32(s, tcg_op1, rn, pass, MO_16);
-+            read_vec_element_i32(s, tcg_op2, rm, pass, MO_16);
-+
-+            switch (fpopcode) {
-+            case 0x0: /* FMAXNM */
-+                gen_helper_advsimd_maxnumh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x1: /* FMLA */
-+                read_vec_element_i32(s, tcg_res, rd, pass, MO_16);
-+                gen_helper_advsimd_muladdh(tcg_res, tcg_op1, tcg_op2, tcg_res,
-+                                           fpst);
-+                break;
-+            case 0x2: /* FADD */
-+                gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x3: /* FMULX */
-+                gen_helper_advsimd_mulxh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x4: /* FCMEQ */
-+                gen_helper_advsimd_ceq_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x6: /* FMAX */
-+                gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x7: /* FRECPS */
-+                gen_helper_recpsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x8: /* FMINNM */
-+                gen_helper_advsimd_minnumh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x9: /* FMLS */
-+                /* As usual for ARM, separate negation for fused multiply-add */
-+                tcg_gen_xori_i32(tcg_op1, tcg_op1, 0x8000);
-+                read_vec_element_i32(s, tcg_res, rd, pass, MO_16);
-+                gen_helper_advsimd_muladdh(tcg_res, tcg_op1, tcg_op2, tcg_res,
-+                                           fpst);
-+                break;
-+            case 0xa: /* FSUB */
-+                gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0xe: /* FMIN */
-+                gen_helper_advsimd_minh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0xf: /* FRSQRTS */
-+                gen_helper_rsqrtsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x13: /* FMUL */
-+                gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x14: /* FCMGE */
-+                gen_helper_advsimd_cge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x15: /* FACGE */
-+                gen_helper_advsimd_acge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x17: /* FDIV */
-+                gen_helper_advsimd_divh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x1a: /* FABD */
-+                gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                tcg_gen_andi_i32(tcg_res, tcg_res, 0x7fff);
-+                break;
-+            case 0x1c: /* FCMGT */
-+                gen_helper_advsimd_cgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x1d: /* FACGT */
-+                gen_helper_advsimd_acgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            default:
-+                fprintf(stderr, "%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
-+                        __func__, insn, fpopcode, s->pc);
-+                g_assert_not_reached();
-+            }
-+
-+            write_vec_element_i32(s, tcg_res, rd, pass, MO_16);
-+            tcg_temp_free_i32(tcg_res);
-+            tcg_temp_free_i32(tcg_op1);
-+            tcg_temp_free_i32(tcg_op2);
-+        }
-     }
- 
-     tcg_temp_free_ptr(fpst);
 -- 
 2.15.1
