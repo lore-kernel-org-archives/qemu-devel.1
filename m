@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1epFUh-0008Rj-Pj
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:45 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1epFUm-00005O-2X
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1epFUg-0005gT-24
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:43 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:44722)
+	(envelope-from <alex.bennee@linaro.org>) id 1epFUl-0005sb-6b
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:48 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:42892)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1epFUf-0005ei-OC
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:41 -0500
-Received: by mail-wr0-x242.google.com with SMTP id v65so14510731wrc.11
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:42:41 -0800 (PST)
+	id 1epFUl-0005qn-0p
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:42:47 -0500
+Received: by mail-wr0-x243.google.com with SMTP id k9so14528642wre.9
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:42:46 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 23 Feb 2018 15:36:34 +0000
-Message-Id: <20180223153636.29809-30-alex.bennee@linaro.org>
+Date: Fri, 23 Feb 2018 15:36:28 +0000
+Message-Id: <20180223153636.29809-24-alex.bennee@linaro.org>
 In-Reply-To: <20180223153636.29809-1-alex.bennee@linaro.org>
 References: <20180223153636.29809-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 29/31] arm/translate-a64: add all FP16 ops
- in simd_scalar_pairwise
+Subject: [Qemu-devel] [PATCH v3 23/31] arm/translate-a64: add FP16 FRECPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,125 +32,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-I only needed to do a little light re-factoring to support the
-half-precision helpers.
+Now we have added f16 during the re-factoring we can simply call the
+helper.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 80 +++++++++++++++++++++++++++++++---------------
- 1 file changed, 54 insertions(+), 26 deletions(-)
+ target/arm/translate-a64.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 806f2eb34a..6eae8bd8b1 100644
+index 00b04d34f9..56de5711fe 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -6416,24 +6416,30 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
-     case 0xf: /* FMAXP */
-     case 0x2c: /* FMINNMP */
-     case 0x2f: /* FMINP */
--        /* FP op, size[0] is 32 or 64 bit */
-+        /* FP op, size[0] is 32 or 64 bit*/
-         if (!u) {
--            unallocated_encoding(s);
--            return;
-+            if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+                unallocated_encoding(s);
-+                return;
-+            } else {
-+                size = MO_16;
-+            }
-+        } else {
-+            size = extract32(size, 0, 1) ? MO_64 : MO_32;
-         }
-+
-         if (!fp_access_check(s)) {
-             return;
-         }
- 
--        size = extract32(size, 0, 1) ? 3 : 2;
--        fpst = get_fpstatus_ptr(false);
-+        fpst = get_fpstatus_ptr(size == MO_16);
-         break;
-     default:
-         unallocated_encoding(s);
+@@ -11311,6 +11311,8 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+     case 0x6d: /* FCMLE (zero) */
+         handle_2misc_fcmp_zero(s, fpop, is_scalar, 0, is_q, MO_16, rn, rd);
          return;
-     }
- 
--    if (size == 3) {
-+    if (size == MO_64) {
-         TCGv_i64 tcg_op1 = tcg_temp_new_i64();
-         TCGv_i64 tcg_op2 = tcg_temp_new_i64();
-         TCGv_i64 tcg_res = tcg_temp_new_i64();
-@@ -6474,27 +6480,49 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
-         TCGv_i32 tcg_op2 = tcg_temp_new_i32();
-         TCGv_i32 tcg_res = tcg_temp_new_i32();
- 
--        read_vec_element_i32(s, tcg_op1, rn, 0, MO_32);
--        read_vec_element_i32(s, tcg_op2, rn, 1, MO_32);
-+        read_vec_element_i32(s, tcg_op1, rn, 0, size);
-+        read_vec_element_i32(s, tcg_op2, rn, 1, size);
- 
--        switch (opcode) {
--        case 0xc: /* FMAXNMP */
--            gen_helper_vfp_maxnums(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0xd: /* FADDP */
--            gen_helper_vfp_adds(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0xf: /* FMAXP */
--            gen_helper_vfp_maxs(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x2c: /* FMINNMP */
--            gen_helper_vfp_minnums(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        case 0x2f: /* FMINP */
--            gen_helper_vfp_mins(tcg_res, tcg_op1, tcg_op2, fpst);
--            break;
--        default:
--            g_assert_not_reached();
-+        if (size == MO_16) {
-+            switch (opcode) {
-+            case 0xc: /* FMAXNMP */
-+                gen_helper_advsimd_maxnumh(tcg_res, tcg_op1, tcg_op2, fpst);
++    case 0x3d: /* FRECPE */
++        break;
+     case 0x18: /* FRINTN */
+         need_rmode = true;
+         only_in_vector = true;
+@@ -11431,6 +11433,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+         case 0x3b: /* FCVTZS */
+             gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
+             break;
++        case 0x3d: /* FRECPE */
++            gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
++            break;
+         case 0x5a: /* FCVTNU */
+         case 0x5b: /* FCVTMU */
+         case 0x5c: /* FCVTAU */
+@@ -11466,6 +11471,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+             case 0x3b: /* FCVTZS */
+                 gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
+                 break;
++            case 0x3d: /* FRECPE */
++                gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
 +                break;
-+            case 0xd: /* FADDP */
-+                gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0xf: /* FMAXP */
-+                gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x2c: /* FMINNMP */
-+                gen_helper_advsimd_minnumh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x2f: /* FMINP */
-+                gen_helper_advsimd_minh(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-+        } else {
-+            switch (opcode) {
-+            case 0xc: /* FMAXNMP */
-+                gen_helper_vfp_maxnums(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0xd: /* FADDP */
-+                gen_helper_vfp_adds(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0xf: /* FMAXP */
-+                gen_helper_vfp_maxs(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x2c: /* FMINNMP */
-+                gen_helper_vfp_minnums(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            case 0x2f: /* FMINP */
-+                gen_helper_vfp_mins(tcg_res, tcg_op1, tcg_op2, fpst);
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-         }
- 
-         write_fp_sreg(s, rd, tcg_res);
+             case 0x5a: /* FCVTNU */
+             case 0x5b: /* FCVTMU */
+             case 0x5c: /* FCVTAU */
 -- 
 2.15.1
