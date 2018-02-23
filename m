@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epGX8-0003Z9-KJ
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:49:19 -0500
+	(envelope-from <berrange@redhat.com>) id 1epGXa-0003vi-6a
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:49:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epGX7-0002Od-Lt
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:49:18 -0500
-Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:42631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1epGX7-0002Ml-Er
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:49:17 -0500
-Received: by mail-pl0-x22a.google.com with SMTP id 31so5188111ple.9
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 08:49:17 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1epGXZ-0002kk-5H
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 11:49:46 -0500
+Date: Fri, 23 Feb 2018 16:49:37 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180223164937.GG31076@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180223154613.2096-1-alex.bennee@linaro.org>
+	<20180223154613.2096-5-alex.bennee@linaro.org>
+	<20180223161723.GF31076@redhat.com> <878tbjac3d.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-40-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-40-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Feb 2018 16:48:38 +0000
-Message-ID: <CAFEAcA-98xW_JP33Cv+A+WxDNVm79jay8Dm-km5LrhPJkQOCvw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 39/67] target/arm: Implement SVE
- Predicate Count Group
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <878tbjac3d.fsf@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 4/8] new contrib/generate_all.sh: batch
+ risugen script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-On 17 February 2018 at 18:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-sve.h    |   2 +
->  target/arm/sve_helper.c    |  14 ++++++
->  target/arm/translate-sve.c | 116 +++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      |  27 +++++++++++
->  4 files changed, 159 insertions(+)
->
+On Fri, Feb 23, 2018 at 04:45:58PM +0000, Alex Benn=C3=A9e wrote:
+>=20
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>=20
+> > On Fri, Feb 23, 2018 at 03:46:09PM +0000, Alex Benn=C3=A9e wrote:
+> >> This is a simple script for generating all instructions in a given
+> >> RISU file. You can split up the batch size by passing a -n N command
+> >> line options. For example:
+> >>
+> >>   ./contrib/generate_all.sh -n 2 hp.risu testcases.armv8.2_hp
+> >>
+> >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> >> ---
+> >>  contrib/generate_all.sh | 96 ++++++++++++++++++++++++++++++++++++++=
++++++++++++
+> >>  1 file changed, 96 insertions(+)
+> >>  create mode 100755 contrib/generate_all.sh
+> >>
+> >> diff --git a/contrib/generate_all.sh b/contrib/generate_all.sh
+> >> new file mode 100755
+> >> index 0000000..1e6b847
+> >> --- /dev/null
+> >> +++ b/contrib/generate_all.sh
+> >> @@ -0,0 +1,96 @@
+> >> +#!/bin/bash
+> >> +#
+> >> +# Generate all patterns in a given RISU file
+> >> +#
+> >> +# Copyright (c) 2017 Linaro Limited
+> >> +# All rights reserved. This program and the accompanying materials
+> >> +# are made available under the terms of the Eclipse Public License =
+v1.0
+> >> +# which accompanies this distribution, and is available at
+> >> +# http://www.eclipse.org/legal/epl-v10.html
+> >
+> > Really ? Why this license not our standard GPLv2+, or BSD if it is wa=
+nted
+> > to be a public-domain-ish license ?
+>=20
+> I just chose what RISU is licensed under - but there is no reason I
+> couldn't make it something else.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+If it is going to live in QEMU source tree, then avoiding introducing a n=
+ew
+license is desirable.
 
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
