@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVv-0001Ki-7L
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:44:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epFWL-0001om-Se
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVs-0007pV-Nf
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42578)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1epFVs-0007nL-Fg
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:56 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NFfLsG093526
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:55 -0500
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gam85mvmt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:55 -0500
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 10:43:53 -0500
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 10:43:19 -0500
-In-Reply-To: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1519400599-21081-14-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v9 13/13] s390-ccw: interactive boot menu for
- scsi
+	(envelope-from <peter.maydell@linaro.org>) id 1epFWK-00008m-RH
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:44:25 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1epFWK-00006l-Kh
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:44:24 -0500
+Received: by mail-pg0-x242.google.com with SMTP id l4so3489098pgp.11
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:44:24 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180217182323.25885-32-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-32-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Feb 2018 15:44:03 +0000
+Message-ID: <CAFEAcA9kSgYNVQ6L6b94Gnz2ZnD4RKfeBqJintfgVqW47zq-qA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 31/67] target/arm: Implement
+ SVE conditionally broadcast/extract element
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,112 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Interactive boot menu for scsi. This follows a similar procedure
-as the interactive menu for eckd dasd. An example follows:
+On 17 February 2018 at 18:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    |   2 +
+>  target/arm/sve_helper.c    |  11 ++
+>  target/arm/translate-sve.c | 299 +++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      |  20 +++
+>  4 files changed, 332 insertions(+)
+>
+> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+> index d977aea00d..a58fb4ba01 100644
+> --- a/target/arm/helper-sve.h
+> +++ b/target/arm/helper-sve.h
+> @@ -463,6 +463,8 @@ DEF_HELPER_FLAGS_4(sve_trn_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+>  DEF_HELPER_FLAGS_4(sve_compact_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+>  DEF_HELPER_FLAGS_4(sve_compact_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+>
+> +DEF_HELPER_FLAGS_2(sve_last_active_element, TCG_CALL_NO_RWG, s32, ptr, i32)
+> +
+>  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+>  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+>  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index 87a1a32232..ee289be642 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -2050,3 +2050,14 @@ void HELPER(sve_compact_d)(void *vd, void *vn, void *vg, uint32_t desc)
+>          d[j] = 0;
+>      }
+>  }
+> +
+> +/* Similar to the ARM LastActiveElement pseudocode function, except the
+> +   result is multiplied by the element size.  This includes the not found
+> +   indication; e.g. not found for esz=3 is -8.  */
+> +int32_t HELPER(sve_last_active_element)(void *vg, uint32_t pred_desc)
+> +{
+> +    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
+> +    intptr_t esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
 
-    s390x Enumerated Boot Menu.
+pred_desc is obviously an encoding of some stuff, so the comment would
+be a good place to mention what it is.
 
-    3 entries detected. Select from index 0 to 2.
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/ipl.c              |  1 +
- pc-bios/s390-ccw/bootmap.c  |  4 ++++
- pc-bios/s390-ccw/main.c     |  1 +
- pc-bios/s390-ccw/menu.c     | 20 ++++++++++++++++++++
- pc-bios/s390-ccw/s390-ccw.h |  2 ++
- 5 files changed, 28 insertions(+)
+> +/* Compute CLAST for a scalar.  */
+> +static void do_clast_scalar(DisasContext *s, int esz, int pg, int rm,
+> +                            bool before, TCGv_i64 reg_val)
+> +{
+> +    TCGv_i32 last = tcg_temp_new_i32();
+> +    TCGv_i64 ele, cmp, zero;
+> +
+> +    find_last_active(s, last, esz, pg);
+> +
+> +    /* Extend the original value of last prior to incrementing.  */
+> +    cmp = tcg_temp_new_i64();
+> +    tcg_gen_ext_i32_i64(cmp, last);
+> +
+> +    if (!before) {
+> +        incr_last_active(s, last, esz);
+> +    }
+> +
+> +    /* The conceit here is that while last < 0 indicates not found, after
+> +       adjusting for cpu_env->vfp.zregs[rm], it is still a valid address
+> +       from which we can load garbage.  We then discard the garbage with
+> +       a conditional move.  */
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index c12e460..edbec90 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -246,6 +246,7 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
-             *flags |= QIPL_FLAG_BM_OPTS_ZIPL;
-             return;
-         }
-+    case S390_IPL_TYPE_QEMU_SCSI:
-         break;
-     default:
-         error_report("boot menu is not supported for this device type.");
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index ae93b55..29bfd8c 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -568,6 +568,10 @@ static void ipl_scsi(void)
-     debug_print_int("program table entries", program_table_entries);
-     IPL_assert(program_table_entries != 0, "Empty Program Table");
- 
-+    if (menu_is_enabled_enum()) {
-+        loadparm = menu_get_enum_boot_index(program_table_entries);
-+    }
-+
-     debug_print_int("loadparm", loadparm);
-     IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
-                " maximum number of boot entries allowed");
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index a7473b0..9d9f8cf 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -92,6 +92,7 @@ static void menu_setup(void)
- 
-     switch (iplb.pbt) {
-     case S390_IPL_TYPE_CCW:
-+    case S390_IPL_TYPE_QEMU_SCSI:
-         menu_set_parms(qipl.qipl_flags & BOOT_MENU_FLAG_MASK,
-                        qipl.boot_menu_timeout);
-         return;
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index ee56939..96eec81 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -217,6 +217,21 @@ int menu_get_zipl_boot_index(const char *menu_data)
-     return get_boot_index(entries - 1); /* subtract 1 to exclude banner */
- }
- 
-+
-+int menu_get_enum_boot_index(int entries)
-+{
-+    char tmp[4];
-+
-+    sclp_print("s390x Enumerated Boot Menu.\n\n");
-+
-+    sclp_print(uitoa(entries, tmp, sizeof(tmp)));
-+    sclp_print(" entries detected. Select from boot index 0 to ");
-+    sclp_print(uitoa(entries - 1, tmp, sizeof(tmp)));
-+    sclp_print(".\n\n");
-+
-+    return get_boot_index(entries);
-+}
-+
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
- {
-     flag = boot_menu_flag;
-@@ -227,3 +242,8 @@ bool menu_is_enabled_zipl(void)
- {
-     return flag & (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL);
- }
-+
-+bool menu_is_enabled_enum(void)
-+{
-+    return flag & QIPL_FLAG_BM_OPTS_CMD;
-+}
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index c4ddf9f..fd18da2 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -91,6 +91,8 @@ void zipl_load(void);
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
- int menu_get_zipl_boot_index(const char *menu_data);
- bool menu_is_enabled_zipl(void);
-+int menu_get_enum_boot_index(int entries);
-+bool menu_is_enabled_enum(void);
- 
- static inline void fill_hex(char *out, unsigned char val)
- {
--- 
-2.7.4
+That's a bit ugly. Can we at least do a compile time assert that the
+worst case (which I guess is offset of zregs[0] minus largest-element-size)
+is still positive ? That way if for some reason we reshuffle fields
+in CPUARMState we'll notice if it's going to fall off the beginning
+of the struct.
+
+> +    ele = load_last_active(s, last, rm, esz);
+> +    tcg_temp_free_i32(last);
+> +
+> +    zero = tcg_const_i64(0);
+> +    tcg_gen_movcond_i64(TCG_COND_GE, reg_val, cmp, zero, ele, reg_val);
+> +
+> +    tcg_temp_free_i64(zero);
+> +    tcg_temp_free_i64(cmp);
+> +    tcg_temp_free_i64(ele);
+> +}
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
