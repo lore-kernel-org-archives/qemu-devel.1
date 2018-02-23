@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1epFca-0007nK-0O
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:50:52 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1epFeG-0000w3-B9
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:52:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1epFcY-0004Zb-Nb
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:50:52 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1epFcY-0004ZH-Em
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:50:50 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NFn231025195
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:50:49 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gak0jr89y-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:50:48 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 15:50:43 -0000
-References: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1519400599-21081-14-git-send-email-walling@linux.vnet.ibm.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 16:50:38 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1epFeF-0006Ae-Eb
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:52:36 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:43676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1epFeF-0006AB-7U
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:52:35 -0500
+Received: by mail-wr0-x241.google.com with SMTP id u49so14554578wrc.10
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:52:35 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 23 Feb 2018 15:36:30 +0000
+Message-Id: <20180223153636.29809-26-alex.bennee@linaro.org>
+In-Reply-To: <20180223153636.29809-1-alex.bennee@linaro.org>
+References: <20180223153636.29809-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1519400599-21081-14-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <1818cb72-895b-2397-5385-8fc10b22921d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v9 13/13] s390-ccw: interactive boot menu
- for scsi
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 25/31] arm/translate-a64: add FP16 FSQRT to
+ simd_two_reg_misc_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,42 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com
+To: qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On 23.02.2018 16:43, Collin L. Walling wrote:
-> Interactive boot menu for scsi. This follows a similar procedure
-> as the interactive menu for eckd dasd. An example follows:
-> 
->     s390x Enumerated Boot Menu.
-> 
->     3 entries detected. Select from index 0 to 2.
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/ipl.c              |  1 +
->  pc-bios/s390-ccw/bootmap.c  |  4 ++++
->  pc-bios/s390-ccw/main.c     |  1 +
->  pc-bios/s390-ccw/menu.c     | 20 ++++++++++++++++++++
->  pc-bios/s390-ccw/s390-ccw.h |  2 ++
->  5 files changed, 28 insertions(+)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index c12e460..edbec90 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -246,6 +246,7 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
->              *flags |= QIPL_FLAG_BM_OPTS_ZIPL;
->              return;
->          }
-break still missing here ...
-> +    case S390_IPL_TYPE_QEMU_SCSI:
->          break;
->      default:
->          error_report("boot menu is not supported for this device type.");
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v2
+  remove superfluous helpers
+---
+ target/arm/helper-a64.c    | 13 +++++++++++++
+ target/arm/helper-a64.h    |  1 +
+ target/arm/translate-a64.c |  5 +++++
+ 3 files changed, 19 insertions(+)
 
-otherwise, LGTM
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 92a0d55a9c..afb25ad20c 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -828,3 +828,16 @@ uint32_t HELPER(advsimd_f16touinth)(float16 a, void *fpstp)
+     }
+     return float16_to_uint16(a, fpst);
+ }
++
++/*
++ * Square Root and Reciprocal square root
++ */
++
++float16 HELPER(sqrt_f16)(float16 a, void *fpstp)
++{
++    float_status *s = fpstp;
++
++    return float16_sqrt(a, s);
++}
++
++
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 339323fc3d..ef4ddfe9d8 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -80,3 +80,4 @@ DEF_HELPER_2(advsimd_rinth_exact, f16, f16, ptr)
+ DEF_HELPER_2(advsimd_rinth, f16, f16, ptr)
+ DEF_HELPER_2(advsimd_f16tosinth, i32, f16, ptr)
+ DEF_HELPER_2(advsimd_f16touinth, i32, f16, ptr)
++DEF_HELPER_2(sqrt_f16, f16, f16, ptr)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index a7e99e2a2f..ba3926262e 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11388,6 +11388,8 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+     case 0x6f: /* FNEG */
+         need_fpst = false;
+         break;
++    case 0x7f: /* FSQRT (vector) */
++        break;
+     default:
+         fprintf(stderr, "%s: insn %#04x fpop %#2x\n", __func__, insn, fpop);
+         g_assert_not_reached();
+@@ -11502,6 +11504,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+             case 0x6f: /* FNEG */
+                 tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
+                 break;
++            case 0x7f: /* FSQRT */
++                gen_helper_sqrt_f16(tcg_res, tcg_op, tcg_fpstatus);
++                break;
+             default:
+                 g_assert_not_reached();
+             }
 -- 
-Regards,
- Viktor Mihajlovski
+2.15.1
