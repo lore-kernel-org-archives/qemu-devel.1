@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1epCop-0007kc-46
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1epCop-0007kq-PO
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:51:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1epCol-0008A5-49
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1epCon-0008EE-8c
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:51:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34132
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1epCok-00089S-Vr
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:51:15 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NCoLMs021012
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:51:14 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gaecvb9fv-1
+	id 1epCom-0008DK-WC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:51:17 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1NCnPWm114560
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:51:16 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gadv64377-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:51:13 -0500
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 07:51:15 -0500
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 12:51:12 -0000
+	Fri, 23 Feb 2018 12:51:13 -0000
 From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 13:51:04 +0100
+Date: Fri, 23 Feb 2018 13:51:05 +0100
 In-Reply-To: <1519390265-15576-1-git-send-email-imbrenda@linux.vnet.ibm.com>
 References: <1519390265-15576-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-Message-Id: <1519390265-15576-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] s390x/sclp: clean up sclp masks
+Message-Id: <1519390265-15576-4-git-send-email-imbrenda@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 3/3] s390x/sclp: extend SCLP event masks to
+ 64 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,219 +41,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cohuck@redhat.com
 Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-Introduce an sccb_mask_t to be used for SCLP event masks instead of just
-unsigned int or uint32_t. This will allow later to extend the mask with
-more ease.
+Extend the SCLP event masks to 64 bits.
+
+Notice that using any of the new bits results in a state that cannot be
+migrated to an older version.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
 ---
- hw/char/sclpconsole-lm.c          |  4 ++--
- hw/char/sclpconsole.c             |  4 ++--
- hw/s390x/event-facility.c         | 20 ++++++++++----------
- hw/s390x/sclpcpu.c                |  4 ++--
- hw/s390x/sclpquiesce.c            |  4 ++--
- include/hw/s390x/event-facility.h | 22 +++++++++++++---------
- 6 files changed, 31 insertions(+), 27 deletions(-)
+ hw/s390x/event-facility.c         | 50 ++++++++++++++++++++++++++++++++-------
+ include/hw/s390x/event-facility.h |  2 +-
+ 2 files changed, 42 insertions(+), 10 deletions(-)
 
-diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-index c500bda..cc4d70a 100644
---- a/hw/char/sclpconsole-lm.c
-+++ b/hw/char/sclpconsole-lm.c
-@@ -102,12 +102,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_MESSAGE || type == SCLP_EVENT_PMSGCMD;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_OP_CMD | SCLP_EVENT_MASK_PMSGCMD;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG | SCLP_EVENT_MASK_PMSGCMD;
- }
-diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-index d0265df..ec9db13 100644
---- a/hw/char/sclpconsole.c
-+++ b/hw/char/sclpconsole.c
-@@ -83,12 +83,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_ASCII_CONSOLE_DATA;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG_ASCII;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG_ASCII;
- }
 diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index b7cd075..94fe948 100644
+index 94fe948..6072fd3 100644
 --- a/hw/s390x/event-facility.c
 +++ b/hw/s390x/event-facility.c
-@@ -29,8 +29,8 @@ typedef struct SCLPEventsBus {
- struct SCLPEventFacility {
+@@ -30,7 +30,10 @@ struct SCLPEventFacility {
      SysBusDevice parent_obj;
      SCLPEventsBus sbus;
--    /* guest' receive mask */
--    unsigned int receive_mask;
-+    /* guest's receive mask */
-+    sccb_mask_t receive_mask;
+     /* guest's receive mask */
+-    sccb_mask_t receive_mask;
++    union {
++        uint32_t receive_mask_compat32;
++        sccb_mask_t receive_mask;
++    };
      /*
       * when false, we keep the same broken, backwards compatible behaviour as
       * before, allowing only masks of size exactly 4; when true, we implement
-@@ -61,9 +61,9 @@ static bool event_pending(SCLPEventFacility *ef)
-     return false;
+@@ -262,7 +265,7 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+     case SCLP_SELECTIVE_READ:
+         copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
+                   sizeof(sclp_active_selection_mask), ef->mask_length);
+-        sclp_active_selection_mask = be32_to_cpu(sclp_active_selection_mask);
++        sclp_active_selection_mask = be64_to_cpu(sclp_active_selection_mask);
+         if (!sclp_cp_receive_mask ||
+             (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
+             sccb->h.response_code =
+@@ -294,21 +297,22 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+     }
+ 
+     /*
+-     * Note: We currently only support masks up to 4 byte length;
+-     *       the remainder is filled up with zeroes. Linux uses
+-     *       a 4 byte mask length.
++     * Note: We currently only support masks up to 8 byte length;
++     *       the remainder is filled up with zeroes. Older Linux
++     *       kernels use a 4 byte mask length, newer ones can use both
++     *       8 or 4 depending on what is available on the host.
+      */
+ 
+     /* keep track of the guest's capability masks */
+     copy_mask((uint8_t *)&tmp_mask, WEM_CP_RECEIVE_MASK(we_mask, mask_length),
+               sizeof(tmp_mask), mask_length);
+-    ef->receive_mask = be32_to_cpu(tmp_mask);
++    ef->receive_mask = be64_to_cpu(tmp_mask);
+ 
+     /* return the SCLP's capability masks to the guest */
+-    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
++    tmp_mask = cpu_to_be64(get_host_receive_mask(ef));
+     copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+               mask_length, sizeof(tmp_mask));
+-    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
++    tmp_mask = cpu_to_be64(get_host_send_mask(ef));
+     copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+               mask_length, sizeof(tmp_mask));
+ 
+@@ -369,6 +373,21 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
+     }
  }
  
--static unsigned int get_host_send_mask(SCLPEventFacility *ef)
-+static sccb_mask_t get_host_send_mask(SCLPEventFacility *ef)
++static bool vmstate_event_facility_mask64_needed(void *opaque)
++{
++    SCLPEventFacility *ef = opaque;
++
++    return (ef->receive_mask & 0xFFFFFFFF) != 0;
++}
++
++static int vmstate_event_facility_mask64_pre_load(void *opaque)
++{
++    SCLPEventFacility *ef = opaque;
++
++    ef->receive_mask &= ~0xFFFFFFFFULL;
++    return 0;
++}
++
+ static bool vmstate_event_facility_mask_length_needed(void *opaque)
  {
--    unsigned int mask;
-+    sccb_mask_t mask;
-     BusChild *kid;
-     SCLPEventClass *child;
- 
-@@ -77,9 +77,9 @@ static unsigned int get_host_send_mask(SCLPEventFacility *ef)
-     return mask;
- }
- 
--static unsigned int get_host_receive_mask(SCLPEventFacility *ef)
-+static sccb_mask_t get_host_receive_mask(SCLPEventFacility *ef)
- {
--    unsigned int mask;
-+    sccb_mask_t mask;
-     BusChild *kid;
-     SCLPEventClass *child;
- 
-@@ -189,7 +189,7 @@ out:
- }
- 
- static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
--                                        unsigned int mask)
-+                                        sccb_mask_t mask)
- {
-     uint16_t rc;
-     int slen;
-@@ -242,8 +242,8 @@ static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
- 
- static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
- {
--    unsigned int sclp_active_selection_mask;
--    unsigned int sclp_cp_receive_mask;
-+    sccb_mask_t sclp_active_selection_mask;
-+    sccb_mask_t sclp_cp_receive_mask;
- 
-     ReadEventData *red = (ReadEventData *) sccb;
- 
-@@ -285,7 +285,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
- {
-     WriteEventMask *we_mask = (WriteEventMask *) sccb;
-     uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
--    uint32_t tmp_mask;
-+    sccb_mask_t tmp_mask;
- 
-     if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
-         ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
-diff --git a/hw/s390x/sclpcpu.c b/hw/s390x/sclpcpu.c
-index 3ee890b..50c021b 100644
---- a/hw/s390x/sclpcpu.c
-+++ b/hw/s390x/sclpcpu.c
-@@ -37,12 +37,12 @@ void raise_irq_cpu_hotplug(void)
-     sclp_service_interrupt(0);
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_CONFIG_MGT_DATA;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
+     SCLPEventFacility *ef = opaque;
+@@ -384,6 +403,18 @@ static int vmstate_event_facility_mask_length_pre_load(void *opaque)
      return 0;
  }
-diff --git a/hw/s390x/sclpquiesce.c b/hw/s390x/sclpquiesce.c
-index 0241643..1c8f5c9 100644
---- a/hw/s390x/sclpquiesce.c
-+++ b/hw/s390x/sclpquiesce.c
-@@ -28,12 +28,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_SIGNAL_QUIESCE;
- }
  
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_SIGNAL_QUIESCE;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return 0;
- }
++static const VMStateDescription vmstate_event_facility_mask64 = {
++    .name = "vmstate-event-facility/mask64",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .needed = vmstate_event_facility_mask64_needed,
++    .pre_load = vmstate_event_facility_mask64_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(receive_mask, SCLPEventFacility),
++        VMSTATE_END_OF_LIST()
++     }
++};
++
+ static const VMStateDescription vmstate_event_facility_mask_length = {
+     .name = "vmstate-event-facility/mask_length",
+     .version_id = 0,
+@@ -402,10 +433,11 @@ static const VMStateDescription vmstate_event_facility = {
+     .version_id = 0,
+     .minimum_version_id = 0,
+     .fields = (VMStateField[]) {
+-        VMSTATE_UINT32(receive_mask, SCLPEventFacility),
++        VMSTATE_UINT32(receive_mask_compat32, SCLPEventFacility),
+         VMSTATE_END_OF_LIST()
+      },
+     .subsections = (const VMStateDescription * []) {
++        &vmstate_event_facility_mask64,
+         &vmstate_event_facility_mask_length,
+         NULL
+      }
 diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-index 5119b9b..0e2b761 100644
+index 0e2b761..06ba4ea 100644
 --- a/include/hw/s390x/event-facility.h
 +++ b/include/hw/s390x/event-facility.h
-@@ -28,12 +28,14 @@
- #define SCLP_EVENT_SIGNAL_QUIESCE               0x1d
- 
- /* SCLP event masks */
--#define SCLP_EVENT_MASK_SIGNAL_QUIESCE          0x00000008
--#define SCLP_EVENT_MASK_MSG_ASCII               0x00000040
--#define SCLP_EVENT_MASK_CONFIG_MGT_DATA         0x10000000
--#define SCLP_EVENT_MASK_OP_CMD                  0x80000000
--#define SCLP_EVENT_MASK_MSG                     0x40000000
--#define SCLP_EVENT_MASK_PMSGCMD                 0x00800000
-+#define SCLP_EVMASK(T)  (1ULL << (sizeof(sccb_mask_t) * 8 - (T)))
-+
-+#define SCLP_EVENT_MASK_OP_CMD          SCLP_EVMASK(SCLP_EVENT_OPRTNS_COMMAND)
-+#define SCLP_EVENT_MASK_MSG             SCLP_EVMASK(SCLP_EVENT_MESSAGE)
-+#define SCLP_EVENT_MASK_CONFIG_MGT_DATA SCLP_EVMASK(SCLP_EVENT_CONFIG_MGT_DATA)
-+#define SCLP_EVENT_MASK_PMSGCMD         SCLP_EVMASK(SCLP_EVENT_PMSGCMD)
-+#define SCLP_EVENT_MASK_MSG_ASCII       SCLP_EVMASK(SCLP_EVENT_ASCII_CONSOLE_DATA)
-+#define SCLP_EVENT_MASK_SIGNAL_QUIESCE  SCLP_EVMASK(SCLP_EVENT_SIGNAL_QUIESCE)
- 
- #define SCLP_UNCONDITIONAL_READ                 0x00
- #define SCLP_SELECTIVE_READ                     0x01
-@@ -71,6 +73,8 @@ typedef struct WriteEventMask {
+@@ -73,7 +73,7 @@ typedef struct WriteEventMask {
  #define WEM_RECEIVE_MASK(wem, mask_len) ((wem)->masks + 2 * (mask_len))
  #define WEM_SEND_MASK(wem, mask_len) ((wem)->masks + 3 * (mask_len))
  
-+typedef uint32_t sccb_mask_t;
-+
+-typedef uint32_t sccb_mask_t;
++typedef uint64_t sccb_mask_t;
+ 
  typedef struct EventBufferHeader {
      uint16_t length;
-     uint8_t  type;
-@@ -160,7 +164,7 @@ typedef struct WriteEventData {
- typedef struct ReadEventData {
-     SCCBHeader h;
-     union {
--        uint32_t mask;
-+        sccb_mask_t mask;
-         EventBufferHeader ebh;
-     };
- } QEMU_PACKED ReadEventData;
-@@ -177,10 +181,10 @@ typedef struct SCLPEventClass {
-     int (*exit)(SCLPEvent *event);
- 
-     /* get SCLP's send mask */
--    unsigned int (*get_send_mask)(void);
-+    sccb_mask_t (*get_send_mask)(void);
- 
-     /* get SCLP's receive mask */
--    unsigned int (*get_receive_mask)(void);
-+    sccb_mask_t (*get_receive_mask)(void);
- 
-     int (*read_event_data)(SCLPEvent *event, EventBufferHeader *evt_buf_hdr,
-                            int *slen);
 -- 
 2.7.4
