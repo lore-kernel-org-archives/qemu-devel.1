@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epEHU-00082Z-9M
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:25:01 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1epEJe-0000fv-PC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:27:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epEHT-0002sT-7F
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:25:00 -0500
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:45303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1epEHS-0002q3-Vw
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:24:59 -0500
-Received: by mail-pg0-x233.google.com with SMTP id e11so3405481pgq.12
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 06:24:58 -0800 (PST)
+	(envelope-from <borntraeger@de.ibm.com>) id 1epEJZ-0005JP-LS
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:27:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1epEJZ-0005IM-Cl
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:27:09 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1NEQJuc047933
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 09:27:07 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gak0jmkvp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 09:27:07 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 23 Feb 2018 14:27:04 -0000
+References: <1519390265-15576-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1519390265-15576-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 23 Feb 2018 15:27:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-27-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-27-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Feb 2018 14:24:37 +0000
-Message-ID: <CAFEAcA8UWBemOXvu7-Dt5CMv7VHSTNp4fGSKPnnHT2UfNryOHw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 26/67] target/arm: Implement
- SVE Permute - Extract Group
+In-Reply-To: <1519390265-15576-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <7258ca5e-322b-7ba1-2825-2f742d415d51@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] s390x/sclp: proper support of
+ larger send and receive masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +43,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, cohuck@redhat.com
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 17 February 2018 at 18:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+On 02/23/2018 01:51 PM, Claudio Imbrenda wrote:
+> Until 67915de9f0383ccf4a ("s390x/event-facility: variable-length event masks")
+> we only supported sclp event masks with a size of exactly 4 bytes, even
+> though the architecture allows the guests to set up sclp event masks
+> from 1 to 1021 bytes in length.
+> After that patch, the behaviour was almost compliant, but some issues
+> were still remaining, in particular regarding the handling of selective
+> reads and migration.
+> 
+> When setting the sclp event mask, a mask size is also specified. Until
+> now we only considered the size in order to decide which bits to save
+> in the internal state. On the other hand, when a guest performs a
+> selective read, it sends a mask, but it does not specify a size; the
+> implied size is the size of the last mask that has been set.
+> 
+> Specifying bits in the mask of selective read that are not available in
+> the internal mask should return an error, and bits past the end of the
+> mask should obviously be ignored. This can only be achieved by keeping
+> track of the lenght of the mask.
+> 
+> The mask length is thus now part of the internal state that needs to be
+> migrated.
+> 
+> This patch fixes the handling of selective reads, whose size will now
+> match the length of the event mask, as per architecture.
+> 
+> While the default behaviour is to be compliant with the architecture,
+> when using older machine models the old broken behaviour is selected
+> (allowing only masks of size exactly 4), in order to be able to migrate
+> toward older versions.
+> 
+> Fixes: 67915de9f0383ccf4a ("s390x/event-facility: variable-length event masks")
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
 > ---
->  target/arm/helper-sve.h    |  2 ++
->  target/arm/sve_helper.c    | 81 ++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/translate-sve.c | 29 +++++++++++++++++
->  target/arm/sve.decode      |  9 +++++-
->  4 files changed, 120 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-> index 79493ab647..94f4356ce9 100644
-> --- a/target/arm/helper-sve.h
-> +++ b/target/arm/helper-sve.h
-> @@ -414,6 +414,8 @@ DEF_HELPER_FLAGS_4(sve_cpy_z_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
->  DEF_HELPER_FLAGS_4(sve_cpy_z_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
->  DEF_HELPER_FLAGS_4(sve_cpy_z_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
->
-> +DEF_HELPER_FLAGS_4(sve_ext, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+>  hw/s390x/event-facility.c  | 91 +++++++++++++++++++++++++++++++++++++++-------
+>  hw/s390x/s390-virtio-ccw.c |  8 +++-
+>  2 files changed, 85 insertions(+), 14 deletions(-)
+> 
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 155a694..b7cd075 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -31,6 +31,15 @@ struct SCLPEventFacility {
+>      SCLPEventsBus sbus;
+>      /* guest' receive mask */
+>      unsigned int receive_mask;
+> +    /*
+> +     * when false, we keep the same broken, backwards compatible behaviour as
+> +     * before, allowing only masks of size exactly 4; when true, we implement
+> +     * the architecture correctly, allowing all valid mask sizes. Needed for
+> +     * migration toward older versions.
+> +     */
+> +    bool allow_all_mask_sizes;
+> +    /* length of the receive mask */
+> +    uint16_t mask_length;
+>  };
+> 
+>  /* return true if any child has event pending set */
+> @@ -220,6 +229,17 @@ static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
+>      return rc;
+>  }
+> 
+> +/* copy up to dst_len bytes and fill the rest of dst with zeroes */
+
+you just moved this function but shouldnt it be
+
+		src_len bytes and fill will zeroes until dst_len?
+
+> +static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
+> +                      uint16_t src_len)
+> +{
+> +    int i;
 > +
->  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
->  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
->  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-> index 6a95d1ec48..fb3f54300b 100644
-> --- a/target/arm/sve_helper.c
-> +++ b/target/arm/sve_helper.c
-> @@ -1469,3 +1469,84 @@ void HELPER(sve_cpy_z_d)(void *vd, void *vg, uint64_t val, uint32_t desc)
->          d[i] = (pg[H1(i)] & 1 ? val : 0);
+> +    for (i = 0; i < dst_len; i++) {
+> +        dst[i] = i < src_len ? src[i] : 0;
+> +    }
+> +}
+> +
+>  static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+>  {
+>      unsigned int sclp_active_selection_mask;
+> @@ -240,7 +260,9 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+>          sclp_active_selection_mask = sclp_cp_receive_mask;
+>          break;
+>      case SCLP_SELECTIVE_READ:
+> -        sclp_active_selection_mask = be32_to_cpu(red->mask);
+> +        copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
+> +                  sizeof(sclp_active_selection_mask), ef->mask_length);
+> +        sclp_active_selection_mask = be32_to_cpu(sclp_active_selection_mask);
+>          if (!sclp_cp_receive_mask ||
+>              (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
+>              sccb->h.response_code =
+> @@ -259,24 +281,14 @@ out:
+>      return;
+>  }
+> 
+> -/* copy up to dst_len bytes and fill the rest of dst with zeroes */
+> -static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
+> -                      uint16_t src_len)
+> -{
+> -    int i;
+> -
+> -    for (i = 0; i < dst_len; i++) {
+> -        dst[i] = i < src_len ? src[i] : 0;
+> -    }
+> -}
+> -
+>  static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+>  {
+>      WriteEventMask *we_mask = (WriteEventMask *) sccb;
+>      uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
+>      uint32_t tmp_mask;
+> 
+> -    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX)) {
+> +    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
+> +        ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
+>          sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
+>          goto out;
+>      }
+> @@ -301,6 +313,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+>                mask_length, sizeof(tmp_mask));
+> 
+>      sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_COMPLETION);
+> +    ef->mask_length = mask_length;
+> 
+>  out:
+>      return;
+> @@ -356,6 +369,34 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
 >      }
 >  }
+> 
+> +static bool vmstate_event_facility_mask_length_needed(void *opaque)
+> +{
+> +    SCLPEventFacility *ef = opaque;
 > +
-> +/* Big-endian hosts need to frob the byte indicies.  If the copy
-> + * happens to be 8-byte aligned, then no frobbing necessary.
-> + */
-
-Have you run risu tests with a big endian host?
-
->  ###########################################################################
->  # Named fields.  These are primarily for disjoint fields.
->
-> -%imm4_16_p1             16:4 !function=plus1
-> +%imm4_16_p1    16:4 !function=plus1
-
-Another bit that should be squashed into an earlier patch.
-
->  %imm6_22_5     22:1 5:5
-> +%imm8_16_10    16:5 10:3
->  %imm9_16_10    16:s6 10:3
->  %preg4_5       5:4
->
-> @@ -363,6 +364,12 @@ FCPY               00000101 .. 01 .... 110 imm:8 .....             @rdn_pg4
->  CPY_m_i                00000101 .. 01 .... 01 . ........ .....   @rdn_pg4 imm=%sh8_i8s
->  CPY_z_i                00000101 .. 01 .... 00 . ........ .....   @rdn_pg4 imm=%sh8_i8s
->
-> +### SVE Permute - Extract Group
+> +    return ef->allow_all_mask_sizes;
+> +}
 > +
-> +# SVE extract vector (immediate offset)
-> +EXT            00000101 001 ..... 000 ... rm:5 rd:5 \
-> +               &rrri rn=%reg_movprfx imm=%imm8_16_10
+> +static int vmstate_event_facility_mask_length_pre_load(void *opaque)
+> +{
+> +    SCLPEventFacility *ef = opaque;
 > +
->  ### SVE Predicate Logical Operations Group
->
->  # SVE predicate logical operations
-> --
+> +    ef->allow_all_mask_sizes = false;
+> +    return 0;
+> +}
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+why do we need this? Shouldnt the value be set solely by the machine version?
 
-thanks
--- PMM
+
+> +
+> +static const VMStateDescription vmstate_event_facility_mask_length = {
+> +    .name = "vmstate-event-facility/mask_length",
+> +    .version_id = 0,
+> +    .minimum_version_id = 0,
+> +    .needed = vmstate_event_facility_mask_length_needed,
+> +    .pre_load = vmstate_event_facility_mask_length_pre_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_BOOL(allow_all_mask_sizes, SCLPEventFacility),
+
+same here. Do we really need to migrate "allow_all_mask_sizes" ? Shouldnt that only
+depend on machine <= 2.11?
+
+> +        VMSTATE_UINT16(mask_length, SCLPEventFacility),
+> +        VMSTATE_END_OF_LIST()
+> +     }
+> +};
+> +
+>  static const VMStateDescription vmstate_event_facility = {
+>      .name = "vmstate-event-facility",
+>      .version_id = 0,
+> @@ -363,15 +404,39 @@ static const VMStateDescription vmstate_event_facility = {
+>      .fields = (VMStateField[]) {
+>          VMSTATE_UINT32(receive_mask, SCLPEventFacility),
+>          VMSTATE_END_OF_LIST()
+> +     },
+> +    .subsections = (const VMStateDescription * []) {
+> +        &vmstate_event_facility_mask_length,
+> +        NULL
+>       }
+>  };
+> 
+> +static void sclp_event_set_allow_all_mask_sizes(Object *obj, bool value,
+> +                                                       Error **errp)
+> +{
+> +    SCLPEventFacility *ef = (SCLPEventFacility *)obj;
+> +
+> +    ef->allow_all_mask_sizes = value;
+> +}
+> +
+> +static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **e)
+> +{
+> +    SCLPEventFacility *ef = (SCLPEventFacility *)obj;
+> +
+> +    return ef->allow_all_mask_sizes;
+> +}
+> +
+>  static void init_event_facility(Object *obj)
+>  {
+>      SCLPEventFacility *event_facility = EVENT_FACILITY(obj);
+>      DeviceState *sdev = DEVICE(obj);
+>      Object *new;
+> 
+> +    event_facility->mask_length = 4;
+> +    event_facility->allow_all_mask_sizes = true;
+> +    object_property_add_bool(obj, "allow_all_mask_sizes",
+> +                             sclp_event_get_allow_all_mask_sizes,
+> +                             sclp_event_set_allow_all_mask_sizes, NULL);
+>      /* Spawn a new bus for SCLP events */
+>      qbus_create_inplace(&event_facility->sbus, sizeof(event_facility->sbus),
+>                          TYPE_SCLP_EVENTS_BUS, sdev, NULL);
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 8b3053f..e9309fd 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -29,6 +29,7 @@
+>  #include "s390-pci-bus.h"
+>  #include "hw/s390x/storage-keys.h"
+>  #include "hw/s390x/storage-attributes.h"
+> +#include "hw/s390x/event-facility.h"
+>  #include "hw/compat.h"
+>  #include "ipl.h"
+>  #include "hw/s390x/s390-virtio-ccw.h"
+> @@ -671,7 +672,12 @@ bool css_migration_enabled(void)
+>      type_init(ccw_machine_register_##suffix)
+> 
+>  #define CCW_COMPAT_2_11 \
+> -        HW_COMPAT_2_11
+> +        HW_COMPAT_2_11 \
+> +        {\
+> +            .driver   = TYPE_SCLP_EVENT_FACILITY,\
+> +            .property = "allow_all_mask_sizes",\
+> +            .value    = "off",\
+> +        },
+> 
+>  #define CCW_COMPAT_2_10 \
+>          HW_COMPAT_2_10
+> 
+
+Otherwise looks good.
