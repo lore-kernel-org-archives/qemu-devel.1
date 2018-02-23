@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVl-00017h-B2
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:51 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVq-0001Dq-78
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVi-0007Sd-3o
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51376)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1epFVm-0007ci-Vu
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58386)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1epFVh-0007RH-Qh
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:46 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1epFVm-0007as-M2
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:43:50 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NFdQ4G043842
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:44 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2game1cdyd-1
+	w1NFeYUg139419
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:49 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gam6yn1nv-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:44 -0500
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:43:48 -0500
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 10:43:42 -0500
+	Fri, 23 Feb 2018 10:43:47 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 10:43:07 -0500
+Date: Fri, 23 Feb 2018 10:43:13 -0500
 In-Reply-To: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1519400599-21081-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1519400599-21081-2-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v9 01/13] s390-ccw: refactor boot map table code
+Message-Id: <1519400599-21081-8-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v9 07/13] s390-ccw: set up interactive boot
+ menu parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,203 +41,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-Some ECKD bootmap code was using structs designed for SCSI.
-Even though this works, it confuses readability. Add a new
-BootMapTable struct to assist with readability in bootmap
-entry code. Also:
-
-- replace ScsiMbr in ECKD code with appropriate structs
-- fix read_block messages to reflect BootMapTable
-- fixup ipl_scsi to use BootMapTable (referred to as Program Table)
-- defined value for maximum table entries
+Reads boot menu flag and timeout values from the iplb and
+sets the respective fields for the menu.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c | 60 +++++++++++++++++++++-------------------------
- pc-bios/s390-ccw/bootmap.h | 11 ++++++++-
- 2 files changed, 37 insertions(+), 34 deletions(-)
+ pc-bios/s390-ccw/Makefile   |  2 +-
+ pc-bios/s390-ccw/main.c     | 24 ++++++++++++++++++++++++
+ pc-bios/s390-ccw/menu.c     | 22 ++++++++++++++++++++++
+ pc-bios/s390-ccw/s390-ccw.h |  3 +++
+ 4 files changed, 50 insertions(+), 1 deletion(-)
+ create mode 100644 pc-bios/s390-ccw/menu.c
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 67a6123..a4eaf24 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -182,24 +182,24 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
-     return block_nr;
- }
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 9f7904f..1712c2d 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
  
--static void run_eckd_boot_script(block_number_t mbr_block_nr)
-+static void run_eckd_boot_script(block_number_t bmt_block_nr)
- {
-     int i;
-     unsigned int loadparm = get_loadparm_index();
-     block_number_t block_nr;
-     uint64_t address;
--    ScsiMbr *bte = (void *)sec; /* Eckd bootmap table entry */
-+    BootMapTable *bmt = (void *)sec;
-     BootMapScript *bms = (void *)sec;
+ .PHONY : all clean build-all
  
-     debug_print_int("loadparm", loadparm);
--    IPL_assert(loadparm < 31, "loadparm value greater than"
-+    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
-                " maximum number of boot entries allowed");
+-OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
++OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index e41b264..32ed70e 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -18,6 +18,9 @@ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+ QemuIplParameters qipl;
  
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
--    read_block(mbr_block_nr, sec, "Cannot read MBR");
-+    read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
- 
--    block_nr = eckd_block_num((void *)&(bte->blockptr[loadparm]));
--    IPL_assert(block_nr != -1, "No Boot Map");
-+    block_nr = eckd_block_num(&bmt->entry[loadparm]);
-+    IPL_assert(block_nr != -1, "Cannot find Boot Map Table Entry");
- 
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(block_nr, sec, "Cannot read Boot Map Script");
-@@ -223,7 +223,7 @@ static void ipl_eckd_cdl(void)
-     XEckdMbr *mbr;
-     Ipl2 *ipl2 = (void *)sec;
-     IplVolumeLabel *vlbl = (void *)sec;
--    block_number_t block_nr;
-+    block_number_t bmt_block_nr;
- 
-     /* we have just read the block #0 and recognized it as "IPL1" */
-     sclp_print("CDL\n");
-@@ -238,8 +238,8 @@ static void ipl_eckd_cdl(void)
-     IPL_assert(mbr->dev_type == DEV_TYPE_ECKD,
-                "Non-ECKD device type in zIPL section of IPL2 record.");
- 
--    /* save pointer to Boot Script */
--    block_nr = eckd_block_num((void *)&(mbr->blockptr));
-+    /* save pointer to Boot Map Table */
-+    bmt_block_nr = eckd_block_num(&mbr->blockptr);
- 
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(2, vlbl, "Cannot read Volume Label at block 2");
-@@ -249,7 +249,7 @@ static void ipl_eckd_cdl(void)
-                "Invalid magic of volser block");
-     print_volser(vlbl->f.volser);
- 
--    run_eckd_boot_script(block_nr);
-+    run_eckd_boot_script(bmt_block_nr);
-     /* no return */
- }
- 
-@@ -280,7 +280,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
- 
- static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
- {
--    block_number_t block_nr;
-+    block_number_t bmt_block_nr;
-     BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
- 
-     if (mode != ECKD_LDL_UNLABELED) {
-@@ -299,8 +299,10 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
-     }
-     verify_boot_info(bip);
- 
--    block_nr = eckd_block_num((void *)&(bip->bp.ipl.bm_ptr.eckd.bptr));
--    run_eckd_boot_script(block_nr);
-+    /* save pointer to Boot Map Table */
-+    bmt_block_nr = eckd_block_num((void *)&bip->bp.ipl.bm_ptr.eckd.bptr);
++#define LOADPARM_PROMPT "PROMPT  "
++#define LOADPARM_EMPTY  "........"
 +
-+    run_eckd_boot_script(bmt_block_nr);
-     /* no return */
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
+@@ -74,6 +77,26 @@ static bool find_dev(Schib *schib, int dev_no)
+     return false;
  }
  
-@@ -325,7 +327,7 @@ static void print_eckd_msg(void)
- 
- static void ipl_eckd(void)
++static void menu_setup(void)
++{
++    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
++        menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
++        return;
++    }
++
++    /* If loadparm was set to any other value, then do not enable menu */
++    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
++        return;
++    }
++
++    switch (iplb.pbt) {
++    case S390_IPL_TYPE_CCW:
++        menu_set_parms(qipl.qipl_flags & QIPL_FLAG_BM_OPTS_CMD,
++                       qipl.boot_menu_timeout);
++        return;
++    }
++}
++
+ static void virtio_setup(void)
  {
--    ScsiMbr *mbr = (void *)sec;
-+    XEckdMbr *mbr = (void *)sec;
-     LDL_VTOC *vlbl = (void *)sec;
- 
-     print_eckd_msg();
-@@ -449,10 +451,8 @@ static void zipl_run(ScsiBlockPtr *pte)
- static void ipl_scsi(void)
- {
-     ScsiMbr *mbr = (void *)sec;
--    uint8_t *ns, *ns_end;
-     int program_table_entries = 0;
--    const int pte_len = sizeof(ScsiBlockPtr);
--    ScsiBlockPtr *prog_table_entry = NULL;
-+    BootMapTable *prog_table = (void *)sec;
-     unsigned int loadparm = get_loadparm_index();
- 
-     /* Grab the MBR */
-@@ -467,34 +467,28 @@ static void ipl_scsi(void)
-     debug_print_int("MBR Version", mbr->version_id);
-     IPL_check(mbr->version_id == 1,
-               "Unknown MBR layout version, assuming version 1");
--    debug_print_int("program table", mbr->blockptr[0].blockno);
--    IPL_assert(mbr->blockptr[0].blockno, "No Program Table");
-+    debug_print_int("program table", mbr->pt.blockno);
-+    IPL_assert(mbr->pt.blockno, "No Program Table");
- 
-     /* Parse the program table */
--    read_block(mbr->blockptr[0].blockno, sec,
--               "Error reading Program Table");
--
-+    read_block(mbr->pt.blockno, sec, "Error reading Program Table");
-     IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
- 
--    debug_print_int("loadparm index", loadparm);
--    ns_end = sec + virtio_get_block_size();
--    for (ns = (sec + pte_len); (ns + pte_len) < ns_end; ns += pte_len) {
--        prog_table_entry = (ScsiBlockPtr *)ns;
--        if (!prog_table_entry->blockno) {
-+    while (program_table_entries <= MAX_TABLE_ENTRIES) {
-+        if (!prog_table->entry[program_table_entries].scsi.blockno) {
-             break;
+     Schib schib;
+@@ -117,6 +140,7 @@ static void virtio_setup(void)
+         default:
+             panic("List-directed IPL not supported yet!\n");
          }
--
-         program_table_entries++;
--        if (program_table_entries == loadparm + 1) {
--            break; /* selected entry found */
--        }
-     }
- 
-     debug_print_int("program table entries", program_table_entries);
--
-     IPL_assert(program_table_entries != 0, "Empty Program Table");
- 
--    zipl_run(prog_table_entry); /* no return */
-+    debug_print_int("loadparm", loadparm);
-+    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
-+               " maximum number of boot entries allowed");
++        menu_setup();
+     } else {
+         for (ssid = 0; ssid < 0x3; ssid++) {
+             blk_schid.ssid = ssid;
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+new file mode 100644
+index 0000000..1ce33dd
+--- /dev/null
++++ b/pc-bios/s390-ccw/menu.c
+@@ -0,0 +1,22 @@
++/*
++ * QEMU S390 Interactive Boot Menu
++ *
++ * Copyright 2018 IBM Corp.
++ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
 +
-+    zipl_run(&prog_table->entry[loadparm].scsi); /* no return */
- }
- 
- /***********************************************************************
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index cf99a4c..486c0f3 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -53,6 +53,15 @@ typedef union BootMapPointer {
-     ExtEckdBlockPtr xeckd;
- } __attribute__ ((packed)) BootMapPointer;
- 
-+#define MAX_TABLE_ENTRIES  30
++#include "libc.h"
++#include "s390-ccw.h"
 +
-+/* aka Program Table */
-+typedef struct BootMapTable {
-+    uint8_t magic[4];
-+    uint8_t reserved[12];
-+    BootMapPointer entry[];
-+} __attribute__ ((packed)) BootMapTable;
++static uint8_t flag;
++static uint64_t timeout;
 +
- typedef struct ComponentEntry {
-     ScsiBlockPtr data;
-     uint8_t pad[7];
-@@ -70,7 +79,7 @@ typedef struct ScsiMbr {
-     uint8_t magic[4];
-     uint32_t version_id;
-     uint8_t reserved[8];
--    ScsiBlockPtr blockptr[];
-+    ScsiBlockPtr pt;   /* block pointer to program table */
- } __attribute__ ((packed)) ScsiMbr;
++void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
++{
++    flag = boot_menu_flag;
++    timeout = boot_menu_timeout;
++}
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 25d4d21..6cfd4b2 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -84,6 +84,9 @@ ulong get_second(void);
+ /* bootmap.c */
+ void zipl_load(void);
  
- #define ZIPL_MAGIC              "zIPL"
++/* menu.c */
++void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
++
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
 -- 
 2.7.4
