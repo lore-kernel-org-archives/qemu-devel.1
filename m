@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1epHql-0006uN-7B
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:13:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epHum-0008GV-VQ
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:17:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1epHqg-0002tg-8k
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:13:39 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52588 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1epHqg-0002tP-2e
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:13:34 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180212072207.9367-1-armbru@redhat.com>
-	<20180212072207.9367-15-armbru@redhat.com>
-	<CAMxuvaxFtRUrzJsgyG+sF+ZyppB=dZx_UW=Jjw6tuWpj1O92sw@mail.gmail.com>
-Date: Fri, 23 Feb 2018 19:13:16 +0100
-In-Reply-To: <CAMxuvaxFtRUrzJsgyG+sF+ZyppB=dZx_UW=Jjw6tuWpj1O92sw@mail.gmail.com>
-	(Marc-Andre Lureau's message of "Wed, 14 Feb 2018 16:28:47 +0100")
-Message-ID: <87muzzingj.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1epHul-0005D2-SY
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:17:48 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:36197)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1epHul-0005CX-L0
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:17:47 -0500
+Received: by mail-pl0-x242.google.com with SMTP id v3so5341528plg.3
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:17:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 14/14] qapi: Add #if conditions to
- commands, events, types, visitors
+In-Reply-To: <20180223154613.2096-4-alex.bennee@linaro.org>
+References: <20180223154613.2096-1-alex.bennee@linaro.org>
+	<20180223154613.2096-4-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Feb 2018 18:17:26 +0000
+Message-ID: <CAFEAcA-2OMtdNNbj-R_e-2vJ8vhLfiC5Uj8vFyjqFwVSn72k8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 3/8] aarch64.risu: add cryptographic
+ extensions for v8.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-Marc-Andre Lureau <mlureau@redhat.com> writes:
-
-> Hi
+On 23 February 2018 at 15:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  aarch64.risu | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
 >
-> On Mon, Feb 12, 2018 at 8:22 AM, Markus Armbruster <armbru@redhat.com> wrote:
->> Example change to generated code:
->>
->>     diff -rup test-qapi-events.h.old test-qapi-events.h
->>     --- test-qapi-events.h.old  2018-02-12 07:02:45.672737544 +0100
->>     +++ test-qapi-events.h      2018-02-12 07:03:01.128517669 +0100
->>     @@ -30,8 +30,10 @@ void qapi_event_send_event_e(UserDefZero
->>      void qapi_event_send_event_f(UserDefAlternate *arg, Error **errp);
->>
->>      void qapi_event_send___org_qemu_x_event(__org_qemu_x_Enum __org_qemu_x_member1, const char *__org_qemu_x_member2, bool has_q_wchar_t, int64_t q_wchar_t, Error **errp);
->>     +#if defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)
->>
->>      void qapi_event_send_testifevent(TestIfStruct *foo, Error **errp);
->>     +#endif /* defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT) */
->>
->>      typedef enum test_QAPIEvent {
->>          TEST_QAPI_EVENT_EVENT_A = 0,
->>
->> TODO nice blank lines before #if and after #endif
->> FIXME unclean access of protected members in commands.py
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> I reviewed the RFC series, and your approach to visit ifcond instead
-> of having them as attribute argument for the visitor (something you
-> suggested me initially iirc).
+> diff --git a/aarch64.risu b/aarch64.risu
+> index 838bded..06a9f3c 100644
+> --- a/aarch64.risu
+> +++ b/aarch64.risu
+> @@ -2937,3 +2937,35 @@ FCVTZUsi_RES A64_V sf:1 0011110 1 type:1 1 11 001 =
+000000 rn:5 rd:5
+>  # End of:
+>  # Data processing - SIMD and floating point
+>  # Data processing - Scalar Floating-Point and Advanced SIMD
+> +
+> +# These are optional ARMv8.2 cryptographic extensions
+> +@v8.2,Cryptographic,CryptographicSHA
+> +
+> +# Cryptographic three-register SHA 512
+> +# 31       21 20  16 15 14 13 12 11    10 9  5 4  0
+> +# 11001110011   Rm    1  O  0 0   opcode   Rn   Rd
+> +
+> +SHA512H   A64_V 1100 1110 011 rm:5 1 0 00 00 rn:5 rd:5
+> +SHA512H2  A64_V 1100 1110 011 rm:5 1 0 00 01 rn:5 rd:5
+> +SHA512SUI A64_V 1100 1110 011 rm:5 1 0 00 10 rn:5 rd:5
 
-I think I tossed out the idea, no more.
+"SHA512SU1"
 
-> I think the approach is interesting but that single patch shows the
-> complexity involved. The decorator approach still looks cleaner and
-> simpler to me.
+> +RAX1      A64_V 1100 1110 011 rm:5 1 0 00 11 rn:5 rd:5
+> +SM3PARTW1 A64_V 1100 1110 011 rm:5 1 1 00 00 rn:5 rd:5
+> +SM3PARTW2 A64_V 1100 1110 011 rm:5 1 1 00 01 rn:5 rd:5
+> +SM4       A64_V 1100 1110 011 rm:5 1 1 00 10 rn:5 rd:5
 
-De gustibus...
+"SM4EKEY"
 
-For what it's worth, I disliked the decorator magic enough to write this
-series.
+I also had a pattern for the unallocated encoding:
+# unallocated encoding: O=3D1 opcode=3D11
+SHA512_RES A64_C82 11001110011 rm:5 1 1 00 11 rn:5 rd:5
 
->                Furthermore, I don't fancy much having to redo and tune
-> the generation *again* to fix the inden, extra-spaces etc that were
-> fixed after several revisions (it takes hours to get there, it's
-> boring). Can't we go first with my approach and then look at replacing
-> it? Can't one add a "FIXME: replace the decorator with something less
-> magic" at ifcond_decorator definition for now? Is this code so
-> critical that it has to be the way you want in the first place? The
-> approach to take it first and improve it worked very well for
-> qapi2texi, it just took a few more days for you (and reviewers) to
-> improve it. I'd suggest we work that way instead of having me rewrite
-> and rewrite until you are happy (which is something I can't do right
-> without many painful iterations for you and me).
+> +
+> +# Cryptographic four-register
+> +# 31       23 22 21 20  16 15 14  10 9  5 4  0
+> +# 1100 1110 0  Op0    Rm    0   Ra    Rn   Rd
+> +
+> +EOR3      A64_V 1110 1110 0 00 rm:5 0 ra:5 rn:5 rd:5
+> +BCAX      A64_V 1110 1110 0 01 rm:5 0 ra:5 rn:5 rd:5
+> +SM3SS1    A64_V 1110 1110 0 10 rm:5 0 ra:5 rn:5 rd:5
 
-This is up to the backup QAPI maintainer now :)
+and another unallocated pattern:
+# unallocated: op0=3D11
+C4REG_RES A64_C82 110011100 11 rm:5 0 ra:5 rn:5 rd:5
+
+> +# Cryptographic two-register SHA 512
+> +# 31                    12 11  10 9  5 4  0
+> +# 1100 1110 1100 0000 1000   op    Rn   Rd
+> +
+> +SHA512SU0 A64_V 1100 1110 1100 0000 1000 00 rn:5 rd:5
+> +SM4E      A64_V 1100 1110 1100 0000 1000 01 rn:5 rd:5
+
+and again:
+# unallocated: opcode =3D 1x
+C2REG_RES A64_C82 1100 1110 1100 0000 1000 1 x:1 rn:5 rd:5
+
+and I think you're missing these two lots of insns:
+
+# Cryptographic three-register, imm2
+SM3TT1A A64_C82 11001110010 rm:5 10 imm:2 00 rn:5 rd:5
+SM3TT1B A64_C82 11001110010 rm:5 10 imm:2 01 rn:5 rd:5
+SM3TT2A A64_C82 11001110010 rm:5 10 imm:2 10 rn:5 rd:5
+SM3TT2B A64_C82 11001110010 rm:5 10 imm:2 11 rn:5 rd:5
+
+# XAR
+XAR A64_C82 1100 1110 100 rm:5 imm:6 rn:5 rd:5
+
+thanks
+-- PMM
