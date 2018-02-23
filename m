@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epGn1-00072g-41
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:05:44 -0500
+	(envelope-from <berrange@redhat.com>) id 1epGnF-0007Em-8F
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:05:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epGn0-0005Nl-8w
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:05:43 -0500
-Date: Fri, 23 Feb 2018 18:05:25 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180223170525.GF3470@localhost.localdomain>
-References: <20180213202701.15858-1-eblake@redhat.com>
-	<20180213202701.15858-10-eblake@redhat.com>
-	<20180214120525.GB4766@localhost.localdomain>
-	<afb56cfd-4f42-07e5-9a65-d929b2ea9916@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1epGnE-0005xL-CC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:05:57 -0500
+Date: Fri, 23 Feb 2018 17:05:48 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180223170548.GH31076@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180223154613.2096-1-alex.bennee@linaro.org>
+	<20180223154613.2096-5-alex.bennee@linaro.org>
+	<20180223161723.GF31076@redhat.com> <878tbjac3d.fsf@linaro.org>
+	<20180223164937.GG31076@redhat.com>
+	<CAFEAcA-r7o=yMD+Mvo0-3Lpfe-Vvs_SdKOnJoOFnuNJn1oEdLA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <afb56cfd-4f42-07e5-9a65-d929b2ea9916@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 09/21] null: Switch to
- .bdrv_co_block_status()
+In-Reply-To: <CAFEAcA-r7o=yMD+Mvo0-3Lpfe-Vvs_SdKOnJoOFnuNJn1oEdLA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 4/8] new contrib/generate_all.sh: batch
+ risugen script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 23.02.2018 um 17:43 hat Eric Blake geschrieben:
-> > OFFSET_VALID | DATA might be excusable because I can see that it's
-> > convenient that a protocol driver refers to itself as *file instead of
-> > returning NULL there and then the offset is valid (though it would be
-> > pointless to actually follow the file pointer), but OFFSET_VALID without
-> > DATA probably isn't.
-> 
-> So OFFSET_VALID | DATA for a protocol BDS is not just convenient, but
-> necessary to avoid breaking qemu-img map output.  But you are also right
-> that OFFSET_VALID without data makes little sense at a protocol layer. So
-> with that in mind, I'm auditing all of the protocol layers to make sure
-> OFFSET_VALID ends up as something sane.
+On Fri, Feb 23, 2018 at 05:01:42PM +0000, Peter Maydell wrote:
+> On 23 February 2018 at 16:49, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> > If it is going to live in QEMU source tree, then avoiding introducing=
+ a new
+> > license is desirable.
+>=20
+> It isn't -- risu has its own repository.
 
-That's one way to look at it.
+Ah, I see what you mean. Disregard my comments here then
 
-The other way is that qemu-img map shouldn't ask the protocol layer for
-its offset because it already knows the offset (it is what it passes as
-a parameter to bdrv_co_block_status).
 
-Anyway, it's probably not worth changing the interface, we should just
-make sure that the return values of the individual drivers are
-consistent.
-
-Kevin
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
