@@ -1,28 +1,52 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1ep6rH-0001KF-Hy
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 01:30:46 -0500
+	(envelope-from <jl4312@columbia.edu>) id 1ep6x5-0002by-0v
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 01:36:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1ep6mh-0001Eo-Ue
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 01:29:27 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1ep6mh-0001Bd-BH
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 01:24:43 -0500
-Received: by mail-pg0-x241.google.com with SMTP id l24so3015016pgc.5
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 22:24:43 -0800 (PST)
+	(envelope-from <jl4312@columbia.edu>) id 1ep6w0-0002Rj-Mn
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 01:35:26 -0500
+Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:42991)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1ep6vz-0002Np-Ql
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 01:34:20 -0500
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w1N6XAMH056627
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 01:34:18 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id B038C6D
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 01:34:19 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+	[128.59.72.13]) by hazelnut (Postfix) with ESMTP id 9AE7B80
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 01:34:19 -0500 (EST)
+Received: from mail-wm0-f69.google.com (mail-wm0-f69.google.com [74.125.82.69])
+	by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w1N6YH5D057173
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 01:34:18 -0500
+Received: by mail-wm0-f69.google.com with SMTP id n14so63615wmc.0
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 22:34:18 -0800 (PST)
+Received: from mail-wr0-f171.google.com (mail-wr0-f171.google.com.
+	[209.85.128.171])
+	by smtp.gmail.com with ESMTPSA id z8sm1408744edi.11.2018.02.22.22.34.15
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 22 Feb 2018 22:34:15 -0800 (PST)
+Received: by mail-wr0-f171.google.com with SMTP id v65so12909400wrc.11
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 22:34:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKN+_vdSVUn92Te-6DP4bP33ZE+OQ_HSe3erC4B7mtM70Q@mail.gmail.com>
-References: <20180222222844.7109-1-frasse.iglesias@gmail.com>
-	<20180222222844.7109-2-frasse.iglesias@gmail.com>
-	<CAKmqyKN+_vdSVUn92Te-6DP4bP33ZE+OQ_HSe3erC4B7mtM70Q@mail.gmail.com>
-From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Fri, 23 Feb 2018 07:24:41 +0100
-Message-ID: <CAAYMZQsHyKBRqhErwEsixDw9qeG-i=70TUT21aE1BeG2fU46Bw@mail.gmail.com>
+References: <CAHyh4xii5y-8=uMJeQGARrHZAETtW4ugmBWUypbQ923vk0P3Lw@mail.gmail.com>
+	<20180223035555.GL18962@xz-mi>
+	<CAHyh4xiCpJQZgtQR-KDrDntZZnAK5V5D=oB7UwQbuZNy7G_z7g@mail.gmail.com>
+	<20180223061034.GM18962@xz-mi>
+In-Reply-To: <20180223061034.GM18962@xz-mi>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Fri, 23 Feb 2018 06:34:04 +0000
+Message-ID: <CAHyh4xh+EP6-vvrcQiQTBQQ4+3yrQvVFNGrtgt0w57ZZ0LNcZA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] xilinx_spips: Enable only two slaves
- when reading/writing with stripe
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] intel-iommu and vhost: Do we need 'device-iotlb'
+ and 'ats'?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +55,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>
+To: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>, jasowang@redhat.com
 
-On 22 February 2018 at 23:38, Alistair Francis <alistair23@gmail.com> wrote:
+On Fri, Feb 23, 2018 at 1:10 AM Peter Xu <peterx@redhat.com> wrote:
 
-> On Thu, Feb 22, 2018 at 2:28 PM, Francisco Iglesias
-> <frasse.iglesias@gmail.com> wrote:
-> > Assert only the lower cs on bus 0 and upper cs on bus 1 when both buses
-> and
-> > chip selects are enabled (e.g reading/writing with stripe).
+> On Fri, Feb 23, 2018 at 12:32:13AM -0500, Jintack Lim wrote:
+> > Hi Peter,
 > >
-> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> > ---
-> >  hw/ssi/xilinx_spips.c | 42 ++++++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 38 insertions(+), 4 deletions(-)
+> > Hope you had great holidays!
 > >
-> > diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> > index 8af36ca3d4..e566d179fe 100644
-> > --- a/hw/ssi/xilinx_spips.c
-> > +++ b/hw/ssi/xilinx_spips.c
-> > @@ -223,7 +223,7 @@ static void xilinx_spips_update_cs(XilinxSPIPS *s,
-> int field)
-> >  {
-> >      int i;
+> > On Thu, Feb 22, 2018 at 10:55 PM, Peter Xu <peterx@redhat.com> wrote:
+> > > On Tue, Feb 20, 2018 at 11:03:46PM -0500, Jintack Lim wrote:
+> > >> Hi,
+> > >>
+> > >> I'm using vhost with the virtual intel-iommu, and this page[1] shows
+> > >> the QEMU command line example.
+> > >>
+> > >> qemu-system-x86_64 -M q35,accel=3Dkvm,kernel-irqchip=3Dsplit -m 2G \
+> > >>                    -device intel-iommu,intremap=3Don,device-iotlb=3D=
+on \
+> > >>                    -device ioh3420,id=3Dpcie.1,chassis=3D1 \
+> > >>                    -device
+> > >>
+> virtio-net-pci,bus=3Dpcie.1,netdev=3Dnet0,disable-legacy=3Don,disable-mod=
+ern=3Doff,iommu_platform=3Don,ats=3Don
+> > >> \
+> > >>                    -netdev tap,id=3Dnet0,vhostforce \
+> > >>                    $IMAGE_PATH
+> > >>
+> > >> I wonder what's the impact of using device-iotlb and ats options as
+> > >> they are described necessary.
+> > >>
+> > >> In my understanding, vhost in the kernel only looks at
+> > >> VIRTIO_F_IOMMU_PLATFORM, and when it is set, vhost uses a
+> > >> device-iotlb. In addition, vhost and QEMU communicate using vhost_ms=
+g
+> > >> basically to cache mappings correctly in the vhost, so I wonder what=
+'s
+> > >> the role of ats in this case.
+> > >
+> > > The "ats" as virtio device parameter will add ATS capability to the
+> > > PCI device.
+> > >
+> > > The "device-iotlb" as intel-iommu parameter will enable ATS in the
+> > > IOMMU device (and also report that in ACPI field).
+> > >
+> > > If both parameters are provided IIUC it means guest will know virtio
+> > > device has device-iotlb and it'll treat the device specially (e.g.,
+> > > guest will need to send device-iotlb invalidations).
 > >
-> > -    for (i = 0; i < s->num_cs; i++) {
-> > +    for (i = 0; i < s->num_cs * s->num_busses; i++) {
-> >          bool old_state = s->cs_lines_state[i];
-> >          bool new_state = field & (1 << i);
+> > Oh, I see. I was focusing on how QEMU and vhost work in the host, but
+> > I think I missed the guest part! Thanks. I see that the Intel IOMMU
+> > driver has has_iotlb_device flag for that purpose.
 > >
-> > @@ -234,7 +234,7 @@ static void xilinx_spips_update_cs(XilinxSPIPS *s,
-> int field)
-> >          }
-> >          qemu_set_irq(s->cs_lines[i], !new_state);
-> >      }
-> > -    if (!(field & ((1 << s->num_cs) - 1))) {
-> > +    if (!(field & ((1 << (s->num_cs * s->num_busses)) - 1))) {
-> >          s->snoop_state = SNOOP_CHECKING;
-> >          s->cmd_dummies = 0;
-> >          s->link_state = 1;
-> > @@ -248,7 +248,41 @@ static void xlnx_zynqmp_qspips_update_cs_lines(XlnxZynqMPQSPIPS
-> *s)
-> >  {
-> >      if (s->regs[R_GQSPI_GF_SNAPSHOT]) {
-> >          int field = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT,
-> CHIP_SELECT);
-> > -        xilinx_spips_update_cs(XILINX_SPIPS(s), field);
-> > +        bool both_buses_enabled;
-> > +        uint8_t buses;
-> > +        int cs = 0;
-> > +
-> > +        buses = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT,
-> DATA_BUS_SELECT);
-> > +        both_buses_enabled = (buses & 0x3) == 0x3;
-> > +
-> > +        if (both_buses_enabled) {
-> > +            /* Bus 0 lower cs */
-> > +            if (field & 1) {
-> > +                cs |= 1;
-> > +            }
-> > +            /* Bus 1 upper cs */
-> > +            if (field & (1 << 1)) {
-> > +                cs |= 1 << 3;
-> > +            }
-> > +        } else {
-> > +            /* Bus 0 lower cs */
-> > +            if (buses & 1 && field & 1) {
-> > +                cs |= 1;
-> > +            }
-> > +            /* Bus 0 upper cs */
-> > +            if (buses & 1 && field & (1 << 1)) {
-> > +                cs |= 1 << 1;
-> > +            }
-> > +            /* Bus 1 lower cs */
-> > +            if (buses & (1 << 1) && field & 1) {
-> > +                cs |= 1 << 2;
-> > +            }
-> > +            /* Bus 1 upper cs */
-> > +            if (buses & (1 << 1) && field & (1 << 1)) {
-> > +                cs |= 1 << 3;
-> > +            }
+> > >
+> > > We'd better keep these parameters when running virtio devices with
+> > > vIOMMU.  For the rest of vhost/arm specific questions, I'll leave to
+> > > others.
+> >
+> > It seems like SMMU is not checking ATS capability - at least
+> > ats_enabled flag - but I may miss something here as well :)
+> >
+> > >
+> > > PS: Though IIUC the whole ATS thing may not really be necessary for
+> > > current VT-d emulation, since even with ATS vhost is registering UNMA=
+P
+> > > IOMMU notifiers (see vhost_iommu_region_add()), and IIUC that means
+> > > vhost will receive IOTLB invalidations even without ATS support, and
+> > > it _might_ still work.
+> >
+> > Right. That's what I thought.
+> >
+> > Come to think of it, I'm not sure why we need to flush mappings in
+> > IOMMU and devices separately in the first place... Any thoughts?
 >
-> It might make more sense to have the buses & 1 in it's own if
-> statement and have nested if statements here. Just to be easier to
-> follow.
+> I don't know ATS much, neither.
 >
-> Tested-by: Alistair Francis <alistair.francis@xilinx.com>
+> You can have a look at chap 4 of vt-d spec:
 >
-> Alistair
+>         One approach to scaling IOTLBs is to enable I/O devices to
+>         participate in the DMA remapping with IOTLBs implemented at
+>         the devices. The Device-IOTLBs alleviate pressure for IOTLB
+>         resources in the core logic, and provide opportunities for
+>         devices to improve performance by pre-fetching address
+>         translations before issuing DMA requests. This may be useful
+>         for devices with strict DMA latency requirements (such as
+>         isochronous devices), and for devices that have large DMA
+>         working set or multiple active DMA streams.
 >
-> Hi Alistair,
+> So I think it's for performance's sake. For example, the DMA operation
+> won't need to be translated at all if it's pre-translated, so it can
+> have less latency.  And also, that'll offload some of the translation
+> process so that workload can be more distributed.
+>
+> When with that (caches located both on IOMMU's and device's side), we
+> need to invalidate all the cache when needed.
+>
 
-Thank you very much for reviewing and testing! Good point above, I'll do a
-new version of the patch doing this.
+Right. I think my question was not clear. My question was that why don=E2=
+=80=99t
+IOMMU invalidate device-iotlb along with its mappings in one go. Then IOMMU
+device driver doesn=E2=80=99t need to flush device-iotlb explicitly. Maybe =
+the
+reason is that ATS and IOMMU are not always coupled.. but I guess it=E2=80=
+=99s time
+for me to get some more background :)
 
-Best regards,
-Francisco Iglesias
 
-
-
-
-
-> > +        }
-> > +        xilinx_spips_update_cs(XILINX_SPIPS(s), cs);
-> >      }
-> >  }
 > >
-> > @@ -260,7 +294,7 @@ static void xilinx_spips_update_cs_lines(XilinxSPIPS
-> *s)
-> >      if (num_effective_busses(s) == 2) {
-> >          /* Single bit chip-select for qspi */
-> >          field &= 0x1;
-> > -        field |= field << 1;
-> > +        field |= field << 3;
-> >      /* Dual stack U-Page */
-> >      } else if (s->regs[R_LQSPI_CFG] & LQSPI_CFG_TWO_MEM &&
-> >                 s->regs[R_LQSPI_STS] & LQSPI_CFG_U_PAGE) {
-> > --
-> > 2.11.0
+> > Your reply was really helpful to me. I appreciate it.
+>
+> My pleasure.  Thanks,
+>
 > >
+> > Thanks,
+> > Jintack
 > >
+> > > But there can be other differences, like
+> > > performance, etc.
+> > >
+> > >>
+> > >> A related question is that if we use SMMU emulation[2] on ARM withou=
+t
+> > >> those options, does vhost cache mappings as if it has a device-iotlb=
+?
+> > >> (I guess this is the case.)
+> > >>
+> > >> I'm pretty new to QEMU code, so I might be missing something. Can
+> > >> somebody shed some light on it?
+> > >>
+> > >> [1] https://wiki.qemu.org/Features/VT-d
+> > >> [2]
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg04736.html
+> > >>
+> > >> Thanks,
+> > >> Jintack
+> > >>
+> > >
+> > > --
+> > > Peter Xu
+> > >
+> >
+>
+> --
+> Peter Xu
+>
 >
