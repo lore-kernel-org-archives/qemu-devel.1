@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1epCcc-0005DS-PR
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:38:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epCoc-0007by-D6
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:51:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1epCcX-0002RW-PO
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:38:42 -0500
-Date: Fri, 23 Feb 2018 13:38:23 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180223133823.238ad4a4.cohuck@redhat.com>
-In-Reply-To: <20180223101919.21075-1-cohuck@redhat.com>
-References: <20180223101919.21075-1-cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1epCob-00082b-Jw
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:51:06 -0500
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:38666)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1epCob-00080z-D3
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 07:51:05 -0500
+Received: by mail-pg0-x235.google.com with SMTP id l24so3324161pgc.5
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 04:51:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: remove s390_get_memslot_count
+In-Reply-To: <20180217182323.25885-13-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-13-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Feb 2018 12:50:43 +0000
+Message-ID: <CAFEAcA-x8DgwS4m_3tXjYhxunfi6-fmkkfOX65V4kujm+eXZrg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 12/67] target/arm: Implement
+ SVE bitwise shift by vector (predicated)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,22 +30,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Fri, 23 Feb 2018 11:19:19 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 17 February 2018 at 18:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-> Not needed anymore after removal of the memory hotplug code.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  include/hw/s390x/sclp.h  | 1 -
->  target/s390x/cpu.c       | 9 ---------
->  target/s390x/cpu.h       | 4 ----
->  target/s390x/kvm-stub.c  | 5 -----
->  target/s390x/kvm.c       | 5 -----
->  target/s390x/kvm_s390x.h | 1 -
->  6 files changed, 25 deletions(-)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Queued to s390-next.
+thanks
+-- PMM
