@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1epHFx-0007mf-Ex
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:35:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1epHGx-0000BT-MX
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1epHFv-0007iG-Bv
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:35:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39954 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1epHGs-0000B6-Qm
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:36:39 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40006 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1epHFv-0007hg-3G
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:35:35 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1epHGs-0000Am-M1
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:36:34 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-20-armbru@redhat.com>
-	<151905557279.12376.11982412186477174825@sif>
-Date: Fri, 23 Feb 2018 18:35:23 +0100
-In-Reply-To: <151905557279.12376.11982412186477174825@sif> (Michael Roth's
-	message of "Mon, 19 Feb 2018 09:52:52 -0600")
-Message-ID: <87o9kfk3s4.fsf@dusky.pond.sub.org>
+	<20180211093607.27351-21-armbru@redhat.com>
+	<c1d0433c-267c-6874-290b-b1189f70046d@redhat.com>
+Date: Fri, 23 Feb 2018 18:36:32 +0100
+In-Reply-To: <c1d0433c-267c-6874-290b-b1189f70046d@redhat.com> (Eric Blake's
+	message of "Mon, 12 Feb 2018 15:44:32 -0600")
+Message-ID: <87k1v3k3q7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 19/29] qapi: Make code-generating
- visitors use QAPIGen more
+Subject: Re: [Qemu-devel] [PATCH v2 20/29] qapi/types qapi/visit: Generate
+ built-in stuff into separate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-Michael Roth <mdroth@linux.vnet.ibm.com> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> Quoting Markus Armbruster (2018-02-11 03:35:57)
->> The use of QAPIGen is rather shallow so far: most of the output
->> accumulation is not converted.  Take the next step: convert output
->> accumulation in the code-generating visitor classes.  Helper functions
->> outside these classes are not converted.
->> 
+> On 02/11/2018 03:35 AM, Markus Armbruster wrote:
+>> Linking code from multiple separate QAPI schemata into the same
+>> program is possible, but involves some weirdness around built-in
+>> types:
+>>
+>> * We generate code for built-in types into .c only with option
+>>    --builtins.  The user is responsible for generating code for exactly
+>>    one QAPI schema per program with --builtins.
+>>
+>> * We generate code for built-in types into .h regardless of
+>>    --builtins, but guarded by #ifndef QAPI_VISIT_BUILTIN.  Because all
+>>    copies of this code are exactly the same, including any combination
+>>    of these headers works.
+>>
+>> Replace this contraption by something more conventional: generate code
+>> for built-in types into their very own files: qapi-builtin-types.c,
+>> qapi-builtin-visit.c, qapi-builtin-types.h, qapi-builtin-visit.h, but
+>> only with --builtins.  Obey --output-dir, but ignore --prefix for
+>> them.
+>>
+>> Make qapi-types.h include qapi-builtin-types.h.  With multiple
+>> schemata you now have multiple qapi-types.[ch], but only one
+>> qapi-builtin-types.[ch].  Same for qapi-visit.[ch] and
+>> qapi-builtin-visit.[ch].
+>>
+>> Bonus: if all you need is built-in stuff, you can include a much
+>> smaller header.  To be exploited shortly.
+>>
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
->>  scripts/qapi/commands.py   | 71 ++++++++++++++++------------------------
->>  scripts/qapi/common.py     | 13 ++++++++
->>  scripts/qapi/doc.py        | 74 ++++++++++++++++++++----------------------
->>  scripts/qapi/events.py     | 55 ++++++++++++-------------------
->>  scripts/qapi/introspect.py | 56 +++++++++++++-------------------
->>  scripts/qapi/types.py      | 81 +++++++++++++++++++---------------------------
->>  scripts/qapi/visit.py      | 80 +++++++++++++++++++--------------------------
->>  7 files changed, 188 insertions(+), 242 deletions(-)
->> 
+>> @@ -2046,6 +2046,7 @@ class QAPIGenH(QAPIGenC):
+>>       class QAPIGenDoc(QAPIGen):
+>> +
+>>       def _top(self, fname):
+>>           return (QAPIGen._top(self, fname)
+>>                   + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
 >
-> <snip>
->
->> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->> index 29d98ca934..31d2f73e7e 100644
->> --- a/scripts/qapi/common.py
->> +++ b/scripts/qapi/common.py
->> @@ -2049,3 +2049,16 @@ class QAPIGenDoc(QAPIGen):
->>      def _top(self, fname):
->>          return (QAPIGen._top(self, fname)
->>                  + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
->> +
->> +
->> +class QAPISchemaMonolithicCVisitor(QAPISchemaVisitor):
->> +
->> +    def __init__(self, prefix, what, blurb, pydoc):
->> +        self._prefix = prefix
->> +        self._what = what
->> +        self._genc = QAPIGenC(blurb, pydoc)
->> +        self._genh = QAPIGenH(blurb, pydoc)
->> +
->> +    def write(self, output_dir):
->> +        self._genc.write(output_dir, self._prefix + self._what + '.c')
->> +        self._genh.write(output_dir, self._prefix + self._what + '.h')
->
-> minor nit: since subclasses of QAPISchemaVisitor and
-> QAPISchemaMonolithicCVisitor all rely on .write() now, should we declare it
-> in the abstract QAPISchemaVisitor?
+> Does this hunk belong in an earlier patch?
 
-Perhaps.  If they had more in common, the case for an abstract super
-class would be clearer.
+Yes: PATCH 05.
 
-> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Otherwise,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
 Thanks!
