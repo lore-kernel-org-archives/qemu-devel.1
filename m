@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epBjA-0006zB-5S
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:41:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epBlS-0008Is-AP
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:43:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epBj9-0006Sb-Fd
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:41:24 -0500
-Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:35624)
+	(envelope-from <peter.maydell@linaro.org>) id 1epBlR-0001NA-Jy
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:43:46 -0500
+Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:43974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1epBj9-0006Rm-9U
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:41:23 -0500
-Received: by mail-pl0-x22e.google.com with SMTP id bb3so4752087plb.2
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 03:41:23 -0800 (PST)
+	id 1epBlR-0001Me-Eg
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:43:45 -0500
+Received: by mail-pf0-x230.google.com with SMTP id z14so3404684pfe.10
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 03:43:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180222234919.9060-1-richard.henderson@linaro.org>
-References: <20180222234919.9060-1-richard.henderson@linaro.org>
+In-Reply-To: <CAFEAcA8h-Y8_zDL1mQuZTarMqWo9LwDgvgwEmpPbmYLfBvtRyw@mail.gmail.com>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-4-richard.henderson@linaro.org>
+	<CAFEAcA8h-Y8_zDL1mQuZTarMqWo9LwDgvgwEmpPbmYLfBvtRyw@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Feb 2018 11:41:02 +0000
-Message-ID: <CAFEAcA8vUvPmmfwKqCVqaFq25octGPwfB+rPvyT9GhkY16tYrA@mail.gmail.com>
+Date: Fri, 23 Feb 2018 11:43:24 +0000
+Message-ID: <CAFEAcA9T-sqz740ux0YfhM357-BS6ONs4cYX_iMiy0NLzM1yWg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Add decodetree.py
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 03/67] target/arm: Add SVE
+ decode skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +32,16 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 22 February 2018 at 23:49, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> The following changes since commit ff8689611a1d954897d857b28f7ef404e11cfa2c:
->
->   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-signed' into staging (2018-02-22 11:37:05 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-decode-20180222
->
-> for you to fetch changes up to 568ae7efae7e4b90e213049efb8b6e4e12b47ca3:
->
->   scripts: Add decodetree.py (2018-02-22 15:44:07 -0800)
->
-> ----------------------------------------------------------------
-> Add decodetree.py
->
-> ----------------------------------------------------------------
-> Richard Henderson (1):
->       scripts: Add decodetree.py
+On 23 February 2018 at 11:40, Peter Maydell <peter.maydell@linaro.org> wrote:
+> I realized while working through the rest of the series that this is
+> too early to do the sve_access_check() and fp_access_check(). Those
+> only apply to instructions which actually exist, so we mustn't
+> do the checks until after we've dealt with all the unallocated_encoding()
+> cases. I think you need to push them down inside disas_sve() somehow.
+> See also my comments on patch 8.
 
-Applied, thanks.
+...I meant "patch 9".
 
 -- PMM
