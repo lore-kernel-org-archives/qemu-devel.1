@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhenyuw@linux.intel.com>) id 1ep3wm-0003HZ-SQ
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:24:02 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ep4Hg-0007AL-Df
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:45:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhenyuw@linux.intel.com>) id 1ep3vg-0006AI-Ft
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:22:56 -0500
-Received: from mga12.intel.com ([192.55.52.136]:34418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhenyuw@linux.intel.com>)
-	id 1ep3vf-00066c-LB
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:21:47 -0500
-Date: Fri, 23 Feb 2018 11:14:38 +0800
-From: Zhenyu Wang <zhenyuw@linux.intel.com>
-Message-ID: <20180223031437.ix4kyynqvzgal65l@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20180219111458.25983-1-kraxel@redhat.com>
-	<20180219111458.25983-5-kraxel@redhat.com>
-	<20180222153740.3zkvjen77uwjqhd2@sirius.home.kraxel.org>
-	<CAFEAcA8_VRML=FopCKdGnrPCyZ9MwKokMj60962=tgCNwNT2oA@mail.gmail.com>
-	<20180222095917.29eda1d9@w520.home>
+	(envelope-from <no-reply@patchew.org>) id 1ep4Gf-00019F-M7
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:44:32 -0500
+Resent-Message-Id: <E1ep4Gf-00019F-M7@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ep4Gf-000150-2P
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 22:43:29 -0500
+In-Reply-To: <20180222195740.12726-1-bsd@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151935739375.747.14628929821017242116@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="shavk5og3mkyxpdk"
-Content-Disposition: inline
-In-Reply-To: <20180222095917.29eda1d9@w520.home>
-Subject: Re: [Qemu-devel] [PATCH v4 4/7] qdev: add hotpluggable to
- DeviceState
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 22 Feb 2018 19:43:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Initial write support for MTP
+ objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,87 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Tina Zhang <tina.zhang@intel.com>, Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, intel-gvt-dev@lists.freedesktop.org
+To: bsd@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com
 
-
---shavk5og3mkyxpdk
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 2018.02.22 09:59:17 -0700, Alex Williamson wrote:
-> On Thu, 22 Feb 2018 15:46:17 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->=20
-> > On 22 February 2018 at 15:37, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > > On Mon, Feb 19, 2018 at 12:14:55PM +0100, Gerd Hoffmann wrote: =20
-> > >> vfio display support wants disable hotplug for certain devices, beca=
-use
-> > >> qemu doesn't support hotplugging display devices and qemu consoles.
-> > >>
-> > >> Add a hotpluggable bool to DeviceState, initialize it from
-> > >> DeviceClass->hotpluggable, update device_get_hotpluggable accordingl=
-y.
-> > >>
-> > >> Devices can flip the new variable from true to false if needed. =20
-> > >
-> > > Alex wants an ack for this one.  Who maintains it these days?
-> > >
-> > > MAINTAINERS doesn't list qdev.  For QOM which is closest probably
-> > > Andreas F=E4rber is listed.  Havn't seen him on the list for a while
-> > > though.
-> > >
-> > > Ok, lets try some usual suspects...
-> > > Markus? Eric? Paolo? Peter?  Any comments on this one? =20
-> >=20
-> > What type of device is only sometimes hotpluggable ?
-> > The commit message says "display devices" and "consoles",
-> > but I would expect those to both be types of device which
-> > have a class which is never hotpluggable, so you can mark
-> > them non-hotpluggable with the existing class flag rather
-> > than needing a per-instance flag.
->=20
-> With this series, a vfio-pci device optionally supports a display.  The
-> vfio-pci device is hotpluggable, but QEMU display support is not.  So
-> the solution here is to make the vfio-pci device non-hotpluggable only
-> when it supports and enables a display.
->
-
-I'm not sure, how this is supposed to work?
-
-And there's also case that vgpu's display is not required but still need
-device hotplug feature e.g to use render/media acceleration, as supported
-by current vfio mdev device on gvt-g.
-
-> Gerd, is there another solution that the display object is instantiated
-> separately from the vfio-pci object and the display support in the
-> vfio-pci device references the display object via an id.  Possibly
-> vfio-pci could remain hotpluggable while the display class device is
-> not.  Potentially one display could be switched between multiple
-> display capable devices, like an input control button on a monitor,
-> losing signal if none are connected.  Possible?  Clearly I have no idea
-> how display objects actually work in QEMU.  Thanks,
->=20
-> Alex
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
-
---=20
-Open Source Technology Center, Intel ltd.
-
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
-
---shavk5og3mkyxpdk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCWo+HHQAKCRCxBBozTXgY
-J9PvAKCIP0DbJvdloafcJiGRluq4wsE4fQCfUvt1McOmzkBZoMrhpUyATZZ8dPs=
-=Dgk2
------END PGP SIGNATURE-----
-
---shavk5og3mkyxpdk--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjIyMTk1NzQwLjEyNzI2LTEtYnNkQHJlZGhhdC5jb20KU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCB2NSAwLzVdIEluaXRpYWwgd3JpdGUgc3VwcG9ydCBmb3IgTVRQ
+IG9iamVjdHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
+dG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
+Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
+bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
+YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
+dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
+ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKY2I5ODQ5Y2M4MCB1c2ItbXRwOiBBZHZlcnRpc2UgU2VuZE9iamVjdEluZm8g
+Zm9yIHdyaXRlIHN1cHBvcnQKMTE4YzkyYjZiZSB1c2ItbXRwOiBJbnRyb2R1Y2Ugd3JpdGUgc3Vw
+cG9ydCBmb3IgTVRQIG9iamVjdHMKNDI4NDNjMzM5NiB1c2ItbXRwOiBTdXBwb3J0IGRlbGV0ZSBv
+ZiBtdHAgb2JqZWN0cwoyMzdhYTE1Zjc0IHVzYi1tdHA6IHByaW50IHBhcmVudCBwYXRoIGluIElO
+X0lHTk9SRUQgdHJhY2UgZm4KMDE1M2ZiNDIxMyB1c2ItbXRwOiBBZGQgb25lIG1vcmUgYXJndW1l
+bnQgd2hlbiBidWlsZGluZyByZXN1bHRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzU6IHVzYi1tdHA6IEFkZCBvbmUgbW9yZSBhcmd1bWVudCB3aGVuIGJ1aWxkaW5nIHJl
+c3VsdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi81OiB1c2ItbXRwOiBwcmludCBwYXJlbnQgcGF0aCBp
+biBJTl9JR05PUkVEIHRyYWNlIGZuLi4uCkNoZWNraW5nIFBBVENIIDMvNTogdXNiLW10cDogU3Vw
+cG9ydCBkZWxldGUgb2YgbXRwIG9iamVjdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiB1c2ItbXRw
+OiBJbnRyb2R1Y2Ugd3JpdGUgc3VwcG9ydCBmb3IgTVRQIG9iamVjdHMuLi4KRVJST1I6IHRyYWls
+aW5nIHdoaXRlc3BhY2UKIzczOiBGSUxFOiBody91c2IvZGV2LW10cC5jOjEzOTg6CisgICAgICAg
+IH0gICAgICAgICAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIxNCBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
+QVRDSCA1LzU6IHVzYi1tdHA6IEFkdmVydGlzZSBTZW5kT2JqZWN0SW5mbyBmb3Igd3JpdGUgc3Vw
+cG9ydC4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVt
+ZW50cyAoOCwgOCkKIzExNTogRklMRTogaHcvdXNiL2Rldi1tdHAuYzoxNDMwOgorICAgICAgICB9
+IGVsc2UgaWYgKGMtPmFyZ3ZbMF0gJiYgKGMtPmFyZ3ZbMF0gIT0gUUVNVV9TVE9SQUdFX0lEKSkg
+eworICAgICAgICAvKiBGaXJzdCBwYXJhbWV0ZXIgcG9pbnRzIHRvIHN0b3JhZ2UgaWQgb3IgaXMg
+MCAqLwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMDQgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
