@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epJV5-0004If-KU
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:59:24 -0500
+	(envelope-from <mjc@sifive.com>) id 1epJbM-0006d4-TD
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epJV0-0006on-Mq
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:59:23 -0500
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:34055)
+	(envelope-from <mjc@sifive.com>) id 1epJbL-0001ZC-Ef
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:05:52 -0500
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:46697)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1epJV0-0006kS-FK
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:59:18 -0500
-Received: by mail-pg0-x22c.google.com with SMTP id m19so3757018pgn.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 11:59:18 -0800 (PST)
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-29-richard.henderson@linaro.org>
-	<CAFEAcA8BnNkgHNQd2xK8BrYzhtG4_fee3rWTKXqVxRNEf5FJNA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b67bcb61-6f0a-b565-2e56-2ab7c26d7b10@linaro.org>
-Date: Fri, 23 Feb 2018 11:59:14 -0800
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1epJbL-0001Yl-5N
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 15:05:51 -0500
+Received: by mail-ot0-x22f.google.com with SMTP id g97so2708519otg.13
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 12:05:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8BnNkgHNQd2xK8BrYzhtG4_fee3rWTKXqVxRNEf5FJNA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 28/67] target/arm: Implement SVE Permute
- - Predicates Group
+In-Reply-To: <20180223101032.GA31076@redhat.com>
+References: <1519344729-73482-1-git-send-email-mjc@sifive.com>
+	<20180223101032.GA31076@redhat.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Sat, 24 Feb 2018 09:05:49 +1300
+Message-ID: <CAHNT7NvMMAD6sAT60RnLgFXwdFPWHEXtysMQt04Qejnpw30Bkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 00/23] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,81 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On 02/23/2018 07:15 AM, Peter Maydell wrote:
->> +static const uint64_t expand_bit_data[5][2] = {
->> +    { 0x1111111111111111ull, 0x2222222222222222ull },
->> +    { 0x0303030303030303ull, 0x0c0c0c0c0c0c0c0cull },
->> +    { 0x000f000f000f000full, 0x00f000f000f000f0ull },
->> +    { 0x000000ff000000ffull, 0x0000ff000000ff00ull },
->> +    { 0x000000000000ffffull, 0x00000000ffff0000ull }
->> +};
->> +
->> +/* Expand units of 2**N bits to units of 2**(N+1) bits,
->> +   with the higher bits zero.  */
-> 
-> In bitops.h we call this operation "half shuffle" (where
-> it is specifically working on units of 1 bit size), and
-> the inverse "half unshuffle". Worth mentioning that (or
-> using similar terminology) ?
+Dear Daniel,
 
-I hadn't noticed this helper.  I'll at least mention.
+We've had this discussion on a recent pull request where some code was
+going to be copied directly from hw/arm/virt.c to hw/riscv/virt.c and we
+have subsequently relicensed the recipient file as GPLv2+. This code has
+not yet been incorporated into the port. Besides naming conventions and use
+of some common APIs, however the logic in hw/riscv/virt.c is original work.
+Try diffing them. I wrote the device tree code from scratch and we have a
+unique memory map, and the other functions are dervied from other RISC-V
+machines which are MIT licensed.
 
-FWIW, the half_un/shuffle operation is what you get with N=0, which corresponds
-to a byte predicate interleave.  We need the intermediate steps for half,
-single, and double predicate interleaves.
+- https://github.com/riscv/riscv-qemu/pull/109
 
->> +static uint64_t expand_bits(uint64_t x, int n)
->> +{
->> +    int i, sh;
-> 
-> Worth asserting that n is within the range we expect it to be ?
-> (what range is that? 0 to 4?)
+In any case, SiFive are happy to license their contributions as GPLv2+.
+We'll need to get the main contributors to agree to re-license to GPLv2+ or
+fall back to having GPLv2+ prefix the MIT license, as MIT is compatible
+with GPLv2+. Stefan O'Rear has commented that he is happy for his code to
+be GPLv2+ and so is SiFive, but we'll need to get confirmation from Sagar,
+one of the main port contributors, and potentially the whole list of
+contributors to do complete due diligence on re-licensing. i.e. if we want
+to eradicate MIT license from the code-base.
 
-N goes from 0-3; I goes from 0-4.  N will have been controlled by decode, so
-I'm not sure it's worth an assert.  Even if I did add one, I wouldn't want it
-here, at the center of a loop kernel.
+SiFive have made substantial changes to all of the non-GPLv2+ files in the
+port, and SiFive can license their contributions as GPLv2+ which would
+allow us to prefix all files in hw/riscv with GPLv2+. The only issue is
+that we must get approval from contributors to completely remove the MIT
+license, as the original contributors licensed their code under that
+license, as is the case for all of Fabrice's original code and many other
+parts of the code base e.g. GPEX hw/pci-host/gpex.c.
 
->> +        d[0] = nn + (mm << (1 << esz));
-> 
-> Is this actually doing an addition, or is it just an odd
-> way of writing a bitwise OR when neither of the two
-> inputs have 1 in the same bit position?
+SiFive have made substantial changes to all files in the RISC-V port, so we
+would be empowered to at least prefix the MIT license with GPLv2+.
 
-It could be an OR.  Here I'm hoping that the compiler will use a shift-add
-instruction.  Which it wouldn't necessarily be able to prove by itself if I did
-write it with an OR.
+Is that acceptable? the MIT terms are compatible with GPLv2+ as MIT is a
+"permissive-license".
 
->> +        d[0] = extract64(l + (h << (4 * oprsz)), 0, 8 * oprsz);
-> 
-> This looks like it's using addition for logical OR again ?
+'cc Sagar, Bastian, as they have been main contributors to the port in the
+past...
 
-Yes.  Although this time I admit it'll never produce an LEA.
+Regards,
+Michael.
 
->> +        /* For VL which is not a power of 2, the results from M do not
->> +           align nicely with the uint64_t for D.  Put the aligned results
->> +           from M into TMP_M and then copy it into place afterward.  */
-> 
-> How much risu testing did you do of funny vector lengths ?
+On Fri, Feb 23, 2018 at 11:10 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com>
+wrote:
 
-As much as I can with the unlicensed Foundation Platform: all lengths from 1-4.
-
-Which, unfortunately does leave a few multi-word predicate paths untested, but
-many of the routines loop identically within this length and beyond.
-
-
->> +static const uint64_t even_bit_esz_masks[4] = {
->> +    0x5555555555555555ull,
->> +    0x3333333333333333ull,
->> +    0x0f0f0f0f0f0f0f0full,
->> +    0x00ff00ff00ff00ffull
->> +};
-> 
-> Comment describing the purpose of these numbers would be useful.
-
-Ack.
-
-
-r~
+> On Fri, Feb 23, 2018 at 01:11:46PM +1300, Michael Clark wrote:
+> > QEMU RISC-V Emulation Support (RV64GC, RV32GC)
+> >
+> > This is hopefully the "fix remaining issues in-tree" release.
+>
+> This code seems to be a mixture of LGPLv2+ and MIT licensed code. The
+> preferred license for QEMU contributions is GPLv2+. Is there a reason
+> you need to diverge from this or can it be changed to be all GPLv2+ ?
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
