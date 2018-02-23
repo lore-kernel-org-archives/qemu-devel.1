@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1epEGR-0007Ij-H8
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:23:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epEHU-00082Z-9M
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:25:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1epEGM-0001gj-GB
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:23:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35262 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1epEGM-0001fv-Al
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:23:50 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D82040FB646
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 14:23:46 +0000 (UTC)
-References: <20180215212552.26997-1-marcandre.lureau@redhat.com>
-	<20180215212552.26997-4-marcandre.lureau@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <cf62af9e-39f8-deeb-0465-118a9547c212@redhat.com>
-Date: Fri, 23 Feb 2018 15:23:39 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1epEHT-0002sT-7F
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:25:00 -0500
+Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:45303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1epEHS-0002q3-Vw
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:24:59 -0500
+Received: by mail-pg0-x233.google.com with SMTP id e11so3405481pgq.12
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 06:24:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180215212552.26997-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] vhost-user-test: add back memfd check
+In-Reply-To: <20180217182323.25885-27-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-27-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Feb 2018 14:24:37 +0000
+Message-ID: <CAFEAcA8UWBemOXvu7-Dt5CMv7VHSTNp4fGSKPnnHT2UfNryOHw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 26/67] target/arm: Implement
+ SVE Permute - Extract Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-
-
-On 02/15/2018 10:25 PM, Marc-Andr=C3=A9 Lureau wrote:
-> This revert commit fb68096da3d35e64c88cd610c1fa42766c58e92a, and
-> modify test_read_guest_mem() to use different chardev names, when
-> using memfd (_test_server_free(), where the chardev is removed, runs
-> in idle).
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
+On 17 February 2018 at 18:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->   tests/vhost-user-test.c | 93 +++++++++++++++++++++++++++++++++++-----=
----------
->   1 file changed, 66 insertions(+), 27 deletions(-)
+>  target/arm/helper-sve.h    |  2 ++
+>  target/arm/sve_helper.c    | 81 ++++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 29 +++++++++++++++++
+>  target/arm/sve.decode      |  9 +++++-
+>  4 files changed, 120 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+> index 79493ab647..94f4356ce9 100644
+> --- a/target/arm/helper-sve.h
+> +++ b/target/arm/helper-sve.h
+> @@ -414,6 +414,8 @@ DEF_HELPER_FLAGS_4(sve_cpy_z_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+>  DEF_HELPER_FLAGS_4(sve_cpy_z_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+>  DEF_HELPER_FLAGS_4(sve_cpy_z_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+>
+> +DEF_HELPER_FLAGS_4(sve_ext, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+> +
+>  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+>  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+>  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index 6a95d1ec48..fb3f54300b 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -1469,3 +1469,84 @@ void HELPER(sve_cpy_z_d)(void *vd, void *vg, uint64_t val, uint32_t desc)
+>          d[i] = (pg[H1(i)] & 1 ? val : 0);
+>      }
+>  }
+> +
+> +/* Big-endian hosts need to frob the byte indicies.  If the copy
+> + * happens to be 8-byte aligned, then no frobbing necessary.
+> + */
 
-Looks good to me:
-Acked-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Have you run risu tests with a big endian host?
 
-Thanks,
-Maxime
+>  ###########################################################################
+>  # Named fields.  These are primarily for disjoint fields.
+>
+> -%imm4_16_p1             16:4 !function=plus1
+> +%imm4_16_p1    16:4 !function=plus1
+
+Another bit that should be squashed into an earlier patch.
+
+>  %imm6_22_5     22:1 5:5
+> +%imm8_16_10    16:5 10:3
+>  %imm9_16_10    16:s6 10:3
+>  %preg4_5       5:4
+>
+> @@ -363,6 +364,12 @@ FCPY               00000101 .. 01 .... 110 imm:8 .....             @rdn_pg4
+>  CPY_m_i                00000101 .. 01 .... 01 . ........ .....   @rdn_pg4 imm=%sh8_i8s
+>  CPY_z_i                00000101 .. 01 .... 00 . ........ .....   @rdn_pg4 imm=%sh8_i8s
+>
+> +### SVE Permute - Extract Group
+> +
+> +# SVE extract vector (immediate offset)
+> +EXT            00000101 001 ..... 000 ... rm:5 rd:5 \
+> +               &rrri rn=%reg_movprfx imm=%imm8_16_10
+> +
+>  ### SVE Predicate Logical Operations Group
+>
+>  # SVE predicate logical operations
+> --
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
