@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep10u-0000zA-8V
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:16:06 -0500
+	(envelope-from <mjc@sifive.com>) id 1ep11P-0001QQ-JA
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:16:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep0zu-0005RV-5k
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:15:00 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:34039)
+	(envelope-from <mjc@sifive.com>) id 1ep10b-0006qw-JO
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:15:31 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:39593)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep0zt-0005Pv-N0
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:13:57 -0500
-Received: by mail-pl0-x244.google.com with SMTP id u13so3876112plq.1
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:13:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep10b-0006pF-6G
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:14:41 -0500
+Received: by mail-pf0-x242.google.com with SMTP id c143so2778453pfb.6
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:14:41 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 23 Feb 2018 13:11:53 +1300
-Message-Id: <1519344729-73482-8-git-send-email-mjc@sifive.com>
+Date: Fri, 23 Feb 2018 13:12:05 +1300
+Message-Id: <1519344729-73482-20-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519344729-73482-1-git-send-email-mjc@sifive.com>
 References: <1519344729-73482-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v6 07/23] RISC-V GDB Stub
+Subject: [Qemu-devel] [PATCH v6 19/23] SiFive RISC-V PRCI Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +28,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-GDB Register read and write routines.
+Simple model of the PRCI  (Power, Reset, Clock, Interrupt) to emulate
+register reads made by the SDK BSP.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- target/riscv/gdbstub.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
- create mode 100644 target/riscv/gdbstub.c
+ hw/riscv/sifive_prci.c         | 95 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_prci.h | 43 +++++++++++++++++++
+ 2 files changed, 138 insertions(+)
+ create mode 100644 hw/riscv/sifive_prci.c
+ create mode 100644 include/hw/riscv/sifive_prci.h
 
-diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
 new file mode 100644
-index 0000000..aa5ec44
+index 0000000..fc19089
 --- /dev/null
-+++ b/target/riscv/gdbstub.c
-@@ -0,0 +1,64 @@
++++ b/hw/riscv/sifive_prci.c
+@@ -0,0 +1,95 @@
 +/*
-+ * RISC-V GDB Server Stub
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
 + *
-+ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017 SiFive, Inc.
 + *
++ * Simple model of the PRCI to emulate register reads made by the SDK BSP
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "exec/gdbstub.h"
-+#include "cpu.h"
++#include "hw/sysbus.h"
++#include "target/riscv/cpu.h"
++#include "hw/riscv/sifive_prci.h"
 +
-+int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++/* currently implements enough to mock freedom-e-sdk BSP clock programming */
++
++static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
 +{
-+    RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
-+
-+    if (n < 32) {
-+        return gdb_get_regl(mem_buf, env->gpr[n]);
-+    } else if (n == 32) {
-+        return gdb_get_regl(mem_buf, env->pc);
-+    } else if (n < 65) {
-+        return gdb_get_reg64(mem_buf, env->fpr[n - 33]);
-+    } else if (n < 4096 + 65) {
-+        return gdb_get_regl(mem_buf, csr_read_helper(env, n - 65));
++    if (addr == 0 /* PRCI_HFROSCCFG */) {
++        return 1 << 31; /* ROSC_RDY */
 +    }
++    if (addr == 8 /* PRCI_PLLCFG    */) {
++        return 1 << 31; /* PLL_LOCK */
++    }
++    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
 +    return 0;
 +}
 +
-+int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++static void sifive_prci_write(void *opaque, hwaddr addr,
++           uint64_t val64, unsigned int size)
 +{
-+    RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
-+
-+    if (n == 0) {
-+        /* discard writes to x0 */
-+        return sizeof(target_ulong);
-+    } else if (n < 32) {
-+        env->gpr[n] = ldtul_p(mem_buf);
-+        return sizeof(target_ulong);
-+    } else if (n == 32) {
-+        env->pc = ldtul_p(mem_buf);
-+        return sizeof(target_ulong);
-+    } else if (n < 65) {
-+        env->fpr[n - 33] = ldq_p(mem_buf); /* always 64-bit */
-+        return sizeof(uint64_t);
-+    } else if (n < 4096 + 65) {
-+        csr_write_helper(env, ldtul_p(mem_buf), n - 65);
-+    }
-+    return 0;
++    /* discard writes */
 +}
++
++static const MemoryRegionOps sifive_prci_ops = {
++    .read = sifive_prci_read,
++    .write = sifive_prci_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
++};
++
++static void sifive_prci_init(Object *obj)
++{
++    SiFivePRCIState *s = SIFIVE_PRCI(obj);
++
++    memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
++                          TYPE_SIFIVE_PRCI, 0x8000);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++}
++
++static const TypeInfo sifive_prci_info = {
++    .name          = TYPE_SIFIVE_PRCI,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SiFivePRCIState),
++    .instance_init = sifive_prci_init,
++};
++
++static void sifive_prci_register_types(void)
++{
++    type_register_static(&sifive_prci_info);
++}
++
++type_init(sifive_prci_register_types)
++
++
++/*
++ * Create PRCI device.
++ */
++DeviceState *sifive_prci_create(hwaddr addr)
++{
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
++    return dev;
++}
+diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
+new file mode 100644
+index 0000000..0e032e5
+--- /dev/null
++++ b/include/hw/riscv/sifive_prci.h
+@@ -0,0 +1,43 @@
++/*
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
++ *
++ * Copyright (c) 2017 SiFive, Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_SIFIVE_PRCI_H
++#define HW_SIFIVE_PRCI_H
++
++#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
++
++#define SIFIVE_PRCI(obj) \
++    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
++
++typedef struct SiFivePRCIState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion mmio;
++} SiFivePRCIState;
++
++DeviceState *sifive_prci_create(hwaddr addr);
++
++#endif
 -- 
 2.7.0
