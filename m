@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epEBy-0004KN-FD
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:19:19 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1epEGR-0007Ij-H8
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:23:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epEBx-0006Bo-HF
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:19:18 -0500
-Received: from mail-pl0-x234.google.com ([2607:f8b0:400e:c01::234]:42290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1epEBx-0006Ag-9P
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:19:17 -0500
-Received: by mail-pl0-x234.google.com with SMTP id 31so4960033ple.9
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 06:19:17 -0800 (PST)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1epEGM-0001gj-GB
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:23:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35262 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1epEGM-0001fv-Al
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:23:50 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4D82040FB646
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 14:23:46 +0000 (UTC)
+References: <20180215212552.26997-1-marcandre.lureau@redhat.com>
+	<20180215212552.26997-4-marcandre.lureau@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <cf62af9e-39f8-deeb-0465-118a9547c212@redhat.com>
+Date: Fri, 23 Feb 2018 15:23:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-26-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-26-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Feb 2018 14:18:56 +0000
-Message-ID: <CAFEAcA9=_kCGqv8Ck6Ttg=wEotYdTj7VYcs_w09+3D=7k5pARA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 25/67] target/arm: Implement SVE Integer
- Wide Immediate - Predicated Group
+In-Reply-To: <20180215212552.26997-4-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] vhost-user-test: add back memfd check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
-
-On 17 February 2018 at 18:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-> +/* Two operand predicated copy immediate with merge.  All valid immediates
-> + * can fit within 17 signed bits in the simd_data field.
-> + */
-> +void HELPER(sve_cpy_m_b)(void *vd, void *vn, void *vg,
-> +                         uint64_t mm, uint32_t desc)
-> +{
-> +    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-> +    uint64_t *d = vd, *n = vn;
-> +    uint8_t *pg = vg;
-> +
-> +    mm = (mm & 0xff) * (-1ull / 0xff);
-
-What is this expression doing? I guess from context that it's
-replicating the low 8 bits of mm across the 64-bit value,
-but this is too obscure to do without a comment or wrapping
-it in a helper function with a useful name, I think.
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+On 02/15/2018 10:25 PM, Marc-Andr=C3=A9 Lureau wrote:
+> This revert commit fb68096da3d35e64c88cd610c1fa42766c58e92a, and
+> modify test_read_guest_mem() to use different chardev names, when
+> using memfd (_test_server_free(), where the chardev is removed, runs
+> in idle).
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
+> ---
+>   tests/vhost-user-test.c | 93 +++++++++++++++++++++++++++++++++++-----=
+---------
+>   1 file changed, 66 insertions(+), 27 deletions(-)
+
+Looks good to me:
+Acked-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+
+Thanks,
+Maxime
