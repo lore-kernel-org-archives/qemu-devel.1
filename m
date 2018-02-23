@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epBid-0006eJ-UX
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:40:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1epBjA-0006zB-5S
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:41:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epBid-0005Kf-0H
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:40:51 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:42101)
+	(envelope-from <peter.maydell@linaro.org>) id 1epBj9-0006Sb-Fd
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:41:24 -0500
+Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:35624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1epBic-0005I3-QR
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:40:50 -0500
-Received: by mail-pf0-x241.google.com with SMTP id t15so3401017pfh.9
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 03:40:50 -0800 (PST)
+	id 1epBj9-0006Rm-9U
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 06:41:23 -0500
+Received: by mail-pl0-x22e.google.com with SMTP id bb3so4752087plb.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 03:41:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-4-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-4-richard.henderson@linaro.org>
+In-Reply-To: <20180222234919.9060-1-richard.henderson@linaro.org>
+References: <20180222234919.9060-1-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Feb 2018 11:40:29 +0000
-Message-ID: <CAFEAcA8h-Y8_zDL1mQuZTarMqWo9LwDgvgwEmpPbmYLfBvtRyw@mail.gmail.com>
+Date: Fri, 23 Feb 2018 11:41:02 +0000
+Message-ID: <CAFEAcA8vUvPmmfwKqCVqaFq25octGPwfB+rPvyT9GhkY16tYrA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 03/67] target/arm: Add SVE
- decode skeleton
+Subject: Re: [Qemu-devel] [PULL 0/1] Add decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +29,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 17 February 2018 at 18:22, Richard Henderson
+On 22 February 2018 at 23:49, Richard Henderson
 <richard.henderson@linaro.org> wrote:
-> Including only 4, as-yet unimplemented, instruction patterns
-> so that the whole thing compiles.
+> The following changes since commit ff8689611a1d954897d857b28f7ef404e11cfa2c:
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 11 +++++++-
->  target/arm/translate-sve.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++
->  .gitignore                 |  1 +
->  target/arm/Makefile.objs   | 10 ++++++++
->  target/arm/sve.decode      | 45 +++++++++++++++++++++++++++++++++
->  5 files changed, 129 insertions(+), 1 deletion(-)
->  create mode 100644 target/arm/translate-sve.c
->  create mode 100644 target/arm/sve.decode
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-signed' into staging (2018-02-22 11:37:05 +0000)
 >
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index e0e7ebf68c..a50fef98af 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -12772,9 +12772,18 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
->      s->fp_access_checked = false;
+> are available in the Git repository at:
 >
->      switch (extract32(insn, 25, 4)) {
-> -    case 0x0: case 0x1: case 0x2: case 0x3: /* UNALLOCATED */
-> +    case 0x0: case 0x1: case 0x3: /* UNALLOCATED */
->          unallocated_encoding(s);
->          break;
-> +    case 0x2:
-> +        if (!arm_dc_feature(s, ARM_FEATURE_SVE)) {
-> +            unallocated_encoding(s);
-> +        } else if (!sve_access_check(s) || !fp_access_check(s)) {
-> +            /* exception raised */
-> +        } else if (!disas_sve(s, insn)) {
-> +            unallocated_encoding(s);
-> +        }
-> +        break;
+>   git://github.com/rth7680/qemu.git tags/pull-decode-20180222
+>
+> for you to fetch changes up to 568ae7efae7e4b90e213049efb8b6e4e12b47ca3:
+>
+>   scripts: Add decodetree.py (2018-02-22 15:44:07 -0800)
+>
+> ----------------------------------------------------------------
+> Add decodetree.py
+>
+> ----------------------------------------------------------------
+> Richard Henderson (1):
+>       scripts: Add decodetree.py
 
-I realized while working through the rest of the series that this is
-too early to do the sve_access_check() and fp_access_check(). Those
-only apply to instructions which actually exist, so we mustn't
-do the checks until after we've dealt with all the unallocated_encoding()
-cases. I think you need to push them down inside disas_sve() somehow.
-See also my comments on patch 8.
+Applied, thanks.
 
-(We get this wrong for current AArch32 VFP and Neon, but correct
-for all of AArch64.)
-
-thanks
 -- PMM
