@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzg-0001IJ-PC
+	(envelope-from <kwolf@redhat.com>) id 1epIzg-0001IN-Ra
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzf-0005HZ-LC
+	(envelope-from <kwolf@redhat.com>) id 1epIzf-0005GY-0x
 	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:42 +0100
-Message-Id: <20180223192549.26666-30-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:41 +0100
+Message-Id: <20180223192549.26666-29-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 29/36] ssh: Use QAPI BlockdevOptionsSsh
- object
+Subject: [Qemu-devel] [PATCH v3 28/36] sheepdog: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,220 +22,450 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Create a BlockdevOptionsSsh object in connect_to_ssh() and take the
-options from there. 'host_key_check' is still processed separately
-because it's not in the schema yet.
+This adds the .bdrv_co_create driver callback to sheepdog, which enables
+image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/ssh.c | 136 +++++++++++++++++++++++++++---------------------------------
- 1 file changed, 61 insertions(+), 75 deletions(-)
+ qapi/block-core.json |  24 ++++-
+ block/sheepdog.c     | 242 +++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 191 insertions(+), 75 deletions(-)
 
-diff --git a/block/ssh.c b/block/ssh.c
-index b63addcf94..9a89b7f350 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -543,21 +543,6 @@ static QemuOptsList ssh_runtime_opts = {
-             .type = QEMU_OPT_NUMBER,
-             .help = "Port to connect to",
-         },
--        {
--            .name = "path",
--            .type = QEMU_OPT_STRING,
--            .help = "Path of the image on the host",
--        },
--        {
--            .name = "user",
--            .type = QEMU_OPT_STRING,
--            .help = "User as which to connect",
--        },
--        {
--            .name = "host_key_check",
--            .type = QEMU_OPT_STRING,
--            .help = "Defines how and what to check the host key against",
--        },
-         { /* end of list */ }
-     },
- };
-@@ -582,23 +567,31 @@ static bool ssh_process_legacy_socket_options(QDict *output_opts,
-     return true;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 2b249c9e3d..f7679fce53 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3512,6 +3512,28 @@
+             'erasure-coded': 'SheepdogRedundancyErasureCoded' } }
+ 
+ ##
++# @BlockdevCreateOptionsSheepdog:
++#
++# Driver specific image creation options for Sheepdog.
++#
++# @location         Where to store the new image file
++# @size             Size of the virtual disk in bytes
++# @backing-file     File name of a base image
++# @preallocation    Preallocation mode (allowed values: off, full)
++# @redundancy       Redundancy of the image
++# @object-size      Object size of the image
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsSheepdog',
++  'data': { 'location':         'BlockdevOptionsSheepdog',
++            'size':             'size',
++            '*backing-file':    'str',
++            '*preallocation':   'PreallocMode',
++            '*redundancy':      'SheepdogRedundancy',
++            '*object-size':     'size' } }
++
++##
+ # @BlockdevCreateNotSupported:
+ #
+ # This is used for all drivers that don't support creating images.
+@@ -3562,7 +3584,7 @@
+       'raw':            'BlockdevCreateNotSupported',
+       'rbd':            'BlockdevCreateOptionsRbd',
+       'replication':    'BlockdevCreateNotSupported',
+-      'sheepdog':       'BlockdevCreateNotSupported',
++      'sheepdog':       'BlockdevCreateOptionsSheepdog',
+       'ssh':            'BlockdevCreateNotSupported',
+       'throttle':       'BlockdevCreateNotSupported',
+       'vdi':            'BlockdevCreateNotSupported',
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 22df2ba9d0..83da6236ca 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -17,6 +17,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-output-visitor.h"
+ #include "qemu/uri.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+@@ -533,23 +534,6 @@ static void sd_aio_setup(SheepdogAIOCB *acb, BDRVSheepdogState *s,
+     qemu_co_mutex_unlock(&s->queue_lock);
  }
  
--static InetSocketAddress *ssh_config(QDict *options, Error **errp)
-+static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
- {
--    InetSocketAddress *inet = NULL;
--    QDict *addr = NULL;
--    QObject *crumpled_addr = NULL;
--    Visitor *iv = NULL;
--    Error *local_error = NULL;
+-static SocketAddress *sd_socket_address(const char *path,
+-                                        const char *host, const char *port)
+-{
+-    SocketAddress *addr = g_new0(SocketAddress, 1);
 -
--    qdict_extract_subqdict(options, &addr, "server.");
--    if (!qdict_size(addr)) {
--        error_setg(errp, "SSH server address missing");
--        goto out;
-+    BlockdevOptionsSsh *result = NULL;
-+    QemuOpts *opts = NULL;
-+    Error *local_err = NULL;
-+    QObject *crumpled;
-+    const QDictEntry *e;
+-    if (path) {
+-        addr->type = SOCKET_ADDRESS_TYPE_UNIX;
+-        addr->u.q_unix.path = g_strdup(path);
+-    } else {
+-        addr->type = SOCKET_ADDRESS_TYPE_INET;
+-        addr->u.inet.host = g_strdup(host ?: SD_DEFAULT_ADDR);
+-        addr->u.inet.port = g_strdup(port ?: stringify(SD_DEFAULT_PORT));
+-    }
+-
+-    return addr;
+-}
+-
+ static SocketAddress *sd_server_config(QDict *options, Error **errp)
+ {
+     QDict *server = NULL;
+@@ -1882,6 +1866,44 @@ out_with_err_set:
+     return ret;
+ }
+ 
++static int sd_create_prealloc(BlockdevOptionsSheepdog *location, int64_t size,
++                              Error **errp)
++{
++    BlockDriverState *bs;
 +    Visitor *v;
++    QObject *obj = NULL;
++    QDict *qdict;
++    Error *local_err = NULL;
++    int ret;
 +
-+    /* Translate legacy options */
-+    opts = qemu_opts_create(&ssh_runtime_opts, NULL, 0, &error_abort);
-+    qemu_opts_absorb_qdict(opts, options, &local_err);
++    v = qobject_output_visitor_new(&obj);
++    visit_type_BlockdevOptionsSheepdog(v, NULL, &location, &local_err);
++    visit_free(v);
++
 +    if (local_err) {
 +        error_propagate(errp, local_err);
-+        goto fail;
-     }
- 
--    crumpled_addr = qdict_crumple(addr, errp);
--    if (!crumpled_addr) {
--        goto out;
-+    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
++        qobject_decref(obj);
++        return -EINVAL;
++    }
++
++    qdict = qobject_to_qdict(obj);
++    qdict_flatten(qdict);
++
++    qdict_put_str(qdict, "driver", "sheepdog");
++
++    bs = bdrv_open(NULL, NULL, qdict, BDRV_O_PROTOCOL | BDRV_O_RDWR, errp);
++    if (bs == NULL) {
++        ret = -EIO;
 +        goto fail;
 +    }
 +
-+    /* Create the QAPI object */
-+    crumpled = qdict_crumple(options, errp);
-+    if (crumpled == NULL) {
-+        goto fail;
++    ret = sd_prealloc(bs, 0, size, errp);
++fail:
++    bdrv_unref(bs);
++    QDECREF(qdict);
++    return ret;
++}
++
+ static int parse_redundancy(BDRVSheepdogState *s, SheepdogRedundancy *opt)
+ {
+     struct SheepdogInode *inode = &s->inode;
+@@ -1934,9 +1956,9 @@ static int parse_redundancy(BDRVSheepdogState *s, SheepdogRedundancy *opt)
+  * # create a erasure coded vdi with x data strips and y parity strips
+  * -o redundancy=x:y (x must be one of {2,4,8,16} and 1 <= y < SD_EC_MAX_STRIP)
+  */
+-static int parse_redundancy_str(BDRVSheepdogState *s, const char *opt)
++static SheepdogRedundancy *parse_redundancy_str(const char *opt)
+ {
+-    struct SheepdogRedundancy redundancy;
++    SheepdogRedundancy *redundancy;
+     const char *n1, *n2;
+     long copy, parity;
+     char p[10];
+@@ -1947,26 +1969,27 @@ static int parse_redundancy_str(BDRVSheepdogState *s, const char *opt)
+     n2 = strtok(NULL, ":");
+ 
+     if (!n1) {
+-        return -EINVAL;
++        return NULL;
      }
  
-     /*
-@@ -609,51 +602,50 @@ static InetSocketAddress *ssh_config(QDict *options, Error **errp)
-      * but when they come from -drive, they're all QString.  The
-      * visitor expects the former.
-      */
--    iv = qobject_input_visitor_new(crumpled_addr);
--    visit_type_InetSocketAddress(iv, NULL, &inet, &local_error);
--    if (local_error) {
--        error_propagate(errp, local_error);
--        goto out;
-+    v = qobject_input_visitor_new(crumpled);
-+    visit_type_BlockdevOptionsSsh(v, NULL, &result, &local_err);
+     ret = qemu_strtol(n1, NULL, 10, &copy);
+     if (ret < 0) {
+-        return ret;
++        return NULL;
+     }
+ 
++    redundancy = g_new0(SheepdogRedundancy, 1);
+     if (!n2) {
+-        redundancy = (SheepdogRedundancy) {
++        *redundancy = (SheepdogRedundancy) {
+             .type               = SHEEPDOG_REDUNDANCY_TYPE_FULL,
+             .u.full.copies      = copy,
+         };
+     } else {
+         ret = qemu_strtol(n2, NULL, 10, &parity);
+         if (ret < 0) {
+-            return ret;
++            return NULL;
+         }
+ 
+-        redundancy = (SheepdogRedundancy) {
++        *redundancy = (SheepdogRedundancy) {
+             .type               = SHEEPDOG_REDUNDANCY_TYPE_ERASURE_CODED,
+             .u.erasure_coded    = {
+                 .data_strips    = copy,
+@@ -1975,17 +1998,19 @@ static int parse_redundancy_str(BDRVSheepdogState *s, const char *opt)
+         };
+     }
+ 
+-    return parse_redundancy(s, &redundancy);
++    return redundancy;
+ }
+ 
+-static int parse_block_size_shift(BDRVSheepdogState *s, QemuOpts *opt)
++static int parse_block_size_shift(BDRVSheepdogState *s,
++                                  BlockdevCreateOptionsSheepdog *opts)
+ {
+     struct SheepdogInode *inode = &s->inode;
+     uint64_t object_size;
+     int obj_order;
+ 
+-    object_size = qemu_opt_get_size_del(opt, BLOCK_OPT_OBJECT_SIZE, 0);
+-    if (object_size) {
++    if (opts->has_object_size) {
++        object_size = opts->object_size;
++
+         if ((object_size - 1) & object_size) {    /* not a power of 2? */
+             return -EINVAL;
+         }
+@@ -1999,57 +2024,55 @@ static int parse_block_size_shift(BDRVSheepdogState *s, QemuOpts *opt)
+     return 0;
+ }
+ 
+-static int sd_create(const char *filename, QemuOpts *opts,
+-                     Error **errp)
++static int sd_co_create(BlockdevCreateOptions *options, Error **errp)
+ {
+-    Error *err = NULL;
++    BlockdevCreateOptionsSheepdog *opts = &options->u.sheepdog;
+     int ret = 0;
+     uint32_t vid = 0;
+     char *backing_file = NULL;
+     char *buf = NULL;
+     BDRVSheepdogState *s;
+-    SheepdogConfig cfg;
+     uint64_t max_vdi_size;
+     bool prealloc = false;
+ 
++    assert(options->driver == BLOCKDEV_DRIVER_SHEEPDOG);
++
+     s = g_new0(BDRVSheepdogState, 1);
+ 
+-    if (strstr(filename, "://")) {
+-        sd_parse_uri(&cfg, filename, &err);
+-    } else {
+-        parse_vdiname(&cfg, filename, &err);
+-    }
+-    if (err) {
+-        error_propagate(errp, err);
++    /* Steal SocketAddress from QAPI, set NULL to prevent double free */
++    s->addr = opts->location->server;
++    opts->location->server = NULL;
++
++    if (strlen(opts->location->vdi) >= sizeof(s->name)) {
++        error_setg(errp, "'vdi' string too long");
++        ret = -EINVAL;
+         goto out;
+     }
++    pstrcpy(s->name, sizeof(s->name), opts->location->vdi);
+ 
+-    buf = cfg.port ? g_strdup_printf("%d", cfg.port) : NULL;
+-    s->addr = sd_socket_address(cfg.path, cfg.host, buf);
+-    g_free(buf);
+-    strcpy(s->name, cfg.vdi);
+-    sd_config_done(&cfg);
++    s->inode.vdi_size = opts->size;
++    backing_file = opts->backing_file;
+ 
+-    s->inode.vdi_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                                 BDRV_SECTOR_SIZE);
+-    backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+-    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+-    if (!buf || !strcmp(buf, "off")) {
++    if (!opts->has_preallocation) {
++        opts->preallocation = PREALLOC_MODE_OFF;
++    }
++    switch (opts->preallocation) {
++    case PREALLOC_MODE_OFF:
+         prealloc = false;
+-    } else if (!strcmp(buf, "full")) {
++        break;
++    case PREALLOC_MODE_FULL:
+         prealloc = true;
+-    } else {
+-        error_setg(errp, "Invalid preallocation mode: '%s'", buf);
++        break;
++    default:
++        error_setg(errp, "Preallocation mode not supported for Sheepdog");
+         ret = -EINVAL;
+         goto out;
+     }
+ 
+-    g_free(buf);
+-    buf = qemu_opt_get_del(opts, BLOCK_OPT_REDUNDANCY);
+-    if (buf) {
+-        ret = parse_redundancy_str(s, buf);
++    if (opts->has_redundancy) {
++        ret = parse_redundancy(s, opts->redundancy);
+         if (ret < 0) {
+-            error_setg(errp, "Invalid redundancy mode: '%s'", buf);
++            error_setg(errp, "Invalid redundancy mode");
+             goto out;
+         }
+     }
+@@ -2061,20 +2084,20 @@ static int sd_create(const char *filename, QemuOpts *opts,
+         goto out;
+     }
+ 
+-    if (backing_file) {
++    if (opts->has_backing_file) {
+         BlockBackend *blk;
+         BDRVSheepdogState *base;
+         BlockDriver *drv;
+ 
+         /* Currently, only Sheepdog backing image is supported. */
+-        drv = bdrv_find_protocol(backing_file, true, NULL);
++        drv = bdrv_find_protocol(opts->backing_file, true, NULL);
+         if (!drv || strcmp(drv->protocol_name, "sheepdog") != 0) {
+             error_setg(errp, "backing_file must be a sheepdog image");
+             ret = -EINVAL;
+             goto out;
+         }
+ 
+-        blk = blk_new_open(backing_file, NULL, NULL,
++        blk = blk_new_open(opts->backing_file, NULL, NULL,
+                            BDRV_O_PROTOCOL, errp);
+         if (blk == NULL) {
+             ret = -EIO;
+@@ -2142,28 +2165,96 @@ static int sd_create(const char *filename, QemuOpts *opts,
+     }
+ 
+     if (prealloc) {
+-        BlockDriverState *bs;
+-        QDict *opts;
+-
+-        opts = qdict_new();
+-        qdict_put_str(opts, "driver", "sheepdog");
+-        bs = bdrv_open(filename, NULL, opts, BDRV_O_PROTOCOL | BDRV_O_RDWR,
+-                       errp);
+-        if (!bs) {
+-            goto out;
+-        }
+-
+-        ret = sd_prealloc(bs, 0, s->inode.vdi_size, errp);
+-
+-        bdrv_unref(bs);
++        ret = sd_create_prealloc(opts->location, opts->size, errp);
+     }
+ out:
+     g_free(backing_file);
+     g_free(buf);
++    g_free(s->addr);
+     g_free(s);
+     return ret;
+ }
+ 
++static int sd_create(const char *filename, QemuOpts *opts,
++                     Error **errp)
++{
++    BlockdevCreateOptions *create_options = NULL;
++    QDict *qdict, *location_qdict;
++    QObject *crumpled;
++    Visitor *v;
++    const char *redundancy;
++    Error *local_err = NULL;
++    int ret;
++
++    redundancy = qemu_opt_get_del(opts, BLOCK_OPT_REDUNDANCY);
++
++    qdict = qemu_opts_to_qdict(opts, NULL);
++    qdict_put_str(qdict, "driver", "sheepdog");
++
++    location_qdict = qdict_new();
++    qdict_put(qdict, "location", location_qdict);
++
++    sd_parse_filename(filename, location_qdict, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto fail;
++    }
++
++    qdict_flatten(qdict);
++
++    /* Change legacy command line options into QMP ones */
++    static const QDictRenames opt_renames[] = {
++        { BLOCK_OPT_BACKING_FILE,       "backing-file" },
++        { BLOCK_OPT_OBJECT_SIZE,        "object-size" },
++        { NULL, NULL },
++    };
++
++    if (!qdict_rename_keys(qdict, opt_renames, errp)) {
++        ret = -EINVAL;
++        goto fail;
++    }
++
++    /* Get the QAPI object */
++    crumpled = qdict_crumple(qdict, errp);
++    if (crumpled == NULL) {
++        ret = -EINVAL;
++        goto fail;
++    }
++
++    v = qobject_input_visitor_new_keyval(crumpled);
++    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
 +    visit_free(v);
 +    qobject_decref(crumpled);
 +
 +    if (local_err) {
 +        error_propagate(errp, local_err);
++        ret = -EINVAL;
 +        goto fail;
-     }
- 
--out:
--    QDECREF(addr);
--    qobject_decref(crumpled_addr);
--    visit_free(iv);
--    return inet;
-+    /* Remove the processed options from the QDict (the visitor processes
-+     * _all_ options in the QDict) */
-+    while ((e = qdict_first(options))) {
-+        qdict_del(options, e->key);
 +    }
 +
++    assert(create_options->driver == BLOCKDEV_DRIVER_SHEEPDOG);
++    create_options->u.sheepdog.size =
++        ROUND_UP(create_options->u.sheepdog.size, BDRV_SECTOR_SIZE);
++
++    if (redundancy) {
++        create_options->u.sheepdog.has_redundancy = true;
++        create_options->u.sheepdog.redundancy =
++            parse_redundancy_str(redundancy);
++        if (create_options->u.sheepdog.redundancy == NULL) {
++            error_setg(errp, "Invalid redundancy mode");
++            ret = -EINVAL;
++            goto fail;
++        }
++    }
++
++    ret = sd_co_create(create_options, errp);
 +fail:
-+    qemu_opts_del(opts);
-+    return result;
- }
- 
- static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-                           int ssh_flags, int creat_mode, Error **errp)
++    qapi_free_BlockdevCreateOptions(create_options);
++    QDECREF(qdict);
++    return ret;
++}
++
+ static void sd_close(BlockDriverState *bs)
  {
-+    BlockdevOptionsSsh *opts;
-     int r, ret;
--    QemuOpts *opts = NULL;
--    Error *local_err = NULL;
--    const char *user, *path, *host_key_check;
-+    const char *user, *host_key_check;
-     long port = 0;
- 
--    opts = qemu_opts_create(&ssh_runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        ret = -EINVAL;
--        error_propagate(errp, local_err);
--        goto err;
--    }
--
--    if (!ssh_process_legacy_socket_options(options, opts, errp)) {
--        ret = -EINVAL;
--        goto err;
-+    host_key_check = qdict_get_try_str(options, "host_key_check");
-+    if (!host_key_check) {
-+        host_key_check = "yes";
-+    } else {
-+        qdict_del(options, "host_key_check");
-     }
- 
--    path = qemu_opt_get(opts, "path");
--    if (!path) {
--        ret = -EINVAL;
--        error_setg(errp, "No path was specified");
--        goto err;
-+    opts = ssh_parse_options(options, errp);
-+    if (opts == NULL) {
-+        return -EINVAL;
-     }
- 
--    user = qemu_opt_get(opts, "user");
--    if (!user) {
-+    if (opts->has_user) {
-+        user = opts->user;
-+    } else {
-         user = g_get_user_name();
-         if (!user) {
-             error_setg_errno(errp, errno, "Can't get user name");
-@@ -662,17 +654,9 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-         }
-     }
- 
--    host_key_check = qemu_opt_get(opts, "host_key_check");
--    if (!host_key_check) {
--        host_key_check = "yes";
--    }
--
-     /* Pop the config into our state object, Exit if invalid */
--    s->inet = ssh_config(options, errp);
--    if (!s->inet) {
--        ret = -EINVAL;
--        goto err;
--    }
-+    s->inet = opts->server;
-+    opts->server = NULL;
- 
-     if (qemu_strtol(s->inet->port, NULL, 10, &port) < 0) {
-         error_setg(errp, "Use only numeric port value");
-@@ -729,15 +713,17 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
- 
-     /* Open the remote file. */
-     DPRINTF("opening file %s flags=0x%x creat_mode=0%o",
--            path, ssh_flags, creat_mode);
--    s->sftp_handle = libssh2_sftp_open(s->sftp, path, ssh_flags, creat_mode);
-+            opts->path, ssh_flags, creat_mode);
-+    s->sftp_handle = libssh2_sftp_open(s->sftp, opts->path, ssh_flags,
-+                                       creat_mode);
-     if (!s->sftp_handle) {
--        session_error_setg(errp, s, "failed to open remote file '%s'", path);
-+        session_error_setg(errp, s, "failed to open remote file '%s'",
-+                           opts->path);
-         ret = -EINVAL;
-         goto err;
-     }
- 
--    qemu_opts_del(opts);
-+    qapi_free_BlockdevOptionsSsh(opts);
- 
-     r = libssh2_sftp_fstat(s->sftp_handle, &s->attrs);
-     if (r < 0) {
-@@ -764,7 +750,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-     }
-     s->session = NULL;
- 
--    qemu_opts_del(opts);
-+    qapi_free_BlockdevOptionsSsh(opts);
- 
-     return ret;
- }
+     Error *local_err = NULL;
+@@ -3144,6 +3235,7 @@ static BlockDriver bdrv_sheepdog = {
+     .bdrv_reopen_abort            = sd_reopen_abort,
+     .bdrv_close                   = sd_close,
+     .bdrv_create                  = sd_create,
++    .bdrv_co_create               = sd_co_create,
+     .bdrv_has_zero_init           = bdrv_has_zero_init_1,
+     .bdrv_getlength               = sd_getlength,
+     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
+@@ -3180,6 +3272,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
+     .bdrv_reopen_abort            = sd_reopen_abort,
+     .bdrv_close                   = sd_close,
+     .bdrv_create                  = sd_create,
++    .bdrv_co_create               = sd_co_create,
+     .bdrv_has_zero_init           = bdrv_has_zero_init_1,
+     .bdrv_getlength               = sd_getlength,
+     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
+@@ -3216,6 +3309,7 @@ static BlockDriver bdrv_sheepdog_unix = {
+     .bdrv_reopen_abort            = sd_reopen_abort,
+     .bdrv_close                   = sd_close,
+     .bdrv_create                  = sd_create,
++    .bdrv_co_create               = sd_co_create,
+     .bdrv_has_zero_init           = bdrv_has_zero_init_1,
+     .bdrv_getlength               = sd_getlength,
+     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
 -- 
 2.13.6
