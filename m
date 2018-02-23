@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1epGwT-0003yv-UC
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:15:30 -0500
+	(envelope-from <armbru@redhat.com>) id 1epGzQ-0004xV-Pu
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:18:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1epGwQ-0000a0-Fl
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:15:29 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40370 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1epGzN-0003pa-J2
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:18:32 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40442 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1epGwQ-0000YG-4R
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:15:26 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1epGzN-0003p5-Cx
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:18:29 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20180211004013.10784-1-eblake@redhat.com>
-	<20180211004013.10784-4-eblake@redhat.com>
-	<20180212095231.GF4071@redhat.com>
-	<CAJ+F1CKLhP88mTk7bn-VYfGra1BGTALtgj8tmgksq2-pDdJPJA@mail.gmail.com>
-Date: Fri, 23 Feb 2018 18:15:09 +0100
-In-Reply-To: <CAJ+F1CKLhP88mTk7bn-VYfGra1BGTALtgj8tmgksq2-pDdJPJA@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 12 Feb 2018
-	11:17:11 +0100")
-Message-ID: <87o9kfljaa.fsf@dusky.pond.sub.org>
+References: <20180211093607.27351-1-armbru@redhat.com>
+	<20180211093607.27351-6-armbru@redhat.com>
+	<151882914354.12376.14797462837938712408@sif>
+Date: Fri, 23 Feb 2018 18:18:25 +0100
+In-Reply-To: <151882914354.12376.14797462837938712408@sif> (Michael Roth's
+	message of "Fri, 16 Feb 2018 18:59:03 -0600")
+Message-ID: <87inanlj4u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] qapi: Rename .json to .qapi
+Subject: Re: [Qemu-devel] [PATCH v2 05/29] qapi: New classes QAPIGenC,
+ QAPIGenH, QAPIGenDoc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +30,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Michael Roth <mdroth@linux.vnet.ibm.com> writes:
 
-> Hi
+> Quoting Markus Armbruster (2018-02-11 03:35:43)
+>> These classes encapsulate accumulating and writing output.
+>>=20
+>> Convert C code generation to QAPIGenC and QAPIGenH.  The conversion is
+>> rather shallow: most of the output accumulation is not converted.
+>> Left for later.
+>>=20
+>> The indentation machinery uses a single global variable indent_level,
+>> even though we generally interleave creation of a .c and its .h.  It
+>> should become instance variable of QAPIGenC.  Also left for later.
+>>=20
+>> Documentation generation isn't converted, and QAPIGenDoc isn't used.
+>> This will change shortly.
+>>=20
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >
-> On Mon, Feb 12, 2018 at 10:52 AM, Daniel P. Berrang=C3=A9
-> <berrange@redhat.com> wrote:
->> On Sat, Feb 10, 2018 at 06:40:13PM -0600, Eric Blake wrote:
->>> Our QAPI input files aren't quite true JSON (comments being the obvious
->>> difference); naming things .json doesn't make that obvious.  Use a new
->>> suffix .qapi that makes it easy to identify our files.
->>>
->>> This change is mostly mechanical, but it is not just a global
->>> search-and-replace as some instances of '.json' really do refer
->>> to JSON files, or to a URL that can't change, and so on.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>
->>> I'd also like help figuring out how to make .dir-locals.el give
->>> an automatic sane mode to all .qapi files
->>
->> Stuff I'm reading the suggests the only way to achieve that is to
->> use 'eval' which is considered unsafe for .dir-locals.el. As a
->> result the user will get prompted to allow the "eval" to run
->> when emacs starts which is unpleasant :-(
->>
+> 2 minor nits below, but in any case:
 >
-> I suggested such patch some time ago:
+> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 >
-> "[PATCH 2/2] .dir-locals.el: add json schema to auto-mode"
+>> ---
+>>  scripts/qapi-commands.py   | 23 +++++------
+>>  scripts/qapi-event.py      | 22 ++++++-----
+>>  scripts/qapi-introspect.py | 18 +++++----
+>>  scripts/qapi-types.py      | 22 ++++++-----
+>>  scripts/qapi-visit.py      | 22 ++++++-----
+>>  scripts/qapi.py            | 99 +++++++++++++++++++++++++--------------=
+-------
+>>  6 files changed, 112 insertions(+), 94 deletions(-)
+>>=20
+>> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+>> index c3aa52fce1..8d38ade076 100644
+>> --- a/scripts/qapi-commands.py
+>> +++ b/scripts/qapi-commands.py
+>> @@ -260,12 +260,10 @@ blurb =3D '''
+>>   * Schema-defined QAPI/QMP commands
+>>  '''
+>>=20
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qmp-marshal.c', 'qmp-commands.h',
+>> -                            blurb, __doc__)
+>> -
+>> -fdef.write(mcgen('''
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>=20
+>> +genc.add(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "qemu-common.h"
+>>  #include "qemu/module.h"
+>> @@ -280,20 +278,23 @@ fdef.write(mcgen('''
+>>  #include "%(prefix)sqmp-commands.h"
+>>=20
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +               prefix=3Dprefix))
+>>=20
+>> -fdecl.write(mcgen('''
+>> +genh.add(mcgen('''
+>>  #include "%(prefix)sqapi-types.h"
+>>  #include "qapi/qmp/dispatch.h"
+>>=20
+>>  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+>>  ''',
+>> -                  prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3D=
+False)))
+>> +               prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3DFal=
+se)))
+>>=20
+>>  schema =3D QAPISchema(input_file)
+>>  vis =3D QAPISchemaGenCommandVisitor()
+>>  schema.visit(vis)
+>> -fdef.write(vis.defn)
+>> -fdecl.write(vis.decl)
+>> +genc.add(vis.defn)
+>> +genh.add(vis.decl)
+>>=20
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qmp-marshal.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qmp-commands.h')
+>> diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+>> index edb9ddb650..bd7a9be3dc 100644
+>> --- a/scripts/qapi-event.py
+>> +++ b/scripts/qapi-event.py
+>> @@ -176,11 +176,10 @@ blurb =3D '''
+>>   * Schema-defined QAPI/QMP events
+>>  '''
+>>=20
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qapi-event.c', 'qapi-event.h',
+>> -                            blurb, __doc__)
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>=20
+>> -fdef.write(mcgen('''
+>> +genc.add(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "qemu-common.h"
+>>  #include "%(prefix)sqapi-event.h"
+>> @@ -191,21 +190,24 @@ fdef.write(mcgen('''
+>>  #include "qapi/qmp-event.h"
+>>=20
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +               prefix=3Dprefix))
+>>=20
+>> -fdecl.write(mcgen('''
+>> +genh.add(mcgen('''
+>>  #include "qapi/util.h"
+>>  #include "%(prefix)sqapi-types.h"
+>>=20
+>>  ''',
+>> -                  prefix=3Dprefix))
+>> +               prefix=3Dprefix))
+>>=20
+>>  event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DFalse)
+>>=20
+>>  schema =3D QAPISchema(input_file)
+>>  vis =3D QAPISchemaGenEventVisitor()
+>>  schema.visit(vis)
+>> -fdef.write(vis.defn)
+>> -fdecl.write(vis.decl)
+>> +genc.add(vis.defn)
+>> +genh.add(vis.decl)
+>>=20
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qapi-event.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qapi-event.h')
+>> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+>> index ebe8706f41..3d65690fe3 100644
+>> --- a/scripts/qapi-introspect.py
+>> +++ b/scripts/qapi-introspect.py
+>> @@ -181,21 +181,23 @@ blurb =3D '''
+>>   * QAPI/QMP schema introspection
+>>  '''
+>>=20
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qmp-introspect.c', 'qmp-introspect.h',
+>> -                            blurb, __doc__)
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>=20
+>> -fdef.write(mcgen('''
+>> +genc.add(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "%(prefix)sqmp-introspect.h"
+>>=20
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +               prefix=3Dprefix))
+>>=20
+>>  schema =3D QAPISchema(input_file)
+>>  vis =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
+>>  schema.visit(vis)
+>> -fdef.write(vis.defn)
+>> -fdecl.write(vis.decl)
+>> +genc.add(vis.defn)
+>> +genh.add(vis.decl)
+>>=20
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qmp-introspect.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qmp-introspect.h')
+>> diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
+>> index 4db8424da1..c0ac879beb 100644
+>> --- a/scripts/qapi-types.py
+>> +++ b/scripts/qapi-types.py
+>> @@ -180,7 +180,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>>          self.decl =3D ''
+>>          self.defn =3D ''
+>>          self._fwdecl =3D ''
+>> -        self._btin =3D guardstart('QAPI_TYPES_BUILTIN')
+>> +        self._btin =3D '\n' + guardstart('QAPI_TYPES_BUILTIN')
 >
-> I still consider that a one time prompt for this is fairly unintrusive
-> (after all you, run so much code you trust blindly by doing make check
-> from qemu :)
+> Minor nit, but if we compensate for guardstart() change here, shouldn't
+> we do the same in QAPISchemaGenVisitVisitor? Both are cosmetic (though
+> Visit is in less need since it has extra an extra newline already,
+> but changing one and not the other to compensate here makes the patch
+> appear less mechanical, and the resulting formatting fix-up gets dropped
+> later in the series anyway)
 
-Quoting myself (Message-ID: <878thydawr.fsf@dusky.pond.sub.org>):
+Yes, it's better to keep the two consistent.
 
-    Not a nice user experience.  [...]
-
-    Why can't we simply use the usual file name extension like a normal
-    person?
-
-    If that's too much to ask, then I'd recommend adding modelines (like the
-    ones you delete) to the Makefiles that lack one.
-
->> Alternatively though, just add "-*- json -*-" in a comment in
->> the first line of the file
+>>      def visit_end(self):
+>>          self.decl =3D self._fwdecl + self.decl
 >
+> <snip>
 >
-> In each file, that's intrusive.
+>> +class QAPIGenDoc(QAPIGen):
+>> +    def _top(self, fname):
+>> +        return (QAPIGen._top(self, fname)
+>> +                + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
+>
+> The whitespace change in
+> "qapi/types qapi/visit: Generate built-in stuff into separate files" shou=
+ld
+> probably be squashed in here:
+>
+>  class QAPIGenDoc(QAPIGen):
+> +
+>      def _top(self, fname):
+>          return (QAPIGen._top(self, fname)
+>                  + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
 
-Interrupting every developer looking at source file with Emacs the first
-time with a question that has security implications is also intrusive.
-I've made my preference clear.
-
-We already have modelines in 20 out of 190 .json files.  The missing one
-are all under tests/.
-
->                                 Especially because there are no
-> comments in json in theory :)
-
-That's one of the reasons we use "-*- Mode: Python -*-" instead.
+Yes.
