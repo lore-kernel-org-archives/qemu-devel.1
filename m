@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epEpi-0006Er-Fw
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:29 -0500
+	(envelope-from <laurent@vivier.eu>) id 1epEpo-0006NO-9Y
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epEpb-0005N3-OW
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:22 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:45213)
+	(envelope-from <laurent@vivier.eu>) id 1epEpl-0005b7-5H
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:28 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:55107)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1epEpb-0005Kj-4X
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:15 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1epEpk-0005ZM-MV
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 10:00:25 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 23 Feb 2018 15:59:57 +0100
-Message-Id: <20180223145959.18761-3-laurent@vivier.eu>
+Date: Fri, 23 Feb 2018 15:59:56 +0100
+Message-Id: <20180223145959.18761-2-laurent@vivier.eu>
 In-Reply-To: <20180223145959.18761-1-laurent@vivier.eu>
 References: <20180223145959.18761-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v3 2/4] target/m68k: add fmod/frem
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 1/4] softfloat: export some functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,280 +27,381 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Richard Henderson <rth@twiddle.net>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Using a local m68k floatx80_mod()
-[copied from previous:
-Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
+Move fpu/softfloat-macros.h to include/fpu/
 
-The quotient byte of the FPSR is updated with
-the result of the operation.
+Export floatx80 functions to be used by target floatx80
+specific implementations.
+
+Exports:
+  propagateFloatx80NaN(), extractFloatx80Frac(),
+  extractFloatx80Exp(), extractFloatx80Sign(),
+  normalizeFloatx80Subnormal(), packFloatx80(),
+  roundAndPackFloatx80(), normalizeRoundAndPackFloatx80()
+
+Also exports packFloat32() that will be used to implement
+m68k fsinh, fcos, fsin, ftan operations.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/Makefile.objs |   3 +-
- target/m68k/cpu.h         |   1 +
- target/m68k/fpu_helper.c  |  35 +++++++++++++++-
- target/m68k/helper.h      |   2 +
- target/m68k/softfloat.c   | 105 ++++++++++++++++++++++++++++++++++++++++++++++
- target/m68k/softfloat.h   |  26 ++++++++++++
- target/m68k/translate.c   |   6 +++
- 7 files changed, 176 insertions(+), 2 deletions(-)
- create mode 100644 target/m68k/softfloat.c
- create mode 100644 target/m68k/softfloat.h
+CC: Aurelien Jarno <aurelien@aurel32.net>
+CC: Alex Bennée <alex.bennee@linaro.org>
+CC: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
-index d143f20270..ac61948676 100644
---- a/target/m68k/Makefile.objs
-+++ b/target/m68k/Makefile.objs
-@@ -1,4 +1,5 @@
- obj-y += m68k-semi.o
--obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o
-+obj-y += translate.o op_helper.o helper.o cpu.o
-+obj-y += fpu_helper.o softfloat.o
- obj-y += gdbstub.o
- obj-$(CONFIG_SOFTMMU) += monitor.o
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 65f4fb95cb..2259bf22dc 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -427,6 +427,7 @@ typedef enum {
- /* Quotient */
+ fpu/softfloat-specialize.h              |   3 +-
+ fpu/softfloat.c                         |  91 +++---------------------
+ {fpu => include/fpu}/softfloat-macros.h |  10 +--
+ include/fpu/softfloat.h                 | 120 ++++++++++++++++++++++++++++++++
+ 4 files changed, 136 insertions(+), 88 deletions(-)
+ rename {fpu => include/fpu}/softfloat-macros.h (98%)
+
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
+index e81ca001e1..46126e9e0a 100644
+--- a/fpu/softfloat-specialize.h
++++ b/fpu/softfloat-specialize.h
+@@ -1011,8 +1011,7 @@ static floatx80 commonNaNToFloatx80(commonNaNT a, float_status *status)
+ | `b' is a signaling NaN, the invalid exception is raised.
+ *----------------------------------------------------------------------------*/
  
- #define FPSR_QT_MASK  0x00ff0000
-+#define FPSR_QT_SHIFT 16
- 
- /* Floating-Point Control Register */
- /* Rounding mode */
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 3c5a82aaa0..8286228b81 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -23,7 +23,7 @@
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
--#include "fpu/softfloat.h"
-+#include "softfloat.h"
- 
- /* Undefined offsets may be different on various FPU.
-  * On 68040 they return 0.0 (floatx80_zero)
-@@ -509,3 +509,36 @@ uint32_t HELPER(fmovemd_ld_postinc)(CPUM68KState *env, uint32_t addr,
+-static floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b,
+-                                     float_status *status)
++floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status)
  {
-     return fmovem_postinc(env, addr, mask, cpu_ld_float64_ra);
- }
-+
-+static void make_quotient(CPUM68KState *env, floatx80 val)
-+{
-+    int32_t quotient;
-+    int sign;
-+
-+    if (floatx80_is_any_nan(val)) {
-+        return;
-+    }
-+
-+    quotient = floatx80_to_int32(val, &env->fp_status);
-+    sign = quotient < 0;
-+    if (sign) {
-+        quotient = -quotient;
-+    }
-+
-+    quotient = (sign << 7) | (quotient & 0x7f);
-+    env->fpsr = (env->fpsr & ~FPSR_QT_MASK) | (quotient << FPSR_QT_SHIFT);
-+}
-+
-+void HELPER(fmod)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-+{
-+    res->d = floatx80_mod(val1->d, val0->d, &env->fp_status);
-+
-+    make_quotient(env, res->d);
-+}
-+
-+void HELPER(frem)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-+{
-+    res->d = floatx80_rem(val1->d, val0->d, &env->fp_status);
-+
-+    make_quotient(env, res->d);
-+}
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 7f400f0def..76a0590c9c 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -63,6 +63,8 @@ DEF_HELPER_3(fmovemx_ld_postinc, i32, env, i32, i32)
- DEF_HELPER_3(fmovemd_st_predec, i32, env, i32, i32)
- DEF_HELPER_3(fmovemd_st_postinc, i32, env, i32, i32)
- DEF_HELPER_3(fmovemd_ld_postinc, i32, env, i32, i32)
-+DEF_HELPER_4(fmod, void, env, fp, fp, fp)
-+DEF_HELPER_4(frem, void, env, fp, fp, fp)
- 
- DEF_HELPER_3(mac_move, void, env, i32, i32)
- DEF_HELPER_3(macmulf, i64, env, i32, i32)
-diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
-new file mode 100644
-index 0000000000..8c77757b4e
---- /dev/null
-+++ b/target/m68k/softfloat.c
-@@ -0,0 +1,105 @@
-+/*
-+ * Ported from a work by Andreas Grabher for Previous, NeXT Computer Emulator,
-+ * derived from NetBSD M68040 FPSP functions,
-+ * derived from release 2a of the SoftFloat IEC/IEEE Floating-point Arithmetic
-+ * Package. Those parts of the code (and some later contributions) are
-+ * provided under that license, as detailed below.
-+ * It has subsequently been modified by contributors to the QEMU Project,
-+ * so some portions are provided under:
-+ *  the SoftFloat-2a license
-+ *  the BSD license
-+ *  GPL-v2-or-later
-+ *
-+ * Any future contributions to this file will be taken to be licensed under
-+ * the Softfloat-2a license unless specifically indicated otherwise.
-+ */
-+
-+/* Portions of this work are licensed under the terms of the GNU GPL,
-+ * version 2 or later. See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "softfloat.h"
+     flag aIsQuietNaN, aIsSignalingNaN, bIsQuietNaN, bIsSignalingNaN;
+     flag aIsLargerSignificand;
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index e7fb0d357a..fb4853682e 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -93,7 +93,7 @@ this code that are retained.
+ | division and square root approximations.  (Can be specialized to target if
+ | desired.)
+ *----------------------------------------------------------------------------*/
+-#include "softfloat-macros.h"
 +#include "fpu/softfloat-macros.h"
+ 
+ /*----------------------------------------------------------------------------
+ | Functions and definitions to determine:  (1) whether tininess for underflow
+@@ -2192,25 +2192,6 @@ static void
+ 
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Packs the sign `zSign', exponent `zExp', and significand `zSig' into a
+-| single-precision floating-point value, returning the result.  After being
+-| shifted into the proper positions, the three fields are simply added
+-| together to form the result.  This means that any integer portion of `zSig'
+-| will be added into the exponent.  Since a properly normalized significand
+-| will have an integer portion equal to 1, the `zExp' input should be 1 less
+-| than the desired result exponent whenever `zSig' is a complete, normalized
+-| significand.
+-*----------------------------------------------------------------------------*/
+-
+-static inline float32 packFloat32(flag zSign, int zExp, uint32_t zSig)
+-{
+-
+-    return make_float32(
+-          ( ( (uint32_t) zSign )<<31 ) + ( ( (uint32_t) zExp )<<23 ) + zSig);
+-
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Takes an abstract floating-point value having sign `zSign', exponent `zExp',
+ | and significand `zSig', and returns the proper single-precision floating-
+@@ -2490,42 +2471,6 @@ static float64
+ 
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Returns the fraction bits of the extended double-precision floating-point
+-| value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline uint64_t extractFloatx80Frac( floatx80 a )
+-{
+-
+-    return a.low;
+-
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Returns the exponent bits of the extended double-precision floating-point
+-| value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline int32_t extractFloatx80Exp( floatx80 a )
+-{
+-
+-    return a.high & 0x7FFF;
+-
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Returns the sign bit of the extended double-precision floating-point value
+-| `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline flag extractFloatx80Sign( floatx80 a )
+-{
+-
+-    return a.high>>15;
+-
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Normalizes the subnormal extended double-precision floating-point value
+ | represented by the denormalized significand `aSig'.  The normalized exponent
+@@ -2533,30 +2478,14 @@ static inline flag extractFloatx80Sign( floatx80 a )
+ | `zSigPtr', respectively.
+ *----------------------------------------------------------------------------*/
+ 
+-static void
+- normalizeFloatx80Subnormal( uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr )
++void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr,
++                                uint64_t *zSigPtr)
+ {
+     int8_t shiftCount;
+ 
+     shiftCount = countLeadingZeros64( aSig );
+     *zSigPtr = aSig<<shiftCount;
+     *zExpPtr = 1 - shiftCount;
+-
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Packs the sign `zSign', exponent `zExp', and significand `zSig' into an
+-| extended double-precision floating-point value, returning the result.
+-*----------------------------------------------------------------------------*/
+-
+-static inline floatx80 packFloatx80( flag zSign, int32_t zExp, uint64_t zSig )
+-{
+-    floatx80 z;
+-
+-    z.low = zSig;
+-    z.high = ( ( (uint16_t) zSign )<<15 ) + zExp;
+-    return z;
+-
+ }
+ 
+ /*----------------------------------------------------------------------------
+@@ -2583,9 +2512,9 @@ static inline floatx80 packFloatx80( flag zSign, int32_t zExp, uint64_t zSig )
+ | Floating-Point Arithmetic.
+ *----------------------------------------------------------------------------*/
+ 
+-static floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
+-                                     int32_t zExp, uint64_t zSig0, uint64_t zSig1,
+-                                     float_status *status)
++floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
++                              int32_t zExp, uint64_t zSig0, uint64_t zSig1,
++                              float_status *status)
+ {
+     int8_t roundingMode;
+     flag roundNearestEven, increment, isTiny;
+@@ -2779,10 +2708,10 @@ static floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
+ | normalized.
+ *----------------------------------------------------------------------------*/
+ 
+-static floatx80 normalizeRoundAndPackFloatx80(int8_t roundingPrecision,
+-                                              flag zSign, int32_t zExp,
+-                                              uint64_t zSig0, uint64_t zSig1,
+-                                              float_status *status)
++floatx80 normalizeRoundAndPackFloatx80(int8_t roundingPrecision,
++                                       flag zSign, int32_t zExp,
++                                       uint64_t zSig0, uint64_t zSig1,
++                                       float_status *status)
+ {
+     int8_t shiftCount;
+ 
+diff --git a/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+similarity index 98%
+rename from fpu/softfloat-macros.h
+rename to include/fpu/softfloat-macros.h
+index c45a23193e..35e1603a5e 100644
+--- a/fpu/softfloat-macros.h
++++ b/include/fpu/softfloat-macros.h
+@@ -603,7 +603,7 @@ static inline void
+ | unsigned integer is returned.
+ *----------------------------------------------------------------------------*/
+ 
+-static uint64_t estimateDiv128To64( uint64_t a0, uint64_t a1, uint64_t b )
++static inline uint64_t estimateDiv128To64(uint64_t a0, uint64_t a1, uint64_t b)
+ {
+     uint64_t b0, b1;
+     uint64_t rem0, rem1, term0, term1;
+@@ -630,7 +630,7 @@ static uint64_t estimateDiv128To64( uint64_t a0, uint64_t a1, uint64_t b )
+  *
+  * Licensed under the GPLv2/LGPLv3
+  */
+-static uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
++static inline uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
+ {
+     uint64_t d0, d1, q0, q1, r1, r0, m;
+ 
+@@ -683,7 +683,7 @@ static uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
+ | value.
+ *----------------------------------------------------------------------------*/
+ 
+-static uint32_t estimateSqrt32(int aExp, uint32_t a)
++static inline uint32_t estimateSqrt32(int aExp, uint32_t a)
+ {
+     static const uint16_t sqrtOddAdjustments[] = {
+         0x0004, 0x0022, 0x005D, 0x00B1, 0x011D, 0x019F, 0x0236, 0x02E0,
+@@ -717,7 +717,7 @@ static uint32_t estimateSqrt32(int aExp, uint32_t a)
+ | `a'.  If `a' is zero, 32 is returned.
+ *----------------------------------------------------------------------------*/
+ 
+-static int8_t countLeadingZeros32( uint32_t a )
++static inline int8_t countLeadingZeros32(uint32_t a)
+ {
+ #if SOFTFLOAT_GNUC_PREREQ(3, 4)
+     if (a) {
+@@ -765,7 +765,7 @@ static int8_t countLeadingZeros32( uint32_t a )
+ | `a'.  If `a' is zero, 64 is returned.
+ *----------------------------------------------------------------------------*/
+ 
+-static int8_t countLeadingZeros64( uint64_t a )
++static inline int8_t countLeadingZeros64(uint64_t a)
+ {
+ #if SOFTFLOAT_GNUC_PREREQ(3, 4)
+     if (a) {
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 9b7b5e34e2..125dcb5586 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -419,6 +419,22 @@ static inline float32 float32_set_sign(float32 a, int sign)
+ #define float32_half make_float32(0x3f000000)
+ #define float32_infinity make_float32(0x7f800000)
+ 
++/*----------------------------------------------------------------------------
++| Packs the sign `zSign', exponent `zExp', and significand `zSig' into a
++| single-precision floating-point value, returning the result.  After being
++| shifted into the proper positions, the three fields are simply added
++| together to form the result.  This means that any integer portion of `zSig'
++| will be added into the exponent.  Since a properly normalized significand
++| will have an integer portion equal to 1, the `zExp' input should be 1 less
++| than the desired result exponent whenever `zSig' is a complete, normalized
++| significand.
++*----------------------------------------------------------------------------*/
++
++static inline float32 packFloat32(flag zSign, int zExp, uint32_t zSig)
++{
++    return make_float32(
++          (((uint32_t)zSign) << 31) + (((uint32_t)zExp) << 23) + zSig);
++}
+ 
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated single-precision NaN.
+@@ -632,6 +648,110 @@ static inline bool floatx80_invalid_encoding(floatx80 a)
+ #define floatx80_half make_floatx80(0x3ffe, 0x8000000000000000LL)
+ #define floatx80_infinity make_floatx80(0x7fff, 0x8000000000000000LL)
+ 
++/*----------------------------------------------------------------------------
++| Returns the fraction bits of the extended double-precision floating-point
++| value `a'.
++*----------------------------------------------------------------------------*/
++
++static inline uint64_t extractFloatx80Frac(floatx80 a)
++{
++    return a.low;
++}
 +
 +/*----------------------------------------------------------------------------
-+ | Returns the modulo remainder of the extended double-precision floating-point
-+ | value `a' with respect to the corresponding value `b'.
-+ *----------------------------------------------------------------------------*/
++| Returns the exponent bits of the extended double-precision floating-point
++| value `a'.
++*----------------------------------------------------------------------------*/
 +
-+floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status)
++static inline int32_t extractFloatx80Exp(floatx80 a)
 +{
-+    flag aSign, zSign;
-+    int32_t aExp, bExp, expDiff;
-+    uint64_t aSig0, aSig1, bSig;
-+    uint64_t qTemp, term0, term1;
-+
-+    aSig0 = extractFloatx80Frac(a);
-+    aExp = extractFloatx80Exp(a);
-+    aSign = extractFloatx80Sign(a);
-+    bSig = extractFloatx80Frac(b);
-+    bExp = extractFloatx80Exp(b);
-+
-+    if (aExp == 0x7FFF) {
-+        if ((uint64_t) (aSig0 << 1)
-+            || ((bExp == 0x7FFF) && (uint64_t) (bSig << 1))) {
-+            return propagateFloatx80NaN(a, b, status);
-+        }
-+        goto invalid;
-+    }
-+    if (bExp == 0x7FFF) {
-+        if ((uint64_t) (bSig << 1)) {
-+            return propagateFloatx80NaN(a, b, status);
-+        }
-+        return a;
-+    }
-+    if (bExp == 0) {
-+        if (bSig == 0) {
-+        invalid:
-+            float_raise(float_flag_invalid, status);
-+            return floatx80_default_nan(status);
-+        }
-+        normalizeFloatx80Subnormal(bSig, &bExp, &bSig);
-+    }
-+    if (aExp == 0) {
-+        if ((uint64_t) (aSig0 << 1) == 0) {
-+            return a;
-+        }
-+        normalizeFloatx80Subnormal(aSig0, &aExp, &aSig0);
-+    }
-+    bSig |= LIT64(0x8000000000000000);
-+    zSign = aSign;
-+    expDiff = aExp - bExp;
-+    aSig1 = 0;
-+    if (expDiff < 0) {
-+        return a;
-+    }
-+    qTemp = (bSig <= aSig0);
-+    if (qTemp) {
-+        aSig0 -= bSig;
-+    }
-+    expDiff -= 64;
-+    while (0 < expDiff) {
-+        qTemp = estimateDiv128To64(aSig0, aSig1, bSig);
-+        qTemp = (2 < qTemp) ? qTemp - 2 : 0;
-+        mul64To128(bSig, qTemp, &term0, &term1);
-+        sub128(aSig0, aSig1, term0, term1, &aSig0, &aSig1);
-+        shortShift128Left(aSig0, aSig1, 62, &aSig0, &aSig1);
-+    }
-+    expDiff += 64;
-+    if (0 < expDiff) {
-+        qTemp = estimateDiv128To64(aSig0, aSig1, bSig);
-+        qTemp = (2 < qTemp) ? qTemp - 2 : 0;
-+        qTemp >>= 64 - expDiff;
-+        mul64To128(bSig, qTemp << (64 - expDiff), &term0, &term1);
-+        sub128(aSig0, aSig1, term0, term1, &aSig0, &aSig1);
-+        shortShift128Left(0, bSig, 64 - expDiff, &term0, &term1);
-+        while (le128(term0, term1, aSig0, aSig1)) {
-+            ++qTemp;
-+            sub128(aSig0, aSig1, term0, term1, &aSig0, &aSig1);
-+        }
-+    }
-+    return
-+        normalizeRoundAndPackFloatx80(
-+            80, zSign, bExp + expDiff, aSig0, aSig1, status);
++    return a.high & 0x7FFF;
 +}
-diff --git a/target/m68k/softfloat.h b/target/m68k/softfloat.h
-new file mode 100644
-index 0000000000..8d8ca0fc45
---- /dev/null
-+++ b/target/m68k/softfloat.h
-@@ -0,0 +1,26 @@
-+/*
-+ * Ported from a work by Andreas Grabher for Previous, NeXT Computer Emulator,
-+ * derived from NetBSD M68040 FPSP functions,
-+ * derived from release 2a of the SoftFloat IEC/IEEE Floating-point Arithmetic
-+ * Package. Those parts of the code (and some later contributions) are
-+ * provided under that license, as detailed below.
-+ * It has subsequently been modified by contributors to the QEMU Project,
-+ * so some portions are provided under:
-+ *  the SoftFloat-2a license
-+ *  the BSD license
-+ *  GPL-v2-or-later
-+ *
-+ * Any future contributions to this file will be taken to be licensed under
-+ * the Softfloat-2a license unless specifically indicated otherwise.
-+ */
 +
-+/* Portions of this work are licensed under the terms of the GNU GPL,
-+ * version 2 or later. See the COPYING file in the top-level directory.
-+ */
++/*----------------------------------------------------------------------------
++| Returns the sign bit of the extended double-precision floating-point value
++| `a'.
++*----------------------------------------------------------------------------*/
 +
-+#ifndef TARGET_M68K_SOFTFLOAT_H
-+#define TARGET_M68K_SOFTFLOAT_H
-+#include "fpu/softfloat.h"
++static inline flag extractFloatx80Sign(floatx80 a)
++{
++    return a.high >> 15;
++}
 +
-+floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status);
-+#endif
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index a22993c7ce..f8db26fa8e 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -5081,6 +5081,9 @@ DISAS_INSN(fpu)
-     case 0x64: /* fddiv */
-         gen_helper_fddiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
-+    case 0x21: /* fmod */
-+        gen_helper_fmod(cpu_env, cpu_dest, cpu_src, cpu_dest);
-+        break;
-     case 0x22: /* fadd */
-         gen_helper_fadd(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
-@@ -5102,6 +5105,9 @@ DISAS_INSN(fpu)
-     case 0x24: /* fsgldiv */
-         gen_helper_fsgldiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
-+    case 0x25: /* frem */
-+        gen_helper_frem(cpu_env, cpu_dest, cpu_src, cpu_dest);
-+        break;
-     case 0x27: /* fsglmul */
-         gen_helper_fsglmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
++/*----------------------------------------------------------------------------
++| Packs the sign `zSign', exponent `zExp', and significand `zSig' into an
++| extended double-precision floating-point value, returning the result.
++*----------------------------------------------------------------------------*/
++
++static inline floatx80 packFloatx80(flag zSign, int32_t zExp, uint64_t zSig)
++{
++    floatx80 z;
++
++    z.low = zSig;
++    z.high = (((uint16_t)zSign) << 15) + zExp;
++    return z;
++}
++
++/*----------------------------------------------------------------------------
++| Normalizes the subnormal extended double-precision floating-point value
++| represented by the denormalized significand `aSig'.  The normalized exponent
++| and significand are stored at the locations pointed to by `zExpPtr' and
++| `zSigPtr', respectively.
++*----------------------------------------------------------------------------*/
++
++void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr,
++                                uint64_t *zSigPtr);
++
++/*----------------------------------------------------------------------------
++| Takes two extended double-precision floating-point values `a' and `b', one
++| of which is a NaN, and returns the appropriate NaN result.  If either `a' or
++| `b' is a signaling NaN, the invalid exception is raised.
++*----------------------------------------------------------------------------*/
++
++floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status);
++
++/*----------------------------------------------------------------------------
++| Takes an abstract floating-point value having sign `zSign', exponent `zExp',
++| and extended significand formed by the concatenation of `zSig0' and `zSig1',
++| and returns the proper extended double-precision floating-point value
++| corresponding to the abstract input.  Ordinarily, the abstract value is
++| rounded and packed into the extended double-precision format, with the
++| inexact exception raised if the abstract input cannot be represented
++| exactly.  However, if the abstract value is too large, the overflow and
++| inexact exceptions are raised and an infinity or maximal finite value is
++| returned.  If the abstract value is too small, the input value is rounded to
++| a subnormal number, and the underflow and inexact exceptions are raised if
++| the abstract input cannot be represented exactly as a subnormal extended
++| double-precision floating-point number.
++|     If `roundingPrecision' is 32 or 64, the result is rounded to the same
++| number of bits as single or double precision, respectively.  Otherwise, the
++| result is rounded to the full precision of the extended double-precision
++| format.
++|     The input significand must be normalized or smaller.  If the input
++| significand is not normalized, `zExp' must be 0; in that case, the result
++| returned is a subnormal number, and it must not require rounding.  The
++| handling of underflow and overflow follows the IEC/IEEE Standard for Binary
++| Floating-Point Arithmetic.
++*----------------------------------------------------------------------------*/
++
++floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
++                              int32_t zExp, uint64_t zSig0, uint64_t zSig1,
++                              float_status *status);
++
++/*----------------------------------------------------------------------------
++| Takes an abstract floating-point value having sign `zSign', exponent
++| `zExp', and significand formed by the concatenation of `zSig0' and `zSig1',
++| and returns the proper extended double-precision floating-point value
++| corresponding to the abstract input.  This routine is just like
++| `roundAndPackFloatx80' except that the input significand does not have to be
++| normalized.
++*----------------------------------------------------------------------------*/
++
++floatx80 normalizeRoundAndPackFloatx80(int8_t roundingPrecision,
++                                       flag zSign, int32_t zExp,
++                                       uint64_t zSig0, uint64_t zSig1,
++                                       float_status *status);
++
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated extended double-precision NaN.
+ *----------------------------------------------------------------------------*/
 -- 
 2.14.3
