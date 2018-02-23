@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shea@shealevy.com>) id 1ep5S6-0003gk-09
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 00:00:21 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ep5ZZ-0005Fz-LL
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 00:07:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shea@shealevy.com>) id 1ep5QY-0001ut-Qq
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 23:59:22 -0500
-Received: from smtprelay0190.hostedemail.com ([216.40.44.190]:59854
-	helo=smtprelay.hostedemail.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <shea@shealevy.com>) id 1ep5QX-0001sF-CS
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 23:57:46 -0500
-From: Shea Levy <shea@shealevy.com>
-Date: Thu, 22 Feb 2018 23:57:35 -0500
-Message-Id: <20180223045735.1288-1-shea@shealevy.com>
-In-Reply-To: <20180219024555.26467-1-shea@shealevy.com>
-References: <20180219024555.26467-1-shea@shealevy.com>
-Subject: [Qemu-devel] [PATCH v3] linux-user: Support f_flags in statfs when
- available.
+	(envelope-from <no-reply@patchew.org>) id 1ep5Y7-0006Ju-1x
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 00:07:05 -0500
+Resent-Message-Id: <E1ep5Y7-0006Ju-1x@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ep5Y6-0006Hs-I5
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 00:05:34 -0500
+In-Reply-To: <20180223045735.1288-1-shea@shealevy.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151936230278.747.687358007779310044@bdbb90650ae5>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 22 Feb 2018 21:05:03 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Support f_flags in statfs
+ when available.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,205 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Shea Levy <shea@shealevy.com>
+To: shea@shealevy.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Signed-off-by: Shea Levy <shea@shealevy.com>
----
- configure                 | 21 +++++++++++++++++++
- linux-user/syscall.c      |  3 +++
- linux-user/syscall_defs.h | 53 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 77 insertions(+)
-
-diff --git a/configure b/configure
-index 913e14839d..91082aa1dc 100755
---- a/configure
-+++ b/configure
-@@ -5303,6 +5303,23 @@ if compile_prog "" "" ; then
-     have_utmpx=yes
- fi
- 
-+##########################################
-+# Check for newer fields of struct statfs on Linux
-+
-+if test "$linux_user" = "yes"; then
-+  cat > $TMPC <<EOF
-+#include <sys/vfs.h>
-+
-+int main(void) {
-+  struct statfs fs;
-+  fs.f_flags = 0;
-+  return fs.f_flags;
-+}
-+EOF
-+  if compile_object ; then
-+      have_statfs_flags=yes
-+  fi
-+fi
- ##########################################
- # checks for sanitizers
- 
-@@ -6518,6 +6535,10 @@ if test "$have_utmpx" = "yes" ; then
-   echo "HAVE_UTMPX=y" >> $config_host_mak
- fi
- 
-+if test "$have_statfs_flags" = "yes" ; then
-+  echo "HAVE_STATFS_FLAGS=y" >> $config_host_mak
-+fi
-+
- if test "$ivshmem" = "yes" ; then
-   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
- fi
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 82b35a6bdf..77481eca2c 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9534,6 +9534,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-             __put_user(stfs.f_fsid.__val[1], &target_stfs->f_fsid.val[1]);
-             __put_user(stfs.f_namelen, &target_stfs->f_namelen);
-             __put_user(stfs.f_frsize, &target_stfs->f_frsize);
-+#ifdef HAVE_STATFS_FLAGS
-+            __put_user(stfs.f_flags, &target_stfs->f_flags);
-+#endif
-             memset(target_stfs->f_spare, 0, sizeof(target_stfs->f_spare));
-             unlock_user_struct(target_stfs, arg2, 1);
-         }
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index a35c52a60a..64aa49d3c5 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -362,7 +362,14 @@ struct kernel_statfs {
- 	int f_ffree;
-         kernel_fsid_t f_fsid;
- 	int f_namelen;
-+#ifdef HAVE_STATFS_FLAGS
-+	int f_frsize;
-+	int f_flags;
-+	int f_spare[4];
-+#else
- 	int f_spare[6];
-+#endif
-+
- };
- 
- struct target_dirent {
-@@ -2223,7 +2230,12 @@ struct target_statfs {
- 	/* Linux specials */
- 	target_fsid_t		f_fsid;
- 	int32_t			f_namelen;
-+#ifdef HAVE_STATFS_FLAGS
-+	int32_t			f_flags;
-+	int32_t			f_spare[5];
-+#else
- 	int32_t			f_spare[6];
-+#endif
- };
- #else
- struct target_statfs {
-@@ -2239,7 +2251,12 @@ struct target_statfs {
- 	/* Linux specials */
- 	target_fsid_t		f_fsid;
- 	abi_long		f_namelen;
-+#ifdef HAVE_STATFS_FLAGS
-+	abi_long		f_flags;
-+	abi_long		f_spare[5];
-+#else
- 	abi_long		f_spare[6];
-+#endif
- };
- #endif
- 
-@@ -2255,7 +2272,12 @@ struct target_statfs64 {
- 	uint64_t	f_bavail;
- 	target_fsid_t	f_fsid;
- 	uint32_t	f_namelen;
-+#ifdef HAVE_STATFS_FLAGS
-+	uint32_t	f_flags;
-+	uint32_t	f_spare[5];
-+#else
- 	uint32_t	f_spare[6];
-+#endif
- };
- #elif (defined(TARGET_PPC64) || defined(TARGET_X86_64) || \
-        defined(TARGET_SPARC64) || defined(TARGET_AARCH64)) && \
-@@ -2271,7 +2293,12 @@ struct target_statfs {
- 	target_fsid_t f_fsid;
- 	abi_long f_namelen;
- 	abi_long f_frsize;
-+#ifdef HAVE_STATFS_FLAGS
-+	abi_long f_flags;
-+	abi_long f_spare[4];
-+#else
- 	abi_long f_spare[5];
-+#endif
- };
- 
- struct target_statfs64 {
-@@ -2285,7 +2312,12 @@ struct target_statfs64 {
- 	target_fsid_t f_fsid;
- 	abi_long f_namelen;
- 	abi_long f_frsize;
-+#ifdef HAVE_STATFS_FLAGS
-+	abi_long f_flags;
-+	abi_long f_spare[4];
-+#else
- 	abi_long f_spare[5];
-+#endif
- };
- #elif defined(TARGET_S390X)
- struct target_statfs {
-@@ -2299,7 +2331,13 @@ struct target_statfs {
-     kernel_fsid_t f_fsid;
-     int32_t  f_namelen;
-     int32_t  f_frsize;
-+#ifdef HAVE_STATFS_FLAGS
-+    int32_t  f_flags;
-+    int32_t  f_spare[4];
-+#else
-     int32_t  f_spare[5];
-+#endif
-+
- };
- 
- struct target_statfs64 {
-@@ -2313,7 +2351,12 @@ struct target_statfs64 {
-     kernel_fsid_t f_fsid;
-     int32_t  f_namelen;
-     int32_t  f_frsize;
-+#ifdef HAVE_STATFS_FLAGS
-+    int32_t  f_flags;
-+    int32_t  f_spare[4];
-+#else
-     int32_t  f_spare[5];
-+#endif
- };
- #else
- struct target_statfs {
-@@ -2327,7 +2370,12 @@ struct target_statfs {
- 	target_fsid_t f_fsid;
- 	uint32_t f_namelen;
- 	uint32_t f_frsize;
-+#ifdef HAVE_STATFS_FLAGS
-+	uint32_t f_flags;
-+	uint32_t f_spare[4];
-+#else
- 	uint32_t f_spare[5];
-+#endif
- };
- 
- struct target_statfs64 {
-@@ -2341,7 +2389,12 @@ struct target_statfs64 {
- 	target_fsid_t f_fsid;
-         uint32_t f_namelen;
- 	uint32_t f_frsize;
-+#ifdef HAVE_STATFS_FLAGS
-+	uint32_t f_flags;
-+	uint32_t f_spare[4];
-+#else
- 	uint32_t f_spare[5];
-+#endif
- };
- #endif
- 
--- 
-2.16.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjIzMDQ1NzM1LjEyODgtMS1zaGVhQHNoZWFsZXZ5LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzXSBsaW51eC11c2VyOiBTdXBwb3J0IGZfZmxhZ3MgaW4g
+c3RhdGZzIHdoZW4gYXZhaWxhYmxlLgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE4MDIyMzA0NTczNS4xMjg4LTEtc2hlYUBzaGVhbGV2eS5jb20g
+LT4gcGF0Y2hldy8yMDE4MDIyMzA0NTczNS4xMjg4LTEtc2hlYUBzaGVhbGV2eS5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiYWRmODk4NzhhIGxpbnV4LXVzZXI6IFN1cHBvcnQg
+Zl9mbGFncyBpbiBzdGF0ZnMgd2hlbiBhdmFpbGFibGUuCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzE6IGxpbnV4LXVzZXI6IFN1cHBvcnQgZl9mbGFncyBpbiBzdGF0ZnMg
+d2hlbiBhdmFpbGFibGUuLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzcxOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjM2NjoKK15JaW50IGZfZnJz
+aXplOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzcyOiBGSUxF
+OiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjM2NzoKK15JaW50IGZfZmxhZ3M7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzM6IEZJTEU6IGxpbnV4LXVzZXIv
+c3lzY2FsbF9kZWZzLmg6MzY4OgorXklpbnQgZl9zcGFyZVs0XTskCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM4NjogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2Rl
+ZnMuaDoyMjM0OgorXklpbnQzMl90XkleSV5JZl9mbGFnczskCgpFUlJPUjogY29kZSBpbmRlbnQg
+c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM4NzogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMu
+aDoyMjM1OgorXklpbnQzMl90XkleSV5JZl9zcGFyZVs1XTskCgpFUlJPUjogY29kZSBpbmRlbnQg
+c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM5OTogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMu
+aDoyMjU1OgorXklhYmlfbG9uZ15JXklmX2ZsYWdzOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
+bGQgbmV2ZXIgdXNlIHRhYnMKIzEwMDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoy
+MjU2OgorXklhYmlfbG9uZ15JXklmX3NwYXJlWzVdOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
+bGQgbmV2ZXIgdXNlIHRhYnMKIzExMjogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoy
+Mjc2OgorXkl1aW50MzJfdF5JZl9mbGFnczskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMxMTM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MjI3NzoK
+K15JdWludDMyX3ReSWZfc3BhcmVbNV07JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMTI1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIyOTc6Cite
+SWFiaV9sb25nIGZfZmxhZ3M7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojMTI2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIyOTg6CiteSWFiaV9s
+b25nIGZfc3BhcmVbNF07JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojMTM4OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIzMTY6CiteSWFiaV9sb25n
+IGZfZmxhZ3M7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTM5
+OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIzMTc6CiteSWFiaV9sb25nIGZfc3Bh
+cmVbNF07JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTc4OiBG
+SUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIzNzQ6CiteSXVpbnQzMl90IGZfZmxhZ3M7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTc5OiBGSUxFOiBs
+aW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIzNzU6CiteSXVpbnQzMl90IGZfc3BhcmVbNF07JAoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTkxOiBGSUxFOiBsaW51
+eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIzOTM6CiteSXVpbnQzMl90IGZfZmxhZ3M7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTkyOiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGxfZGVmcy5oOjIzOTQ6CiteSXVpbnQzMl90IGZfc3BhcmVbNF07JAoKdG90YWw6IDE3
+IGVycm9ycywgMCB3YXJuaW5ncywgMTY1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
+aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
