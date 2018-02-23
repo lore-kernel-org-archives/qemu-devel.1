@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epIOz-000868-ST
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:49:02 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1epIT6-0000xP-9e
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:53:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1epIOy-0005C2-NH
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:49:01 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39217)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1epIOy-0005AF-HO
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:49:00 -0500
-Received: by mail-pl0-x241.google.com with SMTP id s13so5378644plq.6
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 10:49:00 -0800 (PST)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1epIT5-00022J-GH
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 13:53:16 -0500
+References: <20180223112933.4135-1-mark.cave-ayland@ilande.co.uk>
+	<CAFEAcA-6KuJe17cHNVUzaKT30uv7bBS52ctoNxS0u9Mfp_HtXg@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <7f968a6f-e647-e4dd-0ce5-54b2d63c6eb7@ilande.co.uk>
+Date: Fri, 23 Feb 2018 18:53:02 +0000
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-WGk0Jkvamr3s_sAzLeUS1VrW7UHuUBnU-xDOEpEh95A@mail.gmail.com>
-References: <20171228180814.9749-1-lukeshu@lukeshu.com>
-	<20171228180814.9749-2-lukeshu@lukeshu.com>
-	<CAFEAcA-WGk0Jkvamr3s_sAzLeUS1VrW7UHuUBnU-xDOEpEh95A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Feb 2018 18:48:39 +0000
-Message-ID: <CAFEAcA-SmyrNBb4u70hSLtJxd6Wq+P4c6fCXtZBvTKRZdBa+_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 01/10] linux-user: Use #if to only call
- validate_guest_space for 32-bit ARM target
+In-Reply-To: <CAFEAcA-6KuJe17cHNVUzaKT30uv7bBS52ctoNxS0u9Mfp_HtXg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] loader: don't perform overlapping address
+ check for memory region ROM images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luke Shumaker <lukeshu@lukeshu.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Luke Shumaker <lukeshu@parabola.nu>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On 23 February 2018 at 18:35, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 28 December 2017 at 18:08, Luke Shumaker <lukeshu@lukeshu.com> wrote:
->> From: Luke Shumaker <lukeshu@parabola.nu>
+On 23/02/18 18:04, Peter Maydell wrote:
+
+> On 23 February 2018 at 11:29, Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+>> All memory region ROM images have a base address of 0 which causes the overlapping
+>> address check to fail if more than one memory region ROM image is present, or an
+>> existing ROM image is loaded at address 0.
 >>
->> Instead of defining a bogus validate_guest_space that always returns 1 on
->> targets other than 32-bit ARM, use #if blocks to only call it on 32-bit ARM
->> targets.  This makes the "normal" flow control clearer.
+>> Make sure that we ignore the overlapping address check in
+>> rom_check_and_register_reset() if this is a memory region ROM image. In particular
+>> this fixes the "rom: requested regions overlap" error on startup when trying to
+>> run qemu-system-sparc with a -kernel image since commit 7497638642: "tcx: switch to
+>> load_image_mr() and remove prom_addr hack".
 >>
->> Signed-off-by: Luke Shumaker <lukeshu@parabola.nu>
+>> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> Do you want to take this via your sparc tree?
 
->> @@ -1845,11 +1835,12 @@ unsigned long init_guest_space(unsigned long host_start,
->>      /* If just a starting address is given, then just verify that
->>       * address.  */
->>      if (host_start && !host_size) {
->> +#if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
->
-> I would strongly prefer us not to add new "these targets do
-> this" ifdefs, please. The current approach means that any
-> target can say it needs an implementation of this hook by
-> providing one and defining the TARGET_HAS_VALIDATE_GUEST_SPACE
-> macro to say so. I think that's a better approach.
+I can do, although I don't have any outstanding SPARC patches (just PPC 
+ones for the moment) so it would just be a single commit PR. Is that okay?
 
-Looking through some of the rest of this patchset I might change
-my mind on that (the code in master is very confusing). I won't
-have time to get to this til Tuesday now, though.
 
-thanks
--- PMM
+ATB,
+
+Mark.
