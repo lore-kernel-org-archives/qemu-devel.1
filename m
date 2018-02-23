@@ -1,38 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1epL4P-0004dO-TY
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 16:40:08 -0500
+	(envelope-from <wei@redhat.com>) id 1epLN5-0001Zz-AV
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 16:59:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1epL4L-00062U-RK
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 16:39:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1epL4L-00060r-Il
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 16:39:53 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NLdCrM098739
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 16:39:51 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gaqrkf2uy-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 16:39:50 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 16:39:49 -0500
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 16:39:44 -0500
-In-Reply-To: <1519421985-18185-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1519421985-18185-1-git-send-email-stefanb@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1519421985-18185-2-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 1/2] tests: Move common TPM test code into
- tpm-emu.c
+	(envelope-from <wei@redhat.com>) id 1epLN2-0007YB-6T
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 16:59:15 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58340 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1epLN2-0007Ww-1a
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 16:59:12 -0500
+From: Wei Huang <wei@redhat.com>
+Date: Fri, 23 Feb 2018 15:58:57 -0600
+Message-Id: <20180223215858.16987-4-wei@redhat.com>
+In-Reply-To: <20180223215858.16987-1-wei@redhat.com>
+References: <20180223215858.16987-1-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V5 3/4] tests/migration: Add migration-test
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,478 +25,171 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: dgilbert@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
 
-Move threads and other common TPM test code into tpm-emu.c.
+This patch moves the settings related migration-test from the
+migration-test.c file to a seperate header file. It also renames the
+x86-a-b-bootblock.s file extension from .s to .S, allowing gcc
+pre-processor to include the C-style header file correctly.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Wei Huang <wei@redhat.com>
 ---
- tests/Makefile.include |   2 +-
- tests/tpm-crb-test.c   | 174 +------------------------------------------=
-------
- tests/tpm-emu.c        | 167 +++++++++++++++++++++++++++++++++++++++++++=
-++++
- tests/tpm-emu.h        |  38 +++++++++++
- 4 files changed, 209 insertions(+), 172 deletions(-)
- create mode 100644 tests/tpm-emu.c
- create mode 100644 tests/tpm-emu.h
+ tests/migration-test.c                             | 28 +++++++++++-----------
+ tests/migration/Makefile                           |  4 ++--
+ tests/migration/migration-test.h                   | 18 ++++++++++++++
+ .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  7 +++---
+ tests/migration/x86-a-b-bootblock.h                |  2 +-
+ 5 files changed, 39 insertions(+), 20 deletions(-)
+ create mode 100644 tests/migration/migration-test.h
+ rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (94%)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a1bcbff..ff44264 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -714,7 +714,7 @@ tests/test-crypto-tlssession$(EXESUF): tests/test-cry=
-pto-tlssession.o \
- tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
- tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
-         tests/io-channel-helpers.o $(test-io-obj-y)
--tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o $(test-io-obj-y)
-+tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o tests/tpm-emu.o $(test=
--io-obj-y)
- tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
-         tests/io-channel-helpers.o $(test-io-obj-y)
- tests/test-io-channel-tls$(EXESUF): tests/test-io-channel-tls.o \
-diff --git a/tests/tpm-crb-test.c b/tests/tpm-crb-test.c
-index 8bf1507..e1513cb 100644
---- a/tests/tpm-crb-test.c
-+++ b/tests/tpm-crb-test.c
-@@ -14,177 +14,9 @@
- #include <glib/gstdio.h>
-=20
- #include "hw/acpi/tpm.h"
--#include "hw/tpm/tpm_ioctl.h"
- #include "io/channel-socket.h"
- #include "libqtest.h"
--#include "qapi/error.h"
--
--#define TPM_RC_FAILURE 0x101
--#define TPM2_ST_NO_SESSIONS 0x8001
--
--struct tpm_hdr {
--    uint16_t tag;
--    uint32_t len;
--    uint32_t code; /*ordinal/error */
--    char buffer[];
--} QEMU_PACKED;
--
--typedef struct TestState {
--    CompatGMutex data_mutex;
--    CompatGCond data_cond;
--    SocketAddress *addr;
--    QIOChannel *tpm_ioc;
--    GThread *emu_tpm_thread;
--    struct tpm_hdr *tpm_msg;
--} TestState;
--
--static void test_wait_cond(TestState *s)
--{
--    gint64 end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
--
--    g_mutex_lock(&s->data_mutex);
--    if (!g_cond_wait_until(&s->data_cond, &s->data_mutex, end_time)) {
--        g_assert_not_reached();
--    }
--    g_mutex_unlock(&s->data_mutex);
--}
--
--static void *emu_tpm_thread(void *data)
--{
--    TestState *s =3D data;
--    QIOChannel *ioc =3D s->tpm_ioc;
--
--    s->tpm_msg =3D g_new(struct tpm_hdr, 1);
--    while (true) {
--        int minhlen =3D sizeof(s->tpm_msg->tag) + sizeof(s->tpm_msg->len=
-);
--
--        if (!qio_channel_read(ioc, (char *)s->tpm_msg, minhlen, &error_a=
-bort)) {
--            break;
--        }
--        s->tpm_msg->tag =3D be16_to_cpu(s->tpm_msg->tag);
--        s->tpm_msg->len =3D be32_to_cpu(s->tpm_msg->len);
--        g_assert_cmpint(s->tpm_msg->len, >=3D, minhlen);
--        g_assert_cmpint(s->tpm_msg->tag, =3D=3D, TPM2_ST_NO_SESSIONS);
--
--        s->tpm_msg =3D g_realloc(s->tpm_msg, s->tpm_msg->len);
--        qio_channel_read(ioc, (char *)&s->tpm_msg->code,
--                         s->tpm_msg->len - minhlen, &error_abort);
--        s->tpm_msg->code =3D be32_to_cpu(s->tpm_msg->code);
--
--        /* reply error */
--        s->tpm_msg->tag =3D cpu_to_be16(TPM2_ST_NO_SESSIONS);
--        s->tpm_msg->len =3D cpu_to_be32(sizeof(struct tpm_hdr));
--        s->tpm_msg->code =3D cpu_to_be32(TPM_RC_FAILURE);
--        qio_channel_write(ioc, (char *)s->tpm_msg, be32_to_cpu(s->tpm_ms=
-g->len),
--                          &error_abort);
--    }
--
--    g_free(s->tpm_msg);
--    s->tpm_msg =3D NULL;
--    object_unref(OBJECT(s->tpm_ioc));
--    return NULL;
--}
--
--static void *emu_ctrl_thread(void *data)
--{
--    TestState *s =3D data;
--    QIOChannelSocket *lioc =3D qio_channel_socket_new();
--    QIOChannel *ioc;
--
--    qio_channel_socket_listen_sync(lioc, s->addr, &error_abort);
--    g_cond_signal(&s->data_cond);
--
--    qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
--    ioc =3D QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
--    g_assert(ioc);
--
--    {
--        uint32_t cmd =3D 0;
--        struct iovec iov =3D { .iov_base =3D &cmd, .iov_len =3D sizeof(c=
-md) };
--        int *pfd =3D NULL;
--        size_t nfd =3D 0;
--
--        qio_channel_readv_full(ioc, &iov, 1, &pfd, &nfd, &error_abort);
--        cmd =3D be32_to_cpu(cmd);
--        g_assert_cmpint(cmd, =3D=3D, CMD_SET_DATAFD);
--        g_assert_cmpint(nfd, =3D=3D, 1);
--        s->tpm_ioc =3D QIO_CHANNEL(qio_channel_socket_new_fd(*pfd, &erro=
-r_abort));
--        g_free(pfd);
--
--        cmd =3D 0;
--        qio_channel_write(ioc, (char *)&cmd, sizeof(cmd), &error_abort);
--
--        s->emu_tpm_thread =3D g_thread_new(NULL, emu_tpm_thread, s);
--    }
--
--    while (true) {
--        uint32_t cmd;
--        ssize_t ret;
--
--        ret =3D qio_channel_read(ioc, (char *)&cmd, sizeof(cmd), NULL);
--        if (ret <=3D 0) {
--            break;
--        }
--
--        cmd =3D be32_to_cpu(cmd);
--        switch (cmd) {
--        case CMD_GET_CAPABILITY: {
--            ptm_cap cap =3D cpu_to_be64(0x3fff);
--            qio_channel_write(ioc, (char *)&cap, sizeof(cap), &error_abo=
-rt);
--            break;
--        }
--        case CMD_INIT: {
--            ptm_init init;
--            qio_channel_read(ioc, (char *)&init.u.req, sizeof(init.u.req=
-),
--                              &error_abort);
--            init.u.resp.tpm_result =3D 0;
--            qio_channel_write(ioc, (char *)&init.u.resp, sizeof(init.u.r=
-esp),
--                              &error_abort);
--            break;
--        }
--        case CMD_SHUTDOWN: {
--            ptm_res res =3D 0;
--            qio_channel_write(ioc, (char *)&res, sizeof(res), &error_abo=
-rt);
--            qio_channel_close(s->tpm_ioc, &error_abort);
--            g_thread_join(s->emu_tpm_thread);
--            break;
--        }
--        case CMD_STOP: {
--            ptm_res res =3D 0;
--            qio_channel_write(ioc, (char *)&res, sizeof(res), &error_abo=
-rt);
--            break;
--        }
--        case CMD_SET_BUFFERSIZE: {
--            ptm_setbuffersize sbs;
--            qio_channel_read(ioc, (char *)&sbs.u.req, sizeof(sbs.u.req),
--                             &error_abort);
--            sbs.u.resp.buffersize =3D sbs.u.req.buffersize ?: cpu_to_be3=
-2(4096);
--            sbs.u.resp.tpm_result =3D 0;
--            sbs.u.resp.minsize =3D cpu_to_be32(128);
--            sbs.u.resp.maxsize =3D cpu_to_be32(4096);
--            qio_channel_write(ioc, (char *)&sbs.u.resp, sizeof(sbs.u.res=
-p),
--                              &error_abort);
--            break;
--        }
--        case CMD_SET_LOCALITY: {
--            ptm_loc loc;
--            /* Note: this time it's not u.req / u.resp... */
--            qio_channel_read(ioc, (char *)&loc, sizeof(loc), &error_abor=
-t);
--            g_assert_cmpint(loc.u.req.loc, =3D=3D, 0);
--            loc.u.resp.tpm_result =3D 0;
--            qio_channel_write(ioc, (char *)&loc, sizeof(loc), &error_abo=
-rt);
--            break;
--        }
--        default:
--            g_debug("unimplemented %u", cmd);
--            g_assert_not_reached();
--        }
--    }
--
--    object_unref(OBJECT(ioc));
--    object_unref(OBJECT(lioc));
--    return NULL;
--}
-+#include "tpm-emu.h"
-=20
- #define TPM_CMD "\x80\x01\x00\x00\x00\x0c\x00\x00\x01\x44\x00\x00"
-=20
-@@ -250,8 +82,8 @@ int main(int argc, char **argv)
-     g_mutex_init(&test.data_mutex);
-     g_cond_init(&test.data_cond);
-=20
--    thread =3D g_thread_new(NULL, emu_ctrl_thread, &test);
--    test_wait_cond(&test);
-+    thread =3D g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
-+    tpm_emu_test_wait_cond(&test);
-=20
-     args =3D g_strdup_printf(
-         "-chardev socket,id=3Dchr,path=3D%s "
-diff --git a/tests/tpm-emu.c b/tests/tpm-emu.c
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 74f9361bdd..ce2922df6a 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -21,10 +21,10 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/nvram/chrp_nvram.h"
+ 
+-#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
++#include "migration/migration-test.h"
+ 
+-const unsigned start_address = 1024 * 1024;
+-const unsigned end_address = 100 * 1024 * 1024;
++const unsigned start_address = TEST_MEM_START;
++const unsigned end_address = TEST_MEM_END;
+ bool got_stop;
+ 
+ #if defined(__linux__)
+@@ -77,8 +77,8 @@ static bool ufd_version_check(void)
+ 
+ static const char *tmpfs;
+ 
+-/* A simple PC boot sector that modifies memory (1-100MB) quickly
+- * outputting a 'B' every so often if it's still running.
++/* The boot file modifies memory area in [start_address, end_address)
++ * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
+  */
+ #include "tests/migration/x86-a-b-bootblock.h"
+ 
+@@ -104,9 +104,8 @@ static void init_bootfile_ppc(const char *bootpath)
+     memcpy(header->name, "common", 6);
+     chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
+ 
+-    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
+-     * so let's modify memory between 1MB and 100MB
+-     * to do like PC bootsector
++    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB. So it is OK to modify
++     * memory between start_address and end_address like PC bootsector does.
+      */
+ 
+     sprintf(buf + 16,
+@@ -263,11 +262,11 @@ static void wait_for_migration_pass(QTestState *who)
+ static void check_guests_ram(QTestState *who)
+ {
+     /* Our ASM test will have been incrementing one byte from each page from
+-     * 1MB to <100MB in order.
+-     * This gives us a constraint that any page's byte should be equal or less
+-     * than the previous pages byte (mod 256); and they should all be equal
+-     * except for one transition at the point where we meet the incrementer.
+-     * (We're running this with the guest stopped).
++     * start_address to <end_address in order. This gives us a constraint
++     * that any page's byte should be equal or less than the previous pages
++     * byte (mod 256); and they should all be equal except for one transition
++     * at the point where we meet the incrementer. (We're running this with
++     * the guest stopped).
+      */
+     unsigned address;
+     uint8_t first_byte;
+@@ -278,7 +277,8 @@ static void check_guests_ram(QTestState *who)
+     qtest_memread(who, start_address, &first_byte, 1);
+     last_byte = first_byte;
+ 
+-    for (address = start_address + 4096; address < end_address; address += 4096)
++    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
++         address += TEST_MEM_PAGE_SIZE)
+     {
+         uint8_t b;
+         qtest_memread(who, address, &b, 1);
+diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+index 8fbedaa8b8..013b8d1f44 100644
+--- a/tests/migration/Makefile
++++ b/tests/migration/Makefile
+@@ -25,8 +25,8 @@ include $(SRC_PATH)/rules.mak
+ 
+ x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+ 
+-x86-a-b-bootblock.h: x86-a-b-bootblock.s
+-	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
++x86-a-b-bootblock.h: x86-a-b-bootblock.S
++	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
+ 	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+ 	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+ 	echo "$$__note" > $@
+diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
 new file mode 100644
-index 0000000..cbb92af
+index 0000000000..48b59b3281
 --- /dev/null
-+++ b/tests/tpm-emu.c
-@@ -0,0 +1,167 @@
++++ b/tests/migration/migration-test.h
+@@ -0,0 +1,18 @@
 +/*
-+ * Minimal TPM emulator for TPM test cases
++ * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
 + *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + */
++#ifndef _TEST_MIGRATION_H_
++#define _TEST_MIGRATION_H_
 +
-+#include "qemu/osdep.h"
-+#include <glib/gstdio.h>
++/* Common */
++#define TEST_MEM_START      (1 * 1024 * 1024)
++#define TEST_MEM_END        (100 * 1024 * 1024)
++#define TEST_MEM_PAGE_SIZE  4096
 +
-+#include "hw/tpm/tpm_ioctl.h"
-+#include "io/channel-socket.h"
-+#include "qapi/error.h"
-+#include "tpm-emu.h"
++/* PPC */
++#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
 +
-+void tpm_emu_test_wait_cond(TestState *s)
-+{
-+    gint64 end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
-+
-+    g_mutex_lock(&s->data_mutex);
-+    if (!g_cond_wait_until(&s->data_cond, &s->data_mutex, end_time)) {
-+        g_assert_not_reached();
-+    }
-+    g_mutex_unlock(&s->data_mutex);
-+}
-+
-+static void *tpm_emu_tpm_thread(void *data)
-+{
-+    TestState *s =3D data;
-+    QIOChannel *ioc =3D s->tpm_ioc;
-+
-+    s->tpm_msg =3D g_new(struct tpm_hdr, 1);
-+    while (true) {
-+        int minhlen =3D sizeof(s->tpm_msg->tag) + sizeof(s->tpm_msg->len=
-);
-+
-+        if (!qio_channel_read(ioc, (char *)s->tpm_msg, minhlen, &error_a=
-bort)) {
-+            break;
-+        }
-+        s->tpm_msg->tag =3D be16_to_cpu(s->tpm_msg->tag);
-+        s->tpm_msg->len =3D be32_to_cpu(s->tpm_msg->len);
-+        g_assert_cmpint(s->tpm_msg->len, >=3D, minhlen);
-+        g_assert_cmpint(s->tpm_msg->tag, =3D=3D, TPM2_ST_NO_SESSIONS);
-+
-+        s->tpm_msg =3D g_realloc(s->tpm_msg, s->tpm_msg->len);
-+        qio_channel_read(ioc, (char *)&s->tpm_msg->code,
-+                         s->tpm_msg->len - minhlen, &error_abort);
-+        s->tpm_msg->code =3D be32_to_cpu(s->tpm_msg->code);
-+
-+        /* reply error */
-+        s->tpm_msg->tag =3D cpu_to_be16(TPM2_ST_NO_SESSIONS);
-+        s->tpm_msg->len =3D cpu_to_be32(sizeof(struct tpm_hdr));
-+        s->tpm_msg->code =3D cpu_to_be32(TPM_RC_FAILURE);
-+        qio_channel_write(ioc, (char *)s->tpm_msg, be32_to_cpu(s->tpm_ms=
-g->len),
-+                          &error_abort);
-+    }
-+
-+    g_free(s->tpm_msg);
-+    s->tpm_msg =3D NULL;
-+    object_unref(OBJECT(s->tpm_ioc));
-+    return NULL;
-+}
-+
-+void *tpm_emu_ctrl_thread(void *data)
-+{
-+    TestState *s =3D data;
-+    QIOChannelSocket *lioc =3D qio_channel_socket_new();
-+    QIOChannel *ioc;
-+
-+    qio_channel_socket_listen_sync(lioc, s->addr, &error_abort);
-+    g_cond_signal(&s->data_cond);
-+
-+    qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
-+    ioc =3D QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
-+    g_assert(ioc);
-+
-+    {
-+        uint32_t cmd =3D 0;
-+        struct iovec iov =3D { .iov_base =3D &cmd, .iov_len =3D sizeof(c=
-md) };
-+        int *pfd =3D NULL;
-+        size_t nfd =3D 0;
-+
-+        qio_channel_readv_full(ioc, &iov, 1, &pfd, &nfd, &error_abort);
-+        cmd =3D be32_to_cpu(cmd);
-+        g_assert_cmpint(cmd, =3D=3D, CMD_SET_DATAFD);
-+        g_assert_cmpint(nfd, =3D=3D, 1);
-+        s->tpm_ioc =3D QIO_CHANNEL(qio_channel_socket_new_fd(*pfd, &erro=
-r_abort));
-+        g_free(pfd);
-+
-+        cmd =3D 0;
-+        qio_channel_write(ioc, (char *)&cmd, sizeof(cmd), &error_abort);
-+
-+        s->emu_tpm_thread =3D g_thread_new(NULL, tpm_emu_tpm_thread, s);
-+    }
-+
-+    while (true) {
-+        uint32_t cmd;
-+        ssize_t ret;
-+
-+        ret =3D qio_channel_read(ioc, (char *)&cmd, sizeof(cmd), NULL);
-+        if (ret <=3D 0) {
-+            break;
-+        }
-+
-+        cmd =3D be32_to_cpu(cmd);
-+        switch (cmd) {
-+        case CMD_GET_CAPABILITY: {
-+            ptm_cap cap =3D cpu_to_be64(0x3fff);
-+            qio_channel_write(ioc, (char *)&cap, sizeof(cap), &error_abo=
-rt);
-+            break;
-+        }
-+        case CMD_INIT: {
-+            ptm_init init;
-+            qio_channel_read(ioc, (char *)&init.u.req, sizeof(init.u.req=
-),
-+                              &error_abort);
-+            init.u.resp.tpm_result =3D 0;
-+            qio_channel_write(ioc, (char *)&init.u.resp, sizeof(init.u.r=
-esp),
-+                              &error_abort);
-+            break;
-+        }
-+        case CMD_SHUTDOWN: {
-+            ptm_res res =3D 0;
-+            qio_channel_write(ioc, (char *)&res, sizeof(res), &error_abo=
-rt);
-+            qio_channel_close(s->tpm_ioc, &error_abort);
-+            g_thread_join(s->emu_tpm_thread);
-+            break;
-+        }
-+        case CMD_STOP: {
-+            ptm_res res =3D 0;
-+            qio_channel_write(ioc, (char *)&res, sizeof(res), &error_abo=
-rt);
-+            break;
-+        }
-+        case CMD_SET_BUFFERSIZE: {
-+            ptm_setbuffersize sbs;
-+            qio_channel_read(ioc, (char *)&sbs.u.req, sizeof(sbs.u.req),
-+                             &error_abort);
-+            sbs.u.resp.buffersize =3D sbs.u.req.buffersize ?: cpu_to_be3=
-2(4096);
-+            sbs.u.resp.tpm_result =3D 0;
-+            sbs.u.resp.minsize =3D cpu_to_be32(128);
-+            sbs.u.resp.maxsize =3D cpu_to_be32(4096);
-+            qio_channel_write(ioc, (char *)&sbs.u.resp, sizeof(sbs.u.res=
-p),
-+                              &error_abort);
-+            break;
-+        }
-+        case CMD_SET_LOCALITY: {
-+            ptm_loc loc;
-+            /* Note: this time it's not u.req / u.resp... */
-+            qio_channel_read(ioc, (char *)&loc, sizeof(loc), &error_abor=
-t);
-+            g_assert_cmpint(loc.u.req.loc, =3D=3D, 0);
-+            loc.u.resp.tpm_result =3D 0;
-+            qio_channel_write(ioc, (char *)&loc, sizeof(loc), &error_abo=
-rt);
-+            break;
-+        }
-+        default:
-+            g_debug("unimplemented %u", cmd);
-+            g_assert_not_reached();
-+        }
-+    }
-+
-+    object_unref(OBJECT(ioc));
-+    object_unref(OBJECT(lioc));
-+    return NULL;
-+}
-diff --git a/tests/tpm-emu.h b/tests/tpm-emu.h
-new file mode 100644
-index 0000000..ef4bfa8
---- /dev/null
-+++ b/tests/tpm-emu.h
-@@ -0,0 +1,38 @@
-+/*
-+ * Minimal TPM emulator for TPM test cases
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef TESTS_TPM_EMU_H
-+#define TESTS_TPM_EMU_H
-+
-+#define TPM_RC_FAILURE 0x101
-+#define TPM2_ST_NO_SESSIONS 0x8001
-+
-+struct tpm_hdr {
-+    uint16_t tag;
-+    uint32_t len;
-+    uint32_t code; /*ordinal/error */
-+    char buffer[];
-+} QEMU_PACKED;
-+
-+typedef struct TestState {
-+    CompatGMutex data_mutex;
-+    CompatGCond data_cond;
-+    SocketAddress *addr;
-+    QIOChannel *tpm_ioc;
-+    GThread *emu_tpm_thread;
-+    struct tpm_hdr *tpm_msg;
-+} TestState;
-+
-+void tpm_emu_test_wait_cond(TestState *s);
-+void *tpm_emu_ctrl_thread(void *data);
-+
-+#endif /* TEST_TPM_EMU_H */
---=20
-2.5.5
++#endif /* _TEST_MIGRATION_H_ */
+diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
+similarity index 94%
+rename from tests/migration/x86-a-b-bootblock.s
+rename to tests/migration/x86-a-b-bootblock.S
+index 98dbfab084..08b51f9e7f 100644
+--- a/tests/migration/x86-a-b-bootblock.s
++++ b/tests/migration/x86-a-b-bootblock.S
+@@ -12,6 +12,7 @@
+ #
+ # Author: dgilbert@redhat.com
+ 
++#include "migration-test.h"
+ 
+ .code16
+ .org 0x7c00
+@@ -45,11 +46,11 @@ start:             # at 0x7c00 ?
+         mov $0, %bl
+ mainloop:
+         # Start from 1MB
+-        mov $(1024*1024),%eax
++        mov $TEST_MEM_START,%eax
+ innerloop:
+         incb (%eax)
+-        add $4096,%eax
+-        cmp $(100*1024*1024),%eax
++        add $TEST_MEM_PAGE_SIZE,%eax
++        cmp $TEST_MEM_END,%eax
+         jl innerloop
+ 
+         inc %bl
+diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+index 9e8e2e028b..44e4b99506 100644
+--- a/tests/migration/x86-a-b-bootblock.h
++++ b/tests/migration/x86-a-b-bootblock.h
+@@ -1,5 +1,5 @@
+ /* This file is automatically generated from
+- * tests/migration/x86-a-b-bootblock.s, edit that and then run
++ * tests/migration/x86-a-b-bootblock.S, edit that and then run
+  * "make x86-a-b-bootblock.h" inside tests/migration to update,
+  * and then remember to send both in your patch submission.
+  */
+-- 
+2.14.3
