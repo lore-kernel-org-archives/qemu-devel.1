@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1epMfq-0006KZ-PB
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:22:44 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1epMnO-0000Y3-Go
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1epMfm-00026X-Go
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:22:42 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:44652)
+	(envelope-from <richard.henderson@linaro.org>) id 1epMnL-0006cP-EU
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:30:30 -0500
+Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:46161)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1epMfm-00024y-8Y
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:22:38 -0500
-Received: by mail-lf0-x244.google.com with SMTP id v9so14576628lfa.11
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 15:22:38 -0800 (PST)
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Sat, 24 Feb 2018 00:22:32 +0100
-Message-Id: <20180223232233.31482-2-frasse.iglesias@gmail.com>
-In-Reply-To: <20180223232233.31482-1-frasse.iglesias@gmail.com>
-References: <20180223232233.31482-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] xilinx_spips: Enable only two slaves
- when reading/writing with stripe
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1epMnL-0006VQ-4D
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:30:27 -0500
+Received: by mail-pf0-x22e.google.com with SMTP id z24so4126109pfh.13
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 15:30:27 -0800 (PST)
+References: <20180223153636.29809-1-alex.bennee@linaro.org>
+	<20180223153636.29809-4-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ee422087-7454-8bff-ecac-cdee71bb570e@linaro.org>
+Date: Fri, 23 Feb 2018 15:30:22 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180223153636.29809-4-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/31] target/arm/cpu.h: update comment
+ for half-precision values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, peter.maydell@linaro.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Assert only the lower cs on bus 0 and upper cs on bus 1 when both buses and
-chip selects are enabled (e.g reading/writing with stripe).
+On 02/23/2018 07:36 AM, Alex Bennée wrote:
+> @@ -168,6 +168,7 @@ typedef struct {
+>   *  Qn = regs[n].d[1]:regs[n].d[0]
+>   *  Dn = regs[n].d[0]
+>   *  Sn = regs[n].d[0] bits 31..0
+> + *  Hn = regs[n].d[0] bits 15..0 for even n, and bits 31..16 for odd n
 
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
----
- hw/ssi/xilinx_spips.c | 41 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 37 insertions(+), 4 deletions(-)
+Everything past here --------------^ is wrong.
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 8af36ca3d4..0cb484ecf4 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -223,7 +223,7 @@ static void xilinx_spips_update_cs(XilinxSPIPS *s, int field)
- {
-     int i;
- 
--    for (i = 0; i < s->num_cs; i++) {
-+    for (i = 0; i < s->num_cs * s->num_busses; i++) {
-         bool old_state = s->cs_lines_state[i];
-         bool new_state = field & (1 << i);
- 
-@@ -234,7 +234,7 @@ static void xilinx_spips_update_cs(XilinxSPIPS *s, int field)
-         }
-         qemu_set_irq(s->cs_lines[i], !new_state);
-     }
--    if (!(field & ((1 << s->num_cs) - 1))) {
-+    if (!(field & ((1 << (s->num_cs * s->num_busses)) - 1))) {
-         s->snoop_state = SNOOP_CHECKING;
-         s->cmd_dummies = 0;
-         s->link_state = 1;
-@@ -248,7 +248,40 @@ static void xlnx_zynqmp_qspips_update_cs_lines(XlnxZynqMPQSPIPS *s)
- {
-     if (s->regs[R_GQSPI_GF_SNAPSHOT]) {
-         int field = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, CHIP_SELECT);
--        xilinx_spips_update_cs(XILINX_SPIPS(s), field);
-+        bool upper_cs_sel = field & (1 << 1);
-+        bool lower_cs_sel = field & 1;
-+        bool bus0_enabled;
-+        bool bus1_enabled;
-+        uint8_t buses;
-+        int cs = 0;
-+
-+        buses = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, DATA_BUS_SELECT);
-+        bus0_enabled = buses & 1;
-+        bus1_enabled = buses & (1 << 1);
-+
-+        if (bus0_enabled && bus1_enabled) {
-+            if (lower_cs_sel) {
-+                cs |= 1;
-+            }
-+            if (upper_cs_sel) {
-+                cs |= 1 << 3;
-+            }
-+        } else if (bus0_enabled) {
-+            if (lower_cs_sel) {
-+                cs |= 1;
-+            }
-+            if (upper_cs_sel) {
-+                cs |= 1 << 1;
-+            }
-+        } else if (bus1_enabled) {
-+            if (lower_cs_sel) {
-+                cs |= 1 << 2;
-+            }
-+            if (upper_cs_sel) {
-+                cs |= 1 << 3;
-+            }
-+        }
-+        xilinx_spips_update_cs(XILINX_SPIPS(s), cs);
-     }
- }
- 
-@@ -260,7 +293,7 @@ static void xilinx_spips_update_cs_lines(XilinxSPIPS *s)
-     if (num_effective_busses(s) == 2) {
-         /* Single bit chip-select for qspi */
-         field &= 0x1;
--        field |= field << 1;
-+        field |= field << 3;
-     /* Dual stack U-Page */
-     } else if (s->regs[R_LQSPI_CFG] & LQSPI_CFG_TWO_MEM &&
-                s->regs[R_LQSPI_STS] & LQSPI_CFG_U_PAGE) {
--- 
-2.11.0
+
+r~
