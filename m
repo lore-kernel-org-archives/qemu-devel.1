@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ep8bO-0006pg-1W
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 03:21:10 -0500
+	(envelope-from <famz@redhat.com>) id 1ep8nQ-0000qV-Lr
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 03:33:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ep8bN-0004zO-1r
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 03:21:10 -0500
-Date: Fri, 23 Feb 2018 16:20:44 +0800
+	(envelope-from <famz@redhat.com>) id 1ep8nN-0006Ff-Ii
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 03:33:36 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41048 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ep8nN-0006Ek-Dq
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 03:33:33 -0500
+Date: Fri, 23 Feb 2018 16:33:15 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180223082044.GB31530@lemon.usersys.redhat.com>
-References: <20180220131014.8998-1-stefanha@redhat.com>
+Message-ID: <20180223083315.GC31530@lemon.usersys.redhat.com>
+References: <20180216164620.GA53727@humpty.home.comstyle.com>
+	<c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
+	<85dc7f9f-95e1-c666-ee17-8f04d008d21b@gmx.com>
+	<e625c026-2fa4-f3ea-d85e-080c65a4885f@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180220131014.8998-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vl: introduce vm_shutdown()
+In-Reply-To: <e625c026-2fa4-f3ea-d85e-080c65a4885f@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as a OpenBSD
+ maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,41 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Kamil Rytarowski <n54@gmx.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
 
-On Tue, 02/20 13:10, Stefan Hajnoczi wrote:
-> 1. virtio_scsi_handle_cmd_vq() racing with iothread_stop_all() hits the
->    virtio_scsi_ctx_check() assertion failure because the BDS AioContext
->    has been modified by iothread_stop_all().
+On Fri, 02/16 14:44, Philippe Mathieu-Daud=E9 wrote:
+> On 02/16/2018 02:41 PM, Kamil Rytarowski wrote:
+> > On 16.02.2018 18:30, Philippe Mathieu-Daud=E9 wrote:
+> >> But before announcing the host OS being supported again, I'd rather =
+see
+> >> reproducible build/tests logs, in a (public - if possible) continuou=
+s
+> >> integration system. Else it is hard to notice when it get broken.
+> >>
+> >=20
+> > This is already done for FreeBSD, NetBSD and OpenBSD.
+>=20
+> We have the ability to run those, but afaik no CI are using them.
 
-Does this patch fix the issue completely? IIUC virtio_scsi_handle_cmd can
-already be entered at the time of main thread calling virtio_scsi_clear_aio(),
-so this race condition still exists:
-
-  main thread                           iothread
------------------------------------------------------------------------------
-  vm_shutdown
-    ...
-      virtio_bus_stop_ioeventfd
-        virtio_scsi_dataplane_stop
-                                        aio_poll()
-                                          ...
-                                            virtio_scsi_data_plane_handle_cmd()
-          aio_context_acquire(s->ctx)
-                                              virtio_scsi_acquire(s).enter
-          virtio_scsi_clear_aio()
-          aio_context_release(s->ctx)
-                                              virtio_scsi_acquire(s).return
-                                              virtio_scsi_handle_cmd_vq()
-                                                ...
-                                                  virtqueue_pop()
-
-Is it possible that the above virtqueue_pop() still returns one element that was
-queued before vm_shutdown() was called?
-
-If so I think we additionally need to an "s->ioeventfd_stopped" flag set in
-virtio_scsi_stop_ioeventfd() and check it in
-virtio_scsi_data_plane_handle_cmd().
+That's right. I can try enabling them on patchew, but my gut feeling is t=
+hat
+these still need to be optimized (especially, enabling persisted ccache l=
+ike our
+docker tests, so it is reasonably efficient for our limited resources).
 
 Fam
