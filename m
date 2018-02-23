@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep11a-0001YN-0p
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:17:05 -0500
+	(envelope-from <mjc@sifive.com>) id 1ep11m-0001ga-Vs
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:20:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ep10L-0006Jt-3y
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:15:41 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:38629)
+	(envelope-from <mjc@sifive.com>) id 1ep10i-00074e-Kd
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:15:54 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:36181)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep10K-0006I0-DT
-	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:14:24 -0500
-Received: by mail-pf0-x244.google.com with SMTP id d26so2775363pfn.5
-	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:14:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ep10i-00072c-4s
+	for qemu-devel@nongnu.org; Thu, 22 Feb 2018 19:14:48 -0500
+Received: by mail-pg0-x243.google.com with SMTP id j9so2672482pgv.3
+	for <qemu-devel@nongnu.org>; Thu, 22 Feb 2018 16:14:48 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 23 Feb 2018 13:12:00 +1300
-Message-Id: <1519344729-73482-15-git-send-email-mjc@sifive.com>
+Date: Fri, 23 Feb 2018 13:12:07 +1300
+Message-Id: <1519344729-73482-22-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519344729-73482-1-git-send-email-mjc@sifive.com>
 References: <1519344729-73482-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v6 14/23] SiFive RISC-V CLINT Block
+Subject: [Qemu-devel] [PATCH v6 21/23] SiFive Freedom E300 RISC-V Machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-The CLINT (Core Local Interruptor) device provides real-time clock, timer
-and interprocessor interrupts based on SiFive's CLINT specification.
+This provides a RISC-V Board compatible with the the SiFive E300 SDK.
+The following machine is implemented:
+
+- 'sifive_e300'; CLINT, PLIC, UART, AON, GPIO, QSPI, PWM
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_clint.c         | 260 ++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_clint.h |  56 +++++++++
- 2 files changed, 316 insertions(+)
- create mode 100644 hw/riscv/sifive_clint.c
- create mode 100644 include/hw/riscv/sifive_clint.h
+ hw/riscv/sifive_e300.c         | 233 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_e300.h |  79 ++++++++++++++
+ 2 files changed, 312 insertions(+)
+ create mode 100644 hw/riscv/sifive_e300.c
+ create mode 100644 include/hw/riscv/sifive_e300.h
 
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+diff --git a/hw/riscv/sifive_e300.c b/hw/riscv/sifive_e300.c
 new file mode 100644
-index 0000000..93fbb33
+index 0000000..2c47b07
 --- /dev/null
-+++ b/hw/riscv/sifive_clint.c
-@@ -0,0 +1,260 @@
++++ b/hw/riscv/sifive_e300.c
+@@ -0,0 +1,233 @@
 +/*
-+ * SiFive CLINT (Core Local Interruptor)
++ * QEMU RISC-V Board Compatible with SiFive E300 SDK
 + *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * This provides real-time clock, timer and interprocessor interrupts.
++ * Provides a board compatible with the bsp in the SiFive E300 SDK:
++ *
++ * 0) UART
++ * 1) CLINT (Core Level Interruptor)
++ * 2) PLIC (Platform Level Interrupt Controller)
++ * 3) PRCI (Power, Reset, Clock, Interrupt)
++ * 4) Registers emulated as RAM: AON, GPIO, QSPI, PWM
++ * 5) Flash memory emulated as RAM
++ *
++ * The Mask ROM reset vector jumps to the flash payload at 0x2040_0000.
++ * The OTP ROM and Flash boot code will be emulated in a future version.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -73,248 +84,211 @@ index 0000000..93fbb33
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/log.h"
 +#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
 +#include "hw/sysbus.h"
++#include "hw/char/serial.h"
 +#include "target/riscv/cpu.h"
++#include "hw/riscv/riscv_hart.h"
++#include "hw/riscv/sifive_plic.h"
 +#include "hw/riscv/sifive_clint.h"
-+#include "qemu/timer.h"
++#include "hw/riscv/sifive_prci.h"
++#include "hw/riscv/sifive_uart.h"
++#include "hw/riscv/sifive_e300.h"
++#include "chardev/char.h"
++#include "sysemu/arch_init.h"
++#include "exec/address-spaces.h"
++#include "elf.h"
 +
-+/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
-+#define TIMER_FREQ (10 * 1000 * 1000)
++static const struct MemmapEntry {
++    hwaddr base;
++    hwaddr size;
++} sifive_e300_memmap[] = {
++    [SIFIVE_E300_DEBUG] =    {        0x0,      0x100 },
++    [SIFIVE_E300_MROM] =     {     0x1000,     0x2000 },
++    [SIFIVE_E300_OTP] =      {    0x20000,     0x2000 },
++    [SIFIVE_E300_CLINT] =    {  0x2000000,    0x10000 },
++    [SIFIVE_E300_PLIC] =     {  0xc000000,  0x4000000 },
++    [SIFIVE_E300_AON] =      { 0x10000000,     0x8000 },
++    [SIFIVE_E300_PRCI] =     { 0x10008000,     0x8000 },
++    [SIFIVE_E300_OTP_CTRL] = { 0x10010000,     0x1000 },
++    [SIFIVE_E300_GPIO0] =    { 0x10012000,     0x1000 },
++    [SIFIVE_E300_UART0] =    { 0x10013000,     0x1000 },
++    [SIFIVE_E300_QSPI0] =    { 0x10014000,     0x1000 },
++    [SIFIVE_E300_PWM0] =     { 0x10015000,     0x1000 },
++    [SIFIVE_E300_UART1] =    { 0x10023000,     0x1000 },
++    [SIFIVE_E300_QSPI1] =    { 0x10024000,     0x1000 },
++    [SIFIVE_E300_PWM1] =     { 0x10025000,     0x1000 },
++    [SIFIVE_E300_QSPI2] =    { 0x10034000,     0x1000 },
++    [SIFIVE_E300_PWM2] =     { 0x10035000,     0x1000 },
++    [SIFIVE_E300_XIP] =      { 0x20000000, 0x20000000 },
++    [SIFIVE_E300_DTIM] =     { 0x80000000,     0x4000 }
++};
 +
-+static uint64_t cpu_riscv_read_rtc(void)
++static uint64_t identity_translate(void *opaque, uint64_t addr)
 +{
-+    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
-+                    NANOSECONDS_PER_SECOND);
++    return addr;
 +}
 +
-+/*
-+ * Called when timecmp is written to update the QEMU timer or immediately
-+ * trigger timer interrupt if mtimecmp <= current timer value.
-+ */
-+static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
++static uint64_t load_kernel(const char *kernel_filename)
 +{
-+    uint64_t next;
-+    uint64_t diff;
++    uint64_t kernel_entry, kernel_high;
 +
-+    uint64_t rtc_r = cpu_riscv_read_rtc();
-+
-+    cpu->env.timecmp = value;
-+    if (cpu->env.timecmp <= rtc_r) {
-+        /* if we're setting an MTIMECMP value in the "past",
-+           immediately raise the timer interrupt */
-+        riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
-+        return;
++    if (load_elf(kernel_filename, identity_translate, NULL,
++                 &kernel_entry, NULL, &kernel_high,
++                 0, ELF_MACHINE, 1, 0) < 0) {
++        error_report("qemu: could not load kernel '%s'", kernel_filename);
++        exit(1);
 +    }
-+
-+    /* otherwise, set up the future timer interrupt */
-+    riscv_set_local_interrupt(cpu, MIP_MTIP, 0);
-+    diff = cpu->env.timecmp - rtc_r;
-+    /* back to ns (note args switched in muldiv64) */
-+    next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
-+    timer_mod(cpu->env.timer, next);
++    return kernel_entry;
 +}
 +
-+/*
-+ * Callback used when the timer set using timer_mod expires.
-+ * Should raise the timer interrupt line
-+ */
-+static void sifive_clint_timer_cb(void *opaque)
++static void sifive_mmio_emulate(MemoryRegion *parent, const char *name,
++                             uintptr_t offset, uintptr_t length)
 +{
-+    RISCVCPU *cpu = opaque;
-+    riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
++    MemoryRegion *mock_mmio = g_new(MemoryRegion, 1);
++    memory_region_init_ram(mock_mmio, NULL, name, length, &error_fatal);
++    memory_region_add_subregion(parent, offset, mock_mmio);
 +}
 +
-+/* CPU wants to read rtc or timecmp register */
-+static uint64_t sifive_clint_read(void *opaque, hwaddr addr, unsigned size)
++static void riscv_sifive_e300_init(MachineState *machine)
 +{
-+    SiFiveCLINTState *clint = opaque;
-+    if (addr >= clint->sip_base &&
-+        addr < clint->sip_base + (clint->num_harts << 2)) {
-+        size_t hartid = (addr - clint->sip_base) >> 2;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x3) == 0) {
-+            return (env->mip & MIP_MSIP) > 0;
-+        } else {
-+            error_report("clint: invalid read: %08x", (uint32_t)addr);
-+            return 0;
-+        }
-+    } else if (addr >= clint->timecmp_base &&
-+        addr < clint->timecmp_base + (clint->num_harts << 3)) {
-+        size_t hartid = (addr - clint->timecmp_base) >> 3;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x7) == 0) {
-+            /* timecmp_lo */
-+            uint64_t timecmp = env->timecmp;
-+            return timecmp & 0xFFFFFFFF;
-+        } else if ((addr & 0x7) == 4) {
-+            /* timecmp_hi */
-+            uint64_t timecmp = env->timecmp;
-+            return (timecmp >> 32) & 0xFFFFFFFF;
-+        } else {
-+            error_report("clint: invalid read: %08x", (uint32_t)addr);
-+            return 0;
-+        }
-+    } else if (addr == clint->time_base) {
-+        /* time_lo */
-+        return cpu_riscv_read_rtc() & 0xFFFFFFFF;
-+    } else if (addr == clint->time_base + 4) {
-+        /* time_hi */
-+        return (cpu_riscv_read_rtc() >> 32) & 0xFFFFFFFF;
++    const struct MemmapEntry *memmap = sifive_e300_memmap;
++
++    SiFiveE300State *s = g_new0(SiFiveE300State, 1);
++    MemoryRegion *sys_mem = get_system_memory();
++    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
++
++    /* Initialize SOC */
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
++                              &error_abort);
++    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAC_PRIV_1_10,
++                            "cpu-type", &error_abort);
++    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
++                            &error_abort);
++    object_property_set_bool(OBJECT(&s->soc), true, "realized",
++                            &error_abort);
++
++    /* Data Tightly Integrated Memory */
++    memory_region_init_ram(main_mem, NULL, "riscv.sifive.e300.ram",
++        memmap[SIFIVE_E300_DTIM].size, &error_fatal);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_DTIM].base, main_mem);
++
++    /* Mask ROM */
++    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.e300.mrom",
++        memmap[SIFIVE_E300_MROM].size, &error_fatal);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_MROM].base, mask_rom);
++
++    /* MMIO */
++    s->plic = sifive_plic_create(memmap[SIFIVE_E300_PLIC].base,
++        (char *)SIFIVE_E300_PLIC_HART_CONFIG,
++        SIFIVE_E300_PLIC_NUM_SOURCES,
++        SIFIVE_E300_PLIC_NUM_PRIORITIES,
++        SIFIVE_E300_PLIC_PRIORITY_BASE,
++        SIFIVE_E300_PLIC_PENDING_BASE,
++        SIFIVE_E300_PLIC_ENABLE_BASE,
++        SIFIVE_E300_PLIC_ENABLE_STRIDE,
++        SIFIVE_E300_PLIC_CONTEXT_BASE,
++        SIFIVE_E300_PLIC_CONTEXT_STRIDE,
++        memmap[SIFIVE_E300_PLIC].size);
++    sifive_clint_create(memmap[SIFIVE_E300_CLINT].base,
++        memmap[SIFIVE_E300_CLINT].size, smp_cpus,
++        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.aon",
++        memmap[SIFIVE_E300_AON].base, memmap[SIFIVE_E300_AON].size);
++    sifive_prci_create(memmap[SIFIVE_E300_PRCI].base);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.gpio0",
++        memmap[SIFIVE_E300_GPIO0].base, memmap[SIFIVE_E300_GPIO0].size);
++    sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART0].base,
++        serial_hds[0], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART0_IRQ]);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi0",
++        memmap[SIFIVE_E300_QSPI0].base, memmap[SIFIVE_E300_QSPI0].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm0",
++        memmap[SIFIVE_E300_PWM0].base, memmap[SIFIVE_E300_PWM0].size);
++    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART1].base,
++        serial_hds[1], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART1_IRQ]); */
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi1",
++        memmap[SIFIVE_E300_QSPI1].base, memmap[SIFIVE_E300_QSPI1].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm1",
++        memmap[SIFIVE_E300_PWM1].base, memmap[SIFIVE_E300_PWM1].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi2",
++        memmap[SIFIVE_E300_QSPI2].base, memmap[SIFIVE_E300_QSPI2].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm2",
++        memmap[SIFIVE_E300_PWM2].base, memmap[SIFIVE_E300_PWM2].size);
++
++    /* Flash memory */
++    memory_region_init_ram(xip_mem, NULL, "riscv.sifive.e300.xip",
++        memmap[SIFIVE_E300_XIP].size, &error_fatal);
++    memory_region_set_readonly(xip_mem, true);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_XIP].base, xip_mem);
++
++    /* Mask ROM reset vector */
++    uint32_t reset_vec[2] = {
++        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
++        0x00028067,        /* 0x1004: jr      t0 */
++    };
++
++    /* copy in the reset vector */
++    cpu_physical_memory_write(0x1000, reset_vec, sizeof(reset_vec));
++    memory_region_set_readonly(mask_rom, true);
++
++    if (machine->kernel_filename) {
++        load_kernel(machine->kernel_filename);
 +    }
++}
 +
-+    error_report("clint: invalid read: %08x", (uint32_t)addr);
++static int riscv_sifive_e300_sysbus_device_init(SysBusDevice *sysbusdev)
++{
 +    return 0;
 +}
 +
-+/* CPU wrote to rtc or timecmp register */
-+static void sifive_clint_write(void *opaque, hwaddr addr, uint64_t value,
-+        unsigned size)
++static void riscv_sifive_e300_class_init(ObjectClass *klass, void *data)
 +{
-+    SiFiveCLINTState *clint = opaque;
-+
-+    if (addr >= clint->sip_base &&
-+        addr < clint->sip_base + (clint->num_harts << 2)) {
-+        size_t hartid = (addr - clint->sip_base) >> 2;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x3) == 0) {
-+            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MSIP, value != 0);
-+        } else {
-+            error_report("clint: invalid sip write: %08x", (uint32_t)addr);
-+        }
-+        return;
-+    } else if (addr >= clint->timecmp_base &&
-+        addr < clint->timecmp_base + (clint->num_harts << 3)) {
-+        size_t hartid = (addr - clint->timecmp_base) >> 3;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x7) == 0) {
-+            /* timecmp_lo */
-+            uint64_t timecmp = env->timecmp;
-+            sifive_clint_write_timecmp(RISCV_CPU(cpu),
-+                timecmp << 32 | (value & 0xFFFFFFFF));
-+            return;
-+        } else if ((addr & 0x7) == 4) {
-+            /* timecmp_hi */
-+            uint64_t timecmp = env->timecmp;
-+            sifive_clint_write_timecmp(RISCV_CPU(cpu),
-+                value << 32 | (timecmp & 0xFFFFFFFF));
-+        } else {
-+            error_report("clint: invalid timecmp write: %08x", (uint32_t)addr);
-+        }
-+        return;
-+    } else if (addr == clint->time_base) {
-+        /* time_lo */
-+        error_report("clint: time_lo write not implemented");
-+        return;
-+    } else if (addr == clint->time_base + 4) {
-+        /* time_hi */
-+        error_report("clint: time_hi write not implemented");
-+        return;
-+    }
-+
-+    error_report("clint: invalid write: %08x", (uint32_t)addr);
++    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    k->init = riscv_sifive_e300_sysbus_device_init;
 +}
 +
-+static const MemoryRegionOps sifive_clint_ops = {
-+    .read = sifive_clint_read,
-+    .write = sifive_clint_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static Property sifive_clint_properties[] = {
-+    DEFINE_PROP_UINT32("num-harts", SiFiveCLINTState, num_harts, 0),
-+    DEFINE_PROP_UINT32("sip-base", SiFiveCLINTState, sip_base, 0),
-+    DEFINE_PROP_UINT32("timecmp-base", SiFiveCLINTState, timecmp_base, 0),
-+    DEFINE_PROP_UINT32("time-base", SiFiveCLINTState, time_base, 0),
-+    DEFINE_PROP_UINT32("aperture-size", SiFiveCLINTState, aperture_size, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void sifive_clint_realize(DeviceState *dev, Error **errp)
-+{
-+    SiFiveCLINTState *s = SIFIVE_CLINT(dev);
-+    memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_clint_ops, s,
-+                          TYPE_SIFIVE_CLINT, s->aperture_size);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-+}
-+
-+static void sifive_clint_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    dc->realize = sifive_clint_realize;
-+    dc->props = sifive_clint_properties;
-+}
-+
-+static const TypeInfo sifive_clint_info = {
-+    .name          = TYPE_SIFIVE_CLINT,
++static const TypeInfo riscv_sifive_e300_device = {
++    .name          = TYPE_SIFIVE_E300,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SiFiveCLINTState),
-+    .class_init    = sifive_clint_class_init,
++    .instance_size = sizeof(SiFiveE300State),
++    .class_init    = riscv_sifive_e300_class_init,
 +};
 +
-+static void sifive_clint_register_types(void)
++static void riscv_sifive_e300_machine_init(MachineClass *mc)
 +{
-+    type_register_static(&sifive_clint_info);
++    mc->desc = "RISC-V Board compatible with SiFive E300 SDK";
++    mc->init = riscv_sifive_e300_init;
++    mc->max_cpus = 1;
 +}
 +
-+type_init(sifive_clint_register_types)
++DEFINE_MACHINE("sifive_e300", riscv_sifive_e300_machine_init)
 +
-+
-+/*
-+ * Create CLINT device.
-+ */
-+DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
-+    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base)
++static void riscv_sifive_e300_register_types(void)
 +{
-+    int i;
-+    for (i = 0; i < num_harts; i++) {
-+        CPUState *cpu = qemu_get_cpu(i);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            continue;
-+        }
-+        env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                  &sifive_clint_timer_cb, cpu);
-+        env->timecmp = 0;
-+    }
-+
-+    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_CLINT);
-+    qdev_prop_set_uint32(dev, "num-harts", num_harts);
-+    qdev_prop_set_uint32(dev, "sip-base", sip_base);
-+    qdev_prop_set_uint32(dev, "timecmp-base", timecmp_base);
-+    qdev_prop_set_uint32(dev, "time-base", time_base);
-+    qdev_prop_set_uint32(dev, "aperture-size", size);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
-+    return dev;
++    type_register_static(&riscv_sifive_e300_device);
 +}
-diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
++
++type_init(riscv_sifive_e300_register_types);
+diff --git a/include/hw/riscv/sifive_e300.h b/include/hw/riscv/sifive_e300.h
 new file mode 100644
-index 0000000..cec3fbd
+index 0000000..453c43b
 --- /dev/null
-+++ b/include/hw/riscv/sifive_clint.h
-@@ -0,0 +1,56 @@
++++ b/include/hw/riscv/sifive_e300.h
+@@ -0,0 +1,79 @@
 +/*
-+ * SiFive CLINT (Core Local Interruptor) interface
++ * SiFive E300 series machine interface
 + *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2017 SiFive, Inc.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -336,35 +310,59 @@ index 0000000..cec3fbd
 + * THE SOFTWARE.
 + */
 +
-+#ifndef HW_SIFIVE_CLINT_H
-+#define HW_SIFIVE_CLINT_H
++#ifndef HW_SIFIVE_E300_H
++#define HW_SIFIVE_E300_H
 +
-+#define TYPE_SIFIVE_CLINT "riscv.sifive.clint"
++#define TYPE_SIFIVE_E300 "riscv.sifive.e300"
 +
-+#define SIFIVE_CLINT(obj) \
-+    OBJECT_CHECK(SiFiveCLINTState, (obj), TYPE_SIFIVE_CLINT)
++#define SIFIVE_E300(obj) \
++    OBJECT_CHECK(SiFiveE300State, (obj), TYPE_SIFIVE_E300)
 +
-+typedef struct SiFiveCLINTState {
++typedef struct SiFiveE300State {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
-+    MemoryRegion mmio;
-+    uint32_t num_harts;
-+    uint32_t sip_base;
-+    uint32_t timecmp_base;
-+    uint32_t time_base;
-+    uint32_t aperture_size;
-+} SiFiveCLINTState;
-+
-+DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
-+    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base);
++    RISCVHartArrayState soc;
++    DeviceState *plic;
++} SiFiveE300State;
 +
 +enum {
-+    SIFIVE_SIP_BASE     = 0x0,
-+    SIFIVE_TIMECMP_BASE = 0x4000,
-+    SIFIVE_TIME_BASE    = 0xBFF8
++    SIFIVE_E300_DEBUG,
++    SIFIVE_E300_MROM,
++    SIFIVE_E300_OTP,
++    SIFIVE_E300_CLINT,
++    SIFIVE_E300_PLIC,
++    SIFIVE_E300_AON,
++    SIFIVE_E300_PRCI,
++    SIFIVE_E300_OTP_CTRL,
++    SIFIVE_E300_GPIO0,
++    SIFIVE_E300_UART0,
++    SIFIVE_E300_QSPI0,
++    SIFIVE_E300_PWM0,
++    SIFIVE_E300_UART1,
++    SIFIVE_E300_QSPI1,
++    SIFIVE_E300_PWM1,
++    SIFIVE_E300_QSPI2,
++    SIFIVE_E300_PWM2,
++    SIFIVE_E300_XIP,
++    SIFIVE_E300_DTIM
 +};
++
++enum {
++    SIFIVE_E300_UART0_IRQ = 3,
++    SIFIVE_E300_UART1_IRQ = 4
++};
++
++#define SIFIVE_E300_PLIC_HART_CONFIG "M"
++#define SIFIVE_E300_PLIC_NUM_SOURCES 127
++#define SIFIVE_E300_PLIC_NUM_PRIORITIES 7
++#define SIFIVE_E300_PLIC_PRIORITY_BASE 0x0
++#define SIFIVE_E300_PLIC_PENDING_BASE 0x1000
++#define SIFIVE_E300_PLIC_ENABLE_BASE 0x2000
++#define SIFIVE_E300_PLIC_ENABLE_STRIDE 0x80
++#define SIFIVE_E300_PLIC_CONTEXT_BASE 0x200000
++#define SIFIVE_E300_PLIC_CONTEXT_STRIDE 0x1000
 +
 +#endif
 -- 
