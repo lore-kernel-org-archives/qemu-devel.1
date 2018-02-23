@@ -1,35 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1epHNG-0003ga-JP
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:43:11 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1epHQu-00061W-0H
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:46:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1epHNC-0008Ji-Jq
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:43:10 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53868
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1epHNC-0008Ic-Ez
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:43:06 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1NHe3Oq131013
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 12:43:05 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gapm4thtn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 12:43:05 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Fri, 23 Feb 2018 17:43:04 -0000
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Fri, 23 Feb 2018 18:42:57 +0100
-In-Reply-To: <1519407778-23095-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-References: <1519407778-23095-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-Message-Id: <1519407778-23095-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 2/3] s390x/sclp: clean up sclp masks
+	(envelope-from <richard.henderson@linaro.org>) id 1epHQq-0000Ik-1o
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:46:56 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1epHQp-0000H3-6N
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 12:46:51 -0500
+Received: by mail-pg0-x244.google.com with SMTP id y26so3624577pgv.4
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 09:46:51 -0800 (PST)
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-27-richard.henderson@linaro.org>
+	<CAFEAcA8UWBemOXvu7-Dt5CMv7VHSTNp4fGSKPnnHT2UfNryOHw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a3956498-6020-7c30-d97e-841c280cc40a@linaro.org>
+Date: Fri, 23 Feb 2018 09:46:47 -0800
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8UWBemOXvu7-Dt5CMv7VHSTNp4fGSKPnnHT2UfNryOHw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 26/67] target/arm: Implement
+ SVE Permute - Extract Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,222 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cohuck@redhat.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Introduce an sccb_mask_t to be used for SCLP event masks instead of just
-unsigned int or uint32_t. This will allow later to extend the mask with
-more ease.
+On 02/23/2018 06:24 AM, Peter Maydell wrote:
+> On 17 February 2018 at 18:22, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/helper-sve.h    |  2 ++
+>>  target/arm/sve_helper.c    | 81 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  target/arm/translate-sve.c | 29 +++++++++++++++++
+>>  target/arm/sve.decode      |  9 +++++-
+>>  4 files changed, 120 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+>> index 79493ab647..94f4356ce9 100644
+>> --- a/target/arm/helper-sve.h
+>> +++ b/target/arm/helper-sve.h
+>> @@ -414,6 +414,8 @@ DEF_HELPER_FLAGS_4(sve_cpy_z_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+>>  DEF_HELPER_FLAGS_4(sve_cpy_z_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+>>  DEF_HELPER_FLAGS_4(sve_cpy_z_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+>>
+>> +DEF_HELPER_FLAGS_4(sve_ext, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+>> +
+>>  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+>>  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+>>  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+>> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+>> index 6a95d1ec48..fb3f54300b 100644
+>> --- a/target/arm/sve_helper.c
+>> +++ b/target/arm/sve_helper.c
+>> @@ -1469,3 +1469,84 @@ void HELPER(sve_cpy_z_d)(void *vd, void *vg, uint64_t val, uint32_t desc)
+>>          d[i] = (pg[H1(i)] & 1 ? val : 0);
+>>      }
+>>  }
+>> +
+>> +/* Big-endian hosts need to frob the byte indicies.  If the copy
+>> + * happens to be 8-byte aligned, then no frobbing necessary.
+>> + */
+> 
+> Have you run risu tests with a big endian host?
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
----
- hw/char/sclpconsole-lm.c          |  4 ++--
- hw/char/sclpconsole.c             |  4 ++--
- hw/s390x/event-facility.c         | 20 ++++++++++----------
- hw/s390x/sclpcpu.c                |  4 ++--
- hw/s390x/sclpquiesce.c            |  4 ++--
- include/hw/s390x/event-facility.h | 22 +++++++++++++---------
- 6 files changed, 31 insertions(+), 27 deletions(-)
+Some, early on.  It's probably time to do it again.
 
-diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-index c500bda..cc4d70a 100644
---- a/hw/char/sclpconsole-lm.c
-+++ b/hw/char/sclpconsole-lm.c
-@@ -102,12 +102,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_MESSAGE || type == SCLP_EVENT_PMSGCMD;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_OP_CMD | SCLP_EVENT_MASK_PMSGCMD;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG | SCLP_EVENT_MASK_PMSGCMD;
- }
-diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-index d0265df..ec9db13 100644
---- a/hw/char/sclpconsole.c
-+++ b/hw/char/sclpconsole.c
-@@ -83,12 +83,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_ASCII_CONSOLE_DATA;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG_ASCII;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return SCLP_EVENT_MASK_MSG_ASCII;
- }
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 9233892..e04ed9f 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -29,8 +29,8 @@ typedef struct SCLPEventsBus {
- struct SCLPEventFacility {
-     SysBusDevice parent_obj;
-     SCLPEventsBus sbus;
--    /* guest' receive mask */
--    unsigned int receive_mask;
-+    /* guest's receive mask */
-+    sccb_mask_t receive_mask;
-     /*
-      * when false, we keep the same broken, backwards compatible behaviour as
-      * before, allowing only masks of size exactly 4; when true, we implement
-@@ -61,9 +61,9 @@ static bool event_pending(SCLPEventFacility *ef)
-     return false;
- }
- 
--static unsigned int get_host_send_mask(SCLPEventFacility *ef)
-+static sccb_mask_t get_host_send_mask(SCLPEventFacility *ef)
- {
--    unsigned int mask;
-+    sccb_mask_t mask;
-     BusChild *kid;
-     SCLPEventClass *child;
- 
-@@ -77,9 +77,9 @@ static unsigned int get_host_send_mask(SCLPEventFacility *ef)
-     return mask;
- }
- 
--static unsigned int get_host_receive_mask(SCLPEventFacility *ef)
-+static sccb_mask_t get_host_receive_mask(SCLPEventFacility *ef)
- {
--    unsigned int mask;
-+    sccb_mask_t mask;
-     BusChild *kid;
-     SCLPEventClass *child;
- 
-@@ -189,7 +189,7 @@ out:
- }
- 
- static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
--                                        unsigned int mask)
-+                                        sccb_mask_t mask)
- {
-     uint16_t rc;
-     int slen;
-@@ -242,8 +242,8 @@ static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
- 
- static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
- {
--    unsigned int sclp_active_selection_mask;
--    unsigned int sclp_cp_receive_mask;
-+    sccb_mask_t sclp_active_selection_mask;
-+    sccb_mask_t sclp_cp_receive_mask;
- 
-     ReadEventData *red = (ReadEventData *) sccb;
- 
-@@ -285,7 +285,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
- {
-     WriteEventMask *we_mask = (WriteEventMask *) sccb;
-     uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
--    uint32_t tmp_mask;
-+    sccb_mask_t tmp_mask;
- 
-     if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
-         ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
-diff --git a/hw/s390x/sclpcpu.c b/hw/s390x/sclpcpu.c
-index 3ee890b..50c021b 100644
---- a/hw/s390x/sclpcpu.c
-+++ b/hw/s390x/sclpcpu.c
-@@ -37,12 +37,12 @@ void raise_irq_cpu_hotplug(void)
-     sclp_service_interrupt(0);
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_CONFIG_MGT_DATA;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return 0;
- }
-diff --git a/hw/s390x/sclpquiesce.c b/hw/s390x/sclpquiesce.c
-index 0241643..1c8f5c9 100644
---- a/hw/s390x/sclpquiesce.c
-+++ b/hw/s390x/sclpquiesce.c
-@@ -28,12 +28,12 @@ static bool can_handle_event(uint8_t type)
-     return type == SCLP_EVENT_SIGNAL_QUIESCE;
- }
- 
--static unsigned int send_mask(void)
-+static sccb_mask_t send_mask(void)
- {
-     return SCLP_EVENT_MASK_SIGNAL_QUIESCE;
- }
- 
--static unsigned int receive_mask(void)
-+static sccb_mask_t receive_mask(void)
- {
-     return 0;
- }
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-index 5119b9b..0e2b761 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -28,12 +28,14 @@
- #define SCLP_EVENT_SIGNAL_QUIESCE               0x1d
- 
- /* SCLP event masks */
--#define SCLP_EVENT_MASK_SIGNAL_QUIESCE          0x00000008
--#define SCLP_EVENT_MASK_MSG_ASCII               0x00000040
--#define SCLP_EVENT_MASK_CONFIG_MGT_DATA         0x10000000
--#define SCLP_EVENT_MASK_OP_CMD                  0x80000000
--#define SCLP_EVENT_MASK_MSG                     0x40000000
--#define SCLP_EVENT_MASK_PMSGCMD                 0x00800000
-+#define SCLP_EVMASK(T)  (1ULL << (sizeof(sccb_mask_t) * 8 - (T)))
-+
-+#define SCLP_EVENT_MASK_OP_CMD          SCLP_EVMASK(SCLP_EVENT_OPRTNS_COMMAND)
-+#define SCLP_EVENT_MASK_MSG             SCLP_EVMASK(SCLP_EVENT_MESSAGE)
-+#define SCLP_EVENT_MASK_CONFIG_MGT_DATA SCLP_EVMASK(SCLP_EVENT_CONFIG_MGT_DATA)
-+#define SCLP_EVENT_MASK_PMSGCMD         SCLP_EVMASK(SCLP_EVENT_PMSGCMD)
-+#define SCLP_EVENT_MASK_MSG_ASCII       SCLP_EVMASK(SCLP_EVENT_ASCII_CONSOLE_DATA)
-+#define SCLP_EVENT_MASK_SIGNAL_QUIESCE  SCLP_EVMASK(SCLP_EVENT_SIGNAL_QUIESCE)
- 
- #define SCLP_UNCONDITIONAL_READ                 0x00
- #define SCLP_SELECTIVE_READ                     0x01
-@@ -71,6 +73,8 @@ typedef struct WriteEventMask {
- #define WEM_RECEIVE_MASK(wem, mask_len) ((wem)->masks + 2 * (mask_len))
- #define WEM_SEND_MASK(wem, mask_len) ((wem)->masks + 3 * (mask_len))
- 
-+typedef uint32_t sccb_mask_t;
-+
- typedef struct EventBufferHeader {
-     uint16_t length;
-     uint8_t  type;
-@@ -160,7 +164,7 @@ typedef struct WriteEventData {
- typedef struct ReadEventData {
-     SCCBHeader h;
-     union {
--        uint32_t mask;
-+        sccb_mask_t mask;
-         EventBufferHeader ebh;
-     };
- } QEMU_PACKED ReadEventData;
-@@ -177,10 +181,10 @@ typedef struct SCLPEventClass {
-     int (*exit)(SCLPEvent *event);
- 
-     /* get SCLP's send mask */
--    unsigned int (*get_send_mask)(void);
-+    sccb_mask_t (*get_send_mask)(void);
- 
-     /* get SCLP's receive mask */
--    unsigned int (*get_receive_mask)(void);
-+    sccb_mask_t (*get_receive_mask)(void);
- 
-     int (*read_event_data)(SCLPEvent *event, EventBufferHeader *evt_buf_hdr,
-                            int *slen);
--- 
-2.7.4
+Running those tests was why I dropped the ZIP/UZP/TRN patches from the host
+vector support patch set.  Supporting those endian agnostic is incompatible
+with our "pdp-endian-like" storage of vectors for ARM -- we would have to put
+the vectors in full host-endian order for that.
+
+In the meantime, the frobbing within helpers does work.
+
+
+r~
