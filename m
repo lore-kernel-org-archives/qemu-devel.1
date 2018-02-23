@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epElO-0002q1-UY
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:55:56 -0500
+	(envelope-from <eblake@redhat.com>) id 1epElf-0002zB-8s
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:56:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epElL-0000A6-Mr
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:55:55 -0500
-Received: from smtp62.cstnet.cn ([159.226.251.62]:36106 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epElL-0008QJ-0w
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:55:51 -0500
-Date: Fri, 23 Feb 2018 22:55:42 +0800 (GMT+08:00)
-From: =?UTF-8?B?6IuP6Iiq?= <suhang16@mails.ucas.ac.cn>
-In-Reply-To: <c5009934-13c3-6e86-2618-9935837d3b8d@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1epElc-0000ge-29
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:56:11 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53248 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1epElb-0000fN-Sh
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 09:56:07 -0500
 References: <1519372288-20791-1-git-send-email-suhang16@mails.ucas.ac.cn>
 	<c5009934-13c3-6e86-2618-9935837d3b8d@redhat.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <12b54434-c992-d882-9ce7-0f658d067a7c@redhat.com>
+Date: Fri, 23 Feb 2018 08:55:56 -0600
 MIME-Version: 1.0
-Message-ID: <68ab1a9e.137ba.161c329a74f.Coremail.suhang16@mails.ucas.ac.cn>
+In-Reply-To: <c5009934-13c3-6e86-2618-9935837d3b8d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v3 3/3] util/uri.c: add brackets to `if`
  statements
 List-Id: <qemu-devel.nongnu.org>
@@ -28,112 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thomas huth <thuth@redhat.com>, "stefanha@gmail.com" <stefanha@gmail.com>
+To: Thomas Huth <thuth@redhat.com>, Su Hang <suhang16@mails.ucas.ac.cn>, stefanha@redhat.com
 Cc: qemu-devel@nongnu.org
 
-VGhhbmtzIGZvciB5b3VyIHJlcGx5LiBeX14KSSB3aWxsIGFwcGx5IGFsbCB5b3VyIHN1Z2dlc3Rp
-b24gaW4gbXkgbmV4dCBwYXRjaC4KCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlcy0tLS0tCj4gRnJv
-bTogIlRob21hcyBIdXRoIiA8dGh1dGhAcmVkaGF0LmNvbT4KPiBTZW50IFRpbWU6IDIwMTgtMDIt
-MjMgMTc6MzQ6MTIgKEZyaWRheSkKPiBUbzogIlN1IEhhbmciIDxzdWhhbmcxNkBtYWlscy51Y2Fz
-LmFjLmNuPiwgc3RlZmFuaGFAcmVkaGF0LmNvbQo+IENjOiBxZW11LWRldmVsQG5vbmdudS5vcmcK
-PiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAzLzNdIHV0aWwvdXJpLmM6IGFk
-ZCBicmFja2V0cyB0byBgaWZgIHN0YXRlbWVudHMKPiAKPiBPbiAyMy4wMi4yMDE4IDA4OjUxLCBT
-dSBIYW5nIHdyb3RlOgo+ID4gQWRkIGJyYWNrZXRzIHRoYXQgd3JhcCBgaWZgLCBgZWxzZWAsIGB3
-aGlsZWAgdGhhdCBob2xkIHNpbmdsZQo+ID4gc3RhdGVtZW50cy4KPiA+IAo+ID4gSW4gb3JkZXIg
-dG8gZG8gdGhpcywgSSB3cml0ZSBhIHNpbXBsZSBweXRob24gcmVnZXggc2NyaXB0Lgo+ID4gCj4g
-PiBTaW5jZSB0aGVuLCBhbGwgY29tcGxhaW50cyByaXNlZCBieSBjaGVja3BhdGNoLnBsIGhhcyBi
-ZWVuIHN1cHByZXNzZWQuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IFN1IEhhbmcgPHN1aGFuZzE2
-QG1haWxzLnVjYXMuYWMuY24+Cj4gPiAtLS0KPiA+ICB1dGlsL3VyaS5jIHwgNDYyICsrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgMjkxIGluc2VydGlvbnMoKyksIDE3MSBkZWxldGlvbnMoLSkKPiA+
-IAo+ID4gZGlmZiAtLWdpdCBhL3V0aWwvdXJpLmMgYi91dGlsL3VyaS5jCj4gPiBpbmRleCAyNzhl
-ODc2YWI4YjEuLjQ4ZjcyOTg3ODdiMSAxMDA2NDQKPiA+IC0tLSBhL3V0aWwvdXJpLmMKPiA+ICsr
-KyBiL3V0aWwvdXJpLmMKPiA+IEBAIC0xMDUsMTggKzEwNSwxOCBAQCBzdGF0aWMgdm9pZCB1cmlf
-Y2xlYW4oVVJJICp1cmkpOwo+ID4gICAqLwo+ID4gIAo+ID4gICNkZWZpbmUgSVNfVU5XSVNFKHAp
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBcCj4gPiAtICAgICAgKCgoKihwKSA9PSAneycpKSB8fCAoKCoocCkgPT0gJ30nKSkgfHwgKCgq
-KHApID09ICd8JykpIHx8ICAgICAgICAgICAgICAgIFwKPiA+IC0gICAgICAgKCgqKHApID09ICdc
-XCcpKSB8fCAoKCoocCkgPT0gJ14nKSkgfHwgKCgqKHApID09ICdbJykpIHx8ICAgICAgICAgICAg
-ICAgXAo+ID4gLSAgICAgICAoKCoocCkgPT0gJ10nKSkgfHwgKCgqKHApID09ICdgJykpKQo+ID4g
-KyAgICAoKCgqKHApID09ICd7JykpIHx8ICgoKihwKSA9PSAnfScpKSB8fCAoKCoocCkgPT0gJ3wn
-KSkgfHwgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAoKCoocCkgPT0gJ1xcJykpIHx8ICgo
-KihwKSA9PSAnXicpKSB8fCAoKCoocCkgPT0gJ1snKSkgfHwgICAgICAgICAgICAgICAgIFwKPiA+
-ICsgICAgICgoKihwKSA9PSAnXScpKSB8fCAoKCoocCkgPT0gJ2AnKSkpCj4gPiAgLyoKPiA+ICAg
-KiByZXNlcnZlZCA9ICI7IiB8ICIvIiB8ICI/IiB8ICI6IiB8ICJAIiB8ICImIiB8ICI9IiB8ICIr
-IiB8ICIkIiB8ICIsIiB8Cj4gPiAgICogICAgICAgICAgICAiWyIgfCAiXSIKPiA+ICAgKi8KPiA+
-ICAKPiA+ICAjZGVmaW5lIElTX1JFU0VSVkVEKHgpICgoKHgpID09ICc7JykgfHwgKCh4KSA9PSAn
-LycpIHx8ICgoeCkgPT0gJz8nKSB8fCAgICAgICAgXAo+ID4gLSAgICAgICAgKCh4KSA9PSAnOicp
-IHx8ICgoeCkgPT0gJ0AnKSB8fCAoKHgpID09ICcmJykgfHwgKCh4KSA9PSAnPScpIHx8ICAgICAg
-ICBcCj4gPiAtICAgICAgICAoKHgpID09ICcrJykgfHwgKCh4KSA9PSAnJCcpIHx8ICgoeCkgPT0g
-JywnKSB8fCAoKHgpID09ICdbJykgfHwgICAgICAgIFwKPiA+IC0gICAgICAgICgoeCkgPT0gJ10n
-KSkKPiA+ICsgICAgICAoKHgpID09ICc6JykgfHwgKCh4KSA9PSAnQCcpIHx8ICgoeCkgPT0gJyYn
-KSB8fCAoKHgpID09ICc9JykgfHwgICAgICAgICAgXAo+ID4gKyAgICAgICgoeCkgPT0gJysnKSB8
-fCAoKHgpID09ICckJykgfHwgKCh4KSA9PSAnLCcpIHx8ICgoeCkgPT0gJ1snKSB8fCAgICAgICAg
-ICBcCj4gPiArICAgICAgKCh4KSA9PSAnXScpKQo+IAo+IFRoZSBhYm92ZSB3aGl0ZXNwYWNlIGNo
-YW5nZXMgc2hvdWxkIGlkZWFsbHkgYmUgZG9uZSBpbiB0aGUgZmlyc3QgcGF0Y2ggaW5zdGVhZC4K
-PiAKPiA+ICAvKgo+ID4gICAqIHVucmVzZXJ2ZWQgPSBhbHBoYW51bSB8IG1hcmsKPiA+IEBAIC0y
-MTEsMTUgKzIxMSwxNyBAQCBzdGF0aWMgaW50IHJmYzM5ODZfcGFyc2Vfc2NoZW1lKFVSSSAqdXJp
-LCBjb25zdCBjaGFyICoqc3RyKQo+ID4gIHsKPiA+ICAgICAgY29uc3QgY2hhciAqY3VyOwo+ID4g
-IAo+ID4gLSAgICBpZiAoc3RyID09IE5VTEwpCj4gPiArICAgIGlmIChzdHIgPT0gTlVMTCkgewo+
-ID4gICAgICAgICAgcmV0dXJuIC0xOwo+ID4gKyAgICB9Cj4gPiAgCj4gPiAgICAgIGN1ciA9ICpz
-dHI7Cj4gPiAtICAgIGlmICghSVNBX0FMUEhBKGN1cikpCj4gPiArICAgIGlmICghSVNBX0FMUEhB
-KGN1cikpIHsKPiA+ICAgICAgICAgIHJldHVybiAyOwo+ID4gKyAgICB9Cj4gPiAgICAgIGN1cisr
-Owo+ID4gLSAgICB3aGlsZSAoSVNBX0FMUEhBKGN1cikgfHwgSVNBX0RJR0lUKGN1cikgfHwKPiA+
-IC0gICAgICAgICAgICgqY3VyID09ICcrJykgfHwgKCpjdXIgPT0gJy0nKSB8fCAoKmN1ciA9PSAn
-LicpKQo+ID4gKyAgICB3aGlsZSAoSVNBX0FMUEhBKGN1cikgfHwgSVNBX0RJR0lUKGN1cikgfHwg
-KCpjdXIgPT0gJysnKSB8fCAoKmN1ciA9PSAnLScpIHx8Cj4gPiArICAgICAgICAgICAoKmN1ciA9
-PSAnLicpKQo+ID4gICAgICAgICAgY3VyKys7Cj4gCj4gWW91J3ZlIGNoYW5nZWQgdGhlIHdoaWxl
-IHN0YXRlbWVudCwgYnV0IGNoZWNrcGF0Y2gucGwgYXBwYXJlbnRseSBkb2VzIG5vdAo+IGNvbXBs
-YWluIGFib3V0IG1pc3NpbmcgY3VybHkgYnJhY2VzIGhlcmUgLi4uIHRoYXQncyBzdHJhbmdlLCBJ
-IHRob3VnaHQgd2UnZAo+IGFsc28gd2FudGVkIHRvIGVuZm9yY2UgY3VybHkgYnJhY2VzIGZvciB3
-aGlsZSBsb29wcy4gQW55d2F5LCBjb3VsZCB5b3UgcGxlYXNlCj4gYWRkIGN1cmx5IGJyYWNlcyBh
-cm91bmQgdGhlICIqY3VyKys7IiBoZXJlLCB0b28/Cj4gCj4gPiBAQCAtMTQzNywxNSArMTUwMywx
-OCBAQCBkb25lX2NkOgo+ID4gICAgICAgICAgLyogc3RyaW5nIHdpbGwgb3ZlcmxhcCwgZG8gbm90
-IHVzZSBzdHJjcHkgKi8KPiA+ICAgICAgICAgIHRtcCA9IGN1cjsKPiA+ICAgICAgICAgIHNlZ3Ag
-Kz0gMzsKPiA+IC0gICAgICAgIHdoaWxlICgoKnRtcCsrID0gKnNlZ3ArKykgIT0gMCkKPiA+ICsg
-ICAgICAgIHdoaWxlICgoKnRtcCsrID0gKnNlZ3ArKykgIT0gMCkgewo+ID4gICAgICAgICAgICAg
-IDsKPiA+ICsgICAgICAgIH0KPiAKPiBBIGJpa2VzaGVkLXBhaW50aW5nLWZyaWRheSBxdWVzdGlv
-biBmb3IgZXZlcnlib2R5IG9uIHFlbXUtZGV2ZWw6Cj4gU2hvdWxkIHRoZXJlIGJlIGEgc2luZ2xl
-IHNlbWljb2xvbiBpbnNpZGUgY3VybHkgYnJhY2VzIGluIHRoaXMgY2FzZSwgb3Igbm90Pwo+IAo+
-ID4gICAgICAgICAgLyogSWYgdGhlcmUgYXJlIG5vIHByZXZpb3VzIHNlZ21lbnRzLCB0aGVuIGtl
-ZXAgZ29pbmcgZnJvbSBoZXJlLiAgKi8KPiA+ICAgICAgICAgIHNlZ3AgPSBjdXI7Cj4gPiAtICAg
-ICAgICB3aGlsZSAoKHNlZ3AgPiBwYXRoKSAmJiAoKC0tc2VncClbMF0gPT0gJy8nKSkKPiA+ICsg
-ICAgICAgIHdoaWxlICgoc2VncCA+IHBhdGgpICYmICgoLS1zZWdwKVswXSA9PSAnLycpKSB7Cj4g
-PiAgICAgICAgICAgICAgOwo+IAo+IChkaXRvKQo+IAo+ID4gLSAgICAgICAgaWYgKHNlZ3AgPT0g
-cGF0aCkKPiA+ICsgICAgICAgIH0KPiA+ICsgICAgICAgIGlmIChzZWdwID09IHBhdGgpIHsKPiA+
-ICAgICAgICAgICAgICBjb250aW51ZTsKPiA+ICsgICAgICAgIH0KPiA+ICAKPiA+ICAgICAgICAg
-IC8qICJzZWdwIiBpcyBwb2ludGluZyB0byB0aGUgZW5kIG9mIGEgcHJldmlvdXMgc2VnbWVudDsg
-ZmluZCBpdCdzCj4gPiAgICAgICAgICAgKiBzdGFydC4gIFdlIG5lZWQgdG8gYmFjayB1cCB0byB0
-aGUgcHJldmlvdXMgc2VnbWVudCBhbmQgc3RhcnQKPiBbLi4uXQo+ID4gQEAgLTE0OTEsOCArMTU2
-Miw5IEBAIGRvbmVfY2Q6Cj4gPiAgc3RhdGljIGludCBpc19oZXgoY2hhciBjKQo+ID4gIHsKPiA+
-ICAgICAgaWYgKCgoYyA+PSAnMCcpICYmIChjIDw9ICc5JykpIHx8ICgoYyA+PSAnYScpICYmIChj
-IDw9ICdmJykpIHx8Cj4gPiAtICAgICAgICAoKGMgPj0gJ0EnKSAmJiAoYyA8PSAnRicpKSkKPiA+
-ICsgICAgICAgICgoYyA+PSAnQScpICYmIChjIDw9ICdGJykpKSB7Cj4gPiAgICAgICAgICByZXR1
-cm4gMTsKPiA+ICsgICAgfQo+ID4gICAgICByZXR1cm4gMDsKPiA+ICB9Cj4gCj4gTm90IHJlbGF0
-ZWQgdG8geW91ciBwYXRjaCwgYnV0IGFuIGlkZWEgZm9yIGEgZnV0dXJlIGNsZWFuLXVwIHBhdGNo
-Ogo+IFdlJ3ZlIGFscmVhZHkgZ290IHFlbXVfaXN4ZGlnaXQoKSwgc28gdGhlcmUgaXMgbm8gcmVh
-bCBuZWVkIGZvciB0aGlzCj4gc2VwYXJhdGUgaXNfaGV4KCkgZnVuY3Rpb24uCj4gCj4gWy4uLl0K
-PiA+IEBAIC0yMDIwLDE3ICsyMTI3LDE5IEBAIGNoYXIgKnVyaV9yZXNvbHZlX3JlbGF0aXZlKGNv
-bnN0IGNoYXIgKnVyaSwgY29uc3QgY2hhciAqYmFzZSkKPiA+ICAgICAgICAgICAqLwo+ID4gICAg
-ICAgICAgaWYgKGJwdHJbcG9zXSAhPSByZWYtPnBhdGhbcG9zXSkgeyAvKiBjaGVjayBmb3IgdHJp
-dmlhbCBVUkkgPT0gYmFzZSAqLwo+ID4gICAgICAgICAgICAgIGZvciAoOyBicHRyW2l4XSAhPSAw
-OyBpeCsrKSB7Cj4gPiAtICAgICAgICAgICAgICAgIGlmIChicHRyW2l4XSA9PSAnLycpCj4gPiAr
-ICAgICAgICAgICAgICAgIGlmIChicHRyW2l4XSA9PSAnLycpIHsKPiA+ICAgICAgICAgICAgICAg
-ICAgICAgIG5ic2xhc2grKzsKPiA+ICsgICAgICAgICAgICAgICAgfQo+ID4gICAgICAgICAgICAg
-IH0KPiA+ICAgICAgICAgIH0KPiA+ICAgICAgICAgIGxlbiA9IHN0cmxlbih1cHRyKSArIDE7Cj4g
-PiAgICAgIH0KPiA+ICAKPiA+ICAgICAgaWYgKG5ic2xhc2ggPT0gMCkgewo+ID4gLSAgICAgICAg
-aWYgKHVwdHIgIT0gTlVMTCkKPiA+ICsgICAgICAgIGlmICh1cHRyICE9IE5VTEwpIHsKPiA+ICAg
-ICAgICAgICAgICAvKiBleGNlcHRpb24gY2hhcmFjdGVycyBmcm9tIHVyaV90b19zdHJpbmcgKi8K
-PiA+IC0gICAgICAgICAgICB2YWwgPSB1cmlfc3RyaW5nX2VzY2FwZSh1cHRyLCAiLzsmPSskLCIp
-Owo+ID4gKyAgICAgICAgfQo+ID4gKyAgICAgICAgdmFsID0gdXJpX3N0cmluZ19lc2NhcGUodXB0
-ciwgIi87Jj0rJCwiKTsKPiAKPiBUaGF0J3MgYSBidWc6IHVyaV9zdHJpbmdfZXNjYXBlKCkgc2hv
-dWxkIGJlIHdpdGhpbiB0aGUgY3VybHkgYnJhY2VzIGluc3RlYWQuCj4gCj4gQnkgdGhlIHdheSwg
-Zm91bmQgdGhhdCBvbmUgd2l0aCB0aGUgZm9sbG93aW5nIHRyaWNrOiBDb21wYXJlIHRoZSBkaXNh
-c3NlbWJsaWVzCj4gYmVmb3JlIGFuZCBhZnRlciB5b3UncmUgY2hhbmdlczoKPiAKPiAgZ2l0IGNo
-ZWNrb3V0IG1hc3Rlcgo+ICBtYWtlIHV0aWwvdXJpLm8KPiAgc3RyaXAgdXRpbC91cmkubwo+ICBv
-YmpkdW1wIC1EcnggdXRpbC91cmkubyA+IC90bXAvdXJpLW1hc3Rlci50eHQKPiAgZ2l0IGNoZWNr
-b3V0IGNsZWFudXBicmFuY2gKPiAgbWFrZSB1dGlsL3VyaS5vCj4gIHN0cmlwIHV0aWwvdXJpLm8K
-PiAgb2JqZHVtcCAtRHJ4IHV0aWwvdXJpLm8gPiAvdG1wL3VyaS1jbGVhbnVwLnR4dAo+ICBkaWZm
-IC11IC90bXAvdXJpLSoudHh0Cj4gCj4gU2luY2UgeW91J3JlIG9ubHkgZG9pbmcgY29kaW5nIHN0
-eWxlIGNsZWFuLXVwLCB0aGVyZSBzaG91bGQgbm90IGJlCj4gYW55IGRpZmYgaW4gdGhlIHJlc3Vs
-dGluZyBhc3NlbWJsZXIgY29kZS4KPiAKPiAgQ2hlZXJzLAo+ICAgVGhvbWFzCg==
+On 02/23/2018 03:34 AM, Thomas Huth wrote:
+> On 23.02.2018 08:51, Su Hang wrote:
+>> Add brackets that wrap `if`, `else`, `while` that hold single
+>> statements.
+>>
+>> In order to do this, I write a simple python regex script.
+
+Without documenting the script, no one else can reproduce this; but it's 
+no different than if they had manually made changes instead of trying to 
+script it, so I'm not sure this sentence adds much in its current form.
+
+>>
+>> Since then, all complaints rised by checkpatch.pl has been suppressed.
+
+s/rised/raised/
+s/Since then,/With that/
+s/has/have/
+
+>>
+>> Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+>> ---
+>>   util/uri.c | 462 ++++++++++++++++++++++++++++++++++++++-----------------------
+>>   1 file changed, 291 insertions(+), 171 deletions(-)
+>>
+
+>>       cur = *str;
+>> -    if (!ISA_ALPHA(cur))
+>> +    if (!ISA_ALPHA(cur)) {
+>>           return 2;
+>> +    }
+>>       cur++;
+>> -    while (ISA_ALPHA(cur) || ISA_DIGIT(cur) ||
+>> -           (*cur == '+') || (*cur == '-') || (*cur == '.'))
+>> +    while (ISA_ALPHA(cur) || ISA_DIGIT(cur) || (*cur == '+') || (*cur == '-') ||
+>> +           (*cur == '.'))
+>>           cur++;
+> 
+> You've changed the while statement, but checkpatch.pl apparently does not
+> complain about missing curly braces here ... that's strange, I thought we'd
+> also wanted to enforce curly braces for while loops.
+
+Maybe because it gets lost since the condition expanded over more than 
+one line?  But yes, now that we've noticed it manually, it should be 
+fixed.  While at it, you can avoid the redundant ():
+
+while (ISA_ALPHA(cur) || ISA_DIGIT(cur) || *cur == '+' || *cur == '-' ||
+        *cur == '.') {
+
+
+>> -        while ((*tmp++ = *segp++) != 0)
+>> +        while ((*tmp++ = *segp++) != 0) {
+>>               ;
+>> +        }
+> 
+> A bikeshed-painting-friday question for everybody on qemu-devel:
+> Should there be a single semicolon inside curly braces in this case, or not?
+> 
+
+Checkpatch doesn't complain, but lone ';' statements are rare.  I'd omit 
+it, and use just:
+
+while (cond) {
+}
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
