@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epN83-0005YQ-UQ
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:51:52 -0500
+	(envelope-from <jsnow@redhat.com>) id 1epN8H-0005mD-W1
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epN81-0005L2-08
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:51:52 -0500
-Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:41732)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1epN80-0005KJ-Q9
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:51:48 -0500
-Received: by mail-pg0-x22d.google.com with SMTP id q27so2343414pgn.8
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 15:51:48 -0800 (PST)
-References: <20180223153636.29809-1-alex.bennee@linaro.org>
-	<20180223153636.29809-5-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <93ed5c75-c704-2d47-c1b8-699f419ab2b3@linaro.org>
-Date: Fri, 23 Feb 2018 15:51:43 -0800
-MIME-Version: 1.0
-In-Reply-To: <20180223153636.29809-5-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 04/31] target/arm/cpu.h: add additional
- float_status flags
+	(envelope-from <jsnow@redhat.com>) id 1epN8F-0005m9-Rr
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 18:52:05 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Fri, 23 Feb 2018 18:51:34 -0500
+Message-Id: <20180223235142.21501-14-jsnow@redhat.com>
+In-Reply-To: <20180223235142.21501-1-jsnow@redhat.com>
+References: <20180223235142.21501-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [RFC v4 13/21] blockjobs: add commit, abort,
+ clean helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +20,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-On 02/23/2018 07:36 AM, Alex Bennée wrote:
-> Half-precision flush to zero behaviour is controlled by a separate
-> FZ16 bit in the FPCR. To handle this we pass a pointer to
-> fp_status_fp16 when working on half-precision operations. The value of
-> the presented FPCR is calculated from an amalgam of the two when read.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> ---
-> v3
->   - add FPCR_[FZ/FZ16/DN] defines to cpu.h and use
->   - only propagate flag status to fp_status as they are ored later
->   - ensure dnan and round mode propagated to fp_status_fp16
-> ---
+The completed_single function is getting a little mucked up with
+checking to see which callbacks exist, so let's factor them out.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ blockjob.c | 35 ++++++++++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
 
-
-r~
+diff --git a/blockjob.c b/blockjob.c
+index ef17dea004..431ce9c220 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -394,6 +394,29 @@ static void block_job_update_rc(BlockJob *job)
+     }
+ }
+ 
++static void block_job_commit(BlockJob *job)
++{
++    assert(!job->ret);
++    if (job->driver->commit) {
++        job->driver->commit(job);
++    }
++}
++
++static void block_job_abort(BlockJob *job)
++{
++    assert(job->ret);
++    if (job->driver->abort) {
++        job->driver->abort(job);
++    }
++}
++
++static void block_job_clean(BlockJob *job)
++{
++    if (job->driver->clean) {
++        job->driver->clean(job);
++    }
++}
++
+ static void block_job_completed_single(BlockJob *job)
+ {
+     assert(job->completed);
+@@ -402,17 +425,11 @@ static void block_job_completed_single(BlockJob *job)
+     block_job_update_rc(job);
+ 
+     if (!job->ret) {
+-        if (job->driver->commit) {
+-            job->driver->commit(job);
+-        }
++        block_job_commit(job);
+     } else {
+-        if (job->driver->abort) {
+-            job->driver->abort(job);
+-        }
+-    }
+-    if (job->driver->clean) {
+-        job->driver->clean(job);
++        block_job_abort(job);
+     }
++    block_job_clean(job);
+ 
+     if (job->cb) {
+         job->cb(job->opaque, job->ret);
+-- 
+2.14.3
