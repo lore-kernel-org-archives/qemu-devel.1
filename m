@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzF-0000pZ-TX
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzL-0000wd-Eo
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1epIzB-0004SM-OT
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1epIzJ-0004i7-TC
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 14:26:35 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Feb 2018 20:25:25 +0100
-Message-Id: <20180223192549.26666-13-kwolf@redhat.com>
+Date: Fri, 23 Feb 2018 20:25:30 +0100
+Message-Id: <20180223192549.26666-18-kwolf@redhat.com>
 In-Reply-To: <20180223192549.26666-1-kwolf@redhat.com>
 References: <20180223192549.26666-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 12/36] qcow2: Use visitor for options in
- qcow2_create()
+Subject: [Qemu-devel] [PATCH v3 17/36] gluster: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,366 +22,268 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Instead of manually creating the BlockdevCreateOptions object, use a
-visitor to parse the given options into the QAPI object.
-
-This involves translation from the old command line syntax to the syntax
-mandated by the QAPI schema. Option names are still checked against
-qcow2_create_opts, so only the old option names are allowed on the
-command line, even if they are translated in qcow2_create().
-
-In contrast, new option values are optionally recognised besides the old
-values: 'compat' accepts 'v2'/'v3' as an alias for '0.10'/'1.1', and
-'encrypt.format' accepts 'qcow' as an alias for 'aes' now.
+This adds the .bdrv_co_create driver callback to gluster, which enables
+image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2.c              | 217 ++++++++++++++++-----------------------------
- tests/qemu-iotests/049.out |   8 +-
- tests/qemu-iotests/112.out |   4 +-
- 3 files changed, 83 insertions(+), 146 deletions(-)
+ qapi/block-core.json |  18 ++++++-
+ block/gluster.c      | 135 ++++++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 108 insertions(+), 45 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 64bf2863cd..58737d0833 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -38,7 +38,7 @@
- #include "qemu/option_int.h"
- #include "qemu/cutils.h"
- #include "qemu/bswap.h"
--#include "qapi/opts-visitor.h"
-+#include "qapi/qobject-input-visitor.h"
- #include "qapi-visit.h"
- #include "block/crypto.h"
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0040795603..74021c51d7 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3377,6 +3377,22 @@
+             '*nocow':           'bool' } }
  
-@@ -2414,37 +2414,6 @@ static int qcow2_crypt_method_from_format(const char *encryptfmt)
-     }
+ ##
++# @BlockdevCreateOptionsGluster:
++#
++# Driver specific image creation options for gluster.
++#
++# @location         Where to store the new image file
++# @size             Size of the virtual disk in bytes
++# @preallocation    Preallocation mode for the new image (default: off)
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsGluster',
++  'data': { 'location':         'BlockdevOptionsGluster',
++            'size':             'size',
++            '*preallocation':   'PreallocMode' } }
++
++##
+ # @BlockdevQcow2Version:
+ #
+ # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
+@@ -3450,7 +3466,7 @@
+       'file':           'BlockdevCreateOptionsFile',
+       'ftp':            'BlockdevCreateNotSupported',
+       'ftps':           'BlockdevCreateNotSupported',
+-      'gluster':        'BlockdevCreateNotSupported',
++      'gluster':        'BlockdevCreateOptionsGluster',
+       'host_cdrom':     'BlockdevCreateNotSupported',
+       'host_device':    'BlockdevCreateNotSupported',
+       'http':           'BlockdevCreateNotSupported',
+diff --git a/block/gluster.c b/block/gluster.c
+index 1a07d221d1..6e2f0e3185 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -655,9 +655,11 @@ out:
+     return -errno;
  }
  
--static QCryptoBlockCreateOptions *
--qcow2_parse_encryption(const char *encryptfmt, QemuOpts *opts, Error **errp)
--{
--    QCryptoBlockCreateOptions *cryptoopts = NULL;
--    QDict *options, *encryptopts;
--    int fmt;
--
--    options = qemu_opts_to_qdict(opts, NULL);
--    qdict_extract_subqdict(options, &encryptopts, "encrypt.");
--    QDECREF(options);
--
--    fmt = qcow2_crypt_method_from_format(encryptfmt);
--
--    switch (fmt) {
--    case QCOW_CRYPT_LUKS:
--        cryptoopts = block_crypto_create_opts_init(
--            Q_CRYPTO_BLOCK_FORMAT_LUKS, encryptopts, errp);
--        break;
--    case QCOW_CRYPT_AES:
--        cryptoopts = block_crypto_create_opts_init(
--            Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
--        break;
--    default:
--        error_setg(errp, "Unknown encryption format '%s'", encryptfmt);
--        break;
--    }
--
--    QDECREF(encryptopts);
--    return cryptoopts;
--}
--
- static int qcow2_set_up_encryption(BlockDriverState *bs,
-                                    QCryptoBlockCreateOptions *cryptoopts,
-                                    Error **errp)
-@@ -2838,7 +2807,7 @@ static int qcow2_create2(BlockdevCreateOptions *create_options, Error **errp)
-     }
-     if (version < 3 && qcow2_opts->lazy_refcounts) {
-         error_setg(errp, "Lazy refcounts only supported with compatibility "
--                   "level 1.1 and above (use compat=1.1 or greater)");
-+                   "level 1.1 and above (use version=v3 or greater)");
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -2856,7 +2825,7 @@ static int qcow2_create2(BlockdevCreateOptions *create_options, Error **errp)
-     }
-     if (version < 3 && qcow2_opts->refcount_bits != 16) {
-         error_setg(errp, "Different refcount widths than 16 bits require "
--                   "compatibility level 1.1 or above (use compat=1.1 or "
-+                   "compatibility level 1.1 or above (use version=v3 or "
-                    "greater)");
-         ret = -EINVAL;
-         goto out;
-@@ -3043,144 +3012,112 @@ out:
- 
- static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+-static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+-                                      const char *filename,
+-                                      QDict *options, Error **errp)
++/* Converts options given in @filename and the @options QDict into the QAPI
++ * object @gconf. */
++static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
++                              const char *filename,
++                              QDict *options, Error **errp)
  {
--    BlockdevCreateOptions create_options;
--    char *backing_file = NULL;
--    char *backing_fmt = NULL;
--    BlockdevDriver backing_drv;
--    char *buf = NULL;
--    uint64_t size = 0;
--    int flags = 0;
--    size_t cluster_size = DEFAULT_CLUSTER_SIZE;
--    PreallocMode prealloc;
--    int version;
--    uint64_t refcount_bits;
--    char *encryptfmt = NULL;
--    QCryptoBlockCreateOptions *cryptoopts = NULL;
-+    BlockdevCreateOptions *create_options = NULL;
-+    QDict *qdict = NULL;
-+    QObject *qobj;
-+    Visitor *v;
-     BlockDriverState *bs = NULL;
-     Error *local_err = NULL;
-+    const char *val;
      int ret;
+     if (filename) {
+@@ -668,8 +670,7 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+                                     "[host[:port]]volume/path[?socket=...]"
+                                     "[,file.debug=N]"
+                                     "[,file.logfile=/path/filename.log]\n");
+-            errno = -ret;
+-            return NULL;
++            return ret;
+         }
+     } else {
+         ret = qemu_gluster_parse_json(gconf, options, errp);
+@@ -685,10 +686,23 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+                              "file.server.1.transport=unix,"
+                              "file.server.1.socket=/var/run/glusterd.socket ..."
+                              "\n");
+-            errno = -ret;
+-            return NULL;
++            return ret;
+         }
++    }
  
--    /* Read out options */
--    size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                    BDRV_SECTOR_SIZE);
--    backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
--    backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
--    backing_drv = qapi_enum_parse(&BlockdevDriver_lookup, backing_fmt,
--                                  0, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    /* Only the keyval visitor supports the dotted syntax needed for
-+     * encryption, so go through a QDict before getting a QAPI type. Ignore
-+     * options meant for the protocol layer so that the visitor doesn't
-+     * complain. */
-+    qdict = qemu_opts_to_qdict_filtered(opts, NULL, bdrv_qcow2.create_opts,
-+                                        true);
++    return 0;
++}
 +
-+    /* Handle encryption options */
-+    val = qdict_get_try_str(qdict, BLOCK_OPT_ENCRYPT);
-+    if (val && !strcmp(val, "on")) {
-+        qdict_put_str(qdict, BLOCK_OPT_ENCRYPT, "qcow");
-+    } else if (val && !strcmp(val, "off")) {
-+        qdict_del(qdict, BLOCK_OPT_ENCRYPT);
-+    }
++static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
++                                      const char *filename,
++                                      QDict *options, Error **errp)
++{
++    int ret;
 +
-+    val = qdict_get_try_str(qdict, BLOCK_OPT_ENCRYPT_FORMAT);
-+    if (val && !strcmp(val, "aes")) {
-+        qdict_put_str(qdict, BLOCK_OPT_ENCRYPT_FORMAT, "qcow");
-+    }
-+
-+    /* Convert compat=0.10/1.1 into compat=v2/v3, to be renamed into
-+     * version=v2/v3 below. */
-+    val = qdict_get_try_str(qdict, BLOCK_OPT_COMPAT_LEVEL);
-+    if (val && !strcmp(val, "0.10")) {
-+        qdict_put_str(qdict, BLOCK_OPT_COMPAT_LEVEL, "v2");
-+    } else if (val && !strcmp(val, "1.1")) {
-+        qdict_put_str(qdict, BLOCK_OPT_COMPAT_LEVEL, "v3");
-+    }
-+
-+    /* Change legacy command line options into QMP ones */
-+    static const QDictRenames opt_renames[] = {
-+        { BLOCK_OPT_BACKING_FILE,       "backing-file" },
-+        { BLOCK_OPT_BACKING_FMT,        "backing-fmt" },
-+        { BLOCK_OPT_CLUSTER_SIZE,       "cluster-size" },
-+        { BLOCK_OPT_LAZY_REFCOUNTS,     "lazy-refcounts" },
-+        { BLOCK_OPT_REFCOUNT_BITS,      "refcount-bits" },
-+        { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
-+        { BLOCK_OPT_COMPAT_LEVEL,       "version" },
-+        { NULL, NULL },
-+    };
-+
-+    if (!qdict_rename_keys(qdict, opt_renames, errp)) {
-         ret = -EINVAL;
-         goto finish;
-     }
- 
--    encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
--    if (encryptfmt) {
--        if (qemu_opt_get(opts, BLOCK_OPT_ENCRYPT)) {
--            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
--                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
--            ret = -EINVAL;
--            goto finish;
--        }
--    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
--        encryptfmt = g_strdup("aes");
--    }
--    if (encryptfmt) {
--        cryptoopts = qcow2_parse_encryption(encryptfmt, opts, errp);
--        if (cryptoopts == NULL) {
--            ret = -EINVAL;
--            goto finish;
--        }
--    }
--
--    cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        ret = -EINVAL;
-+    /* Create and open the file (protocol layer) */
-+    ret = bdrv_create_file(filename, opts, errp);
++    ret = qemu_gluster_parse(gconf, filename, options, errp);
 +    if (ret < 0) {
-         goto finish;
++        errno = -ret;
++        return NULL;
      }
--    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
--                               PREALLOC_MODE_OFF, &local_err);
+ 
+     return qemu_gluster_glfs_init(gconf, errp);
+@@ -1021,19 +1035,71 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
+     return 0;
+ }
+ 
+-static int qemu_gluster_create(const char *filename,
+-                               QemuOpts *opts, Error **errp)
++static int qemu_gluster_co_create(BlockdevCreateOptions *options,
++                                  Error **errp)
+ {
+-    BlockdevOptionsGluster *gconf;
++    BlockdevCreateOptionsGluster *opts = &options->u.gluster;
+     struct glfs *glfs;
+     struct glfs_fd *fd = NULL;
+     int ret = 0;
+-    PreallocMode prealloc;
+-    int64_t total_size = 0;
++
++    assert(options->driver == BLOCKDEV_DRIVER_GLUSTER);
++
++    glfs = qemu_gluster_glfs_init(opts->location, errp);
++    if (!glfs) {
++        ret = -errno;
++        goto out;
++    }
++
++    fd = glfs_creat(glfs, opts->location->path,
++                    O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
++    if (!fd) {
++        ret = -errno;
++        goto out;
++    }
++
++    ret = qemu_gluster_do_truncate(fd, opts->size, opts->preallocation, errp);
++
++out:
++    if (fd) {
++        if (glfs_close(fd) != 0 && ret == 0) {
++            ret = -errno;
++        }
++    }
++    glfs_clear_preopened(glfs);
++    return ret;
++}
++
++static int qemu_gluster_create(const char *filename,
++                               QemuOpts *opts, Error **errp)
++{
++    BlockdevCreateOptions *options;
++    BlockdevCreateOptionsGluster *gopts;
++    BlockdevOptionsGluster *gconf;
+     char *tmp = NULL;
+     Error *local_err = NULL;
++    int ret;
++
++    options = g_new0(BlockdevCreateOptions, 1);
++    options->driver = BLOCKDEV_DRIVER_GLUSTER;
++    gopts = &options->u.gluster;
+ 
+     gconf = g_new0(BlockdevOptionsGluster, 1);
++    gopts->location = gconf;
++
++    gopts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++                           BDRV_SECTOR_SIZE);
++
++    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
++    gopts->preallocation = qapi_enum_parse(&PreallocMode_lookup, tmp,
++                                           PREALLOC_MODE_OFF, &local_err);
++    g_free(tmp);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto fail;
++    }
++
+     gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
+                                            GLUSTER_DEBUG_DEFAULT);
+     if (gconf->debug < 0) {
+@@ -1049,42 +1115,19 @@ static int qemu_gluster_create(const char *filename,
+     }
+     gconf->has_logfile = true;
+ 
+-    glfs = qemu_gluster_init(gconf, filename, NULL, errp);
+-    if (!glfs) {
+-        ret = -errno;
+-        goto out;
+-    }
+-
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
+-
+-    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+-    prealloc = qapi_enum_parse(&PreallocMode_lookup, tmp, PREALLOC_MODE_OFF,
+-                               &local_err);
+-    g_free(tmp);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
 -        ret = -EINVAL;
-+
-+    bs = bdrv_open(filename, NULL, NULL,
-+                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
-+    if (bs == NULL) {
-+        ret = -EIO;
-         goto finish;
+-        goto out;
++    ret = qemu_gluster_parse(gconf, filename, NULL, errp);
++    if (ret < 0) {
++        goto fail;
      }
  
--    version = qcow2_opt_get_version_del(opts, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    /* Set 'driver' and 'node' options */
-+    qdict_put_str(qdict, "driver", "qcow2");
-+    qdict_put_str(qdict, "file", bs->node_name);
-+
-+    /* Now get the QAPI type BlockdevCreateOptions */
-+    qobj = qdict_crumple(qdict, errp);
-+    QDECREF(qdict);
-+    qdict = qobject_to_qdict(qobj);
-+    if (qdict == NULL) {
-         ret = -EINVAL;
-         goto finish;
+-    fd = glfs_creat(glfs, gconf->path,
+-                    O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
+-    if (!fd) {
+-        ret = -errno;
+-        goto out;
++    ret = qemu_gluster_co_create(options, errp);
++    if (ret < 0) {
++        goto fail;
      }
  
--    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_LAZY_REFCOUNTS, false)) {
--        flags |= BLOCK_FLAG_LAZY_REFCOUNTS;
--    }
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_free(v);
- 
--    refcount_bits = qcow2_opt_get_refcount_bits_del(opts, version, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         ret = -EINVAL;
-         goto finish;
-     }
- 
+-    ret = qemu_gluster_do_truncate(fd, total_size, prealloc, errp);
 -
--    /* Create and open the file (protocol layer) */
--    ret = bdrv_create_file(filename, opts, errp);
--    if (ret < 0) {
--        goto finish;
+-out:
+-    if (fd) {
+-        if (glfs_close(fd) != 0 && ret == 0) {
+-            ret = -errno;
+-        }
 -    }
--
--    bs = bdrv_open(filename, NULL, NULL,
--                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
--    if (bs == NULL) {
--        ret = -EIO;
--        goto finish;
--    }
-+    /* Silently round up size */
-+    create_options->u.qcow2.size = ROUND_UP(create_options->u.qcow2.size,
-+                                            BDRV_SECTOR_SIZE);
- 
-     /* Create the qcow2 image (format layer) */
--    create_options = (BlockdevCreateOptions) {
--        .driver         = BLOCKDEV_DRIVER_QCOW2,
--        .u.qcow2        = {
--            .file               = &(BlockdevRef) {
--                .type               = QTYPE_QSTRING,
--                .u.reference        = bs->node_name,
--            },
--            .size               = size,
--            .has_version        = true,
--            .version            = version == 2
--                                  ? BLOCKDEV_QCOW2_VERSION_V2
--                                  : BLOCKDEV_QCOW2_VERSION_V3,
--            .has_backing_file   = (backing_file != NULL),
--            .backing_file       = backing_file,
--            .has_backing_fmt    = (backing_fmt != NULL),
--            .backing_fmt        = backing_drv,
--            .has_encrypt        = (encryptfmt != NULL),
--            .encrypt            = cryptoopts,
--            .has_cluster_size   = true,
--            .cluster_size       = cluster_size,
--            .has_preallocation  = true,
--            .preallocation      = prealloc,
--            .has_lazy_refcounts = true,
--            .lazy_refcounts     = (flags & BLOCK_FLAG_LAZY_REFCOUNTS),
--            .has_refcount_bits  = true,
--            .refcount_bits      = refcount_bits,
--        },
--    };
--    ret = qcow2_create2(&create_options, errp);
-+    ret = qcow2_create2(create_options, errp);
-     if (ret < 0) {
-         goto finish;
-     }
- 
+-    qapi_free_BlockdevOptionsGluster(gconf);
+-    glfs_clear_preopened(glfs);
 +    ret = 0;
- finish:
-+    QDECREF(qdict);
-     bdrv_unref(bs);
--
--    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
--    g_free(backing_file);
--    g_free(backing_fmt);
--    g_free(encryptfmt);
--    g_free(buf);
-+    qapi_free_BlockdevCreateOptions(create_options);
++fail:
++    qapi_free_BlockdevCreateOptions(options);
      return ret;
  }
  
-diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-index 003247023e..0871bff564 100644
---- a/tests/qemu-iotests/049.out
-+++ b/tests/qemu-iotests/049.out
-@@ -166,11 +166,11 @@ qemu-img create -f qcow2 -o compat=1.1 TEST_DIR/t.qcow2 64M
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=0.42 TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: Invalid compatibility level: '0.42'
-+qemu-img: TEST_DIR/t.qcow2: Invalid parameter '0.42'
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=foobar TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: Invalid compatibility level: 'foobar'
-+qemu-img: TEST_DIR/t.qcow2: Invalid parameter 'foobar'
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- == Check preallocation option ==
-@@ -182,7 +182,7 @@ qemu-img create -f qcow2 -o preallocation=metadata TEST_DIR/t.qcow2 64M
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o preallocation=1234 TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: invalid parameter value: 1234
-+qemu-img: TEST_DIR/t.qcow2: Invalid parameter '1234'
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=1234 lazy_refcounts=off refcount_bits=16
- 
- == Check encryption option ==
-@@ -205,7 +205,7 @@ qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=off TEST_DIR/t.qcow2 64M
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=on TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibility level 1.1 and above (use compat=1.1 or greater)
-+qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibility level 1.1 and above (use version=v3 or greater)
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=on refcount_bits=16
- 
- *** done
-diff --git a/tests/qemu-iotests/112.out b/tests/qemu-iotests/112.out
-index 81b04d1452..86f041075d 100644
---- a/tests/qemu-iotests/112.out
-+++ b/tests/qemu-iotests/112.out
-@@ -21,9 +21,9 @@ refcount bits: 16
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- refcount bits: 16
--qemu-img: TEST_DIR/t.IMGFMT: Different refcount widths than 16 bits require compatibility level 1.1 or above (use or greater)
-+qemu-img: TEST_DIR/t.IMGFMT: Different refcount widths than 16 bits require compatibility level 1.1 or above (use version=v3 or greater)
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
--qemu-img: TEST_DIR/t.IMGFMT: Different refcount widths than 16 bits require compatibility level 1.1 or above (use or greater)
-+qemu-img: TEST_DIR/t.IMGFMT: Different refcount widths than 16 bits require compatibility level 1.1 or above (use version=v3 or greater)
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- 
- === Snapshot limit on refcount_bits=1 ===
+@@ -1436,6 +1479,7 @@ static BlockDriver bdrv_gluster = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
+@@ -1464,6 +1508,7 @@ static BlockDriver bdrv_gluster_tcp = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
+@@ -1492,6 +1537,7 @@ static BlockDriver bdrv_gluster_unix = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
+@@ -1526,6 +1572,7 @@ static BlockDriver bdrv_gluster_rdma = {
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
+     .bdrv_create                  = qemu_gluster_create,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+     .bdrv_truncate                = qemu_gluster_truncate,
 -- 
 2.13.6
