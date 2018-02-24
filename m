@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1epPbx-000291-Iz
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:54 -0500
+	(envelope-from <Babu.Moger@amd.com>) id 1epPc1-0002AZ-7n
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1epPbv-0000V1-8W
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:53 -0500
-Received: from mail-bl2nam02on0055.outbound.protection.outlook.com
-	([104.47.38.55]:35904
+	(envelope-from <Babu.Moger@amd.com>) id 1epPbx-0000Wi-VX
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:57 -0500
+Received: from mail-bl2nam02on0051.outbound.protection.outlook.com
+	([104.47.38.51]:33378
 	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1epPbv-0000U4-1T
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:51 -0500
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1epPbx-0000W3-OB
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:53 -0500
 From: Babu Moger <babu.moger@amd.com>
-Date: Fri, 23 Feb 2018 21:30:22 -0500
-Message-Id: <1519439425-27883-3-git-send-email-babu.moger@amd.com>
+Date: Fri, 23 Feb 2018 21:30:25 -0500
+Message-Id: <1519439425-27883-6-git-send-email-babu.moger@amd.com>
 In-Reply-To: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
 References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 2/5] target/i386: Populate AMD Processor
- Cache Information
+Subject: [Qemu-devel] [PATCH v2 5/5] target/i386: Remove generic SMT thread
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,166 +31,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 Cc: mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, pixo@polepetko.eu, Gary.Hook@amd.com, babu.moger@amd.com
 
-From: Stanislav Lanci <pixo@polepetko.eu>
+Remove generic non-intel check while validating hyperthreading support.
+Certain AMD CPUs can support hyperthreading now.
 
-Adds information about cache size and topology from cpuid 0x8000001D leaf
-for different cache types on AMD processors.
+CPU family with TOPOEXT feature can support hyperthreading now.
 
-Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 ---
- target/i386/cpu.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/kvm.c | 29 ++++++++++++++++++---
- 2 files changed, 102 insertions(+), 3 deletions(-)
+ target/i386/cpu.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b5e431e..a5a480e 100644
+index 6d06637..295c409 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -118,6 +118,7 @@
- #define L1I_LINE_SIZE         64
- #define L1I_ASSOCIATIVITY      8
- #define L1I_SETS              64
-+#define L1I_SETS_AMD         256
- #define L1I_PARTITIONS         1
- /* Size = LINE_SIZE*ASSOCIATIVITY*SETS*PARTITIONS = 32KiB */
- #define L1I_DESCRIPTOR CPUID_2_L1I_32KB_8WAY_64B
-@@ -129,7 +130,9 @@
- /* Level 2 unified cache: */
- #define L2_LINE_SIZE          64
- #define L2_ASSOCIATIVITY      16
-+#define L2_ASSOCIATIVITY_AMD   8
- #define L2_SETS             4096
-+#define L2_SETS_AMD         1024
- #define L2_PARTITIONS          1
- /* Size = LINE_SIZE*ASSOCIATIVITY*SETS*PARTITIONS = 4MiB */
- /*FIXME: CPUID leaf 2 descriptor is inconsistent with CPUID leaf 4 */
-@@ -146,6 +149,7 @@
- #define L3_N_LINE_SIZE         64
- #define L3_N_ASSOCIATIVITY     16
- #define L3_N_SETS           16384
-+#define L3_N_SETS_AMD        8192
- #define L3_N_PARTITIONS         1
- #define L3_N_DESCRIPTOR CPUID_2_L3_16MB_16WAY_64B
- #define L3_N_LINES_PER_TAG      1
-@@ -3590,6 +3594,78 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *edx = 0;
-         }
-         break;
-+    case 0x8000001D: /* AMD TOPOEXT cache info */
-+        if (cpu->cache_info_passthrough) {
-+            host_cpuid(index, count, eax, ebx, ecx, edx);
-+            break;
-+        } else if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
-+            *eax = 0;
-+            switch (count) {
-+            case 0: /* L1 dcache info */
-+                *eax |= CPUID_4_TYPE_DCACHE | \
-+                        CPUID_4_LEVEL(1) | \
-+                        CPUID_4_SELF_INIT_LEVEL | \
-+                        ((cs->nr_threads - 1) << 14);
-+                *ebx = (L1D_LINE_SIZE - 1) | \
-+                       ((L1D_PARTITIONS - 1) << 12) | \
-+                       ((L1D_ASSOCIATIVITY - 1) << 22);
-+                *ecx = L1D_SETS - 1;
-+                *edx = 0;
-+                break;
-+            case 1: /* L1 icache info */
-+                *eax |= CPUID_4_TYPE_ICACHE | \
-+                        CPUID_4_LEVEL(1) | \
-+                        CPUID_4_SELF_INIT_LEVEL | \
-+                        ((cs->nr_threads - 1) << 14);
-+                *ebx = (L1I_LINE_SIZE - 1) | \
-+                       ((L1I_PARTITIONS - 1) << 12) | \
-+                       ((L1I_ASSOCIATIVITY_AMD - 1) << 22);
-+                *ecx = L1I_SETS_AMD - 1;
-+                *edx = 0;
-+                break;
-+            case 2: /* L2 cache info */
-+                *eax |= CPUID_4_TYPE_UNIFIED | \
-+                        CPUID_4_LEVEL(2) | \
-+                        CPUID_4_SELF_INIT_LEVEL | \
-+                        ((cs->nr_threads - 1) << 14);
-+                *ebx = (L2_LINE_SIZE - 1) | \
-+                       ((L2_PARTITIONS - 1) << 12) | \
-+                       ((L2_ASSOCIATIVITY_AMD - 1) << 22);
-+                *ecx = L2_SETS_AMD - 1;
-+                *edx = CPUID_4_INCLUSIVE;
-+                break;
-+            case 3: /* L3 cache info */
-+                if (!cpu->enable_l3_cache) {
-+                    *eax = 0;
-+                    *ebx = 0;
-+                    *ecx = 0;
-+                    *edx = 0;
-+                    break;
-+                }
-+                *eax |= CPUID_4_TYPE_UNIFIED | \
-+                        CPUID_4_LEVEL(3) | \
-+                        CPUID_4_SELF_INIT_LEVEL | \
-+                        ((cs->nr_cores * cs->nr_threads - 1) << 14);
-+                *ebx = (L3_N_LINE_SIZE - 1) | \
-+                       ((L3_N_PARTITIONS - 1) << 12) | \
-+                       ((L3_N_ASSOCIATIVITY - 1) << 22);
-+                *ecx = L3_N_SETS_AMD - 1;
-+                *edx = CPUID_4_NO_INVD_SHARING;
-+                break;
-+            default: /* end of info */
-+                *eax = 0;
-+                *ebx = 0;
-+                *ecx = 0;
-+                *edx = 0;
-+                break;
-+            }
-+        } else {
-+            *eax = 0;
-+            *ebx = 0;
-+            *ecx = 0;
-+            *edx = 0;
-+        }
-+        break;
-     case 0xC0000000:
-         *eax = env->cpuid_xlevel2;
-         *ebx = 0;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 85856b6..8adf7d1 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -909,9 +909,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-         c = &cpuid_data.entries[cpuid_i++];
+@@ -4336,17 +4336,20 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
  
--        c->function = i;
--        c->flags = 0;
--        cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-+        switch (i) {
-+        case 0x8000001d:
-+            /* Query for all AMD cache information leaves */
-+            for (j = 0; ; j++) {
-+                c->function = i;
-+                c->flags = KVM_CPUID_FLAG_SIGNIFICANT_INDEX;
-+                c->index = j;
-+                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
-+
-+                if (c->eax == 0) {
-+                    break;
-+                }
-+                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-+                    fprintf(stderr, "cpuid_data is full, no space for "
-+                            "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
-+                    abort();
-+                }
-+                c = &cpuid_data.entries[cpuid_i++];
-+            }
-+            break;
-+        default:
-+            c->function = i;
-+            c->flags = 0;
-+            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-+            break;
-+        }
+     qemu_init_vcpu(cs);
+ 
+-    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
+-     * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+-     * based on inputs (sockets,cores,threads), it is still better to gives
++    /* Most Intel and certain AMD CPUs support hyperthreading. Even though QEMU
++     * fixes this issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
++     * based on inputs (sockets,cores,threads), it is still better to give
+      * users a warning.
+      *
+      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+      */
+-    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+-        error_report("AMD CPU doesn't support hyperthreading. Please configure"
+-                     " -smp options properly.");
++     if (IS_AMD_CPU(env) &&
++         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
++         cs->nr_threads > 1 && !ht_warned) {
++            error_report("This family of AMD CPU doesn't support "
++                         "hyperthreading. Please configure -smp "
++                         "options properly.");
+         ht_warned = true;
      }
  
-     /* Call Centaur's CPUID instructions they are supported. */
 -- 
 1.8.3.1
