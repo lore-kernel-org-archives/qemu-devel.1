@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1epbwa-0000lC-4f
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:41:01 -0500
+	(envelope-from <mreitz@redhat.com>) id 1epbwb-0000oV-BH
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:41:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1epbwZ-0005A9-5P
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:41:00 -0500
+	(envelope-from <mreitz@redhat.com>) id 1epbwa-0005Bg-89
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:41:01 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 24 Feb 2018 16:40:32 +0100
-Message-Id: <20180224154033.29559-7-mreitz@redhat.com>
+Date: Sat, 24 Feb 2018 16:40:31 +0100
+Message-Id: <20180224154033.29559-6-mreitz@redhat.com>
 In-Reply-To: <20180224154033.29559-1-mreitz@redhat.com>
 References: <20180224154033.29559-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 6/7] block: Handle null backing link
+Subject: [Qemu-devel] [PATCH v3 5/7] qapi: Make more of qobject_to()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,116 +22,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Instead of converting all "backing": null instances into "backing": "",
-handle a null value directly in bdrv_open_inherit().
-
-This enables explicitly null backing links for json:{} filenames.
+This patch reworks some places which use either qobject_type() checks
+plus qobject_to(), where the latter alone is sufficient, or NULL checks
+plus qobject_type() checks where we can simply do a qobject_to() != NULL
+check.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c                    |  4 +++-
- blockdev.c                 | 14 --------------
- tests/qemu-iotests/089     | 20 ++++++++++++++++++++
- tests/qemu-iotests/089.out |  8 ++++++++
- 4 files changed, 31 insertions(+), 15 deletions(-)
+ qapi/qobject-input-visitor.c |  4 ++--
+ qobject/json-parser.c        | 13 +++++++------
+ qobject/qdict.c              | 20 +++++++++++---------
+ 3 files changed, 20 insertions(+), 17 deletions(-)
 
-diff --git a/block.c b/block.c
-index cb69fd7ae4..b86614d8ad 100644
---- a/block.c
-+++ b/block.c
-@@ -2600,7 +2600,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index f0c7f3e370..a1a3f9dcd7 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -339,7 +339,7 @@ static GenericList *qobject_input_next_list(Visitor *v, GenericList *tail,
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
  
-     /* See cautionary note on accessing @options above */
-     backing = qdict_get_try_str(options, "backing");
--    if (backing && *backing == '\0') {
-+    if (qobject_to(qdict_get(options, "backing"), QNull) != NULL ||
-+        (backing && *backing == '\0'))
-+    {
-         flags |= BDRV_O_NO_BACKING;
-         qdict_del(options, "backing");
+-    assert(tos && tos->obj && qobject_type(tos->obj) == QTYPE_QLIST);
++    assert(tos && qobject_to(tos->obj, QList));
+ 
+     if (!tos->entry) {
+         return NULL;
+@@ -353,7 +353,7 @@ static void qobject_input_check_list(Visitor *v, Error **errp)
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
+ 
+-    assert(tos && tos->obj && qobject_type(tos->obj) == QTYPE_QLIST);
++    assert(tos && qobject_to(tos->obj, QList));
+ 
+     if (tos->entry) {
+         error_setg(errp, "Only %u list elements expected in %s",
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 9192c7f054..6063d31427 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -276,7 +276,8 @@ static void parser_context_free(JSONParserContext *ctxt)
+  */
+ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
+ {
+-    QObject *key = NULL, *value;
++    QObject *value;
++    QString *key = NULL;
+     JSONToken *peek, *token;
+ 
+     peek = parser_context_peek_token(ctxt);
+@@ -285,8 +286,8 @@ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
+         goto out;
      }
-diff --git a/blockdev.c b/blockdev.c
-index edc699ae15..003245c6cb 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3972,7 +3972,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
-     QObject *obj;
-     Visitor *v = qobject_output_visitor_new(&obj);
-     QDict *qdict;
--    const QDictEntry *ent;
-     Error *local_err = NULL;
  
-     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-@@ -3986,19 +3985,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+-    key = parse_value(ctxt, ap);
+-    if (!key || qobject_type(key) != QTYPE_QSTRING) {
++    key = qobject_to(parse_value(ctxt, ap), QString);
++    if (!key) {
+         parse_error(ctxt, peek, "key is not a string in object");
+         goto out;
+     }
+@@ -308,14 +309,14 @@ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
+         goto out;
+     }
  
-     qdict_flatten(qdict);
+-    qdict_put_obj(dict, qstring_get_str(qobject_to(key, QString)), value);
++    qdict_put_obj(dict, qstring_get_str(key), value);
  
--    /*
--     * Rewrite "backing": null to "backing": ""
--     * TODO Rewrite "" to null instead, and perhaps not even here
--     */
--    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
--        char *dot = strrchr(ent->key, '.');
+-    qobject_decref(key);
++    QDECREF(key);
+ 
+     return 0;
+ 
+ out:
+-    qobject_decref(key);
++    QDECREF(key);
+ 
+     return -1;
+ }
+diff --git a/qobject/qdict.c b/qobject/qdict.c
+index 2562f7a426..ad048cba6e 100644
+--- a/qobject/qdict.c
++++ b/qobject/qdict.c
+@@ -882,18 +882,20 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
+ 
+         child = qdict_get(two_level, prefix);
+         if (suffix) {
+-            if (child) {
+-                if (qobject_type(child) != QTYPE_QDICT) {
++            QDict *child_dict = qobject_to(child, QDict);
++            if (!child_dict) {
++                if (child) {
+                     error_setg(errp, "Key %s prefix is already set as a scalar",
+                                prefix);
+                     goto error;
+                 }
+-            } else {
+-                child = QOBJECT(qdict_new());
+-                qdict_put_obj(two_level, prefix, child);
++
++                child_dict = qdict_new();
++                qdict_put_obj(two_level, prefix, QOBJECT(child_dict));
+             }
++
+             qobject_incref(ent->value);
+-            qdict_put_obj(qobject_to(child, QDict), suffix, ent->value);
++            qdict_put_obj(child_dict, suffix, ent->value);
+         } else {
+             if (child) {
+                 error_setg(errp, "Key %s prefix is already set as a dict",
+@@ -913,9 +915,9 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
+     multi_level = qdict_new();
+     for (ent = qdict_first(two_level); ent != NULL;
+          ent = qdict_next(two_level, ent)) {
 -
--        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
--            && qobject_type(ent->value) == QTYPE_QNULL) {
--            qdict_put(qdict, ent->key, qstring_new());
--        }
--    }
--
-     if (!qdict_get_try_str(qdict, "node-name")) {
-         error_setg(errp, "'node-name' must be specified for the root node");
-         goto fail;
-diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-index 0b059aba90..aa1ba4a98e 100755
---- a/tests/qemu-iotests/089
-+++ b/tests/qemu-iotests/089
-@@ -82,6 +82,26 @@ $QEMU_IO_PROG --cache $CACHEMODE \
- $QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
- 
- 
-+echo
-+echo "=== Testing correct handling of 'backing':null ==="
-+echo
-+
-+_make_test_img -b "$TEST_IMG.base" $IMG_SIZE
-+
-+# This should read 42
-+$QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
-+
-+# This should read 0
-+$QEMU_IO -c 'read -P 0 0 512' "json:{\
-+    'driver': '$IMGFMT',
-+    'file': {
-+        'driver': 'file',
-+        'filename': '$TEST_IMG'
-+    },
-+    'backing': null
-+}" | _filter_qemu_io
-+
-+
- # Taken from test 071
- echo
- echo "=== Testing blkdebug ==="
-diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
-index 0bf5a13ec1..89e3e4340a 100644
---- a/tests/qemu-iotests/089.out
-+++ b/tests/qemu-iotests/089.out
-@@ -19,6 +19,14 @@ Pattern verification failed at offset 0, 512 bytes
- read 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-+=== Testing correct handling of 'backing':null ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+read 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
- === Testing blkdebug ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+-        if (qobject_type(ent->value) == QTYPE_QDICT) {
+-            child = qdict_crumple(qobject_to(ent->value, QDict), errp);
++        QDict *dict = qobject_to(ent->value, QDict);
++        if (dict) {
++            child = qdict_crumple(dict, errp);
+             if (!child) {
+                 goto error;
+             }
 -- 
 2.14.3
