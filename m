@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1epbwT-0000dq-9N
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:40:54 -0500
+	(envelope-from <mreitz@redhat.com>) id 1epbwa-0000lC-4f
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1epbwS-00054L-1z
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:40:53 -0500
+	(envelope-from <mreitz@redhat.com>) id 1epbwZ-0005A9-5P
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 10:41:00 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 24 Feb 2018 16:40:30 +0100
-Message-Id: <20180224154033.29559-5-mreitz@redhat.com>
+Date: Sat, 24 Feb 2018 16:40:32 +0100
+Message-Id: <20180224154033.29559-7-mreitz@redhat.com>
 In-Reply-To: <20180224154033.29559-1-mreitz@redhat.com>
 References: <20180224154033.29559-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/7] qapi: Remove qobject_to_X() functions
+Subject: [Qemu-devel] [PATCH v3 6/7] block: Handle null backing link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,192 +22,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-They are no longer needed now.
+Instead of converting all "backing": null instances into "backing": "",
+handle a null value directly in bdrv_open_inherit().
+
+This enables explicitly null backing links for json:{} filenames.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- include/qapi/qmp/qbool.h   |  1 -
- include/qapi/qmp/qdict.h   |  1 -
- include/qapi/qmp/qlist.h   |  1 -
- include/qapi/qmp/qnum.h    |  1 -
- include/qapi/qmp/qstring.h |  1 -
- qobject/qbool.c            | 11 -----------
- qobject/qdict.c            | 11 -----------
- qobject/qlist.c            | 11 -----------
- qobject/qnum.c             | 11 -----------
- qobject/qstring.c          | 11 -----------
- 10 files changed, 60 deletions(-)
+ block.c                    |  4 +++-
+ blockdev.c                 | 14 --------------
+ tests/qemu-iotests/089     | 20 ++++++++++++++++++++
+ tests/qemu-iotests/089.out |  8 ++++++++
+ 4 files changed, 31 insertions(+), 15 deletions(-)
 
-diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
-index 629c508d34..b9a44a1bfe 100644
---- a/include/qapi/qmp/qbool.h
-+++ b/include/qapi/qmp/qbool.h
-@@ -23,7 +23,6 @@ struct QBool {
+diff --git a/block.c b/block.c
+index cb69fd7ae4..b86614d8ad 100644
+--- a/block.c
++++ b/block.c
+@@ -2600,7 +2600,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
  
- QBool *qbool_from_bool(bool value);
- bool qbool_get_bool(const QBool *qb);
--QBool *qobject_to_qbool(const QObject *obj);
- bool qbool_is_equal(const QObject *x, const QObject *y);
- void qbool_destroy_obj(QObject *obj);
+     /* See cautionary note on accessing @options above */
+     backing = qdict_get_try_str(options, "backing");
+-    if (backing && *backing == '\0') {
++    if (qobject_to(qdict_get(options, "backing"), QNull) != NULL ||
++        (backing && *backing == '\0'))
++    {
+         flags |= BDRV_O_NO_BACKING;
+         qdict_del(options, "backing");
+     }
+diff --git a/blockdev.c b/blockdev.c
+index edc699ae15..003245c6cb 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3972,7 +3972,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+     QObject *obj;
+     Visitor *v = qobject_output_visitor_new(&obj);
+     QDict *qdict;
+-    const QDictEntry *ent;
+     Error *local_err = NULL;
  
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index ff6f7842c3..c19b7aa2c4 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -39,7 +39,6 @@ void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
- void qdict_del(QDict *qdict, const char *key);
- int qdict_haskey(const QDict *qdict, const char *key);
- QObject *qdict_get(const QDict *qdict, const char *key);
--QDict *qobject_to_qdict(const QObject *obj);
- bool qdict_is_equal(const QObject *x, const QObject *y);
- void qdict_iter(const QDict *qdict,
-                 void (*iter)(const char *key, QObject *obj, void *opaque),
-diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
-index 5fd976a398..5c673acb06 100644
---- a/include/qapi/qmp/qlist.h
-+++ b/include/qapi/qmp/qlist.h
-@@ -53,7 +53,6 @@ QObject *qlist_pop(QList *qlist);
- QObject *qlist_peek(QList *qlist);
- int qlist_empty(const QList *qlist);
- size_t qlist_size(const QList *qlist);
--QList *qobject_to_qlist(const QObject *obj);
- bool qlist_is_equal(const QObject *x, const QObject *y);
- void qlist_destroy_obj(QObject *obj);
+     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+@@ -3986,19 +3985,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
  
-diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
-index 15e3971c7f..3e47475b2c 100644
---- a/include/qapi/qmp/qnum.h
-+++ b/include/qapi/qmp/qnum.h
-@@ -68,7 +68,6 @@ double qnum_get_double(QNum *qn);
+     qdict_flatten(qdict);
  
- char *qnum_to_string(QNum *qn);
- 
--QNum *qobject_to_qnum(const QObject *obj);
- bool qnum_is_equal(const QObject *x, const QObject *y);
- void qnum_destroy_obj(QObject *obj);
- 
-diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
-index 98070ef3d6..b72843fc1b 100644
---- a/include/qapi/qmp/qstring.h
-+++ b/include/qapi/qmp/qstring.h
-@@ -30,7 +30,6 @@ const char *qstring_get_str(const QString *qstring);
- void qstring_append_int(QString *qstring, int64_t value);
- void qstring_append(QString *qstring, const char *str);
- void qstring_append_chr(QString *qstring, int c);
--QString *qobject_to_qstring(const QObject *obj);
- bool qstring_is_equal(const QObject *x, const QObject *y);
- void qstring_destroy_obj(QObject *obj);
- 
-diff --git a/qobject/qbool.c b/qobject/qbool.c
-index 14d57c03fd..c45cbc1d3a 100644
---- a/qobject/qbool.c
-+++ b/qobject/qbool.c
-@@ -39,17 +39,6 @@ bool qbool_get_bool(const QBool *qb)
-     return qb->value;
- }
- 
--/**
-- * qobject_to_qbool(): Convert a QObject into a QBool
-- */
--QBool *qobject_to_qbool(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QBOOL) {
--        return NULL;
--    }
--    return container_of(obj, QBool, base);
--}
+-    /*
+-     * Rewrite "backing": null to "backing": ""
+-     * TODO Rewrite "" to null instead, and perhaps not even here
+-     */
+-    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
+-        char *dot = strrchr(ent->key, '.');
 -
- /**
-  * qbool_is_equal(): Test whether the two QBools are equal
-  */
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index b85c37cd1d..2562f7a426 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -37,17 +37,6 @@ QDict *qdict_new(void)
-     return qdict;
- }
- 
--/**
-- * qobject_to_qdict(): Convert a QObject into a QDict
-- */
--QDict *qobject_to_qdict(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QDICT) {
--        return NULL;
+-        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
+-            && qobject_type(ent->value) == QTYPE_QNULL) {
+-            qdict_put(qdict, ent->key, qstring_new());
+-        }
 -    }
--    return container_of(obj, QDict, base);
--}
 -
- /**
-  * tdb_hash(): based on the hash agorithm from gdbm, via tdb
-  * (from module-init-tools)
-diff --git a/qobject/qlist.c b/qobject/qlist.c
-index 9deb66fd5c..782df470cf 100644
---- a/qobject/qlist.c
-+++ b/qobject/qlist.c
-@@ -151,17 +151,6 @@ size_t qlist_size(const QList *qlist)
-     return count;
- }
+     if (!qdict_get_try_str(qdict, "node-name")) {
+         error_setg(errp, "'node-name' must be specified for the root node");
+         goto fail;
+diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
+index 0b059aba90..aa1ba4a98e 100755
+--- a/tests/qemu-iotests/089
++++ b/tests/qemu-iotests/089
+@@ -82,6 +82,26 @@ $QEMU_IO_PROG --cache $CACHEMODE \
+ $QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
  
--/**
-- * qobject_to_qlist(): Convert a QObject into a QList
-- */
--QList *qobject_to_qlist(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QLIST) {
--        return NULL;
--    }
--    return container_of(obj, QList, base);
--}
--
- /**
-  * qlist_is_equal(): Test whether the two QLists are equal
-  *
-diff --git a/qobject/qnum.c b/qobject/qnum.c
-index a6444d7c7f..986bf325a5 100644
---- a/qobject/qnum.c
-+++ b/qobject/qnum.c
-@@ -199,17 +199,6 @@ char *qnum_to_string(QNum *qn)
-     return NULL;
- }
  
--/**
-- * qobject_to_qnum(): Convert a QObject into a QNum
-- */
--QNum *qobject_to_qnum(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QNUM) {
--        return NULL;
--    }
--    return container_of(obj, QNum, base);
--}
--
- /**
-  * qnum_is_equal(): Test whether the two QNums are equal
-  *
-diff --git a/qobject/qstring.c b/qobject/qstring.c
-index 741a3c54ad..dcec5de9f2 100644
---- a/qobject/qstring.c
-+++ b/qobject/qstring.c
-@@ -105,17 +105,6 @@ void qstring_append_chr(QString *qstring, int c)
-     qstring->string[qstring->length] = 0;
- }
++echo
++echo "=== Testing correct handling of 'backing':null ==="
++echo
++
++_make_test_img -b "$TEST_IMG.base" $IMG_SIZE
++
++# This should read 42
++$QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
++
++# This should read 0
++$QEMU_IO -c 'read -P 0 0 512' "json:{\
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'file',
++        'filename': '$TEST_IMG'
++    },
++    'backing': null
++}" | _filter_qemu_io
++
++
+ # Taken from test 071
+ echo
+ echo "=== Testing blkdebug ==="
+diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
+index 0bf5a13ec1..89e3e4340a 100644
+--- a/tests/qemu-iotests/089.out
++++ b/tests/qemu-iotests/089.out
+@@ -19,6 +19,14 @@ Pattern verification failed at offset 0, 512 bytes
+ read 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--/**
-- * qobject_to_qstring(): Convert a QObject to a QString
-- */
--QString *qobject_to_qstring(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QSTRING) {
--        return NULL;
--    }
--    return container_of(obj, QString, base);
--}
--
- /**
-  * qstring_get_str(): Return a pointer to the stored string
-  *
++=== Testing correct handling of 'backing':null ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
+ === Testing blkdebug ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
 -- 
 2.14.3
