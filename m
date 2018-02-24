@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epRdw-0000XO-Cs
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 23:41:05 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1epRsm-0003FX-43
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 23:56:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epRdt-0005Oc-97
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 23:41:04 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:43431)
+	(envelope-from <richard.henderson@linaro.org>) id 1epRsj-0008FY-1G
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 23:56:24 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:44796)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1epRdt-0005Mp-1S
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 23:41:01 -0500
-Received: by mail-pl0-x241.google.com with SMTP id f23so6086192plr.10
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 20:41:00 -0800 (PST)
+	id 1epRsi-0008Eg-Lw
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 23:56:20 -0500
+Received: by mail-pf0-x242.google.com with SMTP id 17so4353287pfw.11
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 20:56:20 -0800 (PST)
 References: <20180220180325.29818-1-peter.maydell@linaro.org>
-	<20180220180325.29818-2-peter.maydell@linaro.org>
+	<20180220180325.29818-3-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <16ee379f-16b3-ab78-edf2-0d1e005221c0@linaro.org>
-Date: Fri, 23 Feb 2018 20:40:56 -0800
+Message-ID: <e55c2d18-b3b9-520b-0e9d-69ba711543b8@linaro.org>
+Date: Fri, 23 Feb 2018 20:56:16 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180220180325.29818-2-peter.maydell@linaro.org>
+In-Reply-To: <20180220180325.29818-3-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 01/19] loader: Add new load_ramdisk_as()
+Subject: Re: [Qemu-devel] [PATCH 02/19] hw/arm/boot: Honour CPU's address
+ space for image loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,17 +36,21 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 02/20/2018 10:03 AM, Peter Maydell wrote:
-> Add a function load_ramdisk_as() which behaves like the existing
-> load_ramdisk() but allows the caller to specify the AddressSpace
-> to use. This matches the pattern we have already for various
-> other loader functions.
+> Instead of loading kernels, device trees, and the like to
+> the system address space, use the CPU's address space. This
+> is important if we're trying to load the file to memory or
+> via an alias memory region that is provided by an SoC
+> object and thus not mapped into the system address space.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  include/hw/loader.h | 12 +++++++++++-
->  hw/core/loader.c    |  8 +++++++-
->  2 files changed, 18 insertions(+), 2 deletions(-)
+> Function name changed to arm_boot_address_space()
+> rather than arm_boot_addressspace(), following irc
+> conversation...
+> ---
+>  hw/arm/boot.c | 119 +++++++++++++++++++++++++++++++++++++---------------------
+>  1 file changed, 76 insertions(+), 43 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
