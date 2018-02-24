@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eph2K-00082q-AK
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 16:07:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1eph4C-0000VK-S9
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 16:09:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eph2J-0001Dm-AE
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 16:07:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1eph4B-0002lc-MA
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 16:09:12 -0500
 References: <20180224154033.29559-1-mreitz@redhat.com>
-	<20180224154033.29559-6-mreitz@redhat.com>
+	<20180224154033.29559-7-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <b4c93a5b-5957-9611-15d5-5cff1585356f@redhat.com>
-Date: Sat, 24 Feb 2018 15:07:09 -0600
+Message-ID: <a3875a7f-a3a2-9dca-cbb4-1660cfc3c76b@redhat.com>
+Date: Sat, 24 Feb 2018 15:09:05 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180224154033.29559-6-mreitz@redhat.com>
+In-Reply-To: <20180224154033.29559-7-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] qapi: Make more of qobject_to()
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block: Handle null backing link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +28,19 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 On 02/24/2018 09:40 AM, Max Reitz wrote:
-> This patch reworks some places which use either qobject_type() checks
-> plus qobject_to(), where the latter alone is sufficient, or NULL checks
-> plus qobject_type() checks where we can simply do a qobject_to() != NULL
-> check.
+> Instead of converting all "backing": null instances into "backing": "",
+> handle a null value directly in bdrv_open_inherit().
+> 
+> This enables explicitly null backing links for json:{} filenames.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > Reviewed-by: Alberto Garcia <berto@igalia.com>
 > ---
->   qapi/qobject-input-visitor.c |  4 ++--
->   qobject/json-parser.c        | 13 +++++++------
->   qobject/qdict.c              | 20 +++++++++++---------
->   3 files changed, 20 insertions(+), 17 deletions(-)
+>   block.c                    |  4 +++-
+>   blockdev.c                 | 14 --------------
+>   tests/qemu-iotests/089     | 20 ++++++++++++++++++++
+>   tests/qemu-iotests/089.out |  8 ++++++++
+>   4 files changed, 31 insertions(+), 15 deletions(-)
 > 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
