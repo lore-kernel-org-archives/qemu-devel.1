@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1epgsg-0004Wr-JN
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:57:19 -0500
+	(envelope-from <eblake@redhat.com>) id 1eph0I-0006ZD-Fg
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 16:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1epgsf-00074s-SX
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:57:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1eph0H-000652-HR
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 16:05:10 -0500
 References: <20180224154033.29559-1-mreitz@redhat.com>
-	<20180224154033.29559-3-mreitz@redhat.com>
+	<20180224154033.29559-4-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c8a20a6d-039f-544a-3b58-098f6be19ecf@redhat.com>
-Date: Sat, 24 Feb 2018 14:57:00 -0600
+Message-ID: <abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
+Date: Sat, 24 Feb 2018 15:04:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180224154033.29559-3-mreitz@redhat.com>
+In-Reply-To: <20180224154033.29559-4-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] qapi: Add qobject_to()
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] qapi: Replace qobject_to_X(o) by
+ qobject_to(o, X)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +29,62 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 On 02/24/2018 09:40 AM, Max Reitz wrote:
-> This is a dynamic casting macro that, given a QObject type, returns an
-> object as that type or NULL if the object is of a different type (or
-> NULL itself).
+> This patch was generated using the following Coccinelle script:
 > 
-> The macro uses lower-case letters because:
-> 1. There does not seem to be a hard rule on whether qemu macros have to
->     be upper-cased,
-> 2. The current situation in qapi/qmp is inconsistent (compare e.g.
->     QINCREF() vs. qdict_put()),
-> 3. qobject_to() will evaluate its @obj parameter only once, thus it is
->     generally not important to the caller whether it is a macro or not,
-> 4. I prefer it aesthetically.
+
+> and a bit of manual fix-up for overly long lines and three places in
+> tests/check-qjson.c that Coccinelle did not find.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
 > ---
->   include/qapi/qmp/qobject.h | 30 ++++++++++++++++++++++++++++++
->   1 file changed, 30 insertions(+)
-> 
 
-> +++ b/include/qapi/qmp/qobject.h
-> @@ -50,6 +50,22 @@ struct QObject {
->   #define QDECREF(obj)              \
->       qobject_decref(obj ? QOBJECT(obj) : NULL)
+> diff --git a/block.c b/block.c
+> index 814e5a02da..cb69fd7ae4 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1457,7 +1457,7 @@ static QDict *parse_json_filename(const char *filename, Error **errp)
+>           return NULL;
+>       }
 >   
-> +/* Required for qobject_to() */
-> +#define QTYPE_CAST_TO_QNull     QTYPE_QNULL
-> +#define QTYPE_CAST_TO_QNum      QTYPE_QNUM
-> +#define QTYPE_CAST_TO_QString   QTYPE_QSTRING
-> +#define QTYPE_CAST_TO_QDict     QTYPE_QDICT
-> +#define QTYPE_CAST_TO_QList     QTYPE_QLIST
-> +#define QTYPE_CAST_TO_QBool     QTYPE_QBOOL
-> +
-> +QEMU_BUILD_BUG_MSG(QTYPE__MAX != 7,
-> +                   "The QTYPE_CAST_TO_* list needs to be extended");
-> +
-> +#define qobject_to(obj, type) \
-> +    container_of(qobject_check_type(obj, glue(QTYPE_CAST_TO_, type)) ?: \
-> +                     QOBJECT((type *)NULL), \
+> -    options = qobject_to_qdict(options_obj);
+> +    options = qobject_to(options_obj, QDict);
 
-I guess the third (second?) branch of the ternary is written this way, 
-rather than the simpler 'NULL', to ensure that 'type' is still something 
-that can have the QOBJECT() macro applied to it?  Should be okay.
+Bikeshedding - would it read any easier as:
 
-> +                 type, base)
-> +
+options = qobject_to(QDict, options_obj);
+
+?  If so, your Coccinelle script can be touched up, and patch 2/7 swaps 
+argument order around, so it would be tolerable but still slightly 
+busywork to regenerate the series.  But I'm not strongly attached to 
+either order, and so I'm also willing to take this as-is (especially 
+since that's less work), if no one else has a strong opinion that 
+swapping order would aid legibility.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+
+> +++ b/block/rbd.c
+> @@ -256,14 +256,14 @@ static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs_json,
+>       if (!keypairs_json) {
+>           return ret;
+>       }
+> -    keypairs = qobject_to_qlist(qobject_from_json(keypairs_json,
+> -                                                  &error_abort));
+> +    keypairs = qobject_to(qobject_from_json(keypairs_json, &error_abort),
+> +                          QList);
+
+The question about legibility gets a bit more obvious when you span lines.
+
+> @@ -893,8 +893,9 @@ static void simple_number(void)
+>           QNum *qnum;
+>           int64_t val;
+>   
+> -        qnum = qobject_to_qnum(qobject_from_json(test_cases[i].encoded,
+> -                                                 &error_abort));
+> +        qnum = qobject_to(qobject_from_json(test_cases[i].encoded,
+> +                                            &error_abort),
+> +                          QNum);
 
 -- 
 Eric Blake, Principal Software Engineer
