@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epgGx-0001vp-Lk
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:21 -0500
+	(envelope-from <laurent@vivier.eu>) id 1epgH0-0001xq-LB
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epgGw-0007pN-4F
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:19 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:42943)
+	(envelope-from <laurent@vivier.eu>) id 1epgGx-0007r1-DG
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:22 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:45789)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1epgGv-0007na-PT
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:18 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1epgGx-0007pj-3a
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:19 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 24 Feb 2018 21:18:02 +0100
-Message-Id: <20180224201802.911-5-laurent@vivier.eu>
+Date: Sat, 24 Feb 2018 21:18:00 +0100
+Message-Id: <20180224201802.911-3-laurent@vivier.eu>
 In-Reply-To: <20180224201802.911-1-laurent@vivier.eu>
 References: <20180224201802.911-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v4 4/4] target/m68k: add fscale,
- fgetman and fgetexp
+Subject: [Qemu-devel] [PATCH v4 2/4] target/m68k: add fmod/frem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,251 +26,276 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Using local m68k floatx80_getman(), floatx80_getexp(), floatx80_scale()
+Using a local m68k floatx80_mod()
 [copied from previous:
 Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
+
+The quotient byte of the FPSR is updated with
+the result of the operation.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/m68k/fpu_helper.c |  15 +++++
- target/m68k/helper.h     |   3 +
- target/m68k/softfloat.c  | 144 +++++++++++++++++++++++++++++++++++++++++++++++
- target/m68k/softfloat.h  |   3 +
- target/m68k/translate.c  |   9 +++
- 5 files changed, 174 insertions(+)
+ target/m68k/Makefile.objs |   3 +-
+ target/m68k/cpu.h         |   1 +
+ target/m68k/fpu_helper.c  |  35 +++++++++++++++-
+ target/m68k/helper.h      |   2 +
+ target/m68k/softfloat.c   | 105 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/m68k/softfloat.h   |  26 ++++++++++++
+ target/m68k/translate.c   |   6 +++
+ 7 files changed, 176 insertions(+), 2 deletions(-)
+ create mode 100644 target/m68k/softfloat.c
+ create mode 100644 target/m68k/softfloat.h
 
+diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
+index d143f20270..ac61948676 100644
+--- a/target/m68k/Makefile.objs
++++ b/target/m68k/Makefile.objs
+@@ -1,4 +1,5 @@
+ obj-y += m68k-semi.o
+-obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o
++obj-y += translate.o op_helper.o helper.o cpu.o
++obj-y += fpu_helper.o softfloat.o
+ obj-y += gdbstub.o
+ obj-$(CONFIG_SOFTMMU) += monitor.o
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 65f4fb95cb..2259bf22dc 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -427,6 +427,7 @@ typedef enum {
+ /* Quotient */
+ 
+ #define FPSR_QT_MASK  0x00ff0000
++#define FPSR_QT_SHIFT 16
+ 
+ /* Floating-Point Control Register */
+ /* Rounding mode */
 diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 8286228b81..cdb9b50462 100644
+index 3c5a82aaa0..8286228b81 100644
 --- a/target/m68k/fpu_helper.c
 +++ b/target/m68k/fpu_helper.c
-@@ -542,3 +542,18 @@ void HELPER(frem)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
+@@ -23,7 +23,7 @@
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
+-#include "fpu/softfloat.h"
++#include "softfloat.h"
  
-     make_quotient(env, res->d);
+ /* Undefined offsets may be different on various FPU.
+  * On 68040 they return 0.0 (floatx80_zero)
+@@ -509,3 +509,36 @@ uint32_t HELPER(fmovemd_ld_postinc)(CPUM68KState *env, uint32_t addr,
+ {
+     return fmovem_postinc(env, addr, mask, cpu_ld_float64_ra);
  }
 +
-+void HELPER(fgetexp)(CPUM68KState *env, FPReg *res, FPReg *val)
++static void make_quotient(CPUM68KState *env, floatx80 val)
 +{
-+    res->d = floatx80_getexp(val->d, &env->fp_status);
++    int32_t quotient;
++    int sign;
++
++    if (floatx80_is_any_nan(val)) {
++        return;
++    }
++
++    quotient = floatx80_to_int32(val, &env->fp_status);
++    sign = quotient < 0;
++    if (sign) {
++        quotient = -quotient;
++    }
++
++    quotient = (sign << 7) | (quotient & 0x7f);
++    env->fpsr = (env->fpsr & ~FPSR_QT_MASK) | (quotient << FPSR_QT_SHIFT);
 +}
 +
-+void HELPER(fgetman)(CPUM68KState *env, FPReg *res, FPReg *val)
++void HELPER(fmod)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
 +{
-+    res->d = floatx80_getman(val->d, &env->fp_status);
++    res->d = floatx80_mod(val1->d, val0->d, &env->fp_status);
++
++    make_quotient(env, res->d);
 +}
 +
-+void HELPER(fscale)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
++void HELPER(frem)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
 +{
-+    res->d = floatx80_scale(val1->d, val0->d, &env->fp_status);
++    res->d = floatx80_rem(val1->d, val0->d, &env->fp_status);
++
++    make_quotient(env, res->d);
 +}
 diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 76a0590c9c..c348dced3a 100644
+index 7f400f0def..76a0590c9c 100644
 --- a/target/m68k/helper.h
 +++ b/target/m68k/helper.h
-@@ -65,6 +65,9 @@ DEF_HELPER_3(fmovemd_st_postinc, i32, env, i32, i32)
+@@ -63,6 +63,8 @@ DEF_HELPER_3(fmovemx_ld_postinc, i32, env, i32, i32)
+ DEF_HELPER_3(fmovemd_st_predec, i32, env, i32, i32)
+ DEF_HELPER_3(fmovemd_st_postinc, i32, env, i32, i32)
  DEF_HELPER_3(fmovemd_ld_postinc, i32, env, i32, i32)
- DEF_HELPER_4(fmod, void, env, fp, fp, fp)
- DEF_HELPER_4(frem, void, env, fp, fp, fp)
-+DEF_HELPER_3(fgetexp, void, env, fp, fp)
-+DEF_HELPER_3(fgetman, void, env, fp, fp)
-+DEF_HELPER_4(fscale, void, env, fp, fp, fp)
++DEF_HELPER_4(fmod, void, env, fp, fp, fp)
++DEF_HELPER_4(frem, void, env, fp, fp, fp)
  
  DEF_HELPER_3(mac_move, void, env, i32, i32)
  DEF_HELPER_3(macmulf, i64, env, i32, i32)
 diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
-index 8c77757b4e..9cb141900c 100644
---- a/target/m68k/softfloat.c
+new file mode 100644
+index 0000000000..8c77757b4e
+--- /dev/null
 +++ b/target/m68k/softfloat.c
-@@ -22,6 +22,19 @@
- #include "softfloat.h"
- #include "fpu/softfloat-macros.h"
- 
-+static floatx80 propagateFloatx80NaNOneArg(floatx80 a, float_status *status)
-+{
-+    if (floatx80_is_signaling_nan(a, status)) {
-+        float_raise(float_flag_invalid, status);
-+    }
+@@ -0,0 +1,105 @@
++/*
++ * Ported from a work by Andreas Grabher for Previous, NeXT Computer Emulator,
++ * derived from NetBSD M68040 FPSP functions,
++ * derived from release 2a of the SoftFloat IEC/IEEE Floating-point Arithmetic
++ * Package. Those parts of the code (and some later contributions) are
++ * provided under that license, as detailed below.
++ * It has subsequently been modified by contributors to the QEMU Project,
++ * so some portions are provided under:
++ *  the SoftFloat-2a license
++ *  the BSD license
++ *  GPL-v2-or-later
++ *
++ * Any future contributions to this file will be taken to be licensed under
++ * the Softfloat-2a license unless specifically indicated otherwise.
++ */
 +
-+    if (status->default_nan_mode) {
-+        return floatx80_default_nan(status);
-+    }
++/* Portions of this work are licensed under the terms of the GNU GPL,
++ * version 2 or later. See the COPYING file in the top-level directory.
++ */
 +
-+    return floatx80_maybe_silence_nan(a, status);
-+}
-+
- /*----------------------------------------------------------------------------
-  | Returns the modulo remainder of the extended double-precision floating-point
-  | value `a' with respect to the corresponding value `b'.
-@@ -103,3 +116,134 @@ floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status)
-         normalizeRoundAndPackFloatx80(
-             80, zSign, bExp + expDiff, aSig0, aSig1, status);
- }
-+
-+/*----------------------------------------------------------------------------
-+ | Returns the mantissa of the extended double-precision floating-point
-+ | value `a'.
-+ *----------------------------------------------------------------------------*/
-+
-+floatx80 floatx80_getman(floatx80 a, float_status *status)
-+{
-+    flag aSign;
-+    int32_t aExp;
-+    uint64_t aSig;
-+
-+    aSig = extractFloatx80Frac(a);
-+    aExp = extractFloatx80Exp(a);
-+    aSign = extractFloatx80Sign(a);
-+
-+    if (aExp == 0x7FFF) {
-+        if ((uint64_t) (aSig << 1)) {
-+            return propagateFloatx80NaNOneArg(a , status);
-+        }
-+        float_raise(float_flag_invalid , status);
-+        return floatx80_default_nan(status);
-+    }
-+
-+    if (aExp == 0) {
-+        if (aSig == 0) {
-+            return packFloatx80(aSign, 0, 0);
-+        }
-+        normalizeFloatx80Subnormal(aSig, &aExp, &aSig);
-+    }
-+
-+    return roundAndPackFloatx80(status->floatx80_rounding_precision, aSign,
-+                                0x3FFF, aSig, 0, status);
-+}
++#include "qemu/osdep.h"
++#include "softfloat.h"
++#include "fpu/softfloat-macros.h"
 +
 +/*----------------------------------------------------------------------------
-+ | Returns the exponent of the extended double-precision floating-point
-+ | value `a' as an extended double-precision value.
++ | Returns the modulo remainder of the extended double-precision floating-point
++ | value `a' with respect to the corresponding value `b'.
 + *----------------------------------------------------------------------------*/
 +
-+floatx80 floatx80_getexp(floatx80 a, float_status *status)
++floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status)
 +{
-+    flag aSign;
-+    int32_t aExp;
-+    uint64_t aSig;
++    flag aSign, zSign;
++    int32_t aExp, bExp, expDiff;
++    uint64_t aSig0, aSig1, bSig;
++    uint64_t qTemp, term0, term1;
 +
-+    aSig = extractFloatx80Frac(a);
-+    aExp = extractFloatx80Exp(a);
-+    aSign = extractFloatx80Sign(a);
-+
-+    if (aExp == 0x7FFF) {
-+        if ((uint64_t) (aSig << 1)) {
-+            return propagateFloatx80NaNOneArg(a , status);
-+        }
-+        float_raise(float_flag_invalid , status);
-+        return floatx80_default_nan(status);
-+    }
-+
-+    if (aExp == 0) {
-+        if (aSig == 0) {
-+            return packFloatx80(aSign, 0, 0);
-+        }
-+        normalizeFloatx80Subnormal(aSig, &aExp, &aSig);
-+    }
-+
-+    return int32_to_floatx80(aExp - 0x3FFF, status);
-+}
-+
-+/*----------------------------------------------------------------------------
-+ | Scales extended double-precision floating-point value in operand `a' by
-+ | value `b'. The function truncates the value in the second operand 'b' to
-+ | an integral value and adds that value to the exponent of the operand 'a'.
-+ | The operation performed according to the IEC/IEEE Standard for Binary
-+ | Floating-Point Arithmetic.
-+ *----------------------------------------------------------------------------*/
-+
-+floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status)
-+{
-+    flag aSign, bSign;
-+    int32_t aExp, bExp, shiftCount;
-+    uint64_t aSig, bSig;
-+
-+    aSig = extractFloatx80Frac(a);
++    aSig0 = extractFloatx80Frac(a);
 +    aExp = extractFloatx80Exp(a);
 +    aSign = extractFloatx80Sign(a);
 +    bSig = extractFloatx80Frac(b);
 +    bExp = extractFloatx80Exp(b);
-+    bSign = extractFloatx80Sign(b);
 +
-+    if (bExp == 0x7FFF) {
-+        if ((uint64_t) (bSig << 1) ||
-+            ((aExp == 0x7FFF) && (uint64_t) (aSig << 1))) {
-+            return propagateFloatx80NaN(a, b, status);
-+        }
-+        float_raise(float_flag_invalid , status);
-+        return floatx80_default_nan(status);
-+    }
 +    if (aExp == 0x7FFF) {
-+        if ((uint64_t) (aSig << 1)) {
++        if ((uint64_t) (aSig0 << 1)
++            || ((bExp == 0x7FFF) && (uint64_t) (bSig << 1))) {
 +            return propagateFloatx80NaN(a, b, status);
 +        }
-+        return packFloatx80(aSign, floatx80_infinity.high,
-+                            floatx80_infinity.low);
++        goto invalid;
 +    }
-+    if (aExp == 0) {
-+        if (aSig == 0) {
-+            return packFloatx80(aSign, 0, 0);
++    if (bExp == 0x7FFF) {
++        if ((uint64_t) (bSig << 1)) {
++            return propagateFloatx80NaN(a, b, status);
 +        }
-+        if (bExp < 0x3FFF) {
-+            return a;
-+        }
-+        normalizeFloatx80Subnormal(aSig, &aExp, &aSig);
-+    }
-+
-+    if (bExp < 0x3FFF) {
 +        return a;
 +    }
-+
-+    if (0x400F < bExp) {
-+        aExp = bSign ? -0x6001 : 0xE000;
-+        return roundAndPackFloatx80(status->floatx80_rounding_precision,
-+                                    aSign, aExp, aSig, 0, status);
++    if (bExp == 0) {
++        if (bSig == 0) {
++        invalid:
++            float_raise(float_flag_invalid, status);
++            return floatx80_default_nan(status);
++        }
++        normalizeFloatx80Subnormal(bSig, &bExp, &bSig);
 +    }
-+
-+    shiftCount = 0x403E - bExp;
-+    bSig >>= shiftCount;
-+    aExp = bSign ? (aExp - bSig) : (aExp + bSig);
-+
-+    return roundAndPackFloatx80(status->floatx80_rounding_precision,
-+                                aSign, aExp, aSig, 0, status);
++    if (aExp == 0) {
++        if ((uint64_t) (aSig0 << 1) == 0) {
++            return a;
++        }
++        normalizeFloatx80Subnormal(aSig0, &aExp, &aSig0);
++    }
++    bSig |= LIT64(0x8000000000000000);
++    zSign = aSign;
++    expDiff = aExp - bExp;
++    aSig1 = 0;
++    if (expDiff < 0) {
++        return a;
++    }
++    qTemp = (bSig <= aSig0);
++    if (qTemp) {
++        aSig0 -= bSig;
++    }
++    expDiff -= 64;
++    while (0 < expDiff) {
++        qTemp = estimateDiv128To64(aSig0, aSig1, bSig);
++        qTemp = (2 < qTemp) ? qTemp - 2 : 0;
++        mul64To128(bSig, qTemp, &term0, &term1);
++        sub128(aSig0, aSig1, term0, term1, &aSig0, &aSig1);
++        shortShift128Left(aSig0, aSig1, 62, &aSig0, &aSig1);
++    }
++    expDiff += 64;
++    if (0 < expDiff) {
++        qTemp = estimateDiv128To64(aSig0, aSig1, bSig);
++        qTemp = (2 < qTemp) ? qTemp - 2 : 0;
++        qTemp >>= 64 - expDiff;
++        mul64To128(bSig, qTemp << (64 - expDiff), &term0, &term1);
++        sub128(aSig0, aSig1, term0, term1, &aSig0, &aSig1);
++        shortShift128Left(0, bSig, 64 - expDiff, &term0, &term1);
++        while (le128(term0, term1, aSig0, aSig1)) {
++            ++qTemp;
++            sub128(aSig0, aSig1, term0, term1, &aSig0, &aSig1);
++        }
++    }
++    return
++        normalizeRoundAndPackFloatx80(
++            80, zSign, bExp + expDiff, aSig0, aSig1, status);
 +}
 diff --git a/target/m68k/softfloat.h b/target/m68k/softfloat.h
-index 8d8ca0fc45..78fbc0cd0c 100644
---- a/target/m68k/softfloat.h
+new file mode 100644
+index 0000000000..8d8ca0fc45
+--- /dev/null
 +++ b/target/m68k/softfloat.h
-@@ -23,4 +23,7 @@
- #include "fpu/softfloat.h"
- 
- floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status);
-+floatx80 floatx80_getman(floatx80 a, float_status *status);
-+floatx80 floatx80_getexp(floatx80 a, float_status *status);
-+floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status);
- #endif
+@@ -0,0 +1,26 @@
++/*
++ * Ported from a work by Andreas Grabher for Previous, NeXT Computer Emulator,
++ * derived from NetBSD M68040 FPSP functions,
++ * derived from release 2a of the SoftFloat IEC/IEEE Floating-point Arithmetic
++ * Package. Those parts of the code (and some later contributions) are
++ * provided under that license, as detailed below.
++ * It has subsequently been modified by contributors to the QEMU Project,
++ * so some portions are provided under:
++ *  the SoftFloat-2a license
++ *  the BSD license
++ *  GPL-v2-or-later
++ *
++ * Any future contributions to this file will be taken to be licensed under
++ * the Softfloat-2a license unless specifically indicated otherwise.
++ */
++
++/* Portions of this work are licensed under the terms of the GNU GPL,
++ * version 2 or later. See the COPYING file in the top-level directory.
++ */
++
++#ifndef TARGET_M68K_SOFTFLOAT_H
++#define TARGET_M68K_SOFTFLOAT_H
++#include "fpu/softfloat.h"
++
++floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status);
++#endif
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f8db26fa8e..dbb24f8d84 100644
+index a22993c7ce..f8db26fa8e 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -5072,6 +5072,12 @@ DISAS_INSN(fpu)
-     case 0x5e: /* fdneg */
-         gen_helper_fdneg(cpu_env, cpu_dest, cpu_src);
+@@ -5081,6 +5081,9 @@ DISAS_INSN(fpu)
+     case 0x64: /* fddiv */
+         gen_helper_fddiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
          break;
-+    case 0x1e: /* fgetexp */
-+        gen_helper_fgetexp(cpu_env, cpu_dest, cpu_src);
++    case 0x21: /* fmod */
++        gen_helper_fmod(cpu_env, cpu_dest, cpu_src, cpu_dest);
 +        break;
-+    case 0x1f: /* fgetman */
-+        gen_helper_fgetman(cpu_env, cpu_dest, cpu_src);
-+        break;
-     case 0x20: /* fdiv */
-         gen_helper_fdiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
+     case 0x22: /* fadd */
+         gen_helper_fadd(cpu_env, cpu_dest, cpu_src, cpu_dest);
          break;
-@@ -5108,6 +5114,9 @@ DISAS_INSN(fpu)
-     case 0x25: /* frem */
-         gen_helper_frem(cpu_env, cpu_dest, cpu_src, cpu_dest);
+@@ -5102,6 +5105,9 @@ DISAS_INSN(fpu)
+     case 0x24: /* fsgldiv */
+         gen_helper_fsgldiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
          break;
-+    case 0x26: /* fscale */
-+        gen_helper_fscale(cpu_env, cpu_dest, cpu_src, cpu_dest);
++    case 0x25: /* frem */
++        gen_helper_frem(cpu_env, cpu_dest, cpu_src, cpu_dest);
 +        break;
      case 0x27: /* fsglmul */
          gen_helper_fsglmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
