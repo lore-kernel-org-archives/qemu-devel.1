@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1epOpK-0001ro-6O
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 20:40:39 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1epOqw-0002bi-6T
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 20:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1epOpH-00005t-2Q
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 20:40:38 -0500
-Resent-Message-Id: <E1epOpH-00005t-2Q@eggs.gnu.org>
-In-Reply-To: <1519123357-13225-1-git-send-email-thuth@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151943642397.924.16059746638036070764@bdbb90650ae5>
+	(envelope-from <haozhong.zhang@intel.com>) id 1epOqt-0000pa-4E
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 20:42:18 -0500
+Received: from mga01.intel.com ([192.55.52.88]:45538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1epOqs-0000oT-RR
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 20:42:15 -0500
+Date: Sat, 24 Feb 2018 09:42:10 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180224014210.l2ms3ikgg6wd2dvv@hz-desktop>
+References: <20180217063135.21550-1-haozhong.zhang@intel.com>
+	<151943504161.924.12375415838237271515@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 23 Feb 2018 17:40:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] scsi: Remove automatic creation of SCSI
- controllers with -drive if=scsi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <151943504161.924.12375415838237271515@bdbb90650ae5>
+Subject: Re: [Qemu-devel] [PATCH] hw/acpi-build: build SRAT memory affinity
+ structures for NVDIMM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,11 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, marcel@redhat.comfamz@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, mst@redhat.com
+To: famz@redhat.com, qemu-devel@nongnu.org
+Cc: xiaoguangrong.eric@gmail.com, mst@redhat.com, ehabkost@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, rth@twiddle.net
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQgdGVzdCBvbiBzMzkweCBob3N0LiBQbGVhc2Ug
-ZmluZCB0aGUgZGV0YWlscyBiZWxvdy4KCk4vQS4gSW50ZXJuYWwgZXJyb3Igd2hpbGUgcmVhZGlu
-ZyBsb2cgZmlsZQoKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hi Fam,
+
+On 02/23/18 17:17 -0800, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series failed build test on s390x host. Please find the details below.
+> 
+> N/A. Internal error while reading log file
+
+What does this message mean? Where can I get the log file?
+
+Thanks,
+Haozhong
