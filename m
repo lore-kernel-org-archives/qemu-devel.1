@@ -1,29 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epPeD-0003ru-A4
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:33:14 -0500
+	(envelope-from <jianfeng.tan@intel.com>) id 1epQCV-0002OW-Re
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 22:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1epPeA-0001Ug-7W
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:33:13 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:33516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1epPeA-0001UF-0O
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:33:10 -0500
-Received: by mail-pl0-x243.google.com with SMTP id c11-v6so2545093plo.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 18:33:09 -0800 (PST)
-References: <20180223145959.18761-1-laurent@vivier.eu>
-	<20180223145959.18761-5-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <dc1ae5ef-b700-2a83-143f-37bb95a867f9@linaro.org>
-Date: Fri, 23 Feb 2018 18:33:06 -0800
-MIME-Version: 1.0
-In-Reply-To: <20180223145959.18761-5-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <jianfeng.tan@intel.com>) id 1epQCS-0002lC-Lh
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 22:08:39 -0500
+Received: from mga01.intel.com ([192.55.52.88]:19330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
+	id 1epQCR-0002gJ-VF
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 22:08:36 -0500
+From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
+Date: Sat, 24 Feb 2018 03:08:27 +0000
+Message-ID: <ED26CBA2FAD1BF48A8719AEF02201E365144EA8B@SHSMSX103.ccr.corp.intel.com>
+References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
+	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
+	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
+	<502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
+	<20180205181521.47232aa4@redhat.com>
+	<5155622d-cc49-d24c-7a7d-24ebb9ca2331@redhat.com>
+	<ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
+	<20180207130635.4033f8b8@redhat.com>
+	<8474af94-7bff-a7b5-e316-b8a0e332467e@intel.com>
+	<20180208105111.7a776513@redhat.com>
+	<53186984-2111-ed5e-0d47-65db12f22ea3@intel.com>
+	<20180208123018.5b3c9da7@redhat.com>
+In-Reply-To: <20180208123018.5b3c9da7@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] target/m68k: add fscale,
- fgetman and fgetexp
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +39,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 02/23/2018 06:59 AM, Laurent Vivier wrote:
-> Using local m68k floatx80_getman(), floatx80_getexp(), floatx80_scale()
-> [copied from previous:
-> Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  target/m68k/fpu_helper.c |  15 +++++
->  target/m68k/helper.h     |   3 +
->  target/m68k/softfloat.c  | 144 +++++++++++++++++++++++++++++++++++++++++++++++
->  target/m68k/softfloat.h  |   3 +
->  target/m68k/translate.c  |   9 +++
->  5 files changed, 174 insertions(+)
+Hi Igor and all,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> -----Original Message-----
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: Thursday, February 8, 2018 7:30 PM
+> To: Tan, Jianfeng
+> Cc: Paolo Bonzini; Jason Wang; Maxime Coquelin; qemu-devel@nongnu.org;
+> Michael S . Tsirkin
+> Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
+> migration
+>=20
+[...]
+> > > It could be solved by adding memdev option to machine,
+> > > which would allow to specify backend object. And then on
+> > > top make -mem-path alias new option to clean thing up.
+> >
+> > Do you mean?
+> >
+> > src vm: -m xG
+> > dst vm: -m xG,memdev=3Dpc.ram -object memory-backend-file,id=3Dpc.ram,s=
+ize=3DxG,mem-path=3Dxxx,share=3Don ...
+> Yep, I've meant something like it
+>=20
+> src vm: -m xG,memdev=3DSHARED_RAM -object memory-backend-file,id=3DSHARED=
+_RAM,size=3DxG,mem-path=3Dxxx,share=3Don
+> dst vm: -m xG,memdev=3DSHARED_RAM -object memory-backend-file,id=3DSHARED=
+_RAM,size=3DxG,mem-path=3Dxxx,share=3Don
 
-r~
+After a second thought, I find adding a backend for nonnuma pc RAM is round=
+about way.
+
+And we actually have an existing way to add a file-backed RAM: commit c9027=
+60fb25f ("Add option to use file backed guest memory"). Basically, this com=
+mit adds two options, --mem-path and --mem-prealloc, without specify a back=
+end explicitly.
+
+So how about just adding a new option --mem-share to decide if that's a pri=
+vate memory or shared memory? That seems much straightforward way to me; af=
+ter this change we can migrate like:
+
+src vm: -m xG
+dst vm: -m xG --mem-path xxx --mem-share
+
+Thanks,
+Jianfeng
+
+>=20
+> or it could be -machine FOO,inital_ram_memdev=3D...
+> maybe making -M optional in this case as size is specified by backend
+>=20
+> PS:
+> it's not a good idea to use QEMU's internal id 'pc.ram'
+> for user specified objects as it might cause problems.
