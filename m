@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1epPbx-000292-J6
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1epPeD-0003ru-A4
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:33:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1epPbu-0000Ul-ST
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:53 -0500
-Received: from mail-bl2nam02on0055.outbound.protection.outlook.com
-	([104.47.38.55]:35904
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1epPbu-0000U4-Le
-	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:30:50 -0500
-From: Babu Moger <babu.moger@amd.com>
-Date: Fri, 23 Feb 2018 21:30:20 -0500
-Message-Id: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1epPeA-0001Ug-7W
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:33:13 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:33516)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1epPeA-0001UF-0O
+	for qemu-devel@nongnu.org; Fri, 23 Feb 2018 21:33:10 -0500
+Received: by mail-pl0-x243.google.com with SMTP id c11-v6so2545093plo.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Feb 2018 18:33:09 -0800 (PST)
+References: <20180223145959.18761-1-laurent@vivier.eu>
+	<20180223145959.18761-5-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <dc1ae5ef-b700-2a83-143f-37bb95a867f9@linaro.org>
+Date: Fri, 23 Feb 2018 18:33:06 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 0/5] Enable TOPOEXT to support
- hyperthreading on AMD CPU
+In-Reply-To: <20180223145959.18761-5-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] target/m68k: add fscale,
+ fgetman and fgetexp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, pixo@polepetko.eu, Gary.Hook@amd.com, babu.moger@amd.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>
 
-These series enable TOPOEXT feature on AMD CPU. These are required to support
-hyperthreading on kvm guests. Addresses the issues reported by these bugs
-https://bugzilla.redhat.com/show_bug.cgi?id=1481253
-https://bugs.launchpad.net/qemu/+bug/1703506 
+On 02/23/2018 06:59 AM, Laurent Vivier wrote:
+> Using local m68k floatx80_getman(), floatx80_getexp(), floatx80_scale()
+> [copied from previous:
+> Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  target/m68k/fpu_helper.c |  15 +++++
+>  target/m68k/helper.h     |   3 +
+>  target/m68k/softfloat.c  | 144 +++++++++++++++++++++++++++++++++++++++++++++++
+>  target/m68k/softfloat.h  |   3 +
+>  target/m68k/translate.c  |   9 +++
+>  5 files changed, 174 insertions(+)
 
-v2:
-Fixed few more minor issues per Gary Hooks comments. Thank you Gary.
-Removed the patch#1. We need to handle the instruction cache associativity 
-seperately. It varies based on the cpu family. I will comeback to that later.
-Added two more typo corrections in patch#1 and patch#5.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-v1:
-Stanislav Lanci posted few patches earlier. 
-https://patchwork.kernel.org/patch/10040903/
-
-Rebased his patches with few changes.
-1. Spit the patches into two, separating cpuid functions 
-   0x8000001D and 0x8000001E (Patch 2 and 3).
-2. Removed the generic non-intel check and made a separate patch
-   with some changes(Patch 5).
-3. Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
-
-Added 2 more patches.
-Patch 1. Fixes cache associativity.
-Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
-
-
-Babu Moger (3):
-  target/i386: Fix a minor typo found while reviwing
-  target/i386: Enable TOPOEXT feature on AMD EPYC CPU
-  target/i386: Remove generic SMT thread check
-
-Stanislav Lanci (2):
-  target/i386: Populate AMD Processor Cache Information
-  target/i386: Add support for CPUID_8000_001E for AMD
-
- linux-headers/asm-x86/kvm.h |   2 +-
- target/i386/cpu.c           | 104 ++++++++++++++++++++++++++++++++++++++++----
- target/i386/kvm.c           |  31 +++++++++++--
- 3 files changed, 124 insertions(+), 13 deletions(-)
-
--- 
-1.8.3.1
+r~
