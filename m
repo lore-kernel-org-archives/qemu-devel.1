@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epgHC-00025H-Ik
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:36 -0500
+	(envelope-from <no-reply@patchew.org>) id 1epgY0-0007Ic-Du
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:36:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1epgH9-00084a-8I
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:34 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:51095)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1epgH8-00083s-Kn
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:18:31 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 24 Feb 2018 21:17:59 +0100
-Message-Id: <20180224201802.911-2-laurent@vivier.eu>
-In-Reply-To: <20180224201802.911-1-laurent@vivier.eu>
-References: <20180224201802.911-1-laurent@vivier.eu>
+	(envelope-from <no-reply@patchew.org>) id 1epgXv-0000fx-Ra
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:35:56 -0500
+Resent-Message-Id: <E1epgXv-0000fx-Ra@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1epgXv-0000Zx-I9
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 15:35:51 -0500
+In-Reply-To: <20180224154033.29559-1-mreitz@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151950358714.985.16059086733541504115@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 1/4] softfloat: export some functions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 24 Feb 2018 12:19:48 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] block: Handle null backing link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,383 +28,509 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: mreitz@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, berto@igalia.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, armbru@redhat.com
 
-Move fpu/softfloat-macros.h to include/fpu/
-
-Export floatx80 functions to be used by target floatx80
-specific implementations.
-
-Exports:
-  propagateFloatx80NaN(), extractFloatx80Frac(),
-  extractFloatx80Exp(), extractFloatx80Sign(),
-  normalizeFloatx80Subnormal(), packFloatx80(),
-  roundAndPackFloatx80(), normalizeRoundAndPackFloatx80()
-
-Also exports packFloat32() that will be used to implement
-m68k fsinh, fcos, fsin, ftan operations.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
-CC: Aurelien Jarno <aurelien@aurel32.net>
-CC: Alex Bennée <alex.bennee@linaro.org>
-CC: Peter Maydell <peter.maydell@linaro.org>
-
- fpu/softfloat-specialize.h              |   3 +-
- fpu/softfloat.c                         |  91 +++---------------------
- {fpu => include/fpu}/softfloat-macros.h |  10 +--
- include/fpu/softfloat.h                 | 120 ++++++++++++++++++++++++++++++++
- 4 files changed, 136 insertions(+), 88 deletions(-)
- rename {fpu => include/fpu}/softfloat-macros.h (98%)
-
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index e81ca001e1..46126e9e0a 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -1011,8 +1011,7 @@ static floatx80 commonNaNToFloatx80(commonNaNT a, float_status *status)
- | `b' is a signaling NaN, the invalid exception is raised.
- *----------------------------------------------------------------------------*/
- 
--static floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b,
--                                     float_status *status)
-+floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status)
- {
-     flag aIsQuietNaN, aIsSignalingNaN, bIsQuietNaN, bIsSignalingNaN;
-     flag aIsLargerSignificand;
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index e7fb0d357a..fb4853682e 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -93,7 +93,7 @@ this code that are retained.
- | division and square root approximations.  (Can be specialized to target if
- | desired.)
- *----------------------------------------------------------------------------*/
--#include "softfloat-macros.h"
-+#include "fpu/softfloat-macros.h"
- 
- /*----------------------------------------------------------------------------
- | Functions and definitions to determine:  (1) whether tininess for underflow
-@@ -2192,25 +2192,6 @@ static void
- 
- }
- 
--/*----------------------------------------------------------------------------
--| Packs the sign `zSign', exponent `zExp', and significand `zSig' into a
--| single-precision floating-point value, returning the result.  After being
--| shifted into the proper positions, the three fields are simply added
--| together to form the result.  This means that any integer portion of `zSig'
--| will be added into the exponent.  Since a properly normalized significand
--| will have an integer portion equal to 1, the `zExp' input should be 1 less
--| than the desired result exponent whenever `zSig' is a complete, normalized
--| significand.
--*----------------------------------------------------------------------------*/
--
--static inline float32 packFloat32(flag zSign, int zExp, uint32_t zSig)
--{
--
--    return make_float32(
--          ( ( (uint32_t) zSign )<<31 ) + ( ( (uint32_t) zExp )<<23 ) + zSig);
--
--}
--
- /*----------------------------------------------------------------------------
- | Takes an abstract floating-point value having sign `zSign', exponent `zExp',
- | and significand `zSig', and returns the proper single-precision floating-
-@@ -2490,42 +2471,6 @@ static float64
- 
- }
- 
--/*----------------------------------------------------------------------------
--| Returns the fraction bits of the extended double-precision floating-point
--| value `a'.
--*----------------------------------------------------------------------------*/
--
--static inline uint64_t extractFloatx80Frac( floatx80 a )
--{
--
--    return a.low;
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the exponent bits of the extended double-precision floating-point
--| value `a'.
--*----------------------------------------------------------------------------*/
--
--static inline int32_t extractFloatx80Exp( floatx80 a )
--{
--
--    return a.high & 0x7FFF;
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the sign bit of the extended double-precision floating-point value
--| `a'.
--*----------------------------------------------------------------------------*/
--
--static inline flag extractFloatx80Sign( floatx80 a )
--{
--
--    return a.high>>15;
--
--}
--
- /*----------------------------------------------------------------------------
- | Normalizes the subnormal extended double-precision floating-point value
- | represented by the denormalized significand `aSig'.  The normalized exponent
-@@ -2533,30 +2478,14 @@ static inline flag extractFloatx80Sign( floatx80 a )
- | `zSigPtr', respectively.
- *----------------------------------------------------------------------------*/
- 
--static void
-- normalizeFloatx80Subnormal( uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr )
-+void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr,
-+                                uint64_t *zSigPtr)
- {
-     int8_t shiftCount;
- 
-     shiftCount = countLeadingZeros64( aSig );
-     *zSigPtr = aSig<<shiftCount;
-     *zExpPtr = 1 - shiftCount;
--
--}
--
--/*----------------------------------------------------------------------------
--| Packs the sign `zSign', exponent `zExp', and significand `zSig' into an
--| extended double-precision floating-point value, returning the result.
--*----------------------------------------------------------------------------*/
--
--static inline floatx80 packFloatx80( flag zSign, int32_t zExp, uint64_t zSig )
--{
--    floatx80 z;
--
--    z.low = zSig;
--    z.high = ( ( (uint16_t) zSign )<<15 ) + zExp;
--    return z;
--
- }
- 
- /*----------------------------------------------------------------------------
-@@ -2583,9 +2512,9 @@ static inline floatx80 packFloatx80( flag zSign, int32_t zExp, uint64_t zSig )
- | Floating-Point Arithmetic.
- *----------------------------------------------------------------------------*/
- 
--static floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
--                                     int32_t zExp, uint64_t zSig0, uint64_t zSig1,
--                                     float_status *status)
-+floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
-+                              int32_t zExp, uint64_t zSig0, uint64_t zSig1,
-+                              float_status *status)
- {
-     int8_t roundingMode;
-     flag roundNearestEven, increment, isTiny;
-@@ -2779,10 +2708,10 @@ static floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
- | normalized.
- *----------------------------------------------------------------------------*/
- 
--static floatx80 normalizeRoundAndPackFloatx80(int8_t roundingPrecision,
--                                              flag zSign, int32_t zExp,
--                                              uint64_t zSig0, uint64_t zSig1,
--                                              float_status *status)
-+floatx80 normalizeRoundAndPackFloatx80(int8_t roundingPrecision,
-+                                       flag zSign, int32_t zExp,
-+                                       uint64_t zSig0, uint64_t zSig1,
-+                                       float_status *status)
- {
-     int8_t shiftCount;
- 
-diff --git a/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-similarity index 98%
-rename from fpu/softfloat-macros.h
-rename to include/fpu/softfloat-macros.h
-index c45a23193e..35e1603a5e 100644
---- a/fpu/softfloat-macros.h
-+++ b/include/fpu/softfloat-macros.h
-@@ -603,7 +603,7 @@ static inline void
- | unsigned integer is returned.
- *----------------------------------------------------------------------------*/
- 
--static uint64_t estimateDiv128To64( uint64_t a0, uint64_t a1, uint64_t b )
-+static inline uint64_t estimateDiv128To64(uint64_t a0, uint64_t a1, uint64_t b)
- {
-     uint64_t b0, b1;
-     uint64_t rem0, rem1, term0, term1;
-@@ -630,7 +630,7 @@ static uint64_t estimateDiv128To64( uint64_t a0, uint64_t a1, uint64_t b )
-  *
-  * Licensed under the GPLv2/LGPLv3
-  */
--static uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
-+static inline uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
- {
-     uint64_t d0, d1, q0, q1, r1, r0, m;
- 
-@@ -683,7 +683,7 @@ static uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
- | value.
- *----------------------------------------------------------------------------*/
- 
--static uint32_t estimateSqrt32(int aExp, uint32_t a)
-+static inline uint32_t estimateSqrt32(int aExp, uint32_t a)
- {
-     static const uint16_t sqrtOddAdjustments[] = {
-         0x0004, 0x0022, 0x005D, 0x00B1, 0x011D, 0x019F, 0x0236, 0x02E0,
-@@ -717,7 +717,7 @@ static uint32_t estimateSqrt32(int aExp, uint32_t a)
- | `a'.  If `a' is zero, 32 is returned.
- *----------------------------------------------------------------------------*/
- 
--static int8_t countLeadingZeros32( uint32_t a )
-+static inline int8_t countLeadingZeros32(uint32_t a)
- {
- #if SOFTFLOAT_GNUC_PREREQ(3, 4)
-     if (a) {
-@@ -765,7 +765,7 @@ static int8_t countLeadingZeros32( uint32_t a )
- | `a'.  If `a' is zero, 64 is returned.
- *----------------------------------------------------------------------------*/
- 
--static int8_t countLeadingZeros64( uint64_t a )
-+static inline int8_t countLeadingZeros64(uint64_t a)
- {
- #if SOFTFLOAT_GNUC_PREREQ(3, 4)
-     if (a) {
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 9b7b5e34e2..125dcb5586 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -419,6 +419,22 @@ static inline float32 float32_set_sign(float32 a, int sign)
- #define float32_half make_float32(0x3f000000)
- #define float32_infinity make_float32(0x7f800000)
- 
-+/*----------------------------------------------------------------------------
-+| Packs the sign `zSign', exponent `zExp', and significand `zSig' into a
-+| single-precision floating-point value, returning the result.  After being
-+| shifted into the proper positions, the three fields are simply added
-+| together to form the result.  This means that any integer portion of `zSig'
-+| will be added into the exponent.  Since a properly normalized significand
-+| will have an integer portion equal to 1, the `zExp' input should be 1 less
-+| than the desired result exponent whenever `zSig' is a complete, normalized
-+| significand.
-+*----------------------------------------------------------------------------*/
-+
-+static inline float32 packFloat32(flag zSign, int zExp, uint32_t zSig)
-+{
-+    return make_float32(
-+          (((uint32_t)zSign) << 31) + (((uint32_t)zExp) << 23) + zSig);
-+}
- 
- /*----------------------------------------------------------------------------
- | The pattern for a default generated single-precision NaN.
-@@ -632,6 +648,110 @@ static inline bool floatx80_invalid_encoding(floatx80 a)
- #define floatx80_half make_floatx80(0x3ffe, 0x8000000000000000LL)
- #define floatx80_infinity make_floatx80(0x7fff, 0x8000000000000000LL)
- 
-+/*----------------------------------------------------------------------------
-+| Returns the fraction bits of the extended double-precision floating-point
-+| value `a'.
-+*----------------------------------------------------------------------------*/
-+
-+static inline uint64_t extractFloatx80Frac(floatx80 a)
-+{
-+    return a.low;
-+}
-+
-+/*----------------------------------------------------------------------------
-+| Returns the exponent bits of the extended double-precision floating-point
-+| value `a'.
-+*----------------------------------------------------------------------------*/
-+
-+static inline int32_t extractFloatx80Exp(floatx80 a)
-+{
-+    return a.high & 0x7FFF;
-+}
-+
-+/*----------------------------------------------------------------------------
-+| Returns the sign bit of the extended double-precision floating-point value
-+| `a'.
-+*----------------------------------------------------------------------------*/
-+
-+static inline flag extractFloatx80Sign(floatx80 a)
-+{
-+    return a.high >> 15;
-+}
-+
-+/*----------------------------------------------------------------------------
-+| Packs the sign `zSign', exponent `zExp', and significand `zSig' into an
-+| extended double-precision floating-point value, returning the result.
-+*----------------------------------------------------------------------------*/
-+
-+static inline floatx80 packFloatx80(flag zSign, int32_t zExp, uint64_t zSig)
-+{
-+    floatx80 z;
-+
-+    z.low = zSig;
-+    z.high = (((uint16_t)zSign) << 15) + zExp;
-+    return z;
-+}
-+
-+/*----------------------------------------------------------------------------
-+| Normalizes the subnormal extended double-precision floating-point value
-+| represented by the denormalized significand `aSig'.  The normalized exponent
-+| and significand are stored at the locations pointed to by `zExpPtr' and
-+| `zSigPtr', respectively.
-+*----------------------------------------------------------------------------*/
-+
-+void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr,
-+                                uint64_t *zSigPtr);
-+
-+/*----------------------------------------------------------------------------
-+| Takes two extended double-precision floating-point values `a' and `b', one
-+| of which is a NaN, and returns the appropriate NaN result.  If either `a' or
-+| `b' is a signaling NaN, the invalid exception is raised.
-+*----------------------------------------------------------------------------*/
-+
-+floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status);
-+
-+/*----------------------------------------------------------------------------
-+| Takes an abstract floating-point value having sign `zSign', exponent `zExp',
-+| and extended significand formed by the concatenation of `zSig0' and `zSig1',
-+| and returns the proper extended double-precision floating-point value
-+| corresponding to the abstract input.  Ordinarily, the abstract value is
-+| rounded and packed into the extended double-precision format, with the
-+| inexact exception raised if the abstract input cannot be represented
-+| exactly.  However, if the abstract value is too large, the overflow and
-+| inexact exceptions are raised and an infinity or maximal finite value is
-+| returned.  If the abstract value is too small, the input value is rounded to
-+| a subnormal number, and the underflow and inexact exceptions are raised if
-+| the abstract input cannot be represented exactly as a subnormal extended
-+| double-precision floating-point number.
-+|     If `roundingPrecision' is 32 or 64, the result is rounded to the same
-+| number of bits as single or double precision, respectively.  Otherwise, the
-+| result is rounded to the full precision of the extended double-precision
-+| format.
-+|     The input significand must be normalized or smaller.  If the input
-+| significand is not normalized, `zExp' must be 0; in that case, the result
-+| returned is a subnormal number, and it must not require rounding.  The
-+| handling of underflow and overflow follows the IEC/IEEE Standard for Binary
-+| Floating-Point Arithmetic.
-+*----------------------------------------------------------------------------*/
-+
-+floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
-+                              int32_t zExp, uint64_t zSig0, uint64_t zSig1,
-+                              float_status *status);
-+
-+/*----------------------------------------------------------------------------
-+| Takes an abstract floating-point value having sign `zSign', exponent
-+| `zExp', and significand formed by the concatenation of `zSig0' and `zSig1',
-+| and returns the proper extended double-precision floating-point value
-+| corresponding to the abstract input.  This routine is just like
-+| `roundAndPackFloatx80' except that the input significand does not have to be
-+| normalized.
-+*----------------------------------------------------------------------------*/
-+
-+floatx80 normalizeRoundAndPackFloatx80(int8_t roundingPrecision,
-+                                       flag zSign, int32_t zExp,
-+                                       uint64_t zSig0, uint64_t zSig1,
-+                                       float_status *status);
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated extended double-precision NaN.
- *----------------------------------------------------------------------------*/
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLXF1aWNrQGNlbnRvczYgYnVpbGQgdGVzdC4g
+UGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4g
+SWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2Ug
+aXQKbG9jYWxseS4KClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MDIyNDE1NDAzMy4yOTU1
+OS0xLW1yZWl0ekByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC83
+XSBibG9jazogSGFuZGxlIG51bGwgYmFja2luZyBsaW5rCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0ZSAtLWluaXQgZHRjCiMg
+TGV0IGRvY2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhwb3J0IFNIT1dfRU5WPTEK
+ZXhwb3J0IEo9OAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNgo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFlMzQ3ZGEwNjggYmxvY2s6
+IERlcHJlY2F0ZSAiYmFja2luZyI6ICIiCjMzNDJjMTQ0MzEgYmxvY2s6IEhhbmRsZSBudWxsIGJh
+Y2tpbmcgbGluawo4NGE4MWY2YzMwIHFhcGk6IE1ha2UgbW9yZSBvZiBxb2JqZWN0X3RvKCkKZDQy
+MzFlNDdmMSBxYXBpOiBSZW1vdmUgcW9iamVjdF90b19YKCkgZnVuY3Rpb25zCjFmMjY5ZmYwOWEg
+cWFwaTogUmVwbGFjZSBxb2JqZWN0X3RvX1gobykgYnkgcW9iamVjdF90byhvLCBYKQo3MDc1ZmM0
+Yjk5IHFhcGk6IEFkZCBxb2JqZWN0X3RvKCkKMDdmNGFkMWJlMCBjb21waWxlcjogQWRkIFFFTVVf
+QlVJTERfQlVHX01TRygpIG1hY3JvCgo9PT0gT1VUUFVUIEJFR0lOID09PQpTdWJtb2R1bGUgJ2R0
+YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
+dGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbGlfazhu
+X3Mvc3JjL2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICdlNTQzODgw
+MTVhZjFmYjRiZjA0ZDBiY2E5OWNhYmExMDc0ZDljYzQyJwogIEJVSUxEICAgY2VudG9zNgptYWtl
+WzFdOiBFbnRlcmluZyBkaXJlY3RvcnkgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1saV9r
+OG5fcy9zcmMnCiAgR0VOICAgICAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbGlfazhuX3Mv
+c3JjL2RvY2tlci1zcmMuMjAxOC0wMi0yNC0xNS4xOC4yOC4xNTM1Mi9xZW11LnRhcgpDbG9uaW5n
+IGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1saV9rOG5fcy9zcmMvZG9ja2VyLXNy
+Yy4yMDE4LTAyLTI0LTE1LjE4LjI4LjE1MzUyL3FlbXUudGFyLnZyb290Jy4uLgpkb25lLgpDaGVj
+a2luZyBvdXQgZmlsZXM6ICA0OCUgKDI4MjcvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAg
+NDklICgyODgxLzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUwJSAoMjkzOS81ODc4KSAg
+IApDaGVja2luZyBvdXQgZmlsZXM6ICA1MSUgKDI5OTgvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZp
+bGVzOiAgNTIlICgzMDU3LzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUzJSAoMzExNi81
+ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NCUgKDMxNzUvNTg3OCkgICAKQ2hlY2tpbmcg
+b3V0IGZpbGVzOiAgNTUlICgzMjMzLzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU2JSAo
+MzI5Mi81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NyUgKDMzNTEvNTg3OCkgICAKQ2hl
+Y2tpbmcgb3V0IGZpbGVzOiAgNTglICgzNDEwLzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczog
+IDU5JSAoMzQ2OS81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MCUgKDM1MjcvNTg3OCkg
+ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjElICgzNTg2LzU4NzgpICAgCkNoZWNraW5nIG91dCBm
+aWxlczogIDYyJSAoMzY0NS81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MyUgKDM3MDQv
+NTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjQlICgzNzYyLzU4NzgpICAgCkNoZWNraW5n
+IG91dCBmaWxlczogIDY1JSAoMzgyMS81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2NiUg
+KDM4ODAvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjclICgzOTM5LzU4NzgpICAgCkNo
+ZWNraW5nIG91dCBmaWxlczogIDY4JSAoMzk5OC81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6
+ICA2OSUgKDQwNTYvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzAlICg0MTE1LzU4Nzgp
+ICAgCkNoZWNraW5nIG91dCBmaWxlczogIDcxJSAoNDE3NC81ODc4KSAgIApDaGVja2luZyBvdXQg
+ZmlsZXM6ICA3MiUgKDQyMzMvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzMlICg0Mjkx
+LzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc0JSAoNDM1MC81ODc4KSAgIApDaGVja2lu
+ZyBvdXQgZmlsZXM6ICA3NSUgKDQ0MDkvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzYl
+ICg0NDY4LzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc3JSAoNDUyNy81ODc4KSAgIApD
+aGVja2luZyBvdXQgZmlsZXM6ICA3OCUgKDQ1ODUvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVz
+OiAgNzklICg0NjQ0LzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgwJSAoNDcwMy81ODc4
+KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MSUgKDQ3NjIvNTg3OCkgICAKQ2hlY2tpbmcgb3V0
+IGZpbGVzOiAgODIlICg0ODIwLzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgzJSAoNDg3
+OS81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NCUgKDQ5MzgvNTg3OCkgICAKQ2hlY2tp
+bmcgb3V0IGZpbGVzOiAgODUlICg0OTk3LzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDg2
+JSAoNTA1Ni81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NyUgKDUxMTQvNTg3OCkgICAK
+Q2hlY2tpbmcgb3V0IGZpbGVzOiAgODglICg1MTczLzU4NzgpICAgCkNoZWNraW5nIG91dCBmaWxl
+czogIDg5JSAoNTIzMi81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MCUgKDUyOTEvNTg3
+OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTElICg1MzQ5LzU4NzgpICAgCkNoZWNraW5nIG91
+dCBmaWxlczogIDkyJSAoNTQwOC81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MyUgKDU0
+NjcvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTQlICg1NTI2LzU4NzgpICAgCkNoZWNr
+aW5nIG91dCBmaWxlczogIDk1JSAoNTU4NS81ODc4KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5
+NiUgKDU2NDMvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTclICg1NzAyLzU4NzgpICAg
+CkNoZWNraW5nIG91dCBmaWxlczogIDk4JSAoNTc2MS81ODc4KSAgIApDaGVja2luZyBvdXQgZmls
+ZXM6ICA5OSUgKDU4MjAvNTg3OCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAxMDAlICg1ODc4LzU4
+NzgpICAgCkNoZWNraW5nIG91dCBmaWxlczogMTAwJSAoNTg3OC81ODc4KSwgZG9uZS4KWW91ciBi
+cmFuY2ggaXMgdXAtdG8tZGF0ZSB3aXRoICdvcmlnaW4vdGVzdCcuClN1Ym1vZHVsZSAnZHRjJyAo
+Z2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
+ZHRjJwpDbG9uaW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1saV9rOG5fcy9z
+cmMvZG9ja2VyLXNyYy4yMDE4LTAyLTI0LTE1LjE4LjI4LjE1MzUyL3FlbXUudGFyLnZyb290L2R0
+YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICdlNTQzODgwMTVhZjFmYjRi
+ZjA0ZDBiY2E5OWNhYmExMDc0ZDljYzQyJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGdp
+dDovL2dpdC5xZW11Lm9yZy9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1
+aS9rZXljb2RlbWFwZGInCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
+LWxpX2s4bl9zL3NyYy9kb2NrZXItc3JjLjIwMTgtMDItMjQtMTUuMTguMjguMTUzNTIvcWVtdS50
+YXIudnJvb3QvdWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUgcGF0aCAndWkva2V5Y29kZW1h
+cGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBlZjNkODMy
+Y2UnCiAgQ09QWSAgICBSVU5ORVIKICAgIFJVTiB0ZXN0LXF1aWNrIGluIHFlbXU6Y2VudG9zNiAK
+UGFja2FnZXMgaW5zdGFsbGVkOgpTREwtZGV2ZWwtMS4yLjE0LTcuZWw2XzcuMS54ODZfNjQKYmlz
+b24tMi40LjEtNS5lbDYueDg2XzY0CmJ6aXAyLWRldmVsLTEuMC41LTcuZWw2XzAueDg2XzY0CmNj
+YWNoZS0zLjEuNi0yLmVsNi54ODZfNjQKY3NuYXBweS1kZXZlbC0wLTYuMjAxNTA3MjlnaXRkN2Jj
+NjgzLmVsNi54ODZfNjQKZmxleC0yLjUuMzUtOS5lbDYueDg2XzY0CmdjYy00LjQuNy0xOC5lbDYu
+eDg2XzY0CmdldHRleHQtMC4xNy0xOC5lbDYueDg2XzY0CmdpdC0xLjcuMS05LmVsNl85Lng4Nl82
+NApnbGliMi1kZXZlbC0yLjI4LjgtOS5lbDYueDg2XzY0CmxpYmVwb3h5LWRldmVsLTEuMi0zLmVs
+Ni54ODZfNjQKbGliZmR0LWRldmVsLTEuNC4wLTEuZWw2Lng4Nl82NApsaWJyZG1hY20tZGV2ZWwt
+MS4wLjIxLTAuZWw2Lng4Nl82NApsem8tZGV2ZWwtMi4wMy0zLjEuZWw2XzUuMS54ODZfNjQKbWFr
+ZS0zLjgxLTIzLmVsNi54ODZfNjQKbWVzYS1saWJFR0wtZGV2ZWwtMTEuMC43LTQuZWw2Lng4Nl82
+NAptZXNhLWxpYmdibS1kZXZlbC0xMS4wLjctNC5lbDYueDg2XzY0CnBhY2thZ2UgZysrIGlzIG5v
+dCBpbnN0YWxsZWQKcGl4bWFuLWRldmVsLTAuMzIuOC0xLmVsNi54ODZfNjQKc3BpY2UtZ2xpYi1k
+ZXZlbC0wLjI2LTguZWw2Lng4Nl82NApzcGljZS1zZXJ2ZXItZGV2ZWwtMC4xMi40LTE2LmVsNi54
+ODZfNjQKdGFyLTEuMjMtMTUuZWw2XzgueDg2XzY0CnZ0ZS1kZXZlbC0wLjI1LjEtOS5lbDYueDg2
+XzY0Cnhlbi1kZXZlbC00LjYuNi0yLmVsNi54ODZfNjQKemxpYi1kZXZlbC0xLjIuMy0yOS5lbDYu
+eDg2XzY0CgpFbnZpcm9ubWVudCB2YXJpYWJsZXM6ClBBQ0tBR0VTPWJpc29uICAgICBiemlwMi1k
+ZXZlbCAgICAgY2NhY2hlICAgICBjc25hcHB5LWRldmVsICAgICBmbGV4ICAgICBnKysgICAgIGdj
+YyAgICAgZ2V0dGV4dCAgICAgZ2l0ICAgICBnbGliMi1kZXZlbCAgICAgbGliZXBveHktZGV2ZWwg
+ICAgIGxpYmZkdC1kZXZlbCAgICAgbGlicmRtYWNtLWRldmVsICAgICBsem8tZGV2ZWwgICAgIG1h
+a2UgICAgIG1lc2EtbGliRUdMLWRldmVsICAgICBtZXNhLWxpYmdibS1kZXZlbCAgICAgcGl4bWFu
+LWRldmVsICAgICBTREwtZGV2ZWwgICAgIHNwaWNlLWdsaWItZGV2ZWwgICAgIHNwaWNlLXNlcnZl
+ci1kZXZlbCAgICAgdGFyICAgICB2dGUtZGV2ZWwgICAgIHhlbi1kZXZlbCAgICAgemxpYi1kZXZl
+bApIT1NUTkFNRT03YzIwMjk4ZmM3YTMKTUFLRUZMQUdTPSAtajgKSj04CkNDQUNIRV9ESVI9L3Zh
+ci90bXAvY2NhY2hlCkVYVFJBX0NPTkZJR1VSRV9PUFRTPQpWPQpTSE9XX0VOVj0xClBBVEg9L3Vz
+ci9saWIvY2NhY2hlOi91c3IvbGliNjQvY2NhY2hlOi91c3IvbG9jYWwvc2JpbjovdXNyL2xvY2Fs
+L2JpbjovdXNyL3NiaW46L3Vzci9iaW46L3NiaW46L2JpbgpQV0Q9LwpUQVJHRVRfTElTVD0KU0hM
+Vkw9MQpIT01FPS9yb290ClRFU1RfRElSPS90bXAvcWVtdS10ZXN0CkZFQVRVUkVTPSBkdGMKREVC
+VUc9Cl89L3Vzci9iaW4vZW52CgpDb25maWd1cmUgb3B0aW9uczoKLS1lbmFibGUtd2Vycm9yIC0t
+dGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2NC1zb2Z0bW11IC0tcHJlZml4PS90bXAv
+cWVtdS10ZXN0L2luc3RhbGwKTm8gQysrIGNvbXBpbGVyIGF2YWlsYWJsZTsgZGlzYWJsaW5nIEMr
+KyBzcGVjaWZpYyBvcHRpb25hbCBjb2RlCkluc3RhbGwgcHJlZml4ICAgIC90bXAvcWVtdS10ZXN0
+L2luc3RhbGwKQklPUyBkaXJlY3RvcnkgICAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbC9zaGFyZS9x
+ZW11CmZpcm13YXJlIHBhdGggICAgIC90bXAvcWVtdS10ZXN0L2luc3RhbGwvc2hhcmUvcWVtdS1m
+aXJtd2FyZQpiaW5hcnkgZGlyZWN0b3J5ICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL2JpbgpsaWJy
+YXJ5IGRpcmVjdG9yeSAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL2xpYgptb2R1bGUgZGlyZWN0b3J5
+ICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL2xpYi9xZW11CmxpYmV4ZWMgZGlyZWN0b3J5IC90bXAv
+cWVtdS10ZXN0L2luc3RhbGwvbGliZXhlYwppbmNsdWRlIGRpcmVjdG9yeSAvdG1wL3FlbXUtdGVz
+dC9pbnN0YWxsL2luY2x1ZGUKY29uZmlnIGRpcmVjdG9yeSAgL3RtcC9xZW11LXRlc3QvaW5zdGFs
+bC9ldGMKbG9jYWwgc3RhdGUgZGlyZWN0b3J5ICAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbC92YXIK
+TWFudWFsIGRpcmVjdG9yeSAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbC9zaGFyZS9tYW4KRUxGIGlu
+dGVycCBwcmVmaXggL3Vzci9nbmVtdWwvcWVtdS0lTQpTb3VyY2UgcGF0aCAgICAgICAvdG1wL3Fl
+bXUtdGVzdC9zcmMKR0lUIGJpbmFyeSAgICAgICAgZ2l0CkdJVCBzdWJtb2R1bGVzICAgIApDIGNv
+bXBpbGVyICAgICAgICBjYwpIb3N0IEMgY29tcGlsZXIgICBjYwpDKysgY29tcGlsZXIgICAgICAK
+T2JqZWN0aXZlLUMgY29tcGlsZXIgY2MKQVJGTEFHUyAgICAgICAgICAgcnYKQ0ZMQUdTICAgICAg
+ICAgICAgLU8yIC1VX0ZPUlRJRllfU09VUkNFIC1EX0ZPUlRJRllfU09VUkNFPTIgLWcgClFFTVVf
+Q0ZMQUdTICAgICAgIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0xICAgLUkkKFNSQ19QQVRIKS9kdGMv
+bGliZmR0IC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9nbGli
+LTIuMC9pbmNsdWRlICAgLUROQ1VSU0VTX1dJREVDSEFSICAgLWZQSUUgLURQSUUgLW02NCAtbWN4
+MTYgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VS
+Q0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1X
+d3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAt
+Zm5vLWNvbW1vbiAtZndyYXB2ICAtV2VuZGlmLWxhYmVscyAtV25vLW1pc3NpbmctaW5jbHVkZS1k
+aXJzIC1XZW1wdHktYm9keSAtV25lc3RlZC1leHRlcm5zIC1XZm9ybWF0LXNlY3VyaXR5IC1XZm9y
+bWF0LXkyayAtV2luaXQtc2VsZiAtV2lnbm9yZWQtcXVhbGlmaWVycyAtV29sZC1zdHlsZS1kZWNs
+YXJhdGlvbiAtV29sZC1zdHlsZS1kZWZpbml0aW9uIC1XdHlwZS1saW1pdHMgLWZzdGFjay1wcm90
+ZWN0b3ItYWxsIC1Xbm8tbWlzc2luZy1icmFjZXMgIC1JL3Vzci9pbmNsdWRlL2xpYnBuZzEyICAg
+LUkvdXNyL2luY2x1ZGUvbGliZHJtICAgICAtSS91c3IvaW5jbHVkZS9zcGljZS1zZXJ2ZXIgLUkv
+dXNyL2luY2x1ZGUvY2FjYXJkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9n
+bGliLTIuMC9pbmNsdWRlIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0xIC1JL3Vzci9pbmNsdWRlL25z
+czMgLUkvdXNyL2luY2x1ZGUvbnNwcjQgLUkvdXNyL2luY2x1ZGUvc3BpY2UtMSAgCkxERkxBR1Mg
+ICAgICAgICAgIC1XbCwtLXdhcm4tY29tbW9uIC1XbCwteixyZWxybyAtV2wsLXosbm93IC1waWUg
+LW02NCAtZyAKbWFrZSAgICAgICAgICAgICAgbWFrZQppbnN0YWxsICAgICAgICAgICBpbnN0YWxs
+CnB5dGhvbiAgICAgICAgICAgIHB5dGhvbiAtQgpzbWJkICAgICAgICAgICAgICAvdXNyL3NiaW4v
+c21iZAptb2R1bGUgc3VwcG9ydCAgICBubwpob3N0IENQVSAgICAgICAgICB4ODZfNjQKaG9zdCBi
+aWcgZW5kaWFuICAgbm8KdGFyZ2V0IGxpc3QgICAgICAgeDg2XzY0LXNvZnRtbXUgYWFyY2g2NC1z
+b2Z0bW11Cmdwcm9mIGVuYWJsZWQgICAgIG5vCnNwYXJzZSBlbmFibGVkICAgIG5vCnN0cmlwIGJp
+bmFyaWVzICAgIHllcwpwcm9maWxlciAgICAgICAgICBubwpzdGF0aWMgYnVpbGQgICAgICBubwpT
+REwgc3VwcG9ydCAgICAgICB5ZXMgKDEuMi4xNCkKR1RLIHN1cHBvcnQgICAgICAgeWVzICgyLjI0
+LjIzKQpHVEsgR0wgc3VwcG9ydCAgICBubwpWVEUgc3VwcG9ydCAgICAgICB5ZXMgKDAuMjUuMSkK
+VExTIHByaW9yaXR5ICAgICAgTk9STUFMCkdOVVRMUyBzdXBwb3J0ICAgIG5vCkdOVVRMUyBybmQg
+ICAgICAgIG5vCmxpYmdjcnlwdCAgICAgICAgIG5vCmxpYmdjcnlwdCBrZGYgICAgIG5vCm5ldHRs
+ZSAgICAgICAgICAgIG5vIApuZXR0bGUga2RmICAgICAgICBubwpsaWJ0YXNuMSAgICAgICAgICBu
+bwpjdXJzZXMgc3VwcG9ydCAgICB5ZXMKdmlyZ2wgc3VwcG9ydCAgICAgbm8KY3VybCBzdXBwb3J0
+ICAgICAgbm8KbWluZ3czMiBzdXBwb3J0ICAgbm8KQXVkaW8gZHJpdmVycyAgICAgb3NzCkJsb2Nr
+IHdoaXRlbGlzdCAocncpIApCbG9jayB3aGl0ZWxpc3QgKHJvKSAKVmlydEZTIHN1cHBvcnQgICAg
+bm8KTXVsdGlwYXRoIHN1cHBvcnQgbm8KVk5DIHN1cHBvcnQgICAgICAgeWVzClZOQyBTQVNMIHN1
+cHBvcnQgIG5vClZOQyBKUEVHIHN1cHBvcnQgIHllcwpWTkMgUE5HIHN1cHBvcnQgICB5ZXMKeGVu
+IHN1cHBvcnQgICAgICAgeWVzCnhlbiBjdHJsIHZlcnNpb24gIDQwNjAwCnB2IGRvbSBidWlsZCAg
+ICAgIG5vCmJybGFwaSBzdXBwb3J0ICAgIG5vCmJsdWV6ICBzdXBwb3J0ICAgIG5vCkRvY3VtZW50
+YXRpb24gICAgIG5vClBJRSAgICAgICAgICAgICAgIHllcwp2ZGUgc3VwcG9ydCAgICAgICBubwpu
+ZXRtYXAgc3VwcG9ydCAgICBubwpMaW51eCBBSU8gc3VwcG9ydCBubwpBVFRSL1hBVFRSIHN1cHBv
+cnQgeWVzCkluc3RhbGwgYmxvYnMgICAgIHllcwpLVk0gc3VwcG9ydCAgICAgICB5ZXMKSEFYIHN1
+cHBvcnQgICAgICAgbm8KSFZGIHN1cHBvcnQgICAgICAgbm8KV0hQWCBzdXBwb3J0ICAgICAgbm8K
+VENHIHN1cHBvcnQgICAgICAgeWVzClRDRyBkZWJ1ZyBlbmFibGVkIG5vClRDRyBpbnRlcnByZXRl
+ciAgIG5vCm1hbGxvYyB0cmltIHN1cHBvcnQgeWVzClJETUEgc3VwcG9ydCAgICAgIG5vCmZkdCBz
+dXBwb3J0ICAgICAgIHllcwpwcmVhZHYgc3VwcG9ydCAgICB5ZXMKZmRhdGFzeW5jICAgICAgICAg
+eWVzCm1hZHZpc2UgICAgICAgICAgIHllcwpwb3NpeF9tYWR2aXNlICAgICB5ZXMKcG9zaXhfbWVt
+YWxpZ24gICAgeWVzCmxpYmNhcC1uZyBzdXBwb3J0IG5vCnZob3N0LW5ldCBzdXBwb3J0IHllcwp2
+aG9zdC1zY3NpIHN1cHBvcnQgeWVzCnZob3N0LXZzb2NrIHN1cHBvcnQgeWVzCnZob3N0LXVzZXIg
+c3VwcG9ydCB5ZXMKVHJhY2UgYmFja2VuZHMgICAgbG9nCnNwaWNlIHN1cHBvcnQgICAgIHllcyAo
+MC4xMi42LzAuMTIuNCkKcmJkIHN1cHBvcnQgICAgICAgbm8KeGZzY3RsIHN1cHBvcnQgICAgbm8K
+c21hcnRjYXJkIHN1cHBvcnQgeWVzCmxpYnVzYiAgICAgICAgICAgIG5vCnVzYiBuZXQgcmVkaXIg
+ICAgIG5vCk9wZW5HTCBzdXBwb3J0ICAgIHllcwpPcGVuR0wgZG1hYnVmcyAgICBubwpsaWJpc2Nz
+aSBzdXBwb3J0ICBubwpsaWJuZnMgc3VwcG9ydCAgICBubwpidWlsZCBndWVzdCBhZ2VudCB5ZXMK
+UUdBIFZTUyBzdXBwb3J0ICAgbm8KUUdBIHczMiBkaXNrIGluZm8gbm8KUUdBIE1TSSBzdXBwb3J0
+ICAgbm8Kc2VjY29tcCBzdXBwb3J0ICAgbm8KY29yb3V0aW5lIGJhY2tlbmQgdWNvbnRleHQKY29y
+b3V0aW5lIHBvb2wgICAgeWVzCmRlYnVnIHN0YWNrIHVzYWdlIG5vCmNyeXB0byBhZmFsZyAgICAg
+IG5vCkdsdXN0ZXJGUyBzdXBwb3J0IG5vCmdjb3YgICAgICAgICAgICAgIGdjb3YKZ2NvdiBlbmFi
+bGVkICAgICAgbm8KVFBNIHN1cHBvcnQgICAgICAgeWVzCmxpYnNzaDIgc3VwcG9ydCAgIG5vClRQ
+TSBwYXNzdGhyb3VnaCAgIHllcwpUUE0gZW11bGF0b3IgICAgICB5ZXMKUU9NIGRlYnVnZ2luZyAg
+ICAgeWVzCkxpdmUgYmxvY2sgbWlncmF0aW9uIHllcwpsem8gc3VwcG9ydCAgICAgICB5ZXMKc25h
+cHB5IHN1cHBvcnQgICAgbm8KYnppcDIgc3VwcG9ydCAgICAgeWVzCk5VTUEgaG9zdCBzdXBwb3J0
+IG5vCmxpYnhtbDIgICAgICAgICAgIG5vCnRjbWFsbG9jIHN1cHBvcnQgIG5vCmplbWFsbG9jIHN1
+cHBvcnQgIG5vCmF2eDIgb3B0aW1pemF0aW9uIG5vCnJlcGxpY2F0aW9uIHN1cHBvcnQgeWVzClZ4
+SFMgYmxvY2sgZGV2aWNlIG5vCmNhcHN0b25lICAgICAgICAgIG5vCgpXQVJOSU5HOiBVc2Ugb2Yg
+R1RLIDIuMCBpcyBkZXByZWNhdGVkIGFuZCB3aWxsIGJlIHJlbW92ZWQgaW4KV0FSTklORzogZnV0
+dXJlIHJlbGVhc2VzLiBQbGVhc2Ugc3dpdGNoIHRvIHVzaW5nIEdUSyAzLjAKCldBUk5JTkc6IFVz
+ZSBvZiBTREwgMS4yIGlzIGRlcHJlY2F0ZWQgYW5kIHdpbGwgYmUgcmVtb3ZlZCBpbgpXQVJOSU5H
+OiBmdXR1cmUgcmVsZWFzZXMuIFBsZWFzZSBzd2l0Y2ggdG8gdXNpbmcgU0RMIDIuMApta2RpciAt
+cCBkdGMvbGliZmR0CiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsu
+dG1wCiAgR0VOICAgICBhYXJjaDY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrLnRtcApta2Rp
+ciAtcCBkdGMvdGVzdHMKICBHRU4gICAgIGNvbmZpZy1ob3N0LmgKICBHRU4gICAgIHFlbXUtb3B0
+aW9ucy5kZWYKICBHRU4gICAgIHFtcC1jb21tYW5kcy5oCiAgR0VOICAgICBxYXBpLXZpc2l0LmgK
+ICBHRU4gICAgIHFhcGktdHlwZXMuaAogIEdFTiAgICAgcWFwaS1ldmVudC5oCiAgR0VOICAgICB4
+ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsKICBHRU4gICAgIHFtcC1tYXJzaGFsLmMK
+ICBHRU4gICAgIHFhcGktdHlwZXMuYwogIEdFTiAgICAgYWFyY2g2NC1zb2Z0bW11L2NvbmZpZy1k
+ZXZpY2VzLm1hawogIEdFTiAgICAgcWFwaS1ldmVudC5jCiAgR0VOICAgICBxYXBpLXZpc2l0LmMK
+ICBHRU4gICAgIHFtcC1pbnRyb3NwZWN0LmgKICBHRU4gICAgIHFtcC1pbnRyb3NwZWN0LmMKICBH
+RU4gICAgIHRyYWNlL2dlbmVyYXRlZC10Y2ctdHJhY2Vycy5oCiAgR0VOICAgICB0cmFjZS9nZW5l
+cmF0ZWQtaGVscGVycy13cmFwcGVycy5oCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVy
+cy5oCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5jCiAgR0VOICAgICBtb2R1bGVf
+YmxvY2suaAogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLWF0c2V0MS10by1xY29kZS5jCiAgR0VO
+ICAgICB1aS9pbnB1dC1rZXltYXAtbGludXgtdG8tcWNvZGUuYwogIEdFTiAgICAgdWkvaW5wdXQt
+a2V5bWFwLXFjb2RlLXRvLWF0c2V0MS5jCiAgR0VOICAgICB1aS9pbnB1dC1rZXltYXAtcWNvZGUt
+dG8tYXRzZXQyLmMKICBHRU4gICAgIHVpL2lucHV0LWtleW1hcC1xY29kZS10by1hdHNldDMuYwog
+IEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLXFjb2RlLXRvLWxpbnV4LmMKICBHRU4gICAgIHVpL2lu
+cHV0LWtleW1hcC1xY29kZS10by1xbnVtLmMKICBHRU4gICAgIHVpL2lucHV0LWtleW1hcC1xY29k
+ZS10by1zdW4uYwogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLXFudW0tdG8tcWNvZGUuYwogIEdF
+TiAgICAgdWkvaW5wdXQta2V5bWFwLXVzYi10by1xY29kZS5jCiAgR0VOICAgICB1aS9pbnB1dC1r
+ZXltYXAtd2luMzItdG8tcWNvZGUuYwogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLXgxMS10by1x
+Y29kZS5jCiAgR0VOICAgICB1aS9pbnB1dC1rZXltYXAteG9yZ2V2ZGV2LXRvLXFjb2RlLmMKICBH
+RU4gICAgIHVpL2lucHV0LWtleW1hcC14b3Jna2JkLXRvLXFjb2RlLmMKICBHRU4gICAgIHVpL2lu
+cHV0LWtleW1hcC14b3JneHF1YXJ0ei10by1xY29kZS5jCiAgR0VOICAgICB1aS9pbnB1dC1rZXlt
+YXAteG9yZ3h3aW4tdG8tcWNvZGUuYwogIEdFTiAgICAgdGVzdHMvdGVzdC1xYXBpLXR5cGVzLmgK
+ICBHRU4gICAgIHRlc3RzL3Rlc3QtcWFwaS12aXNpdC5oCiAgR0VOICAgICB0ZXN0cy90ZXN0LXFt
+cC1jb21tYW5kcy5oCiAgR0VOICAgICB0ZXN0cy90ZXN0LXFhcGktZXZlbnQuaAogIEdFTiAgICAg
+dGVzdHMvdGVzdC1xbXAtaW50cm9zcGVjdC5oCiAgR0VOICAgICB0cmFjZS1yb290LmgKICBHRU4g
+ICAgIHV0aWwvdHJhY2UuaAogIEdFTiAgICAgY3J5cHRvL3RyYWNlLmgKICBHRU4gICAgIGlvL3Ry
+YWNlLmgKICBHRU4gICAgIG1pZ3JhdGlvbi90cmFjZS5oCiAgR0VOICAgICBibG9jay90cmFjZS5o
+CiAgR0VOICAgICBjaGFyZGV2L3RyYWNlLmgKICBHRU4gICAgIGh3L2Jsb2NrL3RyYWNlLmgKICBH
+RU4gICAgIGh3L2Jsb2NrL2RhdGFwbGFuZS90cmFjZS5oCiAgR0VOICAgICBody9jaGFyL3RyYWNl
+LmgKICBHRU4gICAgIGh3L2ludGMvdHJhY2UuaAogIEdFTiAgICAgaHcvbmV0L3RyYWNlLmgKICBH
+RU4gICAgIGh3L3JkbWEvdHJhY2UuaAogIEdFTiAgICAgaHcvcmRtYS92bXcvdHJhY2UuaAogIEdF
+TiAgICAgaHcvdmlydGlvL3RyYWNlLmgKICBHRU4gICAgIGh3L2F1ZGlvL3RyYWNlLmgKICBHRU4g
+ICAgIGh3L21pc2MvdHJhY2UuaAogIEdFTiAgICAgaHcvbWlzYy9tYWNpby90cmFjZS5oCiAgR0VO
+ICAgICBody91c2IvdHJhY2UuaAogIEdFTiAgICAgaHcvc2NzaS90cmFjZS5oCiAgR0VOICAgICBo
+dy9udnJhbS90cmFjZS5oCiAgR0VOICAgICBody9kaXNwbGF5L3RyYWNlLmgKICBHRU4gICAgIGh3
+L2lucHV0L3RyYWNlLmgKICBHRU4gICAgIGh3L3RpbWVyL3RyYWNlLmgKICBHRU4gICAgIGh3L2Rt
+YS90cmFjZS5oCiAgR0VOICAgICBody9zcGFyYy90cmFjZS5oCiAgR0VOICAgICBody9zcGFyYzY0
+L3RyYWNlLmgKICBHRU4gICAgIGh3L3NkL3RyYWNlLmgKICBHRU4gICAgIGh3L2lzYS90cmFjZS5o
+CiAgR0VOICAgICBody9tZW0vdHJhY2UuaAogIEdFTiAgICAgaHcvaTM4Ni90cmFjZS5oCiAgR0VO
+ICAgICBody9pMzg2L3hlbi90cmFjZS5oCiAgR0VOICAgICBody85cGZzL3RyYWNlLmgKICBHRU4g
+ICAgIGh3L3BwYy90cmFjZS5oCiAgR0VOICAgICBody9wY2kvdHJhY2UuaAogIEdFTiAgICAgaHcv
+cGNpLWhvc3QvdHJhY2UuaAogIEdFTiAgICAgaHcvczM5MHgvdHJhY2UuaAogIEdFTiAgICAgaHcv
+dmZpby90cmFjZS5oCiAgR0VOICAgICBody9hY3BpL3RyYWNlLmgKICBHRU4gICAgIGh3L2FybS90
+cmFjZS5oCiAgR0VOICAgICBody9hbHBoYS90cmFjZS5oCiAgR0VOICAgICBody9ocHBhL3RyYWNl
+LmgKICBHRU4gICAgIGh3L3hlbi90cmFjZS5oCiAgR0VOICAgICBody9pZGUvdHJhY2UuaAogIEdF
+TiAgICAgdWkvdHJhY2UuaAogIEdFTiAgICAgYXVkaW8vdHJhY2UuaAogIEdFTiAgICAgbmV0L3Ry
+YWNlLmgKICBHRU4gICAgIHRhcmdldC9hcm0vdHJhY2UuaAogIEdFTiAgICAgdGFyZ2V0L2kzODYv
+dHJhY2UuaAogIEdFTiAgICAgdGFyZ2V0L21pcHMvdHJhY2UuaAogIEdFTiAgICAgdGFyZ2V0L3Nw
+YXJjL3RyYWNlLmgKICBHRU4gICAgIHRhcmdldC9zMzkweC90cmFjZS5oCiAgR0VOICAgICB0YXJn
+ZXQvcHBjL3RyYWNlLmgKICBHRU4gICAgIHFvbS90cmFjZS5oCiAgR0VOICAgICBsaW51eC11c2Vy
+L3RyYWNlLmgKICBHRU4gICAgIHFhcGkvdHJhY2UuaAogIEdFTiAgICAgYWNjZWwvdGNnL3RyYWNl
+LmgKICBHRU4gICAgIGFjY2VsL2t2bS90cmFjZS5oCiAgR0VOICAgICBuYmQvdHJhY2UuaAogIEdF
+TiAgICAgc2NzaS90cmFjZS5oCiAgR0VOICAgICB0cmFjZS1yb290LmMKICBHRU4gICAgIHV0aWwv
+dHJhY2UuYwogIEdFTiAgICAgY3J5cHRvL3RyYWNlLmMKICBHRU4gICAgIGlvL3RyYWNlLmMKICBH
+RU4gICAgIG1pZ3JhdGlvbi90cmFjZS5jCiAgR0VOICAgICBibG9jay90cmFjZS5jCiAgR0VOICAg
+ICBjaGFyZGV2L3RyYWNlLmMKICBHRU4gICAgIGh3L2Jsb2NrL3RyYWNlLmMKICBHRU4gICAgIGh3
+L2Jsb2NrL2RhdGFwbGFuZS90cmFjZS5jCiAgR0VOICAgICBody9jaGFyL3RyYWNlLmMKICBHRU4g
+ICAgIGh3L2ludGMvdHJhY2UuYwogIEdFTiAgICAgaHcvbmV0L3RyYWNlLmMKICBHRU4gICAgIGh3
+L3JkbWEvdHJhY2UuYwogIEdFTiAgICAgaHcvcmRtYS92bXcvdHJhY2UuYwogIEdFTiAgICAgaHcv
+dmlydGlvL3RyYWNlLmMKICBHRU4gICAgIGh3L2F1ZGlvL3RyYWNlLmMKICBHRU4gICAgIGh3L21p
+c2MvdHJhY2UuYwogIEdFTiAgICAgaHcvbWlzYy9tYWNpby90cmFjZS5jCiAgR0VOICAgICBody91
+c2IvdHJhY2UuYwogIEdFTiAgICAgaHcvc2NzaS90cmFjZS5jCiAgR0VOICAgICBody9udnJhbS90
+cmFjZS5jCiAgR0VOICAgICBody9kaXNwbGF5L3RyYWNlLmMKICBHRU4gICAgIGh3L2lucHV0L3Ry
+YWNlLmMKICBHRU4gICAgIGh3L3RpbWVyL3RyYWNlLmMKICBHRU4gICAgIGh3L2RtYS90cmFjZS5j
+CiAgR0VOICAgICBody9zcGFyYy90cmFjZS5jCiAgR0VOICAgICBody9zcGFyYzY0L3RyYWNlLmMK
+ICBHRU4gICAgIGh3L3NkL3RyYWNlLmMKICBHRU4gICAgIGh3L2lzYS90cmFjZS5jCiAgR0VOICAg
+ICBody9tZW0vdHJhY2UuYwogIEdFTiAgICAgaHcvaTM4Ni90cmFjZS5jCiAgR0VOICAgICBody9p
+Mzg2L3hlbi90cmFjZS5jCiAgR0VOICAgICBody85cGZzL3RyYWNlLmMKICBHRU4gICAgIGh3L3Bw
+Yy90cmFjZS5jCiAgR0VOICAgICBody9wY2kvdHJhY2UuYwogIEdFTiAgICAgaHcvcGNpLWhvc3Qv
+dHJhY2UuYwogIEdFTiAgICAgaHcvczM5MHgvdHJhY2UuYwogIEdFTiAgICAgaHcvdmZpby90cmFj
+ZS5jCiAgR0VOICAgICBody9hY3BpL3RyYWNlLmMKICBHRU4gICAgIGh3L2FybS90cmFjZS5jCiAg
+R0VOICAgICBody9hbHBoYS90cmFjZS5jCiAgR0VOICAgICBody9ocHBhL3RyYWNlLmMKICBHRU4g
+ICAgIGh3L3hlbi90cmFjZS5jCiAgR0VOICAgICBody9pZGUvdHJhY2UuYwogIEdFTiAgICAgdWkv
+dHJhY2UuYwogIEdFTiAgICAgYXVkaW8vdHJhY2UuYwogIEdFTiAgICAgbmV0L3RyYWNlLmMKICBH
+RU4gICAgIHRhcmdldC9hcm0vdHJhY2UuYwogIEdFTiAgICAgdGFyZ2V0L2kzODYvdHJhY2UuYwog
+IEdFTiAgICAgdGFyZ2V0L21pcHMvdHJhY2UuYwogIEdFTiAgICAgdGFyZ2V0L3NwYXJjL3RyYWNl
+LmMKICBHRU4gICAgIHRhcmdldC9zMzkweC90cmFjZS5jCiAgR0VOICAgICB0YXJnZXQvcHBjL3Ry
+YWNlLmMKICBHRU4gICAgIHFvbS90cmFjZS5jCiAgR0VOICAgICBsaW51eC11c2VyL3RyYWNlLmMK
+ICBHRU4gICAgIHFhcGkvdHJhY2UuYwogIEdFTiAgICAgYWNjZWwvdGNnL3RyYWNlLmMKICBHRU4g
+ICAgIGFjY2VsL2t2bS90cmFjZS5jCiAgR0VOICAgICBuYmQvdHJhY2UuYwogIEdFTiAgICAgc2Nz
+aS90cmFjZS5jCiAgR0VOICAgICBjb25maWctYWxsLWRldmljZXMubWFrCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvdGVzdHMvZHVtcHRyZWVzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3Jj
+L2R0Yy90ZXN0cy90cmVlcy5TCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvdGVz
+dHV0aWxzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy92YWx1ZS1sYWJlbHMu
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2FzbV90cmVlX2R1bXAuYwoJIERF
+UCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3RydW5jYXRlZF9wcm9wZXJ0eS5jCgkgREVQ
+IC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvY2hlY2tfcGF0aC5jCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvdGVzdHMvb3ZlcmxheV9iYWRfZml4dXAuYwoJIERFUCAvdG1wL3FlbXUt
+dGVzdC9zcmMvZHRjL3Rlc3RzL292ZXJsYXkuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRj
+L3Rlc3RzL3N1Ym5vZGVfaXRlcmF0ZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVz
+dHMvcHJvcGVydHlfaXRlcmF0ZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMv
+aW50ZWdlci1leHByZXNzaW9ucy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMv
+dXRpbGZkdF90ZXN0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9wYXRoX29m
+ZnNldF9hbGlhc2VzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9hZGRfc3Vi
+bm9kZV93aXRoX25vcHMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2R0YnNf
+ZXF1YWxfdW5vcmRlcmVkLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9kdGJf
+cmV2ZXJzZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZHRic19lcXVhbF9v
+cmRlcmVkLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9leHRyYS10ZXJtaW5h
+dGluZy1udWxsLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9pbmNiaW4uYwoJ
+IERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2Jvb3QtY3B1aWQuYwoJIERFUCAvdG1w
+L3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3BoYW5kbGVfZm9ybWF0LmMKCSBERVAgL3RtcC9xZW11
+LXRlc3Qvc3JjL2R0Yy90ZXN0cy9wYXRoLXJlZmVyZW5jZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVz
+dC9zcmMvZHRjL3Rlc3RzL3JlZmVyZW5jZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRj
+L3Rlc3RzL3N0cmluZ19lc2NhcGVzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0
+cy9wcm9wbmFtZV9lc2NhcGVzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9h
+cHBlbmRwcm9wMi5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvYXBwZW5kcHJv
+cDEuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2RlbF9ub2RlLmMKCSBERVAg
+L3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9kZWxfcHJvcGVydHkuYwoJIERFUCAvdG1wL3Fl
+bXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3NldHByb3AuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMv
+ZHRjL3Rlc3RzL3NldF9uYW1lLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9y
+d190cmVlMS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvb3Blbl9wYWNrLmMK
+CSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9tYW5nbGUtbGF5b3V0LmMKCSBERVAg
+L3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub3B1bGF0ZS5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvdGVzdHMvbW92ZV9hbmRfc2F2ZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3Ny
+Yy9kdGMvdGVzdHMvc3dfdHJlZTEuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3Rz
+L25vcF9ub2RlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub3BfcHJvcGVy
+dHkuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3NldHByb3BfaW5wbGFjZS5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvc3RyaW5nbGlzdC5jCgkgREVQIC90
+bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvYWRkcl9zaXplX2NlbGxzLmMKCSBERVAgL3RtcC9x
+ZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub3Rmb3VuZC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3Ny
+Yy9kdGMvdGVzdHMvc2l6ZWRfY2VsbHMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rl
+c3RzL2NoYXJfbGl0ZXJhbC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZ2V0
+X2FsaWFzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub2RlX2NoZWNrX2Nv
+bXBhdGlibGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL25vZGVfb2Zmc2V0
+X2J5X2NvbXBhdGlibGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL25vZGVf
+b2Zmc2V0X2J5X3BoYW5kbGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL25v
+ZGVfb2Zmc2V0X2J5X3Byb3BfdmFsdWUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rl
+c3RzL3BhcmVudF9vZmZzZXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3N1
+cGVybm9kZV9hdGRlcHRoX29mZnNldC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVz
+dHMvZ2V0X3BhdGguYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dldHByb3Au
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dldF9waGFuZGxlLmMKCSBERVAg
+L3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9nZXRfbmFtZS5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvdGVzdHMvc3Vibm9kZV9vZmZzZXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9z
+cmMvZHRjL3Rlc3RzL3BhdGhfb2Zmc2V0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90
+ZXN0cy9maW5kX3Byb3BlcnR5LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9y
+b290X25vZGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dldF9tZW1fcnN2
+LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0X292ZXJsYXkuYwoJIERF
+UCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xpYmZkdC9mZHRfYWRkcmVzc2VzLmMKCSBERVAgL3Rt
+cC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0X2VtcHR5X3RyZWUuYwoJIERFUCAvdG1wL3Fl
+bXUtdGVzdC9zcmMvZHRjL2xpYmZkdC9mZHRfc3RyZXJyb3IuYwoJIERFUCAvdG1wL3FlbXUtdGVz
+dC9zcmMvZHRjL2xpYmZkdC9mZHRfc3cuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xp
+YmZkdC9mZHRfcm8uYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xpYmZkdC9mZHRfcncu
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xpYmZkdC9mZHRfd2lwLmMKCSBERVAgL3Rt
+cC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3Jj
+L2R0Yy91dGlsLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9mZHRvdmVybGF5LmMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9mZHRwdXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9z
+cmMvZHRjL2ZkdGdldC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvZmR0ZHVtcC5jCgkg
+TEVYIGNvbnZlcnQtZHRzdjAtbGV4ZXIubGV4LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0
+Yy9zcmNwb3MuYwoJIEJJU09OIGR0Yy1wYXJzZXIudGFiLmMKCSBMRVggZHRjLWxleGVyLmxleC5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdHJlZXNvdXJjZS5jCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvbGl2ZXRyZWUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2Zs
+YXR0cmVlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9mc3RyZWUuYwoJIERFUCAvdG1w
+L3FlbXUtdGVzdC9zcmMvZHRjL2R0Yy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvZGF0
+YS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvY2hlY2tzLmMKCSBERVAgY29udmVydC1k
+dHN2MC1sZXhlci5sZXguYwoJIERFUCBkdGMtcGFyc2VyLnRhYi5jCgkgREVQIGR0Yy1sZXhlci5s
+ZXguYwoJQ0hLIHZlcnNpb25fZ2VuLmgKCVVQRCB2ZXJzaW9uX2dlbi5oCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvdXRpbC5jCgkgQ0MgbGliZmR0L2ZkdC5vCgkgQ0MgbGliZmR0L2ZkdF9y
+by5vCgkgQ0MgbGliZmR0L2ZkdF93aXAubwoJIENDIGxpYmZkdC9mZHRfcncubwoJIENDIGxpYmZk
+dC9mZHRfc3RyZXJyb3IubwoJIENDIGxpYmZkdC9mZHRfYWRkcmVzc2VzLm8KCSBDQyBsaWJmZHQv
+ZmR0X2VtcHR5X3RyZWUubwoJIENDIGxpYmZkdC9mZHRfc3cubwoJIENDIGxpYmZkdC9mZHRfb3Zl
+cmxheS5vCgkgQVIgbGliZmR0L2xpYmZkdC5hCmFyOiBjcmVhdGluZyBsaWJmZHQvbGliZmR0LmEK
+YSAtIGxpYmZkdC9mZHQubwphIC0gbGliZmR0L2ZkdF9yby5vCmEgLSBsaWJmZHQvZmR0X3dpcC5v
+CmEgLSBsaWJmZHQvZmR0X3N3Lm8KYSAtIGxpYmZkdC9mZHRfcncubwphIC0gbGliZmR0L2ZkdF9z
+dHJlcnJvci5vCmEgLSBsaWJmZHQvZmR0X2VtcHR5X3RyZWUubwphIC0gbGliZmR0L2ZkdF9hZGRy
+ZXNzZXMubwphIC0gbGliZmR0L2ZkdF9vdmVybGF5Lm8KbWtkaXIgLXAgZHRjL2xpYmZkdApta2Rp
+ciAtcCBkdGMvdGVzdHMKICBDQyAgICAgIHRlc3RzL3FlbXUtaW90ZXN0cy9zb2NrZXRfc2NtX2hl
+bHBlci5vCiAgR0VOICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdHlwZXMuaAogIEdF
+TiAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xYXBpLXZpc2l0LmgKICBHRU4gICAgIHFnYS9x
+YXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS10eXBlcy5jCiAgR0VOICAgICBxZ2EvcWFwaS1nZW5lcmF0
+ZWQvcWdhLXFtcC1jb21tYW5kcy5oCiAgR0VOICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFh
+cGktdmlzaXQuYwogIEdFTiAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xbXAtbWFyc2hhbC5j
+CiAgQ0MgICAgICBxbXAtaW50cm9zcGVjdC5vCiAgQ0MgICAgICBxYXBpLXR5cGVzLm8KICBDQyAg
+ICAgIHFhcGktdmlzaXQubwogIENDICAgICAgcWFwaS1ldmVudC5vCiAgQ0MgICAgICBxYXBpL3Fh
+cGktdmlzaXQtY29yZS5vCiAgQ0MgICAgICBxYXBpL3FhcGktZGVhbGxvYy12aXNpdG9yLm8KICBD
+QyAgICAgIHFhcGkvcW9iamVjdC1pbnB1dC12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcW9iamVj
+dC1vdXRwdXQtdmlzaXRvci5vCiAgQ0MgICAgICBxYXBpL3FtcC1yZWdpc3RyeS5vCiAgQ0MgICAg
+ICBxYXBpL3FtcC1kaXNwYXRjaC5vCiAgQ0MgICAgICBxYXBpL3N0cmluZy1pbnB1dC12aXNpdG9y
+Lm8KICBDQyAgICAgIHFhcGkvc3RyaW5nLW91dHB1dC12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkv
+b3B0cy12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcWFwaS1jbG9uZS12aXNpdG9yLm8KICBDQyAg
+ICAgIHFhcGkvcW1wLWV2ZW50Lm8KICBDQyAgICAgIHFhcGkvcWFwaS11dGlsLm8KICBDQyAgICAg
+IHFvYmplY3QvcW51bGwubwogIENDICAgICAgcW9iamVjdC9xbnVtLm8KICBDQyAgICAgIHFvYmpl
+Y3QvcXN0cmluZy5vCiAgQ0MgICAgICBxb2JqZWN0L3FkaWN0Lm8KICBDQyAgICAgIHFvYmplY3Qv
+cWxpc3QubwogIENDICAgICAgcW9iamVjdC9xYm9vbC5vCiAgQ0MgICAgICBxb2JqZWN0L3FsaXQu
+bwogIENDICAgICAgcW9iamVjdC9xanNvbi5vCiAgQ0MgICAgICBxb2JqZWN0L3FvYmplY3Qubwog
+IENDICAgICAgcW9iamVjdC9qc29uLWxleGVyLm8KICBDQyAgICAgIHFvYmplY3QvanNvbi1zdHJl
+YW1lci5vCiAgQ0MgICAgICBxb2JqZWN0L2pzb24tcGFyc2VyLm8KICBDQyAgICAgIHRyYWNlL2Nv
+bnRyb2wubwogIENDICAgICAgdHJhY2UvcW1wLm8KICBDQyAgICAgIHV0aWwvb3NkZXAubwogIEND
+ICAgICAgdXRpbC9jdXRpbHMubwogIENDICAgICAgdXRpbC91bmljb2RlLm8KICBDQyAgICAgIHV0
+aWwvcWVtdS10aW1lci1jb21tb24ubwogIENDICAgICAgdXRpbC9idWZmZXJpc3plcm8ubwogIEND
+ICAgICAgdXRpbC9sb2NrY250Lm8KICBDQyAgICAgIHV0aWwvYWlvY2IubwogIENDICAgICAgdXRp
+bC9hc3luYy5vCiAgQ0MgICAgICB1dGlsL3RocmVhZC1wb29sLm8KICBDQyAgICAgIHV0aWwvcWVt
+dS10aW1lci5vCiAgQ0MgICAgICB1dGlsL21haW4tbG9vcC5vCiAgQ0MgICAgICB1dGlsL2lvaGFu
+ZGxlci5vCiAgQ0MgICAgICB1dGlsL2Fpby1wb3NpeC5vCiAgQ0MgICAgICB1dGlsL2NvbXBhdGZk
+Lm8KICBDQyAgICAgIHV0aWwvZXZlbnRfbm90aWZpZXItcG9zaXgubwogIENDICAgICAgdXRpbC9t
+bWFwLWFsbG9jLm8KICBDQyAgICAgIHV0aWwvb3NsaWItcG9zaXgubwogIENDICAgICAgdXRpbC9x
+ZW11LW9wZW5wdHkubwogIENDICAgICAgdXRpbC9xZW11LXRocmVhZC1wb3NpeC5vCiAgQ0MgICAg
+ICB1dGlsL21lbWZkLm8KICBDQyAgICAgIHV0aWwvZW52bGlzdC5vCiAgQ0MgICAgICB1dGlsL3Bh
+dGgubwogIENDICAgICAgdXRpbC9tb2R1bGUubwogIENDICAgICAgdXRpbC9ob3N0LXV0aWxzLm8K
+ICBDQyAgICAgIHV0aWwvYml0bWFwLm8KICBDQyAgICAgIHV0aWwvYml0b3BzLm8KICBDQyAgICAg
+IHV0aWwvaGJpdG1hcC5vCiAgQ0MgICAgICB1dGlsL2ZpZm84Lm8KICBDQyAgICAgIHV0aWwvYWNs
+Lm8KICBDQyAgICAgIHV0aWwvY2FjaGVpbmZvLm8KICBDQyAgICAgIHV0aWwvZXJyb3IubwogIEND
+ICAgICAgdXRpbC9xZW11LWVycm9yLm8KICBDQyAgICAgIHV0aWwvaWQubwogIENDICAgICAgdXRp
+bC9pb3YubwogIENDICAgICAgdXRpbC9xZW11LWNvbmZpZy5vCiAgQ0MgICAgICB1dGlsL3FlbXUt
+c29ja2V0cy5vCiAgQ0MgICAgICB1dGlsL3VyaS5vCiAgQ0MgICAgICB1dGlsL25vdGlmeS5vCiAg
+Q0MgICAgICB1dGlsL3FlbXUtb3B0aW9uLm8KICBDQyAgICAgIHV0aWwvcWVtdS1wcm9ncmVzcy5v
+CiAgQ0MgICAgICB1dGlsL2tleXZhbC5vCiAgQ0MgICAgICB1dGlsL2hleGR1bXAubwogIENDICAg
+ICAgdXRpbC9jcmMzMmMubwogIENDICAgICAgdXRpbC91dWlkLm8KICBDQyAgICAgIHV0aWwvdGhy
+b3R0bGUubwogIENDICAgICAgdXRpbC9nZXRhdXh2YWwubwogIENDICAgICAgdXRpbC9yZWFkbGlu
+ZS5vCiAgQ0MgICAgICB1dGlsL3JjdS5vCiAgQ0MgICAgICB1dGlsL3FlbXUtY29yb3V0aW5lLm8K
+ICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUtbG9jay5vCiAgQ0MgICAgICB1dGlsL3FlbXUt
+Y29yb3V0aW5lLWlvLm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUtc2xlZXAubwogIEND
+ICAgICAgdXRpbC9jb3JvdXRpbmUtdWNvbnRleHQubwogIENDICAgICAgdXRpbC9idWZmZXIubwog
+IENDICAgICAgdXRpbC90aW1lZC1hdmVyYWdlLm8KICBDQyAgICAgIHV0aWwvYmFzZTY0Lm8KICBD
+QyAgICAgIHV0aWwvbG9nLm8KICBDQyAgICAgIHV0aWwvcGFnZXNpemUubwogIENDICAgICAgdXRp
+bC9xZGlzdC5vCiAgQ0MgICAgICB1dGlsL3FodC5vCiAgQ0MgICAgICB1dGlsL3JhbmdlLm8KICBD
+QyAgICAgIHV0aWwvc3RhdHM2NC5vCiAgQ0MgICAgICB1dGlsL3N5c3RlbWQubwogIENDICAgICAg
+dHJhY2Utcm9vdC5vCiAgQ0MgICAgICB1dGlsL3ZmaW8taGVscGVycy5vCiAgQ0MgICAgICB1dGls
+L3RyYWNlLm8KICBDQyAgICAgIGNyeXB0by90cmFjZS5vCiAgQ0MgICAgICBpby90cmFjZS5vCiAg
+Q0MgICAgICBtaWdyYXRpb24vdHJhY2UubwogIENDICAgICAgYmxvY2svdHJhY2UubwogIENDICAg
+ICAgY2hhcmRldi90cmFjZS5vCiAgQ0MgICAgICBody9ibG9jay90cmFjZS5vCiAgQ0MgICAgICBo
+dy9ibG9jay9kYXRhcGxhbmUvdHJhY2UubwogIENDICAgICAgaHcvY2hhci90cmFjZS5vCiAgQ0Mg
+ICAgICBody9pbnRjL3RyYWNlLm8KICBDQyAgICAgIGh3L25ldC90cmFjZS5vCiAgQ0MgICAgICBo
+dy9yZG1hL3RyYWNlLm8KICBDQyAgICAgIGh3L3JkbWEvdm13L3RyYWNlLm8KICBDQyAgICAgIGh3
+L3ZpcnRpby90cmFjZS5vCiAgQ0MgICAgICBody9hdWRpby90cmFjZS5vCiAgQ0MgICAgICBody9t
+aXNjL21hY2lvL3RyYWNlLm8KICBDQyAgICAgIGh3L21pc2MvdHJhY2UubwogIENDICAgICAgaHcv
+dXNiL3RyYWNlLm8KICBDQyAgICAgIGh3L3Njc2kvdHJhY2UubwogIENDICAgICAgaHcvbnZyYW0v
+dHJhY2UubwogIENDICAgICAgaHcvZGlzcGxheS90cmFjZS5vCiAgQ0MgICAgICBody9pbnB1dC90
+cmFjZS5vCiAgQ0MgICAgICBody90aW1lci90cmFjZS5vCiAgQ0MgICAgICBody9kbWEvdHJhY2Uu
+bwogIENDICAgICAgaHcvc3BhcmMvdHJhY2UubwogIENDICAgICAgaHcvc3BhcmM2NC90cmFjZS5v
+CiAgQ0MgICAgICBody9zZC90cmFjZS5vCiAgQ0MgICAgICBody9pc2EvdHJhY2UubwogIENDICAg
+ICAgaHcvbWVtL3RyYWNlLm8KICBDQyAgICAgIGh3L2kzODYvdHJhY2UubwogIENDICAgICAgaHcv
+aTM4Ni94ZW4vdHJhY2UubwogIENDICAgICAgaHcvOXBmcy90cmFjZS5vCiAgQ0MgICAgICBody9w
+cGMvdHJhY2UubwogIENDICAgICAgaHcvcGNpL3RyYWNlLm8KICBDQyAgICAgIGh3L3BjaS1ob3N0
+L3RyYWNlLm8KICBDQyAgICAgIGh3L3MzOTB4L3RyYWNlLm8KICBDQyAgICAgIGh3L3ZmaW8vdHJh
+Y2UubwogIENDICAgICAgaHcvYWNwaS90cmFjZS5vCiAgQ0MgICAgICBody9hcm0vdHJhY2Uubwog
+IENDICAgICAgaHcvYWxwaGEvdHJhY2UubwogIENDICAgICAgaHcvaHBwYS90cmFjZS5vCiAgQ0Mg
+ICAgICBody94ZW4vdHJhY2UubwogIENDICAgICAgaHcvaWRlL3RyYWNlLm8KICBDQyAgICAgIHVp
+L3RyYWNlLm8KICBDQyAgICAgIGF1ZGlvL3RyYWNlLm8KICBDQyAgICAgIG5ldC90cmFjZS5vCiAg
+Q0MgICAgICB0YXJnZXQvYXJtL3RyYWNlLm8KICBDQyAgICAgIHRhcmdldC9pMzg2L3RyYWNlLm8K
+ICBDQyAgICAgIHRhcmdldC9taXBzL3RyYWNlLm8KICBDQyAgICAgIHRhcmdldC9zcGFyYy90cmFj
+ZS5vCiAgQ0MgICAgICB0YXJnZXQvczM5MHgvdHJhY2UubwogIENDICAgICAgdGFyZ2V0L3BwYy90
+cmFjZS5vCiAgQ0MgICAgICBxb20vdHJhY2UubwogIENDICAgICAgbGludXgtdXNlci90cmFjZS5v
+CiAgQ0MgICAgICBxYXBpL3RyYWNlLm8KICBDQyAgICAgIGFjY2VsL3RjZy90cmFjZS5vCiAgQ0Mg
+ICAgICBhY2NlbC9rdm0vdHJhY2UubwogIENDICAgICAgbmJkL3RyYWNlLm8KICBDQyAgICAgIHNj
+c2kvdHJhY2UubwogIENDICAgICAgY3J5cHRvL3Bia2RmLXN0dWIubwogIENDICAgICAgc3R1YnMv
+YXJjaC1xdWVyeS1jcHUtZGVmLm8KICBDQyAgICAgIHN0dWJzL2FyY2gtcXVlcnktY3B1LW1vZGVs
+LWV4cGFuc2lvbi5vCiAgQ0MgICAgICBzdHVicy9hcmNoLXF1ZXJ5LWNwdS1tb2RlbC1jb21wYXJp
+c29uLm8KICBDQyAgICAgIHN0dWJzL2FyY2gtcXVlcnktY3B1LW1vZGVsLWJhc2VsaW5lLm8KICBD
+QyAgICAgIHN0dWJzL2JkcnYtbmV4dC1tb25pdG9yLW93bmVkLm8KICBDQyAgICAgIHN0dWJzL2Js
+ay1jb21taXQtYWxsLm8KICBDQyAgICAgIHN0dWJzL2Jsb2NrZGV2LWNsb3NlLWFsbC1iZHJ2LXN0
+YXRlcy5vCiAgQ0MgICAgICBzdHVicy9jbG9jay13YXJwLm8KICBDQyAgICAgIHN0dWJzL2NwdS1n
+ZXQtY2xvY2subwogIENDICAgICAgc3R1YnMvY3B1LWdldC1pY291bnQubwogIENDICAgICAgc3R1
+YnMvZHVtcC5vCiAgQ0MgICAgICBzdHVicy9lcnJvci1wcmludGYubwogIENDICAgICAgc3R1YnMv
+ZmRzZXQubwogIENDICAgICAgc3R1YnMvZ2Ric3R1Yi5vCiAgQ0MgICAgICBzdHVicy9nZXQtdm0t
+bmFtZS5vCiAgQ0MgICAgICBzdHVicy9pb3RocmVhZC5vCiAgQ0MgICAgICBzdHVicy9pb3RocmVh
+ZC1sb2NrLm8KICBDQyAgICAgIHN0dWJzL2lzLWRhZW1vbml6ZWQubwogIENDICAgICAgc3R1YnMv
+bWFjaGluZS1pbml0LWRvbmUubwogIENDICAgICAgc3R1YnMvbWlnci1ibG9ja2VyLm8KICBDQyAg
+ICAgIHN0dWJzL2NoYW5nZS1zdGF0ZS1oYW5kbGVyLm8KICBDQyAgICAgIHN0dWJzL21vbml0b3Iu
+bwogIENDICAgICAgc3R1YnMvbm90aWZ5LWV2ZW50Lm8KICBDQyAgICAgIHN0dWJzL3F0ZXN0Lm8K
+ICBDQyAgICAgIHN0dWJzL3JlcGxheS5vCiAgQ0MgICAgICBzdHVicy9ydW5zdGF0ZS1jaGVjay5v
+CiAgQ0MgICAgICBzdHVicy9zZXQtZmQtaGFuZGxlci5vCiAgQ0MgICAgICBzdHVicy9zbGlycC5v
+CiAgQ0MgICAgICBzdHVicy9zeXNidXMubwogIENDICAgICAgc3R1YnMvdHBtLm8KICBDQyAgICAg
+IHN0dWJzL3RyYWNlLWNvbnRyb2wubwogIENDICAgICAgc3R1YnMvdXVpZC5vCiAgQ0MgICAgICBz
+dHVicy92bS1zdG9wLm8KICBDQyAgICAgIHN0dWJzL3Ztc3RhdGUubwogIENDICAgICAgc3R1YnMv
+cW1wX3BjX2RpbW0ubwogIENDICAgICAgc3R1YnMvdGFyZ2V0LW1vbml0b3ItZGVmcy5vCiAgQ0Mg
+ICAgICBzdHVicy90YXJnZXQtZ2V0LW1vbml0b3ItZGVmLm8KICBDQyAgICAgIHN0dWJzL3BjX21h
+ZHRfY3B1X2VudHJ5Lm8KICBDQyAgICAgIHN0dWJzL3ZtZ2VuaWQubwogIENDICAgICAgc3R1YnMv
+eGVuLWNvbW1vbi5vCiAgQ0MgICAgICBzdHVicy94ZW4taHZtLm8KICBDQyAgICAgIHN0dWJzL3Bj
+aS1ob3N0LXBpaXgubwogIENDICAgICAgc3R1YnMvcmFtLWJsb2NrLm8KICBDQyAgICAgIGNvbnRy
+aWIvaXZzaG1lbS1jbGllbnQvaXZzaG1lbS1jbGllbnQubwogIENDICAgICAgY29udHJpYi9pdnNo
+bWVtLWNsaWVudC9tYWluLm8KICBDQyAgICAgIGNvbnRyaWIvaXZzaG1lbS1zZXJ2ZXIvbWFpbi5v
+CiAgQ0MgICAgICBjb250cmliL2l2c2htZW0tc2VydmVyL2l2c2htZW0tc2VydmVyLm8KICBDQyAg
+ICAgIHFlbXUtbmJkLm8KICBDQyAgICAgIGJsb2NrLm8KICBDQyAgICAgIGJsb2Nram9iLm8KICBD
+QyAgICAgIHFlbXUtaW8tY21kcy5vCiAgQ0MgICAgICByZXBsaWNhdGlvbi5vCiAgQ0MgICAgICBi
+bG9jay9yYXctZm9ybWF0Lm8KICBDQyAgICAgIGJsb2NrL3ZkaS5vCiAgQ0MgICAgICBibG9jay9x
+Y293Lm8KICBDQyAgICAgIGJsb2NrL3ZtZGsubwogIENDICAgICAgYmxvY2svY2xvb3AubwogIEND
+ICAgICAgYmxvY2svYm9jaHMubwogIENDICAgICAgYmxvY2svdnBjLm8KICBDQyAgICAgIGJsb2Nr
+L3Z2ZmF0Lm8KICBDQyAgICAgIGJsb2NrL2RtZy5vCiAgQ0MgICAgICBibG9jay9xY293Mi5vCiAg
+Q0MgICAgICBibG9jay9xY293Mi1yZWZjb3VudC5vCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay5j
+OiBJbiBmdW5jdGlvbiAnYmRydl9vcGVuX2luaGVyaXQnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxv
+Y2suYzoyNjAzOiBlcnJvcjogZGVyZWZlcmVuY2luZyBwb2ludGVyIHRvIGluY29tcGxldGUgdHlw
+ZQovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2suYzoyNjAzOiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRz
+IHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdfX21wdHInCi90bXAvcWVtdS10ZXN0L3NyYy9i
+bG9jay5jOjI2MDM6IGVycm9yOiBkZXJlZmVyZW5jaW5nIHBvaW50ZXIgdG8gaW5jb21wbGV0ZSB0
+eXBlCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay5jOjI2MDM6IGVycm9yOiBpbnZhbGlkIHVzZSBv
+ZiBpbmNvbXBsZXRlIHR5cGVkZWYgJ1FOdWxsJwptYWtlOiAqKiogW2Jsb2NrLm9dIEVycm9yIDEK
+bWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0
+IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
+bmUgNDA3LCBpbiA8bW9kdWxlPgogICAgc3lzLmV4aXQobWFpbigpKQogIEZpbGUgIi4vdGVzdHMv
+ZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNDA0LCBpbiBtYWluCiAgICByZXR1cm4gYXJncy5jbWRv
+YmoucnVuKGFyZ3MsIGFyZ3YpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGlu
+ZSAyNjEsIGluIHJ1bgogICAgcmV0dXJuIERvY2tlcigpLnJ1bihhcmd2LCBhcmdzLmtlZXAsIHF1
+aWV0PWFyZ3MucXVpZXQpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSAy
+MjksIGluIHJ1bgogICAgcXVpZXQ9cXVpZXQpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2Vy
+LnB5IiwgbGluZSAxNDcsIGluIF9kb19jaGVjawogICAgcmV0dXJuIHN1YnByb2Nlc3MuY2hlY2tf
+Y2FsbChzZWxmLl9jb21tYW5kICsgY21kLCAqKmt3YXJncykKICBGaWxlICIvdXNyL2xpYjY0L3B5
+dGhvbjIuNy9zdWJwcm9jZXNzLnB5IiwgbGluZSAxODYsIGluIGNoZWNrX2NhbGwKICAgIHJhaXNl
+IENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vz
+c0Vycm9yOiBDb21tYW5kICdbJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5p
+bnN0YW5jZS51dWlkPWU4ZjFjZTJjMTk5ZjExZThhMmM5NTI1NDAwNjljODMwJywgJy11JywgJzAn
+LCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLS1uZXQ9
+bm9uZScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9
+JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9OCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19F
+TlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvcm9vdC8u
+Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
+dG1wL3BhdGNoZXctdGVzdGVyLXRtcC1saV9rOG5fcy9zcmMvZG9ja2VyLXNyYy4yMDE4LTAyLTI0
+LTE1LjE4LjI4LjE1MzUyOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczYnLCAnL3Zh
+ci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
+YXR1cyAyCm1ha2VbMV06ICoqKiBbdGVzdHMvZG9ja2VyL01ha2VmaWxlLmluY2x1ZGU6MTI5OiBk
+b2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5ICcvdmFyL3RtcC9w
+YXRjaGV3LXRlc3Rlci10bXAtbGlfazhuX3Mvc3JjJwptYWtlOiAqKiogW3Rlc3RzL2RvY2tlci9N
+YWtlZmlsZS5pbmNsdWRlOjE2MzogZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczZdIEVycm9y
+IDIKCnJlYWwJMW0xOC42MThzCnVzZXIJMG0zLjkzM3MKc3lzCTBtMy42NTNzCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDIKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
