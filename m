@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1epZ7a-0008Ot-Fj
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 07:40:11 -0500
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epZNw-0003Dw-Lj
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 07:57:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1epZ7X-0004Y3-Tx
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 07:40:10 -0500
-Resent-Message-Id: <E1epZ7X-0004Y3-Tx@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21042)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1epZ7X-0004Xp-M1
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 07:40:07 -0500
-In-Reply-To: <20180220132627.4163-1-hlandau@devever.net>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151943361794.924.14351072885425924368@bdbb90650ae5>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epZNt-0003rn-IT
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 07:57:04 -0500
+Received: from smtp65.cstnet.cn ([159.226.251.65]:39764 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epZNs-0003m5-T5
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 07:57:01 -0500
+Date: Sat, 24 Feb 2018 20:56:53 +0800 (GMT+08:00)
+From: =?UTF-8?B?6IuP6Iiq?= <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <12b54434-c992-d882-9ce7-0f658d067a7c@redhat.com>
+References: <1519372288-20791-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<c5009934-13c3-6e86-2618-9935837d3b8d@redhat.com>
+	<12b54434-c992-d882-9ce7-0f658d067a7c@redhat.com>
 Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 23 Feb 2018 16:53:38 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] Fix ast2500 protection register emulation
+Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Message-ID: <1a2f136b.13907.161c7e33cc9.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] util/uri.c: add brackets to `if`
+ statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,11 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hlandau@devever.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, clg@kaod.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, stefanha@redhat.com, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQgdGVzdCBvbiBzMzkweCBob3N0LiBQbGVhc2Ug
-ZmluZCB0aGUgZGV0YWlscyBiZWxvdy4KCk4vQS4gSW50ZXJuYWwgZXJyb3Igd2hpbGUgcmVhZGlu
-ZyBsb2cgZmlsZQoKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+SGksIHdoZW4gSSB0cnkgdG8gY2hhbmdlIApgd2hpbGUgKGNvbmQpIDtgIAp0bwpgd2hpbGUgKGNv
+bmQpIHsKfWAKY2hlY2twYXRjaC5wbCBjb21wbGFpbnMgYWJvdXQgdGhpczoKJycnCkVSUk9SOiBz
+dXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg4LCA4KQojMTUw
+NjogRklMRTogdXJpLmM6MTUwNjoKKyAgICAgICAgd2hpbGUgKCgqdG1wKysgPSAqc2VncCsrKSAh
+PSAwKSB7ClsuLi5dCisgICAgICAgIH0KCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBj
+b25kaXRpb25hbCBzdGF0ZW1lbnRzICg4LCA4KQojMTUxMjogRklMRTogdXJpLmM6MTUxMjoKKyAg
+ICAgICAgd2hpbGUgKChzZWdwID4gcGF0aCkgJiYgKCgtLXNlZ3ApWzBdID09ICcvJykpIHsKWy4u
+Ll0KKyAgICAgICAgfQonJycKCldoZW4gSSBhZGQgYSBzZW1pY29sb24sIGNoZWNrcGF0Y2gucGwg
+c3RvcCBjb21wbGFpbmluZy4KYHdoaWxlIChjb25kKSB7CiAgICA7Cn1gCldoYXQgc2hvdWxkIEkg
+ZG8gbm93PwoKIkVyaWMgQmxha2UiIDxlYmxha2VAcmVkaGF0LmNvbT53cm90ZToKPiBPbiAwMi8y
+My8yMDE4IDAzOjM0IEFNLCBUaG9tYXMgSHV0aCB3cm90ZToNCj4gPiBPbiAyMy4wMi4yMDE4IDA4
+OjUxLCBTdSBIYW5nIHdyb3RlOg0KPiA+PiBBZGQgYnJhY2tldHMgdGhhdCB3cmFwIGBpZmAsIGBl
+bHNlYCwgYHdoaWxlYCB0aGF0IGhvbGQgc2luZ2xlDQo+ID4+IHN0YXRlbWVudHMuDQo+ID4+DQo+
+ID4+IEluIG9yZGVyIHRvIGRvIHRoaXMsIEkgd3JpdGUgYSBzaW1wbGUgcHl0aG9uIHJlZ2V4IHNj
+cmlwdC4NCj4gDQo+IFdpdGhvdXQgZG9jdW1lbnRpbmcgdGhlIHNjcmlwdCwgbm8gb25lIGVsc2Ug
+Y2FuIHJlcHJvZHVjZSB0aGlzOyBidXQgaXQncyANCj4gbm8gZGlmZmVyZW50IHRoYW4gaWYgdGhl
+eSBoYWQgbWFudWFsbHkgbWFkZSBjaGFuZ2VzIGluc3RlYWQgb2YgdHJ5aW5nIHRvIA0KPiBzY3Jp
+cHQgaXQsIHNvIEknbSBub3Qgc3VyZSB0aGlzIHNlbnRlbmNlIGFkZHMgbXVjaCBpbiBpdHMgY3Vy
+cmVudCBmb3JtLg0KPiANCj4gPj4NCj4gPj4gU2luY2UgdGhlbiwgYWxsIGNvbXBsYWludHMgcmlz
+ZWQgYnkgY2hlY2twYXRjaC5wbCBoYXMgYmVlbiBzdXBwcmVzc2VkLg0KPiANCj4gcy9yaXNlZC9y
+YWlzZWQvDQo+IHMvU2luY2UgdGhlbiwvV2l0aCB0aGF0Lw0KPiBzL2hhcy9oYXZlLw0KPiANCj4g
+Pj4NCj4gPj4gU2lnbmVkLW9mZi1ieTogU3UgSGFuZyA8c3VoYW5nMTZAbWFpbHMudWNhcy5hYy5j
+bj4NCj4gPj4gLS0tDQo+ID4+ICAgdXRpbC91cmkuYyB8IDQ2MiArKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4+ICAgMSBmaWxl
+IGNoYW5nZWQsIDI5MSBpbnNlcnRpb25zKCspLCAxNzEgZGVsZXRpb25zKC0pDQo+ID4+DQo+IA0K
+PiA+PiAgICAgICBjdXIgPSAqc3RyOw0KPiA+PiAtICAgIGlmICghSVNBX0FMUEhBKGN1cikpDQo+
+ID4+ICsgICAgaWYgKCFJU0FfQUxQSEEoY3VyKSkgew0KPiA+PiAgICAgICAgICAgcmV0dXJuIDI7
+DQo+ID4+ICsgICAgfQ0KPiA+PiAgICAgICBjdXIrKzsNCj4gPj4gLSAgICB3aGlsZSAoSVNBX0FM
+UEhBKGN1cikgfHwgSVNBX0RJR0lUKGN1cikgfHwNCj4gPj4gLSAgICAgICAgICAgKCpjdXIgPT0g
+JysnKSB8fCAoKmN1ciA9PSAnLScpIHx8ICgqY3VyID09ICcuJykpDQo+ID4+ICsgICAgd2hpbGUg
+KElTQV9BTFBIQShjdXIpIHx8IElTQV9ESUdJVChjdXIpIHx8ICgqY3VyID09ICcrJykgfHwgKCpj
+dXIgPT0gJy0nKSB8fA0KPiA+PiArICAgICAgICAgICAoKmN1ciA9PSAnLicpKQ0KPiA+PiAgICAg
+ICAgICAgY3VyKys7DQo+ID4gDQo+ID4gWW91J3ZlIGNoYW5nZWQgdGhlIHdoaWxlIHN0YXRlbWVu
+dCwgYnV0IGNoZWNrcGF0Y2gucGwgYXBwYXJlbnRseSBkb2VzIG5vdA0KPiA+IGNvbXBsYWluIGFi
+b3V0IG1pc3NpbmcgY3VybHkgYnJhY2VzIGhlcmUgLi4uIHRoYXQncyBzdHJhbmdlLCBJIHRob3Vn
+aHQgd2UnZA0KPiA+IGFsc28gd2FudGVkIHRvIGVuZm9yY2UgY3VybHkgYnJhY2VzIGZvciB3aGls
+ZSBsb29wcy4NCj4gDQo+IE1heWJlIGJlY2F1c2UgaXQgZ2V0cyBsb3N0IHNpbmNlIHRoZSBjb25k
+aXRpb24gZXhwYW5kZWQgb3ZlciBtb3JlIHRoYW4gDQo+IG9uZSBsaW5lPyAgQnV0IHllcywgbm93
+IHRoYXQgd2UndmUgbm90aWNlZCBpdCBtYW51YWxseSwgaXQgc2hvdWxkIGJlIA0KPiBmaXhlZC4g
+IFdoaWxlIGF0IGl0LCB5b3UgY2FuIGF2b2lkIHRoZSByZWR1bmRhbnQgKCk6DQo+IA0KPiB3aGls
+ZSAoSVNBX0FMUEhBKGN1cikgfHwgSVNBX0RJR0lUKGN1cikgfHwgKmN1ciA9PSAnKycgfHwgKmN1
+ciA9PSAnLScgfHwNCj4gICAgICAgICAqY3VyID09ICcuJykgew0KPiANCj4gDQo+ID4+IC0gICAg
+ICAgIHdoaWxlICgoKnRtcCsrID0gKnNlZ3ArKykgIT0gMCkNCj4gPj4gKyAgICAgICAgd2hpbGUg
+KCgqdG1wKysgPSAqc2VncCsrKSAhPSAwKSB7DQo+ID4+ICAgICAgICAgICAgICAgOw0KPiA+PiAr
+ICAgICAgICB9DQo+ID4gDQo+ID4gQSBiaWtlc2hlZC1wYWludGluZy1mcmlkYXkgcXVlc3Rpb24g
+Zm9yIGV2ZXJ5Ym9keSBvbiBxZW11LWRldmVsOg0KPiA+IFNob3VsZCB0aGVyZSBiZSBhIHNpbmds
+ZSBzZW1pY29sb24gaW5zaWRlIGN1cmx5IGJyYWNlcyBpbiB0aGlzIGNhc2UsIG9yIG5vdD8NCj4g
+PiANCj4gDQo+IENoZWNrcGF0Y2ggZG9lc24ndCBjb21wbGFpbiwgYnV0IGxvbmUgJzsnIHN0YXRl
+bWVudHMgYXJlIHJhcmUuICBJJ2Qgb21pdCANCj4gaXQsIGFuZCB1c2UganVzdDoNCj4gDQo+IHdo
+aWxlIChjb25kKSB7DQo+IH0NCj4gDQo+IA0KPiAtLSANCj4gRXJpYyBCbGFrZSwgUHJpbmNpcGFs
+IFNvZnR3YXJlIEVuZ2luZWVyDQo+IFJlZCBIYXQsIEluYy4gICAgICAgICAgICsxLTkxOS0zMDEt
+MzI2Ng0KPiBWaXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcNCg==
