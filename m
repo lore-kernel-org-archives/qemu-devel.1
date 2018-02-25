@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eppQT-0005yi-Ks
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 01:04:47 -0500
+	(envelope-from <famz@redhat.com>) id 1eppRb-0006c9-3y
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 01:05:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eppQO-00059K-MF
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 01:04:45 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34322 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1eppRa-00062B-3e
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 01:05:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57724 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eppQO-000592-Ht
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 01:04:40 -0500
-Date: Sun, 25 Feb 2018 14:04:36 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eppRZ-00061t-Ub
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 01:05:54 -0500
+Date: Sun, 25 Feb 2018 14:05:43 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180225060436.GB18756@lemon.usersys.redhat.com>
+Message-ID: <20180225060543.GC18756@lemon.usersys.redhat.com>
 References: <20180213173429.19501-1-stefanha@redhat.com>
 	<20180213173429.19501-2-stefanha@redhat.com>
-	<20180213180918.GY573@redhat.com>
-	<adc8d85b-2e7c-e00e-4eba-515327e48699@redhat.com>
+	<39bb633f-55ee-d8bd-d733-e819a0d01fde@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <adc8d85b-2e7c-e00e-4eba-515327e48699@redhat.com>
+In-Reply-To: <39bb633f-55ee-d8bd-d733-e819a0d01fde@amsat.org>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 1/5] Add a git-publish configuration file
 List-Id: <qemu-devel.nongnu.org>
@@ -30,32 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Wed, 02/14 15:08, Paolo Bonzini wrote:
-> On 13/02/2018 19:09, Daniel P. Berrang=E9 wrote:
-> > Why is a custom entry needed for block here (and other things
-> > below).   Won't running get_maintainer.pl already correctly
-> > report when a patch needs cc'ing to qemu-block@nongnu.org
-> > based on MAINTAINER rules ?
+On Wed, 02/14 14:37, Philippe Mathieu-Daud=E9 wrote:
+> On 02/13/2018 02:34 PM, Stefan Hajnoczi wrote:
+> > From: Fam Zheng <famz@redhat.com>
+> >=20
+> > git-publish [1] is a convenient tool to send patches and has been
+> > popular among QEMU developers.  Recently it has been made available i=
+n
+> > Fedora official repo thanks to Stefan's work.
 >=20
-> Sometimes you want to CC block people even on a non-block patch, for
-> example if you want their opinion about using the API.
->=20
-> We should probably add at least arm and ppc profiles, too.
->=20
-> > --nogit --nogit-fallback
->=20
-> QEMU's getmaintainer (unlike the Linux version!) already tries to avoid
-> falling back to git if a maintainer is listed.  Are these options neces=
-sary?
->=20
+> Also Debian:
+> https://packages.debian.org/sid/git-publish
 
-Falling back to git is usually more noisy than useful even when a maintai=
-ner is
-not listed, in my past experience. That's why I don't use it myself and p=
-ropose
-such here. But I'm open to different opinions.
+Thank you for doing that! I will add the pointer.
 
 Fam
