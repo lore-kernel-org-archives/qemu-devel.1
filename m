@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jixiang_zhang@h3c.com>) id 1epmsk-0001eR-Fq
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 22:21:47 -0500
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epnx0-0004Qo-Is
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jixiang_zhang@h3c.com>) id 1epmsg-0001IF-CI
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 22:21:46 -0500
-Received: from smtp.h3c.com ([60.191.123.56]:29474 helo=h3cmg01-ex.h3c.com)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epnwx-0006K0-RE
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:30:14 -0500
+Received: from smtp17.cstnet.cn ([159.226.251.17]:50556 helo=cstnet.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jixiang_zhang@h3c.com>) id 1epmsf-0000r3-Gp
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 22:21:42 -0500
-From: Zhangjixiang <jixiang_zhang@h3c.com>
-Date: Sun, 25 Feb 2018 03:21:19 +0000
-Message-ID: <CC0ED444C2C80B429092A9F3715307D9D456F102@H3CMLB12-EX.srv.huawei-3com.com>
-Content-Language: zh-CN
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] [PATCH] HMP: Initialize err before using
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epnwx-0006Ch-7K
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:30:11 -0500
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Sun, 25 Feb 2018 12:29:20 +0800
+Message-Id: <1519532963-12976-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel]  [PATCH v4 RFC 0/3] util/uri.c: Coding style format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +21,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>
+To: boxafox@163.com
+Cc: qemu-devel@nongnu.org
 
-RnJvbSAyOTU2NDBlNmY0YWE4M2I4NDNlMjQ1YmIxYWY5OTk1YmUzN2RlODRkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQ0KRnJvbTogemhhbmdqaXhpYW5nIDxqaXhpYW5nX3poYW5nQGgzYy5jb20+
-DQpEYXRlOiBTdW4sIDI1IEZlYiAyMDE4IDA5OjQ3OjUxICswODAwDQpTdWJqZWN0OiBbUEFUQ0hd
-IEhNUDogSW5pdGlhbGl6ZSBlcnIgYmVmb3JlIHVzaW5nDQoNCldoZW4gYmRydl9zbmFwc2hvdF9k
-ZWxldGUgcmV0dXJuIGZhaWwsIHRoZSBlcnJwIHdpbGwgbm90IGJlDQphc3NpZ25lZCBhIHZhbGlk
-IHZhbHVlIGluIGVycm9yX3Byb3BhZ2F0ZSBhcyBlcnJwIGRpZG4ndCBiZQ0KaW5pdGlhbGl6ZWQg
-aW4gaG1wX2RlbHZtLCB0aGVuIGVycm9yX3JlcG9ydGZfZXJyIHdpbGwgdXNlIGFuDQp1bmluaXRp
-YWxpemVkIHZhbHVlKGNhbGwgYnkgaG1wX2RlbHZtKSwgYW5kIHFlbXUgY3Jhc2guDQoNClNpZ25l
-ZC1vZmYtYnk6IHpoYW5naml4aWFuZyA8aml4aWFuZ196aGFuZ0BoM2MuY29tPg0KLS0tDQpobXAu
-YyB8IDIgKy0NCjEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0K
-DQpkaWZmIC0tZ2l0IGEvaG1wLmMgYi9obXAuYw0KaW5kZXggNzg3MGQ2YTMwMC4uNGE0ZGEwMDRl
-OSAxMDA2NDQNCi0tLSBhL2htcC5jDQorKysgYi9obXAuYw0KQEAgLTEzNDAsNyArMTM0MCw3IEBA
-IHZvaWQgaG1wX3NhdmV2bShNb25pdG9yICptb24sIGNvbnN0IFFEaWN0ICpxZGljdCkNCnZvaWQg
-aG1wX2RlbHZtKE1vbml0b3IgKm1vbiwgY29uc3QgUURpY3QgKnFkaWN0KQ0Kew0KICAgICBCbG9j
-a0RyaXZlclN0YXRlICpiczsNCi0gICAgRXJyb3IgKmVycjsNCisgICAgRXJyb3IgKmVyciA9IE5V
-TEw7DQogICAgIGNvbnN0IGNoYXIgKm5hbWUgPSBxZGljdF9nZXRfc3RyKHFkaWN0LCAibmFtZSIp
-Ow0KICAgICBpZiAoYmRydl9hbGxfZGVsZXRlX3NuYXBzaG90KG5hbWUsICZicywgJmVycikgPCAw
-KSB7DQotLQ0KMi4xMS4wDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQrmnKzpgq7ku7blj4rlhbbpmYTk
-u7blkKvmnInmlrDljY7kuInmioDmnK/mnInpmZDlhazlj7jnmoTkv53lr4bkv6Hmga/vvIzku4Xp
-mZDkuo7lj5HpgIHnu5nkuIrpnaLlnLDlnYDkuK3liJflh7oNCueahOS4quS6uuaIlue+pOe7hOOA
-guemgeatouS7u+S9leWFtuS7luS6uuS7peS7u+S9leW9ouW8j+S9v+eUqO+8iOWMheaLrOS9huS4
-jemZkOS6juWFqOmDqOaIlumDqOWIhuWcsOazhOmcsuOAgeWkjeWItuOAgQ0K5oiW5pWj5Y+R77yJ
-5pys6YKu5Lu25Lit55qE5L+h5oGv44CC5aaC5p6c5oKo6ZSZ5pS25LqG5pys6YKu5Lu277yM6K+3
-5oKo56uL5Y2z55S16K+d5oiW6YKu5Lu26YCa55+l5Y+R5Lu25Lq65bm25Yig6Zmk5pysDQrpgq7k
-u7bvvIENClRoaXMgZS1tYWlsIGFuZCBpdHMgYXR0YWNobWVudHMgY29udGFpbiBjb25maWRlbnRp
-YWwgaW5mb3JtYXRpb24gZnJvbSBOZXcgSDNDLCB3aGljaCBpcw0KaW50ZW5kZWQgb25seSBmb3Ig
-dGhlIHBlcnNvbiBvciBlbnRpdHkgd2hvc2UgYWRkcmVzcyBpcyBsaXN0ZWQgYWJvdmUuIEFueSB1
-c2Ugb2YgdGhlDQppbmZvcm1hdGlvbiBjb250YWluZWQgaGVyZWluIGluIGFueSB3YXkgKGluY2x1
-ZGluZywgYnV0IG5vdCBsaW1pdGVkIHRvLCB0b3RhbCBvciBwYXJ0aWFsDQpkaXNjbG9zdXJlLCBy
-ZXByb2R1Y3Rpb24sIG9yIGRpc3NlbWluYXRpb24pIGJ5IHBlcnNvbnMgb3RoZXIgdGhhbiB0aGUg
-aW50ZW5kZWQNCnJlY2lwaWVudChzKSBpcyBwcm9oaWJpdGVkLiBJZiB5b3UgcmVjZWl2ZSB0aGlz
-IGUtbWFpbCBpbiBlcnJvciwgcGxlYXNlIG5vdGlmeSB0aGUgc2VuZGVyDQpieSBwaG9uZSBvciBl
-bWFpbCBpbW1lZGlhdGVseSBhbmQgZGVsZXRlIGl0IQ0K
+*** BLURB HERE ***
+
+Su Hang (3):
+  util/uri.c: Coding style check, Only whitespace involved.
+  util/uri.c: remove brackets () that wrap `return` statement's content.
+  util/uri.c: wrap single statement blocks with braces {}
+
+ util/uri.c | 1753 ++++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 940 insertions(+), 813 deletions(-)
+
+    Using `git diff -w` to make sure that the first patch only contains
+    whitespace changes, replace all TAB with whitespace.
+    Here is what I actually use:
+    '''
+    [core]
+        whitespace = -trailing-space,-indent-with-non-tab,-tab-in-indent
+
+        git diff -w  --word-diff-regex=[^[:space:]]
+    '''
+
+    For second patch, using
+    `perl -pi -e "s/return \((.*?)\);/return \1;/g" util/uri.c`
+    to remove brackets () that wrap `return` statement's content.
+    Changing patterns like this:
+    `return (a);` to `return a;`.
+
+    For third patch, using curly braces to wrap `if` `while` `else` statements,
+    which only hold single statement. For example:
+    '''
+    if (cond)
+        statement;
+    '''
+    to
+    '''
+    if (cond) {
+        statement;
+    }
+    '''
+
+    And using tricks that compare the disassemblies before and after
+    code changes, to make sure code logic isn't changed:
+    '''
+    git checkout master
+    make util/uri.o
+    strip util/uri.o
+    objdump -Drx util/uri.o > /tmp/uri-master.txt
+    git checkout cleanupbranch
+    make util/uri.o
+    strip util/uri.o
+    objdump -Drx util/uri.o > /tmp/uri-cleanup.txt
+    diff -u /tmp/uri-*.txt
+    '''
+
+--
+2.7.4
