@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eq3Ll-0001HL-AD
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 15:56:50 -0500
+	(envelope-from <airlied@gmail.com>) id 1eq5II-0005Bu-Ib
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 18:01:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eq3Lg-0000ZT-P8
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 15:56:49 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48628 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eq3Lg-0000ZC-K1
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 15:56:44 -0500
-References: <151953467143.1042.1841095009900086023@bdbb90650ae5>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <40ca37b5-e835-a8db-524e-92e9efc9c650@redhat.com>
-Date: Sun, 25 Feb 2018 21:56:34 +0100
+	(envelope-from <airlied@gmail.com>) id 1eq5IH-0008DC-Mb
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 18:01:22 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36395)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <airlied@gmail.com>) id 1eq5IH-00089K-Fz
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 18:01:21 -0500
+Received: by mail-lf0-x244.google.com with SMTP id g72so132577lfg.3
+	for <qemu-devel@nongnu.org>; Sun, 25 Feb 2018 15:01:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <151953467143.1042.1841095009900086023@bdbb90650ae5>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 RFC 0/3] util/uri.c: Coding style format
+In-Reply-To: <20180223023814.24459-1-airlied@gmail.com>
+References: <20180223023814.24459-1-airlied@gmail.com>
+From: Dave Airlie <airlied@gmail.com>
+Date: Mon, 26 Feb 2018 09:01:19 +1000
+Message-ID: <CAPM=9tzH8U2NGaX_LYaVc0uVmb45i=5Vzvs0mtfROub4LVR-sg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu-3d: add support for second
+ capability set (v4)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,140 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
-Cc: suhang16@mails.ucas.ac.cn, boxafox@163.com
+To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On 25.02.2018 05:57, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series failed build test on s390x host. Please find the details below.
-[...]
->   GEN     trace/generated-helpers.c
->   CC      mipsel-softmmu/trace/control-target.o
->   CC      ppc-softmmu/memory_mapping.o
->   CC      ppc-softmmu/dump.o
->   CC      ppc-softmmu/migration/ram.o
->   CC      ppc-softmmu/accel/accel.o
->   CC      ppc-softmmu/accel/stubs/hax-stub.o
->   CC      ppc-softmmu/accel/stubs/hvf-stub.o
->   CC      ppc-softmmu/accel/stubs/whpx-stub.o
->   CC      ppc-softmmu/accel/stubs/kvm-stub.o
->   CC      ppc-softmmu/accel/tcg/tcg-all.o
->   CC      ppc-softmmu/accel/tcg/cputlb.o
->   CC      ppc-softmmu/accel/tcg/tcg-runtime.o
->   CC      mipsel-softmmu/trace/generated-helpers.o
->   CC      ppc-softmmu/accel/tcg/tcg-runtime-gvec.o
->   LINK    mipsel-softmmu/qemu-system-mipsel
->   CC      ppc-softmmu/accel/tcg/cpu-exec.o
->   CC      ppc-softmmu/accel/tcg/cpu-exec-common.o
-> collect2: error: ld returned 1 exit status
-> make[1]: *** [Makefile:193: qemu-system-mipsel] Error 1
-> make: *** [Makefile:404: subdir-mipsel-softmmu] Error 2
->   CC      ppc-softmmu/accel/tcg/translate-all.o
->   CC      sh4-softmmu/target/sh4/gdbstub.o
->   CC      ppc-softmmu/accel/tcg/translator.o
->   CC      ppc-softmmu/hw/9pfs/virtio-9p-device.o
->   CC      ppc-softmmu/hw/block/virtio-blk.o
->   CC      ppc-softmmu/hw/block/vhost-user-blk.o
->   CC      ppc-softmmu/hw/block/dataplane/virtio-blk.o
->   CC      ppc-softmmu/hw/char/virtio-serial-bus.o
->   CC      ppc-softmmu/hw/core/generic-loader.o
->   CC      ppc-softmmu/hw/core/null-machine.o
->   CC      ppc-softmmu/hw/display/sm501.o
->   CC      ppc-softmmu/hw/display/vga.o
->   CC      ppc-softmmu/hw/display/virtio-gpu.o
->   CC      ppc-softmmu/hw/display/virtio-gpu-3d.o
->   CC      ppc-softmmu/hw/display/virtio-gpu-pci.o
->   GEN     trace/generated-helpers.c
->   CC      ppc-softmmu/hw/i2c/ppc4xx_i2c.o
->   CC      sh4-softmmu/trace/control-target.o
->   CC      ppc-softmmu/hw/misc/ivshmem.o
->   CC      ppc-softmmu/hw/misc/mmio_interface.o
->   CC      sh4-softmmu/trace/generated-helpers.o
->   CC      ppc-softmmu/hw/net/xilinx_ethlite.o
->   CC      ppc-softmmu/hw/net/virtio-net.o
->   CC      ppc-softmmu/hw/net/vhost_net.o
->   LINK    sh4-softmmu/qemu-system-sh4
->   CC      ppc-softmmu/hw/net/fsl_etsec/etsec.o
->   CC      ppc-softmmu/hw/net/fsl_etsec/registers.o
->   CC      ppc-softmmu/hw/net/fsl_etsec/rings.o
->   CC      ppc-softmmu/hw/net/fsl_etsec/miim.o
->   CC      ppc-softmmu/hw/scsi/virtio-scsi.o
->   CC      ppc-softmmu/hw/scsi/virtio-scsi-dataplane.o
->   CC      ppc-softmmu/hw/scsi/vhost-scsi-common.o
-> collect2: error: ld returned 1 exit status
-> make[1]: *** [Makefile:193: qemu-system-sh4] Error 1
-> make: *** [Makefile:404: subdir-sh4-softmmu] Error 2
->   CC      ppc-softmmu/hw/scsi/vhost-scsi.o
->   CC      ppc-softmmu/hw/scsi/vhost-user-scsi.o
->   CC      ppc-softmmu/hw/timer/mc146818rtc.o
->   CC      ppc-softmmu/hw/vfio/common.o
->   CC      ppc-softmmu/hw/vfio/pci.o
->   CC      ppc-softmmu/hw/vfio/pci-quirks.o
->   CC      ppc-softmmu/hw/vfio/platform.o
->   CC      ppc-softmmu/hw/vfio/spapr.o
->   CC      ppc-softmmu/hw/virtio/virtio.o
->   CC      ppc-softmmu/hw/virtio/virtio-balloon.o
->   CC      ppc-softmmu/hw/virtio/vhost.o
->   CC      ppc-softmmu/hw/virtio/vhost-backend.o
->   CC      ppc-softmmu/hw/virtio/vhost-user.o
->   CC      ppc-softmmu/hw/virtio/vhost-vsock.o
->   CC      ppc-softmmu/hw/virtio/virtio-crypto.o
->   CC      ppc-softmmu/hw/virtio/virtio-crypto-pci.o
->   CC      ppc-softmmu/hw/ppc/ppc.o
->   CC      ppc-softmmu/hw/ppc/ppc_booke.o
->   CC      ppc-softmmu/hw/ppc/fdt.o
->   CC      ppc-softmmu/hw/ppc/ppc4xx_devs.o
->   CC      ppc-softmmu/hw/ppc/ppc405_uc.o
->   CC      ppc-softmmu/hw/ppc/ppc4xx_pci.o
->   CC      ppc-softmmu/hw/ppc/ppc405_boards.o
->   CC      ppc-softmmu/hw/ppc/ppc440_bamboo.o
->   CC      ppc-softmmu/hw/ppc/prep.o
->   CC      ppc-softmmu/hw/ppc/prep_systemio.o
->   CC      ppc-softmmu/hw/ppc/rs6000_mc.o
->   CC      ppc-softmmu/hw/ppc/mac_oldworld.o
->   CC      ppc-softmmu/hw/ppc/mac_newworld.o
->   CC      ppc-softmmu/hw/ppc/e500.o
->   CC      ppc-softmmu/hw/ppc/mpc8544ds.o
->   CC      ppc-softmmu/hw/ppc/e500plat.o
->   CC      ppc-softmmu/hw/ppc/mpc8544_guts.o
->   CC      ppc-softmmu/hw/ppc/ppce500_spin.o
->   CC      ppc-softmmu/hw/ppc/virtex_ml507.o
->   CC      ppc-softmmu/target/ppc/cpu-models.o
->   CC      ppc-softmmu/target/ppc/cpu.o
->   CC      ppc-softmmu/target/ppc/translate.o
->   CC      ppc-softmmu/target/ppc/machine.o
->   CC      ppc-softmmu/target/ppc/mmu_helper.o
->   CC      ppc-softmmu/target/ppc/mmu-hash32.o
->   CC      ppc-softmmu/target/ppc/monitor.o
->   CC      ppc-softmmu/target/ppc/arch_dump.o
->   CC      ppc-softmmu/target/ppc/kvm-stub.o
->   CC      ppc-softmmu/target/ppc/dfp_helper.o
->   CC      ppc-softmmu/target/ppc/excp_helper.o
->   CC      ppc-softmmu/target/ppc/fpu_helper.o
->   CC      ppc-softmmu/target/ppc/int_helper.o
->   CC      ppc-softmmu/target/ppc/timebase_helper.o
->   CC      ppc-softmmu/target/ppc/misc_helper.o
->   CC      ppc-softmmu/target/ppc/mem_helper.o
->   CC      ppc-softmmu/target/ppc/gdbstub.o
->   CC      ppc-softmmu/target/ppc/../../libdecnumber/decContext.o
->   CC      ppc-softmmu/target/ppc/../../libdecnumber/decNumber.o
->   CC      ppc-softmmu/target/ppc/../../libdecnumber/dpd/decimal32.o
->   CC      ppc-softmmu/target/ppc/../../libdecnumber/dpd/decimal64.o
->   CC      ppc-softmmu/target/ppc/../../libdecnumber/dpd/decimal128.o
->   GEN     trace/generated-helpers.c
->   CC      ppc-softmmu/trace/control-target.o
->   CC      ppc-softmmu/gdbstub-xml.o
->   CC      ppc-softmmu/trace/generated-helpers.o
->   LINK    ppc-softmmu/qemu-system-ppc
-> collect2: error: ld returned 1 exit status
-> make[1]: *** [Makefile:193: qemu-system-ppc] Error 1
-> make: *** [Makefile:404: subdir-ppc-softmmu] Error 2
+Gerd,
 
- Hi Fam,
+This seems to have passed the bots, but realised I hadn't cc'ed you.
 
-Patchew genereted some really weird errors here - linking failed without
-any further explanation. Are there currently any known problems with the
-build bot?
+Please pick it up whenever you get a chance.
 
- Thomas
+Dave.
+
+On 23 February 2018 at 12:38, Dave Airlie <airlied@gmail.com> wrote:
+> From: Dave Airlie <airlied@redhat.com>
+>
+> Due to a kernel bug we can never increase the size of capability
+> set 1, so introduce a new capability set in parallel, old userspace
+> will continue to use the old set, new userspace will start using
+> the new one when it detects a fixed kernel.
+>
+> v2: don't use a define from virglrenderer, just probe it.
+> v3: fix compilation when virglrenderer disabled
+> v4: fix style warning, just use ?: op instead.
+>
+> Signed-off-by: Dave Airlie <airlied@redhat.com>
+> ---
+>  hw/display/virtio-gpu-3d.c                  | 15 +++++++++++++++
+>  hw/display/virtio-gpu.c                     |  7 ++++++-
+>  include/hw/virtio/virtio-gpu.h              |  2 +-
+>  include/standard-headers/linux/virtio_gpu.h |  1 +
+>  4 files changed, 23 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+> index 7db84efe89..3558f38fe8 100644
+> --- a/hw/display/virtio-gpu-3d.c
+> +++ b/hw/display/virtio-gpu-3d.c
+> @@ -362,6 +362,11 @@ static void virgl_cmd_get_capset_info(VirtIOGPU *g,
+>          virgl_renderer_get_cap_set(resp.capset_id,
+>                                     &resp.capset_max_version,
+>                                     &resp.capset_max_size);
+> +    } else if (info.capset_index == 1) {
+> +        resp.capset_id = VIRTIO_GPU_CAPSET_VIRGL2;
+> +        virgl_renderer_get_cap_set(resp.capset_id,
+> +                                   &resp.capset_max_version,
+> +                                   &resp.capset_max_size);
+>      } else {
+>          resp.capset_max_version = 0;
+>          resp.capset_max_size = 0;
+> @@ -635,4 +640,14 @@ int virtio_gpu_virgl_init(VirtIOGPU *g)
+>      return 0;
+>  }
+>
+> +int virtio_gpu_virgl_get_num_capsets(VirtIOGPU *g)
+> +{
+> +    uint32_t capset2_max_ver, capset2_max_size;
+> +    virgl_renderer_get_cap_set(VIRTIO_GPU_CAPSET_VIRGL2,
+> +                              &capset2_max_ver,
+> +                              &capset2_max_size);
+> +
+> +    return capset2_max_ver ? 2 : 1;
+> +}
+> +
+>  #endif /* CONFIG_VIRGL */
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index 6658f6c6a6..2dd3c3481a 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -1215,7 +1215,12 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
+>          /* use larger control queue in 3d mode */
+>          g->ctrl_vq   = virtio_add_queue(vdev, 256, virtio_gpu_handle_ctrl_cb);
+>          g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
+> -        g->virtio_config.num_capsets = 1;
+> +
+> +#if defined(CONFIG_VIRGL)
+> +        g->virtio_config.num_capsets = virtio_gpu_virgl_get_num_capsets(g);
+> +#else
+> +        g->virtio_config.num_capsets = 0;
+> +#endif
+>      } else {
+>          g->ctrl_vq   = virtio_add_queue(vdev, 64, virtio_gpu_handle_ctrl_cb);
+>          g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
+> diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+> index 83f474ffc3..22ac3c2d0e 100644
+> --- a/include/hw/virtio/virtio-gpu.h
+> +++ b/include/hw/virtio/virtio-gpu.h
+> @@ -171,5 +171,5 @@ void virtio_gpu_virgl_fence_poll(VirtIOGPU *g);
+>  void virtio_gpu_virgl_reset(VirtIOGPU *g);
+>  void virtio_gpu_gl_block(void *opaque, bool block);
+>  int virtio_gpu_virgl_init(VirtIOGPU *g);
+> -
+> +int virtio_gpu_virgl_get_num_capsets(VirtIOGPU *g);
+>  #endif
+> diff --git a/include/standard-headers/linux/virtio_gpu.h b/include/standard-headers/linux/virtio_gpu.h
+> index c1c8f0751d..52a830dcf8 100644
+> --- a/include/standard-headers/linux/virtio_gpu.h
+> +++ b/include/standard-headers/linux/virtio_gpu.h
+> @@ -260,6 +260,7 @@ struct virtio_gpu_cmd_submit {
+>  };
+>
+>  #define VIRTIO_GPU_CAPSET_VIRGL 1
+> +#define VIRTIO_GPU_CAPSET_VIRGL2 2
+>
+>  /* VIRTIO_GPU_CMD_GET_CAPSET_INFO */
+>  struct virtio_gpu_get_capset_info {
+> --
+> 2.14.3
+>
+>
