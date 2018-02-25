@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epo3Q-0007Xs-9g
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:36:58 -0500
+	(envelope-from <no-reply@patchew.org>) id 1epoIT-0003qm-Cs
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:52:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epo3K-0001tf-Eg
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:36:52 -0500
-Received: from smtp17.cstnet.cn ([159.226.251.17]:53746 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1epo3H-0001si-KE
-	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:36:46 -0500
-From: Su Hang <suhang16@mails.ucas.ac.cn>
-Date: Sun, 25 Feb 2018 12:35:56 +0800
-Message-Id: <1519533358-13759-2-git-send-email-suhang16@mails.ucas.ac.cn>
+	(envelope-from <no-reply@patchew.org>) id 1epoIP-00015b-Cs
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:52:25 -0500
+Resent-Message-Id: <E1epoIP-00015b-Cs@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21029)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1epoIP-00014U-3W
+	for qemu-devel@nongnu.org; Sat, 24 Feb 2018 23:52:21 -0500
 In-Reply-To: <1519533358-13759-1-git-send-email-suhang16@mails.ucas.ac.cn>
-References: <1519533358-13759-1-git-send-email-suhang16@mails.ucas.ac.cn>
-Subject: [Qemu-devel]  [PATCH v4 RFC 1/3] util/uri.c: Coding style check,
- Only whitespace involved. Using `clang-format -i util/uri.c` first,
- then change back few code manually, to make sure only whitespace involved.
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151953431836.1042.6199862486161363575@bdbb90650ae5>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 24 Feb 2018 20:51:59 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4 RFC 0/3] util/uri.c: Coding style format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,2395 +28,394 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: boxafox@163.com
-Cc: qemu-devel@nongnu.org
+To: suhang16@mails.ucas.ac.cn
+Cc: famz@redhat.com, boxafox@163.com, qemu-devel@nongnu.org
 
-Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
----
- util/uri.c | 1468 ++++++++++++++++++++++++++++++------------------------------
- 1 file changed, 735 insertions(+), 733 deletions(-)
-
-diff --git a/util/uri.c b/util/uri.c
-index 21b18281703a..cf09f41735a1 100644
---- a/util/uri.c
-+++ b/util/uri.c
-@@ -63,7 +63,6 @@ static void uri_clean(URI *uri);
-  */
- #define IS_ALPHA(x) (IS_LOWALPHA(x) || IS_UPALPHA(x))
- 
--
- /*
-  * lowalpha = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" |
-  *            "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" |
-@@ -97,27 +96,27 @@ static void uri_clean(URI *uri);
-  * mark = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
-  */
- 
--#define IS_MARK(x) (((x) == '-') || ((x) == '_') || ((x) == '.') ||     \
--    ((x) == '!') || ((x) == '~') || ((x) == '*') || ((x) == '\'') ||    \
-+#define IS_MARK(x) (((x) == '-') || ((x) == '_') || ((x) == '.') ||            \
-+    ((x) == '!') || ((x) == '~') || ((x) == '*') || ((x) == '\'') ||           \
-     ((x) == '(') || ((x) == ')'))
- 
- /*
-  * unwise = "{" | "}" | "|" | "\" | "^" | "`"
-  */
- 
--#define IS_UNWISE(p)                                                    \
--      (((*(p) == '{')) || ((*(p) == '}')) || ((*(p) == '|')) ||         \
--       ((*(p) == '\\')) || ((*(p) == '^')) || ((*(p) == '[')) ||        \
--       ((*(p) == ']')) || ((*(p) == '`')))
-+#define IS_UNWISE(p)                                                           \
-+    (((*(p) == '{')) || ((*(p) == '}')) || ((*(p) == '|')) ||                  \
-+     ((*(p) == '\\')) || ((*(p) == '^')) || ((*(p) == '[')) ||                 \
-+     ((*(p) == ']')) || ((*(p) == '`')))
- /*
-  * reserved = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | "," |
-  *            "[" | "]"
-  */
- 
--#define IS_RESERVED(x) (((x) == ';') || ((x) == '/') || ((x) == '?') || \
--        ((x) == ':') || ((x) == '@') || ((x) == '&') || ((x) == '=') || \
--        ((x) == '+') || ((x) == '$') || ((x) == ',') || ((x) == '[') || \
--        ((x) == ']'))
-+#define IS_RESERVED(x) (((x) == ';') || ((x) == '/') || ((x) == '?') ||        \
-+    ((x) == ':') || ((x) == '@') || ((x) == '&') || ((x) == '=') ||            \
-+    ((x) == '+') || ((x) == '$') || ((x) == ',') || ((x) == '[') ||            \
-+    ((x) == ']'))
- 
- /*
-  * unreserved = alphanum | mark
-@@ -129,7 +128,7 @@ static void uri_clean(URI *uri);
-  * Skip to next pointer char, handle escaped sequences
-  */
- 
--#define NEXT(p) ((*p == '%')? p += 3 : p++)
-+#define NEXT(p) ((*p == '%') ? p += 3 : p++)
- 
- /*
-  * Productions from the spec.
-@@ -141,37 +140,36 @@ static void uri_clean(URI *uri);
-  * path          = [ abs_path | opaque_part ]
-  */
- 
--
- /************************************************************************
-- *									*
-- *                         RFC 3986 parser				*
-- *									*
-+ *                                                                      *
-+ *                         RFC 3986 parser                              *
-+ *                                                                      *
-  ************************************************************************/
- 
- #define ISA_DIGIT(p) ((*(p) >= '0') && (*(p) <= '9'))
--#define ISA_ALPHA(p) (((*(p) >= 'a') && (*(p) <= 'z')) ||		\
-+#define ISA_ALPHA(p) (((*(p) >= 'a') && (*(p) <= 'z')) ||                      \
-                       ((*(p) >= 'A') && (*(p) <= 'Z')))
--#define ISA_HEXDIG(p)							\
--       (ISA_DIGIT(p) || ((*(p) >= 'a') && (*(p) <= 'f')) ||		\
--        ((*(p) >= 'A') && (*(p) <= 'F')))
-+#define ISA_HEXDIG(p)                                                          \
-+    (ISA_DIGIT(p) || ((*(p) >= 'a') && (*(p) <= 'f')) ||                       \
-+     ((*(p) >= 'A') && (*(p) <= 'F')))
- 
- /*
-  *    sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
-  *                     / "*" / "+" / "," / ";" / "="
-  */
--#define ISA_SUB_DELIM(p)						\
--      (((*(p) == '!')) || ((*(p) == '$')) || ((*(p) == '&')) ||		\
--       ((*(p) == '(')) || ((*(p) == ')')) || ((*(p) == '*')) ||		\
--       ((*(p) == '+')) || ((*(p) == ',')) || ((*(p) == ';')) ||		\
--       ((*(p) == '=')) || ((*(p) == '\'')))
-+#define ISA_SUB_DELIM(p)                                                       \
-+    (((*(p) == '!')) || ((*(p) == '$')) || ((*(p) == '&')) ||                  \
-+     ((*(p) == '(')) || ((*(p) == ')')) || ((*(p) == '*')) ||                  \
-+     ((*(p) == '+')) || ((*(p) == ',')) || ((*(p) == ';')) ||                  \
-+     ((*(p) == '=')) || ((*(p) == '\'')))
- 
- /*
-  *    gen-delims    = ":" / "/" / "?" / "#" / "[" / "]" / "@"
-  */
--#define ISA_GEN_DELIM(p)						\
--      (((*(p) == ':')) || ((*(p) == '/')) || ((*(p) == '?')) ||         \
--       ((*(p) == '#')) || ((*(p) == '[')) || ((*(p) == ']')) ||         \
--       ((*(p) == '@')))
-+#define ISA_GEN_DELIM(p)                                                       \
-+    (((*(p) == ':')) || ((*(p) == '/')) || ((*(p) == '?')) ||                  \
-+     ((*(p) == '#')) || ((*(p) == '[')) || ((*(p) == ']')) ||                  \
-+     ((*(p) == '@')))
- 
- /*
-  *    reserved      = gen-delims / sub-delims
-@@ -181,22 +179,22 @@ static void uri_clean(URI *uri);
- /*
-  *    unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
-  */
--#define ISA_UNRESERVED(p)						\
--      ((ISA_ALPHA(p)) || (ISA_DIGIT(p)) || ((*(p) == '-')) ||		\
--       ((*(p) == '.')) || ((*(p) == '_')) || ((*(p) == '~')))
-+#define ISA_UNRESERVED(p)                                                      \
-+    ((ISA_ALPHA(p)) || (ISA_DIGIT(p)) || ((*(p) == '-')) ||                    \
-+     ((*(p) == '.')) || ((*(p) == '_')) || ((*(p) == '~')))
- 
- /*
-  *    pct-encoded   = "%" HEXDIG HEXDIG
-  */
--#define ISA_PCT_ENCODED(p)						\
--     ((*(p) == '%') && (ISA_HEXDIG(p + 1)) && (ISA_HEXDIG(p + 2)))
-+#define ISA_PCT_ENCODED(p)                                                     \
-+    ((*(p) == '%') && (ISA_HEXDIG(p + 1)) && (ISA_HEXDIG(p + 2)))
- 
- /*
-  *    pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
-  */
--#define ISA_PCHAR(p)							\
--     (ISA_UNRESERVED(p) || ISA_PCT_ENCODED(p) || ISA_SUB_DELIM(p) ||	\
--      ((*(p) == ':')) || ((*(p) == '@')))
-+#define ISA_PCHAR(p)                                                           \
-+    (ISA_UNRESERVED(p) || ISA_PCT_ENCODED(p) || ISA_SUB_DELIM(p) ||            \
-+     ((*(p) == ':')) || ((*(p) == '@')))
- 
- /**
-  * rfc3986_parse_scheme:
-@@ -209,25 +207,26 @@ static void uri_clean(URI *uri);
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_scheme(URI *uri, const char **str) {
-+static int rfc3986_parse_scheme(URI *uri, const char **str)
-+{
-     const char *cur;
- 
-     if (str == NULL)
--	return(-1);
-+        return (-1);
- 
-     cur = *str;
-     if (!ISA_ALPHA(cur))
--	return(2);
-+        return (2);
-     cur++;
--    while (ISA_ALPHA(cur) || ISA_DIGIT(cur) ||
--           (*cur == '+') || (*cur == '-') || (*cur == '.')) cur++;
-+    while (ISA_ALPHA(cur) || ISA_DIGIT(cur) || (*cur == '+') || (*cur == '-') ||
-+           (*cur == '.'))
-+        cur++;
-     if (uri != NULL) {
-         g_free(uri->scheme);
--	uri->scheme = g_strndup(*str, cur - *str);
-+        uri->scheme = g_strndup(*str, cur - *str);
-     }
-     *str = cur;
--    return(0);
-+    return (0);
- }
- 
- /**
-@@ -245,8 +244,7 @@ rfc3986_parse_scheme(URI *uri, const char **str) {
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_fragment(URI *uri, const char **str)
-+static int rfc3986_parse_fragment(URI *uri, const char **str)
- {
-     const char *cur;
- 
-@@ -261,10 +259,10 @@ rfc3986_parse_fragment(URI *uri, const char **str)
-         NEXT(cur);
-     if (uri != NULL) {
-         g_free(uri->fragment);
--	if (uri->cleanup & 2)
--	    uri->fragment = g_strndup(*str, cur - *str);
--	else
--	    uri->fragment = uri_string_unescape(*str, cur - *str, NULL);
-+        if (uri->cleanup & 2)
-+            uri->fragment = g_strndup(*str, cur - *str);
-+        else
-+            uri->fragment = uri_string_unescape(*str, cur - *str, NULL);
-     }
-     *str = cur;
-     return (0);
-@@ -281,8 +279,7 @@ rfc3986_parse_fragment(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_query(URI *uri, const char **str)
-+static int rfc3986_parse_query(URI *uri, const char **str)
- {
-     const char *cur;
- 
-@@ -296,7 +293,7 @@ rfc3986_parse_query(URI *uri, const char **str)
-         NEXT(cur);
-     if (uri != NULL) {
-         g_free(uri->query);
--	uri->query = g_strndup (*str, cur - *str);
-+        uri->query = g_strndup(*str, cur - *str);
-     }
-     *str = cur;
-     return (0);
-@@ -314,8 +311,7 @@ rfc3986_parse_query(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_port(URI *uri, const char **str)
-+static int rfc3986_parse_port(URI *uri, const char **str)
- {
-     const char *cur = *str;
-     int port = 0;
-@@ -349,27 +345,26 @@ rfc3986_parse_port(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_user_info(URI *uri, const char **str)
-+static int rfc3986_parse_user_info(URI *uri, const char **str)
- {
-     const char *cur;
- 
-     cur = *str;
--    while (ISA_UNRESERVED(cur) || ISA_PCT_ENCODED(cur) ||
--           ISA_SUB_DELIM(cur) || (*cur == ':'))
--	NEXT(cur);
-+    while (ISA_UNRESERVED(cur) || ISA_PCT_ENCODED(cur) || ISA_SUB_DELIM(cur) ||
-+           (*cur == ':'))
-+        NEXT(cur);
-     if (*cur == '@') {
--	if (uri != NULL) {
-+        if (uri != NULL) {
-             g_free(uri->user);
--	    if (uri->cleanup & 2)
--		uri->user = g_strndup(*str, cur - *str);
--	    else
--		uri->user = uri_string_unescape(*str, cur - *str, NULL);
--	}
--	*str = cur;
--	return(0);
--    }
--    return(1);
-+            if (uri->cleanup & 2)
-+                uri->user = g_strndup(*str, cur - *str);
-+            else
-+                uri->user = uri_string_unescape(*str, cur - *str, NULL);
-+        }
-+        *str = cur;
-+        return (0);
-+    }
-+    return (1);
- }
- 
- /**
-@@ -386,28 +381,28 @@ rfc3986_parse_user_info(URI *uri, const char **str)
-  *
-  * Returns 0 if found and skipped, 1 otherwise
-  */
--static int
--rfc3986_parse_dec_octet(const char **str) {
-+static int rfc3986_parse_dec_octet(const char **str)
-+{
-     const char *cur = *str;
- 
-     if (!(ISA_DIGIT(cur)))
--        return(1);
--    if (!ISA_DIGIT(cur+1))
--	cur++;
--    else if ((*cur != '0') && (ISA_DIGIT(cur + 1)) && (!ISA_DIGIT(cur+2)))
--	cur += 2;
-+        return (1);
-+    if (!ISA_DIGIT(cur + 1))
-+        cur++;
-+    else if ((*cur != '0') && (ISA_DIGIT(cur + 1)) && (!ISA_DIGIT(cur + 2)))
-+        cur += 2;
-     else if ((*cur == '1') && (ISA_DIGIT(cur + 1)) && (ISA_DIGIT(cur + 2)))
--	cur += 3;
--    else if ((*cur == '2') && (*(cur + 1) >= '0') &&
--	     (*(cur + 1) <= '4') && (ISA_DIGIT(cur + 2)))
--	cur += 3;
--    else if ((*cur == '2') && (*(cur + 1) == '5') &&
--	     (*(cur + 2) >= '0') && (*(cur + 1) <= '5'))
--	cur += 3;
-+        cur += 3;
-+    else if ((*cur == '2') && (*(cur + 1) >= '0') && (*(cur + 1) <= '4') &&
-+             (ISA_DIGIT(cur + 2)))
-+        cur += 3;
-+    else if ((*cur == '2') && (*(cur + 1) == '5') && (*(cur + 2) >= '0') &&
-+             (*(cur + 1) <= '5'))
-+        cur += 3;
-     else
--        return(1);
-+        return (1);
-     *str = cur;
--    return(0);
-+    return (0);
- }
- /**
-  * rfc3986_parse_host:
-@@ -424,8 +419,7 @@ rfc3986_parse_dec_octet(const char **str) {
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_host(URI *uri, const char **str)
-+static int rfc3986_parse_host(URI *uri, const char **str)
- {
-     const char *cur = *str;
-     const char *host;
-@@ -436,34 +430,34 @@ rfc3986_parse_host(URI *uri, const char **str)
-      */
-     if (*cur == '[') {
-         cur++;
--	while ((*cur != ']') && (*cur != 0))
--	    cur++;
--	if (*cur != ']')
--	    return(1);
--	cur++;
--	goto found;
-+        while ((*cur != ']') && (*cur != 0))
-+            cur++;
-+        if (*cur != ']')
-+            return (1);
-+        cur++;
-+        goto found;
-     }
-     /*
-      * try to parse an IPv4
-      */
-     if (ISA_DIGIT(cur)) {
-         if (rfc3986_parse_dec_octet(&cur) != 0)
--	    goto not_ipv4;
--	if (*cur != '.')
--	    goto not_ipv4;
--	cur++;
-+            goto not_ipv4;
-+        if (*cur != '.')
-+            goto not_ipv4;
-+        cur++;
-         if (rfc3986_parse_dec_octet(&cur) != 0)
--	    goto not_ipv4;
--	if (*cur != '.')
--	    goto not_ipv4;
-+            goto not_ipv4;
-+        if (*cur != '.')
-+            goto not_ipv4;
-         if (rfc3986_parse_dec_octet(&cur) != 0)
--	    goto not_ipv4;
--	if (*cur != '.')
--	    goto not_ipv4;
-+            goto not_ipv4;
-+        if (*cur != '.')
-+            goto not_ipv4;
-         if (rfc3986_parse_dec_octet(&cur) != 0)
--	    goto not_ipv4;
--	goto found;
--not_ipv4:
-+            goto not_ipv4;
-+        goto found;
-+    not_ipv4:
-         cur = *str;
-     }
-     /*
-@@ -474,18 +468,18 @@ not_ipv4:
- found:
-     if (uri != NULL) {
-         g_free(uri->authority);
--	uri->authority = NULL;
-+        uri->authority = NULL;
-         g_free(uri->server);
--	if (cur != host) {
--	    if (uri->cleanup & 2)
--		uri->server = g_strndup(host, cur - host);
--	    else
--		uri->server = uri_string_unescape(host, cur - host, NULL);
--	} else
--	    uri->server = NULL;
-+        if (cur != host) {
-+            if (uri->cleanup & 2)
-+                uri->server = g_strndup(host, cur - host);
-+            else
-+                uri->server = uri_string_unescape(host, cur - host, NULL);
-+        } else
-+            uri->server = NULL;
-     }
-     *str = cur;
--    return(0);
-+    return (0);
- }
- 
- /**
-@@ -500,8 +494,7 @@ found:
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_authority(URI *uri, const char **str)
-+static int rfc3986_parse_authority(URI *uri, const char **str)
- {
-     const char *cur;
-     int ret;
-@@ -516,14 +509,16 @@ rfc3986_parse_authority(URI *uri, const char **str)
-     else
-         cur++;
-     ret = rfc3986_parse_host(uri, &cur);
--    if (ret != 0) return(ret);
-+    if (ret != 0)
-+        return (ret);
-     if (*cur == ':') {
-         cur++;
-         ret = rfc3986_parse_port(uri, &cur);
--	if (ret != 0) return(ret);
-+        if (ret != 0)
-+            return (ret);
-     }
-     *str = cur;
--    return(0);
-+    return (0);
- }
- 
- /**
-@@ -542,16 +537,15 @@ rfc3986_parse_authority(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_segment(const char **str, char forbid, int empty)
-+static int rfc3986_parse_segment(const char **str, char forbid, int empty)
- {
-     const char *cur;
- 
-     cur = *str;
-     if (!ISA_PCHAR(cur)) {
-         if (empty)
--	    return(0);
--	return(1);
-+            return (0);
-+        return (1);
-     }
-     while (ISA_PCHAR(cur) && (*cur != forbid))
-         NEXT(cur);
-@@ -571,8 +565,7 @@ rfc3986_parse_segment(const char **str, char forbid, int empty)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_path_ab_empty(URI *uri, const char **str)
-+static int rfc3986_parse_path_ab_empty(URI *uri, const char **str)
- {
-     const char *cur;
-     int ret;
-@@ -581,8 +574,9 @@ rfc3986_parse_path_ab_empty(URI *uri, const char **str)
- 
-     while (*cur == '/') {
-         cur++;
--	ret = rfc3986_parse_segment(&cur, 0, 1);
--	if (ret != 0) return(ret);
-+        ret = rfc3986_parse_segment(&cur, 0, 1);
-+        if (ret != 0)
-+            return (ret);
-     }
-     if (uri != NULL) {
-         g_free(uri->path);
-@@ -611,8 +605,7 @@ rfc3986_parse_path_ab_empty(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_path_absolute(URI *uri, const char **str)
-+static int rfc3986_parse_path_absolute(URI *uri, const char **str)
- {
-     const char *cur;
-     int ret;
-@@ -620,15 +613,16 @@ rfc3986_parse_path_absolute(URI *uri, const char **str)
-     cur = *str;
- 
-     if (*cur != '/')
--        return(1);
-+        return (1);
-     cur++;
-     ret = rfc3986_parse_segment(&cur, 0, 0);
-     if (ret == 0) {
--	while (*cur == '/') {
--	    cur++;
--	    ret = rfc3986_parse_segment(&cur, 0, 1);
--	    if (ret != 0) return(ret);
--	}
-+        while (*cur == '/') {
-+            cur++;
-+            ret = rfc3986_parse_segment(&cur, 0, 1);
-+            if (ret != 0)
-+                return (ret);
-+        }
-     }
-     if (uri != NULL) {
-         g_free(uri->path);
-@@ -657,8 +651,7 @@ rfc3986_parse_path_absolute(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_path_rootless(URI *uri, const char **str)
-+static int rfc3986_parse_path_rootless(URI *uri, const char **str)
- {
-     const char *cur;
-     int ret;
-@@ -666,11 +659,13 @@ rfc3986_parse_path_rootless(URI *uri, const char **str)
-     cur = *str;
- 
-     ret = rfc3986_parse_segment(&cur, 0, 0);
--    if (ret != 0) return(ret);
-+    if (ret != 0)
-+        return (ret);
-     while (*cur == '/') {
-         cur++;
--	ret = rfc3986_parse_segment(&cur, 0, 1);
--	if (ret != 0) return(ret);
-+        ret = rfc3986_parse_segment(&cur, 0, 1);
-+        if (ret != 0)
-+            return (ret);
-     }
-     if (uri != NULL) {
-         g_free(uri->path);
-@@ -699,8 +694,7 @@ rfc3986_parse_path_rootless(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_path_no_scheme(URI *uri, const char **str)
-+static int rfc3986_parse_path_no_scheme(URI *uri, const char **str)
- {
-     const char *cur;
-     int ret;
-@@ -708,11 +702,13 @@ rfc3986_parse_path_no_scheme(URI *uri, const char **str)
-     cur = *str;
- 
-     ret = rfc3986_parse_segment(&cur, ':', 0);
--    if (ret != 0) return(ret);
-+    if (ret != 0)
-+        return (ret);
-     while (*cur == '/') {
-         cur++;
--	ret = rfc3986_parse_segment(&cur, 0, 1);
--	if (ret != 0) return(ret);
-+        ret = rfc3986_parse_segment(&cur, 0, 1);
-+        if (ret != 0)
-+            return (ret);
-     }
-     if (uri != NULL) {
-         g_free(uri->path);
-@@ -744,8 +740,7 @@ rfc3986_parse_path_no_scheme(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_hier_part(URI *uri, const char **str)
-+static int rfc3986_parse_hier_part(URI *uri, const char **str)
- {
-     const char *cur;
-     int ret;
-@@ -754,24 +749,28 @@ rfc3986_parse_hier_part(URI *uri, const char **str)
- 
-     if ((*cur == '/') && (*(cur + 1) == '/')) {
-         cur += 2;
--	ret = rfc3986_parse_authority(uri, &cur);
--	if (ret != 0) return(ret);
--	ret = rfc3986_parse_path_ab_empty(uri, &cur);
--	if (ret != 0) return(ret);
--	*str = cur;
--	return(0);
-+        ret = rfc3986_parse_authority(uri, &cur);
-+        if (ret != 0)
-+            return (ret);
-+        ret = rfc3986_parse_path_ab_empty(uri, &cur);
-+        if (ret != 0)
-+            return (ret);
-+        *str = cur;
-+        return (0);
-     } else if (*cur == '/') {
-         ret = rfc3986_parse_path_absolute(uri, &cur);
--	if (ret != 0) return(ret);
-+        if (ret != 0)
-+            return (ret);
-     } else if (ISA_PCHAR(cur)) {
-         ret = rfc3986_parse_path_rootless(uri, &cur);
--	if (ret != 0) return(ret);
-+        if (ret != 0)
-+            return (ret);
-     } else {
--	/* path-empty is effectively empty */
--	if (uri != NULL) {
-+        /* path-empty is effectively empty */
-+        if (uri != NULL) {
-             g_free(uri->path);
--	    uri->path = NULL;
--	}
-+            uri->path = NULL;
-+        }
-     }
-     *str = cur;
-     return (0);
-@@ -793,48 +792,53 @@ rfc3986_parse_hier_part(URI *uri, const char **str)
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_relative_ref(URI *uri, const char *str) {
-+static int rfc3986_parse_relative_ref(URI *uri, const char *str)
-+{
-     int ret;
- 
-     if ((*str == '/') && (*(str + 1) == '/')) {
-         str += 2;
--	ret = rfc3986_parse_authority(uri, &str);
--	if (ret != 0) return(ret);
--	ret = rfc3986_parse_path_ab_empty(uri, &str);
--	if (ret != 0) return(ret);
-+        ret = rfc3986_parse_authority(uri, &str);
-+        if (ret != 0)
-+            return (ret);
-+        ret = rfc3986_parse_path_ab_empty(uri, &str);
-+        if (ret != 0)
-+            return (ret);
-     } else if (*str == '/') {
--	ret = rfc3986_parse_path_absolute(uri, &str);
--	if (ret != 0) return(ret);
-+        ret = rfc3986_parse_path_absolute(uri, &str);
-+        if (ret != 0)
-+            return (ret);
-     } else if (ISA_PCHAR(str)) {
-         ret = rfc3986_parse_path_no_scheme(uri, &str);
--	if (ret != 0) return(ret);
-+        if (ret != 0)
-+            return (ret);
-     } else {
--	/* path-empty is effectively empty */
--	if (uri != NULL) {
-+        /* path-empty is effectively empty */
-+        if (uri != NULL) {
-             g_free(uri->path);
--	    uri->path = NULL;
--	}
-+            uri->path = NULL;
-+        }
-     }
- 
-     if (*str == '?') {
--	str++;
--	ret = rfc3986_parse_query(uri, &str);
--	if (ret != 0) return(ret);
-+        str++;
-+        ret = rfc3986_parse_query(uri, &str);
-+        if (ret != 0)
-+            return (ret);
-     }
-     if (*str == '#') {
--	str++;
--	ret = rfc3986_parse_fragment(uri, &str);
--	if (ret != 0) return(ret);
-+        str++;
-+        ret = rfc3986_parse_fragment(uri, &str);
-+        if (ret != 0)
-+            return (ret);
-     }
-     if (*str != 0) {
--	uri_clean(uri);
--	return(1);
-+        uri_clean(uri);
-+        return (1);
-     }
--    return(0);
-+    return (0);
- }
- 
--
- /**
-  * rfc3986_parse:
-  * @uri:  pointer to an URI structure
-@@ -847,33 +851,37 @@ rfc3986_parse_relative_ref(URI *uri, const char *str) {
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse(URI *uri, const char *str) {
-+static int rfc3986_parse(URI *uri, const char *str)
-+{
-     int ret;
- 
-     ret = rfc3986_parse_scheme(uri, &str);
--    if (ret != 0) return(ret);
-+    if (ret != 0)
-+        return (ret);
-     if (*str != ':') {
--	return(1);
-+        return (1);
-     }
-     str++;
-     ret = rfc3986_parse_hier_part(uri, &str);
--    if (ret != 0) return(ret);
-+    if (ret != 0)
-+        return (ret);
-     if (*str == '?') {
--	str++;
--	ret = rfc3986_parse_query(uri, &str);
--	if (ret != 0) return(ret);
-+        str++;
-+        ret = rfc3986_parse_query(uri, &str);
-+        if (ret != 0)
-+            return (ret);
-     }
-     if (*str == '#') {
--	str++;
--	ret = rfc3986_parse_fragment(uri, &str);
--	if (ret != 0) return(ret);
-+        str++;
-+        ret = rfc3986_parse_fragment(uri, &str);
-+        if (ret != 0)
-+            return (ret);
-     }
-     if (*str != 0) {
--	uri_clean(uri);
--	return(1);
-+        uri_clean(uri);
-+        return (1);
-     }
--    return(0);
-+    return (0);
- }
- 
- /**
-@@ -888,12 +896,12 @@ rfc3986_parse(URI *uri, const char *str) {
-  *
-  * Returns 0 or the error code
-  */
--static int
--rfc3986_parse_uri_reference(URI *uri, const char *str) {
-+static int rfc3986_parse_uri_reference(URI *uri, const char *str)
-+{
-     int ret;
- 
-     if (str == NULL)
--	return(-1);
-+        return (-1);
-     uri_clean(uri);
- 
-     /*
-@@ -902,14 +910,14 @@ rfc3986_parse_uri_reference(URI *uri, const char *str) {
-      */
-     ret = rfc3986_parse(uri, str);
-     if (ret != 0) {
--	uri_clean(uri);
-+        uri_clean(uri);
-         ret = rfc3986_parse_relative_ref(uri, str);
--	if (ret != 0) {
--	    uri_clean(uri);
--	    return(ret);
--	}
-+        if (ret != 0) {
-+            uri_clean(uri);
-+            return (ret);
-+        }
-     }
--    return(0);
-+    return (0);
- }
- 
- /**
-@@ -922,20 +930,20 @@ rfc3986_parse_uri_reference(URI *uri, const char *str) {
-  *
-  * Returns a newly built URI or NULL in case of error
-  */
--URI *
--uri_parse(const char *str) {
-+URI *uri_parse(const char *str)
-+{
-     URI *uri;
-     int ret;
- 
-     if (str == NULL)
--	return(NULL);
-+        return (NULL);
-     uri = uri_new();
-     ret = rfc3986_parse_uri_reference(uri, str);
-     if (ret) {
-         uri_free(uri);
--        return(NULL);
-+        return (NULL);
-     }
--    return(uri);
-+    return (uri);
- }
- 
- /**
-@@ -950,9 +958,9 @@ uri_parse(const char *str) {
-  *
-  * Returns 0 or the error code
-  */
--int
--uri_parse_into(URI *uri, const char *str) {
--    return(rfc3986_parse_uri_reference(uri, str));
-+int uri_parse_into(URI *uri, const char *str)
-+{
-+    return (rfc3986_parse_uri_reference(uri, str));
- }
- 
- /**
-@@ -966,13 +974,13 @@ uri_parse_into(URI *uri, const char *str) {
-  *
-  * Returns a newly built URI or NULL in case of error
-  */
--URI *
--uri_parse_raw(const char *str, int raw) {
-+URI *uri_parse_raw(const char *str, int raw)
-+{
-     URI *uri;
-     int ret;
- 
-     if (str == NULL)
--	return(NULL);
-+        return (NULL);
-     uri = uri_new();
-     if (raw) {
-         uri->cleanup |= 2;
-@@ -980,15 +988,15 @@ uri_parse_raw(const char *str, int raw) {
-     ret = uri_parse_into(uri, str);
-     if (ret) {
-         uri_free(uri);
--        return(NULL);
-+        return (NULL);
-     }
--    return(uri);
-+    return (uri);
- }
- 
- /************************************************************************
-- *									*
-- *			Generic URI structure functions			*
-- *									*
-+ *                                                                      *
-+ *                    Generic URI structure functions                   *
-+ *                                                                      *
-  ************************************************************************/
- 
- /**
-@@ -998,12 +1006,12 @@ uri_parse_raw(const char *str, int raw) {
-  *
-  * Returns the new structure or NULL in case of error
-  */
--URI *
--uri_new(void) {
-+URI *uri_new(void)
-+{
-     URI *ret;
- 
-     ret = g_new0(URI, 1);
--    return(ret);
-+    return (ret);
- }
- 
- /**
-@@ -1012,15 +1020,15 @@ uri_new(void) {
-  * Function to handle properly a reallocation when saving an URI
-  * Also imposes some limit on the length of an URI string output
-  */
--static char *
--realloc2n(char *ret, int *max) {
-+static char *realloc2n(char *ret, int *max)
-+{
-     char *temp;
-     int tmp;
- 
-     tmp = *max * 2;
-     temp = g_realloc(ret, (tmp + 1));
-     *max = tmp;
--    return(temp);
-+    return (temp);
- }
- 
- /**
-@@ -1031,221 +1039,217 @@ realloc2n(char *ret, int *max) {
-  *
-  * Returns a new string (to be deallocated by caller)
-  */
--char *
--uri_to_string(URI *uri) {
-+char *uri_to_string(URI *uri)
-+{
-     char *ret = NULL;
-     char *temp;
-     const char *p;
-     int len;
-     int max;
- 
--    if (uri == NULL) return(NULL);
--
-+    if (uri == NULL)
-+        return (NULL);
- 
-     max = 80;
-     ret = g_malloc(max + 1);
-     len = 0;
- 
-     if (uri->scheme != NULL) {
--	p = uri->scheme;
--	while (*p != 0) {
--	    if (len >= max) {
-+        p = uri->scheme;
-+        while (*p != 0) {
-+            if (len >= max) {
-                 temp = realloc2n(ret, &max);
--		ret = temp;
--	    }
--	    ret[len++] = *p++;
--	}
--	if (len >= max) {
-+                ret = temp;
-+            }
-+            ret[len++] = *p++;
-+        }
-+        if (len >= max) {
-             temp = realloc2n(ret, &max);
-             ret = temp;
--	}
--	ret[len++] = ':';
-+        }
-+        ret[len++] = ':';
-     }
-     if (uri->opaque != NULL) {
--	p = uri->opaque;
--	while (*p != 0) {
--	    if (len + 3 >= max) {
-+        p = uri->opaque;
-+        while (*p != 0) {
-+            if (len + 3 >= max) {
-                 temp = realloc2n(ret, &max);
-                 ret = temp;
--	    }
--	    if (IS_RESERVED(*(p)) || IS_UNRESERVED(*(p)))
--		ret[len++] = *p++;
--	    else {
--		int val = *(unsigned char *)p++;
--		int hi = val / 0x10, lo = val % 0x10;
--		ret[len++] = '%';
--		ret[len++] = hi + (hi > 9? 'A'-10 : '0');
--		ret[len++] = lo + (lo > 9? 'A'-10 : '0');
--	    }
--	}
-+            }
-+            if (IS_RESERVED(*(p)) || IS_UNRESERVED(*(p)))
-+                ret[len++] = *p++;
-+            else {
-+                int val = *(unsigned char *)p++;
-+                int hi = val / 0x10, lo = val % 0x10;
-+                ret[len++] = '%';
-+                ret[len++] = hi + (hi > 9 ? 'A' - 10 : '0');
-+                ret[len++] = lo + (lo > 9 ? 'A' - 10 : '0');
-+            }
-+        }
-     } else {
--	if (uri->server != NULL) {
--	    if (len + 3 >= max) {
-+        if (uri->server != NULL) {
-+            if (len + 3 >= max) {
-                 temp = realloc2n(ret, &max);
-                 ret = temp;
--	    }
--	    ret[len++] = '/';
--	    ret[len++] = '/';
--	    if (uri->user != NULL) {
--		p = uri->user;
--		while (*p != 0) {
--		    if (len + 3 >= max) {
-+            }
-+            ret[len++] = '/';
-+            ret[len++] = '/';
-+            if (uri->user != NULL) {
-+                p = uri->user;
-+                while (*p != 0) {
-+                    if (len + 3 >= max) {
-                         temp = realloc2n(ret, &max);
-                         ret = temp;
--		    }
--		    if ((IS_UNRESERVED(*(p))) ||
--			((*(p) == ';')) || ((*(p) == ':')) ||
--			((*(p) == '&')) || ((*(p) == '=')) ||
--			((*(p) == '+')) || ((*(p) == '$')) ||
--			((*(p) == ',')))
--			ret[len++] = *p++;
--		    else {
--			int val = *(unsigned char *)p++;
--			int hi = val / 0x10, lo = val % 0x10;
--			ret[len++] = '%';
--			ret[len++] = hi + (hi > 9? 'A'-10 : '0');
--			ret[len++] = lo + (lo > 9? 'A'-10 : '0');
--		    }
--		}
--		if (len + 3 >= max) {
-+                    }
-+                    if ((IS_UNRESERVED(*(p))) || ((*(p) == ';')) ||
-+                        ((*(p) == ':')) || ((*(p) == '&')) || ((*(p) == '=')) ||
-+                        ((*(p) == '+')) || ((*(p) == '$')) || ((*(p) == ',')))
-+                        ret[len++] = *p++;
-+                    else {
-+                        int val = *(unsigned char *)p++;
-+                        int hi = val / 0x10, lo = val % 0x10;
-+                        ret[len++] = '%';
-+                        ret[len++] = hi + (hi > 9 ? 'A' - 10 : '0');
-+                        ret[len++] = lo + (lo > 9 ? 'A' - 10 : '0');
-+                    }
-+                }
-+                if (len + 3 >= max) {
-                     temp = realloc2n(ret, &max);
-                     ret = temp;
--		}
--		ret[len++] = '@';
--	    }
--	    p = uri->server;
--	    while (*p != 0) {
--		if (len >= max) {
-+                }
-+                ret[len++] = '@';
-+            }
-+            p = uri->server;
-+            while (*p != 0) {
-+                if (len >= max) {
-                     temp = realloc2n(ret, &max);
-                     ret = temp;
--		}
--		ret[len++] = *p++;
--	    }
--	    if (uri->port > 0) {
--		if (len + 10 >= max) {
-+                }
-+                ret[len++] = *p++;
-+            }
-+            if (uri->port > 0) {
-+                if (len + 10 >= max) {
-                     temp = realloc2n(ret, &max);
-                     ret = temp;
--		}
--		len += snprintf(&ret[len], max - len, ":%d", uri->port);
--	    }
--	} else if (uri->authority != NULL) {
--	    if (len + 3 >= max) {
-+                }
-+                len += snprintf(&ret[len], max - len, ":%d", uri->port);
-+            }
-+        } else if (uri->authority != NULL) {
-+            if (len + 3 >= max) {
-                 temp = realloc2n(ret, &max);
-                 ret = temp;
--	    }
--	    ret[len++] = '/';
--	    ret[len++] = '/';
--	    p = uri->authority;
--	    while (*p != 0) {
--		if (len + 3 >= max) {
-+            }
-+            ret[len++] = '/';
-+            ret[len++] = '/';
-+            p = uri->authority;
-+            while (*p != 0) {
-+                if (len + 3 >= max) {
-                     temp = realloc2n(ret, &max);
-                     ret = temp;
--		}
--		if ((IS_UNRESERVED(*(p))) ||
--                    ((*(p) == '$')) || ((*(p) == ',')) || ((*(p) == ';')) ||
--                    ((*(p) == ':')) || ((*(p) == '@')) || ((*(p) == '&')) ||
--                    ((*(p) == '=')) || ((*(p) == '+')))
--		    ret[len++] = *p++;
--		else {
--		    int val = *(unsigned char *)p++;
--		    int hi = val / 0x10, lo = val % 0x10;
--		    ret[len++] = '%';
--		    ret[len++] = hi + (hi > 9? 'A'-10 : '0');
--		    ret[len++] = lo + (lo > 9? 'A'-10 : '0');
--		}
--	    }
--	} else if (uri->scheme != NULL) {
--	    if (len + 3 >= max) {
-+                }
-+                if ((IS_UNRESERVED(*(p))) || ((*(p) == '$')) ||
-+                    ((*(p) == ',')) || ((*(p) == ';')) || ((*(p) == ':')) ||
-+                    ((*(p) == '@')) || ((*(p) == '&')) || ((*(p) == '=')) ||
-+                    ((*(p) == '+')))
-+                    ret[len++] = *p++;
-+                else {
-+                    int val = *(unsigned char *)p++;
-+                    int hi = val / 0x10, lo = val % 0x10;
-+                    ret[len++] = '%';
-+                    ret[len++] = hi + (hi > 9 ? 'A' - 10 : '0');
-+                    ret[len++] = lo + (lo > 9 ? 'A' - 10 : '0');
-+                }
-+            }
-+        } else if (uri->scheme != NULL) {
-+            if (len + 3 >= max) {
-                 temp = realloc2n(ret, &max);
-                 ret = temp;
--	    }
--	    ret[len++] = '/';
--	    ret[len++] = '/';
--	}
--	if (uri->path != NULL) {
--	    p = uri->path;
--	    /*
--	     * the colon in file:///d: should not be escaped or
--	     * Windows accesses fail later.
--	     */
--	    if ((uri->scheme != NULL) &&
--		(p[0] == '/') &&
--		(((p[1] >= 'a') && (p[1] <= 'z')) ||
--		 ((p[1] >= 'A') && (p[1] <= 'Z'))) &&
--		(p[2] == ':') &&
--	        (!strcmp(uri->scheme, "file"))) {
--		if (len + 3 >= max) {
-+            }
-+            ret[len++] = '/';
-+            ret[len++] = '/';
-+        }
-+        if (uri->path != NULL) {
-+            p = uri->path;
-+            /*
-+             * the colon in file:///d: should not be escaped or
-+             * Windows accesses fail later.
-+             */
-+            if ((uri->scheme != NULL) && (p[0] == '/') &&
-+                (((p[1] >= 'a') && (p[1] <= 'z')) ||
-+                 ((p[1] >= 'A') && (p[1] <= 'Z'))) &&
-+                (p[2] == ':') && (!strcmp(uri->scheme, "file"))) {
-+                if (len + 3 >= max) {
-                     temp = realloc2n(ret, &max);
-                     ret = temp;
--		}
--		ret[len++] = *p++;
--		ret[len++] = *p++;
--		ret[len++] = *p++;
--	    }
--	    while (*p != 0) {
--		if (len + 3 >= max) {
-+                }
-+                ret[len++] = *p++;
-+                ret[len++] = *p++;
-+                ret[len++] = *p++;
-+            }
-+            while (*p != 0) {
-+                if (len + 3 >= max) {
-                     temp = realloc2n(ret, &max);
-                     ret = temp;
--		}
--		if ((IS_UNRESERVED(*(p))) || ((*(p) == '/')) ||
-+                }
-+                if ((IS_UNRESERVED(*(p))) || ((*(p) == '/')) ||
-                     ((*(p) == ';')) || ((*(p) == '@')) || ((*(p) == '&')) ||
--	            ((*(p) == '=')) || ((*(p) == '+')) || ((*(p) == '$')) ||
--	            ((*(p) == ',')))
--		    ret[len++] = *p++;
--		else {
--		    int val = *(unsigned char *)p++;
--		    int hi = val / 0x10, lo = val % 0x10;
--		    ret[len++] = '%';
--		    ret[len++] = hi + (hi > 9? 'A'-10 : '0');
--		    ret[len++] = lo + (lo > 9? 'A'-10 : '0');
--		}
--	    }
--	}
--	if (uri->query != NULL) {
--	    if (len + 1 >= max) {
-+                    ((*(p) == '=')) || ((*(p) == '+')) || ((*(p) == '$')) ||
-+                    ((*(p) == ',')))
-+                    ret[len++] = *p++;
-+                else {
-+                    int val = *(unsigned char *)p++;
-+                    int hi = val / 0x10, lo = val % 0x10;
-+                    ret[len++] = '%';
-+                    ret[len++] = hi + (hi > 9 ? 'A' - 10 : '0');
-+                    ret[len++] = lo + (lo > 9 ? 'A' - 10 : '0');
-+                }
-+            }
-+        }
-+        if (uri->query != NULL) {
-+            if (len + 1 >= max) {
-                 temp = realloc2n(ret, &max);
-                 ret = temp;
--	    }
--	    ret[len++] = '?';
--	    p = uri->query;
--	    while (*p != 0) {
--		if (len + 1 >= max) {
-+            }
-+            ret[len++] = '?';
-+            p = uri->query;
-+            while (*p != 0) {
-+                if (len + 1 >= max) {
-                     temp = realloc2n(ret, &max);
-                     ret = temp;
--		}
--		ret[len++] = *p++;
--	    }
--	}
-+                }
-+                ret[len++] = *p++;
-+            }
-+        }
-     }
-     if (uri->fragment != NULL) {
--	if (len + 3 >= max) {
-+        if (len + 3 >= max) {
-             temp = realloc2n(ret, &max);
-             ret = temp;
--	}
--	ret[len++] = '#';
--	p = uri->fragment;
--	while (*p != 0) {
--	    if (len + 3 >= max) {
-+        }
-+        ret[len++] = '#';
-+        p = uri->fragment;
-+        while (*p != 0) {
-+            if (len + 3 >= max) {
-                 temp = realloc2n(ret, &max);
-                 ret = temp;
--	    }
--	    if ((IS_UNRESERVED(*(p))) || (IS_RESERVED(*(p))))
--		ret[len++] = *p++;
--	    else {
--		int val = *(unsigned char *)p++;
--		int hi = val / 0x10, lo = val % 0x10;
--		ret[len++] = '%';
--		ret[len++] = hi + (hi > 9? 'A'-10 : '0');
--		ret[len++] = lo + (lo > 9? 'A'-10 : '0');
--	    }
--	}
-+            }
-+            if ((IS_UNRESERVED(*(p))) || (IS_RESERVED(*(p))))
-+                ret[len++] = *p++;
-+            else {
-+                int val = *(unsigned char *)p++;
-+                int hi = val / 0x10, lo = val % 0x10;
-+                ret[len++] = '%';
-+                ret[len++] = hi + (hi > 9 ? 'A' - 10 : '0');
-+                ret[len++] = lo + (lo > 9 ? 'A' - 10 : '0');
-+            }
-+        }
-     }
-     if (len >= max) {
-         temp = realloc2n(ret, &max);
-         ret = temp;
-     }
-     ret[len] = 0;
--    return(ret);
-+    return (ret);
- }
- 
- /**
-@@ -1254,9 +1258,10 @@ uri_to_string(URI *uri) {
-  *
-  * Make sure the URI struct is free of content
-  */
--static void
--uri_clean(URI *uri) {
--    if (uri == NULL) return;
-+static void uri_clean(URI *uri)
-+{
-+    if (uri == NULL)
-+        return;
- 
-     g_free(uri->scheme);
-     uri->scheme = NULL;
-@@ -1282,16 +1287,16 @@ uri_clean(URI *uri) {
-  *
-  * Free up the URI struct
-  */
--void
--uri_free(URI *uri) {
-+void uri_free(URI *uri)
-+{
-     uri_clean(uri);
-     g_free(uri);
- }
- 
- /************************************************************************
-- *									*
-- *			Helper functions				*
-- *									*
-+ *                                                                      *
-+ *                           Helper functions                           *
-+ *                                                                      *
-  ************************************************************************/
- 
- /**
-@@ -1305,21 +1310,21 @@ uri_free(URI *uri) {
-  *
-  * Returns 0 or an error code
-  */
--static int
--normalize_uri_path(char *path) {
-+static int normalize_uri_path(char *path)
-+{
-     char *cur, *out;
- 
-     if (path == NULL)
--	return(-1);
-+        return (-1);
- 
-     /* Skip all initial "/" chars.  We want to get to the beginning of the
-      * first non-empty segment.
-      */
-     cur = path;
-     while (cur[0] == '/')
--      ++cur;
-+        ++cur;
-     if (cur[0] == '\0')
--      return(0);
-+        return (0);
- 
-     /* Keep everything we've seen so far.  */
-     out = cur;
-@@ -1328,46 +1333,46 @@ normalize_uri_path(char *path) {
-      * Analyze each segment in sequence for cases (c) and (d).
-      */
-     while (cur[0] != '\0') {
--	/*
--	 * c) All occurrences of "./", where "." is a complete path segment,
--	 *    are removed from the buffer string.
--	 */
--	if ((cur[0] == '.') && (cur[1] == '/')) {
--	    cur += 2;
--	    /* '//' normalization should be done at this point too */
--	    while (cur[0] == '/')
--		cur++;
--	    continue;
--	}
--
--	/*
--	 * d) If the buffer string ends with "." as a complete path segment,
--	 *    that "." is removed.
--	 */
--	if ((cur[0] == '.') && (cur[1] == '\0'))
--	    break;
--
--	/* Otherwise keep the segment.  */
--	while (cur[0] != '/') {
-+        /*
-+         * c) All occurrences of "./", where "." is a complete path segment,
-+         *    are removed from the buffer string.
-+         */
-+        if ((cur[0] == '.') && (cur[1] == '/')) {
-+            cur += 2;
-+            /* '//' normalization should be done at this point too */
-+            while (cur[0] == '/')
-+                cur++;
-+            continue;
-+        }
-+
-+        /*
-+         * d) If the buffer string ends with "." as a complete path segment,
-+         *    that "." is removed.
-+         */
-+        if ((cur[0] == '.') && (cur[1] == '\0'))
-+            break;
-+
-+        /* Otherwise keep the segment.  */
-+        while (cur[0] != '/') {
-             if (cur[0] == '\0')
--              goto done_cd;
--	    (out++)[0] = (cur++)[0];
--	}
--	/* nomalize // */
--	while ((cur[0] == '/') && (cur[1] == '/'))
--	    cur++;
-+                goto done_cd;
-+            (out++)[0] = (cur++)[0];
-+        }
-+        /* nomalize // */
-+        while ((cur[0] == '/') && (cur[1] == '/'))
-+            cur++;
- 
-         (out++)[0] = (cur++)[0];
-     }
-- done_cd:
-+done_cd:
-     out[0] = '\0';
- 
-     /* Reset to the beginning of the first segment for the next sequence.  */
-     cur = path;
-     while (cur[0] == '/')
--      ++cur;
-+        ++cur;
-     if (cur[0] == '\0')
--	return(0);
-+        return (0);
- 
-     /*
-      * Analyze each segment in sequence for cases (e) and (f).
-@@ -1397,23 +1402,23 @@ normalize_uri_path(char *path) {
-         /* Find the end of the current segment.  */
-         segp = cur;
-         while ((segp[0] != '/') && (segp[0] != '\0'))
--          ++segp;
-+            ++segp;
- 
-         /* If this is the last segment, we're done (we need at least two
-          * segments to meet the criteria for the (e) and (f) cases).
-          */
-         if (segp[0] == '\0')
--          break;
-+            break;
- 
-         /* If the first segment is "..", or if the next segment _isn't_ "..",
-          * keep this segment and try the next one.
-          */
-         ++segp;
--        if (((cur[0] == '.') && (cur[1] == '.') && (segp == cur+3))
--            || ((segp[0] != '.') || (segp[1] != '.')
--                || ((segp[2] != '/') && (segp[2] != '\0')))) {
--          cur = segp;
--          continue;
-+        if (((cur[0] == '.') && (cur[1] == '.') && (segp == cur + 3)) ||
-+            ((segp[0] != '.') || (segp[1] != '.') ||
-+             ((segp[2] != '/') && (segp[2] != '\0')))) {
-+            cur = segp;
-+            continue;
-         }
- 
-         /* If we get here, remove this segment and the next one and back up
-@@ -1425,22 +1430,22 @@ normalize_uri_path(char *path) {
- 
-         /* If this is the end of the buffer, we're done.  */
-         if (segp[2] == '\0') {
--          cur[0] = '\0';
--          break;
-+            cur[0] = '\0';
-+            break;
-         }
-         /* Valgrind complained, strcpy(cur, segp + 3); */
-         /* string will overlap, do not use strcpy */
-         tmp = cur;
-         segp += 3;
-         while ((*tmp++ = *segp++) != 0)
--          ;
-+            ;
- 
-         /* If there are no previous segments, then keep going from here.  */
-         segp = cur;
-         while ((segp > path) && ((--segp)[0] == '/'))
--          ;
-+            ;
-         if (segp == path)
--          continue;
-+            continue;
- 
-         /* "segp" is pointing to the end of a previous segment; find it's
-          * start.  We need to back up to the previous segment and start
-@@ -1451,7 +1456,7 @@ normalize_uri_path(char *path) {
-          */
-         cur = segp;
-         while ((cur > path) && (cur[-1] != '/'))
--          --cur;
-+            --cur;
-     }
-     out[0] = '\0';
- 
-@@ -1467,31 +1472,30 @@ normalize_uri_path(char *path) {
-      * We discard them from the final path.
-      */
-     if (path[0] == '/') {
--      cur = path;
--      while ((cur[0] == '/') && (cur[1] == '.') && (cur[2] == '.')
--             && ((cur[3] == '/') || (cur[3] == '\0')))
--	cur += 3;
--
--      if (cur != path) {
--	out = path;
--	while (cur[0] != '\0')
--          (out++)[0] = (cur++)[0];
--	out[0] = 0;
--      }
-+        cur = path;
-+        while ((cur[0] == '/') && (cur[1] == '.') && (cur[2] == '.') &&
-+               ((cur[3] == '/') || (cur[3] == '\0')))
-+            cur += 3;
-+
-+        if (cur != path) {
-+            out = path;
-+            while (cur[0] != '\0')
-+                (out++)[0] = (cur++)[0];
-+            out[0] = 0;
-+        }
-     }
- 
--    return(0);
-+    return (0);
- }
- 
--static int is_hex(char c) {
--    if (((c >= '0') && (c <= '9')) ||
--        ((c >= 'a') && (c <= 'f')) ||
-+static int is_hex(char c)
-+{
-+    if (((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) ||
-         ((c >= 'A') && (c <= 'F')))
--	return(1);
--    return(0);
-+        return (1);
-+    return (0);
- }
- 
--
- /**
-  * uri_string_unescape:
-  * @str:  the string to unescape
-@@ -1506,48 +1510,50 @@ static int is_hex(char c) {
-  * Returns a copy of the string, but unescaped, will return NULL only in case
-  * of error
-  */
--char *
--uri_string_unescape(const char *str, int len, char *target) {
-+char *uri_string_unescape(const char *str, int len, char *target)
-+{
-     char *ret, *out;
-     const char *in;
- 
-     if (str == NULL)
--	return(NULL);
--    if (len <= 0) len = strlen(str);
--    if (len < 0) return(NULL);
-+        return (NULL);
-+    if (len <= 0)
-+        len = strlen(str);
-+    if (len < 0)
-+        return (NULL);
- 
-     if (target == NULL) {
--	ret = g_malloc(len + 1);
-+        ret = g_malloc(len + 1);
-     } else
--	ret = target;
-+        ret = target;
-     in = str;
-     out = ret;
--    while(len > 0) {
--	if ((len > 2) && (*in == '%') && (is_hex(in[1])) && (is_hex(in[2]))) {
--	    in++;
--	    if ((*in >= '0') && (*in <= '9'))
--	        *out = (*in - '0');
--	    else if ((*in >= 'a') && (*in <= 'f'))
--	        *out = (*in - 'a') + 10;
--	    else if ((*in >= 'A') && (*in <= 'F'))
--	        *out = (*in - 'A') + 10;
--	    in++;
--	    if ((*in >= '0') && (*in <= '9'))
--	        *out = *out * 16 + (*in - '0');
--	    else if ((*in >= 'a') && (*in <= 'f'))
--	        *out = *out * 16 + (*in - 'a') + 10;
--	    else if ((*in >= 'A') && (*in <= 'F'))
--	        *out = *out * 16 + (*in - 'A') + 10;
--	    in++;
--	    len -= 3;
--	    out++;
--	} else {
--	    *out++ = *in++;
--	    len--;
--	}
-+    while (len > 0) {
-+        if ((len > 2) && (*in == '%') && (is_hex(in[1])) && (is_hex(in[2]))) {
-+            in++;
-+            if ((*in >= '0') && (*in <= '9'))
-+                *out = (*in - '0');
-+            else if ((*in >= 'a') && (*in <= 'f'))
-+                *out = (*in - 'a') + 10;
-+            else if ((*in >= 'A') && (*in <= 'F'))
-+                *out = (*in - 'A') + 10;
-+            in++;
-+            if ((*in >= '0') && (*in <= '9'))
-+                *out = *out * 16 + (*in - '0');
-+            else if ((*in >= 'a') && (*in <= 'f'))
-+                *out = *out * 16 + (*in - 'a') + 10;
-+            else if ((*in >= 'A') && (*in <= 'F'))
-+                *out = *out * 16 + (*in - 'A') + 10;
-+            in++;
-+            len -= 3;
-+            out++;
-+        } else {
-+            *out++ = *in++;
-+            len--;
-+        }
-     }
-     *out = 0;
--    return(ret);
-+    return (ret);
- }
- 
- /**
-@@ -1560,59 +1566,59 @@ uri_string_unescape(const char *str, int len, char *target) {
-  *
-  * Returns a new escaped string or NULL in case of error.
-  */
--char *
--uri_string_escape(const char *str, const char *list) {
-+char *uri_string_escape(const char *str, const char *list)
-+{
-     char *ret, ch;
-     char *temp;
-     const char *in;
-     int len, out;
- 
-     if (str == NULL)
--	return(NULL);
-+        return (NULL);
-     if (str[0] == 0)
--	return(g_strdup(str));
-+        return (g_strdup(str));
-     len = strlen(str);
--    if (!(len > 0)) return(NULL);
-+    if (!(len > 0))
-+        return (NULL);
- 
-     len += 20;
-     ret = g_malloc(len);
-     in = str;
-     out = 0;
--    while(*in != 0) {
--	if (len - out <= 3) {
-+    while (*in != 0) {
-+        if (len - out <= 3) {
-             temp = realloc2n(ret, &len);
--	    ret = temp;
--	}
--
--	ch = *in;
--
--	if ((ch != '@') && (!IS_UNRESERVED(ch)) && (!strchr(list, ch))) {
--	    unsigned char val;
--	    ret[out++] = '%';
--	    val = ch >> 4;
--	    if (val <= 9)
--		ret[out++] = '0' + val;
--	    else
--		ret[out++] = 'A' + val - 0xA;
--	    val = ch & 0xF;
--	    if (val <= 9)
--		ret[out++] = '0' + val;
--	    else
--		ret[out++] = 'A' + val - 0xA;
--	    in++;
--	} else {
--	    ret[out++] = *in++;
--	}
-+            ret = temp;
-+        }
- 
-+        ch = *in;
-+
-+        if ((ch != '@') && (!IS_UNRESERVED(ch)) && (!strchr(list, ch))) {
-+            unsigned char val;
-+            ret[out++] = '%';
-+            val = ch >> 4;
-+            if (val <= 9)
-+                ret[out++] = '0' + val;
-+            else
-+                ret[out++] = 'A' + val - 0xA;
-+            val = ch & 0xF;
-+            if (val <= 9)
-+                ret[out++] = '0' + val;
-+            else
-+                ret[out++] = 'A' + val - 0xA;
-+            in++;
-+        } else {
-+            ret[out++] = *in++;
-+        }
-     }
-     ret[out] = 0;
--    return(ret);
-+    return (ret);
- }
- 
- /************************************************************************
-- *									*
-- *			Public functions				*
-- *									*
-+ *                                                                      *
-+ *                           Public functions                           *
-+ *                                                                      *
-  ************************************************************************/
- 
- /**
-@@ -1630,8 +1636,8 @@ uri_string_escape(const char *str, const char *list) {
-  * Returns a new URI string (to be freed by the caller) or NULL in case
-  *         of error.
-  */
--char *
--uri_resolve(const char *uri, const char *base) {
-+char *uri_resolve(const char *uri, const char *base)
-+{
-     char *val = NULL;
-     int ret, len, indx, cur, out;
-     URI *ref = NULL;
-@@ -1647,43 +1653,42 @@ uri_resolve(const char *uri, const char *base) {
-      *    URI.  Should we do that here?
-      */
-     if (uri == NULL)
--	ret = -1;
-+        ret = -1;
-     else {
--	if (*uri) {
--	    ref = uri_new();
--	    ret = uri_parse_into(ref, uri);
--	}
--	else
--	    ret = 0;
-+        if (*uri) {
-+            ref = uri_new();
-+            ret = uri_parse_into(ref, uri);
-+        } else
-+            ret = 0;
-     }
-     if (ret != 0)
--	goto done;
-+        goto done;
-     if ((ref != NULL) && (ref->scheme != NULL)) {
--	/*
--	 * The URI is absolute don't modify.
--	 */
--	val = g_strdup(uri);
--	goto done;
-+        /*
-+         * The URI is absolute don't modify.
-+         */
-+        val = g_strdup(uri);
-+        goto done;
-     }
-     if (base == NULL)
--	ret = -1;
-+        ret = -1;
-     else {
--	bas = uri_new();
--	ret = uri_parse_into(bas, base);
-+        bas = uri_new();
-+        ret = uri_parse_into(bas, base);
-     }
-     if (ret != 0) {
--	if (ref)
--	    val = uri_to_string(ref);
--	goto done;
-+        if (ref)
-+            val = uri_to_string(ref);
-+        goto done;
-     }
-     if (ref == NULL) {
--	/*
--	 * the base fragment must be ignored
--	 */
-+        /*
-+         * the base fragment must be ignored
-+         */
-         g_free(bas->fragment);
-         bas->fragment = NULL;
--	val = uri_to_string(bas);
--	goto done;
-+        val = uri_to_string(bas);
-+        goto done;
-     }
- 
-     /*
-@@ -1700,23 +1705,23 @@ uri_resolve(const char *uri, const char *base) {
-      */
-     res = uri_new();
-     if ((ref->scheme == NULL) && (ref->path == NULL) &&
--	((ref->authority == NULL) && (ref->server == NULL))) {
-+        ((ref->authority == NULL) && (ref->server == NULL))) {
-         res->scheme = g_strdup(bas->scheme);
--	if (bas->authority != NULL)
--	    res->authority = g_strdup(bas->authority);
--	else if (bas->server != NULL) {
-+        if (bas->authority != NULL)
-+            res->authority = g_strdup(bas->authority);
-+        else if (bas->server != NULL) {
-             res->server = g_strdup(bas->server);
-             res->user = g_strdup(bas->user);
-             res->port = bas->port;
--	}
-+        }
-         res->path = g_strdup(bas->path);
-         if (ref->query != NULL) {
--	    res->query = g_strdup (ref->query);
-+            res->query = g_strdup(ref->query);
-         } else {
-             res->query = g_strdup(bas->query);
-         }
-         res->fragment = g_strdup(ref->fragment);
--	goto step_7;
-+        goto step_7;
-     }
- 
-     /*
-@@ -1726,8 +1731,8 @@ uri_resolve(const char *uri, const char *base) {
-      *    scheme is inherited from the base URI's scheme component.
-      */
-     if (ref->scheme != NULL) {
--	val = uri_to_string(ref);
--	goto done;
-+        val = uri_to_string(ref);
-+        goto done;
-     }
-     res->scheme = g_strdup(bas->scheme);
- 
-@@ -1742,22 +1747,22 @@ uri_resolve(const char *uri, const char *base) {
-      *    use an authority component.
-      */
-     if ((ref->authority != NULL) || (ref->server != NULL)) {
--	if (ref->authority != NULL)
--	    res->authority = g_strdup(ref->authority);
--	else {
--	    res->server = g_strdup(ref->server);
-+        if (ref->authority != NULL)
-+            res->authority = g_strdup(ref->authority);
-+        else {
-+            res->server = g_strdup(ref->server);
-             res->user = g_strdup(ref->user);
-             res->port = ref->port;
--	}
-+        }
-         res->path = g_strdup(ref->path);
--	goto step_7;
-+        goto step_7;
-     }
-     if (bas->authority != NULL)
--	res->authority = g_strdup(bas->authority);
-+        res->authority = g_strdup(bas->authority);
-     else if (bas->server != NULL) {
-         res->server = g_strdup(bas->server);
-         res->user = g_strdup(bas->user);
--	res->port = bas->port;
-+        res->port = bas->port;
-     }
- 
-     /*
-@@ -1765,11 +1770,10 @@ uri_resolve(const char *uri, const char *base) {
-      *    the reference is an absolute-path and we skip to step 7.
-      */
-     if ((ref->path != NULL) && (ref->path[0] == '/')) {
--	res->path = g_strdup(ref->path);
--	goto step_7;
-+        res->path = g_strdup(ref->path);
-+        goto step_7;
-     }
- 
--
-     /*
-      * 6) If this step is reached, then we are resolving a relative-path
-      *    reference.  The relative path needs to be merged with the base
-@@ -1780,9 +1784,9 @@ uri_resolve(const char *uri, const char *base) {
-      */
-     len = 2; /* extra / and 0 */
-     if (ref->path != NULL)
--	len += strlen(ref->path);
-+        len += strlen(ref->path);
-     if (bas->path != NULL)
--	len += strlen(bas->path);
-+        len += strlen(bas->path);
-     res->path = g_malloc(len);
-     res->path[0] = 0;
- 
-@@ -1794,18 +1798,18 @@ uri_resolve(const char *uri, const char *base) {
-     cur = 0;
-     out = 0;
-     if (bas->path != NULL) {
--	while (bas->path[cur] != 0) {
--	    while ((bas->path[cur] != 0) && (bas->path[cur] != '/'))
--		cur++;
--	    if (bas->path[cur] == 0)
--		break;
--
--	    cur++;
--	    while (out < cur) {
--		res->path[out] = bas->path[out];
--		out++;
--	    }
--	}
-+        while (bas->path[cur] != 0) {
-+            while ((bas->path[cur] != 0) && (bas->path[cur] != '/'))
-+                cur++;
-+            if (bas->path[cur] == 0)
-+                break;
-+
-+            cur++;
-+            while (out < cur) {
-+                res->path[out] = bas->path[out];
-+                out++;
-+            }
-+        }
-     }
-     res->path[out] = 0;
- 
-@@ -1814,15 +1818,15 @@ uri_resolve(const char *uri, const char *base) {
-      *    string.
-      */
-     if (ref->path != NULL && ref->path[0] != 0) {
--	indx = 0;
--	/*
--	 * Ensure the path includes a '/'
--	 */
--	if ((out == 0) && (bas->server != NULL))
--	    res->path[out++] = '/';
--	while (ref->path[indx] != 0) {
--	    res->path[out++] = ref->path[indx++];
--	}
-+        indx = 0;
-+        /*
-+         * Ensure the path includes a '/'
-+         */
-+        if ((out == 0) && (bas->server != NULL))
-+            res->path[out++] = '/';
-+        while (ref->path[indx] != 0) {
-+            res->path[out++] = ref->path[indx++];
-+        }
-     }
-     res->path[out] = 0;
- 
-@@ -1842,12 +1846,12 @@ step_7:
- 
- done:
-     if (ref != NULL)
--	uri_free(ref);
-+        uri_free(ref);
-     if (bas != NULL)
--	uri_free(bas);
-+        uri_free(bas);
-     if (res != NULL)
--	uri_free(res);
--    return(val);
-+        uri_free(res);
-+    return (val);
- }
- 
- /**
-@@ -1882,8 +1886,7 @@ done:
-  * Returns a new URI string (to be freed by the caller) or NULL in case
-  * error.
-  */
--char *
--uri_resolve_relative (const char *uri, const char * base)
-+char *uri_resolve_relative(const char *uri, const char *base)
- {
-     char *val = NULL;
-     int ret;
-@@ -1897,58 +1900,57 @@ uri_resolve_relative (const char *uri, const char * base)
-     int remove_path = 0;
- 
-     if ((uri == NULL) || (*uri == 0))
--	return NULL;
-+        return NULL;
- 
-     /*
-      * First parse URI into a standard form
-      */
--    ref = uri_new ();
-+    ref = uri_new();
-     /* If URI not already in "relative" form */
-     if (uri[0] != '.') {
--	ret = uri_parse_into (ref, uri);
--	if (ret != 0)
--	    goto done;		/* Error in URI, return NULL */
-+        ret = uri_parse_into(ref, uri);
-+        if (ret != 0)
-+            goto done; /* Error in URI, return NULL */
-     } else
--	ref->path = g_strdup(uri);
-+        ref->path = g_strdup(uri);
- 
-     /*
-      * Next parse base into the same standard form
-      */
-     if ((base == NULL) || (*base == 0)) {
--	val = g_strdup (uri);
--	goto done;
-+        val = g_strdup(uri);
-+        goto done;
-     }
--    bas = uri_new ();
-+    bas = uri_new();
-     if (base[0] != '.') {
--	ret = uri_parse_into (bas, base);
--	if (ret != 0)
--	    goto done;		/* Error in base, return NULL */
-+        ret = uri_parse_into(bas, base);
-+        if (ret != 0)
-+            goto done; /* Error in base, return NULL */
-     } else
--	bas->path = g_strdup(base);
-+        bas->path = g_strdup(base);
- 
-     /*
-      * If the scheme / server on the URI differs from the base,
-      * just return the URI
-      */
-     if ((ref->scheme != NULL) &&
--	((bas->scheme == NULL) ||
--	 (strcmp (bas->scheme, ref->scheme)) ||
--	 (strcmp (bas->server, ref->server)))) {
--	val = g_strdup (uri);
--	goto done;
-+        ((bas->scheme == NULL) || (strcmp(bas->scheme, ref->scheme)) ||
-+         (strcmp(bas->server, ref->server)))) {
-+        val = g_strdup(uri);
-+        goto done;
-     }
-     if (bas->path == ref->path ||
-         (bas->path && ref->path && !strcmp(bas->path, ref->path))) {
--	val = g_strdup("");
--	goto done;
-+        val = g_strdup("");
-+        goto done;
-     }
-     if (bas->path == NULL) {
--	val = g_strdup(ref->path);
--	goto done;
-+        val = g_strdup(ref->path);
-+        goto done;
-     }
-     if (ref->path == NULL) {
--        ref->path = (char *) "/";
--	remove_path = 1;
-+        ref->path = (char *)"/";
-+        remove_path = 1;
-     }
- 
-     /*
-@@ -1958,78 +1960,78 @@ uri_resolve_relative (const char *uri, const char * base)
-      * two path components may be missing (bug 316224)
-      */
-     if (bas->path == NULL) {
--	if (ref->path != NULL) {
--	    uptr = ref->path;
--	    if (*uptr == '/')
--		uptr++;
--	    /* exception characters from uri_to_string */
--	    val = uri_string_escape(uptr, "/;&=+$,");
--	}
--	goto done;
-+        if (ref->path != NULL) {
-+            uptr = ref->path;
-+            if (*uptr == '/')
-+                uptr++;
-+            /* exception characters from uri_to_string */
-+            val = uri_string_escape(uptr, "/;&=+$,");
-+        }
-+        goto done;
-     }
-     bptr = bas->path;
-     if (ref->path == NULL) {
--	for (ix = 0; bptr[ix] != 0; ix++) {
--	    if (bptr[ix] == '/')
--		nbslash++;
--	}
--	uptr = NULL;
--	len = 1;	/* this is for a string terminator only */
-+        for (ix = 0; bptr[ix] != 0; ix++) {
-+            if (bptr[ix] == '/')
-+                nbslash++;
-+        }
-+        uptr = NULL;
-+        len = 1; /* this is for a string terminator only */
-     } else {
--    /*
--     * Next we compare the two strings and find where they first differ
--     */
--	if ((ref->path[pos] == '.') && (ref->path[pos+1] == '/'))
-+        /*
-+         * Next we compare the two strings and find where they first differ
-+         */
-+        if ((ref->path[pos] == '.') && (ref->path[pos + 1] == '/'))
-             pos += 2;
--	if ((*bptr == '.') && (bptr[1] == '/'))
-+        if ((*bptr == '.') && (bptr[1] == '/'))
-             bptr += 2;
--	else if ((*bptr == '/') && (ref->path[pos] != '/'))
--	    bptr++;
--	while ((bptr[pos] == ref->path[pos]) && (bptr[pos] != 0))
--	    pos++;
--
--	if (bptr[pos] == ref->path[pos]) {
--	    val = g_strdup("");
--	    goto done;		/* (I can't imagine why anyone would do this) */
--	}
--
--	/*
--	 * In URI, "back up" to the last '/' encountered.  This will be the
--	 * beginning of the "unique" suffix of URI
--	 */
--	ix = pos;
--	if ((ref->path[ix] == '/') && (ix > 0))
--	    ix--;
--	else if ((ref->path[ix] == 0) && (ix > 1) && (ref->path[ix - 1] == '/'))
--	    ix -= 2;
--	for (; ix > 0; ix--) {
--	    if (ref->path[ix] == '/')
--		break;
--	}
--	if (ix == 0) {
--	    uptr = ref->path;
--	} else {
--	    ix++;
--	    uptr = &ref->path[ix];
--	}
--
--	/*
--	 * In base, count the number of '/' from the differing point
--	 */
--	if (bptr[pos] != ref->path[pos]) {/* check for trivial URI == base */
--	    for (; bptr[ix] != 0; ix++) {
--		if (bptr[ix] == '/')
--		    nbslash++;
--	    }
--	}
--	len = strlen (uptr) + 1;
-+        else if ((*bptr == '/') && (ref->path[pos] != '/'))
-+            bptr++;
-+        while ((bptr[pos] == ref->path[pos]) && (bptr[pos] != 0))
-+            pos++;
-+
-+        if (bptr[pos] == ref->path[pos]) {
-+            val = g_strdup("");
-+            goto done; /* (I can't imagine why anyone would do this) */
-+        }
-+
-+        /*
-+         * In URI, "back up" to the last '/' encountered.  This will be the
-+         * beginning of the "unique" suffix of URI
-+         */
-+        ix = pos;
-+        if ((ref->path[ix] == '/') && (ix > 0))
-+            ix--;
-+        else if ((ref->path[ix] == 0) && (ix > 1) && (ref->path[ix - 1] == '/'))
-+            ix -= 2;
-+        for (; ix > 0; ix--) {
-+            if (ref->path[ix] == '/')
-+                break;
-+        }
-+        if (ix == 0) {
-+            uptr = ref->path;
-+        } else {
-+            ix++;
-+            uptr = &ref->path[ix];
-+        }
-+
-+        /*
-+         * In base, count the number of '/' from the differing point
-+         */
-+        if (bptr[pos] != ref->path[pos]) { /* check for trivial URI == base */
-+            for (; bptr[ix] != 0; ix++) {
-+                if (bptr[ix] == '/')
-+                    nbslash++;
-+            }
-+        }
-+        len = strlen(uptr) + 1;
-     }
- 
-     if (nbslash == 0) {
--	if (uptr != NULL)
--	    /* exception characters from uri_to_string */
--	    val = uri_string_escape(uptr, "/;&=+$,");
--	goto done;
-+        if (uptr != NULL)
-+            /* exception characters from uri_to_string */
-+            val = uri_string_escape(uptr, "/;&=+$,");
-+        goto done;
-     }
- 
-     /*
-@@ -2037,35 +2039,35 @@ uri_resolve_relative (const char *uri, const char * base)
-      * length of the remainder of the URI, plus enough space
-      * for the "../" groups, plus one for the terminator
-      */
--    val = g_malloc (len + 3 * nbslash);
-+    val = g_malloc(len + 3 * nbslash);
-     vptr = val;
-     /*
-      * Put in as many "../" as needed
-      */
--    for (; nbslash>0; nbslash--) {
--	*vptr++ = '.';
--	*vptr++ = '.';
--	*vptr++ = '/';
-+    for (; nbslash > 0; nbslash--) {
-+        *vptr++ = '.';
-+        *vptr++ = '.';
-+        *vptr++ = '/';
-     }
-     /*
-      * Finish up with the end of the URI
-      */
-     if (uptr != NULL) {
--        if ((vptr > val) && (len > 0) &&
--	    (uptr[0] == '/') && (vptr[-1] == '/')) {
--	    memcpy (vptr, uptr + 1, len - 1);
--	    vptr[len - 2] = 0;
--	} else {
--	    memcpy (vptr, uptr, len);
--	    vptr[len - 1] = 0;
--	}
-+        if ((vptr > val) && (len > 0) && (uptr[0] == '/') &&
-+            (vptr[-1] == '/')) {
-+            memcpy(vptr, uptr + 1, len - 1);
-+            vptr[len - 2] = 0;
-+        } else {
-+            memcpy(vptr, uptr, len);
-+            vptr[len - 1] = 0;
-+        }
-     } else {
--	vptr[len - 1] = 0;
-+        vptr[len - 1] = 0;
-     }
- 
-     /* escape the freshly-built path */
-     vptr = val;
--	/* exception characters from uri_to_string */
-+    /* exception characters from uri_to_string */
-     val = uri_string_escape(vptr, "/;&=+$,");
-     g_free(vptr);
- 
-@@ -2076,9 +2078,9 @@ done:
-     if (remove_path != 0)
-         ref->path = NULL;
-     if (ref != NULL)
--	uri_free (ref);
-+        uri_free(ref);
-     if (bas != NULL)
--	uri_free (bas);
-+        uri_free(bas);
- 
-     return val;
- }
-@@ -2087,12 +2089,12 @@ done:
-  * Utility functions to help parse and assemble query strings.
-  */
- 
--struct QueryParams *
--query_params_new (int init_alloc)
-+struct QueryParams *query_params_new(int init_alloc)
- {
-     struct QueryParams *ps;
- 
--    if (init_alloc <= 0) init_alloc = 1;
-+    if (init_alloc <= 0)
-+        init_alloc = 1;
- 
-     ps = g_new(QueryParams, 1);
-     ps->n = 0;
-@@ -2105,9 +2107,8 @@ query_params_new (int init_alloc)
- /* Ensure there is space to store at least one more parameter
-  * at the end of the set.
-  */
--static int
--query_params_append (struct QueryParams *ps,
--               const char *name, const char *value)
-+static int query_params_append(struct QueryParams *ps, const char *name,
-+                               const char *value)
- {
-     if (ps->n >= ps->alloc) {
-         ps->p = g_renew(QueryParam, ps->p, ps->alloc * 2);
-@@ -2122,41 +2123,41 @@ query_params_append (struct QueryParams *ps,
-     return 0;
- }
- 
--void
--query_params_free (struct QueryParams *ps)
-+void query_params_free(struct QueryParams *ps)
- {
-     int i;
- 
-     for (i = 0; i < ps->n; ++i) {
--        g_free (ps->p[i].name);
--        g_free (ps->p[i].value);
-+        g_free(ps->p[i].name);
-+        g_free(ps->p[i].value);
-     }
--    g_free (ps->p);
--    g_free (ps);
-+    g_free(ps->p);
-+    g_free(ps);
- }
- 
--struct QueryParams *
--query_params_parse (const char *query)
-+struct QueryParams *query_params_parse(const char *query)
- {
-     struct QueryParams *ps;
-     const char *end, *eq;
- 
--    ps = query_params_new (0);
--    if (!query || query[0] == '\0') return ps;
-+    ps = query_params_new(0);
-+    if (!query || query[0] == '\0')
-+        return ps;
- 
-     while (*query) {
-         char *name = NULL, *value = NULL;
- 
-         /* Find the next separator, or end of the string. */
--        end = strchr (query, '&');
-+        end = strchr(query, '&');
-         if (!end)
--            end = strchr (query, ';');
-+            end = strchr(query, ';');
-         if (!end)
--            end = query + strlen (query);
-+            end = query + strlen(query);
- 
-         /* Find the first '=' character between here and end. */
--        eq = strchr (query, '=');
--        if (eq && eq >= end) eq = NULL;
-+        eq = strchr(query, '=');
-+        if (eq && eq >= end)
-+            eq = NULL;
- 
-         /* Empty section (eg. "&&"). */
-         if (end == query)
-@@ -2166,14 +2167,14 @@ query_params_parse (const char *query)
-          * and consistent with CGI.pm we assume value is "".
-          */
-         else if (!eq) {
--            name = uri_string_unescape (query, end - query, NULL);
-+            name = uri_string_unescape(query, end - query, NULL);
-             value = NULL;
-         }
-         /* Or if we have "name=" here (works around annoying
-          * problem when calling uri_string_unescape with len = 0).
-          */
--        else if (eq+1 == end) {
--            name = uri_string_unescape (query, eq - query, NULL);
-+        else if (eq + 1 == end) {
-+            name = uri_string_unescape(query, eq - query, NULL);
-             value = g_new0(char, 1);
-         }
-         /* If the '=' character is at the beginning then we have
-@@ -2184,18 +2185,19 @@ query_params_parse (const char *query)
- 
-         /* Otherwise it's "name=value". */
-         else {
--            name = uri_string_unescape (query, eq - query, NULL);
--            value = uri_string_unescape (eq+1, end - (eq+1), NULL);
-+            name = uri_string_unescape(query, eq - query, NULL);
-+            value = uri_string_unescape(eq + 1, end - (eq + 1), NULL);
-         }
- 
-         /* Append to the parameter set. */
--        query_params_append (ps, name, value);
-+        query_params_append(ps, name, value);
-         g_free(name);
-         g_free(value);
- 
-     next:
-         query = end;
--        if (*query) query ++; /* skip '&' separator */
-+        if (*query)
-+            query++; /* skip '&' separator */
-     }
- 
-     return ps;
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTk1MzMzNTgtMTM3NTktMS1naXQtc2VuZC1lbWFpbC1zdWhhbmcxNkBtYWls
+cy51Y2FzLmFjLmNuClN1YmplY3Q6IFtRZW11LWRldmVsXSAgW1BBVENIIHY0IFJGQyAwLzNdIHV0
+aWwvdXJpLmM6IENvZGluZyBzdHlsZSBmb3JtYXQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
+JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
+ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
+IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
+ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGI2NDNkNjRmNyB1dGlsL3VyaS5jOiB3
+cmFwIHNpbmdsZSBzdGF0ZW1lbnQgYmxvY2tzIHdpdGggYnJhY2VzIHt9CmFiNDA0ZmM1NTEgdXRp
+bC91cmkuYzogcmVtb3ZlIGJyYWNrZXRzIHRoYXQgd3JhcCBgcmV0dXJuYCBzdGF0ZW1lbnQncyBj
+b250ZW50LgozNzg0N2I2NmRiIHV0aWwvdXJpLmM6IENvZGluZyBzdHlsZSBjaGVjaywgT25seSB3
+aGl0ZXNwYWNlIGludm9sdmVkLiBVc2luZyBgY2xhbmctZm9ybWF0IC1pIHV0aWwvdXJpLmNgIGZp
+cnN0LCB0aGVuIGNoYW5nZSBiYWNrIGZldyBjb2RlIG1hbnVhbGx5LCB0byBtYWtlIHN1cmUgb25s
+eSB3aGl0ZXNwYWNlIGludm9sdmVkLgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
+Q0ggMS8zOiB1dGlsL3VyaS5jOiBDb2Rpbmcgc3R5bGUgY2hlY2ssIE9ubHkgd2hpdGVzcGFjZSBp
+bnZvbHZlZC4gVXNpbmcgYGNsYW5nLWZvcm1hdCAtaSB1dGlsL3VyaS5jYCBmaXJzdCwgdGhlbiBj
+aGFuZ2UgYmFjayBmZXcgY29kZSBtYW51YWxseSwgdG8gbWFrZSBzdXJlIG9ubHkgd2hpdGVzcGFj
+ZSBpbnZvbHZlZC4uLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVz
+ZXMgYXJlIG5vdCByZXF1aXJlZAojMTY3OiBGSUxFOiB1dGlsL3VyaS5jOjIxNToKKyAgICAgICAg
+cmV0dXJuICgtMSk7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNl
+cyBhcmUgbm90IHJlcXVpcmVkCiMxNzI6IEZJTEU6IHV0aWwvdXJpLmM6MjE5OgorICAgICAgICBy
+ZXR1cm4gKDIpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMg
+YXJlIG5vdCByZXF1aXJlZAojMTg2OiBGSUxFOiB1dGlsL3VyaS5jOjIyOToKKyAgICByZXR1cm4g
+KDApOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlz
+IHN0YXRlbWVudAojMjA4OiBGSUxFOiB1dGlsL3VyaS5jOjI2MjoKKyAgICAgICAgaWYgKHVyaS0+
+Y2xlYW51cCAmIDIpClsuLi5dCisgICAgICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFjZXMge30g
+YXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI3MjogRklMRTog
+dXRpbC91cmkuYzozNTk6CisgICAgICAgICAgICBpZiAodXJpLT5jbGVhbnVwICYgMikKWy4uLl0K
+KyAgICAgICAgICAgIGVsc2UKWy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24s
+IHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzI3ODogRklMRTogdXRpbC91cmkuYzozNjU6
+CisgICAgICAgIHJldHVybiAoMCk7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBw
+YXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiMyODE6IEZJTEU6IHV0aWwvdXJpLmM6MzY3Ogor
+ICAgIHJldHVybiAoMSk7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRo
+ZXNlcyBhcmUgbm90IHJlcXVpcmVkCiMzMDE6IEZJTEU6IHV0aWwvdXJpLmM6Mzg5OgorICAgICAg
+ICByZXR1cm4gKDEpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojMzAyOiBGSUxFOiB1dGlsL3VyaS5jOjM5MDoKKyAgICBpZiAo
+IUlTQV9ESUdJVChjdXIgKyAxKSkKWy4uLl0KKyAgICBlbHNlIGlmICgoKmN1ciAhPSAnMCcpICYm
+IChJU0FfRElHSVQoY3VyICsgMSkpICYmICghSVNBX0RJR0lUKGN1ciArIDIpKSkKWy4uLl0KICAg
+ICBlbHNlIGlmICgoKmN1ciA9PSAnMScpICYmIChJU0FfRElHSVQoY3VyICsgMSkpICYmIChJU0Ff
+RElHSVQoY3VyICsgMikpKQpbLi4uXQotICAgIGVsc2UgaWYgKCgqY3VyID09ICcyJykgJiYgKCoo
+Y3VyICsgMSkgPj0gJzAnKSAmJgpbLi4uXQotICAgIGVsc2UgaWYgKCgqY3VyID09ICcyJykgJiYg
+KCooY3VyICsgMSkgPT0gJzUnKSAmJgpbLi4uXQorICAgICAgICBjdXIgKz0gMzsKWy4uLl0KCkVS
+Uk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1l
+bnQKIzMwNDogRklMRTogdXRpbC91cmkuYzozOTI6CisgICAgZWxzZSBpZiAoKCpjdXIgIT0gJzAn
+KSAmJiAoSVNBX0RJR0lUKGN1ciArIDEpKSAmJiAoIUlTQV9ESUdJVChjdXIgKyAyKSkpClsuLi5d
+CiAgICAgZWxzZSBpZiAoKCpjdXIgPT0gJzEnKSAmJiAoSVNBX0RJR0lUKGN1ciArIDEpKSAmJiAo
+SVNBX0RJR0lUKGN1ciArIDIpKSkKWy4uLl0KLSAgICBlbHNlIGlmICgoKmN1ciA9PSAnMicpICYm
+ICgqKGN1ciArIDEpID49ICcwJykgJiYKWy4uLl0KLSAgICBlbHNlIGlmICgoKmN1ciA9PSAnMicp
+ICYmICgqKGN1ciArIDEpID09ICc1JykgJiYKWy4uLl0KKyAgICAgICAgY3VyICs9IDM7ClsuLi5d
+CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiMzMTU6IEZJTEU6IHV0aWwvdXJpLmM6Mzk2OgorICAgIGVsc2UgaWYgKCgqY3VyID09
+ICcyJykgJiYgKCooY3VyICsgMSkgPj0gJzAnKSAmJiAoKihjdXIgKyAxKSA8PSAnNCcpICYmClsu
+Li5dCisgICAgZWxzZSBpZiAoKCpjdXIgPT0gJzInKSAmJiAoKihjdXIgKyAxKSA9PSAnNScpICYm
+ICgqKGN1ciArIDIpID49ICcwJykgJiYKWy4uLl0KICAgICBlbHNlClsuLi5dCgpFUlJPUjogYnJh
+Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzMTg6
+IEZJTEU6IHV0aWwvdXJpLmM6Mzk5OgorICAgIGVsc2UgaWYgKCgqY3VyID09ICcyJykgJiYgKCoo
+Y3VyICsgMSkgPT0gJzUnKSAmJiAoKihjdXIgKyAyKSA+PSAnMCcpICYmClsuLi5dCiAgICAgZWxz
+ZQpbLi4uXQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJl
+IG5vdCByZXF1aXJlZAojMzIzOiBGSUxFOiB1dGlsL3VyaS5jOjQwMzoKKyAgICAgICAgcmV0dXJu
+ICgxKTsKCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBu
+b3QgcmVxdWlyZWQKIzMyNjogRklMRTogdXRpbC91cmkuYzo0MDU6CisgICAgcmV0dXJuICgwKTsK
+CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBldmVuIGZvciBzaW5nbGUgc3RhdGVtZW50
+IGJsb2NrcwojMzUwOiBGSUxFOiB1dGlsL3VyaS5jOjQzMzoKKyAgICAgICAgd2hpbGUgKCgqY3Vy
+ICE9ICddJykgJiYgKCpjdXIgIT0gMCkpCisgICAgICAgICAgICBjdXIrKzsKCkVSUk9SOiBicmFj
+ZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzM1Mjog
+RklMRTogdXRpbC91cmkuYzo0MzU6CisgICAgICAgIGlmICgqY3VyICE9ICddJykKWy4uLl0KCkVS
+Uk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWly
+ZWQKIzM1MzogRklMRTogdXRpbC91cmkuYzo0MzY6CisgICAgICAgICAgICByZXR1cm4gKDEpOwoK
+RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
+bWVudAojMzY3OiBGSUxFOiB1dGlsL3VyaS5jOjQ0NjoKKyAgICAgICAgaWYgKCpjdXIgIT0gJy4n
+KQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0
+aGlzIHN0YXRlbWVudAojMzc1OiBGSUxFOiB1dGlsL3VyaS5jOjQ1MToKKyAgICAgICAgaWYgKCpj
+dXIgIT0gJy4nKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
+YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzgyOiBGSUxFOiB1dGlsL3VyaS5jOjQ1NToKKyAgICAg
+ICAgaWYgKCpjdXIgIT0gJy4nKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
+IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDA4OiBGSUxFOiB1dGlsL3VyaS5jOjQ3
+MzoKKyAgICAgICAgaWYgKGN1ciAhPSBob3N0KSB7ClsuLi5dCisgICAgICAgIH0gZWxzZQpbLi4u
+XQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
+YXRlbWVudAojNDA5OiBGSUxFOiB1dGlsL3VyaS5jOjQ3NDoKKyAgICAgICAgICAgIGlmICh1cmkt
+PmNsZWFudXAgJiAyKQpbLi4uXQorICAgICAgICAgICAgZWxzZQpbLi4uXQoKRVJST1I6IHJldHVy
+biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNDE4OiBG
+SUxFOiB1dGlsL3VyaS5jOjQ4MjoKKyAgICByZXR1cm4gKDApOwoKRVJST1I6IGJyYWNlcyB7fSBh
+cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDM3OiBGSUxFOiB1
+dGlsL3VyaS5jOjUxMjoKKyAgICBpZiAocmV0ICE9IDApClsuLi5dCgpFUlJPUjogcmV0dXJuIGlz
+IG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM0Mzg6IEZJTEU6
+IHV0aWwvdXJpLmM6NTEzOgorICAgICAgICByZXR1cm4gKHJldCk7CgpFUlJPUjogYnJhY2VzIHt9
+IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0NDM6IEZJTEU6
+IHV0aWwvdXJpLmM6NTE3OgorICAgICAgICBpZiAocmV0ICE9IDApClsuLi5dCgpFUlJPUjogcmV0
+dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM0NDQ6
+IEZJTEU6IHV0aWwvdXJpLmM6NTE4OgorICAgICAgICAgICAgcmV0dXJuIChyZXQpOwoKRVJST1I6
+IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAoj
+NDQ4OiBGSUxFOiB1dGlsL3VyaS5jOjUyMToKKyAgICByZXR1cm4gKDApOwoKRVJST1I6IHJldHVy
+biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNDY3OiBG
+SUxFOiB1dGlsL3VyaS5jOjU0NzoKKyAgICAgICAgICAgIHJldHVybiAoMCk7CgpFUlJPUjogcmV0
+dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM0Njg6
+IEZJTEU6IHV0aWwvdXJpLmM6NTQ4OgorICAgICAgICByZXR1cm4gKDEpOwoKRVJST1I6IHJldHVy
+biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNDkwOiBG
+SUxFOiB1dGlsL3VyaS5jOjU3OToKKyAgICAgICAgICAgIHJldHVybiAocmV0KTsKCkVSUk9SOiBy
+ZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzUw
+OTogRklMRTogdXRpbC91cmkuYzo2MTY6CisgICAgICAgIHJldHVybiAoMSk7CgpFUlJPUjogcmV0
+dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM1MjI6
+IEZJTEU6IHV0aWwvdXJpLmM6NjI0OgorICAgICAgICAgICAgICAgIHJldHVybiAocmV0KTsKCkVS
+Uk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1l
+bnQKIzU0MjogRklMRTogdXRpbC91cmkuYzo2NjI6CisgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoK
+RVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1
+aXJlZAojNTQzOiBGSUxFOiB1dGlsL3VyaS5jOjY2MzoKKyAgICAgICAgcmV0dXJuIChyZXQpOwoK
+RVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1
+aXJlZAojNTUwOiBGSUxFOiB1dGlsL3VyaS5jOjY2ODoKKyAgICAgICAgICAgIHJldHVybiAocmV0
+KTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
+dGF0ZW1lbnQKIzU2OTogRklMRTogdXRpbC91cmkuYzo3MDU6CisgICAgaWYgKHJldCAhPSAwKQpb
+Li4uXQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5v
+dCByZXF1aXJlZAojNTcwOiBGSUxFOiB1dGlsL3VyaS5jOjcwNjoKKyAgICAgICAgcmV0dXJuIChy
+ZXQpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5v
+dCByZXF1aXJlZAojNTc3OiBGSUxFOiB1dGlsL3VyaS5jOjcxMToKKyAgICAgICAgICAgIHJldHVy
+biAocmV0KTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2Yg
+dGhpcyBzdGF0ZW1lbnQKIzYwMjogRklMRTogdXRpbC91cmkuYzo3NTM6CisgICAgICAgIGlmIChy
+ZXQgIT0gMCkKWy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhl
+c2VzIGFyZSBub3QgcmVxdWlyZWQKIzYwMzogRklMRTogdXRpbC91cmkuYzo3NTQ6CisgICAgICAg
+ICAgICByZXR1cm4gKHJldCk7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFs
+bCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM2MDU6IEZJTEU6IHV0aWwvdXJpLmM6NzU2OgorICAg
+ICAgICBpZiAocmV0ICE9IDApClsuLi5dCgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9u
+LCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM2MDY6IEZJTEU6IHV0aWwvdXJpLmM6NzU3
+OgorICAgICAgICAgICAgcmV0dXJuIChyZXQpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5j
+dGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNjA4OiBGSUxFOiB1dGlsL3VyaS5j
+Ojc1OToKKyAgICAgICAgcmV0dXJuICgwKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2Fy
+eSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzYxMjogRklMRTogdXRpbC91cmkuYzo3
+NjI6CisgICAgICAgIGlmIChyZXQgIT0gMCkKWy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEg
+ZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzYxMzogRklMRTogdXRpbC91
+cmkuYzo3NjM6CisgICAgICAgICAgICByZXR1cm4gKHJldCk7CgpFUlJPUjogYnJhY2VzIHt9IGFy
+ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM2MTc6IEZJTEU6IHV0
+aWwvdXJpLmM6NzY2OgorICAgICAgICBpZiAocmV0ICE9IDApClsuLi5dCgpFUlJPUjogcmV0dXJu
+IGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM2MTg6IEZJ
+TEU6IHV0aWwvdXJpLmM6NzY3OgorICAgICAgICAgICAgcmV0dXJuIChyZXQpOwoKRVJST1I6IGJy
+YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjQ5
+OiBGSUxFOiB1dGlsL3VyaS5jOjgwMjoKKyAgICAgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoKRVJS
+T1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJl
+ZAojNjUwOiBGSUxFOiB1dGlsL3VyaS5jOjgwMzoKKyAgICAgICAgICAgIHJldHVybiAocmV0KTsK
+CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
+ZW1lbnQKIzY1MjogRklMRTogdXRpbC91cmkuYzo4MDU6CisgICAgICAgIGlmIChyZXQgIT0gMCkK
+Wy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBu
+b3QgcmVxdWlyZWQKIzY1MzogRklMRTogdXRpbC91cmkuYzo4MDY6CisgICAgICAgICAgICByZXR1
+cm4gKHJldCk7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
+IHRoaXMgc3RhdGVtZW50CiM2NTg6IEZJTEU6IHV0aWwvdXJpLmM6ODA5OgorICAgICAgICBpZiAo
+cmV0ICE9IDApClsuLi5dCgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRo
+ZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM2NTk6IEZJTEU6IHV0aWwvdXJpLmM6ODEwOgorICAgICAg
+ICAgICAgcmV0dXJuIChyZXQpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBh
+bGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjYzOiBGSUxFOiB1dGlsL3VyaS5jOjgxMzoKKyAg
+ICAgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlv
+biwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNjY0OiBGSUxFOiB1dGlsL3VyaS5jOjgx
+NDoKKyAgICAgICAgICAgIHJldHVybiAocmV0KTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vz
+c2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzY4MzogRklMRTogdXRpbC91cmku
+Yzo4MjY6CisgICAgICAgIGlmIChyZXQgIT0gMCkKWy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90
+IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzY4NDogRklMRTogdXRp
+bC91cmkuYzo4Mjc6CisgICAgICAgICAgICByZXR1cm4gKHJldCk7CgpFUlJPUjogYnJhY2VzIHt9
+IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM2OTI6IEZJTEU6
+IHV0aWwvdXJpLmM6ODMyOgorICAgICAgICBpZiAocmV0ICE9IDApClsuLi5dCgpFUlJPUjogcmV0
+dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM2OTM6
+IEZJTEU6IHV0aWwvdXJpLmM6ODMzOgorICAgICAgICAgICAgcmV0dXJuIChyZXQpOwoKRVJST1I6
+IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAoj
+Njk5OiBGSUxFOiB1dGlsL3VyaS5jOjgzNzoKKyAgICAgICAgcmV0dXJuICgxKTsKCkVSUk9SOiBy
+ZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzcw
+MjogRklMRTogdXRpbC91cmkuYzo4Mzk6CisgICAgcmV0dXJuICgwKTsKCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzcyMTogRklM
+RTogdXRpbC91cmkuYzo4NTk6CisgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoKRVJST1I6IHJldHVy
+biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNzIyOiBG
+SUxFOiB1dGlsL3VyaS5jOjg2MDoKKyAgICAgICAgcmV0dXJuIChyZXQpOwoKRVJST1I6IHJldHVy
+biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNzI1OiBG
+SUxFOiB1dGlsL3VyaS5jOjg2MjoKKyAgICAgICAgcmV0dXJuICgxKTsKCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzczMDogRklM
+RTogdXRpbC91cmkuYzo4NjY6CisgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoKRVJST1I6IHJldHVy
+biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNzMxOiBG
+SUxFOiB1dGlsL3VyaS5jOjg2NzoKKyAgICAgICAgcmV0dXJuIChyZXQpOwoKRVJST1I6IGJyYWNl
+cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNzM4OiBG
+SUxFOiB1dGlsL3VyaS5jOjg3MToKKyAgICAgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoKRVJST1I6
+IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAoj
+NzM5OiBGSUxFOiB1dGlsL3VyaS5jOjg3MjoKKyAgICAgICAgICAgIHJldHVybiAocmV0KTsKCkVS
+Uk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1l
+bnQKIzc0NzogRklMRTogdXRpbC91cmkuYzo4Nzc6CisgICAgICAgIGlmIChyZXQgIT0gMCkKWy4u
+Ll0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3Qg
+cmVxdWlyZWQKIzc0ODogRklMRTogdXRpbC91cmkuYzo4Nzg6CisgICAgICAgICAgICByZXR1cm4g
+KHJldCk7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUg
+bm90IHJlcXVpcmVkCiM3NTQ6IEZJTEU6IHV0aWwvdXJpLmM6ODgyOgorICAgICAgICByZXR1cm4g
+KDEpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5v
+dCByZXF1aXJlZAojNzU3OiBGSUxFOiB1dGlsL3VyaS5jOjg4NDoKKyAgICByZXR1cm4gKDApOwoK
+RVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1
+aXJlZAojNzczOiBGSUxFOiB1dGlsL3VyaS5jOjkwNDoKKyAgICAgICAgcmV0dXJuICgtMSk7CgpF
+UlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVp
+cmVkCiM3OTA6IEZJTEU6IHV0aWwvdXJpLmM6OTE3OgorICAgICAgICAgICAgcmV0dXJuIChyZXQp
+OwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCBy
+ZXF1aXJlZAojNzk0OiBGSUxFOiB1dGlsL3VyaS5jOjkyMDoKKyAgICByZXR1cm4gKDApOwoKRVJS
+T1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJl
+ZAojODExOiBGSUxFOiB1dGlsL3VyaS5jOjkzOToKKyAgICAgICAgcmV0dXJuIChOVUxMKTsKCkVS
+Uk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWly
+ZWQKIzgxNzogRklMRTogdXRpbC91cmkuYzo5NDQ6CisgICAgICAgIHJldHVybiAoTlVMTCk7CgpF
+UlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVp
+cmVkCiM4MjA6IEZJTEU6IHV0aWwvdXJpLmM6OTQ2OgorICAgIHJldHVybiAodXJpKTsKCkVSUk9S
+OiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQK
+IzgzMzogRklMRTogdXRpbC91cmkuYzo5NjM6CisgICAgcmV0dXJuIChyZmMzOTg2X3BhcnNlX3Vy
+aV9yZWZlcmVuY2UodXJpLCBzdHIpKTsKCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24s
+IHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzg1MDogRklMRTogdXRpbC91cmkuYzo5ODM6
+CisgICAgICAgIHJldHVybiAoTlVMTCk7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9u
+LCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM4NTk6IEZJTEU6IHV0aWwvdXJpLmM6OTkx
+OgorICAgICAgICByZXR1cm4gKE5VTEwpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlv
+biwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojODYyOiBGSUxFOiB1dGlsL3VyaS5jOjk5
+MzoKKyAgICByZXR1cm4gKHVyaSk7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBw
+YXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM4ODc6IEZJTEU6IHV0aWwvdXJpLmM6MTAxNDoK
+KyAgICByZXR1cm4gKHJldCk7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJl
+bnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM5MDY6IEZJTEU6IHV0aWwvdXJpLmM6MTAzMToKKyAg
+ICByZXR1cm4gKHRlbXApOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
+YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojOTI2OiBGSUxFOiB1dGlsL3VyaS5jOjEwNTA6CisgICAg
+aWYgKHVyaSA9PSBOVUxMKQpbLi4uXQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwg
+cGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojOTI3OiBGSUxFOiB1dGlsL3VyaS5jOjEwNTE6
+CisgICAgICAgIHJldHVybiAoTlVMTCk7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
+Zm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM5Nzk6IEZJTEU6IHV0aWwvdXJpLmM6MTA3
+OToKKyAgICAgICAgICAgIGlmIChJU19SRVNFUlZFRCgqKHApKSB8fCBJU19VTlJFU0VSVkVEKCoo
+cCkpKQpbLi4uXQorICAgICAgICAgICAgZWxzZSB7ClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFy
+ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMDI5OiBGSUxFOiB1
+dGlsL3VyaS5jOjExMDQ6CisgICAgICAgICAgICAgICAgICAgIGlmICgoSVNfVU5SRVNFUlZFRCgq
+KHApKSkgfHwgKCgqKHApID09ICc7JykpIHx8ClsuLi5dCisgICAgICAgICAgICAgICAgICAgIGVs
+c2UgewpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBv
+ZiB0aGlzIHN0YXRlbWVudAojMTExMzogRklMRTogdXRpbC91cmkuYzoxMTUwOgorICAgICAgICAg
+ICAgICAgIGlmICgoSVNfVU5SRVNFUlZFRCgqKHApKSkgfHwgKCgqKHApID09ICckJykpIHx8Clsu
+Li5dCisgICAgICAgICAgICAgICAgZWxzZSB7ClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBu
+ZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMTgzOiBGSUxFOiB1dGls
+L3VyaS5jOjExOTQ6CisgICAgICAgICAgICAgICAgaWYgKChJU19VTlJFU0VSVkVEKCoocCkpKSB8
+fCAoKCoocCkgPT0gJy8nKSkgfHwKWy4uLl0KLQkJZWxzZSB7ClsuLi5dCgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMjY1OiBG
+SUxFOiB1dGlsL3VyaS5jOjEyMzY6CisgICAgICAgICAgICBpZiAoKElTX1VOUkVTRVJWRUQoKihw
+KSkpIHx8IChJU19SRVNFUlZFRCgqKHApKSkpClsuLi5dCisgICAgICAgICAgICBlbHNlIHsKWy4u
+Ll0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3Qg
+cmVxdWlyZWQKIzEyODI6IEZJTEU6IHV0aWwvdXJpLmM6MTI1MjoKKyAgICByZXR1cm4gKHJldCk7
+CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiMxMjk1OiBGSUxFOiB1dGlsL3VyaS5jOjEyNjM6CisgICAgaWYgKHVyaSA9PSBOVUxM
+KQpbLi4uXQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJl
+IG5vdCByZXF1aXJlZAojMTMzNDogRklMRTogdXRpbC91cmkuYzoxMzE4OgorICAgICAgICByZXR1
+cm4gKC0xKTsKCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFy
+ZSBub3QgcmVxdWlyZWQKIzEzNDU6IEZJTEU6IHV0aWwvdXJpLmM6MTMyNzoKKyAgICAgICAgcmV0
+dXJuICgwKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBldmVuIGZvciBzaW5nbGUg
+c3RhdGVtZW50IGJsb2NrcwojMTM3MTogRklMRTogdXRpbC91cmkuYzoxMzQzOgorICAgICAgICAg
+ICAgd2hpbGUgKGN1clswXSA9PSAnLycpCisgICAgICAgICAgICAgICAgY3VyKys7CgpFUlJPUjog
+YnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMx
+Mzg2OiBGSUxFOiB1dGlsL3VyaS5jOjEzNTI6CisgICAgICAgIGlmICgoY3VyWzBdID09ICcuJykg
+JiYgKGN1clsxXSA9PSAnXDAnKSkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2Fy
+eSBldmVuIGZvciBzaW5nbGUgc3RhdGVtZW50IGJsb2NrcwojMTQwNDogRklMRTogdXRpbC91cmku
+YzoxMzYyOgorICAgICAgICB3aGlsZSAoKGN1clswXSA9PSAnLycpICYmIChjdXJbMV0gPT0gJy8n
+KSkKKyAgICAgICAgICAgIGN1cisrOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwg
+cGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTQyMDogRklMRTogdXRpbC91cmkuYzoxMzc1
+OgorICAgICAgICByZXR1cm4gKDApOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGV2
+ZW4gZm9yIHNpbmdsZSBzdGF0ZW1lbnQgYmxvY2tzCiMxNTEzOiBGSUxFOiB1dGlsL3VyaS5jOjE0
+ODI6CisgICAgICAgICAgICB3aGlsZSAoY3VyWzBdICE9ICdcMCcpCisgICAgICAgICAgICAgICAg
+KG91dCsrKVswXSA9IChjdXIrKylbMF07CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9u
+LCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiMxNTIwOiBGSUxFOiB1dGlsL3VyaS5jOjE0
+ODg6CisgICAgcmV0dXJuICgwKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
+YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE1Mjg6IEZJTEU6IHV0aWwvdXJpLmM6MTQ5MzoK
+KyAgICBpZiAoKChjID49ICcwJykgJiYgKGMgPD0gJzknKSkgfHwgKChjID49ICdhJykgJiYgKGMg
+PD0gJ2YnKSkgfHwKWy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVu
+dGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE1MzI6IEZJTEU6IHV0aWwvdXJpLmM6MTQ5NToKKyAg
+ICAgICAgcmV0dXJuICgxKTsKCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVu
+dGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE1MzM6IEZJTEU6IHV0aWwvdXJpLmM6MTQ5NjoKKyAg
+ICByZXR1cm4gKDApOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVz
+ZXMgYXJlIG5vdCByZXF1aXJlZAojMTU1NTogRklMRTogdXRpbC91cmkuYzoxNTE5OgorICAgICAg
+ICByZXR1cm4gKE5VTEwpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
+YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTU1NjogRklMRTogdXRpbC91cmkuYzoxNTIwOgorICAg
+IGlmIChsZW4gPD0gMCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
+YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE1NTg6IEZJTEU6IHV0aWwvdXJpLmM6MTUyMjoK
+KyAgICBpZiAobGVuIDwgMCkKWy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24s
+IHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE1NTk6IEZJTEU6IHV0aWwvdXJpLmM6MTUy
+MzoKKyAgICAgICAgcmV0dXJuIChOVUxMKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2Fy
+eSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE1OTU6IEZJTEU6IHV0aWwvdXJpLmM6
+MTUzNDoKKyAgICAgICAgICAgIGlmICgoKmluID49ICcwJykgJiYgKCppbiA8PSAnOScpKQpbLi4u
+XQorICAgICAgICAgICAgZWxzZSBpZiAoKCppbiA+PSAnYScpICYmICgqaW4gPD0gJ2YnKSkKWy4u
+Ll0KKyAgICAgICAgICAgIGVsc2UgaWYgKCgqaW4gPj0gJ0EnKSAmJiAoKmluIDw9ICdGJykpClsu
+Li5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiMxNTk3OiBGSUxFOiB1dGlsL3VyaS5jOjE1MzY6CisgICAgICAgICAgICBlbHNl
+IGlmICgoKmluID49ICdhJykgJiYgKCppbiA8PSAnZicpKQpbLi4uXQorICAgICAgICAgICAgZWxz
+ZSBpZiAoKCppbiA+PSAnQScpICYmICgqaW4gPD0gJ0YnKSkKWy4uLl0KCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE1OTk6IEZJ
+TEU6IHV0aWwvdXJpLmM6MTUzODoKKyAgICAgICAgICAgIGVsc2UgaWYgKCgqaW4gPj0gJ0EnKSAm
+JiAoKmluIDw9ICdGJykpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9y
+IGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxNjAyOiBGSUxFOiB1dGlsL3VyaS5jOjE1NDE6
+CisgICAgICAgICAgICBpZiAoKCppbiA+PSAnMCcpICYmICgqaW4gPD0gJzknKSkKWy4uLl0KKyAg
+ICAgICAgICAgIGVsc2UgaWYgKCgqaW4gPj0gJ2EnKSAmJiAoKmluIDw9ICdmJykpClsuLi5dCisg
+ICAgICAgICAgICBlbHNlIGlmICgoKmluID49ICdBJykgJiYgKCppbiA8PSAnRicpKQpbLi4uXQoK
+RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
+bWVudAojMTYwNDogRklMRTogdXRpbC91cmkuYzoxNTQzOgorICAgICAgICAgICAgZWxzZSBpZiAo
+KCppbiA+PSAnYScpICYmICgqaW4gPD0gJ2YnKSkKWy4uLl0KKyAgICAgICAgICAgIGVsc2UgaWYg
+KCgqaW4gPj0gJ0EnKSAmJiAoKmluIDw9ICdGJykpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFy
+ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxNjA2OiBGSUxFOiB1
+dGlsL3VyaS5jOjE1NDU6CisgICAgICAgICAgICBlbHNlIGlmICgoKmluID49ICdBJykgJiYgKCpp
+biA8PSAnRicpKQpbLi4uXQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50
+aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTYxODogRklMRTogdXRpbC91cmkuYzoxNTU2OgorICAg
+IHJldHVybiAocmV0KTsKCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhl
+c2VzIGFyZSBub3QgcmVxdWlyZWQKIzE2Mzc6IEZJTEU6IHV0aWwvdXJpLmM6MTU3NzoKKyAgICAg
+ICAgcmV0dXJuIChOVUxMKTsKCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVu
+dGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE2NDA6IEZJTEU6IHV0aWwvdXJpLmM6MTU3OToKKyAg
+ICAgICAgcmV0dXJuIChnX3N0cmR1cChzdHIpKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vz
+c2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE2NDM6IEZJTEU6IHV0aWwvdXJp
+LmM6MTU4MToKKyAgICBpZiAoIShsZW4gPiAwKSkKWy4uLl0KCkVSUk9SOiByZXR1cm4gaXMgbm90
+IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE2NDQ6IEZJTEU6IHV0
+aWwvdXJpLmM6MTU4MjoKKyAgICAgICAgcmV0dXJuIChOVUxMKTsKCkVSUk9SOiBicmFjZXMge30g
+YXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE2ODU6IEZJTEU6
+IHV0aWwvdXJpLmM6MTYwMDoKKyAgICAgICAgICAgIGlmICh2YWwgPD0gOSkKWy4uLl0KKyAgICAg
+ICAgICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
+IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE2OTA6IEZJTEU6IHV0aWwvdXJpLmM6MTYwNToKKyAg
+ICAgICAgICAgIGlmICh2YWwgPD0gOSkKWy4uLl0KKyAgICAgICAgICAgIGVsc2UKWy4uLl0KCkVS
+Uk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWly
+ZWQKIzE3MDE6IEZJTEU6IHV0aWwvdXJpLmM6MTYxNToKKyAgICByZXR1cm4gKHJldCk7CgpFUlJP
+UjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50
+CiMxNzM4OiBGSUxFOiB1dGlsL3VyaS5jOjE2NTg6CisgICAgICAgIGlmICgqdXJpKSB7ClsuLi5d
+CisgICAgICAgIH0gZWxzZQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
+ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTc3MjogRklMRTogdXRpbC91cmkuYzoxNjgw
+OgorICAgICAgICBpZiAocmVmKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
+IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTgwMjogRklMRTogdXRpbC91cmkuYzox
+NzEwOgorICAgICAgICBpZiAoYmFzLT5hdXRob3JpdHkgIT0gTlVMTCkKWy4uLl0KKyAgICAgICAg
+ZWxzZSBpZiAoYmFzLT5zZXJ2ZXIgIT0gTlVMTCkgewpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBh
+cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTg0MjogRklMRTog
+dXRpbC91cmkuYzoxNzUwOgorICAgICAgICBpZiAocmVmLT5hdXRob3JpdHkgIT0gTlVMTCkKWy4u
+Ll0KKyAgICAgICAgZWxzZSB7ClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
+ZXZlbiBmb3Igc2luZ2xlIHN0YXRlbWVudCBibG9ja3MKIzE5MDE6IEZJTEU6IHV0aWwvdXJpLmM6
+MTgwMjoKKyAgICAgICAgICAgIHdoaWxlICgoYmFzLT5wYXRoW2N1cl0gIT0gMCkgJiYgKGJhcy0+
+cGF0aFtjdXJdICE9ICcvJykpCisgICAgICAgICAgICAgICAgY3VyKys7CgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxOTAzOiBG
+SUxFOiB1dGlsL3VyaS5jOjE4MDQ6CisgICAgICAgICAgICBpZiAoYmFzLT5wYXRoW2N1cl0gPT0g
+MCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2Yg
+dGhpcyBzdGF0ZW1lbnQKIzE5Mzg6IEZJTEU6IHV0aWwvdXJpLmM6MTgyNToKKyAgICAgICAgaWYg
+KChvdXQgPT0gMCkgJiYgKGJhcy0+c2VydmVyICE9IE5VTEwpKQpbLi4uXQoKRVJST1I6IHJldHVy
+biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTk1OTog
+RklMRTogdXRpbC91cmkuYzoxODU0OgorICAgIHJldHVybiAodmFsKTsKCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE5OTE6IEZJ
+TEU6IHV0aWwvdXJpLmM6MTkxMjoKKyAgICAgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoKRVJST1I6
+IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
+MjAxMzogRklMRTogdXRpbC91cmkuYzoxOTI3OgorICAgICAgICBpZiAocmV0ICE9IDApClsuLi5d
+CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiMyMDY5OiBGSUxFOiB1dGlsL3VyaS5jOjE5NjU6CisgICAgICAgICAgICBpZiAoKnVw
+dHIgPT0gJy8nKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
+YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjA4NTogRklMRTogdXRpbC91cmkuYzoxOTc1OgorICAg
+ICAgICAgICAgaWYgKGJwdHJbaXhdID09ICcvJykKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJl
+IG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIwOTg6IEZJTEU6IHV0
+aWwvdXJpLmM6MTk4NDoKKyAgICAgICAgaWYgKChyZWYtPnBhdGhbcG9zXSA9PSAnLicpICYmIChy
+ZWYtPnBhdGhbcG9zICsgMV0gPT0gJy8nKSkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5l
+Y2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIxMDE6IEZJTEU6IHV0aWwv
+dXJpLmM6MTk4NjoKKyAgICAgICAgaWYgKCgqYnB0ciA9PSAnLicpICYmIChicHRyWzFdID09ICcv
+JykpClsuLi5dCi0JZWxzZSBpZiAoKCpicHRyID09ICcvJykgJiYgKHJlZi0+cGF0aFtwb3NdICE9
+ICcvJykpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1z
+IG9mIHRoaXMgc3RhdGVtZW50CiMyMTA3OiBGSUxFOiB1dGlsL3VyaS5jOjE5ODg6CisgICAgICAg
+IGVsc2UgaWYgKCgqYnB0ciA9PSAnLycpICYmIChyZWYtPnBhdGhbcG9zXSAhPSAnLycpKQpbLi4u
+XQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGV2ZW4gZm9yIHNpbmdsZSBzdGF0ZW1l
+bnQgYmxvY2tzCiMyMTA5OiBGSUxFOiB1dGlsL3VyaS5jOjE5OTA6CisgICAgICAgIHdoaWxlICgo
+YnB0cltwb3NdID09IHJlZi0+cGF0aFtwb3NdKSAmJiAoYnB0cltwb3NdICE9IDApKQorICAgICAg
+ICAgICAgcG9zKys7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1z
+IG9mIHRoaXMgc3RhdGVtZW50CiMyMTQ1OiBGSUxFOiB1dGlsL3VyaS5jOjIwMDM6CisgICAgICAg
+IGlmICgocmVmLT5wYXRoW2l4XSA9PSAnLycpICYmIChpeCA+IDApKQpbLi4uXQorICAgICAgICBl
+bHNlIGlmICgocmVmLT5wYXRoW2l4XSA9PSAwKSAmJiAoaXggPiAxKSAmJiAocmVmLT5wYXRoW2l4
+IC0gMV0gPT0gJy8nKSkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
+YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIxNDc6IEZJTEU6IHV0aWwvdXJpLmM6MjAwNToK
+KyAgICAgICAgZWxzZSBpZiAoKHJlZi0+cGF0aFtpeF0gPT0gMCkgJiYgKGl4ID4gMSkgJiYgKHJl
+Zi0+cGF0aFtpeCAtIDFdID09ICcvJykpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNl
+c3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyMTUwOiBGSUxFOiB1dGlsL3Vy
+aS5jOjIwMDg6CisgICAgICAgICAgICBpZiAocmVmLT5wYXRoW2l4XSA9PSAnLycpClsuLi5dCgpF
+UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
+ZW50CiMyMTc1OiBGSUxFOiB1dGlsL3VyaS5jOjIwMjM6CisgICAgICAgICAgICAgICAgaWYgKGJw
+dHJbaXhdID09ICcvJykKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
+YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIxODc6IEZJTEU6IHV0aWwvdXJpLmM6MjAzMToK
+KyAgICAgICAgaWYgKHVwdHIgIT0gTlVMTCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5l
+Y2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIyNjg6IEZJTEU6IHV0aWwv
+dXJpLmM6MjA5NjoKKyAgICBpZiAoaW5pdF9hbGxvYyA8PSAwKQpbLi4uXQoKRVJST1I6IGJyYWNl
+cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjMzNzog
+RklMRTogdXRpbC91cmkuYzoyMTU5OgorICAgICAgICBpZiAoZXEgJiYgZXEgPj0gZW5kKQpbLi4u
+XQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
+YXRlbWVudAojMjM3OTogRklMRTogdXRpbC91cmkuYzoyMTk5OgorICAgICAgICBpZiAoKnF1ZXJ5
+KQpbLi4uXQoKdG90YWw6IDE0NyBlcnJvcnMsIDAgd2FybmluZ3MsIDIyOTkgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+Mi8zOiB1dGlsL3VyaS5jOiByZW1vdmUgYnJhY2tldHMgdGhhdCB3cmFwIGByZXR1cm5gIHN0YXRl
+bWVudCdzIGNvbnRlbnQuLi4uCkNoZWNraW5nIFBBVENIIDMvMzogdXRpbC91cmkuYzogd3JhcCBz
+aW5nbGUgc3RhdGVtZW50IGJsb2NrcyB3aXRoIGJyYWNlcyB7fS4uLgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
