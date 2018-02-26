@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eqNWX-0002T0-Iv
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:29:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqNpx-0007Qj-8n
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:49:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eqNWT-00032n-Jw
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:29:17 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60254 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1eqNWT-00031M-DK
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:29:13 -0500
-References: <20180223215858.16987-1-wei@redhat.com>
-	<20180223215858.16987-3-wei@redhat.com> <20180226180110.GE2873@work-vm>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <3904e31b-8c66-b241-7369-1b479b683da8@redhat.com>
-Date: Mon, 26 Feb 2018 12:28:56 -0600
+	(envelope-from <cohuck@redhat.com>) id 1eqNpu-00034y-4b
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:49:21 -0500
+Date: Mon, 26 Feb 2018 19:48:57 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180226194857.01ce4a8c.cohuck@redhat.com>
+In-Reply-To: <1519641757-12396-7-git-send-email-thuth@redhat.com>
+References: <1519641757-12396-1-git-send-email-thuth@redhat.com>
+	<1519641757-12396-7-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180226180110.GE2873@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V5 2/4] tests/migration: Convert the boot
- block compilation script into Makefile
+Subject: Re: [Qemu-devel] [PULL-for-s390x 06/14] s390-ccw: parse and set
+ boot menu options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,154 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
+On Mon, 26 Feb 2018 11:42:29 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-
-On 02/26/2018 12:01 PM, Dr. David Alan Gilbert wrote:
-> * Wei Huang (wei@redhat.com) wrote:
->> The x86 boot block header currently is generated with a shell script.
->> To better support other CPUs (e.g. aarch64), we convert the script
->> into Makefile. This allows us to 1) support cross-compilation easily,
->> and 2) avoid creating a script file for every architecture.
->>
->> Signed-off-by: Wei Huang <wei@redhat.com>
+> From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 > 
-> But what happens if you're on a system that doesn't have the cross
-> compilers?  I found it's too easy to get stuck with it trying
-> to rebuild the header when there's no need.
+> Set boot menu options for an s390 guest and store them in
+> the iplb. These options are set via the QEMU command line
+> option:
+> 
+>     -boot menu=on|off[,splash-time=X]
+> 
+> or via the libvirt domain xml:
+> 
+>     <os>
+>       <bootmenu enable='yes|no' timeout='X'/>
+>     </os>
+> 
+> Where X represents some positive integer representing
+> milliseconds.
+> 
+> Any value set for loadparm will override all boot menu options.
+> If loadparm=PROMPT, then the menu will be enabled without a
+> timeout.
+> 
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/ipl.c          | 52 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/ipl.h          |  9 +++++++--
+>  pc-bios/s390-ccw/iplb.h |  9 +++++++--
 
-I think it is fine. If no cross compiler is present, NNN_cross_prefix
-won't find anything. So it ends up with using the gcc tools on host
-systems. Obviously the compilation will fail. This should become the
-problem to solve for whoever wants to do cross-compile. For us, we have
-done our part because the .h files have been provided.
+Updating the header, but it is not consumed in the bios?
 
-> 
-> Dave
-> 
->> ---
->>  tests/migration/Makefile                 | 36 ++++++++++++++++++++++++++++++++
->>  tests/migration/rebuild-x86-bootblock.sh | 33 -----------------------------
->>  tests/migration/x86-a-b-bootblock.h      |  2 +-
->>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
->>  4 files changed, 39 insertions(+), 37 deletions(-)
->>  create mode 100644 tests/migration/Makefile
->>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
->>
->> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
->> new file mode 100644
->> index 0000000000..8fbedaa8b8
->> --- /dev/null
->> +++ b/tests/migration/Makefile
->> @@ -0,0 +1,36 @@
->> +#
->> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
->> +#
->> +# Authors:
->> +#   Dave Gilbert <dgilbert@redhat.com>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
->> +# See the COPYING file in the top-level directory.
->> +#
->> +export __note
->> +override define __note
->> +/* This file is automatically generated from
->> + * tests/migration/$<, edit that and then run
->> + * "make $@" inside tests/migration to update,
->> + * and then remember to send both in your patch submission.
->> + */
->> +endef
->> +
->> +all: x86-a-b-bootblock.h
->> +# Dummy command so that make thinks it has done something
->> +	@true
->> +
->> +SRC_PATH=../..
->> +include $(SRC_PATH)/rules.mak
->> +
->> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
->> +
->> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
->> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
->> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
->> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
->> +	echo "$$__note" > $@
->> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
->> +
->> +clean:
->> +	rm -f *.bootsect *.boot *.o
->> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
->> deleted file mode 100755
->> index 86cec5d284..0000000000
->> --- a/tests/migration/rebuild-x86-bootblock.sh
->> +++ /dev/null
->> @@ -1,33 +0,0 @@
->> -#!/bin/sh
->> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
->> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
->> -# See the COPYING file in the top-level directory.
->> -#
->> -# Author: dgilbert@redhat.com
->> -
->> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
->> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
->> -
->> -if [ ! -e "$ASMFILE" ]
->> -then
->> -  echo "Couldn't find $ASMFILE" >&2
->> -  exit 1
->> -fi
->> -
->> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
->> -cd "$ASM_WORK_DIR" &&
->> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
->> -objcopy -O binary x86.o x86.boot &&
->> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
->> -xxd -i x86.bootsect |
->> -sed -e 's/.*int.*//' > x86.hex &&
->> -cat - x86.hex <<HERE > "$HEADER"
->> -/* This file is automatically generated from
->> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
->> - * tests/migration/rebuild-x86-bootblock.sh to update,
->> - * and then remember to send both in your patch submission.
->> - */
->> -HERE
->> -
->> -rm x86.hex x86.bootsect x86.boot x86.o
->> -cd .. && rmdir "$ASM_WORK_DIR"
->> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
->> index 78a151fe2a..9e8e2e028b 100644
->> --- a/tests/migration/x86-a-b-bootblock.h
->> +++ b/tests/migration/x86-a-b-bootblock.h
->> @@ -1,6 +1,6 @@
->>  /* This file is automatically generated from
->>   * tests/migration/x86-a-b-bootblock.s, edit that and then run
->> - * tests/migration/rebuild-x86-bootblock.sh to update,
->> + * "make x86-a-b-bootblock.h" inside tests/migration to update,
->>   * and then remember to send both in your patch submission.
->>   */
->>  unsigned char x86_bootsect[] = {
->> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
->> index b1642641a7..98dbfab084 100644
->> --- a/tests/migration/x86-a-b-bootblock.s
->> +++ b/tests/migration/x86-a-b-bootblock.s
->> @@ -3,9 +3,8 @@
->>  #  range.
->>  #  Outputs an initial 'A' on serial followed by repeated 'B's
->>  #
->> -# run   tests/migration/rebuild-x86-bootblock.sh
->> -#   to regenerate the hex, and remember to include both the .h and .s
->> -#   in any patches.
->> +#  In tests/migration dir, run 'make x86-a-b-bootblock.h' to regenerate
->> +#  the hex, and remember to include both the .h and .s in any patches.
->>  #
->>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
->>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
->> -- 
->> 2.14.3
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+>  3 files changed, 66 insertions(+), 4 deletions(-)
+
+> +static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+> +{
+> +    QemuOptsList *plist = qemu_find_opts("boot-opts");
+> +    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
+> +    uint8_t *flags = &ipl->qipl.qipl_flags;
+> +    uint32_t *timeout = &ipl->qipl.boot_menu_timeout;
+> +    const char *tmp;
+> +    unsigned long splash_time = 0;
+> +
+> +    if (!get_boot_device(0)) {
+> +        if (boot_menu) {
+> +            error_report("boot menu requires a bootindex to be specified for "
+> +                         "the IPL device.");
+> +        }
+> +        return;
+> +    }
+> +
+> +    switch (ipl->iplb.pbt) {
+> +    case S390_IPL_TYPE_CCW:
+> +        break;
+> +    default:
+> +        error_report("boot menu is not supported for this device type.");
+
+If I specify both a bootindex for a device and a -kernel parameter, I
+get this error message. Looks a tad odd, but not sure how to avoid it.
+
+Also, error_report() should not use trailing punctuation, but we can
+fix that up with a follow-on patch.
+
+> +        return;
+> +    }
+> +
+> +    if (!boot_menu) {
+> +        return;
+> +    }
+> +
+> +    *flags |= QIPL_FLAG_BM_OPTS_CMD;
+> +
+> +    tmp = qemu_opt_get(opts, "splash-time");
+> +
+> +    if (tmp && qemu_strtoul(tmp, NULL, 10, &splash_time)) {
+> +        error_report("splash-time is invalid, forcing it to 0.");
+> +        *timeout = 0;
+> +        return;
+> +    }
+> +
+> +    if (splash_time > 0xffffffff) {
+> +        error_report("splash-time is too large, forcing it to max value.");
+> +        *timeout = 0xffffffff;
+> +        return;
+> +    }
+> +
+> +    *timeout = cpu_to_be32(splash_time);
+> +}
+> +
