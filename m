@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR8D-0006yH-Bc
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:26 -0500
+	(envelope-from <mjc@sifive.com>) id 1eqR8H-00072Z-T9
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR8B-0005i5-W4
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:25 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37875)
+	(envelope-from <mjc@sifive.com>) id 1eqR8F-0005n8-S3
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:29 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44197)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR8B-0005hd-Ma
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:23 -0500
-Received: by mail-pg0-x244.google.com with SMTP id y26so6735191pgv.4
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:20:23 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR8F-0005m5-Ez
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:27 -0500
+Received: by mail-pl0-x242.google.com with SMTP id w21so10125238plp.11
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:20:27 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Tue, 27 Feb 2018 11:17:57 +1300
-Message-Id: <1519683480-33201-21-git-send-email-mjc@sifive.com>
+Date: Tue, 27 Feb 2018 11:17:58 +1300
+Message-Id: <1519683480-33201-22-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519683480-33201-1-git-send-email-mjc@sifive.com>
 References: <1519683480-33201-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v7 20/23] SiFive RISC-V PRCI Block
+Subject: [Qemu-devel] [PATCH v7 21/23] SiFive Freedom E300 RISC-V Machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-Simple model of the PRCI  (Power, Reset, Clock, Interrupt) to emulate
-register reads made by the SDK BSP.
+This provides a RISC-V Board compatible with the the SiFive E300 SDK.
+The following machine is implemented:
+
+- 'sifive_e300'; CLINT, PLIC, UART, AON, GPIO, QSPI, PWM
 
 Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_prci.c         | 89 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_prci.h | 37 ++++++++++++++++++
- 2 files changed, 126 insertions(+)
- create mode 100644 hw/riscv/sifive_prci.c
- create mode 100644 include/hw/riscv/sifive_prci.h
+ hw/riscv/sifive_e300.c         | 236 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_e300.h |  73 +++++++++++++
+ 2 files changed, 309 insertions(+)
+ create mode 100644 hw/riscv/sifive_e300.c
+ create mode 100644 include/hw/riscv/sifive_e300.h
 
-diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
+diff --git a/hw/riscv/sifive_e300.c b/hw/riscv/sifive_e300.c
 new file mode 100644
-index 0000000..0910ea3
+index 0000000..a55d2ab
 --- /dev/null
-+++ b/hw/riscv/sifive_prci.c
-@@ -0,0 +1,89 @@
++++ b/hw/riscv/sifive_e300.c
+@@ -0,0 +1,236 @@
 +/*
-+ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
++ * QEMU RISC-V Board Compatible with SiFive E300 SDK
 + *
 + * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * Simple model of the PRCI to emulate register reads made by the SDK BSP
++ * Provides a board compatible with the bsp in the SiFive E300 SDK:
++ *
++ * 0) UART
++ * 1) CLINT (Core Level Interruptor)
++ * 2) PLIC (Platform Level Interrupt Controller)
++ * 3) PRCI (Power, Reset, Clock, Interrupt)
++ * 4) Registers emulated as RAM: AON, GPIO, QSPI, PWM
++ * 5) Flash memory emulated as RAM
++ *
++ * The Mask ROM reset vector jumps to the flash payload at 0x2040_0000.
++ * The OTP ROM and Flash boot code will be emulated in a future version.
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -67,82 +79,219 @@ index 0000000..0910ea3
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
 +#include "hw/sysbus.h"
++#include "hw/char/serial.h"
 +#include "target/riscv/cpu.h"
++#include "hw/riscv/riscv_hart.h"
++#include "hw/riscv/sifive_plic.h"
++#include "hw/riscv/sifive_clint.h"
 +#include "hw/riscv/sifive_prci.h"
++#include "hw/riscv/sifive_uart.h"
++#include "hw/riscv/sifive_e300.h"
++#include "chardev/char.h"
++#include "sysemu/arch_init.h"
++#include "exec/address-spaces.h"
++#include "elf.h"
 +
-+/* currently implements enough to mock freedom-e-sdk BSP clock programming */
++static const struct MemmapEntry {
++    hwaddr base;
++    hwaddr size;
++} sifive_e300_memmap[] = {
++    [SIFIVE_E300_DEBUG] =    {        0x0,      0x100 },
++    [SIFIVE_E300_MROM] =     {     0x1000,     0x2000 },
++    [SIFIVE_E300_OTP] =      {    0x20000,     0x2000 },
++    [SIFIVE_E300_CLINT] =    {  0x2000000,    0x10000 },
++    [SIFIVE_E300_PLIC] =     {  0xc000000,  0x4000000 },
++    [SIFIVE_E300_AON] =      { 0x10000000,     0x8000 },
++    [SIFIVE_E300_PRCI] =     { 0x10008000,     0x8000 },
++    [SIFIVE_E300_OTP_CTRL] = { 0x10010000,     0x1000 },
++    [SIFIVE_E300_GPIO0] =    { 0x10012000,     0x1000 },
++    [SIFIVE_E300_UART0] =    { 0x10013000,     0x1000 },
++    [SIFIVE_E300_QSPI0] =    { 0x10014000,     0x1000 },
++    [SIFIVE_E300_PWM0] =     { 0x10015000,     0x1000 },
++    [SIFIVE_E300_UART1] =    { 0x10023000,     0x1000 },
++    [SIFIVE_E300_QSPI1] =    { 0x10024000,     0x1000 },
++    [SIFIVE_E300_PWM1] =     { 0x10025000,     0x1000 },
++    [SIFIVE_E300_QSPI2] =    { 0x10034000,     0x1000 },
++    [SIFIVE_E300_PWM2] =     { 0x10035000,     0x1000 },
++    [SIFIVE_E300_XIP] =      { 0x20000000, 0x20000000 },
++    [SIFIVE_E300_DTIM] =     { 0x80000000,     0x4000 }
++};
 +
-+static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
++static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
 +{
-+    if (addr == 0 /* PRCI_HFROSCCFG */) {
-+        return 1 << 31; /* ROSC_RDY */
++    int i;
++    for (i = 0; i < (len >> 2); i++) {
++        stl_phys(&address_space_memory, pa + (i << 2), rom[i]);
 +    }
-+    if (addr == 8 /* PRCI_PLLCFG    */) {
-+        return 1 << 31; /* PLL_LOCK */
++}
++
++static uint64_t identity_translate(void *opaque, uint64_t addr)
++{
++    return addr;
++}
++
++static uint64_t load_kernel(const char *kernel_filename)
++{
++    uint64_t kernel_entry, kernel_high;
++
++    if (load_elf(kernel_filename, identity_translate, NULL,
++                 &kernel_entry, NULL, &kernel_high,
++                 0, ELF_MACHINE, 1, 0) < 0) {
++        error_report("qemu: could not load kernel '%s'", kernel_filename);
++        exit(1);
 +    }
-+    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
++    return kernel_entry;
++}
++
++static void sifive_mmio_emulate(MemoryRegion *parent, const char *name,
++                             uintptr_t offset, uintptr_t length)
++{
++    MemoryRegion *mock_mmio = g_new(MemoryRegion, 1);
++    memory_region_init_ram(mock_mmio, NULL, name, length, &error_fatal);
++    memory_region_add_subregion(parent, offset, mock_mmio);
++}
++
++static void riscv_sifive_e300_init(MachineState *machine)
++{
++    const struct MemmapEntry *memmap = sifive_e300_memmap;
++
++    SiFiveE300State *s = g_new0(SiFiveE300State, 1);
++    MemoryRegion *sys_mem = get_system_memory();
++    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
++
++    /* Initialize SOC */
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
++                              &error_abort);
++    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAC_PRIV_1_10,
++                            "cpu-type", &error_abort);
++    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
++                            &error_abort);
++    object_property_set_bool(OBJECT(&s->soc), true, "realized",
++                            &error_abort);
++
++    /* Data Tightly Integrated Memory */
++    memory_region_init_ram(main_mem, NULL, "riscv.sifive.e300.ram",
++        memmap[SIFIVE_E300_DTIM].size, &error_fatal);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_DTIM].base, main_mem);
++
++    /* Mask ROM */
++    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.e300.mrom",
++        memmap[SIFIVE_E300_MROM].size, &error_fatal);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_MROM].base, mask_rom);
++
++    /* MMIO */
++    s->plic = sifive_plic_create(memmap[SIFIVE_E300_PLIC].base,
++        (char *)SIFIVE_E300_PLIC_HART_CONFIG,
++        SIFIVE_E300_PLIC_NUM_SOURCES,
++        SIFIVE_E300_PLIC_NUM_PRIORITIES,
++        SIFIVE_E300_PLIC_PRIORITY_BASE,
++        SIFIVE_E300_PLIC_PENDING_BASE,
++        SIFIVE_E300_PLIC_ENABLE_BASE,
++        SIFIVE_E300_PLIC_ENABLE_STRIDE,
++        SIFIVE_E300_PLIC_CONTEXT_BASE,
++        SIFIVE_E300_PLIC_CONTEXT_STRIDE,
++        memmap[SIFIVE_E300_PLIC].size);
++    sifive_clint_create(memmap[SIFIVE_E300_CLINT].base,
++        memmap[SIFIVE_E300_CLINT].size, smp_cpus,
++        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.aon",
++        memmap[SIFIVE_E300_AON].base, memmap[SIFIVE_E300_AON].size);
++    sifive_prci_create(memmap[SIFIVE_E300_PRCI].base);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.gpio0",
++        memmap[SIFIVE_E300_GPIO0].base, memmap[SIFIVE_E300_GPIO0].size);
++    sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART0].base,
++        serial_hds[0], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART0_IRQ]);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi0",
++        memmap[SIFIVE_E300_QSPI0].base, memmap[SIFIVE_E300_QSPI0].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm0",
++        memmap[SIFIVE_E300_PWM0].base, memmap[SIFIVE_E300_PWM0].size);
++    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART1].base,
++        serial_hds[1], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART1_IRQ]); */
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi1",
++        memmap[SIFIVE_E300_QSPI1].base, memmap[SIFIVE_E300_QSPI1].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm1",
++        memmap[SIFIVE_E300_PWM1].base, memmap[SIFIVE_E300_PWM1].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi2",
++        memmap[SIFIVE_E300_QSPI2].base, memmap[SIFIVE_E300_QSPI2].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm2",
++        memmap[SIFIVE_E300_PWM2].base, memmap[SIFIVE_E300_PWM2].size);
++
++    /* Flash memory */
++    memory_region_init_ram(xip_mem, NULL, "riscv.sifive.e300.xip",
++        memmap[SIFIVE_E300_XIP].size, &error_fatal);
++    memory_region_set_readonly(xip_mem, true);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_XIP].base, xip_mem);
++
++    /* Mask ROM reset vector */
++    uint32_t reset_vec[2] = {
++        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
++        0x00028067,        /* 0x1004: jr      t0 */
++    };
++
++    /* copy in the reset vector */
++    copy_le32_to_phys(memmap[SIFIVE_E300_MROM].base,
++        reset_vec, sizeof(reset_vec));
++    memory_region_set_readonly(mask_rom, true);
++
++    if (machine->kernel_filename) {
++        load_kernel(machine->kernel_filename);
++    }
++}
++
++static int riscv_sifive_e300_sysbus_device_init(SysBusDevice *sysbusdev)
++{
 +    return 0;
 +}
 +
-+static void sifive_prci_write(void *opaque, hwaddr addr,
-+           uint64_t val64, unsigned int size)
++static void riscv_sifive_e300_class_init(ObjectClass *klass, void *data)
 +{
-+    /* discard writes */
++    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    k->init = riscv_sifive_e300_sysbus_device_init;
 +}
 +
-+static const MemoryRegionOps sifive_prci_ops = {
-+    .read = sifive_prci_read,
-+    .write = sifive_prci_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void sifive_prci_init(Object *obj)
-+{
-+    SiFivePRCIState *s = SIFIVE_PRCI(obj);
-+
-+    memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
-+                          TYPE_SIFIVE_PRCI, 0x8000);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+}
-+
-+static const TypeInfo sifive_prci_info = {
-+    .name          = TYPE_SIFIVE_PRCI,
++static const TypeInfo riscv_sifive_e300_device = {
++    .name          = TYPE_SIFIVE_E300,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SiFivePRCIState),
-+    .instance_init = sifive_prci_init,
++    .instance_size = sizeof(SiFiveE300State),
++    .class_init    = riscv_sifive_e300_class_init,
 +};
 +
-+static void sifive_prci_register_types(void)
++static void riscv_sifive_e300_machine_init(MachineClass *mc)
 +{
-+    type_register_static(&sifive_prci_info);
++    mc->desc = "RISC-V Board compatible with SiFive E300 SDK";
++    mc->init = riscv_sifive_e300_init;
++    mc->max_cpus = 1;
 +}
 +
-+type_init(sifive_prci_register_types)
++DEFINE_MACHINE("sifive_e300", riscv_sifive_e300_machine_init)
 +
-+
-+/*
-+ * Create PRCI device.
-+ */
-+DeviceState *sifive_prci_create(hwaddr addr)
++static void riscv_sifive_e300_register_types(void)
 +{
-+    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
-+    return dev;
++    type_register_static(&riscv_sifive_e300_device);
 +}
-diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
++
++type_init(riscv_sifive_e300_register_types);
+diff --git a/include/hw/riscv/sifive_e300.h b/include/hw/riscv/sifive_e300.h
 new file mode 100644
-index 0000000..b6f4c48
+index 0000000..99ad1f9
 --- /dev/null
-+++ b/include/hw/riscv/sifive_prci.h
-@@ -0,0 +1,37 @@
++++ b/include/hw/riscv/sifive_e300.h
+@@ -0,0 +1,73 @@
 +/*
-+ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
++ * SiFive E300 series machine interface
 + *
 + * Copyright (c) 2017 SiFive, Inc.
 + *
@@ -159,23 +308,59 @@ index 0000000..b6f4c48
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_SIFIVE_PRCI_H
-+#define HW_SIFIVE_PRCI_H
++#ifndef HW_SIFIVE_E300_H
++#define HW_SIFIVE_E300_H
 +
-+#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
++#define TYPE_SIFIVE_E300 "riscv.sifive.e300"
 +
-+#define SIFIVE_PRCI(obj) \
-+    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
++#define SIFIVE_E300(obj) \
++    OBJECT_CHECK(SiFiveE300State, (obj), TYPE_SIFIVE_E300)
 +
-+typedef struct SiFivePRCIState {
++typedef struct SiFiveE300State {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
-+    MemoryRegion mmio;
-+} SiFivePRCIState;
++    RISCVHartArrayState soc;
++    DeviceState *plic;
++} SiFiveE300State;
 +
-+DeviceState *sifive_prci_create(hwaddr addr);
++enum {
++    SIFIVE_E300_DEBUG,
++    SIFIVE_E300_MROM,
++    SIFIVE_E300_OTP,
++    SIFIVE_E300_CLINT,
++    SIFIVE_E300_PLIC,
++    SIFIVE_E300_AON,
++    SIFIVE_E300_PRCI,
++    SIFIVE_E300_OTP_CTRL,
++    SIFIVE_E300_GPIO0,
++    SIFIVE_E300_UART0,
++    SIFIVE_E300_QSPI0,
++    SIFIVE_E300_PWM0,
++    SIFIVE_E300_UART1,
++    SIFIVE_E300_QSPI1,
++    SIFIVE_E300_PWM1,
++    SIFIVE_E300_QSPI2,
++    SIFIVE_E300_PWM2,
++    SIFIVE_E300_XIP,
++    SIFIVE_E300_DTIM
++};
++
++enum {
++    SIFIVE_E300_UART0_IRQ = 3,
++    SIFIVE_E300_UART1_IRQ = 4
++};
++
++#define SIFIVE_E300_PLIC_HART_CONFIG "M"
++#define SIFIVE_E300_PLIC_NUM_SOURCES 127
++#define SIFIVE_E300_PLIC_NUM_PRIORITIES 7
++#define SIFIVE_E300_PLIC_PRIORITY_BASE 0x0
++#define SIFIVE_E300_PLIC_PENDING_BASE 0x1000
++#define SIFIVE_E300_PLIC_ENABLE_BASE 0x2000
++#define SIFIVE_E300_PLIC_ENABLE_STRIDE 0x80
++#define SIFIVE_E300_PLIC_CONTEXT_BASE 0x200000
++#define SIFIVE_E300_PLIC_CONTEXT_STRIDE 0x1000
 +
 +#endif
 -- 
