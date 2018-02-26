@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eqE4S-0006c8-7C
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 03:23:41 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eqE4x-0006qT-8P
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 03:24:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eqE4O-0006VD-6z
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 03:23:40 -0500
-Received: from ozlabs.ru ([107.173.13.209]:57546)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eqE4N-0006Tw-TN
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 03:23:36 -0500
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Mon, 26 Feb 2018 19:22:59 +1100
-Message-Id: <20180226082259.40293-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2] qmp: Add qom-list-properties to list
- QOM object properties
+	(envelope-from <kraxel@redhat.com>) id 1eqE4t-0006t2-A1
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 03:24:11 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39852 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eqE4t-0006sS-59
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 03:24:07 -0500
+Date: Mon, 26 Feb 2018 09:23:48 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180226082348.siwgbzomshdpvnmx@sirius.home.kraxel.org>
+References: <20180219111458.25983-1-kraxel@redhat.com>
+	<20180219111458.25983-5-kraxel@redhat.com>
+	<20180222153740.3zkvjen77uwjqhd2@sirius.home.kraxel.org>
+	<CAFEAcA8_VRML=FopCKdGnrPCyZ9MwKokMj60962=tgCNwNT2oA@mail.gmail.com>
+	<20180222095917.29eda1d9@w520.home>
+	<20180223085322.vhc4awb5aprohe2s@sirius.home.kraxel.org>
+	<20180223085841.0f8362ed@w520.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180223085841.0f8362ed@w520.home>
+Subject: Re: [Qemu-devel] [PATCH v4 4/7] qdev: add hotpluggable to
+ DeviceState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,184 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laine Stump <laine@redhat.com>, Erik Skultety <eskultet@redhat.com>
 
-There is already 'device-list-properties' which does most of the job,
-however it does not handle everything returned by qom-list-types such
-as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
-It does not handle abstract classes either.
+  Hi,
 
-This adds a new qom-list-properties command which prints properties
-of a specific class and its instance. It is pretty much a simplified copy
-of the device-list-properties handler.
+> > The connection between QemuConsole and User Interface (i.e. gtk, spice,
+> > ...) is a bit more flexible.  But also not really designed for hotplug
+> > as QemuConsole is not hotpluggable in the first place ...
+> > 
+> > We could drop the display property and use two devices instead.
+> > 
+> >   new vfio-pci would behave like display=off with this series.
+> >   added vfio-pci-display has display=on behavior.
+> >   display=auto is not possible.
+> 
+> I expect libvirt and above would balk at creating a separate QEMU
+> device for this purpose, easy for QEMU, hard for anything that manages
+> QEMU.
 
-Since it creates an object instance, device properties should appear
-in the output as they are copied to QOM properties at the instance_init
-hook.
+Now as you've mentioned libvirt I remember we had the same discussion
+before, with usb host adapters.  The uhci and ehci controllers have a
+simliar issue:  If they are configured as companion setup (ehci for usb2
+and uhci for usb1) they can't be hotplugged, as standalone controller
+hotplugging works fine.
 
-This adds a object_class_property_iter_init() helper to allow class
-properties enumeration uses it in the new QMP command to allow properties
-listing for abstract classes.
+We ended up with splitting the controllers into two groups:  The ones
+which can be used in a companion setup (basically all ich9-* devices)
+which are not hotpluggable.   And the other ones which don't support
+companion setups but can be hotplugged.  Commits:
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v2:
-* added abstract classes support, now things like "pci-device" or
-"spapr-machine" show properties, previously these would produce
-an "abstract class" error
----
- qapi-schema.json     | 29 +++++++++++++++++++++++++++++
- include/qom/object.h | 16 ++++++++++++++++
- qmp.c                | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- qom/object.c         |  7 +++++++
- 4 files changed, 101 insertions(+)
+   ec56214f6f usb: tag standalone ehci as hotpluggable
+   638ca939d8 usb: tag standalone uhci as hotpluggable
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 0262b9f..fa5f189 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -1455,6 +1455,35 @@
-   'returns': [ 'DevicePropertyInfo' ] }
- 
- ##
-+# @QOMPropertyInfo:
-+#
-+# Information about object properties.
-+#
-+# @name: the name of the property
-+# @type: the typename of the property
-+# @description: if specified, the description of the property.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'QOMPropertyInfo',
-+  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
-+
-+##
-+# @qom-list-properties:
-+#
-+# List properties associated with a QOM object.
-+#
-+# @typename: the type name of an object
-+#
-+# Returns: a list of QOMPropertyInfo describing object properties
-+#
-+# Since: 2.12
-+##
-+{ 'command': 'qom-list-properties',
-+  'data': { 'typename': 'str'},
-+  'returns': [ 'QOMPropertyInfo' ] }
-+
-+##
- # @xen-set-global-dirty-log:
- #
- # Enable or disable the global dirty log mode.
-diff --git a/include/qom/object.h b/include/qom/object.h
-index dc73d59..ef07d78 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1017,6 +1017,22 @@ void object_property_iter_init(ObjectPropertyIterator *iter,
-                                Object *obj);
- 
- /**
-+ * object_class_property_iter_init:
-+ * @klass: the class
-+ *
-+ * Initializes an iterator for traversing all properties
-+ * registered against an object class and all parent classes.
-+ *
-+ * It is forbidden to modify the property list while iterating,
-+ * whether removing or adding properties.
-+ *
-+ * This can be used on abstract classes as it does not create a temporary
-+ * instance.
-+ */
-+void object_class_property_iter_init(ObjectPropertyIterator *iter,
-+                                     ObjectClass *klass);
-+
-+/**
-  * object_property_iter_next:
-  * @iter: the iterator instance
-  *
-diff --git a/qmp.c b/qmp.c
-index 793f6f3..151d3d7 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -576,6 +576,55 @@ DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
-     return prop_list;
- }
- 
-+QOMPropertyInfoList *qmp_qom_list_properties(const char *typename,
-+                                             Error **errp)
-+{
-+    ObjectClass *klass;
-+    Object *obj = NULL;
-+    ObjectProperty *prop;
-+    ObjectPropertyIterator iter;
-+    QOMPropertyInfoList *prop_list = NULL;
-+
-+    klass = object_class_by_name(typename);
-+    if (klass == NULL) {
-+        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-+                  "Class '%s' not found", typename);
-+        return NULL;
-+    }
-+
-+    klass = object_class_dynamic_cast(klass, TYPE_OBJECT);
-+    if (klass == NULL) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_OBJECT);
-+        return NULL;
-+    }
-+
-+    if (object_class_is_abstract(klass)) {
-+        object_class_property_iter_init(&iter, klass);
-+    } else {
-+        obj = object_new(typename);
-+        object_property_iter_init(&iter, obj);
-+    }
-+    while ((prop = object_property_iter_next(&iter))) {
-+        QOMPropertyInfo *info;
-+        QOMPropertyInfoList *entry;
-+
-+        info = g_malloc0(sizeof(*info));
-+        info->name = g_strdup(prop->name);
-+        info->type = g_strdup(prop->type);
-+        info->has_description = !!prop->description;
-+        info->description = g_strdup(prop->description);
-+
-+        entry = g_malloc0(sizeof(*entry));
-+        entry->value = info;
-+        entry->next = prop_list;
-+        prop_list = entry;
-+    }
-+
-+    object_unref(obj);
-+
-+    return prop_list;
-+}
-+
- CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     return arch_query_cpu_definitions(errp);
-diff --git a/qom/object.c b/qom/object.c
-index 5dcee46..e7978bd 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1037,6 +1037,13 @@ ObjectProperty *object_property_iter_next(ObjectPropertyIterator *iter)
-     return val;
- }
- 
-+void object_class_property_iter_init(ObjectPropertyIterator *iter,
-+                                     ObjectClass *klass)
-+{
-+    g_hash_table_iter_init(&iter->iter, klass->properties);
-+    iter->nextclass = klass;
-+}
-+
- ObjectProperty *object_class_property_find(ObjectClass *klass, const char *name,
-                                            Error **errp)
- {
--- 
-2.11.0
+The argument from the libvirt side was that it is actually easier for
+them to handle if hotplugging is a fixed property of a device and
+doesn't change magically depending on device configuration.  First
+because they can query qemu then whenever a given device can be
+hotplugged or not, and second because it'll work for both plug-in and
+plug-out.
+
+So this patch isn't going to fly, and unless someone can come up with a
+better idea I'll go use the two-devices approach.
+
+cheers,
+  Gerd
