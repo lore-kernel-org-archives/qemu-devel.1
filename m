@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqGFL-00055Y-Dv
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqGFQ-00058Y-Mb
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqGFJ-0002Vx-Kg
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqGFM-0002Wl-DI
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:08 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 26 Feb 2018 11:42:27 +0100
-Message-Id: <1519641757-12396-5-git-send-email-thuth@redhat.com>
+Date: Mon, 26 Feb 2018 11:42:28 +0100
+Message-Id: <1519641757-12396-6-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519641757-12396-1-git-send-email-thuth@redhat.com>
 References: <1519641757-12396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL-for-s390x 04/14] s390-ccw: update libc
+Subject: [Qemu-devel] [PULL-for-s390x 05/14] s390-ccw: move auxiliary IPL
+ data to separate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,318 +25,198 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-Moved:
-  memcmp from bootmap.h to libc.h (renamed from _memcmp)
-  strlen from sclp.c to libc.h (renamed from _strlen)
+The s390-ccw firmware needs some information in support of the
+boot process which is not available on the native machine.
+Examples are the netboot firmware load address and now the
+boot menu parameters.
 
-Added C standard functions:
-  isdigit
+While storing that data in unused fields of the IPL parameter block
+works, that approach could create problems if the parameter block
+definition should change in the future. Because then a guest could
+overwrite these fields using the set IPLB diagnose.
 
-Added non C-standard function:
-  uitoa
-  atoui
+In fact the data in question is of more global nature and not really
+tied to an IPL device, so separating it is rather logical.
 
+This commit introduces a new structure to hold firmware relevant
+IPL parameters set by QEMU. The data is stored at location 204 (dec)
+and can contain up to 7 32-bit words. This area is available to
+programming in the z/Architecture Principles of Operation and
+can thus safely be used by the firmware until the IPL has completed.
+
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+[thuth: fixed "4 + 8 * n" comment]
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/Makefile  |  2 +-
- pc-bios/s390-ccw/bootmap.c |  4 +--
- pc-bios/s390-ccw/bootmap.h | 16 +--------
- pc-bios/s390-ccw/libc.c    | 88 ++++++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/libc.h    | 37 +++++++++++++++++--
- pc-bios/s390-ccw/main.c    | 17 +--------
- pc-bios/s390-ccw/sclp.c    | 10 +-----
- 7 files changed, 129 insertions(+), 45 deletions(-)
- create mode 100644 pc-bios/s390-ccw/libc.c
+ hw/s390x/ipl.c          | 18 +++++++++++++++++-
+ hw/s390x/ipl.h          | 25 +++++++++++++++++++++++--
+ pc-bios/s390-ccw/iplb.h | 18 ++++++++++++++++--
+ pc-bios/s390-ccw/main.c |  6 +++++-
+ 4 files changed, 61 insertions(+), 6 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 6d0c2ee..9f7904f 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- 
- .PHONY : all clean build-all
- 
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
-+OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index a94638d..092fb35 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -506,7 +506,7 @@ static bool is_iso_bc_entry_compatible(IsoBcSection *s)
-                     "Failed to read image sector 0");
- 
-     /* Checking bytes 8 - 32 for S390 Linux magic */
--    return !_memcmp(magic_sec + 8, linux_s390_magic, 24);
-+    return !memcmp(magic_sec + 8, linux_s390_magic, 24);
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 0d06fc1..79f5a58 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -399,6 +399,21 @@ void s390_reipl_request(void)
+     qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
  }
  
- /* Location of the current sector of the directory */
-@@ -635,7 +635,7 @@ static uint32_t find_iso_bc(void)
-         if (vd->type == VOL_DESC_TYPE_BOOT) {
-             IsoVdElTorito *et = &vd->vd.boot;
- 
--            if (!_memcmp(&et->el_torito[0], el_torito_magic, 32)) {
-+            if (!memcmp(&et->el_torito[0], el_torito_magic, 32)) {
-                 return bswap32(et->bc_offset);
-             }
++static void s390_ipl_prepare_qipl(S390CPU *cpu)
++{
++    S390IPLState *ipl = get_ipl_device();
++    uint8_t *addr;
++    uint64_t len = 4096;
++
++    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
++    if (!addr || len < QIPL_ADDRESS + sizeof(QemuIplParameters)) {
++        error_report("Cannot set QEMU IPL parameters");
++        return;
++    }
++    memcpy(addr + QIPL_ADDRESS, &ipl->qipl, sizeof(QemuIplParameters));
++    cpu_physical_memory_unmap(addr, len, 1, len);
++}
++
+ void s390_ipl_prepare_cpu(S390CPU *cpu)
+ {
+     S390IPLState *ipl = get_ipl_device();
+@@ -418,8 +433,9 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+             error_report_err(err);
+             vm_stop(RUN_STATE_INTERNAL_ERROR);
          }
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 4bd95cd..4cf7e1e 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -328,20 +328,6 @@ static inline bool magic_match(const void *data, const void *magic)
-     return *((uint32_t *)data) == *((uint32_t *)magic);
+-        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
++        ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+     }
++    s390_ipl_prepare_qipl(cpu);
  }
  
--static inline int _memcmp(const void *s1, const void *s2, size_t n)
--{
--    int i;
--    const uint8_t *p1 = s1, *p2 = s2;
--
--    for (i = 0; i < n; i++) {
--        if (p1[i] != p2[i]) {
--            return p1[i] > p2[i] ? 1 : -1;
--        }
--    }
--
--    return 0;
--}
--
- static inline uint32_t iso_733_to_u32(uint64_t x)
- {
-     return (uint32_t)x;
-@@ -434,7 +420,7 @@ const uint8_t vol_desc_magic[] = "CD001";
+ static void s390_ipl_reset(DeviceState *dev)
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 8a705e0..5cc3b77 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -16,8 +16,7 @@
+ #include "cpu.h"
  
- static inline bool is_iso_vd_valid(IsoVolDesc *vd)
- {
--    return !_memcmp(&vd->ident[0], vol_desc_magic, 5) &&
-+    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
-            vd->version == 0x1 &&
-            vd->type <= VOL_DESC_TYPE_PARTITION;
- }
-diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
-new file mode 100644
-index 0000000..38ea77d
---- /dev/null
-+++ b/pc-bios/s390-ccw/libc.c
-@@ -0,0 +1,88 @@
+ struct IplBlockCcw {
+-    uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[85];
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -90,6 +89,27 @@ void s390_ipl_prepare_cpu(S390CPU *cpu);
+ IplParameterBlock *s390_ipl_get_iplb(void);
+ void s390_reipl_request(void);
+ 
++#define QIPL_ADDRESS  0xcc
++
 +/*
-+ * libc-style definitions and functions
-+ *
-+ * Copyright 2018 IBM Corp.
-+ * Author(s): Collin L. Walling <walling@linux.vnet.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
++ * The QEMU IPL Parameters will be stored at absolute address
++ * 204 (0xcc) which means it is 32-bit word aligned but not
++ * double-word aligned.
++ * Placement of data fields in this area must account for
++ * their alignment needs. E.g., netboot_start_address must
++ * have an offset of 4 + n * 8 bytes within the struct in order
++ * to keep it double-word aligned.
++ * The total size of the struct must never exceed 28 bytes.
++ * This definition must be kept in sync with the defininition
++ * in pc-bios/s390-ccw/iplb.h.
 + */
++struct QemuIplParameters {
++    uint8_t  reserved1[4];
++    uint64_t netboot_start_addr;
++    uint8_t  reserved2[16];
++} QEMU_PACKED;
++typedef struct QemuIplParameters QemuIplParameters;
 +
-+#include "libc.h"
-+#include "s390-ccw.h"
+ #define TYPE_S390_IPL "s390-ipl"
+ #define S390_IPL(obj) OBJECT_CHECK(S390IPLState, (obj), TYPE_S390_IPL)
+ 
+@@ -105,6 +125,7 @@ struct S390IPLState {
+     bool iplb_valid;
+     bool reipl_requested;
+     bool netboot;
++    QemuIplParameters qipl;
+ 
+     /*< public >*/
+     char *kernel;
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 890aed9..31d2934 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -13,8 +13,7 @@
+ #define IPLB_H
+ 
+ struct IplBlockCcw {
+-    uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[85];
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -73,6 +72,21 @@ typedef struct IplParameterBlock IplParameterBlock;
+ 
+ extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ 
++#define QIPL_ADDRESS  0xcc
 +
-+/**
-+ * atoui:
-+ * @str: the string to be converted.
-+ *
-+ * Given a string @str, convert it to an integer. Leading spaces are
-+ * ignored. Any other non-numerical value will terminate the conversion
-+ * and return 0. This function only handles numbers between 0 and
-+ * UINT64_MAX inclusive.
-+ *
-+ * Returns: an integer converted from the string @str, or the number 0
-+ * if an error occurred.
++/*
++ * This definition must be kept in sync with the defininition
++ * in hw/s390x/ipl.h
 + */
-+uint64_t atoui(const char *str)
-+{
-+    int val = 0;
++struct QemuIplParameters {
++    uint8_t  reserved1[4];
++    uint64_t netboot_start_addr;
++    uint8_t  reserved2[16];
++} __attribute__ ((packed));
++typedef struct QemuIplParameters QemuIplParameters;
 +
-+    if (!str || !str[0]) {
-+        return 0;
-+    }
++extern QemuIplParameters qipl;
 +
-+    while (*str == ' ') {
-+        str++;
-+    }
-+
-+    while (*str) {
-+        if (!isdigit(*str)) {
-+            break;
-+        }
-+        val = val * 10 + *str - '0';
-+        str++;
-+    }
-+
-+    return val;
-+}
-+
-+/**
-+ * uitoa:
-+ * @num: an integer (base 10) to be converted.
-+ * @str: a pointer to a string to store the conversion.
-+ * @len: the length of the passed string.
-+ *
-+ * Given an integer @num, convert it to a string. The string @str must be
-+ * allocated beforehand. The resulting string will be null terminated and
-+ * returned. This function only handles numbers between 0 and UINT64_MAX
-+ * inclusive.
-+ *
-+ * Returns: the string @str of the converted integer @num
-+ */
-+char *uitoa(uint64_t num, char *str, size_t len)
-+{
-+    size_t num_idx = 1; /* account for NUL */
-+    uint64_t tmp = num;
-+
-+    IPL_assert(str != NULL, "uitoa: no space allocated to store string");
-+
-+    /* Count indices of num */
-+    while ((tmp /= 10) != 0) {
-+        num_idx++;
-+    }
-+
-+    /* Check if we have enough space for num and NUL */
-+    IPL_assert(len > num_idx, "uitoa: array too small for conversion");
-+
-+    str[num_idx--] = '\0';
-+
-+    /* Convert int to string */
-+    while (num_idx >= 0) {
-+        str[num_idx--] = num % 10 + '0';
-+        num /= 10;
-+    }
-+
-+    return str;
-+}
-diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-index 0142ea8..63ece70 100644
---- a/pc-bios/s390-ccw/libc.h
-+++ b/pc-bios/s390-ccw/libc.h
-@@ -1,6 +1,8 @@
- /*
-  * libc-style definitions and functions
-  *
-+ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
-+ *
-  * This code is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the
-  * Free Software Foundation; either version 2 of the License, or (at your
-@@ -19,7 +21,7 @@ typedef unsigned long long uint64_t;
- 
- static inline void *memset(void *s, int c, size_t n)
- {
--    int i;
-+    size_t i;
-     unsigned char *p = s;
- 
-     for (i = 0; i < n; i++) {
-@@ -33,7 +35,7 @@ static inline void *memcpy(void *s1, const void *s2, size_t n)
- {
-     uint8_t *dest = s1;
-     const uint8_t *src = s2;
--    int i;
-+    size_t i;
- 
-     for (i = 0; i < n; i++) {
-         dest[i] = src[i];
-@@ -42,4 +44,35 @@ static inline void *memcpy(void *s1, const void *s2, size_t n)
-     return s1;
- }
- 
-+static inline int memcmp(const void *s1, const void *s2, size_t n)
-+{
-+    size_t i;
-+    const uint8_t *p1 = s1, *p2 = s2;
-+
-+    for (i = 0; i < n; i++) {
-+        if (p1[i] != p2[i]) {
-+            return p1[i] > p2[i] ? 1 : -1;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static inline size_t strlen(const char *str)
-+{
-+    size_t i;
-+    for (i = 0; *str; i++) {
-+        str++;
-+    }
-+    return i;
-+}
-+
-+static inline int isdigit(int c)
-+{
-+    return (c >= '0') && (c <= '9');
-+}
-+
-+uint64_t atoui(const char *str);
-+char *uitoa(uint64_t num, char *str, size_t len);
-+
- #endif
+ #define S390_IPL_TYPE_FCP 0x00
+ #define S390_IPL_TYPE_CCW 0x02
+ #define S390_IPL_TYPE_QEMU_SCSI 0xff
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 401e9db..e857ce4 100644
+index e857ce4..e41b264 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -40,22 +40,7 @@ void panic(const char *string)
+@@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+ static SubChannelId blk_schid = { .one = 1 };
+ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
++QemuIplParameters qipl;
  
- unsigned int get_loadparm_index(void)
- {
--    const char *lp = loadparm;
--    int i;
--    unsigned int idx = 0;
--
--    for (i = 0; i < 8; i++) {
--        char c = lp[i];
--
--        if (c < '0' || c > '9') {
--            break;
--        }
--
--        idx *= 10;
--        idx += c - '0';
--    }
--
--    return idx;
-+    return atoui(loadparm);
- }
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+@@ -81,6 +82,7 @@ static void virtio_setup(void)
+     uint16_t dev_no;
+     char ldp[] = "LOADPARM=[________]\n";
+     VDev *vdev = virtio_get_device();
++    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
  
- static bool find_dev(Schib *schib, int dev_no)
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index 90d1bc3..e6a0898 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -65,14 +65,6 @@ void sclp_setup(void)
-     sclp_set_write_mask();
- }
+     /*
+      * We unconditionally enable mss support. In every sane configuration,
+@@ -93,6 +95,8 @@ static void virtio_setup(void)
+     memcpy(ldp + 10, loadparm, 8);
+     sclp_print(ldp);
  
--static int _strlen(const char *str)
--{
--    int i;
--    for (i = 0; *str; i++)
--        str++;
--    return i;
--}
--
- long write(int fd, const void *str, size_t len)
- {
-     WriteEventData *sccb = (void *)_sccb;
-@@ -113,7 +105,7 @@ long write(int fd, const void *str, size_t len)
++    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
++
+     if (store_iplb(&iplb)) {
+         switch (iplb.pbt) {
+         case S390_IPL_TYPE_CCW:
+@@ -127,7 +131,7 @@ static void virtio_setup(void)
  
- void sclp_print(const char *str)
- {
--    write(1, str, _strlen(str));
-+    write(1, str, strlen(str));
- }
+     if (virtio_get_device_type() == VIRTIO_ID_NET) {
+         sclp_print("Network boot device detected\n");
+-        vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
++        vdev->netboot_start_addr = qipl.netboot_start_addr;
+     } else {
+         virtio_blk_setup_device(blk_schid);
  
- void sclp_get_loadparm_ascii(char *loadparm)
 -- 
 1.8.3.1
