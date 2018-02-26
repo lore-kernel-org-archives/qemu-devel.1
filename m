@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1eqMLx-0007NA-S3
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 12:14:18 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eqN5j-000200-1D
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:01:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1eqMLt-0004g9-QC
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 12:14:17 -0500
-Received: from mail-sn1nam02on0137.outbound.protection.outlook.com
-	([104.47.36.137]:41302
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1eqMLt-0004fp-Hw
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 12:14:13 -0500
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Mon, 26 Feb 2018 09:13:36 -0800
-Message-Id: <1519665216-1078-9-git-send-email-juterry@microsoft.com>
-In-Reply-To: <1519665216-1078-1-git-send-email-juterry@microsoft.com>
-References: <1519665216-1078-1-git-send-email-juterry@microsoft.com>
+	(envelope-from <dgilbert@redhat.com>) id 1eqN5f-0006AK-Ux
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:01:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39910 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eqN5f-0006A6-Ng
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 13:01:31 -0500
+Date: Mon, 26 Feb 2018 18:01:11 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180226180110.GE2873@work-vm>
+References: <20180223215858.16987-1-wei@redhat.com>
+	<20180223215858.16987-3-wei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 8/8] WHPX improve interrupt notification
- registration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180223215858.16987-3-wei@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V5 2/4] tests/migration: Convert the boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, "Justin Terry (VM)" <juterry@microsoft.com>
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
 
-Improves the usage of the InterruptNotification registration by skipping the
-additional call to WHvSetVirtualProcessorRegisters if we have already
-registered for the window exit.
+* Wei Huang (wei@redhat.com) wrote:
+> The x86 boot block header currently is generated with a shell script.
+> To better support other CPUs (e.g. aarch64), we convert the script
+> into Makefile. This allows us to 1) support cross-compilation easily,
+> and 2) avoid creating a script file for every architecture.
+> 
+> Signed-off-by: Wei Huang <wei@redhat.com>
 
-Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
----
- target/i386/whpx-all.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+But what happens if you're on a system that doesn't have the cross
+compilers?  I found it's too easy to get stuck with it trying
+to rebuild the header when there's no need.
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 24387bebad..940bbe590d 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -756,12 +756,11 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-     }
- 
-     /* Update the state of the interrupt delivery notification */
--    if (cpu->interrupt_request & CPU_INTERRUPT_HARD) {
-+    if (!vcpu->window_registered &&
-+        cpu->interrupt_request & CPU_INTERRUPT_HARD) {
-         reg_values[reg_count].DeliverabilityNotifications.InterruptNotification
-             = 1;
--        if (vcpu->window_registered != 1) {
--            vcpu->window_registered = 1;
--        }
-+        vcpu->window_registered = 1;
-         reg_names[reg_count] = WHvX64RegisterDeliverabilityNotifications;
-         reg_count += 1;
-     }
--- 
-2.13.6
+Dave
+
+> ---
+>  tests/migration/Makefile                 | 36 ++++++++++++++++++++++++++++++++
+>  tests/migration/rebuild-x86-bootblock.sh | 33 -----------------------------
+>  tests/migration/x86-a-b-bootblock.h      |  2 +-
+>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
+>  4 files changed, 39 insertions(+), 37 deletions(-)
+>  create mode 100644 tests/migration/Makefile
+>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+> 
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> new file mode 100644
+> index 0000000000..8fbedaa8b8
+> --- /dev/null
+> +++ b/tests/migration/Makefile
+> @@ -0,0 +1,36 @@
+> +#
+> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+> +#
+> +# Authors:
+> +#   Dave Gilbert <dgilbert@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +# See the COPYING file in the top-level directory.
+> +#
+> +export __note
+> +override define __note
+> +/* This file is automatically generated from
+> + * tests/migration/$<, edit that and then run
+> + * "make $@" inside tests/migration to update,
+> + * and then remember to send both in your patch submission.
+> + */
+> +endef
+> +
+> +all: x86-a-b-bootblock.h
+> +# Dummy command so that make thinks it has done something
+> +	@true
+> +
+> +SRC_PATH=../..
+> +include $(SRC_PATH)/rules.mak
+> +
+> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> +
+> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
+> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+> +	echo "$$__note" > $@
+> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
+> +
+> +clean:
+> +	rm -f *.bootsect *.boot *.o
+> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+> deleted file mode 100755
+> index 86cec5d284..0000000000
+> --- a/tests/migration/rebuild-x86-bootblock.sh
+> +++ /dev/null
+> @@ -1,33 +0,0 @@
+> -#!/bin/sh
+> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> -# See the COPYING file in the top-level directory.
+> -#
+> -# Author: dgilbert@redhat.com
+> -
+> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+> -
+> -if [ ! -e "$ASMFILE" ]
+> -then
+> -  echo "Couldn't find $ASMFILE" >&2
+> -  exit 1
+> -fi
+> -
+> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
+> -cd "$ASM_WORK_DIR" &&
+> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
+> -objcopy -O binary x86.o x86.boot &&
+> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
+> -xxd -i x86.bootsect |
+> -sed -e 's/.*int.*//' > x86.hex &&
+> -cat - x86.hex <<HERE > "$HEADER"
+> -/* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> - * and then remember to send both in your patch submission.
+> - */
+> -HERE
+> -
+> -rm x86.hex x86.bootsect x86.boot x86.o
+> -cd .. && rmdir "$ASM_WORK_DIR"
+> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+> index 78a151fe2a..9e8e2e028b 100644
+> --- a/tests/migration/x86-a-b-bootblock.h
+> +++ b/tests/migration/x86-a-b-bootblock.h
+> @@ -1,6 +1,6 @@
+>  /* This file is automatically generated from
+>   * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> + * "make x86-a-b-bootblock.h" inside tests/migration to update,
+>   * and then remember to send both in your patch submission.
+>   */
+>  unsigned char x86_bootsect[] = {
+> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
+> index b1642641a7..98dbfab084 100644
+> --- a/tests/migration/x86-a-b-bootblock.s
+> +++ b/tests/migration/x86-a-b-bootblock.s
+> @@ -3,9 +3,8 @@
+>  #  range.
+>  #  Outputs an initial 'A' on serial followed by repeated 'B's
+>  #
+> -# run   tests/migration/rebuild-x86-bootblock.sh
+> -#   to regenerate the hex, and remember to include both the .h and .s
+> -#   in any patches.
+> +#  In tests/migration dir, run 'make x86-a-b-bootblock.h' to regenerate
+> +#  the hex, and remember to include both the .h and .s in any patches.
+>  #
+>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
