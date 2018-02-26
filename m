@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eqAT0-0001F5-95
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 23:32:47 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eqAZR-00036g-Nf
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 23:39:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eqASx-0001fU-1P
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 23:32:46 -0500
-Received: from mga07.intel.com ([134.134.136.100]:2956)
+	(envelope-from <wei.w.wang@intel.com>) id 1eqAZO-0004dn-G9
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 23:39:25 -0500
+Received: from mga05.intel.com ([192.55.52.43]:63319)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eqASw-0001dV-O4
-	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 23:32:42 -0500
-Message-ID: <5A938E93.5020502@intel.com>
-Date: Mon, 26 Feb 2018 12:35:31 +0800
+	id 1eqAZO-0004bm-6P
+	for qemu-devel@nongnu.org; Sun, 25 Feb 2018 23:39:22 -0500
+Message-ID: <5A939024.3080501@intel.com>
+Date: Mon, 26 Feb 2018 12:42:12 +0800
 From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
 References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
-	<1517915299-15349-4-git-send-email-wei.w.wang@intel.com>
-	<20180209121517.GD2428@work-vm>
-In-Reply-To: <20180209121517.GD2428@work-vm>
+	<20180208201523.GE2326@work-vm> <5A7D1121.6030903@intel.com>
+	<20180209105335.GA2428@work-vm>
+In-Reply-To: <20180209105335.GA2428@work-vm>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio-balloon: add a timer to
- limit the free page report waiting time
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] virtio-balloon: free page hint
+ reporting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +31,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On 02/09/2018 08:15 PM, Dr. David Alan Gilbert wrote:
+On 02/09/2018 06:53 PM, Dr. David Alan Gilbert wrote:
 > * Wei Wang (wei.w.wang@intel.com) wrote:
->> This patch adds a timer to limit the time that host waits for the free
->> page hints reported by the guest. Users can specify the time in ms via
->> "free-page-wait-time" command line option. If a user doesn't specify a
->> time, host waits till the guest finishes reporting all the free page
->> hints. The policy (wait for all the free page hints to be reported or
->> use a time limit) is determined by the orchestration layer.
-> That's kind of a get-out; but there's at least two problems:
->     a) With a timeout of 0 (the default) we might hang forever waiting
->        for the guest; broken guests are just too common, we can't do
->        that.
->     b) Even if we were going to do that, you'd have to make sure that
->        migrate_cancel provided a way out.
->     c) How does that work during a savevm snapshot or when the guest is
->        stopped?
->     d) OK, the timer gives us some safety (except c); but how does the
->        orchestration layer ever come up with a 'safe' value for it?
->        Unless we can suggest a safe value that the orchestration layer
->        can use, or a way they can work it out, then they just wont use
->        it.
+>> On 02/09/2018 04:15 AM, Dr. David Alan Gilbert wrote:
+>>> * Wei Wang (wei.w.wang@intel.com) wrote:
+>>>> This is the deivce part implementation to add a new feature,
+>>>> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
+>>>> receives the guest free page hints from the driver and clears the
+>>>> corresponding bits in the dirty bitmap, so that those free pages are
+>>>> not transferred by the migration thread to the destination.
+>>>>
+>>>> Please see the driver patch link for test results:
+>>>> https://lkml.org/lkml/2018/2/4/60
+>>> Hi Wei,
+>>>      I'll look at the code a bit more - but first some more basic
+>>> questions on that lkml post:
+>>>
+>>>       a) The idle guest time thing is a nice result; can you just state
+>>>          what the host was, speed of connection, and what other options
+>>>          you were using?
+>>>
+>>>       b) The workload test, the one with the kernel compile; you list
+>>>          the kernel compile time but don't mention any changes in the
+>>>          migration times of the ping-pong; can you give those times as
+>>>          well?
+>>>
+>>>       c) What's your real workload that this is aimed at?
+>>>          Is it really for people migrating idle VMs - or do you have some
+>>>          NFV application in mind, if so why not include a figure for
+>>>          those?
+>>>
+>> Hi Dave,
+>>
+>> Thanks for joining the review. Please see below info.
+>>
+>> a) Environment info
+>>      - Host:
+>>          - Physical CPU: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
+>>          - kernel: 3.10.0
+>>
+>>      - Guest:
+>>          - kernel: 4.15.0
+>>          - QEMU setup: -cpu host -M pc -smp 4,threads=1,sockets=1 -m 8G
+>> --mem-prealloc -realtime mlock=on -balloon virtio,free-page-hint=true
+>>
+>>      - Migration setup:
+>>          - migrate_set_speed 0
+>>          - migrate_set_downtime 0.01  (10ms)
+> That's an unusually low downtime (and I'm not sure what setting the
+> speed to 0 does!).
+
+For idle guest tests, I used 0.01s downtime. If we run workloads, we can 
+change it to 2s. Just make sure we set the same downtime for both legacy 
+and optimization cases so that we can have an apple to apple comparison.
+
+speed being set to 0 means using the largest bandwidth. Here it is 
+effectively the same as setting it to 100G.
+
 >
+>> b) Michael asked the same question on the kernel patches, I'll reply there
+>> with you cc-ed, so that kernel maintainers can also see it. Btw, do you have
+>> any other workloads you would suggest to have a try?
+> No, not really; I guess it's best for VMs that are either idle or have
+> lots of spare RAM.
 
-Hi Dave,
+Yes, less free memory results in less improvement (please see the more 
+results with the linux compilation workload shared in LKML).
 
-Sorry for my late response. Please see below:
-
-a) I think people would just kill the guest if it is broken. We can also 
-change the default timeout value, for example 1 second, which is enough 
-for the free page reporting.
-
-b) How about changing it this way: if timeout happens, host sends a stop 
-command to the guest, and makes virtio_balloon_poll_free_page_hints() 
-"return" immediately (without getting the guest's acknowledge). The 
-"return" basically goes back to the migration_thread function:
-while (s->state == MIGRATION_STATUS_ACTIVE ||
-            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-...
-}
-
-migration_cancel sets the state to MIGRATION_CANCELLING, so it will stop 
-the migration process.
-
-c) This optimization needs the guest to report. If the guest is stopped, 
-it wouldn't work. How about adding a check of "RUN_STATE" before going 
-into the optimization?
-
-d) Yes. Normally it is faster to wait for the guest to report all the 
-free pages. Probably, we can just hardcode a value (e.g. 1s) for now 
-(instead of making it configurable by users), this is used to handle the 
-case that the guest is broken. What would you think?
 
 Best,
 Wei
