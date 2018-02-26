@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eqExi-0005Xq-3C
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:20:47 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eqF00-0006Q3-D5
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:23:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eqExe-000641-3L
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:20:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42656
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eqExd-00063N-TY
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:20:42 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1Q9KREj042062
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 04:20:40 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gcew3hk30-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 04:20:40 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 26 Feb 2018 09:20:38 -0000
-References: <20180223173657.29125-1-david@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 26 Feb 2018 10:20:34 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180223173657.29125-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <wei.w.wang@intel.com>) id 1eqEzw-00071C-Dg
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:23:08 -0500
+Received: from mga07.intel.com ([134.134.136.100]:26547)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eqEzw-00070q-4B
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:23:04 -0500
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Mon, 26 Feb 2018 09:22:59 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F739443C65@shsmsx102.ccr.corp.intel.com>
+References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
+	<1517915299-15349-3-git-send-email-wei.w.wang@intel.com>
+	<20180209115021.GB2428@work-vm> <5A93960B.9020102@intel.com>
+In-Reply-To: <5A93960B.9020102@intel.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <afa4789f-8377-f033-00c8-35821a872178@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1] numa: s390x has no NUMA
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: use the free page
+ reporting feature from balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,105 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu0@gmail.com" <quan.xu0@gmail.com>, "quintela@redhat.com" <quintela@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "nilal@redhat.com" <nilal@redhat.com>
 
+On Monday, February 26, 2018 1:07 PM, Wei Wang wrote:
+> On 02/09/2018 07:50 PM, Dr. David Alan Gilbert wrote:
+> > * Wei Wang (wei.w.wang@intel.com) wrote:
+> >> Use the free page reporting feature from the balloon device to clear
+> >> the bits corresponding to guest free pages from the dirty bitmap, so
+> >> that the free memory are not sent.
+> >>
+> >> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> >> CC: Michael S. Tsirkin <mst@redhat.com>
+> >> CC: Juan Quintela <quintela@redhat.com>
+> >> ---
+> >>   migration/ram.c | 24 ++++++++++++++++++++----
+> >>   1 file changed, 20 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/migration/ram.c b/migration/ram.c index d6f462c..4fe16d2
+> >> 100644
+> >> --- a/migration/ram.c
+> >> +++ b/migration/ram.c
+> >> @@ -49,6 +49,7 @@
+> >>   #include "qemu/rcu_queue.h"
+> >>   #include "migration/colo.h"
+> >>   #include "migration/block.h"
+> >> +#include "sysemu/balloon.h"
+> >>
+> >>   /***********************************************************/
+> >>   /* ram save/restore */
+> >> @@ -206,6 +207,10 @@ struct RAMState {
+> >>       uint32_t last_version;
+> >>       /* We are in the first round */
+> >>       bool ram_bulk_stage;
+> >> +    /* The feature, skipping the transfer of free pages, is supported=
+ */
+> >> +    bool free_page_support;
+> >> +    /* Skip the transfer of free pages in the bulk stage */
+> >> +    bool free_page_done;
+> >>       /* How many times we have dirty too many pages */
+> >>       int dirty_rate_high_cnt;
+> >>       /* these variables are used for bitmap sync */ @@ -773,7 +778,7
+> >> @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock
+> *rb,
+> >>       unsigned long *bitmap =3D rb->bmap;
+> >>       unsigned long next;
+> >>
+> >> -    if (rs->ram_bulk_stage && start > 0) {
+> >> +    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
+> >>           next =3D start + 1;
+> >>       } else {
+> >>           next =3D find_next_bit(bitmap, size, start); @@ -1653,6
+> >> +1658,8 @@ static void ram_state_reset(RAMState *rs)
+> >>       rs->last_page =3D 0;
+> >>       rs->last_version =3D ram_list.version;
+> >>       rs->ram_bulk_stage =3D true;
+> >> +    rs->free_page_support =3D balloon_free_page_support();
+> >> +    rs->free_page_done =3D false;
+> >>   }
+> >>
+> >>   #define MAX_WAIT 50 /* ms, half buffered_file limit */ @@ -2135,7
+> >> +2142,7 @@ static int ram_state_init(RAMState **rsp)
+> >>       return 0;
+> >>   }
+> >>
+> >> -static void ram_list_init_bitmaps(void)
+> >> +static void ram_list_init_bitmaps(RAMState *rs)
+> >>   {
+> >>       RAMBlock *block;
+> >>       unsigned long pages;
+> >> @@ -2145,7 +2152,11 @@ static void ram_list_init_bitmaps(void)
+> >>           QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> >>               pages =3D block->max_length >> TARGET_PAGE_BITS;
+> >>               block->bmap =3D bitmap_new(pages);
+> >> -            bitmap_set(block->bmap, 0, pages);
+> >> +            if (rs->free_page_support) {
+> >> +                bitmap_set(block->bmap, 1, pages);
+> > I don't understand how it makes sense to do that here; ignoring
+> > anything ese it means that migration_dirty_pages is wrong which could
+> > end up with migration finishing before all real pages are sent.
+> >
+>=20
+> The bulk stage treats all the pages as dirty pages, so we set all the bit=
+s to "1",
+> this is needed by this optimization feature, because the free pages repor=
+ted
+> from the guest can then be directly cleared from the bitmap (we don't nee=
+d
+> any more bitmaps to record free pages).
+>=20
 
+Sorry, there was a misunderstanding of the bitmap_set API (thought it was u=
+sed to set all the bits to 1 or 0). So the above change isn't needed actual=
+ly. Btw, this doesn't affect the results I reported.
 
-On 02/23/2018 06:36 PM, David Hildenbrand wrote:
-> Right now it is possible to crash QEMU for s390x by providing e.g.
->     -numa node,nodeid=0,cpus=0-1
-> 
-> Problem is, that numa.c uses mc->cpu_index_to_instance_props as an
-> indicator whether NUMA is supported by a machine type. We don't
-> implement NUMA on s390x (and that concept also doesn't really exist).
-> We need mc->cpu_index_to_instance_props for query-cpus.
-
-Looks like we assert because of 
-machine->possible_cpus == 0.
-
-Later during boot this is created in s390_possible_cpu_arch_ids. (via 
-s390_init_cpus). What we (in the future) actually could provide is a 
-cpu topology.
-
-So something like this also fixes the bug
-
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index fd5bfcdaa5..d981335ca9 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "cpu.h"
-+#include "sysemu/numa.h"
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
- #include "hw/s390x/s390-virtio-hcall.h"
-@@ -393,11 +394,20 @@ static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
- static CpuInstanceProperties s390_cpu_index_to_props(MachineState *machine,
-                                                      unsigned cpu_index)
- {
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+
-+    /* make sure possible_cpu are intialized */
-+    mc->possible_cpu_arch_ids(machine);
-     g_assert(machine->possible_cpus && cpu_index < machine->possible_cpus->len);
- 
-     return machine->possible_cpus->cpus[cpu_index].props;
- }
- 
-+static int64_t s390_get_default_cpu_node_id(const MachineState *ms, int idx)
-+{
-+    return idx / smp_cpus % nb_numa_nodes;
-+}
-+
- static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
- {
-     int i;
-@@ -473,6 +483,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_hotplug_handler = s390_get_hotplug_handler;
-     mc->cpu_index_to_instance_props = s390_cpu_index_to_props;
-     mc->possible_cpu_arch_ids = s390_possible_cpu_arch_ids;
-+    mc->get_default_cpu_node_id = s390_get_default_cpu_node_id;
-     /* it is overridden with 'host' cpu *in kvm_arch_init* */
-     mc->default_cpu_type = S390_CPU_TYPE_NAME("qemu");
-     hc->plug = s390_machine_device_plug;
-
-
-and it would allow us to extend things later on. On the other hand, my fix does not
-implement anything so your fix is "more correct".
-
-> 
-> So let's fix this case.
-> 
-> qemu-system-s390x: -numa node,nodeid=0,cpus=0-1: NUMA is not supported by
->                    this machine-type
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  numa.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/numa.c b/numa.c
-> index 7e0e789b02..3b9be613d9 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -80,10 +80,16 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
->          return;
->      }
-> 
-> +#ifdef TARGET_S390X
-> +    /* s390x provides cpu_index_to_instance_props but has no NUMA */
-> +    error_report("NUMA is not supported by this machine-type");
-> +    exit(1);
-> +#else
->      if (!mc->cpu_index_to_instance_props) {
->          error_report("NUMA is not supported by this machine-type");
->          exit(1);
->      }
-> +#endif
->      for (cpus = node->cpus; cpus; cpus = cpus->next) {
->          CpuInstanceProperties props;
->          if (cpus->value >= max_cpus) {
-> 
+Best,
+Wei
+=20
