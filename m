@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <matz@suse.de>) id 1eqPkv-0003Av-41
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:52:18 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eqPrp-0005Ee-CT
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:59:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <matz@suse.de>) id 1eqPkq-0007cG-8h
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:52:17 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33223)
+	(envelope-from <alex.williamson@redhat.com>) id 1eqPrl-0002hE-HM
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:59:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54996)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <matz@suse.de>) id 1eqPkp-0007ak-UK
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:52:12 -0500
-Received: from relay2.suse.de (charybdis-ext.suse.de [195.135.220.254])
-	by mx2.suse.de (Postfix) with ESMTP id 21040ADB0
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 20:52:08 +0000 (UTC)
-Date: Mon, 26 Feb 2018 20:52:07 +0000 (UTC)
-From: Michael Matz <matz@suse.de>
-Message-ID: <alpine.LSU.2.21.1802262051120.10187@wotan.suse.de>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1eqPrl-0002eG-Az
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:59:21 -0500
+Date: Mon, 26 Feb 2018 13:59:16 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180226135916.3bcfd7c8@w520.home>
+In-Reply-To: <20180226083551.dingmvxfgqydw35a@sirius.home.kraxel.org>
+References: <20180219111458.25983-1-kraxel@redhat.com>
+	<20180219151649.13a197f9@w520.home>
+	<20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
+	<20180222092811.0a705b9e@w520.home>
+	<20180223090517.beti6t5grnxxhlwq@sirius.home.kraxel.org>
+	<20180226083551.dingmvxfgqydw35a@sirius.home.kraxel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Subject: [Qemu-devel] [PATCH v2] ppc: Fix size of ppc64 xer register
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Torsten Duwe <duwe@suse.de>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, intel-gvt-dev@lists.freedesktop.org, qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>
 
-The normal gdb definition of the XER registers is only 32 bit,
-and that's what the current version of power64-core.xml also
-says (seems copied from gdb's).  But qemu's idea of the XER register
-is target_ulong (in CPUPPCState, ppc_gdb_register_len and
-ppc_cpu_gdb_read_register)
+On Mon, 26 Feb 2018 09:35:51 +0100
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-That mismatch leads to the following message when attaching
-with gdb:
+> On Fri, Feb 23, 2018 at 10:05:17AM +0100, Gerd Hoffmann wrote:
+> > > Hi Gerd,
+> > > 
+> > > It's a little bit concerning that the only way we can test the
+> > > region-based display support is with proprietary drivers that nobody
+> > > but NVIDIA has at this point.  Have you considered adding region-based
+> > > display support to the mdev sample tty driver?  I know it sounds
+> > > ridiculous for a serial device to have a display, but the vfio display
+> > > region support isn't really tied to the functionality of the base mdev
+> > > device.  We could have it simply display a static test pattern, just so
+> > > we can test the end to end code path without a dependency on a closed
+> > > vendor driver.  
+> > 
+> > Hmm, have to think about that.  Some way to change the display content
+> > would be nice as you can see whenever display updates are working then.  
+> 
+> https://www.kraxel.org/cgit/linux/log/?h=vfio-sample-display
+> 
+> Comes with host mdev driver and guest framebuffer driver.
 
-  Truncated register 32 in remote 'g' packet
-
-(and following on that qemu stops responding).  The simple fix is
-to say the truth in the .xml file.  But the better fix is to
-actually make it 32bit on the wire, as old gdbs don't support
-XML files for describing registers.  Also the XER state in qemu
-doesn't seem to use the high 32 bits, so sending it off to gdb
-doesn't seem worthwhile.
-
-[v2: fix formatting in moved line and adjust others]
-
-Signed-off-by: Michael Matz <matz@suse.de>
----
- target/ppc/gdbstub.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
-index 7a33813..688749d 100644
---- a/target/ppc/gdbstub.c
-+++ b/target/ppc/gdbstub.c
-@@ -33,14 +33,14 @@ static int ppc_gdb_register_len_apple(int n)
-         return 8;
-     case 64 ... 95:
-         return 16;
--    case 64+32: /* nip */
--    case 65+32: /* msr */
--    case 67+32: /* lr */
--    case 68+32: /* ctr */
--    case 69+32: /* xer */
--    case 70+32: /* fpscr */
-+    case 64 + 32: /* nip */
-+    case 65 + 32: /* msr */
-+    case 67 + 32: /* lr */
-+    case 68 + 32: /* ctr */
-+    case 70 + 32: /* fpscr */
-         return 8;
--    case 66+32: /* cr */
-+    case 66 + 32: /* cr */
-+    case 69 + 32: /* xer */
-         return 4;
-     default:
-         return 0;
-@@ -61,6 +61,8 @@ static int ppc_gdb_register_len(int n)
-         return 8;
-     case 66:
-         /* cr */
-+    case 69:
-+        /* xer */
-         return 4;
-     case 64:
-         /* nip */
-@@ -70,8 +72,6 @@ static int ppc_gdb_register_len(int n)
-         /* lr */
-     case 68:
-         /* ctr */
--    case 69:
--        /* xer */
-         return sizeof(target_ulong);
-     case 70:
-         /* fpscr */
-@@ -152,7 +152,7 @@ int ppc_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-             gdb_get_regl(mem_buf, env->ctr);
-             break;
-         case 69:
--            gdb_get_regl(mem_buf, env->xer);
-+            gdb_get_reg32(mem_buf, env->xer);
-             break;
-         case 70:
-             gdb_get_reg32(mem_buf, env->fpscr);
-@@ -208,7 +208,7 @@ int ppc_cpu_gdb_read_register_apple(CPUState *cs, uint8_t *mem_buf, int n)
-             gdb_get_reg64(mem_buf, env->ctr);
-             break;
-         case 69 + 32:
--            gdb_get_reg64(mem_buf, env->xer);
-+            gdb_get_reg32(mem_buf, env->xer);
-             break;
-         case 70 + 32:
-             gdb_get_reg64(mem_buf, env->fpscr);
-@@ -259,7 +259,7 @@ int ppc_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-             env->ctr = ldtul_p(mem_buf);
-             break;
-         case 69:
--            env->xer = ldtul_p(mem_buf);
-+            env->xer = ldl_p(mem_buf);
-             break;
-         case 70:
-             /* fpscr */
-@@ -309,7 +309,7 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, uint8_t *mem_buf, int n)
-             env->ctr = ldq_p(mem_buf);
-             break;
-         case 69 + 32:
--            env->xer = ldq_p(mem_buf);
-+            env->xer = ldl_p(mem_buf);
-             break;
-         case 70 + 32:
-             /* fpscr */
--- 
-1.8.1.4
+Awesome!
