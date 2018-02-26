@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eqISy-0006i1-3b
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 08:05:20 -0500
+	(envelope-from <bounces@canonical.com>) id 1eqIwI-000631-Us
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 08:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eqISt-0001mK-68
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 08:05:16 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48900 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eqISt-0001lT-0e
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 08:05:11 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6E618424C
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 13:04:59 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 26 Feb 2018 13:04:52 +0000
-Message-Id: <20180226130452.21309-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/1] serial: Open non-block
+	(envelope-from <bounces@canonical.com>) id 1eqIwC-0006B3-RY
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 08:35:34 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eqIwC-0006AW-KW
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 08:35:28 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eqIwB-0000he-Kg
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 13:35:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9AE2B2E80C8
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 13:35:27 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Feb 2018 13:28:23 -0000
+From: Teddy VALETTE <1751264@bugs.launchpad.net>
+Reply-To: Bug 1751264 <1751264@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151939024836.30479.4933664010119224710.malonedeb@gac.canonical.com>
+Message-Id: <151965170449.9128.13343625124444958518.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1751264] Re: qemu-img convert issue in a tmpfs
+ partition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +37,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+** Description changed:
 
-On a real serial device, the open can block if the handshake
-lines are in a particular state.  If a QEMU is passing the serial
-device to the guest, the QEMU startup is blocked opening the device
-(with a symptom seen as a timeout from libvirt).
+  qemu-img convert command is slow when the file to convert is located in
+  a tmpfs formatted partition.
+  =
 
-Open the serial port with O_NONBLOCK.
+  v2.1.0 on debian/jessie x64, ext4: 10m14s
+  v2.1.0 on debian/jessie x64, tmpfs: 10m15s
+  =
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- chardev/char-serial.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  v2.1.0 on debian/stretch x64, ext4: 11m9s
+  v2.1.0 on debian/stretch x64, tmpfs: 10m21.362s
+  =
 
-diff --git a/chardev/char-serial.c b/chardev/char-serial.c
-index feb52e559d..97be5d4a63 100644
---- a/chardev/char-serial.c
-+++ b/chardev/char-serial.c
-@@ -265,7 +265,8 @@ static void qmp_chardev_open_serial(Chardev *chr,
-     ChardevHostdev *serial = backend->u.serial.data;
-     int fd;
- 
--    fd = qmp_chardev_open_file_source(serial->device, O_RDWR, errp);
-+    fd = qmp_chardev_open_file_source(serial->device, O_RDWR | O_NONBLOCK,
-+                                      errp);
-     if (fd < 0) {
-         return;
-     }
--- 
-2.14.3
+  v2.8.0 on debian/jessie x64, ext4: 10m21s
+- v2.8.0 on debian/jessie x64, tmpfs: Too long
++ v2.8.0 on debian/jessie x64, tmpfs: Too long (50min+)
+  =
+
+  v2.8.0 on debian/stretch x64, ext4: 10m42s
+- v2.8.0 on debian/stretch x64, tmpfs: Too long
++ v2.8.0 on debian/stretch x64, tmpfs: Too long (50min+)
+  =
+
+  It seems that the issue is caused by this commit :
+  https://github.com/qemu/qemu/commit/690c7301600162421b928c7f26fd488fd8fa4=
+64e
+  =
+
+  In order to reproduce this bug :
+  =
+
+  1/ mount a tmpfs partition : mount -t tmpfs tmpfs /tmp
+  2/ get a vmdk file (we used a 15GB image) and put it on /tmp
+  3/ run the 'qemu-img convert -O qcow2 /tmp/file.vmdk /path/to/destination=
+' command
+  =
+
+  When we trace the process, we can see that there's a lseek loop which is
+  very slow (compare to outside a tmpfs partition).
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1751264
+
+Title:
+  qemu-img convert issue in a tmpfs partition
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu-img convert command is slow when the file to convert is located
+  in a tmpfs formatted partition.
+
+  v2.1.0 on debian/jessie x64, ext4: 10m14s
+  v2.1.0 on debian/jessie x64, tmpfs: 10m15s
+
+  v2.1.0 on debian/stretch x64, ext4: 11m9s
+  v2.1.0 on debian/stretch x64, tmpfs: 10m21.362s
+
+  v2.8.0 on debian/jessie x64, ext4: 10m21s
+  v2.8.0 on debian/jessie x64, tmpfs: Too long (50min+)
+
+  v2.8.0 on debian/stretch x64, ext4: 10m42s
+  v2.8.0 on debian/stretch x64, tmpfs: Too long (50min+)
+
+  It seems that the issue is caused by this commit :
+  https://github.com/qemu/qemu/commit/690c7301600162421b928c7f26fd488fd8fa4=
+64e
+
+  In order to reproduce this bug :
+
+  1/ mount a tmpfs partition : mount -t tmpfs tmpfs /tmp
+  2/ get a vmdk file (we used a 15GB image) and put it on /tmp
+  3/ run the 'qemu-img convert -O qcow2 /tmp/file.vmdk /path/to/destination=
+' command
+
+  When we trace the process, we can see that there's a lseek loop which
+  is very slow (compare to outside a tmpfs partition).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1751264/+subscriptions
