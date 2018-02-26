@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqGFE-0004z9-Jw
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:42:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqGFG-0004zM-Hd
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqGFB-0002Qd-Ni
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:42:56 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqGFF-0002SV-E1
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:42:58 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 26 Feb 2018 11:42:25 +0100
-Message-Id: <1519641757-12396-3-git-send-email-thuth@redhat.com>
+Date: Mon, 26 Feb 2018 11:42:26 +0100
+Message-Id: <1519641757-12396-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519641757-12396-1-git-send-email-thuth@redhat.com>
 References: <1519641757-12396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL-for-s390x 02/14] s390-ccw: refactor
- eckd_block_num to use CHS
+Subject: [Qemu-devel] [PULL-for-s390x 03/14] s390-ccw: refactor IPL structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,130 +24,118 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-Add new cylinder/head/sector struct. Use it to calculate
-eckd block numbers instead of a BootMapPointer (which used
-eckd chs anyway).
+ECKD DASDs have different IPL structures for CDL and LDL
+formats. The current Ipl1 and Ipl2 structs follow the CDL
+format, so we prepend "EckdCdl" to them. Boot info for LDL
+has been moved to a new struct: EckdLdlIpl1.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c | 28 ++++++++++++++--------------
- pc-bios/s390-ccw/bootmap.h |  8 ++++++--
- 2 files changed, 20 insertions(+), 16 deletions(-)
+ pc-bios/s390-ccw/bootmap.c | 12 ++++++------
+ pc-bios/s390-ccw/bootmap.h | 37 +++++++++++++++++++++----------------
+ 2 files changed, 27 insertions(+), 22 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index a4eaf24..9534f56 100644
+index 9534f56..a94638d 100644
 --- a/pc-bios/s390-ccw/bootmap.c
 +++ b/pc-bios/s390-ccw/bootmap.c
-@@ -95,32 +95,32 @@ static inline void verify_boot_info(BootInfo *bip)
-                "Bad block size in zIPL section of the 1st record.");
- }
- 
--static block_number_t eckd_block_num(BootMapPointer *p)
-+static block_number_t eckd_block_num(EckdCHS *chs)
+@@ -221,7 +221,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+ static void ipl_eckd_cdl(void)
  {
-     const uint64_t sectors = virtio_get_sectors();
-     const uint64_t heads = virtio_get_heads();
--    const uint64_t cylinder = p->eckd.cylinder
--                            + ((p->eckd.head & 0xfff0) << 12);
--    const uint64_t head = p->eckd.head & 0x000f;
-+    const uint64_t cylinder = chs->cylinder
-+                            + ((chs->head & 0xfff0) << 12);
-+    const uint64_t head = chs->head & 0x000f;
-     const block_number_t block = sectors * heads * cylinder
-                                + sectors * head
--                               + p->eckd.sector
-+                               + chs->sector
-                                - 1; /* block nr starts with zero */
-     return block;
- }
+     XEckdMbr *mbr;
+-    Ipl2 *ipl2 = (void *)sec;
++    EckdCdlIpl2 *ipl2 = (void *)sec;
+     IplVolumeLabel *vlbl = (void *)sec;
+     block_number_t bmt_block_nr;
  
- static bool eckd_valid_address(BootMapPointer *p)
+@@ -231,7 +231,7 @@ static void ipl_eckd_cdl(void)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
+ 
+-    mbr = &ipl2->u.x.mbr;
++    mbr = &ipl2->mbr;
+     IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
+     IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
+                "Bad block size in zIPL section of IPL2 record.");
+@@ -281,7 +281,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
  {
--    const uint64_t head = p->eckd.head & 0x000f;
-+    const uint64_t head = p->eckd.chs.head & 0x000f;
+     block_number_t bmt_block_nr;
+-    BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
++    EckdLdlIpl1 *ipl1 = (void *)sec;
  
-     if (head >= virtio_get_heads()
--        ||  p->eckd.sector > virtio_get_sectors()
--        ||  p->eckd.sector <= 0) {
-+        ||  p->eckd.chs.sector > virtio_get_sectors()
-+        ||  p->eckd.chs.sector <= 0) {
-         return false;
-     }
- 
-     if (!virtio_guessed_disk_nature() &&
--        eckd_block_num(p) >= virtio_get_blocks()) {
-+        eckd_block_num(&p->eckd.chs) >= virtio_get_blocks()) {
-         return false;
-     }
- 
-@@ -140,7 +140,7 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
-     do {
-         more_data = false;
-         for (j = 0;; j++) {
--            block_nr = eckd_block_num((void *)&(bprs[j].xeckd));
-+            block_nr = eckd_block_num(&bprs[j].xeckd.bptr.chs);
-             if (is_null_block_number(block_nr)) { /* end of chunk */
-                 break;
-             }
-@@ -198,7 +198,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+     if (mode != ECKD_LDL_UNLABELED) {
+         print_eckd_ldl_msg(mode);
+@@ -292,15 +292,15 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
- 
--    block_nr = eckd_block_num(&bmt->entry[loadparm]);
-+    block_nr = eckd_block_num(&bmt->entry[loadparm].xeckd.bptr.chs);
-     IPL_assert(block_nr != -1, "Cannot find Boot Map Table Entry");
- 
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-@@ -206,7 +206,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
- 
-     for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
-         address = bms->entry[i].address.load_address;
--        block_nr = eckd_block_num(&(bms->entry[i].blkptr));
-+        block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
- 
-         do {
-             block_nr = load_eckd_segments(block_nr, &address);
-@@ -239,7 +239,7 @@ static void ipl_eckd_cdl(void)
-                "Non-ECKD device type in zIPL section of IPL2 record.");
+     read_block(0, sec, "Cannot read block 0 to grab boot info.");
+     if (mode == ECKD_LDL_UNLABELED) {
+-        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
++        if (!magic_match(ipl1->bip.magic, ZIPL_MAGIC)) {
+             return; /* not applicable layout */
+         }
+         sclp_print("unlabeled LDL.\n");
+     }
+-    verify_boot_info(bip);
++    verify_boot_info(&ipl1->bip);
  
      /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num(&mbr->blockptr);
-+    bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
- 
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(2, vlbl, "Cannot read Volume Label at block 2");
-@@ -300,7 +300,7 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
-     verify_boot_info(bip);
- 
-     /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num((void *)&bip->bp.ipl.bm_ptr.eckd.bptr);
-+    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
+-    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
++    bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
  
      run_eckd_boot_script(bmt_block_nr);
      /* no return */
 diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 486c0f3..b361084 100644
+index b361084..4bd95cd 100644
 --- a/pc-bios/s390-ccw/bootmap.h
 +++ b/pc-bios/s390-ccw/bootmap.h
-@@ -32,10 +32,14 @@ typedef struct FbaBlockPtr {
-     uint16_t blockct;
- } __attribute__ ((packed)) FbaBlockPtr;
+@@ -239,22 +239,27 @@ typedef struct BootInfo {          /* @ 0x70, record #0    */
+     } bp;
+ } __attribute__ ((packed)) BootInfo; /* see also XEckdMbr   */
  
--typedef struct EckdBlockPtr {
--    uint16_t cylinder; /* cylinder/head/sector is an address of the block */
-+typedef struct EckdCHS {
-+    uint16_t cylinder;
-     uint16_t head;
-     uint8_t sector;
-+} __attribute__ ((packed)) EckdCHS;
+-typedef struct Ipl1 {
+-    unsigned char key[4]; /* == "IPL1" */
+-    unsigned char data[24];
+-} __attribute__((packed)) Ipl1;
+-
+-typedef struct Ipl2 {
+-    unsigned char key[4]; /* == "IPL2" */
+-    union {
+-        unsigned char data[144];
+-        struct {
+-            unsigned char reserved1[92-4];
+-            XEckdMbr mbr;
+-            unsigned char reserved2[144-(92-4)-sizeof(XEckdMbr)];
+-        } x;
+-    } u;
+-} __attribute__((packed)) Ipl2;
++/*
++ * Structs for IPL
++ */
++#define STAGE2_BLK_CNT_MAX  24 /* Stage 1b can load up to 24 blocks */
 +
-+typedef struct EckdBlockPtr {
-+    EckdCHS chs; /* cylinder/head/sector is an address of the block */
-     uint16_t size;
-     uint8_t count; /* (size_in_blocks-1);
-                     * it's 0 for TablePtr, ScriptPtr, and SectionPtr */
++typedef struct EckdCdlIpl1 {
++    uint8_t key[4]; /* == "IPL1" */
++    uint8_t data[24];
++} __attribute__((packed)) EckdCdlIpl1;
++
++typedef struct EckdCdlIpl2 {
++    uint8_t key[4]; /* == "IPL2" */
++    uint8_t reserved0[88];
++    XEckdMbr mbr;
++    uint8_t reserved[24];
++} __attribute__((packed)) EckdCdlIpl2;
++
++typedef struct EckdLdlIpl1 {
++    uint8_t reserved[112];
++    BootInfo bip; /* BootInfo is MBR for LDL */
++} __attribute__((packed)) EckdLdlIpl1;
+ 
+ typedef struct IplVolumeLabel {
+     unsigned char key[4]; /* == "VOL1" */
 -- 
 1.8.3.1
