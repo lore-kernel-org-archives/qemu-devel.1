@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eqLeo-00078n-2G
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 11:29:42 -0500
+	(envelope-from <berto@igalia.com>) id 1eqLk5-0001ZJ-96
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 11:35:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eqLek-0008QK-2u
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 11:29:42 -0500
+	(envelope-from <berto@igalia.com>) id 1eqLk1-0003Ll-Bj
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 11:35:09 -0500
 From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180222155922.9833-4-eblake@redhat.com>
+In-Reply-To: <46083cc3-08b8-89ef-2b71-a6ecb9bbb594@redhat.com>
 References: <20180222155922.9833-1-eblake@redhat.com>
-	<20180222155922.9833-4-eblake@redhat.com>
-Date: Mon, 26 Feb 2018 17:29:36 +0100
-Message-ID: <w518tbfd89b.fsf@maestria.local.igalia.com>
+	<20180222155922.9833-5-eblake@redhat.com>
+	<w51371t56ys.fsf@maestria.local.igalia.com>
+	<46083cc3-08b8-89ef-2b71-a6ecb9bbb594@redhat.com>
+Date: Mon, 26 Feb 2018 17:35:02 +0100
+Message-ID: <w51606jd809.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] qcow2: Don't allow overflow during
- cluster allocation
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] qcow2: Avoid memory over-allocation
+ on compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +28,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Thu 22 Feb 2018 04:59:21 PM CET, Eric Blake wrote:
-> Our code was already checking that we did not attempt to
-> allocate more clusters than what would fit in an INT64 (the
-> physical maximimum if we can access a full off_t's worth of
-> data).  But this does not catch smaller limits enforced by
-> various spots in the qcow2 image description: L1 and normal
-> clusters of L2 are documented as having bits 63-56 reserved
-> for other purposes, capping our maximum offset at 64PB (bit
-> 55 is the maximum bit set).  And for compressed images with
-> 2M clusters, the cap drops the maximum offset to bit 48, or
-> a maximum offset of 512TB.  If we overflow that offset, we
-> would write compressed data into one place, but try to
-> decompress from another, which won't work.
+On Thu 22 Feb 2018 08:02:44 PM CET, Eric Blake wrote:
+> On 02/22/2018 10:23 AM, Alberto Garcia wrote:
+>> On Thu 22 Feb 2018 04:59:22 PM CET, Eric Blake wrote:
+>>>           sector_offset = coffset & 511;
+>>>           csize = nb_csectors * 512 - sector_offset;
+>>             [...]
+>>> +        assert(csize < 2 * s->cluster_size);
+>> 
+>> I think it should be <=
+>> 
+>> If sector_offset is 0 and nb_csector is the maximum allowed value then
+>> csize is exactly 2 * s->cluster_size bytes.
 >
-> I don't have 512TB handy to prove whether things break if we
-> compress so much data that we overflow that limit, and don't
-> think that iotests can (quickly) test it either.  Test 138
-> comes close (it corrupts an image into thinking something lives
-> at 32PB, which is half the maximum for L1 sizing - although
-> it relies on 512-byte clusters).  But that test points out
-> that we will generally hit other limits first (such as running
-> out of memory for the refcount table, or exceeding file system
-> limits like 16TB on ext4, etc), so this is more a theoretical
-> safety valve than something likely to be hit.
+> Sigh, yes you're right.  I was thinking that "qemu sets csize to a 
+> maximum of s->cluster_size, but only when sector_offset is not 0" - but 
+> as long as we're dealing with externally-produced images, sector_offset 
+> can be 0 at the same time as providing all 1s to the field.  So I did 
+> indeed have an off-by-one.
 >
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Perhaps the maintainer can fix it up, instead of me spinning a v4?
+
+That would work for me, but note that this part of the commit message
+also needs to be updated:
+
+   In fact, the qcow2 spec permits an all-ones sector count, plus 511
+   bytes from the sector containing the initial offset, for a maximum
+   read of nearly 2 full clusters;
+
+With those two things corrected,
 
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 
