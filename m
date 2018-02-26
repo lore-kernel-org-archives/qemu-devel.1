@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqM5q-00044f-QX
+	(envelope-from <eblake@redhat.com>) id 1eqM5r-000453-26
 	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 11:57:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqM5p-0008Ok-Ha
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 11:57:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1eqM5p-0008Ow-M9
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 11:57:39 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 26 Feb 2018 10:57:22 -0600
-Message-Id: <20180226165723.17818-2-eblake@redhat.com>
+Date: Mon, 26 Feb 2018 10:57:23 -0600
+Message-Id: <20180226165723.17818-3-eblake@redhat.com>
 In-Reply-To: <20180226165723.17818-1-eblake@redhat.com>
 References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
 	<20180226165723.17818-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] nbd: BLOCK_STATUS constants
+Subject: [Qemu-devel] [PATCH v2 2/2] nbd/client: fix error messages in
+ nbd_handle_reply_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,153 +22,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Expose the new constants and structs that will be used by both
-server and client implementations of NBD_CMD_BLOCK_STATUS (the
-command is currently experimental at
-https://github.com/NetworkBlockDevice/nbd/blob/extension-blockstatus/doc/proto.md
-but will hopefully be stabilized soon).
+1. NBD_REP_ERR_INVALID is not only about length, so, make message more
+   general
+
+2. hex format is not very good: it's hard to read something like
+   "option a (set meta context)", so switch to dec.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <1518702707-7077-4-git-send-email-vsementsov@virtuozzo.com>
-[eblake: split from larger patch on server implementation]
+Message-Id: <1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com>
+[eblake: expand scope of patch: ALL uses of nbd_opt_lookup are now
+decimal, all uses of nbd_rep_lookup are prefixed hex]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/nbd.h | 31 +++++++++++++++++++++++++++++++
- nbd/common.c        | 10 ++++++++++
- 2 files changed, 41 insertions(+)
+ nbd/client.c     | 20 ++++++++++----------
+ nbd/server.c     |  4 ++--
+ nbd/trace-events |  8 ++++----
+ 3 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index ef1698914ba..53250d0979c 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -41,6 +41,12 @@ struct NBDOptionReply {
- } QEMU_PACKED;
- typedef struct NBDOptionReply NBDOptionReply;
+diff --git a/nbd/client.c b/nbd/client.c
+index 89f80f95905..756e110f895 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -180,22 +180,22 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+         goto cleanup;
 
-+typedef struct NBDOptionReplyMetaContext {
-+    NBDOptionReply h; /* h.type = NBD_REP_META_CONTEXT, h.length > 4 */
-+    uint32_t context_id;
-+    /* meta context name follows */
-+} QEMU_PACKED NBDOptionReplyMetaContext;
-+
- /* Transmission phase structs
-  *
-  * Note: these are _NOT_ the same as the network representation of an NBD
-@@ -105,6 +111,19 @@ typedef struct NBDStructuredError {
-     uint16_t message_length;
- } QEMU_PACKED NBDStructuredError;
-
-+/* Header of NBD_REPLY_TYPE_BLOCK_STATUS */
-+typedef struct NBDStructuredMeta {
-+    NBDStructuredReplyChunk h; /* h.length >= 12 (at least one extent) */
-+    uint32_t context_id;
-+    /* extents follows */
-+} QEMU_PACKED NBDStructuredMeta;
-+
-+/* Extent chunk for NBD_REPLY_TYPE_BLOCK_STATUS */
-+typedef struct NBDExtent {
-+    uint32_t length;
-+    uint32_t flags; /* NBD_STATE_* */
-+} QEMU_PACKED NBDExtent;
-+
- /* Transmission (export) flags: sent from server to client during handshake,
-    but describe what will happen during transmission */
- #define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
-@@ -136,6 +155,8 @@ typedef struct NBDStructuredError {
- #define NBD_OPT_INFO              (6)
- #define NBD_OPT_GO                (7)
- #define NBD_OPT_STRUCTURED_REPLY  (8)
-+#define NBD_OPT_LIST_META_CONTEXT (9)
-+#define NBD_OPT_SET_META_CONTEXT  (10)
-
- /* Option reply types. */
- #define NBD_REP_ERR(value) ((UINT32_C(1) << 31) | (value))
-@@ -143,6 +164,7 @@ typedef struct NBDStructuredError {
- #define NBD_REP_ACK             (1)    /* Data sending finished. */
- #define NBD_REP_SERVER          (2)    /* Export description. */
- #define NBD_REP_INFO            (3)    /* NBD_OPT_INFO/GO. */
-+#define NBD_REP_META_CONTEXT    (4)    /* NBD_OPT_{LIST,SET}_META_CONTEXT */
-
- #define NBD_REP_ERR_UNSUP           NBD_REP_ERR(1)  /* Unknown option */
- #define NBD_REP_ERR_POLICY          NBD_REP_ERR(2)  /* Server denied */
-@@ -163,6 +185,8 @@ typedef struct NBDStructuredError {
- #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during write */
- #define NBD_CMD_FLAG_NO_HOLE    (1 << 1) /* don't punch hole on zero run */
- #define NBD_CMD_FLAG_DF         (1 << 2) /* don't fragment structured read */
-+#define NBD_CMD_FLAG_REQ_ONE    (1 << 3) /* only one extent in BLOCK_STATUS
-+                                          * reply chunk */
-
- /* Supported request types */
- enum {
-@@ -173,6 +197,7 @@ enum {
-     NBD_CMD_TRIM = 4,
-     /* 5 reserved for failed experiment NBD_CMD_CACHE */
-     NBD_CMD_WRITE_ZEROES = 6,
-+    NBD_CMD_BLOCK_STATUS = 7,
- };
-
- #define NBD_DEFAULT_PORT	10809
-@@ -200,9 +225,15 @@ enum {
- #define NBD_REPLY_TYPE_NONE          0
- #define NBD_REPLY_TYPE_OFFSET_DATA   1
- #define NBD_REPLY_TYPE_OFFSET_HOLE   2
-+#define NBD_REPLY_TYPE_BLOCK_STATUS  3
- #define NBD_REPLY_TYPE_ERROR         NBD_REPLY_ERR(1)
- #define NBD_REPLY_TYPE_ERROR_OFFSET  NBD_REPLY_ERR(2)
-
-+/* Flags for extents (NBDExtent.flags) of NBD_REPLY_TYPE_BLOCK_STATUS,
-+ * for base:allocation meta context */
-+#define NBD_STATE_HOLE (1 << 0)
-+#define NBD_STATE_ZERO (1 << 1)
-+
- static inline bool nbd_reply_type_is_error(int type)
- {
-     return type & (1 << 15);
-diff --git a/nbd/common.c b/nbd/common.c
-index 6295526dd14..8c95c1d606e 100644
---- a/nbd/common.c
-+++ b/nbd/common.c
-@@ -75,6 +75,10 @@ const char *nbd_opt_lookup(uint32_t opt)
-         return "go";
-     case NBD_OPT_STRUCTURED_REPLY:
-         return "structured reply";
-+    case NBD_OPT_LIST_META_CONTEXT:
-+        return "list meta context";
-+    case NBD_OPT_SET_META_CONTEXT:
-+        return "set meta context";
-     default:
-         return "<unknown>";
-     }
-@@ -90,6 +94,8 @@ const char *nbd_rep_lookup(uint32_t rep)
-         return "server";
-     case NBD_REP_INFO:
-         return "info";
-+    case NBD_REP_META_CONTEXT:
-+        return "meta context";
-     case NBD_REP_ERR_UNSUP:
-         return "unsupported";
      case NBD_REP_ERR_POLICY:
-@@ -144,6 +150,8 @@ const char *nbd_cmd_lookup(uint16_t cmd)
-         return "trim";
-     case NBD_CMD_WRITE_ZEROES:
-         return "write zeroes";
-+    case NBD_CMD_BLOCK_STATUS:
-+        return "block status";
+-        error_setg(errp, "Denied by server for option %" PRIx32 " (%s)",
++        error_setg(errp, "Denied by server for option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_INVALID:
+-        error_setg(errp, "Invalid data length for option %" PRIx32 " (%s)",
++        error_setg(errp, "Invalid parameters for option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_PLATFORM:
+-        error_setg(errp, "Server lacks support for option %" PRIx32 " (%s)",
++        error_setg(errp, "Server lacks support for option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_TLS_REQD:
+-        error_setg(errp, "TLS negotiation required before option %" PRIx32
++        error_setg(errp, "TLS negotiation required before option %" PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+@@ -204,17 +204,17 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+         break;
+
+     case NBD_REP_ERR_SHUTDOWN:
+-        error_setg(errp, "Server shutting down before option %" PRIx32 " (%s)",
++        error_setg(errp, "Server shutting down before option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_BLOCK_SIZE_REQD:
+-        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIx32
++        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
+
      default:
-         return "<unknown>";
+-        error_setg(errp, "Unknown error code when asking for option %" PRIx32
++        error_setg(errp, "Unknown error code when asking for option %" PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
      }
-@@ -159,6 +167,8 @@ const char *nbd_reply_type_lookup(uint16_t type)
-         return "data";
-     case NBD_REPLY_TYPE_OFFSET_HOLE:
-         return "hole";
-+    case NBD_REPLY_TYPE_BLOCK_STATUS:
-+        return "block status";
-     case NBD_REPLY_TYPE_ERROR:
-         return "generic error";
-     case NBD_REPLY_TYPE_ERROR_OFFSET:
+@@ -378,8 +378,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             return 1;
+         }
+         if (reply.type != NBD_REP_INFO) {
+-            error_setg(errp, "unexpected reply type %" PRIx32
+-                       " (%s), expected %x",
++            error_setg(errp, "unexpected reply type 0x%" PRIx32
++                       " (%s), expected 0x%x",
+                        reply.type, nbd_rep_lookup(reply.type), NBD_REP_INFO);
+             nbd_send_opt_abort(ioc);
+             return -1;
+@@ -534,7 +534,7 @@ static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error **errp)
+
+     if (reply.type != NBD_REP_ACK) {
+         error_setg(errp, "Server answered option %d (%s) with unexpected "
+-                   "reply %" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
++                   "reply 0x%" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
+                    reply.type, nbd_rep_lookup(reply.type));
+         nbd_send_opt_abort(ioc);
+         return -1;
+diff --git a/nbd/server.c b/nbd/server.c
+index 112e3f69dff..4990a5826e6 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -806,7 +806,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+
+             default:
+                 ret = nbd_opt_drop(client, NBD_REP_ERR_UNSUP, errp,
+-                                   "Unsupported option 0x%" PRIx32 " (%s)",
++                                   "Unsupported option %" PRIu32 " (%s)",
+                                    option, nbd_opt_lookup(option));
+                 break;
+             }
+@@ -822,7 +822,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+                                                         errp);
+
+             default:
+-                error_setg(errp, "Unsupported option 0x%" PRIx32 " (%s)",
++                error_setg(errp, "Unsupported option %" PRIu32 " (%s)",
+                            option, nbd_opt_lookup(option));
+                 return -EINVAL;
+             }
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 2b8268ce8c3..ac19a366aac 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -1,7 +1,7 @@
+ # nbd/client.c
+ nbd_send_option_request(uint32_t opt, const char *name, uint32_t len) "Sending option request %" PRIu32" (%s), len %" PRIu32
+-nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply 0x%" PRIx32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
+-nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request 0x%" PRIx32 " (%s), attempting fallback"
++nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply %" PRIu32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
++nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request %" PRIu32 " (%s), attempting fallback"
+ nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
+ nbd_opt_go_success(void) "Export is good to go"
+ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%s)"
+@@ -33,7 +33,7 @@ nbd_receive_structured_reply_chunk(uint16_t flags, uint16_t type, const char *na
+ nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
+
+ # nbd/server.c
+-nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=0x%" PRIx32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
++nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=%" PRIu32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
+ nbd_negotiate_send_rep_err(const char *msg) "sending error message \"%s\""
+ nbd_negotiate_send_rep_list(const char *name, const char *desc) "Advertising export name '%s' description '%s'"
+ nbd_negotiate_handle_export_name(void) "Checking length"
+@@ -46,7 +46,7 @@ nbd_negotiate_handle_starttls(void) "Setting up TLS"
+ nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
+ nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
+ nbd_negotiate_options_check_magic(uint64_t magic) "Checking opts magic 0x%" PRIx64
+-nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option 0x%" PRIx32 " (%s)"
++nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option %" PRIu32 " (%s)"
+ nbd_negotiate_begin(void) "Beginning negotiation"
+ nbd_negotiate_old_style(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
+ nbd_negotiate_new_style_size_flags(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
 -- 
 2.14.3
