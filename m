@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqGFg-0005P8-33
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqGFj-0005Sa-2p
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqGFe-0002fr-B1
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:24 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqGFi-0002gy-1M
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 05:43:27 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 26 Feb 2018 11:42:34 +0100
-Message-Id: <1519641757-12396-12-git-send-email-thuth@redhat.com>
+Date: Mon, 26 Feb 2018 11:42:35 +0100
+Message-Id: <1519641757-12396-13-git-send-email-thuth@redhat.com>
 In-Reply-To: <1519641757-12396-1-git-send-email-thuth@redhat.com>
 References: <1519641757-12396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL-for-s390x 11/14] s390-ccw: set cp_receive mask
- only when needed and consume pending service irqs
+Subject: [Qemu-devel] [PULL-for-s390x 12/14] s390-ccw: use zipl values when
+ no boot menu options are present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +25,134 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-It is possible while waiting for multiple types of external
-interrupts that we might have pending irqs remaining between
-irq consumption and irq-type disabling. Those interrupts
-could potentially propagate to the guest after IPL completes
-and cause unwanted behavior.
+If no boot menu options are present, then flag the boot menu to
+use the zipl options that were set in the zipl configuration file
+(and stored on disk by zipl). These options are found at some
+offset prior to the start of the zipl boot menu banner. The zipl
+timeout value is limited to a 16-bit unsigned integer and stored
+as seconds, so we take care to convert it to milliseconds in order
+to conform to the rest of the boot menu functionality. This is
+limited to CCW devices.
 
-As it is today, the SCLP will only recognize write events that
-are enabled by the control program's send and receive masks. To
-limit the window for, and prevent further irqs from, ASCII
-console events (specifically keystrokes), we should only enable
-the control program's receive mask when we need it.
+For reference, the zipl configuration file uses the following
+fields in the menu section:
 
-While we're at it, remove assignment of the (non control program)
-send and receive masks, as those are actually set by the SCLP.
+      prompt=1      enable the boot menu
+      timeout=X     set the timeout to X seconds
+
+To explicitly disregard any boot menu options, then menu=off or
+<bootmenu enable='no' ... /> must be specified.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/menu.c     |  5 +++++
- pc-bios/s390-ccw/s390-ccw.h |  1 +
- pc-bios/s390-ccw/sclp.c     | 10 ++++------
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ hw/s390x/ipl.c          |  5 +++++
+ hw/s390x/ipl.h          |  1 +
+ pc-bios/s390-ccw/iplb.h |  1 +
+ pc-bios/s390-ccw/main.c |  3 ++-
+ pc-bios/s390-ccw/menu.c | 16 +++++++++++++++-
+ 5 files changed, 24 insertions(+), 2 deletions(-)
 
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index ee2039d..c12e460 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -241,6 +241,11 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+ 
+     switch (ipl->iplb.pbt) {
+     case S390_IPL_TYPE_CCW:
++        /* In the absence of -boot menu, use zipl parameters */
++        if (!qemu_opt_get(opts, "menu")) {
++            *flags |= QIPL_FLAG_BM_OPTS_ZIPL;
++            return;
++        }
+         break;
+     default:
+         error_report("boot menu is not supported for this device type.");
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index d6c6f75..0570d0a 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -93,6 +93,7 @@ void s390_reipl_request(void);
+ 
+ /* Boot Menu flags */
+ #define QIPL_FLAG_BM_OPTS_CMD   0x80
++#define QIPL_FLAG_BM_OPTS_ZIPL  0x40
+ 
+ /*
+  * The QEMU IPL Parameters will be stored at absolute address
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 832bb94..7dfce4f 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -76,6 +76,7 @@ extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ 
+ /* Boot Menu flags */
+ #define QIPL_FLAG_BM_OPTS_CMD   0x80
++#define QIPL_FLAG_BM_OPTS_ZIPL  0x40
+ 
+ /*
+  * This definition must be kept in sync with the defininition
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 32ed70e..a7473b0 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -20,6 +20,7 @@ QemuIplParameters qipl;
+ 
+ #define LOADPARM_PROMPT "PROMPT  "
+ #define LOADPARM_EMPTY  "........"
++#define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+ 
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+@@ -91,7 +92,7 @@ static void menu_setup(void)
+ 
+     switch (iplb.pbt) {
+     case S390_IPL_TYPE_CCW:
+-        menu_set_parms(qipl.qipl_flags & QIPL_FLAG_BM_OPTS_CMD,
++        menu_set_parms(qipl.qipl_flags & BOOT_MENU_FLAG_MASK,
+                        qipl.boot_menu_timeout);
+         return;
+     }
 diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index b99ff03..8d55869 100644
+index 8d55869..ee56939 100644
 --- a/pc-bios/s390-ccw/menu.c
 +++ b/pc-bios/s390-ccw/menu.c
-@@ -11,6 +11,7 @@
+@@ -18,6 +18,10 @@
+ #define KEYCODE_BACKSP '\177'
+ #define KEYCODE_ENTER  '\r'
  
- #include "libc.h"
- #include "s390-ccw.h"
-+#include "sclp.h"
- 
- #define KEYCODE_NO_INP '\0'
- #define KEYCODE_ESCAPE '\033'
-@@ -116,8 +117,12 @@ static int get_index(void)
- 
-     memset(buf, 0, sizeof(buf));
- 
-+    sclp_set_write_mask(SCLP_EVENT_MASK_MSG_ASCII, SCLP_EVENT_MASK_MSG_ASCII);
++/* Offsets from zipl fields to zipl banner start */
++#define ZIPL_TIMEOUT_OFFSET 138
++#define ZIPL_FLAG_OFFSET    140
 +
-     len = read_prompt(buf, sizeof(buf) - 1);
+ #define TOD_CLOCK_MILLISECOND   0x3e8000
  
-+    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
+ #define LOW_CORE_EXTERNAL_INT_ADDR   0x86
+@@ -187,6 +191,16 @@ int menu_get_zipl_boot_index(const char *menu_data)
+ {
+     size_t len;
+     int entries;
++    uint16_t zipl_flag = *(uint16_t *)(menu_data - ZIPL_FLAG_OFFSET);
++    uint16_t zipl_timeout = *(uint16_t *)(menu_data - ZIPL_TIMEOUT_OFFSET);
 +
-     /* If no input, boot default */
-     if (len == 0) {
-         return 0;
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index aeba8b0..c4ddf9f 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -69,6 +69,7 @@ unsigned int get_loadparm_index(void);
++    if (flag == QIPL_FLAG_BM_OPTS_ZIPL) {
++        if (!zipl_flag) {
++            return 0; /* Boot default */
++        }
++        /* zipl stores timeout as seconds */
++        timeout = zipl_timeout * 1000;
++    }
  
- /* sclp.c */
- void sclp_print(const char *string);
-+void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask);
- void sclp_setup(void);
- void sclp_get_loadparm_ascii(char *loadparm);
- int sclp_read(char *str, size_t count);
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index a2f25eb..3836cb4 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -46,23 +46,21 @@ static int sclp_service_call(unsigned int command, void *sccb)
-         return 0;
- }
+     /* Print and count all menu items, including the banner */
+     for (entries = 0; *menu_data; entries++) {
+@@ -211,5 +225,5 @@ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
  
--static void sclp_set_write_mask(void)
-+void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask)
+ bool menu_is_enabled_zipl(void)
  {
-     WriteEventMask *sccb = (void *)_sccb;
- 
-     sccb->h.length = sizeof(WriteEventMask);
-     sccb->mask_length = sizeof(unsigned int);
--    sccb->receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->cp_receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->send_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII;
-+    sccb->cp_receive_mask = receive_mask;
-+    sccb->cp_send_mask = send_mask;
- 
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
+-    return flag & QIPL_FLAG_BM_OPTS_CMD;
++    return flag & (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL);
  }
- 
- void sclp_setup(void)
- {
--    sclp_set_write_mask();
-+    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
- }
- 
- long write(int fd, const void *str, size_t len)
 -- 
 1.8.3.1
