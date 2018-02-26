@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqRmm-0002up-IY
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 18:02:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1eqRpx-0003wp-5W
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 18:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqRmj-0006Fv-Tl
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 18:02:20 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59606 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1eqRpu-00005H-E5
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 18:05:37 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36334 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eqRmj-0006Ff-Om
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 18:02:17 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eqRpu-000058-8x
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 18:05:34 -0500
 References: <1519683480-33201-1-git-send-email-mjc@sifive.com>
-	<1519683480-33201-24-git-send-email-mjc@sifive.com>
+	<CAHNT7Nts7hHdrXe9-eVCG5h050bt=pgtTfeDGZ+BBpie3uz6wA@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <d652883b-7e99-5ada-93e9-3d5982266d25@redhat.com>
-Date: Mon, 26 Feb 2018 17:02:15 -0600
+Message-ID: <3f1f0ced-fced-046f-1cef-a62b057b0634@redhat.com>
+Date: Mon, 26 Feb 2018 17:05:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <1519683480-33201-24-git-send-email-mjc@sifive.com>
+In-Reply-To: <CAHNT7Nts7hHdrXe9-eVCG5h050bt=pgtTfeDGZ+BBpie3uz6wA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 23/23] RISC-V Build Infrastructure
+Subject: Re: [Qemu-devel] [PATCH v7 00/23] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +31,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On 02/26/2018 04:18 PM, Michael Clark wrote:
-> This adds RISC-V into the build system enabling the following targets:
+On 02/26/2018 04:24 PM, Michael Clark wrote:
+> I've pushed a signed tag which includes the cover letter for the pull
+> request.
 > 
-> - riscv32-softmmu
-> - riscv64-softmmu
-> - riscv32-linux-user
-> - riscv64-linux-user
+> https://github.com/riscv/riscv-qemu/releases/tag/riscv-qemu-upstream-v7
 > 
-> This adds defaults configs for RISC-V, enables the build for the RISC-V
-> CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
-> script is updated to add the RISC-V ELF magic.
-> 
-> Expected checkpatch errors for consistency reasons:
-> 
-> ERROR: line over 90 characters
-> FILE: scripts/qemu-binfmt-conf.sh
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
+> Apologies. I'm not exactly sure how to format a pull request email.
 
-> +++ b/qapi-schema.json
+I use:
 
->   ##
->   # @CpuInfo:
-> @@ -452,6 +454,7 @@
->               'ppc': 'CpuInfoPPC',
->               'mips': 'CpuInfoMIPS',
->               'tricore': 'CpuInfoTricore',
-> +            'riscv': 'CpuInfoRISCV',
->               'other': 'CpuInfoOther' } }
+$ git request-pull origin repo $TAG | xclip
+$ git send-email --confirm=always --annotate \
+    --subject-prefix=PULL origin
 
-Hmm - we're trying to deprecate CpuInfo in parallel, in favor of the new 
-query-cpus-fast.  CpuInfoRISCV will be useless once that happens, but it 
-doesn't invalidate your pull request.
+then paste in the generated cover letter to the templated 00/NN.
 
 -- 
 Eric Blake, Principal Software Engineer
