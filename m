@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR7t-0006cP-Cp
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:07 -0500
+	(envelope-from <mjc@sifive.com>) id 1eqR7x-0006fX-LX
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR7r-0005KM-FI
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:05 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:39000)
+	(envelope-from <mjc@sifive.com>) id 1eqR7v-0005NV-6C
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:09 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:37191)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR7r-0005IU-7H
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:03 -0500
-Received: by mail-pl0-x244.google.com with SMTP id s13so10120842plq.6
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:20:03 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR7u-0005Mr-OK
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:07 -0500
+Received: by mail-pl0-x243.google.com with SMTP id ay8so10111625plb.4
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:20:06 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Tue, 27 Feb 2018 11:17:51 +1300
-Message-Id: <1519683480-33201-15-git-send-email-mjc@sifive.com>
+Date: Tue, 27 Feb 2018 11:17:52 +1300
+Message-Id: <1519683480-33201-16-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519683480-33201-1-git-send-email-mjc@sifive.com>
 References: <1519683480-33201-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v7 14/23] SiFive RISC-V CLINT Block
+Subject: [Qemu-devel] [PATCH v7 15/23] SiFive RISC-V PLIC Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +28,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-The CLINT (Core Local Interruptor) device provides real-time clock, timer
-and interprocessor interrupts based on SiFive's CLINT specification.
+The PLIC (Platform Level Interrupt Controller) device provides a
+parameterizable interrupt controller based on SiFive's PLIC specification.
 
 Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_clint.c         | 254 ++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_clint.h |  50 ++++++++
- 2 files changed, 304 insertions(+)
- create mode 100644 hw/riscv/sifive_clint.c
- create mode 100644 include/hw/riscv/sifive_clint.h
+ hw/riscv/sifive_plic.c         | 505 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_plic.h |  85 +++++++
+ 2 files changed, 590 insertions(+)
+ create mode 100644 hw/riscv/sifive_plic.c
+ create mode 100644 include/hw/riscv/sifive_plic.h
 
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
 new file mode 100644
-index 0000000..4893453
+index 0000000..874de2e
 --- /dev/null
-+++ b/hw/riscv/sifive_clint.c
-@@ -0,0 +1,254 @@
++++ b/hw/riscv/sifive_plic.c
+@@ -0,0 +1,505 @@
 +/*
-+ * SiFive CLINT (Core Local Interruptor)
++ * SiFive PLIC (Platform Level Interrupt Controller)
 + *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * This provides real-time clock, timer and interprocessor interrupts.
++ * This provides a parameterizable interrupt controller based on SiFive's PLIC.
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -68,164 +67,335 @@ index 0000000..4893453
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/log.h"
 +#include "qemu/error-report.h"
 +#include "hw/sysbus.h"
 +#include "target/riscv/cpu.h"
-+#include "hw/riscv/sifive_clint.h"
-+#include "qemu/timer.h"
++#include "hw/riscv/sifive_plic.h"
 +
-+/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
-+#define TIMER_FREQ (10 * 1000 * 1000)
++#define RISCV_DEBUG_PLIC 0
 +
-+static uint64_t cpu_riscv_read_rtc(void)
++static PLICMode char_to_mode(char c)
 +{
-+    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
-+                    NANOSECONDS_PER_SECOND);
-+}
-+
-+/*
-+ * Called when timecmp is written to update the QEMU timer or immediately
-+ * trigger timer interrupt if mtimecmp <= current timer value.
-+ */
-+static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
-+{
-+    uint64_t next;
-+    uint64_t diff;
-+
-+    uint64_t rtc_r = cpu_riscv_read_rtc();
-+
-+    cpu->env.timecmp = value;
-+    if (cpu->env.timecmp <= rtc_r) {
-+        /* if we're setting an MTIMECMP value in the "past",
-+           immediately raise the timer interrupt */
-+        riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
-+        return;
++    switch (c) {
++    case 'U': return PLICMode_U;
++    case 'S': return PLICMode_S;
++    case 'H': return PLICMode_H;
++    case 'M': return PLICMode_M;
++    default:
++        error_report("plic: invalid mode '%c'", c);
++        exit(1);
 +    }
-+
-+    /* otherwise, set up the future timer interrupt */
-+    riscv_set_local_interrupt(cpu, MIP_MTIP, 0);
-+    diff = cpu->env.timecmp - rtc_r;
-+    /* back to ns (note args switched in muldiv64) */
-+    next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
-+    timer_mod(cpu->env.timer, next);
 +}
 +
-+/*
-+ * Callback used when the timer set using timer_mod expires.
-+ * Should raise the timer interrupt line
-+ */
-+static void sifive_clint_timer_cb(void *opaque)
++static char mode_to_char(PLICMode m)
 +{
-+    RISCVCPU *cpu = opaque;
-+    riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
++    switch (m) {
++    case PLICMode_U: return 'U';
++    case PLICMode_S: return 'S';
++    case PLICMode_H: return 'H';
++    case PLICMode_M: return 'M';
++    default: return '?';
++    }
 +}
 +
-+/* CPU wants to read rtc or timecmp register */
-+static uint64_t sifive_clint_read(void *opaque, hwaddr addr, unsigned size)
++static void sifive_plic_print_state(SiFivePLICState *plic)
 +{
-+    SiFiveCLINTState *clint = opaque;
-+    if (addr >= clint->sip_base &&
-+        addr < clint->sip_base + (clint->num_harts << 2)) {
-+        size_t hartid = (addr - clint->sip_base) >> 2;
++    int i;
++    int addrid;
++
++    /* pending */
++    qemu_log("pending       : ");
++    for (i = plic->bitfield_words - 1; i >= 0; i--) {
++        qemu_log("%08x", plic->pending[i]);
++    }
++    qemu_log("\n");
++
++    /* pending */
++    qemu_log("claimed       : ");
++    for (i = plic->bitfield_words - 1; i >= 0; i--) {
++        qemu_log("%08x", plic->claimed[i]);
++    }
++    qemu_log("\n");
++
++    for (addrid = 0; addrid < plic->num_addrs; addrid++) {
++        qemu_log("hart%d-%c enable: ",
++            plic->addr_config[addrid].hartid,
++            mode_to_char(plic->addr_config[addrid].mode));
++        for (i = plic->bitfield_words - 1; i >= 0; i--) {
++            qemu_log("%08x", plic->enable[addrid * plic->bitfield_words + i]);
++        }
++        qemu_log("\n");
++    }
++}
++
++static
++void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool pending)
++{
++    qemu_mutex_lock(&plic->lock);
++    uint32_t word = irq >> 5;
++    if (pending) {
++        plic->pending[word] |= (1 << (irq & 31));
++    } else {
++        plic->pending[word] &= ~(1 << (irq & 31));
++    }
++    qemu_mutex_unlock(&plic->lock);
++}
++
++static
++void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool claimed)
++{
++    qemu_mutex_lock(&plic->lock);
++    uint32_t word = irq >> 5;
++    if (claimed) {
++        plic->claimed[word] |= (1 << (irq & 31));
++    } else {
++        plic->claimed[word] &= ~(1 << (irq & 31));
++    }
++    qemu_mutex_unlock(&plic->lock);
++}
++
++static
++int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
++{
++    int i, j, count = 0;
++    for (i = 0; i < plic->bitfield_words; i++) {
++        uint32_t pending_enabled_not_claimed =
++            (plic->pending[i] & ~plic->claimed[i]) &
++            plic->enable[addrid * plic->bitfield_words + i];
++        if (!pending_enabled_not_claimed) {
++            continue;
++        }
++        for (j = 0; j < 32; j++) {
++            int irq = (i << 5) + j;
++            uint32_t prio = plic->source_priority[irq];
++            int enabled = pending_enabled_not_claimed & (1 << j);
++            if (enabled && prio > plic->target_priority[addrid]) {
++                count++;
++            }
++        }
++    }
++    return count;
++}
++
++static void sifive_plic_update(SiFivePLICState *plic)
++{
++    int addrid;
++
++    /* raise irq on harts where this irq is enabled */
++    for (addrid = 0; addrid < plic->num_addrs; addrid++) {
++        uint32_t hartid = plic->addr_config[addrid].hartid;
++        PLICMode mode = plic->addr_config[addrid].mode;
 +        CPUState *cpu = qemu_get_cpu(hartid);
 +        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
 +        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x3) == 0) {
-+            return (env->mip & MIP_MSIP) > 0;
-+        } else {
-+            error_report("clint: invalid read: %08x", (uint32_t)addr);
-+            return 0;
++            continue;
 +        }
-+    } else if (addr >= clint->timecmp_base &&
-+        addr < clint->timecmp_base + (clint->num_harts << 3)) {
-+        size_t hartid = (addr - clint->timecmp_base) >> 3;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x7) == 0) {
-+            /* timecmp_lo */
-+            uint64_t timecmp = env->timecmp;
-+            return timecmp & 0xFFFFFFFF;
-+        } else if ((addr & 0x7) == 4) {
-+            /* timecmp_hi */
-+            uint64_t timecmp = env->timecmp;
-+            return (timecmp >> 32) & 0xFFFFFFFF;
-+        } else {
-+            error_report("clint: invalid read: %08x", (uint32_t)addr);
-+            return 0;
++        int level = sifive_plic_num_irqs_pending(plic, addrid) > 0;
++        switch (mode) {
++        case PLICMode_M:
++            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MEIP, level);
++            break;
++        case PLICMode_S:
++            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_SEIP, level);
++            break;
++        default:
++            break;
 +        }
-+    } else if (addr == clint->time_base) {
-+        /* time_lo */
-+        return cpu_riscv_read_rtc() & 0xFFFFFFFF;
-+    } else if (addr == clint->time_base + 4) {
-+        /* time_hi */
-+        return (cpu_riscv_read_rtc() >> 32) & 0xFFFFFFFF;
 +    }
 +
-+    error_report("clint: invalid read: %08x", (uint32_t)addr);
++    if (RISCV_DEBUG_PLIC) {
++        sifive_plic_print_state(plic);
++    }
++}
++
++void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq)
++{
++    sifive_plic_set_pending(plic, irq, true);
++    sifive_plic_update(plic);
++}
++
++void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq)
++{
++    sifive_plic_set_pending(plic, irq, false);
++    sifive_plic_update(plic);
++}
++
++static uint32_t sifive_plic_claim(SiFivePLICState *plic, uint32_t addrid)
++{
++    int i, j;
++    for (i = 0; i < plic->bitfield_words; i++) {
++        uint32_t pending_enabled_not_claimed =
++            (plic->pending[i] & ~plic->claimed[i]) &
++            plic->enable[addrid * plic->bitfield_words + i];
++        if (!pending_enabled_not_claimed) {
++            continue;
++        }
++        for (j = 0; j < 32; j++) {
++            int irq = (i << 5) + j;
++            uint32_t prio = plic->source_priority[irq];
++            int enabled = pending_enabled_not_claimed & (1 << j);
++            if (enabled && prio > plic->target_priority[addrid]) {
++                sifive_plic_set_pending(plic, irq, false);
++                sifive_plic_set_claimed(plic, irq, true);
++                return irq;
++            }
++        }
++    }
 +    return 0;
 +}
 +
-+/* CPU wrote to rtc or timecmp register */
-+static void sifive_clint_write(void *opaque, hwaddr addr, uint64_t value,
-+        unsigned size)
++static uint64_t sifive_plic_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    SiFiveCLINTState *clint = opaque;
++    SiFivePLICState *plic = opaque;
 +
-+    if (addr >= clint->sip_base &&
-+        addr < clint->sip_base + (clint->num_harts << 2)) {
-+        size_t hartid = (addr - clint->sip_base) >> 2;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x3) == 0) {
-+            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MSIP, value != 0);
-+        } else {
-+            error_report("clint: invalid sip write: %08x", (uint32_t)addr);
-+        }
-+        return;
-+    } else if (addr >= clint->timecmp_base &&
-+        addr < clint->timecmp_base + (clint->num_harts << 3)) {
-+        size_t hartid = (addr - clint->timecmp_base) >> 3;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: invalid timecmp hartid: %zu", hartid);
-+        } else if ((addr & 0x7) == 0) {
-+            /* timecmp_lo */
-+            uint64_t timecmp = env->timecmp;
-+            sifive_clint_write_timecmp(RISCV_CPU(cpu),
-+                timecmp << 32 | (value & 0xFFFFFFFF));
-+            return;
-+        } else if ((addr & 0x7) == 4) {
-+            /* timecmp_hi */
-+            uint64_t timecmp = env->timecmp;
-+            sifive_clint_write_timecmp(RISCV_CPU(cpu),
-+                value << 32 | (timecmp & 0xFFFFFFFF));
-+        } else {
-+            error_report("clint: invalid timecmp write: %08x", (uint32_t)addr);
-+        }
-+        return;
-+    } else if (addr == clint->time_base) {
-+        /* time_lo */
-+        error_report("clint: time_lo write not implemented");
-+        return;
-+    } else if (addr == clint->time_base + 4) {
-+        /* time_hi */
-+        error_report("clint: time_hi write not implemented");
-+        return;
++    /* writes must be 4 byte words */
++    if ((addr & 0x3) != 0) {
++        goto err;
 +    }
 +
-+    error_report("clint: invalid write: %08x", (uint32_t)addr);
++    if (addr >= plic->priority_base && /* 4 bytes per source */
++        addr < plic->priority_base + (plic->num_sources << 2))
++    {
++        uint32_t irq = (addr - plic->priority_base) >> 2;
++        if (RISCV_DEBUG_PLIC) {
++            qemu_log("plic: read priority: irq=%d priority=%d\n",
++                irq, plic->source_priority[irq]);
++        }
++        return plic->source_priority[irq];
++    } else if (addr >= plic->pending_base && /* 1 bit per source */
++               addr < plic->pending_base + (plic->num_sources >> 3))
++    {
++        uint32_t word = (addr - plic->priority_base) >> 2;
++        if (RISCV_DEBUG_PLIC) {
++            qemu_log("plic: read pending: word=%d value=%d\n",
++                word, plic->pending[word]);
++        }
++        return plic->pending[word];
++    } else if (addr >= plic->enable_base && /* 1 bit per source */
++             addr < plic->enable_base + plic->num_addrs * plic->enable_stride)
++    {
++        uint32_t addrid = (addr - plic->enable_base) / plic->enable_stride;
++        uint32_t wordid = (addr & (plic->enable_stride - 1)) >> 2;
++        if (wordid < plic->bitfield_words) {
++            if (RISCV_DEBUG_PLIC) {
++                qemu_log("plic: read enable: hart%d-%c word=%d value=%x\n",
++                    plic->addr_config[addrid].hartid,
++                    mode_to_char(plic->addr_config[addrid].mode), wordid,
++                    plic->enable[addrid * plic->bitfield_words + wordid]);
++            }
++            return plic->enable[addrid * plic->bitfield_words + wordid];
++        }
++    } else if (addr >= plic->context_base && /* 1 bit per source */
++             addr < plic->context_base + plic->num_addrs * plic->context_stride)
++    {
++        uint32_t addrid = (addr - plic->context_base) / plic->context_stride;
++        uint32_t contextid = (addr & (plic->context_stride - 1));
++        if (contextid == 0) {
++            if (RISCV_DEBUG_PLIC) {
++                qemu_log("plic: read priority: hart%d-%c priority=%x\n",
++                    plic->addr_config[addrid].hartid,
++                    mode_to_char(plic->addr_config[addrid].mode),
++                    plic->target_priority[addrid]);
++            }
++            return plic->target_priority[addrid];
++        } else if (contextid == 4) {
++            uint32_t value = sifive_plic_claim(plic, addrid);
++            if (RISCV_DEBUG_PLIC) {
++                qemu_log("plic: read claim: hart%d-%c irq=%x\n",
++                    plic->addr_config[addrid].hartid,
++                    mode_to_char(plic->addr_config[addrid].mode),
++                    value);
++                sifive_plic_print_state(plic);
++            }
++            return value;
++        }
++    }
++
++err:
++    error_report("plic: invalid register read: %08x", (uint32_t)addr);
++    return 0;
 +}
 +
-+static const MemoryRegionOps sifive_clint_ops = {
-+    .read = sifive_clint_read,
-+    .write = sifive_clint_write,
++static void sifive_plic_write(void *opaque, hwaddr addr, uint64_t value,
++        unsigned size)
++{
++    SiFivePLICState *plic = opaque;
++
++    /* writes must be 4 byte words */
++    if ((addr & 0x3) != 0) {
++        goto err;
++    }
++
++    if (addr >= plic->priority_base && /* 4 bytes per source */
++        addr < plic->priority_base + (plic->num_sources << 2))
++    {
++        uint32_t irq = (addr - plic->priority_base) >> 2;
++        plic->source_priority[irq] = value & 7;
++        if (RISCV_DEBUG_PLIC) {
++            qemu_log("plic: write priority: irq=%d priority=%d\n",
++                irq, plic->source_priority[irq]);
++        }
++        return;
++    } else if (addr >= plic->pending_base && /* 1 bit per source */
++               addr < plic->pending_base + (plic->num_sources >> 3))
++    {
++        error_report("plic: invalid pending write: %08x", (uint32_t)addr);
++        return;
++    } else if (addr >= plic->enable_base && /* 1 bit per source */
++        addr < plic->enable_base + plic->num_addrs * plic->enable_stride)
++    {
++        uint32_t addrid = (addr - plic->enable_base) / plic->enable_stride;
++        uint32_t wordid = (addr & (plic->enable_stride - 1)) >> 2;
++        if (wordid < plic->bitfield_words) {
++            plic->enable[addrid * plic->bitfield_words + wordid] = value;
++            if (RISCV_DEBUG_PLIC) {
++                qemu_log("plic: write enable: hart%d-%c word=%d value=%x\n",
++                    plic->addr_config[addrid].hartid,
++                    mode_to_char(plic->addr_config[addrid].mode), wordid,
++                    plic->enable[addrid * plic->bitfield_words + wordid]);
++            }
++            return;
++        }
++    } else if (addr >= plic->context_base && /* 4 bytes per reg */
++        addr < plic->context_base + plic->num_addrs * plic->context_stride)
++    {
++        uint32_t addrid = (addr - plic->context_base) / plic->context_stride;
++        uint32_t contextid = (addr & (plic->context_stride - 1));
++        if (contextid == 0) {
++            if (RISCV_DEBUG_PLIC) {
++                qemu_log("plic: write priority: hart%d-%c priority=%x\n",
++                    plic->addr_config[addrid].hartid,
++                    mode_to_char(plic->addr_config[addrid].mode),
++                    plic->target_priority[addrid]);
++            }
++            if (value <= plic->num_priorities) {
++                plic->target_priority[addrid] = value;
++                sifive_plic_update(plic);
++            }
++            return;
++        } else if (contextid == 4) {
++            if (RISCV_DEBUG_PLIC) {
++                qemu_log("plic: write claim: hart%d-%c irq=%x\n",
++                    plic->addr_config[addrid].hartid,
++                    mode_to_char(plic->addr_config[addrid].mode),
++                    (uint32_t)value);
++            }
++            if (value < plic->num_sources) {
++                sifive_plic_set_claimed(plic, value, false);
++                sifive_plic_update(plic);
++            }
++            return;
++        }
++    }
++
++err:
++    error_report("plic: invalid register write: %08x", (uint32_t)addr);
++}
++
++static const MemoryRegionOps sifive_plic_ops = {
++    .read = sifive_plic_read,
++    .write = sifive_plic_write,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
 +    .valid = {
 +        .min_access_size = 4,
@@ -233,84 +403,166 @@ index 0000000..4893453
 +    }
 +};
 +
-+static Property sifive_clint_properties[] = {
-+    DEFINE_PROP_UINT32("num-harts", SiFiveCLINTState, num_harts, 0),
-+    DEFINE_PROP_UINT32("sip-base", SiFiveCLINTState, sip_base, 0),
-+    DEFINE_PROP_UINT32("timecmp-base", SiFiveCLINTState, timecmp_base, 0),
-+    DEFINE_PROP_UINT32("time-base", SiFiveCLINTState, time_base, 0),
-+    DEFINE_PROP_UINT32("aperture-size", SiFiveCLINTState, aperture_size, 0),
++static Property sifive_plic_properties[] = {
++    DEFINE_PROP_STRING("hart-config", SiFivePLICState, hart_config),
++    DEFINE_PROP_UINT32("num-sources", SiFivePLICState, num_sources, 0),
++    DEFINE_PROP_UINT32("num-priorities", SiFivePLICState, num_priorities, 0),
++    DEFINE_PROP_UINT32("priority-base", SiFivePLICState, priority_base, 0),
++    DEFINE_PROP_UINT32("pending-base", SiFivePLICState, pending_base, 0),
++    DEFINE_PROP_UINT32("enable-base", SiFivePLICState, enable_base, 0),
++    DEFINE_PROP_UINT32("enable-stride", SiFivePLICState, enable_stride, 0),
++    DEFINE_PROP_UINT32("context-base", SiFivePLICState, context_base, 0),
++    DEFINE_PROP_UINT32("context-stride", SiFivePLICState, context_stride, 0),
++    DEFINE_PROP_UINT32("aperture-size", SiFivePLICState, aperture_size, 0),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void sifive_clint_realize(DeviceState *dev, Error **errp)
++/*
++ * parse PLIC hart/mode address offset config
++ *
++ * "M"              1 hart with M mode
++ * "MS,MS"          2 harts, 0-1 with M and S mode
++ * "M,MS,MS,MS,MS"  5 harts, 0 with M mode, 1-5 with M and S mode
++ */
++static void parse_hart_config(SiFivePLICState *plic)
 +{
-+    SiFiveCLINTState *s = SIFIVE_CLINT(dev);
-+    memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_clint_ops, s,
-+                          TYPE_SIFIVE_CLINT, s->aperture_size);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
++    int addrid, hartid, modes;
++    const char *p;
++    char c;
++
++    /* count and validate hart/mode combinations */
++    addrid = 0, hartid = 0, modes = 0;
++    p = plic->hart_config;
++    while ((c = *p++)) {
++        if (c == ',') {
++            addrid += __builtin_popcount(modes);
++            modes = 0;
++            hartid++;
++        } else {
++            int m = 1 << char_to_mode(c);
++            if (modes == (modes | m)) {
++                error_report("plic: duplicate mode '%c' in config: %s",
++                             c, plic->hart_config);
++                exit(1);
++            }
++            modes |= m;
++        }
++    }
++    if (modes) {
++        addrid += __builtin_popcount(modes);
++    }
++    hartid++;
++
++    /* store hart/mode combinations */
++    plic->num_addrs = addrid;
++    plic->addr_config = g_new(PLICAddr, plic->num_addrs);
++    addrid = 0, hartid = 0;
++    p = plic->hart_config;
++    while ((c = *p++)) {
++        if (c == ',') {
++            hartid++;
++        } else {
++            plic->addr_config[addrid].addrid = addrid;
++            plic->addr_config[addrid].hartid = hartid;
++            plic->addr_config[addrid].mode = char_to_mode(c);
++            addrid++;
++        }
++    }
 +}
 +
-+static void sifive_clint_class_init(ObjectClass *klass, void *data)
++static void sifive_plic_irq_request(void *opaque, int irq, int level)
++{
++    SiFivePLICState *plic = opaque;
++    if (RISCV_DEBUG_PLIC) {
++        qemu_log("sifive_plic_irq_request: irq=%d level=%d\n", irq, level);
++    }
++    sifive_plic_set_pending(plic, irq, level > 0);
++    sifive_plic_update(plic);
++}
++
++static void sifive_plic_realize(DeviceState *dev, Error **errp)
++{
++    SiFivePLICState *plic = SIFIVE_PLIC(dev);
++    int i;
++
++    memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, plic,
++                          TYPE_SIFIVE_PLIC, plic->aperture_size);
++    parse_hart_config(plic);
++    qemu_mutex_init(&plic->lock);
++    plic->bitfield_words = (plic->num_sources + 31) >> 5;
++    plic->source_priority = g_new0(uint32_t, plic->num_sources);
++    plic->target_priority = g_new(uint32_t, plic->num_addrs);
++    plic->pending = g_new0(uint32_t, plic->bitfield_words);
++    plic->claimed = g_new0(uint32_t, plic->bitfield_words);
++    plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
++    plic->irqs = g_new0(qemu_irq, plic->num_sources + 1);
++    for (i = 0; i <= plic->num_sources; i++) {
++        plic->irqs[i] = qemu_allocate_irq(sifive_plic_irq_request, plic, i);
++    }
++}
++
++static void sifive_plic_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+    dc->realize = sifive_clint_realize;
-+    dc->props = sifive_clint_properties;
++
++    dc->props = sifive_plic_properties;
++    dc->realize = sifive_plic_realize;
 +}
 +
-+static const TypeInfo sifive_clint_info = {
-+    .name          = TYPE_SIFIVE_CLINT,
++static const TypeInfo sifive_plic_info = {
++    .name          = TYPE_SIFIVE_PLIC,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SiFiveCLINTState),
-+    .class_init    = sifive_clint_class_init,
++    .instance_size = sizeof(SiFivePLICState),
++    .class_init    = sifive_plic_class_init,
 +};
 +
-+static void sifive_clint_register_types(void)
++static void sifive_plic_register_types(void)
 +{
-+    type_register_static(&sifive_clint_info);
++    type_register_static(&sifive_plic_info);
 +}
 +
-+type_init(sifive_clint_register_types)
-+
++type_init(sifive_plic_register_types)
 +
 +/*
-+ * Create CLINT device.
++ * Create PLIC device.
 + */
-+DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
-+    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base)
++DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
++    uint32_t num_sources, uint32_t num_priorities,
++    uint32_t priority_base, uint32_t pending_base,
++    uint32_t enable_base, uint32_t enable_stride,
++    uint32_t context_base, uint32_t context_stride,
++    uint32_t aperture_size)
 +{
-+    int i;
-+    for (i = 0; i < num_harts; i++) {
-+        CPUState *cpu = qemu_get_cpu(i);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            continue;
-+        }
-+        env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                  &sifive_clint_timer_cb, cpu);
-+        env->timecmp = 0;
-+    }
-+
-+    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_CLINT);
-+    qdev_prop_set_uint32(dev, "num-harts", num_harts);
-+    qdev_prop_set_uint32(dev, "sip-base", sip_base);
-+    qdev_prop_set_uint32(dev, "timecmp-base", timecmp_base);
-+    qdev_prop_set_uint32(dev, "time-base", time_base);
-+    qdev_prop_set_uint32(dev, "aperture-size", size);
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PLIC);
++    assert(enable_stride == (enable_stride & -enable_stride));
++    assert(context_stride == (context_stride & -context_stride));
++    qdev_prop_set_string(dev, "hart-config", hart_config);
++    qdev_prop_set_uint32(dev, "num-sources", num_sources);
++    qdev_prop_set_uint32(dev, "num-priorities", num_priorities);
++    qdev_prop_set_uint32(dev, "priority-base", priority_base);
++    qdev_prop_set_uint32(dev, "pending-base", pending_base);
++    qdev_prop_set_uint32(dev, "enable-base", enable_base);
++    qdev_prop_set_uint32(dev, "enable-stride", enable_stride);
++    qdev_prop_set_uint32(dev, "context-base", context_base);
++    qdev_prop_set_uint32(dev, "context-stride", context_stride);
++    qdev_prop_set_uint32(dev, "aperture-size", aperture_size);
 +    qdev_init_nofail(dev);
 +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
 +    return dev;
 +}
-diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
 new file mode 100644
-index 0000000..aaa2a58
+index 0000000..11a5a98
 --- /dev/null
-+++ b/include/hw/riscv/sifive_clint.h
-@@ -0,0 +1,50 @@
++++ b/include/hw/riscv/sifive_plic.h
+@@ -0,0 +1,85 @@
 +/*
-+ * SiFive CLINT (Core Local Interruptor) interface
++ * SiFive PLIC (Platform Level Interrupt Controller) interface
 + *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2017 SiFive, Inc.
++ *
++ * This provides a RISC-V PLIC device
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -325,36 +577,70 @@ index 0000000..aaa2a58
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_SIFIVE_CLINT_H
-+#define HW_SIFIVE_CLINT_H
++#ifndef HW_SIFIVE_PLIC_H
++#define HW_SIFIVE_PLIC_H
 +
-+#define TYPE_SIFIVE_CLINT "riscv.sifive.clint"
++#include "hw/irq.h"
 +
-+#define SIFIVE_CLINT(obj) \
-+    OBJECT_CHECK(SiFiveCLINTState, (obj), TYPE_SIFIVE_CLINT)
++#define TYPE_SIFIVE_PLIC "riscv.sifive.plic"
 +
-+typedef struct SiFiveCLINTState {
++#define SIFIVE_PLIC(obj) \
++    OBJECT_CHECK(SiFivePLICState, (obj), TYPE_SIFIVE_PLIC)
++
++typedef enum PLICMode {
++    PLICMode_U,
++    PLICMode_S,
++    PLICMode_H,
++    PLICMode_M
++} PLICMode;
++
++typedef struct PLICAddr {
++    uint32_t addrid;
++    uint32_t hartid;
++    PLICMode mode;
++} PLICAddr;
++
++typedef struct SiFivePLICState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
 +    MemoryRegion mmio;
-+    uint32_t num_harts;
-+    uint32_t sip_base;
-+    uint32_t timecmp_base;
-+    uint32_t time_base;
++    uint32_t num_addrs;
++    uint32_t bitfield_words;
++    PLICAddr *addr_config;
++    uint32_t *source_priority;
++    uint32_t *target_priority;
++    uint32_t *pending;
++    uint32_t *claimed;
++    uint32_t *enable;
++    QemuMutex lock;
++    qemu_irq *irqs;
++
++    /* config */
++    char *hart_config;
++    uint32_t num_sources;
++    uint32_t num_priorities;
++    uint32_t priority_base;
++    uint32_t pending_base;
++    uint32_t enable_base;
++    uint32_t enable_stride;
++    uint32_t context_base;
++    uint32_t context_stride;
 +    uint32_t aperture_size;
-+} SiFiveCLINTState;
++} SiFivePLICState;
 +
-+DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
-+    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base);
++void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq);
++void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq);
 +
-+enum {
-+    SIFIVE_SIP_BASE     = 0x0,
-+    SIFIVE_TIMECMP_BASE = 0x4000,
-+    SIFIVE_TIME_BASE    = 0xBFF8
-+};
++DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
++    uint32_t num_sources, uint32_t num_priorities,
++    uint32_t priority_base, uint32_t pending_base,
++    uint32_t enable_base, uint32_t enable_stride,
++    uint32_t context_base, uint32_t context_stride,
++    uint32_t aperture_size);
 +
 +#endif
++
 -- 
 2.7.0
