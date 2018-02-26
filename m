@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eqPrp-0005Ee-CT
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:59:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1eqQ26-0007pc-Cs
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 16:10:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eqPrl-0002hE-HM
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:59:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1eqPrl-0002eG-Az
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:59:21 -0500
-Date: Mon, 26 Feb 2018 13:59:16 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180226135916.3bcfd7c8@w520.home>
-In-Reply-To: <20180226083551.dingmvxfgqydw35a@sirius.home.kraxel.org>
-References: <20180219111458.25983-1-kraxel@redhat.com>
-	<20180219151649.13a197f9@w520.home>
-	<20180220102814.rtcvsrsdtdndcfez@sirius.home.kraxel.org>
-	<20180222092811.0a705b9e@w520.home>
-	<20180223090517.beti6t5grnxxhlwq@sirius.home.kraxel.org>
-	<20180226083551.dingmvxfgqydw35a@sirius.home.kraxel.org>
+	(envelope-from <bounces@canonical.com>) id 1eqQ22-0003VE-DC
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 16:10:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eqQ22-0003Tu-74
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 16:09:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eqQ20-0007JB-Sw
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 21:09:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D02E22E80C7
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 21:09:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] vfio: add display support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Feb 2018 20:56:27 -0000
+From: Thomas Huth <1432103@bugs.launchpad.net>
+Reply-To: Bug 1432103 <1432103@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150314042811.14702.61970.malonedeb@wampee.canonical.com>
+Message-Id: <151967858799.11417.5840538367762106400.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1432103] Re: error in x86 executable segment
+ permission check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, intel-gvt-dev@lists.freedesktop.org, qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>
+To: qemu-devel@nongnu.org
 
-On Mon, 26 Feb 2018 09:35:51 +0100
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays? Can you
+provide a binary to reproduce this issue?
 
-> On Fri, Feb 23, 2018 at 10:05:17AM +0100, Gerd Hoffmann wrote:
-> > > Hi Gerd,
-> > > 
-> > > It's a little bit concerning that the only way we can test the
-> > > region-based display support is with proprietary drivers that nobody
-> > > but NVIDIA has at this point.  Have you considered adding region-based
-> > > display support to the mdev sample tty driver?  I know it sounds
-> > > ridiculous for a serial device to have a display, but the vfio display
-> > > region support isn't really tied to the functionality of the base mdev
-> > > device.  We could have it simply display a static test pattern, just so
-> > > we can test the end to end code path without a dependency on a closed
-> > > vendor driver.  
-> > 
-> > Hmm, have to think about that.  Some way to change the display content
-> > would be nice as you can see whenever display updates are working then.  
-> 
-> https://www.kraxel.org/cgit/linux/log/?h=vfio-sample-display
-> 
-> Comes with host mdev driver and guest framebuffer driver.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Awesome!
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1432103
+
+Title:
+  error in x86 executable segment permission check
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  When the code segment register (%cs) selects an executable segment
+  with no read permission, mov instructions that read from the segment
+  via %cs prefix can still succeed without causing a general protection
+  error.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1432103/+subscriptions
