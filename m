@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eqFF3-0002Za-35
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:38:42 -0500
+	(envelope-from <drjones@redhat.com>) id 1eqFKJ-0004Jk-7O
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:44:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eqFEy-0005WL-6W
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:38:39 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37848 helo=mx1.redhat.com)
+	(envelope-from <drjones@redhat.com>) id 1eqFKG-0008Nv-5Q
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:44:07 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42760 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eqFEy-0005VM-0v
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:38:36 -0500
-References: <20180223132311.26555-1-marcandre.lureau@redhat.com>
-	<20180223132311.26555-5-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ed77e9f5-a6a7-b922-55a9-9c3013efce08@redhat.com>
-Date: Mon, 26 Feb 2018 10:38:32 +0100
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1eqFKG-0008Nn-0Y
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 04:44:04 -0500
+Date: Mon, 26 Feb 2018 10:43:45 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180226094345.l4diagfxcnurln55@kamzik.brq.redhat.com>
+References: <20180223215858.16987-1-wei@redhat.com>
+	<20180223215858.16987-5-wei@redhat.com>
+	<20180226093031.dtyixlskbawaw4tm@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180223132311.26555-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH 4/7] ovmf: link with Tcg2Pei module
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180226093031.dtyixlskbawaw4tm@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V5 4/4] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
+To: Wei Huang <wei@redhat.com>
+Cc: peter.maydell@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On 02/23/18 14:23, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> This module will initialize TPM device, measure reported FVs and BIOS
-> version.
->=20
-> CC: Laszlo Ersek <lersek@redhat.com>
-> CC: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Contributed-under: TianoCore Contribution Agreement 1.0
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  OvmfPkg/OvmfPkgX64.dsc | 7 +++++++
->  OvmfPkg/OvmfPkgX64.fdf | 1 +
->  2 files changed, 8 insertions(+)
->=20
-> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-> index b5cbe8430f..34a7c2778e 100644
-> --- a/OvmfPkg/OvmfPkgX64.dsc
-> +++ b/OvmfPkg/OvmfPkgX64.dsc
-> @@ -279,6 +279,8 @@
->    PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
->    QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
->  !if $(TPM2_ENABLE)
-> +  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-> +  HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCrypt=
-oRouterPei.inf
->    Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLib=
-DTpm.inf
->    Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTp=
-m.inf
->  !endif
-> @@ -647,6 +649,11 @@
-> =20
->  !if $(TPM2_ENABLE) =3D=3D TRUE
->    SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-> +  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
-> +    <LibraryClasses>
-> +      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1=
-.inf
-> +      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSh=
-a256.inf
-> +  }
->  !endif
-> =20
->  !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
-> index dc35d0a1f7..9558142a42 100644
-> --- a/OvmfPkg/OvmfPkgX64.fdf
-> +++ b/OvmfPkg/OvmfPkgX64.fdf
-> @@ -170,6 +170,7 @@ INF  MdeModulePkg/Universal/Variable/Pei/VariablePe=
-i.inf
->  !endif
->  !if $(TPM2_ENABLE) =3D=3D TRUE
->  INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-> +INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
->  !endif
-> =20
->  ######################################################################=
-##########
->=20
+On Mon, Feb 26, 2018 at 10:30:31AM +0100, Andrew Jones wrote:
+> On Fri, Feb 23, 2018 at 03:58:58PM -0600, Wei Huang wrote:
+> > +        /* aarch64 virt machine physical memory starts at 0x40000000, which
+> > +         * is also the kernel loader base address. It should be fine to
+> 
+> It's not the kernel base address.
+> 
+> > +         * allocate & modify the test memory 1MB away.
+> 
+> It's only 512K away - which is still probably fine, but you
+> said he found data once when reading every 4K after 1M, so
+> maybe not.
+>
 
-Would it be possible to drop SHA1 (include SHA256 only) by setting
-PcdTpm2HashMask to value 2? Or SHA1 required for some other reason? (If
-so please mention it in the commit message.)
+BTW, I'd just drop this comment altogether, rather than fix it.
+Or fix it, but put it in the header. The point of the header
+is to avoid these addresses spreading around too much. Putting
+them in comments doesn't help.
 
-Thanks
-Laszlo
+drew
