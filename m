@@ -1,15 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eqJtg-0005qE-0c
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 09:36:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eqJzx-00089Q-1a
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 09:43:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eqJtb-00052p-W5
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 09:36:56 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Mon, 26 Feb 2018 16:36:23 +0200
-Message-Id: <20180226143623.12200-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3] iotests: Test abnormally large size in
- compressed cluster descriptor
+	(envelope-from <pbonzini@redhat.com>) id 1eqJzt-00009k-NM
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 09:43:25 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51214 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eqJzt-00009W-Hr
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 09:43:21 -0500
+References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
+	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
+	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
+	<502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
+	<20180205181521.47232aa4@redhat.com>
+	<5155622d-cc49-d24c-7a7d-24ebb9ca2331@redhat.com>
+	<ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
+	<20180207130635.4033f8b8@redhat.com>
+	<8474af94-7bff-a7b5-e316-b8a0e332467e@intel.com>
+	<20180208105111.7a776513@redhat.com>
+	<53186984-2111-ed5e-0d47-65db12f22ea3@intel.com>
+	<20180208123018.5b3c9da7@redhat.com>
+	<ED26CBA2FAD1BF48A8719AEF02201E365144EAAB@SHSMSX103.ccr.corp.intel.com>
+	<20180226135549.34af5dbf@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bfe718ca-3251-a87d-00e7-60a1dfa2da82@redhat.com>
+Date: Mon, 26 Feb 2018 15:43:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180226135549.34af5dbf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,171 +40,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-L2 entries for compressed clusters have a field that indicates the
-number of sectors used to store the data in the image.
+On 26/02/2018 13:55, Igor Mammedov wrote:
+>>> So how about just adding a new option --mem-share to decide if that's a
+>>> private memory or shared memory? That seems much straightforward way
+> Above options are legacy (which we can't remove for compat reasons),
+> their replacement is 'memory-backend-file' backend which has all of
+> the above including 'share' property.
 
-That's however not the size of the compressed data itself, just the
-number of sectors where that data is located. The actual data size is
-usually not a multiple of the sector size, and therefore cannot be
-represented with this field.
+More precisely, we have added "-object memory-backend-file" to avoid
+proliferation of options related to memory.  Besides unifying the cases
+of 1 and >1 NUMA node, using -object also has the advantage of
+supporting memory hotplug.
 
-The way it works is that QEMU reads all the specified sectors and
-starts decompressing the data until there's enough to recover the
-original uncompressed cluster. If there are any bytes left that
-haven't been decompressed they are simply ignored.
+You wrote "I find adding a backend for nonnuma pc RAM is roundabout way"
+but basically the command line says "this VM has only one NUMA node,
+backed by this memory object" which is a precise description of what the
+VM memory looks like.
 
-One consequence of this is that even if the size field is larger than
-it needs to be QEMU can handle it just fine: it will read more data
-from disk but it will ignore the extra bytes.
+> So just add 'memdev' property to machine and reuse memory-backend-file
+> with it instead of duplicating functionality in the legacy code.
 
-This test creates an image with two compressed clusters that use 5
-sectors (2.5 KB) each, increases the size field to the maximum (8192
-sectors, or 4 MB) and verifies that the data can be read without
-problems.
+That would however also have a different RAMBlock id, effectively
+producing the same output as "-numa node,memdev=...".
 
-This test is important because while the decompressed data takes
-exactly one cluster, the maximum value allowed in the compressed size
-field is twice the cluster size. So although QEMU won't produce images
-with such large values we need to make sure that it can handle them.
+I think this should be solved at the libvirt level.  Libvirt should
+write in the migration XML cookie whether the VM is using -object or
+-mem-path to declare its memory, and newly-started VMs should always use
+-object.  This won't fix the problem for VMs that are already running,
+but it will fix it the next time they are started.
 
-Another effect of increasing the size field is that it can make
-it include data from the following host cluster(s). In this case
-'qemu-img check' will detect that the refcounts are not correct, and
-we'll need to rebuild them.
-
-Additionally, this patch also tests that decreasing the size corrupts
-the image since the original data can no longer be recovered. In this
-case QEMU returns an error when trying to read the compressed data,
-but 'qemu-img check' doesn't see anything wrong if the refcounts are
-consistent.
-
-One possible task for the future is to make 'qemu-img check' verify
-the sizes of the compressed clusters, by trying to decompress the data
-and checking that the size stored in the L2 entry is correct.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
-
-v3: Add TODO comment, as suggested by Eric.
-
-    Corrupt the length of the second compressed cluster as well so the
-    uncompressed data would span three host clusters.
-
-v2: We now have two scenarios where we make QEMU read data from the
-    next host cluster and from beyond the end of the image. This
-    version also runs qemu-img check on the corrupted image.
-
-    If the size field is too small, reading fails but qemu-img check
-    succeeds.
-
-    If the size field is too large, reading succeeds but qemu-img
-    check fails (this can be repaired, though).
-
----
- tests/qemu-iotests/122     | 45 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/122.out | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 76 insertions(+)
-
-diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-index 45b359c2ba..5b9593016c 100755
---- a/tests/qemu-iotests/122
-+++ b/tests/qemu-iotests/122
-@@ -130,6 +130,51 @@ $QEMU_IO -c "read -P 0    1024k 1022k" "$TEST_IMG" 2>&1 | _filter_qemu_io | _fil
- 
- 
- echo
-+echo "=== Corrupted size field in compressed cluster descriptor ==="
-+echo
-+# Create an empty image, fill half of it with data and compress it.
-+# The L2 entries of the two compressed clusters are located at
-+# 0x800000 and 0x800008, their original values are 0x4008000000a00000
-+# and 0x4008000000a00802 (5 sectors for compressed data each).
-+TEST_IMG="$TEST_IMG".1 _make_test_img 8M
-+$QEMU_IO -c "write -P 0x11 0 4M" "$TEST_IMG".1 2>&1 | _filter_qemu_io | _filter_testdir
-+$QEMU_IMG convert -c -O qcow2 -o cluster_size=2M "$TEST_IMG".1 "$TEST_IMG"
-+
-+# Reduce size of compressed data to 4 sectors: this corrupts the image.
-+poke_file "$TEST_IMG" $((0x800000)) "\x40\x06"
-+$QEMU_IO -c "read  -P 0x11 0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+
-+# 'qemu-img check' however doesn't see anything wrong because it
-+# doesn't try to decompress the data and the refcounts are consistent.
-+# TODO: update qemu-img so this can be detected
-+_check_test_img
-+
-+# Increase size of compressed data to the maximum (8192 sectors).
-+# This makes QEMU read more data (8192 sectors instead of 5, host
-+# addresses [0xa00000, 0xdfffff]), but the decompression algorithm
-+# stops once we have enough to restore the uncompressed cluster, so
-+# the rest of the data is ignored.
-+poke_file "$TEST_IMG" $((0x800000)) "\x7f\xfe"
-+# Do it also for the second compressed cluster (L2 entry at 0x800008).
-+# In this case the compressed data would span 3 host clusters
-+# (host addresses: [0xa00802, 0xe00801])
-+poke_file "$TEST_IMG" $((0x800008)) "\x7f\xfe"
-+
-+# Here the image is too small so we're asking QEMU to read beyond the
-+# end of the image.
-+$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+# But if we grow the image we won't be reading beyond its end anymore.
-+$QEMU_IO -c "write -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+
-+# The refcount data is however wrong because due to the increased size
-+# of the compressed data it now reaches the following host clusters.
-+# This can be repaired by qemu-img check.
-+_check_test_img -r all
-+$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+$QEMU_IO -c "read  -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+
-+echo
- echo "=== Full allocation with -S 0 ==="
- echo
- 
-diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
-index 47d8656db8..bdda75650f 100644
---- a/tests/qemu-iotests/122.out
-+++ b/tests/qemu-iotests/122.out
-@@ -99,6 +99,37 @@ read 1024/1024 bytes at offset 1047552
- read 1046528/1046528 bytes at offset 1048576
- 1022 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-+=== Corrupted size field in compressed cluster descriptor ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.1', fmt=IMGFMT size=8388608
-+wrote 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read failed: Input/output error
-+No errors were found on the image.
-+read 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 4194304/4194304 bytes at offset 4194304
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+ERROR cluster 6 refcount=1 reference=3
-+ERROR cluster 7 refcount=1 reference=2
-+Repairing cluster 6 refcount=1 reference=3
-+Repairing cluster 7 refcount=1 reference=2
-+Repairing OFLAG_COPIED data cluster: l2_entry=8000000000c00000 refcount=3
-+Repairing OFLAG_COPIED data cluster: l2_entry=8000000000e00000 refcount=2
-+The following inconsistencies were found and repaired:
-+
-+    0 leaked clusters
-+    4 corruptions
-+
-+Double checking the fixed image now...
-+No errors were found on the image.
-+read 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4194304/4194304 bytes at offset 4194304
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
- === Full allocation with -S 0 ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
--- 
-2.11.0
+Paolo
