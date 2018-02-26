@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR7j-0006Qh-T9
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:57 -0500
+	(envelope-from <mjc@sifive.com>) id 1eqR7m-0006TD-Di
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR7h-00057f-7m
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:55 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:34032)
+	(envelope-from <mjc@sifive.com>) id 1eqR7k-00058y-JB
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:58 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:43215)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR7g-00057X-Vi
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:53 -0500
-Received: by mail-pl0-x244.google.com with SMTP id u13so10139987plq.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:19:52 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR7k-00058X-Aw
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:56 -0500
+Received: by mail-pl0-x243.google.com with SMTP id f23so10126208plr.10
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:19:56 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Tue, 27 Feb 2018 11:17:48 +1300
-Message-Id: <1519683480-33201-12-git-send-email-mjc@sifive.com>
+Date: Tue, 27 Feb 2018 11:17:49 +1300
+Message-Id: <1519683480-33201-13-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519683480-33201-1-git-send-email-mjc@sifive.com>
 References: <1519683480-33201-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v7 11/23] Add symbol table callback interface
- to load_elf
+Subject: [Qemu-devel] [PATCH v7 12/23] RISC-V HTIF Console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,173 +28,353 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-The RISC-V HTIF (Host Target Interface) console device requires access
-to the symbol table to locate the 'tohost' and 'fromhost' symbols.
+HTIF (Host Target Interface) provides console emulation for QEMU. HTIF
+allows identical copies of BBL (Berkeley Boot Loader) and linux to run
+on both Spike and QEMU. BBL provides HTIF console access via the
+SBI (Supervisor Binary Interface) and the linux kernel SBI console.
+
+The HTIT chardev implements the pre qom legacy interface consistent
+with the 16550a UART in 'hw/char/serial.c'.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/core/loader.c     | 18 ++++++++++++++++--
- include/hw/elf_ops.h | 34 +++++++++++++++++++++-------------
- include/hw/loader.h  | 17 ++++++++++++++++-
- 3 files changed, 53 insertions(+), 16 deletions(-)
+ hw/riscv/riscv_htif.c         | 258 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/riscv_htif.h |  61 ++++++++++
+ 2 files changed, 319 insertions(+)
+ create mode 100644 hw/riscv/riscv_htif.c
+ create mode 100644 include/hw/riscv/riscv_htif.h
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 91669d6..80b69ea 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -450,6 +450,20 @@ int load_elf_ram(const char *filename,
-                  int clear_lsb, int data_swab, AddressSpace *as,
-                  bool load_rom)
- {
-+    return load_elf_ram_sym(filename, translate_fn, translate_opaque,
-+                            pentry, lowaddr, highaddr, big_endian,
-+                            elf_machine, clear_lsb, data_swab, as,
-+                            load_rom, NULL);
+diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+new file mode 100644
+index 0000000..3e17f30
+--- /dev/null
++++ b/hw/riscv/riscv_htif.c
+@@ -0,0 +1,258 @@
++/*
++ * QEMU RISC-V Host Target Interface (HTIF) Emulation
++ *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017-2018 SiFive, Inc.
++ *
++ * This provides HTIF device emulation for QEMU. At the moment this allows
++ * for identical copies of bbl/linux to run on both spike and QEMU.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/log.h"
++#include "hw/sysbus.h"
++#include "hw/char/serial.h"
++#include "chardev/char.h"
++#include "chardev/char-fe.h"
++#include "hw/riscv/riscv_htif.h"
++#include "qemu/timer.h"
++#include "exec/address-spaces.h"
++#include "qemu/error-report.h"
++
++#define RISCV_DEBUG_HTIF 0
++#define HTIF_DEBUG(fmt, ...)                                                   \
++    do {                                                                       \
++        if (RISCV_DEBUG_HTIF) {                                                \
++            qemu_log_mask(LOG_TRACE, "%s: " fmt "\n", __func__, ##__VA_ARGS__);\
++        }                                                                      \
++    } while (0)
++
++static uint64_t fromhost_addr, tohost_addr;
++
++void htif_symbol_callback(const char *st_name, int st_info, uint64_t st_value,
++    uint64_t st_size)
++{
++    if (strcmp("fromhost", st_name) == 0) {
++        fromhost_addr = st_value;
++        if (st_size != 8) {
++            error_report("HTIF fromhost must be 8 bytes");
++            exit(1);
++        }
++    } else if (strcmp("tohost", st_name) == 0) {
++        tohost_addr = st_value;
++        if (st_size != 8) {
++            error_report("HTIF tohost must be 8 bytes");
++            exit(1);
++        }
++    }
 +}
 +
-+/* return < 0 if error, otherwise the number of bytes loaded in memory */
-+int load_elf_ram_sym(const char *filename,
-+                     uint64_t (*translate_fn)(void *, uint64_t),
-+                     void *translate_opaque, uint64_t *pentry,
-+                     uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
-+                     int elf_machine, int clear_lsb, int data_swab,
-+                     AddressSpace *as, bool load_rom, symbol_fn_t sym_cb)
-+{
-     int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
-     uint8_t e_ident[EI_NIDENT];
- 
-@@ -488,11 +502,11 @@ int load_elf_ram(const char *filename,
-     if (e_ident[EI_CLASS] == ELFCLASS64) {
-         ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
-                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
--                         data_swab, as, load_rom);
-+                         data_swab, as, load_rom, sym_cb);
-     } else {
-         ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
-                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
--                         data_swab, as, load_rom);
-+                         data_swab, as, load_rom, sym_cb);
-     }
- 
-  fail:
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index d192e7e..b6e19e3 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -105,7 +105,7 @@ static int glue(symcmp, SZ)(const void *s0, const void *s1)
- }
- 
- static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
--                                  int clear_lsb)
-+                                  int clear_lsb, symbol_fn_t sym_cb)
- {
-     struct elf_shdr *symtab, *strtab, *shdr_table = NULL;
-     struct elf_sym *syms = NULL;
-@@ -133,10 +133,26 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
- 
-     nsyms = symtab->sh_size / sizeof(struct elf_sym);
- 
-+    /* String table */
-+    if (symtab->sh_link >= ehdr->e_shnum) {
-+        goto fail;
-+    }
-+    strtab = &shdr_table[symtab->sh_link];
-+
-+    str = load_at(fd, strtab->sh_offset, strtab->sh_size);
-+    if (!str) {
-+        goto fail;
-+    }
-+
-     i = 0;
-     while (i < nsyms) {
--        if (must_swab)
-+        if (must_swab) {
-             glue(bswap_sym, SZ)(&syms[i]);
-+        }
-+        if (sym_cb) {
-+            sym_cb(str + syms[i].st_name, syms[i].st_info,
-+                   syms[i].st_value, syms[i].st_size);
-+        }
-         /* We are only interested in function symbols.
-            Throw everything else away.  */
-         if (syms[i].st_shndx == SHN_UNDEF ||
-@@ -163,15 +179,6 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-         }
-     }
- 
--    /* String table */
--    if (symtab->sh_link >= ehdr->e_shnum)
--        goto fail;
--    strtab = &shdr_table[symtab->sh_link];
--
--    str = load_at(fd, strtab->sh_offset, strtab->sh_size);
--    if (!str)
--        goto fail;
--
-     /* Commit */
-     s = g_malloc0(sizeof(*s));
-     s->lookup_symbol = glue(lookup_symbol, SZ);
-@@ -264,7 +271,8 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-                               int must_swab, uint64_t *pentry,
-                               uint64_t *lowaddr, uint64_t *highaddr,
-                               int elf_machine, int clear_lsb, int data_swab,
--                              AddressSpace *as, bool load_rom)
-+                              AddressSpace *as, bool load_rom,
-+                              symbol_fn_t sym_cb)
- {
-     struct elfhdr ehdr;
-     struct elf_phdr *phdr = NULL, *ph;
-@@ -329,7 +337,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-     if (pentry)
-    	*pentry = (uint64_t)(elf_sword)ehdr.e_entry;
- 
--    glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb);
-+    glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb, sym_cb);
- 
-     size = ehdr.e_phnum * sizeof(phdr[0]);
-     if (lseek(fd, ehdr.e_phoff, SEEK_SET) != ehdr.e_phoff) {
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index 5edbe02..7b05e8b 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -64,7 +64,7 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
- #define ELF_LOAD_WRONG_ENDIAN -4
- const char *load_elf_strerror(int error);
- 
--/** load_elf_ram:
-+/** load_elf_ram_sym:
-  * @filename: Path of ELF file
-  * @translate_fn: optional function to translate load addresses
-  * @translate_opaque: opaque data passed to @translate_fn
-@@ -81,6 +81,7 @@ const char *load_elf_strerror(int error);
-  * @as: The AddressSpace to load the ELF to. The value of address_space_memory
-  *      is used if nothing is supplied here.
-  * @load_rom : Load ELF binary as ROM
-+ * @sym_cb: Callback function for symbol table entries
-  *
-  * Load an ELF file's contents to the emulated system's address space.
-  * Clients may optionally specify a callback to perform address
-@@ -93,6 +94,20 @@ const char *load_elf_strerror(int error);
-  * If @elf_machine is EM_NONE then the machine type will be read from the
-  * ELF header and no checks will be carried out against the machine type.
-  */
-+typedef void (*symbol_fn_t)(const char *st_name, int st_info,
-+                            uint64_t st_value, uint64_t st_size);
-+
-+int load_elf_ram_sym(const char *filename,
-+                     uint64_t (*translate_fn)(void *, uint64_t),
-+                     void *translate_opaque, uint64_t *pentry,
-+                     uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
-+                     int elf_machine, int clear_lsb, int data_swab,
-+                     AddressSpace *as, bool load_rom, symbol_fn_t sym_cb);
-+
-+/** load_elf_ram:
-+ * Same as load_elf_ram_sym(), but doesn't allow the caller to specify a
-+ * symbol callback function
++/*
++ * Called by the char dev to see if HTIF is ready to accept input.
 + */
- int load_elf_ram(const char *filename,
-                  uint64_t (*translate_fn)(void *, uint64_t),
-                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
++static int htif_can_recv(void *opaque)
++{
++    return 1;
++}
++
++/*
++ * Called by the char dev to supply input to HTIF console.
++ * We assume that we will receive one character at a time.
++ */
++static void htif_recv(void *opaque, const uint8_t *buf, int size)
++{
++    HTIFState *htifstate = opaque;
++
++    if (size != 1) {
++        return;
++    }
++
++    /* TODO - we need to check whether mfromhost is zero which indicates
++              the device is ready to receive. The current implementation
++              will drop characters */
++
++    uint64_t val_written = htifstate->pending_read;
++    uint64_t resp = 0x100 | *buf;
++
++    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
++}
++
++/*
++ * Called by the char dev to supply special events to the HTIF console.
++ * Not used for HTIF.
++ */
++static void htif_event(void *opaque, int event)
++{
++
++}
++
++static int htif_be_change(void *opaque)
++{
++    HTIFState *s = opaque;
++
++    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
++        htif_be_change, s, NULL, true);
++
++    return 0;
++}
++
++static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
++{
++    uint8_t device = val_written >> 56;
++    uint8_t cmd = val_written >> 48;
++    uint64_t payload = val_written & 0xFFFFFFFFFFFFULL;
++    int resp = 0;
++
++    HTIF_DEBUG("mtohost write: device: %d cmd: %d what: %02" PRIx64
++        " -payload: %016" PRIx64 "\n", device, cmd, payload & 0xFF, payload);
++
++    /*
++     * Currently, there is a fixed mapping of devices:
++     * 0: riscv-tests Pass/Fail Reporting Only (no syscall proxy)
++     * 1: Console
++     */
++    if (unlikely(device == 0x0)) {
++        /* frontend syscall handler, shutdown and exit code support */
++        if (cmd == 0x0) {
++            if (payload & 0x1) {
++                /* exit code */
++                int exit_code = payload >> 1;
++                exit(exit_code);
++            } else {
++                qemu_log_mask(LOG_UNIMP, "pk syscall proxy not supported\n");
++            }
++        } else {
++            qemu_log("HTIF device %d: unknown command\n", device);
++        }
++    } else if (likely(device == 0x1)) {
++        /* HTIF Console */
++        if (cmd == 0x0) {
++            /* this should be a queue, but not yet implemented as such */
++            htifstate->pending_read = val_written;
++            htifstate->env->mtohost = 0; /* clear to indicate we read */
++            return;
++        } else if (cmd == 0x1) {
++            qemu_chr_fe_write(&htifstate->chr, (uint8_t *)&payload, 1);
++            resp = 0x100 | (uint8_t)payload;
++        } else {
++            qemu_log("HTIF device %d: unknown command\n", device);
++        }
++    } else {
++        qemu_log("HTIF unknown device or command\n");
++        HTIF_DEBUG("device: %d cmd: %d what: %02" PRIx64
++            " payload: %016" PRIx64, device, cmd, payload & 0xFF, payload);
++    }
++    /*
++     * - latest bbl does not set fromhost to 0 if there is a value in tohost
++     * - with this code enabled, qemu hangs waiting for fromhost to go to 0
++     * - with this code disabled, qemu works with bbl priv v1.9.1 and v1.10
++     * - HTIF needs protocol documentation and a more complete state machine
++
++        while (!htifstate->fromhost_inprogress &&
++            htifstate->env->mfromhost != 0x0) {
++        }
++    */
++    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
++    htifstate->env->mtohost = 0; /* clear to indicate we read */
++}
++
++#define TOHOST_OFFSET1 (htifstate->tohost_offset)
++#define TOHOST_OFFSET2 (htifstate->tohost_offset + 4)
++#define FROMHOST_OFFSET1 (htifstate->fromhost_offset)
++#define FROMHOST_OFFSET2 (htifstate->fromhost_offset + 4)
++
++/* CPU wants to read an HTIF register */
++static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned size)
++{
++    HTIFState *htifstate = opaque;
++    if (addr == TOHOST_OFFSET1) {
++        return htifstate->env->mtohost & 0xFFFFFFFF;
++    } else if (addr == TOHOST_OFFSET2) {
++        return (htifstate->env->mtohost >> 32) & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET1) {
++        return htifstate->env->mfromhost & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET2) {
++        return (htifstate->env->mfromhost >> 32) & 0xFFFFFFFF;
++    } else {
++        qemu_log("Invalid htif read: address %016" PRIx64 "\n",
++            (uint64_t)addr);
++        return 0;
++    }
++}
++
++/* CPU wrote to an HTIF register */
++static void htif_mm_write(void *opaque, hwaddr addr,
++                            uint64_t value, unsigned size)
++{
++    HTIFState *htifstate = opaque;
++    if (addr == TOHOST_OFFSET1) {
++        if (htifstate->env->mtohost == 0x0) {
++            htifstate->allow_tohost = 1;
++            htifstate->env->mtohost = value & 0xFFFFFFFF;
++        } else {
++            htifstate->allow_tohost = 0;
++        }
++    } else if (addr == TOHOST_OFFSET2) {
++        if (htifstate->allow_tohost) {
++            htifstate->env->mtohost |= value << 32;
++            htif_handle_tohost_write(htifstate, htifstate->env->mtohost);
++        }
++    } else if (addr == FROMHOST_OFFSET1) {
++        htifstate->fromhost_inprogress = 1;
++        htifstate->env->mfromhost = value & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET2) {
++        htifstate->env->mfromhost |= value << 32;
++        htifstate->fromhost_inprogress = 0;
++    } else {
++        qemu_log("Invalid htif write: address %016" PRIx64 "\n",
++            (uint64_t)addr);
++    }
++}
++
++static const MemoryRegionOps htif_mm_ops = {
++    .read = htif_mm_read,
++    .write = htif_mm_write,
++};
++
++HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
++    CPURISCVState *env, Chardev *chr)
++{
++    uint64_t base = MIN(tohost_addr, fromhost_addr);
++    uint64_t size = MAX(tohost_addr + 8, fromhost_addr + 8) - base;
++    uint64_t tohost_offset = tohost_addr - base;
++    uint64_t fromhost_offset = fromhost_addr - base;
++
++    HTIFState *s = g_malloc0(sizeof(HTIFState));
++    s->address_space = address_space;
++    s->main_mem = main_mem;
++    s->main_mem_ram_ptr = memory_region_get_ram_ptr(main_mem);
++    s->env = env;
++    s->tohost_offset = tohost_offset;
++    s->fromhost_offset = fromhost_offset;
++    s->pending_read = 0;
++    s->allow_tohost = 0;
++    s->fromhost_inprogress = 0;
++    qemu_chr_fe_init(&s->chr, chr, &error_abort);
++    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
++        htif_be_change, s, NULL, true);
++    if (base) {
++        memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
++                            TYPE_HTIF_UART, size);
++        memory_region_add_subregion(address_space, base, &s->mmio);
++    }
++
++    return s;
++}
+diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/riscv/riscv_htif.h
+new file mode 100644
+index 0000000..fb5f881
+--- /dev/null
++++ b/include/hw/riscv/riscv_htif.h
+@@ -0,0 +1,61 @@
++/*
++ * QEMU RISCV Host Target Interface (HTIF) Emulation
++ *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017-2018 SiFive, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef HW_RISCV_HTIF_H
++#define HW_RISCV_HTIF_H
++
++#include "hw/hw.h"
++#include "chardev/char.h"
++#include "chardev/char-fe.h"
++#include "sysemu/sysemu.h"
++#include "exec/memory.h"
++#include "target/riscv/cpu.h"
++
++#define TYPE_HTIF_UART "riscv.htif.uart"
++
++typedef struct HTIFState {
++    int allow_tohost;
++    int fromhost_inprogress;
++
++    hwaddr tohost_offset;
++    hwaddr fromhost_offset;
++    uint64_t tohost_size;
++    uint64_t fromhost_size;
++    MemoryRegion mmio;
++    MemoryRegion *address_space;
++    MemoryRegion *main_mem;
++    void *main_mem_ram_ptr;
++
++    CPURISCVState *env;
++    CharBackend chr;
++    uint64_t pending_read;
++} HTIFState;
++
++extern const VMStateDescription vmstate_htif;
++extern const MemoryRegionOps htif_io_ops;
++
++/* HTIF symbol callback */
++void htif_symbol_callback(const char *st_name, int st_info, uint64_t st_value,
++    uint64_t st_size);
++
++/* legacy pre qom */
++HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
++    CPURISCVState *env, Chardev *chr);
++
++#endif
 -- 
 2.7.0
